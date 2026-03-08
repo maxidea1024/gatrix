@@ -56,7 +56,10 @@ class ServiceAccountService {
       environmentId?: string | null;
     }
   ): Promise<ServiceAccount> {
-    const response = await api.put(`${projectApiPath}/service-accounts/${id}`, data);
+    const response = await api.put(
+      `${projectApiPath}/service-accounts/${id}`,
+      data
+    );
     return response.data;
   }
 
@@ -69,12 +72,21 @@ class ServiceAccountService {
     accountId: number,
     data: { name: string; description?: string; expiresAt?: string }
   ): Promise<ServiceAccountToken & { secret: string }> {
-    const response = await api.post(`${projectApiPath}/service-accounts/${accountId}/tokens`, data);
+    const response = await api.post(
+      `${projectApiPath}/service-accounts/${accountId}/tokens`,
+      data
+    );
     return response.data;
   }
 
-  async deleteToken(projectApiPath: string, accountId: number, tokenId: number): Promise<void> {
-    await api.delete(`${projectApiPath}/service-accounts/${accountId}/tokens/${tokenId}`);
+  async deleteToken(
+    projectApiPath: string,
+    accountId: number,
+    tokenId: number
+  ): Promise<void> {
+    await api.delete(
+      `${projectApiPath}/service-accounts/${accountId}/tokens/${tokenId}`
+    );
   }
 }
 

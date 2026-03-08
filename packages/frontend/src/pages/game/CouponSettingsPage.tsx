@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  useCallback,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
@@ -72,7 +78,10 @@ import {
   CouponType,
   IssuedCouponCode,
 } from '@/services/couponService';
-import { generateExampleCouponCode, CodePattern } from '@/utils/couponCodeGenerator';
+import {
+  generateExampleCouponCode,
+  CodePattern,
+} from '@/utils/couponCodeGenerator';
 import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
 import { useGameWorld } from '@/contexts/GameWorldContext';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -90,12 +99,16 @@ import {
   formatDateTimeDetailed,
 } from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
-import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '@/components/common/ColumnSettingsDialog';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import SDKGuideDrawer from '@/components/coupons/SDKGuideDrawer';
 import RewardSelector from '@/components/game/RewardSelector';
 import RewardDisplay from '@/components/game/RewardDisplay';
-import TargetSettingsGroup, { ChannelSubchannelData } from '@/components/game/TargetSettingsGroup';
+import TargetSettingsGroup, {
+  ChannelSubchannelData,
+} from '@/components/game/TargetSettingsGroup';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Dayjs } from 'dayjs';
 
@@ -163,7 +176,8 @@ const CouponSettingsPage: React.FC = () => {
   const [codesTotal, setCodesTotal] = useState(0);
   const [codesPage, setCodesPage] = useState(0);
   const [codesRowsPerPage, setCodesRowsPerPage] = useState(20);
-  const [codesExportMenuAnchor, setCodesExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const [codesExportMenuAnchor, setCodesExportMenuAnchor] =
+    useState<null | HTMLElement>(null);
   const [codesStats, setCodesStats] = useState<{
     issued: number;
     used: number;
@@ -187,7 +201,8 @@ const CouponSettingsPage: React.FC = () => {
   const handleCopyCode = async (code: string) => {
     copyToClipboardWithNotification(
       code,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -195,7 +210,8 @@ const CouponSettingsPage: React.FC = () => {
   const handleCopyName = async (name: string) => {
     copyToClipboardWithNotification(
       name,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -228,7 +244,10 @@ const CouponSettingsPage: React.FC = () => {
 
       try {
         const now = new Date();
-        const dateTimeStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        const dateTimeStr = now
+          .toISOString()
+          .replace(/[:.]/g, '-')
+          .slice(0, 19);
         const allCodes: IssuedCouponCode[] = [];
         const chunkSize = 1000;
         let offset = 0;
@@ -296,7 +315,10 @@ const CouponSettingsPage: React.FC = () => {
             c.usedAt ? formatDateTime(c.usedAt) : '-',
           ]);
 
-          const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+          const csvContent = [
+            headers.join(','),
+            ...rows.map((r) => r.join(',')),
+          ].join('\n');
 
           blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
           filename = `issued-codes-${codesSetting.code || 'export'}-${dateTimeStr}.csv`;
@@ -365,18 +387,29 @@ const CouponSettingsPage: React.FC = () => {
         } else {
           if (shouldShowProgress) {
             setExportingCodes(false);
-            setExportError(error.message || t('coupons.couponSettings.exportError'));
+            setExportError(
+              error.message || t('coupons.couponSettings.exportError')
+            );
           } else {
-            enqueueSnackbar(parseApiErrorMessage(error, 'coupons.couponSettings.exportError'), {
-              variant: 'error',
-            });
+            enqueueSnackbar(
+              parseApiErrorMessage(error, 'coupons.couponSettings.exportError'),
+              {
+                variant: 'error',
+              }
+            );
           }
         }
       } finally {
         exportAbortControllerRef.current = null;
       }
     },
-    [codesSetting, debouncedCodesSearch, codesStats?.issued || 0, t, enqueueSnackbar]
+    [
+      codesSetting,
+      debouncedCodesSearch,
+      codesStats?.issued || 0,
+      t,
+      enqueueSnackbar,
+    ]
   );
 
   const handleOpenCodes = (it: CouponSetting) => {
@@ -420,7 +453,8 @@ const CouponSettingsPage: React.FC = () => {
   const [fullEditingData, setFullEditingData] = useState<any>(null);
   const [rewardMode, setRewardMode] = useState<'direct' | 'template'>('direct');
   // Track if description was manually edited by user
-  const [isDescriptionManuallyEdited, setIsDescriptionManuallyEdited] = useState(false);
+  const [isDescriptionManuallyEdited, setIsDescriptionManuallyEdited] =
+    useState(false);
   // Collapsible group states (target settings is collapsed by default)
   const [expandedGroups, setExpandedGroups] = useState({
     basicInfo: true,
@@ -448,7 +482,8 @@ const CouponSettingsPage: React.FC = () => {
       status: form.status,
       rewardMode,
       rewardData: rewardMode === 'direct' ? form.rewardData : null,
-      rewardTemplateId: rewardMode === 'template' ? form.rewardTemplateId : null,
+      rewardTemplateId:
+        rewardMode === 'template' ? form.rewardTemplateId : null,
       rewardEmailTitle: form.rewardEmailTitle || '',
       rewardEmailBody: form.rewardEmailBody || '',
       targetPlatforms: [...(form.targetPlatforms || [])].sort(),
@@ -485,7 +520,9 @@ const CouponSettingsPage: React.FC = () => {
       expiresAt: parseUTCForPicker(fullEditingData.expiresAt)?.toISOString(),
       status: fullEditingData.status,
       rewardMode: fullEditingData.rewardTemplateId ? 'template' : 'direct',
-      rewardData: fullEditingData.rewardTemplateId ? null : fullEditingData.rewardData || [],
+      rewardData: fullEditingData.rewardTemplateId
+        ? null
+        : fullEditingData.rewardData || [],
       rewardTemplateId: fullEditingData.rewardTemplateId || null,
       rewardEmailTitle: fullEditingData.rewardEmailTitle || '',
       rewardEmailBody: fullEditingData.rewardEmailBody || '',
@@ -498,7 +535,8 @@ const CouponSettingsPage: React.FC = () => {
         targetSubchannels.forEach((subchannelKey: string) => {
           const [channel, subchannel] = subchannelKey.split(':');
           if (channel && subchannel) {
-            if (!subchannelsByChannel[channel]) subchannelsByChannel[channel] = [];
+            if (!subchannelsByChannel[channel])
+              subchannelsByChannel[channel] = [];
             subchannelsByChannel[channel].push(subchannel);
           }
         });
@@ -509,7 +547,8 @@ const CouponSettingsPage: React.FC = () => {
           }))
           .sort((a: any, b: any) => a.channel.localeCompare(b.channel));
       })(),
-      targetChannelSubchannelsInverted: !!fullEditingData.targetChannelsInverted,
+      targetChannelSubchannelsInverted:
+        !!fullEditingData.targetChannelsInverted,
       targetWorlds: [...(fullEditingData.targetWorlds || [])].sort(),
       targetWorldsInverted: !!fullEditingData.targetWorldsInverted,
       targetUserIds: (fullEditingData.targetUsers || [])
@@ -529,25 +568,36 @@ const CouponSettingsPage: React.FC = () => {
 
   // Memoize code pattern example to prevent unnecessary re-generation
   const codePatternExample = useMemo(() => {
-    return generateExampleCouponCode((form.codePattern || 'ALPHANUMERIC_8') as CodePattern);
+    return generateExampleCouponCode(
+      (form.codePattern || 'ALPHANUMERIC_8') as CodePattern
+    );
   }, [form.codePattern]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (channelTableRef.current && !channelTableRef.current.contains(event.target as Node)) {
+      if (
+        channelTableRef.current &&
+        !channelTableRef.current.contains(event.target as Node)
+      ) {
         setForm((s: any) => ({
           ...s,
           _showChannelTable: false,
         }));
       }
-      if (platformTableRef.current && !platformTableRef.current.contains(event.target as Node)) {
+      if (
+        platformTableRef.current &&
+        !platformTableRef.current.contains(event.target as Node)
+      ) {
         setForm((s: any) => ({
           ...s,
           _showPlatformTable: false,
         }));
       }
-      if (worldTableRef.current && !worldTableRef.current.contains(event.target as Node)) {
+      if (
+        worldTableRef.current &&
+        !worldTableRef.current.contains(event.target as Node)
+      ) {
         setForm((s: any) => ({
           ...s,
           _showWorldTable: false,
@@ -555,7 +605,11 @@ const CouponSettingsPage: React.FC = () => {
       }
     };
 
-    if (form._showChannelTable || form._showPlatformTable || form._showWorldTable) {
+    if (
+      form._showChannelTable ||
+      form._showPlatformTable ||
+      form._showWorldTable
+    ) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
@@ -635,7 +689,8 @@ const CouponSettingsPage: React.FC = () => {
     { id: 'description', labelKey: 'common.description', visible: true },
   ];
 
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLElement | null>(null);
 
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
     const saved = localStorage.getItem('couponSettingsColumns');
@@ -656,7 +711,10 @@ const CouponSettingsPage: React.FC = () => {
     return defaultColumns;
   });
 
-  const visibleColumns = useMemo(() => columns.filter((col) => col.visible), [columns]);
+  const visibleColumns = useMemo(
+    () => columns.filter((col) => col.visible),
+    [columns]
+  );
 
   // Sorting state with localStorage persistence
   const [orderBy, setOrderBy] = useState<string>(() => {
@@ -697,10 +755,14 @@ const CouponSettingsPage: React.FC = () => {
         case 'usageRate': {
           // Calculate usage rate percentage for sorting
           if (it.type === 'SPECIAL') {
-            return it.maxTotalUses ? ((it.usedCount || 0) / it.maxTotalUses) * 100 : 0;
+            return it.maxTotalUses
+              ? ((it.usedCount || 0) / it.maxTotalUses) * 100
+              : 0;
           } else {
             const totalIssued = it.generatedCount || it.issuedCount || 0;
-            return totalIssued > 0 ? ((it.usedCount || 0) / totalIssued) * 100 : 0;
+            return totalIssued > 0
+              ? ((it.usedCount || 0) / totalIssued) * 100
+              : 0;
           }
         }
         default:
@@ -755,7 +817,10 @@ const CouponSettingsPage: React.FC = () => {
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem('couponSettingsColumns', JSON.stringify(defaultColumns));
+    localStorage.setItem(
+      'couponSettingsColumns',
+      JSON.stringify(defaultColumns)
+    );
   };
 
   const handleFilterAdd = (filter: ActiveFilter) => {
@@ -773,7 +838,9 @@ const CouponSettingsPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f));
+    const newFilters = activeFilters.map((f) =>
+      f.key === filterKey ? { ...f, value } : f
+    );
     setActiveFilters(newFilters);
     localStorage.setItem('couponSettingsFilters', JSON.stringify(newFilters));
     setPage(0);
@@ -790,7 +857,9 @@ const CouponSettingsPage: React.FC = () => {
   };
 
   const handleSelectOne = (id: string, checked: boolean) => {
-    setSelectedIds((prev) => (checked ? [...prev, id] : prev.filter((x) => x !== id)));
+    setSelectedIds((prev) =>
+      checked ? [...prev, id] : prev.filter((x) => x !== id)
+    );
   };
 
   const load = useMemo(
@@ -810,7 +879,13 @@ const CouponSettingsPage: React.FC = () => {
         setLoading(false);
       }
     },
-    [page, rowsPerPage, debouncedSearchTerm, typeFilterString, statusFilterString]
+    [
+      page,
+      rowsPerPage,
+      debouncedSearchTerm,
+      typeFilterString,
+      statusFilterString,
+    ]
   );
 
   useEffect(() => {
@@ -820,7 +895,9 @@ const CouponSettingsPage: React.FC = () => {
   // Auto-refresh for items with IN_PROGRESS generation status (partial update only)
   useEffect(() => {
     const inProgressItems = items.filter(
-      (it) => it.generationStatus === 'IN_PROGRESS' || it.generationStatus === 'PENDING'
+      (it) =>
+        it.generationStatus === 'IN_PROGRESS' ||
+        it.generationStatus === 'PENDING'
     );
     if (inProgressItems.length === 0) return;
 
@@ -853,11 +930,15 @@ const CouponSettingsPage: React.FC = () => {
     if (!codesSetting) return;
     setCodesLoading(true);
     try {
-      const res = await couponService.getIssuedCodes(projectApiPath, codesSetting.id, {
-        page: codesPage + 1,
-        limit: codesRowsPerPage,
-        search: debouncedCodesSearch || undefined,
-      });
+      const res = await couponService.getIssuedCodes(
+        projectApiPath,
+        codesSetting.id,
+        {
+          page: codesPage + 1,
+          limit: codesRowsPerPage,
+          search: debouncedCodesSearch || undefined,
+        }
+      );
       const data: any = (res as any).data ? (res as any).data : res;
       setCodesItems(data.codes || []);
       setCodesTotal(data.total || 0);
@@ -875,7 +956,10 @@ const CouponSettingsPage: React.FC = () => {
     console.log('[loadCodesStats] Loading stats for:', codesSetting.id);
     setCodesStatsLoading(true);
     try {
-      const stats = await couponService.getIssuedCodesStats(projectApiPath, codesSetting.id);
+      const stats = await couponService.getIssuedCodesStats(
+        projectApiPath,
+        codesSetting.id
+      );
       console.log('[loadCodesStats] Loaded stats:', stats);
       setCodesStats(stats);
     } catch (error) {
@@ -890,7 +974,10 @@ const CouponSettingsPage: React.FC = () => {
   // Load codes and stats when drawer opens
   useEffect(() => {
     if (openCodes && codesSetting) {
-      console.log('[CouponSettingsPage] Loading codes and stats for:', codesSetting.id);
+      console.log(
+        '[CouponSettingsPage] Loading codes and stats for:',
+        codesSetting.id
+      );
       loadCodes();
       loadCodesStats();
     }
@@ -901,7 +988,14 @@ const CouponSettingsPage: React.FC = () => {
     if (openCodes && codesSetting) {
       loadCodes();
     }
-  }, [openCodes, codesSetting, codesPage, codesRowsPerPage, debouncedCodesSearch, loadCodes]);
+  }, [
+    openCodes,
+    codesSetting,
+    codesPage,
+    codesRowsPerPage,
+    debouncedCodesSearch,
+    loadCodes,
+  ]);
 
   const handleSave = async () => {
     // Basic validation
@@ -924,20 +1018,29 @@ const CouponSettingsPage: React.FC = () => {
 
     // Validate reward email fields
     if (!form.rewardEmailTitle || form.rewardEmailTitle.trim() === '') {
-      enqueueSnackbar(t('coupons.couponSettings.form.rewardEmailTitleRequired'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        t('coupons.couponSettings.form.rewardEmailTitleRequired'),
+        {
+          variant: 'error',
+        }
+      );
       return;
     }
     if (!form.rewardEmailBody || form.rewardEmailBody.trim() === '') {
-      enqueueSnackbar(t('coupons.couponSettings.form.rewardEmailBodyRequired'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        t('coupons.couponSettings.form.rewardEmailBodyRequired'),
+        {
+          variant: 'error',
+        }
+      );
       return;
     }
 
     // Validate that either rewardData or rewardTemplateId is provided
-    if (rewardMode === 'direct' && (!form.rewardData || form.rewardData.length === 0)) {
+    if (
+      rewardMode === 'direct' &&
+      (!form.rewardData || form.rewardData.length === 0)
+    ) {
       enqueueSnackbar(t('surveys.atLeastOneReward'), { variant: 'error' });
       return;
     }
@@ -950,7 +1053,10 @@ const CouponSettingsPage: React.FC = () => {
     // targetSubchannels format: "channel:subchannel" (e.g., "official:global", "official:asia")
     const targetChannels: string[] = [];
     const targetSubchannels: string[] = [];
-    if (form.targetChannelSubchannels && form.targetChannelSubchannels.length > 0) {
+    if (
+      form.targetChannelSubchannels &&
+      form.targetChannelSubchannels.length > 0
+    ) {
       form.targetChannelSubchannels.forEach((item: any) => {
         if (!targetChannels.includes(item.channel)) {
           targetChannels.push(item.channel);
@@ -977,13 +1083,17 @@ const CouponSettingsPage: React.FC = () => {
 
     const payload: any = {
       ...form,
-      startsAt: form.startsAt ? (form.startsAt as Dayjs).toDate().toISOString() : null,
+      startsAt: form.startsAt
+        ? (form.startsAt as Dayjs).toDate().toISOString()
+        : null,
       expiresAt: (form.expiresAt as Dayjs).toDate().toISOString(),
       rewardData: rewardMode === 'direct' ? form.rewardData : null,
-      rewardTemplateId: rewardMode === 'template' ? form.rewardTemplateId : null,
+      rewardTemplateId:
+        rewardMode === 'template' ? form.rewardTemplateId : null,
       // Remove targetChannelSubchannels and use targetChannels/targetSubchannels instead
       targetChannels: targetChannels.length > 0 ? targetChannels : null,
-      targetSubchannels: targetSubchannels.length > 0 ? targetSubchannels : null,
+      targetSubchannels:
+        targetSubchannels.length > 0 ? targetSubchannels : null,
       targetUsers: targetUsers.length > 0 ? targetUsers : null,
     };
     delete payload.targetChannelSubchannels;
@@ -1021,11 +1131,19 @@ const CouponSettingsPage: React.FC = () => {
 
     try {
       if (editing) {
-        const result = await couponService.updateSetting(projectApiPath, editing.id, payload);
+        const result = await couponService.updateSetting(
+          projectApiPath,
+          editing.id,
+          payload
+        );
         setOpenForm(false);
         resetForm();
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           enqueueSnackbar(t('common.saveSuccess') as string, {
             variant: 'success',
@@ -1034,19 +1152,30 @@ const CouponSettingsPage: React.FC = () => {
         await load();
       } else {
         // For create: close form immediately and load in background
-        const result = await couponService.createSetting(projectApiPath, payload);
+        const result = await couponService.createSetting(
+          projectApiPath,
+          payload
+        );
         setOpenForm(false);
         resetForm();
 
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           // Show success message
-          const isLargeQuantity = payload.type === 'NORMAL' && (payload.quantity || 1) >= 10000;
+          const isLargeQuantity =
+            payload.type === 'NORMAL' && (payload.quantity || 1) >= 10000;
           if (isLargeQuantity) {
-            enqueueSnackbar(t('coupons.couponSettings.generatingInBackground') as string, {
-              variant: 'info',
-            });
+            enqueueSnackbar(
+              t('coupons.couponSettings.generatingInBackground') as string,
+              {
+                variant: 'info',
+              }
+            );
           } else {
             enqueueSnackbar(t('common.saveSuccess') as string, {
               variant: 'success',
@@ -1060,7 +1189,9 @@ const CouponSettingsPage: React.FC = () => {
     } catch (e) {
       const err: any = e;
       const errorMessage =
-        err?.response?.data?.error?.message || err?.message || t('common.saveFailed');
+        err?.response?.data?.error?.message ||
+        err?.message ||
+        t('common.saveFailed');
       console.error(
         '[CouponSettings] save failed',
         err?.response?.status,
@@ -1080,7 +1211,10 @@ const CouponSettingsPage: React.FC = () => {
       const res = await couponService.getSetting(projectApiPath, it.id);
       const fullSetting = res.setting;
 
-      console.log('[CouponSettings] handleEdit - fetched full setting', fullSetting);
+      console.log(
+        '[CouponSettings] handleEdit - fetched full setting',
+        fullSetting
+      );
 
       // Set reward mode and data based on rewardTemplateId
       if (fullSetting.rewardTemplateId) {
@@ -1144,13 +1278,17 @@ const CouponSettingsPage: React.FC = () => {
         rewardEmailTitle: fullSetting.rewardEmailTitle || '',
         rewardEmailBody: fullSetting.rewardEmailBody || '',
         targetPlatforms: (fullSetting as any).targetPlatforms || [],
-        targetPlatformsInverted: (fullSetting as any).targetPlatformsInverted || false,
+        targetPlatformsInverted:
+          (fullSetting as any).targetPlatformsInverted || false,
         targetChannelSubchannels,
-        targetChannelSubchannelsInverted: (fullSetting as any).targetChannelsInverted || false,
+        targetChannelSubchannelsInverted:
+          (fullSetting as any).targetChannelsInverted || false,
         targetWorlds: (fullSetting as any).targetWorlds || [],
-        targetWorldsInverted: (fullSetting as any).targetWorldsInverted || false,
+        targetWorldsInverted:
+          (fullSetting as any).targetWorldsInverted || false,
         targetUserIds: ((fullSetting as any).targetUsers || []).join(', '),
-        targetUserIdsInverted: (fullSetting as any).targetUserIdsInverted || false,
+        targetUserIdsInverted:
+          (fullSetting as any).targetUserIdsInverted || false,
       };
 
       console.log('[CouponSettings] handleEdit - final form state', newForm);
@@ -1234,8 +1372,14 @@ const CouponSettingsPage: React.FC = () => {
               {t('coupons.couponSettings.createCoupon')}
             </Button>
           )}
-          {canManage && <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />}
-          <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => setOpenSDKGuide(true)}>
+          {canManage && (
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          )}
+          <Button
+            variant="outlined"
+            startIcon={<CodeIcon />}
+            onClick={() => setOpenSDKGuide(true)}
+          >
             {t('coupons.couponSettings.sdkGuide')}
           </Button>
         </Box>
@@ -1298,7 +1442,9 @@ const CouponSettingsPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -1368,12 +1514,18 @@ const CouponSettingsPage: React.FC = () => {
                         <TableCell padding="checkbox" sx={{ width: 48 }}>
                           <Checkbox
                             indeterminate={
-                              sortedItems.some((it) => selectedIds.includes(it.id)) &&
-                              !sortedItems.every((it) => selectedIds.includes(it.id))
+                              sortedItems.some((it) =>
+                                selectedIds.includes(it.id)
+                              ) &&
+                              !sortedItems.every((it) =>
+                                selectedIds.includes(it.id)
+                              )
                             }
                             checked={
                               sortedItems.length > 0 &&
-                              sortedItems.every((it) => selectedIds.includes(it.id))
+                              sortedItems.every((it) =>
+                                selectedIds.includes(it.id)
+                              )
                             }
                             onChange={(e) => handleSelectAll(e.target.checked)}
                           />
@@ -1382,10 +1534,14 @@ const CouponSettingsPage: React.FC = () => {
                       {visibleColumns.map((col) => (
                         <TableCell
                           key={col.id}
-                          sortDirection={orderBy === col.id ? order : (false as any)}
+                          sortDirection={
+                            orderBy === col.id ? order : (false as any)
+                          }
                           sx={{ py: 1, px: 2 }}
                           align={
-                            ['type', 'status', 'usageRate'].includes(col.id) ? 'center' : 'left'
+                            ['type', 'status', 'usageRate'].includes(col.id)
+                              ? 'center'
+                              : 'left'
                           }
                         >
                           <TableSortLabel
@@ -1411,7 +1567,9 @@ const CouponSettingsPage: React.FC = () => {
                           <TableCell padding="checkbox" sx={{ py: 1, px: 2 }}>
                             <Checkbox
                               checked={selectedIds.includes(it.id)}
-                              onChange={(e) => handleSelectOne(it.id, e.target.checked)}
+                              onChange={(e) =>
+                                handleSelectOne(it.id, e.target.checked)
+                              }
                             />
                           </TableCell>
                         )}
@@ -1440,7 +1598,11 @@ const CouponSettingsPage: React.FC = () => {
                                     >
                                       {it.name}
                                     </Typography>
-                                    <Tooltip title={t('coupons.couponSettings.copyName')}>
+                                    <Tooltip
+                                      title={t(
+                                        'coupons.couponSettings.copyName'
+                                      )}
+                                    >
                                       <IconButton
                                         size="small"
                                         onClick={() => handleCopyName(it.name)}
@@ -1470,10 +1632,16 @@ const CouponSettingsPage: React.FC = () => {
                                         {it.code || '-'}
                                       </Typography>
                                       {it.code && (
-                                        <Tooltip title={t('coupons.couponSettings.copyCode')}>
+                                        <Tooltip
+                                          title={t(
+                                            'coupons.couponSettings.copyCode'
+                                          )}
+                                        >
                                           <IconButton
                                             size="small"
-                                            onClick={() => handleCopyCode(it.code!)}
+                                            onClick={() =>
+                                              handleCopyCode(it.code!)
+                                            }
                                           >
                                             <ContentCopyIcon fontSize="inherit" />
                                           </IconButton>
@@ -1484,7 +1652,9 @@ const CouponSettingsPage: React.FC = () => {
                                     <Box>
                                       {it.generationStatus === 'IN_PROGRESS' ||
                                       it.generationStatus === 'PENDING' ? (
-                                        <Box sx={{ width: '100%', minWidth: 200 }}>
+                                        <Box
+                                          sx={{ width: '100%', minWidth: 200 }}
+                                        >
                                           <Box
                                             sx={{
                                               display: 'flex',
@@ -1495,7 +1665,8 @@ const CouponSettingsPage: React.FC = () => {
                                             <HourglassEmptyIcon
                                               fontSize="small"
                                               sx={{
-                                                animation: 'spin 1s linear infinite',
+                                                animation:
+                                                  'spin 1s linear infinite',
                                                 '@keyframes spin': {
                                                   '0%': {
                                                     transform: 'rotate(0deg)',
@@ -1520,7 +1691,9 @@ const CouponSettingsPage: React.FC = () => {
                                                 value={
                                                   it.totalCount
                                                     ? Math.round(
-                                                        ((it.generatedCount || 0) / it.totalCount) *
+                                                        ((it.generatedCount ||
+                                                          0) /
+                                                          it.totalCount) *
                                                           100
                                                       )
                                                     : 0
@@ -1528,11 +1701,13 @@ const CouponSettingsPage: React.FC = () => {
                                                 sx={{
                                                   height: 28,
                                                   borderRadius: 1,
-                                                  backgroundColor: 'action.hover',
+                                                  backgroundColor:
+                                                    'action.hover',
                                                   border: '1px dashed',
                                                   borderColor: 'divider',
                                                   '& .MuiLinearProgress-bar': {
-                                                    backgroundColor: 'primary.main',
+                                                    backgroundColor:
+                                                      'primary.main',
                                                   },
                                                 }}
                                               />
@@ -1542,22 +1717,34 @@ const CouponSettingsPage: React.FC = () => {
                                                   position: 'absolute',
                                                   top: '50%',
                                                   left: '50%',
-                                                  transform: 'translate(-50%, -50%)',
+                                                  transform:
+                                                    'translate(-50%, -50%)',
                                                   fontSize: '0.75rem',
                                                   color: 'text.primary',
                                                   whiteSpace: 'nowrap',
                                                 }}
                                               >
-                                                {t('coupons.couponSettings.generatingCodes')} (
-                                                {(it.generatedCount || 0).toLocaleString()} /{' '}
-                                                {(it.totalCount || 0).toLocaleString()})
+                                                {t(
+                                                  'coupons.couponSettings.generatingCodes'
+                                                )}{' '}
+                                                (
+                                                {(
+                                                  it.generatedCount || 0
+                                                ).toLocaleString()}{' '}
+                                                /{' '}
+                                                {(
+                                                  it.totalCount || 0
+                                                ).toLocaleString()}
+                                                )
                                               </Typography>
                                             </Box>
                                           </Box>
                                         </Box>
                                       ) : (
                                         <Tooltip
-                                          title={t('coupons.couponSettings.viewIssuedCodes')}
+                                          title={t(
+                                            'coupons.couponSettings.viewIssuedCodes'
+                                          )}
                                         >
                                           <Chip
                                             size="small"
@@ -1580,11 +1767,17 @@ const CouponSettingsPage: React.FC = () => {
                               );
                             case 'type':
                               return (
-                                <TableCell key="type" align="center" sx={{ py: 1, px: 2 }}>
+                                <TableCell
+                                  key="type"
+                                  align="center"
+                                  sx={{ py: 1, px: 2 }}
+                                >
                                   <Chip
                                     size="small"
                                     label={it.type}
-                                    color={it.type === 'SPECIAL' ? 'primary' : 'info'}
+                                    color={
+                                      it.type === 'SPECIAL' ? 'primary' : 'info'
+                                    }
                                     variant="filled"
                                   />
                                 </TableCell>
@@ -1597,7 +1790,11 @@ const CouponSettingsPage: React.FC = () => {
                                   : it.status === 'DISABLED'
                                     ? t('common.disabled')
                                     : t('status.deleted');
-                              let displayColor: 'success' | 'default' | 'warning' | 'error' =
+                              let displayColor:
+                                | 'success'
+                                | 'default'
+                                | 'warning'
+                                | 'error' =
                                 it.status === 'ACTIVE'
                                   ? 'success'
                                   : it.status === 'DISABLED'
@@ -1606,18 +1803,35 @@ const CouponSettingsPage: React.FC = () => {
 
                               // If disabled, check the reason
                               if (it.status === 'DISABLED') {
-                                if (it.disabledReason === 'All coupons have been used') {
-                                  displayLabel = t('coupons.couponSettings.allUsed');
+                                if (
+                                  it.disabledReason ===
+                                  'All coupons have been used'
+                                ) {
+                                  displayLabel = t(
+                                    'coupons.couponSettings.allUsed'
+                                  );
                                   displayColor = 'error';
-                                } else if (it.disabledReason === 'Expired by scheduler') {
-                                  displayLabel = t('coupons.couponSettings.expired');
+                                } else if (
+                                  it.disabledReason === 'Expired by scheduler'
+                                ) {
+                                  displayLabel = t(
+                                    'coupons.couponSettings.expired'
+                                  );
                                   displayColor = 'warning';
                                 }
                               }
 
                               return (
-                                <TableCell key="status" align="center" sx={{ py: 1, px: 2 }}>
-                                  <Chip size="small" color={displayColor} label={displayLabel} />
+                                <TableCell
+                                  key="status"
+                                  align="center"
+                                  sx={{ py: 1, px: 2 }}
+                                >
+                                  <Chip
+                                    size="small"
+                                    color={displayColor}
+                                    label={displayLabel}
+                                  />
                                 </TableCell>
                               );
                             }
@@ -1629,18 +1843,24 @@ const CouponSettingsPage: React.FC = () => {
 
                               if (it.type === 'SPECIAL') {
                                 denominator =
-                                  it.maxTotalUses ?? t('coupons.couponSettings.form.unlimited');
+                                  it.maxTotalUses ??
+                                  t('coupons.couponSettings.form.unlimited');
                                 if (it.maxTotalUses && it.maxTotalUses > 0) {
-                                  percentage = Math.round((numerator / it.maxTotalUses) * 100);
+                                  percentage = Math.round(
+                                    (numerator / it.maxTotalUses) * 100
+                                  );
                                   tooltipText = `${numerator.toLocaleString()} / ${denominator.toLocaleString()}`;
                                 } else {
                                   tooltipText = `${numerator.toLocaleString()} / ${denominator}`;
                                 }
                               } else {
-                                const totalIssued = it.generatedCount || it.issuedCount || 0;
+                                const totalIssued =
+                                  it.generatedCount || it.issuedCount || 0;
                                 denominator = totalIssued;
                                 if (totalIssued > 0) {
-                                  percentage = Math.round((numerator / totalIssued) * 100);
+                                  percentage = Math.round(
+                                    (numerator / totalIssued) * 100
+                                  );
                                 }
                                 tooltipText = `${numerator.toLocaleString()} / ${denominator.toLocaleString()}`;
                               }
@@ -1661,7 +1881,11 @@ const CouponSettingsPage: React.FC = () => {
                               }
 
                               return (
-                                <TableCell key="usageRate" align="center" sx={{ py: 1, px: 2 }}>
+                                <TableCell
+                                  key="usageRate"
+                                  align="center"
+                                  sx={{ py: 1, px: 2 }}
+                                >
                                   <Tooltip title={tooltipText}>
                                     <Box
                                       sx={{
@@ -1715,13 +1939,21 @@ const CouponSettingsPage: React.FC = () => {
                                     title={
                                       it.startsAt
                                         ? formatDateTimeDetailed(it.startsAt)
-                                        : t('coupons.couponSettings.immediateStart')
+                                        : t(
+                                            'coupons.couponSettings.immediateStart'
+                                          )
                                     }
                                   >
                                     <Typography variant="caption">
                                       {it.startsAt
-                                        ? formatRelativeTime(it.startsAt, undefined, language)
-                                        : t('coupons.couponSettings.immediateStart')}
+                                        ? formatRelativeTime(
+                                            it.startsAt,
+                                            undefined,
+                                            language
+                                          )
+                                        : t(
+                                            'coupons.couponSettings.immediateStart'
+                                          )}
                                     </Typography>
                                   </Tooltip>
                                 </TableCell>
@@ -1731,12 +1963,18 @@ const CouponSettingsPage: React.FC = () => {
                                 <TableCell key="end" sx={{ py: 1, px: 2 }}>
                                   <Tooltip
                                     title={
-                                      it.expiresAt ? formatDateTimeDetailed(it.expiresAt) : '-'
+                                      it.expiresAt
+                                        ? formatDateTimeDetailed(it.expiresAt)
+                                        : '-'
                                     }
                                   >
                                     <Typography variant="caption">
                                       {it.expiresAt
-                                        ? formatRelativeTime(it.expiresAt, undefined, language)
+                                        ? formatRelativeTime(
+                                            it.expiresAt,
+                                            undefined,
+                                            language
+                                          )
                                         : '-'}
                                     </Typography>
                                   </Tooltip>
@@ -1744,8 +1982,15 @@ const CouponSettingsPage: React.FC = () => {
                               );
                             case 'createdAt':
                               return (
-                                <TableCell key="createdAt" sx={{ py: 1, px: 2 }}>
-                                  <Tooltip title={formatDateTimeDetailed((it as any).createdAt)}>
+                                <TableCell
+                                  key="createdAt"
+                                  sx={{ py: 1, px: 2 }}
+                                >
+                                  <Tooltip
+                                    title={formatDateTimeDetailed(
+                                      (it as any).createdAt
+                                    )}
+                                  >
                                     <Typography variant="caption">
                                       {formatRelativeTime(
                                         (it as any).createdAt,
@@ -1907,13 +2152,19 @@ const CouponSettingsPage: React.FC = () => {
                   mb: expandedGroups.basicInfo ? 1 : 0,
                   cursor: 'pointer',
                 }}
-                onClick={() => setExpandedGroups((s) => ({ ...s, basicInfo: !s.basicInfo }))}
+                onClick={() =>
+                  setExpandedGroups((s) => ({ ...s, basicInfo: !s.basicInfo }))
+                }
               >
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                   {t('common.basicInformation')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                  {expandedGroups.basicInfo ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  {expandedGroups.basicInfo ? (
+                    <ExpandLessIcon />
+                  ) : (
+                    <ExpandMoreIcon />
+                  )}
                 </IconButton>
               </Box>
               <Collapse in={expandedGroups.basicInfo}>
@@ -1929,7 +2180,9 @@ const CouponSettingsPage: React.FC = () => {
                       setForm((s: any) => ({
                         ...s,
                         name: newName,
-                        description: !isDescriptionManuallyEdited ? newName : s.description,
+                        description: !isDescriptionManuallyEdited
+                          ? newName
+                          : s.description,
                       }));
                     }}
                     helperText={t('coupons.couponSettings.form.nameHelp')}
@@ -1946,7 +2199,9 @@ const CouponSettingsPage: React.FC = () => {
                       }));
                       setIsDescriptionManuallyEdited(true);
                     }}
-                    helperText={t('coupons.couponSettings.form.descriptionHelp')}
+                    helperText={t(
+                      'coupons.couponSettings.form.descriptionHelp'
+                    )}
                     fullWidth
                   />
                 </Stack>
@@ -1965,7 +2220,9 @@ const CouponSettingsPage: React.FC = () => {
                 }))
               }
               targetChannelSubchannels={form.targetChannelSubchannels || []}
-              targetChannelSubchannelsInverted={form.targetChannelSubchannelsInverted || false}
+              targetChannelSubchannelsInverted={
+                form.targetChannelSubchannelsInverted || false
+              }
               channels={channels}
               onChannelsChange={(channels, inverted) =>
                 setForm((s: any) => ({
@@ -1986,7 +2243,9 @@ const CouponSettingsPage: React.FC = () => {
               }
               targetUserIds={form.targetUserIds || ''}
               targetUserIdsInverted={form.targetUserIdsInverted || false}
-              onUserIdsChange={(ids) => setForm((s: any) => ({ ...s, targetUserIds: ids }))}
+              onUserIdsChange={(ids) =>
+                setForm((s: any) => ({ ...s, targetUserIds: ids }))
+              }
               onUserIdsInvertedChange={(inverted) =>
                 setForm((s: any) => ({ ...s, targetUserIdsInverted: inverted }))
               }
@@ -2014,7 +2273,11 @@ const CouponSettingsPage: React.FC = () => {
                   {t('coupons.couponSettings.form.codeAndQuantity')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                  {expandedGroups.codeQuantity ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  {expandedGroups.codeQuantity ? (
+                    <ExpandLessIcon />
+                  ) : (
+                    <ExpandMoreIcon />
+                  )}
                 </IconButton>
               </Box>
               <Collapse in={expandedGroups.codeQuantity}>
@@ -2038,14 +2301,19 @@ const CouponSettingsPage: React.FC = () => {
                         setForm((s: any) => ({
                           ...s,
                           type: e.target.value,
-                          perUserLimit: e.target.value === 'SPECIAL' ? 1 : s.perUserLimit,
-                          maxTotalUses: e.target.value === 'NORMAL' ? null : s.maxTotalUses,
+                          perUserLimit:
+                            e.target.value === 'SPECIAL' ? 1 : s.perUserLimit,
+                          maxTotalUses:
+                            e.target.value === 'NORMAL' ? null : s.maxTotalUses,
                           code: e.target.value === 'NORMAL' ? '' : s.code,
-                          quantity: e.target.value === 'NORMAL' ? s.quantity || 1 : 1,
+                          quantity:
+                            e.target.value === 'NORMAL' ? s.quantity || 1 : 1,
                         }))
                       }
                       helperText={
-                        !!editing ? t('coupons.couponSettings.form.typeCannotBeChanged') : undefined
+                        !!editing
+                          ? t('coupons.couponSettings.form.typeCannotBeChanged')
+                          : undefined
                       }
                     >
                       <MenuItem value="SPECIAL">SPECIAL</MenuItem>
@@ -2067,7 +2335,9 @@ const CouponSettingsPage: React.FC = () => {
                         disabled={!!editing}
                         helperText={
                           !!editing
-                            ? t('coupons.couponSettings.form.codePatternCannotBeChanged')
+                            ? t(
+                                'coupons.couponSettings.form.codePatternCannotBeChanged'
+                              )
                             : `예시: ${codePatternExample}`
                         }
                       >
@@ -2116,7 +2386,8 @@ const CouponSettingsPage: React.FC = () => {
                       onChange={(e) =>
                         setForm((s: any) => ({
                           ...s,
-                          quantity: e.target.value === '' ? '' : Number(e.target.value),
+                          quantity:
+                            e.target.value === '' ? '' : Number(e.target.value),
                         }))
                       }
                       error={quantityError}
@@ -2157,7 +2428,11 @@ const CouponSettingsPage: React.FC = () => {
                   {t('coupons.couponSettings.form.usageLimit')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                  {expandedGroups.usageLimit ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  {expandedGroups.usageLimit ? (
+                    <ExpandLessIcon />
+                  ) : (
+                    <ExpandMoreIcon />
+                  )}
                 </IconButton>
               </Box>
               <Collapse in={expandedGroups.usageLimit}>
@@ -2181,13 +2456,17 @@ const CouponSettingsPage: React.FC = () => {
                             usageLimitType: e.target.value,
                           }))
                         }
-                        helperText={t('coupons.couponSettings.form.usageLimitTypeHelp')}
+                        helperText={t(
+                          'coupons.couponSettings.form.usageLimitTypeHelp'
+                        )}
                       >
                         <MenuItem value="USER">
                           {t('coupons.couponSettings.form.usageLimitTypeUser')}
                         </MenuItem>
                         <MenuItem value="CHARACTER">
-                          {t('coupons.couponSettings.form.usageLimitTypeCharacter')}
+                          {t(
+                            'coupons.couponSettings.form.usageLimitTypeCharacter'
+                          )}
                         </MenuItem>
                       </TextField>
                       <TextField
@@ -2201,16 +2480,25 @@ const CouponSettingsPage: React.FC = () => {
                         onChange={(e) =>
                           setForm((s: any) => ({
                             ...s,
-                            perUserLimit: e.target.value === '' ? '' : Number(e.target.value),
+                            perUserLimit:
+                              e.target.value === ''
+                                ? ''
+                                : Number(e.target.value),
                           }))
                         }
                         error={perUserLimitError}
                         helperText={
                           perUserLimitError
-                            ? t('coupons.couponSettings.form.perUserLimitMinError')
+                            ? t(
+                                'coupons.couponSettings.form.perUserLimitMinError'
+                              )
                             : form.usageLimitType === 'CHARACTER'
-                              ? t('coupons.couponSettings.form.perCharacterLimitHelp')
-                              : t('coupons.couponSettings.form.perUserLimitHelp')
+                              ? t(
+                                  'coupons.couponSettings.form.perCharacterLimitHelp'
+                                )
+                              : t(
+                                  'coupons.couponSettings.form.perUserLimitHelp'
+                                )
                         }
                         sx={{
                           '& input[type=number]': {
@@ -2233,13 +2521,18 @@ const CouponSettingsPage: React.FC = () => {
                         onChange={(e) =>
                           setForm((s: any) => ({
                             ...s,
-                            maxTotalUses: e.target.value === '' ? '' : Number(e.target.value),
+                            maxTotalUses:
+                              e.target.value === ''
+                                ? ''
+                                : Number(e.target.value),
                           }))
                         }
                         error={maxTotalUsesError}
                         helperText={
                           maxTotalUsesError
-                            ? t('coupons.couponSettings.form.maxTotalUsesMinError')
+                            ? t(
+                                'coupons.couponSettings.form.maxTotalUsesMinError'
+                              )
                             : t('coupons.couponSettings.form.maxTotalUsesHelp')
                         }
                         disabled={form.maxTotalUses === null}
@@ -2258,7 +2551,9 @@ const CouponSettingsPage: React.FC = () => {
                             onChange={(e) =>
                               setForm((s: any) => ({
                                 ...s,
-                                maxTotalUses: e.target.checked ? null : (s.maxTotalUses ?? 0),
+                                maxTotalUses: e.target.checked
+                                  ? null
+                                  : (s.maxTotalUses ?? 0),
                               }))
                             }
                           />
@@ -2281,13 +2576,19 @@ const CouponSettingsPage: React.FC = () => {
                   mb: expandedGroups.dateRange ? 1 : 0,
                   cursor: 'pointer',
                 }}
-                onClick={() => setExpandedGroups((s) => ({ ...s, dateRange: !s.dateRange }))}
+                onClick={() =>
+                  setExpandedGroups((s) => ({ ...s, dateRange: !s.dateRange }))
+                }
               >
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                   {t('coupons.couponSettings.form.dateRange')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                  {expandedGroups.dateRange ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  {expandedGroups.dateRange ? (
+                    <ExpandLessIcon />
+                  ) : (
+                    <ExpandMoreIcon />
+                  )}
                 </IconButton>
               </Box>
               <Collapse in={expandedGroups.dateRange}>
@@ -2296,7 +2597,9 @@ const CouponSettingsPage: React.FC = () => {
                     <DateTimePicker
                       label={t('coupons.couponSettings.form.startsAt')}
                       value={form.startsAt}
-                      onChange={(date) => setForm((s: any) => ({ ...s, startsAt: date }))}
+                      onChange={(date) =>
+                        setForm((s: any) => ({ ...s, startsAt: date }))
+                      }
                       timeSteps={{ minutes: 1 }}
                       slotProps={{
                         textField: {
@@ -2311,7 +2614,9 @@ const CouponSettingsPage: React.FC = () => {
                     <DateTimePicker
                       label={t('coupons.couponSettings.form.expiresAt')}
                       value={form.expiresAt}
-                      onChange={(date) => setForm((s: any) => ({ ...s, expiresAt: date }))}
+                      onChange={(date) =>
+                        setForm((s: any) => ({ ...s, expiresAt: date }))
+                      }
                       minDateTime={form.startsAt || undefined}
                       timeSteps={{ minutes: 1 }}
                       slotProps={{
@@ -2338,7 +2643,10 @@ const CouponSettingsPage: React.FC = () => {
                         if (form.startsAt) {
                           const s = form.startsAt as Dayjs;
                           const startStr = s.format('YYYY-MM-DD HH:mm');
-                          const days = Math.max(0, Math.ceil(e.diff(s, 'hour') / 24));
+                          const days = Math.max(
+                            0,
+                            Math.ceil(e.diff(s, 'hour') / 24)
+                          );
                           return `${t('coupons.couponSettings.form.applicablePeriod')}: ${startStr} ~ ${endStr} (${days}${t('common.day')})`;
                         } else {
                           return `${t('coupons.couponSettings.form.applicablePeriod')}: ${t('coupons.couponSettings.form.immediatelyAvailable')} ~ ${endStr}`;
@@ -2360,13 +2668,19 @@ const CouponSettingsPage: React.FC = () => {
                   mb: expandedGroups.rewards ? 1 : 0,
                   cursor: 'pointer',
                 }}
-                onClick={() => setExpandedGroups((s) => ({ ...s, rewards: !s.rewards }))}
+                onClick={() =>
+                  setExpandedGroups((s) => ({ ...s, rewards: !s.rewards }))
+                }
               >
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                   {t('surveys.participationRewards')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                  {expandedGroups.rewards ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  {expandedGroups.rewards ? (
+                    <ExpandLessIcon />
+                  ) : (
+                    <ExpandMoreIcon />
+                  )}
                 </IconButton>
               </Box>
               <Collapse in={expandedGroups.rewards}>
@@ -2381,7 +2695,9 @@ const CouponSettingsPage: React.FC = () => {
                     </Typography>
                     <RewardSelector
                       value={form.rewardData || []}
-                      onChange={(rewards) => setForm((s: any) => ({ ...s, rewardData: rewards }))}
+                      onChange={(rewards) =>
+                        setForm((s: any) => ({ ...s, rewardData: rewards }))
+                      }
                       onModeChange={(mode, templateId) => {
                         setRewardMode(mode);
                         if (mode === 'template') {
@@ -2426,7 +2742,11 @@ const CouponSettingsPage: React.FC = () => {
                   {t('coupons.couponSettings.form.rewardEmail')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                  {expandedGroups.rewardEmail ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  {expandedGroups.rewardEmail ? (
+                    <ExpandLessIcon />
+                  ) : (
+                    <ExpandMoreIcon />
+                  )}
                 </IconButton>
               </Box>
               <Collapse in={expandedGroups.rewardEmail}>
@@ -2442,8 +2762,12 @@ const CouponSettingsPage: React.FC = () => {
                         rewardEmailTitle: e.target.value,
                       }))
                     }
-                    placeholder={t('coupons.couponSettings.form.rewardEmailTitlePlaceholder')}
-                    helperText={t('coupons.couponSettings.form.rewardEmailTitleHelp')}
+                    placeholder={t(
+                      'coupons.couponSettings.form.rewardEmailTitlePlaceholder'
+                    )}
+                    helperText={t(
+                      'coupons.couponSettings.form.rewardEmailTitleHelp'
+                    )}
                   />
                   <TextField
                     required
@@ -2458,8 +2782,12 @@ const CouponSettingsPage: React.FC = () => {
                         rewardEmailBody: e.target.value,
                       }))
                     }
-                    placeholder={t('coupons.couponSettings.form.rewardEmailBodyPlaceholder')}
-                    helperText={t('coupons.couponSettings.form.rewardEmailBodyHelp')}
+                    placeholder={t(
+                      'coupons.couponSettings.form.rewardEmailBodyPlaceholder'
+                    )}
+                    helperText={t(
+                      'coupons.couponSettings.form.rewardEmailBodyHelp'
+                    )}
                   />
                 </Stack>
               </Collapse>
@@ -2479,7 +2807,9 @@ const CouponSettingsPage: React.FC = () => {
             gap: 1,
           }}
         >
-          <Button onClick={() => setOpenForm(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setOpenForm(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button
             onClick={handleSave}
             variant="contained"
@@ -2509,7 +2839,9 @@ const CouponSettingsPage: React.FC = () => {
             {/* Statistics Cards */}
             <Stack direction="row" spacing={2}>
               <Card sx={{ flex: 1 }}>
-                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                >
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <ListIcon sx={{ color: 'text.secondary' }} />
                     <Box>
@@ -2524,7 +2856,9 @@ const CouponSettingsPage: React.FC = () => {
                 </CardContent>
               </Card>
               <Card sx={{ flex: 1 }}>
-                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                >
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <CheckCircleIcon sx={{ color: 'success.main' }} />
                     <Box>
@@ -2539,7 +2873,9 @@ const CouponSettingsPage: React.FC = () => {
                 </CardContent>
               </Card>
               <Card sx={{ flex: 1 }}>
-                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                <CardContent
+                  sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                >
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <HourglassEmptyIcon sx={{ color: 'warning.main' }} />
                     <Box>
@@ -2556,10 +2892,17 @@ const CouponSettingsPage: React.FC = () => {
             </Stack>
 
             {/* Search and Export */}
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ width: '100%' }}>
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              sx={{ width: '100%' }}
+            >
               <TextField
                 placeholder={
-                  t('coupons.couponSettings.issuedCodesDrawer.searchPlaceholder') as string
+                  t(
+                    'coupons.couponSettings.issuedCodesDrawer.searchPlaceholder'
+                  ) as string
                 }
                 value={codesSearch}
                 onChange={(e) => setCodesSearch(e.target.value)}
@@ -2591,7 +2934,9 @@ const CouponSettingsPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -2621,11 +2966,17 @@ const CouponSettingsPage: React.FC = () => {
                   horizontal: 'right',
                 }}
               >
-                <MenuItem onClick={() => handleExportIssuedCodes('csv')} disabled={exportingCodes}>
+                <MenuItem
+                  onClick={() => handleExportIssuedCodes('csv')}
+                  disabled={exportingCodes}
+                >
                   <TableChartIcon sx={{ mr: 1 }} />
                   CSV
                 </MenuItem>
-                <MenuItem onClick={() => handleExportIssuedCodes('xlsx')} disabled={exportingCodes}>
+                <MenuItem
+                  onClick={() => handleExportIssuedCodes('xlsx')}
+                  disabled={exportingCodes}
+                >
                   <ExcelIcon sx={{ mr: 1 }} />
                   Excel (XLSX)
                 </MenuItem>
@@ -2636,17 +2987,27 @@ const CouponSettingsPage: React.FC = () => {
               <Table size="small">
                 <TableHead>
                   <TableRow sx={{ height: 48 }}>
-                    <TableCell sx={{ py: 1, px: 2 }}>{t('coupons.issuedCodes.code')}</TableCell>
-                    <TableCell sx={{ py: 1, px: 2 }}>{t('coupons.issuedCodes.status')}</TableCell>
-                    <TableCell sx={{ py: 1, px: 2 }}>{t('coupons.issuedCodes.issuedAt')}</TableCell>
-                    <TableCell sx={{ py: 1, px: 2 }}>{t('coupons.issuedCodes.usedAt')}</TableCell>
+                    <TableCell sx={{ py: 1, px: 2 }}>
+                      {t('coupons.issuedCodes.code')}
+                    </TableCell>
+                    <TableCell sx={{ py: 1, px: 2 }}>
+                      {t('coupons.issuedCodes.status')}
+                    </TableCell>
+                    <TableCell sx={{ py: 1, px: 2 }}>
+                      {t('coupons.issuedCodes.issuedAt')}
+                    </TableCell>
+                    <TableCell sx={{ py: 1, px: 2 }}>
+                      {t('coupons.issuedCodes.usedAt')}
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {codesLoading ? (
                     <TableRow hover>
                       <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
-                        <Typography color="text.secondary">{t('common.loading')}</Typography>
+                        <Typography color="text.secondary">
+                          {t('common.loading')}
+                        </Typography>
                       </TableCell>
                     </TableRow>
                   ) : codesItems.length === 0 ? (
@@ -2666,11 +3027,19 @@ const CouponSettingsPage: React.FC = () => {
                               gap: 0.5,
                             }}
                           >
-                            <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                            <Typography
+                              variant="caption"
+                              sx={{ fontFamily: 'monospace' }}
+                            >
                               {c.code}
                             </Typography>
-                            <Tooltip title={t('coupons.couponSettings.copyCode')}>
-                              <IconButton size="small" onClick={() => handleCopyCode(c.code)}>
+                            <Tooltip
+                              title={t('coupons.couponSettings.copyCode')}
+                            >
+                              <IconButton
+                                size="small"
+                                onClick={() => handleCopyCode(c.code)}
+                              >
                                 <ContentCopyIcon fontSize="inherit" />
                               </IconButton>
                             </Tooltip>
@@ -2696,7 +3065,9 @@ const CouponSettingsPage: React.FC = () => {
                           />
                         </TableCell>
                         <TableCell sx={{ py: 1, px: 2 }}>
-                          <Typography variant="caption">{formatDateTime(c.createdAt)}</Typography>
+                          <Typography variant="caption">
+                            {formatDateTime(c.createdAt)}
+                          </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1, px: 2 }}>
                           <Typography variant="caption">
@@ -2737,11 +3108,21 @@ const CouponSettingsPage: React.FC = () => {
       </ResizableDrawer>
 
       {/* SDK Guide Drawer */}
-      <SDKGuideDrawer open={openSDKGuide} onClose={() => setOpenSDKGuide(false)} />
+      <SDKGuideDrawer
+        open={openSDKGuide}
+        onClose={() => setOpenSDKGuide(false)}
+      />
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteConfirmOpen} onClose={handleDeleteCancel} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('coupons.couponSettings.deleteConfirmTitle')}</DialogTitle>
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={handleDeleteCancel}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          {t('coupons.couponSettings.deleteConfirmTitle')}
+        </DialogTitle>
         <DialogContent>
           <Typography>
             {t('coupons.couponSettings.deleteConfirmMessage', {
@@ -2753,7 +3134,11 @@ const CouponSettingsPage: React.FC = () => {
           <Button onClick={handleDeleteCancel} color="inherit">
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+          <Button
+            onClick={handleDeleteConfirm}
+            color="error"
+            variant="contained"
+          >
             {t('common.delete')}
           </Button>
         </DialogActions>
@@ -2811,7 +3196,10 @@ const CouponSettingsPage: React.FC = () => {
                     total: (codesStats.issued || 0).toLocaleString(),
                   })}
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
                   {exportProgress}%
                 </Typography>
               </Box>
@@ -2827,7 +3215,11 @@ const CouponSettingsPage: React.FC = () => {
               }}
             >
               <CheckCircleIcon sx={{ fontSize: 48, color: 'success.main' }} />
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: 'center' }}
+              >
                 {t('coupons.couponSettings.exportDialog.completed')}
               </Typography>
             </Box>

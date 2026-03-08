@@ -115,7 +115,9 @@ class TestOrchestrator {
 
       proc.on('exit', (code, signal) => {
         if (!this.isShuttingDown) {
-          console.log(`[ORCHESTRATOR] ${server.name} exited with code ${code}, signal ${signal}`);
+          console.log(
+            `[ORCHESTRATOR] ${server.name} exited with code ${code}, signal ${signal}`
+          );
         }
       });
 
@@ -140,7 +142,9 @@ class TestOrchestrator {
     // Ask all processes to shut down gracefully
     for (const server of this.servers) {
       if (server.process && !server.process.killed && server.process.pid) {
-        console.log(`[ORCHESTRATOR] Requesting graceful stop for ${server.name}...`);
+        console.log(
+          `[ORCHESTRATOR] Requesting graceful stop for ${server.name}...`
+        );
         try {
           if (process.platform === 'win32') {
             // Windows: send SIGTERM to the process
@@ -159,7 +163,10 @@ class TestOrchestrator {
             process.kill(-server.process.pid, 'SIGTERM');
           }
         } catch (error) {
-          console.error(`[ORCHESTRATOR] Error signaling ${server.name}:`, error);
+          console.error(
+            `[ORCHESTRATOR] Error signaling ${server.name}:`,
+            error
+          );
         }
       }
     }
@@ -187,7 +194,10 @@ class TestOrchestrator {
             process.kill(-server.process.pid, 'SIGKILL');
           }
         } catch (error) {
-          console.error(`[ORCHESTRATOR] Error force killing ${server.name}:`, error);
+          console.error(
+            `[ORCHESTRATOR] Error force killing ${server.name}:`,
+            error
+          );
         }
       }
     }

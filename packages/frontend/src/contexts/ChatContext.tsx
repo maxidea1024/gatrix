@@ -14,7 +14,8 @@ import { getChatWebSocketService } from '../services/chatWebSocketService';
 import { apiService } from '../services/api';
 import { AuthService } from '../services/auth';
 
-const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+const DEFAULT_AVATAR_URL =
+  'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 import {
   ChatState,
   ChatContextType,
@@ -72,7 +73,10 @@ const loadCachedMessages = (): Record<number, Message[]> => {
         }
       });
 
-      console.log('✅ Loaded cached messages for channels:', Object.keys(filteredMessages));
+      console.log(
+        '✅ Loaded cached messages for channels:',
+        Object.keys(filteredMessages)
+      );
       return filteredMessages;
     } else {
       console.log('❌ No cached messages found');
@@ -132,7 +136,12 @@ type ChatAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | {
       type: 'SET_LOADING_STAGE';
-      payload: 'idle' | 'syncing' | 'connecting' | 'loading_channels' | 'complete';
+      payload:
+        | 'idle'
+        | 'syncing'
+        | 'connecting'
+        | 'loading_channels'
+        | 'complete';
     }
   | { type: 'SET_LOADING_START_TIME'; payload: number | null }
   | { type: 'SET_CONNECTED'; payload: boolean }
@@ -229,8 +238,13 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     case 'REMOVE_CHANNEL':
       return {
         ...state,
-        channels: state.channels.filter((channel) => channel.id !== action.payload),
-        currentChannelId: state.currentChannelId === action.payload ? null : state.currentChannelId,
+        channels: state.channels.filter(
+          (channel) => channel.id !== action.payload
+        ),
+        currentChannelId:
+          state.currentChannelId === action.payload
+            ? null
+            : state.currentChannelId,
       };
 
     case 'SET_CURRENT_CHANNEL':
@@ -260,7 +274,9 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       });
 
       // 중복 메시지 방지
-      const messageExists = currentMessages.some((msg) => msg.id === action.payload.id);
+      const messageExists = currentMessages.some(
+        (msg) => msg.id === action.payload.id
+      );
       if (messageExists) {
         console.log('⚠️ Message already exists, skipping:', action.payload.id);
         return state;
@@ -287,9 +303,9 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
 
     case 'UPDATE_MESSAGE':
       const updateChannelId = action.payload.channelId;
-      const updatedChannelMessages = (state.messages[updateChannelId] || []).map((msg) =>
-        msg.id === action.payload.id ? action.payload : msg
-      );
+      const updatedChannelMessages = (
+        state.messages[updateChannelId] || []
+      ).map((msg) => (msg.id === action.payload.id ? action.payload : msg));
       return {
         ...state,
         messages: {
@@ -303,17 +319,17 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       const updatedMessagesWithReactions = { ...state.messages };
 
       for (const channelId in updatedMessagesWithReactions) {
-        updatedMessagesWithReactions[channelId] = updatedMessagesWithReactions[channelId].map(
-          (msg) => {
-            if (msg.id === action.payload.messageId) {
-              return {
-                ...msg,
-                reactions: action.payload.reactions,
-              };
-            }
-            return msg;
+        updatedMessagesWithReactions[channelId] = updatedMessagesWithReactions[
+          channelId
+        ].map((msg) => {
+          if (msg.id === action.payload.messageId) {
+            return {
+              ...msg,
+              reactions: action.payload.reactions,
+            };
           }
-        );
+          return msg;
+        });
       }
 
       return {
@@ -351,15 +367,18 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       };
 
     case 'UPDATE_MESSAGE_THREAD_INFO':
-      console.log('🔍 UPDATE_MESSAGE_THREAD_INFO reducer called:', action.payload);
+      console.log(
+        '🔍 UPDATE_MESSAGE_THREAD_INFO reducer called:',
+        action.payload
+      );
 
       // 모든 채널에서 해당 메시지를 찾아 스레드 정보 업데이트
       const updatedMessagesWithThreadInfo = { ...state.messages };
       let messageFound = false;
 
       for (const channelId in updatedMessagesWithThreadInfo) {
-        updatedMessagesWithThreadInfo[channelId] = updatedMessagesWithThreadInfo[channelId].map(
-          (msg) => {
+        updatedMessagesWithThreadInfo[channelId] =
+          updatedMessagesWithThreadInfo[channelId].map((msg) => {
             if (msg.id === action.payload.messageId) {
               messageFound = true;
               console.log('🔍 Found message to update:', {
@@ -376,13 +395,15 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
               };
             }
             return msg;
-          }
-        );
+          });
       }
 
       console.log('🔍 Message found for thread update:', messageFound);
       if (!messageFound) {
-        console.warn('⚠️ Message not found for thread update:', action.payload.messageId);
+        console.warn(
+          '⚠️ Message not found for thread update:',
+          action.payload.messageId
+        );
       }
 
       return {
@@ -413,7 +434,8 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
           ...state.users,
           [action.payload.id]: action.payload,
         },
-        user: state.user?.id === action.payload.id ? action.payload : state.user,
+        user:
+          state.user?.id === action.payload.id ? action.payload : state.user,
       };
 
     case 'SET_CURRENT_USER':
@@ -438,7 +460,9 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     case 'ADD_TYPING_USER':
       const typingChannelId = action.payload.channelId;
       const currentTypingUsers = state.typingUsers[typingChannelId] || [];
-      const existingIndex = currentTypingUsers.findIndex((u) => u.userId === action.payload.userId);
+      const existingIndex = currentTypingUsers.findIndex(
+        (u) => u.userId === action.payload.userId
+      );
 
       if (existingIndex >= 0) {
         // Update existing typing indicator
@@ -464,9 +488,9 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
 
     case 'REMOVE_TYPING_USER':
       const removeTypingChannelId = action.payload.channelId;
-      const filteredTypingUsers = (state.typingUsers[removeTypingChannelId] || []).filter(
-        (u) => u.userId !== action.payload.userId
-      );
+      const filteredTypingUsers = (
+        state.typingUsers[removeTypingChannelId] || []
+      ).filter((u) => u.userId !== action.payload.userId);
       return {
         ...state,
         typingUsers: {
@@ -508,9 +532,9 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
 
     case 'REMOVE_THREAD_TYPING_USER':
       const removeThreadId = action.payload.threadId;
-      const filteredThreadTypingUsers = (state.threadTypingUsers[removeThreadId] || []).filter(
-        (u) => u.userId !== action.payload.userId
-      );
+      const filteredThreadTypingUsers = (
+        state.threadTypingUsers[removeThreadId] || []
+      ).filter((u) => u.userId !== action.payload.userId);
       return {
         ...state,
         threadTypingUsers: {
@@ -547,8 +571,14 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
 const ChatContext = createContext<ChatContextType | null>(null);
 
 // Provider component
-export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(chatReducer, undefined, createInitialState);
+export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [state, dispatch] = useReducer(
+    chatReducer,
+    undefined,
+    createInitialState
+  );
   const { user, getToken } = useAuth();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -558,7 +588,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     console.log(
       '🚀 ChatProvider initialized with messages:',
-      Object.keys(state.messages).map((k) => `${k}: ${state.messages[parseInt(k)].length} messages`)
+      Object.keys(state.messages).map(
+        (k) => `${k}: ${state.messages[parseInt(k)].length} messages`
+      )
     );
   }, []); // 빈 의존성 배열로 한 번만 실행
 
@@ -615,9 +647,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               payload: [
                 {
                   id: message.userId,
-                  username: message.user.name || message.user.username || `User${message.userId}`,
+                  username:
+                    message.user.name ||
+                    message.user.username ||
+                    `User${message.userId}`,
                   name: message.user.name || `User${message.userId}`,
-                  email: message.user.email || `user${message.userId}@example.com`,
+                  email:
+                    message.user.email || `user${message.userId}@example.com`,
                   avatarUrl: message.user.avatarUrl || DEFAULT_AVATAR_URL,
                   isOnline: true,
                   lastSeen: new Date().toISOString(),
@@ -627,7 +663,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           // 메시지에 User info가 없고 state에도 없으면 fallback Used
           else if (message.userId && !state.users[message.userId]) {
-            console.log('⚠️ Using fallback user data for userId:', message.userId);
+            console.log(
+              '⚠️ Using fallback user data for userId:',
+              message.userId
+            );
             dispatch({
               type: 'SET_USERS',
               payload: [
@@ -666,7 +705,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // 1) data.data.data (현재 구조)
           // 2) data.data (정규화된 구조)
           // 3) data (직접 전달된 구조)
-          const threadInfo = (data && data.data && data.data.data) || (data && data.data) || data;
+          const threadInfo =
+            (data && data.data && data.data.data) ||
+            (data && data.data) ||
+            data;
           console.log('🔍 Resolved threadInfo:', threadInfo);
 
           const messageId = threadInfo?.messageId;
@@ -690,7 +732,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               },
             });
           } else {
-            console.error('❌ Could not resolve messageId from thread_updated payload');
+            console.error(
+              '❌ Could not resolve messageId from thread_updated payload'
+            );
           }
         });
 
@@ -719,7 +763,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           // 재연결 시 현재 채널에 다시 참여
           if (state.currentChannelId) {
-            console.log('Rejoining current channel after reconnection:', state.currentChannelId);
+            console.log(
+              'Rejoining current channel after reconnection:',
+              state.currentChannelId
+            );
             wsService.joinChannel(state.currentChannelId);
           }
         });
@@ -874,13 +921,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // 따라서 조건 없이 메시지 표시
         if (user) {
           if (data.action === 'accept') {
-            enqueueSnackbar(t('chat.invitationAccepted', { inviteeName: data.inviteeName }), {
-              variant: 'success',
-            });
+            enqueueSnackbar(
+              t('chat.invitationAccepted', { inviteeName: data.inviteeName }),
+              {
+                variant: 'success',
+              }
+            );
           } else {
-            enqueueSnackbar(t('chat.invitationDeclined', { inviteeName: data.inviteeName }), {
-              variant: 'info',
-            });
+            enqueueSnackbar(
+              t('chat.invitationDeclined', { inviteeName: data.inviteeName }),
+              {
+                variant: 'info',
+              }
+            );
           }
         }
 
@@ -1039,12 +1092,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     async (channelId: number, forceReload = false) => {
       // Prevent concurrent loads for the same channel
       if (loadingMessagesRef.current.has(channelId)) {
-        console.log('⏳ loadMessages already in progress, skipping:', channelId);
+        console.log(
+          '⏳ loadMessages already in progress, skipping:',
+          channelId
+        );
         return;
       }
       loadingMessagesRef.current.add(channelId);
       try {
-        console.log('🔄 loadMessages called for channel:', channelId, 'forceReload:', forceReload);
+        console.log(
+          '🔄 loadMessages called for channel:',
+          channelId,
+          'forceReload:',
+          forceReload
+        );
         console.log('📊 Current messages state:', state.messages);
 
         // 강제 리로드가 아니고 이미 메시지가 있고, 해당 채널이 이번 세션에서 한 번 이상 Refresh 되었으면 스킵
@@ -1077,7 +1138,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           // 1) 최신 추가 메시지만 Confirm (after)
           try {
-            const latestCachedMessage = cachedMessages[cachedMessages.length - 1];
+            const latestCachedMessage =
+              cachedMessages[cachedMessages.length - 1];
             const incremental = await ChatService.getMessages({
               channelId,
               limit: 20, // 최신 20개만 Confirm
@@ -1092,7 +1154,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               });
             }
           } catch (serverError) {
-            console.warn('Failed incremental fetch, will still do full refresh:', serverError);
+            console.warn(
+              'Failed incremental fetch, will still do full refresh:',
+              serverError
+            );
           }
 
           // 2) 메타데이터(threadCount 등) 최신화를 위해 전체 갱신(fetch fresh)
@@ -1133,7 +1198,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         refreshedChannelsRef.current.add(channelId);
       } catch (error: any) {
-        console.error('Failed to load messages for channel', channelId, ':', error);
+        console.error(
+          'Failed to load messages for channel',
+          channelId,
+          ':',
+          error
+        );
         dispatch({
           type: 'SET_ERROR',
           payload: error.message || t('chat.loadMessagesFailed'),
@@ -1303,7 +1373,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Used자 데이터와 초대 수도 함께 로드 (개별 오류 처리)
       await Promise.allSettled([
-        loadUsers().catch((error) => console.error('❌ Failed to load users:', error)),
+        loadUsers().catch((error) =>
+          console.error('❌ Failed to load users:', error)
+        ),
         loadPendingInvitationsCount().catch((error) =>
           console.error('❌ Failed to load invitations:', error)
         ),
@@ -1312,9 +1384,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // 마지막 참여 채널 자동 선택
       const lastChannelId = localStorage.getItem('lastChannelId');
       if (lastChannelId && channels.length > 0) {
-        const lastChannel = channels.find((c) => c.id === parseInt(lastChannelId));
+        const lastChannel = channels.find(
+          (c) => c.id === parseInt(lastChannelId)
+        );
         if (lastChannel) {
-          console.log('Auto-selecting last channel:', lastChannel.name, 'ID:', lastChannel.id);
+          console.log(
+            'Auto-selecting last channel:',
+            lastChannel.name,
+            'ID:',
+            lastChannel.id
+          );
           // 채널 선택 + 메시지 로딩 + WS join
           dispatch({ type: 'SET_CURRENT_CHANNEL', payload: lastChannel.id });
           localStorage.setItem('lastChannelId', lastChannel.id.toString());
@@ -1333,7 +1412,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // dispatch({ type: 'SET_LOADING', payload: false });
         // dispatch({ type: 'SET_LOADING_STAGE', payload: 'complete' });
         // dispatch({ type: 'SET_LOADING_START_TIME', payload: null });
-        console.log('🔍 Loading completed immediately (no delay for smooth UX)');
+        console.log(
+          '🔍 Loading completed immediately (no delay for smooth UX)'
+        );
       };
 
       // 즉시 완료 처리
@@ -1341,7 +1422,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [connectWebSocket, loadMessages, loadUsers, loadPendingInvitationsCount]);
   // Debounced loader for channel switch (prevent burst loads)
-  const debouncedLoadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debouncedLoadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
   const scheduleLoadMessages = useCallback(
     (cid: number) => {
       if (debouncedLoadTimerRef.current) {
@@ -1449,7 +1532,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         console.log('📡 ChatContext: Creating channel via API...', channelData);
         const channel = await ChatService.createChannel(channelData);
-        console.log('✅ ChatContext: Channel created, adding to state...', channel);
+        console.log(
+          '✅ ChatContext: Channel created, adding to state...',
+          channel
+        );
         dispatch({ type: 'ADD_CHANNEL', payload: channel });
         return channel;
       } catch (error: any) {
@@ -1546,7 +1632,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // 이미 진행 중인 Request이 있으면 스킵
         if (markAsReadRequestsRef.current.has(requestKey)) {
-          console.log(`⏭️ Skipping duplicate markAsRead request for channel ${channelId}`);
+          console.log(
+            `⏭️ Skipping duplicate markAsRead request for channel ${channelId}`
+          );
           return;
         }
 
@@ -1568,7 +1656,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log(`✅ Marked channel ${channelId} as read`);
           } catch (error: any) {
             // 네트워크 오류나 타임아웃은 조용히 처리
-            if (error.code === 'ECONNABORTED' || error.status >= 500 || error.status === 408) {
+            if (
+              error.code === 'ECONNABORTED' ||
+              error.status >= 500 ||
+              error.status === 408
+            ) {
               console.warn(
                 `⚠️ Mark as read failed for channel ${channelId} (network/server issue):`,
                 error.message || error
@@ -1622,7 +1714,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (currentMessages.length === 0) return;
 
         const oldestMessage = currentMessages[0];
-        const result = await ChatService.getMessageHistory(channelId, oldestMessage.id);
+        const result = await ChatService.getMessageHistory(
+          channelId,
+          oldestMessage.id
+        );
 
         if (result.messages.length > 0) {
           dispatch({
@@ -1692,7 +1787,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     (window as any).chatActions = actions;
   }, [state, actions]);
 
-  return <ChatContext.Provider value={{ state, actions }}>{children}</ChatContext.Provider>;
+  return (
+    <ChatContext.Provider value={{ state, actions }}>
+      {children}
+    </ChatContext.Provider>
+  );
 };
 
 // Hook to use chat context

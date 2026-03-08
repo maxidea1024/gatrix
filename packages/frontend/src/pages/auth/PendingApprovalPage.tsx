@@ -1,6 +1,9 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import { HourglassEmpty as HourglassIcon, ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import {
+  HourglassEmpty as HourglassIcon,
+  ArrowBack as ArrowBackIcon,
+} from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -19,7 +22,11 @@ const PendingApprovalPage: React.FC = () => {
   };
 
   return (
-    <AuthLayout title={t('pendingApproval.title')} subtitle="" showLeftPanel={false}>
+    <AuthLayout
+      title={t('pendingApproval.title')}
+      subtitle=""
+      showLeftPanel={false}
+    >
       {/* Language Selector */}
       <Box
         sx={{
@@ -67,7 +74,10 @@ const PendingApprovalPage: React.FC = () => {
               borderRadius: 2,
             }}
           >
-            <Typography variant="body1" sx={{ color: 'white', fontWeight: 500 }}>
+            <Typography
+              variant="body1"
+              sx={{ color: 'white', fontWeight: 500 }}
+            >
               {email}
             </Typography>
           </Box>

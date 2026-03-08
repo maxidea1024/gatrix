@@ -55,7 +55,10 @@ class SignalEndpointService {
     id: number,
     data: { name?: string; description?: string; isEnabled?: boolean }
   ): Promise<SignalEndpoint> {
-    const response = await api.put(`${projectApiPath}/signal-endpoints/${id}`, data);
+    const response = await api.put(
+      `${projectApiPath}/signal-endpoints/${id}`,
+      data
+    );
     return response.data;
   }
 
@@ -64,7 +67,9 @@ class SignalEndpointService {
   }
 
   async toggle(projectApiPath: string, id: number): Promise<SignalEndpoint> {
-    const response = await api.post(`${projectApiPath}/signal-endpoints/${id}/toggle`);
+    const response = await api.post(
+      `${projectApiPath}/signal-endpoints/${id}/toggle`
+    );
     return response.data;
   }
 
@@ -80,8 +85,14 @@ class SignalEndpointService {
     return response.data;
   }
 
-  async deleteToken(projectApiPath: string, endpointId: number, tokenId: number): Promise<void> {
-    await api.delete(`${projectApiPath}/signal-endpoints/${endpointId}/tokens/${tokenId}`);
+  async deleteToken(
+    projectApiPath: string,
+    endpointId: number,
+    tokenId: number
+  ): Promise<void> {
+    await api.delete(
+      `${projectApiPath}/signal-endpoints/${endpointId}/tokens/${tokenId}`
+    );
   }
 
   async getSignals(
@@ -89,10 +100,16 @@ class SignalEndpointService {
     endpointId: number,
     limit = 50,
     offset = 0
-  ): Promise<{ data: Signal[]; pagination: { total: number; limit: number; offset: number } }> {
-    const response = await api.get(`${projectApiPath}/signal-endpoints/${endpointId}/signals`, {
-      params: { limit, offset },
-    });
+  ): Promise<{
+    data: Signal[];
+    pagination: { total: number; limit: number; offset: number };
+  }> {
+    const response = await api.get(
+      `${projectApiPath}/signal-endpoints/${endpointId}/signals`,
+      {
+        params: { limit, offset },
+      }
+    );
     return {
       data: response.data,
       pagination: (response as any).pagination as {

@@ -132,7 +132,11 @@ const EVENT_CATEGORIES: EventCategory[] = [
   },
   {
     key: 'segments',
-    events: ['feature_segment_created', 'feature_segment_updated', 'feature_segment_deleted'],
+    events: [
+      'feature_segment_created',
+      'feature_segment_updated',
+      'feature_segment_deleted',
+    ],
   },
   {
     key: 'game_world',
@@ -191,7 +195,11 @@ const EVENT_CATEGORIES: EventCategory[] = [
   },
   {
     key: 'integration',
-    events: ['integration_created', 'integration_updated', 'integration_deleted'],
+    events: [
+      'integration_created',
+      'integration_updated',
+      'integration_deleted',
+    ],
   },
 ];
 
@@ -202,24 +210,27 @@ interface CreateIntegrationWizardProps {
   initialProvider?: string;
 }
 
-export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = ({
-  open,
-  onClose,
-  onSuccess,
-  initialProvider,
-}) => {
+export const CreateIntegrationWizard: React.FC<
+  CreateIntegrationWizardProps
+> = ({ open, onClose, onSuccess, initialProvider }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
   const [activeStep, setActiveStep] = useState(initialProvider ? 1 : 0);
   const [providers, setProviders] = useState<ProviderDefinition[]>([]);
-  const [selectedProvider, setSelectedProvider] = useState<string | null>(initialProvider || null);
+  const [selectedProvider, setSelectedProvider] = useState<string | null>(
+    initialProvider || null
+  );
   const [description, setDescription] = useState('');
   const [isEnabled, setIsEnabled] = useState(true);
   const [parameters, setParameters] = useState<Record<string, any>>({});
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
-  const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>([]);
-  const [showSensitive, setShowSensitive] = useState<Record<string, boolean>>({});
+  const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>(
+    []
+  );
+  const [showSensitive, setShowSensitive] = useState<Record<string, boolean>>(
+    {}
+  );
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const { environments: envList } = useEnvironments();
@@ -272,7 +283,9 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
       const res = await api.get('/admin/integrations/providers');
       setProviders(res?.data || []);
     } catch {
-      enqueueSnackbar(t('integrations.providerLoadFailed'), { variant: 'error' });
+      enqueueSnackbar(t('integrations.providerLoadFailed'), {
+        variant: 'error',
+      });
     } finally {
       setLoading(false);
     }
@@ -325,7 +338,9 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
   const handleSave = async () => {
     if (!selectedProvider) return;
     if (!isParametersValid() || selectedEvents.length === 0) {
-      enqueueSnackbar(t('integrations.requiredFieldsMissing'), { variant: 'error' });
+      enqueueSnackbar(t('integrations.requiredFieldsMissing'), {
+        variant: 'error',
+      });
       return;
     }
 
@@ -480,7 +495,8 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                 >
                   {providers.map((provider) => {
                     const isSelected = selectedProvider === provider.name;
-                    const color = PROVIDER_COLORS[provider.name.toLowerCase()] || '#607D8B';
+                    const color =
+                      PROVIDER_COLORS[provider.name.toLowerCase()] || '#607D8B';
                     return (
                       <Card
                         key={provider.name}
@@ -488,7 +504,9 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                           height: 120,
                           border: 2,
                           borderColor: isSelected ? color : 'divider',
-                          bgcolor: isSelected ? alpha(color, 0.05) : 'background.paper',
+                          bgcolor: isSelected
+                            ? alpha(color, 0.05)
+                            : 'background.paper',
                           opacity: provider.deprecated ? 0.7 : 1,
                           transition: 'all 0.2s ease',
                           display: 'flex',
@@ -526,13 +544,21 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                               >
                                 <Box
                                   component="img"
-                                  src={PROVIDER_ICONS[provider.name.toLowerCase()] || webhookIcon}
+                                  src={
+                                    PROVIDER_ICONS[
+                                      provider.name.toLowerCase()
+                                    ] || webhookIcon
+                                  }
                                   alt={t(provider.displayName)}
                                   sx={{ width: 32, height: 32 }}
                                 />
                               </Box>
                               <Box flex={1} sx={{ overflow: 'hidden' }}>
-                                <Typography variant="subtitle1" fontWeight="bold" noWrap>
+                                <Typography
+                                  variant="subtitle1"
+                                  fontWeight="bold"
+                                  noWrap
+                                >
                                   {t(provider.displayName)}
                                 </Typography>
                                 <Typography
@@ -540,11 +566,15 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                                   color="text.secondary"
                                   sx={{
                                     display: '-webkit-box',
-                                    WebkitLineClamp: provider.deprecated ? 1 : 2,
+                                    WebkitLineClamp: provider.deprecated
+                                      ? 1
+                                      : 2,
                                     WebkitBoxOrient: 'vertical',
                                     overflow: 'hidden',
                                     lineHeight: '1.4em',
-                                    height: provider.deprecated ? '1.4em' : '2.8em',
+                                    height: provider.deprecated
+                                      ? '1.4em'
+                                      : '2.8em',
                                   }}
                                 >
                                   {t(provider.description)}
@@ -575,7 +605,9 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                                   flexShrink: 0,
                                 }}
                               >
-                                {isSelected && <CheckIcon sx={{ color: color }} />}
+                                {isSelected && (
+                                  <CheckIcon sx={{ color: color }} />
+                                )}
                               </Box>
                             </Box>
                           </CardContent>
@@ -619,14 +651,18 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                         flexShrink: 0,
                         border: '1px solid',
                         borderColor: alpha(
-                          PROVIDER_COLORS[currentProvider.name.toLowerCase()] || '#607D8B',
+                          PROVIDER_COLORS[currentProvider.name.toLowerCase()] ||
+                            '#607D8B',
                           0.1
                         ),
                       }}
                     >
                       <Box
                         component="img"
-                        src={PROVIDER_ICONS[currentProvider.name.toLowerCase()] || webhookIcon}
+                        src={
+                          PROVIDER_ICONS[currentProvider.name.toLowerCase()] ||
+                          webhookIcon
+                        }
                         alt={t(currentProvider.displayName)}
                         sx={{ width: 40, height: 40, objectFit: 'contain' }}
                       />
@@ -639,7 +675,11 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                       >
                         {t(currentProvider.displayName)}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ lineHeight: 1.5 }}
+                      >
                         {t(currentProvider.description)}
                       </Typography>
                     </Box>
@@ -648,7 +688,10 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
 
                 <FormControlLabel
                   control={
-                    <Switch checked={isEnabled} onChange={(e) => setIsEnabled(e.target.checked)} />
+                    <Switch
+                      checked={isEnabled}
+                      onChange={(e) => setIsEnabled(e.target.checked)}
+                    />
                   }
                   label={t('common.enabled')}
                   sx={{ mb: 2 }}
@@ -665,7 +708,9 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                   autoComplete="off"
                 />
 
-                {currentProvider?.parameters.map((param) => renderParameterInput(param))}
+                {currentProvider?.parameters.map((param) =>
+                  renderParameterInput(param)
+                )}
               </Box>
             </Fade>
 
@@ -673,10 +718,18 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
             <Fade in={activeStep === 2}>
               <Box sx={{ display: activeStep === 2 ? 'block' : 'none' }}>
                 <Box sx={{ mb: 4 }}>
-                  <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight="bold"
+                    sx={{ mb: 1 }}
+                  >
                     {t('integrations.eventSelection')}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2 }}
+                  >
                     {t('integrations.eventSelectionHelp')}
                   </Typography>
                   <EventSelector
@@ -687,10 +740,18 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
                 </Box>
 
                 <Box>
-                  <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight="bold"
+                    sx={{ mb: 1 }}
+                  >
                     {t('integrations.environmentSelection')}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2 }}
+                  >
                     {t('integrations.environmentSelectionHelp')}
                   </Typography>
                   <EnvironmentSelector
@@ -705,8 +766,13 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
         )}
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, py: 2, borderTop: 1, borderColor: 'divider' }}>
-        <Button onClick={activeStep === 0 ? onClose : handleBack} disabled={saving}>
+      <DialogActions
+        sx={{ px: 3, py: 2, borderTop: 1, borderColor: 'divider' }}
+      >
+        <Button
+          onClick={activeStep === 0 ? onClose : handleBack}
+          disabled={saving}
+        >
           {activeStep === 0 ? t('common.cancel') : t('common.back')}
         </Button>
         <Button

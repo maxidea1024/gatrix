@@ -3,7 +3,17 @@ import logger from '../utils/logger';
 
 export interface Filter {
   field: string;
-  operator: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'nin' | 'contains' | 'notContains';
+  operator:
+    | 'eq'
+    | 'ne'
+    | 'gt'
+    | 'gte'
+    | 'lt'
+    | 'lte'
+    | 'in'
+    | 'nin'
+    | 'contains'
+    | 'notContains';
   value: any;
 }
 
@@ -56,7 +66,11 @@ export class FilterBuilder {
     }
   }
 
-  private buildPropertyFilter(key: string, operator: string, value: any): string {
+  private buildPropertyFilter(
+    key: string,
+    operator: string,
+    value: any
+  ): string {
     // JSONExtractString을 사용하여 properties JSON에서 값 추출
     const extractExpr = `JSONExtractString(properties, '${this.escapeString(key)}')`;
 
@@ -119,7 +133,10 @@ export class FilterBuilder {
    * 프로젝트의 모든 이벤트에서 사용된 properties 키 추출
    * (필터 UI에서 자동완성용)
    */
-  async getPropertyKeys(projectId: string, eventName?: string): Promise<string[]> {
+  async getPropertyKeys(
+    projectId: string,
+    eventName?: string
+  ): Promise<string[]> {
     try {
       let query = `
         SELECT DISTINCT arrayJoin(propertiesKeys) as key

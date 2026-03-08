@@ -1,5 +1,8 @@
 import { useState, useCallback, useRef } from 'react';
-import { GatrixProvider, type GatrixClientConfig } from '@gatrix/gatrix-react-client-sdk';
+import {
+  GatrixProvider,
+  type GatrixClientConfig,
+} from '@gatrix/gatrix-react-client-sdk';
 import Dashboard from './components/Dashboard';
 import ConfigForm from './components/ConfigForm';
 import BootScreen from './components/BootScreen';
@@ -14,12 +17,21 @@ import './styles.css';
 // Log capture system
 let logIdCounter = 0;
 
-function createCaptureLogger(logsRef: React.MutableRefObject<LogEntry[]>, forceUpdate: () => void) {
+function createCaptureLogger(
+  logsRef: React.MutableRefObject<LogEntry[]>,
+  forceUpdate: () => void
+) {
   return {
     debug(message: string, ...args: any[]) {
       logsRef.current = [
         ...logsRef.current,
-        { id: logIdCounter++, level: 'debug' as const, message, timestamp: new Date(), args },
+        {
+          id: logIdCounter++,
+          level: 'debug' as const,
+          message,
+          timestamp: new Date(),
+          args,
+        },
       ];
       forceUpdate();
       console.debug(`[GatrixClient] ${message}`, ...args);
@@ -27,7 +39,13 @@ function createCaptureLogger(logsRef: React.MutableRefObject<LogEntry[]>, forceU
     info(message: string, ...args: any[]) {
       logsRef.current = [
         ...logsRef.current,
-        { id: logIdCounter++, level: 'info' as const, message, timestamp: new Date(), args },
+        {
+          id: logIdCounter++,
+          level: 'info' as const,
+          message,
+          timestamp: new Date(),
+          args,
+        },
       ];
       forceUpdate();
       console.info(`[GatrixClient] ${message}`, ...args);
@@ -35,7 +53,13 @@ function createCaptureLogger(logsRef: React.MutableRefObject<LogEntry[]>, forceU
     warn(message: string, ...args: any[]) {
       logsRef.current = [
         ...logsRef.current,
-        { id: logIdCounter++, level: 'warn' as const, message, timestamp: new Date(), args },
+        {
+          id: logIdCounter++,
+          level: 'warn' as const,
+          message,
+          timestamp: new Date(),
+          args,
+        },
       ];
       forceUpdate();
       console.warn(`[GatrixClient] ${message}`, ...args);
@@ -43,7 +67,13 @@ function createCaptureLogger(logsRef: React.MutableRefObject<LogEntry[]>, forceU
     error(message: string, ...args: any[]) {
       logsRef.current = [
         ...logsRef.current,
-        { id: logIdCounter++, level: 'error' as const, message, timestamp: new Date(), args },
+        {
+          id: logIdCounter++,
+          level: 'error' as const,
+          message,
+          timestamp: new Date(),
+          args,
+        },
       ];
       forceUpdate();
       console.error(`[GatrixClient] ${message}`, ...args);
@@ -74,9 +104,13 @@ function App() {
 
   const logsRef = useRef<LogEntry[]>([]);
   const forceUpdate = useCallback(() => setLogVersion((v) => v + 1), []);
-  const captureLogger = useRef(createCaptureLogger(logsRef, forceUpdate)).current;
+  const captureLogger = useRef(
+    createCaptureLogger(logsRef, forceUpdate)
+  ).current;
 
-  const errorLogCount = logsRef.current.filter((l) => l.level === 'error').length;
+  const errorLogCount = logsRef.current.filter(
+    (l) => l.level === 'error'
+  ).length;
 
   const handleConnect = useCallback((newConfig: GatrixClientConfig) => {
     localStorage.setItem('gatrix-dashboard-config', JSON.stringify(newConfig));
@@ -172,7 +206,10 @@ function App() {
               ) : showGame === 'defense' ? (
                 <IdleDefenseGame onExit={() => setShowGame(false)} />
               ) : (
-                <div className="dashboard-container" style={{ flex: 1, overflowY: 'auto' }}>
+                <div
+                  className="dashboard-container"
+                  style={{ flex: 1, overflowY: 'auto' }}
+                >
                   <header className="header">
                     <h1 className="header-title">
                       <i className="nes-icon trophy is-small"></i>
@@ -226,7 +263,9 @@ function App() {
             >
               📜
               {errorLogCount > 0 && (
-                <span className="log-fab-badge">{errorLogCount > 99 ? '99+' : errorLogCount}</span>
+                <span className="log-fab-badge">
+                  {errorLogCount > 99 ? '99+' : errorLogCount}
+                </span>
               )}
             </button>
           )}

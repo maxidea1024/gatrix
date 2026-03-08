@@ -77,7 +77,9 @@ export class AdminApiToken {
   /**
    * Find active token by its value (for auth)
    */
-  static async findByTokenValue(tokenValue: string): Promise<AdminApiTokenRecord | null> {
+  static async findByTokenValue(
+    tokenValue: string
+  ): Promise<AdminApiTokenRecord | null> {
     const row = await db(this.TABLE).where('tokenValue', tokenValue).first();
     if (!row) return null;
 

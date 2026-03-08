@@ -20,7 +20,9 @@ import {
   Dns as DnsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import serviceDiscoveryService, { ServiceInstance } from '../../services/serviceDiscoveryService';
+import serviceDiscoveryService, {
+  ServiceInstance,
+} from '../../services/serviceDiscoveryService';
 
 interface EdgeGroup {
   id: string;
@@ -82,11 +84,15 @@ const GatrixEdgesPage: React.FC = () => {
       groupMap.get(groupName)?.push(service);
     });
 
-    const newGroups: EdgeGroup[] = Array.from(groupMap.entries()).map(([name, instances]) => ({
-      id: name,
-      name: name === 'default' ? 'Default Group' : name,
-      instances: instances.sort((a, b) => a.instanceId.localeCompare(b.instanceId)),
-    }));
+    const newGroups: EdgeGroup[] = Array.from(groupMap.entries()).map(
+      ([name, instances]) => ({
+        id: name,
+        name: name === 'default' ? 'Default Group' : name,
+        instances: instances.sort((a, b) =>
+          a.instanceId.localeCompare(b.instanceId)
+        ),
+      })
+    );
 
     setGroups(newGroups);
     // Expand all by default
@@ -290,7 +296,9 @@ const GatrixEdgesPage: React.FC = () => {
                       }}
                       onClick={() => toggleGroup(group.id)}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
                         <Chip
                           label="Self-hosted"
                           size="small"
@@ -302,11 +310,17 @@ const GatrixEdgesPage: React.FC = () => {
                           {group.name}
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
                         <Typography variant="caption" color="text.secondary">
                           {group.instances.length} instances
                         </Typography>
-                        {expandedGroups.has(group.id) ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                        {expandedGroups.has(group.id) ? (
+                          <KeyboardArrowUp />
+                        ) : (
+                          <KeyboardArrowDown />
+                        )}
                       </Box>
                     </Box>
 
@@ -345,7 +359,10 @@ const GatrixEdgesPage: React.FC = () => {
                                   }}
                                 />
                                 <Box>
-                                  <Typography variant="body2" fontWeight="medium">
+                                  <Typography
+                                    variant="body2"
+                                    fontWeight="medium"
+                                  >
                                     {instance.hostname}
                                   </Typography>
                                   <Typography
@@ -405,7 +422,9 @@ const GatrixEdgesPage: React.FC = () => {
 
               {groups.length === 0 && !loading && (
                 <Box sx={{ p: 4, textAlign: 'center' }}>
-                  <Typography color="text.secondary">No Edge servers found.</Typography>
+                  <Typography color="text.secondary">
+                    No Edge servers found.
+                  </Typography>
                 </Box>
               )}
             </Box>

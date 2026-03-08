@@ -30,7 +30,10 @@ router.post(
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
 
-    const field = await featureFlagService.createContextField(req.body, userId!);
+    const field = await featureFlagService.createContextField(
+      req.body,
+      userId!
+    );
 
     res.status(201).json({ success: true, data: { field } });
   })
@@ -56,8 +59,11 @@ router.put(
 router.get(
   '/:fieldName/references',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { FeatureContextFieldModel } = await import('../../../models/FeatureFlag');
-    const references = await FeatureContextFieldModel.getReferences(req.params.fieldName);
+    const { FeatureContextFieldModel } =
+      await import('../../../models/FeatureFlag');
+    const references = await FeatureContextFieldModel.getReferences(
+      req.params.fieldName
+    );
     res.json({ success: true, data: { references } });
   })
 );

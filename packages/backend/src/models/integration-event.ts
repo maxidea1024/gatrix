@@ -41,7 +41,9 @@ export class IntegrationEventModel {
   /**
    * Create a new integration event log
    */
-  static async create(data: CreateIntegrationEventData): Promise<IntegrationEvent> {
+  static async create(
+    data: CreateIntegrationEventData
+  ): Promise<IntegrationEvent> {
     const id = ulid();
 
     try {
@@ -90,7 +92,9 @@ export class IntegrationEventModel {
         throw new Error('Failed to create integration event');
       }
 
-      logger.debug(`Created integration event ${id} for integration ${data.integrationId}`);
+      logger.debug(
+        `Created integration event ${id} for integration ${data.integrationId}`
+      );
       return event;
     } catch (error) {
       logger.error('Error creating integration event:', error);
@@ -123,7 +127,12 @@ export class IntegrationEventModel {
     integrationId: string,
     page: number = 1,
     limit: number = 20
-  ): Promise<{ events: IntegrationEvent[]; total: number; page: number; limit: number }> {
+  ): Promise<{
+    events: IntegrationEvent[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     try {
       const offset = (page - 1) * limit;
 
@@ -145,7 +154,10 @@ export class IntegrationEventModel {
 
       return { events, total, page, limit };
     } catch (error) {
-      logger.error('Error finding integration events by integration ID:', error);
+      logger.error(
+        'Error finding integration events by integration ID:',
+        error
+      );
       throw error;
     }
   }
@@ -173,7 +185,9 @@ export class IntegrationEventModel {
   /**
    * Get event state statistics for an integration
    */
-  static async getStateStats(integrationId: string): Promise<{ state: string; count: number }[]> {
+  static async getStateStats(
+    integrationId: string
+  ): Promise<{ state: string; count: number }[]> {
     try {
       const results = await db(this.TABLE)
         .where('integrationId', integrationId)
@@ -199,10 +213,14 @@ export class IntegrationEventModel {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-      const result = await db(this.TABLE).where('createdAt', '<', cutoffDate).del();
+      const result = await db(this.TABLE)
+        .where('createdAt', '<', cutoffDate)
+        .del();
 
       if (result > 0) {
-        logger.info(`Deleted ${result} old integration events older than ${daysToKeep} days`);
+        logger.info(
+          `Deleted ${result} old integration events older than ${daysToKeep} days`
+        );
       }
 
       return result;
@@ -217,7 +235,9 @@ export class IntegrationEventModel {
    */
   static async deleteByIntegrationId(integrationId: string): Promise<number> {
     try {
-      const result = await db(this.TABLE).where('integrationId', integrationId).del();
+      const result = await db(this.TABLE)
+        .where('integrationId', integrationId)
+        .del();
       logger.info(`Deleted ${result} events for integration ${integrationId}`);
       return result;
     } catch (error) {
@@ -236,8 +256,12 @@ export class IntegrationEventModel {
       eventType: row.eventType,
       state: row.state as IntegrationEventState,
       stateDetails: row.stateDetails,
-      eventData: typeof row.eventData === 'string' ? JSON.parse(row.eventData) : row.eventData,
-      details: typeof row.details === 'string' ? JSON.parse(row.details) : row.details,
+      eventData:
+        typeof row.eventData === 'string'
+          ? JSON.parse(row.eventData)
+          : row.eventData,
+      details:
+        typeof row.details === 'string' ? JSON.parse(row.details) : row.details,
       createdAt: row.createdAt,
     };
   }

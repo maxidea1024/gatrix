@@ -75,7 +75,8 @@ const CACHE_TTL = {
 
 // Cache key builders
 const cacheKey = {
-  orgAdmin: (userId: string, orgId: string) => `rbac:org_admin:${userId}:${orgId}`,
+  orgAdmin: (userId: string, orgId: string) =>
+    `rbac:org_admin:${userId}:${orgId}`,
   userRoles: (userId: string) => `rbac:user_roles:${userId}`,
   rolePerms: (roleId: string) => `rbac:role_perms:${roleId}`,
 };
@@ -100,7 +101,11 @@ class PermissionService {
   /**
    * Check if user has an organisation-level permission
    */
-  async hasOrgPermission(userId: string, orgId: string, perm: string): Promise<boolean> {
+  async hasOrgPermission(
+    userId: string,
+    orgId: string,
+    perm: string
+  ): Promise<boolean> {
     // Sanity check: perm must be an org-scope permission
     if (!isPermissionScopeValid(perm, 'org')) return false;
 
@@ -128,7 +133,11 @@ class PermissionService {
     if (!isPermissionScopeValid(perm, 'project')) return false;
 
     // Get effective role IDs at project scope (with override chain)
-    const roleIds = await this.getEffectiveRoleIds(userId, 'project', projectId);
+    const roleIds = await this.getEffectiveRoleIds(
+      userId,
+      'project',
+      projectId
+    );
     if (roleIds.length === 0) return false;
 
     // Check permissions
@@ -149,7 +158,11 @@ class PermissionService {
     if (!isPermissionScopeValid(perm, 'env')) return false;
 
     // Get effective role IDs at environment scope (with override chain)
-    const roleIds = await this.getEffectiveRoleIds(userId, 'environment', environmentId);
+    const roleIds = await this.getEffectiveRoleIds(
+      userId,
+      'environment',
+      environmentId
+    );
     if (roleIds.length === 0) return false;
 
     // Check permissions
@@ -200,7 +213,8 @@ class PermissionService {
    * Uses hierarchy: system(0) > org(1) > project(2) > env(3)
    */
   async getUserMaxScopeLevel(userId: string): Promise<number> {
-    const { getHighestScopeLevel, SCOPE_LEVELS } = await import('../utils/scope-hierarchy');
+    const { getHighestScopeLevel, SCOPE_LEVELS } =
+      await import('../utils/scope-hierarchy');
     const roles = await db('g_role_bindings')
       .join('g_roles', 'g_role_bindings.roleId', 'g_roles.id')
       .where('g_role_bindings.userId', userId)
@@ -222,15 +236,22 @@ class PermissionService {
    * Check if user is a member of the organisation
    */
   async isOrgMember(userId: string, orgId: string): Promise<boolean> {
-    const member = await db('g_organisation_members').where({ userId, orgId }).first();
+    const member = await db('g_organisation_members')
+      .where({ userId, orgId })
+      .first();
     return !!member;
   }
 
   /**
    * Get user's org membership info
    */
-  async getOrgMembership(userId: string, orgId?: string): Promise<{ orgId: string } | null> {
-    const query = db('g_organisation_members').where('userId', userId).select('orgId');
+  async getOrgMembership(
+    userId: string,
+    orgId?: string
+  ): Promise<{ orgId: string } | null> {
+    const query = db('g_organisation_members')
+      .where('userId', userId)
+      .select('orgId');
 
     if (orgId) {
       query.where('orgId', orgId);
@@ -247,10 +268,16 @@ class PermissionService {
   /**
    * Get all organisation memberships for a user
    */
-  async getUserOrganisations(userId: string): Promise<Array<{ orgId: string }>> {
+  async getUserOrganisations(
+    userId: string
+  ): Promise<Array<{ orgId: string }>> {
     const memberships = await db('g_organisation_members')
       .where('userId', userId)
-      .join('g_organisations', 'g_organisation_members.orgId', 'g_organisations.id')
+      .join(
+        'g_organisations',
+        'g_organisation_members.orgId',
+        'g_organisations.id'
+      )
       .where('g_organisations.isActive', true)
       .select('g_organisation_members.orgId');
 
@@ -265,11 +292,17 @@ class PermissionService {
   async resolveEnvironmentChain(
     environmentId: string
   ): Promise<{ projectId: string; orgId: string } | null> {
-    const env = await db('g_environments').where('id', environmentId).select('projectId').first();
+    const env = await db('g_environments')
+      .where('id', environmentId)
+      .select('projectId')
+      .first();
 
     if (!env?.projectId) return null;
 
-    const project = await db('g_projects').where('id', env.projectId).select('orgId').first();
+    const project = await db('g_projects')
+      .where('id', env.projectId)
+      .select('orgId')
+      .first();
 
     if (!project) return null;
 
@@ -283,7 +316,10 @@ class PermissionService {
    * Resolve projectId → orgId
    */
   async resolveProjectOrg(projectId: string): Promise<string | null> {
-    const project = await db('g_projects').where('id', projectId).select('orgId').first();
+    const project = await db('g_projects')
+      .where('id', projectId)
+      .select('orgId')
+      .first();
     return project?.orgId || null;
   }
 
@@ -294,10 +330,15 @@ class PermissionService {
    * Org Admin → all active projects.
    * Otherwise → projects where user has membership or any binding.
    */
-  async getAccessibleProjectIds(userId: string, orgId: string): Promise<string[]> {
+  async getAccessibleProjectIds(
+    userId: string,
+    orgId: string
+  ): Promise<string[]> {
     // Org Admin → all projects
     if (await this.isOrgAdmin(userId, orgId)) {
-      const allProjects = await db('g_projects').where({ orgId, isActive: true }).select('id');
+      const allProjects = await db('g_projects')
+        .where({ orgId, isActive: true })
+        .select('id');
       return allProjects.map((p: any) => p.id);
     }
 
@@ -321,7 +362,9 @@ class PermissionService {
 
     if (orgBindings.length > 0) {
       // User has org-level binding → access to all projects in the org
-      const allProjects = await db('g_projects').where({ orgId, isActive: true }).select('id');
+      const allProjects = await db('g_projects')
+        .where({ orgId, isActive: true })
+        .select('id');
       return allProjects.map((p: any) => p.id);
     }
 
@@ -364,21 +407,33 @@ class PermissionService {
   ): Promise<string[]> {
     // Org Admin → all environments
     if (await this.isOrgAdmin(userId, orgId)) {
-      const allEnvs = await db('g_environments').where({ projectId }).select('id');
+      const allEnvs = await db('g_environments')
+        .where({ projectId })
+        .select('id');
       return allEnvs.map((e: any) => e.id);
     }
 
     // Project member → all environments
-    const isProjectMember = await db('g_project_members').where({ projectId, userId }).first();
+    const isProjectMember = await db('g_project_members')
+      .where({ projectId, userId })
+      .first();
     if (isProjectMember) {
-      const allEnvs = await db('g_environments').where({ projectId }).select('id');
+      const allEnvs = await db('g_environments')
+        .where({ projectId })
+        .select('id');
       return allEnvs.map((e: any) => e.id);
     }
 
     // Org-level or project-level binding → all environments
-    const roleIds = await this.getEffectiveRoleIds(userId, 'project', projectId);
+    const roleIds = await this.getEffectiveRoleIds(
+      userId,
+      'project',
+      projectId
+    );
     if (roleIds.length > 0) {
-      const allEnvs = await db('g_environments').where({ projectId }).select('id');
+      const allEnvs = await db('g_environments')
+        .where({ projectId })
+        .select('id');
       return allEnvs.map((e: any) => e.id);
     }
 
@@ -444,7 +499,13 @@ class PermissionService {
       .join('g_groups as g', 'rb.groupId', 'g.id')
       .where('gm.userId', userId)
       .whereNotNull('rb.groupId')
-      .select('rb.scopeType', 'rb.scopeId', 'rb.roleId', 'r.roleName', 'g.groupName');
+      .select(
+        'rb.scopeType',
+        'rb.scopeId',
+        'rb.roleId',
+        'r.roleName',
+        'g.groupName'
+      );
 
     for (const b of groupBindings) {
       const perms = await this.getRolePermissions(b.roleId);
@@ -477,7 +538,9 @@ class PermissionService {
         await client.del(allKeys);
       }
 
-      logger.debug(`Invalidated ${allKeys.length} RBAC cache entries for user ${userId}`);
+      logger.debug(
+        `Invalidated ${allKeys.length} RBAC cache entries for user ${userId}`
+      );
     } catch (error) {
       logger.warn('Failed to invalidate user RBAC cache:', error);
     }
@@ -525,13 +588,21 @@ class PermissionService {
   ): Promise<string[]> {
     if (scopeType === 'environment') {
       // Check environment-specific bindings first
-      const envRoles = await this.getBindingRoleIds(userId, 'environment', scopeId);
+      const envRoles = await this.getBindingRoleIds(
+        userId,
+        'environment',
+        scopeId
+      );
       if (envRoles.length > 0) return this.resolveInheritedRoles(envRoles);
 
       // Fallback to project
       const projectId = await this.getProjectFromEnv(scopeId);
       if (projectId) {
-        const projRoles = await this.getBindingRoleIds(userId, 'project', projectId);
+        const projRoles = await this.getBindingRoleIds(
+          userId,
+          'project',
+          projectId
+        );
         if (projRoles.length > 0) return this.resolveInheritedRoles(projRoles);
       }
 
@@ -543,11 +614,17 @@ class PermissionService {
       }
 
       // Fallback to system
-      return this.resolveInheritedRoles(await this.getBindingRoleIds(userId, 'system', 'SYSTEM'));
+      return this.resolveInheritedRoles(
+        await this.getBindingRoleIds(userId, 'system', 'SYSTEM')
+      );
     }
 
     if (scopeType === 'project') {
-      const projRoles = await this.getBindingRoleIds(userId, 'project', scopeId);
+      const projRoles = await this.getBindingRoleIds(
+        userId,
+        'project',
+        scopeId
+      );
       if (projRoles.length > 0) return this.resolveInheritedRoles(projRoles);
 
       // Fallback to org
@@ -557,18 +634,24 @@ class PermissionService {
         if (orgRoles.length > 0) return this.resolveInheritedRoles(orgRoles);
       }
 
-      return this.resolveInheritedRoles(await this.getBindingRoleIds(userId, 'system', 'SYSTEM'));
+      return this.resolveInheritedRoles(
+        await this.getBindingRoleIds(userId, 'system', 'SYSTEM')
+      );
     }
 
     if (scopeType === 'org') {
       const orgRoles = await this.getBindingRoleIds(userId, 'org', scopeId);
       if (orgRoles.length > 0) return this.resolveInheritedRoles(orgRoles);
 
-      return this.resolveInheritedRoles(await this.getBindingRoleIds(userId, 'system', 'SYSTEM'));
+      return this.resolveInheritedRoles(
+        await this.getBindingRoleIds(userId, 'system', 'SYSTEM')
+      );
     }
 
     // system scope
-    return this.resolveInheritedRoles(await this.getBindingRoleIds(userId, 'system', 'SYSTEM'));
+    return this.resolveInheritedRoles(
+      await this.getBindingRoleIds(userId, 'system', 'SYSTEM')
+    );
   }
 
   /**
@@ -603,7 +686,10 @@ class PermissionService {
   /**
    * Check if any of the given roles have the required permission
    */
-  private async checkPermissionInRoles(roleIds: string[], perm: string): Promise<boolean> {
+  private async checkPermissionInRoles(
+    roleIds: string[],
+    perm: string
+  ): Promise<boolean> {
     for (const roleId of roleIds) {
       const perms = await this.getRolePermissions(roleId);
       if (perms.some((p) => matchSingle(p, perm))) return true;
@@ -624,7 +710,9 @@ class PermissionService {
       // Cache miss
     }
 
-    const rows = await db('g_role_permissions').where('roleId', roleId).select('permission');
+    const rows = await db('g_role_permissions')
+      .where('roleId', roleId)
+      .select('permission');
     const perms = rows.map((r: any) => r.permission);
 
     try {
@@ -639,7 +727,10 @@ class PermissionService {
   /**
    * Recursively resolve inherited roles (max depth to prevent cycles)
    */
-  private async resolveInheritedRoles(roleIds: string[], depth: number = 0): Promise<string[]> {
+  private async resolveInheritedRoles(
+    roleIds: string[],
+    depth: number = 0
+  ): Promise<string[]> {
     if (depth >= MAX_INHERITANCE_DEPTH || roleIds.length === 0) {
       return roleIds;
     }
@@ -657,7 +748,10 @@ class PermissionService {
     }
 
     // Recursively resolve parent roles
-    const allParentIds = await this.resolveInheritedRoles([...roleIds, ...parentIds], depth + 1);
+    const allParentIds = await this.resolveInheritedRoles(
+      [...roleIds, ...parentIds],
+      depth + 1
+    );
 
     return Array.from(new Set([...roleIds, ...allParentIds]));
   }
@@ -665,7 +759,10 @@ class PermissionService {
   /**
    * Detect if adding parentRoleId as parent of roleId would create a cycle.
    */
-  async wouldCreateCycle(roleId: string, parentRoleId: string): Promise<boolean> {
+  async wouldCreateCycle(
+    roleId: string,
+    parentRoleId: string
+  ): Promise<boolean> {
     if (roleId === parentRoleId) return true;
 
     const visited = new Set<string>([roleId]);
@@ -706,7 +803,9 @@ class PermissionService {
     }
 
     // Direct bindings
-    const directRoles = await db('g_role_bindings').where('userId', userId).select('roleId');
+    const directRoles = await db('g_role_bindings')
+      .where('userId', userId)
+      .select('roleId');
 
     // Group bindings
     const groupRoles = await db('g_role_bindings as rb')
@@ -721,7 +820,9 @@ class PermissionService {
     ]);
 
     // Resolve inherited roles
-    const allRoleIds = await this.resolveInheritedRoles(Array.from(baseRoleIds));
+    const allRoleIds = await this.resolveInheritedRoles(
+      Array.from(baseRoleIds)
+    );
 
     try {
       await redis.set(key, JSON.stringify(allRoleIds), CACHE_TTL.USER_ROLES);
@@ -734,24 +835,41 @@ class PermissionService {
 
   // ─── Scope resolution helpers ─────────────────────────
 
-  private async getProjectFromEnv(environmentId: string): Promise<string | null> {
-    const env = await db('g_environments').where('id', environmentId).select('projectId').first();
+  private async getProjectFromEnv(
+    environmentId: string
+  ): Promise<string | null> {
+    const env = await db('g_environments')
+      .where('id', environmentId)
+      .select('projectId')
+      .first();
     return env?.projectId || null;
   }
 
-  private async resolveOrgFromScope(scopeType: string, scopeId: string): Promise<string | null> {
+  private async resolveOrgFromScope(
+    scopeType: string,
+    scopeId: string
+  ): Promise<string | null> {
     if (scopeType === 'org') return scopeId;
     if (scopeType === 'system') return null;
 
     if (scopeType === 'project') {
-      const proj = await db('g_projects').where('id', scopeId).select('orgId').first();
+      const proj = await db('g_projects')
+        .where('id', scopeId)
+        .select('orgId')
+        .first();
       return proj?.orgId || null;
     }
 
     if (scopeType === 'environment') {
-      const env = await db('g_environments').where('id', scopeId).select('projectId').first();
+      const env = await db('g_environments')
+        .where('id', scopeId)
+        .select('projectId')
+        .first();
       if (!env?.projectId) return null;
-      const proj = await db('g_projects').where('id', env.projectId).select('orgId').first();
+      const proj = await db('g_projects')
+        .where('id', env.projectId)
+        .select('orgId')
+        .first();
       return proj?.orgId || null;
     }
 

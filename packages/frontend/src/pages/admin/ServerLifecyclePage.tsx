@@ -96,9 +96,19 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
+  column,
+  onToggleVisibility,
+}) => {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: column.id,
   });
 
@@ -128,7 +138,11 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
         </Box>
       }
     >
-      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -138,7 +152,10 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
       </ListItemButton>
     </ListItem>
   );
@@ -152,7 +169,12 @@ interface EventRowProps {
   enqueueSnackbar: (message: string, options?: any) => void;
 }
 
-const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enqueueSnackbar }) => {
+const EventRow: React.FC<EventRowProps> = ({
+  event,
+  visibleColumns,
+  index,
+  enqueueSnackbar,
+}) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
@@ -216,7 +238,9 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
           </Typography>
         );
       case 'group':
-        return <Typography variant="body2">{event.serviceGroup || '-'}</Typography>;
+        return (
+          <Typography variant="body2">{event.serviceGroup || '-'}</Typography>
+        );
       case 'hostname':
         return (
           <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
@@ -266,7 +290,9 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
           </Box>
         );
       case 'environment':
-        return <Typography variant="body2">{event.environmentId || '-'}</Typography>;
+        return (
+          <Typography variant="body2">{event.environmentId || '-'}</Typography>
+        );
       case 'instanceId':
         return (
           <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
@@ -275,7 +301,10 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
         );
       case 'ports':
         return (
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+          <Typography
+            variant="body2"
+            sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
+          >
             {event.ports
               ? Object.entries(event.ports)
                   .map(([k, v]) => `${k}:${v}`)
@@ -284,24 +313,39 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
           </Typography>
         );
       case 'cloudProvider':
-        return <Typography variant="body2">{event.cloudProvider || '-'}</Typography>;
+        return (
+          <Typography variant="body2">{event.cloudProvider || '-'}</Typography>
+        );
       case 'cloudZone':
-        return <Typography variant="body2">{event.cloudZone || '-'}</Typography>;
+        return (
+          <Typography variant="body2">{event.cloudZone || '-'}</Typography>
+        );
       case 'labels':
         return (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
             {event.labels
               ? Object.entries(event.labels)
-                  .filter(([k]) => !['service', 'group', 'environment'].includes(k))
+                  .filter(
+                    ([k]) => !['service', 'group', 'environment'].includes(k)
+                  )
                   .slice(0, 3)
                   .map(([k, v]) => (
-                    <Chip key={k} label={`${k}: ${v}`} size="small" variant="outlined" />
+                    <Chip
+                      key={k}
+                      label={`${k}: ${v}`}
+                      size="small"
+                      variant="outlined"
+                    />
                   ))
               : '-'}
           </Box>
         );
       case 'uptime':
-        return <Typography variant="body2">{formatUptime(event.uptimeSeconds)}</Typography>;
+        return (
+          <Typography variant="body2">
+            {formatUptime(event.uptimeSeconds)}
+          </Typography>
+        );
       case 'timestamp':
         return <RelativeTime date={event.createdAt} />;
       default:
@@ -344,7 +388,10 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
         ))}
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={visibleColumns.length + 1}>
+        <TableCell
+          style={{ paddingBottom: 0, paddingTop: 0 }}
+          colSpan={visibleColumns.length + 1}
+        >
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 2 }}>
               <Typography
@@ -365,11 +412,20 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                 >
                   {/* Instance ID */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverLifecycle.instanceId')}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ fontFamily: 'monospace' }}
+                      >
                         {event.instanceId}
                       </Typography>
                       <IconButton
@@ -383,11 +439,19 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   </Box>
                   {/* Service */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverLifecycle.service')}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2">{event.serviceType}</Typography>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <Typography variant="body2">
+                        {event.serviceType}
+                      </Typography>
                       <IconButton
                         size="small"
                         onClick={() => handleCopy(event.serviceType)}
@@ -399,11 +463,19 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   </Box>
                   {/* Group */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverLifecycle.group')}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2">{event.serviceGroup || '-'}</Typography>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <Typography variant="body2">
+                        {event.serviceGroup || '-'}
+                      </Typography>
                       {event.serviceGroup && (
                         <IconButton
                           size="small"
@@ -417,11 +489,20 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   </Box>
                   {/* Hostname */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverList.hostname')}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ fontFamily: 'monospace' }}
+                      >
                         {event.hostname || '-'}
                       </Typography>
                       {event.hostname && (
@@ -437,11 +518,19 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   </Box>
                   {/* Environment */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverLifecycle.environment')}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2">{event.environmentId || '-'}</Typography>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <Typography variant="body2">
+                        {event.environmentId || '-'}
+                      </Typography>
                       {event.environmentId && (
                         <IconButton
                           size="small"
@@ -455,11 +544,20 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   </Box>
                   {/* External Address */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverList.externalAddress')}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ fontFamily: 'monospace' }}
+                      >
                         {event.externalAddress || '-'}
                       </Typography>
                       {event.externalAddress && (
@@ -475,11 +573,20 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   </Box>
                   {/* Internal Address */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverList.internalAddress')}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ fontFamily: 'monospace' }}
+                      >
                         {event.internalAddress || '-'}
                       </Typography>
                       {event.internalAddress && (
@@ -495,10 +602,16 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   </Box>
                   {/* Ports */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverList.ports')}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
                       <Typography
                         variant="body2"
                         sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
@@ -512,7 +625,9 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                       {event.ports && Object.keys(event.ports).length > 0 && (
                         <IconButton
                           size="small"
-                          onClick={() => handleCopy(JSON.stringify(event.ports))}
+                          onClick={() =>
+                            handleCopy(JSON.stringify(event.ports))
+                          }
                           sx={{ p: 0.25 }}
                         >
                           <ContentCopyIcon sx={{ fontSize: 14 }} />
@@ -522,15 +637,23 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   </Box>
                   {/* Cloud Info */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverLifecycle.cloudInfo')}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
                       <Typography variant="body2">
-                        {event.cloudProvider || '-'} / {event.cloudRegion || '-'} /{' '}
-                        {event.cloudZone || '-'}
+                        {event.cloudProvider || '-'} /{' '}
+                        {event.cloudRegion || '-'} / {event.cloudZone || '-'}
                       </Typography>
-                      {(event.cloudProvider || event.cloudRegion || event.cloudZone) && (
+                      {(event.cloudProvider ||
+                        event.cloudRegion ||
+                        event.cloudZone) && (
                         <IconButton
                           size="small"
                           onClick={() =>
@@ -547,11 +670,19 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   </Box>
                   {/* SDK Version */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       SDK Version
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2">{event.sdkVersion || '-'}</Typography>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <Typography variant="body2">
+                        {event.sdkVersion || '-'}
+                      </Typography>
                       {event.sdkVersion && (
                         <IconButton
                           size="small"
@@ -565,11 +696,19 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   </Box>
                   {/* App Version */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverList.appVersion')}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2">{event.appVersion || '-'}</Typography>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <Typography variant="body2">
+                        {event.appVersion || '-'}
+                      </Typography>
                       {event.appVersion && (
                         <IconButton
                           size="small"
@@ -583,14 +722,24 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   </Box>
                   {/* Uptime */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverLifecycle.uptime')}
                     </Typography>
-                    <Typography variant="body2">{formatUptime(event.uptimeSeconds)}</Typography>
+                    <Typography variant="body2">
+                      {formatUptime(event.uptimeSeconds)}
+                    </Typography>
                   </Box>
                   {/* Created At */}
                   <Box>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverLifecycle.timestamp')}
                     </Typography>
                     <RelativeTime date={event.createdAt} />
@@ -598,7 +747,11 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   {/* Labels */}
                   {event.labels && Object.keys(event.labels).length > 0 && (
                     <Box sx={{ gridColumn: 'span 3' }}>
-                      <Typography variant="caption" color="textSecondary" display="block">
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        display="block"
+                      >
                         {t('serverList.labels')}
                       </Typography>
                       <Box
@@ -610,11 +763,18 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                         }}
                       >
                         {Object.entries(event.labels).map(([k, v]) => (
-                          <Chip key={k} label={`${k}: ${v}`} size="small" variant="outlined" />
+                          <Chip
+                            key={k}
+                            label={`${k}: ${v}`}
+                            size="small"
+                            variant="outlined"
+                          />
                         ))}
                         <IconButton
                           size="small"
-                          onClick={() => handleCopy(JSON.stringify(event.labels, null, 2))}
+                          onClick={() =>
+                            handleCopy(JSON.stringify(event.labels, null, 2))
+                          }
                           sx={{ p: 0.25 }}
                         >
                           <ContentCopyIcon sx={{ fontSize: 14 }} />
@@ -625,7 +785,11 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   {/* Metadata */}
                   {event.metadata && Object.keys(event.metadata).length > 0 && (
                     <Box sx={{ gridColumn: 'span 3' }}>
-                      <Typography variant="caption" color="textSecondary" display="block">
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        display="block"
+                      >
                         {t('serverLifecycle.metadata')}
                       </Typography>
                       <Box
@@ -648,7 +812,9 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                         </Typography>
                         <IconButton
                           size="small"
-                          onClick={() => handleCopy(JSON.stringify(event.metadata, null, 2))}
+                          onClick={() =>
+                            handleCopy(JSON.stringify(event.metadata, null, 2))
+                          }
                           sx={{ p: 0.25 }}
                         >
                           <ContentCopyIcon sx={{ fontSize: 14 }} />
@@ -665,7 +831,8 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                       color="error.main"
                       sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                     >
-                      <ErrorOutlineIcon fontSize="small" /> {t('serverLifecycle.error')}
+                      <ErrorOutlineIcon fontSize="small" />{' '}
+                      {t('serverLifecycle.error')}
                     </Typography>
                     <Paper
                       variant="outlined"
@@ -685,7 +852,11 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
 
                 {event.errorStack && (
                   <Box sx={{ mt: 2 }}>
-                    <Typography variant="caption" color="textSecondary" display="block">
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      display="block"
+                    >
                       {t('serverLifecycle.callStack')}
                     </Typography>
                     <Box
@@ -815,7 +986,8 @@ const ServerLifecyclePage: React.FC = () => {
     return defaultColumns;
   });
 
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLButtonElement | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -847,7 +1019,14 @@ const ServerLifecyclePage: React.FC = () => {
     params.sortOrder = sortOrder;
 
     return await serverLifecycleService.getEvents(projectApiPath, params);
-  }, [page, rowsPerPage, debouncedSearchQuery, debouncedActiveFilters, sortBy, sortOrder]);
+  }, [
+    page,
+    rowsPerPage,
+    debouncedSearchQuery,
+    debouncedActiveFilters,
+    sortBy,
+    sortOrder,
+  ]);
 
   const { data, isLoading, mutate } = useSWR(
     `server-lifecycle-events-${page}-${rowsPerPage}-${debouncedSearchQuery}-${JSON.stringify(debouncedActiveFilters)}-${sortBy}-${sortOrder}`,
@@ -961,7 +1140,10 @@ const ServerLifecyclePage: React.FC = () => {
     (filter: ActiveFilter) => {
       const newFilters = [...activeFilters, filter];
       setActiveFilters(newFilters);
-      localStorage.setItem('serverLifecyclePage.activeFilters', JSON.stringify(newFilters));
+      localStorage.setItem(
+        'serverLifecyclePage.activeFilters',
+        JSON.stringify(newFilters)
+      );
       setPage(0);
     },
     [activeFilters]
@@ -971,7 +1153,10 @@ const ServerLifecyclePage: React.FC = () => {
     (filterKey: string) => {
       const newFilters = activeFilters.filter((f) => f.key !== filterKey);
       setActiveFilters(newFilters);
-      localStorage.setItem('serverLifecyclePage.activeFilters', JSON.stringify(newFilters));
+      localStorage.setItem(
+        'serverLifecyclePage.activeFilters',
+        JSON.stringify(newFilters)
+      );
       setPage(0);
     },
     [activeFilters]
@@ -979,9 +1164,14 @@ const ServerLifecyclePage: React.FC = () => {
 
   const handleFilterChange = useCallback(
     (filterKey: string, value: any) => {
-      const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f));
+      const newFilters = activeFilters.map((f) =>
+        f.key === filterKey ? { ...f, value } : f
+      );
       setActiveFilters(newFilters);
-      localStorage.setItem('serverLifecyclePage.activeFilters', JSON.stringify(newFilters));
+      localStorage.setItem(
+        'serverLifecyclePage.activeFilters',
+        JSON.stringify(newFilters)
+      );
       setPage(0);
     },
     [activeFilters]
@@ -989,9 +1179,14 @@ const ServerLifecyclePage: React.FC = () => {
 
   const handleOperatorChange = useCallback(
     (filterKey: string, operator: 'any_of' | 'include_all') => {
-      const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f));
+      const newFilters = activeFilters.map((f) =>
+        f.key === filterKey ? { ...f, operator } : f
+      );
       setActiveFilters(newFilters);
-      localStorage.setItem('serverLifecyclePage.activeFilters', JSON.stringify(newFilters));
+      localStorage.setItem(
+        'serverLifecyclePage.activeFilters',
+        JSON.stringify(newFilters)
+      );
     },
     [activeFilters]
   );
@@ -1002,14 +1197,20 @@ const ServerLifecyclePage: React.FC = () => {
         col.id === columnId ? { ...col, visible: !col.visible } : col
       );
       setColumns(newColumns);
-      localStorage.setItem('serverLifecycleColumns', JSON.stringify(newColumns));
+      localStorage.setItem(
+        'serverLifecycleColumns',
+        JSON.stringify(newColumns)
+      );
     },
     [columns]
   );
 
   const handleResetColumns = useCallback(() => {
     setColumns(defaultColumns);
-    localStorage.setItem('serverLifecycleColumns', JSON.stringify(defaultColumns));
+    localStorage.setItem(
+      'serverLifecycleColumns',
+      JSON.stringify(defaultColumns)
+    );
   }, []);
 
   const handleColumnDragEnd = useCallback(
@@ -1020,7 +1221,10 @@ const ServerLifecyclePage: React.FC = () => {
         const newIndex = columns.findIndex((col) => col.id === over.id);
         const newColumns = arrayMove(columns, oldIndex, newIndex);
         setColumns(newColumns);
-        localStorage.setItem('serverLifecycleColumns', JSON.stringify(newColumns));
+        localStorage.setItem(
+          'serverLifecycleColumns',
+          JSON.stringify(newColumns)
+        );
       }
     },
     [columns]
@@ -1030,11 +1234,14 @@ const ServerLifecyclePage: React.FC = () => {
     setPage(newPage);
   }, []);
 
-  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newRowsPerPage = parseInt(event.target.value, 10);
-    setRowsPerPage(newRowsPerPage);
-    setPage(0);
-  }, []);
+  const handleRowsPerPageChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newRowsPerPage = parseInt(event.target.value, 10);
+      setRowsPerPage(newRowsPerPage);
+      setPage(0);
+    },
+    []
+  );
 
   // Column to API field mapping for sorting
   const columnToSortField: Record<string, string> = {
@@ -1192,7 +1399,9 @@ const ServerLifecyclePage: React.FC = () => {
                 mb: 1,
               }}
             >
-              <Typography variant="subtitle2">{t('common.columnSettings')}</Typography>
+              <Typography variant="subtitle2">
+                {t('common.columnSettings')}
+              </Typography>
               <Button size="small" onClick={handleResetColumns}>
                 {t('common.reset')}
               </Button>
@@ -1257,15 +1466,17 @@ const ServerLifecyclePage: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data.data.map((event: ServerLifecycleEvent, index: number) => (
-                    <EventRow
-                      key={event.id}
-                      event={event}
-                      visibleColumns={visibleColumns}
-                      index={index}
-                      enqueueSnackbar={enqueueSnackbar}
-                    />
-                  ))}
+                  {data.data.map(
+                    (event: ServerLifecycleEvent, index: number) => (
+                      <EventRow
+                        key={event.id}
+                        event={event}
+                        visibleColumns={visibleColumns}
+                        index={index}
+                        enqueueSnackbar={enqueueSnackbar}
+                      />
+                    )
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

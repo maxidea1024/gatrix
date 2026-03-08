@@ -41,10 +41,15 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
-import bannerService, { Banner, BannerStatus } from '../../services/bannerService';
+import bannerService, {
+  Banner,
+  BannerStatus,
+} from '../../services/bannerService';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
-import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
@@ -74,9 +79,12 @@ const BannerManagementPage: React.FC = () => {
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingBanner, setDeletingBanner] = useState<Banner | null>(null);
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<null | HTMLElement>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
-  const [actionMenuAnchor, setActionMenuAnchor] = useState<null | HTMLElement>(null);
+  const [actionMenuAnchor, setActionMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
   const [actionMenuBanner, setActionMenuBanner] = useState<Banner | null>(null);
 
   // Sorting state with localStorage persistence
@@ -144,7 +152,9 @@ const BannerManagementPage: React.FC = () => {
       ) {
         setBanners(result.banners);
         const validTotal =
-          typeof result.total === 'number' && !isNaN(result.total) ? result.total : 0;
+          typeof result.total === 'number' && !isNaN(result.total)
+            ? result.total
+            : 0;
         setTotal(validTotal);
       } else {
         console.error('Invalid response:', result);
@@ -253,7 +263,9 @@ const BannerManagementPage: React.FC = () => {
   const handleBulkDeleteConfirm = async () => {
     if (selectedIds.length === 0) return;
     try {
-      await Promise.all(selectedIds.map((id) => bannerService.deleteBanner(projectApiPath, id)));
+      await Promise.all(
+        selectedIds.map((id) => bannerService.deleteBanner(projectApiPath, id))
+      );
       enqueueSnackbar(t('banners.bulkDeleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadBanners();
@@ -271,7 +283,10 @@ const BannerManagementPage: React.FC = () => {
   };
 
   // Action menu handlers
-  const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, banner: Banner) => {
+  const handleActionMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    banner: Banner
+  ) => {
     setActionMenuAnchor(event.currentTarget);
     setActionMenuBanner(banner);
   };
@@ -284,7 +299,10 @@ const BannerManagementPage: React.FC = () => {
   const handleDuplicate = async () => {
     if (!actionMenuBanner) return;
     try {
-      await bannerService.duplicateBanner(projectApiPath, actionMenuBanner.bannerId);
+      await bannerService.duplicateBanner(
+        projectApiPath,
+        actionMenuBanner.bannerId
+      );
       enqueueSnackbar(t('banners.duplicateSuccess'), { variant: 'success' });
       loadBanners();
     } catch (error: any) {
@@ -299,7 +317,10 @@ const BannerManagementPage: React.FC = () => {
   const handlePublish = async () => {
     if (!actionMenuBanner) return;
     try {
-      await bannerService.publishBanner(projectApiPath, actionMenuBanner.bannerId);
+      await bannerService.publishBanner(
+        projectApiPath,
+        actionMenuBanner.bannerId
+      );
       enqueueSnackbar(t('banners.publishSuccess'), { variant: 'success' });
       loadBanners();
     } catch (error: any) {
@@ -314,7 +335,10 @@ const BannerManagementPage: React.FC = () => {
   const handleArchive = async () => {
     if (!actionMenuBanner) return;
     try {
-      await bannerService.archiveBanner(projectApiPath, actionMenuBanner.bannerId);
+      await bannerService.archiveBanner(
+        projectApiPath,
+        actionMenuBanner.bannerId
+      );
       enqueueSnackbar(t('banners.archiveSuccess'), { variant: 'success' });
       loadBanners();
     } catch (error: any) {
@@ -336,11 +360,15 @@ const BannerManagementPage: React.FC = () => {
   };
 
   const handleSelectOne = (id: string) => {
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
   };
 
   // Status chip color
-  const getStatusColor = (status: BannerStatus): 'default' | 'success' | 'warning' => {
+  const getStatusColor = (
+    status: BannerStatus
+  ): 'default' | 'success' | 'warning' => {
     switch (status) {
       case 'published':
         return 'success';
@@ -380,7 +408,11 @@ const BannerManagementPage: React.FC = () => {
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
               {t('banners.createBanner')}
             </Button>
           )}
@@ -443,7 +475,9 @@ const BannerManagementPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -466,7 +500,11 @@ const BannerManagementPage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Tooltip title={t('common.refresh')}>
                 <span>
-                  <IconButton size="small" onClick={loadBanners} disabled={loading}>
+                  <IconButton
+                    size="small"
+                    onClick={loadBanners}
+                    disabled={loading}
+                  >
                     <RefreshIcon />
                   </IconButton>
                 </span>
@@ -517,10 +555,12 @@ const BannerManagementPage: React.FC = () => {
                             <TableCell key={column.id} padding="checkbox">
                               <Checkbox
                                 indeterminate={
-                                  selectedIds.length > 0 && selectedIds.length < banners.length
+                                  selectedIds.length > 0 &&
+                                  selectedIds.length < banners.length
                                 }
                                 checked={
-                                  banners.length > 0 && selectedIds.length === banners.length
+                                  banners.length > 0 &&
+                                  selectedIds.length === banners.length
                                 }
                                 onChange={handleSelectAll}
                               />
@@ -535,13 +575,19 @@ const BannerManagementPage: React.FC = () => {
                             </TableCell>
                           );
                         }
-                        const isSortable = ['name', 'createdAt', 'status'].includes(column.id);
+                        const isSortable = [
+                          'name',
+                          'createdAt',
+                          'status',
+                        ].includes(column.id);
                         return (
                           <TableCell key={column.id}>
                             {isSortable ? (
                               <TableSortLabel
                                 active={orderBy === column.id}
-                                direction={orderBy === column.id ? order : 'asc'}
+                                direction={
+                                  orderBy === column.id ? order : 'asc'
+                                }
                                 onClick={() => handleSort(column.id)}
                               >
                                 {t(column.labelKey)}
@@ -567,8 +613,12 @@ const BannerManagementPage: React.FC = () => {
                             return (
                               <TableCell key={column.id} padding="checkbox">
                                 <Checkbox
-                                  checked={selectedIds.includes(banner.bannerId)}
-                                  onChange={() => handleSelectOne(banner.bannerId)}
+                                  checked={selectedIds.includes(
+                                    banner.bannerId
+                                  )}
+                                  onChange={() =>
+                                    handleSelectOne(banner.bannerId)
+                                  }
                                 />
                               </TableCell>
                             );
@@ -610,21 +660,30 @@ const BannerManagementPage: React.FC = () => {
                           if (column.id === 'sequences')
                             return (
                               <TableCell key={column.id}>
-                                <Chip label={banner.sequences?.length || 0} size="small" />
+                                <Chip
+                                  label={banner.sequences?.length || 0}
+                                  size="small"
+                                />
                               </TableCell>
                             );
                           if (column.id === 'status')
                             return (
                               <TableCell key={column.id}>
                                 <Chip
-                                  label={t(`banners.statusLabels.${banner.status}`)}
+                                  label={t(
+                                    `banners.statusLabels.${banner.status}`
+                                  )}
                                   size="small"
                                   color={getStatusColor(banner.status)}
                                 />
                               </TableCell>
                             );
                           if (column.id === 'version')
-                            return <TableCell key={column.id}>v{banner.version}</TableCell>;
+                            return (
+                              <TableCell key={column.id}>
+                                v{banner.version}
+                              </TableCell>
+                            );
                           if (column.id === 'createdAt')
                             return (
                               <TableCell key={column.id}>
@@ -637,7 +696,9 @@ const BannerManagementPage: React.FC = () => {
                               <TableCell key={column.id} align="center">
                                 <IconButton
                                   size="small"
-                                  onClick={(e) => handleActionMenuOpen(e, banner)}
+                                  onClick={(e) =>
+                                    handleActionMenuOpen(e, banner)
+                                  }
                                 >
                                   <MoreVertIcon fontSize="small" />
                                 </IconButton>
@@ -722,7 +783,9 @@ const BannerManagementPage: React.FC = () => {
       <ColumnSettingsDialog
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        columns={columns.filter((col) => col.id !== 'checkbox' && col.id !== 'actions')}
+        columns={columns.filter(
+          (col) => col.id !== 'checkbox' && col.id !== 'actions'
+        )}
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
       />

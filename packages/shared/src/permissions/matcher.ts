@@ -29,7 +29,8 @@ export function matchSingle(userPerm: string, required: string): boolean {
     return false;
   }
 
-  const resourceMatch = userResource === WILDCARD || userResource === reqResource;
+  const resourceMatch =
+    userResource === WILDCARD || userResource === reqResource;
   const actionMatch = userAction === WILDCARD || userAction === reqAction;
 
   return resourceMatch && actionMatch;
@@ -51,7 +52,10 @@ export function hasPermission(
 /**
  * Check if the user has the given permission string.
  */
-export function checkPermission(userPermissions: string[], required: string): boolean {
+export function checkPermission(
+  userPermissions: string[],
+  required: string
+): boolean {
   return userPermissions.some((perm) => matchSingle(perm, required));
 }
 
@@ -62,7 +66,9 @@ export function hasAnyPermission(
   userPermissions: string[],
   requiredPermissions: string[]
 ): boolean {
-  return requiredPermissions.some((req) => userPermissions.some((perm) => matchSingle(perm, req)));
+  return requiredPermissions.some((req) =>
+    userPermissions.some((perm) => matchSingle(perm, req))
+  );
 }
 
 /**
@@ -72,14 +78,19 @@ export function hasAllPermissions(
   userPermissions: string[],
   requiredPermissions: string[]
 ): boolean {
-  return requiredPermissions.every((req) => userPermissions.some((perm) => matchSingle(perm, req)));
+  return requiredPermissions.every((req) =>
+    userPermissions.some((perm) => matchSingle(perm, req))
+  );
 }
 
 /**
  * Get all matching permissions from user's list for a given resource.
  * Returns the actions the user can perform on the resource.
  */
-export function getActionsForResource(userPermissions: string[], resource: string): string[] {
+export function getActionsForResource(
+  userPermissions: string[],
+  resource: string
+): string[] {
   const actions: Set<string> = new Set();
 
   for (const perm of userPermissions) {

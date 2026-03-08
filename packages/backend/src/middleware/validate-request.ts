@@ -5,7 +5,11 @@ import { GatrixError } from './error-handler';
 /**
  * Validation middleware to check express-validator results
  */
-export const validateRequest = (req: Request, res: Response, next: NextFunction) => {
+export const validateRequest = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const errorMessages = errors

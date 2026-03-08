@@ -19,7 +19,8 @@ export async function authenticateClient(
   if (!clientId || !clientSecret) {
     return reply.code(401).send({
       error: 'Unauthorized',
-      message: 'Missing authentication headers: event-lens-client-id and event-lens-client-secret',
+      message:
+        'Missing authentication headers: event-lens-client-id and event-lens-client-secret',
     });
   }
 

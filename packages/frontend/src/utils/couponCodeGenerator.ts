@@ -1,7 +1,11 @@
 // Utility for generating example coupon codes for display purposes
-export type CodePattern = 'ALPHANUMERIC_8' | 'ALPHANUMERIC_16' | 'ALPHANUMERIC_16_HYPHEN';
+export type CodePattern =
+  | 'ALPHANUMERIC_8'
+  | 'ALPHANUMERIC_16'
+  | 'ALPHANUMERIC_16_HYPHEN';
 
-const CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const CHARSET =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 /**
  * Generate a random alphanumeric string of specified length

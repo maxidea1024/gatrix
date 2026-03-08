@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+} from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -12,7 +18,10 @@ import {
   InputAdornment,
   Tooltip,
 } from '@mui/material';
-import { OpenInFull as ExpandIcon, Close as CloseIcon } from '@mui/icons-material';
+import {
+  OpenInFull as ExpandIcon,
+  Close as CloseIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import JsonEditor from './JsonEditor';
 
@@ -75,8 +84,11 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
   // Check if value is an empty JSON object
   const isEmptyObject =
     valueType === 'json' &&
-    ((typeof value === 'object' && value !== null && Object.keys(value).length === 0) ||
-      (typeof value === 'string' && (value.trim() === '{}' || value.trim() === '')));
+    ((typeof value === 'object' &&
+      value !== null &&
+      Object.keys(value).length === 0) ||
+      (typeof value === 'string' &&
+        (value.trim() === '{}' || value.trim() === '')));
   const showEmptyHint = isEmptyString || isEmptyObject;
 
   // Format value for display
@@ -84,8 +96,13 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
     if (value === null || value === undefined) return '';
     if (valueType === 'json') {
       // Return empty for empty objects so placeholder shows
-      if (typeof value === 'object' && Object.keys(value).length === 0) return '';
-      if (typeof value === 'string' && (value.trim() === '{}' || value.trim() === '')) return '';
+      if (typeof value === 'object' && Object.keys(value).length === 0)
+        return '';
+      if (
+        typeof value === 'string' &&
+        (value.trim() === '{}' || value.trim() === '')
+      )
+        return '';
       if (typeof value === 'object') return JSON.stringify(value);
       return String(value);
     }
@@ -151,7 +168,8 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
   const inlineValidationTimer = useRef<ReturnType<typeof setTimeout>>();
   useEffect(() => {
     return () => {
-      if (inlineValidationTimer.current) clearTimeout(inlineValidationTimer.current);
+      if (inlineValidationTimer.current)
+        clearTimeout(inlineValidationTimer.current);
     };
   }, []);
 
@@ -161,7 +179,8 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
       // Always pass the raw string immediately
       onChange(newValue);
       // Debounce JSON validation
-      if (inlineValidationTimer.current) clearTimeout(inlineValidationTimer.current);
+      if (inlineValidationTimer.current)
+        clearTimeout(inlineValidationTimer.current);
       inlineValidationTimer.current = setTimeout(() => {
         try {
           const parsed = JSON.parse(newValue);
@@ -200,7 +219,10 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
           InputProps={{
             sx: showEmptyHint ? { fontStyle: 'italic', ...sx } : sx,
             endAdornment: !disabled && (
-              <InputAdornment position="end" sx={{ alignSelf: 'flex-start', mt: 1 }}>
+              <InputAdornment
+                position="end"
+                sx={{ alignSelf: 'flex-start', mt: 1 }}
+              >
                 <Tooltip
                   title={t('featureFlags.payloadSize', { size: byteLength })}
                   placement="top"
@@ -230,7 +252,9 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                 : t('common.emptyString')
               : placeholder
           }
-          onClick={valueType === 'json' && !disabled ? handleOpenDialog : undefined}
+          onClick={
+            valueType === 'json' && !disabled ? handleOpenDialog : undefined
+          }
           sx={sx}
           InputProps={{
             readOnly: valueType === 'json',
@@ -294,7 +318,8 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                   onChange={(val) => {
                     setEditingValue(val);
                     // Debounce dialog JSON validation
-                    if (dialogValidationTimer.current) clearTimeout(dialogValidationTimer.current);
+                    if (dialogValidationTimer.current)
+                      clearTimeout(dialogValidationTimer.current);
                     dialogValidationTimer.current = setTimeout(() => {
                       try {
                         JSON.parse(val);

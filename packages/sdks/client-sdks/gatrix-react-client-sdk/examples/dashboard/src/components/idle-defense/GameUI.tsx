@@ -48,7 +48,10 @@ export const InventoryPanel: React.FC<InventoryPanelProps> = ({
   onEquip,
 }) => (
   <div style={panelOverlayStyle}>
-    <div className="nes-container is-dark with-title" style={internalPanelStyle}>
+    <div
+      className="nes-container is-dark with-title"
+      style={internalPanelStyle}
+    >
       <div
         style={{
           display: 'grid',
@@ -57,18 +60,37 @@ export const InventoryPanel: React.FC<InventoryPanelProps> = ({
         }}
       >
         {items.length === 0 && (
-          <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>BAG IS EMPTY.</p>
+          <p style={{ gridColumn: '1/-1', textAlign: 'center' }}>
+            BAG IS EMPTY.
+          </p>
         )}
         {items.map((item) => (
           <div
             key={item.id}
             className="nes-container is-rounded"
-            style={{ padding: '8px', fontSize: '10px', backgroundColor: '#333' }}
+            style={{
+              padding: '8px',
+              fontSize: '10px',
+              backgroundColor: '#333',
+            }}
           >
-            <div style={{ fontSize: '16px', marginBottom: '4px' }}>{item.icon}</div>
-            <div style={{ color: RARITY_COLORS[item.rarity], fontWeight: 'bold' }}>{item.name}</div>
+            <div style={{ fontSize: '16px', marginBottom: '4px' }}>
+              {item.icon}
+            </div>
+            <div
+              style={{ color: RARITY_COLORS[item.rarity], fontWeight: 'bold' }}
+            >
+              {item.name}
+            </div>
             <div>x{item.quantity}</div>
-            <div style={{ marginTop: '8px', display: 'flex', gap: '4px', flexDirection: 'column' }}>
+            <div
+              style={{
+                marginTop: '8px',
+                display: 'flex',
+                gap: '4px',
+                flexDirection: 'column',
+              }}
+            >
               <button
                 className={`nes-btn is-small ${item.equipped ? 'is-error' : 'is-success'}`}
                 onClick={() => onEquip(item.id)}
@@ -106,9 +128,17 @@ interface ShopPanelProps {
   onBuy: (id: string) => void;
 }
 
-export const ShopPanel: React.FC<ShopPanelProps> = ({ items, gold, onClose, onBuy }) => (
+export const ShopPanel: React.FC<ShopPanelProps> = ({
+  items,
+  gold,
+  onClose,
+  onBuy,
+}) => (
   <div style={panelOverlayStyle}>
-    <div className="nes-container is-dark with-title" style={internalPanelStyle}>
+    <div
+      className="nes-container is-dark with-title"
+      style={internalPanelStyle}
+    >
       <p className="title">WAVE SHOP (GOLD: {gold}G)</p>
       <div
         style={{
@@ -121,10 +151,16 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({ items, gold, onClose, onBu
           <div
             key={item.id}
             className="nes-container is-rounded"
-            style={{ padding: '8px', fontSize: '10px', backgroundColor: '#333' }}
+            style={{
+              padding: '8px',
+              fontSize: '10px',
+              backgroundColor: '#333',
+            }}
           >
             <div style={{ fontSize: '16px' }}>{item.icon}</div>
-            <div style={{ color: RARITY_COLORS[item.rarity], marginBottom: '4px' }}>
+            <div
+              style={{ color: RARITY_COLORS[item.rarity], marginBottom: '4px' }}
+            >
               {item.name}
             </div>
             <div style={{ color: '#f7d51d' }}>{item.price}G</div>
@@ -132,7 +168,12 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({ items, gold, onClose, onBu
               className={`nes-btn is-small ${gold < item.price ? 'is-disabled' : 'is-primary'}`}
               disabled={gold < item.price}
               onClick={() => onBuy(item.id)}
-              style={{ fontSize: '8px', marginTop: '8px', width: '100%', padding: '2px 4px' }}
+              style={{
+                fontSize: '8px',
+                marginTop: '8px',
+                width: '100%',
+                padding: '2px 4px',
+              }}
             >
               BUY
             </button>
@@ -158,12 +199,22 @@ interface MailPanelProps {
   onClaimAll: () => void;
 }
 
-export const MailPanel: React.FC<MailPanelProps> = ({ mails, onClose, onClaim, onClaimAll }) => (
+export const MailPanel: React.FC<MailPanelProps> = ({
+  mails,
+  onClose,
+  onClaim,
+  onClaimAll,
+}) => (
   <div style={panelOverlayStyle}>
-    <div className="nes-container is-dark with-title" style={internalPanelStyle}>
+    <div
+      className="nes-container is-dark with-title"
+      style={internalPanelStyle}
+    >
       <p className="title">POST OFFICE</p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {mails.length === 0 && <p style={{ textAlign: 'center' }}>INBOX IS EMPTY.</p>}
+        {mails.length === 0 && (
+          <p style={{ textAlign: 'center' }}>INBOX IS EMPTY.</p>
+        )}
         {mails.map((mail) => (
           <div
             key={mail.id}
@@ -176,7 +227,12 @@ export const MailPanel: React.FC<MailPanelProps> = ({ mails, onClose, onClaim, o
             }}
           >
             <div style={{ fontSize: '10px' }}>
-              <div style={{ fontWeight: 'bold', color: mail.read ? '#aaa' : '#fff' }}>
+              <div
+                style={{
+                  fontWeight: 'bold',
+                  color: mail.read ? '#aaa' : '#fff',
+                }}
+              >
                 {mail.subject} {mail.read ? '' : '🆕'}
               </div>
               <div style={{ fontSize: '8px', color: '#ccc' }}>{mail.body}</div>
@@ -193,10 +249,18 @@ export const MailPanel: React.FC<MailPanelProps> = ({ mails, onClose, onClaim, o
         ))}
       </div>
       <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-        <button className="nes-btn is-primary" style={{ flex: 1 }} onClick={onClaimAll}>
+        <button
+          className="nes-btn is-primary"
+          style={{ flex: 1 }}
+          onClick={onClaimAll}
+        >
           CLAIM ALL
         </button>
-        <button className="nes-btn is-error" style={{ flex: 1 }} onClick={onClose}>
+        <button
+          className="nes-btn is-error"
+          style={{ flex: 1 }}
+          onClick={onClose}
+        >
           CLOSE
         </button>
       </div>
@@ -214,7 +278,12 @@ interface GameHUDProps {
   onSkillUse: (id: string) => void;
   onOpenPanel: (panel: UIPanel) => void;
   onExit: () => void;
-  flagStatus: { bossMode: boolean; gameSpeed: number; expBooster: number; autoSkill: boolean };
+  flagStatus: {
+    bossMode: boolean;
+    gameSpeed: number;
+    expBooster: number;
+    autoSkill: boolean;
+  };
 }
 
 export const GameHUD: React.FC<GameHUDProps> = ({
@@ -239,7 +308,10 @@ export const GameHUD: React.FC<GameHUDProps> = ({
       }}
     >
       {/* Header: Title & Global Stats */}
-      <div className="nes-container is-dark with-title" style={{ padding: '10px', margin: 0 }}>
+      <div
+        className="nes-container is-dark with-title"
+        style={{ padding: '10px', margin: 0 }}
+      >
         <p className="title" style={{ backgroundColor: '#212529' }}>
           SLIME DEFENSE
         </p>
@@ -257,7 +329,9 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             <span style={{ color: '#fff' }}>
               STAGE <span style={{ color: '#f7d51d' }}>{hero.wave}</span>
             </span>
-            <span style={{ color: '#f7d51d' }}>💰 {hero.gold.toLocaleString()}</span>
+            <span style={{ color: '#f7d51d' }}>
+              💰 {hero.gold.toLocaleString()}
+            </span>
             <span style={{ color: '#92cc41' }}>LV.{hero.level}</span>
           </div>
           <div style={{ display: 'flex', gap: '15px' }}>
@@ -272,16 +346,34 @@ export const GameHUD: React.FC<GameHUDProps> = ({
       </div>
 
       {/* Middle: Skills & Menu */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '12px' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 320px',
+          gap: '12px',
+        }}
+      >
         {/* Skills Container */}
-        <div className="nes-container is-dark with-title" style={{ padding: '10px' }}>
+        <div
+          className="nes-container is-dark with-title"
+          style={{ padding: '10px' }}
+        >
           <p className="title" style={{ backgroundColor: '#212529' }}>
             SKILLS
           </p>
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '5px' }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '8px',
+              justifyContent: 'center',
+              marginTop: '5px',
+            }}
+          >
             {skills.map((skill) => {
               const isOnCd = skill.currentCd > 0;
-              const cdPercent = isOnCd ? (skill.currentCd / skill.cooldown) * 100 : 0;
+              const cdPercent = isOnCd
+                ? (skill.currentCd / skill.cooldown) * 100
+                : 0;
               return (
                 <button
                   key={skill.id}
@@ -312,7 +404,8 @@ export const GameHUD: React.FC<GameHUDProps> = ({
                     />
                   )}
                   <span style={{ position: 'relative', zIndex: 2 }}>
-                    {skill.icon} {skill.name} {isOnCd && `(${Math.ceil(skill.currentCd / 60)}s)`}
+                    {skill.icon} {skill.name}{' '}
+                    {isOnCd && `(${Math.ceil(skill.currentCd / 60)}s)`}
                   </span>
                 </button>
               );
@@ -321,7 +414,10 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         </div>
 
         {/* Menu Buttons Container */}
-        <div className="nes-container is-dark with-title" style={{ padding: '10px' }}>
+        <div
+          className="nes-container is-dark with-title"
+          style={{ padding: '10px' }}
+        >
           <p className="title" style={{ backgroundColor: '#212529' }}>
             MENU
           </p>
@@ -335,21 +431,27 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           >
             <button
               className={`nes-btn is-small ${activePanel === 'inventory' ? 'is-primary' : ''}`}
-              onClick={() => onOpenPanel(activePanel === 'inventory' ? 'none' : 'inventory')}
+              onClick={() =>
+                onOpenPanel(activePanel === 'inventory' ? 'none' : 'inventory')
+              }
               style={{ fontSize: '9px', padding: '4px' }}
             >
               BAG({inventoryCount})
             </button>
             <button
               className={`nes-btn is-small ${activePanel === 'shop' ? 'is-primary' : ''}`}
-              onClick={() => onOpenPanel(activePanel === 'shop' ? 'none' : 'shop')}
+              onClick={() =>
+                onOpenPanel(activePanel === 'shop' ? 'none' : 'shop')
+              }
               style={{ fontSize: '9px', padding: '4px' }}
             >
               SHOP
             </button>
             <button
               className={`nes-btn is-small ${activePanel === 'mail' ? 'is-primary' : ''}`}
-              onClick={() => onOpenPanel(activePanel === 'mail' ? 'none' : 'mail')}
+              onClick={() =>
+                onOpenPanel(activePanel === 'mail' ? 'none' : 'mail')
+              }
               style={{ fontSize: '9px', padding: '4px' }}
             >
               MAIL{unreadMails > 0 ? `(${unreadMails})` : ''}

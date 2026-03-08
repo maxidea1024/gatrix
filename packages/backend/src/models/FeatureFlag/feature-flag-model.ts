@@ -89,8 +89,10 @@ export class FeatureFlagModel {
         }
         if (flagType) query.where('f.flagType', flagType);
 
-        if (typeof isEnabled === 'boolean') query.where('e.isEnabled', isEnabled);
-        if (typeof isArchived === 'boolean') query.where('f.isArchived', isArchived);
+        if (typeof isEnabled === 'boolean')
+          query.where('e.isEnabled', isEnabled);
+        if (typeof isArchived === 'boolean')
+          query.where('f.isArchived', isArchived);
         if (tags && tags.length > 0) {
           for (const tag of tags) {
             query.whereRaw('JSON_CONTAINS(f.tags, ?)', [JSON.stringify(tag)]);
@@ -103,13 +105,16 @@ export class FeatureFlagModel {
       };
 
       const countResult = await applyFilters(
-        db('g_feature_flags as f').leftJoin('g_feature_flag_environments as e', function () {
-          this.on('f.id', '=', 'e.flagId').andOn(
-            'e.environmentId',
-            '=',
-            db.raw('?', [environmentId])
-          );
-        })
+        db('g_feature_flags as f').leftJoin(
+          'g_feature_flag_environments as e',
+          function () {
+            this.on('f.id', '=', 'e.flagId').andOn(
+              'e.environmentId',
+              '=',
+              db.raw('?', [environmentId])
+            );
+          }
+        )
       )
         .count('f.id as total')
         .first();
@@ -123,7 +128,10 @@ export class FeatureFlagModel {
       const flagIds = flags.map((f: any) => f.id);
       let allEnvStates: any[] = [];
       if (flagIds.length > 0) {
-        allEnvStates = await db('g_feature_flag_environments').whereIn('flagId', flagIds);
+        allEnvStates = await db('g_feature_flag_environments').whereIn(
+          'flagId',
+          flagIds
+        );
       }
 
       // Parse JSON fields and attach environments
@@ -141,7 +149,8 @@ export class FeatureFlagModel {
           tags: parseJsonField<string[]>(f.tags) || [],
           enabledValue: parseJsonField(f.enabledValue),
           disabledValue: parseJsonField(f.disabledValue),
-          validationRules: parseJsonField<ValidationRules>(f.validationRules) || undefined,
+          validationRules:
+            parseJsonField<ValidationRules>(f.validationRules) || undefined,
           environments: envStates.map((e) => ({
             id: e.id,
             flagId: e.flagId,
@@ -188,17 +197,25 @@ export class FeatureFlagModel {
       if (!flag) return null;
 
       // Get ALL environment settings for this flag (for detail page)
-      const allEnvSettings = await db('g_feature_flag_environments').where('flagId', flag.id);
+      const allEnvSettings = await db('g_feature_flag_environments').where(
+        'flagId',
+        flag.id
+      );
 
       // Get current environment settings
-      const envSettings = allEnvSettings.find((e) => e.environmentId === environmentId);
+      const envSettings = allEnvSettings.find(
+        (e) => e.environmentId === environmentId
+      );
 
       // Load strategies and variants for this environment
       const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
         flag.id,
         environmentId
       );
-      const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environmentId);
+      const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(
+        flag.id,
+        environmentId
+      );
 
       return {
         ...flag,
@@ -210,10 +227,12 @@ export class FeatureFlagModel {
         impressionDataEnabled: Boolean(flag.impressionDataEnabled),
         useFixedWeightVariants: Boolean(flag.useFixedWeightVariants),
         tags: parseJsonField<string[]>(flag.tags) || [],
-        links: parseJsonField<{ url: string; title?: string }[]>(flag.links) || [],
+        links:
+          parseJsonField<{ url: string; title?: string }[]>(flag.links) || [],
         enabledValue: parseJsonField(flag.enabledValue),
         disabledValue: parseJsonField(flag.disabledValue),
-        validationRules: parseJsonField<ValidationRules>(flag.validationRules) || undefined,
+        validationRules:
+          parseJsonField<ValidationRules>(flag.validationRules) || undefined,
         strategies,
         variants,
         environments: allEnvSettings.map((e) => ({
@@ -234,7 +253,10 @@ export class FeatureFlagModel {
     }
   }
 
-  static async findById(id: string, environmentId?: string): Promise<FeatureFlagAttributes | null> {
+  static async findById(
+    id: string,
+    environmentId?: string
+  ): Promise<FeatureFlagAttributes | null> {
     try {
       const flag = await db('g_feature_flags as f')
         .select('f.*', 'creator.name as createdByName')
@@ -252,8 +274,14 @@ export class FeatureFlagModel {
           .where('flagId', id)
           .where('environmentId', environmentId)
           .first();
-        strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(id, environmentId);
-        variants = await FeatureVariantModel.findByFlagIdAndEnvironment(id, environmentId);
+        strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
+          id,
+          environmentId
+        );
+        variants = await FeatureVariantModel.findByFlagIdAndEnvironment(
+          id,
+          environmentId
+        );
       }
 
       return {
@@ -266,7 +294,8 @@ export class FeatureFlagModel {
         tags: parseJsonField<string[]>(flag.tags) || [],
         enabledValue: parseJsonField(flag.enabledValue),
         disabledValue: parseJsonField(flag.disabledValue),
-        validationRules: parseJsonField<ValidationRules>(flag.validationRules) || undefined,
+        validationRules:
+          parseJsonField<ValidationRules>(flag.validationRules) || undefined,
         strategies,
         variants,
         environments: envSettings
@@ -322,9 +351,15 @@ export class FeatureFlagModel {
         impressionDataEnabled: data.impressionDataEnabled ?? false,
         tags: data.tags ? JSON.stringify(data.tags) : null,
         valueType: data.valueType,
-        enabledValue: JSON.stringify(coerceValueByType(data.enabledValue, data.valueType)),
-        disabledValue: JSON.stringify(coerceValueByType(data.disabledValue, data.valueType)),
-        validationRules: data.validationRules ? JSON.stringify(data.validationRules) : null,
+        enabledValue: JSON.stringify(
+          coerceValueByType(data.enabledValue, data.valueType)
+        ),
+        disabledValue: JSON.stringify(
+          coerceValueByType(data.disabledValue, data.valueType)
+        ),
+        validationRules: data.validationRules
+          ? JSON.stringify(data.validationRules)
+          : null,
         createdBy: data.createdBy,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -339,7 +374,10 @@ export class FeatureFlagModel {
         });
       }
 
-      return this.findById(id, data.environmentId) as Promise<FeatureFlagAttributes>;
+      return this.findById(
+        id,
+        data.environmentId
+      ) as Promise<FeatureFlagAttributes>;
     } catch (error) {
       logger.error('Error creating feature flag:', error);
       throw error;
@@ -356,19 +394,25 @@ export class FeatureFlagModel {
     try {
       const updateData: any = { updatedAt: new Date() };
 
-      if (data.displayName !== undefined) updateData.displayName = data.displayName;
-      if (data.description !== undefined) updateData.description = data.description;
+      if (data.displayName !== undefined)
+        updateData.displayName = data.displayName;
+      if (data.description !== undefined)
+        updateData.description = data.description;
       if (data.flagType !== undefined) updateData.flagType = data.flagType;
-      if (data.isArchived !== undefined) updateData.isArchived = data.isArchived;
-      if (data.isFavorite !== undefined) updateData.isFavorite = data.isFavorite;
-      if (data.archivedAt !== undefined) updateData.archivedAt = data.archivedAt;
+      if (data.isArchived !== undefined)
+        updateData.isArchived = data.isArchived;
+      if (data.isFavorite !== undefined)
+        updateData.isFavorite = data.isFavorite;
+      if (data.archivedAt !== undefined)
+        updateData.archivedAt = data.archivedAt;
       if (data.impressionDataEnabled !== undefined)
         updateData.impressionDataEnabled = data.impressionDataEnabled;
       if (data.useFixedWeightVariants !== undefined)
         updateData.useFixedWeightVariants = data.useFixedWeightVariants;
       if (data.stale !== undefined) updateData.stale = data.stale;
       if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
-      if (data.links !== undefined) updateData.links = JSON.stringify(data.links);
+      if (data.links !== undefined)
+        updateData.links = JSON.stringify(data.links);
       if (data.validationRules !== undefined)
         updateData.validationRules = data.validationRules
           ? JSON.stringify(data.validationRules)
@@ -380,7 +424,10 @@ export class FeatureFlagModel {
         effectiveValueType === undefined &&
         (data.enabledValue !== undefined || data.disabledValue !== undefined)
       ) {
-        const flag = await db('g_feature_flags').where('id', id).select('valueType').first();
+        const flag = await db('g_feature_flags')
+          .where('id', id)
+          .select('valueType')
+          .first();
         effectiveValueType = flag?.valueType;
       }
 
@@ -412,7 +459,10 @@ export class FeatureFlagModel {
     }
   }
 
-  static async updateLastSeenAt(flagId: string, environmentId: string): Promise<void> {
+  static async updateLastSeenAt(
+    flagId: string,
+    environmentId: string
+  ): Promise<void> {
     try {
       await db('g_feature_flag_environments')
         .where('flagId', flagId)

@@ -28,7 +28,11 @@ async function testEmailTemplateSystem() {
     );
     console.log(`✅ Password Reset (EN): ${enPasswordReset.subject}`);
 
-    const enWelcome = await EmailTemplateService.renderTemplate('welcome', 'en', templateData);
+    const enWelcome = await EmailTemplateService.renderTemplate(
+      'welcome',
+      'en',
+      templateData
+    );
     console.log(`✅ Welcome (EN): ${enWelcome.subject}`);
 
     const enAccountApproval = await EmailTemplateService.renderTemplate(
@@ -47,7 +51,11 @@ async function testEmailTemplateSystem() {
     );
     console.log(`✅ Password Reset (KO): ${koPasswordReset.subject}`);
 
-    const koWelcome = await EmailTemplateService.renderTemplate('welcome', 'ko', templateData);
+    const koWelcome = await EmailTemplateService.renderTemplate(
+      'welcome',
+      'ko',
+      templateData
+    );
     console.log(`✅ Welcome (KO): ${koWelcome.subject}`);
 
     const koAccountApproval = await EmailTemplateService.renderTemplate(
@@ -66,7 +74,11 @@ async function testEmailTemplateSystem() {
     );
     console.log(`✅ Password Reset (ZH): ${zhPasswordReset.subject}`);
 
-    const zhWelcome = await EmailTemplateService.renderTemplate('welcome', 'zh', templateData);
+    const zhWelcome = await EmailTemplateService.renderTemplate(
+      'welcome',
+      'zh',
+      templateData
+    );
     console.log(`✅ Welcome (ZH): ${zhWelcome.subject}`);
 
     const zhAccountApproval = await EmailTemplateService.renderTemplate(
@@ -79,11 +91,12 @@ async function testEmailTemplateSystem() {
     // Test 2: Fallback functionality
     console.log('\n📧 Test 2: Fallback functionality');
     try {
-      const fallbackTest = await EmailTemplateService.renderTemplateWithFallback(
-        'password-reset',
-        'fr' as any, // Unsupported language
-        templateData
-      );
+      const fallbackTest =
+        await EmailTemplateService.renderTemplateWithFallback(
+          'password-reset',
+          'fr' as any, // Unsupported language
+          templateData
+        );
       console.log(`✅ Fallback test passed: ${fallbackTest.subject}`);
     } catch (error) {
       console.log(`❌ Fallback test failed: ${error}`);
@@ -111,11 +124,17 @@ async function testEmailTemplateSystem() {
     console.log(`✅ Password reset email result: ${passwordResetResult}`);
 
     console.log('Testing welcome email...');
-    const welcomeResult = await EmailService.sendWelcomeEmail(testEmail, 'Test User');
+    const welcomeResult = await EmailService.sendWelcomeEmail(
+      testEmail,
+      'Test User'
+    );
     console.log(`✅ Welcome email result: ${welcomeResult}`);
 
     console.log('Testing account approval email...');
-    const approvalResult = await EmailService.sendAccountApprovalEmail(testEmail, 'Test User');
+    const approvalResult = await EmailService.sendAccountApprovalEmail(
+      testEmail,
+      'Test User'
+    );
     console.log(`✅ Account approval email result: ${approvalResult}`);
 
     console.log('\n🎉 All email template tests completed successfully!');

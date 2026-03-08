@@ -132,13 +132,19 @@ const MailboxPage: React.FC = () => {
 
       if (currentTab === 'sent') {
         // Load sent mails
-        const response = await mailService.getSentMails(pageToLoad, ITEMS_PER_PAGE);
+        const response = await mailService.getSentMails(
+          pageToLoad,
+          ITEMS_PER_PAGE
+        );
         if (reset) {
           setMails(response?.data || []);
         } else {
           setMails((prev) => [...prev, ...(response?.data || [])]);
         }
-        setHasNextPage((response?.pagination?.page || 0) < (response?.pagination?.totalPages || 0));
+        setHasNextPage(
+          (response?.pagination?.page || 0) <
+            (response?.pagination?.totalPages || 0)
+        );
       } else {
         // Load received mails
         const filters: MailFilters = {
@@ -158,7 +164,10 @@ const MailboxPage: React.FC = () => {
         } else {
           setMails((prev) => [...prev, ...(response?.data || [])]);
         }
-        setHasNextPage((response?.pagination?.page || 0) < (response?.pagination?.totalPages || 0));
+        setHasNextPage(
+          (response?.pagination?.page || 0) <
+            (response?.pagination?.totalPages || 0)
+        );
       }
 
       // Reset new mail notification when refreshing
@@ -182,7 +191,8 @@ const MailboxPage: React.FC = () => {
     estimateSize: () => 89,
     overscan: 5,
     measureElement:
-      typeof window !== 'undefined' && navigator.userAgent.indexOf('Firefox') === -1
+      typeof window !== 'undefined' &&
+      navigator.userAgent.indexOf('Firefox') === -1
         ? (element) => element?.getBoundingClientRect().height
         : undefined,
   });
@@ -195,11 +205,20 @@ const MailboxPage: React.FC = () => {
       return;
     }
 
-    if (lastItem.index >= mails.length - 1 && hasNextPage && !isNextPageLoading) {
+    if (
+      lastItem.index >= mails.length - 1 &&
+      hasNextPage &&
+      !isNextPageLoading
+    ) {
       setIsNextPageLoading(true);
       setCurrentPage((prev) => prev + 1);
     }
-  }, [hasNextPage, isNextPageLoading, mails.length, rowVirtualizer.getVirtualItems()]);
+  }, [
+    hasNextPage,
+    isNextPageLoading,
+    mails.length,
+    rowVirtualizer.getVirtualItems(),
+  ]);
 
   // Load stats
   const loadStats = async () => {
@@ -238,7 +257,9 @@ const MailboxPage: React.FC = () => {
       try {
         await mailService.markAsRead(mail.id);
         // Update local state
-        setMails((prev) => prev.map((m) => (m.id === mail.id ? { ...m, isRead: true } : m)));
+        setMails((prev) =>
+          prev.map((m) => (m.id === mail.id ? { ...m, isRead: true } : m))
+        );
         loadStats();
         // Notify MainLayout to update unread count
         window.dispatchEvent(new CustomEvent('mail-read'));
@@ -263,7 +284,9 @@ const MailboxPage: React.FC = () => {
         }
       } else {
         // Otherwise just update the star status
-        setMails((prev) => prev.map((m) => (m.id === mailId ? { ...m, isStarred } : m)));
+        setMails((prev) =>
+          prev.map((m) => (m.id === mailId ? { ...m, isStarred } : m))
+        );
       }
 
       loadStats();
@@ -309,7 +332,9 @@ const MailboxPage: React.FC = () => {
   // Handle checkbox toggle
   const handleCheckboxToggle = (mailId: number) => {
     setSelectedMailIds((prev) =>
-      prev.includes(mailId) ? prev.filter((id) => id !== mailId) : [...prev, mailId]
+      prev.includes(mailId)
+        ? prev.filter((id) => id !== mailId)
+        : [...prev, mailId]
     );
   };
 
@@ -366,9 +391,12 @@ const MailboxPage: React.FC = () => {
       await mailService.deleteMultiple(selectedMailIds);
       setMails((prev) => prev.filter((m) => !selectedMailIds.includes(m.id)));
       setSelectedMailIds([]);
-      enqueueSnackbar(t('mailbox.mailsDeleted', { count: selectedMailIds.length }), {
-        variant: 'success',
-      });
+      enqueueSnackbar(
+        t('mailbox.mailsDeleted', { count: selectedMailIds.length }),
+        {
+          variant: 'success',
+        }
+      );
       loadStats();
     } catch (error) {
       console.error('Failed to delete mails:', error);
@@ -390,7 +418,9 @@ const MailboxPage: React.FC = () => {
     try {
       await mailService.markMultipleAsRead(selectedMailIds);
       setMails((prev) =>
-        prev.map((m) => (selectedMailIds.includes(m.id) ? { ...m, isRead: true } : m))
+        prev.map((m) =>
+          selectedMailIds.includes(m.id) ? { ...m, isRead: true } : m
+        )
       );
       setSelectedMailIds([]);
       enqueueSnackbar(t('mailbox.markedAsRead'), { variant: 'success' });
@@ -513,7 +543,9 @@ const MailboxPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 3 }}>
+    <Box
+      sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 3 }}
+    >
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
@@ -521,7 +553,11 @@ const MailboxPage: React.FC = () => {
           <Typography variant="h4" sx={{ fontWeight: 600, flex: 1 }}>
             {t('mailbox.title')}
           </Typography>
-          <Button variant="contained" startIcon={<CreateIcon />} onClick={handleComposeOpen}>
+          <Button
+            variant="contained"
+            startIcon={<CreateIcon />}
+            onClick={handleComposeOpen}
+          >
             {t('mailbox.compose')}
           </Button>
         </Box>
@@ -552,7 +588,11 @@ const MailboxPage: React.FC = () => {
           <Typography variant="body2" sx={{ mr: 2 }}>
             {selectedMailIds.length} selected
           </Typography>
-          <Button size="small" startIcon={<CheckCircleIcon />} onClick={handleBulkMarkAsRead}>
+          <Button
+            size="small"
+            startIcon={<CheckCircleIcon />}
+            onClick={handleBulkMarkAsRead}
+          >
             {t('mailbox.markAsRead')}
           </Button>
           <Button
@@ -586,7 +626,9 @@ const MailboxPage: React.FC = () => {
               right: 0,
               zIndex: 100,
               backgroundColor: (theme) =>
-                theme.palette.mode === 'dark' ? '#2a2d35' : 'rgba(0, 0, 0, 0.02)',
+                theme.palette.mode === 'dark'
+                  ? '#2a2d35'
+                  : 'rgba(0, 0, 0, 0.02)',
               borderBottom: 1,
               borderColor: 'divider',
               px: 2,
@@ -604,7 +646,10 @@ const MailboxPage: React.FC = () => {
             <Tooltip title={t('mailbox.selectAll')}>
               <Checkbox
                 checked={selectAll}
-                indeterminate={selectedMailIds.length > 0 && selectedMailIds.length < mails.length}
+                indeterminate={
+                  selectedMailIds.length > 0 &&
+                  selectedMailIds.length < mails.length
+                }
                 onChange={handleSelectAll}
                 size="small"
               />
@@ -634,10 +679,12 @@ const MailboxPage: React.FC = () => {
                 {t('mailbox.stats.total')}: {stats.totalCount.toLocaleString()}
               </ToggleButton>
               <ToggleButton value="unread">
-                {t('mailbox.stats.unread')}: {stats.unreadCount.toLocaleString()}
+                {t('mailbox.stats.unread')}:{' '}
+                {stats.unreadCount.toLocaleString()}
               </ToggleButton>
               <ToggleButton value="starred">
-                {t('mailbox.stats.starred')}: {stats.starredCount.toLocaleString()}
+                {t('mailbox.stats.starred')}:{' '}
+                {stats.starredCount.toLocaleString()}
               </ToggleButton>
             </ToggleButtonGroup>
             <Box sx={{ flex: 1 }} />
@@ -807,7 +854,9 @@ const MailboxPage: React.FC = () => {
                     const mail = mails[index];
 
                     // Check if this item should be animated (only once)
-                    const shouldAnimate = !animatedItemsRef.current.has(mail.id);
+                    const shouldAnimate = !animatedItemsRef.current.has(
+                      mail.id
+                    );
                     if (shouldAnimate) {
                       animatedItemsRef.current.add(mail.id);
                     }
@@ -824,7 +873,9 @@ const MailboxPage: React.FC = () => {
                           width: '100%',
                           transform: `translateY(${virtualRow.start}px)`,
                           opacity: shouldAnimate ? 0 : 1,
-                          animation: shouldAnimate ? 'fadeInSlide 0.3s ease-out forwards' : 'none',
+                          animation: shouldAnimate
+                            ? 'fadeInSlide 0.3s ease-out forwards'
+                            : 'none',
                           '@keyframes fadeInSlide': {
                             '0%': {
                               opacity: 0,
@@ -881,9 +932,13 @@ const MailboxPage: React.FC = () => {
                             </ListItemIcon>
                             <ListItemIcon sx={{ minWidth: 36 }}>
                               {mail.isRead ? (
-                                <DraftsIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                <DraftsIcon
+                                  sx={{ color: 'text.secondary', fontSize: 20 }}
+                                />
                               ) : (
-                                <MailOutlineIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                                <MailOutlineIcon
+                                  sx={{ color: 'primary.main', fontSize: 20 }}
+                                />
                               )}
                             </ListItemIcon>
                             <ListItemText
@@ -903,13 +958,18 @@ const MailboxPage: React.FC = () => {
                                     sx={{ fontWeight: mail.isRead ? 400 : 700 }}
                                     noWrap
                                   >
-                                    {mail.senderName || t('mailbox.type.system')}
+                                    {mail.senderName ||
+                                      t('mailbox.type.system')}
                                   </Typography>
                                   {mail.priority !== 'normal' && (
                                     <Chip
-                                      label={t(`mailbox.priority.${mail.priority}`)}
+                                      label={t(
+                                        `mailbox.priority.${mail.priority}`
+                                      )}
                                       size="small"
-                                      color={getPriorityColor(mail.priority) as any}
+                                      color={
+                                        getPriorityColor(mail.priority) as any
+                                      }
                                       sx={{ height: 16, fontSize: '0.625rem' }}
                                     />
                                   )}
@@ -971,19 +1031,27 @@ const MailboxPage: React.FC = () => {
                   }}
                 >
                   <Typography variant="h6">{selectedMail.subject}</Typography>
-                  <IconButton onClick={() => handleDeleteClick(selectedMail.id)} color="error">
+                  <IconButton
+                    onClick={() => handleDeleteClick(selectedMail.id)}
+                    color="error"
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </Box>
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" color="text.secondary">
-                    {t('mailbox.from')}: {selectedMail.senderName || t('mailbox.type.system')}
+                    {t('mailbox.from')}:{' '}
+                    {selectedMail.senderName || t('mailbox.type.system')}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {t('mailbox.sent')}: {formatDate(selectedMail.createdAt)}
                   </Typography>
                   {Boolean(selectedMail.isRead && selectedMail.readAt) && (
-                    <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontStyle: 'italic' }}
+                    >
                       {t('mailbox.readAt')}: {formatDate(selectedMail.readAt)}
                     </Typography>
                   )}
@@ -1023,7 +1091,10 @@ const MailboxPage: React.FC = () => {
               >
                 <Box
                   sx={{
-                    animation: mails.length > 0 ? 'bounce 1.5s ease-in-out infinite' : 'none',
+                    animation:
+                      mails.length > 0
+                        ? 'bounce 1.5s ease-in-out infinite'
+                        : 'none',
                     '@keyframes bounce': {
                       '0%, 100%': {
                         transform: 'translateY(0) rotate(0deg)',
@@ -1050,7 +1121,10 @@ const MailboxPage: React.FC = () => {
                   variant="body1"
                   color="text.secondary"
                   sx={{
-                    animation: mails.length > 0 ? 'textBounce 1.5s ease-in-out infinite' : 'none',
+                    animation:
+                      mails.length > 0
+                        ? 'textBounce 1.5s ease-in-out infinite'
+                        : 'none',
                     '@keyframes textBounce': {
                       '0%, 100%': {
                         opacity: 0.6,
@@ -1063,7 +1137,9 @@ const MailboxPage: React.FC = () => {
                     },
                   }}
                 >
-                  {mails.length > 0 ? t('mailbox.selectMail') : t('mailbox.noMails')}
+                  {mails.length > 0
+                    ? t('mailbox.selectMail')
+                    : t('mailbox.noMails')}
                 </Typography>
               </Box>
             )}
@@ -1134,21 +1210,35 @@ const MailboxPage: React.FC = () => {
       />
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteConfirmOpen} onClose={handleDeleteCancel} maxWidth="xs" fullWidth>
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={handleDeleteCancel}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle>{t('mailbox.deleteConfirmTitle')}</DialogTitle>
         <DialogContent>
           <Typography>{t('mailbox.deleteConfirmMessage')}</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteCancel}>{t('common.cancel')}</Button>
-          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+          <Button
+            onClick={handleDeleteConfirm}
+            color="error"
+            variant="contained"
+          >
             {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Bulk Delete Confirmation Dialog */}
-      <Dialog open={bulkDeleteConfirmOpen} onClose={handleBulkDeleteCancel} maxWidth="xs" fullWidth>
+      <Dialog
+        open={bulkDeleteConfirmOpen}
+        onClose={handleBulkDeleteCancel}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle>{t('mailbox.bulkDeleteConfirmTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
@@ -1159,7 +1249,11 @@ const MailboxPage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleBulkDeleteCancel}>{t('common.cancel')}</Button>
-          <Button onClick={handleBulkDeleteConfirm} color="error" variant="contained">
+          <Button
+            onClick={handleBulkDeleteConfirm}
+            color="error"
+            variant="contained"
+          >
             {t('common.delete')}
           </Button>
         </DialogActions>
@@ -1189,8 +1283,14 @@ const MailboxPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEmptyMailboxCancel}>{t('common.cancel')}</Button>
-          <Button onClick={handleEmptyMailboxConfirm} color="error" variant="contained">
+          <Button onClick={handleEmptyMailboxCancel}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={handleEmptyMailboxConfirm}
+            color="error"
+            variant="contained"
+          >
             {t('mailbox.emptyMailbox')}
           </Button>
         </DialogActions>
@@ -1217,8 +1317,14 @@ const MailboxPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleMarkAllAsReadCancel}>{t('common.cancel')}</Button>
-          <Button onClick={handleMarkAllAsReadConfirm} color="primary" variant="contained">
+          <Button onClick={handleMarkAllAsReadCancel}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={handleMarkAllAsReadConfirm}
+            color="primary"
+            variant="contained"
+          >
             {t('mailbox.markAllAsRead')}
           </Button>
         </DialogActions>

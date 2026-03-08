@@ -98,8 +98,12 @@ const OperatorIcon: React.FC<OperatorIconProps> = ({
   }
 
   // Tooltip: localized operator description + example
-  const descText = showTooltip ? t(`constraints.operatorDesc.${operator}`, operator) : '';
-  const exampleText = showTooltip ? t(`constraints.operatorExample.${operator}`, '') : '';
+  const descText = showTooltip
+    ? t(`constraints.operatorDesc.${operator}`, operator)
+    : '';
+  const exampleText = showTooltip
+    ? t(`constraints.operatorExample.${operator}`, '')
+    : '';
 
   // Calculate font size relative to icon size — keep symbols large and readable
   const labelLen = style.label.length;
@@ -152,7 +156,13 @@ const OperatorIcon: React.FC<OperatorIconProps> = ({
   if (showTooltip && descText) {
     const tooltipContent = (
       <Box sx={{ maxWidth: 340 }}>
-        <Box sx={{ fontWeight: 500, fontSize: '0.8rem', mb: exampleText ? 0.75 : 0 }}>
+        <Box
+          sx={{
+            fontWeight: 500,
+            fontSize: '0.8rem',
+            mb: exampleText ? 0.75 : 0,
+          }}
+        >
           {descText}
         </Box>
         {exampleText && (

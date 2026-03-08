@@ -33,7 +33,10 @@ async function startServer(): Promise<void> {
     console.log('=== CHAT SERVER STARTED ===');
   } catch (error) {
     console.error('=== STARTUP ERROR ===', error);
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error(
+      'Error stack:',
+      error instanceof Error ? error.stack : 'No stack trace'
+    );
     logger.error('Error during server startup:', error);
     process.exit(1);
   }

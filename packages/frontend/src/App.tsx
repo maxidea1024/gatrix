@@ -1,5 +1,11 @@
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from 'react-router-dom';
 import { CssBaseline, Box, GlobalStyles, IconButton } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { SnackbarProvider, closeSnackbar } from 'notistack';
@@ -49,100 +55,200 @@ import { EnvironmentAwareLayout } from './components/layout/EnvironmentAwareLayo
 const LoginPage = React.lazy(() => import('./pages/auth/LoginPage'));
 const LogoutPage = React.lazy(() => import('./pages/auth/LogoutPage'));
 const RegisterPage = React.lazy(() => import('./pages/auth/RegisterPage'));
-const PendingApprovalPage = React.lazy(() => import('./pages/auth/PendingApprovalPage'));
-const AccountSuspendedPage = React.lazy(() => import('./pages/auth/AccountSuspendedPage'));
-const SessionExpiredPage = React.lazy(() => import('./pages/auth/SessionExpiredPage'));
-const ForgotPasswordPage = React.lazy(() => import('./pages/auth/ForgotPasswordPage'));
-const ResetPasswordPage = React.lazy(() => import('./pages/auth/ResetPasswordPage'));
-const OAuthCallbackPage = React.lazy(() => import('./pages/auth/OAuthCallbackPage'));
-const InvalidInvitePage = React.lazy(() => import('./pages/auth/InvalidInvitePage'));
+const PendingApprovalPage = React.lazy(
+  () => import('./pages/auth/PendingApprovalPage')
+);
+const AccountSuspendedPage = React.lazy(
+  () => import('./pages/auth/AccountSuspendedPage')
+);
+const SessionExpiredPage = React.lazy(
+  () => import('./pages/auth/SessionExpiredPage')
+);
+const ForgotPasswordPage = React.lazy(
+  () => import('./pages/auth/ForgotPasswordPage')
+);
+const ResetPasswordPage = React.lazy(
+  () => import('./pages/auth/ResetPasswordPage')
+);
+const OAuthCallbackPage = React.lazy(
+  () => import('./pages/auth/OAuthCallbackPage')
+);
+const InvalidInvitePage = React.lazy(
+  () => import('./pages/auth/InvalidInvitePage')
+);
 
 // Pages - Common
 const DashboardPage = React.lazy(() => import('./pages/common/DashboardPage'));
 const NotFoundPage = React.lazy(() => import('./pages/common/NotFoundPage'));
-const UnauthorizedPage = React.lazy(() => import('./pages/common/UnauthorizedPage'));
+const UnauthorizedPage = React.lazy(
+  () => import('./pages/common/UnauthorizedPage')
+);
 const LandingPage = React.lazy(() => import('./pages/LandingPage'));
 
 // Pages - User
 const ProfilePage = React.lazy(() => import('./pages/user/ProfilePage'));
 const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
 const TagsPage = React.lazy(() => import('./pages/settings/TagsPage'));
-const SystemSettingsPage = React.lazy(() => import('./pages/settings/SystemSettingsPage'));
+const SystemSettingsPage = React.lazy(
+  () => import('./pages/settings/SystemSettingsPage')
+);
 
 // Pages - Admin
-const UsersManagementPage = React.lazy(() => import('./pages/admin/UsersManagementPage'));
+const UsersManagementPage = React.lazy(
+  () => import('./pages/admin/UsersManagementPage')
+);
 const GameWorldsPage = React.lazy(() => import('./pages/admin/GameWorldsPage'));
 const WhitelistPage = React.lazy(() => import('./pages/admin/WhitelistPage'));
-const ClientVersionsPage = React.lazy(() => import('./pages/admin/ClientVersionsPage'));
+const ClientVersionsPage = React.lazy(
+  () => import('./pages/admin/ClientVersionsPage')
+);
 const AuditLogsPage = React.lazy(() => import('./pages/admin/AuditLogsPage'));
-const MaintenancePage = React.lazy(() => import('./pages/admin/MaintenancePage'));
-const PlayerConnectionsPage = React.lazy(() => import('./pages/admin/PlayerConnectionsPage'));
-const MessageTemplatesPage = React.lazy(() => import('./pages/admin/MessageTemplatesPage'));
+const MaintenancePage = React.lazy(
+  () => import('./pages/admin/MaintenancePage')
+);
+const PlayerConnectionsPage = React.lazy(
+  () => import('./pages/admin/PlayerConnectionsPage')
+);
+const MessageTemplatesPage = React.lazy(
+  () => import('./pages/admin/MessageTemplatesPage')
+);
 const SchedulerPage = React.lazy(() => import('./pages/admin/SchedulerPage'));
 const JobsPage = React.lazy(() => import('./pages/admin/JobsPage'));
-const QueueMonitorPage = React.lazy(() => import('./pages/admin/QueueMonitorPage'));
-const CustomQueueMonitorPage = React.lazy(() => import('./pages/admin/CustomQueueMonitorPage'));
+const QueueMonitorPage = React.lazy(
+  () => import('./pages/admin/QueueMonitorPage')
+);
+const CustomQueueMonitorPage = React.lazy(
+  () => import('./pages/admin/CustomQueueMonitorPage')
+);
 const ApiTokensPage = React.lazy(() => import('./pages/admin/ApiTokensPage'));
-const CrashEventsPage = React.lazy(() => import('./pages/admin/CrashEventsPage'));
+const CrashEventsPage = React.lazy(
+  () => import('./pages/admin/CrashEventsPage')
+);
 const ChatPage = React.lazy(() => import('./pages/chat/ChatPage'));
 const MailboxPage = React.lazy(() => import('./pages/mailbox/MailboxPage'));
-const SystemConsolePage = React.lazy(() => import('./pages/admin/SystemConsolePage'));
+const SystemConsolePage = React.lazy(
+  () => import('./pages/admin/SystemConsolePage')
+);
 const LogsPage = React.lazy(() => import('./pages/monitoring/LogsPage'));
 const AlertsPage = React.lazy(() => import('./pages/monitoring/AlertsPage'));
-const RealtimeEventsPage = React.lazy(() => import('./pages/admin/RealtimeEventsPage'));
+const RealtimeEventsPage = React.lazy(
+  () => import('./pages/admin/RealtimeEventsPage')
+);
 const ServerListPage = React.lazy(() => import('./pages/admin/ServerListPage'));
-const ServerLifecyclePage = React.lazy(() => import('./pages/admin/ServerLifecyclePage'));
-const ChangeRequestsPage = React.lazy(() => import('./pages/admin/ChangeRequestsPage'));
-const ChangeRequestDetailPage = React.lazy(() => import('./pages/admin/ChangeRequestDetailPage'));
+const ServerLifecyclePage = React.lazy(
+  () => import('./pages/admin/ServerLifecyclePage')
+);
+const ChangeRequestsPage = React.lazy(
+  () => import('./pages/admin/ChangeRequestsPage')
+);
+const ChangeRequestDetailPage = React.lazy(
+  () => import('./pages/admin/ChangeRequestDetailPage')
+);
 const OpenApiPage = React.lazy(() => import('./pages/admin/OpenApiPage'));
-const GrafanaDashboardPage = React.lazy(() => import('./pages/admin/GrafanaDashboardPage'));
-const EventLensProjectsPage = React.lazy(() => import('./pages/admin/EventLensProjectsPage'));
-const DataManagementPage = React.lazy(() => import('./pages/admin/DataManagementPage'));
-const GatrixEdgesPage = React.lazy(() => import('./pages/admin/GatrixEdgesPage'));
-const EnvironmentsPage = React.lazy(() => import('./pages/settings/EnvironmentsPage'));
+const GrafanaDashboardPage = React.lazy(
+  () => import('./pages/admin/GrafanaDashboardPage')
+);
+const EventLensProjectsPage = React.lazy(
+  () => import('./pages/admin/EventLensProjectsPage')
+);
+const DataManagementPage = React.lazy(
+  () => import('./pages/admin/DataManagementPage')
+);
+const GatrixEdgesPage = React.lazy(
+  () => import('./pages/admin/GatrixEdgesPage')
+);
+const EnvironmentsPage = React.lazy(
+  () => import('./pages/settings/EnvironmentsPage')
+);
 const KeyValuePage = React.lazy(() => import('./pages/settings/KeyValuePage'));
-const IntegrationsPage = React.lazy(() => import('./pages/settings/IntegrationsPage'));
-const IntegrationsSdksPage = React.lazy(() => import('./pages/settings/IntegrationsSdksPage'));
-const CreateIntegrationPage = React.lazy(() => import('./pages/settings/CreateIntegrationPage'));
-const EditIntegrationPage = React.lazy(() => import('./pages/settings/EditIntegrationPage'));
-const SignalEndpointsPage = React.lazy(() => import('./pages/admin/SignalEndpointsPage'));
+const IntegrationsPage = React.lazy(
+  () => import('./pages/settings/IntegrationsPage')
+);
+const IntegrationsSdksPage = React.lazy(
+  () => import('./pages/settings/IntegrationsSdksPage')
+);
+const CreateIntegrationPage = React.lazy(
+  () => import('./pages/settings/CreateIntegrationPage')
+);
+const EditIntegrationPage = React.lazy(
+  () => import('./pages/settings/EditIntegrationPage')
+);
+const SignalEndpointsPage = React.lazy(
+  () => import('./pages/admin/SignalEndpointsPage')
+);
 const ActionSetsPage = React.lazy(() => import('./pages/admin/ActionSetsPage'));
-const ServiceAccountsPage = React.lazy(() => import('./pages/admin/ServiceAccountsPage'));
+const ServiceAccountsPage = React.lazy(
+  () => import('./pages/admin/ServiceAccountsPage')
+);
 const RolesPage = React.lazy(() => import('./pages/admin/RolesPage'));
 const GroupsPage = React.lazy(() => import('./pages/admin/GroupsPage'));
 const ProjectsPage = React.lazy(() => import('./pages/admin/ProjectsPage'));
 const WorkspacePage = React.lazy(() => import('./pages/admin/WorkspacePage'));
 
 // Pages - Game
-const ServiceNoticesPage = React.lazy(() => import('./pages/game/ServiceNoticesPage'));
+const ServiceNoticesPage = React.lazy(
+  () => import('./pages/game/ServiceNoticesPage')
+);
 const ServiceNoticesPreviewPage = React.lazy(
   () => import('./pages/game/ServiceNoticesPreviewPage')
 );
-const IngamePopupNoticesPage = React.lazy(() => import('./pages/game/IngamePopupNoticesPage'));
+const IngamePopupNoticesPage = React.lazy(
+  () => import('./pages/game/IngamePopupNoticesPage')
+);
 const CouponsPage = React.lazy(() => import('./pages/game/CouponsPage'));
-const CouponSettingsPage = React.lazy(() => import('./pages/game/CouponSettingsPage'));
-const CouponUsagePage = React.lazy(() => import('./pages/game/CouponUsagePage'));
+const CouponSettingsPage = React.lazy(
+  () => import('./pages/game/CouponSettingsPage')
+);
+const CouponUsagePage = React.lazy(
+  () => import('./pages/game/CouponUsagePage')
+);
 const SurveysPage = React.lazy(() => import('./pages/game/SurveysPage'));
-const RewardTemplatesPage = React.lazy(() => import('./pages/game/RewardTemplatesPage'));
-const StoreProductsPage = React.lazy(() => import('./pages/game/StoreProductsPage'));
-const BannerManagementPage = React.lazy(() => import('./pages/game/BannerManagementPage'));
-const HotTimeButtonEventPage = React.lazy(() => import('./pages/game/HotTimeButtonEventPage'));
+const RewardTemplatesPage = React.lazy(
+  () => import('./pages/game/RewardTemplatesPage')
+);
+const StoreProductsPage = React.lazy(
+  () => import('./pages/game/StoreProductsPage')
+);
+const BannerManagementPage = React.lazy(
+  () => import('./pages/game/BannerManagementPage')
+);
+const HotTimeButtonEventPage = React.lazy(
+  () => import('./pages/game/HotTimeButtonEventPage')
+);
 const LiveEventPage = React.lazy(() => import('./pages/game/LiveEventPage'));
-const PlanningDataPage = React.lazy(() => import('./pages/game/PlanningDataPage'));
-const PlanningDataHistoryPage = React.lazy(() => import('./pages/game/PlanningDataHistoryPage'));
-const FeatureFlagsPage = React.lazy(() => import('./pages/features/FeatureFlagsPage'));
-const FeatureFlagDetailPage = React.lazy(() => import('./pages/features/FeatureFlagDetailPage'));
-const FeatureSegmentsPage = React.lazy(() => import('./pages/features/FeatureSegmentsPage'));
+const PlanningDataPage = React.lazy(
+  () => import('./pages/game/PlanningDataPage')
+);
+const PlanningDataHistoryPage = React.lazy(
+  () => import('./pages/game/PlanningDataHistoryPage')
+);
+const FeatureFlagsPage = React.lazy(
+  () => import('./pages/features/FeatureFlagsPage')
+);
+const FeatureFlagDetailPage = React.lazy(
+  () => import('./pages/features/FeatureFlagDetailPage')
+);
+const FeatureSegmentsPage = React.lazy(
+  () => import('./pages/features/FeatureSegmentsPage')
+);
 const FeatureContextFieldsPage = React.lazy(
   () => import('./pages/features/FeatureContextFieldsPage')
 );
-const FeatureFlagTypesPage = React.lazy(() => import('./pages/features/FeatureFlagTypesPage'));
-const FeatureNetworkPage = React.lazy(() => import('./pages/features/FeatureNetworkPage'));
-const UnknownFlagsPage = React.lazy(() => import('./pages/features/UnknownFlagsPage'));
+const FeatureFlagTypesPage = React.lazy(
+  () => import('./pages/features/FeatureFlagTypesPage')
+);
+const FeatureNetworkPage = React.lazy(
+  () => import('./pages/features/FeatureNetworkPage')
+);
+const UnknownFlagsPage = React.lazy(
+  () => import('./pages/features/UnknownFlagsPage')
+);
 const ReleaseFlowTemplatesPage = React.lazy(
   () => import('./pages/features/ReleaseFlowTemplatesPage')
 );
-const ImpactMetricsPage = React.lazy(() => import('./pages/features/ImpactMetricsPage'));
+const ImpactMetricsPage = React.lazy(
+  () => import('./pages/features/ImpactMetricsPage')
+);
 
 // Conditional Landing Page Component - Simplified since FirstVisitGuard handles first-visit logic
 const ConditionalLandingPage: React.FC = () => {
@@ -171,7 +277,9 @@ const ConditionalLandingPage: React.FC = () => {
 };
 
 // First Visit Guard - Redirects first-time visitors to landing page from any route
-const FirstVisitGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const FirstVisitGuard: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const location = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -197,7 +305,9 @@ const FirstVisitGuard: React.FC<{ children: React.ReactNode }> = ({ children }) 
 };
 
 // LocalizationProvider with language support
-const LocalizedDatePickers: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const LocalizedDatePickers: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { language } = useI18n();
 
   // console.log('🌍 LocalizedDatePickers - Current language:', language);
@@ -240,7 +350,8 @@ const LocalizedDatePickers: React.FC<{ children: React.ReactNode }> = ({ childre
   // console.log('📝 Final locale text:', localeText);
 
   // Force complete re-mount when language changes
-  const adapterLocale = language === 'ko' ? 'ko' : language === 'zh' ? 'zh-cn' : 'en';
+  const adapterLocale =
+    language === 'ko' ? 'ko' : language === 'zh' ? 'zh-cn' : 'en';
 
   // console.log('🔧 Final settings:', {
   //   language,
@@ -253,7 +364,10 @@ const LocalizedDatePickers: React.FC<{ children: React.ReactNode }> = ({ childre
       key={`picker-${language}-${adapterLocale}`}
       dateAdapter={AdapterDayjs}
       adapterLocale={adapterLocale}
-      localeText={localeText?.components?.MuiLocalizationProvider?.defaultProps?.localeText}
+      localeText={
+        localeText?.components?.MuiLocalizationProvider?.defaultProps
+          ?.localeText
+      }
     >
       {children}
     </LocalizationProvider>
@@ -261,7 +375,9 @@ const LocalizedDatePickers: React.FC<{ children: React.ReactNode }> = ({ childre
 };
 
 // Auth Initializer - Shows loading screen while checking authentication
-const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { isLoading } = useAuth();
 
   if (isLoading) {
@@ -335,13 +451,14 @@ const AppContent: React.FC = () => {
                     <GlobalStyles
                       styles={(theme) => ({
                         // Firefox - thin scrollbar for all elements
-                        'html, body, *, div, main, section, article, aside, nav': {
-                          scrollbarWidth: 'thin',
-                          scrollbarColor:
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.2) transparent'
-                              : 'rgba(0, 0, 0, 0.2) transparent',
-                        },
+                        'html, body, *, div, main, section, article, aside, nav':
+                          {
+                            scrollbarWidth: 'thin',
+                            scrollbarColor:
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.2) transparent'
+                                : 'rgba(0, 0, 0, 0.2) transparent',
+                          },
                         // WebKit/Blink (Chrome, Edge, Safari)
                         'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar':
                           {
@@ -397,24 +514,59 @@ const AppContent: React.FC = () => {
                         </IconButton>
                       )}
                     >
-                      <Router basename={import.meta.env.VITE_ROUTER_BASENAME || '/'}>
+                      <Router
+                        basename={import.meta.env.VITE_ROUTER_BASENAME || '/'}
+                      >
                         <FirstVisitGuard>
                           <Suspense fallback={<LoadingIndicator />}>
                             <Routes>
                               {/* Public Routes */}
                               <Route path="/login" element={<LoginPage />} />
                               <Route path="/logout" element={<LogoutPage />} />
-                              <Route path="/register" element={<RegisterPage />} />
-                              <Route path="/signup" element={<RegisterPage />} />
-                              <Route path="/invalid-invite" element={<InvalidInvitePage />} />
-                              <Route path="/pending-approval" element={<PendingApprovalPage />} />
-                              <Route path="/session-expired" element={<SessionExpiredPage />} />
-                              <Route path="/auth/pending" element={<PendingApprovalPage />} />
-                              <Route path="/auth/callback" element={<OAuthCallbackPage />} />
-                              <Route path="/account-suspended" element={<AccountSuspendedPage />} />
-                              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                              <Route path="/reset-password" element={<ResetPasswordPage />} />
-                              <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                              <Route
+                                path="/register"
+                                element={<RegisterPage />}
+                              />
+                              <Route
+                                path="/signup"
+                                element={<RegisterPage />}
+                              />
+                              <Route
+                                path="/invalid-invite"
+                                element={<InvalidInvitePage />}
+                              />
+                              <Route
+                                path="/pending-approval"
+                                element={<PendingApprovalPage />}
+                              />
+                              <Route
+                                path="/session-expired"
+                                element={<SessionExpiredPage />}
+                              />
+                              <Route
+                                path="/auth/pending"
+                                element={<PendingApprovalPage />}
+                              />
+                              <Route
+                                path="/auth/callback"
+                                element={<OAuthCallbackPage />}
+                              />
+                              <Route
+                                path="/account-suspended"
+                                element={<AccountSuspendedPage />}
+                              />
+                              <Route
+                                path="/forgot-password"
+                                element={<ForgotPasswordPage />}
+                              />
+                              <Route
+                                path="/reset-password"
+                                element={<ResetPasswordPage />}
+                              />
+                              <Route
+                                path="/unauthorized"
+                                element={<UnauthorizedPage />}
+                              />
 
                               {/* Service Notices Preview - Public Route */}
                               <Route
@@ -423,7 +575,10 @@ const AppContent: React.FC = () => {
                               />
 
                               {/* Landing Page - only for first-time visitors */}
-                              <Route path="/" element={<ConditionalLandingPage />} />
+                              <Route
+                                path="/"
+                                element={<ConditionalLandingPage />}
+                              />
 
                               {/* Protected Routes */}
 
@@ -494,7 +649,9 @@ const AppContent: React.FC = () => {
                               />
                               <Route
                                 path="/settings/environments"
-                                element={<Navigate to="/admin/environments" replace />}
+                                element={
+                                  <Navigate to="/admin/environments" replace />
+                                }
                               />
                               <Route
                                 path="/settings/system"
@@ -566,16 +723,33 @@ const AppContent: React.FC = () => {
                                       <Routes>
                                         <Route
                                           index
-                                          element={<Navigate to="/admin/users" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/users"
+                                              replace
+                                            />
+                                          }
                                         />
-                                        <Route path="users" element={<UsersManagementPage />} />
-                                        <Route path="workspace" element={<WorkspacePage />} />
+                                        <Route
+                                          path="users"
+                                          element={<UsersManagementPage />}
+                                        />
+                                        <Route
+                                          path="workspace"
+                                          element={<WorkspacePage />}
+                                        />
                                         <Route
                                           path="client-versions"
                                           element={<ClientVersionsPage />}
                                         />
-                                        <Route path="game-worlds" element={<GameWorldsPage />} />
-                                        <Route path="maintenance" element={<MaintenancePage />} />
+                                        <Route
+                                          path="game-worlds"
+                                          element={<GameWorldsPage />}
+                                        />
+                                        <Route
+                                          path="maintenance"
+                                          element={<MaintenancePage />}
+                                        />
                                         <Route
                                           path="player-connections"
                                           element={<PlayerConnectionsPage />}
@@ -584,23 +758,47 @@ const AppContent: React.FC = () => {
                                           path="maintenance-templates"
                                           element={<MessageTemplatesPage />}
                                         />
-                                        <Route path="scheduler" element={<SchedulerPage />} />
-                                        <Route path="whitelist" element={<WhitelistPage />} />
+                                        <Route
+                                          path="scheduler"
+                                          element={<SchedulerPage />}
+                                        />
+                                        <Route
+                                          path="whitelist"
+                                          element={<WhitelistPage />}
+                                        />
 
-                                        <Route path="jobs" element={<JobsPage />} />
+                                        <Route
+                                          path="jobs"
+                                          element={<JobsPage />}
+                                        />
                                         <Route
                                           path="queue-monitor"
                                           element={<QueueMonitorPage />}
                                         />
-                                        <Route path="audit-logs" element={<AuditLogsPage />} />
+                                        <Route
+                                          path="audit-logs"
+                                          element={<AuditLogsPage />}
+                                        />
                                         <Route
                                           path="realtime-events"
                                           element={<RealtimeEventsPage />}
                                         />
-                                        <Route path="crash-events" element={<CrashEventsPage />} />
-                                        <Route path="api-tokens" element={<ApiTokensPage />} />
-                                        <Route path="console" element={<SystemConsolePage />} />
-                                        <Route path="server-list" element={<ServerListPage />} />
+                                        <Route
+                                          path="crash-events"
+                                          element={<CrashEventsPage />}
+                                        />
+                                        <Route
+                                          path="api-tokens"
+                                          element={<ApiTokensPage />}
+                                        />
+                                        <Route
+                                          path="console"
+                                          element={<SystemConsolePage />}
+                                        />
+                                        <Route
+                                          path="server-list"
+                                          element={<ServerListPage />}
+                                        />
                                         <Route
                                           path="server-lifecycle"
                                           element={<ServerLifecyclePage />}
@@ -617,7 +815,10 @@ const AppContent: React.FC = () => {
                                           path="grafana-dashboard"
                                           element={<GrafanaDashboardPage />}
                                         />
-                                        <Route path="open-api" element={<OpenApiPage />} />
+                                        <Route
+                                          path="open-api"
+                                          element={<OpenApiPage />}
+                                        />
                                         <Route
                                           path="event-lens/projects"
                                           element={<EventLensProjectsPage />}
@@ -626,24 +827,47 @@ const AppContent: React.FC = () => {
                                           path="data-management"
                                           element={<DataManagementPage />}
                                         />
-                                        <Route path="gatrix-edges" element={<GatrixEdgesPage />} />
+                                        <Route
+                                          path="gatrix-edges"
+                                          element={<GatrixEdgesPage />}
+                                        />
                                         <Route
                                           path="signal-endpoints"
                                           element={<SignalEndpointsPage />}
                                         />
-                                        <Route path="actions" element={<ActionSetsPage />} />
+                                        <Route
+                                          path="actions"
+                                          element={<ActionSetsPage />}
+                                        />
                                         <Route
                                           path="service-accounts"
                                           element={<ServiceAccountsPage />}
                                         />
-                                        <Route path="roles" element={<RolesPage />} />
-                                        <Route path="groups" element={<GroupsPage />} />
+                                        <Route
+                                          path="roles"
+                                          element={<RolesPage />}
+                                        />
+                                        <Route
+                                          path="groups"
+                                          element={<GroupsPage />}
+                                        />
                                         <Route
                                           path="organisations"
-                                          element={<Navigate to="/admin/workspace" replace />}
+                                          element={
+                                            <Navigate
+                                              to="/admin/workspace"
+                                              replace
+                                            />
+                                          }
                                         />
-                                        <Route path="projects" element={<ProjectsPage />} />
-                                        <Route path="environments" element={<EnvironmentsPage />} />
+                                        <Route
+                                          path="projects"
+                                          element={<ProjectsPage />}
+                                        />
+                                        <Route
+                                          path="environments"
+                                          element={<EnvironmentsPage />}
+                                        />
                                       </Routes>
                                     </EnvironmentAwareLayout>
                                   </ProtectedRoute>
@@ -688,8 +912,14 @@ const AppContent: React.FC = () => {
                                             path="ingame-popup-notices"
                                             element={<IngamePopupNoticesPage />}
                                           />
-                                          <Route path="coupons" element={<CouponsPage />} />
-                                          <Route path="surveys" element={<SurveysPage />} />
+                                          <Route
+                                            path="coupons"
+                                            element={<CouponsPage />}
+                                          />
+                                          <Route
+                                            path="surveys"
+                                            element={<SurveysPage />}
+                                          />
                                           <Route
                                             path="store-products"
                                             element={<StoreProductsPage />}
@@ -714,14 +944,19 @@ const AppContent: React.FC = () => {
                                             path="coupon-usage"
                                             element={<CouponUsagePage />}
                                           />
-                                          <Route path="live-event" element={<LiveEventPage />} />
+                                          <Route
+                                            path="live-event"
+                                            element={<LiveEventPage />}
+                                          />
                                           <Route
                                             path="planning-data"
                                             element={<PlanningDataPage />}
                                           />
                                           <Route
                                             path="planning-data-history"
-                                            element={<PlanningDataHistoryPage />}
+                                            element={
+                                              <PlanningDataHistoryPage />
+                                            }
                                           />
                                         </Routes>
                                       </EnvironmentAwareLayout>
@@ -737,19 +972,34 @@ const AppContent: React.FC = () => {
                                   <ProtectedRoute requiredRoles={['admin']}>
                                     <EnvironmentAwareLayout>
                                       <Routes>
-                                        <Route index element={<FeatureFlagsPage />} />
-                                        <Route path="segments" element={<FeatureSegmentsPage />} />
+                                        <Route
+                                          index
+                                          element={<FeatureFlagsPage />}
+                                        />
+                                        <Route
+                                          path="segments"
+                                          element={<FeatureSegmentsPage />}
+                                        />
                                         <Route
                                           path="context-fields"
                                           element={<FeatureContextFieldsPage />}
                                         />
-                                        <Route path="types" element={<FeatureFlagTypesPage />} />
-                                        <Route path="network" element={<FeatureNetworkPage />} />
+                                        <Route
+                                          path="types"
+                                          element={<FeatureFlagTypesPage />}
+                                        />
+                                        <Route
+                                          path="network"
+                                          element={<FeatureNetworkPage />}
+                                        />
                                         <Route
                                           path="templates"
                                           element={<ReleaseFlowTemplatesPage />}
                                         />
-                                        <Route path="unknown" element={<UnknownFlagsPage />} />
+                                        <Route
+                                          path="unknown"
+                                          element={<UnknownFlagsPage />}
+                                        />
                                         <Route
                                           path="impact-metrics"
                                           element={<ImpactMetricsPage />}

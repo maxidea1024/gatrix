@@ -1,5 +1,8 @@
 import { useApi, useConditionalApi } from './useSWR';
-import { ReleaseFlowTemplate, ReleaseFlowPlan } from '@/services/releaseFlowService';
+import {
+  ReleaseFlowTemplate,
+  ReleaseFlowPlan,
+} from '@/services/releaseFlowService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 /**
@@ -19,7 +22,10 @@ export function useReleaseFlowTemplates(search?: string) {
 /**
  * Hook for a specific release flow plan for a flag and environment
  */
-export function useReleaseFlowPlan(flagId: string | null, environmentId: string | null) {
+export function useReleaseFlowPlan(
+  flagId: string | null,
+  environmentId: string | null
+) {
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 
@@ -64,7 +70,9 @@ export function useReleaseFlowPlansByFlag(flagId: string | null) {
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 
-  const url = flagId ? `${projectApiPath}/release-flows/plans/flag/${flagId}` : null;
+  const url = flagId
+    ? `${projectApiPath}/release-flows/plans/flag/${flagId}`
+    : null;
 
   return useApi<ReleaseFlowPlanSummary[]>(url);
 }

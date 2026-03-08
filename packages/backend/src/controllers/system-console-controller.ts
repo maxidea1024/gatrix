@@ -14,7 +14,9 @@ export class SystemConsoleController {
   static async execute(req: Request, res: Response) {
     const { command, args } = req.body || {};
     if (!command || typeof command !== 'string') {
-      return res.status(400).json({ success: false, message: 'command is required' });
+      return res
+        .status(400)
+        .json({ success: false, message: 'command is required' });
     }
     const argv: string[] = Array.isArray(args) ? args.map(String) : [];
     const ctx = { user: (req as any)?.user };

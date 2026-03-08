@@ -163,7 +163,9 @@ export class LockService {
       expiresAt,
     });
 
-    logger.info(`Lock acquired: ${entityType}:${entityId} by user ${userId} (${lockType})`);
+    logger.info(
+      `Lock acquired: ${entityType}:${entityId} by user ${userId} (${lockType})`
+    );
     return lock;
   }
 
@@ -214,7 +216,9 @@ export class LockService {
    * Get all locks for a user
    */
   static async getUserLocks(userId: string): Promise<EntityLock[]> {
-    return await EntityLock.query().where('lockedBy', userId).orderBy('createdAt', 'desc');
+    return await EntityLock.query()
+      .where('lockedBy', userId)
+      .orderBy('createdAt', 'desc');
   }
 
   /**

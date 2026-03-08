@@ -5,7 +5,11 @@ import { ChangeItem, FieldOp, EntityOpType } from '../models/change-item';
 import { Approval } from '../models/approval';
 import { Environment } from '../models/environment';
 import { User } from '../models/user';
-import { ActionGroup, ACTION_GROUP_TYPES, ActionGroupType } from '../models/action-group';
+import {
+  ActionGroup,
+  ACTION_GROUP_TYPES,
+  ActionGroupType,
+} from '../models/action-group';
 import knex from '../config/knex';
 import { ChangeRequestNotifications } from './sse-notification-service';
 import { GatrixError } from '../middleware/error-handler';
@@ -29,7 +33,13 @@ function generateOps(
   const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
 
   // Skip internal fields
-  const skipFields = ['createdAt', 'updatedAt', 'createdBy', 'updatedBy', 'version'];
+  const skipFields = [
+    'createdAt',
+    'updatedAt',
+    'createdBy',
+    'updatedBy',
+    'version',
+  ];
 
   // Normalize value for comparison (handle MySQL TINYINT boolean)
   const normalizeValue = (val: any): any => {
@@ -193,7 +203,9 @@ export class ChangeRequestService {
 
       // 1. If ID provided, verify it exists and is in DRAFT
       if (changeRequestId) {
-        cr = await ChangeRequest.query().findById(changeRequestId).where('status', 'draft');
+        cr = await ChangeRequest.query()
+          .findById(changeRequestId)
+          .where('status', 'draft');
 
         if (!cr) {
           throw new Error('Change Request not found or not in DRAFT status.');
@@ -221,7 +233,9 @@ export class ChangeRequestService {
           cr = existingDraft;
         } else {
           // 2. Create new Draft CR
-          const cleanTable = targetTable.startsWith('g_') ? targetTable.slice(2) : targetTable;
+          const cleanTable = targetTable.startsWith('g_')
+            ? targetTable.slice(2)
+            : targetTable;
           const isNew = targetId.startsWith('NEW_');
           const identifier =
             afterData?.name ||
@@ -230,7 +244,11 @@ export class ChangeRequestService {
             afterData?.worldId ||
             afterData?.id ||
             (isNew ? 'New Item' : targetId);
-          const action = isNew ? 'Create' : afterData === null ? 'Delete' : 'Update';
+          const action = isNew
+            ? 'Create'
+            : afterData === null
+              ? 'Delete'
+              : 'Update';
 
           cr = await ChangeRequest.query().insert({
             id: ulid(),
@@ -264,12 +282,16 @@ export class ChangeRequestService {
 
       if (existingItem) {
         // Update existing item's ops
-        await ChangeItem.query().findById(existingItem.id).patch({ ops, opType });
+        await ChangeItem.query()
+          .findById(existingItem.id)
+          .patch({ ops, opType });
       } else {
         // Determine ActionGroup type
         let actionGroupType: ActionGroupType = ACTION_GROUP_TYPES.UPDATE_ENTITY;
-        if (opType === 'CREATE') actionGroupType = ACTION_GROUP_TYPES.CREATE_ENTITY;
-        else if (opType === 'DELETE') actionGroupType = ACTION_GROUP_TYPES.DELETE_ENTITY;
+        if (opType === 'CREATE')
+          actionGroupType = ACTION_GROUP_TYPES.CREATE_ENTITY;
+        else if (opType === 'DELETE')
+          actionGroupType = ACTION_GROUP_TYPES.DELETE_ENTITY;
 
         // Find or create ActionGroup
         let actionGroup = await ActionGroup.query()
@@ -278,9 +300,15 @@ export class ChangeRequestService {
           .first();
 
         if (!actionGroup) {
-          const cleanTable = targetTable.startsWith('g_') ? targetTable.slice(2) : targetTable;
+          const cleanTable = targetTable.startsWith('g_')
+            ? targetTable.slice(2)
+            : targetTable;
           const actionLabel =
-            opType === 'CREATE' ? 'Create' : opType === 'DELETE' ? 'Delete' : 'Update';
+            opType === 'CREATE'
+              ? 'Create'
+              : opType === 'DELETE'
+                ? 'Delete'
+                : 'Update';
           const maxOrder = await ActionGroup.query()
             .where('changeRequestId', cr.id)
             .max('orderIndex as maxOrder')
@@ -315,7 +343,9 @@ export class ChangeRequestService {
         const lang = user?.preferredLanguage || 'en';
 
         const tables = [...new Set(items.map((i) => i.targetTable))];
-        const cleanTables = tables.map((t) => (t.startsWith('g_') ? t.slice(2) : t));
+        const cleanTables = tables.map((t) =>
+          t.startsWith('g_') ? t.slice(2) : t
+        );
 
         let newTitle = '';
         if (tables.length === 1) {
@@ -346,7 +376,9 @@ export class ChangeRequestService {
           cr.title.startsWith('복합 변경') ||
           cr.title.startsWith('混合变更')
         ) {
-          await ChangeRequest.query().findById(cr.id).patch({ title: newTitle });
+          await ChangeRequest.query()
+            .findById(cr.id)
+            .patch({ title: newTitle });
         }
       }
 
@@ -370,17 +402,21 @@ export class ChangeRequestService {
   ): Promise<ChangeRequest> {
     const cr = await ChangeRequest.query().findById(changeRequestId);
     if (!cr) throw new Error('Change Request not found');
-    if (cr.status !== 'draft') throw new Error('Metadata can only be updated in DRAFT status');
+    if (cr.status !== 'draft')
+      throw new Error('Metadata can only be updated in DRAFT status');
 
     return await cr.$query().patchAndFetch(metadata);
   }
 
-  static async submitChangeRequest(changeRequestId: string): Promise<ChangeRequest> {
+  static async submitChangeRequest(
+    changeRequestId: string
+  ): Promise<ChangeRequest> {
     const cr = await ChangeRequest.query()
       .findById(changeRequestId)
       .withGraphFetched('[requester, changeItems]');
     if (!cr) throw new Error('Change Request not found');
-    if (cr.status !== 'draft') throw new Error('Only DRAFT requests can be submitted');
+    if (cr.status !== 'draft')
+      throw new Error('Only DRAFT requests can be submitted');
 
     // Validation - only title is required
     if (!cr.title) {
@@ -395,14 +431,21 @@ export class ChangeRequestService {
       if (item.targetId.startsWith('NEW_')) continue;
 
       try {
-        const currentData = await knex(item.targetTable).where('id', item.targetId).first();
+        const currentData = await knex(item.targetTable)
+          .where('id', item.targetId)
+          .first();
 
         if (currentData && typeof currentData.version === 'number') {
           // Store the version at submission time
-          await ChangeItem.query().findById(item.id).patch({ entityVersion: currentData.version });
+          await ChangeItem.query()
+            .findById(item.id)
+            .patch({ entityVersion: currentData.version });
         }
       } catch (err) {
-        logger.warn(`Failed to capture version for ${item.targetTable}:${item.targetId}`, err);
+        logger.warn(
+          `Failed to capture version for ${item.targetTable}:${item.targetId}`,
+          err
+        );
       }
     }
 
@@ -433,7 +476,12 @@ export class ChangeRequestService {
         .findById(changeRequestId)
         .withGraphFetched('[environmentModel, requester]');
       if (!cr)
-        throw new GatrixError('Change Request not found', 404, true, ErrorCodes.CR_NOT_FOUND);
+        throw new GatrixError(
+          'Change Request not found',
+          404,
+          true,
+          ErrorCodes.CR_NOT_FOUND
+        );
       if (cr.status !== 'open')
         throw new GatrixError(
           'Request is not OPEN for approval',
@@ -470,7 +518,10 @@ export class ChangeRequestService {
 
       // 2. Check Threshold
       // Fetch all approvals to be absolutely sure of the count regardless of DB dialect
-      const allApprovals = await Approval.query(trx).where('changeRequestId', changeRequestId);
+      const allApprovals = await Approval.query(trx).where(
+        'changeRequestId',
+        changeRequestId
+      );
       const currentApprovals = allApprovals.length;
 
       // Get required threshold from environment (default to 1)
@@ -493,10 +544,13 @@ export class ChangeRequestService {
       );
 
       if (currentApprovals >= requiredApprovers) {
-        const updated = await ChangeRequest.query(trx).patchAndFetchById(cr.id, {
-          status: 'approved',
-          updatedAt: new Date().toISOString() as any,
-        });
+        const updated = await ChangeRequest.query(trx).patchAndFetchById(
+          cr.id,
+          {
+            status: 'approved',
+            updatedAt: new Date().toISOString() as any,
+          }
+        );
 
         logger.info(`Request ${cr.id} transitioned to APPROVED status.`);
 
@@ -528,7 +582,9 @@ export class ChangeRequestService {
    * Checks if an open Change Request meets the approval criteria
    * (Useful if environment config changes after CR creation)
    */
-  static async checkAndAutoApprove(cr: ChangeRequest): Promise<ChangeRequest | null> {
+  static async checkAndAutoApprove(
+    cr: ChangeRequest
+  ): Promise<ChangeRequest | null> {
     if (cr.status !== 'open') return null;
 
     const effectiveMinApprovals = cr.environmentModel
@@ -582,7 +638,9 @@ export class ChangeRequestService {
     }
 
     // Get rejector info for notification (null means system rejection)
-    const rejector = rejectedBy ? await User.query().findById(rejectedBy) : null;
+    const rejector = rejectedBy
+      ? await User.query().findById(rejectedBy)
+      : null;
     const rejectorName = rejector?.name || rejector?.email || 'System';
 
     // Update Status with rejection info
@@ -635,7 +693,8 @@ export class ChangeRequestService {
       const user = await User.query(trx).findById(requesterId);
       // Check admin status via RBAC permissions (wildcard = org admin)
       const { permissionService } = await import('./permission-service');
-      const userOrgs = await permissionService.getUserOrganisations(requesterId);
+      const userOrgs =
+        await permissionService.getUserOrganisations(requesterId);
       let isAdmin = false;
       for (const org of userOrgs) {
         if (await permissionService.isOrgAdmin(requesterId, org.orgId)) {
@@ -646,7 +705,9 @@ export class ChangeRequestService {
 
       // Validate ownership: Only the original requester or an admin can reopen
       if (cr.requesterId !== requesterId && !isAdmin) {
-        throw new Error('Only the original requester or an admin can reopen this request.');
+        throw new Error(
+          'Only the original requester or an admin can reopen this request.'
+        );
       }
 
       // Phase 4: Check for existing draft - prevent reopen conflict
@@ -686,7 +747,9 @@ export class ChangeRequestService {
       const updated = await cr.$query(trx).patchAndFetch({ status: 'draft' });
 
       // CRITICAL: Delete ALL approvals (Reset progress)
-      await Approval.query(trx).where('changeRequestId', changeRequestId).delete();
+      await Approval.query(trx)
+        .where('changeRequestId', changeRequestId)
+        .delete();
 
       return updated;
     });
@@ -697,7 +760,8 @@ export class ChangeRequestService {
     userId: string
   ): Promise<ChangeRequest> {
     // Import service registry
-    const { hasServiceHandler, getServiceHandler } = await import('./service-registry');
+    const { hasServiceHandler, getServiceHandler } =
+      await import('./service-registry');
 
     const result = await transaction(ChangeRequest.knex(), async (trx) => {
       const cr = await ChangeRequest.query(trx)
@@ -705,7 +769,8 @@ export class ChangeRequestService {
         .withGraphFetched('changeItems');
 
       if (!cr) throw new Error('Change Request not found');
-      if (cr.status !== 'approved') throw new Error('Change Request must be APPROVED to execute');
+      if (cr.status !== 'approved')
+        throw new Error('Change Request must be APPROVED to execute');
 
       // Get environment settings for conflict check policy
       const env = await Environment.query(trx).findById(cr.environmentId);
@@ -737,14 +802,19 @@ export class ChangeRequestService {
         const isCreate = !liveData;
 
         // Check version if available (preferred method)
-        const hasVersionColumn = liveData && typeof liveData.version === 'number';
+        const hasVersionColumn =
+          liveData && typeof liveData.version === 'number';
         const storedEntityVersion = item.entityVersion;
         const liveVersion = liveData?.version;
 
         let hasConflict = false;
         let conflictReason = '';
 
-        if (hasVersionColumn && storedEntityVersion !== undefined && storedEntityVersion !== null) {
+        if (
+          hasVersionColumn &&
+          storedEntityVersion !== undefined &&
+          storedEntityVersion !== null
+        ) {
           // Version-based conflict detection
           if (liveVersion !== storedEntityVersion) {
             hasConflict = true;
@@ -755,7 +825,8 @@ export class ChangeRequestService {
           const isMatch = compareData(liveData, item.beforeData);
           if (!isMatch) {
             hasConflict = true;
-            conflictReason = 'Data has changed since this request was created (deep-diff)';
+            conflictReason =
+              'Data has changed since this request was created (deep-diff)';
           }
         }
 
@@ -767,19 +838,30 @@ export class ChangeRequestService {
               .patch({
                 status: 'conflict',
                 rejectionReason: `Data conflict: ${conflictReason}`,
-                updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ') as any,
+                updatedAt: new Date()
+                  .toISOString()
+                  .slice(0, 19)
+                  .replace('T', ' ') as any,
               });
 
-            throw new GatrixError(conflictReason, 409, true, 'CR_DATA_CONFLICT', {
-              originalDraftBase: item.beforeData,
-              currentLive: liveData,
-              userDraft: item.afterData,
-              storedVersion: storedEntityVersion,
-              liveVersion: liveVersion,
-            });
+            throw new GatrixError(
+              conflictReason,
+              409,
+              true,
+              'CR_DATA_CONFLICT',
+              {
+                originalDraftBase: item.beforeData,
+                currentLive: liveData,
+                userDraft: item.afterData,
+                storedVersion: storedEntityVersion,
+                liveVersion: liveVersion,
+              }
+            );
           } else {
             // Warn but continue (dev/test environments)
-            logger.warn(`Conflict detected but continuing (non-strict): ${conflictReason}`);
+            logger.warn(
+              `Conflict detected but continuing (non-strict): ${conflictReason}`
+            );
           }
         }
 
@@ -804,7 +886,9 @@ export class ChangeRequestService {
               );
             }
           } else {
-            affectedRows = await trx(item.targetTable).where('id', item.targetId).delete();
+            affectedRows = await trx(item.targetTable)
+              .where('id', item.targetId)
+              .delete();
           }
 
           logger.info(`Deleted ${item.targetTable}:${item.targetId}`);
@@ -861,12 +945,16 @@ export class ChangeRequestService {
               // Check if it's ISO 8601 format (ends with Z or has timezone offset)
               if (
                 dbData[field].includes('T') &&
-                (dbData[field].endsWith('Z') || dbData[field].match(/[+-]\d{2}:\d{2}$/))
+                (dbData[field].endsWith('Z') ||
+                  dbData[field].match(/[+-]\d{2}:\d{2}$/))
               ) {
                 const date = new Date(dbData[field]);
                 if (!isNaN(date.getTime())) {
                   // Convert to MySQL DATETIME format: YYYY-MM-DD HH:MM:SS
-                  dbData[field] = date.toISOString().slice(0, 19).replace('T', ' ');
+                  dbData[field] = date
+                    .toISOString()
+                    .slice(0, 19)
+                    .replace('T', ' ');
                 }
               }
             }
@@ -894,7 +982,8 @@ export class ChangeRequestService {
               );
               const idColumnType = columns[0]?.Type?.toLowerCase() || '';
               const usesStringId =
-                idColumnType.includes('varchar') || idColumnType.includes('char');
+                idColumnType.includes('varchar') ||
+                idColumnType.includes('char');
 
               if (usesStringId) {
                 // Generate a new ULID for VARCHAR id columns
@@ -912,10 +1001,16 @@ export class ChangeRequestService {
               }
               // Ensure timestamps are set for new records
               if (!dbData.createdAt) {
-                dbData.createdAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                dbData.createdAt = new Date()
+                  .toISOString()
+                  .slice(0, 19)
+                  .replace('T', ' ');
               }
               if (!dbData.updatedAt) {
-                dbData.updatedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                dbData.updatedAt = new Date()
+                  .toISOString()
+                  .slice(0, 19)
+                  .replace('T', ' ');
               }
               // Set createdBy for new records (use the executor's userId)
               if (dbData.createdBy === undefined) {
@@ -932,17 +1027,25 @@ export class ChangeRequestService {
               }
 
               // Update ChangeItem's targetId to the real ID for future rollback
-              if (item.targetId.startsWith('NEW_') && realId !== item.targetId) {
+              if (
+                item.targetId.startsWith('NEW_') &&
+                realId !== item.targetId
+              ) {
                 await ChangeItem.query(trx)
                   .findById(item.id)
                   .patch({
                     targetId: String(realId),
                   });
-                logger.info(`Updated ChangeItem targetId: ${item.targetId} -> ${realId}`);
+                logger.info(
+                  `Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
+                );
               }
             } else {
               // Optimistic locking: increment version and add to WHERE clause
-              if (typeof liveData?.version === 'number' && storedEntityVersion !== undefined) {
+              if (
+                typeof liveData?.version === 'number' &&
+                storedEntityVersion !== undefined
+              ) {
                 dbData.version = liveData.version + 1;
                 const affectedRows = await trx(item.targetTable)
                   .where('id', item.targetId)
@@ -959,7 +1062,9 @@ export class ChangeRequestService {
                 }
               } else {
                 // No version column - update without optimistic lock
-                await trx(item.targetTable).where('id', item.targetId).update(dbData);
+                await trx(item.targetTable)
+                  .where('id', item.targetId)
+                  .update(dbData);
               }
             }
 
@@ -980,7 +1085,8 @@ export class ChangeRequestService {
               );
               const idColumnType = columns[0]?.Type?.toLowerCase() || '';
               const usesStringId =
-                idColumnType.includes('varchar') || idColumnType.includes('char');
+                idColumnType.includes('varchar') ||
+                idColumnType.includes('char');
 
               if (usesStringId) {
                 // Generate a new ULID for VARCHAR id columns
@@ -1009,17 +1115,26 @@ export class ChangeRequestService {
 
               // Update ChangeItem's targetId to the real ID for future rollback
               const realId: string | number = dbData.id || insertResult;
-              if (item.targetId.startsWith('NEW_') && realId && realId !== item.targetId) {
+              if (
+                item.targetId.startsWith('NEW_') &&
+                realId &&
+                realId !== item.targetId
+              ) {
                 await ChangeItem.query(trx)
                   .findById(item.id)
                   .patch({
                     targetId: String(realId),
                   });
-                logger.info(`Updated ChangeItem targetId: ${item.targetId} -> ${realId}`);
+                logger.info(
+                  `Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
+                );
               }
             } else {
               // Optimistic locking: increment version and add to WHERE clause
-              if (typeof liveData?.version === 'number' && storedEntityVersion !== undefined) {
+              if (
+                typeof liveData?.version === 'number' &&
+                storedEntityVersion !== undefined
+              ) {
                 dbData.version = liveData.version + 1;
                 const affectedRows = await trx(item.targetTable)
                   .where('id', item.targetId)
@@ -1036,10 +1151,14 @@ export class ChangeRequestService {
                 }
               } else {
                 // No version column - update without optimistic lock
-                await trx(item.targetTable).where('id', item.targetId).update(dbData);
+                await trx(item.targetTable)
+                  .where('id', item.targetId)
+                  .update(dbData);
               }
             }
-            logger.warn(`No service handler for ${item.targetTable}, events not published`);
+            logger.warn(
+              `No service handler for ${item.targetTable}, events not published`
+            );
           }
         }
       }
@@ -1205,8 +1324,10 @@ export class ChangeRequestService {
 
         // Determine ActionGroup type for revert
         let actionGroupType: ActionGroupType = ACTION_GROUP_TYPES.UPDATE_ENTITY;
-        if (inverseOpType === 'CREATE') actionGroupType = ACTION_GROUP_TYPES.CREATE_ENTITY;
-        else if (inverseOpType === 'DELETE') actionGroupType = ACTION_GROUP_TYPES.DELETE_ENTITY;
+        if (inverseOpType === 'CREATE')
+          actionGroupType = ACTION_GROUP_TYPES.CREATE_ENTITY;
+        else if (inverseOpType === 'DELETE')
+          actionGroupType = ACTION_GROUP_TYPES.DELETE_ENTITY;
 
         // Find or create ActionGroup for the new CR
         let actionGroup = await ActionGroup.query(trx)
@@ -1250,12 +1371,17 @@ export class ChangeRequestService {
         if (inverseOpType !== 'CREATE') {
           // For UPDATE/DELETE revert, need to capture current state
           try {
-            currentLiveData = await trx(item.targetTable).where('id', item.targetId).first();
+            currentLiveData = await trx(item.targetTable)
+              .where('id', item.targetId)
+              .first();
             if (currentLiveData?.version !== undefined) {
               currentVersion = currentLiveData.version;
             }
           } catch (err) {
-            logger.warn(`Could not fetch live data for ${item.targetTable}:${item.targetId}`, err);
+            logger.warn(
+              `Could not fetch live data for ${item.targetTable}:${item.targetId}`,
+              err
+            );
           }
         }
 
@@ -1313,7 +1439,10 @@ export class ChangeRequestService {
   static async cleanupRejected(retentionDays: number): Promise<number> {
     const thresholdDate = new Date();
     thresholdDate.setDate(thresholdDate.getDate() - retentionDays);
-    const isoThreshold = thresholdDate.toISOString().slice(0, 19).replace('T', ' ');
+    const isoThreshold = thresholdDate
+      .toISOString()
+      .slice(0, 19)
+      .replace('T', ' ');
 
     return await transaction(ChangeRequest.knex(), async (trx) => {
       // Find IDs to delete first to handle related data
@@ -1330,7 +1459,9 @@ export class ChangeRequestService {
       await Approval.query(trx).whereIn('changeRequestId', ids).delete();
 
       // Delete requests
-      const deleted = await ChangeRequest.query(trx).whereIn('id', ids).delete();
+      const deleted = await ChangeRequest.query(trx)
+        .whereIn('id', ids)
+        .delete();
 
       logger.info('Cleanup completed', {
         deleted,

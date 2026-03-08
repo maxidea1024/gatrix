@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Box, Typography, Menu, MenuItem, alpha } from '@mui/material';
 import { Terminal as TerminalIcon } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
@@ -199,8 +205,14 @@ const SystemConsolePage: React.FC = () => {
     const buf = inputBufRef.current;
 
     // If there's a selection, highlight it
-    if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
-      const start = Math.min(selectionStartRef.current, selectionEndRef.current);
+    if (
+      selectionStartRef.current !== null &&
+      selectionEndRef.current !== null
+    ) {
+      const start = Math.min(
+        selectionStartRef.current,
+        selectionEndRef.current
+      );
       const end = Math.max(selectionStartRef.current, selectionEndRef.current);
 
       // Write text before selection
@@ -275,7 +287,8 @@ const SystemConsolePage: React.FC = () => {
 
   const getPromptAnsi = useCallback(() => {
     const username = (user?.name || user?.email || 'user').split('@')[0];
-    const host = typeof window !== 'undefined' ? window.location.hostname : 'host';
+    const host =
+      typeof window !== 'undefined' ? window.location.hostname : 'host';
     return `\u001b[32m${username}@${host}\u001b[0m:\u001b[34m~\u001b[0m % `;
   }, [user]);
 
@@ -387,7 +400,10 @@ const SystemConsolePage: React.FC = () => {
       // Allow Shift+Arrow keys for selection (don't intercept)
       if (
         e.shiftKey &&
-        (key === 'arrowleft' || key === 'arrowright' || key === 'arrowup' || key === 'arrowdown')
+        (key === 'arrowleft' ||
+          key === 'arrowright' ||
+          key === 'arrowup' ||
+          key === 'arrowdown')
       ) {
         return true; // Let xterm handle selection
       }
@@ -428,9 +444,18 @@ const SystemConsolePage: React.FC = () => {
         }
 
         // Then check keyboard selection (Shift+Arrow)
-        if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
-          const start = Math.min(selectionStartRef.current, selectionEndRef.current);
-          const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+        if (
+          selectionStartRef.current !== null &&
+          selectionEndRef.current !== null
+        ) {
+          const start = Math.min(
+            selectionStartRef.current,
+            selectionEndRef.current
+          );
+          const end = Math.max(
+            selectionStartRef.current,
+            selectionEndRef.current
+          );
           const selectedText = inputBufRef.current.slice(start, end);
           if (selectedText) {
             copyToClipboard(selectedText).catch(() => {});
@@ -470,9 +495,18 @@ const SystemConsolePage: React.FC = () => {
             saveUndo();
 
             // If there's a selection, replace it
-            if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
-              const start = Math.min(selectionStartRef.current, selectionEndRef.current);
-              const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+            if (
+              selectionStartRef.current !== null &&
+              selectionEndRef.current !== null
+            ) {
+              const start = Math.min(
+                selectionStartRef.current,
+                selectionEndRef.current
+              );
+              const end = Math.max(
+                selectionStartRef.current,
+                selectionEndRef.current
+              );
               const before = inputBufRef.current.slice(0, start);
               const after = inputBufRef.current.slice(end);
               inputBufRef.current = before + text + after;
@@ -650,7 +684,10 @@ const SystemConsolePage: React.FC = () => {
           setHistory(next);
           setHistoryIndex(-1);
           try {
-            localStorage.setItem('console:history:v1', JSON.stringify(next.slice(-200)));
+            localStorage.setItem(
+              'console:history:v1',
+              JSON.stringify(next.slice(-200))
+            );
           } catch {}
 
           // persist prompt+command only
@@ -710,14 +747,20 @@ const SystemConsolePage: React.FC = () => {
                   copyToClipboard(plainText)
                     .then((success) => {
                       if (success) {
-                        term.write('\u001b[32m✓ Copied to clipboard\u001b[0m\r\n');
+                        term.write(
+                          '\u001b[32m✓ Copied to clipboard\u001b[0m\r\n'
+                        );
                       } else {
-                        term.write('\u001b[33m⚠ Failed to copy to clipboard\u001b[0m\r\n');
+                        term.write(
+                          '\u001b[33m⚠ Failed to copy to clipboard\u001b[0m\r\n'
+                        );
                       }
                       writePrompt(term);
                     })
                     .catch(() => {
-                      term.write('\u001b[33m⚠ Failed to copy to clipboard\u001b[0m\r\n');
+                      term.write(
+                        '\u001b[33m⚠ Failed to copy to clipboard\u001b[0m\r\n'
+                      );
                       writePrompt(term);
                     });
                 }
@@ -744,10 +787,19 @@ const SystemConsolePage: React.FC = () => {
       // Backspace
       if (data === '\u007f') {
         // If there's a selection, delete it
-        if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+        if (
+          selectionStartRef.current !== null &&
+          selectionEndRef.current !== null
+        ) {
           saveUndo();
-          const start = Math.min(selectionStartRef.current, selectionEndRef.current);
-          const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+          const start = Math.min(
+            selectionStartRef.current,
+            selectionEndRef.current
+          );
+          const end = Math.max(
+            selectionStartRef.current,
+            selectionEndRef.current
+          );
           const before = inputBufRef.current.slice(0, start);
           const after = inputBufRef.current.slice(end);
           inputBufRef.current = before + after;
@@ -781,10 +833,19 @@ const SystemConsolePage: React.FC = () => {
       // Delete key: delete character at cursor position
       if (data === '\u001b[3~') {
         // If there's a selection, delete it
-        if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+        if (
+          selectionStartRef.current !== null &&
+          selectionEndRef.current !== null
+        ) {
           saveUndo();
-          const start = Math.min(selectionStartRef.current, selectionEndRef.current);
-          const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+          const start = Math.min(
+            selectionStartRef.current,
+            selectionEndRef.current
+          );
+          const end = Math.max(
+            selectionStartRef.current,
+            selectionEndRef.current
+          );
           const before = inputBufRef.current.slice(0, start);
           const after = inputBufRef.current.slice(end);
           inputBufRef.current = before + after;
@@ -913,10 +974,19 @@ const SystemConsolePage: React.FC = () => {
       // Delete key (ESC [3~)
       if (data === '\u001b[3~') {
         // If there's a selection, delete it
-        if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+        if (
+          selectionStartRef.current !== null &&
+          selectionEndRef.current !== null
+        ) {
           saveUndo();
-          const start = Math.min(selectionStartRef.current, selectionEndRef.current);
-          const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+          const start = Math.min(
+            selectionStartRef.current,
+            selectionEndRef.current
+          );
+          const end = Math.max(
+            selectionStartRef.current,
+            selectionEndRef.current
+          );
           const before = inputBufRef.current.slice(0, start);
           const after = inputBufRef.current.slice(end);
           inputBufRef.current = before + after;
@@ -952,9 +1022,18 @@ const SystemConsolePage: React.FC = () => {
         saveUndo();
 
         // If there's a selection, replace it with the new text
-        if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
-          const start = Math.min(selectionStartRef.current, selectionEndRef.current);
-          const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+        if (
+          selectionStartRef.current !== null &&
+          selectionEndRef.current !== null
+        ) {
+          const start = Math.min(
+            selectionStartRef.current,
+            selectionEndRef.current
+          );
+          const end = Math.max(
+            selectionStartRef.current,
+            selectionEndRef.current
+          );
           const before = inputBufRef.current.slice(0, start);
           const after = inputBufRef.current.slice(end);
           inputBufRef.current = before + printable + after;
@@ -1046,7 +1125,10 @@ const SystemConsolePage: React.FC = () => {
   const persistLines = (lines: StoredLine[]) => {
     try {
       const MAX = 500;
-      localStorage.setItem('console:lines:v1', JSON.stringify(lines.slice(-MAX)));
+      localStorage.setItem(
+        'console:lines:v1',
+        JSON.stringify(lines.slice(-MAX))
+      );
     } catch {}
   };
 
@@ -1109,7 +1191,10 @@ const SystemConsolePage: React.FC = () => {
     setHistory((prev) => {
       const next = [...prev, line];
       try {
-        localStorage.setItem('console:history:v1', JSON.stringify(next.slice(-200)));
+        localStorage.setItem(
+          'console:history:v1',
+          JSON.stringify(next.slice(-200))
+        );
       } catch {}
       return next;
     });
@@ -1174,7 +1259,10 @@ const SystemConsolePage: React.FC = () => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (!history.length) return;
-      const newIndex = historyIndex === -1 ? history.length - 1 : Math.max(0, historyIndex - 1);
+      const newIndex =
+        historyIndex === -1
+          ? history.length - 1
+          : Math.max(0, historyIndex - 1);
       setHistoryIndex(newIndex);
       setInputContent(history[newIndex] || '');
       return;
@@ -1226,7 +1314,8 @@ const SystemConsolePage: React.FC = () => {
       }}
       onKeyDown={(e) => {
         // [ ignore default browser find etc.
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') e.preventDefault();
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f')
+          e.preventDefault();
       }}
     >
       <Box
@@ -1275,7 +1364,9 @@ const SystemConsolePage: React.FC = () => {
         open={!!ctxMenu}
         onClose={() => setCtxMenu(null)}
         anchorReference="anchorPosition"
-        anchorPosition={ctxMenu ? { top: ctxMenu.y, left: ctxMenu.x } : undefined}
+        anchorPosition={
+          ctxMenu ? { top: ctxMenu.y, left: ctxMenu.x } : undefined
+        }
         slotProps={{
           paper: {
             sx: (th) => ({
@@ -1342,7 +1433,8 @@ const SystemConsolePage: React.FC = () => {
       </Menu>
       <Box sx={{ mt: 1, flexShrink: 0 }}>
         <Typography variant="caption" color="text.secondary">
-          {t('console.hint')}: echo --green "Hello World" | help | date | time | timezone | uptime
+          {t('console.hint')}: echo --green "Hello World" | help | date | time |
+          timezone | uptime
         </Typography>
       </Box>
     </Box>

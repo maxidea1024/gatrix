@@ -31,7 +31,8 @@ export interface BaiduTokenResponse {
 
 export class BaiduOAuthService {
   private static readonly BASE_URL = 'https://openapi.baidu.com';
-  private static readonly AUTH_URL = 'https://openapi.baidu.com/oauth/2.0/authorize';
+  private static readonly AUTH_URL =
+    'https://openapi.baidu.com/oauth/2.0/authorize';
 
   /**
    * Baidu OAuth Authentication URL Create
@@ -51,7 +52,10 @@ export class BaiduOAuthService {
   /**
    * Authorization Code로 Access Token 획득
    */
-  static async getAccessToken(code: string, redirectUri: string): Promise<BaiduTokenResponse> {
+  static async getAccessToken(
+    code: string,
+    redirectUri: string
+  ): Promise<BaiduTokenResponse> {
     try {
       const params = new URLSearchParams({
         grant_type: 'authorization_code',
@@ -61,14 +65,20 @@ export class BaiduOAuthService {
         redirect_uri: redirectUri,
       });
 
-      const response = await axios.post(`${this.BASE_URL}/oauth/2.0/token`, params, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
+      const response = await axios.post(
+        `${this.BASE_URL}/oauth/2.0/token`,
+        params,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
 
       if (response.data.error) {
-        throw new Error(`Baidu OAuth Error: ${response.data.error_description}`);
+        throw new Error(
+          `Baidu OAuth Error: ${response.data.error_description}`
+        );
       }
 
       return response.data;
@@ -92,7 +102,9 @@ export class BaiduOAuthService {
       );
 
       if (response.data.error) {
-        throw new Error(`Baidu User Info Error: ${response.data.error_description}`);
+        throw new Error(
+          `Baidu User Info Error: ${response.data.error_description}`
+        );
       }
 
       return response.data;
@@ -105,7 +117,10 @@ export class BaiduOAuthService {
   /**
    * 전체 OAuth 플로우 처리
    */
-  static async handleOAuthCallback(code: string, redirectUri: string): Promise<BaiduProfile> {
+  static async handleOAuthCallback(
+    code: string,
+    redirectUri: string
+  ): Promise<BaiduProfile> {
     const tokenData = await this.getAccessToken(code, redirectUri);
     const userInfo = await this.getUserInfo(tokenData.access_token);
     return userInfo;

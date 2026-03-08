@@ -49,7 +49,12 @@ export class ServiceDiscoveryFactory {
       const password = config.redis.password;
       const db = 0; // Use DB 0 for service discovery
 
-      const provider = new RedisServiceDiscoveryProvider(host, port, password, db);
+      const provider = new RedisServiceDiscoveryProvider(
+        host,
+        port,
+        password,
+        db
+      );
       // Redis provider might not implement startMonitoring, or handles it differently
       if (
         'startMonitoring' in provider &&
@@ -61,7 +66,9 @@ export class ServiceDiscoveryFactory {
       }
       return provider;
     } else {
-      throw new Error(`Unknown service discovery mode: ${mode}. Use 'etcd' or 'redis'`);
+      throw new Error(
+        `Unknown service discovery mode: ${mode}. Use 'etcd' or 'redis'`
+      );
     }
   }
 

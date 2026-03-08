@@ -12,7 +12,9 @@ import ServerGameWorldController from '../../controllers/server-game-world-contr
 import IngamePopupNoticeController from '../../controllers/ingame-popup-notice-controller';
 import { SurveyController } from '../../controllers/survey-controller';
 import { MaintenanceController } from '../../controllers/maintenance-controller';
-import serviceDiscoveryRoutes, { getWhitelistsHandler } from './service-discovery';
+import serviceDiscoveryRoutes, {
+  getWhitelistsHandler,
+} from './service-discovery';
 import ServerClientVersionController from '../../controllers/server-client-version-controller';
 import ServerServiceNoticeController from '../../controllers/server-service-notice-controller';
 import ServerBannerController from '../../controllers/server-banner-controller';
@@ -39,7 +41,11 @@ const upload = multer({
 // ============================================================================
 
 // Get all valid API tokens for Edge mirroring
-router.get('/internal/tokens', serverAuthBase, InternalApiTokensController.getAllTokens as any);
+router.get(
+  '/internal/tokens',
+  serverAuthBase,
+  InternalApiTokensController.getAllTokens as any
+);
 
 // Receive token usage report from Edge servers
 router.post(
@@ -76,7 +82,11 @@ router.get('/test', serverAuthBase, (req: any, res: any) => {
 });
 
 // Environment list (for Edge to discover all environments) - No environment header required
-router.get('/environments', serverAuthBase, ServerEnvironmentController.getEnvironments);
+router.get(
+  '/environments',
+  serverAuthBase,
+  ServerEnvironmentController.getEnvironments
+);
 
 // Authentication routes - No environment required
 router.post('/auth/verify-token', ServerAuthController.verifyToken); // JWT Verify token (API Token 불필요)
@@ -88,7 +98,11 @@ router.get('/users/:id', serverAuthBase, ServerUserController.getUserById);
 router.post('/users/batch', serverAuthBase, ServerUserController.getUsersByIds);
 
 // Notification routes - No environment required (global notifications)
-router.post('/notifications', serverAuthBase, ServerNotificationController.sendNotification);
+router.post(
+  '/notifications',
+  serverAuthBase,
+  ServerNotificationController.sendNotification
+);
 router.post(
   '/notifications/bulk',
   serverAuthBase,
@@ -96,15 +110,35 @@ router.post(
 );
 
 // File routes - No environment required
-router.post('/files/upload-url', serverAuthBase, ServerFileController.getUploadUrl);
+router.post(
+  '/files/upload-url',
+  serverAuthBase,
+  ServerFileController.getUploadUrl
+);
 router.get('/files/:fileId', serverAuthBase, ServerFileController.getFileInfo);
 
 // Chat server routes - No environment required
-router.post('/chat/register', serverAuthBase, ServerChatController.registerServer);
-router.post('/chat/unregister', serverAuthBase, ServerChatController.unregisterServer);
+router.post(
+  '/chat/register',
+  serverAuthBase,
+  ServerChatController.registerServer
+);
+router.post(
+  '/chat/unregister',
+  serverAuthBase,
+  ServerChatController.unregisterServer
+);
 router.post('/chat/stats', serverAuthBase, ServerChatController.reportStats);
-router.post('/chat/activity', serverAuthBase, ServerChatController.reportActivity);
-router.get('/chat/servers', serverAuthBase, ServerChatController.getRegisteredServers);
+router.post(
+  '/chat/activity',
+  serverAuthBase,
+  ServerChatController.reportActivity
+);
+router.get(
+  '/chat/servers',
+  serverAuthBase,
+  ServerChatController.getRegisteredServers
+);
 
 // Service discovery routes
 router.use('/services', serviceDiscoveryRoutes);
@@ -128,16 +162,28 @@ router.post(
 // ============================================================================
 
 // Coupon routes
-router.post('/coupons/:code/redeem', serverSDKAuth, CouponRedeemController.redeem);
+router.post(
+  '/coupons/:code/redeem',
+  serverSDKAuth,
+  CouponRedeemController.redeem
+);
 
 // Game world routes
-router.get('/game-worlds', serverSDKAuth, ServerGameWorldController.getGameWorlds);
+router.get(
+  '/game-worlds',
+  serverSDKAuth,
+  ServerGameWorldController.getGameWorlds
+);
 router.get(
   '/game-worlds/world/:worldId',
   serverSDKAuth,
   ServerGameWorldController.getGameWorldByWorldId
 );
-router.get('/game-worlds/:id', serverSDKAuth, ServerGameWorldController.getGameWorldById);
+router.get(
+  '/game-worlds/:id',
+  serverSDKAuth,
+  ServerGameWorldController.getGameWorldById
+);
 
 // Ingame popup notice routes
 router.get(
@@ -152,7 +198,11 @@ router.get(
 );
 
 // Survey routes
-router.get('/surveys/settings', serverSDKAuth, SurveyController.getServerSurveySettings);
+router.get(
+  '/surveys/settings',
+  serverSDKAuth,
+  SurveyController.getServerSurveySettings
+);
 router.get('/surveys', serverSDKAuth, SurveyController.getServerSurveys);
 router.get('/surveys/:id', serverSDKAuth, SurveyController.getServerSurveyById);
 
@@ -163,10 +213,18 @@ router.get('/whitelists', serverSDKAuth, getWhitelistsHandler);
 router.get('/vars', serverSDKAuth, VarsController.getServerVars as any);
 
 // Maintenance routes
-router.get('/maintenance', serverSDKAuth, MaintenanceController.getStatus as any);
+router.get(
+  '/maintenance',
+  serverSDKAuth,
+  MaintenanceController.getStatus as any
+);
 
 // Client version routes
-router.get('/client-versions', serverSDKAuth, ServerClientVersionController.getClientVersions);
+router.get(
+  '/client-versions',
+  serverSDKAuth,
+  ServerClientVersionController.getClientVersions
+);
 router.get(
   '/client-versions/:id',
   serverSDKAuth,
@@ -174,7 +232,11 @@ router.get(
 );
 
 // Service notice routes
-router.get('/service-notices', serverSDKAuth, ServerServiceNoticeController.getServiceNotices);
+router.get(
+  '/service-notices',
+  serverSDKAuth,
+  ServerServiceNoticeController.getServiceNotices
+);
 router.get(
   '/service-notices/:id',
   serverSDKAuth,
@@ -183,11 +245,23 @@ router.get(
 
 // Banner routes
 router.get('/banners', serverSDKAuth, ServerBannerController.getBanners);
-router.get('/banners/:bannerId', serverSDKAuth, ServerBannerController.getBannerById);
+router.get(
+  '/banners/:bannerId',
+  serverSDKAuth,
+  ServerBannerController.getBannerById
+);
 
 // Store product routes
-router.get('/store-products', serverSDKAuth, ServerStoreProductController.getStoreProducts);
-router.get('/store-products/:id', serverSDKAuth, ServerStoreProductController.getStoreProductById);
+router.get(
+  '/store-products',
+  serverSDKAuth,
+  ServerStoreProductController.getStoreProducts
+);
+router.get(
+  '/store-products/:id',
+  serverSDKAuth,
+  ServerStoreProductController.getStoreProductById
+);
 
 // Planning data upload route (for external CLI uploads)
 router.post(
@@ -198,7 +272,11 @@ router.post(
 );
 
 // Feature flag routes
-router.get('/features', serverSDKAuth as any, ServerFeatureFlagController.getFeatureFlags as any);
+router.get(
+  '/features',
+  serverSDKAuth as any,
+  ServerFeatureFlagController.getFeatureFlags as any
+);
 router.get(
   '/features/:flagName',
   serverSDKAuth as any,
@@ -214,10 +292,18 @@ router.post(
   serverSDKAuth as any,
   ServerFeatureFlagController.reportUnknownFlag as any
 );
-router.get('/segments', serverSDKAuth as any, ServerFeatureFlagController.getSegments as any);
+router.get(
+  '/segments',
+  serverSDKAuth as any,
+  ServerFeatureFlagController.getSegments as any
+);
 
 // Impact metrics routes (SDK → backend)
 import ImpactMetricsController from '../../controllers/impact-metrics-controller';
-router.post('/impact-metrics', serverAuthBase, ImpactMetricsController.receiveMetrics as any);
+router.post(
+  '/impact-metrics',
+  serverAuthBase,
+  ImpactMetricsController.receiveMetrics as any
+);
 
 export default router;

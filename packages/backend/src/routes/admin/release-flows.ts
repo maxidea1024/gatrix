@@ -37,7 +37,10 @@ router.post(
 
 // Plans management
 router.get('/plans/flag/:flagId', ReleaseFlowController.getPlansByFlag as any);
-router.get('/plans/:flagId/:environmentId', ReleaseFlowController.getPlan as any);
+router.get(
+  '/plans/:flagId/:environmentId',
+  ReleaseFlowController.getPlan as any
+);
 router.post(
   '/plans/:planId/milestones/:milestoneId/start',
   requireOrgPermission(P.FEATURES_UPDATE) as any,
@@ -84,7 +87,10 @@ router.delete(
 );
 
 // Safeguards (per-milestone)
-router.get('/milestones/:milestoneId/safeguards', ReleaseFlowController.listSafeguards as any);
+router.get(
+  '/milestones/:milestoneId/safeguards',
+  ReleaseFlowController.listSafeguards as any
+);
 router.post(
   '/safeguards',
   requireOrgPermission(P.FEATURES_UPDATE) as any,

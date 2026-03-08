@@ -58,9 +58,15 @@ import UserSearchDialog from '../../components/chat/UserSearchDialog';
 import InvitationManager from '../../components/chat/InvitationManager';
 import PrivacySettings from '../../components/chat/PrivacySettings';
 import ThreadView from '../../components/chat/ThreadView';
-import UserStatusPicker, { UserStatus } from '../../components/chat/UserStatusPicker';
+import UserStatusPicker, {
+  UserStatus,
+} from '../../components/chat/UserStatusPicker';
 import ChatSkeleton from '../../components/chat/ChatSkeleton';
-import { CreateChannelRequest, SendMessageRequest, Message } from '../../types/chat';
+import {
+  CreateChannelRequest,
+  SendMessageRequest,
+  Message,
+} from '../../types/chat';
 import { getChatWebSocketService } from '../../services/chatWebSocketService';
 
 const ChatPageContent: React.FC = () => {
@@ -101,12 +107,17 @@ const ChatPageContent: React.FC = () => {
   const LAST_THREAD_KEY = 'chatLastThreadByChannel';
   const loadLastThreadMap = (): Record<string, number> => {
     try {
-      return JSON.parse(localStorage.getItem(LAST_THREAD_KEY) || '{}') as Record<string, number>;
+      return JSON.parse(
+        localStorage.getItem(LAST_THREAD_KEY) || '{}'
+      ) as Record<string, number>;
     } catch {
       return {};
     }
   };
-  const saveLastThreadForChannel = (channelId: number, messageId: number | null) => {
+  const saveLastThreadForChannel = (
+    channelId: number,
+    messageId: number | null
+  ) => {
     try {
       const map = loadLastThreadMap();
       if (messageId) map[String(channelId)] = messageId;
@@ -123,7 +134,9 @@ const ChatPageContent: React.FC = () => {
 
   // Thread sidebar width (resizable)
   const [threadWidth, setThreadWidth] = useState<number>(() => {
-    const saved = Number(localStorage.getItem('chatThreadWidth') || DEFAULT_THREAD_WIDTH);
+    const saved = Number(
+      localStorage.getItem('chatThreadWidth') || DEFAULT_THREAD_WIDTH
+    );
     const w = isNaN(saved) ? DEFAULT_THREAD_WIDTH : saved;
     return Math.min(Math.max(w, THREAD_MIN_WIDTH), THREAD_MAX_WIDTH);
   });
@@ -244,7 +257,9 @@ const ChatPageContent: React.FC = () => {
 
   // Auto-join channel when selected
   const [joinedChannels, setJoinedChannels] = useState<Set<number>>(new Set());
-  const [joiningChannels, setJoiningChannels] = useState<Set<number>>(new Set());
+  const [joiningChannels, setJoiningChannels] = useState<Set<number>>(
+    new Set()
+  );
 
   useEffect(() => {
     if (
@@ -261,7 +276,9 @@ const ChatPageContent: React.FC = () => {
 
       joinChannel(state.currentChannelId)
         .then(() => {
-          setJoinedChannels((prev) => new Set(prev).add(state.currentChannelId!));
+          setJoinedChannels((prev) =>
+            new Set(prev).add(state.currentChannelId!)
+          );
           setJoiningChannels((prev) => {
             const newSet = new Set(prev);
 
@@ -278,7 +295,13 @@ const ChatPageContent: React.FC = () => {
           });
         });
     }
-  }, [state.currentChannelId, joinChannel, joinedChannels, joiningChannels, state.isConnected]);
+  }, [
+    state.currentChannelId,
+    joinChannel,
+    joinedChannels,
+    joiningChannels,
+    state.isConnected,
+  ]);
 
   // 연결이 끊어졌을 때 join Status Initialization
   useEffect(() => {
@@ -395,7 +418,9 @@ const ChatPageContent: React.FC = () => {
     }
   };
 
-  const currentChannel = state.channels.find((c) => c.id === state.currentChannelId);
+  const currentChannel = state.channels.find(
+    (c) => c.id === state.currentChannelId
+  );
 
   // Used자 초대 핸들러
   const handleInviteUser = async (userId: number) => {
@@ -416,7 +441,9 @@ const ChatPageContent: React.FC = () => {
   const handleStatusChange = async (status: UserStatus, message?: string) => {
     try {
       // WebSocket을 통해 서버에 Update state
-      const wsService = getChatWebSocketService(() => localStorage.getItem('accessToken'));
+      const wsService = getChatWebSocketService(() =>
+        localStorage.getItem('accessToken')
+      );
       if (wsService.isConnected()) {
         wsService.updateStatus(status, message);
         setUserStatus(status);
@@ -494,7 +521,9 @@ const ChatPageContent: React.FC = () => {
           </Typography>
           {/* 웹소켓 연결 Status */}
           <Tooltip
-            title={state.isConnected ? t('chat.connected') : t('chat.disconnected')}
+            title={
+              state.isConnected ? t('chat.connected') : t('chat.disconnected')
+            }
             placement="bottom"
           >
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -570,7 +599,9 @@ const ChatPageContent: React.FC = () => {
           {isSidebarOpen && (
             <>
               <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                <ChannelList onCreateChannel={() => setCreateChannelOpen(true)} />
+                <ChannelList
+                  onCreateChannel={() => setCreateChannelOpen(true)}
+                />
               </Box>
 
               {/* 하단 기능 버튼들 */}
@@ -590,7 +621,10 @@ const ChatPageContent: React.FC = () => {
                         },
                       }}
                     >
-                      <StatusIcon fontSize="small" sx={{ color: getStatusColor(userStatus) }} />
+                      <StatusIcon
+                        fontSize="small"
+                        sx={{ color: getStatusColor(userStatus) }}
+                      />
                     </IconButton>
                   </Tooltip>
 
@@ -656,7 +690,8 @@ const ChatPageContent: React.FC = () => {
             sx={{
               flex: 1,
               height: '100%',
-              display: threadViewMode === 'stack' && isThreadOpen ? 'none' : 'flex',
+              display:
+                threadViewMode === 'stack' && isThreadOpen ? 'none' : 'flex',
               flexDirection: 'column',
             }}
           >
@@ -703,7 +738,10 @@ const ChatPageContent: React.FC = () => {
                 onDoubleClick={() => {
                   setThreadWidth(DEFAULT_THREAD_WIDTH);
                   try {
-                    localStorage.setItem('chatThreadWidth', String(DEFAULT_THREAD_WIDTH));
+                    localStorage.setItem(
+                      'chatThreadWidth',
+                      String(DEFAULT_THREAD_WIDTH)
+                    );
                   } catch {}
                 }}
                 sx={{
@@ -734,14 +772,22 @@ const ChatPageContent: React.FC = () => {
                   height: '100%',
                 }}
               >
-                <ThreadView originalMessage={threadMessage} onClose={handleCloseThread} />
+                <ThreadView
+                  originalMessage={threadMessage}
+                  onClose={handleCloseThread}
+                />
               </Box>
             </>
           )}
 
           {/* Thread Panel - 스택 모드 (전체 화면 오버레이) */}
           {threadViewMode === 'stack' && isThreadOpen && threadMessage && (
-            <Slide direction="left" in={isThreadOpen} mountOnEnter unmountOnExit>
+            <Slide
+              direction="left"
+              in={isThreadOpen}
+              mountOnEnter
+              unmountOnExit
+            >
               <Box
                 sx={{
                   position: 'absolute',
@@ -793,14 +839,25 @@ const ChatPageContent: React.FC = () => {
         fullWidth
       >
         <DialogTitle>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+          >
             <Box>
               <Typography variant="h6">{t('chat.createChannel')}</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              >
                 {t('chat.createChannelSubtitle')}
               </Typography>
             </Box>
-            <IconButton onClick={() => setCreateChannelOpen(false)} size="small">
+            <IconButton
+              onClick={() => setCreateChannelOpen(false)}
+              size="small"
+            >
               <CloseIcon />
             </IconButton>
           </Box>
@@ -810,7 +867,9 @@ const ChatPageContent: React.FC = () => {
             <TextField
               label={t('chat.channelName')}
               value={channelFormData.name}
-              onChange={(e) => setChannelFormData({ ...channelFormData, name: e.target.value })}
+              onChange={(e) =>
+                setChannelFormData({ ...channelFormData, name: e.target.value })
+              }
               fullWidth
               required
               autoFocus
@@ -880,7 +939,9 @@ const ChatPageContent: React.FC = () => {
             onClick={handleCreateChannel}
             variant="contained"
             disabled={!channelFormData.name.trim() || isCreatingChannel}
-            startIcon={isCreatingChannel ? <CircularProgress size={20} /> : undefined}
+            startIcon={
+              isCreatingChannel ? <CircularProgress size={20} /> : undefined
+            }
             fullWidth
           >
             {isCreatingChannel ? t('chat.creating') : t('chat.createChannel')}
@@ -974,9 +1035,15 @@ const ChatPageContent: React.FC = () => {
             // 초대 관리 창 Close
             setInvitationManagerOpen(false);
 
-            console.log('✅ Successfully switched to accepted channel:', channelId);
+            console.log(
+              '✅ Successfully switched to accepted channel:',
+              channelId
+            );
           } catch (error) {
-            console.error('❌ Failed to refresh channels after invitation acceptance:', error);
+            console.error(
+              '❌ Failed to refresh channels after invitation acceptance:',
+              error
+            );
             // Failed해도 채널 전환은 시도
             actions.setCurrentChannel(channelId);
             setInvitationManagerOpen(false);

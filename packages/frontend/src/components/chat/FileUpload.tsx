@@ -77,7 +77,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
     if (files.length === 0) return;
 
     // Validate file sizes
-    const oversizedFiles = files.filter((file) => file.size > maxFileSize * 1024 * 1024);
+    const oversizedFiles = files.filter(
+      (file) => file.size > maxFileSize * 1024 * 1024
+    );
     if (oversizedFiles.length > 0) {
       enqueueSnackbar(t('chat.fileTooLarge', { size: maxFileSize }), {
         variant: 'error',
@@ -118,13 +120,15 @@ const FileUpload: React.FC<FileUploadProps> = ({
         throw new Error('Geolocation is not supported');
       }
 
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000,
-        });
-      });
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000,
+          });
+        }
+      );
 
       const { latitude, longitude } = position.coords;
 
@@ -135,7 +139,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
           `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
         );
         const data = await response.json();
-        address = data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+        address =
+          data.display_name ||
+          `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
       } catch {
         address = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
       }
@@ -194,7 +200,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   return (
     <>
-      <IconButton size="small" onClick={handleMenuOpen} sx={{ color: 'text.secondary' }}>
+      <IconButton
+        size="small"
+        onClick={handleMenuOpen}
+        sx={{ color: 'text.secondary' }}
+      >
         <AttachIcon />
       </IconButton>
 
@@ -243,7 +253,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setLocationDialog(false)} startIcon={<CancelIcon />}>
+          <Button
+            onClick={() => setLocationDialog(false)}
+            startIcon={<CancelIcon />}
+          >
             {t('common.cancel')}
           </Button>
         </DialogActions>
@@ -256,7 +269,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
             <Typography variant="body2">
               {t('chat.uploading')} {uploadProgress}%
             </Typography>
-            <LinearProgress variant="determinate" value={uploadProgress} sx={{ mt: 1 }} />
+            <LinearProgress
+              variant="determinate"
+              value={uploadProgress}
+              sx={{ mt: 1 }}
+            />
           </Alert>
         </Box>
       )}

@@ -77,7 +77,9 @@ export class StoreProductService extends BaseEnvironmentService<
       `/api/v1/server/store-products/${id}`
     );
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch store product');
+      throw new Error(
+        response.error?.message || 'Failed to fetch store product'
+      );
     }
     return response.data.product;
   }
@@ -159,7 +161,10 @@ export class StoreProductService extends BaseEnvironmentService<
   /**
    * Update or add an item in cache by ULID (event uses ULID, not cmsProductId)
    */
-  private updateItemByUlidInCache(item: StoreProduct, environmentId: string): void {
+  private updateItemByUlidInCache(
+    item: StoreProduct,
+    environmentId: string
+  ): void {
     const currentItems = this.cachedByEnv.get(environmentId) || [];
     const existsInCache = currentItems.some((i) => i.id === item.id);
 
@@ -185,7 +190,10 @@ export class StoreProductService extends BaseEnvironmentService<
    * @param productId Product ID
    * @param environmentId environment ID (required)
    */
-  getByProductId(productId: string, environmentId: string): StoreProduct | null {
+  getByProductId(
+    productId: string,
+    environmentId: string
+  ): StoreProduct | null {
     const products = this.getCached(environmentId);
     return products.find((p) => p.productId === productId) || null;
   }

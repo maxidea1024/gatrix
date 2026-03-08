@@ -62,7 +62,9 @@ const SegmentSelector: React.FC<SegmentSelectorProps> = ({
     <Box>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-        <Typography variant="subtitle2">{t('featureFlags.segments')}</Typography>
+        <Typography variant="subtitle2">
+          {t('featureFlags.segments')}
+        </Typography>
         <Tooltip title={t('featureFlags.segmentSelectorHelp')}>
           <HelpOutlineIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
         </Tooltip>
@@ -80,7 +82,9 @@ const SegmentSelector: React.FC<SegmentSelectorProps> = ({
             }
           }}
           renderValue={() => (
-            <Typography color="text.secondary">{t('featureFlags.selectSegments')}</Typography>
+            <Typography color="text.secondary">
+              {t('featureFlags.selectSegments')}
+            </Typography>
           )}
         >
           {unselectedSegments.map((seg) => (
@@ -97,7 +101,11 @@ const SegmentSelector: React.FC<SegmentSelectorProps> = ({
       {/* Selected Segments */}
       {selectedSegments.length > 0 && (
         <Box>
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mb: 1, display: 'block' }}
+          >
             {t('featureFlags.selectedSegments')}
           </Typography>
 
@@ -112,7 +120,9 @@ const SegmentSelector: React.FC<SegmentSelectorProps> = ({
             }}
           >
             {selectedSegments.map((segName, idx) => {
-              const seg = availableSegments.find((s) => s.segmentName === segName);
+              const seg = availableSegments.find(
+                (s) => s.segmentName === segName
+              );
               const isExpanded = expandedSegment === segName;
 
               return (
@@ -132,7 +142,9 @@ const SegmentSelector: React.FC<SegmentSelectorProps> = ({
                   <Chip
                     icon={<GroupIcon sx={{ fontSize: 16 }} />}
                     label={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
                         <span>{seg?.displayName || segName}</span>
                         <IconButton
                           size="small"
@@ -158,7 +170,9 @@ const SegmentSelector: React.FC<SegmentSelectorProps> = ({
                         </IconButton>
                       </Box>
                     }
-                    onDelete={disabled ? undefined : () => onSegmentRemove(segName)}
+                    onDelete={
+                      disabled ? undefined : () => onSegmentRemove(segName)
+                    }
                     variant="outlined"
                     color="primary"
                     sx={{
@@ -173,7 +187,9 @@ const SegmentSelector: React.FC<SegmentSelectorProps> = ({
 
           {/* Segment Preview */}
           {selectedSegments.map((segName) => {
-            const seg = availableSegments.find((s) => s.segmentName === segName);
+            const seg = availableSegments.find(
+              (s) => s.segmentName === segName
+            );
             const isExpanded = expandedSegment === segName;
 
             return (
@@ -199,7 +215,11 @@ const SegmentSelector: React.FC<SegmentSelectorProps> = ({
                     <Typography variant="body2" color="text.secondary">
                       Segment
                     </Typography>
-                    <Typography variant="body2" fontWeight={600} color="primary.main">
+                    <Typography
+                      variant="body2"
+                      fontWeight={600}
+                      color="primary.main"
+                    >
                       {seg?.displayName || segName}
                     </Typography>
                   </Box>

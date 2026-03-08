@@ -10,7 +10,8 @@ const logFormat = process.env.LOG_FORMAT || '';
 const nodeEnv = process.env.NODE_ENV || 'development';
 const serviceName = process.env.LOG_SERVICE_NAME || 'gatrix-chat-server';
 const monitoringEnabled =
-  process.env.MONITORING_ENABLED === 'true' || process.env.MONITORING_ENABLED === '1';
+  process.env.MONITORING_ENABLED === 'true' ||
+  process.env.MONITORING_ENABLED === '1';
 const hostname = os.hostname();
 
 const lokiEnabled = process.env.GATRIX_LOKI_ENABLED === 'true';
@@ -252,7 +253,9 @@ const createLogger = (category: string): winston.Logger => {
       // Console transport with category format
       new winston.transports.Console({
         level: logLevel,
-        format: useJsonConsoleFormat ? categoryJsonFormat : categoryPrettyFormat,
+        format: useJsonConsoleFormat
+          ? categoryJsonFormat
+          : categoryPrettyFormat,
       }),
       // Add file transports only in production or when LOG_DIR is specified
       ...(process.env.NODE_ENV === 'production' || process.env.LOG_DIR

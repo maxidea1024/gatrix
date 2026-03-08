@@ -27,7 +27,10 @@ interface InvitationSuccessProps {
   onClose: () => void;
 }
 
-const InvitationSuccess: React.FC<InvitationSuccessProps> = ({ invitationData, onClose }) => {
+const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
+  invitationData,
+  onClose,
+}) => {
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation();
 
@@ -39,7 +42,8 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({ invitationData, o
     }
     copyToClipboardWithNotification(
       inviteUrl,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -89,7 +93,9 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({ invitationData, o
         <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
           {t('invitations.successTitle')}
         </Typography>
-        <Typography variant="body2">{t('invitations.successDescription')}</Typography>
+        <Typography variant="body2">
+          {t('invitations.successDescription')}
+        </Typography>
       </Alert>
 
       {/* Invitation information card */}
@@ -139,7 +145,11 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({ invitationData, o
 
         {/* Invitation link */}
         <Box sx={{ mb: 3 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mb: 1, fontWeight: 500 }}
+          >
             {t('invitations.inviteLink')}:
           </Typography>
           <TextField

@@ -73,13 +73,20 @@ export class Organisation {
   }
 
   static async findAll(): Promise<OrganisationRecord[]> {
-    return db(this.TABLE).where('isInternal', false).orderBy('createdAt', 'desc');
+    return db(this.TABLE)
+      .where('isInternal', false)
+      .orderBy('createdAt', 'desc');
   }
 
-  static async update(id: string, data: UpdateOrgData): Promise<OrganisationRecord | null> {
+  static async update(
+    id: string,
+    data: UpdateOrgData
+  ): Promise<OrganisationRecord | null> {
     const updateData: any = { updatedBy: data.updatedBy };
-    if (data.displayName !== undefined) updateData.displayName = data.displayName;
-    if (data.description !== undefined) updateData.description = data.description;
+    if (data.displayName !== undefined)
+      updateData.displayName = data.displayName;
+    if (data.description !== undefined)
+      updateData.description = data.description;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
     await db(this.TABLE).where('id', id).update(updateData);
@@ -93,7 +100,11 @@ export class Organisation {
 
   // ─── Members ─────────────────────────
 
-  static async addMember(orgId: string, userId: string, invitedBy?: string): Promise<void> {
+  static async addMember(
+    orgId: string,
+    userId: string,
+    invitedBy?: string
+  ): Promise<void> {
     const id = generateULID();
     await db(this.MEMBERS_TABLE).insert({
       id,
@@ -104,7 +115,10 @@ export class Organisation {
   }
 
   static async removeMember(orgId: string, userId: string): Promise<boolean> {
-    const result = await db(this.MEMBERS_TABLE).where('orgId', orgId).where('userId', userId).del();
+    const result = await db(this.MEMBERS_TABLE)
+      .where('orgId', orgId)
+      .where('userId', userId)
+      .del();
     return result > 0;
   }
 
@@ -112,7 +126,10 @@ export class Organisation {
     orgId: string,
     userId: string
   ): Promise<{ orgId: string; userId: string } | null> {
-    const row = await db(this.MEMBERS_TABLE).where('orgId', orgId).where('userId', userId).first();
+    const row = await db(this.MEMBERS_TABLE)
+      .where('orgId', orgId)
+      .where('userId', userId)
+      .first();
     return row || null;
   }
 

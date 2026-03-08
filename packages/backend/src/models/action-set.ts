@@ -138,7 +138,11 @@ export class ActionSetModel {
         ])
         .leftJoin('g_users as creator', `${this.TABLE}.createdBy`, 'creator.id')
         .leftJoin('g_users as actor', `${this.TABLE}.actorId`, 'actor.id')
-        .leftJoin('g_signal_endpoints as sep', `${this.TABLE}.sourceId`, 'sep.id')
+        .leftJoin(
+          'g_signal_endpoints as sep',
+          `${this.TABLE}.sourceId`,
+          'sep.id'
+        )
         .where(`${this.TABLE}.id`, id)
         .first();
 
@@ -147,7 +151,8 @@ export class ActionSetModel {
       const actions = await this.findActions(id);
 
       // Parse JSON fields if they are strings
-      const filters = typeof row.filters === 'string' ? JSON.parse(row.filters) : row.filters;
+      const filters =
+        typeof row.filters === 'string' ? JSON.parse(row.filters) : row.filters;
 
       return { ...row, filters, actions };
     } catch (error) {
@@ -167,7 +172,11 @@ export class ActionSetModel {
         ])
         .leftJoin('g_users as creator', `${this.TABLE}.createdBy`, 'creator.id')
         .leftJoin('g_users as actor', `${this.TABLE}.actorId`, 'actor.id')
-        .leftJoin('g_signal_endpoints as sep', `${this.TABLE}.sourceId`, 'sep.id')
+        .leftJoin(
+          'g_signal_endpoints as sep',
+          `${this.TABLE}.sourceId`,
+          'sep.id'
+        )
         .orderBy(`${this.TABLE}.createdAt`, 'desc');
 
       if (projectId) {
@@ -180,7 +189,9 @@ export class ActionSetModel {
       const setIds = rows.map((r: any) => r.id);
       const allActions =
         setIds.length > 0
-          ? await db(this.ACTIONS_TABLE).whereIn('actionSetId', setIds).orderBy('sortOrder', 'asc')
+          ? await db(this.ACTIONS_TABLE)
+              .whereIn('actionSetId', setIds)
+              .orderBy('sortOrder', 'asc')
           : [];
 
       const actionsBySet = allActions.reduce((acc: any, a: any) => {
@@ -198,7 +209,10 @@ export class ActionSetModel {
 
       return rows.map((row: any) => ({
         ...row,
-        filters: typeof row.filters === 'string' ? JSON.parse(row.filters) : row.filters,
+        filters:
+          typeof row.filters === 'string'
+            ? JSON.parse(row.filters)
+            : row.filters,
         actions: actionsBySet[row.id] || [],
       }));
     } catch (error) {
@@ -207,18 +221,27 @@ export class ActionSetModel {
     }
   }
 
-  static async update(id: string, data: UpdateActionSetData): Promise<ActionSet | null> {
+  static async update(
+    id: string,
+    data: UpdateActionSetData
+  ): Promise<ActionSet | null> {
     try {
       await db.transaction(async (trx) => {
-        const updateData: any = { updatedBy: data.updatedBy, updatedAt: db.fn.now() };
+        const updateData: any = {
+          updatedBy: data.updatedBy,
+          updatedAt: db.fn.now(),
+        };
         if (data.name !== undefined) updateData.name = data.name;
-        if (data.description !== undefined) updateData.description = data.description;
+        if (data.description !== undefined)
+          updateData.description = data.description;
         if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
         if (data.actorId !== undefined) updateData.actorId = data.actorId;
         if (data.source !== undefined) updateData.source = data.source;
         if (data.sourceId !== undefined) updateData.sourceId = data.sourceId;
         if (data.filters !== undefined) {
-          updateData.filters = data.filters ? JSON.stringify(data.filters) : null;
+          updateData.filters = data.filters
+            ? JSON.stringify(data.filters)
+            : null;
         }
 
         await trx(this.TABLE).where('id', id).update(updateData);
@@ -261,9 +284,15 @@ export class ActionSetModel {
     }
   }
 
-  static async toggleEnabled(id: string, updatedBy: string): Promise<ActionSet | null> {
+  static async toggleEnabled(
+    id: string,
+    updatedBy: string
+  ): Promise<ActionSet | null> {
     try {
-      const set = await db(this.TABLE).select('isEnabled').where('id', id).first();
+      const set = await db(this.TABLE)
+        .select('isEnabled')
+        .where('id', id)
+        .first();
       if (!set) return null;
 
       await db(this.TABLE).where('id', id).update({
@@ -290,7 +319,9 @@ export class ActionSetModel {
       return actions.map((a: any) => ({
         ...a,
         executionParams:
-          typeof a.executionParams === 'string' ? JSON.parse(a.executionParams) : a.executionParams,
+          typeof a.executionParams === 'string'
+            ? JSON.parse(a.executionParams)
+            : a.executionParams,
       }));
     } catch (error) {
       logger.error('Error finding actions:', error);
@@ -303,7 +334,10 @@ export class ActionSetModel {
   /**
    * Find enabled action sets that match a given signal
    */
-  static async findMatchingActionSets(source: string, sourceId: string): Promise<ActionSet[]> {
+  static async findMatchingActionSets(
+    source: string,
+    sourceId: string
+  ): Promise<ActionSet[]> {
     try {
       const rows = await db(this.TABLE)
         .where('isEnabled', true)
@@ -376,7 +410,10 @@ export class ActionSetModel {
   ): Promise<{ events: ActionSetEvent[]; total: number }> {
     try {
       const [countResult, events] = await Promise.all([
-        db(this.EVENTS_TABLE).where('actionSetId', actionSetId).count('id as total').first(),
+        db(this.EVENTS_TABLE)
+          .where('actionSetId', actionSetId)
+          .count('id as total')
+          .first(),
         db(this.EVENTS_TABLE)
           .where('actionSetId', actionSetId)
           .orderBy('createdAt', 'desc')

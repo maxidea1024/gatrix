@@ -13,7 +13,8 @@ import { UnifiedChangeGateway } from '../services/unified-change-gateway';
 
 // Allow full URLs (scheme://host[:port][...]) or host[:port] without scheme
 // Examples: https://world.example.com, world.example.com:8080, world.example.com, 192.168.1.100:8080, 192.168.1.100
-const WORLD_SERVER_ADDRESS_REGEX = /^(?:[a-zA-Z][a-zA-Z0-9+.-]*:\/\/\S+|[a-zA-Z0-9.-]+(:\d+)?)$/;
+const WORLD_SERVER_ADDRESS_REGEX =
+  /^(?:[a-zA-Z][a-zA-Z0-9+.-]*:\/\/\S+|[a-zA-Z0-9.-]+(:\d+)?)$/;
 
 // Validation schemas
 const createGameWorldSchema = Joi.object({
@@ -24,8 +25,18 @@ const createGameWorldSchema = Joi.object({
   displayOrder: Joi.number().integer().optional(),
   description: Joi.string().max(1000).optional().allow(''),
   // 점검 관련 필드
-  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
-  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceStartDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow('')
+    .empty('')
+    .default(null),
+  maintenanceEndDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow('')
+    .empty('')
+    .default(null),
   maintenanceMessage: Joi.when('isMaintenance', {
     is: true,
     then: Joi.string().min(1).required(),
@@ -42,9 +53,18 @@ const createGameWorldSchema = Joi.object({
     .optional()
     .default([]),
   forceDisconnect: Joi.boolean().optional().default(false),
-  gracePeriodMinutes: Joi.number().integer().min(0).max(60).optional().default(5),
+  gracePeriodMinutes: Joi.number()
+    .integer()
+    .min(0)
+    .max(60)
+    .optional()
+    .default(5),
   customPayload: Joi.object().unknown(true).optional().default({}),
-  infraSettings: Joi.object().unknown(true).optional().allow(null).default(null),
+  infraSettings: Joi.object()
+    .unknown(true)
+    .optional()
+    .allow(null)
+    .default(null),
   infraSettingsRaw: Joi.string().optional().allow(null, '').default(null),
   worldServerAddress: Joi.string()
     .pattern(WORLD_SERVER_ADDRESS_REGEX)
@@ -66,8 +86,18 @@ const updateGameWorldSchema = Joi.object({
   displayOrder: Joi.number().integer().optional(),
   description: Joi.string().max(1000).optional().allow(''),
   // 점검 관련 필드
-  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
-  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceStartDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow('')
+    .empty('')
+    .default(null),
+  maintenanceEndDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow('')
+    .empty('')
+    .default(null),
   maintenanceMessage: Joi.when('isMaintenance', {
     is: true,
     then: Joi.string().min(1).required(),
@@ -84,7 +114,12 @@ const updateGameWorldSchema = Joi.object({
     .optional()
     .default([]),
   forceDisconnect: Joi.boolean().optional().default(false),
-  gracePeriodMinutes: Joi.number().integer().min(0).max(60).optional().default(5),
+  gracePeriodMinutes: Joi.number()
+    .integer()
+    .min(0)
+    .max(60)
+    .optional()
+    .default(5),
   customPayload: Joi.object().unknown(true).optional().allow(null),
   infraSettings: Joi.object().unknown(true).optional().allow(null),
   infraSettingsRaw: Joi.string().optional().allow(null, ''),
@@ -102,8 +137,18 @@ const updateGameWorldSchema = Joi.object({
 // Update maintenance status schema
 const updateMaintenanceSchema = Joi.object({
   isMaintenance: Joi.boolean().required(),
-  maintenanceStartDate: Joi.string().isoDate().optional().allow('', null).empty('').default(null),
-  maintenanceEndDate: Joi.string().isoDate().optional().allow('', null).empty('').default(null),
+  maintenanceStartDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow('', null)
+    .empty('')
+    .default(null),
+  maintenanceEndDate: Joi.string()
+    .isoDate()
+    .optional()
+    .allow('', null)
+    .empty('')
+    .default(null),
   maintenanceMessageTemplateId: Joi.string().optional().allow(null),
   maintenanceMessage: Joi.when('maintenanceMessageTemplateId', {
     is: Joi.exist().not(null),
@@ -125,689 +170,767 @@ const updateMaintenanceSchema = Joi.object({
     .optional()
     .default([]),
   forceDisconnect: Joi.boolean().optional().default(false),
-  gracePeriodMinutes: Joi.number().integer().min(0).max(60).optional().default(5),
+  gracePeriodMinutes: Joi.number()
+    .integer()
+    .min(0)
+    .max(60)
+    .optional()
+    .default(5),
 });
 
 export class GameWorldController {
-  static getGameWorlds = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = req.environmentId;
+  static getGameWorlds = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId;
 
-    // If no environment is provided, return empty list (happens during initial frontend load)
-    if (!environmentId) {
-      return res.json({
-        success: true,
-        data: {
-          worlds: [],
-          total: 0,
-        },
-        message: 'No environment selected',
-      });
-    }
-
-    const worlds = await GameWorldService.getGameWorlds({
-      ...req.query,
-      environmentId,
-    });
-
-    // Attach tags for each world
-    const dataArray = Array.isArray((worlds as any)?.data) ? (worlds as any).data : (worlds as any);
-    let withTags = await Promise.all(
-      (dataArray as any[]).map(async (w: any) => {
-        const tags = await TagService.listTagsForEntity('game_world', w.id);
-        return { ...w, tags };
-      })
-    );
-
-    // Filter by tagIds if provided
-    const tagIdsParam = (req.query as any).tagIds as string | undefined;
-    const tagsOperator = (req.query as any).tags_operator as 'any_of' | 'include_all' | undefined;
-    if (tagIdsParam) {
-      const requiredIds = tagIdsParam
-        .split(',')
-        .map((s) => Number(s))
-        .filter((n) => !isNaN(n));
-      if (requiredIds.length > 0) {
-        const operator = tagsOperator || 'include_all';
-
-        if (operator === 'any_of') {
-          // OR 조건: 선택한 태그 중 하나라도 가진 게임월드 반환
-          withTags = withTags.filter((w: any) => {
-            const ids = (w.tags || []).map((t: any) => Number(t.id));
-            return requiredIds.some((rid) => ids.includes(rid));
-          });
-        } else {
-          // AND 조건: 선택한 모든 태그를 가진 게임월드만 반환
-          withTags = withTags.filter((w: any) => {
-            const ids = (w.tags || []).map((t: any) => Number(t.id));
-            return requiredIds.every((rid) => ids.includes(rid));
-          });
-        }
-      }
-    }
-
-    res.json({
-      success: true,
-      data: {
-        worlds: withTags,
-        total: (worlds as any)?.total ?? (withTags as any)?.length ?? 0,
-      },
-      message: 'Game worlds retrieved successfully',
-    });
-  });
-
-  static getGameWorldById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = req.params.id;
-    const environmentId = req.environmentId;
-
-    if (!id) {
-      throw new GatrixError('Invalid game world ID', 400);
-    }
-
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
-    }
-
-    const world = await GameWorldService.getGameWorldById(id, environmentId);
-    const tags = await TagService.listTagsForEntity('game_world', id);
-
-    res.json({
-      success: true,
-      data: { world: { ...world, tags } },
-      message: 'Game world retrieved successfully',
-    });
-  });
-
-  static getGameWorldByWorldId = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { worldId } = req.params;
-    const environmentId = req.environmentId;
-
-    if (!worldId) {
-      throw new GatrixError('World ID is required', 400);
-    }
-
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
-    }
-
-    const world = await GameWorldService.getGameWorldByWorldId(worldId, environmentId);
-    const tags = await TagService.listTagsForEntity('game_world', world.id);
-
-    res.json({
-      success: true,
-      data: { world: { ...world, tags } },
-      message: 'Game world retrieved successfully',
-    });
-  });
-
-  static createGameWorld = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = req.environmentId;
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
-    }
-
-    // Validate request body
-    const { error, value } = createGameWorldSchema.validate(req.body);
-    if (error) {
-      throw new GatrixError(error.details[0].message, 400);
-    }
-
-    const { tagIds, ...worldValue } = value as any;
-
-    // Validate time settings
-    if (worldValue.isMaintenance) {
-      const startsAt = worldValue.maintenanceStartDate
-        ? new Date(worldValue.maintenanceStartDate)
-        : null;
-      const endsAt = worldValue.maintenanceEndDate ? new Date(worldValue.maintenanceEndDate) : null;
-      const now = new Date();
-
-      // If both times are set, endsAt must be after startsAt
-      if (startsAt && endsAt && endsAt <= startsAt) {
-        throw new GatrixError('End time must be after start time.', 400);
-      }
-
-      // If only endsAt is set, it must be in the future
-      if (!startsAt && endsAt) {
-        if (endsAt <= now) {
-          throw new GatrixError('End time must be in the future.', 400);
-        }
-      }
-    }
-
-    // Resolve authenticated user id from middleware (supports both payload and loaded user)
-    const authenticatedUserId = req.user?.userId;
-    if (!authenticatedUserId) {
-      throw new GatrixError('User authentication required', 401);
-    }
-
-    const worldData = {
-      ...worldValue,
-      createdBy: authenticatedUserId,
-    };
-
-    // Use UnifiedChangeGateway for CR support
-    const gatewayResult = await UnifiedChangeGateway.requestCreation(
-      authenticatedUserId,
-      environmentId,
-      'g_game_worlds',
-      { ...worldData, environmentId, tagIds },
-      async () => {
-        // Direct creation function - executed when CR is not required
-        const world = await GameWorldService.createGameWorld(worldData, environmentId);
-        if (Array.isArray(tagIds)) {
-          await TagService.setTagsForEntity('game_world', world.id, tagIds, authenticatedUserId);
-        }
-        const tags = await TagService.listTagsForEntity('game_world', world.id);
-
-        // Publish event for SDK real-time updates
-        await pubSubService.publishNotification({
-          type: 'gameworld.created',
-          data: { world: { ...world, tags } },
-          targetChannels: ['gameworld', 'admin'],
-        });
-
-        return { ...world, tags };
-      }
-    );
-
-    // Handle response based on gateway result
-    if (gatewayResult.mode === 'DIRECT') {
-      res.status(201).json({
-        success: true,
-        data: { world: gatewayResult.data },
-        message: 'Game world created successfully',
-      });
-    } else {
-      // Change Request created
-      res.status(202).json({
-        success: true,
-        data: {
-          changeRequestId: gatewayResult.changeRequestId,
-          status: gatewayResult.status,
-        },
-        message: 'Change request created. The game world will be created after approval.',
-      });
-    }
-  });
-
-  static updateGameWorld = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = req.params.id;
-    const environmentId = req.environmentId;
-
-    if (!id) {
-      throw new GatrixError('Invalid game world ID', 400);
-    }
-
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
-    }
-
-    // Validate request body
-    const { error, value } = updateGameWorldSchema.validate(req.body);
-    if (error) {
-      throw new GatrixError(error.details[0].message, 400);
-    }
-
-    const { tagIds, ...updateValue } = value as any;
-
-    // Validate time settings
-    if (updateValue.isMaintenance) {
-      const startsAt = updateValue.maintenanceStartDate
-        ? new Date(updateValue.maintenanceStartDate)
-        : null;
-      const endsAt = updateValue.maintenanceEndDate
-        ? new Date(updateValue.maintenanceEndDate)
-        : null;
-      const now = new Date();
-
-      // If both times are set, endsAt must be after startsAt
-      if (startsAt && endsAt && endsAt <= startsAt) {
-        throw new GatrixError('End time must be after start time.', 400);
-      }
-
-      // If only endsAt is set, it must be in the future
-      if (!startsAt && endsAt) {
-        if (endsAt <= now) {
-          throw new GatrixError('End time must be in the future.', 400);
-        }
-      }
-    }
-
-    // Add updatedBy from authenticated user session
-    const authenticatedUserId = req.user?.userId;
-    if (!authenticatedUserId) {
-      throw new GatrixError('User authentication required', 401);
-    }
-
-    const updateData = {
-      ...updateValue,
-      updatedBy: authenticatedUserId,
-    };
-
-    // Use UnifiedChangeGateway for CR support
-    const gatewayResult = await UnifiedChangeGateway.processChange(
-      authenticatedUserId,
-      environmentId,
-      'g_game_worlds',
-      id,
-      { ...updateData, tagIds },
-      async (processedData) => {
-        const { tagIds: processedTagIds, ...processedWorldData } = processedData as any;
-        const world = await GameWorldService.updateGameWorld(id, processedWorldData, environmentId);
-        if (Array.isArray(processedTagIds)) {
-          await TagService.setTagsForEntity('game_world', id, processedTagIds, authenticatedUserId);
-        }
-        const tags = await TagService.listTagsForEntity('game_world', id);
-
-        // Publish event for SDK real-time updates
-        await pubSubService.publishNotification({
-          type: 'gameworld.updated',
-          data: { world: { ...world, tags } },
-          targetChannels: ['gameworld', 'admin'],
-        });
-
-        return { world: { ...world, tags } };
-      }
-    );
-
-    // Handle response based on gateway result
-    if (gatewayResult.mode === 'DIRECT') {
-      res.json({
-        success: true,
-        data: gatewayResult.data,
-        message: 'Game world updated successfully',
-      });
-    } else {
-      // Change Request created
-      res.status(202).json({
-        success: true,
-        data: {
-          changeRequestId: gatewayResult.changeRequestId,
-          status: gatewayResult.status,
-        },
-        message: 'Change request created. The update will be applied after approval.',
-      });
-    }
-  });
-
-  static deleteGameWorld = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = req.params.id;
-    const environmentId = req.environmentId;
-
-    if (!id) {
-      throw new GatrixError('Invalid game world ID', 400);
-    }
-
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
-    }
-
-    const authenticatedUserId = req.user?.userId;
-    if (!authenticatedUserId) {
-      throw new GatrixError('User authentication required', 401);
-    }
-
-    // Use UnifiedChangeGateway for CR support
-    const gatewayResult = await UnifiedChangeGateway.requestDeletion(
-      authenticatedUserId,
-      environmentId,
-      'g_game_worlds',
-      id,
-      async () => {
-        await GameWorldService.deleteGameWorld(id, environmentId);
-
-        // Publish event for SDK real-time updates
-        await pubSubService.publishNotification({
-          type: 'gameworld.deleted',
-          data: { worldId: id },
-          targetChannels: ['gameworld', 'admin'],
+      // If no environment is provided, return empty list (happens during initial frontend load)
+      if (!environmentId) {
+        return res.json({
+          success: true,
+          data: {
+            worlds: [],
+            total: 0,
+          },
+          message: 'No environment selected',
         });
       }
-    );
 
-    // Handle response based on gateway result
-    if (gatewayResult.mode === 'DIRECT') {
-      res.json({
-        success: true,
-        message: 'Game world deleted successfully',
+      const worlds = await GameWorldService.getGameWorlds({
+        ...req.query,
+        environmentId,
       });
-    } else {
-      // Change Request created
-      res.status(202).json({
-        success: true,
-        data: {
-          changeRequestId: gatewayResult.changeRequestId,
-          status: gatewayResult.status,
-        },
-        message: 'Change request created. The deletion will be applied after approval.',
-      });
-    }
-  });
 
-  static toggleVisibility = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = req.params.id;
-    const environmentId = req.environmentId;
-    logger.info(`GameWorldController.toggleVisibility called for id: ${id}`);
+      // Attach tags for each world
+      const dataArray = Array.isArray((worlds as any)?.data)
+        ? (worlds as any).data
+        : (worlds as any);
+      let withTags = await Promise.all(
+        (dataArray as any[]).map(async (w: any) => {
+          const tags = await TagService.listTagsForEntity('game_world', w.id);
+          return { ...w, tags };
+        })
+      );
 
-    if (!id) {
-      throw new GatrixError('Invalid game world ID', 400);
-    }
+      // Filter by tagIds if provided
+      const tagIdsParam = (req.query as any).tagIds as string | undefined;
+      const tagsOperator = (req.query as any).tags_operator as
+        | 'any_of'
+        | 'include_all'
+        | undefined;
+      if (tagIdsParam) {
+        const requiredIds = tagIdsParam
+          .split(',')
+          .map((s) => Number(s))
+          .filter((n) => !isNaN(n));
+        if (requiredIds.length > 0) {
+          const operator = tagsOperator || 'include_all';
 
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
-    }
-
-    const authenticatedUserId = req.user?.userId;
-    if (!authenticatedUserId) {
-      throw new GatrixError('User authentication required', 401);
-    }
-
-    // Use UnifiedChangeGateway for CR support
-    const gatewayResult = await UnifiedChangeGateway.processChange(
-      authenticatedUserId,
-      environmentId,
-      'g_game_worlds',
-      id,
-      async (currentData: any) => {
-        return { isVisible: !currentData.isVisible };
-      },
-      async (processedData: any) => {
-        const world = await GameWorldService.updateGameWorld(
-          id,
-          processedData as any,
-          environmentId
-        );
-        const tags = await TagService.listTagsForEntity('game_world', id);
-
-        // Publish event for SDK real-time updates
-        await pubSubService.publishNotification({
-          type: 'gameworld.updated',
-          data: { world: { ...world, tags } },
-          targetChannels: ['gameworld', 'admin'],
-        });
-
-        return { world: { ...world, tags } };
-      }
-    );
-
-    if (gatewayResult.mode === 'DIRECT') {
-      res.json({
-        success: true,
-        data: gatewayResult.data,
-        message: 'Game world visibility toggled successfully',
-      });
-    } else {
-      res.status(202).json({
-        success: true,
-        data: {
-          changeRequestId: gatewayResult.changeRequestId,
-          status: gatewayResult.status,
-        },
-        message: 'Change request created. Visibility change will be applied after approval.',
-      });
-    }
-  });
-
-  static toggleMaintenance = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = req.params.id;
-    const environmentId = req.environmentId;
-
-    if (!id) {
-      throw new GatrixError('Invalid game world ID', 400);
-    }
-
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
-    }
-
-    const authenticatedUserId = req.user?.userId;
-    if (!authenticatedUserId) {
-      throw new GatrixError('User authentication required', 401);
-    }
-
-    // Use UnifiedChangeGateway for CR support
-    const gatewayResult = await UnifiedChangeGateway.processChange(
-      authenticatedUserId,
-      environmentId,
-      'g_game_worlds',
-      id,
-      async (currentData: any) => {
-        return { isMaintenance: !currentData.isMaintenance };
-      },
-      async (processedData: any) => {
-        const world = await GameWorldService.updateGameWorld(
-          id,
-          processedData as any,
-          environmentId
-        );
-        const tags = await TagService.listTagsForEntity('game_world', id);
-
-        // Publish event for SDK real-time updates
-        await pubSubService.publishNotification({
-          type: 'gameworld.updated',
-          data: { world: { ...world, tags } },
-          targetChannels: ['gameworld', 'admin'],
-        });
-
-        return { world: { ...world, tags } };
-      }
-    );
-
-    if (gatewayResult.mode === 'DIRECT') {
-      res.json({
-        success: true,
-        data: gatewayResult.data,
-        message: 'Game world maintenance status toggled successfully',
-      });
-    } else {
-      res.status(202).json({
-        success: true,
-        data: {
-          changeRequestId: gatewayResult.changeRequestId,
-          status: gatewayResult.status,
-        },
-        message:
-          'Change request created. Maintenance status change will be applied after approval.',
-      });
-    }
-  });
-
-  static updateMaintenance = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = req.params.id;
-    const environmentId = req.environmentId;
-
-    if (!id) {
-      throw new GatrixError('Invalid game world ID', 400);
-    }
-
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
-    }
-
-    // Validate request body
-    const { error, value } = updateMaintenanceSchema.validate(req.body);
-    if (error) {
-      throw new GatrixError(error.details[0].message, 400);
-    }
-
-    // Validate time settings
-    if (value.isMaintenance) {
-      const startsAt = value.maintenanceStartDate ? new Date(value.maintenanceStartDate) : null;
-      const endsAt = value.maintenanceEndDate ? new Date(value.maintenanceEndDate) : null;
-      const now = new Date();
-
-      // If both times are set, endsAt must be after startsAt
-      if (startsAt && endsAt && endsAt <= startsAt) {
-        throw new GatrixError('End time must be after start time.', 400);
-      }
-
-      // If only endsAt is set, it must be in the future
-      if (!startsAt && endsAt) {
-        if (endsAt <= now) {
-          throw new GatrixError('End time must be in the future.', 400);
-        }
-      }
-
-      // Validate minimum duration (5 minutes)
-      if (endsAt) {
-        const effectiveStart = startsAt || now;
-        const durationMinutes = (endsAt.getTime() - effectiveStart.getTime()) / 60000;
-
-        if (durationMinutes < 5) {
-          throw new GatrixError(
-            `Maintenance duration must be at least 5 minutes. (Current: ${Math.max(0, Math.floor(durationMinutes))} min)`,
-            400
-          );
-        }
-
-        // Validate grace period does not exceed duration
-        if (value.forceDisconnect && value.gracePeriodMinutes !== undefined) {
-          if (value.gracePeriodMinutes >= durationMinutes) {
-            throw new GatrixError(
-              `Grace period must be shorter than maintenance duration. (Duration: ${Math.floor(durationMinutes)} min, Grace period: ${value.gracePeriodMinutes} min)`,
-              400
-            );
+          if (operator === 'any_of') {
+            // OR 조건: 선택한 태그 중 하나라도 가진 게임월드 반환
+            withTags = withTags.filter((w: any) => {
+              const ids = (w.tags || []).map((t: any) => Number(t.id));
+              return requiredIds.some((rid) => ids.includes(rid));
+            });
+          } else {
+            // AND 조건: 선택한 모든 태그를 가진 게임월드만 반환
+            withTags = withTags.filter((w: any) => {
+              const ids = (w.tags || []).map((t: any) => Number(t.id));
+              return requiredIds.every((rid) => ids.includes(rid));
+            });
           }
         }
       }
-    }
 
-    // Add updatedBy from authenticated user session
-    const authenticatedUserId = req.user?.userId;
-    if (!authenticatedUserId) {
-      throw new GatrixError('User authentication required', 401);
-    }
-
-    const updateData = {
-      ...value,
-      updatedBy: authenticatedUserId,
-    };
-
-    const gatewayResult = await UnifiedChangeGateway.processChange(
-      authenticatedUserId,
-      environmentId,
-      'g_game_worlds',
-      id,
-      updateData,
-      async (processedData: any) => {
-        const world = await GameWorldService.updateGameWorld(
-          id,
-          processedData as any,
-          environmentId
-        );
-        const tags = await TagService.listTagsForEntity('game_world', id);
-
-        // Publish event for SDK real-time updates
-        await pubSubService.publishNotification({
-          type: 'gameworld.updated',
-          data: { world: { ...world, tags } },
-          targetChannels: ['gameworld', 'admin'],
-        });
-
-        return { world: { ...world, tags } };
-      }
-    );
-
-    if (gatewayResult.mode === 'DIRECT') {
       res.json({
         success: true,
-        data: gatewayResult.data,
-        message: 'Game world maintenance status updated successfully',
-      });
-    } else {
-      res.status(202).json({
-        success: true,
         data: {
-          changeRequestId: gatewayResult.changeRequestId,
-          status: gatewayResult.status,
+          worlds: withTags,
+          total: (worlds as any)?.total ?? (withTags as any)?.length ?? 0,
         },
-        message:
-          'Change request created. Maintenance status update will be applied after approval.',
+        message: 'Game worlds retrieved successfully',
       });
     }
-  });
+  );
 
-  static updateDisplayOrders = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { orderUpdates } = req.body;
-    const environmentId = req.environmentId;
+  static getGameWorldById = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const id = req.params.id;
+      const environmentId = req.environmentId;
 
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
+      if (!id) {
+        throw new GatrixError('Invalid game world ID', 400);
+      }
+
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const world = await GameWorldService.getGameWorldById(id, environmentId);
+      const tags = await TagService.listTagsForEntity('game_world', id);
+
+      res.json({
+        success: true,
+        data: { world: { ...world, tags } },
+        message: 'Game world retrieved successfully',
+      });
     }
+  );
 
-    if (!Array.isArray(orderUpdates)) {
-      throw new GatrixError('Order updates must be an array', 400);
+  static getGameWorldByWorldId = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { worldId } = req.params;
+      const environmentId = req.environmentId;
+
+      if (!worldId) {
+        throw new GatrixError('World ID is required', 400);
+      }
+
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const world = await GameWorldService.getGameWorldByWorldId(
+        worldId,
+        environmentId
+      );
+      const tags = await TagService.listTagsForEntity('game_world', world.id);
+
+      res.json({
+        success: true,
+        data: { world: { ...world, tags } },
+        message: 'Game world retrieved successfully',
+      });
     }
+  );
 
-    // Validate each update
-    for (const update of orderUpdates) {
-      if (!update.id || typeof update.displayOrder !== 'number') {
-        throw new GatrixError('Each update must have id and displayOrder', 400);
+  static createGameWorld = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      // Validate request body
+      const { error, value } = createGameWorldSchema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
+
+      const { tagIds, ...worldValue } = value as any;
+
+      // Validate time settings
+      if (worldValue.isMaintenance) {
+        const startsAt = worldValue.maintenanceStartDate
+          ? new Date(worldValue.maintenanceStartDate)
+          : null;
+        const endsAt = worldValue.maintenanceEndDate
+          ? new Date(worldValue.maintenanceEndDate)
+          : null;
+        const now = new Date();
+
+        // If both times are set, endsAt must be after startsAt
+        if (startsAt && endsAt && endsAt <= startsAt) {
+          throw new GatrixError('End time must be after start time.', 400);
+        }
+
+        // If only endsAt is set, it must be in the future
+        if (!startsAt && endsAt) {
+          if (endsAt <= now) {
+            throw new GatrixError('End time must be in the future.', 400);
+          }
+        }
+      }
+
+      // Resolve authenticated user id from middleware (supports both payload and loaded user)
+      const authenticatedUserId = req.user?.userId;
+      if (!authenticatedUserId) {
+        throw new GatrixError('User authentication required', 401);
+      }
+
+      const worldData = {
+        ...worldValue,
+        createdBy: authenticatedUserId,
+      };
+
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.requestCreation(
+        authenticatedUserId,
+        environmentId,
+        'g_game_worlds',
+        { ...worldData, environmentId, tagIds },
+        async () => {
+          // Direct creation function - executed when CR is not required
+          const world = await GameWorldService.createGameWorld(
+            worldData,
+            environmentId
+          );
+          if (Array.isArray(tagIds)) {
+            await TagService.setTagsForEntity(
+              'game_world',
+              world.id,
+              tagIds,
+              authenticatedUserId
+            );
+          }
+          const tags = await TagService.listTagsForEntity(
+            'game_world',
+            world.id
+          );
+
+          // Publish event for SDK real-time updates
+          await pubSubService.publishNotification({
+            type: 'gameworld.created',
+            data: { world: { ...world, tags } },
+            targetChannels: ['gameworld', 'admin'],
+          });
+
+          return { ...world, tags };
+        }
+      );
+
+      // Handle response based on gateway result
+      if (gatewayResult.mode === 'DIRECT') {
+        res.status(201).json({
+          success: true,
+          data: { world: gatewayResult.data },
+          message: 'Game world created successfully',
+        });
+      } else {
+        // Change Request created
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message:
+            'Change request created. The game world will be created after approval.',
+        });
       }
     }
+  );
 
-    await GameWorldService.updateDisplayOrders(orderUpdates, environmentId);
+  static updateGameWorld = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const id = req.params.id;
+      const environmentId = req.environmentId;
 
-    res.json({
-      success: true,
-      message: 'Display orders updated successfully',
-    });
-  });
+      if (!id) {
+        throw new GatrixError('Invalid game world ID', 400);
+      }
 
-  static moveUp = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = req.params.id;
-    const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
 
-    if (!id) {
-      throw new GatrixError('Invalid game world ID', 400);
+      // Validate request body
+      const { error, value } = updateGameWorldSchema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
+
+      const { tagIds, ...updateValue } = value as any;
+
+      // Validate time settings
+      if (updateValue.isMaintenance) {
+        const startsAt = updateValue.maintenanceStartDate
+          ? new Date(updateValue.maintenanceStartDate)
+          : null;
+        const endsAt = updateValue.maintenanceEndDate
+          ? new Date(updateValue.maintenanceEndDate)
+          : null;
+        const now = new Date();
+
+        // If both times are set, endsAt must be after startsAt
+        if (startsAt && endsAt && endsAt <= startsAt) {
+          throw new GatrixError('End time must be after start time.', 400);
+        }
+
+        // If only endsAt is set, it must be in the future
+        if (!startsAt && endsAt) {
+          if (endsAt <= now) {
+            throw new GatrixError('End time must be in the future.', 400);
+          }
+        }
+      }
+
+      // Add updatedBy from authenticated user session
+      const authenticatedUserId = req.user?.userId;
+      if (!authenticatedUserId) {
+        throw new GatrixError('User authentication required', 401);
+      }
+
+      const updateData = {
+        ...updateValue,
+        updatedBy: authenticatedUserId,
+      };
+
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        authenticatedUserId,
+        environmentId,
+        'g_game_worlds',
+        id,
+        { ...updateData, tagIds },
+        async (processedData) => {
+          const { tagIds: processedTagIds, ...processedWorldData } =
+            processedData as any;
+          const world = await GameWorldService.updateGameWorld(
+            id,
+            processedWorldData,
+            environmentId
+          );
+          if (Array.isArray(processedTagIds)) {
+            await TagService.setTagsForEntity(
+              'game_world',
+              id,
+              processedTagIds,
+              authenticatedUserId
+            );
+          }
+          const tags = await TagService.listTagsForEntity('game_world', id);
+
+          // Publish event for SDK real-time updates
+          await pubSubService.publishNotification({
+            type: 'gameworld.updated',
+            data: { world: { ...world, tags } },
+            targetChannels: ['gameworld', 'admin'],
+          });
+
+          return { world: { ...world, tags } };
+        }
+      );
+
+      // Handle response based on gateway result
+      if (gatewayResult.mode === 'DIRECT') {
+        res.json({
+          success: true,
+          data: gatewayResult.data,
+          message: 'Game world updated successfully',
+        });
+      } else {
+        // Change Request created
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message:
+            'Change request created. The update will be applied after approval.',
+        });
+      }
     }
+  );
 
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
+  static deleteGameWorld = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const id = req.params.id;
+      const environmentId = req.environmentId;
+
+      if (!id) {
+        throw new GatrixError('Invalid game world ID', 400);
+      }
+
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const authenticatedUserId = req.user?.userId;
+      if (!authenticatedUserId) {
+        throw new GatrixError('User authentication required', 401);
+      }
+
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+        authenticatedUserId,
+        environmentId,
+        'g_game_worlds',
+        id,
+        async () => {
+          await GameWorldService.deleteGameWorld(id, environmentId);
+
+          // Publish event for SDK real-time updates
+          await pubSubService.publishNotification({
+            type: 'gameworld.deleted',
+            data: { worldId: id },
+            targetChannels: ['gameworld', 'admin'],
+          });
+        }
+      );
+
+      // Handle response based on gateway result
+      if (gatewayResult.mode === 'DIRECT') {
+        res.json({
+          success: true,
+          message: 'Game world deleted successfully',
+        });
+      } else {
+        // Change Request created
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message:
+            'Change request created. The deletion will be applied after approval.',
+        });
+      }
     }
+  );
 
-    const moved = await GameWorldService.moveUp(id, environmentId);
+  static toggleVisibility = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const id = req.params.id;
+      const environmentId = req.environmentId;
+      logger.info(`GameWorldController.toggleVisibility called for id: ${id}`);
 
-    res.json({
-      success: true,
-      data: { moved },
-      message: moved ? 'Game world moved up successfully' : 'Game world is already at the top',
-    });
-  });
+      if (!id) {
+        throw new GatrixError('Invalid game world ID', 400);
+      }
 
-  static moveDown = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = req.params.id;
-    const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
 
-    if (!id) {
-      throw new GatrixError('Invalid game world ID', 400);
+      const authenticatedUserId = req.user?.userId;
+      if (!authenticatedUserId) {
+        throw new GatrixError('User authentication required', 401);
+      }
+
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        authenticatedUserId,
+        environmentId,
+        'g_game_worlds',
+        id,
+        async (currentData: any) => {
+          return { isVisible: !currentData.isVisible };
+        },
+        async (processedData: any) => {
+          const world = await GameWorldService.updateGameWorld(
+            id,
+            processedData as any,
+            environmentId
+          );
+          const tags = await TagService.listTagsForEntity('game_world', id);
+
+          // Publish event for SDK real-time updates
+          await pubSubService.publishNotification({
+            type: 'gameworld.updated',
+            data: { world: { ...world, tags } },
+            targetChannels: ['gameworld', 'admin'],
+          });
+
+          return { world: { ...world, tags } };
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        res.json({
+          success: true,
+          data: gatewayResult.data,
+          message: 'Game world visibility toggled successfully',
+        });
+      } else {
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message:
+            'Change request created. Visibility change will be applied after approval.',
+        });
+      }
     }
+  );
 
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
+  static toggleMaintenance = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const id = req.params.id;
+      const environmentId = req.environmentId;
+
+      if (!id) {
+        throw new GatrixError('Invalid game world ID', 400);
+      }
+
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const authenticatedUserId = req.user?.userId;
+      if (!authenticatedUserId) {
+        throw new GatrixError('User authentication required', 401);
+      }
+
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        authenticatedUserId,
+        environmentId,
+        'g_game_worlds',
+        id,
+        async (currentData: any) => {
+          return { isMaintenance: !currentData.isMaintenance };
+        },
+        async (processedData: any) => {
+          const world = await GameWorldService.updateGameWorld(
+            id,
+            processedData as any,
+            environmentId
+          );
+          const tags = await TagService.listTagsForEntity('game_world', id);
+
+          // Publish event for SDK real-time updates
+          await pubSubService.publishNotification({
+            type: 'gameworld.updated',
+            data: { world: { ...world, tags } },
+            targetChannels: ['gameworld', 'admin'],
+          });
+
+          return { world: { ...world, tags } };
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        res.json({
+          success: true,
+          data: gatewayResult.data,
+          message: 'Game world maintenance status toggled successfully',
+        });
+      } else {
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message:
+            'Change request created. Maintenance status change will be applied after approval.',
+        });
+      }
     }
+  );
 
-    const moved = await GameWorldService.moveDown(id, environmentId);
+  static updateMaintenance = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const id = req.params.id;
+      const environmentId = req.environmentId;
 
-    res.json({
-      success: true,
-      data: { moved },
-      message: moved ? 'Game world moved down successfully' : 'Game world is already at the bottom',
-    });
-  });
+      if (!id) {
+        throw new GatrixError('Invalid game world ID', 400);
+      }
 
-  static invalidateCache = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = req.environmentId;
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
 
-    if (!environmentId) {
-      throw new GatrixError('Environment is required', 400);
+      // Validate request body
+      const { error, value } = updateMaintenanceSchema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
+
+      // Validate time settings
+      if (value.isMaintenance) {
+        const startsAt = value.maintenanceStartDate
+          ? new Date(value.maintenanceStartDate)
+          : null;
+        const endsAt = value.maintenanceEndDate
+          ? new Date(value.maintenanceEndDate)
+          : null;
+        const now = new Date();
+
+        // If both times are set, endsAt must be after startsAt
+        if (startsAt && endsAt && endsAt <= startsAt) {
+          throw new GatrixError('End time must be after start time.', 400);
+        }
+
+        // If only endsAt is set, it must be in the future
+        if (!startsAt && endsAt) {
+          if (endsAt <= now) {
+            throw new GatrixError('End time must be in the future.', 400);
+          }
+        }
+
+        // Validate minimum duration (5 minutes)
+        if (endsAt) {
+          const effectiveStart = startsAt || now;
+          const durationMinutes =
+            (endsAt.getTime() - effectiveStart.getTime()) / 60000;
+
+          if (durationMinutes < 5) {
+            throw new GatrixError(
+              `Maintenance duration must be at least 5 minutes. (Current: ${Math.max(0, Math.floor(durationMinutes))} min)`,
+              400
+            );
+          }
+
+          // Validate grace period does not exceed duration
+          if (value.forceDisconnect && value.gracePeriodMinutes !== undefined) {
+            if (value.gracePeriodMinutes >= durationMinutes) {
+              throw new GatrixError(
+                `Grace period must be shorter than maintenance duration. (Duration: ${Math.floor(durationMinutes)} min, Grace period: ${value.gracePeriodMinutes} min)`,
+                400
+              );
+            }
+          }
+        }
+      }
+
+      // Add updatedBy from authenticated user session
+      const authenticatedUserId = req.user?.userId;
+      if (!authenticatedUserId) {
+        throw new GatrixError('User authentication required', 401);
+      }
+
+      const updateData = {
+        ...value,
+        updatedBy: authenticatedUserId,
+      };
+
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        authenticatedUserId,
+        environmentId,
+        'g_game_worlds',
+        id,
+        updateData,
+        async (processedData: any) => {
+          const world = await GameWorldService.updateGameWorld(
+            id,
+            processedData as any,
+            environmentId
+          );
+          const tags = await TagService.listTagsForEntity('game_world', id);
+
+          // Publish event for SDK real-time updates
+          await pubSubService.publishNotification({
+            type: 'gameworld.updated',
+            data: { world: { ...world, tags } },
+            targetChannels: ['gameworld', 'admin'],
+          });
+
+          return { world: { ...world, tags } };
+        }
+      );
+
+      if (gatewayResult.mode === 'DIRECT') {
+        res.json({
+          success: true,
+          data: gatewayResult.data,
+          message: 'Game world maintenance status updated successfully',
+        });
+      } else {
+        res.status(202).json({
+          success: true,
+          data: {
+            changeRequestId: gatewayResult.changeRequestId,
+            status: gatewayResult.status,
+          },
+          message:
+            'Change request created. Maintenance status update will be applied after approval.',
+        });
+      }
     }
+  );
 
-    await GameWorldService.invalidateCache(environmentId);
+  static updateDisplayOrders = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { orderUpdates } = req.body;
+      const environmentId = req.environmentId;
 
-    res.json({
-      success: true,
-      message: 'Game worlds cache invalidated successfully',
-    });
-  });
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      if (!Array.isArray(orderUpdates)) {
+        throw new GatrixError('Order updates must be an array', 400);
+      }
+
+      // Validate each update
+      for (const update of orderUpdates) {
+        if (!update.id || typeof update.displayOrder !== 'number') {
+          throw new GatrixError(
+            'Each update must have id and displayOrder',
+            400
+          );
+        }
+      }
+
+      await GameWorldService.updateDisplayOrders(orderUpdates, environmentId);
+
+      res.json({
+        success: true,
+        message: 'Display orders updated successfully',
+      });
+    }
+  );
+
+  static moveUp = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const id = req.params.id;
+      const environmentId = req.environmentId;
+
+      if (!id) {
+        throw new GatrixError('Invalid game world ID', 400);
+      }
+
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const moved = await GameWorldService.moveUp(id, environmentId);
+
+      res.json({
+        success: true,
+        data: { moved },
+        message: moved
+          ? 'Game world moved up successfully'
+          : 'Game world is already at the top',
+      });
+    }
+  );
+
+  static moveDown = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const id = req.params.id;
+      const environmentId = req.environmentId;
+
+      if (!id) {
+        throw new GatrixError('Invalid game world ID', 400);
+      }
+
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      const moved = await GameWorldService.moveDown(id, environmentId);
+
+      res.json({
+        success: true,
+        data: { moved },
+        message: moved
+          ? 'Game world moved down successfully'
+          : 'Game world is already at the bottom',
+      });
+    }
+  );
+
+  static invalidateCache = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId;
+
+      if (!environmentId) {
+        throw new GatrixError('Environment is required', 400);
+      }
+
+      await GameWorldService.invalidateCache(environmentId);
+
+      res.json({
+        success: true,
+        message: 'Game worlds cache invalidated successfully',
+      });
+    }
+  );
 }

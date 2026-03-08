@@ -80,7 +80,11 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
           alignItems: 'center',
           gap: 1,
           color:
-            type === 'LOCKED' ? 'error.main' : type === 'DUPLICATE' ? 'error.main' : 'warning.main',
+            type === 'LOCKED'
+              ? 'error.main'
+              : type === 'DUPLICATE'
+                ? 'error.main'
+                : 'warning.main',
         }}
       >
         {type === 'LOCKED' ? <LockIcon /> : <WarningIcon />}
@@ -96,13 +100,21 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
             <Box>
               <Typography variant="body1" gutterBottom>
                 {t('errors.RESOURCE_LOCKED', {
-                  changeRequestTitle: lockedInfo?.changeRequestTitle || t('common.unknown'),
+                  changeRequestTitle:
+                    lockedInfo?.changeRequestTitle || t('common.unknown'),
                 })}
               </Typography>
 
               {lockedInfo?.changeRequestId && (
-                <Paper variant="outlined" sx={{ p: 2, mt: 2, bgcolor: 'action.hover' }}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                <Paper
+                  variant="outlined"
+                  sx={{ p: 2, mt: 2, bgcolor: 'action.hover' }}
+                >
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
                     {t('auditLogs.resourceId')}: {lockedInfo.changeRequestId}
                   </Typography>
                   {lockedInfo.changeRequestTitle && (
@@ -137,7 +149,10 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                       }}
                     >
                       <StorageIcon fontSize="small" color="primary" />{' '}
-                      {t('changeRequest.conflictDialog.liveData', 'Current Live Data')}
+                      {t(
+                        'changeRequest.conflictDialog.liveData',
+                        'Current Live Data'
+                      )}
                     </Typography>
                     <Paper
                       variant="outlined"
@@ -171,7 +186,10 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                       }}
                     >
                       <HistoryIcon fontSize="small" color="info" />{' '}
-                      {t('changeRequest.conflictDialog.originalData', 'Data When Request Created')}
+                      {t(
+                        'changeRequest.conflictDialog.originalData',
+                        'Data When Request Created'
+                      )}
                     </Typography>
                     <Paper
                       variant="outlined"
@@ -212,7 +230,11 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                   borderColor: 'error.main',
                 }}
               >
-                <Typography variant="subtitle2" color="error" sx={{ mb: 1, fontWeight: 'bold' }}>
+                <Typography
+                  variant="subtitle2"
+                  color="error"
+                  sx={{ mb: 1, fontWeight: 'bold' }}
+                >
                   {t('common.details')}
                 </Typography>
                 <Typography
@@ -222,7 +244,10 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
                   {message}
                 </Typography>
               </Paper>
-              <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
+              <Typography
+                variant="body2"
+                sx={{ mt: 2, color: 'text.secondary' }}
+              >
                 {t(
                   'changeRequest.duplicateDialog.guide',
                   'Please check the existing data on the live server and delete or modify this change request.'
@@ -232,7 +257,9 @@ const ApiErrorDialog: React.FC<ApiErrorDialogProps> = ({
           )}
 
           {type === 'GENERIC' && (
-            <Typography variant="body1">{message || t('common.genericError')}</Typography>
+            <Typography variant="body1">
+              {message || t('common.genericError')}
+            </Typography>
           )}
         </Box>
       </DialogContent>

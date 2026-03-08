@@ -125,15 +125,27 @@ export const optionalAuth = async (
  * Checks via permissionService.hasOrgPermission (uses org-scope role bindings).
  */
 export const requireOrgPermission = (permissions: string | string[]) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     if (!req.user) {
       next(new GatrixError('Authentication required', 401));
       return;
     }
 
-    const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
+    const requiredPermissions = Array.isArray(permissions)
+      ? permissions
+      : [permissions];
     for (const perm of requiredPermissions) {
-      if (await permissionService.hasOrgPermission(req.user.id, req.user.orgId, perm)) {
+      if (
+        await permissionService.hasOrgPermission(
+          req.user.id,
+          req.user.orgId,
+          perm
+        )
+      ) {
         next();
         return;
       }
@@ -152,7 +164,11 @@ export const requireOrgPermission = (permissions: string | string[]) => {
  * Checks via permissionService.hasProjectPermission (uses project-scope role bindings with override chain).
  */
 export const requireProjectPermission = (permissions: string | string[]) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     if (!req.user) {
       next(new GatrixError('Authentication required', 401));
       return;
@@ -164,10 +180,17 @@ export const requireProjectPermission = (permissions: string | string[]) => {
       return;
     }
 
-    const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
+    const requiredPermissions = Array.isArray(permissions)
+      ? permissions
+      : [permissions];
     for (const perm of requiredPermissions) {
       if (
-        await permissionService.hasProjectPermission(req.user.id, req.user.orgId, projectId, perm)
+        await permissionService.hasProjectPermission(
+          req.user.id,
+          req.user.orgId,
+          projectId,
+          perm
+        )
       ) {
         next();
         return;
@@ -187,7 +210,11 @@ export const requireProjectPermission = (permissions: string | string[]) => {
  * Falls back to project-level check if no environment context is available.
  */
 export const requireEnvPermission = (permissions: string | string[]) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     if (!req.user) {
       next(new GatrixError('Authentication required', 401));
       return;
@@ -196,7 +223,9 @@ export const requireEnvPermission = (permissions: string | string[]) => {
     const projectId = req.projectId || req.params.projectId;
     const environmentId = req.environmentId as string | undefined;
 
-    const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
+    const requiredPermissions = Array.isArray(permissions)
+      ? permissions
+      : [permissions];
     for (const perm of requiredPermissions) {
       // If environment context is available, check env-level permission
       if (environmentId && projectId) {
@@ -216,7 +245,12 @@ export const requireEnvPermission = (permissions: string | string[]) => {
       // Fallback to project-level check when no environment context
       else if (projectId) {
         if (
-          await permissionService.hasProjectPermission(req.user.id, req.user.orgId, projectId, perm)
+          await permissionService.hasProjectPermission(
+            req.user.id,
+            req.user.orgId,
+            projectId,
+            perm
+          )
         ) {
           next();
           return;
@@ -224,7 +258,13 @@ export const requireEnvPermission = (permissions: string | string[]) => {
       }
       // Fallback to org-level check when no project context
       else {
-        if (await permissionService.hasOrgPermission(req.user.id, req.user.orgId, perm)) {
+        if (
+          await permissionService.hasOrgPermission(
+            req.user.id,
+            req.user.orgId,
+            perm
+          )
+        ) {
           next();
           return;
         }

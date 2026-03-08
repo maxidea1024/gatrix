@@ -40,10 +40,9 @@ interface IngamePopupNoticeGuideDrawerProps {
   onClose: () => void;
 }
 
-const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> = ({
-  open,
-  onClose,
-}) => {
+const IngamePopupNoticeGuideDrawer: React.FC<
+  IngamePopupNoticeGuideDrawerProps
+> = ({ open, onClose }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -61,16 +60,24 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
   const [testDuration, setTestDuration] = useState<number | null>(null);
   const [testStatus, setTestStatus] = useState<number | null>(null);
   const [responseTime, setResponseTime] = useState<Date | null>(null);
-  const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
-  const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
+  const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>(
+    {}
+  );
+  const [responseHeaders, setResponseHeaders] = useState<
+    Record<string, string>
+  >({});
   const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
-  const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] = useState(false);
-  const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] = useState(false);
+  const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] =
+    useState(false);
+  const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] =
+    useState(false);
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('ingamePopupNoticeGuideDrawer_testInputs');
+      const saved = localStorage.getItem(
+        'ingamePopupNoticeGuideDrawer_testInputs'
+      );
       if (saved) {
         const { apiToken: savedToken } = JSON.parse(saved);
         if (savedToken) setApiToken(savedToken);
@@ -82,7 +89,10 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
 
   useEffect(() => {
     try {
-      localStorage.setItem('ingamePopupNoticeGuideDrawer_testInputs', JSON.stringify({ apiToken }));
+      localStorage.setItem(
+        'ingamePopupNoticeGuideDrawer_testInputs',
+        JSON.stringify({ apiToken })
+      );
     } catch (error) {
       // Silently ignore localStorage errors
     }
@@ -91,14 +101,17 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
   const handleCopyCode = (code: string) => {
     copyToClipboardWithNotification(
       code,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
 
   const handleTestAPI = async () => {
     if (!apiToken.trim()) {
-      setValidationError(t('common.apiTokenRequired') || 'API Token is required');
+      setValidationError(
+        t('common.apiTokenRequired') || 'API Token is required'
+      );
       return;
     }
 
@@ -125,10 +138,13 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
       setRequestHeaders(headers);
 
       const envPath = currentEnvironmentId || 'default';
-      const response = await fetch(`/api/v1/server/${envPath}/ingame-popup-notices`, {
-        method: 'GET',
-        headers,
-      });
+      const response = await fetch(
+        `/api/v1/server/${envPath}/ingame-popup-notices`,
+        {
+          method: 'GET',
+          headers,
+        }
+      );
 
       const endTime = performance.now();
       const duration = Math.round(endTime - startTime);
@@ -147,12 +163,16 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
       setExpandedResponseHeaders(true);
 
       if (!response.ok) {
-        setTestError(`HTTP ${response.status}: ${data.message || 'Request failed'}`);
+        setTestError(
+          `HTTP ${response.status}: ${data.message || 'Request failed'}`
+        );
       } else {
         setTestError(null);
       }
     } catch (error) {
-      setTestError(error instanceof Error ? error.message : 'Unknown error occurred');
+      setTestError(
+        error instanceof Error ? error.message : 'Unknown error occurred'
+      );
       setExpandedResponseHeaders(true);
     } finally {
       setTestLoading(false);
@@ -183,7 +203,8 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
             display: 'flex',
             justifyContent: 'flex-end',
             p: 0.5,
-            backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+            backgroundColor:
+              theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
             borderBottom: `1px solid ${theme.palette.divider}`,
           }}
         >
@@ -273,7 +294,10 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3, pt: 2 }}>
-          <Tabs value={mainTabValue} onChange={(e, newValue) => setMainTabValue(newValue)}>
+          <Tabs
+            value={mainTabValue}
+            onChange={(e, newValue) => setMainTabValue(newValue)}
+          >
             <Tab label={t('ingamePopupNotices.sdkGuideDrawer.tabGuide')} />
             <Tab label={t('ingamePopupNotices.sdkGuideDrawer.tabTest')} />
           </Tabs>
@@ -293,14 +317,18 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                 sx={{
                   p: 2,
                   mb: 3,
-                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                  backgroundColor:
+                    theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
                   fontFamily: 'monospace',
                   fontSize: '0.9rem',
                   borderRadius: 1,
                 }}
               >
                 <Typography component="div" sx={{ mb: 1 }}>
-                  <strong>{t('ingamePopupNotices.sdkGuideDrawer.method')}:</strong> GET
+                  <strong>
+                    {t('ingamePopupNotices.sdkGuideDrawer.method')}:
+                  </strong>{' '}
+                  GET
                 </Typography>
                 <Typography component="div" sx={{ wordBreak: 'break-all' }}>
                   /api/v1/server/{'{ environmentId }'}/ingame-popup-notices
@@ -357,7 +385,8 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                   <TableHead>
                     <TableRow
                       sx={{
-                        backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                        backgroundColor:
+                          theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
                       }}
                     >
                       <TableCell sx={{ fontWeight: 600, width: '20%' }}>
@@ -413,7 +442,9 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('ingamePopupNotices.sdkGuideDrawer.fieldDisplayPriority')}
+                          {t(
+                            'ingamePopupNotices.sdkGuideDrawer.fieldDisplayPriority'
+                          )}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -428,7 +459,9 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('ingamePopupNotices.sdkGuideDrawer.fieldStartDate')}
+                          {t(
+                            'ingamePopupNotices.sdkGuideDrawer.fieldStartDate'
+                          )}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -471,7 +504,10 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                 {t('clientVersions.sdkGuideDrawer.errorResponses')}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+              <Typography
+                variant="body2"
+                sx={{ mb: 2, color: 'text.secondary' }}
+              >
                 {t('ingamePopupNotices.sdkGuideDrawer.errorResponsesDesc')}
               </Typography>
 
@@ -488,9 +524,15 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                 </Tabs>
               </Box>
 
-              {errorTabValue === 0 && <CodeBlock code={errorUnauthorized} language="json" />}
-              {errorTabValue === 1 && <CodeBlock code={errorInvalidToken} language="json" />}
-              {errorTabValue === 2 && <CodeBlock code={errorServerError} language="json" />}
+              {errorTabValue === 0 && (
+                <CodeBlock code={errorUnauthorized} language="json" />
+              )}
+              {errorTabValue === 1 && (
+                <CodeBlock code={errorInvalidToken} language="json" />
+              )}
+              {errorTabValue === 2 && (
+                <CodeBlock code={errorServerError} language="json" />
+              )}
             </>
           )}
 
@@ -498,10 +540,13 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
             <>
               <Box sx={{ mb: 3 }}>
                 <Box
-                  onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
+                  onClick={() =>
+                    setExpandedRequestHeaders(!expandedRequestHeaders)
+                  }
                   sx={{
                     p: 1.5,
-                    backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
+                    backgroundColor:
+                      theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
                     borderRadius: 1,
                     cursor: 'pointer',
                     display: 'flex',
@@ -509,7 +554,8 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                     justifyContent: 'space-between',
                     border: `2px solid ${theme.palette.primary.main}`,
                     '&:hover': {
-                      backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
+                      backgroundColor:
+                        theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
                     },
                   }}
                 >
@@ -521,7 +567,9 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                   </Typography>
                   <Box
                     sx={{
-                      transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transform: expandedRequestHeaders
+                        ? 'rotate(180deg)'
+                        : 'rotate(0deg)',
                       transition: 'transform 0.3s',
                       color: theme.palette.primary.main,
                     }}
@@ -533,7 +581,8 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                   <Box
                     sx={{
                       p: 2,
-                      backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
+                      backgroundColor:
+                        theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
                       borderRadius: 1,
                       mt: 0.5,
                     }}
@@ -542,11 +591,16 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                       <Box sx={{ mb: 2 }}>
                         <Box
                           onClick={() =>
-                            setExpandedRequestHeadersDetail(!expandedRequestHeadersDetail)
+                            setExpandedRequestHeadersDetail(
+                              !expandedRequestHeadersDetail
+                            )
                           }
                           sx={{
                             p: 1,
-                            backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f0f0f0',
+                            backgroundColor:
+                              theme.palette.mode === 'dark'
+                                ? '#1a1a1a'
+                                : '#f0f0f0',
                             borderRadius: 0.5,
                             cursor: 'pointer',
                             display: 'flex',
@@ -554,11 +608,16 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                             justifyContent: 'space-between',
                             '&:hover': {
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#252525' : '#e8e8e8',
+                                theme.palette.mode === 'dark'
+                                  ? '#252525'
+                                  : '#e8e8e8',
                             },
                           }}
                         >
-                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ fontWeight: 600 }}
+                          >
                             {t('ingamePopupNotices.sdkGuideDrawer.headers')} (
                             {Object.keys(requestHeaders).length})
                           </Typography>
@@ -576,29 +635,31 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                         </Box>
                         <Collapse in={expandedRequestHeadersDetail}>
                           <Stack spacing={0.5} sx={{ pl: 1, pt: 1 }}>
-                            {Object.entries(requestHeaders).map(([key, value]) => (
-                              <Box key={key} sx={{ display: 'flex', gap: 1 }}>
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    fontWeight: 600,
-                                    minWidth: 150,
-                                    color: 'primary.main',
-                                  }}
-                                >
-                                  {key}:
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    color: 'text.secondary',
-                                    wordBreak: 'break-all',
-                                  }}
-                                >
-                                  {String(value)}
-                                </Typography>
-                              </Box>
-                            ))}
+                            {Object.entries(requestHeaders).map(
+                              ([key, value]) => (
+                                <Box key={key} sx={{ display: 'flex', gap: 1 }}>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      fontWeight: 600,
+                                      minWidth: 150,
+                                      color: 'primary.main',
+                                    }}
+                                  >
+                                    {key}:
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      color: 'text.secondary',
+                                      wordBreak: 'break-all',
+                                    }}
+                                  >
+                                    {String(value)}
+                                  </Typography>
+                                </Box>
+                              )
+                            )}
                           </Stack>
                         </Collapse>
                       </Box>
@@ -614,7 +675,10 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                           mb: 1,
                         }}
                       >
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600 }}
+                        >
                           {t('common.curlPreview') || 'curl Preview'}
                         </Typography>
                         <Tooltip title={t('common.copy') || 'Copy'}>
@@ -634,7 +698,10 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                       <Box
                         sx={{
                           p: 1.5,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+                          backgroundColor:
+                            theme.palette.mode === 'dark'
+                              ? '#1e1e1e'
+                              : '#f5f5f5',
                           borderRadius: 1,
                           border: `1px solid ${theme.palette.divider}`,
                           fontFamily: 'monospace',
@@ -663,7 +730,10 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                       variant="contained"
                       startIcon={
                         testLoading ? (
-                          <CircularProgress size={16} sx={{ color: 'inherit' }} />
+                          <CircularProgress
+                            size={16}
+                            sx={{ color: 'inherit' }}
+                          />
                         ) : (
                           <PlayArrowIcon />
                         )
@@ -681,10 +751,13 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
               {testResponse && (
                 <Box sx={{ mb: 3 }}>
                   <Box
-                    onClick={() => setExpandedResponseHeaders(!expandedResponseHeaders)}
+                    onClick={() =>
+                      setExpandedResponseHeaders(!expandedResponseHeaders)
+                    }
                     sx={{
                       p: 1.5,
-                      backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
+                      backgroundColor:
+                        theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
                       borderRadius: 1,
                       cursor: 'pointer',
                       display: 'flex',
@@ -692,7 +765,8 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                       justifyContent: 'space-between',
                       border: `2px solid ${theme.palette.primary.main}`,
                       '&:hover': {
-                        backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
+                        backgroundColor:
+                          theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
                       },
                     }}
                   >
@@ -709,7 +783,10 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                       {testStatus && (
                         <Box sx={{ display: 'flex', gap: 2 }}>
                           <Box>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                            <Typography
+                              variant="caption"
+                              sx={{ color: 'text.secondary' }}
+                            >
                               {t('ingamePopupNotices.sdkGuideDrawer.status')}
                             </Typography>
                             <Typography
@@ -722,39 +799,62 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                               }}
                             >
                               {testStatus === 200 ? (
-                                <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                                <CheckCircleIcon
+                                  sx={{ fontSize: 16, color: 'success.main' }}
+                                />
                               ) : (
-                                <ErrorIcon sx={{ fontSize: 16, color: 'error.main' }} />
+                                <ErrorIcon
+                                  sx={{ fontSize: 16, color: 'error.main' }}
+                                />
                               )}
                               {testStatus} {testStatus === 200 ? 'OK' : 'Error'}
                             </Typography>
                           </Box>
                           {testDuration !== null && (
                             <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'text.secondary' }}
+                              >
                                 {t('ingamePopupNotices.sdkGuideDrawer.time')}
                               </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: 600 }}
+                              >
                                 {testDuration}ms
                               </Typography>
                             </Box>
                           )}
                           {Object.keys(responseHeaders).length > 0 && (
                             <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'text.secondary' }}
+                              >
                                 {t('ingamePopupNotices.sdkGuideDrawer.size')}
                               </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {new Blob([JSON.stringify(testResponse)]).size} bytes
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: 600 }}
+                              >
+                                {new Blob([JSON.stringify(testResponse)]).size}{' '}
+                                bytes
                               </Typography>
                             </Box>
                           )}
                           {responseTime && (
                             <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'text.secondary' }}
+                              >
                                 {t('common.receivedAt') || 'Received At'}
                               </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: 600 }}
+                              >
                                 {responseTime.toLocaleTimeString()}
                               </Typography>
                             </Box>
@@ -764,7 +864,9 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                     </Box>
                     <Box
                       sx={{
-                        transform: expandedResponseHeaders ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transform: expandedResponseHeaders
+                          ? 'rotate(180deg)'
+                          : 'rotate(0deg)',
                         transition: 'transform 0.3s',
                         color: theme.palette.primary.main,
                       }}
@@ -776,7 +878,8 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                     <Box
                       sx={{
                         p: 2,
-                        backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
+                        backgroundColor:
+                          theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
                         borderRadius: 1,
                         mt: 0.5,
                       }}
@@ -791,12 +894,16 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                         <Box sx={{ mb: 2 }}>
                           <Box
                             onClick={() =>
-                              setExpandedResponseHeadersDetail(!expandedResponseHeadersDetail)
+                              setExpandedResponseHeadersDetail(
+                                !expandedResponseHeadersDetail
+                              )
                             }
                             sx={{
                               p: 1,
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#1a1a1a' : '#f0f0f0',
+                                theme.palette.mode === 'dark'
+                                  ? '#1a1a1a'
+                                  : '#f0f0f0',
                               borderRadius: 0.5,
                               cursor: 'pointer',
                               display: 'flex',
@@ -804,11 +911,16 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                               justifyContent: 'space-between',
                               '&:hover': {
                                 backgroundColor:
-                                  theme.palette.mode === 'dark' ? '#252525' : '#e8e8e8',
+                                  theme.palette.mode === 'dark'
+                                    ? '#252525'
+                                    : '#e8e8e8',
                               },
                             }}
                           >
-                            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ fontWeight: 600 }}
+                            >
                               {t('ingamePopupNotices.sdkGuideDrawer.headers')} (
                               {Object.keys(responseHeaders).length})
                             </Typography>
@@ -826,36 +938,44 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                           </Box>
                           <Collapse in={expandedResponseHeadersDetail}>
                             <Stack spacing={0.5} sx={{ pl: 1, pt: 1 }}>
-                              {Object.entries(responseHeaders).map(([key, value]) => (
-                                <Box key={key} sx={{ display: 'flex', gap: 1 }}>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      fontWeight: 600,
-                                      minWidth: 150,
-                                      color: 'primary.main',
-                                    }}
+                              {Object.entries(responseHeaders).map(
+                                ([key, value]) => (
+                                  <Box
+                                    key={key}
+                                    sx={{ display: 'flex', gap: 1 }}
                                   >
-                                    {key}:
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      color: 'text.secondary',
-                                      wordBreak: 'break-all',
-                                    }}
-                                  >
-                                    {String(value)}
-                                  </Typography>
-                                </Box>
-                              ))}
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        fontWeight: 600,
+                                        minWidth: 150,
+                                        color: 'primary.main',
+                                      }}
+                                    >
+                                      {key}:
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        color: 'text.secondary',
+                                        wordBreak: 'break-all',
+                                      }}
+                                    >
+                                      {String(value)}
+                                    </Typography>
+                                  </Box>
+                                )
+                              )}
                             </Stack>
                           </Collapse>
                         </Box>
                       )}
 
                       <Box>
-                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ mb: 1, fontWeight: 600 }}
+                        >
                           {t('ingamePopupNotices.sdkGuideDrawer.body')}
                         </Typography>
                         <Box
@@ -872,7 +992,9 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                               justifyContent: 'flex-end',
                               p: 0.5,
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#0e0e0e' : '#f0f0f0',
+                                theme.palette.mode === 'dark'
+                                  ? '#0e0e0e'
+                                  : '#f0f0f0',
                               borderBottom: `1px solid ${theme.palette.divider}`,
                             }}
                           >
@@ -880,7 +1002,9 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                               <IconButton
                                 size="small"
                                 onClick={() => {
-                                  handleCopyCode(JSON.stringify(testResponse, null, 2));
+                                  handleCopyCode(
+                                    JSON.stringify(testResponse, null, 2)
+                                  );
                                 }}
                                 sx={{ color: 'primary.main' }}
                               >

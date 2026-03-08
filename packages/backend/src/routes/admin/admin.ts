@@ -35,8 +35,18 @@ router.get('/users', usersView, AdminController.getAllUsers as any);
 router.post('/users', usersManage, AdminController.createUser as any);
 router.get('/users/:id', usersView, AdminController.getUserById as any);
 
-router.put('/users/:id', usersManage, auditUserUpdate as any, AdminController.updateUser as any);
-router.delete('/users/:id', usersManage, auditUserDelete as any, AdminController.deleteUser as any);
+router.put(
+  '/users/:id',
+  usersManage,
+  auditUserUpdate as any,
+  AdminController.updateUser as any
+);
+router.delete(
+  '/users/:id',
+  usersManage,
+  auditUserDelete as any,
+  AdminController.deleteUser as any
+);
 router.post(
   '/users/:id/activate',
   usersManage,
@@ -50,29 +60,57 @@ router.post(
   AdminController.suspendUser as any
 );
 
-router.post('/users/:id/verify-email', usersManage, AdminController.verifyUserEmail as any);
+router.post(
+  '/users/:id/verify-email',
+  usersManage,
+  AdminController.verifyUserEmail as any
+);
 
 // User permissions (RBAC)
 router.get('/permissions', usersView, AdminController.getAllPermissions as any);
-router.get('/users/:id/permissions', usersView, AdminController.getUserPermissions as any);
+router.get(
+  '/users/:id/permissions',
+  usersView,
+  AdminController.getUserPermissions as any
+);
 
 // Bulk user operations
-router.post('/users/bulk/status', usersManage, AdminController.bulkUpdateUserStatus as any);
+router.post(
+  '/users/bulk/status',
+  usersManage,
+  AdminController.bulkUpdateUserStatus as any
+);
 router.post(
   '/users/bulk/email-verified',
   usersManage,
   AdminController.bulkUpdateUserEmailVerified as any
 );
-router.post('/users/bulk/tags', usersManage, AdminController.bulkUpdateUserTags as any);
-router.post('/users/bulk/delete', usersManage, AdminController.bulkDeleteUsers as any);
+router.post(
+  '/users/bulk/tags',
+  usersManage,
+  AdminController.bulkUpdateUserTags as any
+);
+router.post(
+  '/users/bulk/delete',
+  usersManage,
+  AdminController.bulkDeleteUsers as any
+);
 
 // Audit logs
 router.get('/audit-logs', usersView, AdminController.getAuditLogs as any);
-router.get('/audit-logs/stats', usersView, AdminController.getAuditStats as any);
+router.get(
+  '/audit-logs/stats',
+  usersView,
+  AdminController.getAuditStats as any
+);
 
 // System management (Super Admin only)
 router.post('/cache/clear', systemManage, AdminController.clearCache as any);
-router.post('/audit-logs/cleanup', systemManage, AdminController.cleanupAuditLogs as any);
+router.post(
+  '/audit-logs/cleanup',
+  systemManage,
+  AdminController.cleanupAuditLogs as any
+);
 
 // Pending user approvals
 router.get('/pending-users', usersView, AdminController.getPendingUsers as any);

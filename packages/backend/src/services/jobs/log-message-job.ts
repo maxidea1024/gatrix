@@ -81,7 +81,8 @@ export class LogMessageJob extends BaseJob {
         executionTimeMs: 0,
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
 
       logger.error(`Log message job failed`, {
         jobId: this.context.jobId,

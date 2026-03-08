@@ -13,7 +13,11 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { EnvironmentKey, EnvironmentKeyRecord, KeyType } from '../models/environment-key';
+import {
+  EnvironmentKey,
+  EnvironmentKeyRecord,
+  KeyType,
+} from '../models/environment-key';
 import { Environment } from '../models/environment';
 import { CacheService } from '../services/cache-service';
 import { createLogger } from '../config/logger';
@@ -73,7 +77,11 @@ function extractToken(req: Request): string | undefined {
  */
 function handleSpecialTokens(
   token: string
-): { keyType: KeyType | 'all'; isUnsecured?: boolean; isEdgeBypass?: boolean } | null {
+): {
+  keyType: KeyType | 'all';
+  isUnsecured?: boolean;
+  isEdgeBypass?: boolean;
+} | null {
   if (!ALLOW_UNSECURED) {
     // Only bypass token is allowed in production
     if (token === EDGE_BYPASS_TOKEN) {
@@ -116,7 +124,10 @@ export const authenticateEnvironmentKey = async (
     if (!token) {
       return res.status(401).json({
         success: false,
-        error: { code: ErrorCodes.AUTH_TOKEN_MISSING, message: 'API key is required' },
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_MISSING,
+          message: 'API key is required',
+        },
       });
     }
 
@@ -144,7 +155,10 @@ export const authenticateEnvironmentKey = async (
       if (!dbKey) {
         return res.status(401).json({
           success: false,
-          error: { code: ErrorCodes.AUTH_TOKEN_INVALID, message: 'Invalid or inactive API key' },
+          error: {
+            code: ErrorCodes.AUTH_TOKEN_INVALID,
+            message: 'Invalid or inactive API key',
+          },
         });
       }
       keyData = dbKey;
@@ -161,7 +175,10 @@ export const authenticateEnvironmentKey = async (
     if (!envModel) {
       return res.status(404).json({
         success: false,
-        error: { code: ErrorCodes.ENV_NOT_FOUND, message: 'Environment not found for this key' },
+        error: {
+          code: ErrorCodes.ENV_NOT_FOUND,
+          message: 'Environment not found for this key',
+        },
       });
     }
     req.environmentModel = envModel;
@@ -170,7 +187,10 @@ export const authenticateEnvironmentKey = async (
     // Resolve orgId from project if available
     if (req.projectId) {
       const { default: knex } = await import('../config/knex');
-      const project = await knex('g_projects').select('orgId').where('id', req.projectId).first();
+      const project = await knex('g_projects')
+        .select('orgId')
+        .where('id', req.projectId)
+        .first();
       if (project) {
         req.orgId = project.orgId;
       }
@@ -186,7 +206,10 @@ export const authenticateEnvironmentKey = async (
     logger.error('Environment key authentication error:', error);
     res.status(500).json({
       success: false,
-      error: { code: ErrorCodes.INTERNAL_SERVER_ERROR, message: 'Authentication failed' },
+      error: {
+        code: ErrorCodes.INTERNAL_SERVER_ERROR,
+        message: 'Authentication failed',
+      },
     });
   }
 };
@@ -204,7 +227,10 @@ export const requireKeyType = (requiredType: KeyType) => {
     if (!req.keyType) {
       return res.status(401).json({
         success: false,
-        error: { code: ErrorCodes.AUTH_TOKEN_MISSING, message: 'Key not authenticated' },
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_MISSING,
+          message: 'Key not authenticated',
+        },
       });
     }
 
@@ -237,13 +263,17 @@ export const validateApplicationName = (
   next: NextFunction
 ) => {
   const appName =
-    (req.headers[HEADERS.X_APPLICATION_NAME] as string) || (req.query.appName as string);
+    (req.headers[HEADERS.X_APPLICATION_NAME] as string) ||
+    (req.query.appName as string);
 
   if (!appName) {
     logger.warn('Application name missing', { url: req.originalUrl });
     return res.status(400).json({
       success: false,
-      error: { code: ErrorCodes.BAD_REQUEST, message: 'X-Application-Name is required' },
+      error: {
+        code: ErrorCodes.BAD_REQUEST,
+        message: 'X-Application-Name is required',
+      },
     });
   }
 
@@ -251,7 +281,10 @@ export const validateApplicationName = (
     logger.warn('Invalid application name format', { appName });
     return res.status(400).json({
       success: false,
-      error: { code: ErrorCodes.VALIDATION_ERROR, message: 'Invalid application name format' },
+      error: {
+        code: ErrorCodes.VALIDATION_ERROR,
+        message: 'Invalid application name format',
+      },
     });
   }
 
@@ -262,8 +295,11 @@ export const validateApplicationName = (
 /**
  * No-op rate limiter (placeholder for future implementation)
  */
-export const sdkRateLimit = (req: EnvironmentKeyRequest, res: Response, next: NextFunction) =>
-  next();
+export const sdkRateLimit = (
+  req: EnvironmentKeyRequest,
+  res: Response,
+  next: NextFunction
+) => next();
 
 // ==================== Combined Auth Chains ====================
 

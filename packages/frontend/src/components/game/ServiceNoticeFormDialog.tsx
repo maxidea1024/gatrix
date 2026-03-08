@@ -43,7 +43,9 @@ import {
 } from '../../services/serviceNoticeService';
 import RichTextEditor from '../mailbox/RichTextEditor';
 import { parseUTCForPicker } from '../../utils/dateFormat';
-import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGroup';
+import TargetSettingsGroup, {
+  ChannelSubchannelData,
+} from './TargetSettingsGroup';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useEntityLock } from '../../hooks/useEntityLock';
@@ -70,7 +72,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
-  const { platforms: platformConfig, channels: channelConfig } = usePlatformConfig();
+  const { platforms: platformConfig, channels: channelConfig } =
+    usePlatformConfig();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const [submitting, setSubmitting] = useState(false);
@@ -90,8 +93,11 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   const [category, setCategory] = useState<string>('notice');
   const [platforms, setPlatforms] = useState<string[]>([]);
   const [platformsInverted, setPlatformsInverted] = useState(false);
-  const [channelSubchannels, setChannelSubchannels] = useState<ChannelSubchannelData[]>([]);
-  const [channelSubchannelsInverted, setChannelSubchannelsInverted] = useState(false);
+  const [channelSubchannels, setChannelSubchannels] = useState<
+    ChannelSubchannelData[]
+  >([]);
+  const [channelSubchannelsInverted, setChannelSubchannelsInverted] =
+    useState(false);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [tabTitle, setTabTitle] = useState('');
@@ -124,7 +130,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   // Generate preview HTML
   const previewHtml = useMemo(() => {
     // Use tabTitle if available, otherwise use title
-    const displayTitle = debouncedTabTitle.trim() || debouncedTitle || t('serviceNotices.noTitle');
+    const displayTitle =
+      debouncedTabTitle.trim() || debouncedTitle || t('serviceNotices.noTitle');
 
     const htmlContent = `
 <!DOCTYPE html>
@@ -431,12 +438,12 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           channelMap.get(channel)!.add(subch);
         });
       }
-      const channelSubchannelData: ChannelSubchannelData[] = Array.from(channelMap.entries()).map(
-        ([channel, subchannels]) => ({
-          channel,
-          subchannels: Array.from(subchannels),
-        })
-      );
+      const channelSubchannelData: ChannelSubchannelData[] = Array.from(
+        channelMap.entries()
+      ).map(([channel, subchannels]) => ({
+        channel,
+        subchannels: Array.from(subchannels),
+      }));
       setChannelSubchannels(channelSubchannelData);
       setChannelSubchannelsInverted(false);
       // Parse UTC time and convert to user's timezone for display
@@ -517,7 +524,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       endDate: formatStringDateForCompare(notice.endDate),
       tabTitle: notice.tabTitle?.trim() || null,
       title: notice.title?.trim() || '',
-      content: initialContentRef.current?.trim() || notice.content?.trim() || '',
+      content:
+        initialContentRef.current?.trim() || notice.content?.trim() || '',
       description: notice.description?.trim() || null,
     };
 
@@ -556,7 +564,11 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 
     // Check if content is empty (excluding HTML tags)
     const strippedContent = content.replace(/<[^>]*>/g, '').trim();
-    if (!strippedContent && !content.includes('<img') && !content.includes('<iframe')) {
+    if (
+      !strippedContent &&
+      !content.includes('<img') &&
+      !content.includes('<iframe')
+    ) {
       enqueueSnackbar(t('serviceNotices.contentRequired'), {
         variant: 'error',
       });
@@ -600,22 +612,34 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       };
 
       if (notice) {
-        const result = await import('../../services/serviceNoticeService').then((m) =>
-          m.default.updateServiceNotice(projectApiPath, notice.id, data)
+        const result = await import('../../services/serviceNoticeService').then(
+          (m) => m.default.updateServiceNotice(projectApiPath, notice.id, data)
         );
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           enqueueSnackbar(t('serviceNotices.updateSuccess'), {
             variant: 'success',
           });
         }
       } else {
-        const result = await import('../../services/serviceNoticeService').then((m) =>
-          m.default.createServiceNotice(projectApiPath, data as CreateServiceNoticeData)
+        const result = await import('../../services/serviceNoticeService').then(
+          (m) =>
+            m.default.createServiceNotice(
+              projectApiPath,
+              data as CreateServiceNoticeData
+            )
         );
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           enqueueSnackbar(t('serviceNotices.createSuccess'), {
             variant: 'success',
@@ -642,9 +666,15 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={notice ? t('serviceNotices.editNotice') : t('serviceNotices.createNotice')}
+      title={
+        notice
+          ? t('serviceNotices.editNotice')
+          : t('serviceNotices.createNotice')
+      }
       subtitle={
-        notice ? t('serviceNotices.editNoticeSubtitle') : t('serviceNotices.createNoticeSubtitle')
+        notice
+          ? t('serviceNotices.editNoticeSubtitle')
+          : t('serviceNotices.createNoticeSubtitle')
       }
       storageKey="serviceNoticeFormDrawerWidth"
       defaultWidth={1000}
@@ -725,7 +755,10 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
             <Box>
               <FormControlLabel
                 control={
-                  <Switch checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+                  <Switch
+                    checked={isActive}
+                    onChange={(e) => setIsActive(e.target.checked)}
+                  />
                 }
                 label={t('serviceNotices.isActive')}
               />
@@ -799,8 +832,13 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
                   }}
                 />
               </Box>
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
-                {t('serviceNotices.startDateHelp')} / {t('serviceNotices.endDateHelp')}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 1.75 }}
+              >
+                {t('serviceNotices.startDateHelp')} /{' '}
+                {t('serviceNotices.endDateHelp')}
               </Typography>
             </Box>
 
@@ -808,7 +846,10 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
             <Box>
               <FormControlLabel
                 control={
-                  <Switch checked={isPinned} onChange={(e) => setIsPinned(e.target.checked)} />
+                  <Switch
+                    checked={isPinned}
+                    onChange={(e) => setIsPinned(e.target.checked)}
+                  />
                 }
                 label={t('serviceNotices.isPinned')}
               />
@@ -849,8 +890,13 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
                   required
                 />
               </Box>
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
-                {t('serviceNotices.categoryHelp')} / {t('serviceNotices.noticeTitleHelp')}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 1.75 }}
+              >
+                {t('serviceNotices.categoryHelp')} /{' '}
+                {t('serviceNotices.noticeTitleHelp')}
               </Typography>
             </Box>
 
@@ -866,8 +912,13 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
             {/* Content (Rich Text) */}
             <Box>
               <Paper variant="outlined" sx={{ p: 2 }}>
-                <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5, fontWeight: 600 }}>
-                  {t('serviceNotices.content')} <span style={{ color: 'error.main' }}>*</span>
+                <Typography
+                  variant="subtitle2"
+                  gutterBottom
+                  sx={{ mb: 1.5, fontWeight: 600 }}
+                >
+                  {t('serviceNotices.content')}{' '}
+                  <span style={{ color: 'error.main' }}>*</span>
                 </Typography>
                 <RichTextEditor
                   value={content}
@@ -924,7 +975,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
             overflow: previewCollapsed ? 'visible' : 'auto',
             p: previewCollapsed ? 0 : 3,
             bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.02)',
+              theme.palette.mode === 'dark'
+                ? 'rgba(0, 0, 0, 0.2)'
+                : 'rgba(0, 0, 0, 0.02)',
             transition: 'width 0.3s ease-in-out, padding 0.3s ease-in-out',
             position: 'relative',
           }}

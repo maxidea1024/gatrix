@@ -37,7 +37,10 @@
  * // }
  * ```
  */
-export function toDots(obj: Record<string, any>, prefix: string = ''): Record<string, string> {
+export function toDots(
+  obj: Record<string, any>,
+  prefix: string = ''
+): Record<string, string> {
   const result: Record<string, string> = {};
 
   for (const [key, value] of Object.entries(obj)) {
@@ -194,7 +197,11 @@ export function removeEmpty(obj: Record<string, any>): Record<string, any> {
     }
 
     // 빈 객체 제거
-    if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) {
+    if (
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      Object.keys(value).length === 0
+    ) {
       continue;
     }
 
@@ -256,7 +263,9 @@ export const COMPRESSED_FIELDS = {
  * @param event - 정규화할 이벤트
  * @returns 정규화된 이벤트
  */
-export function normalizeEvent(event: Record<string, any>): Record<string, any> {
+export function normalizeEvent(
+  event: Record<string, any>
+): Record<string, any> {
   const normalized = { ...event };
 
   // properties를 평탄화
@@ -274,6 +283,8 @@ export function normalizeEvent(event: Record<string, any>): Record<string, any> 
  * @param events - 정규화할 이벤트 배열
  * @returns 정규화된 이벤트 배열
  */
-export function normalizeEvents(events: Record<string, any>[]): Record<string, any>[] {
+export function normalizeEvents(
+  events: Record<string, any>[]
+): Record<string, any>[] {
   return events.map(normalizeEvent);
 }

@@ -23,7 +23,11 @@ export const PERMISSION_CATEGORIES: PermissionCategory[] = [
   {
     labelKey: 'permissions.category.system',
     scope: SCOPES.SYSTEM,
-    resources: [RESOURCES.ORGANISATIONS, RESOURCES.SYSTEM_CONFIG, RESOURCES.SYSTEM_MONITORING],
+    resources: [
+      RESOURCES.ORGANISATIONS,
+      RESOURCES.SYSTEM_CONFIG,
+      RESOURCES.SYSTEM_MONITORING,
+    ],
   },
 
   // Org - Workspace

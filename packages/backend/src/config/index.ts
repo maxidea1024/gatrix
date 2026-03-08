@@ -10,10 +10,14 @@ const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   corsOrigin:
     process.env.CORS_ORIGIN ||
-    (process.env.NODE_ENV === 'production' ? 'http://frontend:80' : 'http://localhost:3000'),
+    (process.env.NODE_ENV === 'production'
+      ? 'http://frontend:80'
+      : 'http://localhost:3000'),
   frontendUrl:
     process.env.FRONTEND_URL ||
-    (process.env.NODE_ENV === 'production' ? 'http://frontend:80' : 'http://localhost:3000'),
+    (process.env.NODE_ENV === 'production'
+      ? 'http://frontend:80'
+      : 'http://localhost:3000'),
 
   // Database configuration
   database: {
@@ -93,15 +97,28 @@ const config = {
 
   // Service Discovery configuration
   serviceDiscovery: {
-    heartbeatTTL: parseInt(process.env.SERVICE_DISCOVERY_HEARTBEAT_TTL || '30', 10), // Heartbeat TTL in seconds
-    inactiveKeepTTL: parseInt(process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || '60', 10), // How long to keep inactive services (terminated, error, no-response) visible in UI
-    terminatedMarkerTTL: parseInt(process.env.SERVICE_DISCOVERY_TERMINATED_MARKER_TTL || '300', 10), // Terminated marker TTL in seconds (300 seconds / 5 minutes for audit trail)
-    lifecycleEventRetentionDays: parseInt(process.env.SERVER_LIFECYCLE_RETENTION_DAYS || '14', 10), // How many days to retain lifecycle events (default: 14 days)
+    heartbeatTTL: parseInt(
+      process.env.SERVICE_DISCOVERY_HEARTBEAT_TTL || '30',
+      10
+    ), // Heartbeat TTL in seconds
+    inactiveKeepTTL: parseInt(
+      process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || '60',
+      10
+    ), // How long to keep inactive services (terminated, error, no-response) visible in UI
+    terminatedMarkerTTL: parseInt(
+      process.env.SERVICE_DISCOVERY_TERMINATED_MARKER_TTL || '300',
+      10
+    ), // Terminated marker TTL in seconds (300 seconds / 5 minutes for audit trail)
+    lifecycleEventRetentionDays: parseInt(
+      process.env.SERVER_LIFECYCLE_RETENTION_DAYS || '14',
+      10
+    ), // How many days to retain lifecycle events (default: 14 days)
   },
 
   // Monitoring configuration
   monitoring: {
-    enabled: String(process.env.MONITORING_ENABLED || '').toLowerCase() === 'true',
+    enabled:
+      String(process.env.MONITORING_ENABLED || '').toLowerCase() === 'true',
     metricsPath: process.env.METRICS_PATH || '/metrics',
   },
 };

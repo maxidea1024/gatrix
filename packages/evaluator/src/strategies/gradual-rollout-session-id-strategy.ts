@@ -5,7 +5,11 @@
  * Stickiness is fixed to sessionId (not configurable).
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
+import {
+  EvaluationContext,
+  StrategyParameters,
+  StrategyEvaluationResult,
+} from '@gatrix/shared';
 import { Strategy } from './strategy';
 import { normalizedStrategyValue } from './util';
 
@@ -14,7 +18,10 @@ export class GradualRolloutSessionIdStrategy extends Strategy {
     super('gradualRolloutSessionId');
   }
 
-  isEnabled(parameters: StrategyParameters, context: EvaluationContext): boolean {
+  isEnabled(
+    parameters: StrategyParameters,
+    context: EvaluationContext
+  ): boolean {
     return this.isEnabledWithDetails(parameters, context).enabled;
   }
 

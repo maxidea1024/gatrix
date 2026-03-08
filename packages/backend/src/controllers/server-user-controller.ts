@@ -77,7 +77,9 @@ class ServerUserController {
       }
 
       // 모든 ID가 숫자인지 Confirm
-      const validUserIds = userIds.filter((id) => Number.isInteger(id) && id > 0);
+      const validUserIds = userIds.filter(
+        (id) => Number.isInteger(id) && id > 0
+      );
 
       if (validUserIds.length === 0) {
         return sendSuccessResponse(res, []);

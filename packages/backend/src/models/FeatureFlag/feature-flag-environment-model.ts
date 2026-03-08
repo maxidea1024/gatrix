@@ -7,9 +7,14 @@ import { parseJsonField } from '../../utils/db-utils';
 import { FeatureFlagEnvironmentAttributes, coerceValueByType } from './types';
 
 export class FeatureFlagEnvironmentModel {
-  static async findByFlagId(flagId: string): Promise<FeatureFlagEnvironmentAttributes[]> {
+  static async findByFlagId(
+    flagId: string
+  ): Promise<FeatureFlagEnvironmentAttributes[]> {
     try {
-      const envs = await db('g_feature_flag_environments').where('flagId', flagId);
+      const envs = await db('g_feature_flag_environments').where(
+        'flagId',
+        flagId
+      );
       return envs.map((e: any) => ({
         ...e,
         isEnabled: Boolean(e.isEnabled),
@@ -49,7 +54,10 @@ export class FeatureFlagEnvironmentModel {
   }
 
   static async create(
-    data: Omit<FeatureFlagEnvironmentAttributes, 'id' | 'createdAt' | 'updatedAt'>
+    data: Omit<
+      FeatureFlagEnvironmentAttributes,
+      'id' | 'createdAt' | 'updatedAt'
+    >
   ): Promise<FeatureFlagEnvironmentAttributes> {
     try {
       const id = ulid();
@@ -60,8 +68,14 @@ export class FeatureFlagEnvironmentModel {
         isEnabled: data.isEnabled ?? false,
         overrideEnabledValue: data.overrideEnabledValue ?? false,
         overrideDisabledValue: data.overrideDisabledValue ?? false,
-        enabledValue: data.enabledValue !== undefined ? JSON.stringify(data.enabledValue) : null,
-        disabledValue: data.disabledValue !== undefined ? JSON.stringify(data.disabledValue) : null,
+        enabledValue:
+          data.enabledValue !== undefined
+            ? JSON.stringify(data.enabledValue)
+            : null,
+        disabledValue:
+          data.disabledValue !== undefined
+            ? JSON.stringify(data.disabledValue)
+            : null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -82,7 +96,10 @@ export class FeatureFlagEnvironmentModel {
   ): Promise<FeatureFlagEnvironmentAttributes> {
     try {
       // Upsert - create if not exists
-      const existing = await this.findByFlagIdAndEnvironment(flagId, environmentId);
+      const existing = await this.findByFlagIdAndEnvironment(
+        flagId,
+        environmentId
+      );
       if (!existing) {
         return this.create({ flagId, environmentId, isEnabled });
       }
@@ -110,12 +127,18 @@ export class FeatureFlagEnvironmentModel {
     try {
       let valueType: string | undefined;
       if (data.enabledValue !== undefined || data.disabledValue !== undefined) {
-        const flag = await db('g_feature_flags').where('id', flagId).select('valueType').first();
+        const flag = await db('g_feature_flags')
+          .where('id', flagId)
+          .select('valueType')
+          .first();
         valueType = flag?.valueType;
       }
 
       // Upsert - create if not exists
-      const existing = await this.findByFlagIdAndEnvironment(flagId, environmentId);
+      const existing = await this.findByFlagIdAndEnvironment(
+        flagId,
+        environmentId
+      );
       if (!existing) {
         return this.create({
           flagId,
@@ -141,9 +164,13 @@ export class FeatureFlagEnvironmentModel {
       if (data.overrideDisabledValue !== undefined)
         updateData.overrideDisabledValue = data.overrideDisabledValue;
       if (data.enabledValue !== undefined)
-        updateData.enabledValue = JSON.stringify(coerceValueByType(data.enabledValue, valueType));
+        updateData.enabledValue = JSON.stringify(
+          coerceValueByType(data.enabledValue, valueType)
+        );
       if (data.disabledValue !== undefined)
-        updateData.disabledValue = JSON.stringify(coerceValueByType(data.disabledValue, valueType));
+        updateData.disabledValue = JSON.stringify(
+          coerceValueByType(data.disabledValue, valueType)
+        );
 
       await db('g_feature_flag_environments')
         .where('flagId', flagId)

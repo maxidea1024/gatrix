@@ -125,10 +125,12 @@ export const INTEGRATION_EVENTS = {
   INTEGRATION_TEST: 'integration_test',
 } as const;
 
-export type IntegrationEventType = (typeof INTEGRATION_EVENTS)[keyof typeof INTEGRATION_EVENTS];
+export type IntegrationEventType =
+  (typeof INTEGRATION_EVENTS)[keyof typeof INTEGRATION_EVENTS];
 
 // All event types as array for iteration
-export const ALL_INTEGRATION_EVENTS: IntegrationEventType[] = Object.values(INTEGRATION_EVENTS);
+export const ALL_INTEGRATION_EVENTS: IntegrationEventType[] =
+  Object.values(INTEGRATION_EVENTS);
 
 /**
  * Integration System Event interface

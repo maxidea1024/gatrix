@@ -25,7 +25,10 @@ import {
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
-import { EventSelector, EnvironmentSelector } from '@/components/integrations/IntegrationSelectors';
+import {
+  EventSelector,
+  EnvironmentSelector,
+} from '@/components/integrations/IntegrationSelectors';
 import { useEnvironments } from '@/contexts/EnvironmentContext';
 
 // Provider icons
@@ -88,7 +91,11 @@ const EVENT_CATEGORIES: EventCategory[] = [
   },
   {
     key: 'segments',
-    events: ['feature_segment_created', 'feature_segment_updated', 'feature_segment_deleted'],
+    events: [
+      'feature_segment_created',
+      'feature_segment_updated',
+      'feature_segment_deleted',
+    ],
   },
   {
     key: 'game_world',
@@ -145,7 +152,11 @@ const EVENT_CATEGORIES: EventCategory[] = [
   },
   {
     key: 'integration',
-    events: ['integration_created', 'integration_updated', 'integration_deleted'],
+    events: [
+      'integration_created',
+      'integration_updated',
+      'integration_deleted',
+    ],
   },
 ];
 
@@ -166,8 +177,12 @@ export const CreateIntegrationPage: React.FC = () => {
   const [isEnabled, setIsEnabled] = useState(true);
   const [parameters, setParameters] = useState<Record<string, any>>({});
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
-  const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>([]);
-  const [showSensitive, setShowSensitive] = useState<Record<string, boolean>>({});
+  const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>(
+    []
+  );
+  const [showSensitive, setShowSensitive] = useState<Record<string, boolean>>(
+    {}
+  );
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const { environments: envList } = useEnvironments();
@@ -199,7 +214,9 @@ export const CreateIntegrationPage: React.FC = () => {
       const res = await api.get('/admin/integrations/providers');
       setProviders(res?.data || []);
     } catch {
-      enqueueSnackbar(t('integrations.providerLoadFailed'), { variant: 'error' });
+      enqueueSnackbar(t('integrations.providerLoadFailed'), {
+        variant: 'error',
+      });
     } finally {
       setLoading(false);
     }
@@ -257,7 +274,9 @@ export const CreateIntegrationPage: React.FC = () => {
   const handleSave = async () => {
     if (!selectedProvider) return;
     if (!isParametersValid() || selectedEvents.length === 0) {
-      enqueueSnackbar(t('integrations.requiredFieldsMissing'), { variant: 'error' });
+      enqueueSnackbar(t('integrations.requiredFieldsMissing'), {
+        variant: 'error',
+      });
       return;
     }
 
@@ -362,7 +381,10 @@ export const CreateIntegrationPage: React.FC = () => {
             {t('integrations.createSubtitle')}
           </Typography>
         </Box>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/settings/integrations')}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/settings/integrations')}
+        >
           {t('common.back')}
         </Button>
       </Box>
@@ -399,7 +421,9 @@ export const CreateIntegrationPage: React.FC = () => {
                       cursor: 'pointer',
                       border: 2,
                       borderColor:
-                        selectedProvider === provider.name ? 'primary.main' : 'transparent',
+                        selectedProvider === provider.name
+                          ? 'primary.main'
+                          : 'transparent',
                       '&:hover': { borderColor: 'primary.light' },
                     }}
                     onClick={() => setSelectedProvider(provider.name)}
@@ -446,13 +470,18 @@ export const CreateIntegrationPage: React.FC = () => {
 
               <FormControlLabel
                 control={
-                  <Switch checked={isEnabled} onChange={(e) => setIsEnabled(e.target.checked)} />
+                  <Switch
+                    checked={isEnabled}
+                    onChange={(e) => setIsEnabled(e.target.checked)}
+                  />
                 }
                 label={t('common.enabled')}
                 sx={{ mb: 2 }}
               />
 
-              {currentProvider.parameters.map((param) => renderParameterInput(param))}
+              {currentProvider.parameters.map((param) =>
+                renderParameterInput(param)
+              )}
             </Box>
           )}
 
@@ -508,7 +537,9 @@ export const CreateIntegrationPage: React.FC = () => {
             )
           }
         >
-          {activeStep === STEPS.length - 1 ? t('common.save') : t('common.next')}
+          {activeStep === STEPS.length - 1
+            ? t('common.save')
+            : t('common.next')}
         </Button>
       </Box>
     </Box>

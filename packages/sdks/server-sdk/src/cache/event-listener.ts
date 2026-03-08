@@ -7,7 +7,12 @@
 import Redis from 'ioredis';
 import { Logger } from '../utils/logger';
 import { RedisConfig } from '../types/config';
-import { StandardEvent, CustomEvent, EventCallback, EventListenerMap } from '../types/events';
+import {
+  StandardEvent,
+  CustomEvent,
+  EventCallback,
+  EventListenerMap,
+} from '../types/events';
 import { CacheManager } from './cache-manager';
 import {
   IEventHandler,
@@ -127,7 +132,10 @@ export class EventListener {
           return;
         }
         // Only log actual connection errors, not retry attempts
-        if (!error.message.includes('ECONNREFUSED') && !error.message.includes('connect')) {
+        if (
+          !error.message.includes('ECONNREFUSED') &&
+          !error.message.includes('connect')
+        ) {
           this.logger.error('Subscriber error', { error: error.message });
         }
         // Mark as disconnected but do not attempt manual reconnect here
@@ -196,15 +204,22 @@ export class EventListener {
       if (isMulti) {
         // Multi-environment mode (Edge): subscribe to all channels via pattern
         await this.subscriber.psubscribe(`${this.CHANNEL_PREFIX}:*`);
-        this.logger.info('Event listener connected (multi-env, pattern subscribe)', {
-          pattern: `${this.CHANNEL_PREFIX}:*`,
-        });
+        this.logger.info(
+          'Event listener connected (multi-env, pattern subscribe)',
+          {
+            pattern: `${this.CHANNEL_PREFIX}:*`,
+          }
+        );
       } else {
         // Single-environment mode: subscribe to unified channel
         // Pattern: gatrix-sdk-events:{orgId|-}:{projId|-}:{envId|-}
         const channels: string[] = [];
 
-        if (channelContext?.orgId || channelContext?.projectId || channelContext?.environmentId) {
+        if (
+          channelContext?.orgId ||
+          channelContext?.projectId ||
+          channelContext?.environmentId
+        ) {
           const org = channelContext?.orgId || '-';
           const proj = channelContext?.projectId || '-';
           const env = channelContext?.environmentId || '-';
@@ -222,9 +237,12 @@ export class EventListener {
         if (channels.length > 0) {
           await this.subscriber.subscribe(...channels);
         }
-        this.logger.info('Event listener connected (single-env, specific channels)', {
-          channels,
-        });
+        this.logger.info(
+          'Event listener connected (single-env, specific channels)',
+          {
+            channels,
+          }
+        );
       }
 
       // Common event processing function for both subscribe and psubscribe
@@ -288,7 +306,11 @@ export class EventListener {
 
     // Build unified channel: gatrix-sdk-events:{orgId|-}:{projId|-}:{envId|-}
     const channels: string[] = [];
-    if (channelContext.orgId || channelContext.projectId || channelContext.environmentId) {
+    if (
+      channelContext.orgId ||
+      channelContext.projectId ||
+      channelContext.environmentId
+    ) {
       const org = channelContext.orgId || '-';
       const proj = channelContext.projectId || '-';
       const env = channelContext.environmentId || '-';
@@ -331,7 +353,9 @@ export class EventListener {
         await this.initialize();
 
         // After successful reconnection, reinitialize all cache data
-        this.logger.info('Event listener reconnected. Reinitializing cache data...');
+        this.logger.info(
+          'Event listener reconnected. Reinitializing cache data...'
+        );
         await this.reinitializeCache();
       } catch (_error: any) {
         // Silently continue on reconnection failures
@@ -418,13 +442,17 @@ export class EventListener {
     // Check if the handler's feature is enabled
     const uses = this.cacheManager.getUses();
     if (!handler.isEnabled(uses)) {
-      this.logger.debug('Event ignored - feature is disabled', { event: event.type });
+      this.logger.debug('Event ignored - feature is disabled', {
+        event: event.type,
+      });
       return;
     }
 
     // Extract and validate environmentId (centralized)
     // Segments are global events — no environmentId required
-    let environmentId = (event.data.environmentId || event.data.environment || '') as string;
+    let environmentId = (event.data.environmentId ||
+      event.data.environment ||
+      '') as string;
     const requiresEnvironment = !event.type.startsWith('segment.');
     if (requiresEnvironment && !environmentId) {
       this.logger.warn('Event missing environmentId', { event: event.type });
@@ -435,7 +463,8 @@ export class EventListener {
     // Cache keys are token strings (e.g. unsecured-{orgId}:{projectId}:{envId}-server-api-token)
     // while events carry raw environment IDs (ULIDs)
     if (requiresEnvironment && environmentId) {
-      environmentId = this.cacheManager.resolveTokenForEnvironmentId(environmentId);
+      environmentId =
+        this.cacheManager.resolveTokenForEnvironmentId(environmentId);
     }
 
     await handler.handle(event, environmentId);
@@ -505,7 +534,9 @@ export class EventListener {
       return;
     }
 
-    this.eventListeners[eventType] = this.eventListeners[eventType].filter((cb) => cb !== callback);
+    this.eventListeners[eventType] = this.eventListeners[eventType].filter(
+      (cb) => cb !== callback
+    );
 
     this.logger.debug('Event listener unregistered', { eventType });
   }

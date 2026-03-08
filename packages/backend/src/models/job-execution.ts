@@ -57,14 +57,21 @@ export interface JobExecutionFilters {
 }
 
 export class JobExecutionModel {
-  static async findAll(filters?: JobExecutionFilters): Promise<JobExecutionAttributes[]> {
+  static async findAll(
+    filters?: JobExecutionFilters
+  ): Promise<JobExecutionAttributes[]> {
     try {
       // Convert to knex query builder
       const baseQuery = db('g_job_executions as je')
         .leftJoin('g_jobs as j', 'je.jobId', 'j.id')
         .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
         .leftJoin('g_schedules as s', 'je.scheduleId', 's.id')
-        .select(['je.*', 'j.name as jobName', 'jt.name as jobTypeName', 's.name as scheduleName']);
+        .select([
+          'je.*',
+          'j.name as jobName',
+          'jt.name as jobTypeName',
+          's.name as scheduleName',
+        ]);
 
       // Apply filters
       if (filters?.jobId) {
@@ -100,7 +107,12 @@ export class JobExecutionModel {
         .leftJoin('g_jobs as j', 'je.jobId', 'j.id')
         .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
         .leftJoin('g_schedules as s', 'je.scheduleId', 's.id')
-        .select(['je.*', 'j.name as jobName', 'jt.name as jobTypeName', 's.name as scheduleName'])
+        .select([
+          'je.*',
+          'j.name as jobName',
+          'jt.name as jobTypeName',
+          's.name as scheduleName',
+        ])
         .where('je.id', id);
       if (results.length === 0) return null;
 
@@ -115,7 +127,9 @@ export class JobExecutionModel {
     }
   }
 
-  static async create(data: CreateJobExecutionData): Promise<JobExecutionAttributes> {
+  static async create(
+    data: CreateJobExecutionData
+  ): Promise<JobExecutionAttributes> {
     try {
       const id = generateULID();
       await db('g_job_executions').insert({
@@ -138,7 +152,10 @@ export class JobExecutionModel {
     }
   }
 
-  static async update(id: string, data: UpdateJobExecutionData): Promise<JobExecutionAttributes> {
+  static async update(
+    id: string,
+    data: UpdateJobExecutionData
+  ): Promise<JobExecutionAttributes> {
     try {
       const updateData: any = {};
 
@@ -196,7 +213,10 @@ export class JobExecutionModel {
     }
   }
 
-  static async findByJob(jobId: string, limit?: number): Promise<JobExecutionAttributes[]> {
+  static async findByJob(
+    jobId: string,
+    limit?: number
+  ): Promise<JobExecutionAttributes[]> {
     try {
       return await this.findAll({ jobId, limit });
     } catch (error) {

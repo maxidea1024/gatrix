@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
 import {
   Button,
   TextField,
@@ -39,7 +45,11 @@ import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import { getActionLabel } from '../../utils/changeRequestToast';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
-import bannerService, { Banner, Sequence, LoopModeType } from '../../services/bannerService';
+import bannerService, {
+  Banner,
+  Sequence,
+  LoopModeType,
+} from '../../services/bannerService';
 import { generateULID } from '../../utils/ulid';
 import SequenceEditor from './SequenceEditor';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
@@ -72,7 +82,12 @@ const BANNER_SIZE_PRESETS = [
 // Max undo/redo history size
 const MAX_HISTORY_SIZE = 50;
 
-const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSave, banner }) => {
+const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
+  open,
+  onClose,
+  onSave,
+  banner,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -113,7 +128,9 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
 
   // Get size preset value from width/height
   const getSizePresetValue = useCallback((w: number, h: number) => {
-    const match = BANNER_SIZE_PRESETS.find((p) => p.width === w && p.height === h);
+    const match = BANNER_SIZE_PRESETS.find(
+      (p) => p.width === w && p.height === h
+    );
     return match ? `${w}x${h}` : 'custom';
   }, []);
 
@@ -145,7 +162,9 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
       setSizePreset(getSizePresetValue(banner.width, banner.height));
       setPlaybackSpeed(banner.playbackSpeed);
       setShuffle(banner.shuffle ?? false);
-      const initialSequences = banner.sequences ? JSON.parse(JSON.stringify(banner.sequences)) : [];
+      const initialSequences = banner.sequences
+        ? JSON.parse(JSON.stringify(banner.sequences))
+        : [];
       setSequences(initialSequences);
       setSequenceHistory([initialSequences]);
       setHistoryIndex(0);
@@ -207,7 +226,16 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
-  }, [banner, name, description, width, height, playbackSpeed, shuffle, sequences]);
+  }, [
+    banner,
+    name,
+    description,
+    width,
+    height,
+    playbackSpeed,
+    shuffle,
+    sequences,
+  ]);
 
   // Focus name input when dialog opens
   useEffect(() => {
@@ -230,7 +258,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
 
     // Don't add to history if the sequences are the same as current history
     const currentHistoryState = sequenceHistory[historyIndex];
-    if (JSON.stringify(currentHistoryState) === JSON.stringify(sequences)) return;
+    if (JSON.stringify(currentHistoryState) === JSON.stringify(sequences))
+      return;
 
     // Remove future history and add new state
     const newHistory = sequenceHistory.slice(0, historyIndex + 1);
@@ -325,17 +354,25 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
     setSaving(true);
     try {
       if (banner) {
-        const result = await bannerService.updateBanner(projectApiPath, banner.bannerId, {
-          name,
-          description,
-          width,
-          height,
-          playbackSpeed,
-          shuffle,
-          sequences,
-        });
+        const result = await bannerService.updateBanner(
+          projectApiPath,
+          banner.bannerId,
+          {
+            name,
+            description,
+            width,
+            height,
+            playbackSpeed,
+            shuffle,
+            sequences,
+          }
+        );
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           enqueueSnackbar(t('banners.updateSuccess'), { variant: 'success' });
         }
@@ -350,7 +387,11 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
           sequences,
         });
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           enqueueSnackbar(t('banners.createSuccess'), { variant: 'success' });
         }
@@ -478,7 +519,11 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
                 inputRef={nameInputRef}
                 label={t('banners.name')}
                 value={name}
-                onChange={(e) => setName(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                onChange={(e) =>
+                  setName(
+                    e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '')
+                  )
+                }
                 fullWidth
                 required
                 size="small"
@@ -508,10 +553,16 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
                     >
                       {BANNER_SIZE_PRESETS.map((preset) => (
                         <MenuItem
-                          key={preset.value || `${preset.width}x${preset.height}`}
-                          value={preset.value || `${preset.width}x${preset.height}`}
+                          key={
+                            preset.value || `${preset.width}x${preset.height}`
+                          }
+                          value={
+                            preset.value || `${preset.width}x${preset.height}`
+                          }
                         >
-                          {preset.value === 'custom' ? t('banners.customSize') : preset.label}
+                          {preset.value === 'custom'
+                            ? t('banners.customSize')
+                            : preset.label}
                         </MenuItem>
                       ))}
                     </Select>
@@ -573,7 +624,9 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
                       <TextField
                         label={t('banners.playbackSpeed')}
                         value={playbackSpeed}
-                        onChange={(e) => setPlaybackSpeed(Number(e.target.value) || 1)}
+                        onChange={(e) =>
+                          setPlaybackSpeed(Number(e.target.value) || 1)
+                        }
                         fullWidth
                         size="small"
                         inputProps={{ style: { MozAppearance: 'textfield' } }}
@@ -592,7 +645,9 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
                         }}
                       />
                     </Box>
-                    <Box sx={{ flex: 2, display: 'flex', alignItems: 'center' }}>
+                    <Box
+                      sx={{ flex: 2, display: 'flex', alignItems: 'center' }}
+                    >
                       <FormControlLabel
                         control={
                           <Checkbox
@@ -613,7 +668,9 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
                   <TextField
                     label={t('banners.playbackSpeed')}
                     value={playbackSpeed}
-                    onChange={(e) => setPlaybackSpeed(Number(e.target.value) || 1)}
+                    onChange={(e) =>
+                      setPlaybackSpeed(Number(e.target.value) || 1)
+                    }
                     size="small"
                     sx={{
                       flex: 1,
@@ -677,14 +734,24 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
             >
               <Tooltip title={`${t('common.undo')} (Ctrl+Z)`}>
                 <span>
-                  <IconButton size="small" onClick={handleUndo} disabled={!canUndo} sx={{ p: 0.5 }}>
+                  <IconButton
+                    size="small"
+                    onClick={handleUndo}
+                    disabled={!canUndo}
+                    sx={{ p: 0.5 }}
+                  >
                     <UndoIcon fontSize="small" />
                   </IconButton>
                 </span>
               </Tooltip>
               <Tooltip title={`${t('common.redo')} (Ctrl+Y)`}>
                 <span>
-                  <IconButton size="small" onClick={handleRedo} disabled={!canRedo} sx={{ p: 0.5 }}>
+                  <IconButton
+                    size="small"
+                    onClick={handleRedo}
+                    disabled={!canRedo}
+                    sx={{ p: 0.5 }}
+                  >
                     <RedoIcon fontSize="small" />
                   </IconButton>
                 </span>
@@ -719,9 +786,12 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
                     totalCount={sequences.length}
                     onUpdate={(updated) => handleUpdateSequence(index, updated)}
                     onDelete={() => handleDeleteSequence(index)}
-                    onMoveUp={() => index > 0 && handleMoveSequence(index, index - 1)}
+                    onMoveUp={() =>
+                      index > 0 && handleMoveSequence(index, index - 1)
+                    }
                     onMoveDown={() =>
-                      index < sequences.length - 1 && handleMoveSequence(index, index + 1)
+                      index < sequences.length - 1 &&
+                      handleMoveSequence(index, index + 1)
                     }
                     onFrameSelect={(seqIdx, frameIdx) =>
                       setSelectedPreviewFrame({
@@ -742,7 +812,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
           onChange={(_, expanded) => setPreviewExpanded(expanded)}
           sx={{
             mb: 1,
-            bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50'),
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
             '&:before': { display: 'none' },
           }}
         >
@@ -782,7 +853,11 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
         >
           {saving
             ? t('common.saving')
-            : getActionLabel(isEditing ? 'update' : 'create', requiresApproval, t)}
+            : getActionLabel(
+                isEditing ? 'update' : 'create',
+                requiresApproval,
+                t
+              )}
         </Button>
       </Box>
     </ResizableDrawer>

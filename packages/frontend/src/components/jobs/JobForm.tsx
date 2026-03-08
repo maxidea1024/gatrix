@@ -25,7 +25,13 @@ import {
   Add as AddIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { Job, JobType, CreateJobData, UpdateJobData, JobSchemaField } from '../../types/job';
+import {
+  Job,
+  JobType,
+  CreateJobData,
+  UpdateJobData,
+  JobSchemaField,
+} from '../../types/job';
 import { Tag, tagService } from '../../services/tagService';
 import { jobService } from '../../services/jobService';
 import DynamicJobDataForm from './DynamicJobDataForm';
@@ -71,7 +77,12 @@ const JobForm: React.FC<JobFormProps> = ({
 
   // Initialize form data
   useEffect(() => {
-    console.log('JobForm useEffect triggered - job:', job, 'jobTypes:', jobTypes);
+    console.log(
+      'JobForm useEffect triggered - job:',
+      job,
+      'jobTypes:',
+      jobTypes
+    );
     if (job) {
       console.log('Initializing form with job:', job);
       console.log('Job jobDataMap:', job.jobDataMap);
@@ -79,7 +90,8 @@ const JobForm: React.FC<JobFormProps> = ({
       console.log('Job jobDataMap keys:', Object.keys(job.jobDataMap || {}));
 
       // Job 편집 모드에서 jobDataMap이 비어있으면 상세 정보를 다시 조회
-      const hasJobDataMap = job.jobDataMap && Object.keys(job.jobDataMap).length > 0;
+      const hasJobDataMap =
+        job.jobDataMap && Object.keys(job.jobDataMap).length > 0;
       console.log('Has jobDataMap:', hasJobDataMap);
 
       if (!hasJobDataMap && job.id) {
@@ -179,13 +191,18 @@ const JobForm: React.FC<JobFormProps> = ({
     // Validate job data map based on schema
     if (selectedJobType?.jobSchema) {
       const schema = selectedJobType.jobSchema;
-      Object.entries(schema).forEach(([key, field]: [string, JobSchemaField]) => {
-        if (field.required && !formData.jobDataMap[key]) {
-          newErrors[`jobDataMap.${key}`] = t('jobs.validation.fieldRequired', {
-            field: field.description,
-          });
+      Object.entries(schema).forEach(
+        ([key, field]: [string, JobSchemaField]) => {
+          if (field.required && !formData.jobDataMap[key]) {
+            newErrors[`jobDataMap.${key}`] = t(
+              'jobs.validation.fieldRequired',
+              {
+                field: field.description,
+              }
+            );
+          }
         }
-      });
+      );
     }
 
     setErrors(newErrors);
@@ -267,13 +284,21 @@ const JobForm: React.FC<JobFormProps> = ({
                           }}
                         >
                           {jobType.displayName}
-                          <Chip label={jobType.name} size="small" variant="outlined" />
+                          <Chip
+                            label={jobType.name}
+                            size="small"
+                            variant="outlined"
+                          />
                         </Box>
                       </MenuItem>
                     ))}
                 </Select>
                 {errors.jobTypeId && (
-                  <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{ mt: 0.5, ml: 1.5 }}
+                  >
                     {errors.jobTypeId}
                   </Typography>
                 )}
@@ -296,7 +321,9 @@ const JobForm: React.FC<JobFormProps> = ({
                 control={
                   <Switch
                     checked={formData.isEnabled}
-                    onChange={(e) => handleFieldChange('isEnabled', e.target.checked)}
+                    onChange={(e) =>
+                      handleFieldChange('isEnabled', e.target.checked)
+                    }
                     color="primary"
                   />
                 }
@@ -309,7 +336,9 @@ const JobForm: React.FC<JobFormProps> = ({
                 multiple
                 options={availableTags}
                 getOptionLabel={(option) => option.name}
-                value={availableTags.filter((tag) => formData.tagIds.includes(tag.id))}
+                value={availableTags.filter((tag) =>
+                  formData.tagIds.includes(tag.id)
+                )}
                 onChange={(_, newValue) => {
                   handleFieldChange(
                     'tagIds',
@@ -343,12 +372,17 @@ const JobForm: React.FC<JobFormProps> = ({
                 <Accordion defaultExpanded>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="h6">
-                      {t('jobs.jobDataConfiguration')} - {selectedJobType.displayName}
+                      {t('jobs.jobDataConfiguration')} -{' '}
+                      {selectedJobType.displayName}
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     {selectedJobType.description && (
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 2 }}
+                      >
                         {selectedJobType.description}
                       </Typography>
                     )}
@@ -380,7 +414,11 @@ const JobForm: React.FC<JobFormProps> = ({
           <Button onClick={onCancel} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
-          <Button type="submit" variant="contained" startIcon={job ? <SaveIcon /> : <AddIcon />}>
+          <Button
+            type="submit"
+            variant="contained"
+            startIcon={job ? <SaveIcon /> : <AddIcon />}
+          >
             {job ? '작업 수정' : '작업 추가'}
           </Button>
         </Box>
@@ -423,7 +461,11 @@ const JobForm: React.FC<JobFormProps> = ({
               ))}
             </Select>
             {errors.jobTypeId && (
-              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+              <Typography
+                variant="caption"
+                color="error"
+                sx={{ mt: 0.5, ml: 1.5 }}
+              >
                 {errors.jobTypeId}
               </Typography>
             )}
@@ -446,7 +488,9 @@ const JobForm: React.FC<JobFormProps> = ({
             control={
               <Switch
                 checked={formData.isEnabled}
-                onChange={(e) => handleFieldChange('isEnabled', e.target.checked)}
+                onChange={(e) =>
+                  handleFieldChange('isEnabled', e.target.checked)
+                }
                 color="primary"
               />
             }
@@ -463,7 +507,9 @@ const JobForm: React.FC<JobFormProps> = ({
             multiple
             options={availableTags}
             getOptionLabel={(option) => option.name}
-            value={availableTags.filter((tag) => formData.tagIds.includes(tag.id))}
+            value={availableTags.filter((tag) =>
+              formData.tagIds.includes(tag.id)
+            )}
             onChange={(_, newValue) => {
               handleFieldChange(
                 'tagIds',
@@ -489,7 +535,11 @@ const JobForm: React.FC<JobFormProps> = ({
               })
             }
             renderInput={(params) => (
-              <TextField {...params} placeholder={t('common.selectTags')} variant="outlined" />
+              <TextField
+                {...params}
+                placeholder={t('common.selectTags')}
+                variant="outlined"
+              />
             )}
           />
         </Box>
@@ -511,11 +561,17 @@ const JobForm: React.FC<JobFormProps> = ({
         )}
 
         {/* Actions */}
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 3 }}>
+        <Box
+          sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 3 }}
+        >
           <Button onClick={onCancel} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
-          <Button type="submit" variant="contained" startIcon={job ? <SaveIcon /> : <AddIcon />}>
+          <Button
+            type="submit"
+            variant="contained"
+            startIcon={job ? <SaveIcon /> : <AddIcon />}
+          >
             {job ? '작업 수정' : '작업 추가'}
           </Button>
         </Box>

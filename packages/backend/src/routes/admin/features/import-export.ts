@@ -61,7 +61,9 @@ router.post(
       {
         environmentId,
         flagName: newFlagName,
-        displayName: sourceFlag.displayName ? `${sourceFlag.displayName} (Copy)` : undefined,
+        displayName: sourceFlag.displayName
+          ? `${sourceFlag.displayName} (Copy)`
+          : undefined,
         description: sourceFlag.description,
         flagType: sourceFlag.flagType,
         valueType: sourceFlag.valueType,
@@ -122,7 +124,9 @@ router.post(
     for (const segmentData of segments) {
       try {
         // Check if segment exists by name
-        const existingSegments = await featureFlagService.listSegments(segmentData.segmentName);
+        const existingSegments = await featureFlagService.listSegments(
+          segmentData.segmentName
+        );
         const existingSegment = existingSegments.find(
           (s: any) => s.segmentName === segmentData.segmentName
         );

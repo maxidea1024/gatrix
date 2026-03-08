@@ -6,7 +6,8 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { createLogger } from '../config/logger';
 const logger = createLogger('ChatSyncController');
 
-const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+const DEFAULT_AVATAR_URL =
+  'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
 export class ChatSyncController {
   /**
@@ -104,7 +105,9 @@ export class ChatSyncController {
         updatedAt: user.updatedAt?.toISOString(),
       });
 
-      logger.info(`User ${targetUserId} synced to Chat Server by admin ${req.user?.userId}`);
+      logger.info(
+        `User ${targetUserId} synced to Chat Server by admin ${req.user?.userId}`
+      );
 
       res.json({
         success: true,
@@ -163,7 +166,9 @@ export class ChatSyncController {
       const chatServerService = ChatServerService.getInstance();
       await chatServerService.syncUsers(userData);
 
-      logger.info(`${users.length} users synced to Chat Server by admin ${req.user?.userId}`);
+      logger.info(
+        `${users.length} users synced to Chat Server by admin ${req.user?.userId}`
+      );
 
       res.json({
         success: true,

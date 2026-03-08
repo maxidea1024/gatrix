@@ -33,7 +33,9 @@ type ServerLocation = 'local' | 'remote';
 type ServerType = 'edge' | 'backend';
 
 function getLocalUrl(serverType: ServerType): string {
-  return serverType === 'edge' ? 'http://localhost:3400/api/v1' : 'http://localhost:45000/api/v1';
+  return serverType === 'edge'
+    ? 'http://localhost:3400/api/v1'
+    : 'http://localhost:45000/api/v1';
 }
 
 function getDevToken(serverType: ServerType): string {
@@ -43,12 +45,16 @@ function getDevToken(serverType: ServerType): string {
 function ConfigForm({ onConnect }: ConfigFormProps) {
   // Step 1: Server location
   const [location, setLocation] = useState<ServerLocation>(() => {
-    return (localStorage.getItem(STORAGE_KEY_LOCATION) as ServerLocation) || 'local';
+    return (
+      (localStorage.getItem(STORAGE_KEY_LOCATION) as ServerLocation) || 'local'
+    );
   });
 
   // Step 2: Server type (edge/backend for local)
   const [serverType, setServerType] = useState<ServerType>(() => {
-    return (localStorage.getItem(STORAGE_KEY_SERVER_TYPE) as ServerType) || 'edge';
+    return (
+      (localStorage.getItem(STORAGE_KEY_SERVER_TYPE) as ServerType) || 'edge'
+    );
   });
 
   // Connection details
@@ -68,11 +74,14 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
   const [manualPolling, setManualPolling] = useState(false);
   const [explicitSyncMode, setExplicitSyncMode] = useState(false);
   const [streamingEnabled, setStreamingEnabled] = useState(true);
-  const [streamingMode, setStreamingMode] = useState<'sse' | 'websocket'>('sse');
+  const [streamingMode, setStreamingMode] = useState<'sse' | 'websocket'>(
+    'sse'
+  );
 
   // Load saved preferences on mount
   useEffect(() => {
-    const savedRememberToken = localStorage.getItem(STORAGE_KEY_REMEMBER) === 'true';
+    const savedRememberToken =
+      localStorage.getItem(STORAGE_KEY_REMEMBER) === 'true';
     const savedToken = localStorage.getItem(STORAGE_KEY_TOKEN) || '';
     const savedApiUrl = localStorage.getItem(STORAGE_KEY_API_URL);
     const savedAppName = localStorage.getItem(STORAGE_KEY_APP_NAME);
@@ -95,7 +104,8 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     }
 
     setOfflineMode(localStorage.getItem(STORAGE_KEY_OFFLINE_MODE) === 'true');
-    const savedManualPolling = localStorage.getItem(STORAGE_KEY_MANUAL_POLLING) === 'true';
+    const savedManualPolling =
+      localStorage.getItem(STORAGE_KEY_MANUAL_POLLING) === 'true';
     const savedRefreshInterval = parseInt(
       localStorage.getItem(STORAGE_KEY_REFRESH_INTERVAL) || '1',
       10
@@ -103,12 +113,20 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
 
     setManualPolling(savedManualPolling);
     setRefreshInterval(
-      !savedManualPolling && savedRefreshInterval === 0 ? 1 : savedRefreshInterval
+      !savedManualPolling && savedRefreshInterval === 0
+        ? 1
+        : savedRefreshInterval
     );
-    setExplicitSyncMode(localStorage.getItem(STORAGE_KEY_EXPLICIT_SYNC) === 'true');
-    setStreamingEnabled(localStorage.getItem(STORAGE_KEY_STREAMING_ENABLED) !== 'false');
+    setExplicitSyncMode(
+      localStorage.getItem(STORAGE_KEY_EXPLICIT_SYNC) === 'true'
+    );
+    setStreamingEnabled(
+      localStorage.getItem(STORAGE_KEY_STREAMING_ENABLED) !== 'false'
+    );
     setStreamingMode(
-      (localStorage.getItem(STORAGE_KEY_STREAMING_MODE) as 'sse' | 'websocket') || 'sse'
+      (localStorage.getItem(STORAGE_KEY_STREAMING_MODE) as
+        | 'sse'
+        | 'websocket') || 'sse'
     );
   }, []);
 
@@ -143,10 +161,16 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     localStorage.setItem(STORAGE_KEY_ENVIRONMENT, environment);
     localStorage.setItem(STORAGE_KEY_USER_ID, userId);
     localStorage.setItem(STORAGE_KEY_OFFLINE_MODE, String(offlineMode));
-    localStorage.setItem(STORAGE_KEY_REFRESH_INTERVAL, String(manualPolling ? 0 : refreshInterval));
+    localStorage.setItem(
+      STORAGE_KEY_REFRESH_INTERVAL,
+      String(manualPolling ? 0 : refreshInterval)
+    );
     localStorage.setItem(STORAGE_KEY_MANUAL_POLLING, String(manualPolling));
     localStorage.setItem(STORAGE_KEY_EXPLICIT_SYNC, String(explicitSyncMode));
-    localStorage.setItem(STORAGE_KEY_STREAMING_ENABLED, String(streamingEnabled));
+    localStorage.setItem(
+      STORAGE_KEY_STREAMING_ENABLED,
+      String(streamingEnabled)
+    );
     localStorage.setItem(STORAGE_KEY_STREAMING_MODE, streamingMode);
 
     if (location === 'remote') {
@@ -194,7 +218,9 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
             {/* Step 1: Server Location */}
             <div className="form-group">
               <label className="form-label">SERVER LOCATION</label>
-              <div style={{ display: 'flex', gap: '40px', marginBottom: '20px' }}>
+              <div
+                style={{ display: 'flex', gap: '40px', marginBottom: '20px' }}
+              >
                 <label>
                   <input
                     type="radio"
@@ -222,7 +248,9 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
             {isLocal && (
               <div className="form-group">
                 <label className="form-label">SERVER TYPE</label>
-                <div style={{ display: 'flex', gap: '40px', marginBottom: '20px' }}>
+                <div
+                  style={{ display: 'flex', gap: '40px', marginBottom: '20px' }}
+                >
                   <label>
                     <input
                       type="radio"
@@ -264,7 +292,13 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
 
                 <div className="form-group">
                   <label className="form-label">API TOKEN</label>
-                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
                     <input
                       type={!showToken ? 'password' : 'text'}
                       className="nes-input is-dark"
@@ -376,13 +410,21 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
               <>
                 <div className="form-group">
                   <label className="form-label">POLLING INTERVAL (SEC)</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '20px',
+                    }}
+                  >
                     <input
                       type="number"
                       className={`nes-input is-dark ${manualPolling ? 'is-disabled' : ''}`}
                       value={refreshInterval}
                       onChange={(e) =>
-                        setRefreshInterval(Math.max(1, parseInt(e.target.value) || 1))
+                        setRefreshInterval(
+                          Math.max(1, parseInt(e.target.value) || 1)
+                        )
                       }
                       min="1"
                       disabled={manualPolling}
@@ -393,7 +435,9 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                         type="checkbox"
                         className="nes-checkbox is-dark"
                         checked={manualPolling}
-                        onChange={(e) => handleManualPollingChange(e.target.checked)}
+                        onChange={(e) =>
+                          handleManualPollingChange(e.target.checked)
+                        }
                       />
                       <span className="checkbox-label">MANUAL</span>
                     </label>
@@ -414,7 +458,10 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
 
                 <div className="form-group" style={{ marginTop: '20px' }}>
                   <label className="form-label">STREAMING (REAL-TIME)</label>
-                  <div className="checkbox-group" style={{ marginBottom: '10px' }}>
+                  <div
+                    className="checkbox-group"
+                    style={{ marginBottom: '10px' }}
+                  >
                     <label>
                       <input
                         type="checkbox"
@@ -427,7 +474,13 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   </div>
 
                   {streamingEnabled && (
-                    <div style={{ display: 'flex', gap: '30px', marginLeft: '35px' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '30px',
+                        marginLeft: '35px',
+                      }}
+                    >
                       <label>
                         <input
                           type="radio"

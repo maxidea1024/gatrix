@@ -115,7 +115,9 @@ export interface MyRequestsResponse {
 
 /** Build change-requests base path from project-scoped path or fallback */
 function basePath(projectApiPath: string | null): string {
-  return projectApiPath ? `${projectApiPath}/change-requests` : '/admin/change-requests';
+  return projectApiPath
+    ? `${projectApiPath}/change-requests`
+    : '/admin/change-requests';
 }
 
 class ChangeRequestService {
@@ -137,7 +139,10 @@ class ChangeRequestService {
   /**
    * Get single change request by ID
    */
-  async getById(id: string, projectApiPath: string | null = null): Promise<ChangeRequest> {
+  async getById(
+    id: string,
+    projectApiPath: string | null = null
+  ): Promise<ChangeRequest> {
     const response = await api.get(`${basePath(projectApiPath)}/${id}`);
     return response.data;
   }
@@ -157,7 +162,10 @@ class ChangeRequestService {
     },
     projectApiPath: string | null = null
   ): Promise<ChangeRequest> {
-    const response = await api.patch(`${basePath(projectApiPath)}/${id}`, metadata);
+    const response = await api.patch(
+      `${basePath(projectApiPath)}/${id}`,
+      metadata
+    );
     return response.data;
   }
 
@@ -169,7 +177,10 @@ class ChangeRequestService {
     data: { title: string; reason: string },
     projectApiPath: string | null = null
   ): Promise<ChangeRequest> {
-    const response = await api.post(`${basePath(projectApiPath)}/${id}/submit`, data);
+    const response = await api.post(
+      `${basePath(projectApiPath)}/${id}/submit`,
+      data
+    );
     return response.data;
   }
 
@@ -181,9 +192,12 @@ class ChangeRequestService {
     comment?: string,
     projectApiPath: string | null = null
   ): Promise<ChangeRequest> {
-    const response = await api.post(`${basePath(projectApiPath)}/${id}/approve`, {
-      comment,
-    });
+    const response = await api.post(
+      `${basePath(projectApiPath)}/${id}/approve`,
+      {
+        comment,
+      }
+    );
     return response.data;
   }
 
@@ -195,16 +209,22 @@ class ChangeRequestService {
     comment: string,
     projectApiPath: string | null = null
   ): Promise<ChangeRequest> {
-    const response = await api.post(`${basePath(projectApiPath)}/${id}/reject`, {
-      comment,
-    });
+    const response = await api.post(
+      `${basePath(projectApiPath)}/${id}/reject`,
+      {
+        comment,
+      }
+    );
     return response.data;
   }
 
   /**
    * Reopen rejected change request (Reset to Draft)
    */
-  async reopen(id: string, projectApiPath: string | null = null): Promise<ChangeRequest> {
+  async reopen(
+    id: string,
+    projectApiPath: string | null = null
+  ): Promise<ChangeRequest> {
     const response = await api.post(`${basePath(projectApiPath)}/${id}/reopen`);
     return response.data;
   }
@@ -212,22 +232,32 @@ class ChangeRequestService {
   /**
    * Execute approved change request
    */
-  async execute(id: string, projectApiPath: string | null = null): Promise<ChangeRequest> {
-    const response = await api.post(`${basePath(projectApiPath)}/${id}/execute`);
+  async execute(
+    id: string,
+    projectApiPath: string | null = null
+  ): Promise<ChangeRequest> {
+    const response = await api.post(
+      `${basePath(projectApiPath)}/${id}/execute`
+    );
     return response.data;
   }
 
   /**
    * Delete draft change request
    */
-  async delete(id: string, projectApiPath: string | null = null): Promise<void> {
+  async delete(
+    id: string,
+    projectApiPath: string | null = null
+  ): Promise<void> {
     await api.delete(`${basePath(projectApiPath)}/${id}`);
   }
 
   /**
    * Get my pending requests (as requester or approver)
    */
-  async getMyRequests(projectApiPath: string | null = null): Promise<MyRequestsResponse> {
+  async getMyRequests(
+    projectApiPath: string | null = null
+  ): Promise<MyRequestsResponse> {
     const response = await api.get(`${basePath(projectApiPath)}/my`);
     return response.data;
   }
@@ -235,15 +265,23 @@ class ChangeRequestService {
   /**
    * Get revert preview (inverse ops without creating CR)
    */
-  async getRevertPreview(id: string, projectApiPath: string | null = null): Promise<any> {
-    const response = await api.get(`${basePath(projectApiPath)}/${id}/revert-preview`);
+  async getRevertPreview(
+    id: string,
+    projectApiPath: string | null = null
+  ): Promise<any> {
+    const response = await api.get(
+      `${basePath(projectApiPath)}/${id}/revert-preview`
+    );
     return response.data;
   }
 
   /**
    * Revert applied change request
    */
-  async revert(id: string, projectApiPath: string | null = null): Promise<ChangeRequest> {
+  async revert(
+    id: string,
+    projectApiPath: string | null = null
+  ): Promise<ChangeRequest> {
     const response = await api.post(`${basePath(projectApiPath)}/${id}/revert`);
     return response.data;
   }
@@ -256,13 +294,17 @@ class ChangeRequestService {
     itemId: string,
     projectApiPath: string | null = null
   ): Promise<void> {
-    await api.delete(`${basePath(projectApiPath)}/${changeRequestId}/items/${itemId}`);
+    await api.delete(
+      `${basePath(projectApiPath)}/${changeRequestId}/items/${itemId}`
+    );
   }
 
   /**
    * Get change request statistics
    */
-  async getStats(projectApiPath: string | null = null): Promise<Record<string, number>> {
+  async getStats(
+    projectApiPath: string | null = null
+  ): Promise<Record<string, number>> {
     const response = await api.get(`${basePath(projectApiPath)}/stats`);
     return response.data;
   }

@@ -3,7 +3,11 @@
  * Only constraints and segments determine the outcome.
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
+import {
+  EvaluationContext,
+  StrategyParameters,
+  StrategyEvaluationResult,
+} from '@gatrix/shared';
 import { Strategy } from './strategy';
 
 export class DefaultStrategy extends Strategy {
@@ -11,7 +15,10 @@ export class DefaultStrategy extends Strategy {
     super('default');
   }
 
-  isEnabled(_parameters: StrategyParameters, _context: EvaluationContext): boolean {
+  isEnabled(
+    _parameters: StrategyParameters,
+    _context: EvaluationContext
+  ): boolean {
     return true;
   }
 

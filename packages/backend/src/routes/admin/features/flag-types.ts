@@ -23,7 +23,10 @@ router.get(
 router.put(
   '/:flagType',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const flagType = await FeatureFlagTypeModel.update(req.params.flagType, req.body);
+    const flagType = await FeatureFlagTypeModel.update(
+      req.params.flagType,
+      req.body
+    );
     res.json({ success: true, data: { flagType } });
   })
 );

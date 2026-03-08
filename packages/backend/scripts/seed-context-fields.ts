@@ -60,7 +60,11 @@ async function main() {
       legalValues: ['development', 'staging', 'production'],
       sortOrder: 10,
       tags: ['system'],
-      validationRules: { enabled: true, trimWhitespace: 'trim', allowEmpty: false },
+      validationRules: {
+        enabled: true,
+        trimWhitespace: 'trim',
+        allowEmpty: false,
+      },
     },
     {
       fieldName: 'serverRegion',
@@ -89,7 +93,11 @@ async function main() {
       legalValues: ['KR', 'US', 'JP', 'CN'],
       sortOrder: 13,
       tags: ['geo'],
-      validationRules: { enabled: true, trimWhitespace: 'trim', allowEmpty: false },
+      validationRules: {
+        enabled: true,
+        trimWhitespace: 'trim',
+        allowEmpty: false,
+      },
     },
     {
       fieldName: 'role',
@@ -99,7 +107,11 @@ async function main() {
       legalValues: ['admin', 'gm', 'vip', 'user', 'guest'],
       sortOrder: 20,
       tags: ['identity'],
-      validationRules: { enabled: true, trimWhitespace: 'trim', allowEmpty: false },
+      validationRules: {
+        enabled: true,
+        trimWhitespace: 'trim',
+        allowEmpty: false,
+      },
     },
     {
       fieldName: 'isBeta',
@@ -125,7 +137,11 @@ async function main() {
       legalValues: ['pc', 'mobile', 'console'],
       sortOrder: 30,
       tags: ['device'],
-      validationRules: { enabled: true, trimWhitespace: 'trim', allowEmpty: false },
+      validationRules: {
+        enabled: true,
+        trimWhitespace: 'trim',
+        allowEmpty: false,
+      },
     },
     {
       fieldName: 'deviceType',
@@ -192,7 +208,11 @@ async function main() {
       stickiness: true,
       sortOrder: 80,
       tags: ['experiment'],
-      validationRules: { enabled: true, trimWhitespace: 'trim', allowEmpty: false },
+      validationRules: {
+        enabled: true,
+        trimWhitespace: 'trim',
+        allowEmpty: false,
+      },
     },
     {
       fieldName: 'currentTime',
@@ -221,7 +241,9 @@ async function main() {
       fieldType: field.fieldType,
       description: field.description,
       legalValues: field.legalValues ? JSON.stringify(field.legalValues) : null,
-      validationRules: field.validationRules ? JSON.stringify(field.validationRules) : null,
+      validationRules: field.validationRules
+        ? JSON.stringify(field.validationRules)
+        : null,
       tags: field.tags ? JSON.stringify(field.tags) : null,
       stickiness: field.stickiness || false,
       sortOrder: field.sortOrder,

@@ -109,7 +109,10 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
+import {
+  messageTemplateService,
+  MessageTemplate,
+} from '@/services/messageTemplateService';
 import MultiLanguageMessageInput, {
   MessageLocale,
   MultiLanguageMessageInputRef,
@@ -146,14 +149,21 @@ import ClientVersionGuideDrawer from '../../components/admin/ClientVersionGuideD
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { getContrastColor } from '@/utils/colorUtils';
-import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from '../../utils/changeRequestToast';
 import { useNavigate } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useDebounce } from '../../hooks/useDebounce';
 
 // HSV를 RGB로 변환하는 함수
-const hsvToRgb = (h: number, s: number, v: number): [number, number, number] => {
+const hsvToRgb = (
+  h: number,
+  s: number,
+  v: number
+): [number, number, number] => {
   const c = v * s;
   const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
   const m = v - c;
@@ -188,7 +198,11 @@ const hsvToRgb = (h: number, s: number, v: number): [number, number, number] => 
     b = x;
   }
 
-  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+  return [
+    Math.round((r + m) * 255),
+    Math.round((g + m) * 255),
+    Math.round((b + m) * 255),
+  ];
 };
 
 // 버전별 색상을 HSV 기반으로 다양하게 Create하는 함수 (황금비 활용)
@@ -250,7 +264,14 @@ const getVersionColorStyle = (
 // Existing MUI 색상 시스템과의 호환성을 위한 함수 (fallback용)
 const getVersionColor = (
   version: string
-): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+):
+  | 'default'
+  | 'primary'
+  | 'secondary'
+  | 'error'
+  | 'info'
+  | 'success'
+  | 'warning' => {
   // 간단한 해시 함수
   let hash = 0;
   for (let i = 0; i < version.length; i++) {
@@ -260,14 +281,9 @@ const getVersionColor = (
   }
 
   // Used 가능한 색상 배열
-  const colors: Array<'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = [
-    'primary',
-    'secondary',
-    'error',
-    'info',
-    'success',
-    'warning',
-  ];
+  const colors: Array<
+    'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'
+  > = ['primary', 'secondary', 'error', 'info', 'success', 'warning'];
 
   // 해시값을 색상 인덱스로 변환
   const colorIndex = Math.abs(hash) % colors.length;
@@ -288,9 +304,19 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
+  column,
+  onToggleVisibility,
+}) => {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: column.id,
   });
 
@@ -320,7 +346,11 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
         </Box>
       }
     >
-      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -330,7 +360,10 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
       </ListItemButton>
     </ListItem>
   );
@@ -351,23 +384,27 @@ const ClientVersionsPage: React.FC = () => {
   const projectApiPath = getProjectApiPath();
 
   // 페이지 State management (localStorage 연동)
-  const { pageState, updatePage, updateLimit, updateSort, updateFilters } = usePageState({
-    defaultState: {
-      page: 1,
-      limit: 10,
-      sortBy: 'clientVersion',
-      sortOrder: 'DESC',
-      filters: {},
-    },
-    storageKey: 'clientVersionsPage',
-  });
+  const { pageState, updatePage, updateLimit, updateSort, updateFilters } =
+    usePageState({
+      defaultState: {
+        page: 1,
+        limit: 10,
+        sortBy: 'clientVersion',
+        sortOrder: 'DESC',
+        filters: {},
+      },
+      storageKey: 'clientVersionsPage',
+    });
 
   // Local search state with debouncing
   const [searchTerm, setSearchTerm] = useState(pageState.filters?.search || '');
   const debouncedSearch = useDebounce(searchTerm, 500);
 
   useEffect(() => {
-    updateFilters({ ...pageState.filters, search: debouncedSearch || undefined });
+    updateFilters({
+      ...pageState.filters,
+      search: debouncedSearch || undefined,
+    });
   }, [debouncedSearch]);
 
   // SWR로 데이터 로딩
@@ -395,9 +432,13 @@ const ClientVersionsPage: React.FC = () => {
     () => clientVersionsData?.clientVersions || [],
     [clientVersionsData]
   );
-  const total = useMemo(() => clientVersionsData?.total || 0, [clientVersionsData]);
+  const total = useMemo(
+    () => clientVersionsData?.total || 0,
+    [clientVersionsData]
+  );
   const versions = useMemo(() => availableVersions || [], [availableVersions]);
-  const loading = isLoadingVersions || isLoadingAvailableVersions || isLoadingTags;
+  const loading =
+    isLoadingVersions || isLoadingAvailableVersions || isLoadingTags;
 
   // 초기 Loading state 추적
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -412,11 +453,14 @@ const ClientVersionsPage: React.FC = () => {
   const [selectAll, setSelectAll] = useState(false);
 
   // Dialog
-  const [selectedClientVersion, setSelectedClientVersion] = useState<ClientVersion | null>(null);
+  const [selectedClientVersion, setSelectedClientVersion] =
+    useState<ClientVersion | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
-  const [bulkStatus, setBulkStatus] = useState<ClientStatus>(ClientStatus.ONLINE);
+  const [bulkStatus, setBulkStatus] = useState<ClientStatus>(
+    ClientStatus.ONLINE
+  );
 
   // 점검 관련 Status
   const [maintenanceStartDate, setMaintenanceStartDate] = useState<string>('');
@@ -428,15 +472,21 @@ const ClientVersionsPage: React.FC = () => {
   // 직접 입력
   const [maintenanceMessage, setMaintenanceMessage] = useState<string>('');
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
-  const [maintenanceLocales, setMaintenanceLocales] = useState<MessageLocale[]>([]);
+  const [maintenanceLocales, setMaintenanceLocales] = useState<MessageLocale[]>(
+    []
+  );
 
   // 템플릿 선택
-  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>([]);
+  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>(
+    []
+  );
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [bulkFormDialogOpen, setBulkFormDialogOpen] = useState(false);
-  const [platformDefaultsDialogOpen, setPlatformDefaultsDialogOpen] = useState(false);
-  const [editingClientVersion, setEditingClientVersion] = useState<ClientVersion | null>(null);
+  const [platformDefaultsDialogOpen, setPlatformDefaultsDialogOpen] =
+    useState(false);
+  const [editingClientVersion, setEditingClientVersion] =
+    useState<ClientVersion | null>(null);
   const [isCopyMode, setIsCopyMode] = useState(false);
 
   // 태그 관련 Status
@@ -449,7 +499,10 @@ const ClientVersionsPage: React.FC = () => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [menuTarget, setMenuTarget] = useState<ClientVersion | null>(null);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, item: ClientVersion) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    item: ClientVersion
+  ) => {
     setMenuAnchorEl(event.currentTarget);
     setMenuTarget(item);
   };
@@ -464,10 +517,11 @@ const ClientVersionsPage: React.FC = () => {
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   // 내보내기 메뉴 Status
-  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
-  const [selectedExportMenuAnchor, setSelectedExportMenuAnchor] = useState<null | HTMLElement>(
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(
     null
   );
+  const [selectedExportMenuAnchor, setSelectedExportMenuAnchor] =
+    useState<null | HTMLElement>(null);
 
   // SDK 가이드 Status
   const [openSDKGuide, setOpenSDKGuide] = useState(false);
@@ -525,7 +579,8 @@ const ClientVersionsPage: React.FC = () => {
   });
 
   // Column settings popover state
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLButtonElement | null>(null);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -634,14 +689,21 @@ const ClientVersionsPage: React.FC = () => {
   }, []);
 
   // 동적 Filter 변경 핸들러
-  const handleDynamicFilterChange = useCallback((filterKey: string, value: any) => {
-    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, value } : f)));
-  }, []);
+  const handleDynamicFilterChange = useCallback(
+    (filterKey: string, value: any) => {
+      setActiveFilters((prev) =>
+        prev.map((f) => (f.key === filterKey ? { ...f, value } : f))
+      );
+    },
+    []
+  );
 
   // 동적 Filter 연산자 변경 핸들러
   const handleOperatorChange = useCallback(
     (filterKey: string, operator: 'any_of' | 'include_all') => {
-      setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, operator } : f)));
+      setActiveFilters((prev) =>
+        prev.map((f) => (f.key === filterKey ? { ...f, operator } : f))
+      );
     },
     []
   );
@@ -682,7 +744,9 @@ const ClientVersionsPage: React.FC = () => {
     if (filters.version) {
       restoredFilters.push({
         key: 'version',
-        value: Array.isArray(filters.version) ? filters.version : [filters.version],
+        value: Array.isArray(filters.version)
+          ? filters.version
+          : [filters.version],
         label: t('clientVersions.version'),
         operator: 'any_of',
       });
@@ -692,7 +756,9 @@ const ClientVersionsPage: React.FC = () => {
     if (filters.platform) {
       restoredFilters.push({
         key: 'platform',
-        value: Array.isArray(filters.platform) ? filters.platform : [filters.platform],
+        value: Array.isArray(filters.platform)
+          ? filters.platform
+          : [filters.platform],
         label: t('clientVersions.platform'),
         operator: 'any_of',
       });
@@ -702,7 +768,9 @@ const ClientVersionsPage: React.FC = () => {
     if (filters.clientStatus) {
       restoredFilters.push({
         key: 'clientStatus',
-        value: Array.isArray(filters.clientStatus) ? filters.clientStatus : [filters.clientStatus],
+        value: Array.isArray(filters.clientStatus)
+          ? filters.clientStatus
+          : [filters.clientStatus],
         label: t('clientVersions.statusLabel'),
         operator: 'any_of',
       });
@@ -825,11 +893,21 @@ const ClientVersionsPage: React.FC = () => {
       mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
     } catch (error: any) {
       console.error('Error deleting client version:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.deleteError'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'clientVersions.deleteError'),
+        {
+          variant: 'error',
+        }
+      );
     }
-  }, [selectedClientVersion, t, enqueueSnackbar, closeSnackbar, navigate, mutateVersions]);
+  }, [
+    selectedClientVersion,
+    t,
+    enqueueSnackbar,
+    closeSnackbar,
+    navigate,
+    mutateVersions,
+  ]);
 
   // 일괄 Status 변경 핸들러
   const handleBulkStatusUpdate = useCallback(async () => {
@@ -863,16 +941,23 @@ const ClientVersionsPage: React.FC = () => {
             ? {
                 maintenanceMessage: maintenanceMessage || undefined,
                 supportsMultiLanguage: supportsMultiLanguage,
-                maintenanceLocales: maintenanceLocales.filter((l) => l.message.trim() !== ''),
+                maintenanceLocales: maintenanceLocales.filter(
+                  (l) => l.message.trim() !== ''
+                ),
               }
             : {
                 messageTemplateId:
-                  selectedTemplateId === '' ? undefined : Number(selectedTemplateId),
+                  selectedTemplateId === ''
+                    ? undefined
+                    : Number(selectedTemplateId),
               }),
         }),
       };
 
-      const result = await ClientVersionService.bulkUpdateStatus(projectApiPath, request);
+      const result = await ClientVersionService.bulkUpdateStatus(
+        projectApiPath,
+        request
+      );
       console.log('🔍 Bulk update result:', result);
 
       // Localization된 메시지 Create
@@ -897,9 +982,12 @@ const ClientVersionsPage: React.FC = () => {
       mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
     } catch (error: any) {
       console.error('Error updating status:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.statusUpdateError'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'clientVersions.statusUpdateError'),
+        {
+          variant: 'error',
+        }
+      );
     }
   }, [
     selectedIds,
@@ -922,11 +1010,16 @@ const ClientVersionsPage: React.FC = () => {
 
     try {
       await Promise.all(
-        selectedIds.map((id) => ClientVersionService.deleteClientVersion(projectApiPath, id))
+        selectedIds.map((id) =>
+          ClientVersionService.deleteClientVersion(projectApiPath, id)
+        )
       );
-      enqueueSnackbar(t('clientVersions.bulkDeleteSuccess', { count: selectedIds.length }), {
-        variant: 'success',
-      });
+      enqueueSnackbar(
+        t('clientVersions.bulkDeleteSuccess', { count: selectedIds.length }),
+        {
+          variant: 'success',
+        }
+      );
       setSelectedIds([]);
       setSelectAll(false);
       setBulkDeleteDialogOpen(false);
@@ -934,9 +1027,12 @@ const ClientVersionsPage: React.FC = () => {
       mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
     } catch (error: any) {
       console.error('Failed to delete client versions:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.bulkDeleteError'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'clientVersions.bulkDeleteError'),
+        {
+          variant: 'error',
+        }
+      );
     }
   }, [selectedIds, t, enqueueSnackbar, mutateVersions]);
 
@@ -947,10 +1043,16 @@ const ClientVersionsPage: React.FC = () => {
         let blob: Blob;
         let filename: string;
         const now = new Date();
-        const dateTimeStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19); // YYYY-MM-DDTHH-MM-SS
+        const dateTimeStr = now
+          .toISOString()
+          .replace(/[:.]/g, '-')
+          .slice(0, 19); // YYYY-MM-DDTHH-MM-SS
 
         if (format === 'csv') {
-          blob = await ClientVersionService.exportToCSV(projectApiPath, pageState.filters || {});
+          blob = await ClientVersionService.exportToCSV(
+            projectApiPath,
+            pageState.filters || {}
+          );
           filename = `client-versions-${dateTimeStr}.csv`;
         } else if (format === 'json') {
           // JSON 내보내기
@@ -968,7 +1070,8 @@ const ClientVersionsPage: React.FC = () => {
               const values = line.split(',');
               const obj: any = {};
               headers.forEach((header, index) => {
-                obj[header.replace(/"/g, '')] = values[index]?.replace(/"/g, '') || '';
+                obj[header.replace(/"/g, '')] =
+                  values[index]?.replace(/"/g, '') || '';
               });
               return obj;
             });
@@ -1037,9 +1140,12 @@ const ClientVersionsPage: React.FC = () => {
         setExportMenuAnchor(null);
       } catch (error: any) {
         console.error('Error exporting:', error);
-        enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.exportError'), {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          parseApiErrorMessage(error, 'clientVersions.exportError'),
+          {
+            variant: 'error',
+          }
+        );
       }
     },
     [pageState.filters, t, enqueueSnackbar]
@@ -1051,11 +1157,16 @@ const ClientVersionsPage: React.FC = () => {
       if (selectedIds.length === 0) return;
 
       try {
-        const selectedVersions = clientVersions.filter((cv) => selectedIds.includes(cv.id));
+        const selectedVersions = clientVersions.filter((cv) =>
+          selectedIds.includes(cv.id)
+        );
         let blob: Blob;
         let filename: string;
         const now = new Date();
-        const dateTimeStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19); // YYYY-MM-DDTHH-MM-SS
+        const dateTimeStr = now
+          .toISOString()
+          .replace(/[:.]/g, '-')
+          .slice(0, 19); // YYYY-MM-DDTHH-MM-SS
 
         if (format === 'csv') {
           const csvContent = [
@@ -1178,7 +1289,11 @@ const ClientVersionsPage: React.FC = () => {
           // XLSX 워크북 Create
           const worksheet = XLSX.utils.json_to_sheet(data);
           const workbook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workbook, worksheet, 'Selected Client Versions');
+          XLSX.utils.book_append_sheet(
+            workbook,
+            worksheet,
+            'Selected Client Versions'
+          );
 
           // 컬럼 너비 자동 조정
           const colWidths = headers.map((header) => ({
@@ -1215,9 +1330,12 @@ const ClientVersionsPage: React.FC = () => {
         setSelectedExportMenuAnchor(null);
       } catch (error: any) {
         console.error('Failed to export selected versions:', error);
-        enqueueSnackbar(parseApiErrorMessage(error, 'clientVersions.exportSelectedError'), {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          parseApiErrorMessage(error, 'clientVersions.exportSelectedError'),
+          {
+            variant: 'error',
+          }
+        );
       }
     },
     [selectedIds, clientVersions, t, enqueueSnackbar]
@@ -1238,7 +1356,8 @@ const ClientVersionsPage: React.FC = () => {
         clientVersion: '', // 버전은 비워둠
         clientStatus: clientVersion.clientStatus,
         gameServerAddress: clientVersion.gameServerAddress,
-        gameServerAddressForWhiteList: clientVersion.gameServerAddressForWhiteList || '',
+        gameServerAddressForWhiteList:
+          clientVersion.gameServerAddressForWhiteList || '',
         patchAddress: clientVersion.patchAddress,
         patchAddressForWhiteList: clientVersion.patchAddressForWhiteList || '',
         guestModeAllowed: clientVersion.guestModeAllowed,
@@ -1267,7 +1386,10 @@ const ClientVersionsPage: React.FC = () => {
     async (clientVersion: ClientVersion) => {
       try {
         setSelectedClientVersionForTags(clientVersion);
-        const tags = await ClientVersionService.getTags(projectApiPath, clientVersion.id!);
+        const tags = await ClientVersionService.getTags(
+          projectApiPath,
+          clientVersion.id!
+        );
         setClientVersionTags(tags);
         setTagDialogOpen(true);
       } catch (error) {
@@ -1283,7 +1405,11 @@ const ClientVersionsPage: React.FC = () => {
       if (!selectedClientVersionForTags?.id) return;
 
       try {
-        await ClientVersionService.setTags(projectApiPath, selectedClientVersionForTags.id, tagIds);
+        await ClientVersionService.setTags(
+          projectApiPath,
+          selectedClientVersionForTags.id,
+          tagIds
+        );
         setTagDialogOpen(false);
         enqueueSnackbar(t('common.success'), { variant: 'success' });
         // 필요시 목록 Refresh
@@ -1311,7 +1437,10 @@ const ClientVersionsPage: React.FC = () => {
 
   const handleResetColumns = useCallback(() => {
     setColumns(defaultColumns);
-    localStorage.setItem('clientVersionsColumns', JSON.stringify(defaultColumns));
+    localStorage.setItem(
+      'clientVersionsColumns',
+      JSON.stringify(defaultColumns)
+    );
   }, []);
 
   const handleColumnDragEnd = useCallback(
@@ -1322,7 +1451,10 @@ const ClientVersionsPage: React.FC = () => {
         const newIndex = columns.findIndex((col) => col.id === over.id);
         const newColumns = arrayMove(columns, oldIndex, newIndex);
         setColumns(newColumns);
-        localStorage.setItem('clientVersionsColumns', JSON.stringify(newColumns));
+        localStorage.setItem(
+          'clientVersionsColumns',
+          JSON.stringify(newColumns)
+        );
       }
     },
     [columns]
@@ -1334,7 +1466,12 @@ const ClientVersionsPage: React.FC = () => {
       switch (columnId) {
         case 'platform':
           return (
-            <Chip label={clientVersion.platform} size="small" color="primary" variant="outlined" />
+            <Chip
+              label={clientVersion.platform}
+              size="small"
+              color="primary"
+              variant="outlined"
+            />
           );
         case 'clientVersion':
           return (
@@ -1343,7 +1480,10 @@ const ClientVersionsPage: React.FC = () => {
               size="small"
               variant="filled"
               sx={{
-                ...getVersionColorStyle(clientVersion.clientVersion, theme.palette.mode === 'dark'),
+                ...getVersionColorStyle(
+                  clientVersion.clientVersion,
+                  theme.palette.mode === 'dark'
+                ),
                 cursor: 'pointer',
                 fontWeight: 600,
                 borderRadius: '4px',
@@ -1372,7 +1512,10 @@ const ClientVersionsPage: React.FC = () => {
         case 'gameServerAddress':
           return (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+              <Typography
+                variant="body2"
+                sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
+              >
                 {clientVersion.gameServerAddress}
               </Typography>
               <Tooltip title={t('common.copy')}>
@@ -1401,7 +1544,10 @@ const ClientVersionsPage: React.FC = () => {
         case 'patchAddress':
           return (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+              <Typography
+                variant="body2"
+                sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
+              >
                 {clientVersion.patchAddress}
               </Typography>
               <Tooltip title={t('common.copy')}>
@@ -1430,7 +1576,11 @@ const ClientVersionsPage: React.FC = () => {
         case 'guestModeAllowed':
           return (
             <Chip
-              label={clientVersion.guestModeAllowed ? t('common.yes') : t('common.no')}
+              label={
+                clientVersion.guestModeAllowed
+                  ? t('common.yes')
+                  : t('common.no')
+              }
               size="small"
               color={clientVersion.guestModeAllowed ? 'success' : 'default'}
               variant="outlined"
@@ -1462,7 +1612,11 @@ const ClientVersionsPage: React.FC = () => {
           return (
             <Tooltip title={formatDateTimeDetailed(clientVersion.createdAt)}>
               <Typography variant="body2">
-                {formatRelativeTime(clientVersion.createdAt, undefined, language)}
+                {formatRelativeTime(
+                  clientVersion.createdAt,
+                  undefined,
+                  language
+                )}
               </Typography>
             </Tooltip>
           );
@@ -1570,7 +1724,11 @@ const ClientVersionsPage: React.FC = () => {
             </>
           )}
           <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-          <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => setOpenSDKGuide(true)}>
+          <Button
+            variant="outlined"
+            startIcon={<CodeIcon />}
+            onClick={() => setOpenSDKGuide(true)}
+          >
             {t('clientVersions.sdkGuide')}
           </Button>
         </Box>
@@ -1651,7 +1809,10 @@ const ClientVersionsPage: React.FC = () => {
                 justifyContent: 'space-between',
               }}
             >
-              <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 600, color: 'primary.main' }}
+              >
                 {t('clientVersions.selectedCount', {
                   count: selectedIds.length,
                 })}
@@ -1764,7 +1925,8 @@ const ClientVersionsPage: React.FC = () => {
                         <Checkbox
                           checked={selectAll}
                           indeterminate={
-                            selectedIds.length > 0 && selectedIds.length < clientVersions.length
+                            selectedIds.length > 0 &&
+                            selectedIds.length < clientVersions.length
                           }
                           onChange={(e) => handleSelectAll(e.target.checked)}
                         />
@@ -1775,15 +1937,23 @@ const ClientVersionsPage: React.FC = () => {
                       .map((column) => (
                         <TableCell
                           key={column.id}
-                          align={column.id === 'guestModeAllowed' ? 'center' : 'left'}
+                          align={
+                            column.id === 'guestModeAllowed' ? 'center' : 'left'
+                          }
                           width={column.width}
                         >
                           {t(column.labelKey)}
-                          {(column.id === 'clientVersion' || column.id === 'platform') && ' ↓'}
+                          {(column.id === 'clientVersion' ||
+                            column.id === 'platform') &&
+                            ' ↓'}
                         </TableCell>
                       ))}
                     <TableCell>{t('common.createdBy')}</TableCell>
-                    {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                    {canManage && (
+                      <TableCell align="center">
+                        {t('common.actions')}
+                      </TableCell>
+                    )}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1797,7 +1967,12 @@ const ClientVersionsPage: React.FC = () => {
                         <TableCell padding="checkbox">
                           <Checkbox
                             checked={selectedIds.includes(clientVersion.id)}
-                            onChange={(e) => handleSelectOne(clientVersion.id, e.target.checked)}
+                            onChange={(e) =>
+                              handleSelectOne(
+                                clientVersion.id,
+                                e.target.checked
+                              )
+                            }
                           />
                         </TableCell>
                       )}
@@ -1806,7 +1981,11 @@ const ClientVersionsPage: React.FC = () => {
                         .map((column) => (
                           <TableCell
                             key={column.id}
-                            align={column.id === 'guestModeAllowed' ? 'center' : 'left'}
+                            align={
+                              column.id === 'guestModeAllowed'
+                                ? 'center'
+                                : 'left'
+                            }
                             width={column.width}
                           >
                             {renderCellContent(clientVersion, column.id)}
@@ -1815,7 +1994,8 @@ const ClientVersionsPage: React.FC = () => {
                       <TableCell>
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {clientVersion.createdByName || t('dashboard.unknown')}
+                            {clientVersion.createdByName ||
+                              t('dashboard.unknown')}
                           </Typography>
                           {clientVersion.createdByEmail && (
                             <Typography
@@ -1860,7 +2040,11 @@ const ClientVersionsPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+      >
         <MenuItem
           onClick={() => {
             if (menuTarget) handleCopyVersion(menuTarget);
@@ -2068,7 +2252,11 @@ const ClientVersionsPage: React.FC = () => {
                   <BuildIcon fontSize="small" sx={{ mr: 0.5 }} />{' '}
                   {t('clientVersions.maintenance.title')}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   {t('clientVersions.maintenance.description')}
                 </Typography>
 
@@ -2077,12 +2265,16 @@ const ClientVersionsPage: React.FC = () => {
                   <DateTimePicker
                     label={t('clientVersions.maintenance.startDate')}
                     value={parseUTCForPicker(maintenanceStartDate)}
-                    onChange={(date) => setMaintenanceStartDate(date ? date.toISOString() : '')}
+                    onChange={(date) =>
+                      setMaintenanceStartDate(date ? date.toISOString() : '')
+                    }
                     timeSteps={{ minutes: 1 }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
-                        helperText: t('clientVersions.maintenance.startDateHelp'),
+                        helperText: t(
+                          'clientVersions.maintenance.startDateHelp'
+                        ),
                         slotProps: { input: { readOnly: true } },
                       },
                     }}
@@ -2092,7 +2284,9 @@ const ClientVersionsPage: React.FC = () => {
                   <DateTimePicker
                     label={t('clientVersions.maintenance.endDate')}
                     value={parseUTCForPicker(maintenanceEndDate)}
-                    onChange={(date) => setMaintenanceEndDate(date ? date.toISOString() : '')}
+                    onChange={(date) =>
+                      setMaintenanceEndDate(date ? date.toISOString() : '')
+                    }
                     timeSteps={{ minutes: 1 }}
                     slotProps={{
                       textField: {
@@ -2119,11 +2313,17 @@ const ClientVersionsPage: React.FC = () => {
                     select
                     label={t('maintenance.messageSource')}
                     value={inputMode}
-                    onChange={(e) => setInputMode(e.target.value as 'direct' | 'template')}
+                    onChange={(e) =>
+                      setInputMode(e.target.value as 'direct' | 'template')
+                    }
                     fullWidth
                   >
-                    <MenuItem value="direct">{t('maintenance.directInput')}</MenuItem>
-                    <MenuItem value="template">{t('maintenance.useTemplate')}</MenuItem>
+                    <MenuItem value="direct">
+                      {t('maintenance.directInput')}
+                    </MenuItem>
+                    <MenuItem value="template">
+                      {t('maintenance.useTemplate')}
+                    </MenuItem>
                   </TextField>
                   <Typography
                     variant="caption"
@@ -2139,7 +2339,9 @@ const ClientVersionsPage: React.FC = () => {
                         select
                         label={t('maintenance.selectTemplate')}
                         value={selectedTemplateId}
-                        onChange={(e) => setSelectedTemplateId(Number(e.target.value))}
+                        onChange={(e) =>
+                          setSelectedTemplateId(Number(e.target.value))
+                        }
                         fullWidth
                       >
                         <MenuItem value="">{t('common.select')}</MenuItem>
@@ -2167,8 +2369,12 @@ const ClientVersionsPage: React.FC = () => {
                     <MultiLanguageMessageInput
                       defaultMessage={maintenanceMessage}
                       onDefaultMessageChange={setMaintenanceMessage}
-                      defaultMessageLabel={t('clientVersions.maintenance.defaultMessage')}
-                      defaultMessageHelperText={t('clientVersions.maintenance.defaultMessageHelp')}
+                      defaultMessageLabel={t(
+                        'clientVersions.maintenance.defaultMessage'
+                      )}
+                      defaultMessageHelperText={t(
+                        'clientVersions.maintenance.defaultMessageHelp'
+                      )}
                       defaultMessageRequired={true}
                       supportsMultiLanguage={supportsMultiLanguage}
                       onSupportsMultiLanguageChange={setSupportsMultiLanguage}
@@ -2213,7 +2419,11 @@ const ClientVersionsPage: React.FC = () => {
           >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleBulkStatusUpdate} variant="contained" startIcon={<UpdateIcon />}>
+          <Button
+            onClick={handleBulkStatusUpdate}
+            variant="contained"
+            startIcon={<UpdateIcon />}
+          >
             {t('common.update')}
           </Button>
         </Box>
@@ -2515,7 +2725,9 @@ const ClientVersionsPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            onClick={() => handleSaveTags(clientVersionTags.map((tag) => tag.id))}
+            onClick={() =>
+              handleSaveTags(clientVersionTags.map((tag) => tag.id))
+            }
             variant="contained"
           >
             {t('common.save')}
@@ -2582,7 +2794,10 @@ const ClientVersionsPage: React.FC = () => {
       </Popover>
 
       {/* Client Version Guide Drawer */}
-      <ClientVersionGuideDrawer open={openSDKGuide} onClose={() => setOpenSDKGuide(false)} />
+      <ClientVersionGuideDrawer
+        open={openSDKGuide}
+        onClose={() => setOpenSDKGuide(false)}
+      />
     </Box>
   );
 };

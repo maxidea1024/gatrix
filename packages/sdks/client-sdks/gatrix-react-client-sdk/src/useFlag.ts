@@ -23,7 +23,9 @@ import { useGatrixContext } from './useGatrixContext';
 
 export function useFlag(flagName: string, forceRealtime = true): boolean {
   const { features } = useGatrixContext();
-  const [flag, setFlag] = useState(() => features.isEnabled(flagName, forceRealtime));
+  const [flag, setFlag] = useState(() =>
+    features.isEnabled(flagName, forceRealtime)
+  );
 
   useEffect(() => {
     const watchFn = forceRealtime

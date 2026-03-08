@@ -33,7 +33,10 @@ export default class TagAssignmentModel {
     });
   }
 
-  static async listTagsForEntity(entityType: string, entityId: string): Promise<any[]> {
+  static async listTagsForEntity(
+    entityType: string,
+    entityId: string
+  ): Promise<any[]> {
     const rows = await db('g_tag_assignments as a')
       .join('g_tags as t', 't.id', 'a.tagId')
       .select('t.*')

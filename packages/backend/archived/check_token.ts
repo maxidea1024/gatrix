@@ -58,9 +58,14 @@ async function main() {
     );
 
     // If allowAllEnvironments is false/0 but should be true, fix it
-    if (token.allowAllEnvironments === 0 || token.allowAllEnvironments === false) {
+    if (
+      token.allowAllEnvironments === 0 ||
+      token.allowAllEnvironments === false
+    ) {
       console.log('\n  NOTE: allowAllEnvironments is FALSE in DB.');
-      console.log('  If UI shows "All Environments", there may be a frontend/backend sync issue.');
+      console.log(
+        '  If UI shows "All Environments", there may be a frontend/backend sync issue.'
+      );
     }
   } catch (error) {
     console.error('Unexpected error:', error);

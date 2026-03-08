@@ -48,7 +48,11 @@ import {
   removeRepeatableJob,
   cleanQueue,
 } from '@/services/queueMonitorService';
-import type { QueueStats, QueueJob, RepeatableJob } from '@/services/queueMonitorService';
+import type {
+  QueueStats,
+  QueueJob,
+  RepeatableJob,
+} from '@/services/queueMonitorService';
 import PageContentLoader from '@/components/common/PageContentLoader';
 
 // Format duration in ms to human-readable
@@ -82,7 +86,10 @@ function formatDateTime(ts: number | null): string {
 }
 
 // Status color map
-const statusColors: Record<string, 'success' | 'error' | 'warning' | 'info' | 'default'> = {
+const statusColors: Record<
+  string,
+  'success' | 'error' | 'warning' | 'info' | 'default'
+> = {
   completed: 'success',
   failed: 'error',
   active: 'info',
@@ -212,10 +219,14 @@ const QueueMonitorPage: React.FC = () => {
       if (!selectedQueue) return;
       try {
         await removeRepeatableJob(selectedQueue, key);
-        enqueueSnackbar(t('queueMonitor.removeRepeatableSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('queueMonitor.removeRepeatableSuccess'), {
+          variant: 'success',
+        });
         loadQueueDetails();
       } catch {
-        enqueueSnackbar(t('queueMonitor.removeRepeatableFailed'), { variant: 'error' });
+        enqueueSnackbar(t('queueMonitor.removeRepeatableFailed'), {
+          variant: 'error',
+        });
       }
     });
     setConfirmOpen(true);
@@ -224,14 +235,20 @@ const QueueMonitorPage: React.FC = () => {
   const handleClean = (status: string) => {
     if (!selectedQueue) return;
     setConfirmMessage(
-      t('queueMonitor.cleanConfirm', { status: t(`queueMonitor.${status}`), queue: selectedQueue })
+      t('queueMonitor.cleanConfirm', {
+        status: t(`queueMonitor.${status}`),
+        queue: selectedQueue,
+      })
     );
     setConfirmAction(() => async () => {
       try {
         const result = await cleanQueue(selectedQueue!, status);
-        enqueueSnackbar(t('queueMonitor.cleanSuccess', { count: result.removed }), {
-          variant: 'success',
-        });
+        enqueueSnackbar(
+          t('queueMonitor.cleanSuccess', { count: result.removed }),
+          {
+            variant: 'success',
+          }
+        );
         loadQueueDetails();
         loadStats();
       } catch {
@@ -254,7 +271,14 @@ const QueueMonitorPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Box
+        sx={{
+          mb: 3,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <MonitorIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Box>
@@ -275,7 +299,11 @@ const QueueMonitorPage: React.FC = () => {
                 onChange={(e) => setAutoRefresh(e.target.checked)}
               />
             }
-            label={<Typography variant="caption">{t('queueMonitor.autoRefresh')}</Typography>}
+            label={
+              <Typography variant="caption">
+                {t('queueMonitor.autoRefresh')}
+              </Typography>
+            }
           />
           <Button
             size="small"
@@ -298,7 +326,10 @@ const QueueMonitorPage: React.FC = () => {
           <Box sx={{ display: 'flex', gap: 3 }}>
             {/* Queue List Sidebar */}
             <Box sx={{ width: 280, flexShrink: 0 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1.5, px: 1, color: 'text.secondary' }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ mb: 1.5, px: 1, color: 'text.secondary' }}
+              >
                 {t('queueMonitor.queues')}
               </Typography>
               <Stack spacing={1}>
@@ -309,7 +340,8 @@ const QueueMonitorPage: React.FC = () => {
                     sx={{
                       cursor: 'pointer',
                       border: selectedQueue === q.name ? 2 : 1,
-                      borderColor: selectedQueue === q.name ? 'primary.main' : 'divider',
+                      borderColor:
+                        selectedQueue === q.name ? 'primary.main' : 'divider',
                       bgcolor:
                         selectedQueue === q.name
                           ? (theme) => alpha(theme.palette.primary.main, 0.04)
@@ -322,7 +354,9 @@ const QueueMonitorPage: React.FC = () => {
                       setActiveTab(0);
                     }}
                   >
-                    <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                    <CardContent
+                      sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                    >
                       <Typography
                         variant="subtitle2"
                         sx={{
@@ -334,14 +368,25 @@ const QueueMonitorPage: React.FC = () => {
                       >
                         {q.name}
                       </Typography>
-                      <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                      <Stack
+                        direction="row"
+                        spacing={0.5}
+                        flexWrap="wrap"
+                        useFlexGap
+                      >
                         {q.active > 0 && (
                           <Chip
                             size="small"
                             label={q.active}
                             color="info"
                             variant="filled"
-                            sx={{ height: 20, '& .MuiChip-label': { px: 0.8, fontSize: '0.7rem' } }}
+                            sx={{
+                              height: 20,
+                              '& .MuiChip-label': {
+                                px: 0.8,
+                                fontSize: '0.7rem',
+                              },
+                            }}
                           />
                         )}
                         {q.waiting > 0 && (
@@ -350,7 +395,13 @@ const QueueMonitorPage: React.FC = () => {
                             label={q.waiting}
                             color="warning"
                             variant="filled"
-                            sx={{ height: 20, '& .MuiChip-label': { px: 0.8, fontSize: '0.7rem' } }}
+                            sx={{
+                              height: 20,
+                              '& .MuiChip-label': {
+                                px: 0.8,
+                                fontSize: '0.7rem',
+                              },
+                            }}
                           />
                         )}
                         {q.failed > 0 && (
@@ -359,7 +410,13 @@ const QueueMonitorPage: React.FC = () => {
                             label={q.failed}
                             color="error"
                             variant="filled"
-                            sx={{ height: 20, '& .MuiChip-label': { px: 0.8, fontSize: '0.7rem' } }}
+                            sx={{
+                              height: 20,
+                              '& .MuiChip-label': {
+                                px: 0.8,
+                                fontSize: '0.7rem',
+                              },
+                            }}
                           />
                         )}
                         <Chip
@@ -367,7 +424,10 @@ const QueueMonitorPage: React.FC = () => {
                           label={`${q.completed}`}
                           color="success"
                           variant="outlined"
-                          sx={{ height: 20, '& .MuiChip-label': { px: 0.8, fontSize: '0.7rem' } }}
+                          sx={{
+                            height: 20,
+                            '& .MuiChip-label': { px: 0.8, fontSize: '0.7rem' },
+                          }}
                         />
                       </Stack>
                     </CardContent>
@@ -387,7 +447,9 @@ const QueueMonitorPage: React.FC = () => {
                     height: 300,
                   }}
                 >
-                  <Typography color="text.secondary">{t('queueMonitor.selectQueue')}</Typography>
+                  <Typography color="text.secondary">
+                    {t('queueMonitor.selectQueue')}
+                  </Typography>
                 </Box>
               ) : (
                 <>
@@ -418,17 +480,25 @@ const QueueMonitorPage: React.FC = () => {
                             setActiveTab(idx + 1);
                           }}
                         >
-                          <CardContent sx={{ py: 0.5, '&:last-child': { pb: 0.5 } }}>
+                          <CardContent
+                            sx={{ py: 0.5, '&:last-child': { pb: 0.5 } }}
+                          >
                             <Typography
                               variant="h5"
                               sx={{
                                 fontWeight: 700,
-                                color: color !== 'default' ? `${color}.main` : 'text.primary',
+                                color:
+                                  color !== 'default'
+                                    ? `${color}.main`
+                                    : 'text.primary',
                               }}
                             >
                               {selectedStats[key]}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {t(`queueMonitor.${key}`)}
                             </Typography>
                           </CardContent>
@@ -508,7 +578,9 @@ const QueueMonitorPage: React.FC = () => {
                                   <TableCell sx={{ fontWeight: 600 }}>
                                     {t('queueMonitor.nextRun')}
                                   </TableCell>
-                                  <TableCell sx={{ fontWeight: 600, width: 60 }} />
+                                  <TableCell
+                                    sx={{ fontWeight: 600, width: 60 }}
+                                  />
                                 </TableRow>
                               </TableHead>
                               <TableBody>
@@ -517,7 +589,10 @@ const QueueMonitorPage: React.FC = () => {
                                     <TableCell>
                                       <Typography
                                         variant="body2"
-                                        sx={{ fontFamily: 'monospace', fontWeight: 600 }}
+                                        sx={{
+                                          fontFamily: 'monospace',
+                                          fontWeight: 600,
+                                        }}
                                       >
                                         {rj.name}
                                       </Typography>
@@ -531,7 +606,9 @@ const QueueMonitorPage: React.FC = () => {
                                           sx={{
                                             fontFamily: 'monospace',
                                             height: 22,
-                                            '& .MuiChip-label': { fontSize: '0.75rem' },
+                                            '& .MuiChip-label': {
+                                              fontSize: '0.75rem',
+                                            },
                                           }}
                                         />
                                       ) : (
@@ -539,15 +616,25 @@ const QueueMonitorPage: React.FC = () => {
                                       )}
                                     </TableCell>
                                     <TableCell>
-                                      {rj.every ? formatDuration(parseInt(rj.every)) : '-'}
+                                      {rj.every
+                                        ? formatDuration(parseInt(rj.every))
+                                        : '-'}
                                     </TableCell>
-                                    <TableCell>{formatDateTime(rj.next)}</TableCell>
                                     <TableCell>
-                                      <Tooltip title={t('queueMonitor.removeRepeatable')}>
+                                      {formatDateTime(rj.next)}
+                                    </TableCell>
+                                    <TableCell>
+                                      <Tooltip
+                                        title={t(
+                                          'queueMonitor.removeRepeatable'
+                                        )}
+                                      >
                                         <IconButton
                                           size="small"
                                           color="error"
-                                          onClick={() => handleRemoveRepeatable(rj.key)}
+                                          onClick={() =>
+                                            handleRemoveRepeatable(rj.key)
+                                          }
                                         >
                                           <DeleteIcon fontSize="small" />
                                         </IconButton>
@@ -565,21 +652,30 @@ const QueueMonitorPage: React.FC = () => {
                       {activeTab > 0 && (
                         <Box>
                           {/* Clean button for completed/failed */}
-                          {(activeTab === 1 || activeTab === 2) && jobs.length > 0 && (
-                            <Box
-                              sx={{ px: 2, pt: 1.5, display: 'flex', justifyContent: 'flex-end' }}
-                            >
-                              <Button
-                                size="small"
-                                variant="outlined"
-                                color="warning"
-                                startIcon={<CleanIcon />}
-                                onClick={() => handleClean(statusTabs[activeTab - 1])}
+                          {(activeTab === 1 || activeTab === 2) &&
+                            jobs.length > 0 && (
+                              <Box
+                                sx={{
+                                  px: 2,
+                                  pt: 1.5,
+                                  display: 'flex',
+                                  justifyContent: 'flex-end',
+                                }}
                               >
-                                {t('queueMonitor.clean')} {statusTabs[activeTab - 1]}
-                              </Button>
-                            </Box>
-                          )}
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="warning"
+                                  startIcon={<CleanIcon />}
+                                  onClick={() =>
+                                    handleClean(statusTabs[activeTab - 1])
+                                  }
+                                >
+                                  {t('queueMonitor.clean')}{' '}
+                                  {statusTabs[activeTab - 1]}
+                                </Button>
+                              </Box>
+                            )}
 
                           {jobs.length === 0 ? (
                             <Box sx={{ py: 4, textAlign: 'center' }}>
@@ -611,7 +707,9 @@ const QueueMonitorPage: React.FC = () => {
                                       {t('queueMonitor.failedReason')}
                                     </TableCell>
                                   )}
-                                  <TableCell sx={{ fontWeight: 600, width: 80 }} />
+                                  <TableCell
+                                    sx={{ fontWeight: 600, width: 80 }}
+                                  />
                                 </TableRow>
                               </TableHead>
                               <TableBody>
@@ -641,31 +739,50 @@ const QueueMonitorPage: React.FC = () => {
                                         <Chip
                                           size="small"
                                           label={job.name}
-                                          color={statusColors[statusTabs[activeTab - 1]]}
+                                          color={
+                                            statusColors[
+                                              statusTabs[activeTab - 1]
+                                            ]
+                                          }
                                           variant="outlined"
                                           sx={{
                                             fontFamily: 'monospace',
                                             height: 22,
-                                            '& .MuiChip-label': { fontSize: '0.75rem' },
+                                            '& .MuiChip-label': {
+                                              fontSize: '0.75rem',
+                                            },
                                           }}
                                         />
                                       </TableCell>
                                       <TableCell>
-                                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+                                        <Typography
+                                          variant="body2"
+                                          sx={{ fontSize: '0.8rem' }}
+                                        >
                                           {formatTime(job.timestamp)}
                                         </Typography>
                                       </TableCell>
                                       <TableCell>
-                                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
-                                          {duration !== null ? formatDuration(duration) : '-'}
+                                        <Typography
+                                          variant="body2"
+                                          sx={{ fontSize: '0.8rem' }}
+                                        >
+                                          {duration !== null
+                                            ? formatDuration(duration)
+                                            : '-'}
                                         </Typography>
                                       </TableCell>
                                       <TableCell>
-                                        <Typography variant="body2">{job.attemptsMade}</Typography>
+                                        <Typography variant="body2">
+                                          {job.attemptsMade}
+                                        </Typography>
                                       </TableCell>
-                                      {statusTabs[activeTab - 1] === 'failed' && (
+                                      {statusTabs[activeTab - 1] ===
+                                        'failed' && (
                                         <TableCell>
-                                          <Tooltip title={job.failedReason || ''}>
+                                          <Tooltip
+                                            title={job.failedReason || ''}
+                                          >
                                             <Typography
                                               variant="body2"
                                               color="error"
@@ -684,22 +801,31 @@ const QueueMonitorPage: React.FC = () => {
                                       )}
                                       <TableCell>
                                         <Stack direction="row" spacing={0.5}>
-                                          {statusTabs[activeTab - 1] === 'failed' && (
-                                            <Tooltip title={t('queueMonitor.retry')}>
+                                          {statusTabs[activeTab - 1] ===
+                                            'failed' && (
+                                            <Tooltip
+                                              title={t('queueMonitor.retry')}
+                                            >
                                               <IconButton
                                                 size="small"
                                                 color="primary"
-                                                onClick={() => handleRetry(job.id)}
+                                                onClick={() =>
+                                                  handleRetry(job.id)
+                                                }
                                               >
                                                 <RetryIcon fontSize="small" />
                                               </IconButton>
                                             </Tooltip>
                                           )}
-                                          <Tooltip title={t('queueMonitor.remove')}>
+                                          <Tooltip
+                                            title={t('queueMonitor.remove')}
+                                          >
                                             <IconButton
                                               size="small"
                                               color="error"
-                                              onClick={() => handleRemoveJob(job.id)}
+                                              onClick={() =>
+                                                handleRemoveJob(job.id)
+                                              }
                                             >
                                               <DeleteIcon fontSize="small" />
                                             </IconButton>

@@ -44,7 +44,10 @@ import RewardSelector from './RewardSelector';
 import TargetSettingsGroup from './TargetSettingsGroup';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
-import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from '../../utils/changeRequestToast';
 import { useEntityLock } from '../../hooks/useEntityLock';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 
@@ -84,10 +87,12 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   const [platformSurveyId, setPlatformSurveyId] = useState('');
   const [surveyTitle, setSurveyTitle] = useState('');
   const [surveyContent, setSurveyContent] = useState('');
-  const [triggerConditions, setTriggerConditions] = useState<TriggerCondition[]>([
-    { type: 'userLevel', value: 1 },
-  ]);
-  const [participationRewards, setParticipationRewards] = useState<ParticipationReward[]>([]);
+  const [triggerConditions, setTriggerConditions] = useState<
+    TriggerCondition[]
+  >([{ type: 'userLevel', value: 1 }]);
+  const [participationRewards, setParticipationRewards] = useState<
+    ParticipationReward[]
+  >([]);
   const [rewardTemplateId, setRewardTemplateId] = useState<string | null>(null);
   const [rewardMode, setRewardMode] = useState<'direct' | 'template'>('direct');
   const [rewardMailTitle, setRewardMailTitle] = useState('');
@@ -98,17 +103,22 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   // Targeting state
   const [targetPlatforms, setTargetPlatforms] = useState<string[]>([]);
   const [targetPlatformsInverted, setTargetPlatformsInverted] = useState(false);
-  const [targetChannelSubchannels, setTargetChannelSubchannels] = useState<ChannelSubchannelData[]>(
-    []
-  );
-  const [targetChannelSubchannelsInverted, setTargetChannelSubchannelsInverted] = useState(false);
+  const [targetChannelSubchannels, setTargetChannelSubchannels] = useState<
+    ChannelSubchannelData[]
+  >([]);
+  const [
+    targetChannelSubchannelsInverted,
+    setTargetChannelSubchannelsInverted,
+  ] = useState(false);
   const [targetWorlds, setTargetWorlds] = useState<string[]>([]);
   const [targetWorldsInverted, setTargetWorldsInverted] = useState(false);
 
   // Collapse states
   const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
-  const [triggerConditionsExpanded, setTriggerConditionsExpanded] = useState(true);
-  const [participationMailExpanded, setParticipationMailExpanded] = useState(true);
+  const [triggerConditionsExpanded, setTriggerConditionsExpanded] =
+    useState(true);
+  const [participationMailExpanded, setParticipationMailExpanded] =
+    useState(true);
   const [rewardsExpanded, setRewardsExpanded] = useState(true);
   const [targetingExpanded, setTargetingExpanded] = useState(true);
 
@@ -134,7 +144,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setRewardMailTitle(survey.rewardMailTitle || '');
       setRewardMailContent(survey.rewardMailContent || '');
       setIsActive(Boolean(survey.isActive));
-      setTargetPlatforms(Array.isArray(survey.targetPlatforms) ? survey.targetPlatforms : []);
+      setTargetPlatforms(
+        Array.isArray(survey.targetPlatforms) ? survey.targetPlatforms : []
+      );
       setTargetPlatformsInverted(survey.targetPlatformsInverted || false);
 
       // Convert targetChannels and targetSubchannels to targetChannelSubchannels format
@@ -166,8 +178,12 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       }
 
       setTargetChannelSubchannels(targetChannelSubchannels);
-      setTargetChannelSubchannelsInverted(survey.targetChannelSubchannelsInverted || false);
-      setTargetWorlds(Array.isArray(survey.targetWorlds) ? survey.targetWorlds : []);
+      setTargetChannelSubchannelsInverted(
+        survey.targetChannelSubchannelsInverted || false
+      );
+      setTargetWorlds(
+        Array.isArray(survey.targetWorlds) ? survey.targetWorlds : []
+      );
       setTargetWorldsInverted(survey.targetWorldsInverted || false);
     } else {
       // Reset form
@@ -219,16 +235,20 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         type: c.type,
         value: c.value,
       })),
-      participationRewards: rewardMode === 'direct' ? participationRewards : null,
+      participationRewards:
+        rewardMode === 'direct' ? participationRewards : null,
       rewardTemplateId: rewardMode === 'template' ? rewardTemplateId : null,
       rewardMailTitle: rewardMailTitle.trim() || '',
       rewardMailContent: rewardMailContent.trim() || '',
       isActive: !!isActive,
-      targetPlatforms: targetPlatforms.length > 0 ? [...targetPlatforms].sort() : null,
+      targetPlatforms:
+        targetPlatforms.length > 0 ? [...targetPlatforms].sort() : null,
       targetPlatformsInverted,
-      targetChannels: currentChannels.length > 0 ? [...currentChannels].sort() : null,
+      targetChannels:
+        currentChannels.length > 0 ? [...currentChannels].sort() : null,
       targetChannelsInverted: targetChannelSubchannelsInverted,
-      targetSubchannels: currentSubchannels.length > 0 ? [...currentSubchannels].sort() : null,
+      targetSubchannels:
+        currentSubchannels.length > 0 ? [...currentSubchannels].sort() : null,
       targetSubchannelsInverted: targetChannelSubchannelsInverted,
       targetWorlds: targetWorlds.length > 0 ? [...targetWorlds].sort() : null,
       targetWorldsInverted: targetWorldsInverted,
@@ -242,13 +262,17 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         type: c.type,
         value: c.value,
       })),
-      participationRewards: survey.rewardTemplateId ? null : survey.participationRewards || [],
+      participationRewards: survey.rewardTemplateId
+        ? null
+        : survey.participationRewards || [],
       rewardTemplateId: survey.rewardTemplateId || null,
       rewardMailTitle: survey.rewardMailTitle?.trim() || '',
       rewardMailContent: survey.rewardMailContent?.trim() || '',
       isActive: !!survey.isActive,
       targetPlatforms:
-        (survey.targetPlatforms || []).length > 0 ? [...survey.targetPlatforms].sort() : null,
+        (survey.targetPlatforms || []).length > 0
+          ? [...survey.targetPlatforms].sort()
+          : null,
       targetPlatformsInverted: survey.targetPlatformsInverted || false,
       targetChannels:
         ((survey as any).targetChannels || []).length > 0
@@ -259,8 +283,12 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         ((survey as any).targetSubchannels || []).length > 0
           ? [...(survey as any).targetSubchannels].sort()
           : null,
-      targetSubchannelsInverted: survey.targetChannelSubchannelsInverted || false,
-      targetWorlds: (survey.targetWorlds || []).length > 0 ? [...survey.targetWorlds].sort() : null,
+      targetSubchannelsInverted:
+        survey.targetChannelSubchannelsInverted || false,
+      targetWorlds:
+        (survey.targetWorlds || []).length > 0
+          ? [...survey.targetWorlds].sort()
+          : null,
       targetWorldsInverted: survey.targetWorldsInverted || false,
     };
 
@@ -286,7 +314,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   ]);
 
   // Get available condition types (exclude already used types)
-  const getAvailableConditionTypes = (currentIndex: number): ('userLevel' | 'joinDays')[] => {
+  const getAvailableConditionTypes = (
+    currentIndex: number
+  ): ('userLevel' | 'joinDays')[] => {
     const usedTypes = triggerConditions
       .map((c, idx) => (idx !== currentIndex ? c.type : null))
       .filter(Boolean) as ('userLevel' | 'joinDays')[];
@@ -314,7 +344,10 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
     const usedTypes = new Set(triggerConditions.map((c) => c.type));
     const availableType = usedTypes.has('userLevel') ? 'joinDays' : 'userLevel';
 
-    setTriggerConditions([...triggerConditions, { type: availableType, value: 1 }]);
+    setTriggerConditions([
+      ...triggerConditions,
+      { type: availableType, value: 1 },
+    ]);
   };
 
   const handleRemoveTriggerCondition = (index: number) => {
@@ -332,7 +365,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   ) => {
     // If changing type, check if the new type is already used
     if (field === 'type') {
-      const isTypeUsed = triggerConditions.some((c, idx) => idx !== index && c.type === value);
+      const isTypeUsed = triggerConditions.some(
+        (c, idx) => idx !== index && c.type === value
+      );
       if (isTypeUsed) {
         enqueueSnackbar(t('surveys.conditionTypeAlreadyUsed'), {
           variant: 'warning',
@@ -392,9 +427,12 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           return;
         }
         if (!reward.quantity || reward.quantity <= 0) {
-          enqueueSnackbar(t('surveys.rewardQuantityRequired', { index: i + 1 }), {
-            variant: 'error',
-          });
+          enqueueSnackbar(
+            t('surveys.rewardQuantityRequired', { index: i + 1 }),
+            {
+              variant: 'error',
+            }
+          );
           return;
         }
       }
@@ -426,7 +464,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         surveyTitle: surveyTitle.trim(),
         surveyContent: surveyContent.trim() || undefined,
         triggerConditions,
-        participationRewards: rewardMode === 'direct' ? participationRewards : null,
+        participationRewards:
+          rewardMode === 'direct' ? participationRewards : null,
         rewardTemplateId: rewardMode === 'template' ? rewardTemplateId : null,
         rewardMailTitle: rewardMailTitle.trim() || undefined,
         rewardMailContent: rewardMailContent.trim() || undefined,
@@ -435,23 +474,36 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         targetPlatformsInverted: targetPlatformsInverted,
         targetChannels: targetChannels.length > 0 ? targetChannels : null,
         targetChannelsInverted: targetChannelSubchannelsInverted,
-        targetSubchannels: targetSubchannels.length > 0 ? targetSubchannels : null,
+        targetSubchannels:
+          targetSubchannels.length > 0 ? targetSubchannels : null,
         targetSubchannelsInverted: targetChannelSubchannelsInverted,
         targetWorlds: targetWorlds.length > 0 ? targetWorlds : null,
         targetWorldsInverted: targetWorldsInverted,
       };
 
       if (survey) {
-        const result = await surveyService.updateSurvey(projectApiPath, survey.id, data);
+        const result = await surveyService.updateSurvey(
+          projectApiPath,
+          survey.id,
+          data
+        );
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           enqueueSnackbar(t('surveys.updateSuccess'), { variant: 'success' });
         }
       } else {
         const result = await surveyService.createSurvey(projectApiPath, data);
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           enqueueSnackbar(t('surveys.createSuccess'), { variant: 'success' });
         }
@@ -460,7 +512,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Failed to save survey:', error);
-      const fallbackKey = requiresApproval ? 'surveys.requestSaveFailed' : 'surveys.saveFailed';
+      const fallbackKey = requiresApproval
+        ? 'surveys.requestSaveFailed'
+        : 'surveys.saveFailed';
       handleApiError(error, fallbackKey);
     } finally {
       setSubmitting(false);
@@ -521,7 +575,10 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           <Box>
             <FormControlLabel
               control={
-                <Switch checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+                <Switch
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
+                />
               }
               label={t('surveys.isActive')}
             />
@@ -603,14 +660,20 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                 mb: triggerConditionsExpanded ? 1 : 0,
                 cursor: 'pointer',
               }}
-              onClick={() => setTriggerConditionsExpanded(!triggerConditionsExpanded)}
+              onClick={() =>
+                setTriggerConditionsExpanded(!triggerConditionsExpanded)
+              }
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                   {t('surveys.triggerConditions')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                  {triggerConditionsExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  {triggerConditionsExpanded ? (
+                    <ExpandLessIcon />
+                  ) : (
+                    <ExpandMoreIcon />
+                  )}
                 </IconButton>
               </Box>
               {triggerConditionsExpanded && (
@@ -628,7 +691,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               )}
             </Box>
             <Collapse in={triggerConditionsExpanded}>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', mb: 2 }}
+              >
                 {t('surveys.triggerConditionsHelp')}
               </Typography>
               {triggerConditions.map((condition, index) => {
@@ -641,7 +708,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                         <Select
                           value={condition.type}
                           onChange={(e) =>
-                            handleTriggerConditionChange(index, 'type', e.target.value)
+                            handleTriggerConditionChange(
+                              index,
+                              'type',
+                              e.target.value
+                            )
                           }
                           label={t('surveys.conditionType')}
                         >
@@ -667,7 +738,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                           handleTriggerConditionChange(
                             index,
                             'value',
-                            e.target.value === '' ? '' : parseInt(e.target.value) || 0
+                            e.target.value === ''
+                              ? ''
+                              : parseInt(e.target.value) || 0
                           )
                         }
                         sx={{
@@ -723,17 +796,27 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                 mb: participationMailExpanded ? 1 : 0,
                 cursor: 'pointer',
               }}
-              onClick={() => setParticipationMailExpanded(!participationMailExpanded)}
+              onClick={() =>
+                setParticipationMailExpanded(!participationMailExpanded)
+              }
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                 {t('surveys.participationMail')}
               </Typography>
               <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                {participationMailExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                {participationMailExpanded ? (
+                  <ExpandLessIcon />
+                ) : (
+                  <ExpandMoreIcon />
+                )}
               </IconButton>
             </Box>
             <Collapse in={participationMailExpanded}>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', mb: 2 }}
+              >
                 {t('surveys.participationMailHelp')}
               </Typography>
               <Stack spacing={2}>
@@ -779,7 +862,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               </IconButton>
             </Box>
             <Collapse in={rewardsExpanded}>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', mb: 2 }}
+              >
                 {t('surveys.rewardsHelp')}
               </Typography>
               <Stack spacing={2}>

@@ -129,7 +129,13 @@ export class SignalEndpointModel {
       const allTokens =
         endpointIds.length > 0
           ? await db(this.TOKENS_TABLE)
-              .select('id', 'signalEndpointId', 'tokenName', 'createdBy', 'createdAt')
+              .select(
+                'id',
+                'signalEndpointId',
+                'tokenName',
+                'createdBy',
+                'createdAt'
+              )
               .whereIn('signalEndpointId', endpointIds)
               .orderBy('createdAt', 'desc')
           : [];
@@ -150,11 +156,18 @@ export class SignalEndpointModel {
     }
   }
 
-  static async update(id: string, data: UpdateSignalEndpointData): Promise<SignalEndpoint | null> {
+  static async update(
+    id: string,
+    data: UpdateSignalEndpointData
+  ): Promise<SignalEndpoint | null> {
     try {
-      const updateData: any = { updatedBy: data.updatedBy, updatedAt: db.fn.now() };
+      const updateData: any = {
+        updatedBy: data.updatedBy,
+        updatedAt: db.fn.now(),
+      };
       if (data.name !== undefined) updateData.name = data.name;
-      if (data.description !== undefined) updateData.description = data.description;
+      if (data.description !== undefined)
+        updateData.description = data.description;
       if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
 
       await db(this.TABLE).where('id', id).update(updateData);
@@ -175,9 +188,15 @@ export class SignalEndpointModel {
     }
   }
 
-  static async toggleEnabled(id: string, updatedBy: string): Promise<SignalEndpoint | null> {
+  static async toggleEnabled(
+    id: string,
+    updatedBy: string
+  ): Promise<SignalEndpoint | null> {
     try {
-      const endpoint = await db(this.TABLE).select('isEnabled').where('id', id).first();
+      const endpoint = await db(this.TABLE)
+        .select('isEnabled')
+        .where('id', id)
+        .first();
       if (!endpoint) return null;
 
       await db(this.TABLE).where('id', id).update({
@@ -247,7 +266,9 @@ export class SignalEndpointModel {
     tokenHash: string
   ): Promise<{ endpointId: string; tokenId: string } | null> {
     try {
-      const token = await db(this.TOKENS_TABLE).where('tokenHash', tokenHash).first();
+      const token = await db(this.TOKENS_TABLE)
+        .where('tokenHash', tokenHash)
+        .first();
 
       if (!token) return null;
 
@@ -335,7 +356,9 @@ export class SignalEndpointModel {
 
   static async markSignalProcessed(signalId: string): Promise<void> {
     try {
-      await db(this.SIGNALS_TABLE).where('id', signalId).update({ isProcessed: true });
+      await db(this.SIGNALS_TABLE)
+        .where('id', signalId)
+        .update({ isProcessed: true });
     } catch (error) {
       logger.error('Error marking signal as processed:', error);
       throw error;

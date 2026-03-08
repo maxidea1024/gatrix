@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -125,9 +131,19 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
+  column,
+  onToggleVisibility,
+}) => {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: column.id,
   });
 
@@ -157,7 +173,11 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
         </Box>
       }
     >
-      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -167,7 +187,10 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
       </ListItemButton>
     </ListItem>
   );
@@ -187,7 +210,11 @@ const MessageTemplatesPage: React.FC = () => {
   const loadStartTimeRef = useRef<number>(0);
   // Copy helper with type/label for proper i18n interpolation
   // includeValue=false -> use short toast without the copied value
-  const copyWithToast = (value: string, _typeLabel?: string, _includeValue: boolean = true) => {
+  const copyWithToast = (
+    value: string,
+    _typeLabel?: string,
+    _includeValue: boolean = true
+  ) => {
     const onSuccess = () => {
       enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
     };
@@ -232,7 +259,8 @@ const MessageTemplatesPage: React.FC = () => {
   }, [activeFilters]);
 
   const tagIds = useMemo(
-    () => (activeFilters.find((f) => f.key === 'tags')?.value as number[]) || [],
+    () =>
+      (activeFilters.find((f) => f.key === 'tags')?.value as number[]) || [],
     [activeFilters]
   );
 
@@ -260,12 +288,15 @@ const MessageTemplatesPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<MessageTemplate | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingTemplate, setDeletingTemplate] = useState<MessageTemplate | null>(null);
+  const [deletingTemplate, setDeletingTemplate] =
+    useState<MessageTemplate | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
   // Action menu state
-  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [actionMenuTarget, setActionMenuTarget] = useState<MessageTemplate | null>(null);
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] =
+    useState<null | HTMLElement>(null);
+  const [actionMenuTarget, setActionMenuTarget] =
+    useState<MessageTemplate | null>(null);
 
   const handleActionMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -283,12 +314,12 @@ const MessageTemplatesPage: React.FC = () => {
   // 태그 관련 Status
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
-  const [selectedTemplateForTags, setSelectedTemplateForTags] = useState<MessageTemplate | null>(
-    null
-  );
+  const [selectedTemplateForTags, setSelectedTemplateForTags] =
+    useState<MessageTemplate | null>(null);
   const [templateTags, setTemplateTags] = useState<Tag[]>([]);
 
-  const [fullEditingData, setFullEditingData] = useState<MessageTemplate | null>(null);
+  const [fullEditingData, setFullEditingData] =
+    useState<MessageTemplate | null>(null);
   const [form, setForm] = useState<MessageTemplate>({
     name: '',
     type: 'maintenance',
@@ -361,7 +392,8 @@ const MessageTemplatesPage: React.FC = () => {
     return defaultColumns;
   });
 
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLButtonElement | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -398,9 +430,12 @@ const MessageTemplatesPage: React.FC = () => {
       setItems(result.templates);
       setTotal(result.total);
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'messageTemplates.loadFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'messageTemplates.loadFailed'),
+        {
+          variant: 'error',
+        }
+      );
       setItems([]);
       setTotal(0);
     } finally {
@@ -477,12 +512,19 @@ const MessageTemplatesPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters(activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f)));
+    setActiveFilters(
+      activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f))
+    );
     setPage(0);
   };
 
-  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
-    setActiveFilters(activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f)));
+  const handleOperatorChange = (
+    filterKey: string,
+    operator: 'any_of' | 'include_all'
+  ) => {
+    setActiveFilters(
+      activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f))
+    );
   };
 
   // 페이지 변경 핸들러
@@ -491,11 +533,14 @@ const MessageTemplatesPage: React.FC = () => {
   }, []);
 
   // 페이지 크기 변경 핸들러
-  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newRowsPerPage = parseInt(event.target.value, 10);
-    setRowsPerPage(newRowsPerPage);
-    setPage(0);
-  }, []);
+  const handleRowsPerPageChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newRowsPerPage = parseInt(event.target.value, 10);
+      setRowsPerPage(newRowsPerPage);
+      setPage(0);
+    },
+    []
+  );
 
   // 선택 관련 핸들러
   const handleSelectAll = useCallback(
@@ -513,11 +558,17 @@ const MessageTemplatesPage: React.FC = () => {
   const handleSelectItem = useCallback(
     (id: number, checked: boolean) => {
       setSelectedIds((prev) => {
-        const newIds = checked ? [...prev, id] : prev.filter((selectedId) => selectedId !== id);
+        const newIds = checked
+          ? [...prev, id]
+          : prev.filter((selectedId) => selectedId !== id);
 
         // 전체 선택 Update state
-        const availableIds = items.filter((item) => item.id).map((item) => item.id!);
-        setSelectAll(newIds.length === availableIds.length && availableIds.length > 0);
+        const availableIds = items
+          .filter((item) => item.id)
+          .map((item) => item.id!);
+        setSelectAll(
+          newIds.length === availableIds.length && availableIds.length > 0
+        );
 
         return newIds;
       });
@@ -534,18 +585,24 @@ const MessageTemplatesPage: React.FC = () => {
   const confirmBulkDelete = useCallback(async () => {
     try {
       await messageTemplateService.bulkDelete(projectApiPath, selectedIds);
-      enqueueSnackbar(t('messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }), {
-        variant: 'success',
-      });
+      enqueueSnackbar(
+        t('messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }),
+        {
+          variant: 'success',
+        }
+      );
       setSelectedIds([]);
       setSelectAll(false);
       setBulkDeleteDialogOpen(false);
       load();
     } catch (error: any) {
       console.error('Error bulk deleting templates:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'messageTemplates.bulkDeleteFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'messageTemplates.bulkDeleteFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   }, [selectedIds, t, enqueueSnackbar, load]);
 
@@ -579,9 +636,12 @@ const MessageTemplatesPage: React.FC = () => {
         load();
       } catch (error: any) {
         console.error('Error bulk updating templates:', error);
-        enqueueSnackbar(parseApiErrorMessage(error, 'messageTemplates.bulkUpdateFailed'), {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          parseApiErrorMessage(error, 'messageTemplates.bulkUpdateFailed'),
+          {
+            variant: 'error',
+          }
+        );
       }
     },
     [selectedIds, items, t, enqueueSnackbar, load]
@@ -646,7 +706,10 @@ const MessageTemplatesPage: React.FC = () => {
     async (template: MessageTemplate) => {
       try {
         setSelectedTemplateForTags(template);
-        const tags = await messageTemplateService.getTags(projectApiPath, template.id!);
+        const tags = await messageTemplateService.getTags(
+          projectApiPath,
+          template.id!
+        );
         setTemplateTags(tags);
         setTagDialogOpen(true);
       } catch (error) {
@@ -662,7 +725,11 @@ const MessageTemplatesPage: React.FC = () => {
       if (!selectedTemplateForTags?.id) return;
 
       try {
-        await messageTemplateService.setTags(projectApiPath, selectedTemplateForTags.id, tagIds);
+        await messageTemplateService.setTags(
+          projectApiPath,
+          selectedTemplateForTags.id,
+          tagIds
+        );
         setTagDialogOpen(false);
         enqueueSnackbar(t('common.success'), { variant: 'success' });
         // 필요시 목록 Refresh
@@ -702,12 +769,22 @@ const MessageTemplatesPage: React.FC = () => {
       let templateId: number;
 
       if (editing?.id) {
-        await messageTemplateService.update(projectApiPath, editing.id, payload);
+        await messageTemplateService.update(
+          projectApiPath,
+          editing.id,
+          payload
+        );
         templateId = editing.id;
         enqueueSnackbar(t('common.updateSuccess'), { variant: 'success' });
       } else {
-        const created = await messageTemplateService.create(projectApiPath, payload);
-        templateId = created?.id || (created as any)?.data?.id || (created as any)?.insertId;
+        const created = await messageTemplateService.create(
+          projectApiPath,
+          payload
+        );
+        templateId =
+          created?.id ||
+          (created as any)?.data?.id ||
+          (created as any)?.insertId;
 
         if (!templateId) {
           throw new Error(t('common.cannotGetTemplateId'));
@@ -738,9 +815,12 @@ const MessageTemplatesPage: React.FC = () => {
 
       if (status === 409 && errorData?.code === 'DUPLICATE_NAME') {
         const templateName = errorData?.value || form.name;
-        enqueueSnackbar(t('common.duplicateNameErrorWithValue', { name: templateName }), {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          t('common.duplicateNameErrorWithValue', { name: templateName }),
+          {
+            variant: 'error',
+          }
+        );
       } else {
         enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
           variant: 'error',
@@ -762,7 +842,10 @@ const MessageTemplatesPage: React.FC = () => {
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem('messageTemplatesColumns', JSON.stringify(defaultColumns));
+    localStorage.setItem(
+      'messageTemplatesColumns',
+      JSON.stringify(defaultColumns)
+    );
   };
 
   const handleColumnDragEnd = (event: DragEndEvent) => {
@@ -772,7 +855,10 @@ const MessageTemplatesPage: React.FC = () => {
       const newIndex = columns.findIndex((col) => col.id === over.id);
       const newColumns = arrayMove(columns, oldIndex, newIndex);
       setColumns(newColumns);
-      localStorage.setItem('messageTemplatesColumns', JSON.stringify(newColumns));
+      localStorage.setItem(
+        'messageTemplatesColumns',
+        JSON.stringify(newColumns)
+      );
     }
   };
 
@@ -798,7 +884,13 @@ const MessageTemplatesPage: React.FC = () => {
             <Tooltip title={t('common.copy')}>
               <IconButton
                 size="small"
-                onClick={() => copyWithToast(template.name, t('messageTemplates.name'), false)}
+                onClick={() =>
+                  copyWithToast(
+                    template.name,
+                    t('messageTemplates.name'),
+                    false
+                  )
+                }
               >
                 <ContentCopyIcon fontSize="small" />
               </IconButton>
@@ -831,7 +923,9 @@ const MessageTemplatesPage: React.FC = () => {
       case 'isEnabled':
         return (
           <Chip
-            label={template.isEnabled ? t('common.enabled') : t('common.disabled')}
+            label={
+              template.isEnabled ? t('common.enabled') : t('common.disabled')
+            }
             size="small"
             color={template.isEnabled ? 'success' : 'default'}
           />
@@ -856,7 +950,11 @@ const MessageTemplatesPage: React.FC = () => {
           </Box>
         );
       case 'createdAt':
-        return <Typography variant="body2">{formatRelativeTime(template.createdAt)}</Typography>;
+        return (
+          <Typography variant="body2">
+            {formatRelativeTime(template.createdAt)}
+          </Typography>
+        );
       default:
         return null;
     }
@@ -885,7 +983,11 @@ const MessageTemplatesPage: React.FC = () => {
             </Box>
           </Box>
           {canManage && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAdd}
+            >
               {t('messageTemplates.addTemplate')}
             </Button>
           )}
@@ -954,7 +1056,9 @@ const MessageTemplatesPage: React.FC = () => {
                   input: {
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                        <SearchIcon
+                          sx={{ color: 'text.secondary', fontSize: 20 }}
+                        />
                       </InputAdornment>
                     ),
                   },
@@ -1019,7 +1123,11 @@ const MessageTemplatesPage: React.FC = () => {
                 justifyContent: 'space-between',
               }}
             >
-              <Typography variant="body2" color="primary" sx={{ fontWeight: 500 }}>
+              <Typography
+                variant="body2"
+                color="primary"
+                sx={{ fontWeight: 500 }}
+              >
                 {t('messageTemplates.selectedCount', {
                   count: selectedIds.length,
                 })}
@@ -1083,7 +1191,8 @@ const MessageTemplatesPage: React.FC = () => {
                             checked={selectAll}
                             indeterminate={
                               selectedIds.length > 0 &&
-                              selectedIds.length < items.filter((item) => item.id).length
+                              selectedIds.length <
+                                items.filter((item) => item.id).length
                             }
                             onChange={(e) => handleSelectAll(e.target.checked)}
                           />
@@ -1097,7 +1206,10 @@ const MessageTemplatesPage: React.FC = () => {
                           </TableCell>
                         ))}
                       {canManage && (
-                        <TableCell align="right" sx={{ width: 100, minWidth: 100 }}>
+                        <TableCell
+                          align="right"
+                          sx={{ width: 100, minWidth: 100 }}
+                        >
                           {t('common.actions')}
                         </TableCell>
                       )}
@@ -1110,7 +1222,9 @@ const MessageTemplatesPage: React.FC = () => {
                           <TableCell padding="checkbox">
                             <Checkbox
                               checked={selectedIds.includes(row.id!)}
-                              onChange={(e) => handleSelectItem(row.id!, e.target.checked)}
+                              onChange={(e) =>
+                                handleSelectItem(row.id!, e.target.checked)
+                              }
                               disabled={!row.id}
                             />
                           </TableCell>
@@ -1124,7 +1238,10 @@ const MessageTemplatesPage: React.FC = () => {
                           ))}
                         {canManage && (
                           <TableCell align="right">
-                            <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, row)}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleActionMenuOpen(e, row)}
+                            >
                               <MoreVertIcon fontSize="small" />
                             </IconButton>
                           </TableCell>
@@ -1179,9 +1296,15 @@ const MessageTemplatesPage: React.FC = () => {
       <ResizableDrawer
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        title={editing ? t('messageTemplates.editTitle') : t('messageTemplates.addTitle')}
+        title={
+          editing
+            ? t('messageTemplates.editTitle')
+            : t('messageTemplates.addTitle')
+        }
         subtitle={
-          editing ? t('messageTemplates.editDescription') : t('messageTemplates.addDescription')
+          editing
+            ? t('messageTemplates.editDescription')
+            : t('messageTemplates.addDescription')
         }
         storageKey="messageTemplateFormDrawerWidth"
         defaultWidth={600}
@@ -1200,7 +1323,9 @@ const MessageTemplatesPage: React.FC = () => {
             <TextField
               label={t('common.name')}
               value={form.name}
-              onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, name: e.target.value }))
+              }
               fullWidth
               required
               inputRef={nameFieldRef}
@@ -1226,7 +1351,9 @@ const MessageTemplatesPage: React.FC = () => {
                 setForm((prev) => ({ ...prev, defaultMessage: message }))
               }
               defaultMessageLabel={t('messageTemplates.defaultMessage')}
-              defaultMessageHelperText={t('messageTemplates.defaultMessageHelp')}
+              defaultMessageHelperText={t(
+                'messageTemplates.defaultMessageHelp'
+              )}
               defaultMessageRequired={true}
               defaultMessageError={false}
               supportsMultiLanguage={form.supportsMultiLanguage || false}
@@ -1236,8 +1363,12 @@ const MessageTemplatesPage: React.FC = () => {
                   supportsMultiLanguage: supports,
                 }))
               }
-              supportsMultiLanguageLabel={t('messageTemplates.supportsMultiLanguage')}
-              supportsMultiLanguageHelperText={t('messageTemplates.supportsMultiLanguageHelp')}
+              supportsMultiLanguageLabel={t(
+                'messageTemplates.supportsMultiLanguage'
+              )}
+              supportsMultiLanguageHelperText={t(
+                'messageTemplates.supportsMultiLanguageHelp'
+              )}
               locales={(form.locales || []).map((l) => ({
                 lang: l.lang as 'ko' | 'en' | 'zh',
                 message: l.message,
@@ -1258,7 +1389,9 @@ const MessageTemplatesPage: React.FC = () => {
                   setForm((prev) => ({ ...prev, supportsMultiLanguage: true }));
                 }
               }}
-              languageSpecificMessagesLabel={t('messageTemplates.languageSpecificMessages')}
+              languageSpecificMessagesLabel={t(
+                'messageTemplates.languageSpecificMessages'
+              )}
               enableTranslation={true}
               translateButtonLabel={t('common.autoTranslate')}
               translateTooltip={t('maintenance.translateTooltip')}
@@ -1273,7 +1406,9 @@ const MessageTemplatesPage: React.FC = () => {
                 const selectedIds = Array.isArray(e.target.value)
                   ? e.target.value
                   : [e.target.value];
-                const selectedTags = allTags.filter((tag) => selectedIds.includes(String(tag.id)));
+                const selectedTags = allTags.filter((tag) =>
+                  selectedIds.includes(String(tag.id))
+                );
                 setForm((prev) => ({ ...prev, tags: selectedTags }));
               }}
               SelectProps={{
@@ -1426,7 +1561,10 @@ const MessageTemplatesPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setBulkDeleteDialogOpen(false)} variant="outlined">
+          <Button
+            onClick={() => setBulkDeleteDialogOpen(false)}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -1441,7 +1579,12 @@ const MessageTemplatesPage: React.FC = () => {
       </ResizableDrawer>
 
       {/* 태그 관리 Dialog */}
-      <Dialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={tagDialogOpen}
+        onClose={() => setTagDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
           {t('common.tags')} - {selectedTemplateForTags?.name}
         </DialogTitle>
@@ -1455,7 +1598,9 @@ const MessageTemplatesPage: React.FC = () => {
                 const selectedIds = Array.isArray(e.target.value)
                   ? e.target.value
                   : [e.target.value];
-                const selectedTags = allTags.filter((tag) => selectedIds.includes(String(tag.id)));
+                const selectedTags = allTags.filter((tag) =>
+                  selectedIds.includes(String(tag.id))
+                );
                 setTemplateTags(selectedTags);
               }}
               SelectProps={{
@@ -1499,7 +1644,9 @@ const MessageTemplatesPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setTagDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setTagDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button
             onClick={() => handleSaveTags(templateTags.map((tag) => tag.id))}
             variant="contained"

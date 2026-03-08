@@ -10,7 +10,10 @@ import {
   Fade,
   useTheme,
 } from '@mui/material';
-import { HelpOutline as HelpIcon, Close as CloseIcon } from '@mui/icons-material';
+import {
+  HelpOutline as HelpIcon,
+  Close as CloseIcon,
+} from '@mui/icons-material';
 
 interface HelpTipProps {
   title: string;
@@ -22,7 +25,11 @@ interface HelpTipProps {
  * HelpTip component - displays a help icon that shows a popover with detailed help content
  * Uses Popper + ClickAwayListener instead of Popover to avoid backdrop
  */
-const HelpTip: React.FC<HelpTipProps> = ({ title, children, iconSize = 'small' }) => {
+const HelpTip: React.FC<HelpTipProps> = ({
+  title,
+  children,
+  iconSize = 'small',
+}) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -81,7 +88,11 @@ const HelpTip: React.FC<HelpTipProps> = ({ title, children, iconSize = 'small' }
                     <Typography variant="subtitle1" fontWeight={600}>
                       {title}
                     </Typography>
-                    <IconButton size="small" onClick={handleClose} sx={{ ml: 1 }}>
+                    <IconButton
+                      size="small"
+                      onClick={handleClose}
+                      sx={{ ml: 1 }}
+                    >
                       <CloseIcon fontSize="small" />
                     </IconButton>
                   </Box>

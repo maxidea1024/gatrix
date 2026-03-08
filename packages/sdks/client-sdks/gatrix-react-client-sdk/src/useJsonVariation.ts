@@ -19,7 +19,11 @@
 import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
 
-export function useJsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime = true): T {
+export function useJsonVariation<T>(
+  flagName: string,
+  fallbackValue: T,
+  forceRealtime = true
+): T {
   const { features } = useGatrixContext();
   const [value, setValue] = useState<T>(() =>
     features.jsonVariation<T>(flagName, fallbackValue, forceRealtime)
@@ -31,7 +35,9 @@ export function useJsonVariation<T>(flagName: string, fallbackValue: T, forceRea
       : features.watchSyncedFlagWithInitialState.bind(features);
 
     return watchFn(flagName, () => {
-      setValue(features.jsonVariation<T>(flagName, fallbackValue, forceRealtime));
+      setValue(
+        features.jsonVariation<T>(flagName, fallbackValue, forceRealtime)
+      );
     });
   }, [features, flagName, fallbackValue, forceRealtime]);
 

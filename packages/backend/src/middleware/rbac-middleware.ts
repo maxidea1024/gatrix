@@ -20,7 +20,11 @@ const logger = createLogger('rbacMiddleware');
  * Uses req.user.orgId from the authenticated user.
  */
 export const requireOrgPermission = (perm: string) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       if (!req.user) {
         next(new GatrixError('Authentication required', 401));
@@ -33,9 +37,18 @@ export const requireOrgPermission = (perm: string) => {
         return;
       }
 
-      const allowed = await permissionService.hasOrgPermission(userId, orgId, perm);
+      const allowed = await permissionService.hasOrgPermission(
+        userId,
+        orgId,
+        perm
+      );
       if (!allowed) {
-        logger.warn('Org permission denied', { userId, orgId, perm, path: req.path });
+        logger.warn('Org permission denied', {
+          userId,
+          orgId,
+          perm,
+          path: req.path,
+        });
         next(new GatrixError('Insufficient permissions', 403));
         return;
       }
@@ -54,7 +67,11 @@ export const requireOrgPermission = (perm: string) => {
  * Auto-resolves orgId from the project if not on req.user.
  */
 export const requireProjectPermission = (perm: string) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       if (!req.user) {
         next(new GatrixError('Authentication required', 401));
@@ -79,7 +96,12 @@ export const requireProjectPermission = (perm: string) => {
       // Set projectId on request for downstream use
       req.projectId = projectId;
 
-      const allowed = await permissionService.hasProjectPermission(userId, orgId, projectId, perm);
+      const allowed = await permissionService.hasProjectPermission(
+        userId,
+        orgId,
+        projectId,
+        perm
+      );
       if (!allowed) {
         logger.warn('Project permission denied', {
           userId,
@@ -106,7 +128,11 @@ export const requireProjectPermission = (perm: string) => {
  * Auto-resolves the full chain: environment -> project -> organisation
  */
 export const requireEnvPermission = (perm: string) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       if (!req.user) {
         next(new GatrixError('Authentication required', 401));
@@ -125,7 +151,8 @@ export const requireEnvPermission = (perm: string) => {
       }
 
       // Resolve full chain: environment -> project -> org
-      const chain = await permissionService.resolveEnvironmentChain(environmentId);
+      const chain =
+        await permissionService.resolveEnvironmentChain(environmentId);
       if (!chain) {
         next(new GatrixError('Environment not found', 404));
         return;
@@ -133,7 +160,9 @@ export const requireEnvPermission = (perm: string) => {
 
       // Verify the environment belongs to user's org
       if (chain.orgId !== orgId) {
-        next(new GatrixError('Environment not found in your organisation', 404));
+        next(
+          new GatrixError('Environment not found in your organisation', 404)
+        );
         return;
       }
 

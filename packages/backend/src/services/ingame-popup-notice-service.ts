@@ -1,7 +1,10 @@
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { generateULID } from '../utils/ulid';
 import database from '../config/database';
-import { convertFromMySQLDateTime, convertToMySQLDateTime } from '../utils/date-utils';
+import {
+  convertFromMySQLDateTime,
+  convertToMySQLDateTime,
+} from '../utils/date-utils';
 import { pubSubService } from './pub-sub-service';
 
 export interface IngamePopupNotice {
@@ -127,7 +130,9 @@ class IngamePopupNoticeService {
     }
 
     if (filters.platform) {
-      const platforms = Array.isArray(filters.platform) ? filters.platform : [filters.platform];
+      const platforms = Array.isArray(filters.platform)
+        ? filters.platform
+        : [filters.platform];
       const operator = filters.platformOperator || 'any_of';
 
       if (operator === 'include_all') {
@@ -138,7 +143,9 @@ class IngamePopupNoticeService {
         whereClauses.push(
           `(targetPlatforms IS NULL OR JSON_LENGTH(targetPlatforms) = 0 OR (${platformChecks}))`
         );
-        platforms.forEach((platform) => queryParams.push(JSON.stringify(platform)));
+        platforms.forEach((platform) =>
+          queryParams.push(JSON.stringify(platform))
+        );
       } else {
         // Any of the specified platforms (default) OR be empty/null (all platforms)
         const platformChecks = platforms
@@ -147,7 +154,9 @@ class IngamePopupNoticeService {
         whereClauses.push(
           `(targetPlatforms IS NULL OR JSON_LENGTH(targetPlatforms) = 0 OR (${platformChecks}))`
         );
-        platforms.forEach((platform) => queryParams.push(JSON.stringify(platform)));
+        platforms.forEach((platform) =>
+          queryParams.push(JSON.stringify(platform))
+        );
       }
     }
 
@@ -171,7 +180,8 @@ class IngamePopupNoticeService {
       queryParams.push(searchPattern, searchPattern);
     }
 
-    const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+    const whereClause =
+      whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
 
     // Get total count
     const [countRows] = await pool.execute<RowDataPacket[]>(
@@ -257,7 +267,10 @@ class IngamePopupNoticeService {
       ]
     );
 
-    const notice = await this.getIngamePopupNoticeById(generatedId, environmentId);
+    const notice = await this.getIngamePopupNoticeById(
+      generatedId,
+      environmentId
+    );
     if (!notice) {
       throw new Error('Failed to create ingame popup notice');
     }
@@ -314,7 +327,9 @@ class IngamePopupNoticeService {
 
     if (data.targetPlatforms !== undefined) {
       updates.push('targetPlatforms = ?');
-      values.push(data.targetPlatforms ? JSON.stringify(data.targetPlatforms) : null);
+      values.push(
+        data.targetPlatforms ? JSON.stringify(data.targetPlatforms) : null
+      );
     }
 
     if (data.targetPlatformsInverted !== undefined) {
@@ -324,7 +339,9 @@ class IngamePopupNoticeService {
 
     if (data.targetChannels !== undefined) {
       updates.push('targetChannels = ?');
-      values.push(data.targetChannels ? JSON.stringify(data.targetChannels) : null);
+      values.push(
+        data.targetChannels ? JSON.stringify(data.targetChannels) : null
+      );
     }
 
     if (data.targetChannelsInverted !== undefined) {
@@ -334,7 +351,9 @@ class IngamePopupNoticeService {
 
     if (data.targetSubchannels !== undefined) {
       updates.push('targetSubchannels = ?');
-      values.push(data.targetSubchannels ? JSON.stringify(data.targetSubchannels) : null);
+      values.push(
+        data.targetSubchannels ? JSON.stringify(data.targetSubchannels) : null
+      );
     }
 
     if (data.targetSubchannelsInverted !== undefined) {
@@ -364,7 +383,9 @@ class IngamePopupNoticeService {
 
     if (data.startDate !== undefined) {
       updates.push('startDate = ?');
-      values.push(data.startDate ? convertToMySQLDateTime(data.startDate) : null);
+      values.push(
+        data.startDate ? convertToMySQLDateTime(data.startDate) : null
+      );
     }
 
     if (data.endDate !== undefined) {
@@ -408,13 +429,16 @@ class IngamePopupNoticeService {
   /**
    * Delete ingame popup notice
    */
-  async deleteIngamePopupNotice(id: string, environmentId: string): Promise<void> {
+  async deleteIngamePopupNotice(
+    id: string,
+    environmentId: string
+  ): Promise<void> {
     const pool = database.getPool();
 
-    await pool.execute('DELETE FROM g_ingame_popup_notices WHERE id = ? AND environmentId = ?', [
-      id,
-      environmentId,
-    ]);
+    await pool.execute(
+      'DELETE FROM g_ingame_popup_notices WHERE id = ? AND environmentId = ?',
+      [id, environmentId]
+    );
 
     // Publish SDK event
     await pubSubService.publishSDKEvent(
@@ -433,7 +457,10 @@ class IngamePopupNoticeService {
   /**
    * Delete multiple ingame popup notices
    */
-  async deleteMultipleIngamePopupNotices(ids: string[], environmentId: string): Promise<void> {
+  async deleteMultipleIngamePopupNotices(
+    ids: string[],
+    environmentId: string
+  ): Promise<void> {
     const pool = database.getPool();
     const placeholders = ids.map(() => '?').join(',');
 
@@ -461,7 +488,10 @@ class IngamePopupNoticeService {
   /**
    * Toggle active status
    */
-  async toggleActive(id: string, environmentId: string): Promise<IngamePopupNotice> {
+  async toggleActive(
+    id: string,
+    environmentId: string
+  ): Promise<IngamePopupNotice> {
     const pool = database.getPool();
     await pool.execute(
       'UPDATE g_ingame_popup_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environmentId = ?',
@@ -525,7 +555,9 @@ class IngamePopupNoticeService {
       content: row.content, // Database field for admin UI
       message: row.content, // Map database 'content' field to SDK 'message' field
       targetWorlds:
-        typeof row.targetWorlds === 'string' ? JSON.parse(row.targetWorlds) : row.targetWorlds,
+        typeof row.targetWorlds === 'string'
+          ? JSON.parse(row.targetWorlds)
+          : row.targetWorlds,
       targetWorldsInverted: Boolean(row.targetWorldsInverted),
       targetPlatforms:
         typeof row.targetPlatforms === 'string'
@@ -634,7 +666,9 @@ class IngamePopupNoticeService {
 
     if (filteredSubchannels.length > 0) {
       response.targetSubchannels = filteredSubchannels;
-      response.targetSubchannelsInverted = Boolean(row.targetSubchannelsInverted);
+      response.targetSubchannelsInverted = Boolean(
+        row.targetSubchannelsInverted
+      );
     }
 
     if (targetWorlds.length > 0) {

@@ -158,7 +158,11 @@ function ipv4MatchesCIDR(ip: string, network: string, prefix: number): boolean {
  * Converts IPv4 address to number
  */
 function ipv4ToNumber(ip: string): number {
-  return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+  return (
+    ip
+      .split('.')
+      .reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0
+  );
 }
 
 /**

@@ -17,7 +17,9 @@ import {
 import { useTranslation } from 'react-i18next';
 import BuildIcon from '@mui/icons-material/Build';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import MultiLanguageMessageInput, { MessageLocale } from './MultiLanguageMessageInput';
+import MultiLanguageMessageInput, {
+  MessageLocale,
+} from './MultiLanguageMessageInput';
 import LocalizedDateTimePicker from './LocalizedDateTimePicker';
 import { MessageTemplate } from '@/services/messageTemplateService';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
@@ -123,7 +125,9 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
         gracePeriodMinutes === 0
           ? t('maintenance.kickDelayImmediate')
           : `${gracePeriodMinutes}${t('maintenance.minutesUnit')}`;
-      parts.push(`${t('maintenance.kickExistingPlayers')}: ${t('common.yes')} (${delayText})`);
+      parts.push(
+        `${t('maintenance.kickExistingPlayers')}: ${t('common.yes')} (${delayText})`
+      );
     } else {
       parts.push(`${t('maintenance.kickExistingPlayers')}: ${t('common.no')}`);
     }
@@ -173,20 +177,29 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
             gap: 1,
           }}
         >
-          <BuildIcon fontSize="small" sx={{ mr: 0.5 }} /> {t('maintenance.title')}
+          <BuildIcon fontSize="small" sx={{ mr: 0.5 }} />{' '}
+          {t('maintenance.title')}
         </Typography>
         {/* Maintenance status chip with tooltip for scheduled status */}
         <Tooltip
           title={statusTooltip}
           arrow
           placement="left"
-          disableHoverListener={maintenanceStatus === 'inactive' || !statusTooltip}
+          disableHoverListener={
+            maintenanceStatus === 'inactive' || !statusTooltip
+          }
           slotProps={{
             tooltip: { sx: { whiteSpace: 'pre-line' } },
           }}
         >
           <Chip
-            icon={maintenanceStatus === 'scheduled' ? <ScheduleIcon /> : <BuildIcon />}
+            icon={
+              maintenanceStatus === 'scheduled' ? (
+                <ScheduleIcon />
+              ) : (
+                <BuildIcon />
+              )
+            }
             label={t(statusDisplay.label)}
             size="small"
             sx={{
@@ -238,13 +251,18 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
           select
           label={t('maintenance.messageSource')}
           value={inputMode}
-          onChange={(e) => onInputModeChange(e.target.value as 'direct' | 'template')}
+          onChange={(e) =>
+            onInputModeChange(e.target.value as 'direct' | 'template')
+          }
           fullWidth
         >
           <MenuItem value="direct">{t('maintenance.directInput')}</MenuItem>
           <MenuItem value="template">{t('maintenance.useTemplate')}</MenuItem>
         </TextField>
-        <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+        <Typography
+          variant="caption"
+          sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}
+        >
           {t('maintenance.messageSourceHelp')}
         </Typography>
 
@@ -260,10 +278,14 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
             supportsMultiLanguage={supportsMultiLanguage}
             onSupportsMultiLanguageChange={onSupportsMultiLanguageChange}
             supportsMultiLanguageLabel={t('maintenance.supportsMultiLanguage')}
-            supportsMultiLanguageHelperText={t('maintenance.supportsMultiLanguageHelp')}
+            supportsMultiLanguageHelperText={t(
+              'maintenance.supportsMultiLanguageHelp'
+            )}
             locales={maintenanceLocales}
             onLocalesChange={onMaintenanceLocalesChange}
-            languageSpecificMessagesLabel={t('maintenance.languageSpecificMessages')}
+            languageSpecificMessagesLabel={t(
+              'maintenance.languageSpecificMessages'
+            )}
             enableTranslation={true}
             translateButtonLabel={t('common.autoTranslate')}
             translateTooltip={t('maintenance.translateTooltip')}
@@ -302,7 +324,9 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
             {/* 선택된 템플릿 미리보기 */}
             {selectedTemplateId &&
               (() => {
-                const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
+                const selectedTemplate = templates.find(
+                  (t) => t.id === selectedTemplateId
+                );
                 if (!selectedTemplate) return null;
 
                 return (
@@ -319,26 +343,36 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
                     <Typography variant="subtitle2" gutterBottom>
                       {t('maintenance.templatePreview')}
                     </Typography>
-                    <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', mb: 1 }}>
-                      <strong>{t('clientVersions.maintenance.defaultMessage')}:</strong>{' '}
+                    <Typography
+                      variant="body2"
+                      sx={{ whiteSpace: 'pre-wrap', mb: 1 }}
+                    >
+                      <strong>
+                        {t('clientVersions.maintenance.defaultMessage')}:
+                      </strong>{' '}
                       {selectedTemplate.defaultMessage || '-'}
                     </Typography>
-                    {selectedTemplate.locales && selectedTemplate.locales.length > 0 && (
-                      <Box sx={{ mt: 1 }}>
-                        <Typography variant="caption" color="text.secondary">
-                          {t('clientVersions.maintenance.languageSpecificMessages')}:
-                        </Typography>
-                        {selectedTemplate.locales.map((locale) => (
-                          <Typography
-                            key={locale.lang}
-                            variant="body2"
-                            sx={{ ml: 2, whiteSpace: 'pre-wrap' }}
-                          >
-                            <strong>{locale.lang.toUpperCase()}:</strong> {locale.message || '-'}
+                    {selectedTemplate.locales &&
+                      selectedTemplate.locales.length > 0 && (
+                        <Box sx={{ mt: 1 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {t(
+                              'clientVersions.maintenance.languageSpecificMessages'
+                            )}
+                            :
                           </Typography>
-                        ))}
-                      </Box>
-                    )}
+                          {selectedTemplate.locales.map((locale) => (
+                            <Typography
+                              key={locale.lang}
+                              variant="body2"
+                              sx={{ ml: 2, whiteSpace: 'pre-wrap' }}
+                            >
+                              <strong>{locale.lang.toUpperCase()}:</strong>{' '}
+                              {locale.message || '-'}
+                            </Typography>
+                          ))}
+                        </Box>
+                      )}
                   </Box>
                 );
               })()}
@@ -372,7 +406,9 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
                   control={
                     <Switch
                       checked={forceDisconnect}
-                      onChange={(e) => onForceDisconnectChange?.(e.target.checked)}
+                      onChange={(e) =>
+                        onForceDisconnectChange?.(e.target.checked)
+                      }
                       color="warning"
                     />
                   }
@@ -397,15 +433,27 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
                     select
                     label={t('maintenance.kickDelayMinutes')}
                     value={gracePeriodMinutes}
-                    onChange={(e) => onGracePeriodMinutesChange?.(Number(e.target.value))}
+                    onChange={(e) =>
+                      onGracePeriodMinutesChange?.(Number(e.target.value))
+                    }
                     size="small"
                     sx={{ width: 180 }}
                   >
-                    <MenuItem value={0}>{t('maintenance.kickDelayImmediate')}</MenuItem>
-                    <MenuItem value={1}>{t('maintenance.kickDelay1Min')}</MenuItem>
-                    <MenuItem value={5}>{t('maintenance.kickDelay5Min')}</MenuItem>
-                    <MenuItem value={10}>{t('maintenance.kickDelay10Min')}</MenuItem>
-                    <MenuItem value={30}>{t('maintenance.kickDelay30Min')}</MenuItem>
+                    <MenuItem value={0}>
+                      {t('maintenance.kickDelayImmediate')}
+                    </MenuItem>
+                    <MenuItem value={1}>
+                      {t('maintenance.kickDelay1Min')}
+                    </MenuItem>
+                    <MenuItem value={5}>
+                      {t('maintenance.kickDelay5Min')}
+                    </MenuItem>
+                    <MenuItem value={10}>
+                      {t('maintenance.kickDelay10Min')}
+                    </MenuItem>
+                    <MenuItem value={30}>
+                      {t('maintenance.kickDelay30Min')}
+                    </MenuItem>
                   </TextField>
                   <Typography
                     variant="caption"

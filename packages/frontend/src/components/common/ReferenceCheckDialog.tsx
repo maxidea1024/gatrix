@@ -9,9 +9,14 @@ import {
   Box,
   Alert,
 } from '@mui/material';
-import { Block as BlockIcon, InfoOutlined as InfoIcon } from '@mui/icons-material';
+import {
+  Block as BlockIcon,
+  InfoOutlined as InfoIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import ResourceReferenceList, { ResourceReference } from './ResourceReferenceList';
+import ResourceReferenceList, {
+  ResourceReference,
+} from './ResourceReferenceList';
 
 // Re-export for backward compatibility
 export type { ResourceReference };
@@ -58,7 +63,11 @@ const ReferenceCheckDialog: React.FC<ReferenceCheckDialogProps> = ({
     >
       <DialogTitle sx={{ pb: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          {isDeleteMode ? <BlockIcon color="error" /> : <InfoIcon color="primary" />}
+          {isDeleteMode ? (
+            <BlockIcon color="error" />
+          ) : (
+            <InfoIcon color="primary" />
+          )}
           <Typography variant="h6" component="span" sx={{ fontWeight: 600 }}>
             {title}
           </Typography>

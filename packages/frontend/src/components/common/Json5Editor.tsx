@@ -67,7 +67,9 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
     (event: React.MouseEvent) => {
       event.preventDefault();
       setContextMenu(
-        contextMenu === null ? { mouseX: event.clientX + 2, mouseY: event.clientY - 6 } : null
+        contextMenu === null
+          ? { mouseX: event.clientX + 2, mouseY: event.clientY - 6 }
+          : null
       );
     },
     [contextMenu]
@@ -395,7 +397,9 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
         onClose={handleCloseContextMenu}
         anchorReference="anchorPosition"
         anchorPosition={
-          contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
         }
       >
         <MenuItem onClick={handleUndo} disabled={readOnly}>

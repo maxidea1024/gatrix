@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
 import {
   forceSimulation,
   forceLink,
@@ -115,7 +121,9 @@ import DynamicFilterBar, {
 } from '../../components/common/DynamicFilterBar';
 import { useDebounce } from '../../hooks/useDebounce';
 import SearchTextField from '../../components/common/SearchTextField';
-import serviceDiscoveryService, { ServiceInstance } from '../../services/serviceDiscoveryService';
+import serviceDiscoveryService, {
+  ServiceInstance,
+} from '../../services/serviceDiscoveryService';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { RelativeTime } from '../../components/common/RelativeTime';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
@@ -173,7 +181,10 @@ interface ClusterViewProps {
 }
 
 // Heartbeat TTL in seconds - configurable via environment variable
-const HEARTBEAT_TTL_SECONDS = parseInt(import.meta.env.VITE_HEARTBEAT_TTL_SECONDS || '30', 10);
+const HEARTBEAT_TTL_SECONDS = parseInt(
+  import.meta.env.VITE_HEARTBEAT_TTL_SECONDS || '30',
+  10
+);
 
 // Status color helper function - shared across views
 const getStatusColor = (status: string): string => {
@@ -209,27 +220,38 @@ const ClusterView: React.FC<ClusterViewProps> = ({
   onContextMenu,
 }) => {
   // ClusterView uses first grouping level only for now
-  const groupingBy: GroupingOption = groupingLevels.length > 0 ? groupingLevels[0] : 'none';
+  const groupingBy: GroupingOption =
+    groupingLevels.length > 0 ? groupingLevels[0] : 'none';
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [nodes, setNodes] = useState<ClusterNode[]>([]);
   const [links, setLinks] = useState<ClusterLink[]>([]);
   const [draggedNode, setDraggedNode] = useState<string | null>(null);
-  const simulationRef = useRef<ReturnType<typeof forceSimulation<ClusterNode>> | null>(null);
+  const simulationRef = useRef<ReturnType<
+    typeof forceSimulation<ClusterNode>
+  > | null>(null);
   const nodesRef = useRef<ClusterNode[]>([]);
   const linksRef = useRef<ClusterLink[]>([]);
 
   // Track rumble and heartbeat animation states
   const [rumbleNodes, setRumbleNodes] = useState<Set<string>>(new Set());
-  const [heartbeatAnimNodes, setHeartbeatAnimNodes] = useState<Set<string>>(new Set());
+  const [heartbeatAnimNodes, setHeartbeatAnimNodes] = useState<Set<string>>(
+    new Set()
+  );
   // Counter to force re-render of animate elements - Map<nodeId, counter>
-  const [rumbleCounter, setRumbleCounter] = useState<Map<string, number>>(new Map());
+  const [rumbleCounter, setRumbleCounter] = useState<Map<string, number>>(
+    new Map()
+  );
   const prevStatusRef = useRef<Map<string, string>>(new Map());
   const prevHeartbeatRef = useRef<Set<string>>(new Set());
 
   // Ping gauge state: track last heartbeat time for each node
-  const [lastHeartbeatTime, setLastHeartbeatTime] = useState<Map<string, number>>(new Map());
-  const [pingProgress, setPingProgress] = useState<Map<string, number>>(new Map());
+  const [lastHeartbeatTime, setLastHeartbeatTime] = useState<
+    Map<string, number>
+  >(new Map());
+  const [pingProgress, setPingProgress] = useState<Map<string, number>>(
+    new Map()
+  );
 
   // Pan and zoom state for infinite canvas
   const [viewBox, setViewBox] = useState({
@@ -356,7 +378,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         // Multiple center nodes (grouping mode) - arrange in a circle around screen center
         const groupRadius = Math.min(centerNodes.length * 60, 250);
         centerNodes.forEach((node, index) => {
-          const angle = (2 * Math.PI * index) / centerNodes.length - Math.PI / 2;
+          const angle =
+            (2 * Math.PI * index) / centerNodes.length - Math.PI / 2;
           const x = centerX + Math.cos(angle) * groupRadius;
           const y = centerY + Math.sin(angle) * groupRadius;
           node.x = x;
@@ -368,7 +391,9 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         // Reposition service nodes around their respective center nodes
         serviceNodes.forEach((node) => {
           // Find the linked center node
-          const linkedCenter = centerNodes.find((c) => c.groupKey === node.groupKey);
+          const linkedCenter = centerNodes.find(
+            (c) => c.groupKey === node.groupKey
+          );
           const targetCenter = linkedCenter || { x: centerX, y: centerY };
           const angle = Math.random() * 2 * Math.PI;
           const distance = 80 + Math.random() * 60;
@@ -436,7 +461,9 @@ const ClusterView: React.FC<ClusterViewProps> = ({
       // Increment rumble counter to force re-render of animate element
       setRumbleCounter((prev) => {
         const next = new Map(prev);
-        newHeartbeatNodes.forEach((id) => next.set(id, (prev.get(id) || 0) + 1));
+        newHeartbeatNodes.forEach((id) =>
+          next.set(id, (prev.get(id) || 0) + 1)
+        );
         return next;
       });
 
@@ -591,7 +618,9 @@ const ClusterView: React.FC<ClusterViewProps> = ({
       nodesRef.current.forEach((n) => existingNodeMap.set(n.id, n));
     } else {
       // Only keep service nodes when grouping changes, recreate center nodes
-      nodesRef.current.filter((n) => !n.isCenter).forEach((n) => existingNodeMap.set(n.id, n));
+      nodesRef.current
+        .filter((n) => !n.isCenter)
+        .forEach((n) => existingNodeMap.set(n.id, n));
     }
 
     // Track new nodes for rumble effect
@@ -654,7 +683,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({
       const nodeId = `${service.labels.service}-${service.instanceId}`;
       const existing = existingNodeMap.get(nodeId);
       const groupKey = getGroupKey(service);
-      const targetCenterId = groupingBy === 'none' ? 'center' : `center-${groupKey}`;
+      const targetCenterId =
+        groupingBy === 'none' ? 'center' : `center-${groupKey}`;
       const targetCenter = centerNodes.find((c) => c.id === targetCenterId);
 
       if (existing) {
@@ -697,7 +727,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({
     // Create links - each service links to its group center
     const newLinks: ClusterLink[] = serviceNodes.map((node) => {
       const groupKey = getGroupKey(node.service!);
-      const targetCenterId = groupingBy === 'none' ? 'center' : `center-${groupKey}`;
+      const targetCenterId =
+        groupingBy === 'none' ? 'center' : `center-${groupKey}`;
       return {
         source: targetCenterId,
         target: node.id,
@@ -708,7 +739,9 @@ const ClusterView: React.FC<ClusterViewProps> = ({
     // Update simulation with new nodes/links (don't recreate)
     const simulation = simulationRef.current;
     simulation.nodes(allNodes);
-    (simulation.force('link') as ForceLink<ClusterNode, ClusterLink>)?.links(newLinks);
+    (simulation.force('link') as ForceLink<ClusterNode, ClusterLink>)?.links(
+      newLinks
+    );
 
     // Force re-render to show new state immediately
     setNodes([...allNodes]);
@@ -716,7 +749,9 @@ const ClusterView: React.FC<ClusterViewProps> = ({
 
     // Restart simulation - stronger restart when grouping changes
     const hasChanges =
-      newNodeIds.length > 0 || allNodes.length !== existingNodeMap.size || groupingChanged;
+      newNodeIds.length > 0 ||
+      allNodes.length !== existingNodeMap.size ||
+      groupingChanged;
     if (hasChanges) {
       simulation.alpha(groupingChanged ? 0.8 : 0.3).restart();
     }
@@ -864,7 +899,10 @@ const ClusterView: React.FC<ClusterViewProps> = ({
 
       setViewBox((prev) => {
         const newWidth = Math.max(400, Math.min(4000, prev.width * zoomFactor));
-        const newHeight = Math.max(300, Math.min(3000, prev.height * zoomFactor));
+        const newHeight = Math.max(
+          300,
+          Math.min(3000, prev.height * zoomFactor)
+        );
 
         // Zoom toward mouse position
         const widthRatio = newWidth / prev.width;
@@ -935,7 +973,11 @@ const ClusterView: React.FC<ClusterViewProps> = ({
               width: '100%',
               height: '100%',
               flex: 1,
-              cursor: isPanning ? 'grabbing' : draggedNode ? 'grabbing' : 'grab',
+              cursor: isPanning
+                ? 'grabbing'
+                : draggedNode
+                  ? 'grabbing'
+                  : 'grab',
             }}
             onMouseDown={handlePanStart}
           >
@@ -946,7 +988,11 @@ const ClusterView: React.FC<ClusterViewProps> = ({
               viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
               preserveAspectRatio="xMidYMid meet"
               style={{
-                cursor: draggedNode ? 'grabbing' : isPanning ? 'grabbing' : 'grab',
+                cursor: draggedNode
+                  ? 'grabbing'
+                  : isPanning
+                    ? 'grabbing'
+                    : 'grab',
                 userSelect: 'none',
               }}
               onWheel={handleWheel}
@@ -962,7 +1008,13 @@ const ClusterView: React.FC<ClusterViewProps> = ({
               </style>
               <defs>
                 {/* Gradient definitions for animated links */}
-                <linearGradient id="pulseGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <linearGradient
+                  id="pulseGradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="0%"
+                >
                   <stop offset="0%" stopColor="#90a4ae">
                     <animate
                       attributeName="stop-color"
@@ -990,7 +1042,13 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                 </linearGradient>
 
                 {/* Heartbeat border glow filter */}
-                <filter id="heartbeatGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <filter
+                  id="heartbeatGlow"
+                  x="-50%"
+                  y="-50%"
+                  width="200%"
+                  height="200%"
+                >
                   <feGaussianBlur stdDeviation="3" result="coloredBlur" />
                   <feMerge>
                     <feMergeNode in="coloredBlur" />
@@ -1006,7 +1064,10 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                 if (!source || !target) return null;
 
                 // Check if this link's target node has heartbeat
-                const targetId = typeof link.target === 'string' ? link.target : link.target.id;
+                const targetId =
+                  typeof link.target === 'string'
+                    ? link.target
+                    : link.target.id;
                 const hasHeartbeat = heartbeatIds.has(targetId);
 
                 return (
@@ -1041,7 +1102,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                   // Center cluster node - draggable
                   // Calculate count for this center node
                   const centerCount = node.groupKey
-                    ? services.filter((s) => getGroupKey(s) === node.groupKey).length
+                    ? services.filter((s) => getGroupKey(s) === node.groupKey)
+                        .length
                     : services.length;
 
                   return (
@@ -1079,7 +1141,9 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                             fontWeight="bold"
                             dy="-12"
                           >
-                            {node.groupKey === 'unknown' ? '---' : node.groupKey.toUpperCase()}
+                            {node.groupKey === 'unknown'
+                              ? '---'
+                              : node.groupKey.toUpperCase()}
                           </text>
                           <text
                             textAnchor="middle"
@@ -1166,7 +1230,10 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                     onContextMenu={(e) => {
                       if (onContextMenu && service) {
                         e.preventDefault();
-                        onContextMenu(e as unknown as React.MouseEvent, service);
+                        onContextMenu(
+                          e as unknown as React.MouseEvent,
+                          service
+                        );
                       }
                     }}
                   >
@@ -1271,7 +1338,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                     </circle>
 
                     {/* Ping gauge - circular progress indicator (only for normal states) */}
-                    {(service.status === 'ready' || service.status === 'initializing') && (
+                    {(service.status === 'ready' ||
+                      service.status === 'initializing') && (
                       <>
                         <circle
                           r={pingGaugeRadius}
@@ -1295,7 +1363,13 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                     )}
 
                     {/* Shine effect */}
-                    <ellipse cx={-10} cy={-12} rx="10" ry="7" fill="rgba(255,255,255,0.25)" />
+                    <ellipse
+                      cx={-10}
+                      cy={-12}
+                      rx="10"
+                      ry="7"
+                      fill="rgba(255,255,255,0.25)"
+                    />
 
                     {/* Service type label */}
                     <text
@@ -1306,7 +1380,9 @@ const ClusterView: React.FC<ClusterViewProps> = ({
                       fontWeight="bold"
                       fontFamily="D2Coding, monospace"
                     >
-                      {(service.labels.service || '').substring(0, 7).toUpperCase()}
+                      {(service.labels.service || '')
+                        .substring(0, 7)
+                        .toUpperCase()}
                     </text>
 
                     {/* Hostname */}
@@ -1359,7 +1435,8 @@ const StatusStatsDisplay: React.FC<{
       else if (s.status === 'ready') counts.ready++;
       else if (s.status === 'shutting_down') counts.shutting_down++;
       else if (s.status === 'terminated') counts.terminated++;
-      else if (s.status === 'error' || s.status === 'no-response') counts.error++;
+      else if (s.status === 'error' || s.status === 'no-response')
+        counts.error++;
     });
     return counts;
   }, [services]);
@@ -1395,9 +1472,15 @@ const StatusStatsDisplay: React.FC<{
             bgcolor: 'info.main',
           }}
         />
-        <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ whiteSpace: 'nowrap' }}
+        >
           {t('serverList.stats.initializing')}{' '}
-          <strong style={{ color: 'inherit' }}>{statusCounts.initializing}</strong>
+          <strong style={{ color: 'inherit' }}>
+            {statusCounts.initializing}
+          </strong>
         </Typography>
       </Box>
       <Box sx={{ width: '1px', height: '100%', bgcolor: 'divider' }} />
@@ -1418,7 +1501,11 @@ const StatusStatsDisplay: React.FC<{
             bgcolor: 'success.main',
           }}
         />
-        <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ whiteSpace: 'nowrap' }}
+        >
           {t('serverList.stats.ready')}{' '}
           <strong style={{ color: 'inherit' }}>{statusCounts.ready}</strong>
         </Typography>
@@ -1441,9 +1528,15 @@ const StatusStatsDisplay: React.FC<{
             bgcolor: 'warning.main',
           }}
         />
-        <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ whiteSpace: 'nowrap' }}
+        >
           {t('serverList.stats.shuttingDown')}{' '}
-          <strong style={{ color: 'inherit' }}>{statusCounts.shutting_down}</strong>
+          <strong style={{ color: 'inherit' }}>
+            {statusCounts.shutting_down}
+          </strong>
         </Typography>
       </Box>
       <Box sx={{ width: '1px', height: '100%', bgcolor: 'divider' }} />
@@ -1456,10 +1549,18 @@ const StatusStatsDisplay: React.FC<{
           height: '100%',
         }}
       >
-        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'grey.500' }} />
-        <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+        <Box
+          sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'grey.500' }}
+        />
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ whiteSpace: 'nowrap' }}
+        >
           {t('serverList.stats.terminated')}{' '}
-          <strong style={{ color: 'inherit' }}>{statusCounts.terminated}</strong>
+          <strong style={{ color: 'inherit' }}>
+            {statusCounts.terminated}
+          </strong>
         </Typography>
       </Box>
       <Box sx={{ width: '1px', height: '100%', bgcolor: 'divider' }} />
@@ -1480,7 +1581,11 @@ const StatusStatsDisplay: React.FC<{
             bgcolor: 'error.main',
           }}
         />
-        <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ whiteSpace: 'nowrap' }}
+        >
           {t('serverList.stats.error')}{' '}
           <strong style={{ color: 'inherit' }}>{statusCounts.error}</strong>
         </Typography>
@@ -1518,7 +1623,8 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
     const renderItemsGrid = (items: ServiceInstance[], groupKey?: string) => {
       const colCount = 25;
       const itemCount = items.length;
-      const emptyCount = itemCount > 0 ? (colCount - (itemCount % colCount)) % colCount : 0;
+      const emptyCount =
+        itemCount > 0 ? (colCount - (itemCount % colCount)) % colCount : 0;
 
       return (
         <Box
@@ -1581,7 +1687,9 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                         {service.labels.service}
                       </Typography>
                       <Chip
-                        label={t(`serverList.status.${getStatusTranslationKey(service.status)}`)}
+                        label={t(
+                          `serverList.status.${getStatusTranslationKey(service.status)}`
+                        )}
                         size="small"
                         color={
                           service.status === 'ready'
@@ -1595,7 +1703,10 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                       />
                     </Box>
 
-                    <Table size="small" sx={{ '& td': { border: 0, py: 0.5, px: 0 } }}>
+                    <Table
+                      size="small"
+                      sx={{ '& td': { border: 0, py: 0.5, px: 0 } }}
+                    >
                       <TableBody>
                         <TableRow hover>
                           <TableCell
@@ -1629,7 +1740,9 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                           >
                             {t('serverList.table.hostname')}
                           </TableCell>
-                          <TableCell sx={{ fontWeight: 500, fontSize: '0.75rem' }}>
+                          <TableCell
+                            sx={{ fontWeight: 500, fontSize: '0.75rem' }}
+                          >
                             {service.hostname}
                           </TableCell>
                         </TableRow>
@@ -1813,7 +1926,8 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                     },
                     '&:hover': {
                       transform: 'scale(1.15) translateY(-2px)',
-                      boxShadow: (theme) => `0 8px 16px ${alpha(theme.palette.common.black, 0.25)}`,
+                      boxShadow: (theme) =>
+                        `0 8px 16px ${alpha(theme.palette.common.black, 0.25)}`,
                       zIndex: 2,
                     },
                   }}
@@ -1892,9 +2006,13 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                         }}
                       />
                     ) : service.status === 'shutting_down' ? (
-                      <PowerSettingsNewIcon sx={{ fontSize: 18, color: 'white' }} />
+                      <PowerSettingsNewIcon
+                        sx={{ fontSize: 18, color: 'white' }}
+                      />
                     ) : service.status === 'terminated' ? (
-                      <PowerSettingsNewIcon sx={{ fontSize: 18, color: 'white', opacity: 0.7 }} />
+                      <PowerSettingsNewIcon
+                        sx={{ fontSize: 18, color: 'white', opacity: 0.7 }}
+                      />
                     ) : service.status === 'error' ? (
                       <ErrorIcon sx={{ fontSize: 18, color: 'white' }} />
                     ) : service.status === 'no-response' ? (
@@ -2020,18 +2138,27 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([name, instances]) => ({
           id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
-          name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
+          name:
+            name === 'Unknown'
+              ? `(${getGroupingLabel(currentField)} N/A)`
+              : name,
           level: currentLevel,
           fieldName: currentField,
           instances: hasMoreLevels
             ? []
-            : instances.sort((a, b) => a.instanceId.localeCompare(b.instanceId)),
-          children: hasMoreLevels ? buildGroups(instances, levels, nextLevel) : undefined,
+            : instances.sort((a, b) =>
+                a.instanceId.localeCompare(b.instanceId)
+              ),
+          children: hasMoreLevels
+            ? buildGroups(instances, levels, nextLevel)
+            : undefined,
         }));
     };
 
     // Collect all instances from a group (including nested)
-    const collectAllInstances = (group: LocalServerGroup): ServiceInstance[] => {
+    const collectAllInstances = (
+      group: LocalServerGroup
+    ): ServiceInstance[] => {
       if (group.children && group.children.length > 0) {
         return group.children.flatMap(collectAllInstances);
       }
@@ -2039,7 +2166,10 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
     };
 
     // Render a group recursively with its children
-    const renderGroup = (group: LocalServerGroup, depth: number): React.ReactNode => {
+    const renderGroup = (
+      group: LocalServerGroup,
+      depth: number
+    ): React.ReactNode => {
       const allInstances = collectAllInstances(group);
       const hasChildren = group.children && group.children.length > 0;
 
@@ -2101,7 +2231,10 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
               <Typography variant="body2" sx={{ fontWeight: 700 }}>
                 {group.name}
               </Typography>
-              <Typography variant="caption" sx={{ ml: 1, fontWeight: 800, opacity: 0.6 }}>
+              <Typography
+                variant="caption"
+                sx={{ ml: 1, fontWeight: 800, opacity: 0.6 }}
+              >
                 ({allInstances.length})
               </Typography>
             </Box>
@@ -2169,8 +2302,13 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
     // 3. Updated service IDs changed
     // 4. Grouping levels changed
 
-    if (prevProps.groupingLevels.length !== nextProps.groupingLevels.length) return false;
-    if (prevProps.groupingLevels.some((level, i) => level !== nextProps.groupingLevels[i]))
+    if (prevProps.groupingLevels.length !== nextProps.groupingLevels.length)
+      return false;
+    if (
+      prevProps.groupingLevels.some(
+        (level, i) => level !== nextProps.groupingLevels[i]
+      )
+    )
       return false;
 
     // Shallow compare services array (length check first)
@@ -2203,9 +2341,19 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
+  column,
+  onToggleVisibility,
+}) => {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: column.id,
   });
 
@@ -2235,7 +2383,11 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
         </Box>
       }
     >
-      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -2245,7 +2397,10 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
       </ListItemButton>
     </ListItem>
   );
@@ -2282,7 +2437,9 @@ const ServerListPage: React.FC = () => {
     return localStorage.getItem('serverListSortBy') || 'createdAt';
   });
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(() => {
-    return (localStorage.getItem('serverListSortOrder') as 'asc' | 'desc') || 'asc';
+    return (
+      (localStorage.getItem('serverListSortOrder') as 'asc' | 'desc') || 'asc'
+    );
   });
 
   // View mode state (persisted in localStorage)
@@ -2291,7 +2448,9 @@ const ServerListPage: React.FC = () => {
   });
 
   // Track updated service IDs for highlight effect (with status)
-  const [updatedServiceIds, setUpdatedServiceIds] = useState<Map<string, ServiceStatus>>(new Map());
+  const [updatedServiceIds, setUpdatedServiceIds] = useState<
+    Map<string, ServiceStatus>
+  >(new Map());
 
   // Track newly added service IDs for appearance animation
   const [newServiceIds, setNewServiceIds] = useState<Set<string>>(new Set());
@@ -2333,7 +2492,9 @@ const ServerListPage: React.FC = () => {
     }[]
   >([]);
   const [bulkHealthCheckRunning, setBulkHealthCheckRunning] = useState(false);
-  const [bulkHealthCheckSelected, setBulkHealthCheckSelected] = useState<Set<string>>(new Set());
+  const [bulkHealthCheckSelected, setBulkHealthCheckSelected] = useState<
+    Set<string>
+  >(new Set());
 
   // Track expanded table cells (for labels and ports columns)
   const [expandedCells, setExpandedCells] = useState<Set<string>>(new Set());
@@ -2369,11 +2530,15 @@ const ServerListPage: React.FC = () => {
 
   // Save grouping levels to localStorage
   useEffect(() => {
-    localStorage.setItem('serverListGroupingLevels', JSON.stringify(groupingLevels));
+    localStorage.setItem(
+      'serverListGroupingLevels',
+      JSON.stringify(groupingLevels)
+    );
   }, [groupingLevels]);
 
   // Derived groupingBy for backward compatibility with views
-  const groupingBy: GroupingOption = groupingLevels.length > 0 ? groupingLevels[0] : 'none';
+  const groupingBy: GroupingOption =
+    groupingLevels.length > 0 ? groupingLevels[0] : 'none';
   const setGroupingBy = (option: GroupingOption) => {
     if (option === 'none') {
       setGroupingLevels([]);
@@ -2382,7 +2547,8 @@ const ServerListPage: React.FC = () => {
     }
   };
 
-  const [groupingMenuAnchor, setGroupingMenuAnchor] = useState<null | HTMLElement>(null);
+  const [groupingMenuAnchor, setGroupingMenuAnchor] =
+    useState<null | HTMLElement>(null);
 
   // Grouping label helper
   const getGroupingLabel = (field: GroupingField): string => {
@@ -2495,7 +2661,8 @@ const ServerListPage: React.FC = () => {
   }, [isPaused]);
 
   // Column settings popover state
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLButtonElement | null>(null);
 
   // Service context menu state
   const [contextMenu, setContextMenu] = useState<{
@@ -2605,7 +2772,8 @@ const ServerListPage: React.FC = () => {
                 if (index >= 0) {
                   // Update existing - only highlight if status actually changed (not just heartbeat update)
                   const prevService = prev[index];
-                  const statusChanged = prevService.status !== event.data.status;
+                  const statusChanged =
+                    prevService.status !== event.data.status;
 
                   if (statusChanged) {
                     setUpdatedServiceIds((prevIds) =>
@@ -2621,7 +2789,9 @@ const ServerListPage: React.FC = () => {
                   }
 
                   // Trigger heartbeat pulse animation (for any update including heartbeat)
-                  setHeartbeatIds((prevIds) => new Set(prevIds).add(serviceKey));
+                  setHeartbeatIds((prevIds) =>
+                    new Set(prevIds).add(serviceKey)
+                  );
                   setTimeout(() => {
                     setHeartbeatIds((prevIds) => {
                       const newSet = new Set(prevIds);
@@ -2635,7 +2805,9 @@ const ServerListPage: React.FC = () => {
                   return newServices;
                 } else {
                   // Add new service - trigger appearance animation
-                  setNewServiceIds((prevIds) => new Set(prevIds).add(serviceKey));
+                  setNewServiceIds((prevIds) =>
+                    new Set(prevIds).add(serviceKey)
+                  );
                   setTimeout(() => {
                     setNewServiceIds((prevIds) => {
                       const newSet = new Set(prevIds);
@@ -2804,7 +2976,13 @@ const ServerListPage: React.FC = () => {
   // Check if service has a web port for health check
   const hasWebPort = (service: ServiceInstance): boolean => {
     const ports = service.ports;
-    return !!(ports?.internalApi || ports?.externalApi || ports?.web || ports?.http || ports?.api);
+    return !!(
+      ports?.internalApi ||
+      ports?.externalApi ||
+      ports?.web ||
+      ports?.http ||
+      ports?.api
+    );
   };
 
   // Clean up terminated, error, and no-response servers
@@ -2826,14 +3004,20 @@ const ServerListPage: React.FC = () => {
       // Remove from frontend state immediately
       setServices((prev) =>
         prev.filter(
-          (s) => s.status !== 'terminated' && s.status !== 'error' && s.status !== 'no-response'
+          (s) =>
+            s.status !== 'terminated' &&
+            s.status !== 'error' &&
+            s.status !== 'no-response'
         )
       );
 
       // Show success message
-      enqueueSnackbar(t('serverList.cleanupSuccess', { count: result.deletedCount }), {
-        variant: 'success',
-      });
+      enqueueSnackbar(
+        t('serverList.cleanupSuccess', { count: result.deletedCount }),
+        {
+          variant: 'success',
+        }
+      );
     } catch (error) {
       console.error('❌ Cleanup failed:', error);
       enqueueSnackbar(t('serverList.cleanupFailed'), { variant: 'error' });
@@ -2848,7 +3032,10 @@ const ServerListPage: React.FC = () => {
   };
 
   // Context menu handlers
-  const handleContextMenu = (event: React.MouseEvent, service: ServiceInstance) => {
+  const handleContextMenu = (
+    event: React.MouseEvent,
+    service: ServiceInstance
+  ) => {
     event.preventDefault();
     setContextMenu({
       mouseX: event.clientX,
@@ -2866,7 +3053,8 @@ const ServerListPage: React.FC = () => {
     const jsonStr = JSON.stringify(contextMenu.service, null, 2);
     copyToClipboardWithNotification(
       jsonStr,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
     handleContextMenuClose();
@@ -2876,7 +3064,8 @@ const ServerListPage: React.FC = () => {
     if (!contextMenu?.service) return;
     copyToClipboardWithNotification(
       contextMenu.service.instanceId,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
     handleContextMenuClose();
@@ -2886,7 +3075,8 @@ const ServerListPage: React.FC = () => {
     if (!contextMenu?.service) return;
     copyToClipboardWithNotification(
       contextMenu.service.hostname,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
     handleContextMenuClose();
@@ -2895,8 +3085,10 @@ const ServerListPage: React.FC = () => {
   const handleCopyAddress = () => {
     if (!contextMenu?.service) return;
     copyToClipboardWithNotification(
-      contextMenu.service.externalAddress || contextMenu.service.internalAddress,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      contextMenu.service.externalAddress ||
+        contextMenu.service.internalAddress,
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
     handleContextMenuClose();
@@ -2921,7 +3113,11 @@ const ServerListPage: React.FC = () => {
     const results = checkableServices.map((s) => {
       const ports = s.ports;
       const healthPort =
-        ports?.internalApi || ports?.externalApi || ports?.web || ports?.http || ports?.api;
+        ports?.internalApi ||
+        ports?.externalApi ||
+        ports?.web ||
+        ports?.http ||
+        ports?.api;
       return {
         serviceKey: `${s.labels.service}-${s.instanceId}`,
         service: s.labels.service,
@@ -2954,7 +3150,9 @@ const ServerListPage: React.FC = () => {
   };
 
   const handleBulkHealthCheckSelectAll = () => {
-    setBulkHealthCheckSelected(new Set(bulkHealthCheckResults.map((r) => r.serviceKey)));
+    setBulkHealthCheckSelected(
+      new Set(bulkHealthCheckResults.map((r) => r.serviceKey))
+    );
   };
 
   const handleBulkHealthCheckDeselectAll = () => {
@@ -2982,7 +3180,9 @@ const ServerListPage: React.FC = () => {
 
     // Create a list of items to check. We use the current state's list as source of truth.
     // Note: 'itemsToCheck' are just metadata objects provided to the loop.
-    const itemsToCheck = bulkHealthCheckResults.filter((item) => selectedKeys.has(item.serviceKey));
+    const itemsToCheck = bulkHealthCheckResults.filter((item) =>
+      selectedKeys.has(item.serviceKey)
+    );
 
     for (const item of itemsToCheck) {
       // Find current index dynamically for scrolling
@@ -2993,20 +3193,30 @@ const ServerListPage: React.FC = () => {
       // Update status to 'checking'
       setBulkHealthCheckResults((prev) =>
         prev.map((r) =>
-          r.serviceKey === item.serviceKey ? { ...r, status: 'checking' as const } : r
+          r.serviceKey === item.serviceKey
+            ? { ...r, status: 'checking' as const }
+            : r
         )
       );
 
       // Auto-scroll logic
       if (currentIndex !== -1) {
         setTimeout(() => {
-          const row = document.getElementById(`bulk-health-row-${currentIndex}`);
-          const container = document.getElementById('bulk-health-check-scroll-container');
+          const row = document.getElementById(
+            `bulk-health-row-${currentIndex}`
+          );
+          const container = document.getElementById(
+            'bulk-health-check-scroll-container'
+          );
           if (row && container) {
             const rowTop = row.offsetTop;
             const containerHeight = container.clientHeight;
             const headerHeight = 40;
-            const scrollTarget = rowTop - headerHeight - containerHeight / 2 + row.offsetHeight / 2;
+            const scrollTarget =
+              rowTop -
+              headerHeight -
+              containerHeight / 2 +
+              row.offsetHeight / 2;
             container.scrollTo({
               top: Math.max(0, scrollTarget),
               behavior: 'smooth',
@@ -3016,7 +3226,10 @@ const ServerListPage: React.FC = () => {
       }
 
       try {
-        const result = await serviceDiscoveryService.healthCheck(item.service, item.instanceId);
+        const result = await serviceDiscoveryService.healthCheck(
+          item.service,
+          item.instanceId
+        );
 
         setBulkHealthCheckResults((prev) =>
           prev.map((r) =>
@@ -3066,7 +3279,9 @@ const ServerListPage: React.FC = () => {
   const [hasCompletedHealthCheck, setHasCompletedHealthCheck] = useState(false);
 
   // Export menu anchor
-  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
 
   const handleExportMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setExportMenuAnchor(event.currentTarget);
@@ -3091,7 +3306,10 @@ const ServerListPage: React.FC = () => {
       error: item.error || '',
     }));
 
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[:.]/g, '-')
+      .slice(0, 19);
     const filename = `health-check-${timestamp}`;
 
     if (format === 'json') {
@@ -3172,10 +3390,18 @@ const ServerListPage: React.FC = () => {
   // Bulk health check statistics
   const bulkHealthCheckStats = useMemo(() => {
     const total = bulkHealthCheckResults.length;
-    const success = bulkHealthCheckResults.filter((r) => r.status === 'success').length;
-    const failed = bulkHealthCheckResults.filter((r) => r.status === 'failed').length;
-    const pending = bulkHealthCheckResults.filter((r) => r.status === 'pending').length;
-    const checking = bulkHealthCheckResults.filter((r) => r.status === 'checking').length;
+    const success = bulkHealthCheckResults.filter(
+      (r) => r.status === 'success'
+    ).length;
+    const failed = bulkHealthCheckResults.filter(
+      (r) => r.status === 'failed'
+    ).length;
+    const pending = bulkHealthCheckResults.filter(
+      (r) => r.status === 'pending'
+    ).length;
+    const checking = bulkHealthCheckResults.filter(
+      (r) => r.status === 'checking'
+    ).length;
     const completed = success + failed;
     const avgLatency =
       bulkHealthCheckResults
@@ -3199,38 +3425,59 @@ const ServerListPage: React.FC = () => {
     [services]
   );
   const uniqueGroups = useMemo(
-    () => [...new Set(services.map((s) => s.labels.group).filter(Boolean))].sort() as string[],
+    () =>
+      [
+        ...new Set(services.map((s) => s.labels.group).filter(Boolean)),
+      ].sort() as string[],
     [services]
   );
   const uniqueCloudProviders = useMemo(
     () =>
-      [...new Set(services.map((s) => s.labels.cloudProvider).filter(Boolean))].sort() as string[],
+      [
+        ...new Set(services.map((s) => s.labels.cloudProvider).filter(Boolean)),
+      ].sort() as string[],
     [services]
   );
   const uniqueCloudRegions = useMemo(
     () =>
-      [...new Set(services.map((s) => s.labels.cloudRegion).filter(Boolean))].sort() as string[],
+      [
+        ...new Set(services.map((s) => s.labels.cloudRegion).filter(Boolean)),
+      ].sort() as string[],
     [services]
   );
   const uniqueCloudZones = useMemo(
-    () => [...new Set(services.map((s) => s.labels.cloudZone).filter(Boolean))].sort() as string[],
+    () =>
+      [
+        ...new Set(services.map((s) => s.labels.cloudZone).filter(Boolean)),
+      ].sort() as string[],
     [services]
   );
   const uniqueEnvs = useMemo(
     () =>
-      [...new Set(services.map((s) => s.labels.environmentId).filter(Boolean))].sort() as string[],
+      [
+        ...new Set(services.map((s) => s.labels.environmentId).filter(Boolean)),
+      ].sort() as string[],
     [services]
   );
   const uniqueRoles = useMemo(
-    () => [...new Set(services.map((s) => s.labels.role).filter(Boolean))].sort() as string[],
+    () =>
+      [
+        ...new Set(services.map((s) => s.labels.role).filter(Boolean)),
+      ].sort() as string[],
     [services]
   );
   const uniqueInternalAddresses = useMemo(
-    () => [...new Set(services.map((s) => s.internalAddress).filter(Boolean))].sort(),
+    () =>
+      [
+        ...new Set(services.map((s) => s.internalAddress).filter(Boolean)),
+      ].sort(),
     [services]
   );
   const uniqueExternalAddresses = useMemo(
-    () => [...new Set(services.map((s) => s.externalAddress).filter(Boolean))].sort(),
+    () =>
+      [
+        ...new Set(services.map((s) => s.externalAddress).filter(Boolean)),
+      ].sort(),
     [services]
   );
   const uniqueHostnames = useMemo(
@@ -3338,7 +3585,9 @@ const ServerListPage: React.FC = () => {
   };
 
   const handleFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, value } : f)));
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === filterKey ? { ...f, value } : f))
+    );
   };
 
   // Column configuration handlers
@@ -3384,7 +3633,10 @@ const ServerListPage: React.FC = () => {
 
   // Count inactive services (terminated, error, no-response)
   const inactiveCount = services.filter(
-    (s) => s.status === 'terminated' || s.status === 'error' || s.status === 'no-response'
+    (s) =>
+      s.status === 'terminated' ||
+      s.status === 'error' ||
+      s.status === 'no-response'
   ).length;
 
   // Apply filters and search
@@ -3395,7 +3647,8 @@ const ServerListPage: React.FC = () => {
       const matchesSearch =
         service.instanceId.toLowerCase().includes(searchLower) ||
         service.labels.service.toLowerCase().includes(searchLower) ||
-        (service.labels.group && service.labels.group.toLowerCase().includes(searchLower)) ||
+        (service.labels.group &&
+          service.labels.group.toLowerCase().includes(searchLower)) ||
         service.hostname.toLowerCase().includes(searchLower) ||
         service.externalAddress.toLowerCase().includes(searchLower) ||
         service.internalAddress.toLowerCase().includes(searchLower) ||
@@ -3405,35 +3658,68 @@ const ServerListPage: React.FC = () => {
         // Search in ports (name:port format)
         Object.entries(service.ports || {}).some(
           ([name, port]) =>
-            name.toLowerCase().includes(searchLower) || String(port).includes(searchLower)
+            name.toLowerCase().includes(searchLower) ||
+            String(port).includes(searchLower)
         );
       if (!matchesSearch) return false;
     }
 
     // Dynamic filters (all are now select type with exact match)
     for (const filter of activeFilters) {
-      if (filter.key === 'service' && filter.value && service.labels.service !== filter.value) {
+      if (
+        filter.key === 'service' &&
+        filter.value &&
+        service.labels.service !== filter.value
+      ) {
         return false;
       }
-      if (filter.key === 'status' && filter.value && service.status !== filter.value) {
+      if (
+        filter.key === 'status' &&
+        filter.value &&
+        service.status !== filter.value
+      ) {
         return false;
       }
-      if (filter.key === 'instanceId' && filter.value && service.instanceId !== filter.value) {
+      if (
+        filter.key === 'instanceId' &&
+        filter.value &&
+        service.instanceId !== filter.value
+      ) {
         return false;
       }
-      if (filter.key === 'group' && filter.value && service.labels.group !== filter.value) {
+      if (
+        filter.key === 'group' &&
+        filter.value &&
+        service.labels.group !== filter.value
+      ) {
         return false;
       }
-      if (filter.key === 'region' && filter.value && service.labels.region !== filter.value) {
+      if (
+        filter.key === 'region' &&
+        filter.value &&
+        service.labels.region !== filter.value
+      ) {
         return false;
       }
-      if (filter.key === 'env' && filter.value && service.labels.environmentId !== filter.value) {
+      if (
+        filter.key === 'env' &&
+        filter.value &&
+        service.labels.environmentId !== filter.value
+      ) {
         return false;
       }
-      if (filter.key === 'role' && filter.value && service.labels.role !== filter.value) {
+      if (
+        filter.key === 'role' &&
+        filter.value &&
+        service.labels.role !== filter.value
+      ) {
         return false;
       }
-      if (filter.key === 'hostname' && filter.value && service.hostname !== filter.value) {
+      if (
+        filter.key === 'hostname' &&
+        filter.value &&
+        service.hostname !== filter.value
+      ) {
         return false;
       }
       if (
@@ -3469,7 +3755,8 @@ const ServerListPage: React.FC = () => {
       else if (s.status === 'ready') counts.ready++;
       else if (s.status === 'shutting_down') counts.shutting_down++;
       else if (s.status === 'terminated') counts.terminated++;
-      else if (s.status === 'error' || s.status === 'no-response') counts.error++;
+      else if (s.status === 'error' || s.status === 'no-response')
+        counts.error++;
     });
     return counts;
   }, [filteredServices]);
@@ -3581,7 +3868,11 @@ const ServerListPage: React.FC = () => {
     }
 
     return (
-      <Tooltip title={t(`serverList.statusTooltip.${config.tooltipKey}`)} arrow placement="top">
+      <Tooltip
+        title={t(`serverList.statusTooltip.${config.tooltipKey}`)}
+        arrow
+        placement="top"
+      >
         <Chip
           icon={config.icon}
           label={config.label}
@@ -3593,7 +3884,11 @@ const ServerListPage: React.FC = () => {
     );
   };
 
-  const renderHeartbeatIcon = (service: ServiceInstance, size = 26, iconSize = 14) => {
+  const renderHeartbeatIcon = (
+    service: ServiceInstance,
+    size = 26,
+    iconSize = 14
+  ) => {
     const serviceKey = `${service.labels.service}-${service.instanceId}`;
     const isActive = heartbeatIds.has(serviceKey);
     const statusColor = getStatusColor(service.status);
@@ -3611,7 +3906,9 @@ const ServerListPage: React.FC = () => {
               sx={{
                 ...sx,
                 color: isActive ? 'error.main' : statusColor,
-                animation: isActive ? 'heartbeat 0.6s ease-in-out infinite' : 'none',
+                animation: isActive
+                  ? 'heartbeat 0.6s ease-in-out infinite'
+                  : 'none',
                 '@keyframes heartbeat': {
                   '0%': { transform: 'scale(1)' },
                   '25%': { transform: 'scale(1.3)' },
@@ -3645,7 +3942,9 @@ const ServerListPage: React.FC = () => {
           borderRadius: '50% !important',
           border: '1px solid',
           borderColor:
-            service.status === 'ready' && isActive ? 'error.main' : alpha(statusColor, 0.3),
+            service.status === 'ready' && isActive
+              ? 'error.main'
+              : alpha(statusColor, 0.3),
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -3700,13 +3999,17 @@ const ServerListPage: React.FC = () => {
           ? alpha(theme.palette.warning.main, 0.06)
           : alpha(theme.palette.warning.main, 0.04);
       case 'shutting_down':
-        return isDark ? alpha(theme.palette.info.main, 0.06) : alpha(theme.palette.info.main, 0.04);
+        return isDark
+          ? alpha(theme.palette.info.main, 0.06)
+          : alpha(theme.palette.info.main, 0.04);
       case 'error':
         return isDark
           ? alpha(theme.palette.error.main, 0.08)
           : alpha(theme.palette.error.main, 0.05);
       case 'terminated':
-        return isDark ? alpha(theme.palette.grey[500], 0.08) : alpha(theme.palette.grey[500], 0.05);
+        return isDark
+          ? alpha(theme.palette.grey[500], 0.08)
+          : alpha(theme.palette.grey[500], 0.05);
       case 'no-response':
         return isDark
           ? alpha(theme.palette.warning.main, 0.08)
@@ -3729,13 +4032,17 @@ const ServerListPage: React.FC = () => {
           ? alpha(theme.palette.success.main, 0.12)
           : alpha(theme.palette.success.main, 0.08);
       case 'shutting_down':
-        return isDark ? alpha(theme.palette.info.main, 0.12) : alpha(theme.palette.info.main, 0.08);
+        return isDark
+          ? alpha(theme.palette.info.main, 0.12)
+          : alpha(theme.palette.info.main, 0.08);
       case 'error':
         return isDark
           ? alpha(theme.palette.error.main, 0.12)
           : alpha(theme.palette.error.main, 0.08);
       case 'terminated':
-        return isDark ? alpha(theme.palette.grey[500], 0.12) : alpha(theme.palette.grey[500], 0.08);
+        return isDark
+          ? alpha(theme.palette.grey[500], 0.12)
+          : alpha(theme.palette.grey[500], 0.08);
       default:
         return isDark
           ? alpha(theme.palette.primary.main, 0.12)
@@ -3755,13 +4062,17 @@ const ServerListPage: React.FC = () => {
           ? alpha(theme.palette.success.main, 0.2)
           : alpha(theme.palette.success.main, 0.15);
       case 'shutting_down':
-        return isDark ? alpha(theme.palette.info.main, 0.2) : alpha(theme.palette.info.main, 0.15);
+        return isDark
+          ? alpha(theme.palette.info.main, 0.2)
+          : alpha(theme.palette.info.main, 0.15);
       case 'error':
         return isDark
           ? alpha(theme.palette.error.main, 0.2)
           : alpha(theme.palette.error.main, 0.15);
       case 'terminated':
-        return isDark ? alpha(theme.palette.grey[500], 0.2) : alpha(theme.palette.grey[500], 0.15);
+        return isDark
+          ? alpha(theme.palette.grey[500], 0.2)
+          : alpha(theme.palette.grey[500], 0.15);
       default:
         return isDark
           ? alpha(theme.palette.primary.main, 0.2)
@@ -3829,7 +4140,9 @@ const ServerListPage: React.FC = () => {
                 gap: 1.5,
                 p: 1,
                 bgcolor: (theme) =>
-                  theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255,255,255,0.03)'
+                    : 'rgba(0,0,0,0.02)',
                 border: '1px solid',
                 borderColor: 'divider',
                 flexWrap: 'wrap',
@@ -3862,7 +4175,11 @@ const ServerListPage: React.FC = () => {
                   {columns
                     .filter((c) => c.id !== 'actions')
                     .map((col) => (
-                      <MenuItem key={col.id} value={col.id} sx={{ fontSize: '0.75rem' }}>
+                      <MenuItem
+                        key={col.id}
+                        value={col.id}
+                        sx={{ fontSize: '0.75rem' }}
+                      >
                         {t(col.labelKey)}
                       </MenuItem>
                     ))}
@@ -3870,7 +4187,9 @@ const ServerListPage: React.FC = () => {
                 <Tooltip title={t('common.sort')}>
                   <IconButton
                     size="small"
-                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                    onClick={() =>
+                      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+                    }
                     sx={{
                       bgcolor: 'background.paper',
                       border: '1px solid',
@@ -3998,16 +4317,28 @@ const ServerListPage: React.FC = () => {
                       icon: <BubbleChartIcon fontSize="small" />,
                     },
                   ].map((item) => (
-                    <Tooltip key={item.mode} title={t(`serverList.viewMode.${item.mode}`)}>
+                    <Tooltip
+                      key={item.mode}
+                      title={t(`serverList.viewMode.${item.mode}`)}
+                    >
                       <IconButton
                         size="small"
                         onClick={() => handleViewModeChange(item.mode as any)}
                         sx={{
                           borderRadius: 0,
-                          bgcolor: viewMode === item.mode ? 'primary.main' : 'background.paper',
-                          color: viewMode === item.mode ? 'primary.contrastText' : 'inherit',
+                          bgcolor:
+                            viewMode === item.mode
+                              ? 'primary.main'
+                              : 'background.paper',
+                          color:
+                            viewMode === item.mode
+                              ? 'primary.contrastText'
+                              : 'inherit',
                           '&:hover': {
-                            bgcolor: viewMode === item.mode ? 'primary.dark' : 'action.hover',
+                            bgcolor:
+                              viewMode === item.mode
+                                ? 'primary.dark'
+                                : 'action.hover',
                           },
                         }}
                       >
@@ -4023,7 +4354,11 @@ const ServerListPage: React.FC = () => {
               {/* Real-time Actions (Pause, Cleanup, HealthCheck) */}
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Tooltip
-                  title={isPaused ? t('serverList.resumeUpdates') : t('serverList.pauseUpdates')}
+                  title={
+                    isPaused
+                      ? t('serverList.resumeUpdates')
+                      : t('serverList.pauseUpdates')
+                  }
                 >
                   <Badge
                     badgeContent={pendingUpdates.length}
@@ -4081,8 +4416,10 @@ const ServerListPage: React.FC = () => {
                       size="small"
                       onClick={handleBulkHealthCheckOpen}
                       disabled={
-                        services.filter((s) => s.status === 'ready' || s.status === 'initializing')
-                          .length === 0
+                        services.filter(
+                          (s) =>
+                            s.status === 'ready' || s.status === 'initializing'
+                        ).length === 0
                       }
                       sx={{
                         height: 28,
@@ -4127,7 +4464,8 @@ const ServerListPage: React.FC = () => {
               levels: GroupingField[],
               currentLevel: number = 0
             ): ListGroup[] => {
-              if (levels.length === 0 || currentLevel >= levels.length) return [];
+              if (levels.length === 0 || currentLevel >= levels.length)
+                return [];
               const currentField = levels[currentLevel];
               const hasMoreLevels = currentLevel + 1 < levels.length;
               const groupMap = new Map<string, ServiceInstance[]>();
@@ -4140,7 +4478,10 @@ const ServerListPage: React.FC = () => {
                 .sort(([a], [b]) => a.localeCompare(b))
                 .map(([name, instances]) => ({
                   id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
-                  name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
+                  name:
+                    name === 'Unknown'
+                      ? `(${getGroupingLabel(currentField)} N/A)`
+                      : name,
                   level: currentLevel,
                   fieldName: currentField,
                   instances: hasMoreLevels ? [] : instances,
@@ -4150,13 +4491,18 @@ const ServerListPage: React.FC = () => {
                 }));
             };
 
-            const collectListInstances = (group: ListGroup): ServiceInstance[] => {
+            const collectListInstances = (
+              group: ListGroup
+            ): ServiceInstance[] => {
               if (group.children && group.children.length > 0)
                 return group.children.flatMap(collectListInstances);
               return group.instances;
             };
 
-            const renderServiceRow = (service: ServiceInstance, depth: number) => {
+            const renderServiceRow = (
+              service: ServiceInstance,
+              depth: number
+            ) => {
               const serviceKey = `${service.labels.service}-${service.instanceId}`;
               const updatedStatus = updatedServiceIds.get(serviceKey);
               const isUpdated = updatedStatus !== undefined;
@@ -4273,7 +4619,9 @@ const ServerListPage: React.FC = () => {
                             >
                               {renderHeartbeatIcon(service, 20, 10)}
                               <Chip
-                                label={getStatusLabelText(service.status).toUpperCase()}
+                                label={getStatusLabelText(
+                                  service.status
+                                ).toUpperCase()}
                                 size="small"
                                 sx={{
                                   height: 20,
@@ -4281,10 +4629,16 @@ const ServerListPage: React.FC = () => {
                                   fontSize: '0.65rem',
                                   fontWeight: 900,
                                   borderRadius: 0,
-                                  bgcolor: alpha(getStatusColor(service.status), 0.1),
+                                  bgcolor: alpha(
+                                    getStatusColor(service.status),
+                                    0.1
+                                  ),
                                   color: getStatusColor(service.status),
                                   border: '1px solid',
-                                  borderColor: alpha(getStatusColor(service.status), 0.2),
+                                  borderColor: alpha(
+                                    getStatusColor(service.status),
+                                    0.2
+                                  ),
                                 }}
                               />
                             </Box>
@@ -4336,8 +4690,12 @@ const ServerListPage: React.FC = () => {
                         );
                       case 'ports':
                         const portEntries = Object.entries(service.ports || {});
-                        const portsExpanded = expandedCells.has(`${serviceKey}-ports`);
-                        const visiblePorts = portsExpanded ? portEntries : portEntries.slice(0, 2);
+                        const portsExpanded = expandedCells.has(
+                          `${serviceKey}-ports`
+                        );
+                        const visiblePorts = portsExpanded
+                          ? portEntries
+                          : portEntries.slice(0, 2);
                         const hiddenPortsCount = portEntries.length - 2;
                         return (
                           <TableCell key={column.id}>
@@ -4406,62 +4764,74 @@ const ServerListPage: React.FC = () => {
                       case 'stats':
                         return (
                           <TableCell key={column.id}>
-                            {service.stats && Object.keys(service.stats).length > 0 && (
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  gap: 0.25,
-                                }}
-                              >
-                                {Object.entries(service.stats).map(([k, v]) => (
-                                  <Typography
-                                    key={k}
-                                    variant="caption"
-                                    sx={{
-                                      fontSize: '0.65rem',
-                                      color: 'text.secondary',
-                                      fontFamily: '"D2Coding", monospace',
-                                    }}
-                                  >
-                                    {k}: {typeof v === 'number' ? v.toFixed(2) : String(v)}
-                                  </Typography>
-                                ))}
-                              </Box>
-                            )}
+                            {service.stats &&
+                              Object.keys(service.stats).length > 0 && (
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 0.25,
+                                  }}
+                                >
+                                  {Object.entries(service.stats).map(
+                                    ([k, v]) => (
+                                      <Typography
+                                        key={k}
+                                        variant="caption"
+                                        sx={{
+                                          fontSize: '0.65rem',
+                                          color: 'text.secondary',
+                                          fontFamily: '"D2Coding", monospace',
+                                        }}
+                                      >
+                                        {k}:{' '}
+                                        {typeof v === 'number'
+                                          ? v.toFixed(2)
+                                          : String(v)}
+                                      </Typography>
+                                    )
+                                  )}
+                                </Box>
+                              )}
                           </TableCell>
                         );
                       case 'meta':
                         return (
                           <TableCell key={column.id}>
-                            {service.meta && Object.keys(service.meta).length > 0 && (
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  gap: 0.25,
-                                }}
-                              >
-                                {Object.entries(service.meta).map(([k, v]) => (
-                                  <Typography
-                                    key={k}
-                                    variant="caption"
-                                    sx={{
-                                      fontSize: '0.65rem',
-                                      color: 'text.secondary',
-                                    }}
-                                  >
-                                    {k}: {String(v)}
-                                  </Typography>
-                                ))}
-                              </Box>
-                            )}
+                            {service.meta &&
+                              Object.keys(service.meta).length > 0 && (
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 0.25,
+                                  }}
+                                >
+                                  {Object.entries(service.meta).map(
+                                    ([k, v]) => (
+                                      <Typography
+                                        key={k}
+                                        variant="caption"
+                                        sx={{
+                                          fontSize: '0.65rem',
+                                          color: 'text.secondary',
+                                        }}
+                                      >
+                                        {k}: {String(v)}
+                                      </Typography>
+                                    )
+                                  )}
+                                </Box>
+                              )}
                           </TableCell>
                         );
                       case 'createdAt':
                         return (
                           <TableCell key={column.id}>
-                            <RelativeTime date={service.createdAt} showSeconds />
+                            <RelativeTime
+                              date={service.createdAt}
+                              showSeconds
+                            />
                           </TableCell>
                         );
                       case 'updatedAt':
@@ -4484,8 +4854,13 @@ const ServerListPage: React.FC = () => {
                               }}
                             >
                               {(() => {
-                                const lastUpdate = new Date(service.updatedAt).getTime();
-                                const diff = Math.max(0, currentTime - lastUpdate);
+                                const lastUpdate = new Date(
+                                  service.updatedAt
+                                ).getTime();
+                                const diff = Math.max(
+                                  0,
+                                  currentTime - lastUpdate
+                                );
                                 const ttlMs = HEARTBEAT_TTL_SECONDS * 1000;
                                 const progress = Math.max(
                                   0,
@@ -4541,7 +4916,9 @@ const ServerListPage: React.FC = () => {
                         );
                       case 'labels':
                         const labelEntries = Object.entries(service.labels);
-                        const labelsExpanded = expandedCells.has(`${serviceKey}-labels`);
+                        const labelsExpanded = expandedCells.has(
+                          `${serviceKey}-labels`
+                        );
                         const visibleLabels = labelsExpanded
                           ? labelEntries
                           : labelEntries.slice(0, 2);
@@ -4614,14 +4991,19 @@ const ServerListPage: React.FC = () => {
                         );
                       case 'cloudRegion':
                         return (
-                          <TableCell key={column.id}>{service.labels.cloudRegion || '-'}</TableCell>
+                          <TableCell key={column.id}>
+                            {service.labels.cloudRegion || '-'}
+                          </TableCell>
                         );
                       case 'cloudZone':
                         return (
-                          <TableCell key={column.id}>{service.labels.cloudZone || '-'}</TableCell>
+                          <TableCell key={column.id}>
+                            {service.labels.cloudZone || '-'}
+                          </TableCell>
                         );
                       case 'actions':
-                        const rowHealthStatus = healthCheckStatus.get(serviceKey);
+                        const rowHealthStatus =
+                          healthCheckStatus.get(serviceKey);
                         return (
                           <TableCell key={column.id} align="center">
                             <Box
@@ -4638,43 +5020,47 @@ const ServerListPage: React.FC = () => {
                               >
                                 <MoreVertIcon fontSize="small" />
                               </IconButton>
-                              {rowHealthStatus?.loading && <CircularProgress size={16} />}
-                              {rowHealthStatus?.cooldown && rowHealthStatus.result && (
-                                <Tooltip
-                                  title={
-                                    rowHealthStatus.result.healthy
-                                      ? 'Healthy'
-                                      : rowHealthStatus.result.error || 'Unknown error'
-                                  }
-                                  arrow
-                                >
-                                  <Chip
-                                    label={
-                                      rowHealthStatus.result.healthy
-                                        ? `${rowHealthStatus.result.latency}ms`
-                                        : 'ERR'
-                                    }
-                                    size="small"
-                                    sx={{
-                                      height: 20,
-                                      fontSize: '0.65rem',
-                                      fontWeight: 800,
-                                      borderRadius: 0,
-                                      bgcolor: rowHealthStatus.result.healthy
-                                        ? 'success.main'
-                                        : 'error.main',
-                                      color: 'white',
-                                      animation: rowHealthStatus.fading
-                                        ? 'fadeOut 0.5s ease-out forwards'
-                                        : 'none',
-                                      '@keyframes fadeOut': {
-                                        from: { opacity: 1 },
-                                        to: { opacity: 0 },
-                                      },
-                                    }}
-                                  />
-                                </Tooltip>
+                              {rowHealthStatus?.loading && (
+                                <CircularProgress size={16} />
                               )}
+                              {rowHealthStatus?.cooldown &&
+                                rowHealthStatus.result && (
+                                  <Tooltip
+                                    title={
+                                      rowHealthStatus.result.healthy
+                                        ? 'Healthy'
+                                        : rowHealthStatus.result.error ||
+                                          'Unknown error'
+                                    }
+                                    arrow
+                                  >
+                                    <Chip
+                                      label={
+                                        rowHealthStatus.result.healthy
+                                          ? `${rowHealthStatus.result.latency}ms`
+                                          : 'ERR'
+                                      }
+                                      size="small"
+                                      sx={{
+                                        height: 20,
+                                        fontSize: '0.65rem',
+                                        fontWeight: 800,
+                                        borderRadius: 0,
+                                        bgcolor: rowHealthStatus.result.healthy
+                                          ? 'success.main'
+                                          : 'error.main',
+                                        color: 'white',
+                                        animation: rowHealthStatus.fading
+                                          ? 'fadeOut 0.5s ease-out forwards'
+                                          : 'none',
+                                        '@keyframes fadeOut': {
+                                          from: { opacity: 1 },
+                                          to: { opacity: 0 },
+                                        },
+                                      }}
+                                    />
+                                  </Tooltip>
+                                )}
                             </Box>
                           </TableCell>
                         );
@@ -4725,7 +5111,10 @@ const ServerListPage: React.FC = () => {
                       <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                         {group.name}
                       </Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 700, opacity: 0.6 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ fontWeight: 700, opacity: 0.6 }}
+                      >
                         ({allInstances.length})
                       </Typography>
                     </Box>
@@ -4735,7 +5124,10 @@ const ServerListPage: React.FC = () => {
 
               if (!group.children || group.children.length === 0) {
                 rows.push(
-                  <TableRow key={`group-cols-${group.id}`} sx={{ bgcolor: 'background.paper' }}>
+                  <TableRow
+                    key={`group-cols-${group.id}`}
+                    sx={{ bgcolor: 'background.paper' }}
+                  >
                     {visibleColumns.map((col) => (
                       <TableCell
                         key={`col-${group.id}-${col.id}`}
@@ -4756,14 +5148,19 @@ const ServerListPage: React.FC = () => {
               }
 
               if (group.children && group.children.length > 0) {
-                group.children.forEach((child) => rows.push(...renderGroupRows(child)));
+                group.children.forEach((child) =>
+                  rows.push(...renderGroupRows(child))
+                );
               } else {
                 group.instances.forEach((service) =>
                   rows.push(renderServiceRow(service, group.level + 1))
                 );
                 rows.push(
                   <TableRow key={`spacer-${group.id}`} sx={{ height: 16 }}>
-                    <TableCell colSpan={visibleColumns.length} sx={{ border: 'none' }} />
+                    <TableCell
+                      colSpan={visibleColumns.length}
+                      sx={{ border: 'none' }}
+                    />
                   </TableRow>
                 );
               }
@@ -4771,7 +5168,9 @@ const ServerListPage: React.FC = () => {
             };
 
             const listGroups =
-              groupingLevels.length > 0 ? buildListGroups(displayServices, groupingLevels) : [];
+              groupingLevels.length > 0
+                ? buildListGroups(displayServices, groupingLevels)
+                : [];
             const visibleColumnsHeader = columns.filter((col) => col.visible);
 
             return displayServices.length === 0 ? (
@@ -4811,7 +5210,9 @@ const ServerListPage: React.FC = () => {
                     <TableBody>
                       {groupingLevels.length > 0
                         ? listGroups.flatMap((group) => renderGroupRows(group))
-                        : displayServices.map((service) => renderServiceRow(service, 0))}
+                        : displayServices.map((service) =>
+                            renderServiceRow(service, 0)
+                          )}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -4838,7 +5239,8 @@ const ServerListPage: React.FC = () => {
               levels: GroupingField[],
               currentLevel: number = 0
             ): GridGroup[] => {
-              if (levels.length === 0 || currentLevel >= levels.length) return [];
+              if (levels.length === 0 || currentLevel >= levels.length)
+                return [];
               const currentField = levels[currentLevel];
               const hasMoreLevels = currentLevel + 1 < levels.length;
               const groupMap = new Map<string, ServiceInstance[]>();
@@ -4851,7 +5253,10 @@ const ServerListPage: React.FC = () => {
                 .sort(([a], [b]) => a.localeCompare(b))
                 .map(([name, instances]) => ({
                   id: `grid-${levels.slice(0, currentLevel + 1).join('-')}-${name}`,
-                  name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
+                  name:
+                    name === 'Unknown'
+                      ? `(${getGroupingLabel(currentField)} N/A)`
+                      : name,
                   level: currentLevel,
                   fieldName: currentField,
                   instances: hasMoreLevels ? [] : instances,
@@ -4861,7 +5266,9 @@ const ServerListPage: React.FC = () => {
                 }));
             };
 
-            const collectGridInstances = (group: GridGroup): ServiceInstance[] => {
+            const collectGridInstances = (
+              group: GridGroup
+            ): ServiceInstance[] => {
               if (group.children && group.children.length > 0)
                 return group.children.flatMap(collectGridInstances);
               return group.instances;
@@ -4901,7 +5308,9 @@ const ServerListPage: React.FC = () => {
                       alignItems: 'center',
                     }}
                   >
-                    <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                    <Box
+                      sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}
+                    >
                       {getTypeChip(service.labels.service)}
                       <Chip
                         label={getStatusLabelText(service.status).toUpperCase()}
@@ -4915,23 +5324,34 @@ const ServerListPage: React.FC = () => {
                           bgcolor: alpha(getStatusColor(service.status), 0.1),
                           color: getStatusColor(service.status),
                           border: '1px solid',
-                          borderColor: alpha(getStatusColor(service.status), 0.2),
+                          borderColor: alpha(
+                            getStatusColor(service.status),
+                            0.2
+                          ),
                         }}
                       />
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
                       {renderHeartbeatIcon(service, 20, 10)}
                       {hasWebPort(service) &&
                         (() => {
-                          const gridHealthStatus = healthCheckStatus.get(serviceKey);
-                          if (gridHealthStatus?.loading) return <CircularProgress size={12} />;
-                          if (gridHealthStatus?.cooldown && gridHealthStatus.result) {
+                          const gridHealthStatus =
+                            healthCheckStatus.get(serviceKey);
+                          if (gridHealthStatus?.loading)
+                            return <CircularProgress size={12} />;
+                          if (
+                            gridHealthStatus?.cooldown &&
+                            gridHealthStatus.result
+                          ) {
                             return (
                               <Tooltip
                                 title={
                                   gridHealthStatus.result.healthy
                                     ? 'Healthy'
-                                    : gridHealthStatus.result.error || 'Unknown error'
+                                    : gridHealthStatus.result.error ||
+                                      'Unknown error'
                                 }
                                 arrow
                               >
@@ -4968,7 +5388,9 @@ const ServerListPage: React.FC = () => {
                               }}
                               sx={{ p: 0, width: 14, height: 14 }}
                             >
-                              <TouchAppIcon sx={{ fontSize: 10, opacity: 0.6 }} />
+                              <TouchAppIcon
+                                sx={{ fontSize: 10, opacity: 0.6 }}
+                              />
                             </IconButton>
                           );
                         })()}
@@ -4995,8 +5417,14 @@ const ServerListPage: React.FC = () => {
                     {service.instanceId}
                   </Typography>
 
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  <Box
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}
+                  >
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600 }}
+                    >
                       {service.hostname}
                     </Typography>
                     <Typography
@@ -5036,7 +5464,9 @@ const ServerListPage: React.FC = () => {
               );
             };
 
-            const renderGridGroupRecursive = (group: GridGroup): React.ReactNode => {
+            const renderGridGroupRecursive = (
+              group: GridGroup
+            ): React.ReactNode => {
               const allInstances = collectGridInstances(group);
               const hasChildren = group.children && group.children.length > 0;
               const colCount = 5;
@@ -5072,14 +5502,21 @@ const ServerListPage: React.FC = () => {
                     <Typography variant="body2" sx={{ fontWeight: 800 }}>
                       {group.name}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: 'text.disabled' }}
+                    >
                       ({allInstances.length})
                     </Typography>
                   </Box>
 
                   {hasChildren ? (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {group.children!.map((child) => renderGridGroupRecursive(child))}
+                    <Box
+                      sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+                    >
+                      {group.children!.map((child) =>
+                        renderGridGroupRecursive(child)
+                      )}
                     </Box>
                   ) : (
                     <Box
@@ -5101,7 +5538,9 @@ const ServerListPage: React.FC = () => {
                         },
                       }}
                     >
-                      {group.instances.map((service) => renderDetailedGridCard(service))}
+                      {group.instances.map((service) =>
+                        renderDetailedGridCard(service)
+                      )}
                       {/* Restore Empty Placeholders */}
                       {Array.from({ length: emptyCount }).map((_, idx) => (
                         <Box
@@ -5122,13 +5561,16 @@ const ServerListPage: React.FC = () => {
             };
 
             const groups =
-              groupingLevels.length > 0 ? buildGridGroups(gridDisplayServices, groupingLevels) : [];
+              groupingLevels.length > 0
+                ? buildGridGroups(gridDisplayServices, groupingLevels)
+                : [];
 
             if (groupingLevels.length === 0) {
               const colCount = 5;
               const emptyCount =
                 gridDisplayServices.length > 0
-                  ? (colCount - (gridDisplayServices.length % colCount)) % colCount
+                  ? (colCount - (gridDisplayServices.length % colCount)) %
+                    colCount
                   : 0;
               return (
                 <Box
@@ -5142,7 +5584,9 @@ const ServerListPage: React.FC = () => {
                     alignContent: 'start',
                   }}
                 >
-                  {gridDisplayServices.map((service) => renderDetailedGridCard(service))}
+                  {gridDisplayServices.map((service) =>
+                    renderDetailedGridCard(service)
+                  )}
                   {Array.from({ length: emptyCount }).map((_, idx) => (
                     <Box
                       key={`empty-flatTarget-${idx}`}
@@ -5199,7 +5643,8 @@ const ServerListPage: React.FC = () => {
               levels: GroupingField[],
               currentLevel: number = 0
             ): CardGroup[] => {
-              if (levels.length === 0 || currentLevel >= levels.length) return [];
+              if (levels.length === 0 || currentLevel >= levels.length)
+                return [];
               const currentField = levels[currentLevel];
               const hasMoreLevels = currentLevel + 1 < levels.length;
               const groupMap = new Map<string, ServiceInstance[]>();
@@ -5212,7 +5657,10 @@ const ServerListPage: React.FC = () => {
                 .sort(([a], [b]) => a.localeCompare(b))
                 .map(([name, instances]) => ({
                   id: levels.slice(0, currentLevel + 1).join('-') + '-' + name,
-                  name: name === 'Unknown' ? `(${getGroupingLabel(currentField)} N/A)` : name,
+                  name:
+                    name === 'Unknown'
+                      ? `(${getGroupingLabel(currentField)} N/A)`
+                      : name,
                   level: currentLevel,
                   fieldName: currentField,
                   instances: hasMoreLevels ? [] : instances,
@@ -5223,7 +5671,9 @@ const ServerListPage: React.FC = () => {
             };
 
             // Collect all instances from a group recursively
-            const collectCardInstances = (group: CardGroup): ServiceInstance[] => {
+            const collectCardInstances = (
+              group: CardGroup
+            ): ServiceInstance[] => {
               if (group.children && group.children.length > 0)
                 return group.children.flatMap(collectCardInstances);
               return group.instances;
@@ -5238,7 +5688,10 @@ const ServerListPage: React.FC = () => {
               const highlightStatus = updatedStatus || service.status;
               const customLabels = Object.entries(service.labels).filter(
                 ([key]) =>
-                  key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'region'
+                  key !== 'service' &&
+                  key !== 'group' &&
+                  key !== 'environment' &&
+                  key !== 'region'
               );
               const ports = Object.entries(service.ports || {});
 
@@ -5256,7 +5709,9 @@ const ServerListPage: React.FC = () => {
                     borderColor: 'divider',
                     bgcolor: isUpdated
                       ? (theme) => getHighlightColor(highlightStatus, theme)
-                      : (theme) => getStatusBgColor(service.status, theme) || 'background.paper',
+                      : (theme) =>
+                          getStatusBgColor(service.status, theme) ||
+                          'background.paper',
                     transition: 'all 0.1s ease-in-out',
                     animation: isNew
                       ? 'appearEffect 0.5s ease-out'
@@ -5274,11 +5729,13 @@ const ServerListPage: React.FC = () => {
                     },
                     [`@keyframes flashEffect-${highlightStatus}`]: {
                       '0%': {
-                        bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme),
+                        bgcolor: (theme) =>
+                          getHighlightColorStart(highlightStatus, theme),
                       },
                       '100%': {
                         bgcolor: (theme) =>
-                          getStatusBgColor(service.status, theme) || 'background.paper',
+                          getStatusBgColor(service.status, theme) ||
+                          'background.paper',
                       },
                     },
                   }}
@@ -5345,24 +5802,34 @@ const ServerListPage: React.FC = () => {
                       )}
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
                         {getStatusBadge(service.status)}
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
                         {/* Only show heartbeat icon for initializing/ready status */}
                         {renderHeartbeatIcon(service, 26, 14)}
                         {/* Move health check button here */}
                         {hasWebPort(service) &&
                           (() => {
-                            const cardHealthStatus = healthCheckStatus.get(serviceKey);
-                            if (cardHealthStatus?.loading) return <CircularProgress size={16} />;
-                            if (cardHealthStatus?.cooldown && cardHealthStatus.result) {
+                            const cardHealthStatus =
+                              healthCheckStatus.get(serviceKey);
+                            if (cardHealthStatus?.loading)
+                              return <CircularProgress size={16} />;
+                            if (
+                              cardHealthStatus?.cooldown &&
+                              cardHealthStatus.result
+                            ) {
                               return (
                                 <Tooltip
                                   title={
                                     cardHealthStatus.result.healthy
                                       ? 'Healthy'
-                                      : cardHealthStatus.result.error || 'Unknown error'
+                                      : cardHealthStatus.result.error ||
+                                        'Unknown error'
                                   }
                                   arrow
                                 >
@@ -5391,7 +5858,10 @@ const ServerListPage: React.FC = () => {
                               );
                             }
                             return (
-                              <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
+                              <Tooltip
+                                title={t('serverList.healthCheck.tooltip')}
+                                arrow
+                              >
                                 <IconButton
                                   size="small"
                                   onClick={(e) => {
@@ -5419,8 +5889,10 @@ const ServerListPage: React.FC = () => {
                         size="small"
                         onClick={(e) => {
                           setContextMenu({
-                            mouseX: e.currentTarget.getBoundingClientRect().left,
-                            mouseY: e.currentTarget.getBoundingClientRect().bottom,
+                            mouseX:
+                              e.currentTarget.getBoundingClientRect().left,
+                            mouseY:
+                              e.currentTarget.getBoundingClientRect().bottom,
                             service,
                           });
                         }}
@@ -5434,7 +5906,10 @@ const ServerListPage: React.FC = () => {
                   {/* Hostname */}
                   <Typography
                     variant="body2"
-                    sx={{ fontFamily: '"D2Coding", monospace', fontWeight: 600 }}
+                    sx={{
+                      fontFamily: '"D2Coding", monospace',
+                      fontWeight: 600,
+                    }}
                   >
                     {service.hostname}
                   </Typography>
@@ -5475,9 +5950,13 @@ const ServerListPage: React.FC = () => {
                     }}
                   >
                     <Typography className="label">External</Typography>
-                    <Typography className="value">{service.externalAddress}</Typography>
+                    <Typography className="value">
+                      {service.externalAddress}
+                    </Typography>
                     <Typography className="label">Internal</Typography>
-                    <Typography className="value">{service.internalAddress}</Typography>
+                    <Typography className="value">
+                      {service.internalAddress}
+                    </Typography>
                   </Box>
 
                   {/* Ports - Compact inline chips */}
@@ -5553,7 +6032,10 @@ const ServerListPage: React.FC = () => {
                       }}
                     >
                       {Object.entries(service.stats).map(([key, value]) => (
-                        <Box key={`${service.instanceId}-${key}`} sx={{ textAlign: 'center' }}>
+                        <Box
+                          key={`${service.instanceId}-${key}`}
+                          sx={{ textAlign: 'center' }}
+                        >
                           <Typography
                             variant="caption"
                             color="text.secondary"
@@ -5561,8 +6043,13 @@ const ServerListPage: React.FC = () => {
                           >
                             {key}
                           </Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
-                            {typeof value === 'number' ? value.toFixed(1) : String(value)}
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, fontSize: '0.8rem' }}
+                          >
+                            {typeof value === 'number'
+                              ? value.toFixed(1)
+                              : String(value)}
                           </Typography>
                         </Box>
                       ))}
@@ -5580,7 +6067,10 @@ const ServerListPage: React.FC = () => {
               const hasChildren = group.children && group.children.length > 0;
 
               return (
-                <Box key={group.id} sx={{ mb: group.level === 0 ? 4 : 3, ml: group.level * 2 }}>
+                <Box
+                  key={group.id}
+                  sx={{ mb: group.level === 0 ? 4 : 3, ml: group.level * 2 }}
+                >
                   {/* Premium Group Header */}
                   <Box
                     sx={{
@@ -5615,20 +6105,29 @@ const ServerListPage: React.FC = () => {
                         px: 2,
                         py: 0.75,
                         borderRadius: 0,
-                        bgcolor: group.level === 0 ? 'primary.main' : 'action.selected',
-                        color: group.level === 0 ? 'primary.contrastText' : 'text.primary',
+                        bgcolor:
+                          group.level === 0
+                            ? 'primary.main'
+                            : 'action.selected',
+                        color:
+                          group.level === 0
+                            ? 'primary.contrastText'
+                            : 'text.primary',
                         boxShadow:
                           group.level === 0
-                            ? (theme) => `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
+                            ? (theme) =>
+                                `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
                             : 'none',
                         border: group.level === 0 ? 'none' : '1px solid',
                         borderColor: 'divider',
                         transition: 'all 0.2s ease',
                         '&:hover': {
-                          transform: group.level === 0 ? 'translateY(-1px)' : 'none',
+                          transform:
+                            group.level === 0 ? 'translateY(-1px)' : 'none',
                           boxShadow:
                             group.level === 0
-                              ? (theme) => `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}`
+                              ? (theme) =>
+                                  `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}`
                               : 'none',
                         },
                       }}
@@ -5645,7 +6144,10 @@ const ServerListPage: React.FC = () => {
                       >
                         {getGroupingLabel(group.fieldName)}
                       </Typography>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 800, fontSize: '1rem' }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: 800, fontSize: '1rem' }}
+                      >
                         {group.name}
                       </Typography>
                       <Box
@@ -5670,7 +6172,13 @@ const ServerListPage: React.FC = () => {
 
                   {/* Render children or cards */}
                   {hasChildren ? (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1.5,
+                      }}
+                    >
                       {group.children!.map((child) => renderCardGroup(child))}
                     </Box>
                   ) : (
@@ -5687,7 +6195,9 @@ const ServerListPage: React.FC = () => {
                         },
                       }}
                     >
-                      {group.instances.map((service) => renderServiceCard(service))}
+                      {group.instances.map((service) =>
+                        renderServiceCard(service)
+                      )}
                     </Box>
                   )}
                 </Box>
@@ -5695,7 +6205,9 @@ const ServerListPage: React.FC = () => {
             };
 
             const groups =
-              groupingLevels.length > 0 ? buildCardGroups(gridDisplayServices, groupingLevels) : [];
+              groupingLevels.length > 0
+                ? buildCardGroups(gridDisplayServices, groupingLevels)
+                : [];
 
             // No grouping - render flat grid
             if (groupingLevels.length === 0) {
@@ -5719,7 +6231,9 @@ const ServerListPage: React.FC = () => {
                       <EmptyPagePlaceholder message={t('serverList.noData')} />
                     </Box>
                   ) : (
-                    gridDisplayServices.map((service) => renderServiceCard(service))
+                    gridDisplayServices.map((service) =>
+                      renderServiceCard(service)
+                    )
                   )}
                 </Box>
               );
@@ -5819,7 +6333,9 @@ const ServerListPage: React.FC = () => {
         aria-labelledby="cleanup-dialog-title"
         aria-describedby="cleanup-dialog-description"
       >
-        <DialogTitle id="cleanup-dialog-title">{t('serverList.cleanupConfirmTitle')}</DialogTitle>
+        <DialogTitle id="cleanup-dialog-title">
+          {t('serverList.cleanupConfirmTitle')}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="cleanup-dialog-description">
             {t('serverList.cleanupConfirmMessage')}
@@ -5829,7 +6345,12 @@ const ServerListPage: React.FC = () => {
           <Button onClick={handleCleanupCancel} color="primary">
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleCleanupConfirm} color="error" variant="contained" autoFocus>
+          <Button
+            onClick={handleCleanupConfirm}
+            color="error"
+            variant="contained"
+            autoFocus
+          >
             {t('common.confirm')}
           </Button>
         </DialogActions>
@@ -5947,16 +6468,20 @@ const ServerListPage: React.FC = () => {
                       padding: '4px 8px',
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
                       <Checkbox
                         size="small"
                         checked={
-                          bulkHealthCheckSelected.size === bulkHealthCheckResults.length &&
+                          bulkHealthCheckSelected.size ===
+                            bulkHealthCheckResults.length &&
                           bulkHealthCheckResults.length > 0
                         }
                         indeterminate={
                           bulkHealthCheckSelected.size > 0 &&
-                          bulkHealthCheckSelected.size < bulkHealthCheckResults.length
+                          bulkHealthCheckSelected.size <
+                            bulkHealthCheckResults.length
                         }
                         onChange={(e) =>
                           e.target.checked
@@ -6018,19 +6543,26 @@ const ServerListPage: React.FC = () => {
                       <Checkbox
                         size="small"
                         checked={bulkHealthCheckSelected.has(item.serviceKey)}
-                        onChange={() => handleBulkHealthCheckToggle(item.serviceKey)}
-                        disabled={bulkHealthCheckRunning || item.status !== 'pending'}
+                        onChange={() =>
+                          handleBulkHealthCheckToggle(item.serviceKey)
+                        }
+                        disabled={
+                          bulkHealthCheckRunning || item.status !== 'pending'
+                        }
                       />
                     </TableCell>
                     <TableCell>
                       {item.status === 'pending' && (
-                        <HourglassEmptyIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+                        <HourglassEmptyIcon
+                          sx={{ color: 'text.disabled', fontSize: 20 }}
+                        />
                       )}
                       {item.status === 'checking' && (
                         <SearchIcon
                           sx={{
                             fontSize: 18,
-                            animation: 'searchingAnimSmall 2s ease-in-out infinite',
+                            animation:
+                              'searchingAnimSmall 2s ease-in-out infinite',
                             '@keyframes searchingAnimSmall': {
                               '0%': {
                                 transform: 'translate(0, 0) rotate(0deg)',
@@ -6039,7 +6571,8 @@ const ServerListPage: React.FC = () => {
                                 transform: 'translate(1px, -1px) rotate(10deg)',
                               },
                               '50%': {
-                                transform: 'translate(-1px, 1px) rotate(-10deg)',
+                                transform:
+                                  'translate(-1px, 1px) rotate(-10deg)',
                               },
                               '75%': {
                                 transform: 'translate(1px, 1px) rotate(10deg)',
@@ -6052,7 +6585,9 @@ const ServerListPage: React.FC = () => {
                         />
                       )}
                       {item.status === 'success' && (
-                        <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
+                        <CheckCircleIcon
+                          sx={{ color: 'success.main', fontSize: 20 }}
+                        />
                       )}
                       {item.status === 'failed' && (
                         <ErrorIcon sx={{ color: 'error.main', fontSize: 20 }} />
@@ -6077,9 +6612,12 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 item.service as string,
                                 () =>
-                                  enqueueSnackbar(t('common.copiedToClipboard'), {
-                                    variant: 'success',
-                                  }),
+                                  enqueueSnackbar(
+                                    t('common.copiedToClipboard'),
+                                    {
+                                      variant: 'success',
+                                    }
+                                  ),
                                 () => {}
                               );
                           }}
@@ -6113,9 +6651,12 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 item.group as string,
                                 () =>
-                                  enqueueSnackbar(t('common.copiedToClipboard'), {
-                                    variant: 'success',
-                                  }),
+                                  enqueueSnackbar(
+                                    t('common.copiedToClipboard'),
+                                    {
+                                      variant: 'success',
+                                    }
+                                  ),
                                 () => {}
                               );
                           }}
@@ -6149,9 +6690,12 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 item.env as string,
                                 () =>
-                                  enqueueSnackbar(t('common.copiedToClipboard'), {
-                                    variant: 'success',
-                                  }),
+                                  enqueueSnackbar(
+                                    t('common.copiedToClipboard'),
+                                    {
+                                      variant: 'success',
+                                    }
+                                  ),
                                 () => {}
                               );
                           }}
@@ -6191,9 +6735,12 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 item.hostname as string,
                                 () =>
-                                  enqueueSnackbar(t('common.copiedToClipboard'), {
-                                    variant: 'success',
-                                  }),
+                                  enqueueSnackbar(
+                                    t('common.copiedToClipboard'),
+                                    {
+                                      variant: 'success',
+                                    }
+                                  ),
                                 () => {}
                               );
                           }}
@@ -6233,9 +6780,12 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 item.internalIp as string,
                                 () =>
-                                  enqueueSnackbar(t('common.copiedToClipboard'), {
-                                    variant: 'success',
-                                  }),
+                                  enqueueSnackbar(
+                                    t('common.copiedToClipboard'),
+                                    {
+                                      variant: 'success',
+                                    }
+                                  ),
                                 () => {}
                               );
                           }}
@@ -6275,9 +6825,12 @@ const ServerListPage: React.FC = () => {
                               copyToClipboardWithNotification(
                                 String(item.healthPort) as string,
                                 () =>
-                                  enqueueSnackbar(t('common.copiedToClipboard'), {
-                                    variant: 'success',
-                                  }),
+                                  enqueueSnackbar(
+                                    t('common.copiedToClipboard'),
+                                    {
+                                      variant: 'success',
+                                    }
+                                  ),
                                 () => {}
                               );
                           }}
@@ -6311,7 +6864,11 @@ const ServerListPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       {item.error && (
-                        <Typography variant="body2" color="error.main" sx={{ fontSize: '0.75rem' }}>
+                        <Typography
+                          variant="body2"
+                          color="error.main"
+                          sx={{ fontSize: '0.75rem' }}
+                        >
                           {item.error}
                         </Typography>
                       )}
@@ -6333,17 +6890,22 @@ const ServerListPage: React.FC = () => {
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'space-between' }}>
           <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-            {t('serverList.bulkHealthCheck.selected')}: {bulkHealthCheckSelected.size} /{' '}
-            {bulkHealthCheckResults.length}
+            {t('serverList.bulkHealthCheck.selected')}:{' '}
+            {bulkHealthCheckSelected.size} / {bulkHealthCheckResults.length}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Button onClick={handleBulkHealthCheckClose} disabled={bulkHealthCheckRunning}>
+            <Button
+              onClick={handleBulkHealthCheckClose}
+              disabled={bulkHealthCheckRunning}
+            >
               {t('common.close')}
             </Button>
             <Button
               onClick={handleBulkHealthCheckStart}
               variant="contained"
-              disabled={bulkHealthCheckRunning || bulkHealthCheckSelected.size === 0}
+              disabled={
+                bulkHealthCheckRunning || bulkHealthCheckSelected.size === 0
+              }
               startIcon={
                 bulkHealthCheckRunning ? (
                   <CircularProgress size={16} color="inherit" />
@@ -6405,7 +6967,9 @@ const ServerListPage: React.FC = () => {
         onClose={handleContextMenuClose}
         anchorReference="anchorPosition"
         anchorPosition={
-          contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
         }
       >
         <MenuItem onClick={handleCopyServiceJson}>

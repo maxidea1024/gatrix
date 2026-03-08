@@ -66,7 +66,11 @@ export class ClientVersionService extends BaseEnvironmentService<
     environmentId: string
   ): ClientVersion | null {
     const versions = this.getCached(environmentId);
-    return versions.find((v) => v.platform === platform && v.clientVersion === version) || null;
+    return (
+      versions.find(
+        (v) => v.platform === platform && v.clientVersion === version
+      ) || null
+    );
   }
 
   /**
@@ -160,7 +164,10 @@ export class ClientVersionService extends BaseEnvironmentService<
   /**
    * Get maintenance message for a client version with language support
    */
-  getMaintenanceMessage(version: ClientVersion, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
+  getMaintenanceMessage(
+    version: ClientVersion,
+    lang: 'ko' | 'en' | 'zh' = 'en'
+  ): string | null {
     if (!this.isMaintenanceActive(version)) {
       return null;
     }

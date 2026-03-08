@@ -30,12 +30,17 @@ export class VarsEventHandler implements IEventHandler {
     try {
       if (varKey && varValue !== undefined && varsService) {
         varsService.updateSingleVar(varKey, varValue, environmentId);
-        this.logger.info('Single var updated in cache directly', { key: varKey, environmentId });
+        this.logger.info('Single var updated in cache directly', {
+          key: varKey,
+          environmentId,
+        });
       } else {
         await varsService?.refreshByEnvironment(environmentId);
       }
     } catch (error: any) {
-      this.logger.error('Failed to handle vars update event', { error: error.message });
+      this.logger.error('Failed to handle vars update event', {
+        error: error.message,
+      });
     }
   }
 }

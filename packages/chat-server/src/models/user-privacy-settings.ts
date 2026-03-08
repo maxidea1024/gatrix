@@ -67,7 +67,9 @@ export class UserPrivacySettingsModel {
         try {
           blockedUsers = JSON.parse(settings.blockedUsers || '[]');
         } catch (parseError) {
-          logger.warn(`Invalid JSON in blockedUsers for user ${userId}, using empty array`);
+          logger.warn(
+            `Invalid JSON in blockedUsers for user ${userId}, using empty array`
+          );
           blockedUsers = [];
         }
 
@@ -80,7 +82,10 @@ export class UserPrivacySettingsModel {
       // 설정이 없으면 기본값으로 생성
       return await this.createDefault(userId);
     } catch (error) {
-      logger.error(`Failed to find privacy settings for user ${userId}:`, error);
+      logger.error(
+        `Failed to find privacy settings for user ${userId}:`,
+        error
+      );
       throw error;
     }
   }
@@ -104,7 +109,10 @@ export class UserPrivacySettingsModel {
         updatedAt: new Date(),
       };
     } catch (error) {
-      logger.error(`Failed to create default privacy settings for user ${userId}:`, error);
+      logger.error(
+        `Failed to create default privacy settings for user ${userId}:`,
+        error
+      );
       throw error;
     }
   }
@@ -125,11 +133,16 @@ export class UserPrivacySettingsModel {
         updateData.blockedUsers = JSON.stringify(data.blockedUsers);
       }
 
-      await this.knex('chat_user_privacy_settings').where('userId', userId).update(updateData);
+      await this.knex('chat_user_privacy_settings')
+        .where('userId', userId)
+        .update(updateData);
 
       return await this.findByUserId(userId);
     } catch (error) {
-      logger.error(`Failed to update privacy settings for user ${userId}:`, error);
+      logger.error(
+        `Failed to update privacy settings for user ${userId}:`,
+        error
+      );
       throw error;
     }
   }
@@ -145,13 +158,19 @@ export class UserPrivacySettingsModel {
         await this.update(userId, { blockedUsers });
       }
     } catch (error) {
-      logger.error(`Failed to block user ${targetUserId} for user ${userId}:`, error);
+      logger.error(
+        `Failed to block user ${targetUserId} for user ${userId}:`,
+        error
+      );
       throw error;
     }
   }
 
   // 사용자 차단 해제
-  static async unblockUser(userId: number, targetUserId: number): Promise<void> {
+  static async unblockUser(
+    userId: number,
+    targetUserId: number
+  ): Promise<void> {
     try {
       const settings = await this.findByUserId(userId);
       const blockedUsers = settings.blockedUsers || [];
@@ -159,18 +178,27 @@ export class UserPrivacySettingsModel {
 
       await this.update(userId, { blockedUsers: filteredUsers });
     } catch (error) {
-      logger.error(`Failed to unblock user ${targetUserId} for user ${userId}:`, error);
+      logger.error(
+        `Failed to unblock user ${targetUserId} for user ${userId}:`,
+        error
+      );
       throw error;
     }
   }
 
   // 차단 여부 확인
-  static async isBlocked(userId: number, targetUserId: number): Promise<boolean> {
+  static async isBlocked(
+    userId: number,
+    targetUserId: number
+  ): Promise<boolean> {
     try {
       const settings = await this.findByUserId(userId);
       return settings.blockedUsers.includes(targetUserId);
     } catch (error) {
-      logger.error(`Failed to check if user ${targetUserId} is blocked by user ${userId}:`, error);
+      logger.error(
+        `Failed to check if user ${targetUserId} is blocked by user ${userId}:`,
+        error
+      );
       return false;
     }
   }
@@ -215,18 +243,29 @@ export class UserPrivacySettingsModel {
           return { canInvite: true };
       }
     } catch (error) {
-      logger.error(`Failed to check invite permission for ${inviterId} -> ${inviteeId}:`, error);
+      logger.error(
+        `Failed to check invite permission for ${inviterId} -> ${inviteeId}:`,
+        error
+      );
       return { canInvite: false, reason: 'error' };
     }
   }
 
   // 검색 가능 여부 확인
-  static async isDiscoverable(userId: number, searchType: 'email' | 'name'): Promise<boolean> {
+  static async isDiscoverable(
+    userId: number,
+    searchType: 'email' | 'name'
+  ): Promise<boolean> {
     try {
       const settings = await this.findByUserId(userId);
-      return searchType === 'email' ? settings.discoverableByEmail : settings.discoverableByName;
+      return searchType === 'email'
+        ? settings.discoverableByEmail
+        : settings.discoverableByName;
     } catch (error) {
-      logger.error(`Failed to check discoverability for user ${userId}:`, error);
+      logger.error(
+        `Failed to check discoverability for user ${userId}:`,
+        error
+      );
       return true; // 기본값은 검색 가능
     }
   }

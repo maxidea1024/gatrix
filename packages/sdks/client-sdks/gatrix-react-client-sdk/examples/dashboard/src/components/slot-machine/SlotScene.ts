@@ -239,7 +239,11 @@ export class SlotScene extends Phaser.Scene {
       this.bridge.spinRequested = true;
     }
 
-    if (this.bridge.spinRequested && !this.bridge.isSpinning && !this.isProcessing) {
+    if (
+      this.bridge.spinRequested &&
+      !this.bridge.isSpinning &&
+      !this.isProcessing
+    ) {
       this.bridge.spinRequested = false;
       this.startSpin();
     }
@@ -248,7 +252,9 @@ export class SlotScene extends Phaser.Scene {
 
     this.creditsTxt.setText(`CREDITS: ${this.bridge.credits}`);
     this.betTxt.setText(`BET: ${this.bridge.bet}`);
-    this.spinBtn.setAlpha(this.bridge.isSpinning || this.isProcessing ? 0.4 : 1);
+    this.spinBtn.setAlpha(
+      this.bridge.isSpinning || this.isProcessing ? 0.4 : 1
+    );
   }
 
   // ==================== Symbol Helper ====================
@@ -300,7 +306,9 @@ export class SlotScene extends Phaser.Scene {
         100,
         Math.floor(ratio * 100)
       );
-      this.bgGfx.fillStyle(Phaser.Display.Color.GetColor(mixed.r, mixed.g, mixed.b));
+      this.bgGfx.fillStyle(
+        Phaser.Display.Color.GetColor(mixed.r, mixed.g, mixed.b)
+      );
       const sliceH = Math.ceil(GAME_H / steps) + 1;
       this.bgGfx.fillRect(0, Math.floor((GAME_H / steps) * i), GAME_W, sliceH);
     }
@@ -310,11 +318,23 @@ export class SlotScene extends Phaser.Scene {
     const t = THEMES[this.currentTheme];
     this.frameGfx = this.add.graphics();
     this.frameGfx.lineStyle(6, t.frameColor, 0.3);
-    this.frameGfx.strokeRoundedRect(FRAME_X - 4, FRAME_Y - 4, FRAME_W + 8, FRAME_H + 8, 16);
+    this.frameGfx.strokeRoundedRect(
+      FRAME_X - 4,
+      FRAME_Y - 4,
+      FRAME_W + 8,
+      FRAME_H + 8,
+      16
+    );
     this.frameGfx.lineStyle(3, t.frameColor, 1);
     this.frameGfx.strokeRoundedRect(FRAME_X, FRAME_Y, FRAME_W, FRAME_H, 12);
     this.frameGfx.fillStyle(0x0a0a1a, 0.9);
-    this.frameGfx.fillRoundedRect(FRAME_X + 4, FRAME_Y + 4, FRAME_W - 8, FRAME_H - 8, 10);
+    this.frameGfx.fillRoundedRect(
+      FRAME_X + 4,
+      FRAME_Y + 4,
+      FRAME_W - 8,
+      FRAME_H - 8,
+      10
+    );
     this.frameGfx.lineStyle(1, t.frameColor, 0.15);
     for (let c = 1; c < 3; c++) {
       const x = FRAME_X + FRAME_PAD + c * CELL;
@@ -327,7 +347,14 @@ export class SlotScene extends Phaser.Scene {
     for (let r = 0; r < 3; r++) {
       const y = cellPos(0, r).y;
       this.frameGfx.fillStyle(PAYLINE_COLORS[r], 0.6);
-      this.frameGfx.fillTriangle(FRAME_X - 8, y - 6, FRAME_X - 8, y + 6, FRAME_X + 2, y);
+      this.frameGfx.fillTriangle(
+        FRAME_X - 8,
+        y - 6,
+        FRAME_X - 8,
+        y + 6,
+        FRAME_X + 2,
+        y
+      );
       this.frameGfx.fillTriangle(
         FRAME_X + FRAME_W + 8,
         y - 6,
@@ -592,7 +619,10 @@ export class SlotScene extends Phaser.Scene {
         this.bridge.spinRequested = true;
         this.bridge.onStateChange?.();
       });
-    } else if (this.bridge.autoSpinActive && this.bridge.config.autoSpinEnabled) {
+    } else if (
+      this.bridge.autoSpinActive &&
+      this.bridge.config.autoSpinEnabled
+    ) {
       this.time.delayedCall(800, () => {
         this.bridge.spinRequested = true;
       });
@@ -750,13 +780,15 @@ export class SlotScene extends Phaser.Scene {
       this.winLineGfx.lineStyle(8, color, 0.3);
       this.winLineGfx.beginPath();
       this.winLineGfx.moveTo(pts[0].x, pts[0].y);
-      for (let i = 1; i < pts.length; i++) this.winLineGfx.lineTo(pts[i].x, pts[i].y);
+      for (let i = 1; i < pts.length; i++)
+        this.winLineGfx.lineTo(pts[i].x, pts[i].y);
       this.winLineGfx.strokePath();
       // Main line
       this.winLineGfx.lineStyle(4, color, 0.9);
       this.winLineGfx.beginPath();
       this.winLineGfx.moveTo(pts[0].x, pts[0].y);
-      for (let i = 1; i < pts.length; i++) this.winLineGfx.lineTo(pts[i].x, pts[i].y);
+      for (let i = 1; i < pts.length; i++)
+        this.winLineGfx.lineTo(pts[i].x, pts[i].y);
       this.winLineGfx.strokePath();
     }
   }
@@ -850,8 +882,10 @@ export class SlotScene extends Phaser.Scene {
             coin.setPosition(x + ox, y + oy);
 
             // Arc via mid-point
-            const midX = (x + ox + creditPos.x) / 2 + Phaser.Math.Between(-40, 40);
-            const midY = Math.min(y + oy, creditPos.y) - Phaser.Math.Between(30, 80);
+            const midX =
+              (x + ox + creditPos.x) / 2 + Phaser.Math.Between(-40, 40);
+            const midY =
+              Math.min(y + oy, creditPos.y) - Phaser.Math.Between(30, 80);
 
             // First half: fly up and out
             this.tweens.add({
@@ -933,7 +967,9 @@ export class SlotScene extends Phaser.Scene {
             lifespan: 4000,
             scale: { start: 0.6, end: 0 },
             alpha: { start: 0.25, end: 0 },
-            tint: t.particleColors[Phaser.Math.Between(0, t.particleColors.length - 1)],
+            tint: t.particleColors[
+              Phaser.Math.Between(0, t.particleColors.length - 1)
+            ],
             emitting: false,
           })
           .setDepth(1);

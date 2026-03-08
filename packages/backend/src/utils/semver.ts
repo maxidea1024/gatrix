@@ -29,7 +29,8 @@ export function parseVersion(version: string): SemanticVersion {
   const cleanVersion = version.trim().replace(/^v/, '');
 
   // Regex to parse semver: MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
-  const semverRegex = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z-.]+))?(?:\+([0-9A-Za-z-.]+))?$/;
+  const semverRegex =
+    /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z-.]+))?(?:\+([0-9A-Za-z-.]+))?$/;
   const match = cleanVersion.match(semverRegex);
 
   if (!match) {
@@ -167,7 +168,10 @@ export function isEqual(version1: string, version2: string): boolean {
  * @param {string} version2 - Second version
  * @returns {boolean} True if version1 >= version2
  */
-export function isGreaterThanOrEqual(version1: string, version2: string): boolean {
+export function isGreaterThanOrEqual(
+  version1: string,
+  version2: string
+): boolean {
   return compareVersions(version1, version2) >= 0;
 }
 

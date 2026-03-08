@@ -23,9 +23,21 @@ router.get('/id/:id', GameWorldController.getGameWorldById);
 router.get('/world/:worldId', GameWorldController.getGameWorldByWorldId);
 
 // Admin-only routes
-router.post('/', auditGameWorldCreate as any, GameWorldController.createGameWorld);
-router.put('/:id', auditGameWorldUpdate as any, GameWorldController.updateGameWorld);
-router.delete('/:id', auditGameWorldDelete as any, GameWorldController.deleteGameWorld);
+router.post(
+  '/',
+  auditGameWorldCreate as any,
+  GameWorldController.createGameWorld
+);
+router.put(
+  '/:id',
+  auditGameWorldUpdate as any,
+  GameWorldController.updateGameWorld
+);
+router.delete(
+  '/:id',
+  auditGameWorldDelete as any,
+  GameWorldController.deleteGameWorld
+);
 router.patch(
   '/:id/toggle-visibility',
   auditGameWorldToggleVisibility as any,
@@ -46,8 +58,16 @@ router.patch(
   auditGameWorldUpdateOrders as any,
   GameWorldController.updateDisplayOrders
 );
-router.patch('/:id/move-up', auditGameWorldMoveUp as any, GameWorldController.moveUp);
-router.patch('/:id/move-down', auditGameWorldMoveDown as any, GameWorldController.moveDown);
+router.patch(
+  '/:id/move-up',
+  auditGameWorldMoveUp as any,
+  GameWorldController.moveUp
+);
+router.patch(
+  '/:id/move-down',
+  auditGameWorldMoveDown as any,
+  GameWorldController.moveDown
+);
 router.post('/invalidate-cache', GameWorldController.invalidateCache);
 
 export default router;

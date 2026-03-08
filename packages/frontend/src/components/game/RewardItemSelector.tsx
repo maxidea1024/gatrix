@@ -60,9 +60,12 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
       const types = await planningDataService.getRewardTypeList(projectApiPath);
       setRewardTypes(types);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('planningData.errors.loadRewardTypesFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        error.message || t('planningData.errors.loadRewardTypesFailed'),
+        {
+          variant: 'error',
+        }
+      );
     } finally {
       setLoadingTypes(false);
     }
@@ -99,9 +102,12 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
           setItems([]);
         }
       } catch (error: any) {
-        enqueueSnackbar(error.message || t('planningData.errors.loadItemsFailed'), {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          error.message || t('planningData.errors.loadItemsFailed'),
+          {
+            variant: 'error',
+          }
+        );
         setItems([]);
       } finally {
         setLoadingItems(false);
@@ -126,7 +132,9 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
 
   const handleRewardTypeChange = (newRewardType: string) => {
     // For reward types without table, set itemId to "0"
-    const typeInfo = rewardTypes.find((t) => t.value === parseInt(newRewardType));
+    const typeInfo = rewardTypes.find(
+      (t) => t.value === parseInt(newRewardType)
+    );
     const itemId = typeInfo?.hasTable ? '' : '0';
 
     onChange({
@@ -179,7 +187,9 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
       variant="outlined"
       sx={{
         p: 1,
-        backgroundColor: disabled ? 'action.disabledBackground' : 'background.paper',
+        backgroundColor: disabled
+          ? 'action.disabledBackground'
+          : 'background.paper',
         borderColor: error ? 'error.main' : 'divider',
       }}
     >
@@ -192,7 +202,10 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
           value={
             loadingTypes || rewardTypes.length === 0
               ? ''
-              : value.rewardType && rewardTypes.some((t) => t.value === parseInt(value.rewardType))
+              : value.rewardType &&
+                  rewardTypes.some(
+                    (t) => t.value === parseInt(value.rewardType)
+                  )
                 ? String(value.rewardType)
                 : ''
           }
@@ -269,7 +282,9 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
                     ...params.InputProps,
                     endAdornment: (
                       <>
-                        {loadingItems ? <CircularProgress color="inherit" size={16} /> : null}
+                        {loadingItems ? (
+                          <CircularProgress color="inherit" size={16} />
+                        ) : null}
                         {params.InputProps.endAdornment}
                       </>
                     ),
@@ -291,14 +306,20 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
         )}
 
         {/* Description for types without table */}
-        {selectedTypeInfo && !selectedTypeInfo.hasTable && selectedTypeInfo.descriptionKey && (
-          <>
-            <Typography variant="caption" color="text.secondary" sx={{ flex: '1 1 auto', px: 1 }}>
-              {t(selectedTypeInfo.descriptionKey)}
-            </Typography>
-            <Divider orientation="vertical" flexItem />
-          </>
-        )}
+        {selectedTypeInfo &&
+          !selectedTypeInfo.hasTable &&
+          selectedTypeInfo.descriptionKey && (
+            <>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ flex: '1 1 auto', px: 1 }}
+              >
+                {t(selectedTypeInfo.descriptionKey)}
+              </Typography>
+              <Divider orientation="vertical" flexItem />
+            </>
+          )}
 
         {/* Quantity Input - Only show if reward type is selected */}
         {value.rewardType && (

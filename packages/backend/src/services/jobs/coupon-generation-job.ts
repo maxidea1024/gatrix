@@ -5,7 +5,10 @@ import { createLogger } from '../../config/logger';
 
 const logger = createLogger('CouponGenerationJob');
 import { RowDataPacket } from 'mysql2/promise';
-import { generateCouponCode, CodePattern } from '../../utils/coupon-code-generator';
+import {
+  generateCouponCode,
+  CodePattern,
+} from '../../utils/coupon-code-generator';
 
 export interface CouponGenerationJobData {
   type: string;
@@ -65,7 +68,9 @@ export class CouponGenerationJob {
           settingId,
           quantity,
         });
-        throw new Error('Invalid job data: settingId and quantity are required');
+        throw new Error(
+          'Invalid job data: settingId and quantity are required'
+        );
       }
 
       logger.info('Starting coupon generation job', {
@@ -86,7 +91,8 @@ export class CouponGenerationJob {
         'SELECT codePattern, environment FROM g_coupon_settings WHERE id = ?',
         [settingId]
       );
-      const codePattern = (settings[0]?.codePattern || 'ALPHANUMERIC_8') as CodePattern;
+      const codePattern = (settings[0]?.codePattern ||
+        'ALPHANUMERIC_8') as CodePattern;
       const environmentId = settings[0]?.environmentId;
 
       if (!environmentId) {
@@ -159,12 +165,15 @@ export class CouponGenerationJob {
           totalGenerated += batchCodes.length;
 
           // Update progress less frequently
-          if (totalGenerated - lastProgressUpdate >= this.PROGRESS_UPDATE_INTERVAL) {
+          if (
+            totalGenerated - lastProgressUpdate >=
+            this.PROGRESS_UPDATE_INTERVAL
+          ) {
             const progress = Math.round((totalGenerated / quantity) * 100);
-            await pool.execute('UPDATE g_coupon_settings SET generatedCount = ? WHERE id = ?', [
-              totalGenerated,
-              settingId,
-            ]);
+            await pool.execute(
+              'UPDATE g_coupon_settings SET generatedCount = ? WHERE id = ?',
+              [totalGenerated, settingId]
+            );
             await job.updateProgress(progress);
             logger.info('Coupon generation progress', {
               jobId,

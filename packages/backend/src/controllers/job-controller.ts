@@ -15,7 +15,14 @@ import {
 // Job Get list
 export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { jobTypeId, isEnabled, search, limit = 20, offset = 0, page } = req.query;
+    const {
+      jobTypeId,
+      isEnabled,
+      search,
+      limit = 20,
+      offset = 0,
+      page,
+    } = req.query;
 
     const environmentId = req.environmentId!;
     const filters: any = { environmentId };
@@ -49,7 +56,12 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
       },
     });
   } catch (error) {
-    return sendInternalError(res, 'Failed to get jobs', error, ErrorCodes.RESOURCE_FETCH_FAILED);
+    return sendInternalError(
+      res,
+      'Failed to get jobs',
+      error,
+      ErrorCodes.RESOURCE_FETCH_FAILED
+    );
   }
 };
 
@@ -72,7 +84,12 @@ export const getJob = async (req: AuthenticatedRequest, res: Response) => {
 
     return sendSuccessResponse(res, job);
   } catch (error) {
-    return sendInternalError(res, 'Failed to get job', error, ErrorCodes.RESOURCE_FETCH_FAILED);
+    return sendInternalError(
+      res,
+      'Failed to get job',
+      error,
+      ErrorCodes.RESOURCE_FETCH_FAILED
+    );
   }
 };
 
@@ -123,9 +140,19 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const createdJob = await JobModel.create(jobData);
 
-    return sendSuccessResponse(res, createdJob, 'Job created successfully', 201);
+    return sendSuccessResponse(
+      res,
+      createdJob,
+      'Job created successfully',
+      201
+    );
   } catch (error) {
-    return sendInternalError(res, 'Failed to create job', error, ErrorCodes.RESOURCE_CREATE_FAILED);
+    return sendInternalError(
+      res,
+      'Failed to create job',
+      error,
+      ErrorCodes.RESOURCE_CREATE_FAILED
+    );
   }
 };
 
@@ -176,7 +203,12 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
 
     return sendSuccessResponse(res, updatedJob, 'Job updated successfully');
   } catch (error) {
-    return sendInternalError(res, 'Failed to update job', error, ErrorCodes.RESOURCE_UPDATE_FAILED);
+    return sendInternalError(
+      res,
+      'Failed to update job',
+      error,
+      ErrorCodes.RESOURCE_UPDATE_FAILED
+    );
   }
 };
 
@@ -202,17 +234,30 @@ export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
 
     return sendSuccessResponse(res, undefined, 'Job deleted successfully');
   } catch (error) {
-    return sendInternalError(res, 'Failed to delete job', error, ErrorCodes.RESOURCE_DELETE_FAILED);
+    return sendInternalError(
+      res,
+      'Failed to delete job',
+      error,
+      ErrorCodes.RESOURCE_DELETE_FAILED
+    );
   }
 };
 
 // Job 수동 실행 (임시 구현)
 export const executeJob = async (_req: AuthenticatedRequest, res: Response) => {
-  return sendErrorResponse(res, 501, 'NOT_IMPLEMENTED', 'Job execution not implemented yet');
+  return sendErrorResponse(
+    res,
+    501,
+    'NOT_IMPLEMENTED',
+    'Job execution not implemented yet'
+  );
 };
 
 // Job 실행 이력 조회 (임시 구현)
-export const getJobExecutions = async (_req: AuthenticatedRequest, res: Response) => {
+export const getJobExecutions = async (
+  _req: AuthenticatedRequest,
+  res: Response
+) => {
   return sendSuccessResponse(res, []);
 };
 
@@ -249,6 +294,11 @@ export const getJobTags = async (req: AuthenticatedRequest, res: Response) => {
 
     return sendSuccessResponse(res, tags);
   } catch (error) {
-    return sendInternalError(res, 'Failed to get tags', error, ErrorCodes.RESOURCE_FETCH_FAILED);
+    return sendInternalError(
+      res,
+      'Failed to get tags',
+      error,
+      ErrorCodes.RESOURCE_FETCH_FAILED
+    );
   }
 };

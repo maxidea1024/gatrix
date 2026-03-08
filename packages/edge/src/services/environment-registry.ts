@@ -50,7 +50,10 @@ class EnvironmentRegistry {
   private envMap: Map<string, { orgId: string; projectId: string }> = new Map();
   private projectMap: Map<string, { orgId: string }> = new Map();
   // Name-based lookup: envName -> { orgId, projectId, envId }
-  private envNameMap: Map<string, { orgId: string; projectId: string; envId: string }> = new Map();
+  private envNameMap: Map<
+    string,
+    { orgId: string; projectId: string; envId: string }
+  > = new Map();
 
   /**
    * Initialize the registry
@@ -133,7 +136,10 @@ class EnvironmentRegistry {
           }
         }
       } else {
-        logger.error('Invalid response from environment-tree API:', response.data);
+        logger.error(
+          'Invalid response from environment-tree API:',
+          response.data
+        );
       }
     } catch (error: any) {
       logger.error('Failed to fetch environment tree:', error.message);
@@ -154,7 +160,11 @@ class EnvironmentRegistry {
         this.projectMap.set(project.id, { orgId: org.id });
         for (const env of project.environments) {
           this.envMap.set(env.id, { orgId: org.id, projectId: project.id });
-          this.envNameMap.set(env.name, { orgId: org.id, projectId: project.id, envId: env.id });
+          this.envNameMap.set(env.name, {
+            orgId: org.id,
+            projectId: project.id,
+            envId: env.id,
+          });
         }
       }
     }
@@ -177,9 +187,12 @@ class EnvironmentRegistry {
 
       await this.subscriber.connect();
 
-      this.subscriber.on('pmessage', (_pattern: string, _channel: string, message: string) => {
-        this.handleEvent(message);
-      });
+      this.subscriber.on(
+        'pmessage',
+        (_pattern: string, _channel: string, message: string) => {
+          this.handleEvent(message);
+        }
+      );
 
       await this.subscriber.psubscribe(`${this.CHANNEL_PREFIX}:*`);
 
@@ -245,7 +258,9 @@ class EnvironmentRegistry {
   /**
    * Get org/project for a given environment ID
    */
-  getEnvironmentContext(environmentId: string): { orgId: string; projectId: string } | undefined {
+  getEnvironmentContext(
+    environmentId: string
+  ): { orgId: string; projectId: string } | undefined {
     return this.envMap.get(environmentId);
   }
 
@@ -337,7 +352,9 @@ class EnvironmentRegistry {
   onTreeChanged(callback: () => void): () => void {
     this.treeChangeCallbacks.push(callback);
     return () => {
-      this.treeChangeCallbacks = this.treeChangeCallbacks.filter((cb) => cb !== callback);
+      this.treeChangeCallbacks = this.treeChangeCallbacks.filter(
+        (cb) => cb !== callback
+      );
     };
   }
 }

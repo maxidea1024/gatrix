@@ -27,4 +27,5 @@ class ServiceDiscoveryConfigService {
   }
 }
 
-export const serviceDiscoveryConfigService = new ServiceDiscoveryConfigService();
+export const serviceDiscoveryConfigService =
+  new ServiceDiscoveryConfigService();

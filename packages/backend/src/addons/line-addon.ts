@@ -24,7 +24,9 @@ export class LineAddon extends Addon {
     const { accessToken, to } = parameters;
 
     if (!accessToken || !to) {
-      this.logger.warn(`Missing Line configuration for integration ${integrationId}`);
+      this.logger.warn(
+        `Missing Line configuration for integration ${integrationId}`
+      );
       await this.registerEvent(
         integrationId,
         event,

@@ -23,8 +23,12 @@ export class PlatformDefaultsService {
   /**
    * Get default values of all platforms
    */
-  static async getAllDefaults(projectApiPath: string): Promise<PlatformDefaultsMap> {
-    const response = await apiService.get<PlatformDefaultsMap>(this.basePath(projectApiPath));
+  static async getAllDefaults(
+    projectApiPath: string
+  ): Promise<PlatformDefaultsMap> {
+    const response = await apiService.get<PlatformDefaultsMap>(
+      this.basePath(projectApiPath)
+    );
     return response.data || {};
   }
 
@@ -69,8 +73,13 @@ export class PlatformDefaultsService {
   /**
    * Delete default values of specific platform
    */
-  static async deletePlatformDefaults(projectApiPath: string, platform: string): Promise<void> {
-    await apiService.delete(`${this.basePath(projectApiPath)}/${encodeURIComponent(platform)}`);
+  static async deletePlatformDefaults(
+    projectApiPath: string,
+    platform: string
+  ): Promise<void> {
+    await apiService.delete(
+      `${this.basePath(projectApiPath)}/${encodeURIComponent(platform)}`
+    );
   }
 
   /**
@@ -83,8 +92,10 @@ export class PlatformDefaultsService {
   ): any {
     return {
       ...clientVersionData,
-      gameServerAddress: clientVersionData.gameServerAddress || defaults.gameServerAddress || '',
-      patchAddress: clientVersionData.patchAddress || defaults.patchAddress || '',
+      gameServerAddress:
+        clientVersionData.gameServerAddress || defaults.gameServerAddress || '',
+      patchAddress:
+        clientVersionData.patchAddress || defaults.patchAddress || '',
     };
   }
 
@@ -98,7 +109,8 @@ export class PlatformDefaultsService {
   ): any {
     return {
       ...platformData,
-      gameServerAddress: platformData.gameServerAddress || defaults.gameServerAddress || '',
+      gameServerAddress:
+        platformData.gameServerAddress || defaults.gameServerAddress || '',
       patchAddress: platformData.patchAddress || defaults.patchAddress || '',
     };
   }

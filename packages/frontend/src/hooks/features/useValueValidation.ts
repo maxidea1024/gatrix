@@ -55,7 +55,10 @@ export function useValueValidation(
     [valueType, rules, t]
   );
 
-  const isValid = useCallback((value: any): boolean => validate(value).length === 0, [validate]);
+  const isValid = useCallback(
+    (value: any): boolean => validate(value).length === 0,
+    [validate]
+  );
 
   return useMemo(() => ({ validate, isValid }), [validate, isValid]);
 }
@@ -78,7 +81,9 @@ function validateString(
     rules.minLength !== null &&
     checkValue.length < rules.minLength
   ) {
-    errors.push(t('featureFlags.validation.minLength', { min: rules.minLength }));
+    errors.push(
+      t('featureFlags.validation.minLength', { min: rules.minLength })
+    );
   }
 
   if (
@@ -86,7 +91,9 @@ function validateString(
     rules.maxLength !== null &&
     checkValue.length > rules.maxLength
   ) {
-    errors.push(t('featureFlags.validation.maxLength', { max: rules.maxLength }));
+    errors.push(
+      t('featureFlags.validation.maxLength', { max: rules.maxLength })
+    );
   }
 
   if (rules.pattern) {
@@ -95,7 +102,9 @@ function validateString(
       if (!regex.test(checkValue)) {
         errors.push(
           rules.patternDescription ||
-            t('featureFlags.validation.patternMismatch', { pattern: rules.pattern })
+            t('featureFlags.validation.patternMismatch', {
+              pattern: rules.pattern,
+            })
         );
       }
     } catch {
@@ -155,14 +164,18 @@ function validateJson(
     // Basic JSON Schema check - structural validation only
     try {
       const schema =
-        typeof rules.jsonSchema === 'string' ? JSON.parse(rules.jsonSchema) : rules.jsonSchema;
+        typeof rules.jsonSchema === 'string'
+          ? JSON.parse(rules.jsonSchema)
+          : rules.jsonSchema;
 
       const jsonObj = typeof value === 'string' ? JSON.parse(value) : value;
 
       if (schema.required && Array.isArray(schema.required)) {
         for (const field of schema.required) {
           if (jsonObj[field] === undefined || jsonObj[field] === null) {
-            errors.push(t('featureFlags.validation.missingRequired', { field }));
+            errors.push(
+              t('featureFlags.validation.missingRequired', { field })
+            );
           }
         }
       }

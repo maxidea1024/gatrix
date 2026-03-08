@@ -34,7 +34,10 @@ export const tagService = {
     },
     projectApiPath: string | null = null
   ): Promise<Tag> {
-    const res = await apiService.post<{ tag: Tag }>(basePath(projectApiPath), payload);
+    const res = await apiService.post<{ tag: Tag }>(
+      basePath(projectApiPath),
+      payload
+    );
     return res.data!.tag;
   },
 
@@ -47,11 +50,17 @@ export const tagService = {
     }>,
     projectApiPath: string | null = null
   ): Promise<Tag> {
-    const res = await apiService.put<{ tag: Tag }>(`${basePath(projectApiPath)}/${id}`, payload);
+    const res = await apiService.put<{ tag: Tag }>(
+      `${basePath(projectApiPath)}/${id}`,
+      payload
+    );
     return res.data!.tag;
   },
 
-  async remove(id: number, projectApiPath: string | null = null): Promise<void> {
+  async remove(
+    id: number,
+    projectApiPath: string | null = null
+  ): Promise<void> {
     await apiService.delete(`${basePath(projectApiPath)}/${id}`);
   },
 
@@ -60,9 +69,12 @@ export const tagService = {
     entityId: number,
     projectApiPath: string | null = null
   ): Promise<Tag[]> {
-    const res = await apiService.get<{ tags: Tag[] }>(`${basePath(projectApiPath)}/assignments`, {
-      params: { entityType, entityId },
-    });
+    const res = await apiService.get<{ tags: Tag[] }>(
+      `${basePath(projectApiPath)}/assignments`,
+      {
+        params: { entityType, entityId },
+      }
+    );
     return res.data?.tags || [];
   },
 

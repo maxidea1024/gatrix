@@ -59,8 +59,14 @@ import DynamicFilterBar, {
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
-import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
-import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '../../components/common/ColumnSettingsDialog';
+import {
+  formatDateTime,
+  formatRelativeTime,
+  formatDateTimeDetailed,
+} from '../../utils/dateFormat';
 import { useI18n } from '../../contexts/I18nContext';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
@@ -111,7 +117,10 @@ const IngamePopupNoticesPage: React.FC = () => {
   }, [activeFilters]);
 
   // Convert filters to strings for dependency array
-  const isActiveFilterString = useMemo(() => isActiveFilter || '', [isActiveFilter]);
+  const isActiveFilterString = useMemo(
+    () => isActiveFilter || '',
+    [isActiveFilter]
+  );
   const currentlyVisibleFilterString = useMemo(
     () => currentlyVisibleFilter || '',
     [currentlyVisibleFilter]
@@ -123,15 +132,20 @@ const IngamePopupNoticesPage: React.FC = () => {
 
   // Dialog states
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
-  const [editingNotice, setEditingNotice] = useState<IngamePopupNotice | null>(null);
+  const [editingNotice, setEditingNotice] = useState<IngamePopupNotice | null>(
+    null
+  );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingNotice, setDeletingNotice] = useState<IngamePopupNotice | null>(null);
+  const [deletingNotice, setDeletingNotice] =
+    useState<IngamePopupNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [guideDrawerOpen, setGuideDrawerOpen] = useState(false);
 
   // Action menu state
-  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [actionMenuTarget, setActionMenuTarget] = useState<IngamePopupNotice | null>(null);
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] =
+    useState<null | HTMLElement>(null);
+  const [actionMenuTarget, setActionMenuTarget] =
+    useState<IngamePopupNotice | null>(null);
 
   const handleActionMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -166,7 +180,8 @@ const IngamePopupNoticesPage: React.FC = () => {
   ];
 
   // Column settings
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<null | HTMLElement>(null);
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
     const saved = localStorage.getItem('ingamePopupNoticesColumns');
     if (saved) {
@@ -225,7 +240,10 @@ const IngamePopupNoticesPage: React.FC = () => {
   ];
 
   // Visible columns
-  const visibleColumns = useMemo(() => columns.filter((col) => col.visible), [columns]);
+  const visibleColumns = useMemo(
+    () => columns.filter((col) => col.visible),
+    [columns]
+  );
 
   // Load notices
   const loadNotices = async () => {
@@ -242,7 +260,10 @@ const IngamePopupNoticesPage: React.FC = () => {
       if (isActiveFilter !== undefined && isActiveFilter !== '') {
         filters.isActive = isActiveFilter === 'true';
       }
-      if (currentlyVisibleFilter !== undefined && currentlyVisibleFilter !== '') {
+      if (
+        currentlyVisibleFilter !== undefined &&
+        currentlyVisibleFilter !== ''
+      ) {
         filters.currentlyVisible = currentlyVisibleFilter === 'true';
       }
       if (Array.isArray(platformFilter) && platformFilter.length > 0) {
@@ -268,9 +289,12 @@ const IngamePopupNoticesPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to load ingame popup notices:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.loadFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'ingamePopupNotices.loadFailed'),
+        {
+          variant: 'error',
+        }
+      );
       setNotices([]);
       setTotal(0);
     } finally {
@@ -302,25 +326,38 @@ const IngamePopupNoticesPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f));
+    const newFilters = activeFilters.map((f) =>
+      f.key === filterKey ? { ...f, value } : f
+    );
     setActiveFilters(newFilters);
     setPage(0);
   };
 
-  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
-    const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f));
+  const handleOperatorChange = (
+    filterKey: string,
+    operator: 'any_of' | 'include_all'
+  ) => {
+    const newFilters = activeFilters.map((f) =>
+      f.key === filterKey ? { ...f, operator } : f
+    );
     setActiveFilters(newFilters);
   };
 
   // Column handlers
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     setColumns(newColumns);
-    localStorage.setItem('ingamePopupNoticesColumns', JSON.stringify(newColumns));
+    localStorage.setItem(
+      'ingamePopupNoticesColumns',
+      JSON.stringify(newColumns)
+    );
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem('ingamePopupNoticesColumns', JSON.stringify(defaultColumns));
+    localStorage.setItem(
+      'ingamePopupNoticesColumns',
+      JSON.stringify(defaultColumns)
+    );
   };
 
   // Search handler
@@ -366,7 +403,10 @@ const IngamePopupNoticesPage: React.FC = () => {
     if (!deletingNotice) return;
 
     try {
-      await ingamePopupNoticeService.deleteIngamePopupNotice(projectApiPath, deletingNotice.id);
+      await ingamePopupNoticeService.deleteIngamePopupNotice(
+        projectApiPath,
+        deletingNotice.id
+      );
       enqueueSnackbar(t('ingamePopupNotices.deleteSuccess'), {
         variant: 'success',
       });
@@ -374,9 +414,12 @@ const IngamePopupNoticesPage: React.FC = () => {
       setDeletingNotice(null);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.deleteFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'ingamePopupNotices.deleteFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -387,7 +430,10 @@ const IngamePopupNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(projectApiPath, selectedIds);
+      await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(
+        projectApiPath,
+        selectedIds
+      );
       enqueueSnackbar(
         t('ingamePopupNotices.bulkDeleteSuccess', {
           count: selectedIds.length,
@@ -398,9 +444,12 @@ const IngamePopupNoticesPage: React.FC = () => {
       setSelectedIds([]);
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.bulkDeleteFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'ingamePopupNotices.bulkDeleteFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -412,9 +461,12 @@ const IngamePopupNoticesPage: React.FC = () => {
       });
       loadNotices();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'ingamePopupNotices.toggleFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'ingamePopupNotices.toggleFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -444,7 +496,11 @@ const IngamePopupNoticesPage: React.FC = () => {
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
               {t('ingamePopupNotices.createNotice')}
             </Button>
           )}
@@ -519,7 +575,9 @@ const IngamePopupNoticesPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -597,18 +655,28 @@ const IngamePopupNoticesPage: React.FC = () => {
                       {canManage && (
                         <TableCell padding="checkbox">
                           <Checkbox
-                            checked={notices.length > 0 && selectedIds.length === notices.length}
+                            checked={
+                              notices.length > 0 &&
+                              selectedIds.length === notices.length
+                            }
                             indeterminate={
-                              selectedIds.length > 0 && selectedIds.length < notices.length
+                              selectedIds.length > 0 &&
+                              selectedIds.length < notices.length
                             }
                             onChange={handleSelectAll}
                           />
                         </TableCell>
                       )}
                       {visibleColumns.map((column) => (
-                        <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
+                        <TableCell key={column.id}>
+                          {t(column.labelKey)}
+                        </TableCell>
                       ))}
-                      {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                      {canManage && (
+                        <TableCell align="center">
+                          {t('common.actions')}
+                        </TableCell>
+                      )}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -628,9 +696,13 @@ const IngamePopupNoticesPage: React.FC = () => {
                               <TableCell key={column.id}>
                                 <Chip
                                   label={
-                                    notice.isActive ? t('common.active') : t('common.inactive')
+                                    notice.isActive
+                                      ? t('common.active')
+                                      : t('common.inactive')
                                   }
-                                  color={notice.isActive ? 'success' : 'default'}
+                                  color={
+                                    notice.isActive ? 'success' : 'default'
+                                  }
                                   size="small"
                                 />
                               </TableCell>
@@ -638,8 +710,12 @@ const IngamePopupNoticesPage: React.FC = () => {
                           }
                           if (column.id === 'currentlyVisible') {
                             const now = dayjs();
-                            const startDate = notice.startDate ? dayjs(notice.startDate) : null;
-                            const endDate = notice.endDate ? dayjs(notice.endDate) : null;
+                            const startDate = notice.startDate
+                              ? dayjs(notice.startDate)
+                              : null;
+                            const endDate = notice.endDate
+                              ? dayjs(notice.endDate)
+                              : null;
                             const isCurrentlyVisible =
                               notice.isActive &&
                               (!startDate || now.isAfter(startDate)) &&
@@ -653,9 +729,13 @@ const IngamePopupNoticesPage: React.FC = () => {
                                       ? t('ingamePopupNotices.visible')
                                       : t('ingamePopupNotices.notVisible')
                                   }
-                                  color={isCurrentlyVisible ? 'primary' : 'default'}
+                                  color={
+                                    isCurrentlyVisible ? 'primary' : 'default'
+                                  }
                                   size="small"
-                                  variant={isCurrentlyVisible ? 'filled' : 'outlined'}
+                                  variant={
+                                    isCurrentlyVisible ? 'filled' : 'outlined'
+                                  }
                                 />
                               </TableCell>
                             );
@@ -675,7 +755,8 @@ const IngamePopupNoticesPage: React.FC = () => {
                                   }}
                                   onClick={() => handleEdit(notice)}
                                 >
-                                  {notice.content || t('ingamePopupNotices.noContent')}
+                                  {notice.content ||
+                                    t('ingamePopupNotices.noContent')}
                                 </Typography>
                               </TableCell>
                             );
@@ -683,7 +764,10 @@ const IngamePopupNoticesPage: React.FC = () => {
                           if (column.id === 'priority') {
                             return (
                               <TableCell key={column.id}>
-                                <Chip label={notice.displayPriority} size="small" />
+                                <Chip
+                                  label={notice.displayPriority}
+                                  size="small"
+                                />
                               </TableCell>
                             );
                           }
@@ -697,27 +781,40 @@ const IngamePopupNoticesPage: React.FC = () => {
                                     flexWrap: 'wrap',
                                   }}
                                 >
-                                  {notice.targetPlatforms && notice.targetPlatforms.length > 0 ? (
+                                  {notice.targetPlatforms &&
+                                  notice.targetPlatforms.length > 0 ? (
                                     <>
-                                      {notice.targetPlatforms.map((platform) => (
-                                        <Chip key={platform} label={platform} size="small" />
-                                      ))}
+                                      {notice.targetPlatforms.map(
+                                        (platform) => (
+                                          <Chip
+                                            key={platform}
+                                            label={platform}
+                                            size="small"
+                                          />
+                                        )
+                                      )}
                                     </>
                                   ) : (
-                                    <Chip label={t('common.all')} size="small" variant="outlined" />
-                                  )}
-                                  {notice.targetWorlds && notice.targetWorlds.length > 0 && (
                                     <Chip
-                                      label={`${t('ingamePopupNotices.targetWorlds')}: ${notice.targetWorlds.length}`}
+                                      label={t('common.all')}
                                       size="small"
+                                      variant="outlined"
                                     />
                                   )}
-                                  {notice.targetMarkets && notice.targetMarkets.length > 0 && (
-                                    <Chip
-                                      label={`${t('ingamePopupNotices.targetMarkets')}: ${notice.targetMarkets.length}`}
-                                      size="small"
-                                    />
-                                  )}
+                                  {notice.targetWorlds &&
+                                    notice.targetWorlds.length > 0 && (
+                                      <Chip
+                                        label={`${t('ingamePopupNotices.targetWorlds')}: ${notice.targetWorlds.length}`}
+                                        size="small"
+                                      />
+                                    )}
+                                  {notice.targetMarkets &&
+                                    notice.targetMarkets.length > 0 && (
+                                      <Chip
+                                        label={`${t('ingamePopupNotices.targetMarkets')}: ${notice.targetMarkets.length}`}
+                                        size="small"
+                                      />
+                                    )}
                                   {notice.targetClientVersions &&
                                     notice.targetClientVersions.length > 0 && (
                                       <Chip
@@ -755,8 +852,14 @@ const IngamePopupNoticesPage: React.FC = () => {
                                 >
                                   <Typography variant="caption" display="block">
                                     {notice.startDate
-                                      ? formatRelativeTime(notice.startDate, undefined, language)
-                                      : t('ingamePopupNotices.startImmediately')}
+                                      ? formatRelativeTime(
+                                          notice.startDate,
+                                          undefined,
+                                          language
+                                        )
+                                      : t(
+                                          'ingamePopupNotices.startImmediately'
+                                        )}
                                   </Typography>
                                 </Tooltip>
                                 <Tooltip
@@ -773,7 +876,11 @@ const IngamePopupNoticesPage: React.FC = () => {
                                   >
                                     ~{' '}
                                     {notice.endDate
-                                      ? formatRelativeTime(notice.endDate, undefined, language)
+                                      ? formatRelativeTime(
+                                          notice.endDate,
+                                          undefined,
+                                          language
+                                        )
                                       : t('ingamePopupNotices.endDateNotSet')}
                                   </Typography>
                                 </Tooltip>
@@ -783,9 +890,17 @@ const IngamePopupNoticesPage: React.FC = () => {
                           if (column.id === 'createdAt') {
                             return (
                               <TableCell key={column.id}>
-                                <Tooltip title={formatDateTimeDetailed(notice.createdAt)}>
+                                <Tooltip
+                                  title={formatDateTimeDetailed(
+                                    notice.createdAt
+                                  )}
+                                >
                                   <Typography variant="caption">
-                                    {formatRelativeTime(notice.createdAt, undefined, language)}
+                                    {formatRelativeTime(
+                                      notice.createdAt,
+                                      undefined,
+                                      language
+                                    )}
                                   </Typography>
                                 </Tooltip>
                               </TableCell>
@@ -864,13 +979,20 @@ const IngamePopupNoticesPage: React.FC = () => {
       />
 
       {/* Delete Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>{t('ingamePopupNotices.confirmDelete')}</DialogContentText>
+          <DialogContentText>
+            {t('ingamePopupNotices.confirmDelete')}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button onClick={confirmDelete} color="error" variant="contained">
             {t('common.delete')}
           </Button>
@@ -878,7 +1000,10 @@ const IngamePopupNoticesPage: React.FC = () => {
       </Dialog>
 
       {/* Bulk Delete Dialog */}
-      <Dialog open={bulkDeleteDialogOpen} onClose={() => setBulkDeleteDialogOpen(false)}>
+      <Dialog
+        open={bulkDeleteDialogOpen}
+        onClose={() => setBulkDeleteDialogOpen(false)}
+      >
         <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -888,7 +1013,9 @@ const IngamePopupNoticesPage: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBulkDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setBulkDeleteDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button onClick={confirmBulkDelete} color="error" variant="contained">
             {t('common.delete')}
           </Button>

@@ -26,7 +26,10 @@ export class ActionExecutionService {
    * Process all unprocessed signals
    * Called periodically by the scheduler
    */
-  static async processUnprocessedSignals(): Promise<{ processed: number; errors: number }> {
+  static async processUnprocessedSignals(): Promise<{
+    processed: number;
+    errors: number;
+  }> {
     let processed = 0;
     let errors = 0;
 
@@ -54,7 +57,9 @@ export class ActionExecutionService {
       }
 
       if (processed > 0 || errors > 0) {
-        logger.info(`Signal processing complete: ${processed} processed, ${errors} errors`);
+        logger.info(
+          `Signal processing complete: ${processed} processed, ${errors} errors`
+        );
       }
     } catch (error) {
       logger.error('Error in processUnprocessedSignals:', error);
@@ -78,7 +83,9 @@ export class ActionExecutionService {
       return;
     }
 
-    logger.info(`Signal ${signal.id} matched ${matchingActionSets.length} action set(s)`);
+    logger.info(
+      `Signal ${signal.id} matched ${matchingActionSets.length} action set(s)`
+    );
 
     for (const actionSet of matchingActionSets) {
       await this.executeActionSet(actionSet, signal);
@@ -120,10 +127,15 @@ export class ActionExecutionService {
   /**
    * Execute all actions in an action set for a given signal
    */
-  private static async executeActionSet(actionSet: ActionSet, signal: Signal): Promise<void> {
+  private static async executeActionSet(
+    actionSet: ActionSet,
+    signal: Signal
+  ): Promise<void> {
     // Check filters
     if (!this.matchesFilters(signal, actionSet)) {
-      logger.debug(`Signal ${signal.id} did not match filters for action set ${actionSet.id}`);
+      logger.debug(
+        `Signal ${signal.id} did not match filters for action set ${actionSet.id}`
+      );
       return;
     }
 
@@ -177,12 +189,16 @@ export class ActionExecutionService {
     }
 
     // Update event state
-    await ActionSetModel.updateEventState(event.id, allSuccess ? 'success' : 'failed', {
-      id: actionSet.id,
-      name: actionSet.name,
-      actorId: actionSet.actorId,
-      actions: actionStates,
-    });
+    await ActionSetModel.updateEventState(
+      event.id,
+      allSuccess ? 'success' : 'failed',
+      {
+        id: actionSet.id,
+        name: actionSet.name,
+        actorId: actionSet.actorId,
+        actions: actionStates,
+      }
+    );
   }
 
   /**
@@ -229,14 +245,21 @@ export class ActionExecutionService {
 
     const flag = await featureFlagService.getFlag(environmentId, flagName);
     if (!flag) {
-      throw new Error(`Feature flag "${flagName}" not found in environmentId "${environmentId}"`);
+      throw new Error(
+        `Feature flag "${flagName}" not found in environmentId "${environmentId}"`
+      );
     }
 
     const envConfig = flag.environments?.[environmentId];
     const currentEnabled = envConfig?.isEnabled ?? false;
     const newEnabled = !currentEnabled;
 
-    await featureFlagService.toggleFlag(environmentId, flagName, newEnabled, actionSet.actorId!);
+    await featureFlagService.toggleFlag(
+      environmentId,
+      flagName,
+      newEnabled,
+      actionSet.actorId!
+    );
 
     return {
       flagName,
@@ -266,10 +289,17 @@ export class ActionExecutionService {
 
     const flag = await featureFlagService.getFlag(environmentId, flagName);
     if (!flag) {
-      throw new Error(`Feature flag "${flagName}" not found in environmentId "${environmentId}"`);
+      throw new Error(
+        `Feature flag "${flagName}" not found in environmentId "${environmentId}"`
+      );
     }
 
-    await featureFlagService.toggleFlag(environmentId, flagName, enabled, actionSet.actorId!);
+    await featureFlagService.toggleFlag(
+      environmentId,
+      flagName,
+      enabled,
+      actionSet.actorId!
+    );
 
     return {
       flagName,

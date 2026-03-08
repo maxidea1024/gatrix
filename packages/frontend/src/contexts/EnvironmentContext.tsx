@@ -6,7 +6,10 @@ import React, {
   ReactNode,
   useCallback,
 } from 'react';
-import { environmentService, Environment } from '../services/environmentService';
+import {
+  environmentService,
+  Environment,
+} from '../services/environmentService';
 import { apiService } from '../services/api';
 import { useAuth } from './AuthContext';
 import { useOrgProject } from './OrgProjectContext';
@@ -26,11 +29,17 @@ export interface EnvironmentContextType {
   currentEnvironmentId: string | null; // Keep for backward compatibility (actually environment name)
   isLoading: boolean;
   error: string | null;
-  switchEnvironment: (orgId: string, projectId: string, environmentId: string) => void;
+  switchEnvironment: (
+    orgId: string,
+    projectId: string,
+    environmentId: string
+  ) => void;
   refresh: () => Promise<void>;
 }
 
-const EnvironmentContext = createContext<EnvironmentContextType | undefined>(undefined);
+const EnvironmentContext = createContext<EnvironmentContextType | undefined>(
+  undefined
+);
 
 interface EnvironmentProviderProps {
   children: ReactNode;
@@ -52,21 +61,26 @@ const storeEnvironment = (environmentId: string, name: string): void => {
   }
 };
 
-export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ children }) => {
-  const { isAuthenticated, hasPermission, permissions, permissionsLoading } = useAuth();
+export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({
+  children,
+}) => {
+  const { isAuthenticated, hasPermission, permissions, permissionsLoading } =
+    useAuth();
   const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
-  const { getProjectApiPath, currentProjectId, switchContext } = useOrgProject();
+  const { getProjectApiPath, currentProjectId, switchContext } =
+    useOrgProject();
   const [allEnvironments, setAllEnvironments] = useState<Environment[]>([]);
   const [environments, setEnvironments] = useState<Environment[]>([]);
-  const [currentEnvironmentId, setCurrentEnvironmentId] = useState<string | null>(
-    getStoredEnvironment()
-  );
+  const [currentEnvironmentId, setCurrentEnvironmentId] = useState<
+    string | null
+  >(getStoredEnvironment());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Find current environment from the list
   const currentEnvironment =
-    environments.find((env) => env.environmentId === currentEnvironmentId) || null;
+    environments.find((env) => env.environmentId === currentEnvironmentId) ||
+    null;
 
   // Load environments from API
   const loadEnvironments = useCallback(async () => {
@@ -100,8 +114,11 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
           accessibleEnvs = envList;
         } else {
           // Use environments array (names) instead of environmentIds
-          const accessList = userAccess.environments || (userAccess as any).environments || [];
-          accessibleEnvs = envList.filter((env) => accessList.includes(env.environmentId));
+          const accessList =
+            userAccess.environments || (userAccess as any).environments || [];
+          accessibleEnvs = envList.filter((env) =>
+            accessList.includes(env.environmentId)
+          );
         }
       } catch (accessError) {
         console.warn(
@@ -119,16 +136,23 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
       // If no environment is selected, select the first one (or default)
       if (!storedEnv && accessibleEnvs.length > 0) {
         // Prefer the first environment or the one marked as default
-        const defaultEnv = accessibleEnvs.find((e) => e.isDefault) || accessibleEnvs[0];
+        const defaultEnv =
+          accessibleEnvs.find((e) => e.isDefault) || accessibleEnvs[0];
         if (defaultEnv) {
           setCurrentEnvironmentId(defaultEnv.environmentId);
           storeEnvironment(defaultEnv.environmentId, defaultEnv.displayName);
         }
-      } else if (storedEnv && !accessibleEnvs.find((e) => e.environmentId === storedEnv)) {
+      } else if (
+        storedEnv &&
+        !accessibleEnvs.find((e) => e.environmentId === storedEnv)
+      ) {
         // If the stored environment doesn't exist anymore or not accessible, reset to first
         if (accessibleEnvs.length > 0) {
           setCurrentEnvironmentId(accessibleEnvs[0].environmentId);
-          storeEnvironment(accessibleEnvs[0].environmentId, accessibleEnvs[0].displayName);
+          storeEnvironment(
+            accessibleEnvs[0].environmentId,
+            accessibleEnvs[0].displayName
+          );
         } else {
           // No accessible environments - clear localStorage as well
           setCurrentEnvironmentId(null);
@@ -137,7 +161,8 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
         }
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load environments';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to load environments';
       setError(errorMessage);
       console.error('Error loading environments:', err);
     } finally {
@@ -197,13 +222,19 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
     refresh: loadEnvironments,
   };
 
-  return <EnvironmentContext.Provider value={value}>{children}</EnvironmentContext.Provider>;
+  return (
+    <EnvironmentContext.Provider value={value}>
+      {children}
+    </EnvironmentContext.Provider>
+  );
 };
 
 export const useEnvironment = (): EnvironmentContextType => {
   const context = useContext(EnvironmentContext);
   if (context === undefined) {
-    throw new Error('useEnvironment must be used within an EnvironmentProvider');
+    throw new Error(
+      'useEnvironment must be used within an EnvironmentProvider'
+    );
   }
   return context;
 };

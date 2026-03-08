@@ -19,7 +19,10 @@ router.use(authenticate as any);
 // Planning data routes
 router.get('/reward-lookup', PlanningDataController.getRewardLookup);
 router.get('/reward-types', PlanningDataController.getRewardTypeList);
-router.get('/reward-types/:rewardType/items', PlanningDataController.getRewardTypeItems);
+router.get(
+  '/reward-types/:rewardType/items',
+  PlanningDataController.getRewardTypeItems
+);
 router.get('/ui-list', PlanningDataController.getUIListData);
 router.get('/ui-list/:category/items', PlanningDataController.getUIListItems);
 router.get('/stats', PlanningDataController.getStats);
@@ -34,10 +37,16 @@ router.get('/eventpage', PlanningDataController.getEventPageLookup);
 router.get('/liveevent', PlanningDataController.getLiveEventLookup);
 
 // MateRecruitingGroup routes
-router.get('/materecruiting', PlanningDataController.getMateRecruitingGroupLookup);
+router.get(
+  '/materecruiting',
+  PlanningDataController.getMateRecruitingGroupLookup
+);
 
 // OceanNpcAreaSpawner routes
-router.get('/oceannpcarea', PlanningDataController.getOceanNpcAreaSpawnerLookup);
+router.get(
+  '/oceannpcarea',
+  PlanningDataController.getOceanNpcAreaSpawnerLookup
+);
 
 // File upload route (drag & drop)
 router.post('/upload', upload.any(), PlanningDataController.uploadPlanningData);

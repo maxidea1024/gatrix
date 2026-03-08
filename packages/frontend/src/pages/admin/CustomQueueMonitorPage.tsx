@@ -106,7 +106,14 @@ const CustomQueueMonitorPage: React.FC = () => {
     setMenuTarget(null);
   };
 
-  const statusTabs = ['latest', 'waiting', 'active', 'completed', 'failed', 'delayed'];
+  const statusTabs = [
+    'latest',
+    'waiting',
+    'active',
+    'completed',
+    'failed',
+    'delayed',
+  ];
 
   useEffect(() => {
     if (user) {
@@ -135,7 +142,10 @@ const CustomQueueMonitorPage: React.FC = () => {
     }
   };
 
-  const fetchQueueJobs = async (queueName: string, status: string = 'latest') => {
+  const fetchQueueJobs = async (
+    queueName: string,
+    status: string = 'latest'
+  ) => {
     try {
       const response = await apiClient.get(
         `/admin/queues/api/queues?activeQueue=${queueName}&status=${status}&page=1&jobsPerPage=50`
@@ -184,7 +194,14 @@ const CustomQueueMonitorPage: React.FC = () => {
 
   const getStatusColor = (
     status: string
-  ): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  ):
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'error'
+    | 'info'
+    | 'success'
+    | 'warning' => {
     switch (status) {
       case 'completed':
         return 'success';
@@ -253,7 +270,8 @@ const CustomQueueMonitorPage: React.FC = () => {
                 sx={{
                   cursor: 'pointer',
                   border: selectedQueue === queue.name ? 2 : 1,
-                  borderColor: selectedQueue === queue.name ? 'primary.main' : 'divider',
+                  borderColor:
+                    selectedQueue === queue.name ? 'primary.main' : 'divider',
                 }}
                 onClick={() => setSelectedQueue(queue.name)}
               >
@@ -262,7 +280,11 @@ const CustomQueueMonitorPage: React.FC = () => {
                     {queue.name}
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                    <Chip label={`대기: ${queue.counts?.waiting || 0}`} color="info" size="small" />
+                    <Chip
+                      label={`대기: ${queue.counts?.waiting || 0}`}
+                      color="info"
+                      size="small"
+                    />
                     <Chip
                       label={`실행중: ${queue.counts?.active || 0}`}
                       color="primary"
@@ -273,7 +295,11 @@ const CustomQueueMonitorPage: React.FC = () => {
                       color="success"
                       size="small"
                     />
-                    <Chip label={`실패: ${queue.counts?.failed || 0}`} color="error" size="small" />
+                    <Chip
+                      label={`실패: ${queue.counts?.failed || 0}`}
+                      color="error"
+                      size="small"
+                    />
                   </Box>
                 </CardContent>
               </Card>
@@ -326,17 +352,28 @@ const CustomQueueMonitorPage: React.FC = () => {
                         </TableCell>
                         <TableCell>{formatTimestamp(job.timestamp)}</TableCell>
                         <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1,
+                            }}
+                          >
                             <LinearProgress
                               variant="determinate"
                               value={job.progress || 0}
                               sx={{ flexGrow: 1 }}
                             />
-                            <Typography variant="caption">{job.progress || 0}%</Typography>
+                            <Typography variant="caption">
+                              {job.progress || 0}%
+                            </Typography>
                           </Box>
                         </TableCell>
                         <TableCell align="center">
-                          <IconButton size="small" onClick={(e) => handleMenuOpen(e, job)}>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => handleMenuOpen(e, job)}
+                          >
                             <MoreVertIcon fontSize="small" />
                           </IconButton>
                         </TableCell>
@@ -351,7 +388,11 @@ const CustomQueueMonitorPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+      >
         <MenuItem
           onClick={() => {
             if (menuTarget) {
@@ -391,7 +432,12 @@ const CustomQueueMonitorPage: React.FC = () => {
       </Menu>
 
       {/* 작업 상세 Dialog */}
-      <Dialog open={jobDialogOpen} onClose={() => setJobDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={jobDialogOpen}
+        onClose={() => setJobDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>작업 상세 정보</DialogTitle>
         <DialogContent>
           {selectedJob && (

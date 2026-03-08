@@ -35,7 +35,9 @@ export function useNumberVariation(
       : features.watchSyncedFlagWithInitialState.bind(features);
 
     return watchFn(flagName, () => {
-      setValue(features.numberVariation(flagName, fallbackValue, forceRealtime));
+      setValue(
+        features.numberVariation(flagName, fallbackValue, forceRealtime)
+      );
     });
   }, [features, flagName, fallbackValue, forceRealtime]);
 

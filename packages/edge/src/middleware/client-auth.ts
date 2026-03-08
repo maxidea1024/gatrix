@@ -7,7 +7,8 @@ import { tokenUsageTracker } from '../services/token-usage-tracker';
 import { environmentRegistry } from '../services/environment-registry';
 
 // Unsecured token format: unsecured-{org}:{project}:{env}-{type}-api-token
-const UNSECURED_TOKEN_REGEX = /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
+const UNSECURED_TOKEN_REGEX =
+  /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
 
 // Legacy unsecured tokens — auto-resolve to default/default/development
 const LEGACY_TOKENS: Record<string, boolean> = {
@@ -53,7 +54,11 @@ export interface ClientRequest extends Request {
  * Validates required headers and API token from client requests
  * Environment is resolved from the token (not from URL path)
  */
-export function clientAuth(req: ClientRequest, res: Response, next: NextFunction): void {
+export function clientAuth(
+  req: ClientRequest,
+  res: Response,
+  next: NextFunction
+): void {
   // Extract token from multiple sources
   const authHeader = req.headers['authorization'] as string | undefined;
   let apiToken = req.headers['x-api-token'] as string | undefined;
@@ -78,7 +83,10 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
 
   // Validate required parameters
   if (!apiToken) {
-    logger.warn('Missing API token in client request', { url: req.originalUrl, query: req.query });
+    logger.warn('Missing API token in client request', {
+      url: req.originalUrl,
+      query: req.query,
+    });
     res.status(401).json({
       success: false,
       error: {
@@ -90,12 +98,15 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
   }
 
   if (!applicationName) {
-    logger.warn('Missing application name in client request', { url: req.originalUrl });
+    logger.warn('Missing application name in client request', {
+      url: req.originalUrl,
+    });
     res.status(401).json({
       success: false,
       error: {
         code: 'MISSING_APPLICATION_NAME',
-        message: 'x-application-name header or appName query parameter is required',
+        message:
+          'x-application-name header or appName query parameter is required',
       },
     });
     return;
@@ -105,7 +116,8 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
   const unsecuredMatch = apiToken.match(UNSECURED_TOKEN_REGEX);
   if (unsecuredMatch) {
     const [, , , envId] = unsecuredMatch;
-    const environmentId = environmentRegistry.resolveEnvironmentId(envId) || envId;
+    const environmentId =
+      environmentRegistry.resolveEnvironmentId(envId) || envId;
     req.clientContext = {
       apiToken,
       applicationName,
@@ -115,13 +127,16 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
       platform,
       tokenName: `Unsecured Token (${envId})`,
     };
-    logger.debug('Authenticated with unsecured format token', { environmentId });
+    logger.debug('Authenticated with unsecured format token', {
+      environmentId,
+    });
     return next();
   }
 
   // 2. Legacy unsecured tokens → resolve to default/default/development
   if (LEGACY_TOKENS[apiToken]) {
-    const cacheKey = environmentRegistry.resolveEnvironmentToken(LEGACY_ENV_NAME);
+    const cacheKey =
+      environmentRegistry.resolveEnvironmentToken(LEGACY_ENV_NAME);
     if (!cacheKey) {
       res.status(401).json({
         success: false,
@@ -133,7 +148,8 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
       return;
     }
     const environmentId =
-      environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME) || LEGACY_ENV_NAME;
+      environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME) ||
+      LEGACY_ENV_NAME;
     req.clientContext = {
       apiToken,
       applicationName,
@@ -143,7 +159,10 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
       platform,
       tokenName: 'Legacy Unsecured Token',
     };
-    logger.debug('Authenticated with legacy unsecured token', { environmentId, cacheKey });
+    logger.debug('Authenticated with legacy unsecured token', {
+      environmentId,
+      cacheKey,
+    });
     return next();
   }
 
@@ -209,7 +228,8 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     return;
   }
 
-  const environmentId = environmentRegistry.resolveEnvironmentId(envName) || envName;
+  const environmentId =
+    environmentRegistry.resolveEnvironmentId(envName) || envName;
   req.clientContext = {
     apiToken,
     applicationName,

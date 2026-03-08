@@ -6,6 +6,10 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.get('/export', dataManagementController.exportData as any);
-router.post('/import', upload.single('file') as any, dataManagementController.importData as any);
+router.post(
+  '/import',
+  upload.single('file') as any,
+  dataManagementController.importData as any
+);
 
 export default router;

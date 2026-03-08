@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   Box,
   Typography,
@@ -86,7 +92,9 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import DateRangePicker, { DateRangePreset } from '../../components/common/DateRangePicker';
+import DateRangePicker, {
+  DateRangePreset,
+} from '../../components/common/DateRangePicker';
 import { usePageState } from '../../hooks/usePageState';
 import { useDebounce } from '../../hooks/useDebounce';
 import LogViewer from '../../components/LogViewer';
@@ -108,9 +116,19 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
+  column,
+  onToggleVisibility,
+}) => {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: column.id,
   });
 
@@ -140,7 +158,11 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
         </Box>
       }
     >
-      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -150,7 +172,10 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
       </ListItemButton>
     </ListItem>
   );
@@ -179,15 +204,20 @@ const CrashEventsPage: React.FC = () => {
 
   // Date range state - restore from pageState.filters
   const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    pageState.filters?.dateFrom ? dayjs(pageState.filters.dateFrom) : dayjs().subtract(7, 'day')
+    pageState.filters?.dateFrom
+      ? dayjs(pageState.filters.dateFrom)
+      : dayjs().subtract(7, 'day')
   );
   const [dateTo, setDateTo] = useState<Dayjs | null>(
     pageState.filters?.dateTo ? dayjs(pageState.filters.dateTo) : dayjs()
   );
-  const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>('last7d');
+  const [dateRangePreset, setDateRangePreset] =
+    useState<DateRangePreset>('last7d');
 
   // Search state - restore from pageState.filters
-  const [searchTerm, setSearchTerm] = useState<string>(pageState.filters?.search || '');
+  const [searchTerm, setSearchTerm] = useState<string>(
+    pageState.filters?.search || ''
+  );
 
   // Debounced search term (500ms delay)
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -216,14 +246,20 @@ const CrashEventsPage: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     return params.get('expandedId') || null;
   });
-  const [detailViewMode, setDetailViewMode] = useState<'table' | 'json'>('table');
+  const [detailViewMode, setDetailViewMode] = useState<'table' | 'json'>(
+    'table'
+  );
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState<'stackTrace' | 'log'>('log');
   const [selectedEvent, setSelectedEvent] = useState<CrashEvent | null>(null);
   const [logContent, setLogContent] = useState<string>('');
-  const [stackTraceMap, setStackTraceMap] = useState<Record<string, string>>({});
+  const [stackTraceMap, setStackTraceMap] = useState<Record<string, string>>(
+    {}
+  );
   const [loadingLog, setLoadingLog] = useState(false);
-  const [loadingStackTraceId, setLoadingStackTraceId] = useState<string | null>(null);
+  const [loadingStackTraceId, setLoadingStackTraceId] = useState<string | null>(
+    null
+  );
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -326,7 +362,8 @@ const CrashEventsPage: React.FC = () => {
   });
 
   // Column settings popover state
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLButtonElement | null>(null);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -350,7 +387,9 @@ const CrashEventsPage: React.FC = () => {
 
   // Initial scroll line for log viewer (from URL hash)
   // Capture hash at mount time to prevent it from being lost
-  const [initialLogScrollLine, setInitialLogScrollLine] = useState<number | undefined>(undefined);
+  const [initialLogScrollLine, setInitialLogScrollLine] = useState<
+    number | undefined
+  >(undefined);
   const initialHashRef = useRef<string>(window.location.hash);
 
   // Dynamic filter definitions
@@ -436,11 +475,18 @@ const CrashEventsPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters(activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f)));
+    setActiveFilters(
+      activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f))
+    );
   };
 
-  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
-    setActiveFilters(activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f)));
+  const handleOperatorChange = (
+    filterKey: string,
+    operator: 'any_of' | 'include_all'
+  ) => {
+    setActiveFilters(
+      activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f))
+    );
   };
 
   // Load filter options
@@ -675,7 +721,9 @@ const CrashEventsPage: React.FC = () => {
   const handleSort = useCallback(
     (column: string) => {
       const newSortOrder =
-        pageState.sortBy === column && pageState.sortOrder === 'DESC' ? 'ASC' : 'DESC';
+        pageState.sortBy === column && pageState.sortOrder === 'DESC'
+          ? 'ASC'
+          : 'DESC';
       updateSort(column, newSortOrder);
     },
     [pageState.sortBy, pageState.sortOrder, updateSort]
@@ -726,7 +774,9 @@ const CrashEventsPage: React.FC = () => {
         ['User Agent', event.crashEventUserAgent || '-'],
         ['User Message', event.userMessage || '-'],
       ];
-      const tsvData = fields.map(([key, value]) => `${key}\t${value}`).join('\n');
+      const tsvData = fields
+        .map(([key, value]) => `${key}\t${value}`)
+        .join('\n');
       copyToClipboardWithNotification(
         tsvData,
         () =>
@@ -758,7 +808,8 @@ const CrashEventsPage: React.FC = () => {
     const currentUrl = window.location.href;
     copyToClipboardWithNotification(
       currentUrl,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   }, [t, enqueueSnackbar]);
@@ -842,11 +893,30 @@ const CrashEventsPage: React.FC = () => {
           />
         );
       case 'branch':
-        return <Chip label={event.branch} size="small" color="info" variant="outlined" />;
+        return (
+          <Chip
+            label={event.branch}
+            size="small"
+            color="info"
+            variant="outlined"
+          />
+        );
       case 'appVersion':
-        return <Chip label={event.appVersion || '-'} size="small" variant="outlined" />;
+        return (
+          <Chip
+            label={event.appVersion || '-'}
+            size="small"
+            variant="outlined"
+          />
+        );
       case 'resVersion':
-        return <Chip label={event.resVersion || '-'} size="small" variant="outlined" />;
+        return (
+          <Chip
+            label={event.resVersion || '-'}
+            size="small"
+            variant="outlined"
+          />
+        );
       case 'accountId':
         return event.accountId || '-';
       case 'characterId':
@@ -983,7 +1053,13 @@ const CrashEventsPage: React.FC = () => {
                 setDateRangePreset(preset);
               }}
               preset={dateRangePreset}
-              availablePresets={['today', 'yesterday', 'last7d', 'last30d', 'custom']}
+              availablePresets={[
+                'today',
+                'yesterday',
+                'last7d',
+                'last30d',
+                'custom',
+              ]}
               size="small"
             />
 
@@ -1103,8 +1179,15 @@ const CrashEventsPage: React.FC = () => {
                           }}
                         >
                           <TableCell>
-                            <IconButton size="small" onClick={() => handleToggleRow(event.id)}>
-                              {expandedRowId === event.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            <IconButton
+                              size="small"
+                              onClick={() => handleToggleRow(event.id)}
+                            >
+                              {expandedRowId === event.id ? (
+                                <ExpandLessIcon />
+                              ) : (
+                                <ExpandMoreIcon />
+                              )}
                             </IconButton>
                           </TableCell>
                           {columns
@@ -1127,7 +1210,10 @@ const CrashEventsPage: React.FC = () => {
                                   size="small"
                                   onClick={async () => {
                                     try {
-                                      const stackData = await crashService.getStackTrace(event.id);
+                                      const stackData =
+                                        await crashService.getStackTrace(
+                                          event.id
+                                        );
                                       setSelectedEvent(event);
                                       setStackTraceMap((prev) => ({
                                         ...prev,
@@ -1136,7 +1222,10 @@ const CrashEventsPage: React.FC = () => {
                                       setDrawerType('stackTrace');
                                       setDrawerOpen(true);
                                     } catch (error) {
-                                      console.error('Failed to load stack trace:', error);
+                                      console.error(
+                                        'Failed to load stack trace:',
+                                        error
+                                      );
                                       enqueueSnackbar(t('crashes.loadError'), {
                                         variant: 'error',
                                       });
@@ -1148,7 +1237,10 @@ const CrashEventsPage: React.FC = () => {
                               </Tooltip>
                               {event.logFilePath && (
                                 <Tooltip title={t('crashes.viewLog')}>
-                                  <IconButton size="small" onClick={() => handleViewLog(event)}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleViewLog(event)}
+                                  >
                                     <LogIcon fontSize="small" />
                                   </IconButton>
                                 </Tooltip>
@@ -1158,10 +1250,16 @@ const CrashEventsPage: React.FC = () => {
                         </TableRow>
                         <TableRow hover>
                           <TableCell
-                            colSpan={columns.filter((col) => col.visible).length + 2}
+                            colSpan={
+                              columns.filter((col) => col.visible).length + 2
+                            }
                             sx={{ p: 0, border: 0 }}
                           >
-                            <Collapse in={expandedRowId === event.id} timeout="auto" unmountOnExit>
+                            <Collapse
+                              in={expandedRowId === event.id}
+                              timeout="auto"
+                              unmountOnExit
+                            >
                               <Box
                                 sx={{
                                   py: 2,
@@ -1177,13 +1275,19 @@ const CrashEventsPage: React.FC = () => {
                                 }}
                               >
                                 {/* Properties Title */}
-                                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                <Typography
+                                  variant="h6"
+                                  sx={{ mb: 2, fontWeight: 600 }}
+                                >
                                   {t('crashes.properties')}
                                 </Typography>
 
                                 {/* Table View */}
                                 {detailViewMode === 'table' && (
-                                  <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+                                  <Paper
+                                    variant="outlined"
+                                    sx={{ overflow: 'hidden' }}
+                                  >
                                     <Table size="small">
                                       <TableBody>
                                         {/* ID */}
@@ -1218,13 +1322,18 @@ const CrashEventsPage: React.FC = () => {
                                                     event.id,
                                                     () =>
                                                       enqueueSnackbar(
-                                                        t('common.copiedToClipboard'),
+                                                        t(
+                                                          'common.copiedToClipboard'
+                                                        ),
                                                         { variant: 'success' }
                                                       ),
                                                     () =>
-                                                      enqueueSnackbar(t('common.copyFailed'), {
-                                                        variant: 'error',
-                                                      })
+                                                      enqueueSnackbar(
+                                                        t('common.copyFailed'),
+                                                        {
+                                                          variant: 'error',
+                                                        }
+                                                      )
                                                   );
                                                 }}
                                               >
@@ -1247,7 +1356,9 @@ const CrashEventsPage: React.FC = () => {
                                           </TableCell>
                                           <TableCell>
                                             <Typography variant="body2">
-                                              {dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                                              {dayjs(event.createdAt).format(
+                                                'YYYY-MM-DD HH:mm:ss'
+                                              )}
                                             </Typography>
                                           </TableCell>
                                         </TableRow>
@@ -1272,7 +1383,9 @@ const CrashEventsPage: React.FC = () => {
                                               }}
                                             >
                                               <Chip
-                                                label={getPlatformName(event.platform)}
+                                                label={getPlatformName(
+                                                  event.platform
+                                                )}
                                                 size="small"
                                                 color="primary"
                                                 variant="outlined"
@@ -1284,13 +1397,18 @@ const CrashEventsPage: React.FC = () => {
                                                     event.platform,
                                                     () =>
                                                       enqueueSnackbar(
-                                                        t('common.copiedToClipboard'),
+                                                        t(
+                                                          'common.copiedToClipboard'
+                                                        ),
                                                         { variant: 'success' }
                                                       ),
                                                     () =>
-                                                      enqueueSnackbar(t('common.copyFailed'), {
-                                                        variant: 'error',
-                                                      })
+                                                      enqueueSnackbar(
+                                                        t('common.copyFailed'),
+                                                        {
+                                                          variant: 'error',
+                                                        }
+                                                      )
                                                   );
                                                 }}
                                               >
@@ -1320,7 +1438,9 @@ const CrashEventsPage: React.FC = () => {
                                               }}
                                             >
                                               <Chip
-                                                label={getEnvironmentName(event.environmentId)}
+                                                label={getEnvironmentName(
+                                                  event.environmentId
+                                                )}
                                                 size="small"
                                                 color="secondary"
                                                 variant="outlined"
@@ -1332,13 +1452,18 @@ const CrashEventsPage: React.FC = () => {
                                                     event.environmentId,
                                                     () =>
                                                       enqueueSnackbar(
-                                                        t('common.copiedToClipboard'),
+                                                        t(
+                                                          'common.copiedToClipboard'
+                                                        ),
                                                         { variant: 'success' }
                                                       ),
                                                     () =>
-                                                      enqueueSnackbar(t('common.copyFailed'), {
-                                                        variant: 'error',
-                                                      })
+                                                      enqueueSnackbar(
+                                                        t('common.copyFailed'),
+                                                        {
+                                                          variant: 'error',
+                                                        }
+                                                      )
                                                   );
                                                 }}
                                               >
@@ -1380,13 +1505,18 @@ const CrashEventsPage: React.FC = () => {
                                                     event.branch,
                                                     () =>
                                                       enqueueSnackbar(
-                                                        t('common.copiedToClipboard'),
+                                                        t(
+                                                          'common.copiedToClipboard'
+                                                        ),
                                                         { variant: 'success' }
                                                       ),
                                                     () =>
-                                                      enqueueSnackbar(t('common.copyFailed'), {
-                                                        variant: 'error',
-                                                      })
+                                                      enqueueSnackbar(
+                                                        t('common.copyFailed'),
+                                                        {
+                                                          variant: 'error',
+                                                        }
+                                                      )
                                                   );
                                                 }}
                                               >
@@ -1428,15 +1558,22 @@ const CrashEventsPage: React.FC = () => {
                                                       event.appVersion!,
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -1479,15 +1616,22 @@ const CrashEventsPage: React.FC = () => {
                                                       event.resVersion!,
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -1515,7 +1659,8 @@ const CrashEventsPage: React.FC = () => {
                                                 sx={{
                                                   display: 'flex',
                                                   alignItems: 'center',
-                                                  justifyContent: 'space-between',
+                                                  justifyContent:
+                                                    'space-between',
                                                 }}
                                               >
                                                 <Typography variant="body2">
@@ -1528,15 +1673,22 @@ const CrashEventsPage: React.FC = () => {
                                                       String(event.accountId),
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -1564,7 +1716,8 @@ const CrashEventsPage: React.FC = () => {
                                                 sx={{
                                                   display: 'flex',
                                                   alignItems: 'center',
-                                                  justifyContent: 'space-between',
+                                                  justifyContent:
+                                                    'space-between',
                                                 }}
                                               >
                                                 <Typography variant="body2">
@@ -1577,15 +1730,22 @@ const CrashEventsPage: React.FC = () => {
                                                       String(event.characterId),
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -1613,7 +1773,8 @@ const CrashEventsPage: React.FC = () => {
                                                 sx={{
                                                   display: 'flex',
                                                   alignItems: 'center',
-                                                  justifyContent: 'space-between',
+                                                  justifyContent:
+                                                    'space-between',
                                                 }}
                                               >
                                                 <Typography variant="body2">
@@ -1626,15 +1787,22 @@ const CrashEventsPage: React.FC = () => {
                                                       String(event.gameUserId),
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -1662,7 +1830,8 @@ const CrashEventsPage: React.FC = () => {
                                                 sx={{
                                                   display: 'flex',
                                                   alignItems: 'center',
-                                                  justifyContent: 'space-between',
+                                                  justifyContent:
+                                                    'space-between',
                                                 }}
                                               >
                                                 <Typography variant="body2">
@@ -1675,15 +1844,22 @@ const CrashEventsPage: React.FC = () => {
                                                       event.userName!,
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -1711,7 +1887,8 @@ const CrashEventsPage: React.FC = () => {
                                                 sx={{
                                                   display: 'flex',
                                                   alignItems: 'center',
-                                                  justifyContent: 'space-between',
+                                                  justifyContent:
+                                                    'space-between',
                                                 }}
                                               >
                                                 <Typography variant="body2">
@@ -1721,18 +1898,27 @@ const CrashEventsPage: React.FC = () => {
                                                   size="small"
                                                   onClick={async () => {
                                                     await copyToClipboardWithNotification(
-                                                      String(event.gameServerId),
+                                                      String(
+                                                        event.gameServerId
+                                                      ),
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -1760,7 +1946,8 @@ const CrashEventsPage: React.FC = () => {
                                                 sx={{
                                                   display: 'flex',
                                                   alignItems: 'center',
-                                                  justifyContent: 'space-between',
+                                                  justifyContent:
+                                                    'space-between',
                                                 }}
                                               >
                                                 <Typography variant="body2">
@@ -1773,15 +1960,22 @@ const CrashEventsPage: React.FC = () => {
                                                       event.marketType!,
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -1805,7 +1999,11 @@ const CrashEventsPage: React.FC = () => {
                                               {t('crashes.table.isEditor')}
                                             </TableCell>
                                             <TableCell>
-                                              <Chip label="Editor" size="small" color="warning" />
+                                              <Chip
+                                                label="Editor"
+                                                size="small"
+                                                color="warning"
+                                              />
                                             </TableCell>
                                           </TableRow>
                                         )}
@@ -1843,15 +2041,22 @@ const CrashEventsPage: React.FC = () => {
                                                       event.crashEventIp!,
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -1889,7 +2094,8 @@ const CrashEventsPage: React.FC = () => {
                                                   wordBreak: 'break-all',
                                                 }}
                                               >
-                                                {event.crashEventUserAgent || '-'}
+                                                {event.crashEventUserAgent ||
+                                                  '-'}
                                               </Typography>
                                               {event.crashEventUserAgent && (
                                                 <IconButton
@@ -1899,15 +2105,22 @@ const CrashEventsPage: React.FC = () => {
                                                       event.crashEventUserAgent!,
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -1935,7 +2148,8 @@ const CrashEventsPage: React.FC = () => {
                                                 sx={{
                                                   display: 'flex',
                                                   alignItems: 'center',
-                                                  justifyContent: 'space-between',
+                                                  justifyContent:
+                                                    'space-between',
                                                 }}
                                               >
                                                 <Typography
@@ -1955,15 +2169,22 @@ const CrashEventsPage: React.FC = () => {
                                                       (event as any).firstLine!,
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -1992,7 +2213,8 @@ const CrashEventsPage: React.FC = () => {
                                                 sx={{
                                                   display: 'flex',
                                                   alignItems: 'flex-start',
-                                                  justifyContent: 'space-between',
+                                                  justifyContent:
+                                                    'space-between',
                                                   gap: 1,
                                                 }}
                                               >
@@ -2013,15 +2235,22 @@ const CrashEventsPage: React.FC = () => {
                                                       event.userMessage!,
                                                       () =>
                                                         enqueueSnackbar(
-                                                          t('common.copiedToClipboard'),
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
                                                           {
                                                             variant: 'success',
                                                           }
                                                         ),
                                                       () =>
-                                                        enqueueSnackbar(t('common.copyFailed'), {
-                                                          variant: 'error',
-                                                        })
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
                                                     );
                                                   }}
                                                 >
@@ -2081,17 +2310,25 @@ const CrashEventsPage: React.FC = () => {
                                     size="small"
                                   >
                                     <ToggleButton value="table">
-                                      <TableIcon fontSize="small" sx={{ mr: 0.5 }} />
+                                      <TableIcon
+                                        fontSize="small"
+                                        sx={{ mr: 0.5 }}
+                                      />
                                       Table
                                     </ToggleButton>
                                     <ToggleButton value="json">
-                                      <JsonIcon fontSize="small" sx={{ mr: 0.5 }} />
+                                      <JsonIcon
+                                        fontSize="small"
+                                        sx={{ mr: 0.5 }}
+                                      />
                                       JSON
                                     </ToggleButton>
                                   </ToggleButtonGroup>
                                   <Tooltip
                                     title={
-                                      detailViewMode === 'table' ? 'Copy as Table' : 'Copy as JSON'
+                                      detailViewMode === 'table'
+                                        ? 'Copy as Table'
+                                        : 'Copy as JSON'
                                     }
                                   >
                                     <IconButton
@@ -2180,7 +2417,9 @@ const CrashEventsPage: React.FC = () => {
         >
           <Box>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {drawerType === 'stackTrace' ? t('crashes.viewStackTrace') : t('crashes.viewLog')}
+              {drawerType === 'stackTrace'
+                ? t('crashes.viewStackTrace')
+                : t('crashes.viewLog')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               {drawerType === 'stackTrace'
@@ -2222,10 +2461,14 @@ const CrashEventsPage: React.FC = () => {
                   overflow: 'hidden',
                 }}
               >
-                <StackTraceViewer stackTrace={stackTraceMap[selectedEvent.id]} />
+                <StackTraceViewer
+                  stackTrace={stackTraceMap[selectedEvent.id]}
+                />
               </Box>
             ) : (
-              <Typography color="text.secondary">{t('crashes.stackTraceNotAvailable')}</Typography>
+              <Typography color="text.secondary">
+                {t('crashes.stackTraceNotAvailable')}
+              </Typography>
             )
           ) : // Log View
           loadingLog ? (
@@ -2267,7 +2510,9 @@ const CrashEventsPage: React.FC = () => {
               />
             </Box>
           ) : (
-            <Typography color="text.secondary">{t('crashes.logNotAvailable')}</Typography>
+            <Typography color="text.secondary">
+              {t('crashes.logNotAvailable')}
+            </Typography>
           )}
         </Box>
       </Drawer>

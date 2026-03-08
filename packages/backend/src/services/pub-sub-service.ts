@@ -218,7 +218,9 @@ export class PubSubService extends EventEmitter {
   /**
    * Process cache invalidation job
    */
-  private async processCacheInvalidation(data: CacheInvalidationMessage): Promise<void> {
+  private async processCacheInvalidation(
+    data: CacheInvalidationMessage
+  ): Promise<void> {
     try {
       // Ignore old messages (older than 30 seconds)
       if (Date.now() - data.timestamp > 30_000) {
@@ -249,7 +251,9 @@ export class PubSubService extends EventEmitter {
   /**
    * Process SSE notification job and emit locally
    */
-  private async processSSENotification(message: SSENotificationBusMessage): Promise<void> {
+  private async processSSENotification(
+    message: SSENotificationBusMessage
+  ): Promise<void> {
     try {
       // Ignore very old messages (older than 2 minutes)
       const ts = message.timestamp ?? Date.now();
@@ -269,7 +273,9 @@ export class PubSubService extends EventEmitter {
    * Process local L1 cache invalidation from Pub/Sub broadcast.
    * Only invalidates in-process L1 memory cache (NOT Redis — already handled at source).
    */
-  private async processLocalCacheInvalidation(data: CacheInvalidationMessage): Promise<void> {
+  private async processLocalCacheInvalidation(
+    data: CacheInvalidationMessage
+  ): Promise<void> {
     try {
       // Ignore old messages (older than 30 seconds)
       if (Date.now() - data.timestamp > 30_000) {
@@ -303,7 +309,9 @@ export class PubSubService extends EventEmitter {
     message: Omit<CacheInvalidationMessage, 'timestamp'>
   ): Promise<void> {
     if (!this.isConnected || !this.cacheQueue) {
-      logger.warn('PubSub not connected, skipping cache invalidation broadcast');
+      logger.warn(
+        'PubSub not connected, skipping cache invalidation broadcast'
+      );
       return;
     }
 
@@ -438,7 +446,10 @@ export class PubSubService extends EventEmitter {
         pattern: fullMessage.pattern,
       });
     } catch (error: any) {
-      logger.error('Failed to publish cache invalidation via Redis Pub/Sub:', error);
+      logger.error(
+        'Failed to publish cache invalidation via Redis Pub/Sub:',
+        error
+      );
       // Fallback: enqueue to BullMQ for at-least-once delivery (single instance only)
       await this.addCacheInvalidationJob(message);
     }
@@ -447,7 +458,9 @@ export class PubSubService extends EventEmitter {
   /**
    * Publish SSE notification to all instances via Redis Pub/Sub (broadcast)
    */
-  async publishNotification(message: Omit<SSENotificationBusMessage, 'timestamp'>): Promise<void> {
+  async publishNotification(
+    message: Omit<SSENotificationBusMessage, 'timestamp'>
+  ): Promise<void> {
     try {
       const fullMessage: SSENotificationBusMessage = {
         ...message,
@@ -459,7 +472,10 @@ export class PubSubService extends EventEmitter {
         type: fullMessage.type,
       });
     } catch (error: any) {
-      logger.error('Failed to publish SSE notification via Redis Pub/Sub:', error);
+      logger.error(
+        'Failed to publish SSE notification via Redis Pub/Sub:',
+        error
+      );
       // Fallback: enqueue to BullMQ for at-least-once delivery (not broadcast)
       await this.addSSEJob(message as SSENotificationBusMessage);
     }
@@ -471,10 +487,12 @@ export class PubSubService extends EventEmitter {
   private convertBooleanFields(data: any): any {
     const converted = { ...data };
     if (converted.isVisible !== undefined) {
-      converted.isVisible = converted.isVisible === 1 || converted.isVisible === true;
+      converted.isVisible =
+        converted.isVisible === 1 || converted.isVisible === true;
     }
     if (converted.isActive !== undefined) {
-      converted.isActive = converted.isActive === 1 || converted.isActive === true;
+      converted.isActive =
+        converted.isActive === 1 || converted.isActive === true;
     }
     return converted;
   }
@@ -490,7 +508,11 @@ export class PubSubService extends EventEmitter {
    */
   async publishSDKEvent(
     event: { type: string; data: Record<string, any> },
-    channelTarget: { orgId?: string; projectId?: string; environmentId?: string }
+    channelTarget: {
+      orgId?: string;
+      projectId?: string;
+      environmentId?: string;
+    }
   ): Promise<void> {
     try {
       // Convert MySQL 0/1 to boolean and auto-fill timestamp
@@ -538,7 +560,11 @@ export class PubSubService extends EventEmitter {
       type: string;
       data: { id: string; [key: string]: any };
     },
-    channelTarget: { orgId?: string; projectId?: string; environmentId?: string }
+    channelTarget: {
+      orgId?: string;
+      projectId?: string;
+      environmentId?: string;
+    }
   ): Promise<void> {
     try {
       // Auto-fill timestamp
@@ -579,10 +605,17 @@ export class PubSubService extends EventEmitter {
     const prefix = 'gatrix-sdk-events';
 
     // System-level event: no target specified
-    if (!channelTarget.orgId && !channelTarget.projectId && !channelTarget.environmentId) {
-      logger.warn('publishSDKEvent called with empty channelTarget — using system channel', {
-        channelTarget,
-      });
+    if (
+      !channelTarget.orgId &&
+      !channelTarget.projectId &&
+      !channelTarget.environmentId
+    ) {
+      logger.warn(
+        'publishSDKEvent called with empty channelTarget — using system channel',
+        {
+          channelTarget,
+        }
+      );
       return [prefix];
     }
 
@@ -614,7 +647,8 @@ export class PubSubService extends EventEmitter {
         active: active.length,
         completed: completed.length,
         failed: failed.length,
-        total: waiting.length + active.length + completed.length + failed.length,
+        total:
+          waiting.length + active.length + completed.length + failed.length,
       };
     } catch (error: any) {
       logger.error('Failed to get queue stats:', error);
@@ -647,7 +681,10 @@ export class PubSubService extends EventEmitter {
 
       if (this.sseSubscriber) {
         try {
-          await this.sseSubscriber.unsubscribe(this.SSE_CHANNEL, this.CACHE_CHANNEL);
+          await this.sseSubscriber.unsubscribe(
+            this.SSE_CHANNEL,
+            this.CACHE_CHANNEL
+          );
         } catch (error: any) {
           // Ignore unsubscribe errors during shutdown
         }

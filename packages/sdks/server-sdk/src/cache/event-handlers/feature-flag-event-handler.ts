@@ -28,7 +28,10 @@ export class FeatureFlagEventHandler implements IEventHandler {
     return this.handleFlagEvent(event, environmentId);
   }
 
-  private async handleFlagEvent(event: StandardEvent, environmentId: string): Promise<void> {
+  private async handleFlagEvent(
+    event: StandardEvent,
+    environmentId: string
+  ): Promise<void> {
     const changedKeys = event.data.changedKeys || [];
     const changeType = event.data.changeType || 'definition_changed';
     const featureFlagService = this.cacheManager.getFeatureFlagService();
@@ -52,16 +55,25 @@ export class FeatureFlagEventHandler implements IEventHandler {
         for (const flagName of changedKeys) {
           featureFlagService.removeFlag(flagName, environmentId);
         }
-        this.logger.info('Flags removed from cache', { flags: changedKeys, environmentId });
+        this.logger.info('Flags removed from cache', {
+          flags: changedKeys,
+          environmentId,
+        });
       } else if (changeType === 'enabled_changed') {
         await Promise.all(
           changedKeys.map((flagName: string) => {
-            const cached = featureFlagService.getFlagByName(environmentId, flagName);
+            const cached = featureFlagService.getFlagByName(
+              environmentId,
+              flagName
+            );
             if (cached?.compact) {
-              this.logger.info('Compacted flag re-enabled, fetching full data', {
-                flagName,
-                environmentId,
-              });
+              this.logger.info(
+                'Compacted flag re-enabled, fetching full data',
+                {
+                  flagName,
+                  environmentId,
+                }
+              );
             }
             return featureFlagService
               .updateSingleFlag(flagName, environmentId)
@@ -77,18 +89,22 @@ export class FeatureFlagEventHandler implements IEventHandler {
       } else {
         await Promise.all(
           changedKeys.map((flagName: string) =>
-            featureFlagService.updateSingleFlag(flagName, environmentId).catch((error: any) => {
-              this.logger.warn('Failed to update flag definition', {
-                flagName,
-                environmentId,
-                error: error.message,
-              });
-            })
+            featureFlagService
+              .updateSingleFlag(flagName, environmentId)
+              .catch((error: any) => {
+                this.logger.warn('Failed to update flag definition', {
+                  flagName,
+                  environmentId,
+                  error: error.message,
+                });
+              })
           )
         );
       }
     } catch (error: any) {
-      this.logger.error('Failed to handle feature flag event', { error: error.message });
+      this.logger.error('Failed to handle feature flag event', {
+        error: error.message,
+      });
     }
   }
 
@@ -113,7 +129,9 @@ export class FeatureFlagEventHandler implements IEventHandler {
             await featureFlagService.refreshSegments();
           }
         } catch (error: any) {
-          this.logger.error('Failed to handle segment event', { error: error.message });
+          this.logger.error('Failed to handle segment event', {
+            error: error.message,
+          });
         }
         break;
       }
@@ -121,7 +139,9 @@ export class FeatureFlagEventHandler implements IEventHandler {
         const deletedSegmentName = event.data.segmentName as string;
         if (deletedSegmentName) {
           featureFlagService.removeSegmentFromCache(deletedSegmentName);
-          this.logger.info('Segment removed from cache', { segmentName: deletedSegmentName });
+          this.logger.info('Segment removed from cache', {
+            segmentName: deletedSegmentName,
+          });
         } else {
           await featureFlagService.refreshSegments();
         }

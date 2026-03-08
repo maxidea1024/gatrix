@@ -22,7 +22,10 @@ describe('UserModel', () => {
       const result = await UserModel.findById(1);
 
       expect(result).toEqual(mockUser);
-      expect(mockDatabase.query).toHaveBeenCalledWith(expect.stringContaining('SELECT'), [1]);
+      expect(mockDatabase.query).toHaveBeenCalledWith(
+        expect.stringContaining('SELECT'),
+        [1]
+      );
     });
 
     it('should return null when user not found', async () => {
@@ -119,7 +122,10 @@ describe('UserModel', () => {
       const result = await UserModel.verifyPassword(user, 'correctPassword');
 
       expect(result).toBe(true);
-      expect(mockBcrypt.compare).toHaveBeenCalledWith('correctPassword', 'hashedPassword');
+      expect(mockBcrypt.compare).toHaveBeenCalledWith(
+        'correctPassword',
+        'hashedPassword'
+      );
     });
 
     it('should return false for incorrect password', async () => {

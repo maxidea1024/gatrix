@@ -53,7 +53,10 @@ async function main() {
         timestamp: event.timestamp,
         details: event.data.details,
       });
-      logger.info('📊 Current Maintenance Status:', sdk.getCurrentMaintenanceStatus());
+      logger.info(
+        '📊 Current Maintenance Status:',
+        sdk.getCurrentMaintenanceStatus()
+      );
     });
 
     sdk.on('local.maintenance.ended', (event) => {
@@ -62,7 +65,10 @@ async function main() {
         worldId: event.data.worldId,
         timestamp: event.timestamp,
       });
-      logger.info('📊 Current Maintenance Status:', sdk.getCurrentMaintenanceStatus());
+      logger.info(
+        '📊 Current Maintenance Status:',
+        sdk.getCurrentMaintenanceStatus()
+      );
     });
 
     sdk.on('local.maintenance.updated', (event) => {
@@ -72,25 +78,35 @@ async function main() {
         timestamp: event.timestamp,
         details: event.data.details,
       });
-      logger.info('📊 Current Maintenance Status:', sdk.getCurrentMaintenanceStatus());
+      logger.info(
+        '📊 Current Maintenance Status:',
+        sdk.getCurrentMaintenanceStatus()
+      );
     });
 
     // Print current maintenance status (once on startup)
-    logger.info('📊 Current Maintenance Status:', sdk.getCurrentMaintenanceStatus());
+    logger.info(
+      '📊 Current Maintenance Status:',
+      sdk.getCurrentMaintenanceStatus()
+    );
 
     logger.info('');
     logger.info('='.repeat(60));
     logger.info('Listening for local maintenance events...');
     logger.info('- 🔴 local.maintenance.started: when maintenance begins');
     logger.info('- 🟢 local.maintenance.ended: when maintenance ends');
-    logger.info('- 🟡 local.maintenance.updated: when maintenance settings change');
+    logger.info(
+      '- 🟡 local.maintenance.updated: when maintenance settings change'
+    );
     logger.info('');
     logger.info('Using Redis PubSub for real-time event updates');
     logger.info('');
     logger.info('To test:');
     logger.info('1. Enable/disable service maintenance in admin panel');
     logger.info('2. Enable/disable world maintenance in admin panel');
-    logger.info('3. Change maintenance message while active (for updated event)');
+    logger.info(
+      '3. Change maintenance message while active (for updated event)'
+    );
     logger.info('4. Set future start time and wait for it');
     logger.info('='.repeat(60));
     logger.info('');

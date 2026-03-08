@@ -36,14 +36,19 @@ export const DeferredLoading: React.FC<DeferredLoadingProps> = ({
 
   if (fullScreen) {
     return (
-      <Backdrop open={true} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <Backdrop
+        open={true}
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
         {children || <CircularProgress color="inherit" />}
       </Backdrop>
     );
   }
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3, width: '100%' }}>
+    <Box
+      sx={{ display: 'flex', justifyContent: 'center', p: 3, width: '100%' }}
+    >
       {children || <CircularProgress />}
     </Box>
   );

@@ -73,7 +73,10 @@ export class ServerServiceNoticeController {
         },
       });
     } catch (error) {
-      logger.error('Error in ServerServiceNoticeController.getServiceNotices:', error);
+      logger.error(
+        'Error in ServerServiceNoticeController.getServiceNotices:',
+        error
+      );
       res.status(500).json({
         success: false,
         error: {
@@ -115,7 +118,10 @@ export class ServerServiceNoticeController {
         });
       }
 
-      const notice = await ServiceNoticeService.getServiceNoticeById(noticeId, environmentId);
+      const notice = await ServiceNoticeService.getServiceNoticeById(
+        noticeId,
+        environmentId
+      );
 
       if (!notice) {
         return res.status(404).json({
@@ -136,7 +142,10 @@ export class ServerServiceNoticeController {
         data: notice,
       });
     } catch (error) {
-      logger.error('Error in ServerServiceNoticeController.getServiceNoticeById:', error);
+      logger.error(
+        'Error in ServerServiceNoticeController.getServiceNoticeById:',
+        error
+      );
       res.status(500).json({
         success: false,
         error: {

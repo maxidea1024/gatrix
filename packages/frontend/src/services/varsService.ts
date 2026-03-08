@@ -1,7 +1,17 @@
 import { apiService } from './api';
-import { PlatformOption, ChannelOption, PlatformConfig } from '../types/platformConfig';
+import {
+  PlatformOption,
+  ChannelOption,
+  PlatformConfig,
+} from '../types/platformConfig';
 
-export type VarValueType = 'string' | 'number' | 'boolean' | 'color' | 'object' | 'array';
+export type VarValueType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'color'
+  | 'object'
+  | 'array';
 
 export interface VarItem {
   id: number;
@@ -40,7 +50,9 @@ export const varsService = {
     return (res as any)?.data?.value ?? null;
   },
   async set(projectApiPath: string, key: string, value: any): Promise<void> {
-    await apiService.put(`${projectApiPath}/vars/${encodeURIComponent(key)}`, { value });
+    await apiService.put(`${projectApiPath}/vars/${encodeURIComponent(key)}`, {
+      value,
+    });
   },
 
   // KV Management
@@ -56,12 +68,22 @@ export const varsService = {
     return (res as any)?.data ?? null;
   },
 
-  async createKV(projectApiPath: string, data: CreateVarData): Promise<VarItem> {
-    const res = await apiService.post<VarItem>(`${projectApiPath}/vars/kv`, data);
+  async createKV(
+    projectApiPath: string,
+    data: CreateVarData
+  ): Promise<VarItem> {
+    const res = await apiService.post<VarItem>(
+      `${projectApiPath}/vars/kv`,
+      data
+    );
     return (res as any)?.data;
   },
 
-  async updateKV(projectApiPath: string, key: string, data: UpdateVarData): Promise<VarItem> {
+  async updateKV(
+    projectApiPath: string,
+    key: string,
+    data: UpdateVarData
+  ): Promise<VarItem> {
     const res = await apiService.put<VarItem>(
       `${projectApiPath}/vars/kv/${encodeURIComponent(key)}`,
       data
@@ -70,7 +92,9 @@ export const varsService = {
   },
 
   async deleteKV(projectApiPath: string, key: string): Promise<void> {
-    await apiService.delete(`${projectApiPath}/vars/kv/${encodeURIComponent(key)}`);
+    await apiService.delete(
+      `${projectApiPath}/vars/kv/${encodeURIComponent(key)}`
+    );
   },
 
   // Platform and Channel Configuration
@@ -83,7 +107,10 @@ export const varsService = {
       if (!item || !item.varValue) {
         return [];
       }
-      const parsed = typeof item.varValue === 'string' ? JSON.parse(item.varValue) : item.varValue;
+      const parsed =
+        typeof item.varValue === 'string'
+          ? JSON.parse(item.varValue)
+          : item.varValue;
       return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
       console.warn('Failed to load platforms:', error);
@@ -100,7 +127,10 @@ export const varsService = {
       if (!item || !item.varValue) {
         return [];
       }
-      const parsed = typeof item.varValue === 'string' ? JSON.parse(item.varValue) : item.varValue;
+      const parsed =
+        typeof item.varValue === 'string'
+          ? JSON.parse(item.varValue)
+          : item.varValue;
       return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
       console.warn('Failed to load channels:', error);

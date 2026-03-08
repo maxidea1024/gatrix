@@ -26,7 +26,14 @@ router.get('/', (async (req: AuthenticatedRequest, res: Response) => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     const userId = req.user!.userId;
-    const { isRead, isStarred, mailType, category, page = '1', limit = '20' } = req.query;
+    const {
+      isRead,
+      isStarred,
+      mailType,
+      category,
+      page = '1',
+      limit = '20',
+    } = req.query;
 
     const filters: any = {
       page: parseInt(page as string, 10),
@@ -53,7 +60,12 @@ router.get('/', (async (req: AuthenticatedRequest, res: Response) => {
       pagination: result.pagination,
     });
   } catch (error) {
-    return sendInternalError(res, 'Failed to get mails', error, ErrorCodes.MAIL_NOT_FOUND);
+    return sendInternalError(
+      res,
+      'Failed to get mails',
+      error,
+      ErrorCodes.MAIL_NOT_FOUND
+    );
   }
 }) as any);
 
@@ -86,7 +98,12 @@ router.get('/sent', (async (req: AuthenticatedRequest, res: Response) => {
       },
     });
   } catch (error) {
-    return sendInternalError(res, 'Failed to get sent mails', error, ErrorCodes.MAIL_NOT_FOUND);
+    return sendInternalError(
+      res,
+      'Failed to get sent mails',
+      error,
+      ErrorCodes.MAIL_NOT_FOUND
+    );
   }
 }) as any);
 
@@ -94,7 +111,10 @@ router.get('/sent', (async (req: AuthenticatedRequest, res: Response) => {
  * GET /api/mails/unread-count
  * Get unread mail count for the current user
  */
-router.get('/unread-count', (async (req: AuthenticatedRequest, res: Response) => {
+router.get('/unread-count', (async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   try {
     const userId = req.user!.userId;
     const count = await mailService.getUnreadCount(userId);
@@ -147,7 +167,12 @@ router.get('/:id', (async (req: AuthenticatedRequest, res: Response) => {
 
     return sendSuccessResponse(res, mail);
   } catch (error) {
-    return sendInternalError(res, 'Failed to get mail', error, ErrorCodes.MAIL_NOT_FOUND);
+    return sendInternalError(
+      res,
+      'Failed to get mail',
+      error,
+      ErrorCodes.MAIL_NOT_FOUND
+    );
   }
 }) as any);
 
@@ -170,9 +195,13 @@ router.post('/', (async (req: AuthenticatedRequest, res: Response) => {
 
     // Validation
     if (!recipientId || !subject || !content) {
-      return sendBadRequest(res, 'recipientId, subject, and content are required', {
-        fields: ['recipientId', 'subject', 'content'],
-      });
+      return sendBadRequest(
+        res,
+        'recipientId, subject, and content are required',
+        {
+          fields: ['recipientId', 'subject', 'content'],
+        }
+      );
     }
 
     // Add 2 second delay for better UX (show loading state)
@@ -206,7 +235,12 @@ router.post('/', (async (req: AuthenticatedRequest, res: Response) => {
 
     return sendSuccessResponse(res, mail, 'Mail sent successfully', 201);
   } catch (error) {
-    return sendInternalError(res, 'Failed to send mail', error, ErrorCodes.MAIL_SEND_FAILED);
+    return sendInternalError(
+      res,
+      'Failed to send mail',
+      error,
+      ErrorCodes.MAIL_SEND_FAILED
+    );
   }
 }) as any);
 
@@ -240,7 +274,10 @@ router.patch('/:id/read', (async (req: AuthenticatedRequest, res: Response) => {
  * PATCH /api/mails/read-multiple
  * Mark multiple mails as read
  */
-router.patch('/read-multiple', (async (req: AuthenticatedRequest, res: Response) => {
+router.patch('/read-multiple', (async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   try {
     const userId = req.user!.userId;
     const { mailIds } = req.body;
@@ -305,7 +342,11 @@ router.patch('/:id/star', (async (req: AuthenticatedRequest, res: Response) => {
 
     const isStarred = await mailService.toggleStarred(mailId, userId);
 
-    return sendSuccessResponse(res, { isStarred }, isStarred ? 'Mail starred' : 'Mail unstarred');
+    return sendSuccessResponse(
+      res,
+      { isStarred },
+      isStarred ? 'Mail starred' : 'Mail unstarred'
+    );
   } catch (error) {
     return sendInternalError(
       res,
@@ -321,7 +362,10 @@ router.patch('/:id/star', (async (req: AuthenticatedRequest, res: Response) => {
  * Delete all mails (with optional filters)
  * NOTE: This must come before /:id route
  */
-router.delete('/delete-all', (async (req: AuthenticatedRequest, res: Response) => {
+router.delete('/delete-all', (async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   try {
     const userId = req.user!.userId;
     const { isRead, isStarred } = req.query;
@@ -336,7 +380,11 @@ router.delete('/delete-all', (async (req: AuthenticatedRequest, res: Response) =
 
     const count = await mailService.deleteAllMails(userId, filters);
 
-    return sendSuccessResponse(res, { count }, `${count} mails deleted successfully`);
+    return sendSuccessResponse(
+      res,
+      { count },
+      `${count} mails deleted successfully`
+    );
   } catch (error) {
     return sendInternalError(
       res,
@@ -390,7 +438,11 @@ router.delete('/', (async (req: AuthenticatedRequest, res: Response) => {
 
     const count = await mailService.deleteMultiple(mailIds, userId);
 
-    return sendSuccessResponse(res, { count }, `${count} mails deleted successfully`);
+    return sendSuccessResponse(
+      res,
+      { count },
+      `${count} mails deleted successfully`
+    );
   } catch (error) {
     return sendInternalError(
       res,

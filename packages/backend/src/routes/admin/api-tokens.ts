@@ -26,7 +26,10 @@ const createTokenValidation = [
 
   body('environmentId').notEmpty().withMessage('Environment ID is required'),
 
-  body('expiresAt').optional().isISO8601().withMessage('Expires at must be a valid ISO 8601 date'),
+  body('expiresAt')
+    .optional()
+    .isISO8601()
+    .withMessage('Expires at must be a valid ISO 8601 date'),
 ];
 
 const updateTokenValidation = [
@@ -38,12 +41,20 @@ const updateTokenValidation = [
 
   body('environmentId').notEmpty().withMessage('Environment ID is required'),
 
-  body('expiresAt').optional().isISO8601().withMessage('Expires at must be a valid ISO 8601 date'),
+  body('expiresAt')
+    .optional()
+    .isISO8601()
+    .withMessage('Expires at must be a valid ISO 8601 date'),
 ];
 
 // Apply authentication and permission requirement to all routes
 router.use(authenticate as any);
-router.use(requireProjectPermission([P.SERVICE_ACCOUNTS_READ, P.SERVICE_ACCOUNTS_UPDATE]) as any);
+router.use(
+  requireProjectPermission([
+    P.SERVICE_ACCOUNTS_READ,
+    P.SERVICE_ACCOUNTS_UPDATE,
+  ]) as any
+);
 
 // Routes
 router.get('/', ApiTokensController.getTokens as any);
@@ -60,7 +71,8 @@ router.post(
       tokenType: req.body?.tokenType,
       expiresAt: req.body?.expiresAt,
     }),
-    getDescription: (req) => `API token '${req.body?.tokenName}' (${req.body?.tokenType}) created`,
+    getDescription: (req) =>
+      `API token '${req.body?.tokenName}' (${req.body?.tokenType}) created`,
   }) as any,
   ApiTokensController.createToken as any
 );

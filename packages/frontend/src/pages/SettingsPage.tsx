@@ -138,7 +138,11 @@ const SettingsPage: React.FC = () => {
               onChange={(_, v) => v && setTimezone(v)}
               getOptionLabel={formatTimezone}
               renderInput={(params) => (
-                <TextField {...params} label="Timezone" placeholder="Search timezone" />
+                <TextField
+                  {...params}
+                  label="Timezone"
+                  placeholder="Search timezone"
+                />
               )}
               renderOption={(props, option) => (
                 <li {...props}>

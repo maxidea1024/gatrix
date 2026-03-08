@@ -111,8 +111,14 @@ export class SurveyService {
     // Save to local storage if available
     if (this.storage) {
       await Promise.all([
-        this.storage.save(`Surveys_${environmentId}_data`, JSON.stringify(surveys)),
-        this.storage.save(`Surveys_${environmentId}_settings`, JSON.stringify(settings)),
+        this.storage.save(
+          `Surveys_${environmentId}_data`,
+          JSON.stringify(surveys)
+        ),
+        this.storage.save(
+          `Surveys_${environmentId}_settings`,
+          JSON.stringify(settings)
+        ),
       ]);
     }
 
@@ -199,7 +205,9 @@ export class SurveyService {
   clearCacheForEnvironment(environmentId: string): void {
     this.cachedSurveysByEnv.delete(environmentId);
     this.cachedSettingsByEnv.delete(environmentId);
-    this.logger.debug('Surveys cache cleared for environment', { environmentId });
+    this.logger.debug('Surveys cache cleared for environment', {
+      environmentId,
+    });
   }
 
   /**
@@ -214,9 +222,12 @@ export class SurveyService {
     suppressWarnings?: boolean
   ): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
     if (!this.featureEnabled && !suppressWarnings) {
-      this.logger.warn('SurveyService.refreshByEnvironment() called but feature is disabled', {
-        environmentId,
-      });
+      this.logger.warn(
+        'SurveyService.refreshByEnvironment() called but feature is disabled',
+        {
+          environmentId,
+        }
+      );
     }
     this.logger.info('Refreshing surveys cache', { environmentId });
     return await this.listByEnvironment(environmentId, params);
@@ -231,7 +242,9 @@ export class SurveyService {
   async getById(id: string, environmentId: string): Promise<Survey> {
     this.logger.debug('Fetching survey by ID', { id, environmentId });
 
-    const response = await this.apiClient.get<{ survey: Survey }>(`/api/v1/server/surveys/${id}`);
+    const response = await this.apiClient.get<{ survey: Survey }>(
+      `/api/v1/server/surveys/${id}`
+    );
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch survey');
@@ -255,7 +268,9 @@ export class SurveyService {
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch survey settings');
+      throw new Error(
+        response.error?.message || 'Failed to fetch survey settings'
+      );
     }
 
     const { settings } = response.data;
@@ -326,10 +341,13 @@ export class SurveyService {
         updatedSurvey = await this.getById(id, environmentId);
       } catch (_error: any) {
         // If survey not found (404), it's no longer active
-        this.logger.debug('Survey not found or not active, removing from cache', {
-          id,
-          environmentId,
-        });
+        this.logger.debug(
+          'Survey not found or not active, removing from cache',
+          {
+            id,
+            environmentId,
+          }
+        );
         this.removeSurvey(id, environmentId);
         return;
       }
@@ -355,10 +373,13 @@ export class SurveyService {
         // Add it to cache
         const newSurveys = [...currentSurveys, updatedSurvey];
         this.cachedSurveysByEnv.set(environmentId, newSurveys);
-        this.logger.debug('Single survey added to cache (was previously removed)', {
-          id,
-          environmentId,
-        });
+        this.logger.debug(
+          'Single survey added to cache (was previously removed)',
+          {
+            id,
+            environmentId,
+          }
+        );
       }
     } catch (error: any) {
       this.logger.error('Failed to update single survey in cache', {
@@ -416,7 +437,10 @@ export class SurveyService {
     this.cachedSettingsByEnv.set(environmentId, newSettings);
 
     // Check if settings actually changed
-    const settingsChanged = !this.areSettingsEqual(oldSettings || null, newSettings);
+    const settingsChanged = !this.areSettingsEqual(
+      oldSettings || null,
+      newSettings
+    );
 
     if (settingsChanged) {
       this.logger.info('Survey settings updated', {
@@ -473,7 +497,9 @@ export class SurveyService {
       // Check platform targeting
       if (survey.targetPlatforms && survey.targetPlatforms.length > 0) {
         const isInPlatformList = survey.targetPlatforms.includes(platform);
-        if (survey.targetPlatformsInverted ? isInPlatformList : !isInPlatformList) {
+        if (
+          survey.targetPlatformsInverted ? isInPlatformList : !isInPlatformList
+        ) {
           return false;
         }
       }
@@ -481,7 +507,9 @@ export class SurveyService {
       // Check channel targeting
       if (survey.targetChannels && survey.targetChannels.length > 0) {
         const isInChannelList = survey.targetChannels.includes(channel);
-        if (survey.targetChannelsInverted ? isInChannelList : !isInChannelList) {
+        if (
+          survey.targetChannelsInverted ? isInChannelList : !isInChannelList
+        ) {
           return false;
         }
       }
@@ -489,8 +517,13 @@ export class SurveyService {
       // Check subchannel targeting (format: channel:subchannel)
       if (survey.targetSubchannels && survey.targetSubchannels.length > 0) {
         const subchannelKey = `${channel}:${subChannel}`;
-        const isInSubchannelList = survey.targetSubchannels.includes(subchannelKey);
-        if (survey.targetSubchannelsInverted ? isInSubchannelList : !isInSubchannelList) {
+        const isInSubchannelList =
+          survey.targetSubchannels.includes(subchannelKey);
+        if (
+          survey.targetSubchannelsInverted
+            ? isInSubchannelList
+            : !isInSubchannelList
+        ) {
           return false;
         }
       }

@@ -17,7 +17,8 @@ import type { GatrixContext } from '@gatrix/gatrix-js-client-sdk';
  */
 export function updateContext(): (context: Partial<GatrixContext>) => void {
   const client = getGatrixClient();
-  return (context: Partial<GatrixContext>) => client.features.updateContext(context);
+  return (context: Partial<GatrixContext>) =>
+    client.features.updateContext(context);
 }
 
 /**

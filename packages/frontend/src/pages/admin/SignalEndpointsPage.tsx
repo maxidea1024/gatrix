@@ -73,7 +73,12 @@ interface EndpointDialogProps {
   onSave: (data: { name: string; description?: string }) => void;
 }
 
-const EndpointDialog: React.FC<EndpointDialogProps> = ({ open, endpoint, onClose, onSave }) => {
+const EndpointDialog: React.FC<EndpointDialogProps> = ({
+  open,
+  endpoint,
+  onClose,
+  onSave,
+}) => {
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -97,7 +102,11 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({ open, endpoint, onClose
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={endpoint ? t('signalEndpoints.editEndpoint') : t('signalEndpoints.createEndpoint')}
+      title={
+        endpoint
+          ? t('signalEndpoints.editEndpoint')
+          : t('signalEndpoints.createEndpoint')
+      }
       subtitle={t('signalEndpoints.drawerSubtitle')}
       storageKey="signalEndpointDrawerWidth"
       defaultWidth={500}
@@ -116,7 +125,10 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({ open, endpoint, onClose
         }}
       >
         <Paper variant="outlined" sx={{ p: 2 }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+          >
             {t('signalEndpoints.basicInfo')}
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -178,7 +190,12 @@ interface TokenDialogProps {
   onCreated: () => void;
 }
 
-const TokenDialog: React.FC<TokenDialogProps> = ({ open, endpointId, onClose, onCreated }) => {
+const TokenDialog: React.FC<TokenDialogProps> = ({
+  open,
+  endpointId,
+  onClose,
+  onCreated,
+}) => {
   const { t } = useTranslation();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
@@ -197,14 +214,22 @@ const TokenDialog: React.FC<TokenDialogProps> = ({ open, endpointId, onClose, on
     if (!endpointId || !tokenName.trim()) return;
     setLoading(true);
     try {
-      const result = await signalEndpointService.createToken(projectApiPath, endpointId, {
-        name: tokenName.trim(),
-      });
+      const result = await signalEndpointService.createToken(
+        projectApiPath,
+        endpointId,
+        {
+          name: tokenName.trim(),
+        }
+      );
       setCreatedToken(result.secret);
       onCreated();
-      enqueueSnackbar(t('signalEndpoints.tokenCreatedSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('signalEndpoints.tokenCreatedSuccess'), {
+        variant: 'success',
+      });
     } catch (error) {
-      enqueueSnackbar(t('signalEndpoints.tokenCreateFailed'), { variant: 'error' });
+      enqueueSnackbar(t('signalEndpoints.tokenCreateFailed'), {
+        variant: 'error',
+      });
     } finally {
       setLoading(false);
     }
@@ -242,8 +267,13 @@ const TokenDialog: React.FC<TokenDialogProps> = ({ open, endpointId, onClose, on
                       copyToClipboardWithNotification(
                         createdToken,
                         () =>
-                          enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                          enqueueSnackbar(t('common.copiedToClipboard'), {
+                            variant: 'success',
+                          }),
+                        () =>
+                          enqueueSnackbar(t('common.copyFailed'), {
+                            variant: 'error',
+                          })
                       )
                     }
                   >
@@ -322,7 +352,9 @@ const SignalEndpointsPage: React.FC = () => {
   const [endpoints, setEndpoints] = useState<SignalEndpoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [endpointTokens, setEndpointTokens] = useState<Record<number, SignalEndpointToken[]>>({});
+  const [endpointTokens, setEndpointTokens] = useState<
+    Record<number, SignalEndpointToken[]>
+  >({});
 
   // Dialog states
   const [editDialog, setEditDialog] = useState<{
@@ -347,7 +379,10 @@ const SignalEndpointsPage: React.FC = () => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [menuTarget, setMenuTarget] = useState<SignalEndpoint | null>(null);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, item: SignalEndpoint) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    item: SignalEndpoint
+  ) => {
     setMenuAnchorEl(event.currentTarget);
     setMenuTarget(item);
   };
@@ -376,12 +411,20 @@ const SignalEndpointsPage: React.FC = () => {
   const fetchTokens = useCallback(
     async (endpointId: number) => {
       try {
-        const endpoint = await signalEndpointService.getById(projectApiPath, endpointId);
+        const endpoint = await signalEndpointService.getById(
+          projectApiPath,
+          endpointId
+        );
         if (endpoint.tokens) {
-          setEndpointTokens((prev) => ({ ...prev, [endpointId]: endpoint.tokens! }));
+          setEndpointTokens((prev) => ({
+            ...prev,
+            [endpointId]: endpoint.tokens!,
+          }));
         }
       } catch (error) {
-        enqueueSnackbar(t('signalEndpoints.tokenLoadFailed'), { variant: 'error' });
+        enqueueSnackbar(t('signalEndpoints.tokenLoadFailed'), {
+          variant: 'error',
+        });
       }
     },
     [t]
@@ -396,20 +439,33 @@ const SignalEndpointsPage: React.FC = () => {
     }
   };
 
-  const handleSaveEndpoint = async (data: { name: string; description?: string }) => {
+  const handleSaveEndpoint = async (data: {
+    name: string;
+    description?: string;
+  }) => {
     try {
       if (editDialog.endpoint) {
-        await signalEndpointService.update(projectApiPath, editDialog.endpoint.id, data);
-        enqueueSnackbar(t('signalEndpoints.updateSuccess'), { variant: 'success' });
+        await signalEndpointService.update(
+          projectApiPath,
+          editDialog.endpoint.id,
+          data
+        );
+        enqueueSnackbar(t('signalEndpoints.updateSuccess'), {
+          variant: 'success',
+        });
       } else {
         await signalEndpointService.create(projectApiPath, data);
-        enqueueSnackbar(t('signalEndpoints.createSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('signalEndpoints.createSuccess'), {
+          variant: 'success',
+        });
       }
       setEditDialog({ open: false, endpoint: null });
       fetchEndpoints();
     } catch (error) {
       enqueueSnackbar(
-        editDialog.endpoint ? t('signalEndpoints.updateFailed') : t('signalEndpoints.createFailed'),
+        editDialog.endpoint
+          ? t('signalEndpoints.updateFailed')
+          : t('signalEndpoints.createFailed'),
         { variant: 'error' }
       );
     }
@@ -428,15 +484,22 @@ const SignalEndpointsPage: React.FC = () => {
     if (!deleteDialog) return;
     try {
       if (deleteDialog.type === 'endpoint') {
-        await signalEndpointService.delete(projectApiPath, deleteDialog.endpointId);
-        enqueueSnackbar(t('signalEndpoints.deleteSuccess'), { variant: 'success' });
+        await signalEndpointService.delete(
+          projectApiPath,
+          deleteDialog.endpointId
+        );
+        enqueueSnackbar(t('signalEndpoints.deleteSuccess'), {
+          variant: 'success',
+        });
       } else if (deleteDialog.tokenId) {
         await signalEndpointService.deleteToken(
           projectApiPath,
           deleteDialog.endpointId,
           deleteDialog.tokenId
         );
-        enqueueSnackbar(t('signalEndpoints.tokenDeleteSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('signalEndpoints.tokenDeleteSuccess'), {
+          variant: 'success',
+        });
         fetchTokens(deleteDialog.endpointId);
       }
       setDeleteDialog(null);
@@ -466,7 +529,11 @@ const SignalEndpointsPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchEndpoints}>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={fetchEndpoints}
+          >
             {t('common.refresh')}
           </Button>
           {endpoints.length > 0 && canManage && (
@@ -486,7 +553,11 @@ const SignalEndpointsPage: React.FC = () => {
         {endpoints.length === 0 ? (
           <EmptyPagePlaceholder
             message={t('signalEndpoints.noEndpoints')}
-            onAddClick={canManage ? () => setEditDialog({ open: true, endpoint: null }) : undefined}
+            onAddClick={
+              canManage
+                ? () => setEditDialog({ open: true, endpoint: null })
+                : undefined
+            }
             addButtonLabel={t('signalEndpoints.createEndpoint')}
           />
         ) : (
@@ -497,8 +568,12 @@ const SignalEndpointsPage: React.FC = () => {
                   <TableCell width={40} />
                   <TableCell>{t('signalEndpoints.name')}</TableCell>
                   <TableCell>{t('signalEndpoints.description')}</TableCell>
-                  <TableCell align="center">{t('signalEndpoints.status')}</TableCell>
-                  <TableCell align="center">{t('signalEndpoints.tokens')}</TableCell>
+                  <TableCell align="center">
+                    {t('signalEndpoints.status')}
+                  </TableCell>
+                  <TableCell align="center">
+                    {t('signalEndpoints.tokens')}
+                  </TableCell>
                   <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
@@ -519,17 +594,27 @@ const SignalEndpointsPage: React.FC = () => {
                       hover
                       sx={{
                         '& > td': {
-                          borderBottom: expandedId === endpoint.id ? 'none' : undefined,
+                          borderBottom:
+                            expandedId === endpoint.id ? 'none' : undefined,
                         },
                       }}
                     >
                       <TableCell>
-                        <IconButton size="small" onClick={() => handleExpand(endpoint.id)}>
-                          {expandedId === endpoint.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                        <IconButton
+                          size="small"
+                          onClick={() => handleExpand(endpoint.id)}
+                        >
+                          {expandedId === endpoint.id ? (
+                            <ExpandLessIcon />
+                          ) : (
+                            <ExpandMoreIcon />
+                          )}
                         </IconButton>
                       </TableCell>
                       <TableCell>
-                        <Typography fontWeight="medium">{endpoint.name}</Typography>
+                        <Typography fontWeight="medium">
+                          {endpoint.name}
+                        </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography
@@ -569,7 +654,10 @@ const SignalEndpointsPage: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton size="small" onClick={(e) => handleMenuOpen(e, endpoint)}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleMenuOpen(e, endpoint)}
+                        >
                           <MoreVertIcon fontSize="small" />
                         </IconButton>
                       </TableCell>
@@ -581,11 +669,19 @@ const SignalEndpointsPage: React.FC = () => {
                         colSpan={6}
                         sx={{
                           py: 0,
-                          borderBottom: expandedId === endpoint.id ? undefined : 'none',
+                          borderBottom:
+                            expandedId === endpoint.id ? undefined : 'none',
                         }}
                       >
                         <Collapse in={expandedId === endpoint.id}>
-                          <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1, my: 1 }}>
+                          <Box
+                            sx={{
+                              p: 2,
+                              bgcolor: 'action.hover',
+                              borderRadius: 1,
+                              my: 1,
+                            }}
+                          >
                             <Box
                               sx={{
                                 display: 'flex',
@@ -595,13 +691,18 @@ const SignalEndpointsPage: React.FC = () => {
                               }}
                             >
                               <Typography variant="subtitle2">
-                                {t('signalEndpoints.tokensFor', { name: endpoint.name })}
+                                {t('signalEndpoints.tokensFor', {
+                                  name: endpoint.name,
+                                })}
                               </Typography>
                               <Button
                                 size="small"
                                 startIcon={<AddIcon />}
                                 onClick={() =>
-                                  setTokenDialog({ open: true, endpointId: endpoint.id })
+                                  setTokenDialog({
+                                    open: true,
+                                    endpointId: endpoint.id,
+                                  })
                                 }
                               >
                                 {t('signalEndpoints.addToken')}
@@ -610,7 +711,11 @@ const SignalEndpointsPage: React.FC = () => {
                             <Divider sx={{ mb: 1 }} />
                             {!endpointTokens[endpoint.id] ||
                             endpointTokens[endpoint.id].length === 0 ? (
-                              <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ py: 1 }}
+                              >
                                 {t('signalEndpoints.noTokens')}
                               </Typography>
                             ) : (
@@ -620,8 +725,16 @@ const SignalEndpointsPage: React.FC = () => {
                                     <ListItemText
                                       primary={token.tokenName}
                                       secondary={
-                                        <Tooltip title={formatDateTimeDetailed(token.createdAt)}>
-                                          <span>{formatRelativeTime(token.createdAt)}</span>
+                                        <Tooltip
+                                          title={formatDateTimeDetailed(
+                                            token.createdAt
+                                          )}
+                                        >
+                                          <span>
+                                            {formatRelativeTime(
+                                              token.createdAt
+                                            )}
+                                          </span>
                                         </Tooltip>
                                       }
                                     />
@@ -648,7 +761,10 @@ const SignalEndpointsPage: React.FC = () => {
                               </List>
                             )}
                             <Divider sx={{ mt: 1, mb: 1 }} />
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {t('signalEndpoints.endpointUrl')}:{' '}
                               <Box
                                 component="code"
@@ -664,11 +780,16 @@ const SignalEndpointsPage: React.FC = () => {
                                   copyToClipboardWithNotification(
                                     `POST /api/v1/signals/${endpoint.name}`,
                                     () =>
-                                      enqueueSnackbar(t('common.copiedToClipboard'), {
-                                        variant: 'success',
-                                      }),
+                                      enqueueSnackbar(
+                                        t('common.copiedToClipboard'),
+                                        {
+                                          variant: 'success',
+                                        }
+                                      ),
                                     () =>
-                                      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                      enqueueSnackbar(t('common.copyFailed'), {
+                                        variant: 'error',
+                                      })
                                   )
                                 }
                               >
@@ -688,10 +809,15 @@ const SignalEndpointsPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+      >
         <MenuItem
           onClick={() => {
-            if (menuTarget) setTokenDialog({ open: true, endpointId: menuTarget.id });
+            if (menuTarget)
+              setTokenDialog({ open: true, endpointId: menuTarget.id });
             handleMenuClose();
           }}
         >
@@ -758,7 +884,9 @@ const SignalEndpointsPage: React.FC = () => {
               ? t('signalEndpoints.deleteEndpoint')
               : t('signalEndpoints.deleteToken')
           }
-          message={t('signalEndpoints.deleteConfirmMessage', { name: deleteDialog.name })}
+          message={t('signalEndpoints.deleteConfirmMessage', {
+            name: deleteDialog.name,
+          })}
           onClose={() => setDeleteDialog(null)}
           onConfirm={handleDeleteConfirm}
         />

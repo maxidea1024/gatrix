@@ -70,7 +70,11 @@ class IngamePopupNoticeController {
    * Get ingame popup notices with pagination and filters
    * GET /api/v1/admin/ingame-popup-notices
    */
-  async getIngamePopupNotices(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async getIngamePopupNotices(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
@@ -100,11 +104,15 @@ class IngamePopupNoticeController {
 
       if (req.query.platform) {
         const platformParam = req.query.platform as string;
-        filters.platform = platformParam.includes(',') ? platformParam.split(',') : platformParam;
+        filters.platform = platformParam.includes(',')
+          ? platformParam.split(',')
+          : platformParam;
       }
 
       if (req.query.platformOperator) {
-        filters.platformOperator = req.query.platformOperator as 'any_of' | 'include_all';
+        filters.platformOperator = req.query.platformOperator as
+          | 'any_of'
+          | 'include_all';
       }
 
       if (req.query.clientVersion) {
@@ -119,7 +127,11 @@ class IngamePopupNoticeController {
         filters.search = req.query.search as string;
       }
 
-      const result = await IngamePopupNoticeService.getIngamePopupNotices(page, limit, filters);
+      const result = await IngamePopupNoticeService.getIngamePopupNotices(
+        page,
+        limit,
+        filters
+      );
 
       return sendSuccessResponse(res, result);
     } catch (error) {
@@ -131,7 +143,11 @@ class IngamePopupNoticeController {
    * Get ingame popup notice by ID
    * GET /api/v1/admin/ingame-popup-notices/:id
    */
-  async getIngamePopupNoticeById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async getIngamePopupNoticeById(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const id = req.params.id;
       const environmentId = req.environmentId;
@@ -140,10 +156,17 @@ class IngamePopupNoticeController {
         throw new GatrixError('Environment is required', 400);
       }
 
-      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id, environmentId);
+      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(
+        id,
+        environmentId
+      );
 
       if (!notice) {
-        return sendNotFound(res, 'Ingame popup notice not found', ErrorCodes.RESOURCE_NOT_FOUND);
+        return sendNotFound(
+          res,
+          'Ingame popup notice not found',
+          ErrorCodes.RESOURCE_NOT_FOUND
+        );
       }
 
       return sendSuccessResponse(res, { notice });
@@ -156,7 +179,11 @@ class IngamePopupNoticeController {
    * Create ingame popup notice
    * POST /api/v1/admin/ingame-popup-notices
    */
-  async createIngamePopupNotice(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async createIngamePopupNotice(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const environmentId = req.environmentId;
 
@@ -199,7 +226,9 @@ class IngamePopupNoticeController {
             targetChannels: ['popup', 'admin'],
           });
 
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`);
+          await pubSubService.invalidateKey(
+            `${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`
+          );
 
           return notice;
         }
@@ -219,7 +248,8 @@ class IngamePopupNoticeController {
             changeRequestId: gatewayResult.changeRequestId,
             status: gatewayResult.status,
           },
-          message: 'Change request created. The notice will be created after approval.',
+          message:
+            'Change request created. The notice will be created after approval.',
         });
       }
     } catch (error) {
@@ -231,7 +261,11 @@ class IngamePopupNoticeController {
    * Update ingame popup notice
    * PUT /api/v1/admin/ingame-popup-notices/:id
    */
-  async updateIngamePopupNotice(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async updateIngamePopupNotice(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const id = req.params.id;
       const environmentId = req.environmentId;
@@ -277,7 +311,9 @@ class IngamePopupNoticeController {
             targetChannels: ['popup', 'admin'],
           });
 
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`);
+          await pubSubService.invalidateKey(
+            `${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`
+          );
 
           return notice;
         }
@@ -296,7 +332,8 @@ class IngamePopupNoticeController {
             changeRequestId: gatewayResult.changeRequestId,
             status: gatewayResult.status,
           },
-          message: 'Change request created. The notice update will be applied after approval.',
+          message:
+            'Change request created. The notice update will be applied after approval.',
         });
       }
     } catch (error) {
@@ -308,7 +345,11 @@ class IngamePopupNoticeController {
    * Delete ingame popup notice
    * DELETE /api/v1/admin/ingame-popup-notices/:id
    */
-  async deleteIngamePopupNotice(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async deleteIngamePopupNotice(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const id = req.params.id;
       const environmentId = req.environmentId;
@@ -329,7 +370,10 @@ class IngamePopupNoticeController {
         'g_ingame_popup_notices',
         id,
         async () => {
-          await IngamePopupNoticeService.deleteIngamePopupNotice(id, environmentId);
+          await IngamePopupNoticeService.deleteIngamePopupNotice(
+            id,
+            environmentId
+          );
 
           // Publish event for SDK real-time updates
           await pubSubService.publishNotification({
@@ -338,12 +382,18 @@ class IngamePopupNoticeController {
             targetChannels: ['popup', 'admin'],
           });
 
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`);
+          await pubSubService.invalidateKey(
+            `${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`
+          );
         }
       );
 
       if (gatewayResult.mode === 'DIRECT') {
-        return sendSuccessResponse(res, undefined, 'Ingame popup notice deleted successfully');
+        return sendSuccessResponse(
+          res,
+          undefined,
+          'Ingame popup notice deleted successfully'
+        );
       } else {
         return res.status(202).json({
           success: true,
@@ -351,7 +401,8 @@ class IngamePopupNoticeController {
             changeRequestId: gatewayResult.changeRequestId,
             status: gatewayResult.status,
           },
-          message: 'Change request created. The deletion will be applied after approval.',
+          message:
+            'Change request created. The deletion will be applied after approval.',
         });
       }
     } catch (error) {
@@ -382,7 +433,8 @@ class IngamePopupNoticeController {
       }
 
       // Check if CR is required
-      const requiresCR = await UnifiedChangeGateway.requiresApproval(environmentId);
+      const requiresCR =
+        await UnifiedChangeGateway.requiresApproval(environmentId);
 
       if (requiresCR) {
         // Create individual CRs for each item
@@ -394,7 +446,10 @@ class IngamePopupNoticeController {
             'g_ingame_popup_notices',
             id,
             async () => {
-              await IngamePopupNoticeService.deleteIngamePopupNotice(id, environmentId);
+              await IngamePopupNoticeService.deleteIngamePopupNotice(
+                id,
+                environmentId
+              );
             }
           );
           results.push({ id, changeRequestId: gatewayResult.changeRequestId });
@@ -406,8 +461,13 @@ class IngamePopupNoticeController {
           message: `Change requests created for ${ids.length} notice(s). Deletions will be applied after approval.`,
         });
       } else {
-        await IngamePopupNoticeService.deleteMultipleIngamePopupNotices(ids, environmentId);
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`);
+        await IngamePopupNoticeService.deleteMultipleIngamePopupNotices(
+          ids,
+          environmentId
+        );
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`
+        );
         return sendSuccessResponse(
           res,
           undefined,
@@ -423,7 +483,11 @@ class IngamePopupNoticeController {
    * Toggle active status
    * PATCH /api/v1/admin/ingame-popup-notices/:id/toggle-active
    */
-  async toggleActive(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async toggleActive(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const id = req.params.id;
       const environmentId = req.environmentId;
@@ -461,7 +525,9 @@ class IngamePopupNoticeController {
             targetChannels: ['popup', 'admin'],
           });
 
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`);
+          await pubSubService.invalidateKey(
+            `${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`
+          );
 
           return notice;
         }
@@ -480,7 +546,8 @@ class IngamePopupNoticeController {
             changeRequestId: gatewayResult.changeRequestId,
             status: gatewayResult.status,
           },
-          message: 'Change request created. Status toggle will be applied after approval.',
+          message:
+            'Change request created. Status toggle will be applied after approval.',
         });
       }
     } catch (error) {
@@ -493,7 +560,11 @@ class IngamePopupNoticeController {
    * GET /api/v1/server/:env/ingame-popup-notices
    * Returns only active notices that are currently visible and not expired
    */
-  async getServerIngamePopupNotices(req: EnvironmentRequest, res: Response, next: NextFunction) {
+  async getServerIngamePopupNotices(
+    req: EnvironmentRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const environmentId = req.environmentId!;
       const filters: IngamePopupNoticeFilters = {
@@ -507,7 +578,11 @@ class IngamePopupNoticeController {
         ttlMs: DEFAULT_CONFIG.POPUP_NOTICE_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          const result = await IngamePopupNoticeService.getIngamePopupNotices(1, 1000, filters);
+          const result = await IngamePopupNoticeService.getIngamePopupNotices(
+            1,
+            1000,
+            filters
+          );
 
           // Filter out notices where endDate is in the past
           const now = new Date();
@@ -538,18 +613,30 @@ class IngamePopupNoticeController {
    * GET /api/v1/server/:env/ingame-popup-notices/:id
    * Returns notice formatted for Server SDK
    */
-  async getServerIngamePopupNoticeById(req: EnvironmentRequest, res: Response, next: NextFunction) {
+  async getServerIngamePopupNoticeById(
+    req: EnvironmentRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const id = req.params.id;
       const environmentId = req.environmentId!;
-      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id, environmentId);
+      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(
+        id,
+        environmentId
+      );
 
       if (!notice) {
-        return sendNotFound(res, 'Ingame popup notice not found', ErrorCodes.RESOURCE_NOT_FOUND);
+        return sendNotFound(
+          res,
+          'Ingame popup notice not found',
+          ErrorCodes.RESOURCE_NOT_FOUND
+        );
       }
 
       // Format notice for Server SDK response
-      const formattedNotice = IngamePopupNoticeService.formatNoticeForServerSDK(notice);
+      const formattedNotice =
+        IngamePopupNoticeService.formatNoticeForServerSDK(notice);
 
       return sendSuccessResponse(res, { notice: formattedNotice });
     } catch (error) {

@@ -127,7 +127,8 @@ const KeyValuePage: React.FC = () => {
   const handleCopyKeyName = (keyName: string) => {
     copyToClipboardWithNotification(
       keyName,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -135,7 +136,14 @@ const KeyValuePage: React.FC = () => {
   // Get chip color based on type
   const getTypeChipColor = (
     type: string
-  ): 'default' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' => {
+  ):
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'error'
+    | 'info'
+    | 'warning' => {
     switch (type) {
       case 'string':
         return 'primary';
@@ -157,7 +165,8 @@ const KeyValuePage: React.FC = () => {
   // Format type display
   const formatTypeDisplay = (item: VarItem): string => {
     if (item.valueType === 'array') {
-      const elementType = item.description?.match(/\[elementType:(\w+)\]/)?.[1] || 'unknown';
+      const elementType =
+        item.description?.match(/\[elementType:(\w+)\]/)?.[1] || 'unknown';
       return `${elementType}[]`;
     }
     return item.valueType;
@@ -257,7 +266,11 @@ const KeyValuePage: React.FC = () => {
           {t('settings.kv.subtitle')}
         </Typography>
         {canManage && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreate}
+          >
             {t('settings.kv.create')}
           </Button>
         )}
@@ -265,7 +278,9 @@ const KeyValuePage: React.FC = () => {
 
       {loading && items.length === 0 ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-          <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+          <Typography color="text.secondary">
+            {t('common.loadingData')}
+          </Typography>
         </Box>
       ) : items.length === 0 ? (
         <EmptyPagePlaceholder
@@ -286,14 +301,20 @@ const KeyValuePage: React.FC = () => {
                     <TableCell>{t('settings.kv.value')}</TableCell>
                     <TableCell>{t('settings.kv.description')}</TableCell>
                     <TableCell>{t('common.updatedAt')}</TableCell>
-                    {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                    {canManage && (
+                      <TableCell align="center">
+                        {t('common.actions')}
+                      </TableCell>
+                    )}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {items.map((item) => (
                     <TableRow key={item.varKey} hover>
                       <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
                           <Typography
                             variant="body2"
                             sx={{
@@ -311,7 +332,11 @@ const KeyValuePage: React.FC = () => {
                           <Tooltip title={t('common.copy')}>
                             <IconButton
                               size="small"
-                              onClick={() => handleCopyKeyName(item.varKey.replace('kv:', ''))}
+                              onClick={() =>
+                                handleCopyKeyName(
+                                  item.varKey.replace('kv:', '')
+                                )
+                              }
                               sx={{ p: 0.5 }}
                             >
                               <CopyIcon fontSize="small" />
@@ -335,7 +360,12 @@ const KeyValuePage: React.FC = () => {
                       <TableCell>{renderValueDisplay(item)}</TableCell>
                       <TableCell>
                         <Tooltip
-                          title={item.description?.replace(/\[elementType:\w+\]\s*/, '') || '-'}
+                          title={
+                            item.description?.replace(
+                              /\[elementType:\w+\]\s*/,
+                              ''
+                            ) || '-'
+                          }
                         >
                           <Typography
                             variant="body2"
@@ -347,7 +377,10 @@ const KeyValuePage: React.FC = () => {
                               whiteSpace: 'nowrap',
                             }}
                           >
-                            {item.description?.replace(/\[elementType:\w+\]\s*/, '') || '-'}
+                            {item.description?.replace(
+                              /\[elementType:\w+\]\s*/,
+                              ''
+                            ) || '-'}
                           </Typography>
                         </Tooltip>
                       </TableCell>
@@ -359,13 +392,18 @@ const KeyValuePage: React.FC = () => {
                       {canManage && (
                         <TableCell align="center">
                           <Tooltip title={t('common.edit')}>
-                            <IconButton size="small" onClick={() => handleEdit(item)}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleEdit(item)}
+                            >
                               <EditIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                           <Tooltip
                             title={
-                              !item.isCopyable ? t('settings.kv.cannotCopy') : t('common.duplicate')
+                              !item.isCopyable
+                                ? t('settings.kv.cannotCopy')
+                                : t('common.duplicate')
                             }
                           >
                             <span>

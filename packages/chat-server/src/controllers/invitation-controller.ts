@@ -50,7 +50,11 @@ async function getUserInfo(userId: number): Promise<{
 
       // 3. Cache the result in Redis (1 hour TTL)
       try {
-        await redisClient.setex(userKey, 3600, JSON.stringify({ value: userInfo }));
+        await redisClient.setex(
+          userKey,
+          3600,
+          JSON.stringify({ value: userInfo })
+        );
       } catch (error) {
         logger.warn('Failed to cache user data to Redis', { userId, error });
       }
@@ -111,7 +115,10 @@ export class InvitationController {
       }
 
       // Check if invitee is already a member
-      const isAlreadyMember = await ChannelModel.isMember(channelIdNum, inviteeId);
+      const isAlreadyMember = await ChannelModel.isMember(
+        channelIdNum,
+        inviteeId
+      );
       if (isAlreadyMember) {
         res.status(400).json({
           success: false,
@@ -121,10 +128,11 @@ export class InvitationController {
       }
 
       // Check if there's already a pending invitation
-      const hasPendingInvitation = await ChannelInvitationModel.hasPendingInvitation(
-        channelIdNum,
-        inviteeId
-      );
+      const hasPendingInvitation =
+        await ChannelInvitationModel.hasPendingInvitation(
+          channelIdNum,
+          inviteeId
+        );
       logger.info('Checking pending invitation', {
         channelId: channelIdNum,
         inviteeId,
@@ -133,10 +141,8 @@ export class InvitationController {
 
       if (hasPendingInvitation) {
         // Get existing invitation details for debugging
-        const existingInvitations = await ChannelInvitationModel.findByChannelId(
-          channelIdNum,
-          'pending'
-        );
+        const existingInvitations =
+          await ChannelInvitationModel.findByChannelId(channelIdNum, 'pending');
         logger.info('Existing pending invitations for channel', {
           channelId: channelIdNum,
           invitations: existingInvitations,
@@ -205,28 +211,38 @@ export class InvitationController {
       // Send real-time notification to invitee
       try {
         // Dynamically import BroadcastService to resolve circular import issues
-        const BroadcastServiceModule = await import('../services/broadcast-service');
+        const BroadcastServiceModule =
+          await import('../services/broadcast-service');
         const BroadcastService = BroadcastServiceModule.default;
         const broadcastService = BroadcastService.getInstance();
 
         if (broadcastService) {
-          await broadcastService.broadcastToUser(inviteeId, 'channel_invitation', {
-            invitationId: invitation.id,
-            channelId: channelIdNum,
-            channelName: channel.name,
-            inviterName: inviter.name,
-            message: message, // Only pass user-entered message (frontend generates default message)
-            expiresAt: invitation.expiresAt,
-            createdAt: invitation.createdAt,
-          });
+          await broadcastService.broadcastToUser(
+            inviteeId,
+            'channel_invitation',
+            {
+              invitationId: invitation.id,
+              channelId: channelIdNum,
+              channelName: channel.name,
+              inviterName: inviter.name,
+              message: message, // Only pass user-entered message (frontend generates default message)
+              expiresAt: invitation.expiresAt,
+              createdAt: invitation.createdAt,
+            }
+          );
 
-          logger.info(`Real-time invitation notification sent to user ${inviteeId}`, {
-            invitationId: invitation.id,
-            channelId: channelIdNum,
-            inviterId: userId,
-          });
+          logger.info(
+            `Real-time invitation notification sent to user ${inviteeId}`,
+            {
+              invitationId: invitation.id,
+              channelId: channelIdNum,
+              inviterId: userId,
+            }
+          );
         } else {
-          logger.warn('BroadcastService not available for real-time notifications');
+          logger.warn(
+            'BroadcastService not available for real-time notifications'
+          );
         }
       } catch (notificationError) {
         logger.error('Failed to send real-time invitation notification', {
@@ -255,7 +271,9 @@ export class InvitationController {
         },
       });
 
-      logger.info(`User ${userId} invited user ${inviteeId} to channel ${channelIdNum}`);
+      logger.info(
+        `User ${userId} invited user ${inviteeId} to channel ${channelIdNum}`
+      );
 
       res.status(201).json({
         success: true,
@@ -324,7 +342,10 @@ export class InvitationController {
       }
 
       const status = action === 'accept' ? 'accepted' : 'declined';
-      const updatedInvitation = await ChannelInvitationModel.respond(invitationIdNum, status);
+      const updatedInvitation = await ChannelInvitationModel.respond(
+        invitationIdNum,
+        status
+      );
 
       // Get invitee info (Redis cache → DB fallback)
       const inviteeData = await getUserInfo(userId);
@@ -338,26 +359,34 @@ export class InvitationController {
         const { BroadcastService } = require('../services/broadcast-service');
         const broadcastService = BroadcastService.getInstance();
 
-        await broadcastService.broadcastToChannel(invitation.channelId, 'user_joined_channel', {
-          userId,
-          channelId: invitation.channelId,
-          userName: inviteeName,
-          timestamp: Date.now(),
-        });
+        await broadcastService.broadcastToChannel(
+          invitation.channelId,
+          'user_joined_channel',
+          {
+            userId,
+            channelId: invitation.channelId,
+            userName: inviteeName,
+            timestamp: Date.now(),
+          }
+        );
       }
 
       // Notify inviter about response
       const { BroadcastService } = require('../services/broadcast-service');
       const broadcastService = BroadcastService.getInstance();
 
-      await broadcastService.broadcastToUser(invitation.inviterId, 'invitation_response', {
-        invitationId: invitation.id,
-        channelId: invitation.channelId,
-        inviteeId: userId,
-        inviteeName: inviteeName,
-        action,
-        timestamp: Date.now(),
-      });
+      await broadcastService.broadcastToUser(
+        invitation.inviterId,
+        'invitation_response',
+        {
+          invitationId: invitation.id,
+          channelId: invitation.channelId,
+          inviteeId: userId,
+          inviteeName: inviteeName,
+          action,
+          timestamp: Date.now(),
+        }
+      );
 
       res.json({
         success: true,
@@ -384,10 +413,14 @@ export class InvitationController {
       const limitNum = Math.min(parseInt(limit as string) || 20, 50);
       const offset = (pageNum - 1) * limitNum;
 
-      const result = await ChannelInvitationModel.findByInviteeId(userId, status as any, {
-        limit: limitNum,
-        offset,
-      });
+      const result = await ChannelInvitationModel.findByInviteeId(
+        userId,
+        status as any,
+        {
+          limit: limitNum,
+          offset,
+        }
+      );
 
       // Add channel info and inviter info
       const enrichedInvitations = await Promise.all(
@@ -440,7 +473,10 @@ export class InvitationController {
   }
 
   // Get my sent invitations
-  static async getMySentInvitations(req: Request, res: Response): Promise<void> {
+  static async getMySentInvitations(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { status, page = 1, limit = 20 } = req.query;
@@ -456,10 +492,14 @@ export class InvitationController {
       const limitNum = Math.min(parseInt(limit as string) || 20, 50);
       const offset = (pageNum - 1) * limitNum;
 
-      const result = await ChannelInvitationModel.findByInviterId(userId, status as any, {
-        limit: limitNum,
-        offset,
-      });
+      const result = await ChannelInvitationModel.findByInviterId(
+        userId,
+        status as any,
+        {
+          limit: limitNum,
+          offset,
+        }
+      );
 
       logger.info('getMySentInvitations result', { userId, status, result });
 
@@ -514,7 +554,10 @@ export class InvitationController {
   }
 
   // Get channel's pending invitations
-  static async getChannelPendingInvitations(req: Request, res: Response): Promise<void> {
+  static async getChannelPendingInvitations(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { channelId } = req.params;
@@ -548,7 +591,8 @@ export class InvitationController {
       if (!isMember) {
         res.status(403).json({
           success: false,
-          error: 'You must be a member of the channel to view pending invitations',
+          error:
+            'You must be a member of the channel to view pending invitations',
         });
         return;
       }
@@ -610,7 +654,10 @@ export class InvitationController {
         return;
       }
 
-      const cancelledInvitation = await ChannelInvitationModel.cancel(invitationIdNum, userId);
+      const cancelledInvitation = await ChannelInvitationModel.cancel(
+        invitationIdNum,
+        userId
+      );
 
       // Notify invitee about cancellation
       const { BroadcastService } = require('../services/broadcast-service');

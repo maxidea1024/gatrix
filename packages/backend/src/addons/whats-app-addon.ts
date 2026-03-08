@@ -22,8 +22,15 @@ export class WhatsAppAddon extends Addon {
     const { accessToken, phoneNumberId, recipientPhoneNumber } = parameters;
 
     if (!accessToken || !phoneNumberId || !recipientPhoneNumber) {
-      this.logger.warn(`Missing WhatsApp configuration for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing required parameters');
+      this.logger.warn(
+        `Missing WhatsApp configuration for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing required parameters'
+      );
       return;
     }
 

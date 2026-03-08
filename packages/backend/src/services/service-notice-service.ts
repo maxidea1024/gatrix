@@ -1,7 +1,10 @@
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { generateULID } from '../utils/ulid';
 import database from '../config/database';
-import { convertDateFieldsFromMySQL, convertToMySQLDateTime } from '../utils/date-utils';
+import {
+  convertDateFieldsFromMySQL,
+  convertToMySQLDateTime,
+} from '../utils/date-utils';
 import { pubSubService } from './pub-sub-service';
 
 import { createLogger } from '../config/logger';
@@ -112,19 +115,27 @@ class ServiceNoticeService {
     }
 
     if (filters.platform) {
-      const platforms = Array.isArray(filters.platform) ? filters.platform : [filters.platform];
+      const platforms = Array.isArray(filters.platform)
+        ? filters.platform
+        : [filters.platform];
       const operator = filters.platformOperator || 'any_of';
 
       if (operator === 'include_all') {
         // AND condition: notice must include ALL selected platforms OR be empty (all platforms)
         platforms.forEach((platform) => {
-          whereClauses.push('(JSON_LENGTH(platforms) = 0 OR JSON_CONTAINS(platforms, ?))');
+          whereClauses.push(
+            '(JSON_LENGTH(platforms) = 0 OR JSON_CONTAINS(platforms, ?))'
+          );
           queryParams.push(JSON.stringify(platform));
         });
       } else {
         // OR condition: notice must include ANY of the selected platforms OR be empty (all platforms)
-        const platformConditions = platforms.map(() => 'JSON_CONTAINS(platforms, ?)').join(' OR ');
-        whereClauses.push(`(JSON_LENGTH(platforms) = 0 OR (${platformConditions}))`);
+        const platformConditions = platforms
+          .map(() => 'JSON_CONTAINS(platforms, ?)')
+          .join(' OR ');
+        whereClauses.push(
+          `(JSON_LENGTH(platforms) = 0 OR (${platformConditions}))`
+        );
         platforms.forEach((platform) => {
           queryParams.push(JSON.stringify(platform));
         });
@@ -132,19 +143,27 @@ class ServiceNoticeService {
     }
 
     if (filters.channel) {
-      const channels = Array.isArray(filters.channel) ? filters.channel : [filters.channel];
+      const channels = Array.isArray(filters.channel)
+        ? filters.channel
+        : [filters.channel];
       const operator = filters.channelOperator || 'any_of';
 
       if (operator === 'include_all') {
         // AND condition: notice must include ALL selected channels OR be empty (all channels)
         channels.forEach((channel) => {
-          whereClauses.push('(JSON_LENGTH(channels) = 0 OR JSON_CONTAINS(channels, ?))');
+          whereClauses.push(
+            '(JSON_LENGTH(channels) = 0 OR JSON_CONTAINS(channels, ?))'
+          );
           queryParams.push(JSON.stringify(channel));
         });
       } else {
         // OR condition: notice must include ANY of the selected channels OR be empty (all channels)
-        const channelConditions = channels.map(() => 'JSON_CONTAINS(channels, ?)').join(' OR ');
-        whereClauses.push(`(JSON_LENGTH(channels) = 0 OR (${channelConditions}))`);
+        const channelConditions = channels
+          .map(() => 'JSON_CONTAINS(channels, ?)')
+          .join(' OR ');
+        whereClauses.push(
+          `(JSON_LENGTH(channels) = 0 OR (${channelConditions}))`
+        );
         channels.forEach((channel) => {
           queryParams.push(JSON.stringify(channel));
         });
@@ -160,7 +179,9 @@ class ServiceNoticeService {
       if (operator === 'include_all') {
         // AND condition: notice must include ALL selected subchannels OR be empty (all subchannels)
         subchannels.forEach((subchannel) => {
-          whereClauses.push('(JSON_LENGTH(subchannels) = 0 OR JSON_CONTAINS(subchannels, ?))');
+          whereClauses.push(
+            '(JSON_LENGTH(subchannels) = 0 OR JSON_CONTAINS(subchannels, ?))'
+          );
           queryParams.push(JSON.stringify(subchannel));
         });
       } else {
@@ -168,7 +189,9 @@ class ServiceNoticeService {
         const subchannelConditions = subchannels
           .map(() => 'JSON_CONTAINS(subchannels, ?)')
           .join(' OR ');
-        whereClauses.push(`(JSON_LENGTH(subchannels) = 0 OR (${subchannelConditions}))`);
+        whereClauses.push(
+          `(JSON_LENGTH(subchannels) = 0 OR (${subchannelConditions}))`
+        );
         subchannels.forEach((subchannel) => {
           queryParams.push(JSON.stringify(subchannel));
         });
@@ -176,12 +199,15 @@ class ServiceNoticeService {
     }
 
     if (filters.search) {
-      whereClauses.push('(title LIKE ? OR content LIKE ? OR description LIKE ?)');
+      whereClauses.push(
+        '(title LIKE ? OR content LIKE ? OR description LIKE ?)'
+      );
       const searchPattern = `%${filters.search}%`;
       queryParams.push(searchPattern, searchPattern, searchPattern);
     }
 
-    const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+    const whereClause =
+      whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
 
     // Get total count
     const [countResult] = await pool.execute<RowDataPacket[]>(
@@ -223,10 +249,18 @@ class ServiceNoticeService {
         isActive: Boolean(row.isActive),
         isPinned: Boolean(row.isPinned),
         category: row.category,
-        platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
-        channels: typeof row.channels === 'string' ? JSON.parse(row.channels) : row.channels,
+        platforms:
+          typeof row.platforms === 'string'
+            ? JSON.parse(row.platforms)
+            : row.platforms,
+        channels:
+          typeof row.channels === 'string'
+            ? JSON.parse(row.channels)
+            : row.channels,
         subchannels:
-          typeof row.subchannels === 'string' ? JSON.parse(row.subchannels) : row.subchannels,
+          typeof row.subchannels === 'string'
+            ? JSON.parse(row.subchannels)
+            : row.subchannels,
         startDate: row.startDate,
         endDate: row.endDate,
         tabTitle: row.tabTitle,
@@ -237,7 +271,12 @@ class ServiceNoticeService {
         updatedAt: row.updatedAt,
       };
       // Convert MySQL DATETIME to ISO 8601
-      return convertDateFieldsFromMySQL(notice, ['startDate', 'endDate', 'createdAt', 'updatedAt']);
+      return convertDateFieldsFromMySQL(notice, [
+        'startDate',
+        'endDate',
+        'createdAt',
+        'updatedAt',
+      ]);
     });
 
     return { notices, total };
@@ -246,7 +285,10 @@ class ServiceNoticeService {
   /**
    * Get service notice by ID
    */
-  async getServiceNoticeById(id: string, environmentId: string): Promise<ServiceNotice | null> {
+  async getServiceNoticeById(
+    id: string,
+    environmentId: string
+  ): Promise<ServiceNotice | null> {
     const pool = database.getPool();
     const [rows] = await pool.execute<RowDataPacket[]>(
       'SELECT * FROM g_service_notices WHERE id = ? AND environmentId = ?',
@@ -264,7 +306,10 @@ class ServiceNoticeService {
       isActive: Boolean(row.isActive),
       isPinned: Boolean(row.isPinned),
       category: row.category,
-      platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
+      platforms:
+        typeof row.platforms === 'string'
+          ? JSON.parse(row.platforms)
+          : row.platforms,
       startDate: row.startDate,
       endDate: row.endDate,
       tabTitle: row.tabTitle,
@@ -275,7 +320,12 @@ class ServiceNoticeService {
       updatedAt: row.updatedAt,
     };
     // Convert MySQL DATETIME to ISO 8601
-    return convertDateFieldsFromMySQL(notice, ['startDate', 'endDate', 'createdAt', 'updatedAt']);
+    return convertDateFieldsFromMySQL(notice, [
+      'startDate',
+      'endDate',
+      'createdAt',
+      'updatedAt',
+    ]);
   }
 
   /**
@@ -291,7 +341,9 @@ class ServiceNoticeService {
       startDate: data.startDate,
       endDate: data.endDate,
       convertedStartDate: convertToMySQLDateTime(data.startDate),
-      convertedEndDate: data.endDate ? convertToMySQLDateTime(data.endDate) : null,
+      convertedEndDate: data.endDate
+        ? convertToMySQLDateTime(data.endDate)
+        : null,
     });
 
     const generatedId = generateULID();
@@ -326,7 +378,9 @@ class ServiceNoticeService {
     // Invalidate ETag cache and publish SDK Event with full data for cache update
     try {
       // Invalidate ETag cache so SDK fetches fresh data
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`);
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`
+      );
 
       await pubSubService.publishSDKEvent(
         {
@@ -391,7 +445,9 @@ class ServiceNoticeService {
 
     if (data.startDate !== undefined) {
       updates.push('startDate = ?');
-      values.push(data.startDate ? convertToMySQLDateTime(data.startDate) : null);
+      values.push(
+        data.startDate ? convertToMySQLDateTime(data.startDate) : null
+      );
     }
 
     if (data.endDate !== undefined) {
@@ -443,7 +499,9 @@ class ServiceNoticeService {
     // Invalidate ETag cache and publish SDK Event with full data for cache update
     try {
       // Invalidate ETag cache so SDK fetches fresh data
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`);
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`
+      );
 
       await pubSubService.publishSDKEvent(
         {
@@ -474,15 +532,17 @@ class ServiceNoticeService {
    */
   async deleteServiceNotice(id: string, environmentId: string): Promise<void> {
     const pool = database.getPool();
-    await pool.execute('DELETE FROM g_service_notices WHERE id = ? AND environmentId = ?', [
-      id,
-      environmentId,
-    ]);
+    await pool.execute(
+      'DELETE FROM g_service_notices WHERE id = ? AND environmentId = ?',
+      [id, environmentId]
+    );
 
     // Invalidate ETag cache and publish SDK Event (Deletion)
     try {
       // Invalidate ETag cache so SDK fetches fresh data
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`);
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`
+      );
 
       await pubSubService.publishSDKEvent(
         {
@@ -502,7 +562,10 @@ class ServiceNoticeService {
   /**
    * Delete multiple service notices
    */
-  async deleteMultipleServiceNotices(ids: string[], environmentId: string): Promise<void> {
+  async deleteMultipleServiceNotices(
+    ids: string[],
+    environmentId: string
+  ): Promise<void> {
     if (ids.length === 0) return;
 
     const pool = database.getPool();
@@ -531,7 +594,10 @@ class ServiceNoticeService {
   /**
    * Toggle active status
    */
-  async toggleActive(id: string, environmentId: string): Promise<ServiceNotice> {
+  async toggleActive(
+    id: string,
+    environmentId: string
+  ): Promise<ServiceNotice> {
     const pool = database.getPool();
     await pool.execute(
       'UPDATE g_service_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environmentId = ?',
@@ -546,7 +612,9 @@ class ServiceNoticeService {
     // Invalidate ETag cache and publish SDK Event
     try {
       // Invalidate ETag cache so SDK fetches fresh data
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`);
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`
+      );
 
       await pubSubService.publishSDKEvent(
         {

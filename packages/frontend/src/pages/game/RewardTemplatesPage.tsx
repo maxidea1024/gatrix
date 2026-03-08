@@ -36,11 +36,15 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
-import rewardTemplateService, { RewardTemplate } from '../../services/rewardTemplateService';
+import rewardTemplateService, {
+  RewardTemplate,
+} from '../../services/rewardTemplateService';
 import { tagService } from '../../services/tagService';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
-import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
@@ -74,10 +78,14 @@ const RewardTemplatesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<RewardTemplate | null>(null);
+  const [editingTemplate, setEditingTemplate] = useState<RewardTemplate | null>(
+    null
+  );
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [deletingTemplate, setDeletingTemplate] = useState<RewardTemplate | null>(null);
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [deletingTemplate, setDeletingTemplate] =
+    useState<RewardTemplate | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<null | HTMLElement>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
   // Sorting state with localStorage persistence
@@ -97,7 +105,10 @@ const RewardTemplatesPage: React.FC = () => {
     try {
       const saved = localStorage.getItem('rewardTemplatesActiveFilters');
       const filters = saved ? JSON.parse(saved) : [];
-      console.log('[RewardTemplatesPage] Restored filters from localStorage:', filters);
+      console.log(
+        '[RewardTemplatesPage] Restored filters from localStorage:',
+        filters
+      );
       return filters;
     } catch (e) {
       console.error('[RewardTemplatesPage] Failed to restore filters:', e);
@@ -189,7 +200,9 @@ const RewardTemplatesPage: React.FC = () => {
   });
 
   // Apply dynamic filters to templates
-  const applyFilters = (templatesToFilter: RewardTemplate[]): RewardTemplate[] => {
+  const applyFilters = (
+    templatesToFilter: RewardTemplate[]
+  ): RewardTemplate[] => {
     if (activeFilters.length === 0) {
       return templatesToFilter;
     }
@@ -203,7 +216,9 @@ const RewardTemplatesPage: React.FC = () => {
       return activeFilters.every((filter) => {
         // Handle tags filter
         if (filter.key === 'tags') {
-          const selectedTagIds = Array.isArray(filter.value) ? filter.value : [];
+          const selectedTagIds = Array.isArray(filter.value)
+            ? filter.value
+            : [];
           if (selectedTagIds.length === 0) return true;
 
           const templateTags = template.tags || [];
@@ -250,13 +265,16 @@ const RewardTemplatesPage: React.FC = () => {
   const loadTemplates = async () => {
     setLoading(true);
     try {
-      const result = await rewardTemplateService.getRewardTemplates(projectApiPath, {
-        page: page + 1,
-        limit: rowsPerPage,
-        search: debouncedSearchTerm || undefined,
-        sortBy: orderBy,
-        sortOrder: order,
-      });
+      const result = await rewardTemplateService.getRewardTemplates(
+        projectApiPath,
+        {
+          page: page + 1,
+          limit: rowsPerPage,
+          search: debouncedSearchTerm || undefined,
+          sortBy: orderBy,
+          sortOrder: order,
+        }
+      );
 
       if (
         result &&
@@ -303,7 +321,8 @@ const RewardTemplatesPage: React.FC = () => {
         setTemplates(filteredTemplates);
         // Ensure total is a valid number, default to 0 if undefined or NaN
         const totalCount = result.total;
-        const validTotal = typeof totalCount === 'number' && !isNaN(totalCount) ? totalCount : 0;
+        const validTotal =
+          typeof totalCount === 'number' && !isNaN(totalCount) ? totalCount : 0;
         setTotal(validTotal);
       } else {
         console.error('Invalid response:', result);
@@ -313,9 +332,12 @@ const RewardTemplatesPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to load templates:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'rewardTemplates.loadFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'rewardTemplates.loadFailed'),
+        {
+          variant: 'error',
+        }
+      );
       setTemplates([]);
       setAllTemplates([]);
       setTotal(0);
@@ -327,8 +349,14 @@ const RewardTemplatesPage: React.FC = () => {
 
   // Save active filters to localStorage
   useEffect(() => {
-    console.log('[RewardTemplatesPage] Saving filters to localStorage:', activeFilters);
-    localStorage.setItem('rewardTemplatesActiveFilters', JSON.stringify(activeFilters));
+    console.log(
+      '[RewardTemplatesPage] Saving filters to localStorage:',
+      activeFilters
+    );
+    localStorage.setItem(
+      'rewardTemplatesActiveFilters',
+      JSON.stringify(activeFilters)
+    );
   }, [activeFilters]);
 
   // Load all registry tags on mount (for filter options)
@@ -339,7 +367,10 @@ const RewardTemplatesPage: React.FC = () => {
         setAllRegistryTags(tags);
         console.log('[RewardTemplatesPage] Registry tags loaded:', tags.length);
       } catch (error) {
-        console.error('[RewardTemplatesPage] Failed to load registry tags:', error);
+        console.error(
+          '[RewardTemplatesPage] Failed to load registry tags:',
+          error
+        );
       }
     };
     loadTags();
@@ -358,12 +389,18 @@ const RewardTemplatesPage: React.FC = () => {
     const updatedColumns = [checkboxCol!, ...newColumns, actionsCol!];
 
     setColumns(updatedColumns);
-    localStorage.setItem('rewardTemplatesColumns', JSON.stringify(updatedColumns));
+    localStorage.setItem(
+      'rewardTemplatesColumns',
+      JSON.stringify(updatedColumns)
+    );
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem('rewardTemplatesColumns', JSON.stringify(defaultColumns));
+    localStorage.setItem(
+      'rewardTemplatesColumns',
+      JSON.stringify(defaultColumns)
+    );
   };
 
   // Sort handler
@@ -394,13 +431,20 @@ const RewardTemplatesPage: React.FC = () => {
 
   const handleDynamicFilterChange = (key: string, value: any) => {
     console.log('[RewardTemplatesPage] Changing filter value:', { key, value });
-    setActiveFilters((prev) => prev.map((f) => (f.key === key ? { ...f, value } : f)));
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === key ? { ...f, value } : f))
+    );
     setPage(0); // Reset to first page when changing filter value
   };
 
-  const handleOperatorChange = (key: string, operator: 'any_of' | 'include_all') => {
+  const handleOperatorChange = (
+    key: string,
+    operator: 'any_of' | 'include_all'
+  ) => {
     console.log('[RewardTemplatesPage] Changing operator:', { key, operator });
-    setActiveFilters((prev) => prev.map((f) => (f.key === key ? { ...f, operator } : f)));
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === key ? { ...f, operator } : f))
+    );
     setPage(0); // Reset to first page when changing operator
   };
 
@@ -415,7 +459,9 @@ const RewardTemplatesPage: React.FC = () => {
     const templateCopy: RewardTemplate = {
       ...template,
       tags: template.tags ? template.tags.map((tag) => ({ ...tag })) : [],
-      rewardItems: template.rewardItems ? template.rewardItems.map((item) => ({ ...item })) : [],
+      rewardItems: template.rewardItems
+        ? template.rewardItems.map((item) => ({ ...item }))
+        : [],
     };
     setEditingTemplate(templateCopy);
     setFormDrawerOpen(true);
@@ -429,7 +475,9 @@ const RewardTemplatesPage: React.FC = () => {
       id: '', // Remove ID so it's treated as a new template
       name: copiedName,
       tags: template.tags ? template.tags.map((tag) => ({ ...tag })) : [],
-      rewardItems: template.rewardItems ? template.rewardItems.map((item) => ({ ...item })) : [],
+      rewardItems: template.rewardItems
+        ? template.rewardItems.map((item) => ({ ...item }))
+        : [],
     };
     setEditingTemplate(copiedTemplate);
     setFormDrawerOpen(true);
@@ -456,16 +504,22 @@ const RewardTemplatesPage: React.FC = () => {
     if (!deletingTemplate) return;
 
     try {
-      await rewardTemplateService.deleteRewardTemplate(projectApiPath, deletingTemplate.id);
+      await rewardTemplateService.deleteRewardTemplate(
+        projectApiPath,
+        deletingTemplate.id
+      );
       enqueueSnackbar(t('rewardTemplates.deleteSuccess'), {
         variant: 'success',
       });
       setSelectedIds([]);
       loadTemplates();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'rewardTemplates.deleteFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'rewardTemplates.deleteFailed'),
+        {
+          variant: 'error',
+        }
+      );
     } finally {
       setDeleteConfirmOpen(false);
       setDeletingTemplate(null);
@@ -487,7 +541,9 @@ const RewardTemplatesPage: React.FC = () => {
 
     try {
       await Promise.all(
-        selectedIds.map((id) => rewardTemplateService.deleteRewardTemplate(projectApiPath, id))
+        selectedIds.map((id) =>
+          rewardTemplateService.deleteRewardTemplate(projectApiPath, id)
+        )
       );
       enqueueSnackbar(t('rewardTemplates.bulkDeleteSuccess'), {
         variant: 'success',
@@ -495,9 +551,12 @@ const RewardTemplatesPage: React.FC = () => {
       setSelectedIds([]);
       loadTemplates();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'rewardTemplates.bulkDeleteFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'rewardTemplates.bulkDeleteFailed'),
+        {
+          variant: 'error',
+        }
+      );
     } finally {
       setBulkDeleteConfirmOpen(false);
     }
@@ -517,7 +576,9 @@ const RewardTemplatesPage: React.FC = () => {
   };
 
   const handleSelectOne = (id: string) => {
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
   };
 
   // Visible columns
@@ -549,7 +610,11 @@ const RewardTemplatesPage: React.FC = () => {
         </Box>
         {canManage && (
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
               {t('rewardTemplates.createTemplate')}
             </Button>
           </Box>
@@ -619,7 +684,9 @@ const RewardTemplatesPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -658,7 +725,11 @@ const RewardTemplatesPage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Tooltip title={t('common.refresh')}>
                 <span>
-                  <IconButton size="small" onClick={loadTemplates} disabled={loading}>
+                  <IconButton
+                    size="small"
+                    onClick={loadTemplates}
+                    disabled={loading}
+                  >
                     <RefreshIcon />
                   </IconButton>
                 </span>
@@ -709,10 +780,12 @@ const RewardTemplatesPage: React.FC = () => {
                             <TableCell key={column.id} padding="checkbox">
                               <Checkbox
                                 indeterminate={
-                                  selectedIds.length > 0 && selectedIds.length < templates.length
+                                  selectedIds.length > 0 &&
+                                  selectedIds.length < templates.length
                                 }
                                 checked={
-                                  templates.length > 0 && selectedIds.length === templates.length
+                                  templates.length > 0 &&
+                                  selectedIds.length === templates.length
                                 }
                                 onChange={handleSelectAll}
                               />
@@ -727,13 +800,17 @@ const RewardTemplatesPage: React.FC = () => {
                             </TableCell>
                           );
                         }
-                        const isSortable = ['name', 'createdAt'].includes(column.id);
+                        const isSortable = ['name', 'createdAt'].includes(
+                          column.id
+                        );
                         return (
                           <TableCell key={column.id}>
                             {isSortable ? (
                               <TableSortLabel
                                 active={orderBy === column.id}
-                                direction={orderBy === column.id ? order : 'asc'}
+                                direction={
+                                  orderBy === column.id ? order : 'asc'
+                                }
                                 onClick={() => handleSort(column.id)}
                               >
                                 {t(column.labelKey)}
@@ -802,7 +879,10 @@ const RewardTemplatesPage: React.FC = () => {
                           if (column.id === 'rewardItems') {
                             return (
                               <TableCell key={column.id}>
-                                <RewardDisplay rewards={template.rewardItems} maxDisplay={3} />
+                                <RewardDisplay
+                                  rewards={template.rewardItems}
+                                  maxDisplay={3}
+                                />
                               </TableCell>
                             );
                           }
@@ -818,25 +898,33 @@ const RewardTemplatesPage: React.FC = () => {
                                   }}
                                 >
                                   {template.tags && template.tags.length > 0 ? (
-                                    template.tags.slice(0, 6).map((tag, idx) => (
-                                      <Tooltip
-                                        key={`${tag.id}-${idx}`}
-                                        title={tag.description || t('tags.noDescription')}
-                                        arrow
-                                      >
-                                        <Chip
-                                          label={tag.name}
-                                          size="small"
-                                          sx={{
-                                            bgcolor: tag.color,
-                                            color: '#fff',
-                                            cursor: 'help',
-                                          }}
-                                        />
-                                      </Tooltip>
-                                    ))
+                                    template.tags
+                                      .slice(0, 6)
+                                      .map((tag, idx) => (
+                                        <Tooltip
+                                          key={`${tag.id}-${idx}`}
+                                          title={
+                                            tag.description ||
+                                            t('tags.noDescription')
+                                          }
+                                          arrow
+                                        >
+                                          <Chip
+                                            label={tag.name}
+                                            size="small"
+                                            sx={{
+                                              bgcolor: tag.color,
+                                              color: '#fff',
+                                              cursor: 'help',
+                                            }}
+                                          />
+                                        </Tooltip>
+                                      ))
                                   ) : (
-                                    <Typography variant="body2" color="text.secondary">
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                    >
                                       -
                                     </Typography>
                                   )}
@@ -863,17 +951,28 @@ const RewardTemplatesPage: React.FC = () => {
                                   }}
                                 >
                                   <Tooltip title={t('common.edit')}>
-                                    <IconButton size="small" onClick={() => handleEdit(template)}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleEdit(template)}
+                                    >
                                       <EditIcon fontSize="small" />
                                     </IconButton>
                                   </Tooltip>
-                                  <Tooltip title={t('rewardTemplates.copyTemplate')}>
-                                    <IconButton size="small" onClick={() => handleCopy(template)}>
+                                  <Tooltip
+                                    title={t('rewardTemplates.copyTemplate')}
+                                  >
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleCopy(template)}
+                                    >
                                       <ContentCopyIcon fontSize="small" />
                                     </IconButton>
                                   </Tooltip>
                                   <Tooltip title={t('common.delete')}>
-                                    <IconButton size="small" onClick={() => handleDelete(template)}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleDelete(template)}
+                                    >
                                       <DeleteIcon fontSize="small" />
                                     </IconButton>
                                   </Tooltip>
@@ -909,7 +1008,9 @@ const RewardTemplatesPage: React.FC = () => {
       <ColumnSettingsDialog
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        columns={columns.filter((col) => col.id !== 'checkbox' && col.id !== 'actions')}
+        columns={columns.filter(
+          (col) => col.id !== 'checkbox' && col.id !== 'actions'
+        )}
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
       />

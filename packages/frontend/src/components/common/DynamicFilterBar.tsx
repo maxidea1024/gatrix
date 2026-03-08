@@ -54,7 +54,10 @@ interface DynamicFilterBarProps {
   onFilterAdd: (filter: ActiveFilter) => void;
   onFilterRemove: (filterKey: string) => void;
   onFilterChange: (filterKey: string, value: any) => void;
-  onOperatorChange?: (filterKey: string, operator: 'any_of' | 'include_all') => void;
+  onOperatorChange?: (
+    filterKey: string,
+    operator: 'any_of' | 'include_all'
+  ) => void;
   onRefresh?: () => void; // Optional refresh callback
   refreshDisabled?: boolean; // Optional refresh button disabled state
   leftActions?: React.ReactNode; // Optional left-aligned actions (before filters)
@@ -94,14 +97,18 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 
   const handleAddFilter = (filterDef: FilterDefinition) => {
     const defaultValue =
-      filterDef.type === 'multiselect' || filterDef.type === 'tags' ? [] : undefined;
+      filterDef.type === 'multiselect' || filterDef.type === 'tags'
+        ? []
+        : undefined;
     const defaultOperator = filterDef.operator || 'any_of';
     onFilterAdd({
       key: filterDef.key,
       value: defaultValue,
       label: filterDef.label,
       operator:
-        filterDef.type === 'multiselect' || filterDef.type === 'tags' ? defaultOperator : undefined,
+        filterDef.type === 'multiselect' || filterDef.type === 'tags'
+          ? defaultOperator
+          : undefined,
     });
     setEditingFilter(filterDef.key);
     // Only open select dropdown for select/multiselect/tags types
@@ -225,13 +232,18 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 
       // Check if click is on MUI Menu/Popover (Select dropdown only)
       // Only check for Popover and Menu, NOT Paper (Paper is used everywhere)
-      const isMenuClick = (target as Element).closest('.MuiPopover-root, .MuiMenu-root');
+      const isMenuClick = (target as Element).closest(
+        '.MuiPopover-root, .MuiMenu-root'
+      );
       if (isMenuClick) {
         return; // Don't close if clicking on dropdown menu
       }
 
       // Check if click is outside the edit container
-      if (editContainerRef.current && !editContainerRef.current.contains(target)) {
+      if (
+        editContainerRef.current &&
+        !editContainerRef.current.contains(target)
+      ) {
         console.log(
           '[DynamicFilterBar] Click outside edit container, editingFilter:',
           editingFilter
@@ -244,7 +256,9 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 
         // If Select is open, close it and exit edit mode
         if (selectOpen) {
-          console.log('[DynamicFilterBar] Select is open, closing it and exiting edit mode');
+          console.log(
+            '[DynamicFilterBar] Select is open, closing it and exiting edit mode'
+          );
           setSelectOpen(false);
 
           // Check if filter has a value before exiting
@@ -309,7 +323,11 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
     if (!isEditing) {
       // Display mode - show as chip or tag chips
       // Don't show filter if value is empty/undefined
-      if (filter.value === undefined || filter.value === null || filter.value === '') {
+      if (
+        filter.value === undefined ||
+        filter.value === null ||
+        filter.value === ''
+      ) {
         return null;
       }
 
@@ -323,7 +341,9 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
             : [];
         if (valueArray.length === 0) return null;
 
-        const selectedOptions = filterDef.options.filter((opt) => valueArray.includes(opt.value));
+        const selectedOptions = filterDef.options.filter((opt) =>
+          valueArray.includes(opt.value)
+        );
 
         const operator = filter.operator || filterDef.operator || 'any_of';
         const isSingleSelection = selectedOptions.length === 1;
@@ -335,7 +355,8 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
         if (isSingleSelection) {
           operatorText = 'is';
         } else if (isMultipleSelection) {
-          operatorText = operator === 'include_all' ? 'include all of' : 'is any of';
+          operatorText =
+            operator === 'include_all' ? 'include all of' : 'is any of';
         }
 
         return (
@@ -360,7 +381,12 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                   {filter.label}
                 </Box>
                 {operatorText && (
-                  <Tooltip title={!allowToggle ? t('common.filter.operatorLocked') : ''} arrow>
+                  <Tooltip
+                    title={
+                      !allowToggle ? t('common.filter.operatorLocked') : ''
+                    }
+                    arrow
+                  >
                     <Box
                       onClick={
                         isMultipleSelection && onOperatorChange && allowToggle
@@ -392,7 +418,11 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                   </Tooltip>
                 )}
                 {selectedOptions.map((option) => (
-                  <Tooltip key={option.value} title={option.description || ''} arrow>
+                  <Tooltip
+                    key={option.value}
+                    title={option.description || ''}
+                    arrow
+                  >
                     <Chip
                       label={option.label}
                       size="small"
@@ -455,7 +485,9 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
             : [];
         if (valueArray.length === 0) return null;
 
-        const selectedOptions = filterDef.options.filter((opt) => valueArray.includes(opt.value));
+        const selectedOptions = filterDef.options.filter((opt) =>
+          valueArray.includes(opt.value)
+        );
 
         const operator = filter.operator || filterDef.operator || 'any_of';
         const isSingleSelection = selectedOptions.length === 1;
@@ -467,7 +499,8 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
         if (isSingleSelection) {
           operatorText = 'is';
         } else if (isMultipleSelection) {
-          operatorText = operator === 'include_all' ? 'include all of' : 'is any of';
+          operatorText =
+            operator === 'include_all' ? 'include all of' : 'is any of';
         }
 
         return (
@@ -492,7 +525,12 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                   {filter.label}
                 </Box>
                 {operatorText && (
-                  <Tooltip title={!allowToggle ? t('common.filter.operatorLocked') : ''} arrow>
+                  <Tooltip
+                    title={
+                      !allowToggle ? t('common.filter.operatorLocked') : ''
+                    }
+                    arrow
+                  >
                     <Box
                       onClick={
                         isMultipleSelection && onOperatorChange && allowToggle
@@ -580,7 +618,9 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
       // Single select or text - show as single chip
       let displayValue = filter.value;
       if (filterDef.type === 'select' && filterDef.options) {
-        const option = filterDef.options.find((opt) => opt.value == filter.value); // Use == for type coercion
+        const option = filterDef.options.find(
+          (opt) => opt.value == filter.value
+        ); // Use == for type coercion
         displayValue = option ? option.label : filter.value;
       }
 
@@ -588,7 +628,9 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
         <Chip
           icon={<FilterListIcon />}
           label={
-            <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+            <Box
+              sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}
+            >
               <Box component="span">{filter.label}</Box>
               <Box
                 component="span"
@@ -752,7 +794,8 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 setEditingFilter(null);
               }}
               onChange={(e) => {
-                const newValue = e.target.value === '' ? undefined : e.target.value;
+                const newValue =
+                  e.target.value === '' ? undefined : e.target.value;
                 onFilterChange(filter.key, newValue);
                 // Close immediately after selection
                 if (newValue !== undefined && newValue !== '') {
@@ -779,7 +822,10 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               }}
             >
               {filterDef.options.map((option, idx) => (
-                <MenuItem key={`${filter.key}-${idx}-${option.value}`} value={option.value}>
+                <MenuItem
+                  key={`${filter.key}-${idx}-${option.value}`}
+                  value={option.value}
+                >
                   {option.label}
                 </MenuItem>
               ))}
@@ -807,7 +853,9 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 setSearchText('');
 
                 // Immediately exit editing mode when Select closes
-                const currentFilter = activeFilters.find((f) => f.key === filter.key);
+                const currentFilter = activeFilters.find(
+                  (f) => f.key === filter.key
+                );
                 const hasValue =
                   currentFilter &&
                   Array.isArray(currentFilter.value) &&
@@ -826,7 +874,8 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               }}
               autoFocus
               renderValue={(selected) => {
-                if (!Array.isArray(selected) || selected.length === 0) return '';
+                if (!Array.isArray(selected) || selected.length === 0)
+                  return '';
                 const selectedOptions = filterDef.options!.filter((opt) =>
                   selected.includes(opt.value)
                 );
@@ -906,18 +955,29 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               {filterDef.options
                 .filter(
                   (option) =>
-                    !searchText || option.label.toLowerCase().includes(searchText.toLowerCase())
+                    !searchText ||
+                    option.label
+                      .toLowerCase()
+                      .includes(searchText.toLowerCase())
                 )
                 .map((option, idx) => (
-                  <MenuItem key={`${filter.key}-ms-${idx}-${option.value}`} value={option.value}>
+                  <MenuItem
+                    key={`${filter.key}-ms-${idx}-${option.value}`}
+                    value={option.value}
+                  >
                     <Checkbox
                       checked={
-                        Array.isArray(filter.value) && filter.value.indexOf(option.value) > -1
+                        Array.isArray(filter.value) &&
+                        filter.value.indexOf(option.value) > -1
                       }
                       size="small"
                     />
                     {option.icon && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>{option.icon}</Box>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', mr: 1 }}
+                      >
+                        {option.icon}
+                      </Box>
                     )}
                     <ListItemText primary={option.label} />
                   </MenuItem>
@@ -946,7 +1006,9 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 setSearchText('');
 
                 // Immediately exit editing mode when Select closes
-                const currentFilter = activeFilters.find((f) => f.key === filter.key);
+                const currentFilter = activeFilters.find(
+                  (f) => f.key === filter.key
+                );
                 const hasValue =
                   currentFilter &&
                   Array.isArray(currentFilter.value) &&
@@ -965,7 +1027,8 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               }}
               autoFocus
               renderValue={(selected) => {
-                if (!Array.isArray(selected) || selected.length === 0) return '';
+                if (!Array.isArray(selected) || selected.length === 0)
+                  return '';
                 const selectedOptions = filterDef.options!.filter((opt) =>
                   selected.includes(opt.value)
                 );
@@ -1046,19 +1109,31 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 .filter(
                   (option) =>
                     !searchText ||
-                    option.label.toLowerCase().includes(searchText.toLowerCase()) ||
+                    option.label
+                      .toLowerCase()
+                      .includes(searchText.toLowerCase()) ||
                     (option.description &&
-                      option.description.toLowerCase().includes(searchText.toLowerCase()))
+                      option.description
+                        .toLowerCase()
+                        .includes(searchText.toLowerCase()))
                 )
                 .map((option, idx) => (
-                  <MenuItem key={`${filter.key}-tag-${idx}-${option.value}`} value={option.value}>
+                  <MenuItem
+                    key={`${filter.key}-tag-${idx}-${option.value}`}
+                    value={option.value}
+                  >
                     <Checkbox
                       checked={
-                        Array.isArray(filter.value) && filter.value.indexOf(option.value) > -1
+                        Array.isArray(filter.value) &&
+                        filter.value.indexOf(option.value) > -1
                       }
                       size="small"
                     />
-                    <Tooltip title={option.description || ''} arrow placement="right">
+                    <Tooltip
+                      title={option.description || ''}
+                      arrow
+                      placement="right"
+                    >
                       <Box
                         sx={{
                           display: 'flex',
@@ -1118,7 +1193,11 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 
   // Helper function to check if a filter has a meaningful value
   const hasFilterValue = (filter: ActiveFilter): boolean => {
-    if (filter.value === undefined || filter.value === null || filter.value === '') {
+    if (
+      filter.value === undefined ||
+      filter.value === null ||
+      filter.value === ''
+    ) {
       return false;
     }
     if (Array.isArray(filter.value) && filter.value.length === 0) {
@@ -1221,7 +1300,9 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
         )}
 
         {/* Actions after filter add button */}
-        {afterFilterAddActions && <Box sx={{ flexShrink: 0 }}>{afterFilterAddActions}</Box>}
+        {afterFilterAddActions && (
+          <Box sx={{ flexShrink: 0 }}>{afterFilterAddActions}</Box>
+        )}
       </Box>
 
       {/* Refresh Button - Right aligned */}
@@ -1229,7 +1310,11 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
         <Box sx={{ flexShrink: 0 }}>
           <Tooltip title={refreshDisabled ? '' : t('common.refresh')}>
             <span>
-              <IconButton size="small" onClick={onRefresh} disabled={refreshDisabled}>
+              <IconButton
+                size="small"
+                onClick={onRefresh}
+                disabled={refreshDisabled}
+              >
                 <RefreshIcon />
               </IconButton>
             </span>

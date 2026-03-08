@@ -19,7 +19,9 @@ const validateRequest = (req: any, res: any, next: any) => {
       value: err.value,
     }));
 
-    const errorMessage = errorDetails.map((err: any) => `${err.field}: ${err.message}`).join(', ');
+    const errorMessage = errorDetails
+      .map((err: any) => `${err.field}: ${err.message}`)
+      .join(', ');
 
     const error = new GatrixError(`Validation failed: ${errorMessage}`, 400);
     (error as any).validationErrors = errorDetails;
@@ -36,7 +38,11 @@ router.get('/game-worlds', clientSDKAuth, ClientController.getGameWorlds);
 
 router.get('/cache-stats', clientSDKAuth, ClientController.getCacheStats);
 
-router.post('/invalidate-cache', clientSDKAuth, ClientController.invalidateCache);
+router.post(
+  '/invalidate-cache',
+  clientSDKAuth,
+  ClientController.invalidateCache
+);
 
 // Feature Flag evaluation routes (token determines environment)
 router.post('/features/eval', clientSDKAuth, ClientController.evaluateFlags);
@@ -88,6 +94,10 @@ router.post(
 
 // Banner routes for game client
 router.get('/banners', clientSDKAuth, BannerClientController.getBanners);
-router.get('/banners/:bannerId', clientSDKAuth, BannerClientController.getBannerById);
+router.get(
+  '/banners/:bannerId',
+  clientSDKAuth,
+  BannerClientController.getBannerById
+);
 
 export default router;

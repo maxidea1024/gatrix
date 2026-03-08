@@ -43,18 +43,26 @@ export class ServiceMaintenanceService {
     if (!this.storage) return;
 
     try {
-      const cachedJson = await this.storage.get(`ServiceMaintenance_${environmentId}`);
+      const cachedJson = await this.storage.get(
+        `ServiceMaintenance_${environmentId}`
+      );
       if (cachedJson) {
         this.cachedStatusByEnv.set(environmentId, JSON.parse(cachedJson));
-        this.logger.debug('Loaded service maintenance status from local storage', {
-          environmentId,
-        });
+        this.logger.debug(
+          'Loaded service maintenance status from local storage',
+          {
+            environmentId,
+          }
+        );
       }
     } catch (error: any) {
-      this.logger.warn('Failed to load service maintenance status from local storage', {
-        environmentId,
-        error: error.message,
-      });
+      this.logger.warn(
+        'Failed to load service maintenance status from local storage',
+        {
+          environmentId,
+          error: error.message,
+        }
+      );
     }
   }
 
@@ -77,7 +85,9 @@ export class ServiceMaintenanceService {
    * Fetch service maintenance status for a specific environment
    * GET /api/v1/server/maintenance
    */
-  async getStatusByEnvironment(environmentId: string): Promise<MaintenanceStatus> {
+  async getStatusByEnvironment(
+    environmentId: string
+  ): Promise<MaintenanceStatus> {
     const endpoint = `/api/v1/server/maintenance`;
 
     this.logger.debug('Fetching service maintenance status', { environmentId });
@@ -85,7 +95,9 @@ export class ServiceMaintenanceService {
     const response = await this.apiClient.get<MaintenanceStatus>(endpoint);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch service maintenance status');
+      throw new Error(
+        response.error?.message || 'Failed to fetch service maintenance status'
+      );
     }
 
     // Ensure isMaintenanceActive has a boolean value (for backward compatibility with older backend)
@@ -98,7 +110,10 @@ export class ServiceMaintenanceService {
 
     // Save to local storage if available
     if (this.storage) {
-      await this.storage.save(`ServiceMaintenance_${environmentId}`, JSON.stringify(status));
+      await this.storage.save(
+        `ServiceMaintenance_${environmentId}`,
+        JSON.stringify(status)
+      );
     }
 
     this.logger.info('Service maintenance status fetched', {
@@ -113,10 +128,15 @@ export class ServiceMaintenanceService {
   /**
    * Fetch service maintenance status for multiple environments
    */
-  async getStatusByEnvironments(environments: string[]): Promise<MaintenanceStatus[]> {
-    this.logger.debug('Fetching service maintenance status for multiple environments', {
-      environments,
-    });
+  async getStatusByEnvironments(
+    environments: string[]
+  ): Promise<MaintenanceStatus[]> {
+    this.logger.debug(
+      'Fetching service maintenance status for multiple environments',
+      {
+        environments,
+      }
+    );
 
     const results: MaintenanceStatus[] = [];
 
@@ -125,7 +145,10 @@ export class ServiceMaintenanceService {
         const status = await this.getStatusByEnvironment(env);
         results.push(status);
       } catch (error) {
-        this.logger.error(`Failed to fetch maintenance status for environment ${env}`, { error });
+        this.logger.error(
+          `Failed to fetch maintenance status for environment ${env}`,
+          { error }
+        );
       }
     }
 
@@ -240,7 +263,10 @@ export class ServiceMaintenanceService {
    * @param lang Language code
    * @param environmentId environment ID (required)
    */
-  getMessage(lang: 'ko' | 'en' | 'zh' = 'en', environmentId: string): string | null {
+  getMessage(
+    lang: 'ko' | 'en' | 'zh' = 'en',
+    environmentId: string
+  ): string | null {
     const cachedStatus = this.cachedStatusByEnv.get(environmentId);
     if (!this.isMaintenanceActive(environmentId) || !cachedStatus?.detail) {
       return null;
@@ -262,7 +288,9 @@ export class ServiceMaintenanceService {
    * Fetch service maintenance status for multiple environments
    * (Alias for getStatusByEnvironments for consistency with BaseEnvironmentService)
    */
-  async listByEnvironments(environments: string[]): Promise<MaintenanceStatus[]> {
+  async listByEnvironments(
+    environments: string[]
+  ): Promise<MaintenanceStatus[]> {
     return this.getStatusByEnvironments(environments);
   }
 }

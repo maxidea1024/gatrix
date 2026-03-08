@@ -116,7 +116,9 @@ export class ServerBannerController {
         });
       }
 
-      logger.info(`Server SDK: Retrieved banner ${bannerId} for environmentId ${environmentId}`);
+      logger.info(
+        `Server SDK: Retrieved banner ${bannerId} for environmentId ${environmentId}`
+      );
 
       res.json({
         success: true,

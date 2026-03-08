@@ -116,15 +116,23 @@ async function addTestCrashes() {
       console.log(`  Environment: ${crashData.environmentId}`);
 
       const firstLine =
-        crashData.stack.split('\n')[0]?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
+        crashData.stack
+          .split('\n')[0]
+          ?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
       console.log(`  First Line: ${firstLine}`);
 
       try {
         // Generate crash hash from stack trace
-        const chash = crypto.createHash('md5').update(crashData.stack).digest('hex');
+        const chash = crypto
+          .createHash('md5')
+          .update(crashData.stack)
+          .digest('hex');
 
         // Check if crash already exists
-        let crash = await ClientCrash.findByHashAndBranch(chash, crashData.branch);
+        let crash = await ClientCrash.findByHashAndBranch(
+          chash,
+          crashData.branch
+        );
         let isNewCrash = false;
 
         if (!crash) {

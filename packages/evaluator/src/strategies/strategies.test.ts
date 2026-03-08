@@ -69,7 +69,9 @@ describe('FlexibleRolloutStrategy', () => {
   });
 
   it('should return false when no stickiness value available', () => {
-    expect(strategy.isEnabled({ rollout: 50, stickiness: 'userId' }, defaultContext)).toBe(false);
+    expect(
+      strategy.isEnabled({ rollout: 50, stickiness: 'userId' }, defaultContext)
+    ).toBe(false);
   });
 
   it('should use default stickiness (userId -> sessionId -> undefined)', () => {
@@ -83,7 +85,9 @@ describe('FlexibleRolloutStrategy', () => {
 
   it('should use random stickiness', () => {
     // At 100% random should always pass
-    expect(strategy.isEnabled({ rollout: 100, stickiness: 'random' }, defaultContext)).toBe(true);
+    expect(
+      strategy.isEnabled({ rollout: 100, stickiness: 'random' }, defaultContext)
+    ).toBe(true);
   });
 
   it('should use custom stickiness from properties', () => {
@@ -108,8 +112,15 @@ describe('FlexibleRolloutStrategy', () => {
   });
 
   it('should produce consistent results for same userId/groupId', () => {
-    const params: StrategyParameters = { rollout: 50, stickiness: 'userId', groupId: 'test' };
-    const ctx: EvaluationContext = { ...defaultContext, userId: 'consistent-user' };
+    const params: StrategyParameters = {
+      rollout: 50,
+      stickiness: 'userId',
+      groupId: 'test',
+    };
+    const ctx: EvaluationContext = {
+      ...defaultContext,
+      userId: 'consistent-user',
+    };
     const result1 = strategy.isEnabled(params, ctx);
     const result2 = strategy.isEnabled(params, ctx);
     expect(result1).toBe(result2);
@@ -153,11 +164,15 @@ describe('UserWithIdStrategy', () => {
   });
 
   it('should return false when no userIds defined', () => {
-    expect(strategy.isEnabled({}, { ...defaultContext, userId: 'user-1' })).toBe(false);
+    expect(
+      strategy.isEnabled({}, { ...defaultContext, userId: 'user-1' })
+    ).toBe(false);
   });
 
   it('should return false when no userId in context', () => {
-    expect(strategy.isEnabled({ userIds: 'user-1,user-2' }, defaultContext)).toBe(false);
+    expect(
+      strategy.isEnabled({ userIds: 'user-1,user-2' }, defaultContext)
+    ).toBe(false);
   });
 
   it('should return detailed result', () => {
@@ -191,15 +206,21 @@ describe('GradualRolloutUserIdStrategy', () => {
   });
 
   it('should enable at 100% percentage', () => {
-    expect(strategy.isEnabled({ percentage: 100 }, { ...defaultContext, userId: 'user-1' })).toBe(
-      true
-    );
+    expect(
+      strategy.isEnabled(
+        { percentage: 100 },
+        { ...defaultContext, userId: 'user-1' }
+      )
+    ).toBe(true);
   });
 
   it('should disable at 0% percentage', () => {
-    expect(strategy.isEnabled({ percentage: 0 }, { ...defaultContext, userId: 'user-1' })).toBe(
-      false
-    );
+    expect(
+      strategy.isEnabled(
+        { percentage: 0 },
+        { ...defaultContext, userId: 'user-1' }
+      )
+    ).toBe(false);
   });
 
   it('should return false when no userId in context', () => {
@@ -236,7 +257,9 @@ describe('GradualRolloutRandomStrategy', () => {
 
   it('should always enable at 100% percentage', () => {
     for (let i = 0; i < 10; i++) {
-      expect(strategy.isEnabled({ percentage: 100 }, defaultContext)).toBe(true);
+      expect(strategy.isEnabled({ percentage: 100 }, defaultContext)).toBe(
+        true
+      );
     }
   });
 
@@ -247,7 +270,10 @@ describe('GradualRolloutRandomStrategy', () => {
   });
 
   it('should return detailed result with random value', () => {
-    const result = strategy.isEnabledWithDetails({ percentage: 50 }, defaultContext);
+    const result = strategy.isEnabledWithDetails(
+      { percentage: 50 },
+      defaultContext
+    );
     expect(result.details?.percentage).toBe(50);
     expect(typeof result.details?.random).toBe('number');
   });
@@ -264,13 +290,19 @@ describe('GradualRolloutSessionIdStrategy', () => {
 
   it('should enable at 100% percentage', () => {
     expect(
-      strategy.isEnabled({ percentage: 100 }, { ...defaultContext, sessionId: 'session-1' })
+      strategy.isEnabled(
+        { percentage: 100 },
+        { ...defaultContext, sessionId: 'session-1' }
+      )
     ).toBe(true);
   });
 
   it('should disable at 0% percentage', () => {
     expect(
-      strategy.isEnabled({ percentage: 0 }, { ...defaultContext, sessionId: 'session-1' })
+      strategy.isEnabled(
+        { percentage: 0 },
+        { ...defaultContext, sessionId: 'session-1' }
+      )
     ).toBe(false);
   });
 
@@ -280,7 +312,10 @@ describe('GradualRolloutSessionIdStrategy', () => {
 
   it('should produce consistent results for same sessionId', () => {
     const params: StrategyParameters = { percentage: 50, groupId: 'test' };
-    const ctx: EvaluationContext = { ...defaultContext, sessionId: 'stable-session' };
+    const ctx: EvaluationContext = {
+      ...defaultContext,
+      sessionId: 'stable-session',
+    };
     const result1 = strategy.isEnabled(params, ctx);
     const result2 = strategy.isEnabled(params, ctx);
     expect(result1).toBe(result2);
@@ -307,7 +342,10 @@ describe('RemoteAddressStrategy', () => {
 
   it('should not match different IP', () => {
     expect(
-      strategy.isEnabled({ IPs: '192.168.1.1' }, { ...defaultContext, remoteAddress: '10.0.0.1' })
+      strategy.isEnabled(
+        { IPs: '192.168.1.1' },
+        { ...defaultContext, remoteAddress: '10.0.0.1' }
+      )
     ).toBe(false);
   });
 
@@ -339,7 +377,9 @@ describe('RemoteAddressStrategy', () => {
   });
 
   it('should return false when no IPs defined', () => {
-    expect(strategy.isEnabled({}, { ...defaultContext, remoteAddress: '1.2.3.4' })).toBe(false);
+    expect(
+      strategy.isEnabled({}, { ...defaultContext, remoteAddress: '1.2.3.4' })
+    ).toBe(false);
   });
 
   it('should return false when no remoteAddress in context', () => {
@@ -348,7 +388,10 @@ describe('RemoteAddressStrategy', () => {
 
   it('should match /32 CIDR (single host)', () => {
     expect(
-      strategy.isEnabled({ IPs: '10.0.0.5/32' }, { ...defaultContext, remoteAddress: '10.0.0.5' })
+      strategy.isEnabled(
+        { IPs: '10.0.0.5/32' },
+        { ...defaultContext, remoteAddress: '10.0.0.5' }
+      )
     ).toBe(true);
   });
 
@@ -376,7 +419,10 @@ describe('ApplicationHostnameStrategy', () => {
   });
 
   it('should return detailed result', () => {
-    const result = strategy.isEnabledWithDetails({ hostNames: 'some-host' }, defaultContext);
+    const result = strategy.isEnabledWithDetails(
+      { hostNames: 'some-host' },
+      defaultContext
+    );
     expect(result.details?.currentHostname).toBeTruthy();
     expect(result.details?.hostList).toBeDefined();
   });

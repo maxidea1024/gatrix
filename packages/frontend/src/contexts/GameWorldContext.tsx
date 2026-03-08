@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 import { gameWorldService } from '../services/gameWorldService';
 import { useAuth } from './AuthContext';
 import { useEnvironment } from './EnvironmentContext';
@@ -17,22 +23,30 @@ export interface GameWorldContextType {
   refresh: () => Promise<void>;
 }
 
-const GameWorldContext = createContext<GameWorldContextType | undefined>(undefined);
+const GameWorldContext = createContext<GameWorldContextType | undefined>(
+  undefined
+);
 
 interface GameWorldProviderProps {
   children: ReactNode;
 }
 
-export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }) => {
+export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({
+  children,
+}) => {
   const { isAuthenticated, hasPermission, permissionsLoading } = useAuth();
-  const { currentEnvironment, isLoading: environmentLoading } = useEnvironment();
+  const { currentEnvironment, isLoading: environmentLoading } =
+    useEnvironment();
   const { getProjectApiPath } = useOrgProject();
   const [worlds, setWorlds] = useState<GameWorldOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Check if user has permission to view game worlds
-  const canViewGameWorlds = hasPermission([P.GAME_WORLDS_READ, P.GAME_WORLDS_UPDATE]);
+  const canViewGameWorlds = hasPermission([
+    P.GAME_WORLDS_READ,
+    P.GAME_WORLDS_UPDATE,
+  ]);
 
   const loadGameWorlds = async () => {
     // Don't load if no environment is selected
@@ -53,13 +67,16 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }
       setIsLoading(true);
       setError(null);
       const result = await gameWorldService.getGameWorlds(projectApiPath);
-      const worldOptions: GameWorldOption[] = (result.worlds || []).map((world: any) => ({
-        label: world.name,
-        value: world.worldId,
-      }));
+      const worldOptions: GameWorldOption[] = (result.worlds || []).map(
+        (world: any) => ({
+          label: world.name,
+          value: world.worldId,
+        })
+      );
       setWorlds(worldOptions);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load game worlds';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to load game worlds';
       setError(errorMessage);
       console.error('Error loading game worlds:', err);
     } finally {
@@ -93,7 +110,11 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }
   // Listen for game world updates from backend (only when authenticated and has permission)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'gameWorldsUpdated' && isAuthenticated && canViewGameWorlds) {
+      if (
+        e.key === 'gameWorldsUpdated' &&
+        isAuthenticated &&
+        canViewGameWorlds
+      ) {
         loadGameWorlds();
       }
     };
@@ -109,7 +130,11 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }
     refresh: loadGameWorlds,
   };
 
-  return <GameWorldContext.Provider value={value}>{children}</GameWorldContext.Provider>;
+  return (
+    <GameWorldContext.Provider value={value}>
+      {children}
+    </GameWorldContext.Provider>
+  );
 };
 
 export const useGameWorld = (): GameWorldContextType => {

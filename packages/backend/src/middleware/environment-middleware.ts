@@ -56,7 +56,11 @@ export const environmentContextMiddleware = async (
  * Use this to restrict certain routes to specific environment types
  */
 export const requireEnvironmentType = (allowedTypes: string[]) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const environmenId = req.environmentId;
 
@@ -112,7 +116,9 @@ export const preventProductionModification = async (
       if (environment.requiresApproval) {
         // TODO: Implement approval workflow
         // For now, just log a warning
-        logger.warn(`Production modification attempted without approval workflow`);
+        logger.warn(
+          `Production modification attempted without approval workflow`
+        );
       }
     }
 

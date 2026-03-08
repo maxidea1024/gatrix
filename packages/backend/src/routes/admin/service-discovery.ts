@@ -92,7 +92,9 @@ router.get('/sse', authenticateSSE, async (req, res) => {
       }
       return s;
     });
-    res.write(`data: ${JSON.stringify({ type: 'init', data: normalizedServices })}\n\n`);
+    res.write(
+      `data: ${JSON.stringify({ type: 'init', data: normalizedServices })}\n\n`
+    );
 
     // Watch for changes and get unwatch function
     let unwatch: (() => void) | null = null;
@@ -104,7 +106,9 @@ router.get('/sse', authenticateSSE, async (req, res) => {
           if (instance.status === 'heartbeat') {
             instance.status = 'ready' as any;
           }
-          res.write(`data: ${JSON.stringify({ type: event.type, data: instance })}\n\n`);
+          res.write(
+            `data: ${JSON.stringify({ type: event.type, data: instance })}\n\n`
+          );
         } catch (error) {
           logger.error('Failed to send SSE event:', error);
         }
@@ -118,7 +122,9 @@ router.get('/sse', authenticateSSE, async (req, res) => {
       }
     }
 
-    logger.info(`SSE connection established for service discovery: ${clientId}`);
+    logger.info(
+      `SSE connection established for service discovery: ${clientId}`
+    );
 
     // Handle client disconnect
     req.on('close', () => {
@@ -147,14 +153,17 @@ router.post('/cleanup', async (req: Request, res: Response) => {
     logger.info('Starting server cleanup...');
 
     // Get inactive services (terminated, error, no-response)
-    const inactiveServices = await serviceDiscoveryService.getInactiveServices();
+    const inactiveServices =
+      await serviceDiscoveryService.getInactiveServices();
     logger.info(`Total inactive services: ${inactiveServices.length}`);
 
     // Count by status
     const statusCounts = {
-      terminated: inactiveServices.filter((s) => s.status === 'terminated').length,
+      terminated: inactiveServices.filter((s) => s.status === 'terminated')
+        .length,
       error: inactiveServices.filter((s) => s.status === 'error').length,
-      noResponse: inactiveServices.filter((s) => s.status === 'no-response').length,
+      noResponse: inactiveServices.filter((s) => s.status === 'no-response')
+        .length,
     };
     logger.info(`Services to delete: ${inactiveServices.length}`, statusCounts);
 
@@ -219,193 +228,206 @@ router.put('/config', ServiceDiscoveryConfigController.updateConfig);
  * POST /api/v1/admin/services/:type/:instanceId/health
  * Pings the service's API port (internalApi/externalApi) /health endpoint
  */
-router.post('/:type/:instanceId/health', async (req: Request, res: Response) => {
-  try {
-    const { type, instanceId } = req.params;
-
-    if (!type || !instanceId) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'type and instanceId are required' },
-      });
-    }
-
-    // Get the service instance to find its web port and address
-    const services = await serviceDiscoveryService.getServices(type);
-    const service = services.find((s) => s.instanceId === instanceId);
-
-    if (!service) {
-      return res.status(404).json({
-        success: false,
-        error: { message: 'Service not found' },
-      });
-    }
-
-    // Check if service has an API port (internalApi, externalApi, or legacy web/http/api)
-    const webPort =
-      service.ports?.internalApi ||
-      service.ports?.externalApi ||
-      service.ports?.web ||
-      service.ports?.http ||
-      service.ports?.api;
-    if (!webPort) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          message: 'Service does not have an internalApi/externalApi/web/http/api port',
-        },
-      });
-    }
-
-    // Determine which address to use (prefer internal for server-to-server communication)
-    const address = service.internalAddress || service.externalAddress;
-    const healthUrl = `http://${address}:${webPort}/health`;
-
-    logger.info(`Health checking service: ${type}:${instanceId} at ${healthUrl}`);
-
-    // Make HTTP request to the service's health endpoint
-    const axios = (await import('axios')).default;
-    const startTime = Date.now();
-
+router.post(
+  '/:type/:instanceId/health',
+  async (req: Request, res: Response) => {
     try {
-      const response = await axios.get(healthUrl, {
-        timeout: 5000, // 5 second timeout
-      });
-      const latency = Date.now() - startTime;
+      const { type, instanceId } = req.params;
 
-      res.json({
-        success: true,
-        data: {
-          healthy: true,
-          status: response.status,
-          latency,
-          response: response.data,
-          url: healthUrl,
-        },
-      });
-    } catch (healthError: any) {
-      const latency = Date.now() - startTime;
-      const status = healthError.response?.status || 0;
-      const message =
-        healthError.code === 'ECONNREFUSED'
-          ? 'Connection refused'
-          : healthError.code === 'ETIMEDOUT' || healthError.code === 'ECONNABORTED'
-            ? 'Connection timeout'
-            : healthError.message || 'Unknown error';
+      if (!type || !instanceId) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'type and instanceId are required' },
+        });
+      }
 
-      res.json({
-        success: true,
-        data: {
-          healthy: false,
-          status,
-          latency,
-          error: message,
-          url: healthUrl,
-        },
+      // Get the service instance to find its web port and address
+      const services = await serviceDiscoveryService.getServices(type);
+      const service = services.find((s) => s.instanceId === instanceId);
+
+      if (!service) {
+        return res.status(404).json({
+          success: false,
+          error: { message: 'Service not found' },
+        });
+      }
+
+      // Check if service has an API port (internalApi, externalApi, or legacy web/http/api)
+      const webPort =
+        service.ports?.internalApi ||
+        service.ports?.externalApi ||
+        service.ports?.web ||
+        service.ports?.http ||
+        service.ports?.api;
+      if (!webPort) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            message:
+              'Service does not have an internalApi/externalApi/web/http/api port',
+          },
+        });
+      }
+
+      // Determine which address to use (prefer internal for server-to-server communication)
+      const address = service.internalAddress || service.externalAddress;
+      const healthUrl = `http://${address}:${webPort}/health`;
+
+      logger.info(
+        `Health checking service: ${type}:${instanceId} at ${healthUrl}`
+      );
+
+      // Make HTTP request to the service's health endpoint
+      const axios = (await import('axios')).default;
+      const startTime = Date.now();
+
+      try {
+        const response = await axios.get(healthUrl, {
+          timeout: 5000, // 5 second timeout
+        });
+        const latency = Date.now() - startTime;
+
+        res.json({
+          success: true,
+          data: {
+            healthy: true,
+            status: response.status,
+            latency,
+            response: response.data,
+            url: healthUrl,
+          },
+        });
+      } catch (healthError: any) {
+        const latency = Date.now() - startTime;
+        const status = healthError.response?.status || 0;
+        const message =
+          healthError.code === 'ECONNREFUSED'
+            ? 'Connection refused'
+            : healthError.code === 'ETIMEDOUT' ||
+                healthError.code === 'ECONNABORTED'
+              ? 'Connection timeout'
+              : healthError.message || 'Unknown error';
+
+        res.json({
+          success: true,
+          data: {
+            healthy: false,
+            status,
+            latency,
+            error: message,
+            url: healthUrl,
+          },
+        });
+      }
+    } catch (error) {
+      logger.error('Error during health check:', error);
+      res.status(500).json({
+        success: false,
+        error: { message: 'Failed to perform health check' },
       });
     }
-  } catch (error) {
-    logger.error('Error during health check:', error);
-    res.status(500).json({
-      success: false,
-      error: { message: 'Failed to perform health check' },
-    });
   }
-});
+);
 
 /**
  * Get cache summary from a service instance
  * GET /api/v1/admin/services/:type/:instanceId/cache/summary
  * Proxies request to the service's /internal/cache/summary endpoint
  */
-router.get('/:type/:instanceId/cache/summary', async (req: Request, res: Response) => {
-  try {
-    const { type, instanceId } = req.params;
-
-    if (!type || !instanceId) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'type and instanceId are required' },
-      });
-    }
-
-    // Get the service instance to find its web port and address
-    const services = await serviceDiscoveryService.getServices(type);
-    const service = services.find((s) => s.instanceId === instanceId);
-
-    if (!service) {
-      return res.status(404).json({
-        success: false,
-        error: { message: 'Service not found' },
-      });
-    }
-
-    // Check if service has an API port
-    const webPort =
-      service.ports?.internalApi ||
-      service.ports?.externalApi ||
-      service.ports?.web ||
-      service.ports?.http ||
-      service.ports?.api;
-    if (!webPort) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'Service does not have an API port' },
-      });
-    }
-
-    // Determine which address to use
-    const address = service.internalAddress || service.externalAddress;
-    const cacheUrl = `http://${address}:${webPort}/internal/cache/summary`;
-
-    logger.info(`Fetching cache summary from: ${type}:${instanceId} at ${cacheUrl}`);
-
-    const axios = (await import('axios')).default;
-    const startTime = Date.now();
-
+router.get(
+  '/:type/:instanceId/cache/summary',
+  async (req: Request, res: Response) => {
     try {
-      const response = await axios.get(cacheUrl, {
-        timeout: 5000,
-      });
-      const latency = Date.now() - startTime;
+      const { type, instanceId } = req.params;
 
-      res.json({
-        success: true,
-        data: {
-          ...response.data,
-          latency,
-          url: cacheUrl,
-        },
-      });
-    } catch (cacheError: any) {
-      const latency = Date.now() - startTime;
-      const status = cacheError.response?.status || 0;
-      const message =
-        cacheError.code === 'ECONNREFUSED'
-          ? 'Connection refused'
-          : cacheError.code === 'ETIMEDOUT' || cacheError.code === 'ECONNABORTED'
-            ? 'Connection timeout'
-            : cacheError.message || 'Unknown error';
+      if (!type || !instanceId) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'type and instanceId are required' },
+        });
+      }
 
-      res.json({
-        success: true,
-        data: {
-          status: 'error',
-          error: message,
-          httpStatus: status,
-          latency,
-          url: cacheUrl,
-        },
+      // Get the service instance to find its web port and address
+      const services = await serviceDiscoveryService.getServices(type);
+      const service = services.find((s) => s.instanceId === instanceId);
+
+      if (!service) {
+        return res.status(404).json({
+          success: false,
+          error: { message: 'Service not found' },
+        });
+      }
+
+      // Check if service has an API port
+      const webPort =
+        service.ports?.internalApi ||
+        service.ports?.externalApi ||
+        service.ports?.web ||
+        service.ports?.http ||
+        service.ports?.api;
+      if (!webPort) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'Service does not have an API port' },
+        });
+      }
+
+      // Determine which address to use
+      const address = service.internalAddress || service.externalAddress;
+      const cacheUrl = `http://${address}:${webPort}/internal/cache/summary`;
+
+      logger.info(
+        `Fetching cache summary from: ${type}:${instanceId} at ${cacheUrl}`
+      );
+
+      const axios = (await import('axios')).default;
+      const startTime = Date.now();
+
+      try {
+        const response = await axios.get(cacheUrl, {
+          timeout: 5000,
+        });
+        const latency = Date.now() - startTime;
+
+        res.json({
+          success: true,
+          data: {
+            ...response.data,
+            latency,
+            url: cacheUrl,
+          },
+        });
+      } catch (cacheError: any) {
+        const latency = Date.now() - startTime;
+        const status = cacheError.response?.status || 0;
+        const message =
+          cacheError.code === 'ECONNREFUSED'
+            ? 'Connection refused'
+            : cacheError.code === 'ETIMEDOUT' ||
+                cacheError.code === 'ECONNABORTED'
+              ? 'Connection timeout'
+              : cacheError.message || 'Unknown error';
+
+        res.json({
+          success: true,
+          data: {
+            status: 'error',
+            error: message,
+            httpStatus: status,
+            latency,
+            url: cacheUrl,
+          },
+        });
+      }
+    } catch (error) {
+      logger.error('Error fetching cache summary:', error);
+      res.status(500).json({
+        success: false,
+        error: { message: 'Failed to fetch cache summary' },
       });
     }
-  } catch (error) {
-    logger.error('Error fetching cache summary:', error);
-    res.status(500).json({
-      success: false,
-      error: { message: 'Failed to fetch cache summary' },
-    });
   }
-});
+);
 
 /**
  * Get cache status from a service instance
@@ -452,7 +474,9 @@ router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
     const address = service.internalAddress || service.externalAddress;
     const cacheUrl = `http://${address}:${webPort}/internal/cache`;
 
-    logger.info(`Fetching cache status from: ${type}:${instanceId} at ${cacheUrl}`);
+    logger.info(
+      `Fetching cache status from: ${type}:${instanceId} at ${cacheUrl}`
+    );
 
     const axios = (await import('axios')).default;
     const startTime = Date.now();
@@ -477,7 +501,8 @@ router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
       const message =
         cacheError.code === 'ECONNREFUSED'
           ? 'Connection refused'
-          : cacheError.code === 'ETIMEDOUT' || cacheError.code === 'ECONNABORTED'
+          : cacheError.code === 'ETIMEDOUT' ||
+              cacheError.code === 'ECONNABORTED'
             ? 'Connection timeout'
             : cacheError.message || 'Unknown error';
 
@@ -506,202 +531,216 @@ router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
  * GET /api/v1/admin/services/:type/:instanceId/stats/requests
  * Proxies request to the service's /internal/stats/requests endpoint
  */
-router.get('/:type/:instanceId/stats/requests', async (req: Request, res: Response) => {
-  try {
-    const { type, instanceId } = req.params;
-
-    if (!type || !instanceId) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'type and instanceId are required' },
-      });
-    }
-
-    const services = await serviceDiscoveryService.getServices(type);
-    const service = services.find((s) => s.instanceId === instanceId);
-
-    if (!service) {
-      return res.status(404).json({
-        success: false,
-        error: { message: 'Service not found' },
-      });
-    }
-
-    const webPort =
-      service.ports?.internalApi ||
-      service.ports?.externalApi ||
-      service.ports?.web ||
-      service.ports?.http ||
-      service.ports?.api;
-    if (!webPort) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'Service does not have an API port' },
-      });
-    }
-
-    const address = service.internalAddress || service.externalAddress;
-    const statsUrl = `http://${address}:${webPort}/internal/stats/requests`;
-
-    const axios = (await import('axios')).default;
-    const startTime = Date.now();
-
+router.get(
+  '/:type/:instanceId/stats/requests',
+  async (req: Request, res: Response) => {
     try {
-      const response = await axios.get(statsUrl, { timeout: 5000 });
-      const latency = Date.now() - startTime;
+      const { type, instanceId } = req.params;
 
-      res.json({
-        success: true,
-        ...response.data,
-        latency,
-      });
-    } catch (statsError: any) {
-      const latency = Date.now() - startTime;
-      const message =
-        statsError.code === 'ECONNREFUSED'
-          ? 'Connection refused'
-          : statsError.code === 'ETIMEDOUT' || statsError.code === 'ECONNABORTED'
-            ? 'Connection timeout'
-            : statsError.message || 'Unknown error';
+      if (!type || !instanceId) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'type and instanceId are required' },
+        });
+      }
 
-      res.json({
+      const services = await serviceDiscoveryService.getServices(type);
+      const service = services.find((s) => s.instanceId === instanceId);
+
+      if (!service) {
+        return res.status(404).json({
+          success: false,
+          error: { message: 'Service not found' },
+        });
+      }
+
+      const webPort =
+        service.ports?.internalApi ||
+        service.ports?.externalApi ||
+        service.ports?.web ||
+        service.ports?.http ||
+        service.ports?.api;
+      if (!webPort) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'Service does not have an API port' },
+        });
+      }
+
+      const address = service.internalAddress || service.externalAddress;
+      const statsUrl = `http://${address}:${webPort}/internal/stats/requests`;
+
+      const axios = (await import('axios')).default;
+      const startTime = Date.now();
+
+      try {
+        const response = await axios.get(statsUrl, { timeout: 5000 });
+        const latency = Date.now() - startTime;
+
+        res.json({
+          success: true,
+          ...response.data,
+          latency,
+        });
+      } catch (statsError: any) {
+        const latency = Date.now() - startTime;
+        const message =
+          statsError.code === 'ECONNREFUSED'
+            ? 'Connection refused'
+            : statsError.code === 'ETIMEDOUT' ||
+                statsError.code === 'ECONNABORTED'
+              ? 'Connection timeout'
+              : statsError.message || 'Unknown error';
+
+        res.json({
+          success: false,
+          error: message,
+          latency,
+        });
+      }
+    } catch (error) {
+      logger.error('Error fetching request stats:', error);
+      res.status(500).json({
         success: false,
-        error: message,
-        latency,
+        error: { message: 'Failed to fetch request stats' },
       });
     }
-  } catch (error) {
-    logger.error('Error fetching request stats:', error);
-    res.status(500).json({
-      success: false,
-      error: { message: 'Failed to fetch request stats' },
-    });
   }
-});
+);
 
 /**
  * Reset request statistics on a service instance
  * POST /api/v1/admin/services/:type/:instanceId/stats/requests/reset
  */
-router.post('/:type/:instanceId/stats/requests/reset', async (req: Request, res: Response) => {
-  try {
-    const { type, instanceId } = req.params;
+router.post(
+  '/:type/:instanceId/stats/requests/reset',
+  async (req: Request, res: Response) => {
+    try {
+      const { type, instanceId } = req.params;
 
-    if (!type || !instanceId) {
-      return res.status(400).json({
+      if (!type || !instanceId) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'type and instanceId are required' },
+        });
+      }
+
+      const services = await serviceDiscoveryService.getServices(type);
+      const service = services.find((s) => s.instanceId === instanceId);
+
+      if (!service) {
+        return res.status(404).json({
+          success: false,
+          error: { message: 'Service not found' },
+        });
+      }
+
+      const webPort =
+        service.ports?.internalApi ||
+        service.ports?.externalApi ||
+        service.ports?.web ||
+        service.ports?.http ||
+        service.ports?.api;
+      if (!webPort) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'Service does not have an API port' },
+        });
+      }
+
+      const address = service.internalAddress || service.externalAddress;
+      const resetUrl = `http://${address}:${webPort}/internal/stats/requests/reset`;
+
+      const axios = (await import('axios')).default;
+      const response = await axios.post(resetUrl, {}, { timeout: 5000 });
+
+      res.json(response.data);
+    } catch (error: any) {
+      logger.error('Error resetting request stats:', error);
+      const message =
+        error.code === 'ECONNREFUSED'
+          ? 'Connection refused'
+          : error.message || 'Failed to reset request stats';
+      res.status(500).json({
         success: false,
-        error: { message: 'type and instanceId are required' },
+        error: { message },
       });
     }
-
-    const services = await serviceDiscoveryService.getServices(type);
-    const service = services.find((s) => s.instanceId === instanceId);
-
-    if (!service) {
-      return res.status(404).json({
-        success: false,
-        error: { message: 'Service not found' },
-      });
-    }
-
-    const webPort =
-      service.ports?.internalApi ||
-      service.ports?.externalApi ||
-      service.ports?.web ||
-      service.ports?.http ||
-      service.ports?.api;
-    if (!webPort) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'Service does not have an API port' },
-      });
-    }
-
-    const address = service.internalAddress || service.externalAddress;
-    const resetUrl = `http://${address}:${webPort}/internal/stats/requests/reset`;
-
-    const axios = (await import('axios')).default;
-    const response = await axios.post(resetUrl, {}, { timeout: 5000 });
-
-    res.json(response.data);
-  } catch (error: any) {
-    logger.error('Error resetting request stats:', error);
-    const message =
-      error.code === 'ECONNREFUSED'
-        ? 'Connection refused'
-        : error.message || 'Failed to reset request stats';
-    res.status(500).json({
-      success: false,
-      error: { message },
-    });
   }
-});
+);
 
 /**
  * Set request log rate limit on a service instance
  * POST /api/v1/admin/services/:type/:instanceId/stats/rate-limit
  */
-router.post('/:type/:instanceId/stats/rate-limit', async (req: Request, res: Response) => {
-  try {
-    const { type, instanceId } = req.params;
-    const { limit } = req.body;
+router.post(
+  '/:type/:instanceId/stats/rate-limit',
+  async (req: Request, res: Response) => {
+    try {
+      const { type, instanceId } = req.params;
+      const { limit } = req.body;
 
-    if (!type || !instanceId) {
-      return res.status(400).json({
+      if (!type || !instanceId) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'type and instanceId are required' },
+        });
+      }
+
+      if (typeof limit !== 'number' || limit < 0) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'limit must be a non-negative number' },
+        });
+      }
+
+      const services = await serviceDiscoveryService.getServices(type);
+      const service = services.find((s) => s.instanceId === instanceId);
+
+      if (!service) {
+        return res.status(404).json({
+          success: false,
+          error: { message: 'Service not found' },
+        });
+      }
+
+      const webPort =
+        service.ports?.internalApi ||
+        service.ports?.externalApi ||
+        service.ports?.web ||
+        service.ports?.http ||
+        service.ports?.api;
+      if (!webPort) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'Service does not have an API port' },
+        });
+      }
+
+      const address = service.internalAddress || service.externalAddress;
+      const rateLimitUrl = `http://${address}:${webPort}/internal/stats/rate-limit`;
+
+      const axios = (await import('axios')).default;
+      const response = await axios.post(
+        rateLimitUrl,
+        { limit },
+        { timeout: 5000 }
+      );
+
+      res.json(response.data);
+    } catch (error: any) {
+      logger.error('Error setting rate limit:', error);
+      const message =
+        error.code === 'ECONNREFUSED'
+          ? 'Connection refused'
+          : error.message || 'Failed to set rate limit';
+      res.status(500).json({
         success: false,
-        error: { message: 'type and instanceId are required' },
+        error: { message },
       });
     }
-
-    if (typeof limit !== 'number' || limit < 0) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'limit must be a non-negative number' },
-      });
-    }
-
-    const services = await serviceDiscoveryService.getServices(type);
-    const service = services.find((s) => s.instanceId === instanceId);
-
-    if (!service) {
-      return res.status(404).json({
-        success: false,
-        error: { message: 'Service not found' },
-      });
-    }
-
-    const webPort =
-      service.ports?.internalApi ||
-      service.ports?.externalApi ||
-      service.ports?.web ||
-      service.ports?.http ||
-      service.ports?.api;
-    if (!webPort) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'Service does not have an API port' },
-      });
-    }
-
-    const address = service.internalAddress || service.externalAddress;
-    const rateLimitUrl = `http://${address}:${webPort}/internal/stats/rate-limit`;
-
-    const axios = (await import('axios')).default;
-    const response = await axios.post(rateLimitUrl, { limit }, { timeout: 5000 });
-
-    res.json(response.data);
-  } catch (error: any) {
-    logger.error('Error setting rate limit:', error);
-    const message =
-      error.code === 'ECONNREFUSED'
-        ? 'Connection refused'
-        : error.message || 'Failed to set rate limit';
-    res.status(500).json({
-      success: false,
-      error: { message },
-    });
   }
-});
+);
 
 /**
  * Delete a service instance

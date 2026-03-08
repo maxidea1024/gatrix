@@ -15,7 +15,9 @@ const MatrixBackground: React.FC = () => {
 
     const fontSize = 20;
     let columns = Math.floor(window.innerWidth / fontSize);
-    let drops: number[] = new Array(columns).fill(1).map(() => Math.floor(Math.random() * -100));
+    let drops: number[] = new Array(columns)
+      .fill(1)
+      .map(() => Math.floor(Math.random() * -100));
 
     // Set higher resolution for crisp text
     const updateSize = () => {
@@ -26,7 +28,9 @@ const MatrixBackground: React.FC = () => {
       if (newColumns !== columns) {
         const newDrops = new Array(newColumns)
           .fill(0)
-          .map((_, i) => (i < drops.length ? drops[i] : Math.floor(Math.random() * -100)));
+          .map((_, i) =>
+            i < drops.length ? drops[i] : Math.floor(Math.random() * -100)
+          );
         columns = newColumns;
         drops = newDrops;
       }
@@ -116,7 +120,8 @@ const MatrixBackground: React.FC = () => {
           left: 0,
           width: '100vw',
           height: '100vh',
-          background: 'radial-gradient(circle at center, transparent 10%, rgba(0,0,0,0.85) 100%)',
+          background:
+            'radial-gradient(circle at center, transparent 10%, rgba(0,0,0,0.85) 100%)',
           pointerEvents: 'none',
         }}
       />

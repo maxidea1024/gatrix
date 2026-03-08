@@ -32,7 +32,11 @@ class ApiTokensController {
           'creator.name as creatorName',
           'creator.email as creatorEmail'
         )
-        .leftJoin('g_users as creator', 'g_api_access_tokens.createdBy', 'creator.id');
+        .leftJoin(
+          'g_users as creator',
+          'g_api_access_tokens.createdBy',
+          'creator.id'
+        );
 
       if (tokenType) {
         query = query.where('tokenType', tokenType);
@@ -78,14 +82,18 @@ class ApiTokensController {
       const finalSortBy = validSortFields.includes(sortBy as string)
         ? (sortBy as string)
         : 'createdAt';
-      const finalSortOrder = validSortOrders.includes((sortOrder as string)?.toLowerCase())
+      const finalSortOrder = validSortOrders.includes(
+        (sortOrder as string)?.toLowerCase()
+      )
         ? (sortOrder as string).toLowerCase()
         : 'desc';
 
       // Get tokens with pagination and sorting
       const tokens = await query
         .orderBy(
-          finalSortBy === 'creatorName' ? 'creator.name' : `g_api_access_tokens.${finalSortBy}`,
+          finalSortBy === 'creatorName'
+            ? 'creator.name'
+            : `g_api_access_tokens.${finalSortBy}`,
           finalSortOrder
         )
         .limit(Number(limit))
@@ -150,7 +158,8 @@ class ApiTokensController {
         });
       }
 
-      const { tokenName, description, tokenType, expiresAt, environmentId } = req.body;
+      const { tokenName, description, tokenType, expiresAt, environmentId } =
+        req.body;
       const projectId = (req as any).projectId;
       const userId = (req as any).user.id;
 
@@ -233,7 +242,9 @@ class ApiTokensController {
       const userId = (req as any).user.id;
 
       // Check if token exists
-      const existingToken = await knex('g_api_access_tokens').where('id', id).first();
+      const existingToken = await knex('g_api_access_tokens')
+        .where('id', id)
+        .first();
       if (!existingToken) {
         return res.status(404).json({
           success: false,
@@ -251,8 +262,10 @@ class ApiTokensController {
 
         if (tokenName !== undefined) updateData.tokenName = tokenName;
         if (description !== undefined) updateData.description = description;
-        if (expiresAt !== undefined) updateData.expiresAt = expiresAt ? new Date(expiresAt) : null;
-        if (environmentId !== undefined) updateData.environmentId = environmentId;
+        if (expiresAt !== undefined)
+          updateData.expiresAt = expiresAt ? new Date(expiresAt) : null;
+        if (environmentId !== undefined)
+          updateData.environmentId = environmentId;
 
         // Update token
         await trx('g_api_access_tokens').where('id', id).update(updateData);
@@ -265,7 +278,11 @@ class ApiTokensController {
           'creator.name as creatorName',
           'creator.email as creatorEmail'
         )
-        .leftJoin('g_users as creator', 'g_api_access_tokens.createdBy', 'creator.id')
+        .leftJoin(
+          'g_users as creator',
+          'g_api_access_tokens.createdBy',
+          'creator.id'
+        )
         .where('g_api_access_tokens.id', id)
         .first();
 
@@ -275,7 +292,9 @@ class ApiTokensController {
         maskedTokenValue:
           updatedToken.tokenValue?.substring(0, 4) +
           '••••••••' +
-          updatedToken.tokenValue?.substring(updatedToken.tokenValue.length - 4),
+          updatedToken.tokenValue?.substring(
+            updatedToken.tokenValue.length - 4
+          ),
         environmentId: updatedToken.environmentId || null,
         creator: {
           name: updatedToken.creatorName || 'Unknown',
@@ -288,7 +307,9 @@ class ApiTokensController {
       if (existingToken.tokenValue) {
         const tokenPrefix = existingToken.tokenValue.substring(0, 16);
         await pubSubService.invalidateByPattern(`api_token:${tokenPrefix}.*`);
-        await pubSubService.invalidateByPattern(`server_api_token:${tokenPrefix}.*`);
+        await pubSubService.invalidateByPattern(
+          `server_api_token:${tokenPrefix}.*`
+        );
       }
 
       // Publish token updated event for Edge mirroring
@@ -335,7 +356,9 @@ class ApiTokensController {
       const userId = (req as any).user.id;
 
       // Check if token exists
-      const existingToken = await knex('g_api_access_tokens').where('id', id).first();
+      const existingToken = await knex('g_api_access_tokens')
+        .where('id', id)
+        .first();
       if (!existingToken) {
         return res.status(404).json({
           success: false,
@@ -356,8 +379,12 @@ class ApiTokensController {
       // Invalidate OLD token cache (the old tokenValue is no longer valid)
       if (existingToken.tokenValue) {
         const oldTokenPrefix = existingToken.tokenValue.substring(0, 16);
-        await pubSubService.invalidateByPattern(`api_token:${oldTokenPrefix}.*`);
-        await pubSubService.invalidateByPattern(`server_api_token:${oldTokenPrefix}.*`);
+        await pubSubService.invalidateByPattern(
+          `api_token:${oldTokenPrefix}.*`
+        );
+        await pubSubService.invalidateByPattern(
+          `server_api_token:${oldTokenPrefix}.*`
+        );
       }
 
       // Publish token updated event for Edge mirroring (regenerate = token value changed)
@@ -375,7 +402,10 @@ class ApiTokensController {
           { environmentId: existingToken.environmentId || undefined }
         );
       } catch (eventError) {
-        logger.warn('Failed to publish api_token.updated event for regenerate', { eventError });
+        logger.warn(
+          'Failed to publish api_token.updated event for regenerate',
+          { eventError }
+        );
       }
 
       // Return the new token with the actual token value (only shown once)
@@ -407,7 +437,9 @@ class ApiTokensController {
       const { id } = req.params;
 
       // Check if token exists
-      const existingToken = await knex('g_api_access_tokens').where('id', id).first();
+      const existingToken = await knex('g_api_access_tokens')
+        .where('id', id)
+        .first();
 
       if (!existingToken) {
         return res.status(404).json({
@@ -420,7 +452,9 @@ class ApiTokensController {
       if (existingToken.tokenValue) {
         const tokenPrefix = existingToken.tokenValue.substring(0, 16);
         await pubSubService.invalidateByPattern(`api_token:${tokenPrefix}.*`);
-        await pubSubService.invalidateByPattern(`server_api_token:${tokenPrefix}.*`);
+        await pubSubService.invalidateByPattern(
+          `server_api_token:${tokenPrefix}.*`
+        );
       }
 
       // Delete token (no junction table needed)
@@ -486,7 +520,11 @@ class ApiTokensController {
 
       // Get recently used tokens (last 7 days)
       const [{ count: recentlyUsed }] = await baseQuery()
-        .where('lastUsedAt', '>=', knex.raw('DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)'))
+        .where(
+          'lastUsedAt',
+          '>=',
+          knex.raw('DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)')
+        )
         .count('* as count');
 
       res.json({

@@ -38,10 +38,19 @@ export class OptimizedMetricsService {
 
       // 필터가 없으면 Materialized View 사용 (10-100배 빠름)
       if (!filters || filters.length === 0) {
-        metrics = await this.getMetricsFromMaterializedView(projectId, startDate, endDate);
+        metrics = await this.getMetricsFromMaterializedView(
+          projectId,
+          startDate,
+          endDate
+        );
       } else {
         // 필터가 있으면 원본 테이블 쿼리
-        metrics = await this.getMetricsWithFilters(projectId, startDate, endDate, filters);
+        metrics = await this.getMetricsWithFilters(
+          projectId,
+          startDate,
+          endDate,
+          filters
+        );
       }
 
       // 캐시 저장
@@ -88,7 +97,9 @@ export class OptimizedMetricsService {
 
     const bounceRate =
       row.totalSessions > 0
-        ? parseFloat(((row.totalScreenViews / row.totalSessions) * 100).toFixed(2))
+        ? parseFloat(
+            ((row.totalScreenViews / row.totalSessions) * 100).toFixed(2)
+          )
         : 0;
 
     return {
@@ -136,7 +147,9 @@ export class OptimizedMetricsService {
 
     const bounceRate =
       row.totalSessions > 0
-        ? parseFloat(((row.totalScreenViews / row.totalSessions) * 100).toFixed(2))
+        ? parseFloat(
+            ((row.totalScreenViews / row.totalSessions) * 100).toFixed(2)
+          )
         : 0;
 
     return {

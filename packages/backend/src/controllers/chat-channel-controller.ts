@@ -27,7 +27,10 @@ export class ChatChannelController {
       }
 
       // Chat Server에서 Used자 채널 Get list
-      const response = await ChatChannelController.chatServerService.getUserChannels(user.userId);
+      const response =
+        await ChatChannelController.chatServerService.getUserChannels(
+          user.userId
+        );
 
       res.json({
         success: true,
@@ -80,12 +83,15 @@ export class ChatChannelController {
         maxMembers: 1000,
       };
 
-      logger.info('✅ Channel created successfully (temporary implementation):', {
-        channelId: channel.id,
-        name: channel.name,
-        type: channel.type,
-        createdBy: user.userId,
-      });
+      logger.info(
+        '✅ Channel created successfully (temporary implementation):',
+        {
+          channelId: channel.id,
+          name: channel.name,
+          type: channel.type,
+          createdBy: user.userId,
+        }
+      );
 
       res.status(201).json({
         success: true,
@@ -117,7 +123,9 @@ export class ChatChannelController {
       const { channelId } = req.params;
 
       // Chat Server에서 채널 정보 조회
-      const channel = await ChatChannelController.chatServerService.getChannel(parseInt(channelId));
+      const channel = await ChatChannelController.chatServerService.getChannel(
+        parseInt(channelId)
+      );
 
       if (!channel) {
         res.status(404).json({
@@ -158,13 +166,14 @@ export class ChatChannelController {
       const { page = 1, limit = 50 } = req.query;
 
       // Chat Server에서 채널 메시지 조회
-      const messages = await ChatChannelController.chatServerService.getChannelMessages(
-        parseInt(channelId),
-        {
-          page: parseInt(page as string),
-          limit: parseInt(limit as string),
-        }
-      );
+      const messages =
+        await ChatChannelController.chatServerService.getChannelMessages(
+          parseInt(channelId),
+          {
+            page: parseInt(page as string),
+            limit: parseInt(limit as string),
+          }
+        );
 
       res.json({
         success: true,

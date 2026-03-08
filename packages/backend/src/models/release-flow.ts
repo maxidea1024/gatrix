@@ -9,7 +9,12 @@ import { parseJsonField } from '../utils/db-utils';
 // ==================== Types ====================
 
 export type FlowDiscriminator = 'template' | 'plan';
-export type FlowStatus = 'draft' | 'pending' | 'active' | 'paused' | 'completed';
+export type FlowStatus =
+  | 'draft'
+  | 'pending'
+  | 'active'
+  | 'paused'
+  | 'completed';
 
 export interface TransitionCondition {
   intervalMinutes: number;
@@ -71,7 +76,9 @@ export interface ReleaseFlowStrategyAttributes {
 // ==================== Release Flow Model ====================
 
 export class ReleaseFlowModel {
-  static async listTemplates(search?: string): Promise<ReleaseFlowAttributes[]> {
+  static async listTemplates(
+    search?: string
+  ): Promise<ReleaseFlowAttributes[]> {
     try {
       let query = db('g_release_flows')
         .select('g_release_flows.*')
@@ -192,7 +199,10 @@ export class ReleaseFlowModel {
   }
 
   static async create(
-    data: Omit<ReleaseFlowAttributes, 'id' | 'createdAt' | 'updatedAt' | 'milestones'>
+    data: Omit<
+      ReleaseFlowAttributes,
+      'id' | 'createdAt' | 'updatedAt' | 'milestones'
+    >
   ): Promise<ReleaseFlowAttributes> {
     try {
       const id = ulid();
@@ -225,13 +235,17 @@ export class ReleaseFlowModel {
     try {
       const updateData: any = { updatedAt: new Date() };
 
-      if (data.displayName !== undefined) updateData.displayName = data.displayName;
-      if (data.description !== undefined) updateData.description = data.description;
+      if (data.displayName !== undefined)
+        updateData.displayName = data.displayName;
+      if (data.description !== undefined)
+        updateData.description = data.description;
       if (data.activeMilestoneId !== undefined)
         updateData.activeMilestoneId = data.activeMilestoneId;
       if (data.status !== undefined) updateData.status = data.status;
-      if (data.isArchived !== undefined) updateData.isArchived = data.isArchived;
-      if (data.archivedAt !== undefined) updateData.archivedAt = data.archivedAt;
+      if (data.isArchived !== undefined)
+        updateData.isArchived = data.isArchived;
+      if (data.archivedAt !== undefined)
+        updateData.archivedAt = data.archivedAt;
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       await db('g_release_flows').where('id', id).update(updateData);
@@ -255,7 +269,9 @@ export class ReleaseFlowModel {
 // ==================== Release Flow Milestone Model ====================
 
 export class ReleaseFlowMilestoneModel {
-  static async findByFlowId(flowId: string): Promise<ReleaseFlowMilestoneAttributes[]> {
+  static async findByFlowId(
+    flowId: string
+  ): Promise<ReleaseFlowMilestoneAttributes[]> {
     try {
       const milestones = await db('g_release_flow_milestones')
         .where('flowId', flowId)
@@ -263,10 +279,14 @@ export class ReleaseFlowMilestoneModel {
 
       const result = [];
       for (const m of milestones) {
-        const strategies = await ReleaseFlowStrategyModel.findByMilestoneId(m.id);
+        const strategies = await ReleaseFlowStrategyModel.findByMilestoneId(
+          m.id
+        );
         result.push({
           ...m,
-          transitionCondition: parseJsonField<TransitionCondition>(m.transitionCondition),
+          transitionCondition: parseJsonField<TransitionCondition>(
+            m.transitionCondition
+          ),
           strategies,
         });
       }
@@ -277,9 +297,13 @@ export class ReleaseFlowMilestoneModel {
     }
   }
 
-  static async findById(id: string): Promise<ReleaseFlowMilestoneAttributes | null> {
+  static async findById(
+    id: string
+  ): Promise<ReleaseFlowMilestoneAttributes | null> {
     try {
-      const milestone = await db('g_release_flow_milestones').where('id', id).first();
+      const milestone = await db('g_release_flow_milestones')
+        .where('id', id)
+        .first();
       if (!milestone) return null;
 
       const strategies = await ReleaseFlowStrategyModel.findByMilestoneId(id);
@@ -294,7 +318,10 @@ export class ReleaseFlowMilestoneModel {
   }
 
   static async create(
-    data: Omit<ReleaseFlowMilestoneAttributes, 'id' | 'createdAt' | 'updatedAt' | 'strategies'>
+    data: Omit<
+      ReleaseFlowMilestoneAttributes,
+      'id' | 'createdAt' | 'updatedAt' | 'strategies'
+    >
   ): Promise<ReleaseFlowMilestoneAttributes> {
     try {
       const id = ulid();
@@ -374,7 +401,9 @@ export class ReleaseFlowMilestoneModel {
 
       return rows.map((row: any) => ({
         ...row,
-        transitionCondition: parseJsonField<TransitionCondition>(row.transitionCondition),
+        transitionCondition: parseJsonField<TransitionCondition>(
+          row.transitionCondition
+        ),
       }));
     } catch (error) {
       logger.error('Error finding active plans with transitions:', error);
@@ -386,7 +415,9 @@ export class ReleaseFlowMilestoneModel {
 // ==================== Release Flow Strategy Model ====================
 
 export class ReleaseFlowStrategyModel {
-  static async findByMilestoneId(milestoneId: string): Promise<ReleaseFlowStrategyAttributes[]> {
+  static async findByMilestoneId(
+    milestoneId: string
+  ): Promise<ReleaseFlowStrategyAttributes[]> {
     try {
       const strategies = await db('g_release_flow_strategies')
         .where('milestoneId', milestoneId)
@@ -409,14 +440,18 @@ export class ReleaseFlowStrategyModel {
     }
   }
 
-  private static async getSegmentsForStrategy(strategyId: string): Promise<string[]> {
+  private static async getSegmentsForStrategy(
+    strategyId: string
+  ): Promise<string[]> {
     const segmentLinks = await db('g_release_flow_strategy_segments')
       .where('strategyId', strategyId)
       .select('segmentId');
 
     const segmentNames: string[] = [];
     for (const link of segmentLinks) {
-      const segment = await db('g_feature_segments').where('id', link.segmentId).first();
+      const segment = await db('g_feature_segments')
+        .where('id', link.segmentId)
+        .first();
       if (segment) {
         segmentNames.push(segment.segmentName);
       }
@@ -424,9 +459,13 @@ export class ReleaseFlowStrategyModel {
     return segmentNames;
   }
 
-  static async findById(id: string): Promise<ReleaseFlowStrategyAttributes | null> {
+  static async findById(
+    id: string
+  ): Promise<ReleaseFlowStrategyAttributes | null> {
     try {
-      const strategy = await db('g_release_flow_strategies').where('id', id).first();
+      const strategy = await db('g_release_flow_strategies')
+        .where('id', id)
+        .first();
       if (!strategy) return null;
 
       const segments = await this.getSegmentsForStrategy(id);
@@ -443,7 +482,10 @@ export class ReleaseFlowStrategyModel {
   }
 
   static async create(
-    data: Omit<ReleaseFlowStrategyAttributes, 'id' | 'createdAt' | 'updatedAt' | 'segments'>
+    data: Omit<
+      ReleaseFlowStrategyAttributes,
+      'id' | 'createdAt' | 'updatedAt' | 'segments'
+    >
   ): Promise<ReleaseFlowStrategyAttributes> {
     try {
       const id = ulid();
@@ -474,12 +516,20 @@ export class ReleaseFlowStrategyModel {
     }
   }
 
-  static async updateSegments(strategyId: string, segmentNames: string[]): Promise<void> {
+  static async updateSegments(
+    strategyId: string,
+    segmentNames: string[]
+  ): Promise<void> {
     // This requires looking up segment IDs from names
-    const segments = await db('g_feature_segments').whereIn('segmentName', segmentNames);
+    const segments = await db('g_feature_segments').whereIn(
+      'segmentName',
+      segmentNames
+    );
     const segmentIds = segments.map((s) => s.id);
 
-    await db('g_release_flow_strategy_segments').where('strategyId', strategyId).del();
+    await db('g_release_flow_strategy_segments')
+      .where('strategyId', strategyId)
+      .del();
     if (segmentIds.length > 0) {
       const links = segmentIds.map((segmentId) => ({
         id: ulid(),

@@ -151,7 +151,10 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   /**
    * Verify a token against stored value (plain text comparison)
    */
-  static async verifyToken(token: string, storedTokenValue: string): Promise<boolean> {
+  static async verifyToken(
+    token: string,
+    storedTokenValue: string
+  ): Promise<boolean> {
     return token === storedTokenValue;
   }
 
@@ -210,7 +213,8 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     // Cache-based usage tracking (async to avoid impacting API response speed)
     if (tokenRecord.id) {
       // Dynamic import to avoid circular references
-      const { default: apiTokenUsageService } = await import('../services/api-token-usage-service');
+      const { default: apiTokenUsageService } =
+        await import('../services/api-token-usage-service');
       apiTokenUsageService.recordTokenUsage(tokenRecord.id).catch((error) => {
         // Usage tracking failure should not block API requests, just log it
         const logger = require('../config/logger').default;
@@ -224,7 +228,9 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   /**
    * Get tokens for environment
    */
-  static async getForEnvironment(environmentId: string): Promise<ApiAccessToken[]> {
+  static async getForEnvironment(
+    environmentId: string
+  ): Promise<ApiAccessToken[]> {
     return await this.query()
       .where('environmentId', environmentId)
       .withGraphFetched('[creator(basicInfo), environment]')
@@ -292,7 +298,10 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     // This would typically come from metrics/logs
     // For now, return basic info
     const daysActive = this.createdAt
-      ? Math.floor((new Date().getTime() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24))
+      ? Math.floor(
+          (new Date().getTime() - this.createdAt.getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
       : 0;
 
     return {
@@ -306,7 +315,9 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
    * Clean up expired tokens
    */
   static async cleanupExpired(): Promise<number> {
-    const result = await this.query().where('expiresAt', '<', new Date()).delete();
+    const result = await this.query()
+      .where('expiresAt', '<', new Date())
+      .delete();
 
     return result;
   }

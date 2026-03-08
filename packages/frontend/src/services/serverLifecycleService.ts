@@ -45,17 +45,26 @@ class ServerLifecycleService {
       eventType?: string;
     }
   ): Promise<EventsResponse> {
-    const response = await api.get(`${projectApiPath}/server-lifecycle/events`, {
-      params,
-    });
+    const response = await api.get(
+      `${projectApiPath}/server-lifecycle/events`,
+      {
+        params,
+      }
+    );
     // api.get returns { success, data: { data: [...], total, page, limit } }
     return response.data as EventsResponse;
   }
 
-  async getSummary(projectApiPath: string, limit: number = 10): Promise<ServerLifecycleEvent[]> {
-    const response = await api.get(`${projectApiPath}/server-lifecycle/summary`, {
-      params: { limit },
-    });
+  async getSummary(
+    projectApiPath: string,
+    limit: number = 10
+  ): Promise<ServerLifecycleEvent[]> {
+    const response = await api.get(
+      `${projectApiPath}/server-lifecycle/summary`,
+      {
+        params: { limit },
+      }
+    );
     // api.get returns response.data (the body) which is { success, data: [...] }
     return response.data;
   }

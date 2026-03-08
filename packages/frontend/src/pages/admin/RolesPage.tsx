@@ -69,7 +69,9 @@ const RolesPage: React.FC = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 
   // Permission reference
-  const [availablePermissions, setAvailablePermissions] = useState<string[]>([]);
+  const [availablePermissions, setAvailablePermissions] = useState<string[]>(
+    []
+  );
   const [permissionCategories, setPermissionCategories] = useState<
     Record<string, { label: string; scope?: string; permissions: string[] }>
   >({});
@@ -78,7 +80,9 @@ const RolesPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<RoleWithDetails | null>(null);
+  const [selectedRole, setSelectedRole] = useState<RoleWithDetails | null>(
+    null
+  );
   const [saving, setSaving] = useState(false);
   const [permTabIndex, setPermTabIndex] = useState(0);
 
@@ -95,11 +99,18 @@ const RolesPage: React.FC = () => {
   const [initialPermissions, setInitialPermissions] = useState<string[]>([]);
 
   const [parentRoles, setParentRoles] = useState<RoleInheritance[]>([]);
-  const [initialParentRoleIds, setInitialParentRoleIds] = useState<string[]>([]);
-  const [pendingInheritanceAdds, setPendingInheritanceAdds] = useState<string[]>([]);
-  const [pendingInheritanceRemoves, setPendingInheritanceRemoves] = useState<string[]>([]);
+  const [initialParentRoleIds, setInitialParentRoleIds] = useState<string[]>(
+    []
+  );
+  const [pendingInheritanceAdds, setPendingInheritanceAdds] = useState<
+    string[]
+  >([]);
+  const [pendingInheritanceRemoves, setPendingInheritanceRemoves] = useState<
+    string[]
+  >([]);
   const [selectedParentRoleId, setSelectedParentRoleId] = useState<string>('');
-  const [effectivePerms, setEffectivePerms] = useState<EffectivePermissions | null>(null);
+  const [effectivePerms, setEffectivePerms] =
+    useState<EffectivePermissions | null>(null);
   const [effectivePermsLoading, setEffectivePermsLoading] = useState(false);
 
   // Menu state
@@ -119,7 +130,8 @@ const RolesPage: React.FC = () => {
   const handleCopyText = (text: string) => {
     copyToClipboardWithNotification(
       text,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -165,8 +177,12 @@ const RolesPage: React.FC = () => {
   const filteredRoles = debouncedSearchTerm
     ? roles.filter(
         (r) =>
-          r.roleName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-          (r.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+          r.roleName
+            .toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()) ||
+          (r.description || '')
+            .toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase())
       )
     : roles;
 
@@ -189,7 +205,10 @@ const RolesPage: React.FC = () => {
     try {
       const details = await rbacService.getRole(role.id);
       setDialogMode('edit');
-      const data = { roleName: details.roleName, description: details.description || '' };
+      const data = {
+        roleName: details.roleName,
+        description: details.description || '',
+      };
       setFormData(data);
       setInitialFormData(data);
       setFormPermissions(details.permissions);
@@ -287,9 +306,14 @@ const RolesPage: React.FC = () => {
         for (const parentId of pendingInheritanceRemoves) {
           try {
             // Find the inheritance record id
-            const record = parentRoles.find((pr) => pr.parentRoleId === parentId);
+            const record = parentRoles.find(
+              (pr) => pr.parentRoleId === parentId
+            );
             if (record) {
-              await rbacService.removeRoleInheritance(selectedRole.id, record.id);
+              await rbacService.removeRoleInheritance(
+                selectedRole.id,
+                record.id
+              );
             }
           } catch {
             /* ignore */
@@ -300,7 +324,8 @@ const RolesPage: React.FC = () => {
       setDialogOpen(false);
       loadRoles();
     } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.roles.saveFailed');
+      const message =
+        error?.response?.data?.message || t('rbac.roles.saveFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setSaving(false);
@@ -317,7 +342,8 @@ const RolesPage: React.FC = () => {
       setSelectedRole(null);
       loadRoles();
     } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.roles.deleteFailed');
+      const message =
+        error?.response?.data?.message || t('rbac.roles.deleteFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setSaving(false);
@@ -343,7 +369,11 @@ const RolesPage: React.FC = () => {
             {t('rbac.roles.description')}
           </Typography>
         </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateDialog}>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={openCreateDialog}
+        >
           {t('rbac.roles.create')}
         </Button>
       </Box>
@@ -373,7 +403,9 @@ const RolesPage: React.FC = () => {
                 <TableRow>
                   <TableCell>{t('rbac.roles.name')}</TableCell>
                   <TableCell>{t('rbac.roles.descriptionColumn')}</TableCell>
-                  <TableCell align="center">{t('rbac.roles.permissions')}</TableCell>
+                  <TableCell align="center">
+                    {t('rbac.roles.permissions')}
+                  </TableCell>
                   <TableCell align="center">{t('rbac.roles.users')}</TableCell>
                   <TableCell align="center">{t('rbac.roles.groups')}</TableCell>
                   <TableCell>{t('common.createdAt')}</TableCell>
@@ -384,13 +416,18 @@ const RolesPage: React.FC = () => {
                 {filteredRoles.map((role) => (
                   <TableRow key={role.id} hover>
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
                         <Typography
                           variant="body2"
                           sx={{
                             fontWeight: 500,
                             cursor: 'pointer',
-                            '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                            '&:hover': {
+                              color: 'primary.main',
+                              textDecoration: 'underline',
+                            },
                           }}
                           onClick={() => openEditDialog(role)}
                         >
@@ -436,7 +473,9 @@ const RolesPage: React.FC = () => {
                         label={(role as any).userCount ?? '-'}
                         size="small"
                         variant="outlined"
-                        color={(role as any).userCount > 0 ? 'primary' : 'default'}
+                        color={
+                          (role as any).userCount > 0 ? 'primary' : 'default'
+                        }
                         sx={{ borderRadius: '8px' }}
                       />
                     </TableCell>
@@ -446,7 +485,9 @@ const RolesPage: React.FC = () => {
                         label={(role as any).groupCount ?? '-'}
                         size="small"
                         variant="outlined"
-                        color={(role as any).groupCount > 0 ? 'primary' : 'default'}
+                        color={
+                          (role as any).groupCount > 0 ? 'primary' : 'default'
+                        }
                         sx={{ borderRadius: '8px' }}
                       />
                     </TableCell>
@@ -458,7 +499,10 @@ const RolesPage: React.FC = () => {
                       </Tooltip>
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton size="small" onClick={(e) => handleMenuOpen(e, role)}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => handleMenuOpen(e, role)}
+                      >
                         <MoreVertIcon fontSize="small" />
                       </IconButton>
                     </TableCell>
@@ -471,7 +515,11 @@ const RolesPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+      >
         <MenuItem
           onClick={() => {
             if (menuTarget) openEditDialog(menuTarget);
@@ -500,7 +548,11 @@ const RolesPage: React.FC = () => {
       <ResizableDrawer
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        title={dialogMode === 'create' ? t('rbac.roles.createTitle') : t('rbac.roles.editTitle')}
+        title={
+          dialogMode === 'create'
+            ? t('rbac.roles.createTitle')
+            : t('rbac.roles.editTitle')
+        }
         subtitle={
           dialogMode === 'create'
             ? t('rbac.roles.createDescription')
@@ -511,12 +563,21 @@ const RolesPage: React.FC = () => {
         minWidth={450}
       >
         <Box
-          sx={{ flex: 1, p: 3, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
+          sx={{
+            flex: 1,
+            p: 3,
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
         >
           <TextField
             label={t('rbac.roles.name')}
             value={formData.roleName}
-            onChange={(e) => setFormData({ ...formData, roleName: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, roleName: e.target.value })
+            }
             required
             fullWidth
             autoFocus
@@ -526,7 +587,9 @@ const RolesPage: React.FC = () => {
           <TextField
             label={t('rbac.roles.descriptionColumn')}
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
             fullWidth
             multiline
             rows={2}
@@ -553,7 +616,11 @@ const RolesPage: React.FC = () => {
                   ✦ {t('rbac.roles.wildcardPermission')}
                 </Typography>
               </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontSize: '0.8rem' }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 1, fontSize: '0.8rem' }}
+              >
                 {t(
                   'rbac.roles.wildcardPermissionDesc',
                   'This role has unrestricted access to all resources and actions.'
@@ -580,7 +647,11 @@ const RolesPage: React.FC = () => {
                 <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
                   {t('rbac.roles.inheritance')}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   {t('rbac.roles.inheritanceHelp')}
                 </Typography>
 
@@ -599,7 +670,8 @@ const RolesPage: React.FC = () => {
                     {roles
                       .filter(
                         (r) =>
-                          (dialogMode === 'create' || r.id !== selectedRole?.id) &&
+                          (dialogMode === 'create' ||
+                            r.id !== selectedRole?.id) &&
                           !parentRoles.some((pr) => pr.parentRoleId === r.id) &&
                           !pendingInheritanceAdds.includes(r.id)
                       )
@@ -616,13 +688,18 @@ const RolesPage: React.FC = () => {
                     onClick={() => {
                       if (!selectedParentRoleId) return;
                       // Buffer locally — do not call server
-                      if (pendingInheritanceRemoves.includes(selectedParentRoleId)) {
+                      if (
+                        pendingInheritanceRemoves.includes(selectedParentRoleId)
+                      ) {
                         // Cancel pending remove
                         setPendingInheritanceRemoves((prev) =>
                           prev.filter((id) => id !== selectedParentRoleId)
                         );
                       } else {
-                        setPendingInheritanceAdds((prev) => [...prev, selectedParentRoleId]);
+                        setPendingInheritanceAdds((prev) => [
+                          ...prev,
+                          selectedParentRoleId,
+                        ]);
                       }
                       setSelectedParentRoleId('');
                     }}
@@ -635,7 +712,10 @@ const RolesPage: React.FC = () => {
                 {(() => {
                   const effectiveParents = [
                     ...parentRoles
-                      .filter((pr) => !pendingInheritanceRemoves.includes(pr.parentRoleId))
+                      .filter(
+                        (pr) =>
+                          !pendingInheritanceRemoves.includes(pr.parentRoleId)
+                      )
                       .map((pr) => ({
                         id: pr.parentRoleId,
                         name: pr.parentRoleName,
@@ -671,7 +751,10 @@ const RolesPage: React.FC = () => {
                               );
                             } else {
                               // Add to pending removes
-                              setPendingInheritanceRemoves((prev) => [...prev, pr.id]);
+                              setPendingInheritanceRemoves((prev) => [
+                                ...prev,
+                                pr.id,
+                              ]);
                             }
                           }}
                           size="small"
@@ -687,7 +770,11 @@ const RolesPage: React.FC = () => {
               {/* Effective Permissions — reflects current form state */}
               <Box>
                 <Divider sx={{ mb: 1 }} />
-                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight={600}
+                  sx={{ mb: 0.5 }}
+                >
                   {t('rbac.roles.effectivePermissions')}
                 </Typography>
                 <Typography
@@ -737,7 +824,10 @@ const RolesPage: React.FC = () => {
       </ResizableDrawer>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>{t('rbac.roles.deleteTitle')}</DialogTitle>
         <DialogContent>
           {selectedRole && (
@@ -760,7 +850,12 @@ const RolesPage: React.FC = () => {
           <Button onClick={() => setDeleteDialogOpen(false)} disabled={saving}>
             {t('common.cancel')}
           </Button>
-          <Button variant="contained" color="error" onClick={handleDelete} disabled={saving}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDelete}
+            disabled={saving}
+          >
             {saving ? <CircularProgress size={20} /> : t('common.delete')}
           </Button>
         </DialogActions>

@@ -94,12 +94,20 @@ const DataManagementPage: React.FC = () => {
       </Typography>
 
       {message && (
-        <Alert severity={message.type} sx={{ mb: 3 }} onClose={() => setMessage(null)}>
+        <Alert
+          severity={message.type}
+          sx={{ mb: 3 }}
+          onClose={() => setMessage(null)}
+        >
           {message.text}
         </Alert>
       )}
 
-      <Box display="grid" gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))" gap={3}>
+      <Box
+        display="grid"
+        gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))"
+        gap={3}
+      >
         {/* Export Section */}
         <Card>
           <CardHeader
@@ -117,7 +125,11 @@ const DataManagementPage: React.FC = () => {
               variant="contained"
               color="primary"
               startIcon={
-                exporting ? <CircularProgress size={20} color="inherit" /> : <CloudDownload />
+                exporting ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  <CloudDownload />
+                )
               }
               onClick={handleExport}
               disabled={exporting || !canManage}
@@ -137,7 +149,9 @@ const DataManagementPage: React.FC = () => {
           <Divider />
           <CardContent>
             <Alert severity="warning" icon={<Warning />} sx={{ mb: 2 }}>
-              {t('Warning: Importing data will OVERWRITE all existing data and cannot be undone.')}
+              {t(
+                'Warning: Importing data will OVERWRITE all existing data and cannot be undone.'
+              )}
             </Alert>
 
             <Box mb={2}>
@@ -150,7 +164,9 @@ const DataManagementPage: React.FC = () => {
               />
               <label htmlFor="raised-button-file">
                 <Button variant="outlined" component="span" fullWidth>
-                  {importFile ? importFile.name : t('Select Backup File (.zip)')}
+                  {importFile
+                    ? importFile.name
+                    : t('Select Backup File (.zip)')}
                 </Button>
               </label>
             </Box>
@@ -159,7 +175,11 @@ const DataManagementPage: React.FC = () => {
               variant="contained"
               color="error"
               startIcon={
-                importing ? <CircularProgress size={20} color="inherit" /> : <CloudUpload />
+                importing ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  <CloudUpload />
+                )
               }
               onClick={handleImportClick}
               disabled={!importFile || importing || !canManage}
@@ -172,7 +192,10 @@ const DataManagementPage: React.FC = () => {
       </Box>
 
       {/* Confirmation Dialog */}
-      <Dialog open={confirmImportOpen} onClose={() => setConfirmImportOpen(false)}>
+      <Dialog
+        open={confirmImportOpen}
+        onClose={() => setConfirmImportOpen(false)}
+      >
         <DialogTitle>{t('Confirm Data Import')}</DialogTitle>
         <DialogContent>
           <DialogContentText>

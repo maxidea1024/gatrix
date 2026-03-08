@@ -40,7 +40,13 @@ export interface UserFormData {
   tags: number[];
 }
 
-const UserForm: React.FC<UserFormProps> = ({ open, onClose, onSubmit, user, loading = false }) => {
+const UserForm: React.FC<UserFormProps> = ({
+  open,
+  onClose,
+  onSubmit,
+  user,
+  loading = false,
+}) => {
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -111,7 +117,9 @@ const UserForm: React.FC<UserFormProps> = ({ open, onClose, onSubmit, user, load
 
   const handleTagToggle = (tagId: number) => {
     setSelectedTags((prev) =>
-      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
+      prev.includes(tagId)
+        ? prev.filter((id) => id !== tagId)
+        : [...prev, tagId]
     );
   };
 
@@ -257,12 +265,20 @@ const UserForm: React.FC<UserFormProps> = ({ open, onClose, onSubmit, user, load
                       key={tag.id}
                       label={tag.name}
                       onClick={() => handleTagToggle(tag.id)}
-                      color={selectedTags.includes(tag.id) ? 'primary' : 'default'}
-                      variant={selectedTags.includes(tag.id) ? 'filled' : 'outlined'}
+                      color={
+                        selectedTags.includes(tag.id) ? 'primary' : 'default'
+                      }
+                      variant={
+                        selectedTags.includes(tag.id) ? 'filled' : 'outlined'
+                      }
                       sx={{
-                        backgroundColor: selectedTags.includes(tag.id) ? tag.color : 'transparent',
+                        backgroundColor: selectedTags.includes(tag.id)
+                          ? tag.color
+                          : 'transparent',
                         borderColor: tag.color,
-                        color: selectedTags.includes(tag.id) ? 'white' : tag.color,
+                        color: selectedTags.includes(tag.id)
+                          ? 'white'
+                          : tag.color,
                         '&:hover': {
                           backgroundColor: selectedTags.includes(tag.id)
                             ? tag.color

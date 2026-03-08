@@ -150,7 +150,10 @@ export class SurveyService {
     const total = (countResult?.total as number) || 0;
 
     // Get surveys
-    const rows = await query.orderBy('createdAt', 'desc').limit(limit).offset(offset);
+    const rows = await query
+      .orderBy('createdAt', 'desc')
+      .limit(limit)
+      .offset(offset);
 
     const surveys = rows.map((row) => ({
       ...row,
@@ -191,8 +194,14 @@ export class SurveyService {
   /**
    * Get survey by ID
    */
-  static async getSurveyById(id: string, environmentId: string): Promise<Survey> {
-    const row = await db('g_surveys').where('id', id).where('environmentId', environmentId).first();
+  static async getSurveyById(
+    id: string,
+    environmentId: string
+  ): Promise<Survey> {
+    const row = await db('g_surveys')
+      .where('id', id)
+      .where('environmentId', environmentId)
+      .first();
 
     if (!row) {
       throw new GatrixError('Survey not found', 404);
@@ -299,7 +308,10 @@ export class SurveyService {
 
     // Validate that either participationRewards or rewardTemplateId is provided, but not both
     if (input.participationRewards && input.rewardTemplateId) {
-      throw new GatrixError('Cannot specify both participationRewards and rewardTemplateId', 400);
+      throw new GatrixError(
+        'Cannot specify both participationRewards and rewardTemplateId',
+        400
+      );
     }
 
     // Check if platformSurveyId already exists in this environment
@@ -329,7 +341,9 @@ export class SurveyService {
       rewardMailTitle: input.rewardMailTitle || null,
       rewardMailContent: input.rewardMailContent || null,
       isActive,
-      targetPlatforms: input.targetPlatforms ? JSON.stringify(input.targetPlatforms) : null,
+      targetPlatforms: input.targetPlatforms
+        ? JSON.stringify(input.targetPlatforms)
+        : null,
       targetPlatformsInverted: input.targetPlatformsInverted || false,
       targetChannels: (input as any).targetChannels
         ? JSON.stringify((input as any).targetChannels)
@@ -338,8 +352,11 @@ export class SurveyService {
       targetSubchannels: (input as any).targetSubchannels
         ? JSON.stringify((input as any).targetSubchannels)
         : null,
-      targetSubchannelsInverted: (input as any).targetSubchannelsInverted || false,
-      targetWorlds: input.targetWorlds ? JSON.stringify(input.targetWorlds) : null,
+      targetSubchannelsInverted:
+        (input as any).targetSubchannelsInverted || false,
+      targetWorlds: input.targetWorlds
+        ? JSON.stringify(input.targetWorlds)
+        : null,
       targetWorldsInverted: input.targetWorldsInverted || false,
       createdBy: input.createdBy || null,
     });
@@ -397,17 +414,26 @@ export class SurveyService {
     }
 
     // Validate that either participationRewards or rewardTemplateId is provided, but not both
-    if (input.participationRewards !== undefined && input.rewardTemplateId !== undefined) {
+    if (
+      input.participationRewards !== undefined &&
+      input.rewardTemplateId !== undefined
+    ) {
       if (input.participationRewards && input.rewardTemplateId) {
-        throw new GatrixError('Cannot specify both participationRewards and rewardTemplateId', 400);
+        throw new GatrixError(
+          'Cannot specify both participationRewards and rewardTemplateId',
+          400
+        );
       }
     }
 
     const updateData: any = {};
 
-    if (input.platformSurveyId !== undefined) updateData.platformSurveyId = input.platformSurveyId;
-    if (input.surveyTitle !== undefined) updateData.surveyTitle = input.surveyTitle;
-    if (input.surveyContent !== undefined) updateData.surveyContent = input.surveyContent;
+    if (input.platformSurveyId !== undefined)
+      updateData.platformSurveyId = input.platformSurveyId;
+    if (input.surveyTitle !== undefined)
+      updateData.surveyTitle = input.surveyTitle;
+    if (input.surveyContent !== undefined)
+      updateData.surveyContent = input.surveyContent;
     if (input.triggerConditions !== undefined)
       updateData.triggerConditions = JSON.stringify(input.triggerConditions);
     if (input.participationRewards !== undefined)
@@ -416,7 +442,8 @@ export class SurveyService {
         : null;
     if (input.rewardTemplateId !== undefined)
       updateData.rewardTemplateId = input.rewardTemplateId || null;
-    if (input.rewardMailTitle !== undefined) updateData.rewardMailTitle = input.rewardMailTitle;
+    if (input.rewardMailTitle !== undefined)
+      updateData.rewardMailTitle = input.rewardMailTitle;
     if (input.rewardMailContent !== undefined)
       updateData.rewardMailContent = input.rewardMailContent;
     if (input.isActive !== undefined) updateData.isActive = input.isActive;
@@ -437,9 +464,13 @@ export class SurveyService {
         ? JSON.stringify((input as any).targetSubchannels)
         : null;
     if ((input as any).targetSubchannelsInverted !== undefined)
-      updateData.targetSubchannelsInverted = (input as any).targetSubchannelsInverted;
+      updateData.targetSubchannelsInverted = (
+        input as any
+      ).targetSubchannelsInverted;
     if (input.targetWorlds !== undefined)
-      updateData.targetWorlds = input.targetWorlds ? JSON.stringify(input.targetWorlds) : null;
+      updateData.targetWorlds = input.targetWorlds
+        ? JSON.stringify(input.targetWorlds)
+        : null;
     if (input.targetWorldsInverted !== undefined)
       updateData.targetWorldsInverted = input.targetWorldsInverted;
     if (input.updatedBy !== undefined) updateData.updatedBy = input.updatedBy;
@@ -448,7 +479,10 @@ export class SurveyService {
       throw new GatrixError('No fields to update', 400);
     }
 
-    await db('g_surveys').where('id', id).where('environmentId', environmentId).update(updateData);
+    await db('g_surveys')
+      .where('id', id)
+      .where('environmentId', environmentId)
+      .update(updateData);
 
     const survey = await this.getSurveyById(id, environmentId);
 
@@ -526,7 +560,8 @@ export class SurveyService {
     // Set defaults if not found
     return {
       baseSurveyUrl: config.baseSurveyUrl || 'https://survey.dw.sdo.com',
-      baseJoinedUrl: config.baseJoinedUrl || 'https://survey.dw.sdo.com/survey/joined',
+      baseJoinedUrl:
+        config.baseJoinedUrl || 'https://survey.dw.sdo.com/survey/joined',
       linkCaption: config.linkCaption || 'Respond to the survey',
       joinedSecretKey: config.joinedSecretKey || '123',
     };
@@ -567,7 +602,12 @@ export class SurveyService {
         `INSERT INTO g_vars (environmentId, varKey, varValue, description, createdBy)
          VALUES (?, ?, ?, ?, 1)
          ON DUPLICATE KEY UPDATE varValue = VALUES(varValue), updatedBy = 1`,
-        [environmentId, update.key, update.value, `Survey configuration: ${update.key}`]
+        [
+          environmentId,
+          update.key,
+          update.value,
+          `Survey configuration: ${update.key}`,
+        ]
       );
     }
 

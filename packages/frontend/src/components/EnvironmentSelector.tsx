@@ -45,46 +45,71 @@ interface EnvironmentSelectorProps {
   size?: 'small' | 'medium';
 }
 
-export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size = 'small' }) => {
+export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
+  size = 'small',
+}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  const { environments, currentEnvironment, currentEnvironmentId, isLoading, switchEnvironment } =
-    useEnvironment();
+  const {
+    environments,
+    currentEnvironment,
+    currentEnvironmentId,
+    isLoading,
+    switchEnvironment,
+  } = useEnvironment();
 
-  const { organisations, currentOrg, projects, currentProject, currentProjectId } = useOrgProject();
+  const {
+    organisations,
+    currentOrg,
+    projects,
+    currentProject,
+    currentProjectId,
+  } = useOrgProject();
 
   // Track expanded state for org and project tree nodes
   const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set());
-  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(
+    new Set()
+  );
 
   // Per-project environment cache
-  const [projectEnvMap, setProjectEnvMap] = useState<Record<string, Environment[]>>({});
-  const [loadingProjects, setLoadingProjects] = useState<Set<string>>(new Set());
+  const [projectEnvMap, setProjectEnvMap] = useState<
+    Record<string, Environment[]>
+  >({});
+  const [loadingProjects, setLoadingProjects] = useState<Set<string>>(
+    new Set()
+  );
   const loadedProjectsRef = useRef<Set<string>>(new Set());
 
   // Load environments for a specific project
-  const loadProjectEnvironments = useCallback(async (projectId: string, orgId: string) => {
-    if (loadedProjectsRef.current.has(projectId)) return;
-    loadedProjectsRef.current.add(projectId);
+  const loadProjectEnvironments = useCallback(
+    async (projectId: string, orgId: string) => {
+      if (loadedProjectsRef.current.has(projectId)) return;
+      loadedProjectsRef.current.add(projectId);
 
-    setLoadingProjects((prev) => new Set(prev).add(projectId));
-    try {
-      const apiPath = `/admin/orgs/${orgId}/projects/${projectId}`;
-      const envs = await environmentService.getEnvironments(apiPath);
-      setProjectEnvMap((prev) => ({ ...prev, [projectId]: envs }));
-    } catch (error) {
-      console.error(`Failed to load environments for project ${projectId}:`, error);
-      loadedProjectsRef.current.delete(projectId);
-    } finally {
-      setLoadingProjects((prev) => {
-        const next = new Set(prev);
-        next.delete(projectId);
-        return next;
-      });
-    }
-  }, []);
+      setLoadingProjects((prev) => new Set(prev).add(projectId));
+      try {
+        const apiPath = `/admin/orgs/${orgId}/projects/${projectId}`;
+        const envs = await environmentService.getEnvironments(apiPath);
+        setProjectEnvMap((prev) => ({ ...prev, [projectId]: envs }));
+      } catch (error) {
+        console.error(
+          `Failed to load environments for project ${projectId}:`,
+          error
+        );
+        loadedProjectsRef.current.delete(projectId);
+      } finally {
+        setLoadingProjects((prev) => {
+          const next = new Set(prev);
+          next.delete(projectId);
+          return next;
+        });
+      }
+    },
+    []
+  );
 
   const handleOpen = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
@@ -153,7 +178,9 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
       parts.push(currentProject.displayName || currentProject.projectName);
     }
     if (currentEnvironment) {
-      parts.push(currentEnvironment.displayName || currentEnvironment.environmentName);
+      parts.push(
+        currentEnvironment.displayName || currentEnvironment.environmentName
+      );
     }
     return parts.join(' / ');
   }, [organisations.length, currentOrg, currentProject, currentEnvironment]);
@@ -190,7 +217,10 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
   }
 
   const envColor = currentEnvironment
-    ? getEnvironmentColor(currentEnvironment.environmentType, currentEnvironment.color)
+    ? getEnvironmentColor(
+        currentEnvironment.environmentType,
+        currentEnvironment.color
+      )
     : '#757575';
 
   return (
@@ -308,7 +338,9 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
                           <React.Fragment key={proj.id}>
                             {/* Project node */}
                             <ListItemButton
-                              onClick={() => handleToggleProject(proj.id, org.id)}
+                              onClick={() =>
+                                handleToggleProject(proj.id, org.id)
+                              }
                               dense
                               sx={{
                                 py: 0.5,
@@ -317,7 +349,9 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
                                   ? (theme) =>
                                       alpha(
                                         theme.palette.primary.main,
-                                        theme.palette.mode === 'dark' ? 0.1 : 0.04
+                                        theme.palette.mode === 'dark'
+                                          ? 0.1
+                                          : 0.04
                                       )
                                   : 'transparent',
                               }}
@@ -330,7 +364,9 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
                                 )}
                               </ListItemIcon>
                               <ListItemIcon sx={{ minWidth: 24 }}>
-                                <ProjectIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                                <ProjectIcon
+                                  sx={{ fontSize: 16, opacity: 0.7 }}
+                                />
                               </ListItemIcon>
                               <ListItemText
                                 primary={proj.displayName || proj.projectName}
@@ -357,7 +393,11 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
             return (
               <React.Fragment key={org.id}>
                 {/* Org node */}
-                <ListItemButton onClick={() => handleToggleOrg(org.id)} dense sx={{ py: 0.5 }}>
+                <ListItemButton
+                  onClick={() => handleToggleOrg(org.id)}
+                  dense
+                  sx={{ py: 0.5 }}
+                >
                   <ListItemIcon sx={{ minWidth: 28 }}>
                     {isOrgExpanded ? (
                       <ExpandMoreIcon sx={{ fontSize: 18 }} />
@@ -433,7 +473,9 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
                               )}
                             </ListItemIcon>
                             <ListItemIcon sx={{ minWidth: 24 }}>
-                              <ProjectIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                              <ProjectIcon
+                                sx={{ fontSize: 16, opacity: 0.7 }}
+                              />
                             </ListItemIcon>
                             <ListItemText
                               primary={proj.displayName || proj.projectName}
@@ -491,7 +533,9 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
         <ListItemButton
           onClick={() => {
             handleClose();
-            navigate(`/admin/environments?orgId=${orgId}&projectId=${projectId}`);
+            navigate(
+              `/admin/environments?orgId=${orgId}&projectId=${projectId}`
+            );
           }}
           dense
           sx={{ pl: indent, py: 0.75 }}
@@ -518,7 +562,9 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
       return (
         <ListItemButton
           key={env.environmentId}
-          onClick={() => handleSelectEnvironment(env.environmentId, projectId, orgId)}
+          onClick={() =>
+            handleSelectEnvironment(env.environmentId, projectId, orgId)
+          }
           dense
           selected={isSelected}
           sx={{
@@ -545,7 +591,9 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
                 height: 10,
                 borderRadius: 0.5,
                 backgroundColor: itemColor,
-                boxShadow: isSelected ? `0 0 6px ${alpha(itemColor, 0.6)}` : 'none',
+                boxShadow: isSelected
+                  ? `0 0 6px ${alpha(itemColor, 0.6)}`
+                  : 'none',
               }}
             />
           </ListItemIcon>
@@ -556,7 +604,11 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
               fontWeight: isSelected ? 600 : 400,
             }}
           />
-          {isSelected && <CheckIcon sx={{ fontSize: 18, color: 'success.main', ml: 'auto' }} />}
+          {isSelected && (
+            <CheckIcon
+              sx={{ fontSize: 18, color: 'success.main', ml: 'auto' }}
+            />
+          )}
         </ListItemButton>
       );
     });

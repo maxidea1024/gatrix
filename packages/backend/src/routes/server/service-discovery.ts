@@ -28,7 +28,10 @@ const router = express.Router();
  * Returns enabled whitelists for server-side validation
  * Exported as a separate handler for use in both /services/whitelists and /whitelists paths
  */
-export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) => {
+export const getWhitelistsHandler = async (
+  req: EnvironmentRequest,
+  res: any
+) => {
   const environmentId = req.environmentId!;
   try {
     await respondWithEtagCache(res, {
@@ -44,11 +47,13 @@ export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) =>
         const now = new Date();
 
         // Filter by date range
-        const activeIpWhitelists = ipWhitelistsResult.ipWhitelists.filter((ip: any) => {
-          if (ip.startDate && new Date(ip.startDate) > now) return false;
-          if (ip.endDate && new Date(ip.endDate) < now) return false;
-          return true;
-        });
+        const activeIpWhitelists = ipWhitelistsResult.ipWhitelists.filter(
+          (ip: any) => {
+            if (ip.startDate && new Date(ip.startDate) > now) return false;
+            if (ip.endDate && new Date(ip.endDate) < now) return false;
+            return true;
+          }
+        );
 
         // Get all enabled account whitelists for this environment
         const accountWhitelistsResult = await WhitelistModel.findAll(1, 10000, {
@@ -57,13 +62,14 @@ export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) =>
         });
 
         // Filter by date range
-        const activeAccountWhitelists = accountWhitelistsResult.whitelists.filter(
-          (account: any) => {
-            if (account.startDate && new Date(account.startDate) > now) return false;
-            if (account.endDate && new Date(account.endDate) < now) return false;
+        const activeAccountWhitelists =
+          accountWhitelistsResult.whitelists.filter((account: any) => {
+            if (account.startDate && new Date(account.startDate) > now)
+              return false;
+            if (account.endDate && new Date(account.endDate) < now)
+              return false;
             return true;
-          }
-        );
+          });
 
         // Format response to match SDK expectations
         const ipWhitelist = activeIpWhitelists.map((ip: any) => ({
@@ -71,10 +77,12 @@ export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) =>
           ipAddress: ip.ipAddress,
         }));
 
-        const accountWhitelist = activeAccountWhitelists.map((account: any) => ({
-          id: account.id,
-          accountId: account.accountId,
-        }));
+        const accountWhitelist = activeAccountWhitelists.map(
+          (account: any) => ({
+            id: account.id,
+            accountId: account.accountId,
+          })
+        );
 
         return {
           success: true,
@@ -196,7 +204,10 @@ router.post('/register', serverSDKAuth, async (req: any, res: any) => {
     const projectId = req.apiToken?.projectId || null;
     let orgId = null;
     if (projectId) {
-      const project = await knex('g_projects').select('orgId').where('id', projectId).first();
+      const project = await knex('g_projects')
+        .select('orgId')
+        .where('id', projectId)
+        .first();
       orgId = project?.orgId || null;
     }
 
@@ -286,7 +297,16 @@ router.post('/unregister', serverSDKAuth, async (req: any, res: any) => {
  */
 router.post('/status', serverSDKAuth, async (req: any, res: any) => {
   try {
-    const { instanceId, labels, status, stats, hostname, internalAddress, ports, meta } = req.body;
+    const {
+      instanceId,
+      labels,
+      status,
+      stats,
+      hostname,
+      internalAddress,
+      ports,
+      meta,
+    } = req.body;
     const autoRegisterIfMissing = req.body.autoRegisterIfMissing || false;
 
     if (!instanceId || !labels || !labels.service) {
@@ -303,7 +323,8 @@ router.post('/status', serverSDKAuth, async (req: any, res: any) => {
       return res.status(400).json({
         success: false,
         error: {
-          message: 'Auto-register requires hostname, internalAddress, and ports fields',
+          message:
+            'Auto-register requires hostname, internalAddress, and ports fields',
         },
       });
     }
@@ -366,7 +387,14 @@ router.post('/status', serverSDKAuth, async (req: any, res: any) => {
  */
 router.get('/', serverSDKAuth, async (req: any, res: any) => {
   try {
-    const { serviceType, group, environmentId, status, excludeSelf, ...otherLabels } = req.query;
+    const {
+      serviceType,
+      group,
+      environmentId,
+      status,
+      excludeSelf,
+      ...otherLabels
+    } = req.query;
 
     // Get all services or services of a specific type and/or group
     let services = await serviceDiscoveryService.getServices(
@@ -376,7 +404,9 @@ router.get('/', serverSDKAuth, async (req: any, res: any) => {
 
     // Filter by environment
     if (environmentId) {
-      services = services.filter((s: any) => s.labels.environmentId === environmentId);
+      services = services.filter(
+        (s: any) => s.labels.environmentId === environmentId
+      );
     }
 
     // Filter by other labels (e.g., region=ap-northeast-2)
@@ -416,32 +446,36 @@ router.get('/', serverSDKAuth, async (req: any, res: any) => {
  * Get a specific service instance
  * GET /api/v1/server/services/:serviceType/:instanceId
  */
-router.get('/:serviceType/:instanceId', serverSDKAuth, async (req: any, res: any) => {
-  try {
-    const { serviceType, instanceId } = req.params;
+router.get(
+  '/:serviceType/:instanceId',
+  serverSDKAuth,
+  async (req: any, res: any) => {
+    try {
+      const { serviceType, instanceId } = req.params;
 
-    const services = await serviceDiscoveryService.getServices(serviceType);
-    const service = services.find((s: any) => s.instanceId === instanceId);
+      const services = await serviceDiscoveryService.getServices(serviceType);
+      const service = services.find((s: any) => s.instanceId === instanceId);
 
-    if (!service) {
-      return res.status(404).json({
+      if (!service) {
+        return res.status(404).json({
+          success: false,
+          error: 'Service instance not found',
+        });
+      }
+
+      res.json({
+        success: true,
+        data: service,
+      });
+    } catch (error: any) {
+      logger.error('Failed to get service:', error);
+
+      res.status(500).json({
         success: false,
-        error: 'Service instance not found',
+        error: error.message || 'Failed to get service',
       });
     }
-
-    res.json({
-      success: true,
-      data: service,
-    });
-  } catch (error: any) {
-    logger.error('Failed to get service:', error);
-
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to get service',
-    });
   }
-});
+);
 
 export default router;

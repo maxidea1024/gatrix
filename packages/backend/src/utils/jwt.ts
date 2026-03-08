@@ -29,7 +29,10 @@ export class JwtUtils {
     return jwt.sign(payload, config.jwt.secret as string, options);
   }
 
-  static generateRefreshToken(user: UserWithoutPassword, orgId: string): string {
+  static generateRefreshToken(
+    user: UserWithoutPassword,
+    orgId: string
+  ): string {
     const payload: JwtPayload = {
       userId: user.id as any,
       email: user.email,
@@ -62,7 +65,9 @@ export class JwtUtils {
         exp: decoded.exp,
         iat: decoded.iat,
         expiresAt: new Date(decoded.exp * 1000).toISOString(),
-        timeUntilExpiry: Math.round((decoded.exp * 1000 - Date.now()) / 1000 / 60) + ' minutes',
+        timeUntilExpiry:
+          Math.round((decoded.exp * 1000 - Date.now()) / 1000 / 60) +
+          ' minutes',
         currentTime: new Date().toISOString(),
       });
 

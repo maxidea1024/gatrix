@@ -144,71 +144,83 @@ export class AuthController {
     });
   });
 
-  static getProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    if (!req.user) {
-      throw new GatrixError('User not authenticated', 401);
+  static getProfile = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user) {
+        throw new GatrixError('User not authenticated', 401);
+      }
+
+      const user = await AuthService.getProfile(req.user.userId);
+
+      res.json({
+        success: true,
+        data: { user },
+      });
     }
+  );
 
-    const user = await AuthService.getProfile(req.user.userId);
+  static updateProfile = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user) {
+        throw new GatrixError('User not authenticated', 401);
+      }
 
-    res.json({
-      success: true,
-      data: { user },
-    });
-  });
+      // Validate request body
+      const { error, value } = updateProfileSchema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
 
-  static updateProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    if (!req.user) {
-      throw new GatrixError('User not authenticated', 401);
+      const user = await AuthService.updateProfile(req.user.userId, value);
+
+      res.json({
+        success: true,
+        data: { user },
+        message: 'Profile updated successfully',
+      });
     }
+  );
 
-    // Validate request body
-    const { error, value } = updateProfileSchema.validate(req.body);
-    if (error) {
-      throw new GatrixError(error.details[0].message, 400);
+  static changePassword = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user) {
+        throw new GatrixError('User not authenticated', 401);
+      }
+
+      // Validate request body
+      const { error, value } = changePasswordSchema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
+
+      const { currentPassword, newPassword } = value;
+      await AuthService.changePassword(
+        req.user.userId,
+        currentPassword,
+        newPassword
+      );
+
+      res.json({
+        success: true,
+        message: 'Password changed successfully',
+      });
     }
+  );
 
-    const user = await AuthService.updateProfile(req.user.userId, value);
+  static verifyEmail = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      if (!req.user) {
+        throw new GatrixError('User not authenticated', 401);
+      }
 
-    res.json({
-      success: true,
-      data: { user },
-      message: 'Profile updated successfully',
-    });
-  });
+      await AuthService.verifyEmail(req.user.userId);
 
-  static changePassword = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    if (!req.user) {
-      throw new GatrixError('User not authenticated', 401);
+      res.json({
+        success: true,
+        message: 'Email verified successfully',
+      });
     }
-
-    // Validate request body
-    const { error, value } = changePasswordSchema.validate(req.body);
-    if (error) {
-      throw new GatrixError(error.details[0].message, 400);
-    }
-
-    const { currentPassword, newPassword } = value;
-    await AuthService.changePassword(req.user.userId, currentPassword, newPassword);
-
-    res.json({
-      success: true,
-      message: 'Password changed successfully',
-    });
-  });
-
-  static verifyEmail = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    if (!req.user) {
-      throw new GatrixError('User not authenticated', 401);
-    }
-
-    await AuthService.verifyEmail(req.user.userId);
-
-    res.json({
-      success: true,
-      message: 'Email verified successfully',
-    });
-  });
+  );
 
   // OAuth success callback
   static oauthSuccess = asyncHandler(async (req: Request, res: Response) => {
@@ -235,9 +247,12 @@ export class AuthController {
           frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
         } catch (e) {
           // Use default if referer parsing fails
-          logger.debug('Failed to parse referer for pending redirect, using default:', {
-            frontendOrigin,
-          });
+          logger.debug(
+            'Failed to parse referer for pending redirect, using default:',
+            {
+              frontendOrigin,
+            }
+          );
         }
       }
 
@@ -247,7 +262,8 @@ export class AuthController {
 
     // Generate tokens
     const accessToken = require('../utils/jwt').JwtUtils.generateToken(user);
-    const refreshToken = require('../utils/jwt').JwtUtils.generateRefreshToken(user);
+    const refreshToken =
+      require('../utils/jwt').JwtUtils.generateRefreshToken(user);
 
     // Set refresh token as httpOnly cookie
     res.cookie('refreshToken', refreshToken, {
@@ -272,7 +288,10 @@ export class AuthController {
         frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
       } catch (e) {
         // Use default if referer parsing fails
-        logger.debug('Failed to parse referer, using default frontend origin:', { frontendOrigin });
+        logger.debug(
+          'Failed to parse referer, using default frontend origin:',
+          { frontendOrigin }
+        );
       }
     }
 
@@ -305,9 +324,12 @@ export class AuthController {
         frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
       } catch (e) {
         // Use default if referer parsing fails
-        logger.debug('Failed to parse referer for failure redirect, using default:', {
-          frontendOrigin,
-        });
+        logger.debug(
+          'Failed to parse referer for failure redirect, using default:',
+          {
+            frontendOrigin,
+          }
+        );
       }
     }
 
@@ -341,24 +363,26 @@ export class AuthController {
   });
 
   // Validate reset token
-  static validateResetToken = asyncHandler(async (req: Request, res: Response) => {
-    const { token } = req.params;
+  static validateResetToken = asyncHandler(
+    async (req: Request, res: Response) => {
+      const { token } = req.params;
 
-    if (!token) {
-      throw new GatrixError('토큰이 필요합니다.', 400);
-    }
+      if (!token) {
+        throw new GatrixError('토큰이 필요합니다.', 400);
+      }
 
-    const result = await passwordResetService.validateResetToken(token);
+      const result = await passwordResetService.validateResetToken(token);
 
-    res.json({
-      success: true,
-      data: {
-        success: result.valid,
+      res.json({
+        success: true,
+        data: {
+          success: result.valid,
+          message: result.message,
+        },
         message: result.message,
-      },
-      message: result.message,
-    });
-  });
+      });
+    }
+  );
 
   // Reset password with token
   static resetPassword = asyncHandler(async (req: Request, res: Response) => {

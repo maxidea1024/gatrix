@@ -7,7 +7,9 @@ async function seedGameFlags() {
     logger.info('Starting game feature flags seeding...');
 
     // Get admin user ID
-    const admins = await database.query('SELECT id FROM g_users WHERE role = "admin" LIMIT 1');
+    const admins = await database.query(
+      'SELECT id FROM g_users WHERE role = "admin" LIMIT 1'
+    );
     if (admins.length === 0) {
       logger.error('No admin user found. Please run main seed first.');
       process.exit(1);
@@ -271,14 +273,17 @@ async function seedGameFlags() {
 
     for (const flag of flags) {
       // Check if flag already exists
-      const existing = await database.query('SELECT id FROM g_feature_flags WHERE flagName = ?', [
-        flag.name,
-      ]);
+      const existing = await database.query(
+        'SELECT id FROM g_feature_flags WHERE flagName = ?',
+        [flag.name]
+      );
 
       let flagId: string;
       if (existing.length > 0) {
         flagId = existing[0].id;
-        logger.info(`Flag ${flag.name} already exists, updating environments...`);
+        logger.info(
+          `Flag ${flag.name} already exists, updating environments...`
+        );
       } else {
         flagId = ulid();
         await database.query(
@@ -287,7 +292,9 @@ async function seedGameFlags() {
           [
             flagId,
             flag.name,
-            flag.name.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
+            flag.name
+              .replace(/_/g, ' ')
+              .replace(/\b\w/g, (l) => l.toUpperCase()),
             flag.desc,
             flag.type,
             adminId,

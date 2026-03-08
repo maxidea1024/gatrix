@@ -30,10 +30,15 @@ router.post('/:endpointName', async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Missing authorization token' });
     }
 
-    const plainToken = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
+    const plainToken = authHeader.startsWith('Bearer ')
+      ? authHeader.substring(7)
+      : authHeader;
 
     // Hash the token and look it up
-    const tokenHash = crypto.createHash('sha256').update(plainToken).digest('hex');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(plainToken)
+      .digest('hex');
     const tokenInfo = await SignalEndpointModel.verifyEndpointToken(tokenHash);
 
     if (!tokenInfo) {
@@ -58,7 +63,9 @@ router.post('/:endpointName', async (req: Request, res: Response) => {
       tokenInfo.tokenId
     );
 
-    logger.info(`Signal received on endpoint "${endpointName}" (ID: ${signal.id})`);
+    logger.info(
+      `Signal received on endpoint "${endpointName}" (ID: ${signal.id})`
+    );
 
     res.status(202).json({
       success: true,

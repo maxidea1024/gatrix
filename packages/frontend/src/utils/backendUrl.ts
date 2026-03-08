@@ -19,7 +19,10 @@ export const getBackendUrl = (): string => {
   if (typeof window !== 'undefined') {
     const origin = window.location.origin;
     // If on frontend dev port (43000), point to backend port (45000)
-    if (origin.includes('localhost:43000') || origin.includes('127.0.0.1:43000')) {
+    if (
+      origin.includes('localhost:43000') ||
+      origin.includes('127.0.0.1:43000')
+    ) {
       return 'http://localhost:45000';
     }
     // Otherwise use current origin (production setup with nginx proxy)

@@ -11,7 +11,11 @@ import { createLogger } from '../config/logger';
 const logger = createLogger('VarsController');
 
 export class VarsController {
-  static async getVar(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async getVar(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const key = req.params.key;
       const environmentId = req.environmentId!;
@@ -22,7 +26,11 @@ export class VarsController {
     }
   }
 
-  static async setVar(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async setVar(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const key = req.params.key;
       const environmentId = req.environmentId!;
@@ -54,7 +62,10 @@ export class VarsController {
       );
 
       // Invalidate related caches when specific KV items are updated via setVar
-      if (key === '$clientVersionPassiveData' || key === 'kv:clientVersionPassiveData') {
+      if (
+        key === '$clientVersionPassiveData' ||
+        key === 'kv:clientVersionPassiveData'
+      ) {
         /**
          * NOTE: This is a temporary workaround for an edge case.
          * When $clientVersionPassiveData is updated, we MUST invalidate all client version caches
@@ -62,7 +73,9 @@ export class VarsController {
          * TODO: Refactor this to use a more formal dependency tracking.
          */
         await pubSubService.invalidateByPattern('*client_version:*');
-        await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
+        await pubSubService.invalidateByPattern(
+          `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`
+        );
 
         // Force all SDKs (Edge, Game Servers) to refresh their client versions
         // by emitting a 'client_version.updated' event for each environment
@@ -100,7 +113,11 @@ export class VarsController {
    * Get all KV items
    * GET /api/v1/admin/vars/kv
    */
-  static async getAllKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async getAllKV(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const environmentId = req.environmentId!;
       const items = await VarsService.getAllKV(environmentId);
@@ -114,7 +131,11 @@ export class VarsController {
    * Get all KV items for Server SDK
    * GET /api/v1/server/:env/vars
    */
-  static async getServerVars(req: SDKRequest, res: Response, next: NextFunction) {
+  static async getServerVars(
+    req: SDKRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const environmentId = req.params.env || req.environmentId!;
 
@@ -136,15 +157,22 @@ export class VarsController {
    * Get a single KV item
    * GET /api/v1/admin/vars/kv/:key
    */
-  static async getKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async getKV(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const key = req.params.key;
       const environmentId = req.environmentId!;
-      const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
+      const fullKey =
+        key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
       const item = await VarsModel.getKV(fullKey, environmentId);
 
       if (!item) {
-        return res.status(404).json({ success: false, message: 'KV item not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'KV item not found' });
       }
 
       // Set cache control headers to prevent browser caching
@@ -163,7 +191,11 @@ export class VarsController {
    * Create a new KV item
    * POST /api/v1/admin/vars/kv
    */
-  static async createKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async createKV(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { varKey, varValue, valueType, description } = req.body;
       const environmentId = req.environmentId!;
@@ -219,11 +251,16 @@ export class VarsController {
    * Update an existing KV item
    * PUT /api/v1/admin/vars/kv/:key
    */
-  static async updateKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async updateKV(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const key = req.params.key;
       const environmentId = req.environmentId!;
-      const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
+      const fullKey =
+        key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
       const { varValue, valueType, description } = req.body;
 
       const userId = req.user?.userId || (req as any).user?.id || 1;
@@ -250,7 +287,10 @@ export class VarsController {
       );
 
       // Invalidate related caches when specific KV items are updated
-      if (fullKey === '$clientVersionPassiveData' || fullKey === 'kv:clientVersionPassiveData') {
+      if (
+        fullKey === '$clientVersionPassiveData' ||
+        fullKey === 'kv:clientVersionPassiveData'
+      ) {
         /**
          * NOTE: This is a temporary workaround for an edge case.
          * When $clientVersionPassiveData is updated, we MUST invalidate all client version caches
@@ -261,7 +301,9 @@ export class VarsController {
         // Invalidate all client version caches since meta field includes clientVersionPassiveData
         await pubSubService.invalidateByPattern('*client_version:*');
         // Also invalidate Server SDK ETag cache (Edge)
-        await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
+        await pubSubService.invalidateByPattern(
+          `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`
+        );
 
         // Force all SDKs (Edge, Game Servers) to refresh their client versions
         // by emitting a 'client_version.updated' event for each environment
@@ -296,7 +338,9 @@ export class VarsController {
           type: 'system:config:updated',
           data: {
             configType:
-              fullKey === '$platforms' || fullKey === 'kv:platforms' ? 'platforms' : 'channels',
+              fullKey === '$platforms' || fullKey === 'kv:platforms'
+                ? 'platforms'
+                : 'channels',
           },
         });
       }
@@ -329,11 +373,16 @@ export class VarsController {
    * Delete a KV item
    * DELETE /api/v1/admin/vars/kv/:key
    */
-  static async deleteKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async deleteKV(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const key = req.params.key;
       const environmentId = req.environmentId!;
-      const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
+      const fullKey =
+        key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
 
       await VarsModel.deleteKV(fullKey, environmentId);
 

@@ -1,11 +1,18 @@
-import { ErrorCodes, extractErrorCode, extractErrorMessage } from '@gatrix/shared';
+import {
+  ErrorCodes,
+  extractErrorCode,
+  extractErrorMessage,
+} from '@gatrix/shared';
 import i18n from 'i18next';
 
 /**
  * Get localized error message based on error code
  * Falls back to backend message if no localization exists
  */
-export function getLocalizedErrorMessage(error: any, defaultKey = 'common.unknownError'): string {
+export function getLocalizedErrorMessage(
+  error: any,
+  defaultKey = 'common.unknownError'
+): string {
   const errorCode = extractErrorCode(error);
   const backendMessage = extractErrorMessage(error);
 

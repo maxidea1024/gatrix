@@ -5,7 +5,12 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-function ConfirmDialog({ title, message, onConfirm, onCancel }: ConfirmDialogProps) {
+function ConfirmDialog({
+  title,
+  message,
+  onConfirm,
+  onCancel,
+}: ConfirmDialogProps) {
   return (
     <div className="confirm-overlay">
       <div className="nes-container is-dark with-title confirm-dialog rumble-on-pop">
@@ -17,7 +22,11 @@ function ConfirmDialog({ title, message, onConfirm, onCancel }: ConfirmDialogPro
           <button type="button" className="nes-btn" onClick={onCancel}>
             CANCEL
           </button>
-          <button type="button" className="nes-btn is-error" onClick={onConfirm}>
+          <button
+            type="button"
+            className="nes-btn is-error"
+            onClick={onConfirm}
+          >
             POWER OFF
           </button>
         </div>

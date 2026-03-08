@@ -107,7 +107,9 @@ class StoreProductService {
   /**
    * Get all store products with pagination
    */
-  static async getStoreProducts(params: GetStoreProductsParams): Promise<GetStoreProductsResponse> {
+  static async getStoreProducts(
+    params: GetStoreProductsParams
+  ): Promise<GetStoreProductsResponse> {
     const pool = database.getPool();
     // Ensure page and limit are numbers (query params come as strings)
     const page = Number(params.page) || 1;
@@ -168,7 +170,8 @@ class StoreProductService {
       queryParams.push(params.isActive ? 1 : 0);
     }
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     // Validate sort column
     const allowedSortColumns = [
@@ -183,7 +186,9 @@ class StoreProductService {
       'createdAt',
       'updatedAt',
     ];
-    const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : 'createdAt';
+    const safeSortBy = allowedSortColumns.includes(sortBy)
+      ? sortBy
+      : 'createdAt';
     const safeSortOrder = sortOrder === 'ASC' ? 'ASC' : 'DESC';
 
     try {
@@ -203,7 +208,10 @@ class StoreProductService {
       // Load tags for each product
       const productsWithTags = await Promise.all(
         products.map(async (product) => {
-          const tags = await TagService.listTagsForEntity('store_product', product.id);
+          const tags = await TagService.listTagsForEntity(
+            'store_product',
+            product.id
+          );
           return {
             ...product,
             isActive: Boolean(product.isActive),
@@ -260,7 +268,10 @@ class StoreProductService {
   /**
    * Get store product by ID
    */
-  static async getStoreProductById(id: string, environmentId: string): Promise<StoreProduct> {
+  static async getStoreProductById(
+    id: string,
+    environmentId: string
+  ): Promise<StoreProduct> {
     const pool = database.getPool();
 
     try {
@@ -280,7 +291,9 @@ class StoreProductService {
         ...product,
         isActive: Boolean(product.isActive),
         metadata:
-          typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
+          typeof product.metadata === 'string'
+            ? JSON.parse(product.metadata)
+            : product.metadata,
         tags,
       } as StoreProduct;
     } catch (error) {
@@ -294,7 +307,9 @@ class StoreProductService {
    * Get store product by ID across all environments (for Server SDK)
    * This is used when the SDK receives an event and needs to fetch a specific product
    */
-  static async getStoreProductByIdAcrossEnvironments(id: string): Promise<StoreProduct | null> {
+  static async getStoreProductByIdAcrossEnvironments(
+    id: string
+  ): Promise<StoreProduct | null> {
     const pool = database.getPool();
 
     try {
@@ -314,7 +329,9 @@ class StoreProductService {
         ...product,
         isActive: Boolean(product.isActive),
         metadata:
-          typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
+          typeof product.metadata === 'string'
+            ? JSON.parse(product.metadata)
+            : product.metadata,
         tags,
       } as StoreProduct;
     } catch (error) {
@@ -329,7 +346,9 @@ class StoreProductService {
   /**
    * Create a new store product
    */
-  static async createStoreProduct(input: CreateStoreProductInput): Promise<StoreProduct> {
+  static async createStoreProduct(
+    input: CreateStoreProductInput
+  ): Promise<StoreProduct> {
     const pool = database.getPool();
     const id = ulid();
     const environmentId = input.environmentId;
@@ -369,7 +388,9 @@ class StoreProductService {
       // Invalidate ETag cache and publish SDK event
       try {
         // Invalidate ETag cache so SDK fetches fresh data
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`
+        );
 
         await pubSubService.publishSDKEvent(
           {
@@ -392,7 +413,10 @@ class StoreProductService {
       return product;
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new GatrixError('A product with this ID and store already exists', 409);
+        throw new GatrixError(
+          'A product with this ID and store already exists',
+          409
+        );
       }
       logger.error('Failed to create store product', { error, input });
       throw new GatrixError('Failed to create store product', 500);
@@ -506,7 +530,9 @@ class StoreProductService {
       // Invalidate ETag cache and publish SDK event
       try {
         // Invalidate ETag cache so SDK fetches fresh data
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`
+        );
 
         await pubSubService.publishSDKEvent(
           {
@@ -530,7 +556,10 @@ class StoreProductService {
     } catch (error: any) {
       if (error instanceof GatrixError) throw error;
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new GatrixError('A product with this ID and store already exists', 409);
+        throw new GatrixError(
+          'A product with this ID and store already exists',
+          409
+        );
       }
       logger.error('Failed to update store product', { error, id, input });
       throw new GatrixError('Failed to update store product', 500);
@@ -540,7 +569,10 @@ class StoreProductService {
   /**
    * Delete a store product
    */
-  static async deleteStoreProduct(id: string, environmentId: string): Promise<void> {
+  static async deleteStoreProduct(
+    id: string,
+    environmentId: string
+  ): Promise<void> {
     const pool = database.getPool();
 
     try {
@@ -559,7 +591,9 @@ class StoreProductService {
       // Invalidate ETag cache and publish SDK event
       try {
         // Invalidate ETag cache so SDK fetches fresh data
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`
+        );
 
         await pubSubService.publishSDKEvent(
           {
@@ -587,7 +621,10 @@ class StoreProductService {
   /**
    * Delete multiple store products
    */
-  static async deleteStoreProducts(ids: string[], environmentId: string): Promise<number> {
+  static async deleteStoreProducts(
+    ids: string[],
+    environmentId: string
+  ): Promise<number> {
     const pool = database.getPool();
 
     if (ids.length === 0) return 0;
@@ -608,7 +645,9 @@ class StoreProductService {
       if (result.affectedRows > 0) {
         try {
           // Invalidate ETag cache so SDK fetches fresh data
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
+          await pubSubService.invalidateKey(
+            `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`
+          );
 
           for (const id of ids) {
             await pubSubService.publishSDKEvent(
@@ -673,7 +712,9 @@ class StoreProductService {
       if (result.affectedRows > 0) {
         try {
           // Invalidate ETag cache so SDK fetches fresh data
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
+          await pubSubService.invalidateKey(
+            `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`
+          );
 
           for (const id of ids) {
             await pubSubService.publishSDKEvent(
@@ -733,7 +774,13 @@ class StoreProductService {
           '(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ?)'
         );
         const searchPattern = `%${params.search}%`;
-        queryParams.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
+        queryParams.push(
+          searchPattern,
+          searchPattern,
+          searchPattern,
+          searchPattern,
+          searchPattern
+        );
       }
 
       if (params.currentIsActive !== undefined) {
@@ -764,7 +811,9 @@ class StoreProductService {
       if (result.affectedRows > 0) {
         try {
           // Invalidate ETag cache so SDK fetches fresh data
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
+          await pubSubService.invalidateKey(
+            `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`
+          );
 
           // Publish a batch event instead of individual events for performance
           await pubSubService.publishSDKEvent(
@@ -797,7 +846,10 @@ class StoreProductService {
         error,
         params,
       });
-      throw new GatrixError('Failed to bulk update active status by filter', 500);
+      throw new GatrixError(
+        'Failed to bulk update active status by filter',
+        500
+      );
     }
   }
 
@@ -822,7 +874,13 @@ class StoreProductService {
           '(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ?)'
         );
         const searchPattern = `%${params.search}%`;
-        queryParams.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
+        queryParams.push(
+          searchPattern,
+          searchPattern,
+          searchPattern,
+          searchPattern,
+          searchPattern
+        );
       }
 
       if (params.isActive !== undefined) {
@@ -851,14 +909,16 @@ class StoreProductService {
   static async previewSync(environmentId: string): Promise<SyncPreviewResult> {
     try {
       // Get planning data products (unified multi-language file)
-      const planningData = await PlanningDataService.getCashShopLookup(environmentId);
+      const planningData =
+        await PlanningDataService.getCashShopLookup(environmentId);
       const planningProducts: CmsCashShopProduct[] = planningData.items || [];
 
       // Get current DB products
       const pool = database.getPool();
-      const [rows] = await pool.execute('SELECT * FROM g_store_products WHERE environmentId = ?', [
-        environmentId,
-      ]);
+      const [rows] = await pool.execute(
+        'SELECT * FROM g_store_products WHERE environmentId = ?',
+        [environmentId]
+      );
       const dbProducts = rows as StoreProduct[];
 
       // Create maps for comparison - use id as key (productCode can be duplicated)
@@ -1027,10 +1087,14 @@ class StoreProductService {
 
     // Filter items based on selection if provided
     const toAddFiltered = selected?.toAdd
-      ? preview.toAdd.filter((item) => selected.toAdd.includes(item.cmsProductId))
+      ? preview.toAdd.filter((item) =>
+          selected.toAdd.includes(item.cmsProductId)
+        )
       : preview.toAdd;
     const toUpdateFiltered = selected?.toUpdate
-      ? preview.toUpdate.filter((item) => selected.toUpdate.includes(item.cmsProductId))
+      ? preview.toUpdate.filter((item) =>
+          selected.toUpdate.includes(item.cmsProductId)
+        )
       : preview.toUpdate;
     const toDeleteFiltered = selected?.toDelete
       ? preview.toDelete.filter((item) => selected.toDelete.includes(item.id))
@@ -1110,8 +1174,12 @@ class StoreProductService {
           values.push(nameZhChange?.newValue || nameKoChange?.newValue || '');
         }
 
-        const descZhChange = item.changes.find((c) => c.field === 'descriptionZh');
-        const descKoChange = item.changes.find((c) => c.field === 'descriptionKo');
+        const descZhChange = item.changes.find(
+          (c) => c.field === 'descriptionZh'
+        );
+        const descKoChange = item.changes.find(
+          (c) => c.field === 'descriptionKo'
+        );
         if (descZhChange || descKoChange) {
           updates.push('description = ?');
           values.push(descZhChange?.newValue || descKoChange?.newValue || null);
@@ -1136,7 +1204,9 @@ class StoreProductService {
         // First delete associated tags by setting empty array
         await TagService.setTagsForEntity('store_product', item.id, []);
         // Then delete the product
-        await pool.execute('DELETE FROM g_store_products WHERE id = ?', [item.id]);
+        await pool.execute('DELETE FROM g_store_products WHERE id = ?', [
+          item.id,
+        ]);
         deletedCount++;
       }
 

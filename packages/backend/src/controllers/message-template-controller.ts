@@ -1,9 +1,16 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
-import { MessageTemplateModel, MessageTemplate } from '../models/message-template';
+import {
+  MessageTemplateModel,
+  MessageTemplate,
+} from '../models/message-template';
 
 export class MessageTemplateController {
-  static async list(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async list(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { q, limit, offset, tags } = req.query as any;
 
@@ -46,7 +53,10 @@ export class MessageTemplateController {
       if (tags) {
         tagIds = Array.isArray(tags) ? tags : [tags];
       }
-      const tagsOperator = req.query.tags_operator as 'any_of' | 'include_all' | undefined;
+      const tagsOperator = req.query.tags_operator as
+        | 'any_of'
+        | 'include_all'
+        | undefined;
 
       const environmentId = req.environmentId!;
 
@@ -70,19 +80,28 @@ export class MessageTemplateController {
     }
   }
 
-  static async get(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async get(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const id = req.params.id;
       const environmentId = req.environmentId!;
       const data = await MessageTemplateModel.findById(id, environmentId);
-      if (!data) return res.status(404).json({ success: false, message: 'Not found' });
+      if (!data)
+        return res.status(404).json({ success: false, message: 'Not found' });
       res.json({ success: true, data });
     } catch (e) {
       next(e);
     }
   }
 
-  static async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async create(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const body = req.body as MessageTemplate;
       const environmentId = req.environmentId!;
@@ -115,7 +134,11 @@ export class MessageTemplateController {
     }
   }
 
-  static async update(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async update(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const id = req.params.id;
       const body = req.body as MessageTemplate;
@@ -150,7 +173,11 @@ export class MessageTemplateController {
     }
   }
 
-  static async remove(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async remove(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const id = req.params.id;
       const environmentId = req.environmentId!;
@@ -161,14 +188,20 @@ export class MessageTemplateController {
     }
   }
 
-  static async bulkDelete(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async bulkDelete(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { ids } = req.body;
 
       const environmentId = req.environmentId!;
 
       // Delete all templates
-      await Promise.all(ids.map((id: any) => MessageTemplateModel.delete(id, environmentId)));
+      await Promise.all(
+        ids.map((id: any) => MessageTemplateModel.delete(id, environmentId))
+      );
 
       res.json({
         success: true,
@@ -180,7 +213,11 @@ export class MessageTemplateController {
   }
 
   // 메시지 템플릿 태그 Settings
-  static async setTags(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async setTags(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { id } = req.params;
       const { tagIds } = req.body;
@@ -204,7 +241,11 @@ export class MessageTemplateController {
   }
 
   // 메시지 템플릿 태그 조회
-  static async getTags(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async getTags(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { id } = req.params;
       const tags = await MessageTemplateModel.getTags(id);

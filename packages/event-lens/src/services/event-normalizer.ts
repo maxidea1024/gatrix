@@ -22,7 +22,9 @@ export class EventNormalizer {
       const path = this.normalizePath(rawEvent.path);
 
       // 4. Referrer 분류
-      const { referrerName, referrerType } = this.classifyReferrer(rawEvent.referrer);
+      const { referrerName, referrerType } = this.classifyReferrer(
+        rawEvent.referrer
+      );
 
       // 5. UTM 파라미터 추출
       const utmParams = this.extractUTMParams(rawEvent.path);
@@ -74,13 +76,28 @@ export class EventNormalizer {
       const hostname = url.hostname;
 
       // 검색 엔진
-      const searchEngines = ['google', 'bing', 'yahoo', 'duckduckgo', 'baidu', 'naver', 'daum'];
+      const searchEngines = [
+        'google',
+        'bing',
+        'yahoo',
+        'duckduckgo',
+        'baidu',
+        'naver',
+        'daum',
+      ];
       if (searchEngines.some((engine) => hostname.includes(engine))) {
         return { referrerName: hostname, referrerType: 'search' };
       }
 
       // 소셜 미디어
-      const socialMedia = ['facebook', 'twitter', 'linkedin', 'instagram', 'reddit', 'youtube'];
+      const socialMedia = [
+        'facebook',
+        'twitter',
+        'linkedin',
+        'instagram',
+        'reddit',
+        'youtube',
+      ];
       if (socialMedia.some((social) => hostname.includes(social))) {
         return { referrerName: hostname, referrerType: 'social' };
       }

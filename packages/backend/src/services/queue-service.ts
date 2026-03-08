@@ -45,7 +45,8 @@ export class QueueService {
       await this.createQueue('scheduler', this.processSchedulerJob.bind(this));
 
       // Initialize feature metrics queue
-      const { featureMetricsService } = await import('./feature-metrics-service');
+      const { featureMetricsService } =
+        await import('./feature-metrics-service');
       await featureMetricsService.initialize();
 
       // Unknown flags now uses Redis buffering, no queue initialization needed
@@ -55,14 +56,23 @@ export class QueueService {
         const repeatables = await this.listRepeatable('scheduler');
         const exists = repeatables.some((r) => r.name === 'coupon:expire');
         if (!exists) {
-          await this.addJob('scheduler', 'coupon:expire', {}, { repeat: { pattern: '* * * * *' } });
-          logger.info('Registered repeatable job: coupon:expire (every minute)');
+          await this.addJob(
+            'scheduler',
+            'coupon:expire',
+            {},
+            { repeat: { pattern: '* * * * *' } }
+          );
+          logger.info(
+            'Registered repeatable job: coupon:expire (every minute)'
+          );
         } else {
           logger.info('Repeatable job already exists: coupon:expire');
         }
 
         // Register planning data cleanup job (daily at 3 AM)
-        const planningCleanupExists = repeatables.some((r) => r.name === 'planning:cleanup');
+        const planningCleanupExists = repeatables.some(
+          (r) => r.name === 'planning:cleanup'
+        );
         if (!planningCleanupExists) {
           await this.addJob(
             'scheduler',
@@ -70,13 +80,17 @@ export class QueueService {
             {},
             { repeat: { pattern: '0 3 * * *' } }
           );
-          logger.info('Registered repeatable job: planning:cleanup (daily at 3 AM)');
+          logger.info(
+            'Registered repeatable job: planning:cleanup (daily at 3 AM)'
+          );
         } else {
           logger.info('Repeatable job already exists: planning:cleanup');
         }
 
         // Register change request cleanup job (daily at 4 AM)
-        const crCleanupExists = repeatables.some((r) => r.name === 'change-request:cleanup');
+        const crCleanupExists = repeatables.some(
+          (r) => r.name === 'change-request:cleanup'
+        );
         if (!crCleanupExists) {
           await this.addJob(
             'scheduler',
@@ -84,13 +98,17 @@ export class QueueService {
             {},
             { repeat: { pattern: '0 4 * * *' } }
           );
-          logger.info('Registered repeatable job: change-request:cleanup (daily at 4 AM)');
+          logger.info(
+            'Registered repeatable job: change-request:cleanup (daily at 4 AM)'
+          );
         } else {
           logger.info('Repeatable job already exists: change-request:cleanup');
         }
 
         // Register unknown flags flush job (every minute)
-        const unknownFlagsFlushExists = repeatables.some((r) => r.name === 'unknown-flags:flush');
+        const unknownFlagsFlushExists = repeatables.some(
+          (r) => r.name === 'unknown-flags:flush'
+        );
         if (!unknownFlagsFlushExists) {
           await this.addJob(
             'scheduler',
@@ -98,16 +116,27 @@ export class QueueService {
             {},
             { repeat: { pattern: '* * * * *' } }
           );
-          logger.info('Registered repeatable job: unknown-flags:flush (every minute)');
+          logger.info(
+            'Registered repeatable job: unknown-flags:flush (every minute)'
+          );
         } else {
           logger.info('Repeatable job already exists: unknown-flags:flush');
         }
 
         // Register signal processing job (every 10 seconds)
-        const signalProcessExists = repeatables.some((r) => r.name === 'signal:process');
+        const signalProcessExists = repeatables.some(
+          (r) => r.name === 'signal:process'
+        );
         if (!signalProcessExists) {
-          await this.addJob('scheduler', 'signal:process', {}, { repeat: { every: 10000 } });
-          logger.info('Registered repeatable job: signal:process (every 10 seconds)');
+          await this.addJob(
+            'scheduler',
+            'signal:process',
+            {},
+            { repeat: { every: 10000 } }
+          );
+          logger.info(
+            'Registered repeatable job: signal:process (every 10 seconds)'
+          );
         } else {
           logger.info('Repeatable job already exists: signal:process');
         }
@@ -123,9 +152,13 @@ export class QueueService {
             {},
             { repeat: { pattern: '* * * * *' } }
           );
-          logger.info('Registered repeatable job: release-flow:progression-check (every minute)');
+          logger.info(
+            'Registered repeatable job: release-flow:progression-check (every minute)'
+          );
         } else {
-          logger.info('Repeatable job already exists: release-flow:progression-check');
+          logger.info(
+            'Repeatable job already exists: release-flow:progression-check'
+          );
         }
       } catch (e) {
         logger.error('Failed to register repeatable scheduler jobs:', e);
@@ -208,9 +241,15 @@ export class QueueService {
       logger.debug(`Job ${jobId} completed in queue ${queueName}`);
     });
 
-    queueEvents.on('failed', ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
-      logger.error(`Job ${jobId} failed in queue ${queueName}:`, failedReason);
-    });
+    queueEvents.on(
+      'failed',
+      ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
+        logger.error(
+          `Job ${jobId} failed in queue ${queueName}:`,
+          failedReason
+        );
+      }
+    );
 
     // Store references
     this.queues.set(queueName, queue);
@@ -292,7 +331,12 @@ export class QueueService {
         completed: completed.length,
         failed: failed.length,
         delayed: delayed.length,
-        total: waiting.length + active.length + completed.length + failed.length + delayed.length,
+        total:
+          waiting.length +
+          active.length +
+          completed.length +
+          failed.length +
+          delayed.length,
       };
     } catch (error) {
       logger.error(`Failed to get stats for queue ${queueName}:`, error);
@@ -316,7 +360,11 @@ export class QueueService {
   /**
    * List delayed jobs in range [startMs, endMs]
    */
-  async getScheduledJobsInRange(queueName: string, startMs: number, endMs: number) {
+  async getScheduledJobsInRange(
+    queueName: string,
+    startMs: number,
+    endMs: number
+  ) {
     const queue = this.queues.get(queueName);
     if (!queue) return [];
 
@@ -326,7 +374,9 @@ export class QueueService {
         .map((job) => {
           const delay = (job.opts as any)?.delay || 0;
           const payload: any = (job.data as any)?.payload || {};
-          const payloadStart = payload.start ? Date.parse(payload.start) : undefined;
+          const payloadStart = payload.start
+            ? Date.parse(payload.start)
+            : undefined;
           const scheduledAt = Number.isFinite(payloadStart)
             ? (payloadStart as number)
             : (job.timestamp || 0) + delay;
@@ -335,7 +385,9 @@ export class QueueService {
             title: payload.title || payload.message || 'Scheduled Job',
             description: payload.description,
             start: scheduledAt,
-            end: payload.end ? new Date(payload.end).getTime() : scheduledAt + 60 * 60 * 1000,
+            end: payload.end
+              ? new Date(payload.end).getTime()
+              : scheduledAt + 60 * 60 * 1000,
             tags: payload.tags,
             resource: payload.resource,
             payload,
@@ -378,7 +430,10 @@ export class QueueService {
     }
   }
 
-  async removeRepeatable(queueName: string, repeatJobKey: string): Promise<boolean> {
+  async removeRepeatable(
+    queueName: string,
+    repeatJobKey: string
+  ): Promise<boolean> {
     const queue = this.queues.get(queueName);
     if (!queue) return false;
     try {
@@ -393,7 +448,12 @@ export class QueueService {
   /** History listing */
   async listHistory(
     queueName: string,
-    status: 'completed' | 'failed' | 'waiting' | 'active' | 'delayed' = 'completed',
+    status:
+      | 'completed'
+      | 'failed'
+      | 'waiting'
+      | 'active'
+      | 'delayed' = 'completed',
     start = 0,
     end = 50
   ) {
@@ -427,7 +487,13 @@ export class QueueService {
   async getJobCounts(queueName: string) {
     const queue = this.queues.get(queueName);
     if (!queue) return {} as any;
-    return queue.getJobCounts('completed', 'failed', 'waiting', 'active', 'delayed');
+    return queue.getJobCounts(
+      'completed',
+      'failed',
+      'waiting',
+      'active',
+      'delayed'
+    );
   }
 
   /** Expose queues for integrations (read-only) */

@@ -84,7 +84,9 @@ export interface ApplyTemplateInput {
 
 /** Build release-flows base path from project-scoped path or fallback */
 function basePath(projectApiPath: string | null): string {
-  return projectApiPath ? `${projectApiPath}/release-flows` : '/admin/release-flows';
+  return projectApiPath
+    ? `${projectApiPath}/release-flows`
+    : '/admin/release-flows';
 }
 
 /**
@@ -94,7 +96,9 @@ export async function getTemplates(
   search?: string,
   projectApiPath: string | null = null
 ): Promise<ReleaseFlowTemplate[]> {
-  const response = await api.get(`${basePath(projectApiPath)}/templates`, { params: { search } });
+  const response = await api.get(`${basePath(projectApiPath)}/templates`, {
+    params: { search },
+  });
   return response.data || [];
 }
 
@@ -105,7 +109,10 @@ export async function createTemplate(
   data: CreateTemplateInput,
   projectApiPath: string | null = null
 ): Promise<ReleaseFlowTemplate> {
-  const response = await api.post(`${basePath(projectApiPath)}/templates`, data);
+  const response = await api.post(
+    `${basePath(projectApiPath)}/templates`,
+    data
+  );
   return response.data;
 }
 
@@ -128,7 +135,9 @@ export async function getPlan(
   environmentId: string,
   projectApiPath: string | null = null
 ): Promise<ReleaseFlowPlan | null> {
-  const response = await api.get(`${basePath(projectApiPath)}/plans/${flagId}/${environmentId}`);
+  const response = await api.get(
+    `${basePath(projectApiPath)}/plans/${flagId}/${environmentId}`
+  );
   return response.data;
 }
 
@@ -140,7 +149,9 @@ export async function startMilestone(
   milestoneId: string,
   projectApiPath: string | null = null
 ): Promise<void> {
-  await api.post(`${basePath(projectApiPath)}/plans/${planId}/milestones/${milestoneId}/start`);
+  await api.post(
+    `${basePath(projectApiPath)}/plans/${planId}/milestones/${milestoneId}/start`
+  );
 }
 
 /**
@@ -162,7 +173,10 @@ export async function updateTemplate(
   data: Partial<CreateTemplateInput>,
   projectApiPath: string | null = null
 ): Promise<ReleaseFlowTemplate> {
-  const response = await api.put(`${basePath(projectApiPath)}/templates/${id}`, data);
+  const response = await api.put(
+    `${basePath(projectApiPath)}/templates/${id}`,
+    data
+  );
   return response.data;
 }
 
@@ -195,7 +209,9 @@ export async function startPlan(
   planId: string,
   projectApiPath: string | null = null
 ): Promise<ReleaseFlowPlan> {
-  const response = await api.post(`${basePath(projectApiPath)}/plans/${planId}/start`);
+  const response = await api.post(
+    `${basePath(projectApiPath)}/plans/${planId}/start`
+  );
   return response.data;
 }
 
@@ -206,7 +222,9 @@ export async function pausePlan(
   planId: string,
   projectApiPath: string | null = null
 ): Promise<ReleaseFlowPlan> {
-  const response = await api.post(`${basePath(projectApiPath)}/plans/${planId}/pause`);
+  const response = await api.post(
+    `${basePath(projectApiPath)}/plans/${planId}/pause`
+  );
   return response.data;
 }
 
@@ -217,7 +235,9 @@ export async function resumePlan(
   planId: string,
   projectApiPath: string | null = null
 ): Promise<ReleaseFlowPlan> {
-  const response = await api.post(`${basePath(projectApiPath)}/plans/${planId}/resume`);
+  const response = await api.post(
+    `${basePath(projectApiPath)}/plans/${planId}/resume`
+  );
   return response.data;
 }
 
@@ -228,7 +248,9 @@ export async function progressToNext(
   planId: string,
   projectApiPath: string | null = null
 ): Promise<ReleaseFlowPlan> {
-  const response = await api.post(`${basePath(projectApiPath)}/plans/${planId}/progress`);
+  const response = await api.post(
+    `${basePath(projectApiPath)}/plans/${planId}/progress`
+  );
   return response.data;
 }
 
@@ -334,7 +356,10 @@ export async function createSafeguard(
   data: CreateSafeguardInput,
   projectApiPath: string | null = null
 ): Promise<Safeguard> {
-  const response = await api.post(`${basePath(projectApiPath)}/safeguards`, data);
+  const response = await api.post(
+    `${basePath(projectApiPath)}/safeguards`,
+    data
+  );
   return response.data;
 }
 
@@ -346,7 +371,10 @@ export async function updateSafeguard(
   data: UpdateSafeguardInput,
   projectApiPath: string | null = null
 ): Promise<Safeguard> {
-  const response = await api.put(`${basePath(projectApiPath)}/safeguards/${safeguardId}`, data);
+  const response = await api.put(
+    `${basePath(projectApiPath)}/safeguards/${safeguardId}`,
+    data
+  );
   return response.data;
 }
 
@@ -400,7 +428,9 @@ export interface AvailableMetric {
 export async function getAvailableMetrics(
   projectApiPath: string | null = null
 ): Promise<AvailableMetric[]> {
-  const response = await api.get(`${projectApiPath || '/admin'}/impact-metrics/available`);
+  const response = await api.get(
+    `${projectApiPath || '/admin'}/impact-metrics/available`
+  );
   return response.data || [];
 }
 

@@ -13,7 +13,10 @@ const LOCK_TIMEOUT = 300; // 5 minutes in seconds
 
 async function acquireLock(db: knex.Knex): Promise<boolean> {
   try {
-    const result = await db.raw('SELECT GET_LOCK(?, ?) as lockResult', [LOCK_NAME, LOCK_TIMEOUT]);
+    const result = await db.raw('SELECT GET_LOCK(?, ?) as lockResult', [
+      LOCK_NAME,
+      LOCK_TIMEOUT,
+    ]);
     const lockResult = result[0][0]?.lockResult;
 
     if (lockResult === 1) {
@@ -23,10 +26,13 @@ async function acquireLock(db: knex.Knex): Promise<boolean> {
       });
       return true;
     } else if (lockResult === 0) {
-      logger.warn('Failed to acquire chat migration lock - another process is running migrations', {
-        lockName: LOCK_NAME,
-        timeout: LOCK_TIMEOUT,
-      });
+      logger.warn(
+        'Failed to acquire chat migration lock - another process is running migrations',
+        {
+          lockName: LOCK_NAME,
+          timeout: LOCK_TIMEOUT,
+        }
+      );
       return false;
     } else {
       logger.error('Error acquiring chat migration lock - NULL returned', {
@@ -42,7 +48,9 @@ async function acquireLock(db: knex.Knex): Promise<boolean> {
 
 async function releaseLock(db: knex.Knex): Promise<void> {
   try {
-    const result = await db.raw('SELECT RELEASE_LOCK(?) as releaseResult', [LOCK_NAME]);
+    const result = await db.raw('SELECT RELEASE_LOCK(?) as releaseResult', [
+      LOCK_NAME,
+    ]);
     const releaseResult = result[0][0]?.releaseResult;
 
     if (releaseResult === 1) {
@@ -79,7 +87,9 @@ async function runMigrations() {
     const lockAcquired = await acquireLock(db);
 
     if (!lockAcquired) {
-      logger.info('Skipping chat migrations - another process is already running them');
+      logger.info(
+        'Skipping chat migrations - another process is already running them'
+      );
       process.exit(0);
     }
 

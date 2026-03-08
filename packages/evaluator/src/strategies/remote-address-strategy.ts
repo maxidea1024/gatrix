@@ -5,7 +5,11 @@
  * Supports exact match and CIDR notation (e.g., 192.168.1.0/24).
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
+import {
+  EvaluationContext,
+  StrategyParameters,
+  StrategyEvaluationResult,
+} from '@gatrix/shared';
 import { Strategy } from './strategy';
 
 /**
@@ -49,7 +53,10 @@ export class RemoteAddressStrategy extends Strategy {
     super('remoteAddress');
   }
 
-  isEnabled(parameters: StrategyParameters, context: EvaluationContext): boolean {
+  isEnabled(
+    parameters: StrategyParameters,
+    context: EvaluationContext
+  ): boolean {
     return this.isEnabledWithDetails(parameters, context).enabled;
   }
 
@@ -64,7 +71,11 @@ export class RemoteAddressStrategy extends Strategy {
 
     const remoteAddress = context.remoteAddress;
     if (!remoteAddress) {
-      return { enabled: false, reason: 'No remoteAddress in context', details: { IPs: ips } };
+      return {
+        enabled: false,
+        reason: 'No remoteAddress in context',
+        details: { IPs: ips },
+      };
     }
 
     const ranges = ips.split(/\s*,\s*/);

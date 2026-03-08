@@ -72,7 +72,10 @@ export class ProjectModel {
     return db(this.TABLE).where('isActive', true).orderBy('createdAt', 'desc');
   }
 
-  static async findByName(orgId: string, projectName: string): Promise<ProjectRecord | null> {
+  static async findByName(
+    orgId: string,
+    projectName: string
+  ): Promise<ProjectRecord | null> {
     const row = await db(this.TABLE)
       .where('orgId', orgId)
       .where('projectName', projectName)
@@ -81,14 +84,22 @@ export class ProjectModel {
   }
 
   static async findDefault(orgId: string): Promise<ProjectRecord | null> {
-    const row = await db(this.TABLE).where('orgId', orgId).where('isDefault', true).first();
+    const row = await db(this.TABLE)
+      .where('orgId', orgId)
+      .where('isDefault', true)
+      .first();
     return row || null;
   }
 
-  static async update(id: string, data: UpdateProjectData): Promise<ProjectRecord | null> {
+  static async update(
+    id: string,
+    data: UpdateProjectData
+  ): Promise<ProjectRecord | null> {
     const updateData: any = { updatedBy: data.updatedBy };
-    if (data.displayName !== undefined) updateData.displayName = data.displayName;
-    if (data.description !== undefined) updateData.description = data.description;
+    if (data.displayName !== undefined)
+      updateData.displayName = data.displayName;
+    if (data.description !== undefined)
+      updateData.description = data.description;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
     await db(this.TABLE).where('id', id).update(updateData);
@@ -104,7 +115,10 @@ export class ProjectModel {
    * Resolve orgId from projectId
    */
   static async getOrgId(projectId: string): Promise<string | null> {
-    const row = await db(this.TABLE).select('orgId').where('id', projectId).first();
+    const row = await db(this.TABLE)
+      .select('orgId')
+      .where('id', projectId)
+      .first();
     return row?.orgId || null;
   }
 }

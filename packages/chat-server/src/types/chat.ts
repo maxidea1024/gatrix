@@ -91,7 +91,14 @@ export interface Message {
   channelId: number;
   userId: number;
   content: string;
-  contentType: 'text' | 'image' | 'video' | 'audio' | 'file' | 'location' | 'system';
+  contentType:
+    | 'text'
+    | 'image'
+    | 'video'
+    | 'audio'
+    | 'file'
+    | 'location'
+    | 'system';
   messageData?: MessageData;
   replyToMessageId?: number;
   threadId?: number;

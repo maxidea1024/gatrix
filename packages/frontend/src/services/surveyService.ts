@@ -1,5 +1,8 @@
 import api from './api';
-import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
+import {
+  MutationResult,
+  parseChangeRequestResponse,
+} from './changeRequestUtils';
 
 export interface TriggerCondition {
   type: 'userLevel' | 'joinDays';
@@ -110,7 +113,10 @@ class SurveyService {
   /**
    * Get all surveys with pagination
    */
-  async getSurveys(projectApiPath: string, params?: GetSurveysParams): Promise<GetSurveysResponse> {
+  async getSurveys(
+    projectApiPath: string,
+    params?: GetSurveysParams
+  ): Promise<GetSurveysResponse> {
     const response = await api.get(`${projectApiPath}/surveys`, { params });
     return response.data;
   }
@@ -126,8 +132,13 @@ class SurveyService {
   /**
    * Get survey by platform survey ID
    */
-  async getSurveyByPlatformId(projectApiPath: string, platformSurveyId: string): Promise<Survey> {
-    const response = await api.get(`${projectApiPath}/surveys/platform/${platformSurveyId}`);
+  async getSurveyByPlatformId(
+    projectApiPath: string,
+    platformSurveyId: string
+  ): Promise<Survey> {
+    const response = await api.get(
+      `${projectApiPath}/surveys/platform/${platformSurveyId}`
+    );
     return response.data.survey;
   }
 
@@ -157,7 +168,10 @@ class SurveyService {
   /**
    * Delete a survey
    */
-  async deleteSurvey(projectApiPath: string, id: string): Promise<MutationResult<void>> {
+  async deleteSurvey(
+    projectApiPath: string,
+    id: string
+  ): Promise<MutationResult<void>> {
     const response = await api.delete(`${projectApiPath}/surveys/${id}`);
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
@@ -165,8 +179,13 @@ class SurveyService {
   /**
    * Toggle survey active status
    */
-  async toggleActive(projectApiPath: string, id: string): Promise<MutationResult<Survey>> {
-    const response = await api.patch(`${projectApiPath}/surveys/${id}/toggle-active`);
+  async toggleActive(
+    projectApiPath: string,
+    id: string
+  ): Promise<MutationResult<Survey>> {
+    const response = await api.patch(
+      `${projectApiPath}/surveys/${id}/toggle-active`
+    );
     return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }
 

@@ -42,9 +42,14 @@ export class WebSocketService {
     this.setupEventHandlers();
 
     // BroadcastService singleton 생성
-    this.broadcastService = BroadcastService.createInstance(this.io, this.serverId);
+    this.broadcastService = BroadcastService.createInstance(
+      this.io,
+      this.serverId
+    );
 
-    logger.info(`WebSocket service initialized with server ID: ${this.serverId}`);
+    logger.info(
+      `WebSocket service initialized with server ID: ${this.serverId}`
+    );
   }
 
   private async setupRedisAdapter(): Promise<void> {
@@ -95,7 +100,9 @@ export class WebSocketService {
           avatarUrl: userData.avatarUrl,
         };
 
-        logger.info(`🔌 User ${userData.id} (${userData.username}) connected via WebSocket`);
+        logger.info(
+          `🔌 User ${userData.id} (${userData.username}) connected via WebSocket`
+        );
         next();
       } catch (error) {
         logger.error('Socket authentication failed:', error);
@@ -173,7 +180,11 @@ export class WebSocketService {
 
       // 캐시에 소켓 정보 저장
       const cacheService = CacheService.getInstance();
-      await cacheService.set(`socket:${userId}:${socket.id}`, this.serverId, 24 * 60 * 60 * 1000); // 24시간
+      await cacheService.set(
+        `socket:${userId}:${socket.id}`,
+        this.serverId,
+        24 * 60 * 60 * 1000
+      ); // 24시간
 
       // 사용자를 개인 룸에 추가
       socket.join(`user:${userId}`);
@@ -193,7 +204,10 @@ export class WebSocketService {
       // 메트릭스 업데이트
       const metrics = getMetrics(this.app);
       if (metrics.connectedUsers) {
-        metrics.connectedUsers.set({ server_id: this.serverId }, this.connectedUsers.size);
+        metrics.connectedUsers.set(
+          { server_id: this.serverId },
+          this.connectedUsers.size
+        );
       }
     } catch (error) {
       logger.error(`Error handling connection for user ${userId}:`, error);
@@ -201,7 +215,10 @@ export class WebSocketService {
     }
   }
 
-  private setupSocketEventHandlers(socket: Socket, socketUser: SocketUser): void {
+  private setupSocketEventHandlers(
+    socket: Socket,
+    socketUser: SocketUser
+  ): void {
     // 채널 참여
     socket.on('join_channel', async (data: { channelId: number }) => {
       try {
@@ -233,40 +250,62 @@ export class WebSocketService {
     });
 
     // 타이핑 시작
-    socket.on('start_typing', async (data: { channelId: number; threadId?: number }) => {
-      try {
-        await this.handleStartTyping(socket, socketUser, data.channelId, data.threadId);
-      } catch (error) {
-        logger.error('Error starting typing:', error);
+    socket.on(
+      'start_typing',
+      async (data: { channelId: number; threadId?: number }) => {
+        try {
+          await this.handleStartTyping(
+            socket,
+            socketUser,
+            data.channelId,
+            data.threadId
+          );
+        } catch (error) {
+          logger.error('Error starting typing:', error);
+        }
       }
-    });
+    );
 
     // 타이핑 중지
-    socket.on('stop_typing', async (data: { channelId: number; threadId?: number }) => {
-      try {
-        await this.handleStopTyping(socket, socketUser, data.channelId, data.threadId);
-      } catch (error) {
-        logger.error('Error stopping typing:', error);
+    socket.on(
+      'stop_typing',
+      async (data: { channelId: number; threadId?: number }) => {
+        try {
+          await this.handleStopTyping(
+            socket,
+            socketUser,
+            data.channelId,
+            data.threadId
+          );
+        } catch (error) {
+          logger.error('Error stopping typing:', error);
+        }
       }
-    });
+    );
 
     // 메시지 읽음 처리
-    socket.on('mark_read', async (data: { channelId: number; messageId: number }) => {
-      try {
-        await this.handleMarkRead(socket, socketUser, data);
-      } catch (error) {
-        logger.error('Error marking message as read:', error);
+    socket.on(
+      'mark_read',
+      async (data: { channelId: number; messageId: number }) => {
+        try {
+          await this.handleMarkRead(socket, socketUser, data);
+        } catch (error) {
+          logger.error('Error marking message as read:', error);
+        }
       }
-    });
+    );
 
     // 사용자 상태 변경
-    socket.on('update_status', async (data: { status: string; customStatus?: string }) => {
-      try {
-        await this.handleUpdateStatus(socket, socketUser, data);
-      } catch (error) {
-        logger.error('Error updating status:', error);
+    socket.on(
+      'update_status',
+      async (data: { status: string; customStatus?: string }) => {
+        try {
+          await this.handleUpdateStatus(socket, socketUser, data);
+        } catch (error) {
+          logger.error('Error updating status:', error);
+        }
       }
-    });
+    );
 
     // 연결 해제
     socket.on('disconnect', async (reason: string) => {
@@ -301,7 +340,10 @@ export class WebSocketService {
       }
 
       // 채널 멤버인지 확인
-      const isMember = await ChannelModel.isMember(channelId, socketUser.userId);
+      const isMember = await ChannelModel.isMember(
+        channelId,
+        socketUser.userId
+      );
       if (!isMember && channel.type !== 'public') {
         socket.emit('error', { message: 'Access denied to channel' });
         return;
@@ -344,7 +386,9 @@ export class WebSocketService {
 
     // 캐시에서 채널 멤버십 제거
     const cacheService = CacheService.getInstance();
-    await cacheService.delete(`channel_member:${channelId}:${socketUser.userId}`);
+    await cacheService.delete(
+      `channel_member:${channelId}:${socketUser.userId}`
+    );
 
     // 채널 나가기 알림
     await this.broadcastService.broadcastToChannel(channelId, 'user_left', {
@@ -397,7 +441,11 @@ export class WebSocketService {
       };
 
       // 채널에 메시지 브로드캐스트
-      await this.broadcastService.broadcastToChannel(data.channelId, 'new_message', message);
+      await this.broadcastService.broadcastToChannel(
+        data.channelId,
+        'new_message',
+        message
+      );
 
       // 메트릭스 기록
       const metrics = getMetrics(this.app);
@@ -474,9 +522,15 @@ export class WebSocketService {
   ): Promise<void> {
     // 데이터베이스에 읽음 상태 업데이트
     try {
-      const { MessageReadStatusModel } = require('../models/MessageReadStatusModel');
+      const {
+        MessageReadStatusModel,
+      } = require('../models/MessageReadStatusModel');
 
-      await MessageReadStatusModel.markAsRead(data.messageId, socketUser.userId, data.channelId);
+      await MessageReadStatusModel.markAsRead(
+        data.messageId,
+        socketUser.userId,
+        data.channelId
+      );
     } catch (error) {
       logger.error('Error updating read status:', error);
     }
@@ -545,7 +599,10 @@ export class WebSocketService {
     // 메트릭스 업데이트
     const metrics = getMetrics(this.app);
     if (metrics.connectedUsers) {
-      metrics.connectedUsers.set({ server_id: this.serverId }, this.connectedUsers.size);
+      metrics.connectedUsers.set(
+        { server_id: this.serverId },
+        this.connectedUsers.size
+      );
     }
 
     logger.info(`User ${socketUser.userId} disconnected: ${reason}`);
@@ -578,7 +635,10 @@ export class WebSocketService {
       metrics.connectedUsers.set({ server_id: this.serverId }, connectedCount);
     }
     if (metrics.activeChannels) {
-      metrics.activeChannels.set({ server_id: this.serverId }, channelCounts.size);
+      metrics.activeChannels.set(
+        { server_id: this.serverId },
+        channelCounts.size
+      );
     }
     if (metrics.websocketConnections) {
       metrics.websocketConnections.set(
@@ -604,11 +664,19 @@ export class WebSocketService {
   }
 
   // 외부에서 사용할 수 있는 메서드들
-  public async sendToUser(userId: number, event: string, data: any): Promise<void> {
+  public async sendToUser(
+    userId: number,
+    event: string,
+    data: any
+  ): Promise<void> {
     this.io.to(`user:${userId}`).emit(event, data);
   }
 
-  public async sendToChannel(channelId: number, event: string, data: any): Promise<void> {
+  public async sendToChannel(
+    channelId: number,
+    event: string,
+    data: any
+  ): Promise<void> {
     this.io.to(`channel:${channelId}`).emit(event, data);
   }
 

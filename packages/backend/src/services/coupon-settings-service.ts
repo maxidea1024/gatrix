@@ -6,7 +6,10 @@ import { queueService } from './queue-service';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('CouponSettings');
-import { generateCouponCode, CodePattern } from '../utils/coupon-code-generator';
+import {
+  generateCouponCode,
+  CodePattern,
+} from '../utils/coupon-code-generator';
 
 export type CouponType = 'SPECIAL' | 'NORMAL';
 export type CouponStatus = 'ACTIVE' | 'DISABLED' | 'DELETED';
@@ -121,12 +124,19 @@ export class CouponSettingsService {
     const total = Number(countResult?.total || 0);
 
     // Get paginated settings
-    const rows = await query.clone().orderBy('createdAt', 'desc').limit(limit).offset(offset);
+    const rows = await query
+      .clone()
+      .orderBy('createdAt', 'desc')
+      .limit(limit)
+      .offset(offset);
 
     const settings = rows.map((r: any) => ({
       ...r,
       tags: typeof r.tags === 'string' ? JSON.parse(r.tags) : r.tags,
-      rewardData: typeof r.rewardData === 'string' ? JSON.parse(r.rewardData) : r.rewardData,
+      rewardData:
+        typeof r.rewardData === 'string'
+          ? JSON.parse(r.rewardData)
+          : r.rewardData,
       issuedCount: Number(r.issuedCount || 0),
       usedCount: Number(r.usedCount || 0),
     })) as any[];
@@ -142,29 +152,37 @@ export class CouponSettingsService {
       .first();
     if (!base) throw new GatrixError('Coupon setting not found', 404);
 
-    base.tags = typeof base.tags === 'string' ? JSON.parse(base.tags) : base.tags;
+    base.tags =
+      typeof base.tags === 'string' ? JSON.parse(base.tags) : base.tags;
     base.rewardData =
-      typeof base.rewardData === 'string' ? JSON.parse(base.rewardData) : base.rewardData;
+      typeof base.rewardData === 'string'
+        ? JSON.parse(base.rewardData)
+        : base.rewardData;
 
-    const [worlds, platforms, channels, subchannels, users] = await Promise.all([
-      db('g_coupon_target_worlds')
-        .where('settingId', id)
-        .orderBy('gameWorldId', 'asc')
-        .select('gameWorldId'),
-      db('g_coupon_target_platforms')
-        .where('settingId', id)
-        .orderBy('platform', 'asc')
-        .select('platform'),
-      db('g_coupon_target_channels')
-        .where('settingId', id)
-        .orderBy('channel', 'asc')
-        .select('channel'),
-      db('g_coupon_target_subchannels')
-        .where('settingId', id)
-        .orderBy('subchannel', 'asc')
-        .select('subchannel'),
-      db('g_coupon_target_users').where('settingId', id).orderBy('userId', 'asc').select('userId'),
-    ]);
+    const [worlds, platforms, channels, subchannels, users] = await Promise.all(
+      [
+        db('g_coupon_target_worlds')
+          .where('settingId', id)
+          .orderBy('gameWorldId', 'asc')
+          .select('gameWorldId'),
+        db('g_coupon_target_platforms')
+          .where('settingId', id)
+          .orderBy('platform', 'asc')
+          .select('platform'),
+        db('g_coupon_target_channels')
+          .where('settingId', id)
+          .orderBy('channel', 'asc')
+          .select('channel'),
+        db('g_coupon_target_subchannels')
+          .where('settingId', id)
+          .orderBy('subchannel', 'asc')
+          .select('subchannel'),
+        db('g_coupon_target_users')
+          .where('settingId', id)
+          .orderBy('userId', 'asc')
+          .select('userId'),
+      ]
+    );
 
     return {
       ...base,
@@ -177,13 +195,21 @@ export class CouponSettingsService {
   }
 
   // Create new setting
-  static async createSetting(input: CreateCouponSettingInput, environmentId: string): Promise<any> {
+  static async createSetting(
+    input: CreateCouponSettingInput,
+    environmentId: string
+  ): Promise<any> {
     if (input.rewardTemplateId && input.rewardData) {
-      throw new GatrixError('Use either rewardTemplateId or rewardData, not both', 400);
+      throw new GatrixError(
+        'Use either rewardTemplateId or rewardData, not both',
+        400
+      );
     }
 
     // Convert dates to MySQL DATETIME
-    const startsAt = input.startsAt ? convertToMySQLDateTime(input.startsAt) : null;
+    const startsAt = input.startsAt
+      ? convertToMySQLDateTime(input.startsAt)
+      : null;
     const expiresAt = convertToMySQLDateTime(input.expiresAt);
     if (!expiresAt) throw new GatrixError('Invalid expiration date', 400);
 
@@ -196,17 +222,24 @@ export class CouponSettingsService {
     if (isSpecial) {
       const code = (input.code || '').trim();
       if (!code || code.length < 4)
-        throw new GatrixError('code must be at least 4 characters for SPECIAL', 400);
+        throw new GatrixError(
+          'code must be at least 4 characters for SPECIAL',
+          400
+        );
     }
 
     const perUserLimit = isSpecial ? 1 : (input.perUserLimit ?? 1);
     const settingCode = isNormal ? null : (input.code ?? null);
     const maxTotalUses = isNormal ? null : (input.maxTotalUses ?? null);
 
-    const codePattern = isNormal ? (input.codePattern ?? 'ALPHANUMERIC_8') : 'ALPHANUMERIC_8';
+    const codePattern = isNormal
+      ? (input.codePattern ?? 'ALPHANUMERIC_8')
+      : 'ALPHANUMERIC_8';
     if (
       isNormal &&
-      !['ALPHANUMERIC_8', 'ALPHANUMERIC_16', 'ALPHANUMERIC_16_HYPHEN'].includes(codePattern)
+      !['ALPHANUMERIC_8', 'ALPHANUMERIC_16', 'ALPHANUMERIC_16_HYPHEN'].includes(
+        codePattern
+      )
     ) {
       throw new GatrixError('Invalid code pattern', 400);
     }
@@ -251,16 +284,36 @@ export class CouponSettingsService {
     }
 
     // Insert targeting arrays
-    await this.insertTargets('g_coupon_target_worlds', 'gameWorldId', id, input.targetWorlds);
-    await this.insertTargets('g_coupon_target_platforms', 'platform', id, input.targetPlatforms);
-    await this.insertTargets('g_coupon_target_channels', 'channel', id, input.targetChannels);
+    await this.insertTargets(
+      'g_coupon_target_worlds',
+      'gameWorldId',
+      id,
+      input.targetWorlds
+    );
+    await this.insertTargets(
+      'g_coupon_target_platforms',
+      'platform',
+      id,
+      input.targetPlatforms
+    );
+    await this.insertTargets(
+      'g_coupon_target_channels',
+      'channel',
+      id,
+      input.targetChannels
+    );
     await this.insertTargetsWithChannel(
       'g_coupon_target_subchannels',
       'subchannel',
       id,
       input.targetSubchannels
     );
-    await this.insertTargets('g_coupon_target_users', 'userId', id, input.targetUsers);
+    await this.insertTargets(
+      'g_coupon_target_users',
+      'userId',
+      id,
+      input.targetUsers
+    );
 
     return await this.getSettingById(id, environmentId);
   }
@@ -316,7 +369,10 @@ export class CouponSettingsService {
     await this.getSettingById(id, environmentId);
 
     if (input.rewardTemplateId && input.rewardData) {
-      throw new GatrixError('Use either rewardTemplateId or rewardData, not both', 400);
+      throw new GatrixError(
+        'Use either rewardTemplateId or rewardData, not both',
+        400
+      );
     }
 
     const updates: Record<string, any> = {};
@@ -324,16 +380,26 @@ export class CouponSettingsService {
     if (input.code !== undefined) updates.code = input.code;
     if (input.type !== undefined) updates.type = input.type;
     if (input.name !== undefined) updates.name = input.name;
-    if (input.description !== undefined) updates.description = input.description;
-    if (input.tags !== undefined) updates.tags = input.tags ? JSON.stringify(input.tags) : null;
-    if (input.maxTotalUses !== undefined) updates.maxTotalUses = input.maxTotalUses;
-    if (input.perUserLimit !== undefined) updates.perUserLimit = input.perUserLimit;
-    if (input.usageLimitType !== undefined) updates.usageLimitType = input.usageLimitType;
-    if (input.rewardTemplateId !== undefined) updates.rewardTemplateId = input.rewardTemplateId;
+    if (input.description !== undefined)
+      updates.description = input.description;
+    if (input.tags !== undefined)
+      updates.tags = input.tags ? JSON.stringify(input.tags) : null;
+    if (input.maxTotalUses !== undefined)
+      updates.maxTotalUses = input.maxTotalUses;
+    if (input.perUserLimit !== undefined)
+      updates.perUserLimit = input.perUserLimit;
+    if (input.usageLimitType !== undefined)
+      updates.usageLimitType = input.usageLimitType;
+    if (input.rewardTemplateId !== undefined)
+      updates.rewardTemplateId = input.rewardTemplateId;
     if (input.rewardData !== undefined)
-      updates.rewardData = input.rewardData ? JSON.stringify(input.rewardData) : null;
-    if (input.rewardEmailTitle !== undefined) updates.rewardEmailTitle = input.rewardEmailTitle;
-    if (input.rewardEmailBody !== undefined) updates.rewardEmailBody = input.rewardEmailBody;
+      updates.rewardData = input.rewardData
+        ? JSON.stringify(input.rewardData)
+        : null;
+    if (input.rewardEmailTitle !== undefined)
+      updates.rewardEmailTitle = input.rewardEmailTitle;
+    if (input.rewardEmailBody !== undefined)
+      updates.rewardEmailBody = input.rewardEmailBody;
 
     if (input.startsAt !== undefined) {
       if (input.startsAt === null) {
@@ -366,16 +432,36 @@ export class CouponSettingsService {
     }
 
     // Replace targeting if provided
-    await this.replaceTargets('g_coupon_target_worlds', 'gameWorldId', id, input.targetWorlds);
-    await this.replaceTargets('g_coupon_target_platforms', 'platform', id, input.targetPlatforms);
-    await this.replaceTargets('g_coupon_target_channels', 'channel', id, input.targetChannels);
+    await this.replaceTargets(
+      'g_coupon_target_worlds',
+      'gameWorldId',
+      id,
+      input.targetWorlds
+    );
+    await this.replaceTargets(
+      'g_coupon_target_platforms',
+      'platform',
+      id,
+      input.targetPlatforms
+    );
+    await this.replaceTargets(
+      'g_coupon_target_channels',
+      'channel',
+      id,
+      input.targetChannels
+    );
     await this.replaceTargetsWithChannel(
       'g_coupon_target_subchannels',
       'subchannel',
       id,
       input.targetSubchannels
     );
-    await this.replaceTargets('g_coupon_target_users', 'userId', id, input.targetUsers);
+    await this.replaceTargets(
+      'g_coupon_target_users',
+      'userId',
+      id,
+      input.targetUsers
+    );
 
     return await this.getSettingById(id, environmentId);
   }
@@ -419,7 +505,8 @@ export class CouponSettingsService {
     // Cancel BullMQ job if it's in progress
     if (
       setting.generationJobId &&
-      (setting.generationStatus === 'IN_PROGRESS' || setting.generationStatus === 'PENDING')
+      (setting.generationStatus === 'IN_PROGRESS' ||
+        setting.generationStatus === 'PENDING')
     ) {
       try {
         const queue = queueService.getQueue('coupon-generation');
@@ -453,7 +540,8 @@ export class CouponSettingsService {
         usedCount: 0,
       });
 
-    if (affectedRows === 0) throw new GatrixError('Coupon setting not found', 404);
+    if (affectedRows === 0)
+      throw new GatrixError('Coupon setting not found', 404);
   }
 
   /**
@@ -468,7 +556,9 @@ export class CouponSettingsService {
         status: 'DISABLED',
         disabledBy: db.raw("COALESCE(disabledBy, 'system')"),
         disabledAt: db.raw('UTC_TIMESTAMP()'),
-        disabledReason: db.raw("COALESCE(disabledReason, 'Expired by scheduler')"),
+        disabledReason: db.raw(
+          "COALESCE(disabledReason, 'Expired by scheduler')"
+        ),
       });
     return affectedRows || 0;
   }
@@ -499,16 +589,23 @@ export class CouponSettingsService {
       if (query.search) {
         const pattern = `%${query.search}%`;
         q.where(function () {
-          this.where('cu.userId', 'like', pattern).orWhere('cu.userName', 'like', pattern);
+          this.where('cu.userId', 'like', pattern).orWhere(
+            'cu.userName',
+            'like',
+            pattern
+          );
         });
       }
       if (query.platform) q.where('cu.platform', query.platform);
       if (query.channel) q.where('cu.channel', query.channel);
       if (query.subChannel) q.where('cu.subchannel', query.subChannel);
       if (query.gameWorldId) q.where('cu.gameWorldId', query.gameWorldId);
-      if ((query as any).characterId) q.where('cu.characterId', (query as any).characterId);
-      if (query.from) q.where('cu.usedAt', '>=', convertToMySQLDateTime(query.from));
-      if (query.to) q.where('cu.usedAt', '<=', convertToMySQLDateTime(query.to));
+      if ((query as any).characterId)
+        q.where('cu.characterId', (query as any).characterId);
+      if (query.from)
+        q.where('cu.usedAt', '>=', convertToMySQLDateTime(query.from));
+      if (query.to)
+        q.where('cu.usedAt', '<=', convertToMySQLDateTime(query.to));
 
       return q;
     };
@@ -581,15 +678,18 @@ export class CouponSettingsService {
       ])
       .orderBy('cu.usedAt', 'desc');
 
-    if ((query as any).settingId) q.where('cu.settingId', (query as any).settingId);
+    if ((query as any).settingId)
+      q.where('cu.settingId', (query as any).settingId);
     if ((query as any).couponCode)
       q.whereRaw('COALESCE(c.code, cs.code) = ?', [(query as any).couponCode]);
     if (query.platform) q.where('cu.platform', query.platform);
     if (query.channel) q.where('cu.channel', query.channel);
     if (query.subChannel) q.where('cu.subchannel', query.subChannel);
     if (query.gameWorldId) q.where('cu.gameWorldId', query.gameWorldId);
-    if ((query as any).characterId) q.where('cu.characterId', (query as any).characterId);
-    if (query.from) q.where('cu.usedAt', '>=', convertToMySQLDateTime(query.from));
+    if ((query as any).characterId)
+      q.where('cu.characterId', (query as any).characterId);
+    if (query.from)
+      q.where('cu.usedAt', '>=', convertToMySQLDateTime(query.from));
     if (query.to) q.where('cu.usedAt', '<=', convertToMySQLDateTime(query.to));
 
     return await q;
@@ -610,16 +710,22 @@ export class CouponSettingsService {
         .leftJoin('g_coupon_settings as cs', 'cu.settingId', 'cs.id')
         .leftJoin('g_coupons as c', 'cu.issuedCouponId', 'c.id');
 
-      if ((query as any).settingId) q.where('cu.settingId', (query as any).settingId);
+      if ((query as any).settingId)
+        q.where('cu.settingId', (query as any).settingId);
       if ((query as any).couponCode)
-        q.whereRaw('COALESCE(c.code, cs.code) = ?', [(query as any).couponCode]);
+        q.whereRaw('COALESCE(c.code, cs.code) = ?', [
+          (query as any).couponCode,
+        ]);
       if (query.platform) q.where('cu.platform', query.platform);
       if (query.channel) q.where('cu.channel', query.channel);
       if (query.subChannel) q.where('cu.subchannel', query.subChannel);
       if (query.gameWorldId) q.where('cu.gameWorldId', query.gameWorldId);
-      if ((query as any).characterId) q.where('cu.characterId', (query as any).characterId);
-      if (query.from) q.where('cu.usedAt', '>=', convertToMySQLDateTime(query.from));
-      if (query.to) q.where('cu.usedAt', '<=', convertToMySQLDateTime(query.to));
+      if ((query as any).characterId)
+        q.where('cu.characterId', (query as any).characterId);
+      if (query.from)
+        q.where('cu.usedAt', '>=', convertToMySQLDateTime(query.from));
+      if (query.to)
+        q.where('cu.usedAt', '<=', convertToMySQLDateTime(query.to));
 
       return q;
     };
@@ -677,7 +783,9 @@ export class CouponSettingsService {
     const used = Number(row.usedCount || 0);
     const unused = issued - used;
 
-    logger.debug(`settingId=${settingId}, issued=${issued}, used=${used}, unused=${unused}`);
+    logger.debug(
+      `settingId=${settingId}, issued=${issued}, used=${used}, unused=${unused}`
+    );
 
     return { issued, used, unused };
   }
@@ -737,7 +845,9 @@ export class CouponSettingsService {
       }
 
       total = Number(setting.issuedCount || 0);
-      logger.debug(`Cache hit: total=${total}, time=${Date.now() - startTime}ms`);
+      logger.debug(
+        `Cache hit: total=${total}, time=${Date.now() - startTime}ms`
+      );
     } else {
       const countResult = await db('g_coupons')
         .where('settingId', settingId)
@@ -781,7 +891,10 @@ export class CouponSettingsService {
       status: row.generationStatus || 'COMPLETED',
       generatedCount: row.generatedCount || 0,
       totalCount: row.totalCount || 0,
-      progress: row.totalCount > 0 ? Math.round((row.generatedCount / row.totalCount) * 100) : 0,
+      progress:
+        row.totalCount > 0
+          ? Math.round((row.generatedCount / row.totalCount) * 100)
+          : 0,
     };
   }
 
@@ -816,7 +929,10 @@ export class CouponSettingsService {
       const mismatches: any[] = [];
 
       for (const row of rows) {
-        if (row.cached_issued !== row.actual_issued || row.cached_used !== row.actual_used) {
+        if (
+          row.cached_issued !== row.actual_issued ||
+          row.cached_used !== row.actual_used
+        ) {
           mismatches.push({
             settingId: row.id,
             cached_issued: row.cached_issued,
@@ -865,7 +981,9 @@ export class CouponSettingsService {
         .first();
       const usedCount = Number(usedResult?.count || 0);
 
-      await db('g_coupon_settings').where('id', settingId).update({ issuedCount, usedCount });
+      await db('g_coupon_settings')
+        .where('id', settingId)
+        .update({ issuedCount, usedCount });
 
       logger.info('Cache recalculated for setting', {
         settingId,
@@ -899,7 +1017,8 @@ export class CouponSettingsService {
       .where('id', settingId)
       .select('codePattern', 'environmentId')
       .first();
-    const codePattern = (setting?.codePattern || 'ALPHANUMERIC_8') as CodePattern;
+    const codePattern = (setting?.codePattern ||
+      'ALPHANUMERIC_8') as CodePattern;
     const environmentId = setting?.environmentId;
 
     if (!environmentId) {
@@ -925,7 +1044,10 @@ export class CouponSettingsService {
 
         // Check database for duplicates in batches
         if (i % DUPLICATE_CHECK_BATCH === 0) {
-          const dup = await db('g_coupons').where('code', code).select(db.raw('1 as ok')).first();
+          const dup = await db('g_coupons')
+            .where('code', code)
+            .select(db.raw('1 as ok'))
+            .first();
           if (!dup) {
             found = true;
             break;
@@ -956,7 +1078,9 @@ export class CouponSettingsService {
       }
 
       // Update issuedCount cache
-      await db('g_coupon_settings').where('id', settingId).update({ issuedCount: codes.length });
+      await db('g_coupon_settings')
+        .where('id', settingId)
+        .update({ issuedCount: codes.length });
     }
   }
 
@@ -977,7 +1101,8 @@ export class CouponSettingsService {
       // Create queue if not exists
       const queueName = 'coupon-generation';
       if (!queueService.getQueue(queueName)) {
-        const { CouponGenerationJob } = await import('./jobs/coupon-generation-job');
+        const { CouponGenerationJob } =
+          await import('./jobs/coupon-generation-job');
         await queueService.createQueue(
           queueName,
           async (job: any) => {

@@ -13,10 +13,14 @@ export const config = {
   // Database
   database: {
     host: process.env.CHAT_DB_HOST || process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.CHAT_DB_PORT || process.env.DB_PORT || '3306', 10),
+    port: parseInt(
+      process.env.CHAT_DB_PORT || process.env.DB_PORT || '3306',
+      10
+    ),
     name: process.env.CHAT_DB_NAME || 'gatrix_chat',
     user: process.env.CHAT_DB_USER || process.env.DB_USER || 'root',
-    password: process.env.CHAT_DB_PASSWORD || process.env.DB_PASSWORD || 'password',
+    password:
+      process.env.CHAT_DB_PASSWORD || process.env.DB_PASSWORD || 'password',
     debug: process.env.DB_DEBUG === 'true',
   },
 
@@ -48,8 +52,11 @@ export const config = {
 
   // JWT
   jwt: {
-    secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-for-chat-server',
-    serverSecret: process.env.JWT_SERVER_SECRET || 'your-super-secret-server-key-for-chat-server',
+    secret:
+      process.env.JWT_SECRET || 'your-super-secret-jwt-key-for-chat-server',
+    serverSecret:
+      process.env.JWT_SERVER_SECRET ||
+      'your-super-secret-server-key-for-chat-server',
     expiresIn: process.env.JWT_EXPIRES_IN || '24h',
   },
 
@@ -67,7 +74,10 @@ export const config = {
   gatrix: {
     apiUrl: process.env.GATRIX_API_URL || 'http://localhost:3000',
     apiSecret: process.env.GATRIX_API_SECRET || 'shared-secret-between-servers',
-    connectionTimeout: parseInt(process.env.GATRIX_CONNECTION_TIMEOUT || '30000', 10),
+    connectionTimeout: parseInt(
+      process.env.GATRIX_CONNECTION_TIMEOUT || '30000',
+      10
+    ),
   },
 
   // CORS
@@ -95,7 +105,10 @@ export const config = {
   websocket: {
     pingTimeout: parseInt(process.env.WS_PING_TIMEOUT || '60000', 10),
     pingInterval: parseInt(process.env.WS_PING_INTERVAL || '25000', 10),
-    maxHttpBufferSize: parseInt(process.env.WS_MAX_HTTP_BUFFER_SIZE || '1048576', 10), // 1MB
+    maxHttpBufferSize: parseInt(
+      process.env.WS_MAX_HTTP_BUFFER_SIZE || '1048576',
+      10
+    ), // 1MB
     transports: ['websocket', 'polling'],
     upgradeTimeout: parseInt(process.env.WS_UPGRADE_TIMEOUT || '10000', 10),
     maxConnections: parseInt(process.env.WS_MAX_CONNECTIONS || '10000', 10), // Per instance
@@ -112,7 +125,9 @@ export const config = {
   // Clustering
   cluster: {
     enabled: process.env.CLUSTER_ENABLED === 'true',
-    workers: parseInt(process.env.CLUSTER_WORKERS || '0', 10) || require('os').cpus().length,
+    workers:
+      parseInt(process.env.CLUSTER_WORKERS || '0', 10) ||
+      require('os').cpus().length,
     stickySession: process.env.STICKY_SESSION === 'true',
   },
 
@@ -123,13 +138,19 @@ export const config = {
     useMessagePack: process.env.USE_MESSAGE_PACK === 'true',
     compression: process.env.BROADCAST_COMPRESSION === 'true',
     channelSharding: process.env.CHANNEL_SHARDING === 'true',
-    maxChannelsPerShard: parseInt(process.env.MAX_CHANNELS_PER_SHARD || '1000', 10),
+    maxChannelsPerShard: parseInt(
+      process.env.MAX_CHANNELS_PER_SHARD || '1000',
+      10
+    ),
   },
 
   // Performance Monitoring
   monitoring: {
     enabled: process.env.MONITORING_ENABLED === 'true',
-    metricsPort: parseInt(process.env.CHAT_METRICS_PORT || process.env.METRICS_PORT || '9402', 10),
+    metricsPort: parseInt(
+      process.env.CHAT_METRICS_PORT || process.env.METRICS_PORT || '9402',
+      10
+    ),
     healthCheckPath: process.env.HEALTH_CHECK_PATH || '/health',
     readinessCheckPath: process.env.READINESS_CHECK_PATH || '/ready',
   },
@@ -138,7 +159,10 @@ export const config = {
   memory: {
     maxMemoryUsage: parseInt(process.env.MAX_MEMORY_USAGE || '1073741824', 10), // 1GB
     gcInterval: parseInt(process.env.GC_INTERVAL || '300000', 10), // 5 minutes
-    connectionCleanupInterval: parseInt(process.env.CONNECTION_CLEANUP_INTERVAL || '60000', 10),
+    connectionCleanupInterval: parseInt(
+      process.env.CONNECTION_CLEANUP_INTERVAL || '60000',
+      10
+    ),
   },
 
   // Logging

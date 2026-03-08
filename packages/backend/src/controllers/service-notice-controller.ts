@@ -54,27 +54,47 @@ class ServiceNoticeController {
       }
 
       const filters = {
-        isActive: req.query.isActive !== undefined ? req.query.isActive === 'true' : undefined,
+        isActive:
+          req.query.isActive !== undefined
+            ? req.query.isActive === 'true'
+            : undefined,
         currentlyVisible:
           req.query.currentlyVisible !== undefined
             ? req.query.currentlyVisible === 'true'
             : undefined,
         category: req.query.category as string,
         platform,
-        platformOperator: req.query.platformOperator as 'any_of' | 'include_all' | undefined,
+        platformOperator: req.query.platformOperator as
+          | 'any_of'
+          | 'include_all'
+          | undefined,
         channel,
-        channelOperator: req.query.channelOperator as 'any_of' | 'include_all' | undefined,
+        channelOperator: req.query.channelOperator as
+          | 'any_of'
+          | 'include_all'
+          | undefined,
         subchannel,
-        subchannelOperator: req.query.subchannelOperator as 'any_of' | 'include_all' | undefined,
+        subchannelOperator: req.query.subchannelOperator as
+          | 'any_of'
+          | 'include_all'
+          | undefined,
         search: req.query.search as string,
         sortBy: req.query.sortBy as string,
         sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
         environmentId,
       };
 
-      const result = await ServiceNoticeService.getServiceNotices(page, limit, filters);
+      const result = await ServiceNoticeService.getServiceNotices(
+        page,
+        limit,
+        filters
+      );
 
-      return sendSuccessResponse(res, result, 'Service notices retrieved successfully');
+      return sendSuccessResponse(
+        res,
+        result,
+        'Service notices retrieved successfully'
+      );
     } catch (error) {
       return sendInternalError(
         res,
@@ -88,7 +108,11 @@ class ServiceNoticeController {
   /**
    * Get service notice by ID
    */
-  getServiceNoticeById = async (req: AuthenticatedRequest, res: Response, _next: any) => {
+  getServiceNoticeById = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    _next: any
+  ) => {
     try {
       const id = req.params.id;
       const environmentId = req.environmentId;
@@ -99,13 +123,24 @@ class ServiceNoticeController {
         });
       }
 
-      const notice = await ServiceNoticeService.getServiceNoticeById(id, environmentId);
+      const notice = await ServiceNoticeService.getServiceNoticeById(
+        id,
+        environmentId
+      );
 
       if (!notice) {
-        return sendNotFound(res, 'Service notice not found', ErrorCodes.RESOURCE_NOT_FOUND);
+        return sendNotFound(
+          res,
+          'Service notice not found',
+          ErrorCodes.RESOURCE_NOT_FOUND
+        );
       }
 
-      return sendSuccessResponse(res, { notice }, 'Service notice retrieved successfully');
+      return sendSuccessResponse(
+        res,
+        { notice },
+        'Service notice retrieved successfully'
+      );
     } catch (error) {
       return sendInternalError(
         res,
@@ -163,7 +198,10 @@ class ServiceNoticeController {
         'g_service_notices',
         { ...data, environmentId },
         async () => {
-          const notice = await ServiceNoticeService.createServiceNotice(data, environmentId);
+          const notice = await ServiceNoticeService.createServiceNotice(
+            data,
+            environmentId
+          );
           return notice;
         }
       );
@@ -182,7 +220,8 @@ class ServiceNoticeController {
             changeRequestId: gatewayResult.changeRequestId,
             status: gatewayResult.status,
           },
-          message: 'Change request created. The service notice will be created after approval.',
+          message:
+            'Change request created. The service notice will be created after approval.',
         });
       }
     } catch (error) {
@@ -240,7 +279,11 @@ class ServiceNoticeController {
       );
 
       if (gatewayResult.mode === 'DIRECT') {
-        return sendSuccessResponse(res, gatewayResult.data, 'Service notice updated successfully');
+        return sendSuccessResponse(
+          res,
+          gatewayResult.data,
+          'Service notice updated successfully'
+        );
       } else {
         return res.status(202).json({
           success: true,
@@ -248,7 +291,8 @@ class ServiceNoticeController {
             changeRequestId: gatewayResult.changeRequestId,
             status: gatewayResult.status,
           },
-          message: 'Change request created. The update will be applied after approval.',
+          message:
+            'Change request created. The update will be applied after approval.',
         });
       }
     } catch (error) {
@@ -298,7 +342,11 @@ class ServiceNoticeController {
       );
 
       if (gatewayResult.mode === 'DIRECT') {
-        return sendSuccessResponse(res, undefined, 'Service notice deleted successfully');
+        return sendSuccessResponse(
+          res,
+          undefined,
+          'Service notice deleted successfully'
+        );
       } else {
         return res.status(202).json({
           success: true,
@@ -306,7 +354,8 @@ class ServiceNoticeController {
             changeRequestId: gatewayResult.changeRequestId,
             status: gatewayResult.status,
           },
-          message: 'Change request created. The deletion will be applied after approval.',
+          message:
+            'Change request created. The deletion will be applied after approval.',
         });
       }
     } catch (error) {
@@ -332,7 +381,10 @@ class ServiceNoticeController {
   /**
    * Delete multiple service notices
    */
-  deleteMultipleServiceNotices = async (req: AuthenticatedRequest, res: Response) => {
+  deleteMultipleServiceNotices = async (
+    req: AuthenticatedRequest,
+    res: Response
+  ) => {
     try {
       const { ids } = req.body;
       const environmentId = req.environmentId;
@@ -349,7 +401,8 @@ class ServiceNoticeController {
       }
 
       // For bulk delete, check if CR is required
-      const requiresCR = await UnifiedChangeGateway.requiresApproval(environmentId);
+      const requiresCR =
+        await UnifiedChangeGateway.requiresApproval(environmentId);
 
       if (requiresCR) {
         // Create individual CRs for each item
@@ -373,7 +426,10 @@ class ServiceNoticeController {
           message: `Change requests created for ${ids.length} service notice(s). Deletions will be applied after approval.`,
         });
       } else {
-        await ServiceNoticeService.deleteMultipleServiceNotices(ids, environmentId);
+        await ServiceNoticeService.deleteMultipleServiceNotices(
+          ids,
+          environmentId
+        );
         return sendSuccessResponse(
           res,
           undefined,
@@ -416,9 +472,16 @@ class ServiceNoticeController {
       }
 
       // Get current state
-      const currentNotice = await ServiceNoticeService.getServiceNoticeById(id, environmentId);
+      const currentNotice = await ServiceNoticeService.getServiceNoticeById(
+        id,
+        environmentId
+      );
       if (!currentNotice) {
-        return sendNotFound(res, 'Service notice not found', ErrorCodes.RESOURCE_NOT_FOUND);
+        return sendNotFound(
+          res,
+          'Service notice not found',
+          ErrorCodes.RESOURCE_NOT_FOUND
+        );
       }
 
       // Use UnifiedChangeGateway for CR support
@@ -453,7 +516,8 @@ class ServiceNoticeController {
             changeRequestId: gatewayResult.changeRequestId,
             status: gatewayResult.status,
           },
-          message: 'Change request created. Status toggle will be applied after approval.',
+          message:
+            'Change request created. Status toggle will be applied after approval.',
         });
       }
     } catch (error) {

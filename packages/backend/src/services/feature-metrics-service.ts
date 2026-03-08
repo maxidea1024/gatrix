@@ -44,12 +44,16 @@ class FeatureMetricsService {
     }
 
     try {
-      await queueService.createQueue(QUEUE_NAME, this.processMetricsJob.bind(this), {
-        concurrency: 2,
-        removeOnComplete: 1000, // Keep last 1000 completed jobs
-        removeOnFail: 500, // Keep last 500 failed jobs
-        attempts: 3, // Retry up to 3 times
-      });
+      await queueService.createQueue(
+        QUEUE_NAME,
+        this.processMetricsJob.bind(this),
+        {
+          concurrency: 2,
+          removeOnComplete: 1000, // Keep last 1000 completed jobs
+          removeOnFail: 500, // Keep last 500 failed jobs
+          attempts: 3, // Retry up to 3 times
+        }
+      );
 
       this.isInitialized = true;
       logger.info('Feature metrics queue initialized');
@@ -106,12 +110,20 @@ class FeatureMetricsService {
   private async processMetricsJob(
     job: Job<{ type: string; payload: MetricsJobPayload; timestamp: number }>
   ): Promise<void> {
-    const { environmentId, appName, metrics, reportedAt, bucketStart, sdkVersion } =
-      job.data.payload;
+    const {
+      environmentId,
+      appName,
+      metrics,
+      reportedAt,
+      bucketStart,
+      sdkVersion,
+    } = job.data.payload;
 
     // Use bucketStart for more accurate hourBucket calculation (bucket window start)
     // Fallback to reportedAt for backward compatibility
-    const bucketDate = bucketStart ? new Date(bucketStart) : new Date(reportedAt);
+    const bucketDate = bucketStart
+      ? new Date(bucketStart)
+      : new Date(reportedAt);
     const hourBucket = new Date(bucketDate);
     hourBucket.setMinutes(0, 0, 0);
 
@@ -121,7 +133,13 @@ class FeatureMetricsService {
 
       // Batch upsert metrics
       for (const metric of metrics) {
-        await this.upsertMetric(environmentId, appName, sdkVersion, metric, hourBucket);
+        await this.upsertMetric(
+          environmentId,
+          appName,
+          sdkVersion,
+          metric,
+          hourBucket
+        );
         uniqueFlagNames.add(metric.flagName);
       }
 
@@ -129,7 +147,9 @@ class FeatureMetricsService {
       for (const flagName of uniqueFlagNames) {
         try {
           // Get flag by name to get the ID
-          const flag = await db('g_feature_flags').where('flagName', flagName).first();
+          const flag = await db('g_feature_flags')
+            .where('flagName', flagName)
+            .first();
           if (flag) {
             await FeatureFlagModel.updateLastSeenAt(flag.id, environmentId);
           }
@@ -168,7 +188,8 @@ class FeatureMetricsService {
     const { flagName, enabled, variantName, count } = metric;
 
     // Format hour bucket for MySQL DATETIME (YYYY-MM-DD HH:00:00)
-    const bucketDateTime = hourBucket.toISOString().slice(0, 13).replace('T', ' ') + ':00:00';
+    const bucketDateTime =
+      hourBucket.toISOString().slice(0, 13).replace('T', ' ') + ':00:00';
 
     // Update yesCount or noCount based on enabled value
     const yesIncrement = enabled ? count : 0;

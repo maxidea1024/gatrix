@@ -27,7 +27,11 @@ function ipMatchesCIDR(ip: string, cidr: string): boolean {
 
     // IPv4 주소를 32비트 Convert to integer
     const ipToInt = (ipAddr: string): number => {
-      return ipAddr.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+      return (
+        ipAddr
+          .split('.')
+          .reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0
+      );
     };
 
     const ipInt = ipToInt(ip);
@@ -52,7 +56,10 @@ export class IpWhitelistService {
   ): Promise<IpWhitelistListResponse> {
     try {
       const page = parseInt(pagination.page?.toString() || '1');
-      const limit = Math.min(parseInt(pagination.limit?.toString() || '10'), 100); // Max 100 items per page
+      const limit = Math.min(
+        parseInt(pagination.limit?.toString() || '10'),
+        100
+      ); // Max 100 items per page
 
       const result = await IpWhitelistModel.findAll(page, limit, {
         ...filters,
@@ -69,7 +76,10 @@ export class IpWhitelistService {
   /**
    * Get IP whitelist entry by ID
    */
-  static async getIpWhitelistById(id: string, environmentId: string): Promise<IpWhitelist> {
+  static async getIpWhitelistById(
+    id: string,
+    environmentId: string
+  ): Promise<IpWhitelist> {
     try {
       const ipWhitelist = await IpWhitelistModel.findById(id, environmentId);
 
@@ -115,7 +125,10 @@ export class IpWhitelistService {
       const normalizedIP = normalizeIPOrCIDR(data.ipAddress);
 
       // Check if IP already exists
-      const existing = await IpWhitelistModel.findByIpAddress(normalizedIP, environmentId);
+      const existing = await IpWhitelistModel.findByIpAddress(
+        normalizedIP,
+        environmentId
+      );
       if (existing) {
         throw new GatrixError('IP address already exists in whitelist', 409);
       }
@@ -132,11 +145,14 @@ export class IpWhitelistService {
       // Only add date fields if they have valid values
       if (data.startDate) {
         createData.startDate =
-          data.startDate instanceof Date ? data.startDate : new Date(data.startDate);
+          data.startDate instanceof Date
+            ? data.startDate
+            : new Date(data.startDate);
       }
 
       if (data.endDate) {
-        createData.endDate = data.endDate instanceof Date ? data.endDate : new Date(data.endDate);
+        createData.endDate =
+          data.endDate instanceof Date ? data.endDate : new Date(data.endDate);
       }
 
       const created = await IpWhitelistModel.create(createData, environmentId);
@@ -165,7 +181,9 @@ export class IpWhitelistService {
           { environmentId }
         );
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+        );
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -204,7 +222,10 @@ export class IpWhitelistService {
         const normalizedIP = normalizeIPOrCIDR(data.ipAddress);
 
         // Check if new IP already exists (excluding current entry)
-        const existingWithIP = await IpWhitelistModel.findByIpAddress(normalizedIP, environmentId);
+        const existingWithIP = await IpWhitelistModel.findByIpAddress(
+          normalizedIP,
+          environmentId
+        );
         if (existingWithIP && existingWithIP.id !== id) {
           throw new GatrixError('IP address already exists in whitelist', 409);
         }
@@ -227,7 +248,11 @@ export class IpWhitelistService {
         }
       }
 
-      const updated = await IpWhitelistModel.update(id, updateData, environmentId);
+      const updated = await IpWhitelistModel.update(
+        id,
+        updateData,
+        environmentId
+      );
 
       logger.info('IP whitelist entry updated:', {
         id: updated.id,
@@ -251,7 +276,9 @@ export class IpWhitelistService {
           { environmentId: updated.environmentId }
         );
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${updated.environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.WHITELISTS}:${updated.environmentId}`
+        );
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -262,7 +289,10 @@ export class IpWhitelistService {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error('Error updating IP whitelist:', error, { id, environmentId });
+      logger.error('Error updating IP whitelist:', error, {
+        id,
+        environmentId,
+      });
       throw new GatrixError('Failed to update IP whitelist entry', 500);
     }
   }
@@ -270,7 +300,10 @@ export class IpWhitelistService {
   /**
    * Delete IP whitelist entry
    */
-  static async deleteIpWhitelist(id: string, environmentId: string): Promise<void> {
+  static async deleteIpWhitelist(
+    id: string,
+    environmentId: string
+  ): Promise<void> {
     try {
       // Check if entry exists
       const existing = await this.getIpWhitelistById(id, environmentId);
@@ -309,7 +342,10 @@ export class IpWhitelistService {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error('Error deleting IP whitelist:', error, { id, environmentId });
+      logger.error('Error deleting IP whitelist:', error, {
+        id,
+        environmentId,
+      });
       throw new GatrixError('Failed to delete IP whitelist entry', 500);
     }
   }
@@ -356,7 +392,9 @@ export class IpWhitelistService {
           { environmentId: updated.environmentId }
         );
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${updated.environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.WHITELISTS}:${updated.environmentId}`
+        );
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -378,14 +416,20 @@ export class IpWhitelistService {
   /**
    * Check if an IP address is whitelisted
    */
-  static async isIpWhitelisted(ipAddress: string, environmentId: string): Promise<boolean> {
+  static async isIpWhitelisted(
+    ipAddress: string,
+    environmentId: string
+  ): Promise<boolean> {
     try {
       if (!isValidIPOrCIDR(ipAddress)) {
         return false;
       }
 
       // Get all enabled IP whitelist entries
-      const result = await IpWhitelistModel.findAll(1, 1000, { environmentId, isEnabled: true });
+      const result = await IpWhitelistModel.findAll(1, 1000, {
+        environmentId,
+        isEnabled: true,
+      });
       const now = new Date();
 
       // Check if IP matches any whitelist entry

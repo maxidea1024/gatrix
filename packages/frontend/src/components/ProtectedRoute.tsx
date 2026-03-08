@@ -16,13 +16,19 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredPermissions,
   requireActive = true,
 }) => {
-  const { isAuthenticated, isLoading, user, canAccess, hasPermission } = useAuth();
+  const { isAuthenticated, isLoading, user, canAccess, hasPermission } =
+    useAuth();
   const location = useLocation();
 
   // Show loading spinner while checking authentication
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <CircularProgress />
       </Box>
     );
@@ -92,17 +98,26 @@ export const withProtectedRoute = (
 };
 
 // Admin-only route wrapper
-export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   return <ProtectedRoute requiredRoles={['admin']}>{children}</ProtectedRoute>;
 };
 
 // Public route (redirect to dashboard if already authenticated)
-export const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const PublicRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <CircularProgress />
       </Box>
     );

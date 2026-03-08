@@ -5,7 +5,11 @@
  * No stickiness - purely random on every check.
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
+import {
+  EvaluationContext,
+  StrategyParameters,
+  StrategyEvaluationResult,
+} from '@gatrix/shared';
 import { Strategy } from './strategy';
 
 export class GradualRolloutRandomStrategy extends Strategy {
@@ -13,7 +17,10 @@ export class GradualRolloutRandomStrategy extends Strategy {
     super('gradualRolloutRandom');
   }
 
-  isEnabled(parameters: StrategyParameters, _context: EvaluationContext): boolean {
+  isEnabled(
+    parameters: StrategyParameters,
+    _context: EvaluationContext
+  ): boolean {
     return this.isEnabledWithDetails(parameters, _context).enabled;
   }
 

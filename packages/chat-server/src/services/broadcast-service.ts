@@ -53,7 +53,11 @@ export class BroadcastService {
     const subClient = redisManager.getSubClient();
 
     // Subscribe to broadcast channels
-    subClient.subscribe('chat:broadcast', 'chat:channel_broadcast', 'chat:user_broadcast');
+    subClient.subscribe(
+      'chat:broadcast',
+      'chat:channel_broadcast',
+      'chat:user_broadcast'
+    );
 
     subClient.on('message', async (channel: string, message: string) => {
       try {
@@ -61,7 +65,9 @@ export class BroadcastService {
 
         if (config.broadcasting.useMessagePack) {
           const buffer = Buffer.from(message, 'base64');
-          const decompressed = config.broadcasting.compression ? await gunzipAsync(buffer) : buffer;
+          const decompressed = config.broadcasting.compression
+            ? await gunzipAsync(buffer)
+            : buffer;
           broadcastMessage = unpack(decompressed);
         } else {
           // JWT 토큰이나 다른 문자열이 아닌 유효한 JSON인지 확인
@@ -84,7 +90,10 @@ export class BroadcastService {
     });
   }
 
-  private async handleIncomingBroadcast(channel: string, message: BroadcastMessage): Promise<void> {
+  private async handleIncomingBroadcast(
+    channel: string,
+    message: BroadcastMessage
+  ): Promise<void> {
     switch (channel) {
       case 'chat:broadcast':
         await this.handleGlobalBroadcast(message);
@@ -98,12 +107,16 @@ export class BroadcastService {
     }
   }
 
-  private async handleGlobalBroadcast(message: BroadcastMessage): Promise<void> {
+  private async handleGlobalBroadcast(
+    message: BroadcastMessage
+  ): Promise<void> {
     // Broadcast to all connected clients on this server
     this.io.emit('global_message', message.data);
   }
 
-  private async handleChannelBroadcast(message: BroadcastMessage): Promise<void> {
+  private async handleChannelBroadcast(
+    message: BroadcastMessage
+  ): Promise<void> {
     if (!message.channelId) return;
 
     // Get local users in this channel
@@ -111,7 +124,9 @@ export class BroadcastService {
 
     if (localUsers.length > 0) {
       // Use room-based broadcasting for efficiency
-      this.io.to(`channel:${message.channelId}`).emit(message.type, message.data);
+      this.io
+        .to(`channel:${message.channelId}`)
+        .emit(message.type, message.data);
     }
   }
 
@@ -126,7 +141,11 @@ export class BroadcastService {
   }
 
   // Optimized broadcasting methods
-  public async broadcastToChannel(channelId: number, type: string, data: any): Promise<void> {
+  public async broadcastToChannel(
+    channelId: number,
+    type: string,
+    data: any
+  ): Promise<void> {
     const message: BroadcastMessage = {
       type: type as any,
       channelId,
@@ -144,7 +163,11 @@ export class BroadcastService {
     }
   }
 
-  public async broadcastToUser(userId: number, type: string, data: any): Promise<void> {
+  public async broadcastToUser(
+    userId: number,
+    type: string,
+    data: any
+  ): Promise<void> {
     const message: BroadcastMessage = {
       type: type as any,
       userId,
@@ -175,7 +198,9 @@ export class BroadcastService {
     this.messageQueue.get(channelId)!.push(message);
 
     // Check if batch is full
-    if (this.messageQueue.get(channelId)!.length >= config.broadcasting.batchSize) {
+    if (
+      this.messageQueue.get(channelId)!.length >= config.broadcasting.batchSize
+    ) {
       this.processBatch(channelId);
     }
   }
@@ -243,7 +268,9 @@ export class BroadcastService {
 
     if (config.broadcasting.useMessagePack) {
       const packed = pack(message);
-      serialized = config.broadcasting.compression ? await gzipAsync(packed) : packed;
+      serialized = config.broadcasting.compression
+        ? await gzipAsync(packed)
+        : packed;
     } else {
       const jsonString = JSON.stringify(message);
       serialized = config.broadcasting.compression
@@ -298,9 +325,14 @@ export class BroadcastService {
     return BroadcastService.instance;
   }
 
-  public static createInstance(io: SocketIOServer, serverId: string): BroadcastService {
+  public static createInstance(
+    io: SocketIOServer,
+    serverId: string
+  ): BroadcastService {
     if (BroadcastService.instance) {
-      logger.warn('BroadcastService instance already exists, returning existing instance');
+      logger.warn(
+        'BroadcastService instance already exists, returning existing instance'
+      );
       return BroadcastService.instance;
     }
 

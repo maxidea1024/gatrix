@@ -8,7 +8,10 @@ import {
   Divider,
   alpha,
 } from '@mui/material';
-import { Business as OrgIcon, Folder as ProjectIcon } from '@mui/icons-material';
+import {
+  Business as OrgIcon,
+  Folder as ProjectIcon,
+} from '@mui/icons-material';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +19,9 @@ interface OrgProjectSelectorProps {
   size?: 'small' | 'medium';
 }
 
-export const OrgProjectSelector: React.FC<OrgProjectSelectorProps> = ({ size = 'small' }) => {
+export const OrgProjectSelector: React.FC<OrgProjectSelectorProps> = ({
+  size = 'small',
+}) => {
   const { t } = useTranslation();
   const {
     organisations,
@@ -59,8 +64,12 @@ export const OrgProjectSelector: React.FC<OrgProjectSelectorProps> = ({ size = '
             py: 0.25,
             borderRadius: 1,
             backgroundColor: (theme) =>
-              alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.2 : 0.1),
-            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+              alpha(
+                theme.palette.primary.main,
+                theme.palette.mode === 'dark' ? 0.2 : 0.1
+              ),
+            border: (theme) =>
+              `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
           }}
         >
           <OrgIcon sx={{ fontSize: 16, color: 'inherit', opacity: 0.7 }} />
@@ -84,8 +93,14 @@ export const OrgProjectSelector: React.FC<OrgProjectSelectorProps> = ({ size = '
               '.MuiInput-input:focus': { backgroundColor: 'transparent' },
             }}
             renderValue={() => (
-              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8rem' }} noWrap>
-                {currentOrg?.displayName || currentOrg?.orgName || t('common.loading')}
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 500, fontSize: '0.8rem' }}
+                noWrap
+              >
+                {currentOrg?.displayName ||
+                  currentOrg?.orgName ||
+                  t('common.loading')}
               </Typography>
             )}
           >
@@ -93,7 +108,9 @@ export const OrgProjectSelector: React.FC<OrgProjectSelectorProps> = ({ size = '
               <MenuItem key={org.id} value={org.id}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <OrgIcon sx={{ fontSize: 16, opacity: 0.6 }} />
-                  <Typography variant="body2">{org.displayName || org.orgName}</Typography>
+                  <Typography variant="body2">
+                    {org.displayName || org.orgName}
+                  </Typography>
                 </Box>
               </MenuItem>
             ))}
@@ -103,7 +120,11 @@ export const OrgProjectSelector: React.FC<OrgProjectSelectorProps> = ({ size = '
 
       {/* Separator */}
       {showOrgSelector && (
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.25, opacity: 0.3 }} />
+        <Divider
+          orientation="vertical"
+          flexItem
+          sx={{ mx: 0.25, opacity: 0.3 }}
+        />
       )}
 
       {/* Project selector */}
@@ -117,8 +138,12 @@ export const OrgProjectSelector: React.FC<OrgProjectSelectorProps> = ({ size = '
             py: 0.25,
             borderRadius: 1,
             backgroundColor: (theme) =>
-              alpha(theme.palette.info.main, theme.palette.mode === 'dark' ? 0.15 : 0.08),
-            border: (theme) => `1px solid ${alpha(theme.palette.info.main, 0.25)}`,
+              alpha(
+                theme.palette.info.main,
+                theme.palette.mode === 'dark' ? 0.15 : 0.08
+              ),
+            border: (theme) =>
+              `1px solid ${alpha(theme.palette.info.main, 0.25)}`,
           }}
         >
           <ProjectIcon sx={{ fontSize: 16, color: 'inherit', opacity: 0.7 }} />
@@ -142,8 +167,14 @@ export const OrgProjectSelector: React.FC<OrgProjectSelectorProps> = ({ size = '
               '.MuiInput-input:focus': { backgroundColor: 'transparent' },
             }}
             renderValue={() => (
-              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8rem' }} noWrap>
-                {currentProject?.displayName || currentProject?.projectName || t('common.loading')}
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 500, fontSize: '0.8rem' }}
+                noWrap
+              >
+                {currentProject?.displayName ||
+                  currentProject?.projectName ||
+                  t('common.loading')}
               </Typography>
             )}
           >
@@ -152,7 +183,9 @@ export const OrgProjectSelector: React.FC<OrgProjectSelectorProps> = ({ size = '
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <ProjectIcon sx={{ fontSize: 16, opacity: 0.6 }} />
                   <Box>
-                    <Typography variant="body2">{proj.displayName || proj.projectName}</Typography>
+                    <Typography variant="body2">
+                      {proj.displayName || proj.projectName}
+                    </Typography>
                     {proj.isDefault && (
                       <Typography variant="caption" sx={{ opacity: 0.6 }}>
                         {t('common.default')}

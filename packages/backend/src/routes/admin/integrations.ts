@@ -66,7 +66,14 @@ router.get('/:id', async (req: Request, res: Response) => {
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { provider, description, isEnabled, parameters, events, environmentIds } = req.body;
+    const {
+      provider,
+      description,
+      isEnabled,
+      parameters,
+      events,
+      environmentIds,
+    } = req.body;
     const user = req.user as { id: string; name: string };
 
     if (!provider) {
@@ -74,7 +81,9 @@ router.post('/', async (req: Request, res: Response) => {
     }
 
     if (!events || !Array.isArray(events) || events.length === 0) {
-      return res.status(400).json({ error: 'At least one event must be selected' });
+      return res
+        .status(400)
+        .json({ error: 'At least one event must be selected' });
     }
 
     // Validate required parameters based on provider definition
@@ -87,7 +96,9 @@ router.post('/', async (req: Request, res: Response) => {
     for (const param of requiredParams) {
       const value = parameters?.[param.name];
       if (!value || (typeof value === 'string' && value.trim() === '')) {
-        return res.status(400).json({ error: `Required parameter missing: ${param.name}` });
+        return res
+          .status(400)
+          .json({ error: `Required parameter missing: ${param.name}` });
       }
     }
 
@@ -107,7 +118,8 @@ router.post('/', async (req: Request, res: Response) => {
     res.status(201).json({ data: integration });
   } catch (error) {
     logger.error('Error creating integration:', error);
-    const message = error instanceof Error ? error.message : 'Failed to create integration';
+    const message =
+      error instanceof Error ? error.message : 'Failed to create integration';
     res.status(400).json({ error: message });
   }
 });
@@ -119,7 +131,8 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { description, isEnabled, parameters, events, environmentIds } = req.body;
+    const { description, isEnabled, parameters, events, environmentIds } =
+      req.body;
     const user = req.user as { id: string; name: string };
 
     const integration = await IntegrationService.update(
@@ -142,7 +155,8 @@ router.put('/:id', async (req: Request, res: Response) => {
     res.json({ data: integration });
   } catch (error) {
     logger.error('Error updating integration:', error);
-    const message = error instanceof Error ? error.message : 'Failed to update integration';
+    const message =
+      error instanceof Error ? error.message : 'Failed to update integration';
     res.status(400).json({ error: message });
   }
 });
@@ -210,7 +224,11 @@ router.get('/:id/events', async (req: Request, res: Response) => {
     // Add synthetic delay for better UX (prevent flicker)
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    const result = await IntegrationService.getIntegrationEvents(id, page, limit);
+    const result = await IntegrationService.getIntegrationEvents(
+      id,
+      page,
+      limit
+    );
 
     res.json({
       data: result.events,
@@ -245,7 +263,8 @@ router.post('/:id/test', async (req: Request, res: Response) => {
     res.json({ success: true, message: 'Test message sent successfully' });
   } catch (error) {
     logger.error('Error sending test message:', error);
-    const message = error instanceof Error ? error.message : 'Failed to send test message';
+    const message =
+      error instanceof Error ? error.message : 'Failed to send test message';
     res.status(400).json({ error: message });
   }
 });

@@ -5,7 +5,11 @@
  */
 
 import { hostname } from 'os';
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
+import {
+  EvaluationContext,
+  StrategyParameters,
+  StrategyEvaluationResult,
+} from '@gatrix/shared';
 import { Strategy } from './strategy';
 
 export class ApplicationHostnameStrategy extends Strategy {
@@ -13,10 +17,17 @@ export class ApplicationHostnameStrategy extends Strategy {
 
   constructor() {
     super('applicationHostname');
-    this.currentHostname = (process.env.HOSTNAME || hostname() || 'undefined').toLowerCase();
+    this.currentHostname = (
+      process.env.HOSTNAME ||
+      hostname() ||
+      'undefined'
+    ).toLowerCase();
   }
 
-  isEnabled(parameters: StrategyParameters, _context: EvaluationContext): boolean {
+  isEnabled(
+    parameters: StrategyParameters,
+    _context: EvaluationContext
+  ): boolean {
     return this.isEnabledWithDetails(parameters, _context).enabled;
   }
 

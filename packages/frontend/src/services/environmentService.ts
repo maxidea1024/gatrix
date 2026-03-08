@@ -225,9 +225,14 @@ class EnvironmentService {
     }
   }
 
-  async getEnvironment(projectApiPath: string, environmentId: string): Promise<Environment> {
+  async getEnvironment(
+    projectApiPath: string,
+    environmentId: string
+  ): Promise<Environment> {
     try {
-      const response = await api.get(`${envBasePath(projectApiPath)}/${environmentId}`);
+      const response = await api.get(
+        `${envBasePath(projectApiPath)}/${environmentId}`
+      );
       return mapEnvironment(response.data);
     } catch (error) {
       console.error('Error fetching environment:', error);
@@ -253,7 +258,10 @@ class EnvironmentService {
     data: UpdateEnvironmentData
   ): Promise<Environment> {
     try {
-      const response = await api.put(`${envBasePath(projectApiPath)}/${environmentId}`, data);
+      const response = await api.put(
+        `${envBasePath(projectApiPath)}/${environmentId}`,
+        data
+      );
       return mapEnvironment(response.data);
     } catch (error) {
       console.error('Error updating environment:', error);

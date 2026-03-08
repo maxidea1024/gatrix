@@ -36,10 +36,15 @@ import {
   UpdateIngamePopupNoticeData,
 } from '../../services/ingamePopupNoticeService';
 import ingamePopupNoticeService from '../../services/ingamePopupNoticeService';
-import { messageTemplateService, MessageTemplate } from '../../services/messageTemplateService';
+import {
+  messageTemplateService,
+  MessageTemplate,
+} from '../../services/messageTemplateService';
 import MultiLanguageMessageInput from '../common/MultiLanguageMessageInput';
 import { parseUTCForPicker } from '../../utils/dateFormat';
-import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGroup';
+import TargetSettingsGroup, {
+  ChannelSubchannelData,
+} from './TargetSettingsGroup';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useEntityLock } from '../../hooks/useEntityLock';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -51,12 +56,9 @@ interface IngamePopupNoticeFormDialogProps {
   notice?: IngamePopupNotice | null;
 }
 
-const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = ({
-  open,
-  onClose,
-  onSuccess,
-  notice,
-}) => {
+const IngamePopupNoticeFormDialog: React.FC<
+  IngamePopupNoticeFormDialogProps
+> = ({ open, onClose, onSuccess, notice }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -82,30 +84,38 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
 
   // Target settings - Initialize with default values to avoid controlled/uncontrolled component warnings
   const [targetPlatforms, setTargetPlatforms] = useState<string[]>([]);
-  const [targetPlatformsInverted, setTargetPlatformsInverted] = useState<boolean>(false);
-  const [targetChannelSubchannels, setTargetChannelSubchannels] = useState<ChannelSubchannelData[]>(
-    []
-  );
-  const [targetChannelSubchannelsInverted, setTargetChannelSubchannelsInverted] =
+  const [targetPlatformsInverted, setTargetPlatformsInverted] =
     useState<boolean>(false);
+  const [targetChannelSubchannels, setTargetChannelSubchannels] = useState<
+    ChannelSubchannelData[]
+  >([]);
+  const [
+    targetChannelSubchannelsInverted,
+    setTargetChannelSubchannelsInverted,
+  ] = useState<boolean>(false);
   const [targetWorlds, setTargetWorlds] = useState<string[]>([]);
-  const [targetWorldsInverted, setTargetWorldsInverted] = useState<boolean>(false);
+  const [targetWorldsInverted, setTargetWorldsInverted] =
+    useState<boolean>(false);
 
   // User ID targeting
   const [targetUserIds, setTargetUserIds] = useState<string>('');
-  const [targetUserIdsInverted, setTargetUserIdsInverted] = useState<boolean>(false);
+  const [targetUserIdsInverted, setTargetUserIdsInverted] =
+    useState<boolean>(false);
 
   const [displayPriority, setDisplayPriority] = useState(100);
   const [showOnce, setShowOnce] = useState(false);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [useTemplate, setUseTemplate] = useState(false);
-  const [messageTemplateId, setMessageTemplateId] = useState<number | null>(null);
+  const [messageTemplateId, setMessageTemplateId] = useState<number | null>(
+    null
+  );
   const [description, setDescription] = useState('');
 
   // Template state
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<MessageTemplate | null>(null);
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<MessageTemplate | null>(null);
 
   // Load templates
   useEffect(() => {
@@ -160,7 +170,9 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       setTargetPlatforms(notice.targetPlatforms || []);
       setTargetPlatformsInverted(notice.targetPlatformsInverted || false);
       setTargetChannelSubchannels(targetChannelSubchannels);
-      setTargetChannelSubchannelsInverted(notice.targetChannelsInverted || false);
+      setTargetChannelSubchannelsInverted(
+        notice.targetChannelsInverted || false
+      );
       setTargetWorlds(notice.targetWorlds || []);
       setTargetWorldsInverted(notice.targetWorldsInverted || false);
       setTargetUserIds((notice as any).targetUserIds || '');
@@ -177,7 +189,9 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
 
       // Load selected template
       if (notice.useTemplate && notice.messageTemplateId) {
-        const template = templates.find((t) => t.id === notice.messageTemplateId);
+        const template = templates.find(
+          (t) => t.id === notice.messageTemplateId
+        );
         setSelectedTemplate(template || null);
       }
     } else {
@@ -240,11 +254,14 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
     const currentData = {
       isActive,
       content: content.trim(),
-      targetPlatforms: targetPlatforms.length > 0 ? [...targetPlatforms].sort() : null,
+      targetPlatforms:
+        targetPlatforms.length > 0 ? [...targetPlatforms].sort() : null,
       targetPlatformsInverted,
-      targetChannels: currentChannels.length > 0 ? [...currentChannels].sort() : null,
+      targetChannels:
+        currentChannels.length > 0 ? [...currentChannels].sort() : null,
       targetChannelsInverted: targetChannelSubchannelsInverted,
-      targetSubchannels: currentSubchannels.length > 0 ? [...currentSubchannels].sort() : null,
+      targetSubchannels:
+        currentSubchannels.length > 0 ? [...currentSubchannels].sort() : null,
       targetWorlds: targetWorlds.length > 0 ? [...targetWorlds].sort() : null,
       targetWorldsInverted,
       targetUserIds: targetUserIds.trim() || null,
@@ -262,20 +279,31 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       isActive: notice.isActive,
       content: notice.content.trim(),
       targetPlatforms:
-        (notice.targetPlatforms || []).length > 0 ? [...notice.targetPlatforms].sort() : null,
+        (notice.targetPlatforms || []).length > 0
+          ? [...notice.targetPlatforms].sort()
+          : null,
       targetPlatformsInverted: notice.targetPlatformsInverted || false,
       targetChannels:
-        (notice.targetChannels || []).length > 0 ? [...notice.targetChannels].sort() : null,
+        (notice.targetChannels || []).length > 0
+          ? [...notice.targetChannels].sort()
+          : null,
       targetChannelsInverted: notice.targetChannelsInverted || false,
       targetSubchannels:
-        (notice.targetSubchannels || []).length > 0 ? [...notice.targetSubchannels].sort() : null,
-      targetWorlds: (notice.targetWorlds || []).length > 0 ? [...notice.targetWorlds].sort() : null,
+        (notice.targetSubchannels || []).length > 0
+          ? [...notice.targetSubchannels].sort()
+          : null,
+      targetWorlds:
+        (notice.targetWorlds || []).length > 0
+          ? [...notice.targetWorlds].sort()
+          : null,
       targetWorldsInverted: notice.targetWorldsInverted || false,
       targetUserIds: (notice as any).targetUserIds?.trim() || null,
       targetUserIdsInverted: (notice as any).targetUserIdsInverted || false,
       displayPriority: notice.displayPriority,
       showOnce: notice.showOnce,
-      startDate: notice.startDate ? dayjs(notice.startDate).toISOString() : null,
+      startDate: notice.startDate
+        ? dayjs(notice.startDate).toISOString()
+        : null,
       endDate: notice.endDate ? dayjs(notice.endDate).toISOString() : null,
       useTemplate: notice.useTemplate,
       messageTemplateId: notice.useTemplate ? notice.messageTemplateId : null,
@@ -343,7 +371,8 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
         targetPlatformsInverted: targetPlatformsInverted,
         targetChannels: targetChannels.length > 0 ? targetChannels : null,
         targetChannelsInverted: targetChannelSubchannelsInverted,
-        targetSubchannels: targetSubchannels.length > 0 ? targetSubchannels : null,
+        targetSubchannels:
+          targetSubchannels.length > 0 ? targetSubchannels : null,
         targetSubchannelsInverted: targetChannelSubchannelsInverted,
         targetWorlds: targetWorlds.length > 0 ? targetWorlds : null,
         targetWorldsInverted: targetWorldsInverted,
@@ -366,7 +395,11 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
           data
         );
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           enqueueSnackbar(t('ingamePopupNotices.updateSuccess'), {
             variant: 'success',
@@ -378,7 +411,11 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
           data as CreateIngamePopupNoticeData
         );
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           enqueueSnackbar(t('ingamePopupNotices.createSuccess'), {
             variant: 'success',
@@ -405,7 +442,11 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={notice ? t('ingamePopupNotices.editNotice') : t('ingamePopupNotices.createNotice')}
+      title={
+        notice
+          ? t('ingamePopupNotices.editNotice')
+          : t('ingamePopupNotices.createNotice')
+      }
       subtitle={
         notice
           ? t('ingamePopupNotices.editNoticeSubtitle')
@@ -459,7 +500,10 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
           <Box>
             <FormControlLabel
               control={
-                <Switch checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+                <Switch
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
+                />
               }
               label={t('ingamePopupNotices.isActive')}
             />
@@ -543,8 +587,13 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
                 }}
               />
             </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
-              {t('ingamePopupNotices.startDateHelp')} / {t('ingamePopupNotices.endDateHelp')}
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ ml: 1.75 }}
+            >
+              {t('ingamePopupNotices.startDateHelp')} /{' '}
+              {t('ingamePopupNotices.endDateHelp')}
             </Typography>
           </Box>
 
@@ -553,7 +602,9 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
             label={t('ingamePopupNotices.displayPriority')}
             type="number"
             value={displayPriority}
-            onChange={(e) => setDisplayPriority(parseInt(e.target.value) || 100)}
+            onChange={(e) =>
+              setDisplayPriority(parseInt(e.target.value) || 100)
+            }
             fullWidth
             helperText={t('ingamePopupNotices.displayPriorityHelp')}
           />
@@ -562,7 +613,10 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
           <Box>
             <FormControlLabel
               control={
-                <Switch checked={showOnce} onChange={(e) => setShowOnce(e.target.checked)} />
+                <Switch
+                  checked={showOnce}
+                  onChange={(e) => setShowOnce(e.target.checked)}
+                />
               }
               label={t('ingamePopupNotices.showOnce')}
             />
@@ -579,7 +633,10 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
           <Box>
             <FormControlLabel
               control={
-                <Switch checked={useTemplate} onChange={(e) => setUseTemplate(e.target.checked)} />
+                <Switch
+                  checked={useTemplate}
+                  onChange={(e) => setUseTemplate(e.target.checked)}
+                />
               }
               label={t('ingamePopupNotices.useTemplate')}
             />
@@ -610,7 +667,11 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
                   </MenuItem>
                 ))}
               </Select>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5, ml: 1.75 }}
+              >
                 {t('ingamePopupNotices.messageTemplateHelp')}
               </Typography>
             </FormControl>

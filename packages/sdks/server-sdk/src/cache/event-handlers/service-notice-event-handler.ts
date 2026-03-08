@@ -34,22 +34,34 @@ export class ServiceNoticeEventHandler implements IEventHandler {
             .getServiceNoticeService()
             ?.updateSingleServiceNotice(serviceNoticeData, environmentId);
         } else {
-          this.logger.info('Service notice event (no full data), refreshing cache', {
-            id: event.data.id,
-            environmentId,
-          });
+          this.logger.info(
+            'Service notice event (no full data), refreshing cache',
+            {
+              id: event.data.id,
+              environmentId,
+            }
+          );
           try {
-            await this.cacheManager.getServiceNoticeService()?.refreshByEnvironment(environmentId);
+            await this.cacheManager
+              .getServiceNoticeService()
+              ?.refreshByEnvironment(environmentId);
           } catch (error: any) {
-            this.logger.error('Failed to refresh service notice cache', { error: error.message });
+            this.logger.error('Failed to refresh service notice cache', {
+              error: error.message,
+            });
           }
         }
         break;
       }
       case 'service_notice.deleted': {
         const id = String(event.data.id);
-        this.logger.info('Service notice deleted, removing from cache', { id, environmentId });
-        this.cacheManager.getServiceNoticeService()?.removeFromCache(id, environmentId);
+        this.logger.info('Service notice deleted, removing from cache', {
+          id,
+          environmentId,
+        });
+        this.cacheManager
+          .getServiceNoticeService()
+          ?.removeFromCache(id, environmentId);
         break;
       }
     }

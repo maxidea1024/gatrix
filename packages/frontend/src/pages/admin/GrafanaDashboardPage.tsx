@@ -21,13 +21,15 @@ export const GrafanaDashboardPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [selectedDashboard, setSelectedDashboard] = useState<DashboardKey>(() => {
-    const param = searchParams.get('dashboard');
-    if (param === 'sdkMetrics') {
-      return 'sdkMetrics';
+  const [selectedDashboard, setSelectedDashboard] = useState<DashboardKey>(
+    () => {
+      const param = searchParams.get('dashboard');
+      if (param === 'sdkMetrics') {
+        return 'sdkMetrics';
+      }
+      return 'overview';
     }
-    return 'overview';
-  });
+  );
 
   useEffect(() => {
     const param = searchParams.get('dashboard');
@@ -38,7 +40,9 @@ export const GrafanaDashboardPage: React.FC = () => {
 
   const grafanaUrl = useMemo(() => {
     // Priority 1: Check runtime config (from docker-entrypoint.sh / config.js)
-    const runtimeEnv = (window as any)?.ENV?.VITE_GRAFANA_URL as string | undefined;
+    const runtimeEnv = (window as any)?.ENV?.VITE_GRAFANA_URL as
+      | string
+      | undefined;
     if (runtimeEnv && runtimeEnv.trim()) {
       return runtimeEnv.trim();
     }
@@ -47,7 +51,9 @@ export const GrafanaDashboardPage: React.FC = () => {
   }, []);
 
   const currentDashboard = useMemo(
-    () => dashboards.find((item) => item.key === selectedDashboard) ?? dashboards[0],
+    () =>
+      dashboards.find((item) => item.key === selectedDashboard) ??
+      dashboards[0],
     [selectedDashboard]
   );
 
@@ -56,7 +62,10 @@ export const GrafanaDashboardPage: React.FC = () => {
     return `${grafanaUrl}/d/${currentDashboard.uid}?kiosk=tv&theme=${theme}`;
   }, [grafanaUrl, isDark, currentDashboard.uid]);
 
-  const handleChangeTab = (_event: React.SyntheticEvent, value: DashboardKey) => {
+  const handleChangeTab = (
+    _event: React.SyntheticEvent,
+    value: DashboardKey
+  ) => {
     setSelectedDashboard(value);
     const next = new URLSearchParams(searchParams);
     next.set('dashboard', value);
@@ -86,7 +95,10 @@ export const GrafanaDashboardPage: React.FC = () => {
           }}
         >
           <Tab value="overview" label={t('grafanaDashboard.tabs.overview')} />
-          <Tab value="sdkMetrics" label={t('grafanaDashboard.tabs.sdkMetrics')} />
+          <Tab
+            value="sdkMetrics"
+            label={t('grafanaDashboard.tabs.sdkMetrics')}
+          />
         </Tabs>
       </Box>
       <Box sx={{ flex: 1 }}>

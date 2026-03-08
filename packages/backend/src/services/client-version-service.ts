@@ -76,10 +76,16 @@ async function prepareClientVersionForSDK(
   // Get clientVersionPassiveData from KV settings and resolve by version
   let passiveData: Record<string, any> = {};
   try {
-    const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environmentId);
+    const passiveDataStr = await VarsModel.get(
+      '$clientVersionPassiveData',
+      environmentId
+    );
     passiveData = resolvePassiveData(passiveDataStr, version.clientVersion);
   } catch (error) {
-    logger.warn('Failed to resolve clientVersionPassiveData for SDK event:', error);
+    logger.warn(
+      'Failed to resolve clientVersionPassiveData for SDK event:',
+      error
+    );
   }
 
   // Parse customPayload
@@ -105,7 +111,10 @@ async function prepareClientVersionForSDK(
       }
     }
   } catch (error) {
-    logger.warn(`Failed to parse customPayload for SDK event (version ${version.id}):`, error);
+    logger.warn(
+      `Failed to parse customPayload for SDK event (version ${version.id}):`,
+      error
+    );
   }
 
   // Merge: passiveData first, then customPayload (customPayload overwrites)
@@ -121,8 +130,11 @@ export class ClientVersionService {
   // Used 가능한 버전 Get list (distinct)
   static async getAvailableVersions(environmentId: string): Promise<string[]> {
     try {
-      const versions = await ClientVersionModel.getDistinctVersions(environmentId);
-      return versions.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+      const versions =
+        await ClientVersionModel.getDistinctVersions(environmentId);
+      return versions.sort((a, b) =>
+        b.localeCompare(a, undefined, { numeric: true })
+      );
     } catch (error) {
       logger.error('Error getting available versions:', error);
       throw error;
@@ -134,7 +146,12 @@ export class ClientVersionService {
     filters: Omit<ClientVersionFilters, 'environmentId'> = {},
     pagination: ClientVersionPagination
   ): Promise<{ data: ClientVersionAttributes[]; total: number }> {
-    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC' } = pagination;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'DESC',
+    } = pagination;
     const offset = (page - 1) * limit;
 
     const whereConditions: any = { environmentId };
@@ -175,7 +192,12 @@ export class ClientVersionService {
     filters: Omit<ClientVersionFilters, 'environmentId'> = {},
     pagination: ClientVersionPagination
   ): Promise<ClientVersionListResponse> {
-    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC' } = pagination;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'DESC',
+    } = pagination;
     const offset = (page - 1) * limit;
 
     // Search 조건 구성
@@ -247,7 +269,8 @@ export class ClientVersionService {
       const totalPages = Math.ceil(total / limit);
 
       // Apply maintenance status calculation based on time constraints
-      const processedVersions = applyMaintenanceStatusCalculationToArray(clientVersions);
+      const processedVersions =
+        applyMaintenanceStatusCalculationToArray(clientVersions);
 
       return {
         clientVersions: processedVersions,
@@ -276,7 +299,8 @@ export class ClientVersionService {
       const totalPages = Math.ceil(total / limit);
 
       // Apply maintenance status calculation based on time constraints
-      const processedVersions = applyMaintenanceStatusCalculationToArray(clientVersions);
+      const processedVersions =
+        applyMaintenanceStatusCalculationToArray(clientVersions);
 
       return {
         clientVersions: processedVersions,
@@ -305,7 +329,9 @@ export class ClientVersionService {
     const totalPages = Math.ceil(result.total / limit);
 
     // Apply maintenance status calculation based on time constraints
-    const processedVersions = applyMaintenanceStatusCalculationToArray(result.clientVersions);
+    const processedVersions = applyMaintenanceStatusCalculationToArray(
+      result.clientVersions
+    );
 
     return {
       clientVersions: processedVersions,
@@ -335,7 +361,9 @@ export class ClientVersionService {
     // Invalidate client version cache (including ETag cache for SDK)
     await pubSubService.invalidateByPattern('*client_version:*');
     if (environmentId) {
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`);
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`
+      );
     }
 
     // Publish event with full data for SDK cache update
@@ -343,7 +371,10 @@ export class ClientVersionService {
       const environmentId = result.environmentId;
 
       // Get full client version with tags for SDK cache
-      const fullClientVersion = await this.getClientVersionById(result.id!, environmentId);
+      const fullClientVersion = await this.getClientVersionById(
+        result.id!,
+        environmentId
+      );
 
       // Prepare data for SDK (parse customPayload and merge with passiveData)
       const sdkReadyClientVersion = fullClientVersion
@@ -397,7 +428,8 @@ export class ClientVersionService {
       clientVersion: data.clientVersion,
       clientStatus: data.clientStatus,
       gameServerAddress: platform.gameServerAddress,
-      gameServerAddressForWhiteList: platform.gameServerAddressForWhiteList || null,
+      gameServerAddressForWhiteList:
+        platform.gameServerAddressForWhiteList || null,
       patchAddress: platform.patchAddress,
       patchAddressForWhiteList: platform.patchAddressForWhiteList || null,
       guestModeAllowed: data.guestModeAllowed,
@@ -408,24 +440,39 @@ export class ClientVersionService {
       updatedBy: data.updatedBy,
     }));
 
-    const result = await ClientVersionModel.bulkCreate(clientVersions, environmentId);
+    const result = await ClientVersionModel.bulkCreate(
+      clientVersions,
+      environmentId
+    );
 
     // 태그가 있는 경우 각 Create된 Set tags for client versions
     if (data.tags && Array.isArray(data.tags) && data.tags.length > 0) {
-      const tagIds = data.tags.map((tag: any) => tag.id).filter((id: any) => id); // null/undefined 제거
+      const tagIds = data.tags
+        .map((tag: any) => tag.id)
+        .filter((id: any) => id); // null/undefined 제거
 
       if (tagIds.length > 0) {
         // 각 Create된 Set tags for client versions
         for (const clientVersion of result) {
           if (clientVersion && clientVersion.id) {
             try {
-              await ClientVersionModel.setTags(clientVersion.id, tagIds, data.createdBy);
+              await ClientVersionModel.setTags(
+                clientVersion.id,
+                tagIds,
+                data.createdBy
+              );
             } catch (error) {
-              logger.error(`Failed to set tags for client version ${clientVersion.id}:`, error);
+              logger.error(
+                `Failed to set tags for client version ${clientVersion.id}:`,
+                error
+              );
               // 태그 Settings Failed는 전체 작업을 중단하지 않음
             }
           } else {
-            logger.warn('Skipping tag setting for invalid client version:', clientVersion);
+            logger.warn(
+              'Skipping tag setting for invalid client version:',
+              clientVersion
+            );
           }
         }
       }
@@ -433,7 +480,9 @@ export class ClientVersionService {
 
     // Invalidate client version cache (including ETag cache for SDK - all environments for bulk op)
     await pubSubService.invalidateByPattern('*client_version:*');
-    await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
+    await pubSubService.invalidateByPattern(
+      `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`
+    );
 
     // Publish generic update event (bulk op)
     await pubSubService.publishSDKEvent(
@@ -452,7 +501,11 @@ export class ClientVersionService {
     data: Partial<ClientVersionCreationAttributes>,
     environmentId: string
   ): Promise<ClientVersionAttributes | null> {
-    const updatedRowsCount = await ClientVersionModel.update(id, data, environmentId);
+    const updatedRowsCount = await ClientVersionModel.update(
+      id,
+      data,
+      environmentId
+    );
 
     if (updatedRowsCount === 0) {
       return null;
@@ -461,11 +514,16 @@ export class ClientVersionService {
     // Invalidate client version cache
     await pubSubService.invalidateByPattern('*client_version:*');
 
-    const updatedClientVersion = await this.getClientVersionById(id, environmentId);
+    const updatedClientVersion = await this.getClientVersionById(
+      id,
+      environmentId
+    );
 
     // Invalidate ETag cache for SDK
     if (environmentId) {
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`);
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`
+      );
     }
 
     // Publish event with full data for SDK cache update
@@ -498,7 +556,10 @@ export class ClientVersionService {
     return updatedClientVersion;
   }
 
-  static async deleteClientVersion(id: string, environmentId: string): Promise<boolean> {
+  static async deleteClientVersion(
+    id: string,
+    environmentId: string
+  ): Promise<boolean> {
     const clientVersion = await ClientVersionModel.findById(id, environmentId);
     await ClientVersionModel.delete(id, environmentId);
     const deletedRowsCount = 1;
@@ -516,7 +577,9 @@ export class ClientVersionService {
       // Invalidate client version cache (including ETag cache - all environments for deletion)
       await pubSubService.invalidateByPattern('*client_version:*');
       if (environmentId) {
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`
+        );
       }
     }
 
@@ -527,7 +590,10 @@ export class ClientVersionService {
     data: BulkStatusUpdateRequest,
     environmentId: string
   ): Promise<number> {
-    const result = await ClientVersionModel.bulkUpdateStatus(data, environmentId);
+    const result = await ClientVersionModel.bulkUpdateStatus(
+      data,
+      environmentId
+    );
 
     if (result > 0) {
       // Publish generic update event (bulk status)
@@ -542,7 +608,9 @@ export class ClientVersionService {
       // Invalidate client version cache (including ETag cache - all environments for bulk op)
       await pubSubService.invalidateByPattern('*client_version:*');
       if (environmentId) {
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`
+        );
       }
     }
 

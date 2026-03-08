@@ -1,5 +1,12 @@
 import React, { useMemo } from 'react';
-import { Box, Typography, IconButton, Tooltip, Paper, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Typography,
+  IconButton,
+  Tooltip,
+  Paper,
+  CircularProgress,
+} from '@mui/material';
 import { ContentCopy as CopyIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -153,7 +160,8 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
   const handleCopyAll = () => {
     copyToClipboardWithNotification(
       stackTrace,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -238,7 +246,8 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
       <Box sx={{ flexShrink: 0, mb: 1 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="caption" color="text.secondary">
-            {stackFilePath || t('crashes.stackTrace')} ({lines.length} {t('crashes.lines')})
+            {stackFilePath || t('crashes.stackTrace')} ({lines.length}{' '}
+            {t('crashes.lines')})
           </Typography>
           <Tooltip title={t('crashes.copyAll')}>
             <IconButton size="small" onClick={handleCopyAll}>

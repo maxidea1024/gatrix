@@ -58,7 +58,9 @@ async function main() {
       segmentName: 'beta-testers',
       displayName: 'Beta Testers',
       description: 'Users enrolled in beta testing',
-      constraints: [{ contextName: 'isBeta', operator: 'bool_is', value: 'true' }],
+      constraints: [
+        { contextName: 'isBeta', operator: 'bool_is', value: 'true' },
+      ],
     },
     {
       segmentName: 'vip-users',
@@ -78,7 +80,9 @@ async function main() {
       segmentName: 'paying-users',
       displayName: 'Paying Users',
       description: 'Users who have made purchases',
-      constraints: [{ contextName: 'purchaseCount', operator: 'num_gt', value: '0' }],
+      constraints: [
+        { contextName: 'purchaseCount', operator: 'num_gt', value: '0' },
+      ],
     },
     {
       segmentName: 'whales',

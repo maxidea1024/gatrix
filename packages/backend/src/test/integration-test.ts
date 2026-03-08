@@ -35,16 +35,23 @@ async function testEmailIntegration() {
             status: 'active',
             emailVerified: true,
           });
-          console.log(`✅ Created test user: ${userData.email} (${userData.preferredLanguage})`);
+          console.log(
+            `✅ Created test user: ${userData.email} (${userData.preferredLanguage})`
+          );
         } else {
           // Update existing user's language preference
           await UserModel.update(existingUser.id, {
             preferredLanguage: userData.preferredLanguage as any,
           });
-          console.log(`✅ Updated test user: ${userData.email} (${userData.preferredLanguage})`);
+          console.log(
+            `✅ Updated test user: ${userData.email} (${userData.preferredLanguage})`
+          );
         }
       } catch (error) {
-        console.log(`⚠️ User ${userData.email} might already exist or error occurred:`, error);
+        console.log(
+          `⚠️ User ${userData.email} might already exist or error occurred:`,
+          error
+        );
       }
     }
 
@@ -52,7 +59,9 @@ async function testEmailIntegration() {
     console.log('\n📧 Test 2: Sending emails with language-specific templates');
 
     for (const userData of testUsers) {
-      console.log(`\n🌍 Testing emails for ${userData.email} (${userData.preferredLanguage}):`);
+      console.log(
+        `\n🌍 Testing emails for ${userData.email} (${userData.preferredLanguage}):`
+      );
 
       // Test password reset email
       console.log('  📨 Sending password reset email...');
@@ -64,7 +73,10 @@ async function testEmailIntegration() {
 
       // Test welcome email
       console.log('  📨 Sending welcome email...');
-      const welcomeResult = await EmailService.sendWelcomeEmail(userData.email, userData.name);
+      const welcomeResult = await EmailService.sendWelcomeEmail(
+        userData.email,
+        userData.name
+      );
       console.log(`  ✅ Welcome email result: ${welcomeResult}`);
 
       // Test account approval email
@@ -125,7 +137,9 @@ async function testEmailIntegration() {
 if (require.main === module) {
   testEmailIntegration()
     .then(() => {
-      console.log('\n✅ Email template integration test completed successfully');
+      console.log(
+        '\n✅ Email template integration test completed successfully'
+      );
       process.exit(0);
     })
     .catch((error) => {

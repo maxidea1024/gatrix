@@ -89,7 +89,8 @@ export const initMetrics = (app: FastifyInstance): void => {
         try {
           if (!chunk) return 0;
           if (Buffer.isBuffer(chunk)) return chunk.length;
-          if (typeof chunk === 'string') return Buffer.byteLength(chunk, encoding || 'utf8');
+          if (typeof chunk === 'string')
+            return Buffer.byteLength(chunk, encoding || 'utf8');
         } catch (_) {
           // ignore
         }
@@ -113,7 +114,8 @@ export const initMetrics = (app: FastifyInstance): void => {
         const start: bigint | undefined = (req as any)._metrics_start;
         if (start) {
           const duration = Number(process.hrtime.bigint() - start) / 1e9;
-          const route = (req.routerPath as any) || req.url?.split('?')[0] || 'unknown';
+          const route =
+            (req.routerPath as any) || req.url?.split('?')[0] || 'unknown';
           const labels = [req.method, String(reply.statusCode), route] as const;
           httpRequestDuration.labels(...labels).observe(duration);
           // Compute request/response byte deltas with header fallback
@@ -121,10 +123,17 @@ export const initMetrics = (app: FastifyInstance): void => {
           const ioPrev = (req as any)._metrics_io_start as
             | { read: number; written: number }
             | undefined;
-          const endRead = typeof sockNow?.bytesRead === 'number' ? sockNow.bytesRead : 0;
-          const endWritten = typeof sockNow?.bytesWritten === 'number' ? sockNow.bytesWritten : 0;
+          const endRead =
+            typeof sockNow?.bytesRead === 'number' ? sockNow.bytesRead : 0;
+          const endWritten =
+            typeof sockNow?.bytesWritten === 'number'
+              ? sockNow.bytesWritten
+              : 0;
           // Request bytes: prefer Content-Length header, otherwise socket delta
-          const reqCL = req.headers['content-length'] as string | string[] | undefined;
+          const reqCL = req.headers['content-length'] as
+            | string
+            | string[]
+            | undefined;
           let reqBytes = 0;
           if (reqCL) {
             const raw = Array.isArray(reqCL) ? reqCL[0] : reqCL;
@@ -137,8 +146,11 @@ export const initMetrics = (app: FastifyInstance): void => {
           }
           // Response bytes: prefer measured written bytes, then Content-Length, otherwise socket delta
           let resBytes = 0;
-          const getWritten = (req as any)._metrics_written_getter as undefined | (() => number);
-          const measured = typeof getWritten === 'function' ? Number(getWritten()) : 0;
+          const getWritten = (req as any)._metrics_written_getter as
+            | undefined
+            | (() => number);
+          const measured =
+            typeof getWritten === 'function' ? Number(getWritten()) : 0;
           if (Number.isFinite(measured) && measured > 0) {
             resBytes = measured;
           } else {
@@ -169,7 +181,10 @@ export const initMetrics = (app: FastifyInstance): void => {
     });
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.warn('[Event-Lens Metrics] Initialization skipped due to error:', err);
+    console.warn(
+      '[Event-Lens Metrics] Initialization skipped due to error:',
+      err
+    );
   }
 };
 

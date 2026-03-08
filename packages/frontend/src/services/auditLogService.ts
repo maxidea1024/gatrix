@@ -76,7 +76,10 @@ export class AuditLogService {
   /**
    * Get audit log statistics
    */
-  static async getAuditStats(startDate?: string, endDate?: string): Promise<AuditLogStats[]> {
+  static async getAuditStats(
+    startDate?: string,
+    endDate?: string
+  ): Promise<AuditLogStats[]> {
     const params = new URLSearchParams();
 
     if (startDate) {
@@ -86,7 +89,9 @@ export class AuditLogService {
       params.append('end_date', endDate);
     }
 
-    const response = await apiService.get<any>(`${this.BASE_URL}/stats?${params}`);
+    const response = await apiService.get<any>(
+      `${this.BASE_URL}/stats?${params}`
+    );
 
     if (response?.success && response?.data) {
       return response.data;
@@ -221,12 +226,15 @@ export class AuditLogService {
   static getActionColor(
     action: string
   ): 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' {
-    if (action.includes('create') || action.includes('register')) return 'success';
+    if (action.includes('create') || action.includes('register'))
+      return 'success';
     if (action.includes('delete') || action.includes('reject')) return 'error';
-    if (action.includes('update') || action.includes('change')) return 'warning';
+    if (action.includes('update') || action.includes('change'))
+      return 'warning';
     if (action.includes('login') || action.includes('approve')) return 'info';
     if (action.includes('suspend') || action.includes('demote')) return 'error';
-    if (action.includes('unsuspend') || action.includes('promote')) return 'success';
+    if (action.includes('unsuspend') || action.includes('promote'))
+      return 'success';
     return 'primary';
   }
 }

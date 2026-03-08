@@ -102,7 +102,9 @@ export class FeatureMetricsModel {
       // Merge variant counts into main metrics
       return metrics.map((m: any) => {
         const bucket =
-          m.metricsBucket instanceof Date ? m.metricsBucket.toISOString() : String(m.metricsBucket);
+          m.metricsBucket instanceof Date
+            ? m.metricsBucket.toISOString()
+            : String(m.metricsBucket);
         return {
           ...m,
           variantCounts: variantsByBucket[bucket] || {},
@@ -146,7 +148,9 @@ export class FeatureMetricsModel {
    */
   static async deleteOlderThan(cutoffDate: Date): Promise<number> {
     try {
-      const result = await db('g_feature_metrics').where('metricsBucket', '<', cutoffDate).delete();
+      const result = await db('g_feature_metrics')
+        .where('metricsBucket', '<', cutoffDate)
+        .delete();
 
       return result;
     } catch (error) {

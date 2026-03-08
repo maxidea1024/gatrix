@@ -42,7 +42,8 @@ const translateMultipleSchema = Joi.object({
 const detectLanguageSchema = Joi.object({
   text: Joi.string().required().max(1000).messages({
     'string.empty': 'Text is required for language detection',
-    'string.max': 'Text is too long for language detection (maximum 1000 characters)',
+    'string.max':
+      'Text is too long for language detection (maximum 1000 characters)',
   }),
 });
 
@@ -74,32 +75,34 @@ export class TranslationController {
   /**
    * 다중 언어 Translation
    */
-  static translateToMultipleLanguages = asyncHandler(async (req: Request, res: Response) => {
-    const startedAt = Date.now();
+  static translateToMultipleLanguages = asyncHandler(
+    async (req: Request, res: Response) => {
+      const startedAt = Date.now();
 
-    const { error, value } = translateMultipleSchema.validate(req.body);
-    if (error) {
-      throw new GatrixError(error.details[0].message, 400);
+      const { error, value } = translateMultipleSchema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
+
+      const { text, targetLanguages, sourceLanguage } = value;
+
+      const result = await TranslationService.translateToMultipleLanguages(
+        text,
+        targetLanguages,
+        sourceLanguage
+      );
+
+      const elapsed = Date.now() - startedAt;
+      const remaining = MIN_RESPONSE_MS - elapsed;
+      if (remaining > 0) await sleep(remaining);
+
+      res.json({
+        success: true,
+        data: result,
+        message: 'Text translated to multiple languages successfully',
+      });
     }
-
-    const { text, targetLanguages, sourceLanguage } = value;
-
-    const result = await TranslationService.translateToMultipleLanguages(
-      text,
-      targetLanguages,
-      sourceLanguage
-    );
-
-    const elapsed = Date.now() - startedAt;
-    const remaining = MIN_RESPONSE_MS - elapsed;
-    if (remaining > 0) await sleep(remaining);
-
-    res.json({
-      success: true,
-      data: result,
-      message: 'Text translated to multiple languages successfully',
-    });
-  });
+  );
 
   /**
    * Detect language
@@ -112,7 +115,9 @@ export class TranslationController {
       throw new GatrixError(error.details[0].message, 400);
     }
 
-    const detectedLanguage = await TranslationService.detectLanguage(value.text);
+    const detectedLanguage = await TranslationService.detectLanguage(
+      value.text
+    );
 
     const elapsed = Date.now() - startedAt;
     const remaining = MIN_RESPONSE_MS - elapsed;

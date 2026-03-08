@@ -4,7 +4,11 @@
  * Registers all built-in strategies and provides lookup by name.
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
+import {
+  EvaluationContext,
+  StrategyParameters,
+  StrategyEvaluationResult,
+} from '@gatrix/shared';
 import { Strategy } from './strategy';
 import { DefaultStrategy } from './default-strategy';
 import { FlexibleRolloutStrategy } from './flexible-rollout-strategy';
@@ -66,7 +70,10 @@ export function evaluateStrategyIsEnabled(
   if (!strategy) {
     return { enabled: false, strategyFound: false };
   }
-  return { enabled: strategy.isEnabled(parameters, context), strategyFound: true };
+  return {
+    enabled: strategy.isEnabled(parameters, context),
+    strategyFound: true,
+  };
 }
 
 /**

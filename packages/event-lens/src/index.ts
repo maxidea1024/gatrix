@@ -1,6 +1,9 @@
 import { createApp } from './app';
 import { config } from './config';
-import { testClickHouseConnection, initClickHouseDatabase } from './config/clickhouse';
+import {
+  testClickHouseConnection,
+  initClickHouseDatabase,
+} from './config/clickhouse';
 import { testMySQLConnection } from './config/mysql';
 import logger from './utils/logger';
 import { GatrixServerSDK } from '@gatrix/server-sdk';
@@ -51,11 +54,14 @@ async function start() {
           const packageJson = require('../package.json');
           serverVersion = packageJson.version || '0.0.0';
         } catch (err) {
-          logger.warn('Failed to load package.json version, using default 0.0.0');
+          logger.warn(
+            'Failed to load package.json version, using default 0.0.0'
+          );
         }
       }
       const backendUrl = process.env.GATRIX_URL || 'http://localhost:55000';
-      const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
+      const apiToken =
+        process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
 
       gatrixSdk = new GatrixServerSDK({
         gatrixUrl: backendUrl,
@@ -106,10 +112,13 @@ async function start() {
         },
       });
 
-      logger.info('Event-Lens service registered to Service Discovery via SDK', {
-        instanceId: result.instanceId,
-        version: serverVersion,
-      });
+      logger.info(
+        'Event-Lens service registered to Service Discovery via SDK',
+        {
+          instanceId: result.instanceId,
+          version: serverVersion,
+        }
+      );
     } catch (error: any) {
       logger.warn('Event-Lens service registration failed, continuing', {
         error: error instanceof Error ? error.message : String(error),
@@ -125,7 +134,9 @@ async function start() {
         if (gatrixSdk) {
           try {
             await gatrixSdk.unregisterService();
-            logger.info('Event-Lens service unregistered from Service Discovery');
+            logger.info(
+              'Event-Lens service unregistered from Service Discovery'
+            );
           } catch (error) {
             logger.warn('Error unregistering Event-Lens service:', error);
           }

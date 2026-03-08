@@ -44,7 +44,12 @@ export type MetricsServerInstance = {
   /** Create and register a Gauge metric */
   createGauge: (name: string, help: string, labelNames?: string[]) => any;
   /** Create and register a Histogram metric */
-  createHistogram: (name: string, help: string, labelNames?: string[], buckets?: number[]) => any;
+  createHistogram: (
+    name: string,
+    help: string,
+    labelNames?: string[],
+    buckets?: number[]
+  ) => any;
   /** Start the server */
   start: () => void;
   /** Stop the server */
@@ -55,14 +60,18 @@ export type MetricsServerInstance = {
  * Create a metrics server instance
  * Does not start the server - call start() to begin listening
  */
-export function createMetricsServer(config: MetricsServerConfig = {}): MetricsServerInstance {
+export function createMetricsServer(
+  config: MetricsServerConfig = {}
+): MetricsServerInstance {
   // Lazy require to avoid side effects at import time
   const express = require('express');
   const promClient = require('prom-client');
 
-  const port = config.port || parseInt(process.env.SDK_METRICS_PORT || '9337', 10);
+  const port =
+    config.port || parseInt(process.env.SDK_METRICS_PORT || '9337', 10);
   const nodeEnv = process.env.NODE_ENV || 'development';
-  const bindAddress = config.bindAddress || (nodeEnv === 'production' ? '127.0.0.1' : '0.0.0.0');
+  const bindAddress =
+    config.bindAddress || (nodeEnv === 'production' ? '127.0.0.1' : '0.0.0.0');
 
   // Use provided registry or create a new one
   const registry: Registry = config.registry || new promClient.Registry();
@@ -76,14 +85,18 @@ export function createMetricsServer(config: MetricsServerConfig = {}): MetricsSe
       service: config.service || 'unknown',
       group: config.group || 'unknown',
       environment: config.environment || 'unknown',
-      application: config.applicationName || process.env.SDK_APPLICATION_NAME || 'unknown',
+      application:
+        config.applicationName || process.env.SDK_APPLICATION_NAME || 'unknown',
     });
   }
 
   // Check if default Node.js metrics are already present in any of the registries
   // Use 'process_cpu_user_seconds_total' as a proxy for default metrics
   const PROXY_METRIC = 'process_cpu_user_seconds_total';
-  const allRegistriesToCheck = [registry, ...(config.additionalRegistries || [])];
+  const allRegistriesToCheck = [
+    registry,
+    ...(config.additionalRegistries || []),
+  ];
 
   let hasDefaultMetrics = false;
   try {
@@ -108,10 +121,14 @@ export function createMetricsServer(config: MetricsServerConfig = {}): MetricsSe
     try {
       let metricsOutput: string;
 
-      if (config.additionalRegistries && config.additionalRegistries.length > 0) {
+      if (
+        config.additionalRegistries &&
+        config.additionalRegistries.length > 0
+      ) {
         // Merge multiple registries for output
         const allRegistries = [registry, ...config.additionalRegistries];
-        metricsOutput = await promClient.Registry.merge(allRegistries).metrics();
+        metricsOutput =
+          await promClient.Registry.merge(allRegistries).metrics();
       } else {
         // Single registry output
         metricsOutput = await registry.metrics();
@@ -196,7 +213,9 @@ export function createMetricsServer(config: MetricsServerConfig = {}): MetricsSe
      */
     start(): void {
       server = app.listen(port, bindAddress, () => {
-        config.logger?.info(`Metrics server listening on ${bindAddress}:${port}`);
+        config.logger?.info(
+          `Metrics server listening on ${bindAddress}:${port}`
+        );
       });
     },
 

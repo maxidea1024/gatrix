@@ -34,7 +34,9 @@ export class GameWorldService extends BaseEnvironmentService<
   protected extractItems(response: GameWorldListResponse): GameWorld[] {
     const worlds = response.worlds || [];
     // Sort by displayOrder (ascending)
-    return [...worlds].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+    return [...worlds].sort(
+      (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
+    );
   }
 
   protected getServiceName(): string {
@@ -56,7 +58,9 @@ export class GameWorldService extends BaseEnvironmentService<
   async getById(id: string, environmentId: string): Promise<GameWorld> {
     this.logger.debug('Fetching game world by ID', { id, environmentId });
 
-    const response = await this.apiClient.get<GameWorld>(`/api/v1/server/game-worlds/${id}`);
+    const response = await this.apiClient.get<GameWorld>(
+      `/api/v1/server/game-worlds/${id}`
+    );
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch game world');
@@ -76,7 +80,10 @@ export class GameWorldService extends BaseEnvironmentService<
    * @param worldId World ID
    * @param environmentId environment ID (required)
    */
-  async getByWorldId(worldId: string, environmentId: string): Promise<GameWorld> {
+  async getByWorldId(
+    worldId: string,
+    environmentId: string
+  ): Promise<GameWorld> {
     this.logger.debug('Fetching game world by worldId', {
       worldId,
       environmentId,
@@ -135,7 +142,9 @@ export class GameWorldService extends BaseEnvironmentService<
 
       // Get current worlds for this environment
       const currentWorlds = this.cachedByEnv.get(environmentId) || [];
-      const existsInCache = currentWorlds.some((world) => String(world.id) === String(id));
+      const existsInCache = currentWorlds.some(
+        (world) => String(world.id) === String(id)
+      );
 
       if (existsInCache) {
         // Immutable update: update existing world

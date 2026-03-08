@@ -22,8 +22,15 @@ export class GoogleChatAddon extends Addon {
     const { url } = parameters;
 
     if (!url) {
-      this.logger.warn(`Missing Google Chat webhook URL for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing webhook URL');
+      this.logger.warn(
+        `Missing Google Chat webhook URL for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing webhook URL'
+      );
       return;
     }
 

@@ -23,7 +23,9 @@ router.get(
       : new Date(end.getTime() - 24 * 60 * 60 * 1000);
 
     const traffic = await networkTrafficService.getDetailedTraffic({
-      environments: environments ? (environments as string).split(',') : undefined,
+      environments: environments
+        ? (environments as string).split(',')
+        : undefined,
       appNames: appNames ? (appNames as string).split(',') : undefined,
       startDate: start,
       endDate: end,
@@ -45,7 +47,9 @@ router.get(
       : new Date(end.getTime() - 24 * 60 * 60 * 1000);
 
     const traffic = await networkTrafficService.getAggregatedTraffic({
-      environments: environments ? (environments as string).split(',') : undefined,
+      environments: environments
+        ? (environments as string).split(',')
+        : undefined,
       appNames: appNames ? (appNames as string).split(',') : undefined,
       startDate: start,
       endDate: end,
@@ -67,7 +71,9 @@ router.get(
       : new Date(end.getTime() - 24 * 60 * 60 * 1000);
 
     const traffic = await networkTrafficService.getAggregatedTrafficByApp({
-      environments: environments ? (environments as string).split(',') : undefined,
+      environments: environments
+        ? (environments as string).split(',')
+        : undefined,
       appNames: appNames ? (appNames as string).split(',') : undefined,
       startDate: start,
       endDate: end,
@@ -89,7 +95,9 @@ router.get(
       : new Date(end.getTime() - 24 * 60 * 60 * 1000);
 
     const summary = await networkTrafficService.getTrafficSummary({
-      environments: environments ? (environments as string).split(',') : undefined,
+      environments: environments
+        ? (environments as string).split(',')
+        : undefined,
       appNames: appNames ? (appNames as string).split(',') : undefined,
       startDate: start,
       endDate: end,
@@ -111,7 +119,9 @@ router.get(
       : new Date(end.getTime() - 24 * 60 * 60 * 1000);
 
     const applications = await networkTrafficService.getActiveApplications({
-      environments: environments ? (environments as string).split(',') : undefined,
+      environments: environments
+        ? (environments as string).split(',')
+        : undefined,
       startDate: start,
       endDate: end,
     });
@@ -132,7 +142,9 @@ router.get(
       : new Date(end.getTime() - 24 * 60 * 60 * 1000);
 
     const evaluations = await networkTrafficService.getFlagEvaluationSummary({
-      environments: environments ? (environments as string).split(',') : undefined,
+      environments: environments
+        ? (environments as string).split(',')
+        : undefined,
       appNames: appNames ? (appNames as string).split(',') : undefined,
       startDate: start,
       endDate: end,
@@ -154,7 +166,9 @@ router.get(
       : new Date(end.getTime() - 24 * 60 * 60 * 1000);
 
     const timeseries = await networkTrafficService.getFlagEvaluationTimeSeries({
-      environments: environments ? (environments as string).split(',') : undefined,
+      environments: environments
+        ? (environments as string).split(',')
+        : undefined,
       appNames: appNames ? (appNames as string).split(',') : undefined,
       startDate: start,
       endDate: end,
@@ -175,12 +189,15 @@ router.get(
       ? new Date(startDate as string)
       : new Date(end.getTime() - 24 * 60 * 60 * 1000);
 
-    const timeseries = await networkTrafficService.getFlagEvaluationTimeSeriesByApp({
-      environments: environments ? (environments as string).split(',') : undefined,
-      appNames: appNames ? (appNames as string).split(',') : undefined,
-      startDate: start,
-      endDate: end,
-    });
+    const timeseries =
+      await networkTrafficService.getFlagEvaluationTimeSeriesByApp({
+        environments: environments
+          ? (environments as string).split(',')
+          : undefined,
+        appNames: appNames ? (appNames as string).split(',') : undefined,
+        startDate: start,
+        endDate: end,
+      });
 
     res.json({ success: true, data: { timeseries } });
   })

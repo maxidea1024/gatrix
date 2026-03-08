@@ -1,5 +1,10 @@
 import React, { useId } from 'react';
-import { FormControl, InputLabel, Select, type SelectProps } from '@mui/material';
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  type SelectProps,
+} from '@mui/material';
 import type { FormControlProps } from '@mui/material/FormControl';
 import type { SxProps, Theme } from '@mui/material/styles';
 
@@ -13,8 +18,14 @@ export interface SelectFieldProps {
   fullWidth?: boolean;
   displayEmpty?: boolean;
   sx?: SxProps<Theme>;
-  formControlProps?: Omit<FormControlProps, 'fullWidth' | 'size' | 'variant' | 'sx'>;
-  selectProps?: Omit<SelectProps, 'label' | 'value' | 'onChange' | 'displayEmpty' | 'labelId'>;
+  formControlProps?: Omit<
+    FormControlProps,
+    'fullWidth' | 'size' | 'variant' | 'sx'
+  >;
+  selectProps?: Omit<
+    SelectProps,
+    'label' | 'value' | 'onChange' | 'displayEmpty' | 'labelId'
+  >;
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -34,7 +45,13 @@ const SelectField: React.FC<SelectFieldProps> = ({
   const labelId = id ? `${id}-label` : `${autoId}-label`;
 
   return (
-    <FormControl fullWidth={fullWidth} size={size} variant="outlined" sx={sx} {...formControlProps}>
+    <FormControl
+      fullWidth={fullWidth}
+      size={size}
+      variant="outlined"
+      sx={sx}
+      {...formControlProps}
+    >
       <InputLabel id={labelId} shrink={true}>
         {label}
       </InputLabel>

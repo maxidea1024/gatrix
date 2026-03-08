@@ -42,7 +42,9 @@ export class FileCacheStorageProvider implements CacheStorageProvider {
       const filePath = this.getFilePath(key);
       await fs.writeFile(filePath, value, 'utf8');
     } catch (error: any) {
-      this.logger.error(`Failed to save cache key ${key} to file`, { error: error.message });
+      this.logger.error(`Failed to save cache key ${key} to file`, {
+        error: error.message,
+      });
     }
   }
 
@@ -52,7 +54,9 @@ export class FileCacheStorageProvider implements CacheStorageProvider {
       if (!(await this.exists(key))) return null;
       return await fs.readFile(filePath, 'utf8');
     } catch (error: any) {
-      this.logger.error(`Failed to read cache key ${key} from file`, { error: error.message });
+      this.logger.error(`Failed to read cache key ${key} from file`, {
+        error: error.message,
+      });
       return null;
     }
   }
@@ -73,7 +77,9 @@ export class FileCacheStorageProvider implements CacheStorageProvider {
         await fs.unlink(filePath);
       }
     } catch (error: any) {
-      this.logger.error(`Failed to remove cache key ${key}`, { error: error.message });
+      this.logger.error(`Failed to remove cache key ${key}`, {
+        error: error.message,
+      });
     }
   }
 

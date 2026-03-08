@@ -113,10 +113,20 @@ class ServerChatController {
   // Report chat statistics
   static async reportStats(req: ServerChatRequest, res: Response) {
     try {
-      const { serverId, connectedUsers, activeChannels, messagesPerSecond, timestamp } = req.body;
+      const {
+        serverId,
+        connectedUsers,
+        activeChannels,
+        messagesPerSecond,
+        timestamp,
+      } = req.body;
 
       // Validate required fields
-      if (!serverId || connectedUsers === undefined || activeChannels === undefined) {
+      if (
+        !serverId ||
+        connectedUsers === undefined ||
+        activeChannels === undefined
+      ) {
         return res.status(400).json({
           success: false,
           error: 'serverId, connectedUsers, and activeChannels are required',

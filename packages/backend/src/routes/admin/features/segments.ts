@@ -16,7 +16,10 @@ router.get(
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { search } = req.query;
 
-    const segments = await featureFlagService.listSegments(search as string, req.projectId);
+    const segments = await featureFlagService.listSegments(
+      search as string,
+      req.projectId
+    );
 
     res.json({ success: true, data: { segments } });
   })
@@ -29,7 +32,9 @@ router.get(
     const segment = await featureFlagService.getSegment(req.params.id);
 
     if (!segment) {
-      return res.status(404).json({ success: false, error: 'Segment not found' });
+      return res
+        .status(404)
+        .json({ success: false, error: 'Segment not found' });
     }
 
     res.json({ success: true, data: { segment } });
@@ -54,7 +59,11 @@ router.put(
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
 
-    const segment = await featureFlagService.updateSegment(req.params.id, req.body, userId!);
+    const segment = await featureFlagService.updateSegment(
+      req.params.id,
+      req.body,
+      userId!
+    );
 
     res.json({ success: true, data: { segment } });
   })

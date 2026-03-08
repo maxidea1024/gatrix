@@ -24,7 +24,10 @@ export function truncateToMinute(isoString: string): string {
  * Build query parameters from an EvaluationContext onto a URL.
  * Used by client SDKs for GET eval requests.
  */
-export function buildContextQueryParams(url: URL, context: Record<string, any>): void {
+export function buildContextQueryParams(
+  url: URL,
+  context: Record<string, any>
+): void {
   const systemAndTopLevel = [
     'appName',
     'environment',
@@ -60,7 +63,10 @@ export class EvaluationUtils {
   /**
    * Extract evaluation context and flag names from an Express-like request object
    */
-  static extractFromRequest(req: any): { context: EvaluationContext; flagNames: string[] } {
+  static extractFromRequest(req: any): {
+    context: EvaluationContext;
+    flagNames: string[];
+  } {
     let context: EvaluationContext = {};
     let flagNames: string[] = [];
 
@@ -72,12 +78,15 @@ export class EvaluationUtils {
       const query = req.query || {};
       if (query.userId) context.userId = query.userId as string;
       if (query.sessionId) context.sessionId = query.sessionId as string;
-      if (query.remoteAddress) context.remoteAddress = query.remoteAddress as string;
+      if (query.remoteAddress)
+        context.remoteAddress = query.remoteAddress as string;
       if (query.appName) context.appName = query.appName as string;
       if (query.appVersion) context.appVersion = query.appVersion as string;
       if (query.environment) context.environment = query.environment as string;
       if (query.currentTime) {
-        context.currentTime = new Date(truncateToMinute(query.currentTime as string));
+        context.currentTime = new Date(
+          truncateToMinute(query.currentTime as string)
+        );
       }
 
       // Handle properties[key]=value
@@ -109,7 +118,10 @@ export class EvaluationUtils {
     for (const key of keys) {
       stableContext[key] = (context as any)[key];
     }
-    return crypto.createHash('md5').update(JSON.stringify(stableContext)).digest('hex');
+    return crypto
+      .createHash('md5')
+      .update(JSON.stringify(stableContext))
+      .digest('hex');
   }
 
   /**
@@ -121,7 +133,9 @@ export class EvaluationUtils {
       '|' +
       flagsArray
         .map((f: any) => {
-          const variantPart = f.variant ? `${f.variant.name}:${f.variant.enabled}` : 'no-variant';
+          const variantPart = f.variant
+            ? `${f.variant.name}:${f.variant.enabled}`
+            : 'no-variant';
           return `${f.name}:${f.version}:${f.enabled}:${variantPart}`;
         })
         .join('|');
@@ -207,7 +221,10 @@ export class EvaluationUtils {
         } catch (e) {
           /* ignore */
         }
-      } else if (valueType === 'number' && typeof finalVariant.value === 'string') {
+      } else if (
+        valueType === 'number' &&
+        typeof finalVariant.value === 'string'
+      ) {
         const parsed = Number(finalVariant.value);
         if (!isNaN(parsed)) finalVariant.value = parsed;
       }

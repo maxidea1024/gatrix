@@ -64,15 +64,25 @@ export class RoleModel {
     return db(this.TABLE).where('orgId', orgId).orderBy('roleName', 'asc');
   }
 
-  static async findByName(orgId: string, roleName: string): Promise<RoleRecord | null> {
-    const row = await db(this.TABLE).where('orgId', orgId).where('roleName', roleName).first();
+  static async findByName(
+    orgId: string,
+    roleName: string
+  ): Promise<RoleRecord | null> {
+    const row = await db(this.TABLE)
+      .where('orgId', orgId)
+      .where('roleName', roleName)
+      .first();
     return row || null;
   }
 
-  static async update(id: string, data: UpdateRoleData): Promise<RoleRecord | null> {
+  static async update(
+    id: string,
+    data: UpdateRoleData
+  ): Promise<RoleRecord | null> {
     const updateData: any = { updatedBy: data.updatedBy };
     if (data.roleName !== undefined) updateData.roleName = data.roleName;
-    if (data.description !== undefined) updateData.description = data.description;
+    if (data.description !== undefined)
+      updateData.description = data.description;
 
     await db(this.TABLE).where('id', id).update(updateData);
     return this.findById(id);
@@ -93,14 +103,19 @@ export class RoleModel {
    * Get permissions for a role (pure permission strings, no scope)
    */
   static async getPermissions(roleId: string): Promise<string[]> {
-    const rows = await db(this.PERMISSIONS_TABLE).where('roleId', roleId).select('permission');
+    const rows = await db(this.PERMISSIONS_TABLE)
+      .where('roleId', roleId)
+      .select('permission');
     return rows.map((r: any) => r.permission);
   }
 
   /**
    * Set permissions for a role (replaces all existing)
    */
-  static async setPermissions(roleId: string, permissions: string[]): Promise<void> {
+  static async setPermissions(
+    roleId: string,
+    permissions: string[]
+  ): Promise<void> {
     await db.transaction(async (trx) => {
       // Clear existing
       await trx(this.PERMISSIONS_TABLE).where('roleId', roleId).del();
@@ -129,7 +144,12 @@ export class RoleModel {
   static async getWithDetails(
     roleId: string
   ): Promise<
-    (RoleRecord & { permissions: string[]; userCount: number; groupCount: number }) | null
+    | (RoleRecord & {
+        permissions: string[];
+        userCount: number;
+        groupCount: number;
+      })
+    | null
   > {
     const role = await this.findById(roleId);
     if (!role) return null;

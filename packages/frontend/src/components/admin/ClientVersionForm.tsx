@@ -50,7 +50,10 @@ import { PlatformDefaultsService } from '../../services/platformDefaultsService'
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import JsonEditor from '../common/JsonEditor';
 import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
-import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
+import {
+  MessageTemplate,
+  messageTemplateService,
+} from '../../services/messageTemplateService';
 import { getContrastColor } from '@/utils/colorUtils';
 import { parseApiErrorMessage } from '@/utils/errorUtils';
 import { showChangeRequestCreatedToast } from '@/utils/changeRequestToast';
@@ -109,7 +112,10 @@ const createValidationSchema = (t: any) =>
       .string()
       .max(CLIENT_VERSION_VALIDATION.EXTERNAL_LINK.MAX_LENGTH)
       .notRequired(),
-    memo: yup.string().max(CLIENT_VERSION_VALIDATION.MEMO.MAX_LENGTH).notRequired(),
+    memo: yup
+      .string()
+      .max(CLIENT_VERSION_VALIDATION.MEMO.MAX_LENGTH)
+      .notRequired(),
     customPayload: yup
       .string()
       .max(CLIENT_VERSION_VALIDATION.CUSTOM_PAYLOAD.MAX_LENGTH)
@@ -119,7 +125,8 @@ const createValidationSchema = (t: any) =>
     maintenanceEndDate: yup.string().notRequired(),
     maintenanceMessage: yup.string().when('clientStatus', {
       is: ClientStatus.MAINTENANCE,
-      then: (schema) => schema.required(t('clientVersions.maintenance.messageRequired')),
+      then: (schema) =>
+        schema.required(t('clientVersions.maintenance.messageRequired')),
       otherwise: (schema) => schema.notRequired(),
     }),
     supportsMultiLanguage: yup.boolean().notRequired(),
@@ -159,9 +166,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   >([]);
 
   // Maintenance-related state
-  const [maintenanceLocales, setMaintenanceLocales] = useState<ClientVersionMaintenanceLocale[]>(
-    []
-  );
+  const [maintenanceLocales, setMaintenanceLocales] = useState<
+    ClientVersionMaintenanceLocale[]
+  >([]);
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
 
   // Message source selection
@@ -220,7 +227,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           try {
             // Re-fetch details since maintenanceLocales may be empty from list data
             if (
-              (!source.maintenanceLocales || source.maintenanceLocales.length === 0) &&
+              (!source.maintenanceLocales ||
+                source.maintenanceLocales.length === 0) &&
               source.id
             ) {
               const full = await ClientVersionService.getClientVersionById(
@@ -238,7 +246,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             clientVersion: isCopyMode ? '' : source.clientVersion, // Clear version only in copy mode
             clientStatus: source.clientStatus,
             gameServerAddress: source.gameServerAddress,
-            gameServerAddressForWhiteList: source.gameServerAddressForWhiteList || '',
+            gameServerAddressForWhiteList:
+              source.gameServerAddressForWhiteList || '',
             patchAddress: source.patchAddress,
             patchAddressForWhiteList: source.patchAddressForWhiteList || '',
             guestModeAllowed: source.guestModeAllowed,
@@ -251,22 +260,30 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             // Enable if locale data exists even when supportsMultiLanguage is false
             supportsMultiLanguage:
               (source.supportsMultiLanguage ?? false) ||
-              !!(source.maintenanceLocales && source.maintenanceLocales.length > 0),
+              !!(
+                source.maintenanceLocales &&
+                source.maintenanceLocales.length > 0
+              ),
             // Normalize server language codes
-            maintenanceLocales: (source.maintenanceLocales || []).map((l: any) => ({
-              lang: normalizeLangCode(l.lang),
-              message: l.message || '',
-            })),
+            maintenanceLocales: (source.maintenanceLocales || []).map(
+              (l: any) => ({
+                lang: normalizeLangCode(l.lang),
+                message: l.message || '',
+              })
+            ),
             tags: source.tags || [],
           });
           setSelectedTags(source.tags || []);
-          const normalizedLocales = (source.maintenanceLocales || []).map((l: any) => ({
-            lang: normalizeLangCode(l.lang),
-            message: l.message || '',
-          }));
+          const normalizedLocales = (source.maintenanceLocales || []).map(
+            (l: any) => ({
+              lang: normalizeLangCode(l.lang),
+              message: l.message || '',
+            })
+          );
           setMaintenanceLocales(normalizedLocales);
           setSupportsMultiLanguage(
-            (source.supportsMultiLanguage ?? false) || normalizedLocales.length > 0
+            (source.supportsMultiLanguage ?? false) ||
+              normalizedLocales.length > 0
           );
         })();
       } else {
@@ -281,12 +298,14 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         // Apply defaults for initial platform (e.g. 'pc') immediately (only if fields are empty)
         (async () => {
           try {
-            const initialPlatform = getValues('platform') || defaultValues.platform;
+            const initialPlatform =
+              getValues('platform') || defaultValues.platform;
             if (initialPlatform) {
-              const defaults = await PlatformDefaultsService.getPlatformDefaults(
-                projectApiPath,
-                initialPlatform
-              );
+              const defaults =
+                await PlatformDefaultsService.getPlatformDefaults(
+                  projectApiPath,
+                  initialPlatform
+                );
               const currentGame = getValues('gameServerAddress');
               const currentPatch = getValues('patchAddress');
               if (!currentGame && defaults.gameServerAddress) {
@@ -396,7 +415,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             version,
             isEdit ? clientVersion?.id : undefined
           );
-          setDuplicateError(isDuplicate ? t('clientVersions.form.duplicateVersion') : null);
+          setDuplicateError(
+            isDuplicate ? t('clientVersions.form.duplicateVersion') : null
+          );
         } catch (error) {
           console.error('Error checking duplicate:', error);
         }
@@ -447,14 +468,18 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       setLoading(true);
       // Handle message for template mode
       let finalMaintenanceMessage = data.maintenanceMessage;
-      let finalMaintenanceLocales = maintenanceLocales.filter((l) => l.message.trim() !== '');
+      let finalMaintenanceLocales = maintenanceLocales.filter(
+        (l) => l.message.trim() !== ''
+      );
 
       if (
         data.clientStatus === ClientStatus.MAINTENANCE &&
         inputMode === 'template' &&
         selectedTemplateId
       ) {
-        const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
+        const selectedTemplate = templates.find(
+          (t) => t.id === selectedTemplateId
+        );
         if (selectedTemplate) {
           finalMaintenanceMessage = selectedTemplate.defaultMessage || '';
           finalMaintenanceLocales = (selectedTemplate.locales || [])
@@ -467,10 +492,15 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       }
 
       // Convert empty strings to undefined and separate tags, maintenanceLocales fields
-      const { tags, maintenanceLocales: formMaintenanceLocales, ...dataWithoutTags } = data;
+      const {
+        tags,
+        maintenanceLocales: formMaintenanceLocales,
+        ...dataWithoutTags
+      } = data;
       const cleanedData = {
         ...dataWithoutTags,
-        gameServerAddressForWhiteList: data.gameServerAddressForWhiteList || undefined,
+        gameServerAddressForWhiteList:
+          data.gameServerAddressForWhiteList || undefined,
         patchAddressForWhiteList: data.patchAddressForWhiteList || undefined,
         externalClickLink: data.externalClickLink || undefined,
         memo: data.memo || undefined,
@@ -493,7 +523,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           cleanedData
         );
         if (updateResult.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
           onSuccess();
           onClose();
           return;
@@ -509,7 +543,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           cleanedData
         );
         if (createResult.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
           onSuccess();
           onClose();
           return;
@@ -520,7 +558,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           throw new Error(t('common.cannotGetClientVersionId'));
         }
         enqueueSnackbar(
-          <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}>
+          <Box
+            component="span"
+            sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}
+          >
             Client version{' '}
             <Chip
               size="small"
@@ -537,7 +578,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       // Set tags
       if (selectedTags && selectedTags.length > 0) {
         const tagIds = selectedTags.map((tag) => tag.id);
-        await ClientVersionService.setTags(projectApiPath, clientVersionId, tagIds);
+        await ClientVersionService.setTags(
+          projectApiPath,
+          clientVersionId,
+          tagIds
+        );
       } else {
         // Remove all existing tags if none selected
         await ClientVersionService.setTags(projectApiPath, clientVersionId, []);
@@ -546,7 +591,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Error saving client version:', error);
-      const errorMessage = parseApiErrorMessage(error, 'clientVersions.saveError');
+      const errorMessage = parseApiErrorMessage(
+        error,
+        'clientVersions.saveError'
+      );
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setLoading(false);
@@ -637,10 +685,13 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                             </Typography>
                           </Box>
                         }
-                        placeholder={CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE}
+                        placeholder={
+                          CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE
+                        }
                         error={!!errors.clientVersion}
                         helperText={
-                          errors.clientVersion?.message || t('clientVersions.form.versionHelp')
+                          errors.clientVersion?.message ||
+                          t('clientVersions.form.versionHelp')
                         }
                         inputProps={{
                           autoComplete: 'off',
@@ -684,20 +735,30 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                             // Apply defaults only when creating new
                             if (!isEdit && e.target.value) {
                               try {
-                                const defaults = await PlatformDefaultsService.getPlatformDefaults(
-                                  projectApiPath,
-                                  e.target.value as string
-                                );
+                                const defaults =
+                                  await PlatformDefaultsService.getPlatformDefaults(
+                                    projectApiPath,
+                                    e.target.value as string
+                                  );
 
                                 // Apply platform defaults (overwrite regardless of existing values)
                                 if (defaults.gameServerAddress) {
-                                  setValue('gameServerAddress', defaults.gameServerAddress);
+                                  setValue(
+                                    'gameServerAddress',
+                                    defaults.gameServerAddress
+                                  );
                                 }
                                 if (defaults.patchAddress) {
-                                  setValue('patchAddress', defaults.patchAddress);
+                                  setValue(
+                                    'patchAddress',
+                                    defaults.patchAddress
+                                  );
                                 }
                               } catch (error) {
-                                console.error('Failed to apply platform defaults:', error);
+                                console.error(
+                                  'Failed to apply platform defaults:',
+                                  error
+                                );
                               }
                             }
                           }}
@@ -708,13 +769,15 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                             </MenuItem>
                           ))}
                         </Select>
-                        {(errors.platform?.message || t('clientVersions.form.platformHelp')) && (
+                        {(errors.platform?.message ||
+                          t('clientVersions.form.platformHelp')) && (
                           <Typography
                             variant="caption"
                             color={errors.platform ? 'error' : 'text.secondary'}
                             sx={{ mt: 0.5, display: 'block' }}
                           >
-                            {errors.platform?.message || t('clientVersions.form.platformHelp')}
+                            {errors.platform?.message ||
+                              t('clientVersions.form.platformHelp')}
                           </Typography>
                         )}
                       </FormControl>
@@ -770,8 +833,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                   <MaintenanceSettingsInput
                     startDate={watch('maintenanceStartDate') || ''}
                     endDate={watch('maintenanceEndDate') || ''}
-                    onStartDateChange={(date) => setValue('maintenanceStartDate', date)}
-                    onEndDateChange={(date) => setValue('maintenanceEndDate', date)}
+                    onStartDateChange={(date) =>
+                      setValue('maintenanceStartDate', date)
+                    }
+                    onEndDateChange={(date) =>
+                      setValue('maintenanceEndDate', date)
+                    }
                     inputMode={inputMode}
                     onInputModeChange={setInputMode}
                     maintenanceMessage={watch('maintenanceMessage') || ''}
@@ -779,7 +846,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       setValue('maintenanceMessage', message)
                     }
                     supportsMultiLanguage={supportsMultiLanguage}
-                    onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
+                    onSupportsMultiLanguageChange={
+                      handleSupportsMultiLanguageChange
+                    }
                     maintenanceLocales={maintenanceLocales.map((l) => ({
                       lang: l.lang as 'ko' | 'en' | 'zh',
                       message: l.message,
@@ -870,11 +939,15 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       <TextField
                         {...field}
                         fullWidth
-                        label={t('clientVersions.gameServerAddressForWhiteList')}
+                        label={t(
+                          'clientVersions.gameServerAddressForWhiteList'
+                        )}
                         error={!!errors.gameServerAddressForWhiteList}
                         helperText={
                           errors.gameServerAddressForWhiteList?.message ||
-                          t('clientVersions.form.gameServerAddressForWhiteListHelp')
+                          t(
+                            'clientVersions.form.gameServerAddressForWhiteListHelp'
+                          )
                         }
                         inputProps={{
                           autoComplete: 'off',
@@ -906,7 +979,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         }
                         error={!!errors.patchAddress}
                         helperText={
-                          errors.patchAddress?.message || t('clientVersions.form.patchAddressHelp')
+                          errors.patchAddress?.message ||
+                          t('clientVersions.form.patchAddressHelp')
                         }
                         inputProps={{
                           autoComplete: 'off',
@@ -1028,7 +1102,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             </Paper>
 
             {/* Additional settings section */}
-            <Accordion defaultExpanded={false} disableGutters variant="outlined" sx={{ mb: 2 }}>
+            <Accordion
+              defaultExpanded={false}
+              disableGutters
+              variant="outlined"
+              sx={{ mb: 2 }}
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography
                   variant="subtitle1"
@@ -1044,7 +1123,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   {t('clientVersions.form.additionalSettingsDescription')}
                 </Typography>
 
@@ -1056,7 +1139,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     render={({ field }) => (
                       <Box>
                         <FormControlLabel
-                          control={<Switch checked={field.value} onChange={field.onChange} />}
+                          control={
+                            <Switch
+                              checked={field.value}
+                              onChange={field.onChange}
+                            />
+                          }
                           label={t('clientVersions.guestModeAllowed')}
                         />
                         <Typography
@@ -1106,7 +1194,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         rows={3}
                         label={t('clientVersions.memo')}
                         error={!!errors.memo}
-                        helperText={errors.memo?.message || t('clientVersions.form.memoHelp')}
+                        helperText={
+                          errors.memo?.message ||
+                          t('clientVersions.form.memoHelp')
+                        }
                       />
                     )}
                   />
@@ -1159,12 +1250,21 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           <Button
             type="submit"
             variant="contained"
-            disabled={isSubmitting || loading || !!duplicateError || (displayIsEdit && !isDirty)}
+            disabled={
+              isSubmitting ||
+              loading ||
+              !!duplicateError ||
+              (displayIsEdit && !isDirty)
+            }
             startIcon={displayIsCopy ? <CopyIcon /> : <SaveIcon />}
           >
             {displayIsCopy
               ? t('clientVersions.form.copyTitle')
-              : getActionLabel(displayIsEdit ? 'update' : 'create', requiresApproval, t)}
+              : getActionLabel(
+                  displayIsEdit ? 'update' : 'create',
+                  requiresApproval,
+                  t
+                )}
           </Button>
         </Box>
       </form>

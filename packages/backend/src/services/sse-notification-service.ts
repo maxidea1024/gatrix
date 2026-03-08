@@ -44,7 +44,11 @@ export class SSENotificationService extends EventEmitter {
   /**
    * Add a new SSE client
    */
-  public addClient(clientId: string, response: Response, userId?: string): void {
+  public addClient(
+    clientId: string,
+    response: Response,
+    userId?: string
+  ): void {
     // Set SSE headers
     response.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -90,7 +94,9 @@ export class SSENotificationService extends EventEmitter {
       this.removeClient(clientId);
     });
 
-    logger.info(`SSE client connected: ${clientId}${userId ? ` (user: ${userId})` : ''}`);
+    logger.info(
+      `SSE client connected: ${clientId}${userId ? ` (user: ${userId})` : ''}`
+    );
   }
 
   /**
@@ -116,7 +122,9 @@ export class SSENotificationService extends EventEmitter {
     const client = this.clients.get(clientId);
     if (client) {
       channels.forEach((channel) => client.subscriptions.add(channel));
-      logger.debug(`Client ${clientId} subscribed to channels: ${channels.join(', ')}`);
+      logger.debug(
+        `Client ${clientId} subscribed to channels: ${channels.join(', ')}`
+      );
     }
   }
 
@@ -127,7 +135,9 @@ export class SSENotificationService extends EventEmitter {
     const client = this.clients.get(clientId);
     if (client) {
       channels.forEach((channel) => client.subscriptions.delete(channel));
-      logger.debug(`Client ${clientId} unsubscribed from channels: ${channels.join(', ')}`);
+      logger.debug(
+        `Client ${clientId} unsubscribed from channels: ${channels.join(', ')}`
+      );
     }
   }
 
@@ -194,7 +204,9 @@ export class SSENotificationService extends EventEmitter {
         return;
       }
 
-      const hasSubscription = channels.some((channel) => client.subscriptions.has(channel));
+      const hasSubscription = channels.some((channel) =>
+        client.subscriptions.has(channel)
+      );
       if (hasSubscription) {
         if (this.sendToClient(client.id, event)) {
           sentCount++;
@@ -310,7 +322,8 @@ export class SSENotificationService extends EventEmitter {
       }
 
       client.subscriptions.forEach((subscription) => {
-        subscriptionCounts[subscription] = (subscriptionCounts[subscription] || 0) + 1;
+        subscriptionCounts[subscription] =
+          (subscriptionCounts[subscription] || 0) + 1;
       });
     });
 

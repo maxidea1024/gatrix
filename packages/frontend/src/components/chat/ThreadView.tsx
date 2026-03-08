@@ -18,7 +18,10 @@ import { formatDistanceToNow } from 'date-fns';
 import { getChatWebSocketService } from '../../services/chatWebSocketService';
 import { ko, enUS, zhCN } from 'date-fns/locale';
 import AdvancedMessageInput from './AdvancedMessageInput';
-import { extractUrlsFromMessage, extractLinkPreview } from '../../utils/linkPreview';
+import {
+  extractUrlsFromMessage,
+  extractLinkPreview,
+} from '../../utils/linkPreview';
 import LinkPreviewCard from './LinkPreviewCard';
 
 interface ThreadViewProps {
@@ -99,10 +102,13 @@ const ThreadView: React.FC<ThreadViewProps> = ({
   };
 
   // 텍스트에서 좌표 추출 (예: "📍 현재 위치: 37.503400, 127.052500" 또는 "37.5034, 127.0525")
-  const parseCoordinatesFromText = (text: string): { lat: number; lng: number } | null => {
+  const parseCoordinatesFromText = (
+    text: string
+  ): { lat: number; lng: number } | null => {
     if (!text) return null;
     const trimmed = text.trim();
-    const regex = /(?:📍\s*현재\s*위치[:：]?\s*)?(-?\d{1,2}(?:\.\d+)?)[,\s]+(-?\d{1,3}(?:\.\d+)?)/;
+    const regex =
+      /(?:📍\s*현재\s*위치[:：]?\s*)?(-?\d{1,2}(?:\.\d+)?)[,\s]+(-?\d{1,3}(?:\.\d+)?)/;
     const m = trimmed.match(regex);
     if (!m) return null;
     const lat = parseFloat(m[1]);
@@ -132,7 +138,8 @@ const ThreadView: React.FC<ThreadViewProps> = ({
     const last = threadMessages[threadMessages.length - 1] as any;
     const myUserId = state.user?.id;
     const shouldStick =
-      (last?.userId && myUserId && last.userId === myUserId) || wasAtBottomRef.current;
+      (last?.userId && myUserId && last.userId === myUserId) ||
+      wasAtBottomRef.current;
     if (shouldStick) {
       scrollToBottom();
     }
@@ -142,7 +149,9 @@ const ThreadView: React.FC<ThreadViewProps> = ({
   useEffect(() => {
     // 스레드가 처음 마운트될 때만 포커스 Settings
     const timer = setTimeout(() => {
-      const input = inputRef.current?.querySelector('input, textarea') as HTMLElement;
+      const input = inputRef.current?.querySelector(
+        'input, textarea'
+      ) as HTMLElement;
       if (input && !input.matches(':focus')) {
         // 이미 포커스가 있지 않을 때만 포커스 Settings
         input.focus();
@@ -178,11 +187,15 @@ const ThreadView: React.FC<ThreadViewProps> = ({
       const { messageId, reactions } = payload || {};
       if (!messageId) return;
       // 해당 메시지가 스레드 목록에 있으면 리액션만 교체
-      setThreadMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, reactions } : m)));
+      setThreadMessages((prev) =>
+        prev.map((m) => (m.id === messageId ? { ...m, reactions } : m))
+      );
     };
 
     // WebSocket Event 리스너 Register (싱글톤 인스턴스)
-    const wsService = getChatWebSocketService(() => localStorage.getItem('accessToken'));
+    const wsService = getChatWebSocketService(() =>
+      localStorage.getItem('accessToken')
+    );
     wsService.on('thread_message_created', handleThreadMessage);
     wsService.on('message_reaction_updated', handleReactionUpdated);
 
@@ -197,7 +210,9 @@ const ThreadView: React.FC<ThreadViewProps> = ({
     setIsLoading(true);
     try {
       // 스레드 메시지 로드
-      const threadMessages = await actions.getThreadMessages(originalMessage.id);
+      const threadMessages = await actions.getThreadMessages(
+        originalMessage.id
+      );
       setThreadMessages(threadMessages);
     } catch (error) {
       console.error('Failed to load thread messages:', error);
@@ -266,11 +281,16 @@ const ThreadView: React.FC<ThreadViewProps> = ({
       {/* Original Message */}
       <Box sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-          <Avatar src={originalUserInfo.avatarUrl} sx={{ width: 32, height: 32 }}>
+          <Avatar
+            src={originalUserInfo.avatarUrl}
+            sx={{ width: 32, height: 32 }}
+          >
             {originalUserInfo.name.charAt(0).toUpperCase()}
           </Avatar>
           <Box sx={{ flex: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+            >
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                 {originalUserInfo.name}
               </Typography>
@@ -369,7 +389,8 @@ const ThreadView: React.FC<ThreadViewProps> = ({
         onScroll={(e) => {
           const el = e.currentTarget;
           const threshold = 100;
-          wasAtBottomRef.current = el.scrollTop + el.clientHeight >= el.scrollHeight - threshold;
+          wasAtBottomRef.current =
+            el.scrollTop + el.clientHeight >= el.scrollHeight - threshold;
         }}
         sx={{
           flex: 1,
@@ -384,7 +405,9 @@ const ThreadView: React.FC<ThreadViewProps> = ({
           </Box>
         ) : threadMessages.length === 0 ? (
           <Box sx={{ textAlign: 'center', p: 2, color: 'text.secondary' }}>
-            <Typography variant="body2">{t('chat.noThreadMessages')}</Typography>
+            <Typography variant="body2">
+              {t('chat.noThreadMessages')}
+            </Typography>
           </Box>
         ) : (
           threadMessages.map((message) => {
@@ -400,12 +423,19 @@ const ThreadView: React.FC<ThreadViewProps> = ({
                   borderRadius: 1,
                   '&:hover': {
                     backgroundColor:
-                      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.04)'
+                        : 'rgba(0,0,0,0.02)',
                   },
                 }}
               >
-                <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
-                  <Avatar src={userInfo.avatarUrl} sx={{ width: 28, height: 28 }}>
+                <Box
+                  sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}
+                >
+                  <Avatar
+                    src={userInfo.avatarUrl}
+                    sx={{ width: 28, height: 28 }}
+                  >
                     {userInfo.name.charAt(0).toUpperCase()}
                   </Avatar>
                   <Box sx={{ flex: 1 }}>
@@ -481,8 +511,12 @@ const ThreadView: React.FC<ThreadViewProps> = ({
                                   : 'rgba(0,0,0,0.02)',
                             }}
                           >
-                            <Typography variant="caption" color="text.secondary">
-                              📍 {coords.lat.toFixed(6)}, {coords.lng.toFixed(6)}
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              📍 {coords.lat.toFixed(6)},{' '}
+                              {coords.lng.toFixed(6)}
                             </Typography>
                             <Typography
                               variant="caption"
@@ -520,7 +554,8 @@ const ThreadView: React.FC<ThreadViewProps> = ({
                         {Object.entries(
                           message.reactions.reduce(
                             (acc, reaction) => {
-                              if (!acc[reaction.emoji]) acc[reaction.emoji] = [];
+                              if (!acc[reaction.emoji])
+                                acc[reaction.emoji] = [];
                               acc[reaction.emoji].push(reaction);
                               return acc;
                             },
@@ -543,7 +578,10 @@ const ThreadView: React.FC<ThreadViewProps> = ({
                                     const next = userReaction
                                       ? curr.filter(
                                           (r: any) =>
-                                            !(r.userId === currentUserId && r.emoji === emoji)
+                                            !(
+                                              r.userId === currentUserId &&
+                                              r.emoji === emoji
+                                            )
                                         )
                                       : [
                                           ...curr,
@@ -580,11 +618,14 @@ const ThreadView: React.FC<ThreadViewProps> = ({
                               border: `1px solid ${(reactions as any[]).some((r: any) => r.userId === state.user?.id) ? theme.palette.primary.main : theme.palette.divider}`,
                               cursor: 'pointer',
                               '&:hover': {
-                                backgroundColor: theme.palette.primary.main + '30',
+                                backgroundColor:
+                                  theme.palette.primary.main + '30',
                               },
                             }}
                           >
-                            <Typography sx={{ fontSize: '14px' }}>{emoji}</Typography>
+                            <Typography sx={{ fontSize: '14px' }}>
+                              {emoji}
+                            </Typography>
                             <Typography
                               sx={{
                                 fontSize: '12px',
@@ -633,13 +674,18 @@ const ThreadView: React.FC<ThreadViewProps> = ({
                               const curr = (m.reactions || []) as any[];
                               if (
                                 curr.some(
-                                  (r: any) => r.userId === currentUserId && r.emoji === emoji
+                                  (r: any) =>
+                                    r.userId === currentUserId &&
+                                    r.emoji === emoji
                                 )
                               )
                                 return m;
                               return {
                                 ...m,
-                                reactions: [...curr, { userId: currentUserId, emoji } as any],
+                                reactions: [
+                                  ...curr,
+                                  { userId: currentUserId, emoji } as any,
+                                ],
                               };
                             })
                           );
@@ -668,7 +714,10 @@ const ThreadView: React.FC<ThreadViewProps> = ({
       </Box>
 
       {/* Message Input */}
-      <Box sx={{ p: 2, borderTop: `1px solid ${theme.palette.divider}` }} ref={inputRef}>
+      <Box
+        sx={{ p: 2, borderTop: `1px solid ${theme.palette.divider}` }}
+        ref={inputRef}
+      >
         <AdvancedMessageInput
           channelId={originalMessage.channelId}
           threadId={originalMessage.id}
@@ -732,7 +781,10 @@ const ThreadView: React.FC<ThreadViewProps> = ({
                 />
               ))}
             </Box>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '11px' }}>
+            <Typography
+              variant="caption"
+              sx={{ color: 'text.secondary', fontSize: '11px' }}
+            >
               {threadTypingUsers.length === 1
                 ? t('chat.userTyping', {
                     username:

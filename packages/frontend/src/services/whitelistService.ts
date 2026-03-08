@@ -85,8 +85,10 @@ export class WhitelistService {
     filters: WhitelistFilters = {}
   ): Promise<WhitelistListResponse> {
     // Ensure page and limit are valid numbers
-    const validPage = typeof page === 'number' && !isNaN(page) && page > 0 ? page : 1;
-    const validLimit = typeof limit === 'number' && !isNaN(limit) && limit > 0 ? limit : 10;
+    const validPage =
+      typeof page === 'number' && !isNaN(page) && page > 0 ? page : 1;
+    const validLimit =
+      typeof limit === 'number' && !isNaN(limit) && limit > 0 ? limit : 10;
 
     const params = new URLSearchParams({
       page: validPage.toString(),
@@ -97,7 +99,8 @@ export class WhitelistService {
 
     if (filters.accountId) params.append('accountId', filters.accountId);
     if (filters.ipAddress) params.append('ipAddress', filters.ipAddress);
-    if (filters.createdBy) params.append('createdBy', filters.createdBy.toString());
+    if (filters.createdBy)
+      params.append('createdBy', filters.createdBy.toString());
     if (filters.search) params.append('search', filters.search);
     if (filters.tags && filters.tags.length > 0) {
       filters.tags.forEach((tag) => params.append('tags', tag));
@@ -155,7 +158,10 @@ export class WhitelistService {
     throw new Error('Invalid response structure from server');
   }
 
-  static async updateWhitelist(id: number, data: UpdateWhitelistData): Promise<Whitelist> {
+  static async updateWhitelist(
+    id: number,
+    data: UpdateWhitelistData
+  ): Promise<Whitelist> {
     const response = await apiService.put<any>(`/admin/whitelist/${id}`, data);
 
     console.log('Update whitelist response:', response);
@@ -177,7 +183,9 @@ export class WhitelistService {
   }
 
   static async toggleWhitelistStatus(id: number): Promise<Whitelist> {
-    const response = await apiService.patch<any>(`/admin/whitelist/${id}/toggle`);
+    const response = await apiService.patch<any>(
+      `/admin/whitelist/${id}/toggle`
+    );
 
     if (response?.success && response?.data) {
       return response.data;
@@ -189,7 +197,9 @@ export class WhitelistService {
   static async bulkCreateWhitelists(
     entries: BulkCreateEntry[]
   ): Promise<{ createdCount: number; requestedCount: number }> {
-    const response = await apiService.post<any>('/admin/whitelist/bulk', { entries });
+    const response = await apiService.post<any>('/admin/whitelist/bulk', {
+      entries,
+    });
 
     // ApiService.request() already returns response.data
     if (response?.success && response?.data) {
@@ -200,8 +210,13 @@ export class WhitelistService {
     throw new Error('Invalid response structure from server');
   }
 
-  static async testWhitelist(request: WhitelistTestRequest): Promise<WhitelistTestResult> {
-    const response = await apiService.post<any>('/admin/whitelist/test', request);
+  static async testWhitelist(
+    request: WhitelistTestRequest
+  ): Promise<WhitelistTestResult> {
+    const response = await apiService.post<any>(
+      '/admin/whitelist/test',
+      request
+    );
 
     if (response?.success && response?.data) {
       return response.data;

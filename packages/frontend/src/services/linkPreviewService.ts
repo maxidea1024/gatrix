@@ -111,20 +111,44 @@ class LinkPreviewService {
       }
 
       // Exclude image files
-      const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
+      const imageExtensions = [
+        '.jpg',
+        '.jpeg',
+        '.png',
+        '.gif',
+        '.webp',
+        '.svg',
+        '.bmp',
+      ];
       const pathname = parsedUrl.pathname.toLowerCase();
       if (imageExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
       }
 
       // Exclude video files
-      const videoExtensions = ['.mp4', '.webm', '.ogg', '.avi', '.mov', '.wmv', '.flv'];
+      const videoExtensions = [
+        '.mp4',
+        '.webm',
+        '.ogg',
+        '.avi',
+        '.mov',
+        '.wmv',
+        '.flv',
+      ];
       if (videoExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
       }
 
       // Exclude document files
-      const docExtensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
+      const docExtensions = [
+        '.pdf',
+        '.doc',
+        '.docx',
+        '.xls',
+        '.xlsx',
+        '.ppt',
+        '.pptx',
+      ];
       if (docExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
       }
@@ -147,7 +171,9 @@ class LinkPreviewService {
   /**
    * Fetch previews for multiple URLs concurrently
    */
-  async getMultiplePreviews(urls: string[]): Promise<Map<string, LinkPreviewData | null>> {
+  async getMultiplePreviews(
+    urls: string[]
+  ): Promise<Map<string, LinkPreviewData | null>> {
     const results = new Map<string, LinkPreviewData | null>();
 
     // Filter only preview-supported URLs

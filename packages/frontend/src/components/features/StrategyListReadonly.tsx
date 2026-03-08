@@ -23,9 +23,15 @@ export interface StrategyListReadonlyProps {
   /** Context fields for constraint display */
   contextFields?: ContextFieldInfo[];
   /** Optional function to render header actions per strategy (edit/delete, etc.) */
-  renderHeaderActions?: (strategy: StrategyData, index: number) => React.ReactNode;
+  renderHeaderActions?: (
+    strategy: StrategyData,
+    index: number
+  ) => React.ReactNode;
   /** Optional function to render header prefix per strategy (drag handle, etc.) */
-  renderHeaderPrefix?: (strategy: StrategyData, index: number) => React.ReactNode;
+  renderHeaderPrefix?: (
+    strategy: StrategyData,
+    index: number
+  ) => React.ReactNode;
 }
 
 const StrategyListReadonly: React.FC<StrategyListReadonlyProps> = ({

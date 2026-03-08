@@ -16,12 +16,21 @@ router.post('/', IngamePopupNoticeController.createIngamePopupNotice as any);
 router.put('/:id', IngamePopupNoticeController.updateIngamePopupNotice as any);
 
 // Delete ingame popup notice
-router.delete('/:id', IngamePopupNoticeController.deleteIngamePopupNotice as any);
+router.delete(
+  '/:id',
+  IngamePopupNoticeController.deleteIngamePopupNotice as any
+);
 
 // Delete multiple ingame popup notices
-router.post('/bulk-delete', IngamePopupNoticeController.deleteMultipleIngamePopupNotices as any);
+router.post(
+  '/bulk-delete',
+  IngamePopupNoticeController.deleteMultipleIngamePopupNotices as any
+);
 
 // Toggle active status
-router.patch('/:id/toggle-active', IngamePopupNoticeController.toggleActive as any);
+router.patch(
+  '/:id/toggle-active',
+  IngamePopupNoticeController.toggleActive as any
+);
 
 export default router;

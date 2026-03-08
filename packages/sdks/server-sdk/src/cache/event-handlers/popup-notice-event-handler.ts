@@ -34,7 +34,10 @@ export class PopupNoticeEventHandler implements IEventHandler {
         break;
       }
       case 'popup.deleted':
-        this.cacheManager.removePopupNotice(String(event.data.id), environmentId);
+        this.cacheManager.removePopupNotice(
+          String(event.data.id),
+          environmentId
+        );
         break;
     }
   }

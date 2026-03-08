@@ -1,5 +1,8 @@
 import api from './api';
-import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
+import {
+  MutationResult,
+  parseChangeRequestResponse,
+} from './changeRequestUtils';
 
 // Frame action types
 export type FrameActionType = 'openUrl' | 'command' | 'deepLink' | 'none';
@@ -166,7 +169,10 @@ class BannerService {
   /**
    * Get all banners with pagination
    */
-  async getBanners(projectApiPath: string, params?: GetBannersParams): Promise<GetBannersResponse> {
+  async getBanners(
+    projectApiPath: string,
+    params?: GetBannersParams
+  ): Promise<GetBannersResponse> {
     const response = await api.get(`${projectApiPath}/banners`, { params });
     return response.data;
   }
@@ -174,7 +180,10 @@ class BannerService {
   /**
    * Get banner by ID
    */
-  async getBannerById(projectApiPath: string, bannerId: string): Promise<Banner> {
+  async getBannerById(
+    projectApiPath: string,
+    bannerId: string
+  ): Promise<Banner> {
     const response = await api.get(`${projectApiPath}/banners/${bannerId}`);
     return response.data.banner;
   }
@@ -198,14 +207,20 @@ class BannerService {
     bannerId: string,
     input: UpdateBannerInput
   ): Promise<BannerMutationResult> {
-    const response = await api.put(`${projectApiPath}/banners/${bannerId}`, input);
+    const response = await api.put(
+      `${projectApiPath}/banners/${bannerId}`,
+      input
+    );
     return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }
 
   /**
    * Delete a banner
    */
-  async deleteBanner(projectApiPath: string, bannerId: string): Promise<MutationResult<void>> {
+  async deleteBanner(
+    projectApiPath: string,
+    bannerId: string
+  ): Promise<MutationResult<void>> {
     const response = await api.delete(`${projectApiPath}/banners/${bannerId}`);
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
@@ -213,24 +228,39 @@ class BannerService {
   /**
    * Publish a banner
    */
-  async publishBanner(projectApiPath: string, bannerId: string): Promise<BannerMutationResult> {
-    const response = await api.post(`${projectApiPath}/banners/${bannerId}/publish`);
+  async publishBanner(
+    projectApiPath: string,
+    bannerId: string
+  ): Promise<BannerMutationResult> {
+    const response = await api.post(
+      `${projectApiPath}/banners/${bannerId}/publish`
+    );
     return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }
 
   /**
    * Archive a banner
    */
-  async archiveBanner(projectApiPath: string, bannerId: string): Promise<BannerMutationResult> {
-    const response = await api.post(`${projectApiPath}/banners/${bannerId}/archive`);
+  async archiveBanner(
+    projectApiPath: string,
+    bannerId: string
+  ): Promise<BannerMutationResult> {
+    const response = await api.post(
+      `${projectApiPath}/banners/${bannerId}/archive`
+    );
     return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }
 
   /**
    * Duplicate a banner
    */
-  async duplicateBanner(projectApiPath: string, bannerId: string): Promise<Banner> {
-    const response = await api.post(`${projectApiPath}/banners/${bannerId}/duplicate`);
+  async duplicateBanner(
+    projectApiPath: string,
+    bannerId: string
+  ): Promise<Banner> {
+    const response = await api.post(
+      `${projectApiPath}/banners/${bannerId}/duplicate`
+    );
     return response.data.banner;
   }
 }

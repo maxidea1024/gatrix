@@ -1,5 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Typography, Checkbox, FormControlLabel, Chip } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Checkbox,
+  FormControlLabel,
+  Chip,
+} from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
@@ -29,7 +35,9 @@ const getResourceLabel = (t: any, resource: string): string => {
   const label = t(key, '');
   if (label) return label;
   // Fallback: capitalize and replace underscores
-  return resource.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+  return resource
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c: string) => c.toUpperCase());
 };
 
 interface ResourceGroup {
@@ -43,7 +51,10 @@ interface PermissionTreeEditorProps {
   permissions: string[];
   onChange: (permissions: string[]) => void;
   availablePermissions: string[];
-  permissionCategories: Record<string, { label: string; permissions: string[] }>;
+  permissionCategories: Record<
+    string,
+    { label: string; permissions: string[] }
+  >;
   maxHeight?: number;
 }
 
@@ -87,7 +98,9 @@ const PermissionTreeEditor: React.FC<PermissionTreeEditorProps> = ({
   };
 
   const handleSelectAll = () => {
-    const allSelected = availablePermissions.every((p) => permissions.includes(p));
+    const allSelected = availablePermissions.every((p) =>
+      permissions.includes(p)
+    );
     if (allSelected) {
       onChange(permissions.filter((p) => !availablePermissions.includes(p)));
     } else {
@@ -125,16 +138,28 @@ const PermissionTreeEditor: React.FC<PermissionTreeEditorProps> = ({
     []
   );
 
-  const selectedCount = permissions.filter((p) => availablePermissions.includes(p)).length;
-  const allSelected = availablePermissions.every((p) => permissions.includes(p));
+  const selectedCount = permissions.filter((p) =>
+    availablePermissions.includes(p)
+  ).length;
+  const allSelected = availablePermissions.every((p) =>
+    permissions.includes(p)
+  );
   const someSelected = selectedCount > 0 && !allSelected;
 
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 1,
+        }}
+      >
         <Typography variant="subtitle2" color="text.secondary">
-          {t('rbac.permissions')} ({selectedCount}/{availablePermissions.length})
+          {t('rbac.permissions')} ({selectedCount}/{availablePermissions.length}
+          )
         </Typography>
         <FormControlLabel
           control={
@@ -160,11 +185,14 @@ const PermissionTreeEditor: React.FC<PermissionTreeEditorProps> = ({
         }}
       >
         {Object.entries(permissionCategories).map(([key, category]) => {
-          const catPerms = category.permissions.filter((p) => availablePermissions.includes(p));
+          const catPerms = category.permissions.filter((p) =>
+            availablePermissions.includes(p)
+          );
           if (catPerms.length === 0) return null;
 
           const allCatChecked = catPerms.every((p) => permissions.includes(p));
-          const someCatChecked = catPerms.some((p) => permissions.includes(p)) && !allCatChecked;
+          const someCatChecked =
+            catPerms.some((p) => permissions.includes(p)) && !allCatChecked;
           const isExpanded = expandedCats.has(key);
           const resourceGroups = buildResourceGroups(catPerms);
 
@@ -250,10 +278,18 @@ const PermissionTreeEditor: React.FC<PermissionTreeEditorProps> = ({
                   </Box>
 
                   {resourceGroups.map(
-                    ({ resource, permissions: resPerms, actionMap, extraActions }) => {
-                      const allResChecked = resPerms.every((p) => permissions.includes(p));
+                    ({
+                      resource,
+                      permissions: resPerms,
+                      actionMap,
+                      extraActions,
+                    }) => {
+                      const allResChecked = resPerms.every((p) =>
+                        permissions.includes(p)
+                      );
                       const someResChecked =
-                        resPerms.some((p) => permissions.includes(p)) && !allResChecked;
+                        resPerms.some((p) => permissions.includes(p)) &&
+                        !allResChecked;
                       const resourceLabel = getResourceLabel(t, resource);
 
                       return (
@@ -295,11 +331,19 @@ const PermissionTreeEditor: React.FC<PermissionTreeEditorProps> = ({
                             return (
                               <Box
                                 key={action}
-                                sx={{ width: 44, display: 'flex', justifyContent: 'center' }}
+                                sx={{
+                                  width: 44,
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                }}
                               >
                                 <Checkbox
-                                  checked={available && permissions.includes(perm)}
-                                  onChange={() => available && handleTogglePerm(perm)}
+                                  checked={
+                                    available && permissions.includes(perm)
+                                  }
+                                  onChange={() =>
+                                    available && handleTogglePerm(perm)
+                                  }
                                   disabled={!available}
                                   size="small"
                                   sx={{
@@ -326,7 +370,10 @@ const PermissionTreeEditor: React.FC<PermissionTreeEditorProps> = ({
                                   />
                                 }
                                 label={
-                                  <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ fontSize: '0.7rem' }}
+                                  >
                                     {action}
                                   </Typography>
                                 }

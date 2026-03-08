@@ -37,30 +37,35 @@ export class BannerClientController {
    * Get published banner by ID for client
    * GET /api/v1/client/banners/:bannerId
    */
-  static getBannerById = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const { bannerId } = req.params;
-    const environmentId = req.environmentId!;
+  static getBannerById = asyncHandler(
+    async (req: SDKRequest, res: Response) => {
+      const { bannerId } = req.params;
+      const environmentId = req.environmentId!;
 
-    const banner = await BannerService.getPublishedBannerById(bannerId, environmentId);
+      const banner = await BannerService.getPublishedBannerById(
+        bannerId,
+        environmentId
+      );
 
-    // Transform for client (remove internal fields)
-    const clientBanner = {
-      bannerId: banner.bannerId,
-      name: banner.name,
-      width: banner.width,
-      height: banner.height,
-      playbackSpeed: banner.playbackSpeed,
-      sequences: banner.sequences,
-      metadata: banner.metadata,
-      version: banner.version,
-    };
+      // Transform for client (remove internal fields)
+      const clientBanner = {
+        bannerId: banner.bannerId,
+        name: banner.name,
+        width: banner.width,
+        height: banner.height,
+        playbackSpeed: banner.playbackSpeed,
+        sequences: banner.sequences,
+        metadata: banner.metadata,
+        version: banner.version,
+      };
 
-    res.json({
-      success: true,
-      data: {
-        banner: clientBanner,
-        timestamp: new Date().toISOString(),
-      },
-    });
-  });
+      res.json({
+        success: true,
+        data: {
+          banner: clientBanner,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+  );
 }

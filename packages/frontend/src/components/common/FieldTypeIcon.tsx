@@ -91,10 +91,41 @@ const typeStyles: Record<string, TypeStyle> = {
           stroke={fg}
           strokeWidth="1.8"
         />
-        <rect x="5" y="6" width="14" height="4.5" rx="2.5" fill={fg} opacity={0.3} />
-        <line x1="5" y1="10.5" x2="19" y2="10.5" stroke={fg} strokeWidth="1.4" />
-        <line x1="9" y1="4" x2="9" y2="7" stroke={fg} strokeWidth="2" strokeLinecap="round" />
-        <line x1="15" y1="4" x2="15" y2="7" stroke={fg} strokeWidth="2" strokeLinecap="round" />
+        <rect
+          x="5"
+          y="6"
+          width="14"
+          height="4.5"
+          rx="2.5"
+          fill={fg}
+          opacity={0.3}
+        />
+        <line
+          x1="5"
+          y1="10.5"
+          x2="19"
+          y2="10.5"
+          stroke={fg}
+          strokeWidth="1.4"
+        />
+        <line
+          x1="9"
+          y1="4"
+          x2="9"
+          y2="7"
+          stroke={fg}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <line
+          x1="15"
+          y1="4"
+          x2="15"
+          y2="7"
+          stroke={fg}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
         <circle cx="12" cy="14.8" r="1.5" fill={fg} />
       </>
     ),
@@ -170,7 +201,15 @@ const typeStyles: Record<string, TypeStyle> = {
     render: (fg) => (
       <>
         {/* Flag pole */}
-        <line x1="7" y1="4.5" x2="7" y2="19.5" stroke={fg} strokeWidth="2" strokeLinecap="round" />
+        <line
+          x1="7"
+          y1="4.5"
+          x2="7"
+          y2="19.5"
+          stroke={fg}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
         {/* Flag body */}
         <path
           d="M7,5 L18,7 L17,11.5 L7,13 Z"
@@ -278,9 +317,32 @@ const typeStyles: Record<string, TypeStyle> = {
     fg: '#92400e',
     render: (fg) => (
       <>
-        <circle cx="12" cy="12" r="7.5" fill={fg} opacity={0.15} stroke={fg} strokeWidth="1.6" />
-        <ellipse cx="12" cy="12" rx="3.5" ry="7.5" fill="none" stroke={fg} strokeWidth="1.2" />
-        <line x1="4.5" y1="12" x2="19.5" y2="12" stroke={fg} strokeWidth="1.2" />
+        <circle
+          cx="12"
+          cy="12"
+          r="7.5"
+          fill={fg}
+          opacity={0.15}
+          stroke={fg}
+          strokeWidth="1.6"
+        />
+        <ellipse
+          cx="12"
+          cy="12"
+          rx="3.5"
+          ry="7.5"
+          fill="none"
+          stroke={fg}
+          strokeWidth="1.2"
+        />
+        <line
+          x1="4.5"
+          y1="12"
+          x2="19.5"
+          y2="12"
+          stroke={fg}
+          strokeWidth="1.2"
+        />
       </>
     ),
   },
@@ -290,9 +352,33 @@ const typeStyles: Record<string, TypeStyle> = {
     fg: '#15803d',
     render: (fg) => (
       <>
-        <circle cx="12" cy="12" r="7.5" fill={fg} opacity={0.15} stroke={fg} strokeWidth="1.6" />
-        <line x1="12" y1="7" x2="12" y2="12" stroke={fg} strokeWidth="2" strokeLinecap="round" />
-        <line x1="12" y1="12" x2="15.5" y2="14" stroke={fg} strokeWidth="2" strokeLinecap="round" />
+        <circle
+          cx="12"
+          cy="12"
+          r="7.5"
+          fill={fg}
+          opacity={0.15}
+          stroke={fg}
+          strokeWidth="1.6"
+        />
+        <line
+          x1="12"
+          y1="7"
+          x2="12"
+          y2="12"
+          stroke={fg}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <line
+          x1="12"
+          y1="12"
+          x2="15.5"
+          y2="14"
+          stroke={fg}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
       </>
     ),
   },
@@ -307,7 +393,11 @@ const defaultStyle: TypeStyle = {
   render: typeStyles.string.render,
 };
 
-const FieldTypeIcon: React.FC<FieldTypeIconProps> = ({ type, size = 20, sx }) => {
+const FieldTypeIcon: React.FC<FieldTypeIconProps> = ({
+  type,
+  size = 20,
+  sx,
+}) => {
   const style = typeStyles[type] || defaultStyle;
 
   return (

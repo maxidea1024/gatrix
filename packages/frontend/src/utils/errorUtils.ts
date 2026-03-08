@@ -4,7 +4,10 @@ import i18n from 'i18next';
  * Parse API error and return a user-friendly message
  * Handles CR-specific errors like ResourceLockedException, CR_DATA_CONFLICT, etc.
  */
-export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFailed'): string {
+export function parseApiErrorMessage(
+  error: any,
+  fallbackKey = 'common.saveFailed'
+): string {
   // Try to extract error details from various response formats
   let errorData: any = null;
   let errorCode: string | null = null;
@@ -40,16 +43,20 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
     errorCode = errorData.error || errorData.code || errorData.errorCode;
     // The backend GatrixError wraps the payload inside details.payload
     // in the errorHandler middleware.
-    payload = errorData.payload || errorData.details?.payload || errorData.details;
+    payload =
+      errorData.payload || errorData.details?.payload || errorData.details;
   }
 
   // Handle specific CR-related errors by error code
   if (
-    (errorCode === 'ResourceLockedException' || errorCode === 'RESOURCE_LOCKED') &&
+    (errorCode === 'ResourceLockedException' ||
+      errorCode === 'RESOURCE_LOCKED') &&
     (payload?.changeRequestTitle || payload?.title)
   ) {
     const title = payload?.changeRequestTitle || payload?.title;
-    return String(i18n.t('errors.RESOURCE_LOCKED', { changeRequestTitle: title }));
+    return String(
+      i18n.t('errors.RESOURCE_LOCKED', { changeRequestTitle: title })
+    );
   }
 
   if (errorCode === 'CR_DATA_CONFLICT') {
@@ -81,7 +88,9 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
             ? 'featureFlags.disabledValue'
             : field;
 
-      const fieldLabel = i18n.exists(fieldLabelKey) ? String(i18n.t(fieldLabelKey)) : field;
+      const fieldLabel = i18n.exists(fieldLabelKey)
+        ? String(i18n.t(fieldLabelKey))
+        : field;
 
       // Map each structured error code to localized, user-friendly message
       const localizedErrors = errors.map((err: string) => {
@@ -89,10 +98,14 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
 
         // Parse structured error codes
         if (trimmed === 'EMPTY_NOT_ALLOWED') {
-          return String(i18n.t('featureFlags.validation.errors.emptyNotAllowed'));
+          return String(
+            i18n.t('featureFlags.validation.errors.emptyNotAllowed')
+          );
         }
         if (trimmed === 'WHITESPACE_REJECTED') {
-          return String(i18n.t('featureFlags.validation.errors.whitespaceRejected'));
+          return String(
+            i18n.t('featureFlags.validation.errors.whitespaceRejected')
+          );
         }
         if (trimmed === 'INVALID_NUMBER') {
           return String(i18n.t('featureFlags.validation.errors.invalidNumber'));
@@ -104,52 +117,78 @@ export function parseApiErrorMessage(error: any, fallbackKey = 'common.saveFaile
           return String(i18n.t('featureFlags.validation.errors.invalidJson'));
         }
         if (trimmed === 'INVALID_JSON_SCHEMA') {
-          return String(i18n.t('featureFlags.validation.errors.invalidJsonSchema'));
+          return String(
+            i18n.t('featureFlags.validation.errors.invalidJsonSchema')
+          );
         }
 
         // Parse parameterized error codes
         if (trimmed.startsWith('PATTERN_MISMATCH:')) {
           const desc = trimmed.substring('PATTERN_MISMATCH:'.length);
           return String(
-            i18n.t('featureFlags.validation.errors.patternMismatch', { pattern: desc })
+            i18n.t('featureFlags.validation.errors.patternMismatch', {
+              pattern: desc,
+            })
           );
         }
         if (trimmed.startsWith('PATTERN_MISMATCH_RAW:')) {
           const pattern = trimmed.substring('PATTERN_MISMATCH_RAW:'.length);
-          return String(i18n.t('featureFlags.validation.errors.patternMismatchRaw', { pattern }));
+          return String(
+            i18n.t('featureFlags.validation.errors.patternMismatchRaw', {
+              pattern,
+            })
+          );
         }
         if (trimmed.startsWith('INVALID_PATTERN:')) {
           const pattern = trimmed.substring('INVALID_PATTERN:'.length);
-          return String(i18n.t('featureFlags.validation.errors.invalidPattern', { pattern }));
+          return String(
+            i18n.t('featureFlags.validation.errors.invalidPattern', { pattern })
+          );
         }
         if (trimmed.startsWith('MIN_LENGTH:')) {
           const val = trimmed.substring('MIN_LENGTH:'.length);
-          return String(i18n.t('featureFlags.validation.errors.minLength', { min: val }));
+          return String(
+            i18n.t('featureFlags.validation.errors.minLength', { min: val })
+          );
         }
         if (trimmed.startsWith('MAX_LENGTH:')) {
           const val = trimmed.substring('MAX_LENGTH:'.length);
-          return String(i18n.t('featureFlags.validation.errors.maxLength', { max: val }));
+          return String(
+            i18n.t('featureFlags.validation.errors.maxLength', { max: val })
+          );
         }
         if (trimmed.startsWith('MIN_VALUE:')) {
           const val = trimmed.substring('MIN_VALUE:'.length);
-          return String(i18n.t('featureFlags.validation.errors.minValue', { min: val }));
+          return String(
+            i18n.t('featureFlags.validation.errors.minValue', { min: val })
+          );
         }
         if (trimmed.startsWith('MAX_VALUE:')) {
           const val = trimmed.substring('MAX_VALUE:'.length);
-          return String(i18n.t('featureFlags.validation.errors.maxValue', { max: val }));
+          return String(
+            i18n.t('featureFlags.validation.errors.maxValue', { max: val })
+          );
         }
         if (trimmed.startsWith('LEGAL_VALUES:')) {
           const vals = trimmed.substring('LEGAL_VALUES:'.length);
-          return String(i18n.t('featureFlags.validation.errors.legalValues', { values: vals }));
+          return String(
+            i18n.t('featureFlags.validation.errors.legalValues', {
+              values: vals,
+            })
+          );
         }
         if (trimmed.startsWith('JSON_REQUIRED_FIELD:')) {
           const fieldName = trimmed.substring('JSON_REQUIRED_FIELD:'.length);
           return String(
-            i18n.t('featureFlags.validation.errors.jsonRequiredField', { field: fieldName })
+            i18n.t('featureFlags.validation.errors.jsonRequiredField', {
+              field: fieldName,
+            })
           );
         }
         if (trimmed.startsWith('JSON_TYPE_MISMATCH:')) {
-          const jsonParts = trimmed.substring('JSON_TYPE_MISMATCH:'.length).split(':');
+          const jsonParts = trimmed
+            .substring('JSON_TYPE_MISMATCH:'.length)
+            .split(':');
           return String(
             i18n.t('featureFlags.validation.errors.jsonTypeMismatch', {
               field: jsonParts[0],
@@ -210,10 +249,15 @@ export function extractConflictInfo(error: any): {
   }
 
   const errorCode = errorData?.error || errorData?.code || errorData?.errorCode;
-  const isLocked = errorCode === 'ResourceLockedException' || errorCode === 'RESOURCE_LOCKED';
+  const isLocked =
+    errorCode === 'ResourceLockedException' || errorCode === 'RESOURCE_LOCKED';
 
   if (isLocked) {
-    const payload = errorData?.payload || errorData?.details?.payload || errorData?.details || {};
+    const payload =
+      errorData?.payload ||
+      errorData?.details?.payload ||
+      errorData?.details ||
+      {};
     return {
       lockedBy: payload.lockedBy,
       changeRequestId: payload.changeRequestId,
@@ -230,7 +274,11 @@ export function extractConflictInfo(error: any): {
       isLocked: false,
       isDataConflict: true,
       isDuplicate: false,
-      conflictData: errorData?.payload || errorData?.details?.payload || errorData?.details || {},
+      conflictData:
+        errorData?.payload ||
+        errorData?.details?.payload ||
+        errorData?.details ||
+        {},
     };
   }
 

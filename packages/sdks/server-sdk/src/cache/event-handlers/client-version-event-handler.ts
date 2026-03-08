@@ -34,22 +34,34 @@ export class ClientVersionEventHandler implements IEventHandler {
             .getClientVersionService()
             ?.updateSingleClientVersion(clientVersionData, environmentId);
         } else {
-          this.logger.info('Client version event (no full data), refreshing cache', {
-            id: event.data.id,
-            environmentId,
-          });
+          this.logger.info(
+            'Client version event (no full data), refreshing cache',
+            {
+              id: event.data.id,
+              environmentId,
+            }
+          );
           try {
-            await this.cacheManager.getClientVersionService()?.refreshByEnvironment(environmentId);
+            await this.cacheManager
+              .getClientVersionService()
+              ?.refreshByEnvironment(environmentId);
           } catch (error: any) {
-            this.logger.error('Failed to refresh client version cache', { error: error.message });
+            this.logger.error('Failed to refresh client version cache', {
+              error: error.message,
+            });
           }
         }
         break;
       }
       case 'client_version.deleted': {
         const id = String(event.data.id);
-        this.logger.info('Client version deleted, removing from cache', { id, environmentId });
-        this.cacheManager.getClientVersionService()?.removeFromCache(id, environmentId);
+        this.logger.info('Client version deleted, removing from cache', {
+          id,
+          environmentId,
+        });
+        this.cacheManager
+          .getClientVersionService()
+          ?.removeFromCache(id, environmentId);
         break;
       }
     }

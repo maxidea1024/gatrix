@@ -69,9 +69,9 @@ function formatArgs(args: any[]): string {
 const LEVELS = ['all', 'debug', 'info', 'warn', 'error'] as const;
 
 export default function LogViewer({ logs, onClose, onClear }: LogViewerProps) {
-  const [filterLevel, setFilterLevel] = useState<'all' | 'debug' | 'info' | 'warn' | 'error'>(
-    'all'
-  );
+  const [filterLevel, setFilterLevel] = useState<
+    'all' | 'debug' | 'info' | 'warn' | 'error'
+  >('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [autoScroll, setAutoScroll] = useState(true);
   const [panelWidth, setPanelWidth] = useState(() =>
@@ -82,7 +82,8 @@ export default function LogViewer({ logs, onClose, onClear }: LogViewerProps) {
 
   const filteredLogs = logs.filter((l) => {
     if (filterLevel !== 'all' && l.level !== filterLevel) return false;
-    if (searchQuery) return l.message.toLowerCase().includes(searchQuery.toLowerCase());
+    if (searchQuery)
+      return l.message.toLowerCase().includes(searchQuery.toLowerCase());
     return true;
   });
 
@@ -112,7 +113,10 @@ export default function LogViewer({ logs, onClose, onClear }: LogViewerProps) {
 
       const onMouseMove = (ev: MouseEvent) => {
         const delta = startX - ev.clientX;
-        const newWidth = Math.max(280, Math.min(window.innerWidth * 0.7, startWidth + delta));
+        const newWidth = Math.max(
+          280,
+          Math.min(window.innerWidth * 0.7, startWidth + delta)
+        );
         setPanelWidth(newWidth);
       };
 
@@ -210,15 +214,29 @@ export default function LogViewer({ logs, onClose, onClear }: LogViewerProps) {
           </div>
         ) : (
           filteredLogs.map((entry) => (
-            <div key={entry.id} className={`log-entry log-entry-${entry.level}`}>
-              <span className="log-entry-time">{formatTime(entry.timestamp)}</span>
-              <span className="log-entry-icon" style={{ color: getLevelColor(entry.level) }}>
+            <div
+              key={entry.id}
+              className={`log-entry log-entry-${entry.level}`}
+            >
+              <span className="log-entry-time">
+                {formatTime(entry.timestamp)}
+              </span>
+              <span
+                className="log-entry-icon"
+                style={{ color: getLevelColor(entry.level) }}
+              >
                 {getLevelIcon(entry.level)}
               </span>
-              <span className="log-entry-msg" style={{ color: getLevelColor(entry.level) }}>
+              <span
+                className="log-entry-msg"
+                style={{ color: getLevelColor(entry.level) }}
+              >
                 {entry.message}
                 {entry.args.length > 0 && (
-                  <span className="log-entry-args"> {formatArgs(entry.args)}</span>
+                  <span className="log-entry-args">
+                    {' '}
+                    {formatArgs(entry.args)}
+                  </span>
                 )}
               </span>
             </div>

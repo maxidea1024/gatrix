@@ -9,7 +9,10 @@ import { RequestContext } from '../../../services/feature-flag-service';
 /**
  * Validate environment is set in request
  */
-export const requireEnvironment = (req: AuthenticatedRequest, res: Response): string | null => {
+export const requireEnvironment = (
+  req: AuthenticatedRequest,
+  res: Response
+): string | null => {
   const environmentId = req.environmentId;
   if (!environmentId) {
     res.status(400).json({
@@ -24,7 +27,9 @@ export const requireEnvironment = (req: AuthenticatedRequest, res: Response): st
 /**
  * Extract request context for audit logs
  */
-export const getRequestContext = (req: AuthenticatedRequest): RequestContext => ({
+export const getRequestContext = (
+  req: AuthenticatedRequest
+): RequestContext => ({
   ipAddress: req.ip,
   userAgent: req.get('User-Agent'),
 });

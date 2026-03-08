@@ -218,7 +218,8 @@ export type ProjectPermission = string;
 export type EnvPermission = string;
 
 export const ALL_ORG_PERMISSIONS: string[] = Object.values(ORG_PERMISSIONS);
-export const ALL_PROJECT_PERMISSIONS: string[] = Object.values(PROJECT_PERMISSIONS);
+export const ALL_PROJECT_PERMISSIONS: string[] =
+  Object.values(PROJECT_PERMISSIONS);
 export const ALL_ENV_PERMISSIONS: string[] = Object.values(ENV_PERMISSIONS);
 export const ALL_PERMISSIONS: string[] = [
   ...ALL_ORG_PERMISSIONS,

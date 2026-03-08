@@ -7,10 +7,14 @@ export class SessionWorker {
   private worker: Worker;
 
   constructor() {
-    this.worker = new Worker('event-lens-sessions', this.processJob.bind(this), {
-      connection: redis as any,
-      concurrency: 5,
-    });
+    this.worker = new Worker(
+      'event-lens-sessions',
+      this.processJob.bind(this),
+      {
+        connection: redis as any,
+        concurrency: 5,
+      }
+    );
 
     this.worker.on('completed', (job) => {
       logger.debug('Session job completed', { jobId: job.id });
@@ -31,7 +35,10 @@ export class SessionWorker {
     await this.aggregateSession(sessionId, projectId);
   }
 
-  private async aggregateSession(sessionId: string, projectId: string): Promise<void> {
+  private async aggregateSession(
+    sessionId: string,
+    projectId: string
+  ): Promise<void> {
     try {
       const query = `
         SELECT

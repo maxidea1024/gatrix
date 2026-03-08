@@ -14,7 +14,9 @@ async function main() {
 
   // Support command line argument for port: npx ts-node idle-server.ts 11001
   const portArg = process.argv[2];
-  const metricsPort = portArg ? parseInt(portArg) : parseInt(process.env.METRICS_PORT || '9999');
+  const metricsPort = portArg
+    ? parseInt(portArg)
+    : parseInt(process.env.METRICS_PORT || '9999');
   const instanceName = process.env.INSTANCE_NAME || `idle-${metricsPort}`;
 
   // Determine target environment from environment variable
@@ -99,7 +101,12 @@ async function main() {
     // Send test impact metrics directly to backend for safeguard autocomplete testing
     const IMPACT_METRICS_INTERVAL = 30000; // 30 seconds
     const testMetrics = [
-      { name: 'http_error_rate', type: 'counter' as const, help: 'HTTP 5xx error count', value: 0 },
+      {
+        name: 'http_error_rate',
+        type: 'counter' as const,
+        help: 'HTTP 5xx error count',
+        value: 0,
+      },
       {
         name: 'login_failure_count',
         type: 'counter' as const,
@@ -118,14 +125,24 @@ async function main() {
         help: 'Number of concurrent users',
         value: 0,
       },
-      { name: 'crash_rate', type: 'counter' as const, help: 'Application crash count', value: 0 },
+      {
+        name: 'crash_rate',
+        type: 'counter' as const,
+        help: 'Application crash count',
+        value: 0,
+      },
       {
         name: 'memory_usage_mb',
         type: 'gauge' as const,
         help: 'Memory usage in megabytes',
         value: 0,
       },
-      { name: 'cpu_usage_percent', type: 'gauge' as const, help: 'CPU usage percentage', value: 0 },
+      {
+        name: 'cpu_usage_percent',
+        type: 'gauge' as const,
+        help: 'CPU usage percentage',
+        value: 0,
+      },
       {
         name: 'request_queue_length',
         type: 'gauge' as const,
@@ -175,7 +192,8 @@ async function main() {
         testMetrics[11].value = 120 + Math.floor(Math.random() * 600); // session 2-12min
 
         const apiUrl = process.env.GATRIX_URL || 'http://localhost:45000';
-        const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
+        const apiToken =
+          process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
 
         const payload = {
           impactMetrics: testMetrics.map((m) => ({
@@ -202,7 +220,9 @@ async function main() {
             metrics: testMetrics.map((m) => `${m.name}=${m.value}`),
           });
         } else {
-          logger.warn('Failed to send impact metrics', { status: response.status });
+          logger.warn('Failed to send impact metrics', {
+            status: response.status,
+          });
         }
       } catch (error: any) {
         logger.warn('Failed to send impact metrics', { error: error.message });
@@ -212,7 +232,9 @@ async function main() {
     // Send initial metrics immediately, then periodically
     sendImpactMetrics();
     setInterval(sendImpactMetrics, IMPACT_METRICS_INTERVAL);
-    logger.info(`Impact metrics test enabled (interval: ${IMPACT_METRICS_INTERVAL / 1000}s)`);
+    logger.info(
+      `Impact metrics test enabled (interval: ${IMPACT_METRICS_INTERVAL / 1000}s)`
+    );
 
     // Start metrics server
     metricsServer.start();
@@ -246,7 +268,11 @@ async function main() {
         // Use 100 random users per flag for better statistical distribution
         for (let i = 0; i < 100; i++) {
           const userId = `user-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-          const result = sdk.featureFlag.evaluate(flag.name, { userId }, targetEnvironment);
+          const result = sdk.featureFlag.evaluate(
+            flag.name,
+            { userId },
+            targetEnvironment
+          );
           results.push({
             flag: flag.name,
             enabled: result.enabled,
@@ -263,25 +289,26 @@ async function main() {
     const serviceGroup = process.env.SERVICE_GROUP || 'development';
     const serviceRegion = process.env.SERVICE_REGION || 'default';
 
-    const { instanceId, hostname, internalAddress, externalAddress } = await sdk.registerService({
-      labels: {
-        service: 'idle',
-        group: serviceGroup,
-        region: serviceRegion,
-        env: targetEnvironment,
-      },
-      // hostname: os.hostname(),
-      // internalAddress: internalIp,
-      ports: {
-        internalApi: metricsPort,
-        externalApi: metricsPort,
-      },
-      status: 'ready',
-      meta: {
-        instanceName,
-        startTime: new Date().toISOString(),
-      },
-    });
+    const { instanceId, hostname, internalAddress, externalAddress } =
+      await sdk.registerService({
+        labels: {
+          service: 'idle',
+          group: serviceGroup,
+          region: serviceRegion,
+          env: targetEnvironment,
+        },
+        // hostname: os.hostname(),
+        // internalAddress: internalIp,
+        ports: {
+          internalApi: metricsPort,
+          externalApi: metricsPort,
+        },
+        status: 'ready',
+        meta: {
+          instanceName,
+          startTime: new Date().toISOString(),
+        },
+      });
     logger.info('Service registered with ID', {
       instanceId,
       hostname,
@@ -474,7 +501,11 @@ async function main() {
       for (const flag of flags.slice(0, 3)) {
         logger.info(`Testing flag: ${flag.name}`);
         for (const ctx of testContexts) {
-          const result = sdk.featureFlag.evaluate(flag.name, ctx, targetEnvironment);
+          const result = sdk.featureFlag.evaluate(
+            flag.name,
+            ctx,
+            targetEnvironment
+          );
           logger.info(
             `  ${ctx.userId} => enabled=${result.enabled}, reason=${result.reason}${result.variant ? ', variant=' + result.variant.name : ''}`
           );
@@ -484,10 +515,15 @@ async function main() {
         const stickyCtx = { userId: 'sticky-test-user' };
         const results: boolean[] = [];
         for (let i = 0; i < 5; i++) {
-          results.push(sdk.featureFlag.evaluate(flag.name, stickyCtx, targetEnvironment).enabled);
+          results.push(
+            sdk.featureFlag.evaluate(flag.name, stickyCtx, targetEnvironment)
+              .enabled
+          );
         }
         const allSame = results.every((r) => r === results[0]);
-        logger.info(`  Stickiness test: ${allSame ? 'PASS' : 'FAIL'} [${results.join(', ')}]`);
+        logger.info(
+          `  Stickiness test: ${allSame ? 'PASS' : 'FAIL'} [${results.join(', ')}]`
+        );
       }
     }
 
@@ -552,7 +588,9 @@ async function main() {
           }
         }
 
-        logger.info(`Continuous evaluation: ${evalCount} evaluations for ${flags.length} flags`);
+        logger.info(
+          `Continuous evaluation: ${evalCount} evaluations for ${flags.length} flags`
+        );
         await new Promise((resolve) => setTimeout(resolve, EVAL_INTERVAL_MS));
       }
     }

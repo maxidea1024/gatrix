@@ -4,7 +4,11 @@ import { ChangeRequest } from './change-request';
 /**
  * Outbox event status
  */
-export type OutboxEventStatus = 'pending' | 'processing' | 'completed' | 'failed';
+export type OutboxEventStatus =
+  | 'pending'
+  | 'processing'
+  | 'completed'
+  | 'failed';
 
 /**
  * Outbox event types
@@ -15,7 +19,8 @@ export const OUTBOX_EVENT_TYPES = {
   DELETED: 'deleted',
 } as const;
 
-export type OutboxEventType = (typeof OUTBOX_EVENT_TYPES)[keyof typeof OUTBOX_EVENT_TYPES];
+export type OutboxEventType =
+  (typeof OUTBOX_EVENT_TYPES)[keyof typeof OUTBOX_EVENT_TYPES];
 
 /**
  * OutboxEvent model
@@ -50,7 +55,13 @@ export class OutboxEvent extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['changeRequestId', 'entityType', 'entityId', 'eventType', 'payload'],
+      required: [
+        'changeRequestId',
+        'entityType',
+        'entityId',
+        'eventType',
+        'payload',
+      ],
       properties: {
         id: { type: 'string' },
         changeRequestId: { type: 'string' },

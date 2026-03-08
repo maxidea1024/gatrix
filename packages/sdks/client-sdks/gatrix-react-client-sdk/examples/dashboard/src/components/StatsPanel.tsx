@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { useGatrixClient, type GatrixClientConfig } from '@gatrix/gatrix-react-client-sdk';
+import {
+  useGatrixClient,
+  type GatrixClientConfig,
+} from '@gatrix/gatrix-react-client-sdk';
 
 interface Stats {
   sdkState: string;
@@ -104,7 +107,10 @@ function StatsPanel({
   }, [totalCount]);
 
   useEffect(() => {
-    if (prevEnabledRef.current !== enabledCount && prevEnabledRef.current !== 0) {
+    if (
+      prevEnabledRef.current !== enabledCount &&
+      prevEnabledRef.current !== 0
+    ) {
       setRumbleEnabled(true);
       setTimeout(() => setRumbleEnabled(false), 500);
     }
@@ -112,7 +118,10 @@ function StatsPanel({
   }, [enabledCount]);
 
   useEffect(() => {
-    if (prevDisabledRef.current !== disabledCount && prevDisabledRef.current !== 0) {
+    if (
+      prevDisabledRef.current !== disabledCount &&
+      prevDisabledRef.current !== 0
+    ) {
       setRumbleDisabled(true);
       setTimeout(() => setRumbleDisabled(false), 500);
     }
@@ -200,7 +209,9 @@ function StatsPanel({
     let mascotIcon;
     if (state === 'error' || errorMessage) {
       mascotIcon = (
-        <div className={`mascot-error ${isTyping ? 'mascot-talking' : 'mascot-sad'}`}>
+        <div
+          className={`mascot-error ${isTyping ? 'mascot-talking' : 'mascot-sad'}`}
+        >
           <i className="nes-bcrikko"></i>
         </div>
       );
@@ -255,7 +266,9 @@ function StatsPanel({
 
   return (
     <section className="stats-container">
-      <div className={`nes-container is-dark with-title ${isError ? 'is-error-border' : ''}`}>
+      <div
+        className={`nes-container is-dark with-title ${isError ? 'is-error-border' : ''}`}
+      >
         <p className="title" style={{ backgroundColor: '#212529' }}>
           STATUS
         </p>
@@ -278,12 +291,18 @@ function StatsPanel({
                 <span className="stat-mini-value total">{totalCount}</span>
                 <span className="stat-mini-label">ALL</span>
               </div>
-              <div className={`stat-mini ${rumbleEnabled ? 'stat-rumble' : ''}`}>
+              <div
+                className={`stat-mini ${rumbleEnabled ? 'stat-rumble' : ''}`}
+              >
                 <span className="stat-mini-value enabled">{enabledCount}</span>
                 <span className="stat-mini-label">ON</span>
               </div>
-              <div className={`stat-mini ${rumbleDisabled ? 'stat-rumble' : ''}`}>
-                <span className="stat-mini-value disabled">{disabledCount}</span>
+              <div
+                className={`stat-mini ${rumbleDisabled ? 'stat-rumble' : ''}`}
+              >
+                <span className="stat-mini-value disabled">
+                  {disabledCount}
+                </span>
                 <span className="stat-mini-label">OFF</span>
               </div>
             </div>
@@ -336,7 +355,8 @@ function StatsPanel({
               >
                 <span className="mode-label">SYNC</span>
                 <span className="mode-value">
-                  {config.features?.explicitSyncMode && !client.features.isOfflineMode()
+                  {config.features?.explicitSyncMode &&
+                  !client.features.isOfflineMode()
                     ? 'EXPLICIT'
                     : 'AUTO'}
                 </span>
@@ -350,7 +370,9 @@ function StatsPanel({
                     ? 'OFF'
                     : config.features?.streaming?.enabled === false
                       ? 'OFF'
-                      : (config.features?.streaming?.transport || 'SSE').toUpperCase()}
+                      : (
+                          config.features?.streaming?.transport || 'SSE'
+                        ).toUpperCase()}
                 </span>
               </div>
             </div>
@@ -390,17 +412,23 @@ function StatsPanel({
                         : `${getStatusIconText(effectiveSdkState)} ${effectiveSdkState}`}
                     </td>
                     <td className="stats-label">UP:</td>
-                    <td className="stats-value">{formatUptime(stats?.startTime || null)}</td>
+                    <td className="stats-value">
+                      {formatUptime(stats?.startTime || null)}
+                    </td>
                     <td className="stats-label">SYNC:</td>
                     <td className="stats-value">{formatTime(lastUpdate)}</td>
                   </tr>
                   <tr>
                     <td className="stats-label">FETCH:</td>
-                    <td className="stats-value">{stats?.fetchFlagsCount || 0}</td>
+                    <td className="stats-value">
+                      {stats?.fetchFlagsCount || 0}
+                    </td>
                     <td className="stats-label">UPD:</td>
                     <td className="stats-value">{stats?.updateCount || 0}</td>
                     <td className="stats-label">304:</td>
-                    <td className="stats-value">{stats?.notModifiedCount || 0}</td>
+                    <td className="stats-value">
+                      {stats?.notModifiedCount || 0}
+                    </td>
                   </tr>
                   <tr>
                     <td className="stats-label">ERR:</td>
@@ -408,21 +436,33 @@ function StatsPanel({
                     <td className="stats-label">REC:</td>
                     <td className="stats-value">{stats?.recoveryCount || 0}</td>
                     <td className="stats-label">ETAG:</td>
-                    <td className="stats-value">{formatEtag(stats?.etag || null)}</td>
+                    <td className="stats-value">
+                      {formatEtag(stats?.etag || null)}
+                    </td>
                   </tr>
                   <tr>
                     <td className="stats-label">METRIC:</td>
-                    <td className="stats-value">{stats?.metricsSentCount || 0}</td>
+                    <td className="stats-value">
+                      {stats?.metricsSentCount || 0}
+                    </td>
                     <td className="stats-label">M-ERR:</td>
-                    <td className="stats-value">{stats?.metricsErrorCount || 0}</td>
+                    <td className="stats-value">
+                      {stats?.metricsErrorCount || 0}
+                    </td>
                     <td className="stats-label">IMP:</td>
-                    <td className="stats-value">{stats?.impressionCount || 0}</td>
+                    <td className="stats-value">
+                      {stats?.impressionCount || 0}
+                    </td>
                   </tr>
                   <tr>
                     <td className="stats-label">STR:</td>
-                    <td className="stats-value">{stats?.streamingState || 'off'}</td>
+                    <td className="stats-value">
+                      {stats?.streamingState || 'off'}
+                    </td>
                     <td className="stats-label">S-REC:</td>
-                    <td className="stats-value">{stats?.streamingReconnectCount || 0}</td>
+                    <td className="stats-value">
+                      {stats?.streamingReconnectCount || 0}
+                    </td>
                     <td className="stats-label">S-EVT:</td>
                     <td className="stats-value">
                       {formatTime(stats?.lastStreamingEventTime || null)}

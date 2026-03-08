@@ -99,13 +99,16 @@ export class ReleaseFlowScheduler {
    */
   public async checkAndProgressMilestones(): Promise<void> {
     if (this.checkInProgress) {
-      logger.debug('Release flow progression check already in progress, skipping...');
+      logger.debug(
+        'Release flow progression check already in progress, skipping...'
+      );
       return;
     }
 
     this.checkInProgress = true;
     try {
-      const activePlans = await ReleaseFlowMilestoneModel.findActivePlansWithTransitions();
+      const activePlans =
+        await ReleaseFlowMilestoneModel.findActivePlansWithTransitions();
 
       if (activePlans.length === 0) {
         return;
@@ -129,9 +132,10 @@ export class ReleaseFlowScheduler {
           if (elapsedMs >= requiredMs) {
             // Evaluate safeguards before progression
             if (plan.activeMilestoneId) {
-              const { anyTriggered, results } = await safeguardService.evaluateMilestoneSafeguards(
-                plan.activeMilestoneId
-              );
+              const { anyTriggered, results } =
+                await safeguardService.evaluateMilestoneSafeguards(
+                  plan.activeMilestoneId
+                );
               if (anyTriggered) {
                 const triggeredNames = results
                   .filter((r) => r.triggered)
@@ -152,13 +156,18 @@ export class ReleaseFlowScheduler {
             progressedCount++;
           }
         } catch (error) {
-          logger.error(`Error progressing release flow plan ${plan.flowId}:`, error);
+          logger.error(
+            `Error progressing release flow plan ${plan.flowId}:`,
+            error
+          );
           // Continue with other plans even if one fails
         }
       }
 
       if (progressedCount > 0) {
-        logger.info(`Release flow scheduler: progressed ${progressedCount} milestone(s)`);
+        logger.info(
+          `Release flow scheduler: progressed ${progressedCount} milestone(s)`
+        );
       }
     } catch (error) {
       logger.error('Error in checkAndProgressMilestones:', error);

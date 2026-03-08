@@ -69,7 +69,9 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
     error,
     isLoading,
   } = useSWR(
-    open && changeRequestId ? `/admin/change-requests/${changeRequestId}/revert-preview` : null,
+    open && changeRequestId
+      ? `/admin/change-requests/${changeRequestId}/revert-preview`
+      : null,
     () => changeRequestService.getRevertPreview(changeRequestId!)
   );
 
@@ -169,7 +171,9 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
         clientVersion: t('clientVersions.clientVersion'),
         clientStatus: t('clientVersions.clientStatus'),
         gameServerAddress: t('clientVersions.gameServerAddress'),
-        gameServerAddressForWhiteList: t('clientVersions.gameServerAddressForWhiteList'),
+        gameServerAddressForWhiteList: t(
+          'clientVersions.gameServerAddressForWhiteList'
+        ),
         patchAddress: t('clientVersions.patchAddress'),
         patchAddressForWhiteList: t('clientVersions.patchAddressForWhiteList'),
         guestModeAllowed: t('clientVersions.guestModeAllowed'),
@@ -180,7 +184,9 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
         maintenanceEndDate: t('clientVersions.maintenance.endDate'),
         maintenanceMessage: t('clientVersions.maintenance.defaultMessage'),
         maintenanceLocales: t('gameWorlds.maintenanceLocales'),
-        supportsMultiLanguage: t('clientVersions.maintenance.supportsMultiLanguage'),
+        supportsMultiLanguage: t(
+          'clientVersions.maintenance.supportsMultiLanguage'
+        ),
         tags: t('clientVersions.tags'),
         channel: t('clientVersions.channel'),
         minVersion: t('clientVersions.minVersion'),
@@ -259,9 +265,13 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
                   borderColor: 'warning.main',
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}
+                >
                   <UndoIcon color="warning" />
-                  <Typography variant="h6">{t('changeRequest.revertPreviewTitle')}</Typography>
+                  <Typography variant="h6">
+                    {t('changeRequest.revertPreviewTitle')}
+                  </Typography>
                 </Box>
                 <Typography variant="body2" color="text.secondary">
                   {t('changeRequest.revertPreviewDesc', {
@@ -272,18 +282,24 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
 
               {/* Rollback Items */}
               <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-                {t('changeRequest.revertChanges')} ({preview.revertItems?.length || 0})
+                {t('changeRequest.revertChanges')} (
+                {preview.revertItems?.length || 0})
               </Typography>
 
               {preview.revertItems?.map((item: RevertItem, index: number) => (
-                <Paper key={index} variant="outlined" sx={{ mb: 2, overflow: 'hidden' }}>
+                <Paper
+                  key={index}
+                  variant="outlined"
+                  sx={{ mb: 2, overflow: 'hidden' }}
+                >
                   {/* Item Header */}
                   <Box
                     sx={{
                       px: 2,
                       py: 1.5,
                       bgcolor: 'action.hover',
-                      borderBottom: item.opType !== 'DELETE' ? '1px solid' : 'none',
+                      borderBottom:
+                        item.opType !== 'DELETE' ? '1px solid' : 'none',
                       borderColor: 'divider',
                       display: 'flex',
                       alignItems: 'center',
@@ -291,8 +307,13 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
                     }}
                   >
                     {getOpIcon(item.opType)}
-                    <Typography variant="body2" fontWeight={600} sx={{ flex: 1 }}>
-                      {t(getTableLocalizationKey(item.targetTable))}: {item.targetId}
+                    <Typography
+                      variant="body2"
+                      fontWeight={600}
+                      sx={{ flex: 1 }}
+                    >
+                      {t(getTableLocalizationKey(item.targetTable))}:{' '}
+                      {item.targetId}
                     </Typography>
                     <Chip
                       label={getOpTypeLabel(item.opType)}
@@ -396,7 +417,9 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
                               >
                                 {formatValue(op.oldValue)}
                               </TableCell>
-                              <TableCell sx={{ color: 'success.main', py: 0.5 }}>
+                              <TableCell
+                                sx={{ color: 'success.main', py: 0.5 }}
+                              >
                                 {formatValue(op.newValue)}
                               </TableCell>
                             </TableRow>
@@ -428,7 +451,13 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
           <Button
             variant="contained"
             color="warning"
-            startIcon={isCreating ? <CircularProgress size={16} color="inherit" /> : <UndoIcon />}
+            startIcon={
+              isCreating ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : (
+                <UndoIcon />
+              )
+            }
             onClick={handleCreateRevert}
             disabled={isCreating || isLoading || !!error}
           >

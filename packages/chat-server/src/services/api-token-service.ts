@@ -60,7 +60,11 @@ export class ApiTokenService {
     });
 
     // 캐시에 저장
-    await this.getCacheService().set(`${this.CACHE_PREFIX}${token}`, apiToken, this.CACHE_TTL);
+    await this.getCacheService().set(
+      `${this.CACHE_PREFIX}${token}`,
+      apiToken,
+      this.CACHE_TTL
+    );
 
     logger.info(`API token generated: ${name}`);
     return apiToken;
@@ -72,7 +76,9 @@ export class ApiTokenService {
   static async verifyToken(token: string): Promise<ApiToken | null> {
     try {
       // 캐시에서 먼저 확인
-      let apiToken = await this.getCacheService().get<ApiToken>(`${this.CACHE_PREFIX}${token}`);
+      let apiToken = await this.getCacheService().get<ApiToken>(
+        `${this.CACHE_PREFIX}${token}`
+      );
 
       if (!apiToken) {
         // 캐시에 없으면 데이터베이스에서 조회
@@ -92,7 +98,9 @@ export class ApiTokenService {
         } catch (error) {
           // JSON 파싱 실패 시 문자열을 배열로 변환
           if (typeof tokenData.permissions === 'string') {
-            permissions = tokenData.permissions.split(',').map((p: string) => p.trim());
+            permissions = tokenData.permissions
+              .split(',')
+              .map((p: string) => p.trim());
           } else {
             permissions = ['read']; // 기본값
           }
@@ -108,7 +116,11 @@ export class ApiTokenService {
         };
 
         // 캐시에 저장
-        await this.getCacheService().set(`${this.CACHE_PREFIX}${token}`, apiToken, this.CACHE_TTL);
+        await this.getCacheService().set(
+          `${this.CACHE_PREFIX}${token}`,
+          apiToken,
+          this.CACHE_TTL
+        );
       }
 
       return apiToken;
@@ -161,7 +173,9 @@ export class ApiTokenService {
         } catch (error) {
           // JSON 파싱 실패 시 문자열을 배열로 변환
           if (typeof data.permissions === 'string') {
-            permissions = data.permissions.split(',').map((p: string) => p.trim());
+            permissions = data.permissions
+              .split(',')
+              .map((p: string) => p.trim());
           } else {
             permissions = ['read']; // 기본값
           }
@@ -201,7 +215,11 @@ export class ApiTokenService {
       }
 
       // 기본 토큰 생성
-      const defaultToken = await this.generateToken(defaultTokenName, ['read', 'write', 'admin']);
+      const defaultToken = await this.generateToken(defaultTokenName, [
+        'read',
+        'write',
+        'admin',
+      ]);
       logger.info(`Default API token created: ${defaultToken.token}`);
 
       return defaultToken.token;

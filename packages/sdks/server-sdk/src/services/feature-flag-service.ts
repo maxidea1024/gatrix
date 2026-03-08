@@ -223,7 +223,9 @@ export class FeatureFlagService {
           flagMap.set(flag.name, flag);
         }
         this.cachedFlagsByEnv.set(environmentId, flagMap);
-        this.logger.debug(`Loaded ${flags.length} flags from local storage`, { environmentId });
+        this.logger.debug(`Loaded ${flags.length} flags from local storage`, {
+          environmentId,
+        });
       }
 
       if (segmentsJson) {
@@ -231,9 +233,12 @@ export class FeatureFlagService {
         for (const segment of segments) {
           this.cachedSegments.set(segment.name, segment);
         }
-        this.logger.debug(`Loaded ${segments.length} segments from local storage`, {
-          environmentId,
-        });
+        this.logger.debug(
+          `Loaded ${segments.length} segments from local storage`,
+          {
+            environmentId,
+          }
+        );
       }
     } catch (error: any) {
       this.logger.warn('Failed to load feature flags from local storage', {
@@ -258,7 +263,10 @@ export class FeatureFlagService {
       endpoint += '?compact=true';
     }
 
-    this.logger.debug('Fetching feature flags', { environmentId, compact: this.compactFlags });
+    this.logger.debug('Fetching feature flags', {
+      environmentId,
+      compact: this.compactFlags,
+    });
 
     const client = this.getApiClient(environmentId);
     const response = await client.get<{
@@ -267,7 +275,9 @@ export class FeatureFlagService {
     }>(endpoint);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch feature flags');
+      throw new Error(
+        response.error?.message || 'Failed to fetch feature flags'
+      );
     }
 
     const { flags, segments } = response.data;
@@ -290,8 +300,14 @@ export class FeatureFlagService {
     // Save to local storage if available
     if (this.storage) {
       await Promise.all([
-        this.storage.save(`FeatureFlags_${environmentId}_flags`, JSON.stringify(flags)),
-        this.storage.save(`FeatureFlags_${environmentId}_segments`, JSON.stringify(segments || [])),
+        this.storage.save(
+          `FeatureFlags_${environmentId}_flags`,
+          JSON.stringify(flags)
+        ),
+        this.storage.save(
+          `FeatureFlags_${environmentId}_segments`,
+          JSON.stringify(segments || [])
+        ),
       ]);
     }
 
@@ -309,9 +325,12 @@ export class FeatureFlagService {
    */
   async refreshByEnvironment(environmentId: string): Promise<FeatureFlag[]> {
     if (!this.featureEnabled) {
-      this.logger.warn('FeatureFlagService.refreshByEnvironment() called but feature is disabled', {
-        environmentId,
-      });
+      this.logger.warn(
+        'FeatureFlagService.refreshByEnvironment() called but feature is disabled',
+        {
+          environmentId,
+        }
+      );
     }
     this.logger.info('Refreshing feature flags cache', { environmentId });
 
@@ -328,7 +347,9 @@ export class FeatureFlagService {
    */
   async refreshAll(): Promise<void> {
     if (!this.featureEnabled) {
-      this.logger.warn('FeatureFlagService.refreshAll() called but feature is disabled');
+      this.logger.warn(
+        'FeatureFlagService.refreshAll() called but feature is disabled'
+      );
       return;
     }
 
@@ -391,7 +412,10 @@ export class FeatureFlagService {
   /**
    * Get a single flag by name from cache (O(1) lookup)
    */
-  getFlagByName(environmentId: string, flagName: string): FeatureFlag | undefined {
+  getFlagByName(
+    environmentId: string,
+    flagName: string
+  ): FeatureFlag | undefined {
     const envCache = this.cachedFlagsByEnv.get(environmentId);
     return envCache?.get(flagName);
   }
@@ -448,7 +472,9 @@ export class FeatureFlagService {
 
     this.logger.debug('Fetching feature segments');
 
-    const response = await this.apiClient.get<{ segments: FeatureSegment[] }>(endpoint);
+    const response = await this.apiClient.get<{ segments: FeatureSegment[] }>(
+      endpoint
+    );
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch segments');
@@ -464,7 +490,10 @@ export class FeatureFlagService {
 
     // Save to local storage if available (global segments)
     if (this.storage) {
-      await this.storage.save('FeatureFlags_global_segments', JSON.stringify(segments));
+      await this.storage.save(
+        'FeatureFlags_global_segments',
+        JSON.stringify(segments)
+      );
     }
 
     this.logger.info('Feature segments fetched', { count: segments.length });
@@ -927,10 +956,19 @@ export class FeatureFlagService {
     }
 
     // Use the central evaluator from @gatrix/shared for consistency
-    const result = FeatureFlagEvaluator.evaluate(flag, mergedContext, this.cachedSegments);
+    const result = FeatureFlagEvaluator.evaluate(
+      flag,
+      mergedContext,
+      this.cachedSegments
+    );
 
     // Record metrics
-    this.recordMetric(resolvedEnv, flagName, result.enabled, result.variant?.name);
+    this.recordMetric(
+      resolvedEnv,
+      flagName,
+      result.enabled,
+      result.variant?.name
+    );
 
     return result;
   }
@@ -1080,7 +1118,9 @@ export class FeatureFlagService {
 
       // Invalidate ETag cache for this specific flag endpoint
       const client = this.getApiClient(environmentId);
-      client.invalidateEtagCache(`/api/v1/server/features/${encodeURIComponent(flagName)}`);
+      client.invalidateEtagCache(
+        `/api/v1/server/features/${encodeURIComponent(flagName)}`
+      );
 
       // Fetch updated flag from server
       const response = await client.get<{ flag: FeatureFlag }>(

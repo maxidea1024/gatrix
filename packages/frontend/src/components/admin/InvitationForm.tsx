@@ -11,7 +11,10 @@ import {
   Alert,
   Divider,
 } from '@mui/material';
-import { PersonAdd as PersonAddIcon, Cancel as CancelIcon } from '@mui/icons-material';
+import {
+  PersonAdd as PersonAddIcon,
+  Cancel as CancelIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
   CreateInvitationRequest,
@@ -36,8 +39,12 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
-  const [expirationHours, setExpirationHours] = useState<number>(InvitationDuration.HOURS_48);
-  const [autoJoinMemberships, setAutoJoinMemberships] = useState<AutoJoinMembership[]>([]);
+  const [expirationHours, setExpirationHours] = useState<number>(
+    InvitationDuration.HOURS_48
+  );
+  const [autoJoinMemberships, setAutoJoinMemberships] = useState<
+    AutoJoinMembership[]
+  >([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,9 +107,12 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
             >
               {Object.entries(InvitationDurationLabels).map(([value]) => (
                 <MenuItem key={value} value={Number(value)}>
-                  {Number(value) === InvitationDuration.HOURS_48 && t('invitations.duration.48h')}
-                  {Number(value) === InvitationDuration.WEEK && t('invitations.duration.1w')}
-                  {Number(value) === InvitationDuration.MONTH && t('invitations.duration.1m')}
+                  {Number(value) === InvitationDuration.HOURS_48 &&
+                    t('invitations.duration.48h')}
+                  {Number(value) === InvitationDuration.WEEK &&
+                    t('invitations.duration.1w')}
+                  {Number(value) === InvitationDuration.MONTH &&
+                    t('invitations.duration.1m')}
                 </MenuItem>
               ))}
             </Select>
@@ -111,7 +121,10 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
           <Divider />
 
           {/* Auto-Join Configuration */}
-          <OrgProjectTreeSelector value={autoJoinMemberships} onChange={setAutoJoinMemberships} />
+          <OrgProjectTreeSelector
+            value={autoJoinMemberships}
+            onChange={setAutoJoinMemberships}
+          />
         </Box>
 
         {/* Footer */}
@@ -182,9 +195,12 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
         >
           {Object.entries(InvitationDurationLabels).map(([value]) => (
             <MenuItem key={value} value={Number(value)}>
-              {Number(value) === InvitationDuration.HOURS_48 && t('invitations.duration.48h')}
-              {Number(value) === InvitationDuration.WEEK && t('invitations.duration.1w')}
-              {Number(value) === InvitationDuration.MONTH && t('invitations.duration.1m')}
+              {Number(value) === InvitationDuration.HOURS_48 &&
+                t('invitations.duration.48h')}
+              {Number(value) === InvitationDuration.WEEK &&
+                t('invitations.duration.1w')}
+              {Number(value) === InvitationDuration.MONTH &&
+                t('invitations.duration.1m')}
             </MenuItem>
           ))}
         </Select>
@@ -193,13 +209,26 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
       <Divider />
 
       {/* Auto-Join Configuration */}
-      <OrgProjectTreeSelector value={autoJoinMemberships} onChange={setAutoJoinMemberships} />
+      <OrgProjectTreeSelector
+        value={autoJoinMemberships}
+        onChange={setAutoJoinMemberships}
+      />
 
       <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-        <Button onClick={onCancel} startIcon={<CancelIcon />} variant="outlined" disabled={loading}>
+        <Button
+          onClick={onCancel}
+          startIcon={<CancelIcon />}
+          variant="outlined"
+          disabled={loading}
+        >
           {t('common.cancel')}
         </Button>
-        <Button type="submit" variant="contained" startIcon={<PersonAddIcon />} disabled={loading}>
+        <Button
+          type="submit"
+          variant="contained"
+          startIcon={<PersonAddIcon />}
+          disabled={loading}
+        >
           {t('invitations.create')}
         </Button>
       </Box>

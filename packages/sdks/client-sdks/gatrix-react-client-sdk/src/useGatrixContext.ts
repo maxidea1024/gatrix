@@ -6,7 +6,11 @@
  */
 import { useContext } from 'react';
 import GatrixFlagContext, { type GatrixContextValue } from './GatrixContext';
-import type { GatrixClient, FeaturesClient, Variant } from '@gatrix/gatrix-js-client-sdk';
+import type {
+  GatrixClient,
+  FeaturesClient,
+  Variant,
+} from '@gatrix/gatrix-js-client-sdk';
 
 // Mock methods that log errors when used outside provider
 const mockMethods = {
@@ -31,7 +35,9 @@ const mockMethods = {
     return { name: 'disabled', enabled: false };
   },
   isExplicitSyncEnabled: () => {
-    console.error('isExplicitSyncEnabled() must be used within a GatrixProvider');
+    console.error(
+      'isExplicitSyncEnabled() must be used within a GatrixProvider'
+    );
     return false;
   },
   hasPendingSyncFlags: () => {

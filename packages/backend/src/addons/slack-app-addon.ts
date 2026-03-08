@@ -31,15 +31,29 @@ export class SlackAppAddon extends Addon {
     const { accessToken, defaultChannels } = parameters;
 
     if (!accessToken) {
-      this.logger.warn(`Missing Slack access token for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing access token');
+      this.logger.warn(
+        `Missing Slack access token for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing access token'
+      );
       return;
     }
 
     const channels = this.parseChannels(defaultChannels);
     if (channels.length === 0) {
-      this.logger.warn(`No Slack channels configured for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'No channels configured');
+      this.logger.warn(
+        `No Slack channels configured for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'No channels configured'
+      );
       return;
     }
 
@@ -50,7 +64,12 @@ export class SlackAppAddon extends Addon {
 
     for (const channel of channels) {
       try {
-        const response = await this.postMessage(accessToken, channel, text, blocks);
+        const response = await this.postMessage(
+          accessToken,
+          channel,
+          text,
+          blocks
+        );
 
         if (response.ok) {
           results.push({ channel, success: true });
@@ -64,9 +83,13 @@ export class SlackAppAddon extends Addon {
           );
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         results.push({ channel, success: false, error: errorMessage });
-        this.logger.error(`Failed to send Slack App notification to ${channel}:`, error);
+        this.logger.error(
+          `Failed to send Slack App notification to ${channel}:`,
+          error
+        );
       }
     }
 
@@ -87,11 +110,17 @@ export class SlackAppAddon extends Addon {
         .filter((r) => !r.success)
         .map((r) => `${r.channel}: ${r.error}`)
         .join(', ');
-      await this.registerEvent(integrationId, event, 'successWithErrors', errors, {
-        channels: results.map((r) => r.channel),
-        successCount,
-        failCount,
-      });
+      await this.registerEvent(
+        integrationId,
+        event,
+        'successWithErrors',
+        errors,
+        {
+          channels: results.map((r) => r.channel),
+          successCount,
+          failCount,
+        }
+      );
     }
   }
 
@@ -109,7 +138,10 @@ export class SlackAppAddon extends Addon {
   /**
    * Format message for Slack Web API
    */
-  private formatForWebApi(slackMessage: Record<string, any>): { text: string; blocks: any[] } {
+  private formatForWebApi(slackMessage: Record<string, any>): {
+    text: string;
+    blocks: any[];
+  } {
     const text = slackMessage.text || '';
     const blocks = [
       {
@@ -133,19 +165,22 @@ export class SlackAppAddon extends Addon {
     text: string,
     blocks: any[]
   ): Promise<SlackApiResponse> {
-    const response = await this.fetchRetry('https://slack.com/api/chat.postMessage', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        channel,
-        text,
-        blocks,
-        unfurl_links: false,
-      }),
-    });
+    const response = await this.fetchRetry(
+      'https://slack.com/api/chat.postMessage',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          channel,
+          text,
+          blocks,
+          unfurl_links: false,
+        }),
+      }
+    );
 
     return response.json() as Promise<SlackApiResponse>;
   }

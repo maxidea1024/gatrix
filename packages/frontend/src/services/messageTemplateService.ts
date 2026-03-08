@@ -36,10 +36,9 @@ export const messageTemplateService = {
       offset?: number;
     }
   ): Promise<MessageTemplateListResponse> {
-    const res = await apiService.get<MessageTemplateListResponse | MessageTemplate[]>(
-      `${projectApiPath}/message-templates`,
-      { params } as any
-    );
+    const res = await apiService.get<
+      MessageTemplateListResponse | MessageTemplate[]
+    >(`${projectApiPath}/message-templates`, { params } as any);
     const d: any = res.data;
 
     // Backward compatibility: existing format if array, new format if object
@@ -57,11 +56,19 @@ export const messageTemplateService = {
     };
   },
   async get(projectApiPath: string, id: number): Promise<MessageTemplate> {
-    const res = await apiService.get<MessageTemplate>(`${projectApiPath}/message-templates/${id}`);
+    const res = await apiService.get<MessageTemplate>(
+      `${projectApiPath}/message-templates/${id}`
+    );
     return res.data as any;
   },
-  async create(projectApiPath: string, data: MessageTemplate): Promise<MessageTemplate> {
-    const res = await apiService.post<any>(`${projectApiPath}/message-templates`, data);
+  async create(
+    projectApiPath: string,
+    data: MessageTemplate
+  ): Promise<MessageTemplate> {
+    const res = await apiService.post<any>(
+      `${projectApiPath}/message-templates`,
+      data
+    );
 
     // Server response structure: { success: true, data: created }
     if (res?.data?.success && res?.data?.data) {
@@ -76,7 +83,10 @@ export const messageTemplateService = {
     id: number,
     data: MessageTemplate
   ): Promise<MessageTemplate> {
-    const res = await apiService.put<any>(`${projectApiPath}/message-templates/${id}`, data);
+    const res = await apiService.put<any>(
+      `${projectApiPath}/message-templates/${id}`,
+      data
+    );
 
     // Server response structure: { success: true, data: updated }
     if (res?.data?.success && res?.data?.data) {
@@ -93,16 +103,26 @@ export const messageTemplateService = {
     await apiService.delete(`${projectApiPath}/message-templates/${id}`);
   },
   async bulkDelete(projectApiPath: string, ids: number[]): Promise<void> {
-    await apiService.post(`${projectApiPath}/message-templates/bulk-delete`, { ids });
+    await apiService.post(`${projectApiPath}/message-templates/bulk-delete`, {
+      ids,
+    });
   },
 
   // Tag related methods
   async getTags(projectApiPath: string, id: number): Promise<any[]> {
-    const response = await apiService.get(`${projectApiPath}/message-templates/${id}/tags`);
+    const response = await apiService.get(
+      `${projectApiPath}/message-templates/${id}/tags`
+    );
     return response.data?.data || [];
   },
 
-  async setTags(projectApiPath: string, id: number, tagIds: number[]): Promise<void> {
-    await apiService.put(`${projectApiPath}/message-templates/${id}/tags`, { tagIds });
+  async setTags(
+    projectApiPath: string,
+    id: number,
+    tagIds: number[]
+  ): Promise<void> {
+    await apiService.put(`${projectApiPath}/message-templates/${id}/tags`, {
+      tagIds,
+    });
   },
 };

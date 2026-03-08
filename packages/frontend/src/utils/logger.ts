@@ -24,7 +24,8 @@ class Logger {
 
   constructor() {
     this.isDevelopment = import.meta.env.DEV;
-    this.enableServerLogging = import.meta.env.VITE_ENABLE_SERVER_LOGGING === 'true';
+    this.enableServerLogging =
+      import.meta.env.VITE_ENABLE_SERVER_LOGGING === 'true';
   }
 
   /**

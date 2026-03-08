@@ -32,10 +32,15 @@ export class UserService {
   static async upsertUser(userData: UserData): Promise<UserData> {
     try {
       // 공용 날짜 변환 함수 사용
-      const convertToMySQLDateTime = (dateValue: string | undefined): string | null => {
+      const convertToMySQLDateTime = (
+        dateValue: string | undefined
+      ): string | null => {
         if (!dateValue) return null;
         try {
-          return new Date(dateValue).toISOString().slice(0, 19).replace('T', ' ');
+          return new Date(dateValue)
+            .toISOString()
+            .slice(0, 19)
+            .replace('T', ' ');
         } catch {
           return null;
         }
@@ -85,7 +90,9 @@ export class UserService {
       // Update users list cache
       await this.invalidateUsersListCache();
 
-      logger.info(`User ${userData.id} (${userData.username}) upserted successfully`);
+      logger.info(
+        `User ${userData.id} (${userData.username}) upserted successfully`
+      );
       return userToSave;
     } catch (error) {
       logger.error('Error upserting user:', error);
@@ -122,18 +129,28 @@ export class UserService {
               chatStatus: userData.chatStatus || 'offline',
               customStatus: userData.customStatus || undefined,
               lastActivityAt: userData.lastActivityAt
-                ? new Date(userData.lastActivityAt).toISOString().slice(0, 19).replace('T', ' ')
+                ? new Date(userData.lastActivityAt)
+                    .toISOString()
+                    .slice(0, 19)
+                    .replace('T', ' ')
                 : now,
               createdAt: userData.createdAt
-                ? new Date(userData.createdAt).toISOString().slice(0, 19).replace('T', ' ')
+                ? new Date(userData.createdAt)
+                    .toISOString()
+                    .slice(0, 19)
+                    .replace('T', ' ')
                 : now,
               updatedAt: now,
             };
 
-            const existingUser = await trx('chat_users').where('id', userData.id).first();
+            const existingUser = await trx('chat_users')
+              .where('id', userData.id)
+              .first();
 
             if (existingUser) {
-              await trx('chat_users').where('id', userData.id).update(userToSave);
+              await trx('chat_users')
+                .where('id', userData.id)
+                .update(userToSave);
             } else {
               await trx('chat_users').insert(userToSave);
             }

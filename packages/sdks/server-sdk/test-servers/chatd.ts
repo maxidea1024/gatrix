@@ -60,7 +60,9 @@ class ChatServer extends BaseTestServer {
         timestamp: new Date(),
       });
 
-      this.log(`Message in ${channel.name}: Total ${this.messageCount} messages`);
+      this.log(
+        `Message in ${channel.name}: Total ${this.messageCount} messages`
+      );
 
       // Update service stats (only if service discovery is enabled)
       if (this.config.enableServiceDiscovery) {
@@ -72,7 +74,9 @@ class ChatServer extends BaseTestServer {
               activeChannels: this.channels.size,
             },
           })
-          .catch((err) => this.logError('Failed to update service status', err));
+          .catch((err) =>
+            this.logError('Failed to update service status', err)
+          );
       }
     }
   }

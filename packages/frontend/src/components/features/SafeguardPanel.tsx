@@ -101,7 +101,10 @@ const fromMinutes = (minutes: number): { value: number; unit: TimeUnit } => {
 };
 
 // Format minutes to human-readable string (for table display)
-const formatTimeRange = (minutes: number, t: (key: string) => string): string => {
+const formatTimeRange = (
+  minutes: number,
+  t: (key: string) => string
+): string => {
   const { value, unit } = fromMinutes(minutes);
   switch (unit) {
     case 'days':
@@ -130,10 +133,14 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
   const [evaluating, setEvaluating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [selectedSafeguard, setSelectedSafeguard] = useState<Safeguard | null>(null);
+  const [selectedSafeguard, setSelectedSafeguard] = useState<Safeguard | null>(
+    null
+  );
 
   // Available metrics for autocomplete
-  const [availableMetrics, setAvailableMetrics] = useState<AvailableMetric[]>([]);
+  const [availableMetrics, setAvailableMetrics] = useState<AvailableMetric[]>(
+    []
+  );
   const [metricsLoading, setMetricsLoading] = useState(false);
 
   // Available labels for metric filtering
@@ -191,9 +198,12 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
     const timer = setTimeout(async () => {
       setLabelsLoading(true);
       try {
-        const response = await api.get<string[]>(`${projectApiPath}/impact-metrics/labels`, {
-          params: { metric: metricName },
-        });
+        const response = await api.get<string[]>(
+          `${projectApiPath}/impact-metrics/labels`,
+          {
+            params: { metric: metricName },
+          }
+        );
         setAvailableLabels(response.data || []);
       } catch {
         setAvailableLabels([]);
@@ -256,10 +266,13 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
           operator,
           threshold,
           timeRangeMinutes,
-          labelFilters: Object.keys(labelFilters).length > 0 ? labelFilters : null,
+          labelFilters:
+            Object.keys(labelFilters).length > 0 ? labelFilters : null,
         };
         await updateSafeguard(selectedSafeguard.id, input, projectApiPath);
-        enqueueSnackbar(t('releaseFlow.safeguard.updateSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('releaseFlow.safeguard.updateSuccess'), {
+          variant: 'success',
+        });
       } else {
         const input: CreateSafeguardInput = {
           flowId,
@@ -270,11 +283,14 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
           operator,
           threshold,
           timeRangeMinutes,
-          labelFilters: Object.keys(labelFilters).length > 0 ? labelFilters : undefined,
+          labelFilters:
+            Object.keys(labelFilters).length > 0 ? labelFilters : undefined,
           action: 'pause',
         };
         await createSafeguard(input, projectApiPath);
-        enqueueSnackbar(t('releaseFlow.safeguard.createSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('releaseFlow.safeguard.createSuccess'), {
+          variant: 'success',
+        });
       }
       setDialogOpen(false);
       resetForm();
@@ -296,7 +312,9 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
     if (!selectedSafeguard) return;
     try {
       await deleteSafeguard(selectedSafeguard.id, projectApiPath);
-      enqueueSnackbar(t('releaseFlow.safeguard.deleteSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('releaseFlow.safeguard.deleteSuccess'), {
+        variant: 'success',
+      });
       setDeleteConfirmOpen(false);
       setSelectedSafeguard(null);
       fetchSafeguards();
@@ -309,7 +327,9 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
     setEvaluating(true);
     try {
       await evaluateSafeguards(milestoneId, projectApiPath);
-      enqueueSnackbar(t('releaseFlow.safeguard.evaluateSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('releaseFlow.safeguard.evaluateSuccess'), {
+        variant: 'success',
+      });
       fetchSafeguards();
     } catch {
       // Error handled
@@ -321,7 +341,9 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
   const handleReset = async (safeguardId: string) => {
     try {
       await resetSafeguard(safeguardId, projectApiPath);
-      enqueueSnackbar(t('releaseFlow.safeguard.resetSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('releaseFlow.safeguard.resetSuccess'), {
+        variant: 'success',
+      });
       fetchSafeguards();
     } catch {
       // Error handled
@@ -330,7 +352,10 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
 
   const handleAddLabelFilter = () => {
     if (!newLabelKey.trim()) return;
-    setLabelFilters((prev) => ({ ...prev, [newLabelKey.trim()]: newLabelValue.trim() }));
+    setLabelFilters((prev) => ({
+      ...prev,
+      [newLabelKey.trim()]: newLabelValue.trim(),
+    }));
     setNewLabelKey('');
     setNewLabelValue('');
   };
@@ -359,16 +384,29 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
   return (
     <Box>
       {!hideHeader && (
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          mb={2}
+        >
           <Stack direction="row" alignItems="center" spacing={1}>
             <ShieldIcon fontSize="small" color="primary" />
-            <Typography variant="subtitle2">{t('releaseFlow.safeguards')}</Typography>
+            <Typography variant="subtitle2">
+              {t('releaseFlow.safeguards')}
+            </Typography>
             <Tooltip
               title={t('releaseFlow.safeguard.helpTooltip')}
               arrow
               placement="right"
               slotProps={{
-                tooltip: { sx: { maxWidth: 360, whiteSpace: 'pre-line', fontSize: '0.8rem' } },
+                tooltip: {
+                  sx: {
+                    maxWidth: 360,
+                    whiteSpace: 'pre-line',
+                    fontSize: '0.8rem',
+                  },
+                },
               }}
             >
               <HelpIcon
@@ -384,7 +422,13 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                 <Button
                   size="small"
                   variant="outlined"
-                  startIcon={evaluating ? <CircularProgress size={14} /> : <EvaluateIcon />}
+                  startIcon={
+                    evaluating ? (
+                      <CircularProgress size={14} />
+                    ) : (
+                      <EvaluateIcon />
+                    )
+                  }
                   onClick={handleEvaluate}
                   disabled={evaluating}
                 >
@@ -406,14 +450,25 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
         </Stack>
       )}
       {hideHeader && (
-        <Stack direction="row" alignItems="center" justifyContent="flex-end" mb={1}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="flex-end"
+          mb={1}
+        >
           {safeguards.length > 0 && (
             <Stack direction="row" spacing={1}>
               <Tooltip title={t('releaseFlow.safeguard.evaluateDesc')}>
                 <Button
                   size="small"
                   variant="outlined"
-                  startIcon={evaluating ? <CircularProgress size={14} /> : <EvaluateIcon />}
+                  startIcon={
+                    evaluating ? (
+                      <CircularProgress size={14} />
+                    ) : (
+                      <EvaluateIcon />
+                    )
+                  }
                   onClick={handleEvaluate}
                   disabled={evaluating}
                 >
@@ -450,14 +505,18 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
         <Table size="small" sx={{ tableLayout: 'fixed' }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ width: '30%' }}>{t('releaseFlow.safeguard.metricName')}</TableCell>
+              <TableCell sx={{ width: '30%' }}>
+                {t('releaseFlow.safeguard.metricName')}
+              </TableCell>
               <TableCell sx={{ width: '12%' }}>
                 {t('releaseFlow.safeguard.aggregationMode')}
               </TableCell>
               <TableCell align="center" sx={{ width: '10%' }}>
                 {t('releaseFlow.safeguard.condition')}
               </TableCell>
-              <TableCell sx={{ width: '15%' }}>{t('releaseFlow.safeguard.timeRange')}</TableCell>
+              <TableCell sx={{ width: '15%' }}>
+                {t('releaseFlow.safeguard.timeRange')}
+              </TableCell>
               <TableCell align="center" sx={{ width: '13%' }}>
                 {t('common.status')}
               </TableCell>
@@ -474,7 +533,10 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                 key={sg.id}
                 sx={
                   sg.isTriggered
-                    ? { bgcolor: 'error.main', '& td': { color: 'error.contrastText' } }
+                    ? {
+                        bgcolor: 'error.main',
+                        '& td': { color: 'error.contrastText' },
+                      }
                     : undefined
                 }
               >
@@ -513,27 +575,28 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                       </Typography>
                     </Tooltip>
                   )}
-                  {sg.labelFilters && Object.keys(sg.labelFilters).length > 0 && (
-                    <Stack
-                      direction="row"
-                      spacing={0.5}
-                      sx={{ mt: 0.5, flexWrap: 'wrap', gap: 0.5 }}
-                    >
-                      {Object.entries(sg.labelFilters).map(([k, v]) => (
-                        <Chip
-                          key={k}
-                          label={`${k}=${v}`}
-                          size="small"
-                          variant="outlined"
-                          sx={{
-                            height: 18,
-                            fontSize: '0.65rem',
-                            '& .MuiChip-label': { px: 0.5 },
-                          }}
-                        />
-                      ))}
-                    </Stack>
-                  )}
+                  {sg.labelFilters &&
+                    Object.keys(sg.labelFilters).length > 0 && (
+                      <Stack
+                        direction="row"
+                        spacing={0.5}
+                        sx={{ mt: 0.5, flexWrap: 'wrap', gap: 0.5 }}
+                      >
+                        {Object.entries(sg.labelFilters).map(([k, v]) => (
+                          <Chip
+                            key={k}
+                            label={`${k}=${v}`}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              height: 18,
+                              fontSize: '0.65rem',
+                              '& .MuiChip-label': { px: 0.5 },
+                            }}
+                          />
+                        ))}
+                      </Stack>
+                    )}
                 </TableCell>
                 <TableCell>
                   <Chip
@@ -544,7 +607,11 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                   />
                 </TableCell>
                 <TableCell align="center">
-                  <Typography variant="body2" fontFamily="monospace" fontWeight={600}>
+                  <Typography
+                    variant="body2"
+                    fontFamily="monospace"
+                    fontWeight={600}
+                  >
                     {sg.operator} {sg.threshold}
                   </Typography>
                 </TableCell>
@@ -569,20 +636,32 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                 </TableCell>
                 {canManage && (
                   <TableCell align="right">
-                    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                    <Stack
+                      direction="row"
+                      spacing={0.5}
+                      justifyContent="flex-end"
+                    >
                       {sg.isTriggered && (
                         <Tooltip title={t('releaseFlow.safeguard.resetDesc')}>
-                          <IconButton size="small" onClick={() => handleReset(sg.id)}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleReset(sg.id)}
+                          >
                             <ResetIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       )}
                       <Tooltip title={t('releaseFlow.safeguard.editSafeguard')}>
-                        <IconButton size="small" onClick={() => handleOpenEdit(sg)}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleOpenEdit(sg)}
+                        >
                           <EditIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title={t('releaseFlow.safeguard.deleteSafeguard')}>
+                      <Tooltip
+                        title={t('releaseFlow.safeguard.deleteSafeguard')}
+                      >
                         <IconButton
                           size="small"
                           color="error"
@@ -601,7 +680,12 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
       )}
 
       {/* Create / Edit Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>
           {selectedSafeguard
             ? t('releaseFlow.safeguard.editSafeguard')
@@ -611,7 +695,11 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
           <Stack spacing={2.5} sx={{ pt: 1 }}>
             {/* Section 1: Metric Selection */}
             <Box>
-              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+              <Typography
+                variant="subtitle2"
+                gutterBottom
+                sx={{ fontWeight: 600 }}
+              >
                 {t('releaseFlow.safeguard.sectionMetric')}
               </Typography>
               <Typography
@@ -633,22 +721,33 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                     <TextField
                       {...params}
                       label={t('releaseFlow.safeguard.metricName')}
-                      placeholder={t('releaseFlow.safeguard.metricNamePlaceholder')}
+                      placeholder={t(
+                        'releaseFlow.safeguard.metricNamePlaceholder'
+                      )}
                       size="small"
                       required
                       helperText={t('releaseFlow.safeguard.metricNameHelp')}
                     />
                   )}
                   renderOption={(props, option) => {
-                    const metric = availableMetrics.find((m) => m.name === option);
+                    const metric = availableMetrics.find(
+                      (m) => m.name === option
+                    );
                     return (
                       <li {...props} key={option}>
                         <Box>
-                          <Typography variant="body2" fontFamily="monospace" fontSize="0.8rem">
+                          <Typography
+                            variant="body2"
+                            fontFamily="monospace"
+                            fontSize="0.8rem"
+                          >
                             {option}
                           </Typography>
                           {metric?.help && (
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {metric.help} ({metric.type})
                             </Typography>
                           )}
@@ -663,7 +762,9 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   size="small"
-                  placeholder={t('releaseFlow.safeguard.displayNamePlaceholder')}
+                  placeholder={t(
+                    'releaseFlow.safeguard.displayNamePlaceholder'
+                  )}
                   helperText={t('releaseFlow.safeguard.displayNameHelp')}
                 />
               </Stack>
@@ -673,7 +774,11 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
 
             {/* Section 2: Condition */}
             <Box>
-              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+              <Typography
+                variant="subtitle2"
+                gutterBottom
+                sx={{ fontWeight: 600 }}
+              >
                 {t('releaseFlow.safeguard.sectionCondition')}
               </Typography>
               <Typography
@@ -686,7 +791,9 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
 
               <Stack direction="row" spacing={2}>
                 <FormControl size="small" sx={{ minWidth: 140 }}>
-                  <InputLabel>{t('releaseFlow.safeguard.aggregationMode')}</InputLabel>
+                  <InputLabel>
+                    {t('releaseFlow.safeguard.aggregationMode')}
+                  </InputLabel>
                   <Select
                     value={aggregationMode}
                     label={t('releaseFlow.safeguard.aggregationMode')}
@@ -729,7 +836,11 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
 
             {/* Section 3: Time Range */}
             <Box>
-              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+              <Typography
+                variant="subtitle2"
+                gutterBottom
+                sx={{ fontWeight: 600 }}
+              >
                 {t('releaseFlow.safeguard.sectionTimeRange')}
               </Typography>
               <Typography
@@ -745,21 +856,33 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
                   label={t('releaseFlow.safeguard.timeRangeValue')}
                   type="number"
                   value={timeRangeValue}
-                  onChange={(e) => setTimeRangeValue(Math.max(1, Number(e.target.value)))}
+                  onChange={(e) =>
+                    setTimeRangeValue(Math.max(1, Number(e.target.value)))
+                  }
                   size="small"
                   sx={{ width: 120 }}
                   inputProps={{ min: 1 }}
                 />
                 <FormControl size="small" sx={{ minWidth: 130 }}>
-                  <InputLabel>{t('releaseFlow.safeguard.timeRangeUnit')}</InputLabel>
+                  <InputLabel>
+                    {t('releaseFlow.safeguard.timeRangeUnit')}
+                  </InputLabel>
                   <Select
                     value={timeRangeUnit}
                     label={t('releaseFlow.safeguard.timeRangeUnit')}
-                    onChange={(e) => setTimeRangeUnit(e.target.value as TimeUnit)}
+                    onChange={(e) =>
+                      setTimeRangeUnit(e.target.value as TimeUnit)
+                    }
                   >
-                    <MenuItem value="minutes">{t('releaseFlow.safeguard.unitMinutes')}</MenuItem>
-                    <MenuItem value="hours">{t('releaseFlow.safeguard.unitHours')}</MenuItem>
-                    <MenuItem value="days">{t('releaseFlow.safeguard.unitDays')}</MenuItem>
+                    <MenuItem value="minutes">
+                      {t('releaseFlow.safeguard.unitMinutes')}
+                    </MenuItem>
+                    <MenuItem value="hours">
+                      {t('releaseFlow.safeguard.unitHours')}
+                    </MenuItem>
+                    <MenuItem value="days">
+                      {t('releaseFlow.safeguard.unitDays')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Stack>
@@ -769,7 +892,11 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
 
             {/* Section 4: Label Filters */}
             <Box>
-              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+              <Typography
+                variant="subtitle2"
+                gutterBottom
+                sx={{ fontWeight: 600 }}
+              >
                 {t('releaseFlow.safeguard.sectionLabelFilters')}
               </Typography>
               <Typography
@@ -782,7 +909,11 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
 
               {/* Existing label filters */}
               {Object.keys(labelFilters).length > 0 && (
-                <Stack direction="row" spacing={0.5} sx={{ mb: 1.5, flexWrap: 'wrap', gap: 0.5 }}>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  sx={{ mb: 1.5, flexWrap: 'wrap', gap: 0.5 }}
+                >
                   {Object.entries(labelFilters).map(([key, value]) => (
                     <Chip
                       key={key}
@@ -837,8 +968,14 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button variant="contained" onClick={handleSave} disabled={!metricName.trim()}>
+          <Button onClick={() => setDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={!metricName.trim()}
+          >
             {t('common.save')}
           </Button>
         </DialogActions>

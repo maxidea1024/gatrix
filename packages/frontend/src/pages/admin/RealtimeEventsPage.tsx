@@ -106,7 +106,10 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import { getStoredTimezone, formatDateTimeDetailed } from '../../utils/dateFormat';
+import {
+  getStoredTimezone,
+  formatDateTimeDetailed,
+} from '../../utils/dateFormat';
 import PageContentLoader from '@/components/common/PageContentLoader';
 
 dayjs.extend(utc);
@@ -213,12 +216,21 @@ const RealtimeEventsPage: React.FC = () => {
 
   // 동적 Filter에서 값 추출
   const eventTypeFilter =
-    (activeFilters.find((f) => f.key === 'action')?.value as string | string[]) || '';
-  const eventTypeOperator = activeFilters.find((f) => f.key === 'action')?.operator;
+    (activeFilters.find((f) => f.key === 'action')?.value as
+      | string
+      | string[]) || '';
+  const eventTypeOperator = activeFilters.find(
+    (f) => f.key === 'action'
+  )?.operator;
   const resourceTypeFilter =
-    (activeFilters.find((f) => f.key === 'resource_type')?.value as string | string[]) || '';
-  const resourceTypeOperator = activeFilters.find((f) => f.key === 'resource_type')?.operator;
-  const userFilter = (activeFilters.find((f) => f.key === 'user')?.value as string) || '';
+    (activeFilters.find((f) => f.key === 'resource_type')?.value as
+      | string
+      | string[]) || '';
+  const resourceTypeOperator = activeFilters.find(
+    (f) => f.key === 'resource_type'
+  )?.operator;
+  const userFilter =
+    (activeFilters.find((f) => f.key === 'user')?.value as string) || '';
 
   // Detail panel
   const [selectedEvent, setSelectedEvent] = useState<AuditLog | null>(null);
@@ -232,7 +244,9 @@ const RealtimeEventsPage: React.FC = () => {
 
   // Timeline groups (grouped by minute)
   const [timelineGroups, setTimelineGroups] = useState<TimelineGroup[]>([]);
-  const [changedGroupKeys, setChangedGroupKeys] = useState<Set<string>>(new Set());
+  const [changedGroupKeys, setChangedGroupKeys] = useState<Set<string>>(
+    new Set()
+  );
   const previousGroupCountsRef = useRef<Map<string, number>>(new Map());
 
   // New events notification - track which events have been seen
@@ -253,9 +267,8 @@ const RealtimeEventsPage: React.FC = () => {
     return saved ? JSON.parse(saved) : {};
   });
   const [iconDialogOpen, setIconDialogOpen] = useState(false);
-  const [selectedActionForCustomization, setSelectedActionForCustomization] = useState<
-    string | null
-  >(null);
+  const [selectedActionForCustomization, setSelectedActionForCustomization] =
+    useState<string | null>(null);
 
   // Set dayjs locale
   useEffect(() => {
@@ -313,7 +326,8 @@ const RealtimeEventsPage: React.FC = () => {
 
       if (resourceTypeFilter) {
         filters.resource_type = resourceTypeFilter;
-        if (resourceTypeOperator) filters.resource_type_operator = resourceTypeOperator;
+        if (resourceTypeOperator)
+          filters.resource_type_operator = resourceTypeOperator;
       }
 
       if (userFilter) {
@@ -374,7 +388,11 @@ const RealtimeEventsPage: React.FC = () => {
             // Convert back to array and filter by time window
             allEvents = Array.from(existingEventsMap.values())
               .filter((event) => new Date(event.createdAt) >= thirtyMinutesAgo)
-              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+              .sort(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
+              );
 
             console.log('[RealtimeEvents] After merge:', {
               totalCount: allEvents.length,
@@ -414,7 +432,9 @@ const RealtimeEventsPage: React.FC = () => {
             }
           } else {
             // Initial load - set previousEventIds to prevent flash on first load
-            console.log('[RealtimeEvents] Initial load - setting previousEventIds');
+            console.log(
+              '[RealtimeEvents] Initial load - setting previousEventIds'
+            );
           }
 
           // Mark initial load as complete
@@ -442,7 +462,9 @@ const RealtimeEventsPage: React.FC = () => {
           if (unseenEventIdsToProcess.length > 0 && !isAtTopPosition) {
             console.log('✅ Setting hasUnseenEvents to true');
             setHasUnseenEvents(true);
-            setUnseenEventCount((prev) => prev + unseenEventIdsToProcess.length);
+            setUnseenEventCount(
+              (prev) => prev + unseenEventIdsToProcess.length
+            );
           } else if (isAtTopPosition && unseenEventIdsToProcess.length > 0) {
             console.log('❌ Already at top - marking new events as seen');
             // Mark new events as seen immediately
@@ -463,14 +485,21 @@ const RealtimeEventsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [eventTypeFilter, eventTypeOperator, resourceTypeFilter, resourceTypeOperator, userFilter]);
+  }, [
+    eventTypeFilter,
+    eventTypeOperator,
+    resourceTypeFilter,
+    resourceTypeOperator,
+    userFilter,
+  ]);
 
   // Update timeline groups and stats when events change
   useEffect(() => {
     const userTimezone = getStoredTimezone();
 
     // Group events by minute for timeline view
-    const groups: Record<string, { events: AuditLog[]; timeLabel: string }> = {};
+    const groups: Record<string, { events: AuditLog[]; timeLabel: string }> =
+      {};
     events.forEach((log) => {
       const localTime = dayjs.utc(log.createdAt).tz(userTimezone);
       const minuteKey = localTime.format('HH:mm');
@@ -549,7 +578,10 @@ const RealtimeEventsPage: React.FC = () => {
 
   // Save seenEventIds to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('realtimeEvents_seenEventIds', JSON.stringify(Array.from(seenEventIds)));
+    localStorage.setItem(
+      'realtimeEvents_seenEventIds',
+      JSON.stringify(Array.from(seenEventIds))
+    );
   }, [seenEventIds]);
 
   // Intersection Observer to track when first event is visible
@@ -694,7 +726,10 @@ const RealtimeEventsPage: React.FC = () => {
       [selectedActionForCustomization]: { iconName, color },
     };
     setCustomEventSettings(newSettings);
-    localStorage.setItem('realtimeEvents_customSettings', JSON.stringify(newSettings));
+    localStorage.setItem(
+      'realtimeEvents_customSettings',
+      JSON.stringify(newSettings)
+    );
     setIconDialogOpen(false);
     setSelectedActionForCustomization(null);
   };
@@ -706,13 +741,19 @@ const RealtimeEventsPage: React.FC = () => {
     const newSettings = { ...customEventSettings };
     delete newSettings[selectedActionForCustomization];
     setCustomEventSettings(newSettings);
-    localStorage.setItem('realtimeEvents_customSettings', JSON.stringify(newSettings));
+    localStorage.setItem(
+      'realtimeEvents_customSettings',
+      JSON.stringify(newSettings)
+    );
     setIconDialogOpen(false);
     setSelectedActionForCustomization(null);
   };
 
   // Calculate time difference
-  const getTimeDiff = (current: string | Date, previous?: string | Date): string => {
+  const getTimeDiff = (
+    current: string | Date,
+    previous?: string | Date
+  ): string => {
     if (!previous) return '';
     const diff = dayjs(current).diff(dayjs(previous), 'second');
     if (diff < 60) return `${diff}s`;
@@ -775,11 +816,18 @@ const RealtimeEventsPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters(activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f)));
+    setActiveFilters(
+      activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f))
+    );
   };
 
-  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
-    setActiveFilters(activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f)));
+  const handleOperatorChange = (
+    filterKey: string,
+    operator: 'any_of' | 'include_all'
+  ) => {
+    setActiveFilters(
+      activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f))
+    );
   };
 
   // Handle event click
@@ -933,7 +981,13 @@ const RealtimeEventsPage: React.FC = () => {
       {/* Main Content */}
       <PageContentLoader
         loading={loading}
-        sx={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
       >
         <Box
           sx={{
@@ -998,7 +1052,9 @@ const RealtimeEventsPage: React.FC = () => {
                 </Box>
               ) : timelineGroups.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 8 }}>
-                  <TimelineIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+                  <TimelineIcon
+                    sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }}
+                  />
                   <Typography variant="h6" color="text.secondary" gutterBottom>
                     {t('realtimeEvents.noEventsYet')}
                   </Typography>
@@ -1087,34 +1143,44 @@ const RealtimeEventsPage: React.FC = () => {
                                 border: 4,
                                 borderColor: 'background.paper',
                                 transition: 'all 0.3s ease',
-                                animation: isChanged ? 'rumble 0.6s ease-out' : 'none',
+                                animation: isChanged
+                                  ? 'rumble 0.6s ease-out'
+                                  : 'none',
                                 '@keyframes rumble': {
                                   '0%, 100%': {
                                     transform: 'translate(0, 0) scale(1)',
                                   },
                                   '10%': {
-                                    transform: 'translate(-2px, -1px) scale(1.05)',
+                                    transform:
+                                      'translate(-2px, -1px) scale(1.05)',
                                   },
                                   '20%': {
-                                    transform: 'translate(2px, 1px) scale(1.05)',
+                                    transform:
+                                      'translate(2px, 1px) scale(1.05)',
                                   },
                                   '30%': {
-                                    transform: 'translate(-2px, 1px) scale(1.05)',
+                                    transform:
+                                      'translate(-2px, 1px) scale(1.05)',
                                   },
                                   '40%': {
-                                    transform: 'translate(2px, -1px) scale(1.05)',
+                                    transform:
+                                      'translate(2px, -1px) scale(1.05)',
                                   },
                                   '50%': {
-                                    transform: 'translate(-1px, -1px) scale(1.03)',
+                                    transform:
+                                      'translate(-1px, -1px) scale(1.03)',
                                   },
                                   '60%': {
-                                    transform: 'translate(1px, 1px) scale(1.03)',
+                                    transform:
+                                      'translate(1px, 1px) scale(1.03)',
                                   },
                                   '70%': {
-                                    transform: 'translate(-1px, 1px) scale(1.02)',
+                                    transform:
+                                      'translate(-1px, 1px) scale(1.02)',
                                   },
                                   '80%': {
-                                    transform: 'translate(1px, -1px) scale(1.02)',
+                                    transform:
+                                      'translate(1px, -1px) scale(1.02)',
                                   },
                                   '90%': {
                                     transform: 'translate(-1px, 0) scale(1.01)',
@@ -1147,8 +1213,16 @@ const RealtimeEventsPage: React.FC = () => {
                           >
                             {group.timeLabel}
                           </Typography>
-                          <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
-                            {Array.from(new Set(group.events.map((e) => e.action)))
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              gap: 0.75,
+                              flexWrap: 'wrap',
+                            }}
+                          >
+                            {Array.from(
+                              new Set(group.events.map((e) => e.action))
+                            )
                               .slice(0, 3)
                               .map((action, idx) => (
                                 <Chip
@@ -1161,8 +1235,14 @@ const RealtimeEventsPage: React.FC = () => {
                                     fontWeight: 500,
                                     bgcolor:
                                       theme.palette.mode === 'dark'
-                                        ? alpha(theme.palette.primary.main, 0.15)
-                                        : alpha(theme.palette.primary.main, 0.08),
+                                        ? alpha(
+                                            theme.palette.primary.main,
+                                            0.15
+                                          )
+                                        : alpha(
+                                            theme.palette.primary.main,
+                                            0.08
+                                          ),
                                     color:
                                       theme.palette.mode === 'dark'
                                         ? 'primary.light'
@@ -1171,21 +1251,32 @@ const RealtimeEventsPage: React.FC = () => {
                                     borderColor:
                                       theme.palette.mode === 'dark'
                                         ? alpha(theme.palette.primary.main, 0.3)
-                                        : alpha(theme.palette.primary.main, 0.2),
+                                        : alpha(
+                                            theme.palette.primary.main,
+                                            0.2
+                                          ),
                                     '& .MuiChip-label': { px: 1.5 },
                                     transition: 'all 0.2s ease',
                                     '&:hover': {
                                       bgcolor:
                                         theme.palette.mode === 'dark'
-                                          ? alpha(theme.palette.primary.main, 0.25)
-                                          : alpha(theme.palette.primary.main, 0.15),
+                                          ? alpha(
+                                              theme.palette.primary.main,
+                                              0.25
+                                            )
+                                          : alpha(
+                                              theme.palette.primary.main,
+                                              0.15
+                                            ),
                                       transform: 'translateY(-2px)',
                                       boxShadow: 1,
                                     },
                                   }}
                                 />
                               ))}
-                            {Array.from(new Set(group.events.map((e) => e.action))).length > 3 && (
+                            {Array.from(
+                              new Set(group.events.map((e) => e.action))
+                            ).length > 3 && (
                               <Chip
                                 label={`+${Array.from(new Set(group.events.map((e) => e.action))).length - 3}`}
                                 size="small"
@@ -1265,14 +1356,17 @@ const RealtimeEventsPage: React.FC = () => {
                     '0%, 100%': { transform: 'translateX(-50%) translateY(0)' },
                     '15%': { transform: 'translateX(-50%) translateY(-4px)' },
                     '30%': { transform: 'translateX(-50%) translateY(0)' },
-                    '45%, 100%': { transform: 'translateX(-50%) translateY(0)' },
+                    '45%, 100%': {
+                      transform: 'translateX(-50%) translateY(0)',
+                    },
                   },
                   '&:hover': {
                     bgcolor: 'primary.dark',
                     boxShadow: 4,
                     animation: 'none', // Stop animation on hover
                   },
-                  transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
+                  transition:
+                    'background-color 0.2s ease, box-shadow 0.2s ease',
                 }}
               >
                 <DotIcon
@@ -1336,11 +1430,17 @@ const RealtimeEventsPage: React.FC = () => {
                 </Box>
               ) : events.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 8 }}>
-                  <EventIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+                  <EventIcon
+                    sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }}
+                  />
                   <Typography variant="h6" color="text.secondary" gutterBottom>
                     {t('realtimeEvents.noEventsYet')}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 3 }}
+                  >
                     {t('realtimeEvents.noEventsDescription')}
                   </Typography>
                   <Typography
@@ -1356,7 +1456,10 @@ const RealtimeEventsPage: React.FC = () => {
                   {events.map((event, index) => {
                     const timeDiff =
                       index < events.length - 1
-                        ? getTimeDiff(event.createdAt, events[index + 1].createdAt)
+                        ? getTimeDiff(
+                            event.createdAt,
+                            events[index + 1].createdAt
+                          )
                         : '';
                     const isNew = newEventIds.has(event.id);
 
@@ -1378,7 +1481,9 @@ const RealtimeEventsPage: React.FC = () => {
                                 ? alpha(theme.palette.primary.main, 0.15)
                                 : alpha(theme.palette.primary.main, 0.08)
                               : 'transparent',
-                            animation: isNew ? 'flashEffect 2s ease-out' : 'none',
+                            animation: isNew
+                              ? 'flashEffect 2s ease-out'
+                              : 'none',
                             '@keyframes flashEffect': {
                               '0%': {
                                 bgcolor:
@@ -1453,7 +1558,11 @@ const RealtimeEventsPage: React.FC = () => {
                             }}
                           >
                             <Box sx={{ flex: 1, minWidth: 0 }}>
-                              <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.25 }} noWrap>
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: 600, mb: 0.25 }}
+                                noWrap
+                              >
                                 {event.action}
                               </Typography>
                               {event.user && (
@@ -1491,7 +1600,9 @@ const RealtimeEventsPage: React.FC = () => {
                         </Box>
 
                         {/* Divider between events */}
-                        {index < events.length - 1 && <Divider sx={{ opacity: 0.3 }} />}
+                        {index < events.length - 1 && (
+                          <Divider sx={{ opacity: 0.3 }} />
+                        )}
                       </React.Fragment>
                     );
                   })}
@@ -1558,7 +1669,10 @@ const RealtimeEventsPage: React.FC = () => {
                         borderColor: alpha(theme.palette.primary.main, 0.3),
                       }}
                     >
-                      <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                      <Typography
+                        variant="h5"
+                        sx={{ fontWeight: 700, color: 'primary.main' }}
+                      >
                         {events.length}
                       </Typography>
                       <Typography
@@ -1581,7 +1695,10 @@ const RealtimeEventsPage: React.FC = () => {
                         borderColor: alpha(theme.palette.success.main, 0.3),
                       }}
                     >
-                      <Typography variant="h5" sx={{ fontWeight: 700, color: 'success.main' }}>
+                      <Typography
+                        variant="h5"
+                        sx={{ fontWeight: 700, color: 'success.main' }}
+                      >
                         {uniqueUsers}
                       </Typography>
                       <Typography
@@ -1604,7 +1721,10 @@ const RealtimeEventsPage: React.FC = () => {
                         borderColor: alpha(theme.palette.info.main, 0.3),
                       }}
                     >
-                      <Typography variant="h5" sx={{ fontWeight: 700, color: 'info.main' }}>
+                      <Typography
+                        variant="h5"
+                        sx={{ fontWeight: 700, color: 'info.main' }}
+                      >
                         {eventTypes}
                       </Typography>
                       <Typography
@@ -1644,7 +1764,11 @@ const RealtimeEventsPage: React.FC = () => {
                           mb: 0.5,
                         }}
                       >
-                        <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 600 }}
+                          noWrap
+                        >
                           {stat.action}
                         </Typography>
                         <Chip
@@ -1659,7 +1783,8 @@ const RealtimeEventsPage: React.FC = () => {
                         />
                       </Box>
                       <Typography variant="caption" color="text.secondary">
-                        {((stat.count / events.length) * 100).toFixed(1)}% of total
+                        {((stat.count / events.length) * 100).toFixed(1)}% of
+                        total
                       </Typography>
                     </Box>
                   ))}
@@ -1708,7 +1833,9 @@ const RealtimeEventsPage: React.FC = () => {
                   sx={{
                     width: 32,
                     height: 32,
-                    bgcolor: selectedEvent ? getEventColor(selectedEvent.action) : 'grey',
+                    bgcolor: selectedEvent
+                      ? getEventColor(selectedEvent.action)
+                      : 'grey',
                   }}
                 >
                   {selectedEvent ? getEventIcon(selectedEvent.action) : '?'}
@@ -1763,13 +1890,19 @@ const RealtimeEventsPage: React.FC = () => {
                       <Chip
                         label={selectedEvent.action}
                         sx={{
-                          bgcolor: alpha(getEventColor(selectedEvent.action), 0.1),
+                          bgcolor: alpha(
+                            getEventColor(selectedEvent.action),
+                            0.1
+                          ),
                           color: getEventColor(selectedEvent.action),
                           fontWeight: 600,
                         }}
                       />
                       {selectedEvent.entityType && (
-                        <Chip label={selectedEvent.entityType} variant="outlined" />
+                        <Chip
+                          label={selectedEvent.entityType}
+                          variant="outlined"
+                        />
                       )}
                     </Box>
                   </Box>
@@ -1784,7 +1917,12 @@ const RealtimeEventsPage: React.FC = () => {
                       {formatDateTimeDetailed(selectedEvent.createdAt)}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      ({dayjs.utc(selectedEvent.createdAt).tz(getStoredTimezone()).fromNow()})
+                      (
+                      {dayjs
+                        .utc(selectedEvent.createdAt)
+                        .tz(getStoredTimezone())
+                        .fromNow()}
+                      )
                     </Typography>
                   </Box>
 
@@ -1857,8 +1995,16 @@ const RealtimeEventsPage: React.FC = () => {
                           }}
                         >
                           <ReactDiffViewer
-                            oldValue={JSON.stringify(selectedEvent.oldValues, null, 2)}
-                            newValue={JSON.stringify(selectedEvent.newValues, null, 2)}
+                            oldValue={JSON.stringify(
+                              selectedEvent.oldValues,
+                              null,
+                              2
+                            )}
+                            newValue={JSON.stringify(
+                              selectedEvent.newValues,
+                              null,
+                              2
+                            )}
                             splitView={false}
                             compareMethod={DiffMethod.WORDS}
                             useDarkTheme={theme.palette.mode === 'dark'}
@@ -1867,25 +2013,55 @@ const RealtimeEventsPage: React.FC = () => {
                             styles={{
                               variables: {
                                 dark: {
-                                  diffViewerBackground: theme.palette.background.default,
-                                  addedBackground: alpha(theme.palette.success.main, 0.2),
-                                  addedColor: theme.palette.success.contrastText,
-                                  removedBackground: alpha(theme.palette.error.main, 0.2),
-                                  removedColor: theme.palette.error.contrastText,
-                                  wordAddedBackground: alpha(theme.palette.success.main, 0.4),
-                                  wordRemovedBackground: alpha(theme.palette.error.main, 0.4),
-                                  gutterBackground: theme.palette.background.paper,
+                                  diffViewerBackground:
+                                    theme.palette.background.default,
+                                  addedBackground: alpha(
+                                    theme.palette.success.main,
+                                    0.2
+                                  ),
+                                  addedColor:
+                                    theme.palette.success.contrastText,
+                                  removedBackground: alpha(
+                                    theme.palette.error.main,
+                                    0.2
+                                  ),
+                                  removedColor:
+                                    theme.palette.error.contrastText,
+                                  wordAddedBackground: alpha(
+                                    theme.palette.success.main,
+                                    0.4
+                                  ),
+                                  wordRemovedBackground: alpha(
+                                    theme.palette.error.main,
+                                    0.4
+                                  ),
+                                  gutterBackground:
+                                    theme.palette.background.paper,
                                   gutterColor: theme.palette.text.secondary,
                                 },
                                 light: {
-                                  diffViewerBackground: theme.palette.background.default,
-                                  addedBackground: alpha(theme.palette.success.main, 0.1),
+                                  diffViewerBackground:
+                                    theme.palette.background.default,
+                                  addedBackground: alpha(
+                                    theme.palette.success.main,
+                                    0.1
+                                  ),
                                   addedColor: theme.palette.text.primary,
-                                  removedBackground: alpha(theme.palette.error.main, 0.1),
+                                  removedBackground: alpha(
+                                    theme.palette.error.main,
+                                    0.1
+                                  ),
                                   removedColor: theme.palette.text.primary,
-                                  wordAddedBackground: alpha(theme.palette.success.main, 0.3),
-                                  wordRemovedBackground: alpha(theme.palette.error.main, 0.3),
-                                  gutterBackground: theme.palette.background.paper,
+                                  wordAddedBackground: alpha(
+                                    theme.palette.success.main,
+                                    0.3
+                                  ),
+                                  wordRemovedBackground: alpha(
+                                    theme.palette.error.main,
+                                    0.3
+                                  ),
+                                  gutterBackground:
+                                    theme.palette.background.paper,
                                   gutterColor: theme.palette.text.secondary,
                                 },
                               },
@@ -1904,7 +2080,9 @@ const RealtimeEventsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           {t('realtimeEvents.oldValues')}
                         </Typography>
-                        <Paper sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}>
+                        <Paper
+                          sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}
+                        >
                           <pre
                             style={{
                               margin: 0,
@@ -1927,7 +2105,9 @@ const RealtimeEventsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           {t('realtimeEvents.newValues')}
                         </Typography>
-                        <Paper sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}>
+                        <Paper
+                          sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}
+                        >
                           <pre
                             style={{
                               margin: 0,
@@ -1949,7 +2129,10 @@ const RealtimeEventsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           {t('realtimeEvents.userAgent')}
                         </Typography>
-                        <Typography variant="body2" sx={{ mt: 0.5, wordBreak: 'break-all' }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ mt: 0.5, wordBreak: 'break-all' }}
+                        >
                           {selectedEvent.userAgent}
                         </Typography>
                       </Box>
@@ -1968,11 +2151,14 @@ const RealtimeEventsPage: React.FC = () => {
         action={selectedActionForCustomization}
         currentIconName={
           selectedActionForCustomization
-            ? customEventSettings[selectedActionForCustomization]?.iconName || ''
+            ? customEventSettings[selectedActionForCustomization]?.iconName ||
+              ''
             : ''
         }
         currentColor={
-          selectedActionForCustomization ? getEventColor(selectedActionForCustomization) : '#757575'
+          selectedActionForCustomization
+            ? getEventColor(selectedActionForCustomization)
+            : '#757575'
         }
         onSave={saveCustomSettings}
         onReset={resetCustomSettings}
@@ -2117,7 +2303,9 @@ const IconCustomizationDialog: React.FC<IconCustomizationDialogProps> = ({
   ];
 
   const SelectedIconComponent =
-    selectedIconName && iconMap[selectedIconName] ? iconMap[selectedIconName] : null;
+    selectedIconName && iconMap[selectedIconName]
+      ? iconMap[selectedIconName]
+      : null;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -2155,11 +2343,17 @@ const IconCustomizationDialog: React.FC<IconCustomizationDialogProps> = ({
                       sx={{
                         width: 40,
                         height: 40,
-                        bgcolor: selectedIconName === iconName ? color : 'grey.300',
-                        color: selectedIconName === iconName ? '#fff' : 'grey.700',
+                        bgcolor:
+                          selectedIconName === iconName ? color : 'grey.300',
+                        color:
+                          selectedIconName === iconName ? '#fff' : 'grey.700',
                         cursor: 'pointer',
-                        border: selectedIconName === iconName ? '3px solid' : '1px solid',
-                        borderColor: selectedIconName === iconName ? color : 'grey.400',
+                        border:
+                          selectedIconName === iconName
+                            ? '3px solid'
+                            : '1px solid',
+                        borderColor:
+                          selectedIconName === iconName ? color : 'grey.400',
                         transition: 'all 0.2s',
                         '&:hover': {
                           transform: 'scale(1.1)',
@@ -2191,7 +2385,10 @@ const IconCustomizationDialog: React.FC<IconCustomizationDialogProps> = ({
                     bgcolor: presetColor,
                     borderRadius: 1,
                     cursor: 'pointer',
-                    border: color === presetColor ? '3px solid #000' : '1px solid #ccc',
+                    border:
+                      color === presetColor
+                        ? '3px solid #000'
+                        : '1px solid #ccc',
                     transition: 'all 0.2s',
                     '&:hover': {
                       transform: 'scale(1.1)',
@@ -2209,7 +2406,11 @@ const IconCustomizationDialog: React.FC<IconCustomizationDialogProps> = ({
           {t('common.reset')}
         </Button>
         <Button onClick={onClose}>{t('common.cancel')}</Button>
-        <Button onClick={handleSave} variant="contained" disabled={!selectedIconName}>
+        <Button
+          onClick={handleSave}
+          variant="contained"
+          disabled={!selectedIconName}
+        >
           {t('common.save')}
         </Button>
       </DialogActions>

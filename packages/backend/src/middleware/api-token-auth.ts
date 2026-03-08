@@ -13,10 +13,12 @@ import { ErrorCodes } from '../utils/api-response';
 // Unsecured token format: unsecured-{org}:{project}:{env}-{server|client|edge}-api-token
 // Only allowed when ALLOW_UNSECURED_TOKENS=true is set in the environment
 const ALLOW_UNSECURED_TOKENS = process.env.ALLOW_UNSECURED_TOKENS === 'true';
-const UNSECURED_TOKEN_REGEX = /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
+const UNSECURED_TOKEN_REGEX =
+  /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
 
 // Shorthand infrastructure token — auto-resolves to __internal__/__infrastructure__/default
-export const INFRA_SERVER_TOKEN = process.env.INFRA_SERVER_TOKEN || 'gatrix-infra-server-token';
+export const INFRA_SERVER_TOKEN =
+  process.env.INFRA_SERVER_TOKEN || 'gatrix-infra-server-token';
 const INFRA_ORG = '__internal__';
 const INFRA_PROJECT = '__infrastructure__';
 const INFRA_ENV = 'default';
@@ -94,7 +96,10 @@ function handleSpecialTokens(token: string): {
   }
 
   // Legacy unsecured tokens — resolve to default/default/development for backward compatibility
-  const LEGACY_TOKENS: Record<string, { id: string; tokenType: string; tokenName: string }> = {
+  const LEGACY_TOKENS: Record<
+    string,
+    { id: string; tokenType: string; tokenName: string }
+  > = {
     [LEGACY_CLIENT_TOKEN]: {
       id: 'legacy-unsecured-client',
       tokenType: 'client',
@@ -168,7 +173,10 @@ function handleSpecialTokens(token: string): {
  * Validates if token has access to specific environment.
  * With single environmentId, this is a simple string comparison.
  */
-function checkEnvironmentAccess(apiToken: ApiAccessToken, environmentId: string): boolean {
+function checkEnvironmentAccess(
+  apiToken: ApiAccessToken,
+  environmentId: string
+): boolean {
   if (typeof apiToken.hasEnvironmentAccess === 'function') {
     return apiToken.hasEnvironmentAccess(environmentId);
   }
@@ -181,13 +189,20 @@ function checkEnvironmentAccess(apiToken: ApiAccessToken, environmentId: string)
 /**
  * Core API Token authentication middleware
  */
-export const authenticateApiToken = async (req: SDKRequest, res: Response, next: NextFunction) => {
+export const authenticateApiToken = async (
+  req: SDKRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const token = extractToken(req);
     if (!token) {
       return res.status(401).json({
         success: false,
-        error: { code: ErrorCodes.AUTH_TOKEN_MISSING, message: 'API token is required' },
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_MISSING,
+          message: 'API token is required',
+        },
       });
     }
 
@@ -220,25 +235,34 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       if (!dbToken) {
         return res.status(401).json({
           success: false,
-          error: { code: ErrorCodes.AUTH_TOKEN_INVALID, message: 'Invalid or expired API token' },
+          error: {
+            code: ErrorCodes.AUTH_TOKEN_INVALID,
+            message: 'Invalid or expired API token',
+          },
         });
       }
       tokenData = dbToken;
       await CacheService.set(cacheKey, tokenData, CACHE_TTL);
     } else if (tokenData.id) {
       // Record usage even if cached
-      const { default: apiTokenUsageService } = await import('../services/api-token-usage-service');
+      const { default: apiTokenUsageService } =
+        await import('../services/api-token-usage-service');
       apiTokenUsageService.recordTokenUsage(tokenData.id).catch((e) => {
         logger.error('Failed to record token usage from cache:', e);
       });
     }
 
     // 4. Expiration check
-    const isExpired = tokenData.expiresAt ? new Date() > new Date(tokenData.expiresAt) : false;
+    const isExpired = tokenData.expiresAt
+      ? new Date() > new Date(tokenData.expiresAt)
+      : false;
     if (isExpired) {
       return res.status(401).json({
         success: false,
-        error: { code: ErrorCodes.AUTH_TOKEN_EXPIRED, message: 'API token has expired' },
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_EXPIRED,
+          message: 'API token has expired',
+        },
       });
     }
 
@@ -248,7 +272,10 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     logger.error('Authentication error:', error);
     res.status(500).json({
       success: false,
-      error: { code: ErrorCodes.INTERNAL_SERVER_ERROR, message: 'Authentication failed' },
+      error: {
+        code: ErrorCodes.INTERNAL_SERVER_ERROR,
+        message: 'Authentication failed',
+      },
     });
   }
 };
@@ -262,7 +289,10 @@ export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
     if (!apiToken) {
       return res.status(401).json({
         success: false,
-        error: { code: ErrorCodes.AUTH_TOKEN_MISSING, message: 'Token not found' },
+        error: {
+          code: ErrorCodes.AUTH_TOKEN_MISSING,
+          message: 'Token not found',
+        },
       });
     }
 
@@ -291,15 +321,23 @@ export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
 /**
  * Validates application name from header or query
  */
-export const validateApplicationName = (req: SDKRequest, res: Response, next: NextFunction) => {
+export const validateApplicationName = (
+  req: SDKRequest,
+  res: Response,
+  next: NextFunction
+) => {
   const appName =
-    (req.headers[HEADERS.X_APPLICATION_NAME] as string) || (req.query.appName as string);
+    (req.headers[HEADERS.X_APPLICATION_NAME] as string) ||
+    (req.query.appName as string);
 
   if (!appName) {
     logger.warn('Auth: Application name missing', { url: req.originalUrl });
     return res.status(400).json({
       success: false,
-      error: { code: ErrorCodes.BAD_REQUEST, message: `${HEADERS.X_APPLICATION_NAME} is required` },
+      error: {
+        code: ErrorCodes.BAD_REQUEST,
+        message: `${HEADERS.X_APPLICATION_NAME} is required`,
+      },
     });
   }
 
@@ -308,7 +346,10 @@ export const validateApplicationName = (req: SDKRequest, res: Response, next: Ne
     logger.warn('Auth: Invalid application name format', { appName });
     return res.status(400).json({
       success: false,
-      error: { code: ErrorCodes.VALIDATION_ERROR, message: 'Invalid application name format' },
+      error: {
+        code: ErrorCodes.VALIDATION_ERROR,
+        message: 'Invalid application name format',
+      },
     });
   }
 
@@ -320,7 +361,11 @@ export const validateApplicationName = (req: SDKRequest, res: Response, next: Ne
  * Resolves environment from token (token determines everything).
  * No fallback: environment MUST come from the token.
  */
-export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: NextFunction) => {
+export const setSDKEnvironment = async (
+  req: SDKRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     // Token determines environment — strict, no fallback
     const environmentId = req.apiToken?.environmentId || req.environmentId; // Already set by unsecured token handler
@@ -348,7 +393,12 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
 
       // For unsecured tokens, org/project/env fields are names (not ULIDs)
       // Resolve via full path: org.orgName → project.projectName → env.name
-      if (!env && req.isUnsecuredToken && req.unsecuredOrgId && req.unsecuredProjectId) {
+      if (
+        !env &&
+        req.isUnsecuredToken &&
+        req.unsecuredOrgId &&
+        req.unsecuredProjectId
+      ) {
         env =
           (await Environment.getByFullPath(
             req.unsecuredOrgId,
@@ -399,12 +449,19 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
     logger.error('Environment resolution error:', error);
     res.status(500).json({
       success: false,
-      error: { code: ErrorCodes.INTERNAL_SERVER_ERROR, message: 'Failed to resolve environment' },
+      error: {
+        code: ErrorCodes.INTERNAL_SERVER_ERROR,
+        message: 'Failed to resolve environment',
+      },
     });
   }
 };
 
-export const sdkRateLimit = (req: SDKRequest, res: Response, next: NextFunction) => next();
+export const sdkRateLimit = (
+  req: SDKRequest,
+  res: Response,
+  next: NextFunction
+) => next();
 
 /**
  * Combined authentication chain for Client SDK

@@ -41,7 +41,9 @@ const SystemSettingsPage: React.FC = () => {
   // Tabs - read from URL query parameter
   const tabFromUrl = searchParams.get('tab');
   const initialTab = tabFromUrl ? parseInt(tabFromUrl, 10) : 0;
-  const [tab, setTab] = useState(initialTab >= 0 && initialTab <= 2 ? initialTab : 0);
+  const [tab, setTab] = useState(
+    initialTab >= 0 && initialTab <= 2 ? initialTab : 0
+  );
 
   // Network settings
   const [admindUrl, setAdmindUrl] = useState('');
@@ -58,7 +60,9 @@ const SystemSettingsPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const [admind] = await Promise.all([varsService.get(projectApiPath, 'admindUrl')]);
+        const [admind] = await Promise.all([
+          varsService.get(projectApiPath, 'admindUrl'),
+        ]);
         setAdmindUrl(admind || '');
       } catch (e) {
         // ignore load errors
@@ -88,9 +92,12 @@ const SystemSettingsPage: React.FC = () => {
         variant: 'success',
       });
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'settings.serviceDiscovery.saveFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'settings.serviceDiscovery.saveFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -139,7 +146,11 @@ const SystemSettingsPage: React.FC = () => {
                     <Button
                       variant="contained"
                       onClick={async () => {
-                        await varsService.set(projectApiPath, 'admindUrl', admindUrl || null);
+                        await varsService.set(
+                          projectApiPath,
+                          'admindUrl',
+                          admindUrl || null
+                        );
                       }}
                     >
                       {t('common.save')}
@@ -177,7 +188,9 @@ const SystemSettingsPage: React.FC = () => {
                   label={t('settings.serviceDiscovery.etcdHosts')}
                   placeholder="http://localhost:2379"
                   value={sdConfig.etcdHosts}
-                  onChange={(e) => setSdConfig({ ...sdConfig, etcdHosts: e.target.value })}
+                  onChange={(e) =>
+                    setSdConfig({ ...sdConfig, etcdHosts: e.target.value })
+                  }
                   helperText={t('settings.serviceDiscovery.etcdHostsHelp')}
                   disabled={sdConfig.mode !== 'etcd'}
                 />
@@ -206,13 +219,18 @@ const SystemSettingsPage: React.FC = () => {
                       heartbeatInterval: parseInt(e.target.value, 10) || 15,
                     })
                   }
-                  helperText={t('settings.serviceDiscovery.heartbeatIntervalHelp')}
+                  helperText={t(
+                    'settings.serviceDiscovery.heartbeatIntervalHelp'
+                  )}
                   inputProps={{ min: 5, max: 60 }}
                 />
 
                 {canManage && (
                   <Stack direction="row" spacing={1}>
-                    <Button variant="contained" onClick={handleSaveServiceDiscoveryConfig}>
+                    <Button
+                      variant="contained"
+                      onClick={handleSaveServiceDiscoveryConfig}
+                    >
                       {t('common.save')}
                     </Button>
                   </Stack>

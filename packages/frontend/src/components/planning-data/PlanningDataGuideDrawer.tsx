@@ -50,7 +50,11 @@ const CodeBlock: React.FC<{
         }}
       >
         <Tooltip title="Copy">
-          <IconButton size="small" onClick={onCopy} sx={{ color: 'primary.main' }}>
+          <IconButton
+            size="small"
+            onClick={onCopy}
+            sx={{ color: 'primary.main' }}
+          >
             <CopyIcon fontSize="small" />
           </IconButton>
         </Tooltip>
@@ -80,16 +84,17 @@ const CodeBlock: React.FC<{
 };
 
 // Reusable guide content component
-export const PlanningDataGuideContent: React.FC<PlanningDataGuideContentProps> = ({
-  variant = 'drawer',
-}) => {
+export const PlanningDataGuideContent: React.FC<
+  PlanningDataGuideContentProps
+> = ({ variant = 'drawer' }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
   const handleCopy = (text: string) => {
     copyToClipboardWithNotification(
       text,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -190,7 +195,8 @@ curl -X POST ${backendUrl}/api/v1/server/qa/planning-data/upload \\
       <Alert severity="info" sx={{ mb: 2, textAlign: 'left' }}>
         <Typography variant="body2" component="div">
           <strong>
-            {t('planningData.uploadGuide.countryCodeNote') || 'Country Code Filtering:'}
+            {t('planningData.uploadGuide.countryCodeNote') ||
+              'Country Code Filtering:'}
           </strong>
           <Box component="ul" sx={{ m: 0, pl: 2 }}>
             <li>
@@ -210,7 +216,10 @@ curl -X POST ${backendUrl}/api/v1/server/qa/planning-data/upload \\
         {t('planningData.uploadGuide.clientDataWarning')}
       </Alert>
       <Box sx={{ mb: 3 }}>
-        <CodeBlock code={convertCommand} onCopy={() => handleCopy(convertCommand)} />
+        <CodeBlock
+          code={convertCommand}
+          onCopy={() => handleCopy(convertCommand)}
+        />
       </Box>
 
       {/* CLI Upload */}
@@ -221,7 +230,10 @@ curl -X POST ${backendUrl}/api/v1/server/qa/planning-data/upload \\
         {t('planningData.uploadGuide.cliUploadDesc')}
       </Typography>
       <Box sx={{ mb: 3 }}>
-        <CodeBlock code={uploadCommand} onCopy={() => handleCopy(uploadCommand)} />
+        <CodeBlock
+          code={uploadCommand}
+          onCopy={() => handleCopy(uploadCommand)}
+        />
       </Box>
 
       {/* Standalone Tool */}
@@ -232,7 +244,10 @@ curl -X POST ${backendUrl}/api/v1/server/qa/planning-data/upload \\
         {t('planningData.uploadGuide.standaloneUploadDesc')}
       </Typography>
       <Box sx={{ mb: 3 }}>
-        <CodeBlock code={standaloneCommand} onCopy={() => handleCopy(standaloneCommand)} />
+        <CodeBlock
+          code={standaloneCommand}
+          onCopy={() => handleCopy(standaloneCommand)}
+        />
       </Box>
 
       {/* Curl Upload */}
@@ -259,7 +274,10 @@ curl -X POST ${backendUrl}/api/v1/server/qa/planning-data/upload \\
   );
 };
 
-const PlanningDataGuideDrawer: React.FC<PlanningDataGuideDrawerProps> = ({ open, onClose }) => {
+const PlanningDataGuideDrawer: React.FC<PlanningDataGuideDrawerProps> = ({
+  open,
+  onClose,
+}) => {
   const { t } = useTranslation();
 
   return (

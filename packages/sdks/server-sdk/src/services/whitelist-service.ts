@@ -68,7 +68,9 @@ export class WhitelistService {
       const cachedJson = await this.storage.get(`Whitelist_${environmentId}`);
       if (cachedJson) {
         this.cachedWhitelistByEnv.set(environmentId, JSON.parse(cachedJson));
-        this.logger.debug('Loaded whitelist from local storage', { environmentId });
+        this.logger.debug('Loaded whitelist from local storage', {
+          environmentId,
+        });
       }
     } catch (error: any) {
       this.logger.warn('Failed to load whitelist from local storage', {
@@ -112,7 +114,10 @@ export class WhitelistService {
 
     // Save to local storage if available
     if (this.storage) {
-      await this.storage.save(`Whitelist_${environmentId}`, JSON.stringify(response.data));
+      await this.storage.save(
+        `Whitelist_${environmentId}`,
+        JSON.stringify(response.data)
+      );
     }
 
     this.logger.info('Whitelists fetched', {
@@ -158,9 +163,12 @@ export class WhitelistService {
     suppressWarnings?: boolean
   ): Promise<WhitelistData> {
     if (!this.featureEnabled && !suppressWarnings) {
-      this.logger.warn('WhitelistService.refreshByEnvironment() called but feature is disabled', {
-        environmentId,
-      });
+      this.logger.warn(
+        'WhitelistService.refreshByEnvironment() called but feature is disabled',
+        {
+          environmentId,
+        }
+      );
     }
     this.logger.debug('Refreshing whitelist cache', { environmentId });
     return await this.listByEnvironment(environmentId);

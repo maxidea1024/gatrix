@@ -11,7 +11,11 @@ import { CacheStorageProvider } from '../cache/storage-provider';
 import { VarItem } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
 
-export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], string> {
+export class VarsService extends BaseEnvironmentService<
+  VarItem,
+  VarItem[],
+  string
+> {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
@@ -62,13 +66,18 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
     if (value === null) return null;
 
     try {
-      const item = this.getByKey(key, environmentId || this.resolveToken(environmentId));
+      const item = this.getByKey(
+        key,
+        environmentId || this.resolveToken(environmentId)
+      );
       if (item && (item.valueType === 'object' || item.valueType === 'array')) {
         return JSON.parse(value) as T;
       }
       return value as unknown as T;
     } catch (e) {
-      this.logger.warn(`Failed to parse KV value for key: ${key}`, { error: e });
+      this.logger.warn(`Failed to parse KV value for key: ${key}`, {
+        error: e,
+      });
       return value as unknown as T;
     }
   }
@@ -90,7 +99,11 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
    * @param value New variable value (null means deleted)
    * @param environmentId environment ID
    */
-  updateSingleVar(key: string, value: string | null, environmentId: string): void {
+  updateSingleVar(
+    key: string,
+    value: string | null,
+    environmentId: string
+  ): void {
     const items = this.getCached(environmentId);
     const existingIndex = items.findIndex((item) => item.varKey === key);
 
@@ -99,7 +112,10 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
       if (existingIndex >= 0) {
         const newItems = items.filter((item) => item.varKey !== key);
         this.updateCache(newItems, environmentId);
-        this.logger.debug('Single var removed from cache', { key, environmentId });
+        this.logger.debug('Single var removed from cache', {
+          key,
+          environmentId,
+        });
       }
       return;
     }
@@ -115,14 +131,20 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
     } else {
       // Var not in cache yet — fall back to full refresh
       // We don't have full VarItem structure (valueType, etc.) from event payload
-      this.logger.debug('Var not found in cache for update, will need full refresh', {
-        key,
-        environmentId,
-      });
+      this.logger.debug(
+        'Var not found in cache for update, will need full refresh',
+        {
+          key,
+          environmentId,
+        }
+      );
       this.refreshByEnvironment(environmentId).catch((error: any) => {
-        this.logger.error('Failed to refresh vars after single var update fallback', {
-          error: error.message,
-        });
+        this.logger.error(
+          'Failed to refresh vars after single var update fallback',
+          {
+            error: error.message,
+          }
+        );
       });
     }
 

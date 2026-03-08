@@ -22,7 +22,9 @@ const REGIONS = ['us-east', 'us-west', 'eu-west', 'ap-northeast'];
 const children: ChildProcess[] = [];
 
 function getRandomDelay(): number {
-  return Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) + MIN_DELAY_MS;
+  return (
+    Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) + MIN_DELAY_MS
+  );
 }
 
 function sleep(ms: number): Promise<void> {
@@ -56,7 +58,9 @@ async function spawnServer(index: number): Promise<void> {
     shell: true,
   });
 
-  console.log(`[${new Date().toISOString()}]   -> Group: ${group}, Region: ${region}`);
+  console.log(
+    `[${new Date().toISOString()}]   -> Group: ${group}, Region: ${region}`
+  );
 
   children.push(child);
 
@@ -89,7 +93,9 @@ async function main() {
   console.log('='.repeat(60));
   console.log(`Spawning ${SERVER_COUNT} idle servers`);
   console.log(`Environment: ${ENVIRONMENT}`);
-  console.log(`Delay between spawns: ${MIN_DELAY_MS / 1000}-${MAX_DELAY_MS / 1000} seconds`);
+  console.log(
+    `Delay between spawns: ${MIN_DELAY_MS / 1000}-${MAX_DELAY_MS / 1000} seconds`
+  );
   console.log(`Port range: ${BASE_PORT} - ${BASE_PORT + SERVER_COUNT - 1}`);
   console.log('='.repeat(60));
   console.log('');
@@ -100,7 +106,9 @@ async function main() {
     // Don't delay after the last server
     if (i < SERVER_COUNT - 1) {
       const delay = getRandomDelay();
-      console.log(`[SPAWNER] Waiting ${(delay / 1000).toFixed(1)}s before next server...`);
+      console.log(
+        `[SPAWNER] Waiting ${(delay / 1000).toFixed(1)}s before next server...`
+      );
       await sleep(delay);
     }
   }

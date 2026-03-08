@@ -91,7 +91,10 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
     return event.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
-  const totalEvents = eventCategories.reduce((sum, c) => sum + c.events.length, 0);
+  const totalEvents = eventCategories.reduce(
+    (sum, c) => sum + c.events.length,
+    0
+  );
 
   return (
     <Box>
@@ -145,7 +148,11 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
           <Button size="small" variant="outlined" onClick={handleDeselectAll}>
             {t('common.deselectAll')}
           </Button>
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ ml: 'auto' }}
+          >
             {selectedEvents.length}/{totalEvents}
           </Typography>
         </Box>
@@ -153,7 +160,9 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
         {/* Scrollable Content */}
         <Box sx={{ overflow: 'auto', flex: 1 }}>
           {eventCategories.map((category) => {
-            const selectedCount = category.events.filter((e) => selectedEvents.includes(e)).length;
+            const selectedCount = category.events.filter((e) =>
+              selectedEvents.includes(e)
+            ).length;
             const allSelected = selectedCount === category.events.length;
             const indeterminate = selectedCount > 0 && !allSelected;
 
@@ -177,15 +186,27 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
                       selectedCount > 0
                         ? (theme) => alpha(theme.palette.primary.main, 0.05)
                         : 'transparent',
-                    '&:hover': { bgcolor: (theme) => alpha(theme.palette.action.hover, 0.5) },
+                    '&:hover': {
+                      bgcolor: (theme) =>
+                        alpha(theme.palette.action.hover, 0.5),
+                    },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', pr: 2 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      width: '100%',
+                      pr: 2,
+                    }}
+                  >
                     <Checkbox
                       checked={allSelected}
                       indeterminate={indeterminate}
                       onClick={(e) => e.stopPropagation()}
-                      onChange={(e) => handleCategoryToggle(category, e.target.checked)}
+                      onChange={(e) =>
+                        handleCategoryToggle(category, e.target.checked)
+                      }
                       size="small"
                     />
                     <Typography sx={{ flexGrow: 1 }}>
@@ -199,7 +220,9 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
                     />
                   </Box>
                 </AccordionSummary>
-                <AccordionDetails sx={{ pt: 0, pb: 1, bgcolor: 'action.hover' }}>
+                <AccordionDetails
+                  sx={{ pt: 0, pb: 1, bgcolor: 'action.hover' }}
+                >
                   <FormGroup sx={{ pl: 4 }}>
                     {category.events.map((event) => (
                       <FormControlLabel
@@ -213,7 +236,9 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
                         }
                         label={formatEventName(event)}
                         sx={{
-                          '& .MuiFormControlLabel-label': { fontSize: '0.875rem' },
+                          '& .MuiFormControlLabel-label': {
+                            fontSize: '0.875rem',
+                          },
                         }}
                       />
                     ))}
@@ -225,7 +250,14 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
         </Box>
 
         {/* Footer */}
-        <Box sx={{ p: 1.5, borderTop: 1, borderColor: 'divider', textAlign: 'right' }}>
+        <Box
+          sx={{
+            p: 1.5,
+            borderTop: 1,
+            borderColor: 'divider',
+            textAlign: 'right',
+          }}
+        >
           <Button variant="contained" size="small" onClick={handleClose}>
             {t('common.confirm')}
           </Button>
@@ -236,7 +268,9 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
       {selectedEvents.length > 0 && (
         <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
           {eventCategories.map((category) => {
-            const selectedCount = category.events.filter((e) => selectedEvents.includes(e)).length;
+            const selectedCount = category.events.filter((e) =>
+              selectedEvents.includes(e)
+            ).length;
             if (selectedCount === 0) return null;
             return (
               <Chip
@@ -246,7 +280,9 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
                 color="primary"
                 variant="outlined"
                 onDelete={() => {
-                  onChange(selectedEvents.filter((e) => !category.events.includes(e)));
+                  onChange(
+                    selectedEvents.filter((e) => !category.events.includes(e))
+                  );
                 }}
               />
             );
@@ -314,7 +350,11 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
 
       {/* Help text */}
       {selectedEnvironments.length === 0 && environments.length > 0 && (
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 1, display: 'block' }}
+        >
           {t('integrations.allEnvironmentsHint')}
         </Typography>
       )}

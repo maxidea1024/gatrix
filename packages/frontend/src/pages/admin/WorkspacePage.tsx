@@ -82,19 +82,30 @@ const WorkspacePage: React.FC = () => {
 
   // Create drawer
   const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
-  const [createData, setCreateData] = useState({ orgName: '', displayName: '', description: '' });
+  const [createData, setCreateData] = useState({
+    orgName: '',
+    displayName: '',
+    description: '',
+  });
   const [saving, setSaving] = useState(false);
 
   // Edit drawer
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
-  const [editData, setEditData] = useState({ displayName: '', description: '' });
-  const [initialEditData, setInitialEditData] = useState({ displayName: '', description: '' });
+  const [editData, setEditData] = useState({
+    displayName: '',
+    description: '',
+  });
+  const [initialEditData, setInitialEditData] = useState({
+    displayName: '',
+    description: '',
+  });
   const [editOrgId, setEditOrgId] = useState<string | null>(null);
 
   // Member management drawer
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
-  const [selectedOrg, setSelectedOrg] = useState<OrganisationWithMembers | null>(null);
+  const [selectedOrg, setSelectedOrg] =
+    useState<OrganisationWithMembers | null>(null);
 
   // Member management
   const [memberSearchTerm, setMemberSearchTerm] = useState('');
@@ -110,7 +121,8 @@ const WorkspacePage: React.FC = () => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [menuTarget, setMenuTarget] = useState<OrgWithMemberCount | null>(null);
 
-  const isEditDirty = JSON.stringify(editData) !== JSON.stringify(initialEditData);
+  const isEditDirty =
+    JSON.stringify(editData) !== JSON.stringify(initialEditData);
 
   const isMembersDirty = useMemo(() => {
     if (pendingMembers.length !== initialMembers.length) return true;
@@ -206,7 +218,10 @@ const WorkspacePage: React.FC = () => {
   };
 
   // Context menu handlers
-  const handleMenuOpen = (e: React.MouseEvent<HTMLElement>, org: OrgWithMemberCount) => {
+  const handleMenuOpen = (
+    e: React.MouseEvent<HTMLElement>,
+    org: OrgWithMemberCount
+  ) => {
     e.stopPropagation();
     e.preventDefault();
     setMenuAnchorEl(e.currentTarget);
@@ -234,7 +249,8 @@ const WorkspacePage: React.FC = () => {
       loadOrganisations();
       refreshOrgs();
     } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.orgs.createFailed');
+      const message =
+        error?.response?.data?.message || t('rbac.orgs.createFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setSaving(false);
@@ -264,14 +280,19 @@ const WorkspacePage: React.FC = () => {
       setOrganisations((prev) =>
         prev.map((o) =>
           o.id === editOrgId
-            ? { ...o, displayName: editData.displayName, description: editData.description }
+            ? {
+                ...o,
+                displayName: editData.displayName,
+                description: editData.description,
+              }
             : o
         )
       );
       // Also refresh org context so environment selector shows updated name
       refreshOrgs();
     } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.orgs.saveFailed');
+      const message =
+        error?.response?.data?.message || t('rbac.orgs.saveFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setSaving(false);
@@ -321,8 +342,13 @@ const WorkspacePage: React.FC = () => {
   };
 
   // Update member role (local only)
-  const handleUpdateMemberRole = (userId: string, orgRole: 'admin' | 'user') => {
-    setPendingMembers((prev) => prev.map((m) => (m.userId === userId ? { ...m, orgRole } : m)));
+  const handleUpdateMemberRole = (
+    userId: string,
+    orgRole: 'admin' | 'user'
+  ) => {
+    setPendingMembers((prev) =>
+      prev.map((m) => (m.userId === userId ? { ...m, orgRole } : m))
+    );
   };
 
   // Apply all pending member changes
@@ -346,10 +372,18 @@ const WorkspacePage: React.FC = () => {
         await rbacService.removeOrgMember(selectedOrg.id, member.userId);
       }
       for (const member of addedMembers) {
-        await rbacService.addOrgMember(selectedOrg.id, member.userId, member.orgRole);
+        await rbacService.addOrgMember(
+          selectedOrg.id,
+          member.userId,
+          member.orgRole
+        );
       }
       for (const member of roleChangedMembers) {
-        await rbacService.updateOrgMemberRole(selectedOrg.id, member.userId, member.orgRole);
+        await rbacService.updateOrgMemberRole(
+          selectedOrg.id,
+          member.userId,
+          member.orgRole
+        );
       }
 
       enqueueSnackbar(t('rbac.orgs.membersUpdated'), { variant: 'success' });
@@ -362,10 +396,13 @@ const WorkspacePage: React.FC = () => {
       setInitialMembers(JSON.parse(JSON.stringify(members)));
       // Update member count locally for immediate UI feedback
       setOrganisations((prev) =>
-        prev.map((o) => (o.id === selectedOrg.id ? { ...o, memberCount: members.length } : o))
+        prev.map((o) =>
+          o.id === selectedOrg.id ? { ...o, memberCount: members.length } : o
+        )
       );
     } catch (error: any) {
-      const msg = error?.response?.data?.message || t('rbac.orgs.memberUpdateFailed');
+      const msg =
+        error?.response?.data?.message || t('rbac.orgs.memberUpdateFailed');
       enqueueSnackbar(msg, { variant: 'error' });
     } finally {
       setApplyingMembers(false);
@@ -375,7 +412,12 @@ const WorkspacePage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Box
-        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          mb: 3,
+        }}
       >
         <Box>
           <Typography variant="h5" fontWeight={600} gutterBottom>
@@ -415,7 +457,9 @@ const WorkspacePage: React.FC = () => {
             }}
           >
             <BusinessIcon sx={{ fontSize: 64, mb: 2, opacity: 0.3 }} />
-            <Typography variant="h6">{t('workspace.noOrganisations')}</Typography>
+            <Typography variant="h6">
+              {t('workspace.noOrganisations')}
+            </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
               {t('workspace.noOrganisationsDesc')}
             </Typography>
@@ -442,7 +486,8 @@ const WorkspacePage: React.FC = () => {
                   sx={{
                     borderRadius: 3,
                     border: '1px solid',
-                    borderColor: org.id === currentOrgId ? 'primary.main' : 'divider',
+                    borderColor:
+                      org.id === currentOrgId ? 'primary.main' : 'divider',
                     boxShadow:
                       org.id === currentOrgId
                         ? (theme) =>
@@ -526,7 +571,11 @@ const WorkspacePage: React.FC = () => {
                         }}
                       >
                         <Chip
-                          label={org.isActive ? t('common.active') : t('common.inactive')}
+                          label={
+                            org.isActive
+                              ? t('common.active')
+                              : t('common.inactive')
+                          }
                           size="small"
                           color={org.isActive ? 'success' : 'default'}
                           variant="outlined"
@@ -572,15 +621,26 @@ const WorkspacePage: React.FC = () => {
                         borderColor: 'divider',
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <PeopleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
+                        <PeopleIcon
+                          sx={{ fontSize: 16, color: 'text.secondary' }}
+                        />
                         <Typography variant="caption" color="text.secondary">
                           {org.memberCount} {t('workspace.members')}
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Tooltip title={formatDateTimeDetailed(org.createdAt)} arrow>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
+                        <CalendarTodayIcon
+                          sx={{ fontSize: 16, color: 'text.secondary' }}
+                        />
+                        <Tooltip
+                          title={formatDateTimeDetailed(org.createdAt)}
+                          arrow
+                        >
                           <Typography variant="caption" color="text.secondary">
                             {formatRelativeTime(org.createdAt)}
                           </Typography>
@@ -624,12 +684,16 @@ const WorkspacePage: React.FC = () => {
                             <ListItemButton
                               key={proj.id}
                               onClick={() =>
-                                navigate(`/admin/environments?orgId=${org.id}&projectId=${proj.id}`)
+                                navigate(
+                                  `/admin/environments?orgId=${org.id}&projectId=${proj.id}`
+                                )
                               }
                               sx={{ pl: 4, py: 0.25 }}
                             >
                               <ListItemIcon sx={{ minWidth: 24 }}>
-                                <ProjectIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                                <ProjectIcon
+                                  sx={{ fontSize: 16, opacity: 0.7 }}
+                                />
                               </ListItemIcon>
                               <ListItemText
                                 primary={proj.displayName || proj.projectName}
@@ -652,7 +716,11 @@ const WorkspacePage: React.FC = () => {
       </PageContentLoader>
 
       {/* Context Menu */}
-      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+      >
         {canManageOrgs && (
           <MenuItem
             onClick={() => {
@@ -705,24 +773,38 @@ const WorkspacePage: React.FC = () => {
         subtitle={t('rbac.orgs.createDescription')}
       >
         <Box
-          sx={{ flex: 1, p: 3, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
+          sx={{
+            flex: 1,
+            p: 3,
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
         >
           <TextField
             fullWidth
             label={t('rbac.orgs.name')}
             value={createData.orgName}
-            onChange={(e) => setCreateData({ ...createData, orgName: e.target.value })}
+            onChange={(e) =>
+              setCreateData({ ...createData, orgName: e.target.value })
+            }
             required
             autoFocus
             size="small"
-            error={createData.orgName.length > 0 && !isValidResourceName(createData.orgName)}
+            error={
+              createData.orgName.length > 0 &&
+              !isValidResourceName(createData.orgName)
+            }
             helperText={t('rbac.orgs.orgNameHelp')}
           />
           <TextField
             fullWidth
             label={t('rbac.orgs.displayName')}
             value={createData.displayName}
-            onChange={(e) => setCreateData({ ...createData, displayName: e.target.value })}
+            onChange={(e) =>
+              setCreateData({ ...createData, displayName: e.target.value })
+            }
             required
             size="small"
             helperText={t('rbac.orgs.displayNameHelp')}
@@ -731,7 +813,9 @@ const WorkspacePage: React.FC = () => {
             fullWidth
             label={t('rbac.orgs.descriptionColumn')}
             value={createData.description}
-            onChange={(e) => setCreateData({ ...createData, description: e.target.value })}
+            onChange={(e) =>
+              setCreateData({ ...createData, description: e.target.value })
+            }
             multiline
             rows={3}
             size="small"
@@ -748,7 +832,9 @@ const WorkspacePage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setCreateDrawerOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setCreateDrawerOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             onClick={handleCreate}
@@ -775,13 +861,22 @@ const WorkspacePage: React.FC = () => {
         subtitle={t('rbac.orgs.editDescription')}
       >
         <Box
-          sx={{ flex: 1, p: 3, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
+          sx={{
+            flex: 1,
+            p: 3,
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
         >
           <TextField
             fullWidth
             label={t('rbac.orgs.displayName')}
             value={editData.displayName}
-            onChange={(e) => setEditData({ ...editData, displayName: e.target.value })}
+            onChange={(e) =>
+              setEditData({ ...editData, displayName: e.target.value })
+            }
             size="small"
             required
             helperText={t('rbac.orgs.displayNameHelp')}
@@ -790,7 +885,9 @@ const WorkspacePage: React.FC = () => {
             fullWidth
             label={t('rbac.orgs.descriptionColumn')}
             value={editData.description}
-            onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+            onChange={(e) =>
+              setEditData({ ...editData, description: e.target.value })
+            }
             multiline
             rows={3}
             size="small"
@@ -807,8 +904,14 @@ const WorkspacePage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setEditDrawerOpen(false)}>{t('common.cancel')}</Button>
-          <Button variant="contained" onClick={handleSaveEdit} disabled={saving || !isEditDirty}>
+          <Button onClick={() => setEditDrawerOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSaveEdit}
+            disabled={saving || !isEditDirty}
+          >
             {saving ? <CircularProgress size={20} /> : t('common.save')}
           </Button>
         </Box>
@@ -851,7 +954,10 @@ const WorkspacePage: React.FC = () => {
                       : t('common.noResults')
                   }
                   renderInput={(params) => (
-                    <TextField {...params} placeholder={t('rbac.orgs.searchMemberPlaceholder')} />
+                    <TextField
+                      {...params}
+                      placeholder={t('rbac.orgs.searchMemberPlaceholder')}
+                    />
                   )}
                   renderOption={(props, option) => {
                     const { key, ...otherProps } = props;
@@ -909,7 +1015,9 @@ const WorkspacePage: React.FC = () => {
                           {member.email || ''}
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
                         <Tooltip
                           title={
                             String(member.userId) === String(currentUser?.id)
@@ -922,7 +1030,10 @@ const WorkspacePage: React.FC = () => {
                               size="small"
                               color="error"
                               onClick={() => handleRemoveMember(member.userId)}
-                              disabled={String(member.userId) === String(currentUser?.id)}
+                              disabled={
+                                String(member.userId) ===
+                                String(currentUser?.id)
+                              }
                             >
                               <DeleteIcon fontSize="small" />
                             </IconButton>
@@ -947,13 +1058,19 @@ const WorkspacePage: React.FC = () => {
             gap: 1,
           }}
         >
-          <Button onClick={() => setDetailOpen(false)}>{t('common.close')}</Button>
+          <Button onClick={() => setDetailOpen(false)}>
+            {t('common.close')}
+          </Button>
           <Button
             variant="contained"
             onClick={handleApplyMembers}
             disabled={!isMembersDirty || applyingMembers}
           >
-            {applyingMembers ? <CircularProgress size={20} /> : t('common.apply')}
+            {applyingMembers ? (
+              <CircularProgress size={20} />
+            ) : (
+              t('common.apply')
+            )}
           </Button>
         </Box>
       </ResizableDrawer>

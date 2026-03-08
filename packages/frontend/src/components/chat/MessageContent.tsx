@@ -82,7 +82,9 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
         }}
         loading="lazy"
       />
-      {message.content && <Box sx={{ p: 1 }}>{renderTextContent(message.content)}</Box>}
+      {message.content && (
+        <Box sx={{ p: 1 }}>{renderTextContent(message.content)}</Box>
+      )}
     </Box>
   );
 
@@ -97,7 +99,9 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
           display: 'block',
         }}
       />
-      {message.content && <Box sx={{ p: 1 }}>{renderTextContent(message.content)}</Box>}
+      {message.content && (
+        <Box sx={{ p: 1 }}>{renderTextContent(message.content)}</Box>
+      )}
     </Box>
   );
 
@@ -190,9 +194,12 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <LocationIcon color="primary" />
               <Box>
-                <Typography variant="body2">{location.name || 'Shared Location'}</Typography>
+                <Typography variant="body2">
+                  {location.name || 'Shared Location'}
+                </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {location.address || `${location.latitude}, ${location.longitude}`}
+                  {location.address ||
+                    `${location.latitude}, ${location.longitude}`}
                 </Typography>
               </Box>
             </Box>
@@ -214,7 +221,12 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
 
   const renderSystemMessage = () => (
     <Box sx={{ textAlign: 'center', py: 1 }}>
-      <Chip label={message.content} size="small" variant="outlined" sx={{ fontSize: '0.75rem' }} />
+      <Chip
+        label={message.content}
+        size="small"
+        variant="outlined"
+        sx={{ fontSize: '0.75rem' }}
+      />
     </Box>
   );
 

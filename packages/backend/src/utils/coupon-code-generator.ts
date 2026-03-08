@@ -3,7 +3,10 @@
  * Generates coupon codes based on specified pattern
  */
 
-export type CodePattern = 'ALPHANUMERIC_8' | 'ALPHANUMERIC_16' | 'ALPHANUMERIC_16_HYPHEN';
+export type CodePattern =
+  | 'ALPHANUMERIC_8'
+  | 'ALPHANUMERIC_16'
+  | 'ALPHANUMERIC_16_HYPHEN';
 
 /**
  * Generate a random alphanumeric string
@@ -11,7 +14,8 @@ export type CodePattern = 'ALPHANUMERIC_8' | 'ALPHANUMERIC_16' | 'ALPHANUMERIC_1
  * @returns Random alphanumeric string
  */
 function generateRandomAlphanumeric(length: number): string {
-  const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const chars =
+    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   let result = '';
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));

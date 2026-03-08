@@ -11,7 +11,10 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { ExpandMore as ExpandMoreIcon, Save as SaveIcon } from '@mui/icons-material';
+import {
+  ExpandMore as ExpandMoreIcon,
+  Save as SaveIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import {
@@ -28,7 +31,10 @@ interface PlatformDefaultsDialogProps {
   onClose: () => void;
 }
 
-const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, onClose }) => {
+const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
+  open,
+  onClose,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { platforms, isLoading: platformsLoading } = usePlatformConfig();
@@ -146,7 +152,9 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, o
                       <TextField
                         fullWidth
                         label={t('clientVersions.form.gameServerAddress')}
-                        value={defaults[platform.value]?.gameServerAddress || ''}
+                        value={
+                          defaults[platform.value]?.gameServerAddress || ''
+                        }
                         onChange={(e) =>
                           handlePlatformDefaultChange(
                             platform.value,

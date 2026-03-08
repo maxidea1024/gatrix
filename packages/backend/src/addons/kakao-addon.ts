@@ -22,8 +22,15 @@ export class KakaoAddon extends Addon {
     const { apiUrl, apiKey, senderKey } = parameters;
 
     if (!apiUrl || !apiKey || !senderKey) {
-      this.logger.warn(`Missing Kakao configuration for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing required parameters');
+      this.logger.warn(
+        `Missing Kakao configuration for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing required parameters'
+      );
       return;
     }
 

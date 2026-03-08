@@ -28,7 +28,8 @@ router.post(
   auditLog({
     action: 'whitelist_bulk_create',
     resourceType: 'whitelist',
-    getResourceId: (req: any) => `bulk_${req.body?.entries?.length || 0}_entries`,
+    getResourceId: (req: any) =>
+      `bulk_${req.body?.entries?.length || 0}_entries`,
     getNewValues: (req: any) => req.body,
   }) as any,
   IpWhitelistController.bulkCreateIpWhitelists

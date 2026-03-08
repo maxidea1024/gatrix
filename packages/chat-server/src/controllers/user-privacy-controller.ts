@@ -44,8 +44,11 @@ export class UserPrivacyController {
 
       const filteredData: UpdatePrivacySettingsData = {};
       for (const field of allowedFields) {
-        if (updateData[field as keyof UpdatePrivacySettingsData] !== undefined) {
-          (filteredData as any)[field] = updateData[field as keyof UpdatePrivacySettingsData];
+        if (
+          updateData[field as keyof UpdatePrivacySettingsData] !== undefined
+        ) {
+          (filteredData as any)[field] =
+            updateData[field as keyof UpdatePrivacySettingsData];
         }
       }
 
@@ -73,7 +76,10 @@ export class UserPrivacyController {
         return;
       }
 
-      const updatedSettings = await UserPrivacySettingsModel.update(userId, filteredData);
+      const updatedSettings = await UserPrivacySettingsModel.update(
+        userId,
+        filteredData
+      );
 
       res.json({
         success: true,
@@ -177,7 +183,10 @@ export class UserPrivacyController {
   }
 
   // 초대 가능 여부 확인 (내부 API)
-  static async checkInvitePermission(req: Request, res: Response): Promise<void> {
+  static async checkInvitePermission(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const { inviterId, inviteeId, inviteType } = req.body;
 
@@ -197,7 +206,11 @@ export class UserPrivacyController {
         return;
       }
 
-      const result = await UserPrivacySettingsModel.canInviteUser(inviterId, inviteeId, inviteType);
+      const result = await UserPrivacySettingsModel.canInviteUser(
+        inviterId,
+        inviteeId,
+        inviteType
+      );
 
       res.json({
         success: true,

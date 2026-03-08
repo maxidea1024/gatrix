@@ -4,7 +4,14 @@
  * Displays relative time (e.g., "3 minutes ago", "just now") that auto-updates.
  * Uses smooth text updates to avoid flickering.
  */
-import React, { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  memo,
+} from 'react';
 import { Tooltip, Typography, TypographyProps } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
@@ -75,7 +82,11 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
 
   // Update the relative time text only if it actually changed
   const updateRelativeTime = useCallback(() => {
-    const newText = formatRelativeTime(date, { showSeconds, baseTime }, i18n.language);
+    const newText = formatRelativeTime(
+      date,
+      { showSeconds, baseTime },
+      i18n.language
+    );
     setRelativeText((prev) => (prev === newText ? prev : newText));
   }, [date, showSeconds, baseTime, i18n.language]);
 
@@ -91,7 +102,8 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
     }
 
     // Calculate interval
-    const interval = updateInterval ?? getOptimalInterval(parsedDate, showSeconds);
+    const interval =
+      updateInterval ?? getOptimalInterval(parsedDate, showSeconds);
 
     // Set up interval for updates
     intervalRef.current = setInterval(updateRelativeTime, interval);
@@ -102,7 +114,13 @@ const RelativeTimeInner: React.FC<RelativeTimeProps> = ({
         intervalRef.current = null;
       }
     };
-  }, [parsedDate, updateInterval, updateRelativeTime, showSeconds, i18n.language]);
+  }, [
+    parsedDate,
+    updateInterval,
+    updateRelativeTime,
+    showSeconds,
+    i18n.language,
+  ]);
 
   // Handle invalid or missing date
   if (!date || relativeText === '-') {

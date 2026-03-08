@@ -42,7 +42,11 @@ import DynamicFilterBar, {
   FilterDefinition,
 } from '@/components/common/DynamicFilterBar';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
-import { couponService, CouponSetting, UsageRecord } from '@/services/couponService';
+import {
+  couponService,
+  CouponSetting,
+  UsageRecord,
+} from '@/services/couponService';
 import {
   formatDateTime,
   getStoredTimezone,
@@ -50,7 +54,9 @@ import {
   formatDateTimeDetailed,
 } from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
-import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '@/components/common/ColumnSettingsDialog';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 
@@ -79,7 +85,9 @@ const CouponUsagePage: React.FC = () => {
   const [exportError, setExportError] = useState<string | null>(null);
   const [exportSuccess, setExportSuccess] = useState(false);
   const [exportFormat, setExportFormat] = useState<'csv' | 'xlsx'>('csv');
-  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
   const exportAbortControllerRef = React.useRef<AbortController | null>(null);
 
   // search & dynamic filters
@@ -89,31 +97,42 @@ const CouponUsagePage: React.FC = () => {
 
   // derive individual filter values (stable for deps)
   const settingIdFilter = useMemo(
-    () => (activeFilters.find((f) => f.key === 'settingId')?.value as string) || '',
+    () =>
+      (activeFilters.find((f) => f.key === 'settingId')?.value as string) || '',
     [activeFilters]
   );
   const platformFilter = useMemo(
-    () => (activeFilters.find((f) => f.key === 'platform')?.value as string) || '',
+    () =>
+      (activeFilters.find((f) => f.key === 'platform')?.value as string) || '',
     [activeFilters]
   );
   const channelFilter = useMemo(
-    () => (activeFilters.find((f) => f.key === 'channel')?.value as string) || '',
+    () =>
+      (activeFilters.find((f) => f.key === 'channel')?.value as string) || '',
     [activeFilters]
   );
   const subChannelFilter = useMemo(
-    () => (activeFilters.find((f) => f.key === 'subChannel')?.value as string) || '',
+    () =>
+      (activeFilters.find((f) => f.key === 'subChannel')?.value as string) ||
+      '',
     [activeFilters]
   );
   const worldFilter = useMemo(
-    () => (activeFilters.find((f) => f.key === 'gameWorldId')?.value as string) || '',
+    () =>
+      (activeFilters.find((f) => f.key === 'gameWorldId')?.value as string) ||
+      '',
     [activeFilters]
   );
   const couponCodeFilter = useMemo(
-    () => (activeFilters.find((f) => f.key === 'couponCode')?.value as string) || '',
+    () =>
+      (activeFilters.find((f) => f.key === 'couponCode')?.value as string) ||
+      '',
     [activeFilters]
   );
   const characterIdFilter = useMemo(
-    () => (activeFilters.find((f) => f.key === 'characterId')?.value as string) || '',
+    () =>
+      (activeFilters.find((f) => f.key === 'characterId')?.value as string) ||
+      '',
     [activeFilters]
   );
 
@@ -235,7 +254,8 @@ const CouponUsagePage: React.FC = () => {
     },
   ];
 
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLElement | null>(null);
 
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
     const saved = localStorage.getItem('couponUsageColumns');
@@ -256,7 +276,10 @@ const CouponUsagePage: React.FC = () => {
     return defaultColumns;
   });
 
-  const visibleColumns = useMemo(() => columns.filter((c) => c.visible), [columns]);
+  const visibleColumns = useMemo(
+    () => columns.filter((c) => c.visible),
+    [columns]
+  );
 
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     setColumns(newColumns);
@@ -286,7 +309,8 @@ const CouponUsagePage: React.FC = () => {
     if (!text) return;
     copyToClipboardWithNotification(
       text,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -338,14 +362,19 @@ const CouponUsagePage: React.FC = () => {
     setPage(0);
   };
   const handleFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, value } : f)));
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === filterKey ? { ...f, value } : f))
+    );
     setPage(0);
   };
 
   // fetch settings list once
   useEffect(() => {
     (async () => {
-      const res = await couponService.listSettings(projectApiPath, { page: 1, limit: 100 });
+      const res = await couponService.listSettings(projectApiPath, {
+        page: 1,
+        limit: 100,
+      });
       setSettings(res.settings || []);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -423,7 +452,11 @@ const CouponUsagePage: React.FC = () => {
               .map((h) => {
                 const cell = r[h] || '-';
                 const str = String(cell);
-                if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                if (
+                  str.includes(',') ||
+                  str.includes('"') ||
+                  str.includes('\n')
+                ) {
                   return `"${str.replace(/"/g, '""')}"`;
                 }
                 return str;
@@ -468,9 +501,12 @@ const CouponUsagePage: React.FC = () => {
       });
     } catch (error: any) {
       console.error('Export error:', error);
-      enqueueSnackbar(error.message || t('coupons.couponSettings.exportError'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        error.message || t('coupons.couponSettings.exportError'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -513,7 +549,9 @@ const CouponUsagePage: React.FC = () => {
             onClose={() => setExportMenuAnchor(null)}
           >
             <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
-            <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
+            <MenuItem onClick={() => handleExport('xlsx')}>
+              Excel (XLSX)
+            </MenuItem>
           </Menu>
         </Box>
       </Box>
@@ -575,7 +613,9 @@ const CouponUsagePage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -626,7 +666,9 @@ const CouponUsagePage: React.FC = () => {
                       {visibleColumns.map((col) => (
                         <TableCell
                           key={col.id}
-                          sortDirection={orderBy === col.id ? order : (false as any)}
+                          sortDirection={
+                            orderBy === col.id ? order : (false as any)
+                          }
                         >
                           <TableSortLabel
                             active={orderBy === col.id}
@@ -654,12 +696,16 @@ const CouponUsagePage: React.FC = () => {
                                       gap: 0.5,
                                     }}
                                   >
-                                    <Typography variant="body2">{r.couponName || '-'}</Typography>
+                                    <Typography variant="body2">
+                                      {r.couponName || '-'}
+                                    </Typography>
                                     {r.couponName && (
                                       <Tooltip title={t('common.copy')}>
                                         <IconButton
                                           size="small"
-                                          onClick={() => handleCopy(r.couponName)}
+                                          onClick={() =>
+                                            handleCopy(r.couponName)
+                                          }
                                         >
                                           <ContentCopyIcon fontSize="inherit" />
                                         </IconButton>
@@ -678,12 +724,16 @@ const CouponUsagePage: React.FC = () => {
                                       gap: 0.5,
                                     }}
                                   >
-                                    <Typography variant="body2">{r.couponCode || '-'}</Typography>
+                                    <Typography variant="body2">
+                                      {r.couponCode || '-'}
+                                    </Typography>
                                     {r.couponCode && (
                                       <Tooltip title={t('common.copy')}>
                                         <IconButton
                                           size="small"
-                                          onClick={() => handleCopy(r.couponCode)}
+                                          onClick={() =>
+                                            handleCopy(r.couponCode)
+                                          }
                                         >
                                           <ContentCopyIcon fontSize="inherit" />
                                         </IconButton>
@@ -702,9 +752,14 @@ const CouponUsagePage: React.FC = () => {
                                       gap: 0.5,
                                     }}
                                   >
-                                    <Typography variant="body2">{r.userId}</Typography>
+                                    <Typography variant="body2">
+                                      {r.userId}
+                                    </Typography>
                                     <Tooltip title={t('common.copy')}>
-                                      <IconButton size="small" onClick={() => handleCopy(r.userId)}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => handleCopy(r.userId)}
+                                      >
                                         <ContentCopyIcon fontSize="inherit" />
                                       </IconButton>
                                     </Tooltip>
@@ -721,7 +776,9 @@ const CouponUsagePage: React.FC = () => {
                                       gap: 0.5,
                                     }}
                                   >
-                                    <Typography variant="body2">{r.userName}</Typography>
+                                    <Typography variant="body2">
+                                      {r.userName}
+                                    </Typography>
                                     <Tooltip title={t('common.copy')}>
                                       <IconButton
                                         size="small"
@@ -743,12 +800,16 @@ const CouponUsagePage: React.FC = () => {
                                       gap: 0.5,
                                     }}
                                   >
-                                    <Typography variant="body2">{r.characterId || '-'}</Typography>
+                                    <Typography variant="body2">
+                                      {r.characterId || '-'}
+                                    </Typography>
                                     {r.characterId && (
                                       <Tooltip title={t('common.copy')}>
                                         <IconButton
                                           size="small"
-                                          onClick={() => handleCopy(r.characterId)}
+                                          onClick={() =>
+                                            handleCopy(r.characterId)
+                                          }
                                         >
                                           <ContentCopyIcon fontSize="inherit" />
                                         </IconButton>
@@ -760,15 +821,23 @@ const CouponUsagePage: React.FC = () => {
                             case 'sequence':
                               return (
                                 <TableCell key="sequence">
-                                  <Typography variant="body2">{r.sequence}</Typography>
+                                  <Typography variant="body2">
+                                    {r.sequence}
+                                  </Typography>
                                 </TableCell>
                               );
                             case 'usedAt':
                               return (
                                 <TableCell key="usedAt">
-                                  <Tooltip title={formatDateTimeDetailed(r.usedAt)}>
+                                  <Tooltip
+                                    title={formatDateTimeDetailed(r.usedAt)}
+                                  >
                                     <Typography variant="caption">
-                                      {formatRelativeTime(r.usedAt, undefined, language)}
+                                      {formatRelativeTime(
+                                        r.usedAt,
+                                        undefined,
+                                        language
+                                      )}
                                     </Typography>
                                   </Tooltip>
                                 </TableCell>
@@ -779,13 +848,19 @@ const CouponUsagePage: React.FC = () => {
                                   <Tooltip
                                     title={
                                       r.couponStartsAt
-                                        ? formatDateTimeDetailed(r.couponStartsAt)
+                                        ? formatDateTimeDetailed(
+                                            r.couponStartsAt
+                                          )
                                         : '-'
                                     }
                                   >
                                     <Typography variant="caption">
                                       {r.couponStartsAt
-                                        ? formatRelativeTime(r.couponStartsAt, undefined, language)
+                                        ? formatRelativeTime(
+                                            r.couponStartsAt,
+                                            undefined,
+                                            language
+                                          )
                                         : '-'}
                                     </Typography>
                                   </Tooltip>
@@ -797,13 +872,19 @@ const CouponUsagePage: React.FC = () => {
                                   <Tooltip
                                     title={
                                       r.couponExpiresAt
-                                        ? formatDateTimeDetailed(r.couponExpiresAt)
+                                        ? formatDateTimeDetailed(
+                                            r.couponExpiresAt
+                                          )
                                         : '-'
                                     }
                                   >
                                     <Typography variant="caption">
                                       {r.couponExpiresAt
-                                        ? formatRelativeTime(r.couponExpiresAt, undefined, language)
+                                        ? formatRelativeTime(
+                                            r.couponExpiresAt,
+                                            undefined,
+                                            language
+                                          )
                                         : '-'}
                                     </Typography>
                                   </Tooltip>
@@ -812,25 +893,33 @@ const CouponUsagePage: React.FC = () => {
                             case 'gameWorldId':
                               return (
                                 <TableCell key="gameWorldId">
-                                  <Typography variant="body2">{r.gameWorldId || '-'}</Typography>
+                                  <Typography variant="body2">
+                                    {r.gameWorldId || '-'}
+                                  </Typography>
                                 </TableCell>
                               );
                             case 'platform':
                               return (
                                 <TableCell key="platform">
-                                  <Typography variant="body2">{r.platform || '-'}</Typography>
+                                  <Typography variant="body2">
+                                    {r.platform || '-'}
+                                  </Typography>
                                 </TableCell>
                               );
                             case 'channel':
                               return (
                                 <TableCell key="channel">
-                                  <Typography variant="body2">{r.channel || '-'}</Typography>
+                                  <Typography variant="body2">
+                                    {r.channel || '-'}
+                                  </Typography>
                                 </TableCell>
                               );
                             case 'subChannel':
                               return (
                                 <TableCell key="subChannel">
-                                  <Typography variant="body2">{r.subchannel || '-'}</Typography>
+                                  <Typography variant="body2">
+                                    {r.subchannel || '-'}
+                                  </Typography>
                                 </TableCell>
                               );
                             default:
@@ -869,7 +958,9 @@ const CouponUsagePage: React.FC = () => {
 
       {/* Export Progress Dialog - Only show for large datasets (>1000 records) */}
       <Dialog
-        open={(exporting || exportSuccess || exportError !== null) && total > 1000}
+        open={
+          (exporting || exportSuccess || exportError !== null) && total > 1000
+        }
         onClose={() => {
           if (!exporting) {
             setExportSuccess(false);

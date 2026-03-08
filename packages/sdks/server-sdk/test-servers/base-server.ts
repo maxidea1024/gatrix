@@ -73,10 +73,13 @@ export class BaseTestServer {
       await this.handleFatalError('UNCAUGHT_EXCEPTION');
     });
 
-    process.on('unhandledRejection', async (reason: any, promise: Promise<any>) => {
-      this.logError('Unhandled Rejection', { reason, promise });
-      await this.handleFatalError('UNHANDLED_REJECTION');
-    });
+    process.on(
+      'unhandledRejection',
+      async (reason: any, promise: Promise<any>) => {
+        this.logError('Unhandled Rejection', { reason, promise });
+        await this.handleFatalError('UNHANDLED_REJECTION');
+      }
+    );
 
     // Handle graceful shutdown signals
     process.on('SIGTERM', async () => {
@@ -270,7 +273,8 @@ export class BaseTestServer {
     this.log(`Popup Notices: ${popups.length} loaded`);
     popups.forEach((popup) => {
       const contentPreview =
-        popup.message.substring(0, 50) + (popup.message.length > 50 ? '...' : '');
+        popup.message.substring(0, 50) +
+        (popup.message.length > 50 ? '...' : '');
       this.log(`  - ${popup.id}: ${contentPreview}`);
     });
 
@@ -373,7 +377,9 @@ export class BaseTestServer {
   /**
    * Get internal IP address
    */
-  protected getInternalIp(networkInterfaces: NodeJS.Dict<os.NetworkInterfaceInfo[]>): string {
+  protected getInternalIp(
+    networkInterfaces: NodeJS.Dict<os.NetworkInterfaceInfo[]>
+  ): string {
     for (const name of Object.keys(networkInterfaces)) {
       const interfaces = networkInterfaces[name];
       if (!interfaces) continue;
@@ -429,7 +435,9 @@ export class BaseTestServer {
 
       // Get services by group
       if (worlddServices.length > 0) {
-        const groups = [...new Set(worlddServices.map((s) => s.labels.group).filter(Boolean))];
+        const groups = [
+          ...new Set(worlddServices.map((s) => s.labels.group).filter(Boolean)),
+        ];
         this.log(`  - worldd groups: ${groups.join(', ')}`);
       }
     } catch (error: any) {

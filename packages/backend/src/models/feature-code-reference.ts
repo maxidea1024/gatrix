@@ -60,7 +60,9 @@ export class FeatureCodeReferenceModel {
   static async getSummary(options?: {
     repository?: string;
     branch?: string;
-  }): Promise<{ flagName: string; referenceCount: number; lastScanTime: Date }[]> {
+  }): Promise<
+    { flagName: string; referenceCount: number; lastScanTime: Date }[]
+  > {
     let query = db('g_feature_code_references')
       .select('flagName')
       .count('* as referenceCount')
@@ -86,7 +88,10 @@ export class FeatureCodeReferenceModel {
     scanId: string,
     repository: string,
     branch: string,
-    references: Omit<CodeReferenceAttributes, 'id' | 'createdAt' | 'updatedAt'>[]
+    references: Omit<
+      CodeReferenceAttributes,
+      'id' | 'createdAt' | 'updatedAt'
+    >[]
   ): Promise<number> {
     // Delete existing references for this repository + branch
     await db('g_feature_code_references')
@@ -137,7 +142,10 @@ export class FeatureCodeReferenceModel {
   /**
    * Get latest scan info
    */
-  static async getLatestScanInfo(options?: { repository?: string; branch?: string }): Promise<{
+  static async getLatestScanInfo(options?: {
+    repository?: string;
+    branch?: string;
+  }): Promise<{
     scanId: string;
     scanTime: Date;
     commitHash: string;

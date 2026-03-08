@@ -25,12 +25,14 @@ export class Migration {
    * Acquire a distributed lock using MySQL GET_LOCK()
    * This prevents multiple servers from running migrations simultaneously
    */
-  private async acquireLock(connection: mysql.PoolConnection): Promise<boolean> {
+  private async acquireLock(
+    connection: mysql.PoolConnection
+  ): Promise<boolean> {
     try {
-      const [rows] = (await connection.query('SELECT GET_LOCK(?, ?) as lockResult', [
-        this.lockName,
-        this.lockTimeout,
-      ])) as any;
+      const [rows] = (await connection.query(
+        'SELECT GET_LOCK(?, ?) as lockResult',
+        [this.lockName, this.lockTimeout]
+      )) as any;
 
       const lockResult = rows[0]?.lockResult;
 
@@ -41,10 +43,13 @@ export class Migration {
         });
         return true;
       } else if (lockResult === 0) {
-        logger.warn('Failed to acquire migration lock - another process is running migrations', {
-          lockName: this.lockName,
-          timeout: this.lockTimeout,
-        });
+        logger.warn(
+          'Failed to acquire migration lock - another process is running migrations',
+          {
+            lockName: this.lockName,
+            timeout: this.lockTimeout,
+          }
+        );
         return false;
       } else {
         logger.error('Error acquiring migration lock - NULL returned', {
@@ -63,9 +68,10 @@ export class Migration {
    */
   private async releaseLock(connection: mysql.PoolConnection): Promise<void> {
     try {
-      const [rows] = (await connection.query('SELECT RELEASE_LOCK(?) as releaseResult', [
-        this.lockName,
-      ])) as any;
+      const [rows] = (await connection.query(
+        'SELECT RELEASE_LOCK(?) as releaseResult',
+        [this.lockName]
+      )) as any;
 
       const releaseResult = rows[0]?.releaseResult;
 
@@ -102,12 +108,19 @@ export class Migration {
 
   async getExecutedMigrations(): Promise<string[]> {
     try {
-      const rows = await database.query('SELECT id FROM g_migrations ORDER BY executedAt ASC');
+      const rows = await database.query(
+        'SELECT id FROM g_migrations ORDER BY executedAt ASC'
+      );
       return rows.map((row: any) => row.id);
     } catch (error: any) {
       // Check if the error is specifically about migrations table not existing
-      if (error.code === 'ER_NO_SUCH_TABLE' && error.sqlMessage?.includes('g_migrations')) {
-        logger.info('Migrations table not found - this is normal for first-time setup');
+      if (
+        error.code === 'ER_NO_SUCH_TABLE' &&
+        error.sqlMessage?.includes('g_migrations')
+      ) {
+        logger.info(
+          'Migrations table not found - this is normal for first-time setup'
+        );
         return [];
       }
       // For other errors, still log as error
@@ -152,7 +165,9 @@ export class Migration {
       const lockAcquired = await this.acquireLock(lockConnection);
 
       if (!lockAcquired) {
-        logger.info('Skipping migrations - another process is already running them');
+        logger.info(
+          'Skipping migrations - another process is already running them'
+        );
         return;
       }
 
@@ -202,10 +217,10 @@ export class Migration {
       logger.info(`Running migration: ${migration.name}`);
       await migration.up(connection);
 
-      await connection.execute('INSERT INTO g_migrations (id, name) VALUES (?, ?)', [
-        migration.id,
-        migration.name,
-      ]);
+      await connection.execute(
+        'INSERT INTO g_migrations (id, name) VALUES (?, ?)',
+        [migration.id, migration.name]
+      );
 
       await connection.commit();
       logger.info(`Migration completed: ${migration.name}`);
@@ -234,7 +249,9 @@ export class Migration {
       logger.info(`Rolling back migration: ${migration.name}`);
       await migration.down(connection);
 
-      await connection.execute('DELETE FROM g_migrations WHERE id = ?', [migrationId]);
+      await connection.execute('DELETE FROM g_migrations WHERE id = ?', [
+        migrationId,
+      ]);
 
       await connection.commit();
       logger.info(`Migration rolled back: ${migration.name}`);
@@ -251,7 +268,9 @@ export class Migration {
     const executedMigrations = await this.getExecutedMigrations();
     const migrationFiles = await this.getMigrationFiles();
     const allMigrations = migrationFiles.map((m) => m.id);
-    const pendingMigrations = allMigrations.filter((id) => !executedMigrations.includes(id));
+    const pendingMigrations = allMigrations.filter(
+      (id) => !executedMigrations.includes(id)
+    );
 
     return {
       executed: executedMigrations,

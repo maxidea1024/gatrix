@@ -63,7 +63,9 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
   const { t } = useTranslation();
   // Find context field info for tooltip
   const fieldsArray = Array.isArray(contextFields) ? contextFields : [];
-  const contextFieldInfo = fieldsArray.find((f) => f.fieldName === constraint.contextName);
+  const contextFieldInfo = fieldsArray.find(
+    (f) => f.fieldName === constraint.contextName
+  );
   const contextFieldDescription =
     contextFieldInfo?.description || contextFieldInfo?.displayName || '';
   const fieldType = contextFieldInfo?.fieldType || 'string';
@@ -90,7 +92,9 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
   const isCountryField = fieldType === 'country';
 
   if (compact) {
-    const displayValue = isMultiValue ? constraint.values!.join(', ') : getSingleValueDisplay();
+    const displayValue = isMultiValue
+      ? constraint.values!.join(', ')
+      : getSingleValueDisplay();
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <ContextFieldChip
@@ -108,7 +112,11 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
           }
           fieldType={fieldType}
         />
-        <OperatorIcon operator={constraint.operator} inverted={constraint.inverted} size={16} />
+        <OperatorIcon
+          operator={constraint.operator}
+          inverted={constraint.inverted}
+          size={16}
+        />
         <Typography variant="caption" fontWeight={500}>
           {displayValue}
         </Typography>
@@ -117,12 +125,27 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
   }
 
   // Localized operator text, description and example
-  const operatorText = t(`constraints.operators.${constraint.operator}`, constraint.operator);
-  const operatorDesc = t(`constraints.operatorDesc.${constraint.operator}`, constraint.operator);
-  const operatorExample = t(`constraints.operatorExample.${constraint.operator}`, '');
+  const operatorText = t(
+    `constraints.operators.${constraint.operator}`,
+    constraint.operator
+  );
+  const operatorDesc = t(
+    `constraints.operatorDesc.${constraint.operator}`,
+    constraint.operator
+  );
+  const operatorExample = t(
+    `constraints.operatorExample.${constraint.operator}`,
+    ''
+  );
   const operatorTooltip = (
     <Box sx={{ maxWidth: 340 }}>
-      <Box sx={{ fontWeight: 500, fontSize: '0.8rem', mb: operatorExample ? 0.75 : 0 }}>
+      <Box
+        sx={{
+          fontWeight: 500,
+          fontSize: '0.8rem',
+          mb: operatorExample ? 0.75 : 0,
+        }}
+      >
         {operatorDesc}
       </Box>
       {operatorExample && (
@@ -300,7 +323,11 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
               return (
                 <Chip
                   key={idx}
-                  icon={isCountryField ? <FlagImage code={val} size={14} /> : undefined}
+                  icon={
+                    isCountryField ? (
+                      <FlagImage code={val} size={14} />
+                    ) : undefined
+                  }
                   label={displayLabel}
                   size="small"
                   sx={{
@@ -310,7 +337,10 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
                     bgcolor: 'action.selected',
                     color: 'text.primary',
                     borderRadius: '4px',
-                    ...(val === '' && { fontStyle: 'italic', color: 'text.secondary' }),
+                    ...(val === '' && {
+                      fontStyle: 'italic',
+                      color: 'text.secondary',
+                    }),
                     '& .MuiChip-icon': {
                       ml: 0.5,
                     },
@@ -324,7 +354,9 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
           : (() => {
               const singleVal = getSingleValueDisplay();
               const countryCode = isCountryField ? constraint.value || '' : '';
-              const countryInfo = isCountryField ? getCountryByCode(countryCode) : null;
+              const countryInfo = isCountryField
+                ? getCountryByCode(countryCode)
+                : null;
               const displayLabel = countryInfo
                 ? `${countryInfo.name} (${countryCode.toUpperCase()})`
                 : singleVal;
@@ -460,7 +492,11 @@ export const SegmentPreview: React.FC<SegmentPreviewProps> = ({
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ fontWeight: 500 }}
+        >
           {t('featureFlags.segmentConditions')}
         </Typography>
       </Box>

@@ -23,7 +23,9 @@ async function testKnexMigration() {
 
     // Test audit logs table
     const auditCount = await db('g_audit_logs').count('* as count').first();
-    console.log(`✅ Audit logs table query successful: ${auditCount?.count} logs`);
+    console.log(
+      `✅ Audit logs table query successful: ${auditCount?.count} logs`
+    );
 
     // Test 3: Test PasswordResetService (converted from raw queries to knex)
     console.log('\n📧 Test 3: Testing PasswordResetService with knex');
@@ -31,7 +33,8 @@ async function testKnexMigration() {
     try {
       // This should work even if user doesn't exist (returns success for security)
       const passwordResetService = PasswordResetService.getInstance();
-      const result = await passwordResetService.requestPasswordReset('test@example.com');
+      const result =
+        await passwordResetService.requestPasswordReset('test@example.com');
       console.log(`✅ Password reset request successful: ${result.success}`);
     } catch (error) {
       console.log(

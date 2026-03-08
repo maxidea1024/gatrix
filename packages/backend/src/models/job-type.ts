@@ -66,7 +66,11 @@ export class JobTypeModel {
       const results = await db('g_job_types as jt')
         .leftJoin('g_users as cu', 'jt.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
-        .select(['jt.*', 'cu.name as createdByName', 'uu.name as updatedByName'])
+        .select([
+          'jt.*',
+          'cu.name as createdByName',
+          'uu.name as updatedByName',
+        ])
         .where('jt.environmentId', envName)
         .orderBy('jt.name', 'asc');
 
@@ -90,13 +94,20 @@ export class JobTypeModel {
     }
   }
 
-  static async findById(id: string, environmentId?: string): Promise<JobTypeAttributes | null> {
+  static async findById(
+    id: string,
+    environmentId?: string
+  ): Promise<JobTypeAttributes | null> {
     try {
       const envName = environmentId ?? getCurrentEnvironment();
       const row = await db('g_job_types as jt')
         .leftJoin('g_users as cu', 'jt.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
-        .select(['jt.*', 'cu.name as createdByName', 'uu.name as updatedByName'])
+        .select([
+          'jt.*',
+          'cu.name as createdByName',
+          'uu.name as updatedByName',
+        ])
         .where('jt.id', id)
         .where('jt.environmentId', envName)
         .first();
@@ -113,12 +124,19 @@ export class JobTypeModel {
     }
   }
 
-  static async findByName(name: string, environmentId?: string): Promise<JobTypeAttributes | null> {
+  static async findByName(
+    name: string,
+    environmentId?: string
+  ): Promise<JobTypeAttributes | null> {
     try {
       const envName = environmentId ?? getCurrentEnvironment();
       const row = await db('g_job_types as jt')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
-        .select(['jt.*', 'cu.name as createdByName', 'uu.name as updatedByName'])
+        .select([
+          'jt.*',
+          'cu.name as createdByName',
+          'uu.name as updatedByName',
+        ])
         .where('jt.name', name)
         .where('jt.environmentId', envName)
         .first();
@@ -175,16 +193,23 @@ export class JobTypeModel {
       const envName = environmentId ?? getCurrentEnvironment();
       const updateData: any = {};
 
-      if (data.displayName !== undefined) updateData.displayName = data.displayName;
-      if (data.description !== undefined) updateData.description = data.description;
+      if (data.displayName !== undefined)
+        updateData.displayName = data.displayName;
+      if (data.description !== undefined)
+        updateData.description = data.description;
       if (data.jobSchema !== undefined)
-        updateData.jobSchema = data.jobSchema ? JSON.stringify(data.jobSchema) : null;
+        updateData.jobSchema = data.jobSchema
+          ? JSON.stringify(data.jobSchema)
+          : null;
       if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       updateData.updatedAt = db.fn.now();
 
-      await db('g_job_types').where('id', id).where('environmentId', envName).update(updateData);
+      await db('g_job_types')
+        .where('id', id)
+        .where('environmentId', envName)
+        .update(updateData);
 
       const updated = await this.findById(id, envName);
       if (!updated) {
@@ -201,7 +226,10 @@ export class JobTypeModel {
   static async delete(id: string, environmentId?: string): Promise<boolean> {
     try {
       const envName = environmentId ?? getCurrentEnvironment();
-      const result = await db('g_job_types').where('id', id).where('environmentId', envName).del();
+      const result = await db('g_job_types')
+        .where('id', id)
+        .where('environmentId', envName)
+        .del();
 
       return result > 0;
     } catch (error) {
@@ -210,12 +238,18 @@ export class JobTypeModel {
     }
   }
 
-  static async findEnabled(environmentId?: string): Promise<JobTypeAttributes[]> {
+  static async findEnabled(
+    environmentId?: string
+  ): Promise<JobTypeAttributes[]> {
     try {
       const envName = environmentId ?? getCurrentEnvironment();
       const results = await db('g_job_types as jt')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
-        .select(['jt.*', 'cu.name as createdByName', 'uu.name as updatedByName'])
+        .select([
+          'jt.*',
+          'cu.name as createdByName',
+          'uu.name as updatedByName',
+        ])
         .where('jt.environmentId', envName)
         .where('jt.isEnabled', true)
         .orderBy('jt.name', 'asc');

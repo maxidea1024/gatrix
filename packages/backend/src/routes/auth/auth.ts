@@ -31,7 +31,11 @@ router.post('/reset-password', AuthController.resetPassword);
 // Protected routes (require authentication)
 router.get('/profile', authenticate as any, AuthController.getProfile);
 router.put('/profile', authenticate as any, AuthController.updateProfile);
-router.post('/change-password', authenticate as any, AuthController.changePassword);
+router.post(
+  '/change-password',
+  authenticate as any,
+  AuthController.changePassword
+);
 router.post('/verify-email', authenticate as any, AuthController.verifyEmail);
 
 // Google OAuth routes

@@ -92,7 +92,8 @@ export class HttpRequestJob extends BaseJob {
         executionTimeMs: 0, // Will be set by executeWithTimeout
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
 
       logger.error(`HTTP request job failed`, {
         jobId: this.context.jobId,

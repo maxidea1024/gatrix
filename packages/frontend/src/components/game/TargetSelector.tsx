@@ -131,7 +131,9 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
               control={
                 <Checkbox
                   checked={isSelected}
-                  onChange={(e) => handleOptionChange(option.value, e.target.checked)}
+                  onChange={(e) =>
+                    handleOptionChange(option.value, e.target.checked)
+                  }
                   size="small"
                 />
               }
@@ -226,7 +228,9 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
               label={id}
               onDelete={() => {
                 const filtered = userIdList.filter((_, i) => i !== index);
-                onUserIdsChange?.(filtered.length > 0 ? filtered.join(', ') : '');
+                onUserIdsChange?.(
+                  filtered.length > 0 ? filtered.join(', ') : ''
+                );
               }}
               size="small"
             />
@@ -234,7 +238,9 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
 
           <input
             type="text"
-            placeholder={userIds && userIds.trim() ? '' : 'user1, user2, user3...'}
+            placeholder={
+              userIds && userIds.trim() ? '' : 'user1, user2, user3...'
+            }
             onKeyDown={(e) => {
               const input = (e.currentTarget as HTMLInputElement).value.trim();
               if ((e.key === 'Enter' || e.key === ',') && input) {
@@ -243,7 +249,9 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
                   .split(',')
                   .map((id) => id.trim())
                   .filter((id) => id);
-                const uniqueIds = Array.from(new Set([...userIdList, ...newIds]));
+                const uniqueIds = Array.from(
+                  new Set([...userIdList, ...newIds])
+                );
                 onUserIdsChange?.(uniqueIds.join(', '));
                 (e.currentTarget as HTMLInputElement).value = '';
               }
@@ -355,7 +363,9 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
         </Box>
       </Box>
 
-      {helperText && <FormHelperText sx={{ mt: 1 }}>{helperText}</FormHelperText>}
+      {helperText && (
+        <FormHelperText sx={{ mt: 1 }}>{helperText}</FormHelperText>
+      )}
 
       {renderUserIdInput()}
     </Box>

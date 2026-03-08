@@ -63,7 +63,9 @@ import ConstraintEditor, {
 import SegmentSelector from '../../components/features/SegmentSelector';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
-import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '../../components/common/ColumnSettingsDialog';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import DynamicFilterBar, {
   FilterDefinition,
@@ -152,7 +154,8 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
   const [activeTab, setActiveTab] = useState(0);
 
   const isRollout =
-    strategy.strategyName === 'flexibleRollout' || strategy.strategyName?.includes('Rollout');
+    strategy.strategyName === 'flexibleRollout' ||
+    strategy.strategyName?.includes('Rollout');
 
   const constraintCount = strategy.constraints?.length || 0;
   const segmentCount = strategy.segments?.length || 0;
@@ -177,8 +180,8 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
           <Chip label={index + 1} size="small" color="primary" />
           <Typography variant="subtitle2">
             {t(
-              STRATEGY_TYPES.find((st) => st.name === strategy.strategyName)?.titleKey ||
-                'featureFlags.strategies.flexibleRollout.title'
+              STRATEGY_TYPES.find((st) => st.name === strategy.strategyName)
+                ?.titleKey || 'featureFlags.strategies.flexibleRollout.title'
             )}
           </Typography>
           {strategy.strategyName === 'flexibleRollout' && (
@@ -214,7 +217,12 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               {t('releaseFlow.targetingTab')}
               {targetingCount > 0 && (
-                <Chip label={targetingCount} size="small" color="info" sx={{ height: 20 }} />
+                <Chip
+                  label={targetingCount}
+                  size="small"
+                  color="info"
+                  sx={{ height: 20 }}
+                />
               )}
             </Box>
           }
@@ -259,7 +267,9 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                 {STRATEGY_TYPES.map((type) => (
                   <MenuItem key={type.name} value={type.name}>
                     <Box>
-                      <Typography variant="body2">{t(type.titleKey)}</Typography>
+                      <Typography variant="body2">
+                        {t(type.titleKey)}
+                      </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {t(type.descKey)}
                       </Typography>
@@ -289,7 +299,10 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                       onChange={(_, value) =>
                         onChange({
                           ...strategy,
-                          parameters: { ...strategy.parameters, rollout: value as number },
+                          parameters: {
+                            ...strategy.parameters,
+                            rollout: value as number,
+                          },
                         })
                       }
                       valueLabelDisplay="on"
@@ -313,7 +326,12 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                     <FormControl fullWidth size="small">
                       <Typography
                         variant="subtitle2"
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          mb: 0.5,
+                        }}
                       >
                         {t('featureFlags.stickiness')}
                         <Tooltip title={t('featureFlags.stickinessHelp')}>
@@ -329,7 +347,10 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                         onChange={(e) =>
                           onChange({
                             ...strategy,
-                            parameters: { ...strategy.parameters, stickiness: e.target.value },
+                            parameters: {
+                              ...strategy.parameters,
+                              stickiness: e.target.value,
+                            },
                           })
                         }
                         disabled={readonly}
@@ -339,7 +360,10 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                             <Typography variant="body2">
                               {t('featureFlags.stickinessDefault')}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {t('featureFlags.stickinessDefaultDesc')}
                             </Typography>
                           </Box>
@@ -349,7 +373,10 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                             <Typography variant="body2">
                               {t('featureFlags.stickinessUserId')}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {t('featureFlags.stickinessUserIdDesc')}
                             </Typography>
                           </Box>
@@ -359,7 +386,10 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                             <Typography variant="body2">
                               {t('featureFlags.stickinessSessionId')}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {t('featureFlags.stickinessSessionIdDesc')}
                             </Typography>
                           </Box>
@@ -369,7 +399,10 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                             <Typography variant="body2">
                               {t('featureFlags.stickinessRandom')}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {t('featureFlags.stickinessRandomDesc')}
                             </Typography>
                           </Box>
@@ -381,7 +414,12 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                     <Box>
                       <Typography
                         variant="subtitle2"
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          mb: 0.5,
+                        }}
                       >
                         {t('featureFlags.groupId')}
                         <Tooltip title={t('featureFlags.groupIdHelp')}>
@@ -399,7 +437,10 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                         onChange={(e) =>
                           onChange({
                             ...strategy,
-                            parameters: { ...strategy.parameters, groupId: e.target.value },
+                            parameters: {
+                              ...strategy.parameters,
+                              groupId: e.target.value,
+                            },
                           })
                         }
                         disabled={readonly}
@@ -516,7 +557,10 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                   onChange={(_, newValue) =>
                     onChange({
                       ...strategy,
-                      parameters: { ...strategy.parameters, hostNames: newValue },
+                      parameters: {
+                        ...strategy.parameters,
+                        hostNames: newValue,
+                      },
                     })
                   }
                   disabled={readonly}
@@ -553,7 +597,10 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                     onChange={(_, value) =>
                       onChange({
                         ...strategy,
-                        parameters: { ...strategy.parameters, percentage: value as number },
+                        parameters: {
+                          ...strategy.parameters,
+                          percentage: value as number,
+                        },
                       })
                     }
                     valueLabelDisplay="on"
@@ -579,12 +626,17 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
               selectedSegments={strategy.segments || []}
               availableSegments={segments}
               onSegmentAdd={(segmentName) =>
-                onChange({ ...strategy, segments: [...(strategy.segments || []), segmentName] })
+                onChange({
+                  ...strategy,
+                  segments: [...(strategy.segments || []), segmentName],
+                })
               }
               onSegmentRemove={(segmentName) =>
                 onChange({
                   ...strategy,
-                  segments: (strategy.segments || []).filter((s) => s !== segmentName),
+                  segments: (strategy.segments || []).filter(
+                    (s) => s !== segmentName
+                  ),
                 })
               }
               t={t}
@@ -643,14 +695,18 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     const loadData = async () => {
       try {
         const segRes = await api.get(`${projectApiPath}/features/segments`);
-        const segData = segRes.data?.segments || segRes.data?.data?.segments || [];
+        const segData =
+          segRes.data?.segments || segRes.data?.data?.segments || [];
         setSegments(segData);
       } catch {
         setSegments([]);
       }
       try {
-        const cfRes = await api.get(`${projectApiPath}/features/context-fields`);
-        const fields = cfRes.data?.contextFields || cfRes.data?.data?.contextFields || [];
+        const cfRes = await api.get(
+          `${projectApiPath}/features/context-fields`
+        );
+        const fields =
+          cfRes.data?.contextFields || cfRes.data?.data?.contextFields || [];
         setContextFields(
           fields
             .filter((f: any) => f.isEnabled !== false)
@@ -694,7 +750,11 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
               id: s.id || generateId(),
               strategyName: s.strategyName || 'flexibleRollout',
               title: '',
-              parameters: s.parameters || { rollout: 100, stickiness: 'default', groupId: '' },
+              parameters: s.parameters || {
+                rollout: 100,
+                stickiness: 'default',
+                groupId: '',
+              },
               constraints: s.constraints || [],
               sortOrder: s.sortOrder || 0,
               segments: s.segments || [],
@@ -715,7 +775,11 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                 id: generateId(),
                 strategyName: 'flexibleRollout',
                 title: '',
-                parameters: { rollout: 100, stickiness: 'default', groupId: '' },
+                parameters: {
+                  rollout: 100,
+                  stickiness: 'default',
+                  groupId: '',
+                },
                 constraints: [],
                 sortOrder: 0,
                 segments: [],
@@ -764,7 +828,9 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
   };
 
   const handleMilestoneNameChange = (index: number, name: string) => {
-    setMilestones((prev) => prev.map((m, i) => (i === index ? { ...m, name } : m)));
+    setMilestones((prev) =>
+      prev.map((m, i) => (i === index ? { ...m, name } : m))
+    );
   };
 
   const handleMoveMilestone = (index: number, direction: 'up' | 'down') => {
@@ -790,7 +856,11 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                   id: generateId(),
                   strategyName: 'flexibleRollout',
                   title: '',
-                  parameters: { rollout: 100, stickiness: 'default', groupId: '' },
+                  parameters: {
+                    rollout: 100,
+                    stickiness: 'default',
+                    groupId: '',
+                  },
                   constraints: [],
                   sortOrder: m.strategies.length,
                   segments: [],
@@ -802,11 +872,17 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     );
   };
 
-  const handleRemoveStrategy = (milestoneIndex: number, strategyIndex: number) => {
+  const handleRemoveStrategy = (
+    milestoneIndex: number,
+    strategyIndex: number
+  ) => {
     setMilestones((prev) =>
       prev.map((m, i) =>
         i === milestoneIndex
-          ? { ...m, strategies: m.strategies.filter((_, si) => si !== strategyIndex) }
+          ? {
+              ...m,
+              strategies: m.strategies.filter((_, si) => si !== strategyIndex),
+            }
           : m
       )
     );
@@ -822,7 +898,9 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
         i === milestoneIndex
           ? {
               ...m,
-              strategies: m.strategies.map((s, si) => (si === strategyIndex ? updated : s)),
+              strategies: m.strategies.map((s, si) =>
+                si === strategyIndex ? updated : s
+              ),
             }
           : m
       )
@@ -832,7 +910,9 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
   const handleSave = async () => {
     // Validation
     if (!flowName.trim()) {
-      enqueueSnackbar(t('releaseFlow.templateNameRequired'), { variant: 'error' });
+      enqueueSnackbar(t('releaseFlow.templateNameRequired'), {
+        variant: 'error',
+      });
       return;
     }
     if (milestones.length === 0) {
@@ -841,7 +921,9 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     }
     for (let i = 0; i < milestones.length; i++) {
       if (milestones[i].strategies.length === 0) {
-        enqueueSnackbar(t('releaseFlow.strategyRequired'), { variant: 'error' });
+        enqueueSnackbar(t('releaseFlow.strategyRequired'), {
+          variant: 'error',
+        });
         return;
       }
     }
@@ -905,7 +987,9 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                 size="small"
                 placeholder={t('releaseFlow.templateNamePlaceholder')}
                 disabled={!!initialData || readonly}
-                helperText={!readonly ? t('releaseFlow.templateNameHelp') : undefined}
+                helperText={
+                  !readonly ? t('releaseFlow.templateNameHelp') : undefined
+                }
               />
             </Box>
             <Box>
@@ -919,7 +1003,9 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                 size="small"
                 placeholder={t('releaseFlow.displayNamePlaceholder')}
                 disabled={readonly}
-                helperText={!readonly ? t('releaseFlow.displayNameHelp') : undefined}
+                helperText={
+                  !readonly ? t('releaseFlow.displayNameHelp') : undefined
+                }
               />
             </Box>
             <Box>
@@ -947,13 +1033,22 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
               <Stack spacing={3}>
                 {milestones.map((milestone, mIdx) => (
                   <Paper key={milestone.id} variant="outlined" sx={{ p: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        mb: 2,
+                      }}
+                    >
                       <Chip label={mIdx + 1} size="small" color="primary" />
                       <TextField
                         size="small"
                         placeholder={t('releaseFlow.milestoneNamePlaceholder')}
                         value={milestone.name}
-                        onChange={(e) => handleMilestoneNameChange(mIdx, e.target.value)}
+                        onChange={(e) =>
+                          handleMilestoneNameChange(mIdx, e.target.value)
+                        }
                         sx={{ flex: 1 }}
                         disabled={readonly}
                       />
@@ -974,7 +1069,9 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                             <span>
                               <IconButton
                                 size="small"
-                                onClick={() => handleMoveMilestone(mIdx, 'down')}
+                                onClick={() =>
+                                  handleMoveMilestone(mIdx, 'down')
+                                }
                                 disabled={mIdx === milestones.length - 1}
                               >
                                 <ArrowDownIcon fontSize="small" />
@@ -998,8 +1095,13 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                     </Box>
 
                     {/* Strategies */}
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                      {t('releaseFlow.strategies')} ({milestone.strategies.length})
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 1 }}
+                    >
+                      {t('releaseFlow.strategies')} (
+                      {milestone.strategies.length})
                     </Typography>
                     <Stack spacing={2}>
                       {milestone.strategies.map((strategy, sIdx) => (
@@ -1009,7 +1111,9 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                           index={sIdx}
                           segments={segments}
                           contextFields={contextFields}
-                          onChange={(updated) => handleStrategyChange(mIdx, sIdx, updated)}
+                          onChange={(updated) =>
+                            handleStrategyChange(mIdx, sIdx, updated)
+                          }
                           onRemove={() => handleRemoveStrategy(mIdx, sIdx)}
                           readonly={readonly}
                         />
@@ -1030,7 +1134,11 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
               </Stack>
               {!readonly && (
                 <Box sx={{ mt: 2, textAlign: 'right' }}>
-                  <Button size="small" startIcon={<AddIcon />} onClick={handleAddMilestone}>
+                  <Button
+                    size="small"
+                    startIcon={<AddIcon />}
+                    onClick={handleAddMilestone}
+                  >
                     {t('releaseFlow.addMilestone')}
                   </Button>
                 </Box>
@@ -1083,11 +1191,14 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editorOpen, setEditorOpen] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<ReleaseFlowTemplate | null>(null);
+  const [editingTemplate, setEditingTemplate] =
+    useState<ReleaseFlowTemplate | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingTemplate, setDeletingTemplate] = useState<ReleaseFlowTemplate | null>(null);
+  const [deletingTemplate, setDeletingTemplate] =
+    useState<ReleaseFlowTemplate | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<null | HTMLElement>(null);
 
   // Sorting state with localStorage persistence
   const [orderBy, setOrderBy] = useState<string>(() => {
@@ -1118,7 +1229,11 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   const defaultColumns: ColumnConfig[] = [
     { id: 'checkbox', labelKey: '', visible: true },
     { id: 'name', labelKey: 'releaseFlow.templateName', visible: true },
-    { id: 'description', labelKey: 'releaseFlow.templateDescription', visible: true },
+    {
+      id: 'description',
+      labelKey: 'releaseFlow.templateDescription',
+      visible: true,
+    },
     { id: 'milestones', labelKey: 'releaseFlow.milestones', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
     { id: 'actions', labelKey: 'common.actions', visible: true },
@@ -1160,7 +1275,8 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
         if (orderBy === 'name') {
           cmp = (a.flowName || '').localeCompare(b.flowName || '');
         } else if (orderBy === 'createdAt') {
-          cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          cmp =
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
         }
         return order === 'asc' ? cmp : -cmp;
       });
@@ -1172,7 +1288,9 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
       setTemplates(paginated);
       setTotal(sorted.length);
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'common.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'common.loadFailed'), {
+        variant: 'error',
+      });
       setTemplates([]);
       setTotal(0);
     } finally {
@@ -1183,7 +1301,10 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
 
   // Save filters to localStorage
   useEffect(() => {
-    localStorage.setItem('releaseFlowTemplatesActiveFilters', JSON.stringify(activeFilters));
+    localStorage.setItem(
+      'releaseFlowTemplatesActiveFilters',
+      JSON.stringify(activeFilters)
+    );
   }, [activeFilters]);
 
   useEffect(() => {
@@ -1196,12 +1317,18 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
     const actionsCol = columns.find((c) => c.id === 'actions');
     const updatedColumns = [checkboxCol!, ...newColumns, actionsCol!];
     setColumns(updatedColumns);
-    localStorage.setItem('releaseFlowTemplatesColumns', JSON.stringify(updatedColumns));
+    localStorage.setItem(
+      'releaseFlowTemplatesColumns',
+      JSON.stringify(updatedColumns)
+    );
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem('releaseFlowTemplatesColumns', JSON.stringify(defaultColumns));
+    localStorage.setItem(
+      'releaseFlowTemplatesColumns',
+      JSON.stringify(defaultColumns)
+    );
   };
 
   // Sort handler
@@ -1229,12 +1356,19 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (key: string, value: any) => {
-    setActiveFilters((prev) => prev.map((f) => (f.key === key ? { ...f, value } : f)));
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === key ? { ...f, value } : f))
+    );
     setPage(0);
   };
 
-  const handleOperatorChange = (key: string, operator: 'any_of' | 'include_all') => {
-    setActiveFilters((prev) => prev.map((f) => (f.key === key ? { ...f, operator } : f)));
+  const handleOperatorChange = (
+    key: string,
+    operator: 'any_of' | 'include_all'
+  ) => {
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === key ? { ...f, operator } : f))
+    );
     setPage(0);
   };
 
@@ -1246,17 +1380,26 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
 
   const handleEdit = async (template: ReleaseFlowTemplate) => {
     try {
-      const fullTemplate = await releaseFlowService.getTemplate(template.id, projectApiPath);
+      const fullTemplate = await releaseFlowService.getTemplate(
+        template.id,
+        projectApiPath
+      );
       setEditingTemplate(fullTemplate);
       setEditorOpen(true);
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'common.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'common.loadFailed'), {
+        variant: 'error',
+      });
     }
   };
 
   const handleSave = async (data: CreateTemplateInput) => {
     if (editingTemplate) {
-      await releaseFlowService.updateTemplate(editingTemplate.id, data, projectApiPath);
+      await releaseFlowService.updateTemplate(
+        editingTemplate.id,
+        data,
+        projectApiPath
+      );
       enqueueSnackbar(t('releaseFlow.templateUpdated'), { variant: 'success' });
     } else {
       await releaseFlowService.createTemplate(data, projectApiPath);
@@ -1274,12 +1417,17 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingTemplate) return;
     try {
-      await releaseFlowService.deleteTemplate(deletingTemplate.id, projectApiPath);
+      await releaseFlowService.deleteTemplate(
+        deletingTemplate.id,
+        projectApiPath
+      );
       enqueueSnackbar(t('releaseFlow.templateDeleted'), { variant: 'success' });
       setSelectedIds([]);
       loadTemplates();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), {
+        variant: 'error',
+      });
     } finally {
       setDeleteDialogOpen(false);
       setDeletingTemplate(null);
@@ -1294,13 +1442,17 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   const handleBulkDeleteConfirm = async () => {
     try {
       await Promise.all(
-        selectedIds.map((id) => releaseFlowService.deleteTemplate(id, projectApiPath))
+        selectedIds.map((id) =>
+          releaseFlowService.deleteTemplate(id, projectApiPath)
+        )
       );
       enqueueSnackbar(t('releaseFlow.templateDeleted'), { variant: 'success' });
       setSelectedIds([]);
       loadTemplates();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), { variant: 'error' });
+      enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), {
+        variant: 'error',
+      });
     } finally {
       setBulkDeleteConfirmOpen(false);
     }
@@ -1316,7 +1468,9 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   };
 
   const handleSelectOne = (id: string) => {
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
   };
 
   // Visible columns
@@ -1347,7 +1501,11 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
           </Typography>
         </Box>
         {canManage && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreate}
+          >
             {t('releaseFlow.addTemplate')}
           </Button>
         )}
@@ -1399,7 +1557,10 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                     '&.Mui-focused': {
                       bgcolor: 'background.paper',
                       boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': { borderColor: 'primary.main', borderWidth: '1px' },
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
+                      },
                     },
                   },
                   '& .MuiInputBase-input': { fontSize: '0.875rem' },
@@ -1407,7 +1568,9 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -1444,7 +1607,11 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Tooltip title={t('common.refresh')}>
                 <span>
-                  <IconButton size="small" onClick={loadTemplates} disabled={loading}>
+                  <IconButton
+                    size="small"
+                    onClick={loadTemplates}
+                    disabled={loading}
+                  >
                     <RefreshIcon />
                   </IconButton>
                 </span>
@@ -1477,7 +1644,9 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
         {templates.length === 0 ? (
           <EmptyPagePlaceholder
             message={t('releaseFlow.noTemplatesFound')}
-            subtitle={canManage ? t('releaseFlow.templatesSubtitle') : undefined}
+            subtitle={
+              canManage ? t('releaseFlow.templatesSubtitle') : undefined
+            }
             onAddClick={canManage ? handleCreate : undefined}
             addButtonLabel={t('releaseFlow.addTemplate')}
           />
@@ -1495,10 +1664,12 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                             <TableCell key={column.id} padding="checkbox">
                               <Checkbox
                                 indeterminate={
-                                  selectedIds.length > 0 && selectedIds.length < templates.length
+                                  selectedIds.length > 0 &&
+                                  selectedIds.length < templates.length
                                 }
                                 checked={
-                                  templates.length > 0 && selectedIds.length === templates.length
+                                  templates.length > 0 &&
+                                  selectedIds.length === templates.length
                                 }
                                 onChange={handleSelectAll}
                               />
@@ -1513,13 +1684,17 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                             </TableCell>
                           );
                         }
-                        const isSortable = ['name', 'createdAt'].includes(column.id);
+                        const isSortable = ['name', 'createdAt'].includes(
+                          column.id
+                        );
                         return (
                           <TableCell key={column.id}>
                             {isSortable ? (
                               <TableSortLabel
                                 active={orderBy === column.id}
-                                direction={orderBy === column.id ? order : 'asc'}
+                                direction={
+                                  orderBy === column.id ? order : 'asc'
+                                }
                                 onClick={() => handleSort(column.id)}
                               >
                                 {t(column.labelKey)}
@@ -1565,8 +1740,12 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                                   {template.displayName || template.flowName}
                                 </Typography>
                                 {template.displayName &&
-                                  template.displayName !== template.flowName && (
-                                    <Typography variant="caption" color="text.secondary">
+                                  template.displayName !==
+                                    template.flowName && (
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
                                       {template.flowName}
                                     </Typography>
                                   )}
@@ -1576,7 +1755,10 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                           if (column.id === 'description') {
                             return (
                               <TableCell key={column.id}>
-                                <Typography variant="body2" color="text.secondary">
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
                                   {template.description || '-'}
                                 </Typography>
                               </TableCell>
@@ -1614,14 +1796,19 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                                   }}
                                 >
                                   <Tooltip title={t('common.edit')}>
-                                    <IconButton size="small" onClick={() => handleEdit(template)}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleEdit(template)}
+                                    >
                                       <EditIcon fontSize="small" />
                                     </IconButton>
                                   </Tooltip>
                                   <Tooltip title={t('common.delete')}>
                                     <IconButton
                                       size="small"
-                                      onClick={() => handleDeleteClick(template)}
+                                      onClick={() =>
+                                        handleDeleteClick(template)
+                                      }
                                     >
                                       <DeleteIcon fontSize="small" />
                                     </IconButton>
@@ -1658,7 +1845,9 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
       <ColumnSettingsDialog
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        columns={columns.filter((col) => col.id !== 'checkbox' && col.id !== 'actions')}
+        columns={columns.filter(
+          (col) => col.id !== 'checkbox' && col.id !== 'actions'
+        )}
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
       />
@@ -1682,7 +1871,8 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
         onConfirm={handleDeleteConfirm}
         title={t('releaseFlow.deleteTemplate')}
         message={t('releaseFlow.confirmDeleteTemplate', {
-          name: deletingTemplate?.displayName || deletingTemplate?.flowName || '',
+          name:
+            deletingTemplate?.displayName || deletingTemplate?.flowName || '',
         })}
       />
 
@@ -1692,7 +1882,9 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
         onClose={() => setBulkDeleteConfirmOpen(false)}
         onConfirm={handleBulkDeleteConfirm}
         title={t('releaseFlow.deleteTemplate')}
-        message={t('common.bulkDeleteConfirmMessage', { count: selectedIds.length })}
+        message={t('common.bulkDeleteConfirmMessage', {
+          count: selectedIds.length,
+        })}
       />
     </Box>
   );

@@ -7,7 +7,11 @@
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
 import { RedeemCouponRequest, RedeemCouponResponse } from '../types/api';
-import { CouponRedeemError, CouponRedeemErrorCode, isGatrixSDKError } from '../utils/errors';
+import {
+  CouponRedeemError,
+  CouponRedeemErrorCode,
+  isGatrixSDKError,
+} from '../utils/errors';
 
 export class CouponService {
   private apiClient: ApiClient;
@@ -40,7 +44,10 @@ export class CouponService {
    * @param request Coupon redemption request
    * @param environmentId environment ID (required)
    */
-  async redeem(request: RedeemCouponRequest, environmentId: string): Promise<RedeemCouponResponse> {
+  async redeem(
+    request: RedeemCouponRequest,
+    environmentId: string
+  ): Promise<RedeemCouponResponse> {
     this.logger.info('Redeeming coupon', {
       code: request.code,
       userId: request.userId,
@@ -85,7 +92,10 @@ export class CouponService {
         const message = error.details?.error?.message || error.message;
         const statusCode = error.statusCode || 500;
 
-        if (errorCode && Object.values(CouponRedeemErrorCode).includes(errorCode)) {
+        if (
+          errorCode &&
+          Object.values(CouponRedeemErrorCode).includes(errorCode)
+        ) {
           throw new CouponRedeemError(errorCode, message, statusCode);
         }
       }

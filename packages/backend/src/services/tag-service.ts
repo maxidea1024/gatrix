@@ -11,7 +11,8 @@ export class TagService {
     const name = data.name?.trim();
     if (!name) throw new GatrixError('Tag name is required', 400);
     const existing = await TagModel.findByName(name);
-    if (existing) throw new GatrixError('Tag with this name already exists', 409);
+    if (existing)
+      throw new GatrixError('Tag with this name already exists', 409);
     return await TagModel.create({ ...data, name, createdBy: userId ?? null });
   }
 
@@ -42,7 +43,12 @@ export class TagService {
     tagIds: string[],
     createdBy?: string
   ): Promise<void> {
-    await TagAssignmentModel.setTagsForEntity(entityType, entityId, tagIds, createdBy);
+    await TagAssignmentModel.setTagsForEntity(
+      entityType,
+      entityId,
+      tagIds,
+      createdBy
+    );
   }
 
   static async listTagsForEntity(entityType: string, entityId: string) {

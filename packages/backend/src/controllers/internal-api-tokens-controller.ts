@@ -43,11 +43,15 @@ async function isInternalInfraToken(req: SDKRequest): Promise<boolean> {
 /**
  * Check if Edge bypass token or internal infrastructure token
  */
-async function requireEdgeAccess(req: SDKRequest, res: Response): Promise<boolean> {
+async function requireEdgeAccess(
+  req: SDKRequest,
+  res: Response
+): Promise<boolean> {
   if (req.isEdgeBypassToken) return true;
 
   // Infra/unsecured tokens with __internal__ org are always allowed
-  if (req.isUnsecuredToken && req.unsecuredOrgId === INTERNAL_ORG_NAME) return true;
+  if (req.isUnsecuredToken && req.unsecuredOrgId === INTERNAL_ORG_NAME)
+    return true;
 
   const isInternal = await isInternalInfraToken(req);
   if (!isInternal) {
@@ -100,7 +104,9 @@ class InternalApiTokensController {
         tokenType: token.tokenType,
         allowAllEnvironments: !token.environmentId,
         environments: token.environmentId ? [token.environmentId] : ['*'],
-        expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString() : null,
+        expiresAt: token.expiresAt
+          ? new Date(token.expiresAt).toISOString()
+          : null,
         createdAt: new Date(token.createdAt).toISOString(),
         updatedAt: new Date(token.updatedAt).toISOString(),
       }));
@@ -221,7 +227,13 @@ class InternalApiTokensController {
       const environments =
         projectIds.length > 0
           ? await knex('g_environments')
-              .select('id', 'projectId', 'name', 'displayName', 'environmentType')
+              .select(
+                'id',
+                'projectId',
+                'name',
+                'displayName',
+                'environmentType'
+              )
               .whereIn('projectId', projectIds)
           : [];
 

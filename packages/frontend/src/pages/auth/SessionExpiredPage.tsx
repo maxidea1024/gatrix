@@ -167,7 +167,10 @@ const SessionExpiredPage: React.FC = () => {
                 >
                   {step.title}
                 </Typography>
-                <Typography variant="body2" sx={{ lineHeight: 1.5, color: 'text.secondary' }}>
+                <Typography
+                  variant="body2"
+                  sx={{ lineHeight: 1.5, color: 'text.secondary' }}
+                >
                   {step.desc}
                 </Typography>
               </Box>

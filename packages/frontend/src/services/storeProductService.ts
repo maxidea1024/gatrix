@@ -1,6 +1,9 @@
 import api from './api';
 import { Tag } from './tagService';
-import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
+import {
+  MutationResult,
+  parseChangeRequestResponse,
+} from './changeRequestUtils';
 
 export interface StoreProduct {
   id: string;
@@ -126,7 +129,9 @@ class StoreProductService {
     projectApiPath: string,
     params?: GetStoreProductsParams
   ): Promise<GetStoreProductsResponse> {
-    const response = await api.get(`${projectApiPath}/store-products`, { params });
+    const response = await api.get(`${projectApiPath}/store-products`, {
+      params,
+    });
     // response = { success, data: { products, total, page, limit }, message }
     return response.data;
   }
@@ -142,7 +147,10 @@ class StoreProductService {
   /**
    * Get store product by ID
    */
-  async getStoreProductById(projectApiPath: string, id: string): Promise<StoreProduct> {
+  async getStoreProductById(
+    projectApiPath: string,
+    id: string
+  ): Promise<StoreProduct> {
     const response = await api.get(`${projectApiPath}/store-products/${id}`);
     return response.data.product;
   }
@@ -155,7 +163,10 @@ class StoreProductService {
     input: CreateStoreProductInput
   ): Promise<MutationResult<StoreProduct>> {
     const response = await api.post(`${projectApiPath}/store-products`, input);
-    return parseChangeRequestResponse<StoreProduct>(response, (r) => r?.product);
+    return parseChangeRequestResponse<StoreProduct>(
+      response,
+      (r) => r?.product
+    );
   }
 
   /**
@@ -166,14 +177,23 @@ class StoreProductService {
     id: string,
     input: UpdateStoreProductInput
   ): Promise<MutationResult<StoreProduct>> {
-    const response = await api.put(`${projectApiPath}/store-products/${id}`, input);
-    return parseChangeRequestResponse<StoreProduct>(response, (r) => r?.product);
+    const response = await api.put(
+      `${projectApiPath}/store-products/${id}`,
+      input
+    );
+    return parseChangeRequestResponse<StoreProduct>(
+      response,
+      (r) => r?.product
+    );
   }
 
   /**
    * Delete a store product
    */
-  async deleteStoreProduct(projectApiPath: string, id: string): Promise<MutationResult<void>> {
+  async deleteStoreProduct(
+    projectApiPath: string,
+    id: string
+  ): Promise<MutationResult<void>> {
     const response = await api.delete(`${projectApiPath}/store-products/${id}`);
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
@@ -181,7 +201,10 @@ class StoreProductService {
   /**
    * Delete multiple store products
    */
-  async deleteStoreProducts(projectApiPath: string, ids: string[]): Promise<number> {
+  async deleteStoreProducts(
+    projectApiPath: string,
+    ids: string[]
+  ): Promise<number> {
     const response = await api.delete(`${projectApiPath}/store-products`, {
       data: { ids },
     });
@@ -196,10 +219,16 @@ class StoreProductService {
     id: string,
     isActive: boolean
   ): Promise<MutationResult<StoreProduct>> {
-    const response = await api.patch(`${projectApiPath}/store-products/${id}/toggle-active`, {
-      isActive,
-    });
-    return parseChangeRequestResponse<StoreProduct>(response, (r) => r?.product);
+    const response = await api.patch(
+      `${projectApiPath}/store-products/${id}/toggle-active`,
+      {
+        isActive,
+      }
+    );
+    return parseChangeRequestResponse<StoreProduct>(
+      response,
+      (r) => r?.product
+    );
   }
 
   /**
@@ -210,11 +239,17 @@ class StoreProductService {
     ids: string[],
     isActive: boolean
   ): Promise<MutationResult<number>> {
-    const response = await api.patch(`${projectApiPath}/store-products/bulk-active`, {
-      ids,
-      isActive,
-    });
-    return parseChangeRequestResponse<number>(response, (r) => r?.affectedCount);
+    const response = await api.patch(
+      `${projectApiPath}/store-products/bulk-active`,
+      {
+        ids,
+        isActive,
+      }
+    );
+    return parseChangeRequestResponse<number>(
+      response,
+      (r) => r?.affectedCount
+    );
   }
 
   /**
@@ -242,9 +277,12 @@ class StoreProductService {
     projectApiPath: string,
     params: { search?: string; isActive?: boolean }
   ): Promise<number> {
-    const response = await api.get(`${projectApiPath}/store-products/count-by-filter`, {
-      params,
-    });
+    const response = await api.get(
+      `${projectApiPath}/store-products/count-by-filter`,
+      {
+        params,
+      }
+    );
     return response.data.count;
   }
 
@@ -252,7 +290,9 @@ class StoreProductService {
    * Get CMS CashShop products from CashShop_BCCN.json
    * Returns only valid products (with chinaPrice and productCodeSdo)
    */
-  async getCmsCashShopProducts(projectApiPath: string): Promise<GetCmsCashShopResponse> {
+  async getCmsCashShopProducts(
+    projectApiPath: string
+  ): Promise<GetCmsCashShopResponse> {
     const response = await api.get(`${projectApiPath}/cms/cash-shop`);
     return response.data;
   }
@@ -260,7 +300,9 @@ class StoreProductService {
   /**
    * Refresh CMS CashShop cache and get products
    */
-  async refreshCmsCashShopProducts(projectApiPath: string): Promise<GetCmsCashShopResponse> {
+  async refreshCmsCashShopProducts(
+    projectApiPath: string
+  ): Promise<GetCmsCashShopResponse> {
     const response = await api.post(`${projectApiPath}/cms/cash-shop/refresh`);
     return response.data;
   }
@@ -269,15 +311,23 @@ class StoreProductService {
    * Preview sync with planning data
    */
   async previewSync(projectApiPath: string): Promise<SyncPreviewResult> {
-    const response = await api.get(`${projectApiPath}/store-products/sync/preview`);
+    const response = await api.get(
+      `${projectApiPath}/store-products/sync/preview`
+    );
     return response.data;
   }
 
   /**
    * Apply sync with planning data (selective)
    */
-  async applySync(projectApiPath: string, selected?: SelectedSyncItems): Promise<SyncApplyResult> {
-    const response = await api.post(`${projectApiPath}/store-products/sync/apply`, selected);
+  async applySync(
+    projectApiPath: string,
+    selected?: SelectedSyncItems
+  ): Promise<SyncApplyResult> {
+    const response = await api.post(
+      `${projectApiPath}/store-products/sync/apply`,
+      selected
+    );
     return response.data;
   }
 }

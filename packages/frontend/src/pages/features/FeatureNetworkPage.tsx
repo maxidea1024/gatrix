@@ -4,7 +4,13 @@
  * Similar to Unleash Network dashboard
  */
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
 import {
@@ -202,7 +208,9 @@ const FeatureNetworkPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Ensure allEnvironments is an array
-  const envList: Environment[] = Array.isArray(allEnvironments) ? allEnvironments : [];
+  const envList: Environment[] = Array.isArray(allEnvironments)
+    ? allEnvironments
+    : [];
 
   // State - initialize from URL params
   const [loading, setLoading] = useState(true);
@@ -210,24 +218,34 @@ const FeatureNetworkPage: React.FC = () => {
   const hasLoadedRef = useRef(false);
   const [trafficData, setTrafficData] = useState<TrafficDataPoint[]>([]);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  const [chartDataByApp, setChartDataByApp] = useState<ChartDataPointByApp[]>([]);
+  const [chartDataByApp, setChartDataByApp] = useState<ChartDataPointByApp[]>(
+    []
+  );
   const [summary, setSummary] = useState<TrafficSummary | null>(null);
-  const [evaluations, setEvaluations] = useState<EvaluationSummary | null>(null);
-  const [evaluationTimeSeries, setEvaluationTimeSeries] = useState<EvaluationTimeSeriesPoint[]>([]);
+  const [evaluations, setEvaluations] = useState<EvaluationSummary | null>(
+    null
+  );
+  const [evaluationTimeSeries, setEvaluationTimeSeries] = useState<
+    EvaluationTimeSeriesPoint[]
+  >([]);
   const [evaluationTimeSeriesByApp, setEvaluationTimeSeriesByApp] = useState<
     EvaluationTimeSeriesPointByApp[]
   >([]);
   const [applications, setApplications] = useState<string[]>([]);
   const [initialEnvLoad, setInitialEnvLoad] = useState(true);
-  const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>(() => {
-    const envParam = searchParams.get('environments');
-    return envParam ? envParam.split(',') : [];
-  });
+  const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>(
+    () => {
+      const envParam = searchParams.get('environments');
+      return envParam ? envParam.split(',') : [];
+    }
+  );
   const [selectedApps, setSelectedApps] = useState<string[]>(() => {
     const appsParam = searchParams.get('apps');
     return appsParam ? appsParam.split(',') : [];
   });
-  const [timeRange, setTimeRange] = useState(() => searchParams.get('range') || '24h');
+  const [timeRange, setTimeRange] = useState(
+    () => searchParams.get('range') || '24h'
+  );
   const [showTable, setShowTable] = useState(true);
   const [showEvalTable, setShowEvalTable] = useState(true);
   const [appsLoaded, setAppsLoaded] = useState(false);
@@ -235,12 +253,14 @@ const FeatureNetworkPage: React.FC = () => {
     const tabParam = searchParams.get('tab');
     return tabParam === '1' ? 1 : 0;
   });
-  const [chartGroupBy, setChartGroupBy] = useState<'all' | 'app' | 'env'>(() => {
-    const groupParam = searchParams.get('groupBy');
-    if (groupParam === 'env') return 'env';
-    if (groupParam === 'app') return 'app';
-    return 'all';
-  });
+  const [chartGroupBy, setChartGroupBy] = useState<'all' | 'app' | 'env'>(
+    () => {
+      const groupParam = searchParams.get('groupBy');
+      if (groupParam === 'env') return 'env';
+      if (groupParam === 'app') return 'app';
+      return 'all';
+    }
+  );
 
   // Get time range dates
   const getTimeRange = useCallback(() => {
@@ -254,7 +274,10 @@ const FeatureNetworkPage: React.FC = () => {
   // Update URL params when filters change
   useEffect(() => {
     const params = new URLSearchParams();
-    if (selectedEnvironments.length > 0 && selectedEnvironments.length < envList.length) {
+    if (
+      selectedEnvironments.length > 0 &&
+      selectedEnvironments.length < envList.length
+    ) {
       params.set('environments', selectedEnvironments.join(','));
     }
     if (selectedApps.length > 0 && selectedApps.length < applications.length) {
@@ -395,7 +418,9 @@ const FeatureNetworkPage: React.FC = () => {
       setSummary(summaryRes.data?.summary || null);
       setEvaluations(evaluationsRes.data?.evaluations || null);
       setEvaluationTimeSeries(evalTimeSeriesRes.data?.timeseries || []);
-      setEvaluationTimeSeriesByApp(evalTimeSeriesByAppRes.data?.timeseries || []);
+      setEvaluationTimeSeriesByApp(
+        evalTimeSeriesByAppRes.data?.timeseries || []
+      );
     } catch (error) {
       console.error('Failed to fetch network traffic data:', error);
     } finally {
@@ -403,11 +428,21 @@ const FeatureNetworkPage: React.FC = () => {
       setIsRefreshing(false);
       hasLoadedRef.current = true;
     }
-  }, [getTimeRange, selectedEnvironments, selectedApps, appsLoaded, applications.length]);
+  }, [
+    getTimeRange,
+    selectedEnvironments,
+    selectedApps,
+    appsLoaded,
+    applications.length,
+  ]);
 
   // Set default environments when envList is loaded (only on initial load)
   useEffect(() => {
-    if (envList.length > 0 && selectedEnvironments.length === 0 && initialEnvLoad) {
+    if (
+      envList.length > 0 &&
+      selectedEnvironments.length === 0 &&
+      initialEnvLoad
+    ) {
       // Select all environments by default only on first load
       setSelectedEnvironments(envList.map((e) => e.environmentId));
       setInitialEnvLoad(false);
@@ -427,17 +462,26 @@ const FeatureNetworkPage: React.FC = () => {
   }, [fetchData, selectedEnvironments, selectedApps]);
 
   // Handle environment toggle
-  const handleEnvironmentChange = (_: React.MouseEvent<HTMLElement>, newEnvs: string[]) => {
+  const handleEnvironmentChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newEnvs: string[]
+  ) => {
     setSelectedEnvironments(newEnvs || []);
   };
 
   // Handle app toggle
-  const handleAppChange = (_: React.MouseEvent<HTMLElement>, newApps: string[]) => {
+  const handleAppChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newApps: string[]
+  ) => {
     setSelectedApps(newApps || []);
   };
 
   // Handle time range change
-  const handleTimeRangeChange = (_: React.MouseEvent<HTMLElement>, newRange: string | null) => {
+  const handleTimeRangeChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newRange: string | null
+  ) => {
     if (newRange) {
       setTimeRange(newRange);
     }
@@ -500,11 +544,16 @@ const FeatureNetworkPage: React.FC = () => {
       // Group by environment
       const envNames = [...new Set(chartDataByApp.map((d) => d.environmentId))];
       const datasets = envNames.map((envName, index) => {
-        const envData = chartDataByApp.filter((d) => d.environmentId === envName);
+        const envData = chartDataByApp.filter(
+          (d) => d.environmentId === envName
+        );
         // Aggregate by displayTime
         const aggregated = new Map<string, number>();
         envData.forEach((d) => {
-          aggregated.set(d.displayTime, (aggregated.get(d.displayTime) || 0) + d.totalCount);
+          aggregated.set(
+            d.displayTime,
+            (aggregated.get(d.displayTime) || 0) + d.totalCount
+          );
         });
         const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
         const colorIndex = index % appColors.length;
@@ -530,7 +579,10 @@ const FeatureNetworkPage: React.FC = () => {
         // Aggregate by displayTime
         const aggregated = new Map<string, number>();
         appData.forEach((d) => {
-          aggregated.set(d.displayTime, (aggregated.get(d.displayTime) || 0) + d.totalCount);
+          aggregated.set(
+            d.displayTime,
+            (aggregated.get(d.displayTime) || 0) + d.totalCount
+          );
         });
         const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
         const colorIndex = index % appColors.length;
@@ -552,7 +604,10 @@ const FeatureNetworkPage: React.FC = () => {
       // 'all' - Single aggregated line
       const aggregated = new Map<string, number>();
       chartDataByApp.forEach((d) => {
-        aggregated.set(d.displayTime, (aggregated.get(d.displayTime) || 0) + d.totalCount);
+        aggregated.set(
+          d.displayTime,
+          (aggregated.get(d.displayTime) || 0) + d.totalCount
+        );
       });
       const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
 
@@ -641,13 +696,20 @@ const FeatureNetworkPage: React.FC = () => {
 
     if (chartGroupBy === 'env') {
       // Group by environment
-      const envNames = [...new Set(evaluationTimeSeriesByApp.map((d) => d.environmentId))];
+      const envNames = [
+        ...new Set(evaluationTimeSeriesByApp.map((d) => d.environmentId)),
+      ];
       const datasets = envNames.map((envName, index) => {
-        const envData = evaluationTimeSeriesByApp.filter((d) => d.environmentId === envName);
+        const envData = evaluationTimeSeriesByApp.filter(
+          (d) => d.environmentId === envName
+        );
         // Aggregate by displayTime
         const aggregated = new Map<string, number>();
         envData.forEach((d) => {
-          aggregated.set(d.displayTime, (aggregated.get(d.displayTime) || 0) + d.evaluations);
+          aggregated.set(
+            d.displayTime,
+            (aggregated.get(d.displayTime) || 0) + d.evaluations
+          );
         });
         const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
         const colorIndex = index % appColors.length;
@@ -667,13 +729,20 @@ const FeatureNetworkPage: React.FC = () => {
       return { labels: allDisplayTimes, datasets };
     } else if (chartGroupBy === 'app') {
       // Group by app
-      const appNames = [...new Set(evaluationTimeSeriesByApp.map((d) => d.appName))];
+      const appNames = [
+        ...new Set(evaluationTimeSeriesByApp.map((d) => d.appName)),
+      ];
       const datasets = appNames.map((appName, index) => {
-        const appData = evaluationTimeSeriesByApp.filter((d) => d.appName === appName);
+        const appData = evaluationTimeSeriesByApp.filter(
+          (d) => d.appName === appName
+        );
         // Aggregate by displayTime
         const aggregated = new Map<string, number>();
         appData.forEach((d) => {
-          aggregated.set(d.displayTime, (aggregated.get(d.displayTime) || 0) + d.evaluations);
+          aggregated.set(
+            d.displayTime,
+            (aggregated.get(d.displayTime) || 0) + d.evaluations
+          );
         });
         const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
         const colorIndex = index % appColors.length;
@@ -695,7 +764,10 @@ const FeatureNetworkPage: React.FC = () => {
       // 'all' - Single aggregated line
       const aggregated = new Map<string, number>();
       evaluationTimeSeriesByApp.forEach((d) => {
-        aggregated.set(d.displayTime, (aggregated.get(d.displayTime) || 0) + d.evaluations);
+        aggregated.set(
+          d.displayTime,
+          (aggregated.get(d.displayTime) || 0) + d.evaluations
+        );
       });
       const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
 
@@ -788,7 +860,8 @@ const FeatureNetworkPage: React.FC = () => {
         value: evaluations
           ? Math.round(
               evaluations.totalEvaluations /
-                (TIME_RANGE_OPTIONS.find((o) => o.value === timeRange)?.hours || 24)
+                (TIME_RANGE_OPTIONS.find((o) => o.value === timeRange)?.hours ||
+                  24)
             ).toLocaleString()
           : '0',
         color: '#9c27b0',
@@ -823,7 +896,11 @@ const FeatureNetworkPage: React.FC = () => {
           <span>
             <IconButton onClick={fetchData} disabled={loading || isRefreshing}>
               <RefreshIcon
-                sx={{ animation: isRefreshing ? `${spin} 1s linear infinite` : 'none' }}
+                sx={{
+                  animation: isRefreshing
+                    ? `${spin} 1s linear infinite`
+                    : 'none',
+                }}
               />
             </IconButton>
           </span>
@@ -842,7 +919,11 @@ const FeatureNetworkPage: React.FC = () => {
         >
           {/* Environment Toggle */}
           <Box>
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: 'block', mb: 0.5 }}
+            >
               {t('network.environment')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
@@ -854,14 +935,27 @@ const FeatureNetworkPage: React.FC = () => {
                   onClick={() => {
                     if (selectedEnvironments.includes(env.environmentId)) {
                       setSelectedEnvironments(
-                        selectedEnvironments.filter((e) => e !== env.environmentId)
+                        selectedEnvironments.filter(
+                          (e) => e !== env.environmentId
+                        )
                       );
                     } else {
-                      setSelectedEnvironments([...selectedEnvironments, env.environmentId]);
+                      setSelectedEnvironments([
+                        ...selectedEnvironments,
+                        env.environmentId,
+                      ]);
                     }
                   }}
-                  color={selectedEnvironments.includes(env.environmentId) ? 'primary' : 'default'}
-                  variant={selectedEnvironments.includes(env.environmentId) ? 'filled' : 'outlined'}
+                  color={
+                    selectedEnvironments.includes(env.environmentId)
+                      ? 'primary'
+                      : 'default'
+                  }
+                  variant={
+                    selectedEnvironments.includes(env.environmentId)
+                      ? 'filled'
+                      : 'outlined'
+                  }
                   sx={{ borderRadius: '16px' }}
                 />
               ))}
@@ -889,13 +983,17 @@ const FeatureNetworkPage: React.FC = () => {
                       size="small"
                       onClick={() => {
                         if (selectedApps.includes(app)) {
-                          setSelectedApps(selectedApps.filter((a) => a !== app));
+                          setSelectedApps(
+                            selectedApps.filter((a) => a !== app)
+                          );
                         } else {
                           setSelectedApps([...selectedApps, app]);
                         }
                       }}
                       color={selectedApps.includes(app) ? 'primary' : 'default'}
-                      variant={selectedApps.includes(app) ? 'filled' : 'outlined'}
+                      variant={
+                        selectedApps.includes(app) ? 'filled' : 'outlined'
+                      }
                       sx={{ borderRadius: '16px' }}
                     />
                   ))}
@@ -907,7 +1005,11 @@ const FeatureNetworkPage: React.FC = () => {
 
           {/* Time Range */}
           <Box sx={{ ml: 'auto' }}>
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: 'block', mb: 0.5 }}
+            >
               {t('network.timeRange')}
             </Typography>
             <ToggleButtonGroup
@@ -928,7 +1030,13 @@ const FeatureNetworkPage: React.FC = () => {
 
       {/* Tabs */}
       <PageContentLoader loading={loading}>
-        <Paper sx={{ mb: 3, borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+        <Paper
+          sx={{
+            mb: 3,
+            borderRadius: 2,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          }}
+        >
           <Tabs
             value={activeTab}
             onChange={(_, newValue) => setActiveTab(newValue)}
@@ -958,7 +1066,9 @@ const FeatureNetworkPage: React.FC = () => {
                       boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                     }}
                   >
-                    <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                    <CardContent
+                      sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                    >
                       <Box
                         sx={{
                           display: 'flex',
@@ -967,7 +1077,9 @@ const FeatureNetworkPage: React.FC = () => {
                           mb: 0.5,
                         }}
                       >
-                        <Box sx={{ color: card.color, fontSize: 18 }}>{card.icon}</Box>
+                        <Box sx={{ color: card.color, fontSize: 18 }}>
+                          {card.icon}
+                        </Box>
                         <Typography variant="caption" color="text.secondary">
                           {card.label}
                         </Typography>
@@ -992,16 +1104,24 @@ const FeatureNetworkPage: React.FC = () => {
                   mb: 2,
                 }}
               >
-                <Typography variant="h6">{t('network.requestsOverTime')}</Typography>
+                <Typography variant="h6">
+                  {t('network.requestsOverTime')}
+                </Typography>
                 <ToggleButtonGroup
                   size="small"
                   value={chartGroupBy}
                   exclusive
                   onChange={(_, value) => value && setChartGroupBy(value)}
                 >
-                  <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
-                  <ToggleButton value="app">{t('network.groupByApp')}</ToggleButton>
-                  <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
+                  <ToggleButton value="all">
+                    {t('network.groupByAll')}
+                  </ToggleButton>
+                  <ToggleButton value="app">
+                    {t('network.groupByApp')}
+                  </ToggleButton>
+                  <ToggleButton value="env">
+                    {t('network.groupByEnv')}
+                  </ToggleButton>
                 </ToggleButtonGroup>
               </Box>
               {(loading || isRefreshing) && chartDataByApp.length === 0 ? (
@@ -1015,7 +1135,9 @@ const FeatureNetworkPage: React.FC = () => {
                     justifyContent: 'center',
                   }}
                 >
-                  <Typography color="text.secondary">{t('common.noData')}</Typography>
+                  <Typography color="text.secondary">
+                    {t('common.noData')}
+                  </Typography>
                 </Box>
               ) : (
                 <Box sx={{ height: 300 }}>
@@ -1056,16 +1178,28 @@ const FeatureNetworkPage: React.FC = () => {
                           <TableCell>{t('network.time')}</TableCell>
                           <TableCell>{t('common.environment')}</TableCell>
                           <TableCell>{t('network.application')}</TableCell>
-                          <TableCell align="right">{t('network.features')}</TableCell>
-                          <TableCell align="right">{t('network.segments')}</TableCell>
-                          <TableCell align="right">{t('network.total')}</TableCell>
+                          <TableCell align="right">
+                            {t('network.features')}
+                          </TableCell>
+                          <TableCell align="right">
+                            {t('network.segments')}
+                          </TableCell>
+                          <TableCell align="right">
+                            {t('network.total')}
+                          </TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {trafficData.length === 0 ? (
                           <TableRow hover>
-                            <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                              <Typography color="text.secondary">{t('common.noData')}</Typography>
+                            <TableCell
+                              colSpan={6}
+                              align="center"
+                              sx={{ py: 4 }}
+                            >
+                              <Typography color="text.secondary">
+                                {t('common.noData')}
+                              </Typography>
                             </TableCell>
                           </TableRow>
                         ) : (
@@ -1136,7 +1270,9 @@ const FeatureNetworkPage: React.FC = () => {
                       boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                     }}
                   >
-                    <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                    <CardContent
+                      sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                    >
                       <Box
                         sx={{
                           display: 'flex',
@@ -1145,7 +1281,9 @@ const FeatureNetworkPage: React.FC = () => {
                           mb: 0.5,
                         }}
                       >
-                        <Box sx={{ color: card.color, fontSize: 18 }}>{card.icon}</Box>
+                        <Box sx={{ color: card.color, fontSize: 18 }}>
+                          {card.icon}
+                        </Box>
                         <Typography variant="caption" color="text.secondary">
                           {card.label}
                         </Typography>
@@ -1170,19 +1308,28 @@ const FeatureNetworkPage: React.FC = () => {
                   mb: 2,
                 }}
               >
-                <Typography variant="h6">{t('network.evaluationsOverTime')}</Typography>
+                <Typography variant="h6">
+                  {t('network.evaluationsOverTime')}
+                </Typography>
                 <ToggleButtonGroup
                   size="small"
                   value={chartGroupBy}
                   exclusive
                   onChange={(_, value) => value && setChartGroupBy(value)}
                 >
-                  <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
-                  <ToggleButton value="app">{t('network.groupByApp')}</ToggleButton>
-                  <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
+                  <ToggleButton value="all">
+                    {t('network.groupByAll')}
+                  </ToggleButton>
+                  <ToggleButton value="app">
+                    {t('network.groupByApp')}
+                  </ToggleButton>
+                  <ToggleButton value="env">
+                    {t('network.groupByEnv')}
+                  </ToggleButton>
                 </ToggleButtonGroup>
               </Box>
-              {(loading || isRefreshing) && evaluationTimeSeriesByApp.length === 0 ? (
+              {(loading || isRefreshing) &&
+              evaluationTimeSeriesByApp.length === 0 ? (
                 <Skeleton variant="rectangular" height={300} />
               ) : evaluationTimeSeriesByApp.length === 0 ? (
                 <Box
@@ -1193,7 +1340,9 @@ const FeatureNetworkPage: React.FC = () => {
                     justifyContent: 'center',
                   }}
                 >
-                  <Typography color="text.secondary">{t('common.noData')}</Typography>
+                  <Typography color="text.secondary">
+                    {t('common.noData')}
+                  </Typography>
                 </Box>
               ) : (
                 <Box sx={{ height: 300 }}>
@@ -1234,14 +1383,22 @@ const FeatureNetworkPage: React.FC = () => {
                           <TableCell>{t('network.time')}</TableCell>
                           <TableCell>{t('common.environment')}</TableCell>
                           <TableCell>{t('network.application')}</TableCell>
-                          <TableCell align="right">{t('network.flagEvaluations')}</TableCell>
+                          <TableCell align="right">
+                            {t('network.flagEvaluations')}
+                          </TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {evaluationTimeSeriesByApp.length === 0 ? (
                           <TableRow hover>
-                            <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
-                              <Typography color="text.secondary">{t('common.noData')}</Typography>
+                            <TableCell
+                              colSpan={4}
+                              align="center"
+                              sx={{ py: 4 }}
+                            >
+                              <Typography color="text.secondary">
+                                {t('common.noData')}
+                              </Typography>
                             </TableCell>
                           </TableRow>
                         ) : (

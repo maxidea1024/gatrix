@@ -49,11 +49,13 @@ export interface BucketMetricSample {
 
 export type MetricSample = NumericMetricSample | BucketMetricSample;
 
-const isNumericMetricSample = (sample: MetricSample): sample is NumericMetricSample =>
-  'value' in sample;
+const isNumericMetricSample = (
+  sample: MetricSample
+): sample is NumericMetricSample => 'value' in sample;
 
-const isBucketMetricSample = (sample: MetricSample): sample is BucketMetricSample =>
-  'buckets' in sample;
+const isBucketMetricSample = (
+  sample: MetricSample
+): sample is BucketMetricSample => 'buckets' in sample;
 
 // ==================== Collected Metric ====================
 
@@ -119,10 +121,12 @@ class CounterImpl implements Counter, CollectibleMetric {
   }
 
   collect(): CollectedMetric {
-    const samples: NumericMetricSample[] = [...this.values.entries()].map(([key, value]) => ({
-      labels: parseLabelKey(key),
-      value,
-    }));
+    const samples: NumericMetricSample[] = [...this.values.entries()].map(
+      ([key, value]) => ({
+        labels: parseLabelKey(key),
+        value,
+      })
+    );
 
     this.values.clear();
 
@@ -167,10 +171,12 @@ class GaugeImpl implements Gauge, CollectibleMetric {
   }
 
   collect(): CollectedMetric {
-    const samples: NumericMetricSample[] = [...this.values.entries()].map(([key, value]) => ({
-      labels: parseLabelKey(key),
-      value,
-    }));
+    const samples: NumericMetricSample[] = [...this.values.entries()].map(
+      ([key, value]) => ({
+        labels: parseLabelKey(key),
+        value,
+      })
+    );
 
     this.values.clear();
 
@@ -191,8 +197,12 @@ class HistogramImpl implements Histogram, CollectibleMetric {
   private buckets: number[];
 
   constructor(private opts: BucketMetricOptions) {
-    const buckets = opts.buckets || [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
-    const sortedBuckets = [...new Set(buckets.filter((b) => b !== Infinity))].sort((a, b) => a - b);
+    const buckets = opts.buckets || [
+      0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10,
+    ];
+    const sortedBuckets = [
+      ...new Set(buckets.filter((b) => b !== Infinity)),
+    ].sort((a, b) => a - b);
     this.buckets = [...sortedBuckets, Infinity];
   }
 
@@ -202,7 +212,10 @@ class HistogramImpl implements Histogram, CollectibleMetric {
       count: sample.count,
       sum: sample.sum,
       buckets: new Map(
-        sample.buckets.map((b) => [b.le === '+Inf' ? Infinity : (b.le as number), b.count])
+        sample.buckets.map((b) => [
+          b.le === '+Inf' ? Infinity : (b.le as number),
+          b.count,
+        ])
       ),
     };
     this.values.set(key, data);
@@ -232,15 +245,17 @@ class HistogramImpl implements Histogram, CollectibleMetric {
   }
 
   collect(): CollectedMetric {
-    const samples: BucketMetricSample[] = Array.from(this.values.entries()).map(([key, data]) => ({
-      labels: parseLabelKey(key),
-      count: data.count,
-      sum: data.sum,
-      buckets: Array.from(data.buckets.entries()).map(([le, count]) => ({
-        le: le === Infinity ? ('+Inf' as const) : le,
-        count,
-      })),
-    }));
+    const samples: BucketMetricSample[] = Array.from(this.values.entries()).map(
+      ([key, data]) => ({
+        labels: parseLabelKey(key),
+        count: data.count,
+        sum: data.sum,
+        buckets: Array.from(data.buckets.entries()).map(([le, count]) => ({
+          le: le === Infinity ? ('+Inf' as const) : le,
+          count,
+        })),
+      })
+    );
 
     this.values.clear();
 
@@ -283,7 +298,9 @@ export interface ImpactMetricRegistry {
 
 // ==================== InMemoryMetricRegistry ====================
 
-export class InMemoryMetricRegistry implements ImpactMetricsDataSource, ImpactMetricRegistry {
+export class InMemoryMetricRegistry
+  implements ImpactMetricsDataSource, ImpactMetricRegistry
+{
   private counters = new Map<string, Counter & CollectibleMetric>();
   private gauges = new Map<string, Gauge & CollectibleMetric>();
   private histograms = new Map<string, Histogram & CollectibleMetric>();
@@ -339,7 +356,10 @@ export class InMemoryMetricRegistry implements ImpactMetricsDataSource, ImpactMe
     for (const metric of metrics) {
       switch (metric.type) {
         case 'counter': {
-          const counter = this.counter({ name: metric.name, help: metric.help });
+          const counter = this.counter({
+            name: metric.name,
+            help: metric.help,
+          });
           for (const sample of metric.samples) {
             if (isNumericMetricSample(sample)) {
               counter.inc(sample.value, sample.labels);

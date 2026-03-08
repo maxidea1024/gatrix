@@ -34,8 +34,10 @@ export const jobService = {
   // Jobs
   async getJobs(filters?: JobFilters): Promise<Job[]> {
     const params = new URLSearchParams();
-    if (filters?.jobTypeId) params.append('jobTypeId', filters.jobTypeId.toString());
-    if (filters?.isEnabled !== undefined) params.append('isEnabled', filters.isEnabled.toString());
+    if (filters?.jobTypeId)
+      params.append('jobTypeId', filters.jobTypeId.toString());
+    if (filters?.isEnabled !== undefined)
+      params.append('isEnabled', filters.isEnabled.toString());
     if (filters?.search) params.append('search', filters.search);
 
     const queryString = params.toString();
@@ -46,11 +48,14 @@ export const jobService = {
 
   async getJobsWithPagination(filters?: JobFilters): Promise<JobListResponse> {
     const params = new URLSearchParams();
-    if (filters?.jobTypeId) params.append('jobTypeId', filters.jobTypeId.toString());
-    if (filters?.isEnabled !== undefined) params.append('isEnabled', filters.isEnabled.toString());
+    if (filters?.jobTypeId)
+      params.append('jobTypeId', filters.jobTypeId.toString());
+    if (filters?.isEnabled !== undefined)
+      params.append('isEnabled', filters.isEnabled.toString());
     if (filters?.search) params.append('search', filters.search);
     if (filters?.limit) params.append('limit', filters.limit.toString());
-    if (filters?.offset !== undefined) params.append('offset', filters.offset.toString());
+    if (filters?.offset !== undefined)
+      params.append('offset', filters.offset.toString());
     if (filters?.page) params.append('page', filters.page.toString());
 
     const queryString = params.toString();
@@ -105,7 +110,10 @@ export const jobService = {
   },
 
   // Job Executions
-  async getJobExecutions(jobId: number, filters?: JobExecutionFilters): Promise<JobExecution[]> {
+  async getJobExecutions(
+    jobId: number,
+    filters?: JobExecutionFilters
+  ): Promise<JobExecution[]> {
     const params = new URLSearchParams();
     if (filters?.limit) params.append('limit', filters.limit.toString());
     if (filters?.offset) params.append('offset', filters.offset.toString());
@@ -118,10 +126,13 @@ export const jobService = {
     return response.data?.data || response.data || [];
   },
 
-  async getAllJobExecutions(filters?: JobExecutionFilters): Promise<JobExecution[]> {
+  async getAllJobExecutions(
+    filters?: JobExecutionFilters
+  ): Promise<JobExecution[]> {
     const params = new URLSearchParams();
     if (filters?.jobId) params.append('jobId', filters.jobId.toString());
-    if (filters?.scheduleId) params.append('scheduleId', filters.scheduleId.toString());
+    if (filters?.scheduleId)
+      params.append('scheduleId', filters.scheduleId.toString());
     if (filters?.status) params.append('status', filters.status);
     if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
     if (filters?.dateTo) params.append('dateTo', filters.dateTo);
@@ -141,7 +152,10 @@ export const jobService = {
     return response.data?.data || response.data;
   },
 
-  async getJobExecutionStatistics(dateFrom?: string, dateTo?: string): Promise<any> {
+  async getJobExecutionStatistics(
+    dateFrom?: string,
+    dateTo?: string
+  ): Promise<any> {
     const params = new URLSearchParams();
     if (dateFrom) params.append('date_from', dateFrom);
     if (dateTo) params.append('date_to', dateTo);

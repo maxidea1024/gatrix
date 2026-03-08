@@ -28,7 +28,10 @@ export const getTableLocalizationKey = (tableName: string): string => {
  * Formats a Change Request title into a localized, friendly string
  * Attempts to parse standard generated patterns like "[table] Action: ID"
  */
-export const formatChangeRequestTitle = (title: string, t: TFunction): string => {
+export const formatChangeRequestTitle = (
+  title: string,
+  t: TFunction
+): string => {
   if (!title) return '';
 
   // Regex for standard generated title: [table] Action: Identifier
@@ -73,9 +76,12 @@ export const formatChangeRequestTitle = (title: string, t: TFunction): string =>
       'Batch Update': 'common.batchUpdate',
     };
 
-    const actionLocalized = t(actionMap[action] || `common.${action.toLowerCase()}`, {
-      defaultValue: action,
-    });
+    const actionLocalized = t(
+      actionMap[action] || `common.${action.toLowerCase()}`,
+      {
+        defaultValue: action,
+      }
+    );
 
     return `${tableNameLocalized} ${actionLocalized}`;
   }
@@ -114,12 +120,21 @@ export const formatChangeItemTitle = (
     // Only run if we haven't found a better name (fetched ID is same as targetId usually)
     if (friendlyName === targetId || friendlyName.startsWith('NEW_')) {
       // List of potential friendly name fields in priority order
-      const nameFields = ['title', 'name', 'displayName', 'code', 'clientVersion', 'worldId', 'id'];
+      const nameFields = [
+        'title',
+        'name',
+        'displayName',
+        'code',
+        'clientVersion',
+        'worldId',
+        'id',
+      ];
 
       for (const field of nameFields) {
         if (
           afterData[field] &&
-          (typeof afterData[field] === 'string' || typeof afterData[field] === 'number')
+          (typeof afterData[field] === 'string' ||
+            typeof afterData[field] === 'number')
         ) {
           friendlyName = String(afterData[field]);
           break;

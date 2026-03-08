@@ -30,7 +30,10 @@ function createFlagWithConstraint(constraint: Constraint): FeatureFlag {
 }
 
 // Helper to evaluate a single constraint against a context
-function evalConstraint(constraint: Constraint, context: EvaluationContext): boolean {
+function evalConstraint(
+  constraint: Constraint,
+  context: EvaluationContext
+): boolean {
   const flag = createFlagWithConstraint(constraint);
   const result = FeatureFlagEvaluator.evaluate(flag, context, new Map());
   return result.enabled;
@@ -87,28 +90,37 @@ describe('String Operators', () => {
 
     it('should support case insensitive', () => {
       expect(
-        evalConstraint(c('str_eq', 'region', { value: 'US-EAST', caseInsensitive: true }), {
-          ...defaultContext,
-          properties: { region: 'us-east' },
-        })
+        evalConstraint(
+          c('str_eq', 'region', { value: 'US-EAST', caseInsensitive: true }),
+          {
+            ...defaultContext,
+            properties: { region: 'us-east' },
+          }
+        )
       ).toBe(true);
     });
 
     it('should invert result', () => {
       expect(
-        evalConstraint(c('str_eq', 'region', { value: 'us-east', inverted: true }), {
-          ...defaultContext,
-          properties: { region: 'us-east' },
-        })
+        evalConstraint(
+          c('str_eq', 'region', { value: 'us-east', inverted: true }),
+          {
+            ...defaultContext,
+            properties: { region: 'us-east' },
+          }
+        )
       ).toBe(false);
     });
 
     it('should invert non-match (becomes true)', () => {
       expect(
-        evalConstraint(c('str_eq', 'region', { value: 'us-east', inverted: true }), {
-          ...defaultContext,
-          properties: { region: 'eu-west' },
-        })
+        evalConstraint(
+          c('str_eq', 'region', { value: 'us-east', inverted: true }),
+          {
+            ...defaultContext,
+            properties: { region: 'eu-west' },
+          }
+        )
       ).toBe(true);
     });
   });
@@ -134,19 +146,25 @@ describe('String Operators', () => {
 
     it('should support case insensitive', () => {
       expect(
-        evalConstraint(c('str_contains', 'name', { value: 'ADMIN', caseInsensitive: true }), {
-          ...defaultContext,
-          properties: { name: 'SuperAdmin' },
-        })
+        evalConstraint(
+          c('str_contains', 'name', { value: 'ADMIN', caseInsensitive: true }),
+          {
+            ...defaultContext,
+            properties: { name: 'SuperAdmin' },
+          }
+        )
       ).toBe(true);
     });
 
     it('should invert result', () => {
       expect(
-        evalConstraint(c('str_contains', 'email', { value: '@example.com', inverted: true }), {
-          ...defaultContext,
-          properties: { email: 'user@example.com' },
-        })
+        evalConstraint(
+          c('str_contains', 'email', { value: '@example.com', inverted: true }),
+          {
+            ...defaultContext,
+            properties: { email: 'user@example.com' },
+          }
+        )
       ).toBe(false);
     });
   });
@@ -172,10 +190,13 @@ describe('String Operators', () => {
 
     it('should invert result', () => {
       expect(
-        evalConstraint(c('str_starts_with', 'path', { value: '/api/', inverted: true }), {
-          ...defaultContext,
-          properties: { path: '/api/v1/users' },
-        })
+        evalConstraint(
+          c('str_starts_with', 'path', { value: '/api/', inverted: true }),
+          {
+            ...defaultContext,
+            properties: { path: '/api/v1/users' },
+          }
+        )
       ).toBe(false);
     });
   });
@@ -221,28 +242,46 @@ describe('String Operators', () => {
 
     it('should support case insensitive', () => {
       expect(
-        evalConstraint(c('str_in', 'country', { values: ['us', 'ca'], caseInsensitive: true }), {
-          ...defaultContext,
-          properties: { country: 'US' },
-        })
+        evalConstraint(
+          c('str_in', 'country', {
+            values: ['us', 'ca'],
+            caseInsensitive: true,
+          }),
+          {
+            ...defaultContext,
+            properties: { country: 'US' },
+          }
+        )
       ).toBe(true);
     });
 
     it('should invert result (str_not_in equivalent)', () => {
       expect(
-        evalConstraint(c('str_in', 'country', { values: ['US', 'CA', 'MX'], inverted: true }), {
-          ...defaultContext,
-          properties: { country: 'CA' },
-        })
+        evalConstraint(
+          c('str_in', 'country', {
+            values: ['US', 'CA', 'MX'],
+            inverted: true,
+          }),
+          {
+            ...defaultContext,
+            properties: { country: 'CA' },
+          }
+        )
       ).toBe(false);
     });
 
     it('should invert result for non-member (becomes true)', () => {
       expect(
-        evalConstraint(c('str_in', 'country', { values: ['US', 'CA', 'MX'], inverted: true }), {
-          ...defaultContext,
-          properties: { country: 'JP' },
-        })
+        evalConstraint(
+          c('str_in', 'country', {
+            values: ['US', 'CA', 'MX'],
+            inverted: true,
+          }),
+          {
+            ...defaultContext,
+            properties: { country: 'JP' },
+          }
+        )
       ).toBe(true);
     });
   });
@@ -250,19 +289,25 @@ describe('String Operators', () => {
   describe('str_regex', () => {
     it('should match regex pattern', () => {
       expect(
-        evalConstraint(c('str_regex', 'version', { value: '^\\d+\\.\\d+\\.\\d+$' }), {
-          ...defaultContext,
-          properties: { version: '1.2.3' },
-        })
+        evalConstraint(
+          c('str_regex', 'version', { value: '^\\d+\\.\\d+\\.\\d+$' }),
+          {
+            ...defaultContext,
+            properties: { version: '1.2.3' },
+          }
+        )
       ).toBe(true);
     });
 
     it('should not match non-matching pattern', () => {
       expect(
-        evalConstraint(c('str_regex', 'version', { value: '^\\d+\\.\\d+\\.\\d+$' }), {
-          ...defaultContext,
-          properties: { version: 'v1.2.3' },
-        })
+        evalConstraint(
+          c('str_regex', 'version', { value: '^\\d+\\.\\d+\\.\\d+$' }),
+          {
+            ...defaultContext,
+            properties: { version: 'v1.2.3' },
+          }
+        )
       ).toBe(false);
     });
 
@@ -277,10 +322,13 @@ describe('String Operators', () => {
 
     it('should support case insensitive flag', () => {
       expect(
-        evalConstraint(c('str_regex', 'name', { value: '^admin', caseInsensitive: true }), {
-          ...defaultContext,
-          properties: { name: 'ADMIN_USER' },
-        })
+        evalConstraint(
+          c('str_regex', 'name', { value: '^admin', caseInsensitive: true }),
+          {
+            ...defaultContext,
+            properties: { name: 'ADMIN_USER' },
+          }
+        )
       ).toBe(true);
     });
   });
@@ -437,10 +485,13 @@ describe('Number Operators', () => {
 
     it('should invert result (num_not_in equivalent)', () => {
       expect(
-        evalConstraint(c('num_in', 'tier', { values: ['1', '2', '3'], inverted: true }), {
-          ...defaultContext,
-          properties: { tier: 2 },
-        })
+        evalConstraint(
+          c('num_in', 'tier', { values: ['1', '2', '3'], inverted: true }),
+          {
+            ...defaultContext,
+            properties: { tier: 2 },
+          }
+        )
       ).toBe(false);
     });
   });
@@ -479,10 +530,13 @@ describe('Boolean Operators', () => {
 
     it('should invert result', () => {
       expect(
-        evalConstraint(c('bool_is', 'premium', { value: 'true', inverted: true }), {
-          ...defaultContext,
-          properties: { premium: true },
-        })
+        evalConstraint(
+          c('bool_is', 'premium', { value: 'true', inverted: true }),
+          {
+            ...defaultContext,
+            properties: { premium: true },
+          }
+        )
       ).toBe(false);
     });
   });
@@ -516,10 +570,13 @@ describe('Date Operators', () => {
 
     it('should invert result', () => {
       expect(
-        evalConstraint(c('date_eq', 'signup', { value: testDate, inverted: true }), {
-          ...defaultContext,
-          properties: { signup: testDate },
-        })
+        evalConstraint(
+          c('date_eq', 'signup', { value: testDate, inverted: true }),
+          {
+            ...defaultContext,
+            properties: { signup: testDate },
+          }
+        )
       ).toBe(false);
     });
   });
@@ -702,26 +759,35 @@ describe('Semver Operators', () => {
   describe('semver_in', () => {
     it('should match version in list', () => {
       expect(
-        evalConstraint(c('semver_in', 'appVersion', { values: ['1.0.0', '1.1.0', '1.2.0'] }), {
-          ...defaultContext,
-          appVersion: '1.1.0',
-        })
+        evalConstraint(
+          c('semver_in', 'appVersion', { values: ['1.0.0', '1.1.0', '1.2.0'] }),
+          {
+            ...defaultContext,
+            appVersion: '1.1.0',
+          }
+        )
       ).toBe(true);
     });
 
     it('should not match version not in list', () => {
       expect(
-        evalConstraint(c('semver_in', 'appVersion', { values: ['1.0.0', '1.1.0', '1.2.0'] }), {
-          ...defaultContext,
-          appVersion: '2.0.0',
-        })
+        evalConstraint(
+          c('semver_in', 'appVersion', { values: ['1.0.0', '1.1.0', '1.2.0'] }),
+          {
+            ...defaultContext,
+            appVersion: '2.0.0',
+          }
+        )
       ).toBe(false);
     });
 
     it('should invert result (semver_not_in equivalent)', () => {
       expect(
         evalConstraint(
-          c('semver_in', 'appVersion', { values: ['1.0.0', '1.1.0'], inverted: true }),
+          c('semver_in', 'appVersion', {
+            values: ['1.0.0', '1.1.0'],
+            inverted: true,
+          }),
           { ...defaultContext, appVersion: '1.1.0' }
         )
       ).toBe(false);
@@ -744,26 +810,38 @@ describe('Common Operators', () => {
 
     it('should return true for empty string (value exists)', () => {
       expect(
-        evalConstraint(c('exists', 'region'), { ...defaultContext, properties: { region: '' } })
+        evalConstraint(c('exists', 'region'), {
+          ...defaultContext,
+          properties: { region: '' },
+        })
       ).toBe(true);
     });
 
     it('should return true for zero (value exists)', () => {
       expect(
-        evalConstraint(c('exists', 'count'), { ...defaultContext, properties: { count: 0 } })
+        evalConstraint(c('exists', 'count'), {
+          ...defaultContext,
+          properties: { count: 0 },
+        })
       ).toBe(true);
     });
 
     it('should return true for false (value exists)', () => {
       expect(
-        evalConstraint(c('exists', 'active'), { ...defaultContext, properties: { active: false } })
+        evalConstraint(c('exists', 'active'), {
+          ...defaultContext,
+          properties: { active: false },
+        })
       ).toBe(true);
     });
 
     it('should return false when property does not exist', () => {
-      expect(evalConstraint(c('exists', 'region'), { ...defaultContext, properties: {} })).toBe(
-        false
-      );
+      expect(
+        evalConstraint(c('exists', 'region'), {
+          ...defaultContext,
+          properties: {},
+        })
+      ).toBe(false);
     });
 
     it('should return false for missing properties', () => {
@@ -780,9 +858,12 @@ describe('Common Operators', () => {
     });
 
     it('should work with built-in context fields', () => {
-      expect(evalConstraint(c('exists', 'userId'), { ...defaultContext, userId: 'user-1' })).toBe(
-        true
-      );
+      expect(
+        evalConstraint(c('exists', 'userId'), {
+          ...defaultContext,
+          userId: 'user-1',
+        })
+      ).toBe(true);
     });
 
     it('should return false for missing built-in context fields', () => {
@@ -792,9 +873,12 @@ describe('Common Operators', () => {
 
   describe('not_exists', () => {
     it('should return true when property does not exist', () => {
-      expect(evalConstraint(c('not_exists', 'region'), { ...defaultContext, properties: {} })).toBe(
-        true
-      );
+      expect(
+        evalConstraint(c('not_exists', 'region'), {
+          ...defaultContext,
+          properties: {},
+        })
+      ).toBe(true);
     });
 
     it('should return false when property exists', () => {
@@ -850,19 +934,25 @@ describe('Array Operators', () => {
 
     it('should support case insensitive', () => {
       expect(
-        evalConstraint(c('arr_any', 'tags', { values: ['PREMIUM'], caseInsensitive: true }), {
-          ...defaultContext,
-          properties: { tags: ['basic', 'premium'] },
-        })
+        evalConstraint(
+          c('arr_any', 'tags', { values: ['PREMIUM'], caseInsensitive: true }),
+          {
+            ...defaultContext,
+            properties: { tags: ['basic', 'premium'] },
+          }
+        )
       ).toBe(true);
     });
 
     it('should invert result', () => {
       expect(
-        evalConstraint(c('arr_any', 'tags', { values: ['premium'], inverted: true }), {
-          ...defaultContext,
-          properties: { tags: ['basic', 'premium'] },
-        })
+        evalConstraint(
+          c('arr_any', 'tags', { values: ['premium'], inverted: true }),
+          {
+            ...defaultContext,
+            properties: { tags: ['basic', 'premium'] },
+          }
+        )
       ).toBe(false);
     });
 
@@ -907,18 +997,27 @@ describe('Array Operators', () => {
     it('should support case insensitive', () => {
       expect(
         evalConstraint(
-          c('arr_all', 'tags', { values: ['PREMIUM', 'VIP'], caseInsensitive: true }),
-          { ...defaultContext, properties: { tags: ['premium', 'vip', 'basic'] } }
+          c('arr_all', 'tags', {
+            values: ['PREMIUM', 'VIP'],
+            caseInsensitive: true,
+          }),
+          {
+            ...defaultContext,
+            properties: { tags: ['premium', 'vip', 'basic'] },
+          }
         )
       ).toBe(true);
     });
 
     it('should invert result', () => {
       expect(
-        evalConstraint(c('arr_all', 'tags', { values: ['premium', 'vip'], inverted: true }), {
-          ...defaultContext,
-          properties: { tags: ['premium', 'vip'] },
-        })
+        evalConstraint(
+          c('arr_all', 'tags', { values: ['premium', 'vip'], inverted: true }),
+          {
+            ...defaultContext,
+            properties: { tags: ['premium', 'vip'] },
+          }
+        )
       ).toBe(false);
     });
   });
@@ -926,13 +1025,19 @@ describe('Array Operators', () => {
   describe('arr_empty', () => {
     it('should return true for empty array', () => {
       expect(
-        evalConstraint(c('arr_empty', 'tags'), { ...defaultContext, properties: { tags: [] } })
+        evalConstraint(c('arr_empty', 'tags'), {
+          ...defaultContext,
+          properties: { tags: [] },
+        })
       ).toBe(true);
     });
 
     it('should return false for non-empty array', () => {
       expect(
-        evalConstraint(c('arr_empty', 'tags'), { ...defaultContext, properties: { tags: ['a'] } })
+        evalConstraint(c('arr_empty', 'tags'), {
+          ...defaultContext,
+          properties: { tags: ['a'] },
+        })
       ).toBe(false);
     });
 
@@ -946,9 +1051,12 @@ describe('Array Operators', () => {
     });
 
     it('should return true for undefined property (treated as empty)', () => {
-      expect(evalConstraint(c('arr_empty', 'tags'), { ...defaultContext, properties: {} })).toBe(
-        true
-      );
+      expect(
+        evalConstraint(c('arr_empty', 'tags'), {
+          ...defaultContext,
+          properties: {},
+        })
+      ).toBe(true);
     });
 
     it('should invert result (arr_not_empty equivalent)', () => {
@@ -976,9 +1084,12 @@ describe('Array Operators', () => {
 describe('Edge Cases', () => {
   describe('undefined context values', () => {
     it('should return false for undefined context with normal operator', () => {
-      expect(evalConstraint(c('str_eq', 'missing_field', { value: 'test' }), defaultContext)).toBe(
-        false
-      );
+      expect(
+        evalConstraint(
+          c('str_eq', 'missing_field', { value: 'test' }),
+          defaultContext
+        )
+      ).toBe(false);
     });
 
     it('should return true for undefined context with inverted normal operator', () => {
@@ -1041,10 +1152,13 @@ describe('Edge Cases', () => {
   describe('unknown operator', () => {
     it('should return false for unknown operator', () => {
       expect(
-        evalConstraint(c('unknown_op' as ConstraintOperator, 'field', { value: 'test' }), {
-          ...defaultContext,
-          properties: { field: 'test' },
-        })
+        evalConstraint(
+          c('unknown_op' as ConstraintOperator, 'field', { value: 'test' }),
+          {
+            ...defaultContext,
+            properties: { field: 'test' },
+          }
+        )
       ).toBe(false);
     });
   });

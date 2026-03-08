@@ -69,7 +69,11 @@ export class MessageReactionModel {
   /**
    * 리액션 제거
    */
-  static async removeReaction(messageId: number, userId: number, emoji: string): Promise<boolean> {
+  static async removeReaction(
+    messageId: number,
+    userId: number,
+    emoji: string
+  ): Promise<boolean> {
     try {
       const db = databaseManager.getKnex();
 
@@ -222,7 +226,9 @@ export class MessageReactionModel {
     try {
       const db = databaseManager.getKnex();
 
-      return await db('chat_message_reactions').where('messageId', messageId).del();
+      return await db('chat_message_reactions')
+        .where('messageId', messageId)
+        .del();
     } catch (error) {
       logger.error('Error deleting reactions by message ID:', error);
       throw error;

@@ -43,7 +43,8 @@ export function resolvePassiveData(
 
   // Check if it's version-keyed.
   // We assume it's version-keyed if it has a '*' key or any key containing a dot and a digit.
-  const isVersionKeyed = keys.includes('*') || keys.some((k) => /\d+\.\d+/.test(k));
+  const isVersionKeyed =
+    keys.includes('*') || keys.some((k) => /\d+\.\d+/.test(k));
 
   if (!isVersionKeyed) {
     return parsed;
@@ -61,7 +62,8 @@ export function resolvePassiveData(
 
     try {
       // Escape dots, convert * to regex match-all
-      const pattern = '^' + key.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
+      const pattern =
+        '^' + key.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
       const regex = new RegExp(pattern);
       if (regex.test(clientVersion)) {
         // Preference: longer matches are more specific

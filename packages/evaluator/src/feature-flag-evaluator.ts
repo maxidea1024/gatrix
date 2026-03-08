@@ -33,7 +33,8 @@ export class FeatureFlagEvaluator {
     let reason: EvaluationReason = 'disabled';
 
     if (flag.isEnabled) {
-      const activeStrategies = flag.strategies?.filter((s) => s.isEnabled) || [];
+      const activeStrategies =
+        flag.strategies?.filter((s) => s.isEnabled) || [];
 
       if (activeStrategies.length > 0) {
         for (const strategy of activeStrategies) {
@@ -46,7 +47,10 @@ export class FeatureFlagEvaluator {
             const variant: Variant = {
               name: variantData?.name || defaultEnabledName,
               weight: variantData?.weight || 100,
-              value: this.getFallbackValue(variantData?.value ?? flag.enabledValue, flag.valueType),
+              value: this.getFallbackValue(
+                variantData?.value ?? flag.enabledValue,
+                flag.valueType
+              ),
               enabled: true,
             };
 
@@ -71,7 +75,10 @@ export class FeatureFlagEvaluator {
         const variant: Variant = {
           name: variantData?.name || defaultEnabledName,
           weight: variantData?.weight || 100,
-          value: this.getFallbackValue(variantData?.value ?? flag.enabledValue, flag.valueType),
+          value: this.getFallbackValue(
+            variantData?.value ?? flag.enabledValue,
+            flag.valueType
+          ),
           enabled: true,
         };
 
@@ -124,7 +131,9 @@ export class FeatureFlagEvaluator {
         if (!segment) continue;
 
         if (segment.constraints && segment.constraints.length > 0) {
-          const segmentPass = segment.constraints.every((c) => this.evaluateConstraint(c, context));
+          const segmentPass = segment.constraints.every((c) =>
+            this.evaluateConstraint(c, context)
+          );
           if (!segmentPass) return false;
         }
       }
@@ -150,7 +159,10 @@ export class FeatureFlagEvaluator {
     return true;
   }
 
-  private static evaluateConstraint(constraint: Constraint, context: EvaluationContext): boolean {
+  private static evaluateConstraint(
+    constraint: Constraint,
+    context: EvaluationContext
+  ): boolean {
     const contextValue = this.getContextValue(constraint.contextName, context);
 
     // Handle exists/not_exists BEFORE undefined check
@@ -174,11 +186,18 @@ export class FeatureFlagEvaluator {
     }
 
     // Array operators
-    if (constraint.operator === 'arr_any' || constraint.operator === 'arr_all') {
+    if (
+      constraint.operator === 'arr_any' ||
+      constraint.operator === 'arr_all'
+    ) {
       const arr = Array.isArray(contextValue) ? contextValue.map(String) : [];
       const targetValues =
-        constraint.values?.map((v) => (constraint.caseInsensitive ? v.toLowerCase() : v)) || [];
-      const compareArr = constraint.caseInsensitive ? arr.map((v) => v.toLowerCase()) : arr;
+        constraint.values?.map((v) =>
+          constraint.caseInsensitive ? v.toLowerCase() : v
+        ) || [];
+      const compareArr = constraint.caseInsensitive
+        ? arr.map((v) => v.toLowerCase())
+        : arr;
 
       let result = false;
       if (constraint.operator === 'arr_any') {
@@ -186,20 +205,26 @@ export class FeatureFlagEvaluator {
         result = targetValues.some((tv) => compareArr.includes(tv));
       } else {
         // All target values are in the array
-        result = targetValues.length > 0 && targetValues.every((tv) => compareArr.includes(tv));
+        result =
+          targetValues.length > 0 &&
+          targetValues.every((tv) => compareArr.includes(tv));
       }
       return constraint.inverted ? !result : result;
     }
 
     const stringValue = String(contextValue);
-    const compareValue = constraint.caseInsensitive ? stringValue.toLowerCase() : stringValue;
+    const compareValue = constraint.caseInsensitive
+      ? stringValue.toLowerCase()
+      : stringValue;
     const targetValue = constraint.value
       ? constraint.caseInsensitive
         ? constraint.value.toLowerCase()
         : constraint.value
       : '';
     const targetValues =
-      constraint.values?.map((v) => (constraint.caseInsensitive ? v.toLowerCase() : v)) || [];
+      constraint.values?.map((v) =>
+        constraint.caseInsensitive ? v.toLowerCase() : v
+      ) || [];
 
     let result = false;
 
@@ -254,7 +279,8 @@ export class FeatureFlagEvaluator {
         break;
       // Date
       case 'date_eq':
-        result = new Date(stringValue).getTime() === new Date(targetValue).getTime();
+        result =
+          new Date(stringValue).getTime() === new Date(targetValue).getTime();
         break;
       case 'date_gt':
         result = new Date(stringValue) > new Date(targetValue);
@@ -285,7 +311,9 @@ export class FeatureFlagEvaluator {
         result = this.compareSemver(stringValue, targetValue) <= 0;
         break;
       case 'semver_in':
-        result = targetValues.some((v) => this.compareSemver(stringValue, v) === 0);
+        result = targetValues.some(
+          (v) => this.compareSemver(stringValue, v) === 0
+        );
         break;
       default:
         result = false;
@@ -312,7 +340,9 @@ export class FeatureFlagEvaluator {
       case 'environment':
         return context.environment;
       case 'currentTime':
-        return context.currentTime instanceof Date ? context.currentTime.toISOString() : undefined;
+        return context.currentTime instanceof Date
+          ? context.currentTime.toISOString()
+          : undefined;
       default:
         // Check properties first, then fallback to root context for compatibility
         // (e.g., playground sends flat context without wrapping in properties)
@@ -327,13 +357,16 @@ export class FeatureFlagEvaluator {
   ): number {
     let stickinessValue = '';
     if (stickiness === 'default' || stickiness === 'userId') {
-      stickinessValue = context.userId || context.sessionId || String(Math.random());
+      stickinessValue =
+        context.userId || context.sessionId || String(Math.random());
     } else if (stickiness === 'sessionId') {
       stickinessValue = context.sessionId || String(Math.random());
     } else if (stickiness === 'random') {
       stickinessValue = String(Math.random());
     } else {
-      stickinessValue = String(this.getContextValue(stickiness, context) || Math.random());
+      stickinessValue = String(
+        this.getContextValue(stickiness, context) || Math.random()
+      );
     }
 
     const seed = `${groupId}:${stickinessValue}`;
@@ -397,7 +430,11 @@ export class FeatureFlagEvaluator {
     if (totalWeight <= 0) return undefined;
 
     const stickiness = matchedStrategy?.parameters?.stickiness || 'default';
-    const percentage = this.calculatePercentage(context, stickiness, `${flag.name}-variant`);
+    const percentage = this.calculatePercentage(
+      context,
+      stickiness,
+      `${flag.name}-variant`
+    );
     const targetWeight = (percentage / 100) * totalWeight;
 
     let cumulativeWeight = 0;

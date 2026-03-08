@@ -28,7 +28,9 @@ class SqlExecutor {
         multipleStatements: true, // SQL 파일에서 여러 문장 실행 허용
       });
 
-      logger.info(`Connected to MySQL database: ${database || config.database.name}`);
+      logger.info(
+        `Connected to MySQL database: ${database || config.database.name}`
+      );
     } catch (error) {
       logger.error('Failed to connect to database:', error);
       throw error;
@@ -43,7 +45,10 @@ class SqlExecutor {
     }
   }
 
-  async executeSqlFile(filePath: string, options: SqlExecutionOptions = {}): Promise<void> {
+  async executeSqlFile(
+    filePath: string,
+    options: SqlExecutionOptions = {}
+  ): Promise<void> {
     if (!fs.existsSync(filePath)) {
       throw new Error(`SQL file not found: ${filePath}`);
     }
@@ -58,7 +63,10 @@ class SqlExecutor {
     await this.executeSqlContent(sqlContent, options);
   }
 
-  async executeSqlContent(sqlContent: string, options: SqlExecutionOptions = {}): Promise<void> {
+  async executeSqlContent(
+    sqlContent: string,
+    options: SqlExecutionOptions = {}
+  ): Promise<void> {
     if (!this.connection) {
       throw new Error('Database connection not established');
     }
@@ -93,7 +101,9 @@ class SqlExecutor {
       try {
         if (options.verbose) {
           logger.info(`Executing statement ${i + 1}/${statements.length}:`);
-          logger.info(statement.substring(0, 100) + (statement.length > 100 ? '...' : ''));
+          logger.info(
+            statement.substring(0, 100) + (statement.length > 100 ? '...' : '')
+          );
         }
 
         const [results] = await this.connection.execute(statement);
@@ -102,16 +112,22 @@ class SqlExecutor {
         if (results) {
           if (Array.isArray(results) && results.length > 0) {
             if (options.verbose) {
-              logger.info(`✅ Executed successfully. Rows returned: ${results.length}`);
+              logger.info(
+                `✅ Executed successfully. Rows returned: ${results.length}`
+              );
               // SELECT Query Results 출력
               if (statement.trim().toUpperCase().startsWith('SELECT')) {
                 console.table(results);
               }
             } else {
-              logger.info(`✅ Executed successfully. Rows returned: ${results.length}`);
+              logger.info(
+                `✅ Executed successfully. Rows returned: ${results.length}`
+              );
             }
           } else if ('affectedRows' in results) {
-            logger.info(`✅ Executed successfully. Affected rows: ${results.affectedRows}`);
+            logger.info(
+              `✅ Executed successfully. Affected rows: ${results.affectedRows}`
+            );
           } else {
             logger.info('✅ Executed successfully');
           }
@@ -144,7 +160,11 @@ class SqlExecutor {
       const trimmedLine = line.trim();
 
       // 빈 줄이나 주석 줄 건너뛰기
-      if (!trimmedLine || trimmedLine.startsWith('--') || trimmedLine.startsWith('/*')) {
+      if (
+        !trimmedLine ||
+        trimmedLine.startsWith('--') ||
+        trimmedLine.startsWith('/*')
+      ) {
         continue;
       }
 

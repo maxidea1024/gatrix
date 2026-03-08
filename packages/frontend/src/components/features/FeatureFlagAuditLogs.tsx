@@ -40,14 +40,22 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import { AuditLogService, AuditLogFilters } from '../../services/auditLogService';
+import {
+  AuditLogService,
+  AuditLogFilters,
+} from '../../services/auditLogService';
 import { AuditLog } from '../../types';
-import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import {
+  formatDateTimeDetailed,
+  formatRelativeTime,
+} from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { useI18n } from '../../contexts/I18nContext';
 import dayjs, { Dayjs } from 'dayjs';
-import DateRangePicker, { DateRangePreset } from '../../components/common/DateRangePicker';
+import DateRangePicker, {
+  DateRangePreset,
+} from '../../components/common/DateRangePicker';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -83,9 +91,19 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
+  column,
+  onToggleVisibility,
+}) => {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: column.id,
   });
 
@@ -115,7 +133,11 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
         </Box>
       }
     >
-      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -125,7 +147,10 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
       </ListItemButton>
     </ListItem>
   );
@@ -136,7 +161,10 @@ interface FeatureFlagAuditLogsProps {
   flagId: string;
 }
 
-const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, flagId }) => {
+const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
+  flagName,
+  flagId,
+}) => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const theme = useTheme();
@@ -151,9 +179,12 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
   const [expandedRowId, setExpandedRowId] = useState<number | null>(null);
 
   // Filters
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(dayjs().subtract(7, 'day'));
+  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
+    dayjs().subtract(7, 'day')
+  );
   const [dateTo, setDateTo] = useState<Dayjs | null>(dayjs());
-  const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>('last7d');
+  const [dateRangePreset, setDateRangePreset] =
+    useState<DateRangePreset>('last7d');
   const [userFilter, setUserFilter] = useState('');
   const debouncedUserFilter = useDebounce(userFilter, 500);
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -188,7 +219,8 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
     return defaultColumns;
   });
 
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLButtonElement | null>(null);
 
   const columnSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -236,7 +268,11 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
       }
 
       activeFilters.forEach((filter) => {
-        if (filter.value !== undefined && filter.value !== null && filter.value !== '') {
+        if (
+          filter.value !== undefined &&
+          filter.value !== null &&
+          filter.value !== ''
+        ) {
           if (Array.isArray(filter.value) && filter.value.length > 0) {
             (filters as any)[filter.key] = filter.value;
             if (filter.operator) {
@@ -307,12 +343,19 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, value } : f)));
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === filterKey ? { ...f, value } : f))
+    );
     setPage(1);
   };
 
-  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
-    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, operator } : f)));
+  const handleOperatorChange = (
+    filterKey: string,
+    operator: 'any_of' | 'include_all'
+  ) => {
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === filterKey ? { ...f, operator } : f))
+    );
     setPage(1);
   };
 
@@ -321,7 +364,10 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
       col.id === columnId ? { ...col, visible: !col.visible } : col
     );
     setColumns(newColumns);
-    localStorage.setItem('featureFlagAuditLogsColumns', JSON.stringify(newColumns));
+    localStorage.setItem(
+      'featureFlagAuditLogsColumns',
+      JSON.stringify(newColumns)
+    );
   };
 
   const handleColumnDragEnd = (event: DragEndEvent) => {
@@ -331,7 +377,10 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
       const newIndex = columns.findIndex((col) => col.id === over.id);
       const newColumns = arrayMove(columns, oldIndex, newIndex);
       setColumns(newColumns);
-      localStorage.setItem('featureFlagAuditLogsColumns', JSON.stringify(newColumns));
+      localStorage.setItem(
+        'featureFlagAuditLogsColumns',
+        JSON.stringify(newColumns)
+      );
     }
   };
 
@@ -347,7 +396,8 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
 
     copyToClipboardWithNotification(
       text,
-      () => enqueueSnackbar(t('auditLogs.detailsCopied'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('auditLogs.detailsCopied'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -398,7 +448,11 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                 log.oldValues?.worldId ||
                 log.newValues?.worldId;
               return resourceName ? (
-                <Typography variant="body2" color="text.primary" sx={{ fontWeight: 500 }}>
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  sx={{ fontWeight: 500 }}
+                >
                   {resourceName}
                 </Typography>
               ) : null;
@@ -483,7 +537,13 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
             setPage(1);
           }}
           preset={dateRangePreset}
-          availablePresets={['today', 'yesterday', 'last7d', 'last30d', 'custom']}
+          availablePresets={[
+            'today',
+            'yesterday',
+            'last7d',
+            'last30d',
+            'custom',
+          ]}
           size="small"
         />
 
@@ -556,7 +616,9 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                   {columns
                     .filter((col) => col.visible)
                     .map((column) => (
-                      <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
+                      <TableCell key={column.id}>
+                        {t(column.labelKey)}
+                      </TableCell>
                     ))}
                 </TableRow>
               </TableHead>
@@ -567,13 +629,19 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                       hover
                       sx={{
                         bgcolor:
-                          index % 2 === 1 ? alpha(theme.palette.action.hover, 0.05) : 'transparent',
+                          index % 2 === 1
+                            ? alpha(theme.palette.action.hover, 0.05)
+                            : 'transparent',
                       }}
                     >
                       <TableCell padding="checkbox">
                         <IconButton
                           size="small"
-                          onClick={() => setExpandedRowId(expandedRowId === log.id ? null : log.id)}
+                          onClick={() =>
+                            setExpandedRowId(
+                              expandedRowId === log.id ? null : log.id
+                            )
+                          }
                         >
                           {expandedRowId === log.id ? (
                             <KeyboardArrowDownIcon />
@@ -585,7 +653,9 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                       {columns
                         .filter((col) => col.visible)
                         .map((column) => (
-                          <TableCell key={column.id}>{renderCellContent(log, column.id)}</TableCell>
+                          <TableCell key={column.id}>
+                            {renderCellContent(log, column.id)}
+                          </TableCell>
                         ))}
                     </TableRow>
                     {/* Expanded Row Details */}
@@ -594,10 +664,15 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                         style={{ paddingBottom: 0, paddingTop: 0 }}
                         colSpan={columns.filter((c) => c.visible).length + 1}
                       >
-                        <Collapse in={expandedRowId === log.id} timeout="auto" unmountOnExit>
+                        <Collapse
+                          in={expandedRowId === log.id}
+                          timeout="auto"
+                          unmountOnExit
+                        >
                           <Box sx={{ py: 3, px: 2 }}>
                             {/* UserAgent */}
-                            {((log as any).userAgent || (log as any).user_agent) && (
+                            {((log as any).userAgent ||
+                              (log as any).user_agent) && (
                               <>
                                 <Box sx={{ mb: 2 }}>
                                   <Typography
@@ -621,7 +696,8 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                                       color: 'text.secondary',
                                     }}
                                   >
-                                    {(log as any).userAgent || (log as any).user_agent}
+                                    {(log as any).userAgent ||
+                                      (log as any).user_agent}
                                   </Typography>
                                 </Box>
                                 <Divider sx={{ mb: 2 }} />
@@ -630,8 +706,12 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
 
                             {/* Changes - Diff Viewer */}
                             {(() => {
-                              const oldVals = (log as any).oldValues || (log as any).old_values;
-                              const newVals = (log as any).newValues || (log as any).new_values;
+                              const oldVals =
+                                (log as any).oldValues ||
+                                (log as any).old_values;
+                              const newVals =
+                                (log as any).newValues ||
+                                (log as any).new_values;
 
                               // Both old and new values exist
                               if (oldVals && newVals) {
@@ -663,7 +743,9 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                                       >
                                         <Table size="small">
                                           <TableHead>
-                                            <TableRow sx={{ bgcolor: 'action.hover' }}>
+                                            <TableRow
+                                              sx={{ bgcolor: 'action.hover' }}
+                                            >
                                               <TableCell
                                                 sx={{
                                                   fontWeight: 600,
@@ -705,7 +787,8 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                                                 const oldVal = oldVals?.[key];
                                                 const newVal = newVals?.[key];
                                                 if (
-                                                  JSON.stringify(oldVal) !== JSON.stringify(newVal)
+                                                  JSON.stringify(oldVal) !==
+                                                  JSON.stringify(newVal)
                                                 ) {
                                                   changedFields.push({
                                                     key,
@@ -726,7 +809,9 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                                                         py: 2,
                                                       }}
                                                     >
-                                                      {t('changeRequest.noChanges')}
+                                                      {t(
+                                                        'changeRequest.noChanges'
+                                                      )}
                                                     </TableCell>
                                                   </TableRow>
                                                 );
@@ -756,7 +841,8 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                                                         fontFamily: 'monospace',
                                                         fontSize: '0.75rem',
                                                         bgcolor: alpha(
-                                                          theme.palette.error.main,
+                                                          theme.palette.error
+                                                            .main,
                                                           0.08
                                                         ),
                                                         color: 'text.secondary',
@@ -764,8 +850,11 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                                                       }}
                                                     >
                                                       {oldVal !== undefined
-                                                        ? typeof oldVal === 'object'
-                                                          ? JSON.stringify(oldVal)
+                                                        ? typeof oldVal ===
+                                                          'object'
+                                                          ? JSON.stringify(
+                                                              oldVal
+                                                            )
                                                           : String(oldVal)
                                                         : '-'}
                                                     </TableCell>
@@ -774,15 +863,19 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                                                         fontFamily: 'monospace',
                                                         fontSize: '0.75rem',
                                                         bgcolor: alpha(
-                                                          theme.palette.success.main,
+                                                          theme.palette.success
+                                                            .main,
                                                           0.08
                                                         ),
                                                         wordBreak: 'break-all',
                                                       }}
                                                     >
                                                       {newVal !== undefined
-                                                        ? typeof newVal === 'object'
-                                                          ? JSON.stringify(newVal)
+                                                        ? typeof newVal ===
+                                                          'object'
+                                                          ? JSON.stringify(
+                                                              newVal
+                                                            )
                                                           : String(newVal)
                                                         : '-'}
                                                     </TableCell>
@@ -856,7 +949,10 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
                               }}
                             >
                               <Tooltip title={t('common.copyToClipboard')}>
-                                <IconButton size="small" onClick={() => handleCopyDetails(log)}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleCopyDetails(log)}
+                                >
                                   <ContentCopyIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
@@ -928,7 +1024,10 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
               size="small"
               onClick={() => {
                 setColumns(defaultColumns);
-                localStorage.setItem('featureFlagAuditLogsColumns', JSON.stringify(defaultColumns));
+                localStorage.setItem(
+                  'featureFlagAuditLogsColumns',
+                  JSON.stringify(defaultColumns)
+                );
               }}
               clickable
             />

@@ -21,8 +21,13 @@ import {
   RemoveRedEye as UnreadIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import serviceNoticeService, { ServiceNotice } from '../../services/serviceNoticeService';
-import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
+import serviceNoticeService, {
+  ServiceNotice,
+} from '../../services/serviceNoticeService';
+import {
+  formatRelativeTime,
+  formatDateTimeDetailed,
+} from '../../utils/dateFormat';
 import { Tooltip } from '@mui/material';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 
@@ -78,7 +83,9 @@ const isLocalStorageAvailable = (): boolean => {
 
 // Cookie helper functions
 const setCookie = (name: string, value: string, days: number) => {
-  const expires = days ? `; expires=${new Date(Date.now() + days * 864e5).toUTCString()}` : '';
+  const expires = days
+    ? `; expires=${new Date(Date.now() + days * 864e5).toUTCString()}`
+    : '';
   document.cookie = `${name}=${encodeURIComponent(value)}${expires}; path=/; SameSite=Lax`;
 };
 
@@ -88,7 +95,8 @@ const getCookie = (name: string): string | null => {
   for (let i = 0; i < ca.length; i++) {
     let c = ca[i];
     while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    if (c.indexOf(nameEQ) === 0)
+      return decodeURIComponent(c.substring(nameEQ.length, c.length));
   }
   return null;
 };
@@ -128,7 +136,10 @@ const saveReadNotices = (readNotices: Set<number>) => {
     // Try localStorage first
     if (isLocalStorageAvailable()) {
       localStorage.setItem(READ_NOTICES_KEY, data);
-      console.log('[ReadStatus] Saved to localStorage:', Array.from(readNotices));
+      console.log(
+        '[ReadStatus] Saved to localStorage:',
+        Array.from(readNotices)
+      );
     } else {
       // Fallback to cookie (expires in 365 days)
       setCookie(READ_NOTICES_KEY, data, 365);
@@ -144,7 +155,9 @@ const ServiceNoticesPreviewPage: React.FC = () => {
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const [notices, setNotices] = useState<ServiceNotice[]>([]);
-  const [selectedNotice, setSelectedNotice] = useState<ServiceNotice | null>(null);
+  const [selectedNotice, setSelectedNotice] = useState<ServiceNotice | null>(
+    null
+  );
   const [readNotices, setReadNotices] = useState<Set<number>>(getReadNotices());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -153,7 +166,12 @@ const ServiceNoticesPreviewPage: React.FC = () => {
   useEffect(() => {
     console.log('[ServiceNoticesPreview] Component mounted');
     console.log('[ServiceNoticesPreview] User Agent:', navigator.userAgent);
-    console.log('[ServiceNoticesPreview] Window size:', window.innerWidth, 'x', window.innerHeight);
+    console.log(
+      '[ServiceNoticesPreview] Window size:',
+      window.innerWidth,
+      'x',
+      window.innerHeight
+    );
     return () => {
       console.log('[ServiceNoticesPreview] Component unmounted');
     };
@@ -188,9 +206,14 @@ const ServiceNoticesPreviewPage: React.FC = () => {
 
         // Get all active notices
         console.log('[ServiceNoticesPreview] Calling API...');
-        const result = await serviceNoticeService.getServiceNotices(projectApiPath, 1, 100, {
-          isActive: true,
-        });
+        const result = await serviceNoticeService.getServiceNotices(
+          projectApiPath,
+          1,
+          100,
+          {
+            isActive: true,
+          }
+        );
         console.log('[ServiceNoticesPreview] API response:', result);
 
         if (result && result.notices) {
@@ -199,18 +222,28 @@ const ServiceNoticesPreviewPage: React.FC = () => {
           // endDate is optional - if null, treat as permanent (no end date)
           const now = new Date();
           const activeNotices = result.notices.filter((notice) => {
-            const startDate = notice.startDate ? new Date(notice.startDate) : null;
+            const startDate = notice.startDate
+              ? new Date(notice.startDate)
+              : null;
             const endDate = notice.endDate ? new Date(notice.endDate) : null;
-            return (!startDate || now >= startDate) && (!endDate || now <= endDate);
+            return (
+              (!startDate || now >= startDate) && (!endDate || now <= endDate)
+            );
           });
 
-          console.log('[ServiceNoticesPreview] Active notices count:', activeNotices.length);
+          console.log(
+            '[ServiceNoticesPreview] Active notices count:',
+            activeNotices.length
+          );
           setNotices(activeNotices);
 
           // Select first notice by default and mark as read
           if (activeNotices.length > 0 && !selectedNotice) {
             const firstNotice = activeNotices[0];
-            console.log('[ServiceNoticesPreview] Selecting first notice:', firstNotice.id);
+            console.log(
+              '[ServiceNoticesPreview] Selecting first notice:',
+              firstNotice.id
+            );
             setSelectedNotice(firstNotice);
 
             // Mark first notice as read automatically
@@ -328,7 +361,9 @@ const ServiceNoticesPreviewPage: React.FC = () => {
           overflow: 'hidden',
         }}
       >
-        <Alert severity="info">{t('serviceNotices.previewPage.noActiveNotices')}</Alert>
+        <Alert severity="info">
+          {t('serviceNotices.previewPage.noActiveNotices')}
+        </Alert>
       </Box>
     );
   }
@@ -529,14 +564,20 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                     border: `1px solid ${GAME_COLORS.border}`,
                   }}
                 />
-                <Tooltip title={formatDateTimeDetailed(selectedNotice.updatedAt)}>
+                <Tooltip
+                  title={formatDateTimeDetailed(selectedNotice.updatedAt)}
+                >
                   <Typography
                     variant="caption"
                     sx={{
                       color: GAME_COLORS.textSecondary, // Fixed color, not theme-dependent
                     }}
                   >
-                    {formatRelativeTime(selectedNotice.updatedAt, undefined, i18n.language)}
+                    {formatRelativeTime(
+                      selectedNotice.updatedAt,
+                      undefined,
+                      i18n.language
+                    )}
                   </Typography>
                 </Tooltip>
               </Box>

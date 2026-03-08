@@ -11,7 +11,10 @@ import {
   Paper,
   TextField,
 } from '@mui/material';
-import { CalendarToday as CalendarIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import {
+  CalendarToday as CalendarIcon,
+  ExpandMore as ExpandMoreIcon,
+} from '@mui/icons-material';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
@@ -54,7 +57,11 @@ export interface DateRangePickerProps {
   dateTo: Dayjs | null;
 
   // Callback when date range changes
-  onChange: (from: Dayjs | null, to: Dayjs | null, preset: DateRangePreset) => void;
+  onChange: (
+    from: Dayjs | null,
+    to: Dayjs | null,
+    preset: DateRangePreset
+  ) => void;
 
   // Current preset
   preset?: DateRangePreset;
@@ -291,7 +298,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
     // Only highlight if both dates are selected
     const isInRange =
-      toStart && tempFrom ? dayStart.isAfter(fromStart) && dayStart.isBefore(toStart) : false;
+      toStart && tempFrom
+        ? dayStart.isAfter(fromStart) && dayStart.isBefore(toStart)
+        : false;
 
     const isSelected = isStart || isEnd || isInRange;
 
@@ -331,11 +340,13 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             zIndex: 1,
             userSelect: 'none',
             ...(isSelected && {
-              backgroundColor: isStart || isEnd ? 'primary.main' : 'transparent',
+              backgroundColor:
+                isStart || isEnd ? 'primary.main' : 'transparent',
               color: isStart || isEnd ? 'primary.contrastText' : 'text.primary',
               fontWeight: isStart || isEnd ? 600 : 400,
               '&:hover': {
-                backgroundColor: isStart || isEnd ? 'primary.dark' : 'rgba(25, 118, 210, 0.2)',
+                backgroundColor:
+                  isStart || isEnd ? 'primary.dark' : 'rgba(25, 118, 210, 0.2)',
               },
             }),
           }}
@@ -382,7 +393,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   const open = Boolean(anchorEl);
 
   // Handle mode tab change
-  const handleModeChange = (event: React.SyntheticEvent, newMode: DateRangeMode) => {
+  const handleModeChange = (
+    event: React.SyntheticEvent,
+    newMode: DateRangeMode
+  ) => {
     setMode(newMode);
   };
 
@@ -451,7 +465,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             endIcon={<ExpandMoreIcon />}
             startIcon={<CalendarIcon />}
           >
-            {currentPreset === 'custom' ? getDisplayText() : getPresetLabel('custom')}
+            {currentPreset === 'custom'
+              ? getDisplayText()
+              : getPresetLabel('custom')}
           </Button>
         )}
       </ButtonGroup>
@@ -556,7 +572,11 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 </Box>
                 <Box sx={{ flex: 1 }}>
                   <DateCalendar
-                    value={tempFrom ? tempFrom.add(1, 'month') : dayjs().add(1, 'month')}
+                    value={
+                      tempFrom
+                        ? tempFrom.add(1, 'month')
+                        : dayjs().add(1, 'month')
+                    }
                     onChange={handleDateClick}
                     slots={{
                       day: CustomDay,
@@ -613,7 +633,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                   .map((presetValue) => (
                     <Button
                       key={presetValue}
-                      variant={tempPreset === presetValue ? 'contained' : 'outlined'}
+                      variant={
+                        tempPreset === presetValue ? 'contained' : 'outlined'
+                      }
                       onClick={() => {
                         const range = calculateDateRange(presetValue);
                         setTempFrom(range.from);
@@ -646,7 +668,11 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
               bgcolor: 'background.default',
             }}
           >
-            <Button size="small" onClick={handleCustomCancel} sx={{ textTransform: 'none' }}>
+            <Button
+              size="small"
+              onClick={handleCustomCancel}
+              sx={{ textTransform: 'none' }}
+            >
               {t('common.cancel')}
             </Button>
             <Button

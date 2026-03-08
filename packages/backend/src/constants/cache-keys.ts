@@ -80,7 +80,8 @@ export const CLIENT_VERSION = {
    * @param channel 채널명
    * @param subChannel 서브채널명
    */
-  BY_CHANNEL: (channel: string, subChannel: string) => `client_version:${channel}:${subChannel}`,
+  BY_CHANNEL: (channel: string, subChannel: string) =>
+    `client_version:${channel}:${subChannel}`,
 
   /**
    * 모든 클라이언트 버전 목록
@@ -130,7 +131,8 @@ export const TAG = {
    * @param entityType 엔티티 Type (game_world, user 등)
    * @param entityId 엔티티 ID
    */
-  BY_ENTITY: (entityType: string, entityId: string) => `tags:${entityType}:${entityId}`,
+  BY_ENTITY: (entityType: string, entityId: string) =>
+    `tags:${entityType}:${entityId}`,
 } as const;
 
 /**
@@ -194,7 +196,8 @@ export const TRANSLATION = {
    * @param hash 원문 텍스트 sha256 해시
    * @param lang 대상 언어 코드
    */
-  BY_TEXT_LANG: (hash: string, lang: 'ko' | 'en' | 'zh') => `translate:${hash}:${lang}`,
+  BY_TEXT_LANG: (hash: string, lang: 'ko' | 'en' | 'zh') =>
+    `translate:${hash}:${lang}`,
 
   /**
    * Detect language Results (원문 텍스트 해시 기반)
@@ -240,7 +243,8 @@ export const AUDIT_LOG = {
    * @param userId Used자 ID
    * @param page 페이지 번호
    */
-  BY_USER: (userId: string, page: number) => `audit_logs:user:${userId}:${page}`,
+  BY_USER: (userId: string, page: number) =>
+    `audit_logs:user:${userId}:${page}`,
 } as const;
 /**
  * Server SDK endpoint ETag cache keys
@@ -327,7 +331,8 @@ export const ENV_SCOPED = {
    * Client versions (environment-specific)
    */
   CLIENT_VERSION: {
-    BY_CHANNEL: (channel: string, subChannel: string) => `client_version:${channel}:${subChannel}`,
+    BY_CHANNEL: (channel: string, subChannel: string) =>
+      `client_version:${channel}:${subChannel}`,
     ALL: 'client_versions:all',
     ACTIVE: 'client_versions:active',
   },

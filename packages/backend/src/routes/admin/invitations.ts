@@ -6,7 +6,10 @@ import {
   AdminInvitationController,
   createInvitationValidation,
 } from '../../controllers/admin-invitation-controller';
-import { enhancedAuditLog, fetchInvitationById } from '../../utils/enhanced-audit-log';
+import {
+  enhancedAuditLog,
+  fetchInvitationById,
+} from '../../utils/enhanced-audit-log';
 
 const router = Router();
 
@@ -65,7 +68,9 @@ router.delete(
         email: oldValues?.email,
         role: oldValues?.role,
         wasActive: oldValues?.isActive,
-        wasExpired: oldValues?.expiresAt ? new Date(oldValues.expiresAt) < new Date() : false,
+        wasExpired: oldValues?.expiresAt
+          ? new Date(oldValues.expiresAt) < new Date()
+          : false,
       },
     }),
     getContext: (req, oldValues) => ({

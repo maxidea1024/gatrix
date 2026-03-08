@@ -1,5 +1,8 @@
 import { apiService } from './api';
-import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
+import {
+  MutationResult,
+  parseChangeRequestResponse,
+} from './changeRequestUtils';
 
 export type MaintenanceType = 'regular' | 'emergency';
 
@@ -47,7 +50,10 @@ export const maintenanceService = {
       messages?: MaintenanceDetail['messages'];
     }
   ): Promise<MutationResult<void>> {
-    const response = await apiService.post(`${projectApiPath}/maintenance`, payload);
+    const response = await apiService.post(
+      `${projectApiPath}/maintenance`,
+      payload
+    );
     return parseChangeRequestResponse<void>(response, () => undefined);
   },
   async getTemplates(projectApiPath: string): Promise<{
@@ -71,6 +77,8 @@ export const maintenanceService = {
       messages?: MaintenanceDetail['messages'];
     }>
   ) {
-    return apiService.post(`${projectApiPath}/maintenance/templates`, { templates });
+    return apiService.post(`${projectApiPath}/maintenance/templates`, {
+      templates,
+    });
   },
 };

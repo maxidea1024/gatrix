@@ -51,7 +51,10 @@ export class ReleaseFlowController {
       const userId = req.user?.userId;
       if (!userId) throw new GatrixError('Unauthorized', 401);
 
-      const template = await releaseFlowService.createTemplate(req.body, userId);
+      const template = await releaseFlowService.createTemplate(
+        req.body,
+        userId
+      );
       res.status(201).json({
         success: true,
         data: template,
@@ -94,7 +97,11 @@ export class ReleaseFlowController {
       if (!userId) throw new GatrixError('Unauthorized', 401);
 
       const { id } = req.params;
-      const template = await releaseFlowService.updateTemplate(id, req.body, userId);
+      const template = await releaseFlowService.updateTemplate(
+        id,
+        req.body,
+        userId
+      );
       res.json({
         success: true,
         data: template,
@@ -158,7 +165,10 @@ export class ReleaseFlowController {
   ): Promise<void> {
     try {
       const { flagId, environmentId } = req.params;
-      const plan = await releaseFlowService.getPlanForFlag(flagId, environmentId);
+      const plan = await releaseFlowService.getPlanForFlag(
+        flagId,
+        environmentId
+      );
 
       res.json({
         success: true,
@@ -183,7 +193,10 @@ export class ReleaseFlowController {
 
       const { flagId, environmentId, templateId } = req.body;
       if (!flagId || !environmentId || !templateId) {
-        throw new GatrixError('flagId, environmentId, and templateId are required', 400);
+        throw new GatrixError(
+          'flagId, environmentId, and templateId are required',
+          400
+        );
       }
 
       const plan = await releaseFlowService.applyTemplateToFlag(
@@ -214,7 +227,11 @@ export class ReleaseFlowController {
       if (!userId) throw new GatrixError('Unauthorized', 401);
 
       const { planId, milestoneId } = req.params;
-      const plan = await releaseFlowService.startMilestone(planId, milestoneId, userId);
+      const plan = await releaseFlowService.startMilestone(
+        planId,
+        milestoneId,
+        userId
+      );
 
       res.json({
         success: true,
@@ -368,7 +385,10 @@ export class ReleaseFlowController {
       if (!userId) throw new GatrixError('Unauthorized', 401);
 
       const { milestoneId } = req.params;
-      const milestone = await releaseFlowService.removeTransitionCondition(milestoneId, userId);
+      const milestone = await releaseFlowService.removeTransitionCondition(
+        milestoneId,
+        userId
+      );
 
       res.json({
         success: true,
@@ -444,7 +464,10 @@ export class ReleaseFlowController {
       } = req.body;
 
       if (!flowId || !milestoneId || !metricName || threshold === undefined) {
-        throw new GatrixError('flowId, milestoneId, metricName, and threshold are required', 400);
+        throw new GatrixError(
+          'flowId, milestoneId, metricName, and threshold are required',
+          400
+        );
       }
 
       const safeguard = await safeguardService.create({
@@ -542,7 +565,8 @@ export class ReleaseFlowController {
   ): Promise<void> {
     try {
       const { milestoneId } = req.params;
-      const result = await safeguardService.evaluateMilestoneSafeguards(milestoneId);
+      const result =
+        await safeguardService.evaluateMilestoneSafeguards(milestoneId);
 
       res.json({
         success: true,

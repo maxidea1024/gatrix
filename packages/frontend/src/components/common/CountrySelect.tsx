@@ -3,8 +3,20 @@
  * Displays flag images from flagcdn.com alongside country names
  */
 import React from 'react';
-import { Autocomplete, TextField, Box, Typography, Chip, AutocompleteProps } from '@mui/material';
-import { COUNTRIES, Country, getFlagUrl, getCountryByCode } from '../../utils/countries';
+import {
+  Autocomplete,
+  TextField,
+  Box,
+  Typography,
+  Chip,
+  AutocompleteProps,
+} from '@mui/material';
+import {
+  COUNTRIES,
+  Country,
+  getFlagUrl,
+  getCountryByCode,
+} from '../../utils/countries';
 
 interface CountrySelectProps {
   value: string | string[] | null;
@@ -22,7 +34,10 @@ interface CountrySelectProps {
 /**
  * Renders a flag image for a country code
  */
-export const FlagImage: React.FC<{ code: string; size?: number }> = ({ code, size = 20 }) => (
+export const FlagImage: React.FC<{ code: string; size?: number }> = ({
+  code,
+  size = 20,
+}) => (
   <img
     loading="lazy"
     width={size}
@@ -50,7 +65,9 @@ const CountryChip: React.FC<{
     <Chip
       size="small"
       icon={<FlagImage code={code} size={16} />}
-      label={country ? `${country.name} (${code.toUpperCase()})` : code.toUpperCase()}
+      label={
+        country ? `${country.name} (${code.toUpperCase()})` : code.toUpperCase()
+      }
       onDelete={onDelete}
       disabled={disabled}
       sx={{
@@ -96,7 +113,9 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
         onChange={(_, newValue) => {
           onChange((newValue as Country[]).map((c) => c.code.toUpperCase()));
         }}
-        getOptionLabel={(option) => `${option.name} (${option.code.toUpperCase()})`}
+        getOptionLabel={(option) =>
+          `${option.name} (${option.code.toUpperCase()})`
+        }
         isOptionEqualToValue={(option, val) => option.code === val.code}
         disabled={disabled}
         size={size}
@@ -130,7 +149,11 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
                   </Typography>
                 )}
               </Box>
-              <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ flexShrink: 0 }}
+              >
                 {option.code.toUpperCase()}
               </Typography>
             </Box>
@@ -170,7 +193,9 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
       onChange={(_, newValue) => {
         onChange(newValue ? (newValue as Country).code.toUpperCase() : null);
       }}
-      getOptionLabel={(option) => `${option.name} (${option.code.toUpperCase()})`}
+      getOptionLabel={(option) =>
+        `${option.name} (${option.code.toUpperCase()})`
+      }
       isOptionEqualToValue={(option, val) => option.code === val.code}
       disabled={disabled}
       size={size}
@@ -204,7 +229,11 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
                 </Typography>
               )}
             </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ flexShrink: 0 }}
+            >
               {option.code.toUpperCase()}
             </Typography>
           </Box>
@@ -222,7 +251,14 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
             startAdornment:
               value && !Array.isArray(value) ? (
                 <>
-                  <Box sx={{ display: 'flex', alignItems: 'center', ml: 0.5, mr: 0.5 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      ml: 0.5,
+                      mr: 0.5,
+                    }}
+                  >
                     <FlagImage code={value} size={22} />
                   </Box>
                   {params.InputProps.startAdornment}

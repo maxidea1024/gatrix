@@ -10,9 +10,16 @@ export class GatrixMaintenanceHelper {
   /**
    * Get current maintenance status for client delivery
    */
-  getCurrentMaintenanceStatus(environmentId?: string): CurrentMaintenanceStatus {
-    const env = (this.sdk as any).resolveEnvironment(environmentId, 'getCurrentMaintenanceStatus');
-    const serviceMaintenance = (this.sdk as any).cacheManager?.getServiceMaintenanceService();
+  getCurrentMaintenanceStatus(
+    environmentId?: string
+  ): CurrentMaintenanceStatus {
+    const env = (this.sdk as any).resolveEnvironment(
+      environmentId,
+      'getCurrentMaintenanceStatus'
+    );
+    const serviceMaintenance = (
+      this.sdk as any
+    ).cacheManager?.getServiceMaintenanceService();
     const gameWorld = (this.sdk as any).cacheManager?.getGameWorldService();
 
     if (serviceMaintenance?.isMaintenanceActive(env)) {
@@ -32,14 +39,22 @@ export class GatrixMaintenanceHelper {
     }
 
     const targetWorldId = (this.sdk as any).config.worldId;
-    if (targetWorldId && gameWorld?.isWorldMaintenanceActive(targetWorldId, env)) {
+    if (
+      targetWorldId &&
+      gameWorld?.isWorldMaintenanceActive(targetWorldId, env)
+    ) {
       const world = gameWorld.getWorldByWorldId(targetWorldId, env);
       if (world) {
         const localeMessages: { ko?: string; en?: string; zh?: string } = {};
         if (world.maintenanceLocales) {
           for (const locale of world.maintenanceLocales) {
-            if (locale.lang === 'ko' || locale.lang === 'en' || locale.lang === 'zh') {
-              localeMessages[locale.lang as 'ko' | 'en' | 'zh'] = locale.message;
+            if (
+              locale.lang === 'ko' ||
+              locale.lang === 'en' ||
+              locale.lang === 'zh'
+            ) {
+              localeMessages[locale.lang as 'ko' | 'en' | 'zh'] =
+                locale.message;
             }
           }
         }
@@ -52,7 +67,10 @@ export class GatrixMaintenanceHelper {
             startsAt: world.maintenanceStartDate,
             endsAt: world.maintenanceEndDate,
             message: world.maintenanceMessage,
-            localeMessages: Object.keys(localeMessages).length > 0 ? localeMessages : undefined,
+            localeMessages:
+              Object.keys(localeMessages).length > 0
+                ? localeMessages
+                : undefined,
             forceDisconnect: world.forceDisconnect,
             gracePeriodMinutes: world.gracePeriodMinutes,
           },
@@ -67,8 +85,13 @@ export class GatrixMaintenanceHelper {
    * Check if maintenance is active
    */
   isMaintenanceActive(worldId?: string, environmentId?: string): boolean {
-    const env = (this.sdk as any).resolveEnvironment(environmentId, 'isMaintenanceActive');
-    const serviceMaintenance = (this.sdk as any).cacheManager?.getServiceMaintenanceService();
+    const env = (this.sdk as any).resolveEnvironment(
+      environmentId,
+      'isMaintenanceActive'
+    );
+    const serviceMaintenance = (
+      this.sdk as any
+    ).cacheManager?.getServiceMaintenanceService();
     const gameWorld = (this.sdk as any).cacheManager?.getGameWorldService();
 
     if (serviceMaintenance?.isMaintenanceActive(env)) return true;
@@ -80,7 +103,10 @@ export class GatrixMaintenanceHelper {
 
     const allWorlds = gameWorld?.getCached(env) || [];
     for (const world of allWorlds) {
-      if (world.worldId && gameWorld?.isWorldMaintenanceActive(world.worldId, env)) {
+      if (
+        world.worldId &&
+        gameWorld?.isWorldMaintenanceActive(world.worldId, env)
+      ) {
         return true;
       }
     }
@@ -96,8 +122,13 @@ export class GatrixMaintenanceHelper {
     lang: 'ko' | 'en' | 'zh' = 'en',
     environmentId?: string
   ): MaintenanceInfo {
-    const env = (this.sdk as any).resolveEnvironment(environmentId, 'getMaintenanceInfo');
-    const serviceMaintenance = (this.sdk as any).cacheManager?.getServiceMaintenanceService();
+    const env = (this.sdk as any).resolveEnvironment(
+      environmentId,
+      'getMaintenanceInfo'
+    );
+    const serviceMaintenance = (
+      this.sdk as any
+    ).cacheManager?.getServiceMaintenanceService();
     const gameWorld = (this.sdk as any).cacheManager?.getGameWorldService();
     const cacheManager = (this.sdk as any).cacheManager;
 
@@ -111,12 +142,16 @@ export class GatrixMaintenanceHelper {
         gracePeriodMinutes: status?.detail?.kickDelayMinutes ?? 0,
         startsAt: status?.detail?.startsAt ?? null,
         endsAt: status?.detail?.endsAt ?? null,
-        actualStartTime: cacheManager?.getServiceMaintenanceActualStartTime() ?? null,
+        actualStartTime:
+          cacheManager?.getServiceMaintenanceActualStartTime() ?? null,
       };
     }
 
     const targetWorldId = worldId ?? (this.sdk as any).config.worldId;
-    if (targetWorldId && gameWorld?.isWorldMaintenanceActive(targetWorldId, env)) {
+    if (
+      targetWorldId &&
+      gameWorld?.isWorldMaintenanceActive(targetWorldId, env)
+    ) {
       const world = gameWorld.getWorldByWorldId(targetWorldId, env);
       return {
         isMaintenanceActive: true,
@@ -127,7 +162,9 @@ export class GatrixMaintenanceHelper {
         gracePeriodMinutes: world?.gracePeriodMinutes ?? 0,
         startsAt: world?.maintenanceStartDate ?? null,
         endsAt: world?.maintenanceEndDate ?? null,
-        actualStartTime: cacheManager?.getWorldMaintenanceActualStartTime(targetWorldId) ?? null,
+        actualStartTime:
+          cacheManager?.getWorldMaintenanceActualStartTime(targetWorldId) ??
+          null,
       };
     }
 

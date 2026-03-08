@@ -138,7 +138,9 @@ export class MailModel extends Model {
     const { page = 1, limit = 20, ...filters } = options;
     const offset = (page - 1) * limit;
 
-    let query = this.query().where('recipientId', userId).where('isDeleted', false);
+    let query = this.query()
+      .where('recipientId', userId)
+      .where('isDeleted', false);
 
     // Apply filters
     if (filters.isRead !== undefined) {
@@ -158,7 +160,10 @@ export class MailModel extends Model {
     const countQuery = query.clone().count('* as count').first();
 
     // Get paginated results
-    const results = await query.orderBy('createdAt', 'desc').limit(limit).offset(offset);
+    const results = await query
+      .orderBy('createdAt', 'desc')
+      .limit(limit)
+      .offset(offset);
 
     const countResult = await countQuery;
     const total = countResult ? Number((countResult as any).count) : 0;
@@ -190,7 +195,10 @@ export class MailModel extends Model {
   }
 
   // Mark multiple mails as read
-  static async markMultipleAsRead(mailIds: string[], userId: string): Promise<number> {
+  static async markMultipleAsRead(
+    mailIds: string[],
+    userId: string
+  ): Promise<number> {
     const now = new Date();
     const result = await this.query()
       .patch({
@@ -205,7 +213,10 @@ export class MailModel extends Model {
   }
 
   // Mark all unread mails as read (with optional filters)
-  static async markAllAsRead(userId: string, filters: any = {}): Promise<number> {
+  static async markAllAsRead(
+    userId: string,
+    filters: any = {}
+  ): Promise<number> {
     const now = new Date();
     const query = this.query()
       .patch({
@@ -236,7 +247,9 @@ export class MailModel extends Model {
       return false;
     }
 
-    await this.query().patch({ isStarred: !mail.isStarred }).where('id', mailId);
+    await this.query()
+      .patch({ isStarred: !mail.isStarred })
+      .where('id', mailId);
 
     return !mail.isStarred;
   }
@@ -256,7 +269,10 @@ export class MailModel extends Model {
   }
 
   // Delete multiple mails
-  static async deleteMultiple(mailIds: string[], userId: string): Promise<number> {
+  static async deleteMultiple(
+    mailIds: string[],
+    userId: string
+  ): Promise<number> {
     const now = new Date();
     const result = await this.query()
       .patch({
@@ -270,7 +286,10 @@ export class MailModel extends Model {
   }
 
   // Delete all mails (with optional filters)
-  static async deleteAllMails(userId: string, filters: any = {}): Promise<number> {
+  static async deleteAllMails(
+    userId: string,
+    filters: any = {}
+  ): Promise<number> {
     const now = new Date();
     const query = this.query()
       .patch({

@@ -29,7 +29,11 @@ export interface ItemExtractor<T, TResponse> {
  * @template TResponse - The API response type
  * @template TId - The ID type for items (string or number)
  */
-export abstract class BaseEnvironmentService<T, TResponse, TId = string | number> {
+export abstract class BaseEnvironmentService<
+  T,
+  TResponse,
+  TId = string | number,
+> {
   protected apiClient: ApiClient;
   protected logger: Logger;
   protected storage?: CacheStorageProvider;
@@ -146,21 +150,28 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
 
       // Restore ETag + raw response body into ApiClient so 304 optimization works after process restart
       const cachedEtag = await this.storage.get(etagKey);
-      const cachedResponseJson = this.storage ? await this.storage.get(responseKey) : null;
+      const cachedResponseJson = this.storage
+        ? await this.storage.get(responseKey)
+        : null;
       if (cachedEtag && cachedResponseJson) {
         try {
           const endpoint = this.getEndpoint();
           const responseBody = JSON.parse(cachedResponseJson) as TResponse;
           this.apiClient.setCache(endpoint, cachedEtag, responseBody);
-          this.logger.debug(`Restored ETag for ${this.getServiceName()} from local storage`);
+          this.logger.debug(
+            `Restored ETag for ${this.getServiceName()} from local storage`
+          );
         } catch {
           // Ignore parse errors; next fetch will repopulate the cache
         }
       }
     } catch (error: any) {
-      this.logger.warn(`Failed to load ${this.getServiceName()} from local storage`, {
-        error: error.message,
-      });
+      this.logger.warn(
+        `Failed to load ${this.getServiceName()} from local storage`,
+        {
+          error: error.message,
+        }
+      );
     }
   }
 
@@ -188,7 +199,9 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
         );
         return currentItems;
       }
-      throw new Error(response.error?.message || `Failed to fetch ${this.getServiceName()}`);
+      throw new Error(
+        response.error?.message || `Failed to fetch ${this.getServiceName()}`
+      );
     }
 
     const items = this.extractItems(response.data);
@@ -255,9 +268,12 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
         const items = await this.listByEnvironment(token);
         results.push(...items);
       } catch (error) {
-        this.logger.error(`Failed to fetch ${this.getServiceName()} for token`, {
-          error,
-        });
+        this.logger.error(
+          `Failed to fetch ${this.getServiceName()} for token`,
+          {
+            error,
+          }
+        );
       }
     }
 
@@ -317,7 +333,10 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
   /**
    * Refresh cached items for a specific token
    */
-  async refreshByEnvironment(token?: string, suppressWarnings?: boolean): Promise<T[]> {
+  async refreshByEnvironment(
+    token?: string,
+    suppressWarnings?: boolean
+  ): Promise<T[]> {
     if (!this.featureEnabled && !suppressWarnings) {
       this.logger.warn(
         `${this.getServiceName()}.refreshByEnvironment() called but feature is disabled`
@@ -346,7 +365,10 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
       try {
         await this.listByEnvironment(token);
       } catch (error) {
-        this.logger.error(`Failed to refresh ${this.getServiceName()} for token`, { error });
+        this.logger.error(
+          `Failed to refresh ${this.getServiceName()} for token`,
+          { error }
+        );
       }
     }
   }
@@ -371,11 +393,15 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     const currentItems = this.cachedByEnv.get(resolvedToken) || [];
     const itemId = this.getItemId(item);
 
-    const existsInCache = currentItems.some((i) => this.getItemId(i) === itemId);
+    const existsInCache = currentItems.some(
+      (i) => this.getItemId(i) === itemId
+    );
     let newItems: T[];
 
     if (existsInCache) {
-      newItems = currentItems.map((i) => (this.getItemId(i) === itemId ? item : i));
+      newItems = currentItems.map((i) =>
+        this.getItemId(i) === itemId ? item : i
+      );
     } else {
       newItems = [...currentItems, item];
     }
@@ -413,9 +439,12 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
       const cacheKey = this.getCacheKey(token);
       await this.storage.save(cacheKey, JSON.stringify(items));
     } catch (error: any) {
-      this.logger.error(`Failed to persist ${this.getServiceName()} to local storage`, {
-        error: error.message,
-      });
+      this.logger.error(
+        `Failed to persist ${this.getServiceName()} to local storage`,
+        {
+          error: error.message,
+        }
+      );
     }
   }
 
@@ -442,9 +471,12 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
         await this.storage.save(responseKey, JSON.stringify(responseData));
       }
     } catch (error: any) {
-      this.logger.error(`Failed to persist ETag for ${this.getServiceName()} to local storage`, {
-        error: error.message,
-      });
+      this.logger.error(
+        `Failed to persist ETag for ${this.getServiceName()} to local storage`,
+        {
+          error: error.message,
+        }
+      );
     }
   }
 

@@ -8,7 +8,10 @@ const logger = createLogger('DirectMessageController');
 
 export class DirectMessageController {
   // 1:1 대화 시작 또는 기존 대화 조회
-  static async createOrGetDirectMessage(req: Request, res: Response): Promise<void> {
+  static async createOrGetDirectMessage(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { targetUserId } = req.body;
@@ -64,7 +67,8 @@ export class DirectMessageController {
             errorMessage = 'This user does not accept direct messages';
             break;
           case 'policy_contacts_only':
-            errorMessage = 'This user only accepts direct messages from contacts';
+            errorMessage =
+              'This user only accepts direct messages from contacts';
             break;
         }
 
@@ -76,10 +80,11 @@ export class DirectMessageController {
       }
 
       // 기존 1:1 대화 채널이 있는지 확인
-      const existingChannel = await DirectMessageController.findExistingDirectChannel(
-        userId,
-        targetUserId
-      );
+      const existingChannel =
+        await DirectMessageController.findExistingDirectChannel(
+          userId,
+          targetUserId
+        );
 
       if (existingChannel) {
         // 기존 채널이 있으면 반환
@@ -119,7 +124,12 @@ export class DirectMessageController {
             autoDeleteMessages: false,
             autoDeleteDays: 0,
             requireApproval: false,
-            allowedFileTypes: ['image/*', 'video/*', 'audio/*', 'application/pdf'],
+            allowedFileTypes: [
+              'image/*',
+              'video/*',
+              'audio/*',
+              'application/pdf',
+            ],
             maxFileSize: 10485760, // 10MB
           },
         },
@@ -130,12 +140,16 @@ export class DirectMessageController {
       const { BroadcastService } = require('../services/broadcast-service');
       const broadcastService = BroadcastService.getInstance();
 
-      await broadcastService.broadcastToUser(targetUserId, 'new_direct_message', {
-        channelId: channel.id,
-        fromUserId: userId,
-        fromUserName: currentUser?.name || 'User',
-        timestamp: Date.now(),
-      });
+      await broadcastService.broadcastToUser(
+        targetUserId,
+        'new_direct_message',
+        {
+          channelId: channel.id,
+          fromUserId: userId,
+          fromUserName: currentUser?.name || 'User',
+          timestamp: Date.now(),
+        }
+      );
 
       res.status(201).json({
         success: true,
@@ -152,7 +166,10 @@ export class DirectMessageController {
   }
 
   // 사용자의 모든 1:1 대화 목록 조회
-  static async getDirectMessageChannels(req: Request, res: Response): Promise<void> {
+  static async getDirectMessageChannels(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { page = 1, limit = 20 } = req.query;
@@ -169,11 +186,15 @@ export class DirectMessageController {
       const enrichedChannels = await Promise.all(
         channels.channels.map(async (channel: any) => {
           // DM 채널에서 상대방 찾기
-          const otherMember = channel.members?.find((member: any) => member.userId !== userId);
+          const otherMember = channel.members?.find(
+            (member: any) => member.userId !== userId
+          );
           let otherUser = null;
 
           if (otherMember) {
-            const otherUserData = await redisClient.hgetall(`user:${otherMember.userId}`);
+            const otherUserData = await redisClient.hgetall(
+              `user:${otherMember.userId}`
+            );
             otherUser = otherUserData.id
               ? {
                   id: parseInt(otherUserData.id),
@@ -220,7 +241,10 @@ export class DirectMessageController {
   }
 
   // 1:1 대화 채널 아카이브 (삭제 대신)
-  static async archiveDirectMessage(req: Request, res: Response): Promise<void> {
+  static async archiveDirectMessage(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { channelId } = req.params;
@@ -279,7 +303,10 @@ export class DirectMessageController {
   }
 
   // 기존 1:1 대화 채널 찾기 (내부 메서드)
-  private static async findExistingDirectChannel(userId1: number, userId2: number): Promise<any> {
+  private static async findExistingDirectChannel(
+    userId1: number,
+    userId2: number
+  ): Promise<any> {
     try {
       // 두 사용자가 모두 참여한 direct 타입 채널 찾기
       const knex = ChannelModel['knex'];
@@ -304,7 +331,10 @@ export class DirectMessageController {
   }
 
   // 1:1 대화 상대방 온라인 상태 확인
-  static async getDirectMessageStatus(req: Request, res: Response): Promise<void> {
+  static async getDirectMessageStatus(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const userId = (req as any).user.id;
       const { channelId } = req.params;
@@ -358,10 +388,14 @@ export class DirectMessageController {
 
       try {
         // Redis에서 사용자 상태 확인
-        const userStatus = await redisClient.hgetall(`user:${otherMember.userId}`);
+        const userStatus = await redisClient.hgetall(
+          `user:${otherMember.userId}`
+        );
         if (userStatus && userStatus.status) {
           isOnline = userStatus.status === 'online';
-          lastSeen = userStatus.lastSeen ? new Date(parseInt(userStatus.lastSeen)) : null;
+          lastSeen = userStatus.lastSeen
+            ? new Date(parseInt(userStatus.lastSeen))
+            : null;
         }
       } catch (error) {
         logger.warn('Failed to get user status from Redis:', error);

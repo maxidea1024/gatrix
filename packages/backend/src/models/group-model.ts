@@ -80,15 +80,25 @@ export class GroupModel {
     return db(this.TABLE).where('orgId', orgId).orderBy('groupName', 'asc');
   }
 
-  static async findByName(orgId: string, groupName: string): Promise<GroupRecord | null> {
-    const row = await db(this.TABLE).where('orgId', orgId).where('groupName', groupName).first();
+  static async findByName(
+    orgId: string,
+    groupName: string
+  ): Promise<GroupRecord | null> {
+    const row = await db(this.TABLE)
+      .where('orgId', orgId)
+      .where('groupName', groupName)
+      .first();
     return row || null;
   }
 
-  static async update(id: string, data: UpdateGroupData): Promise<GroupRecord | null> {
+  static async update(
+    id: string,
+    data: UpdateGroupData
+  ): Promise<GroupRecord | null> {
     const updateData: any = { updatedBy: data.updatedBy };
     if (data.groupName !== undefined) updateData.groupName = data.groupName;
-    if (data.description !== undefined) updateData.description = data.description;
+    if (data.description !== undefined)
+      updateData.description = data.description;
     if (data.addNewUsersByDefault !== undefined) {
       updateData.addNewUsersByDefault = data.addNewUsersByDefault;
     }
@@ -174,7 +184,9 @@ export class GroupModel {
     });
 
     // Invalidate all group members' caches
-    const members = await db(this.MEMBERS_TABLE).where('groupId', groupId).select('userId');
+    const members = await db(this.MEMBERS_TABLE)
+      .where('groupId', groupId)
+      .select('userId');
     for (const member of members) {
       await permissionService.invalidateUserCache(member.userId);
     }
@@ -187,7 +199,9 @@ export class GroupModel {
       .del();
 
     if (result > 0) {
-      const members = await db(this.MEMBERS_TABLE).where('groupId', groupId).select('userId');
+      const members = await db(this.MEMBERS_TABLE)
+        .where('groupId', groupId)
+        .select('userId');
       for (const member of members) {
         await permissionService.invalidateUserCache(member.userId);
       }
@@ -237,8 +251,12 @@ export class GroupModel {
         .groupBy('groupId'),
     ]);
 
-    const memberMap = new Map(memberCounts.map((r: any) => [r.groupId, Number(r.count)]));
-    const roleMap = new Map(roleCounts.map((r: any) => [r.groupId, Number(r.count)]));
+    const memberMap = new Map(
+      memberCounts.map((r: any) => [r.groupId, Number(r.count)])
+    );
+    const roleMap = new Map(
+      roleCounts.map((r: any) => [r.groupId, Number(r.count)])
+    );
 
     return groups.map((g) => ({
       ...g,
@@ -251,7 +269,9 @@ export class GroupModel {
    * Get all default-join groups for an org (addNewUsersByDefault = true)
    */
   static async getDefaultGroups(orgId: string): Promise<GroupRecord[]> {
-    return db(this.TABLE).where('orgId', orgId).where('addNewUsersByDefault', true);
+    return db(this.TABLE)
+      .where('orgId', orgId)
+      .where('addNewUsersByDefault', true);
   }
 }
 

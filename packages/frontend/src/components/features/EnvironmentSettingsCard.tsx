@@ -98,7 +98,9 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
 
   // Get segment names for display
   const getSegmentNames = (segmentIds: string[] = []) => {
-    return segmentIds.map((id) => segments.find((s) => s.id === id)?.name || id).join(', ');
+    return segmentIds
+      .map((id) => segments.find((s) => s.id === id)?.name || id)
+      .join(', ');
   };
 
   return (
@@ -160,14 +162,20 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
           >
             {metrics && metrics.total > 0 ? (
               (() => {
-                const yesPercent = Math.round((metrics.totalYes / metrics.total) * 100);
+                const yesPercent = Math.round(
+                  (metrics.totalYes / metrics.total) * 100
+                );
                 const noPercent = 100 - yesPercent;
                 const radius = 18;
                 const cx = 20;
                 const cy = 20;
 
                 // Calculate arc path for pie chart
-                const getArcPath = (startAngle: number, endAngle: number, r: number) => {
+                const getArcPath = (
+                  startAngle: number,
+                  endAngle: number,
+                  r: number
+                ) => {
                   const startRad = ((startAngle - 90) * Math.PI) / 180;
                   const endRad = ((endAngle - 90) * Math.PI) / 180;
                   const x1 = cx + r * Math.cos(startRad);
@@ -191,9 +199,14 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                         <circle cx={cx} cy={cy} r={radius} fill="#ef5350" />
                         {/* Yes (green) - pie slice */}
                         {yesPercent > 0 && yesPercent < 100 && (
-                          <path d={getArcPath(0, yesAngle, radius)} fill="#4caf50" />
+                          <path
+                            d={getArcPath(0, yesAngle, radius)}
+                            fill="#4caf50"
+                          />
                         )}
-                        {yesPercent >= 100 && <circle cx={cx} cy={cy} r={radius} fill="#4caf50" />}
+                        {yesPercent >= 100 && (
+                          <circle cx={cx} cy={cy} r={radius} fill="#4caf50" />
+                        )}
                         {/* Center text */}
                         <text
                           x={cx}
@@ -310,7 +323,10 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                         {/* Segments */}
                         {strategy.segments && strategy.segments.length > 0 && (
                           <Box sx={{ mb: 1 }}>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {t('featureFlags.segment')}:
                             </Typography>
                             <Typography variant="body2">
@@ -328,7 +344,10 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                               gap: 1,
                             }}
                           >
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {t('featureFlags.rollout')}:
                             </Typography>
                             <Chip
@@ -343,23 +362,27 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
                         )}
 
                         {/* Constraints count */}
-                        {strategy.constraints && strategy.constraints.length > 0 && (
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ mt: 0.5, display: 'block' }}
-                          >
-                            +{strategy.constraints.length}{' '}
-                            {t('featureFlags.constraints').toLowerCase()}
-                          </Typography>
-                        )}
+                        {strategy.constraints &&
+                          strategy.constraints.length > 0 && (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ mt: 0.5, display: 'block' }}
+                            >
+                              +{strategy.constraints.length}{' '}
+                              {t('featureFlags.constraints').toLowerCase()}
+                            </Typography>
+                          )}
                       </Box>
 
                       {/* Action buttons */}
                       {canManage && (
                         <Box sx={{ display: 'flex', gap: 0.5 }}>
                           <Tooltip title={t('common.edit')}>
-                            <IconButton size="small" onClick={() => onEditStrategy(strategy)}>
+                            <IconButton
+                              size="small"
+                              onClick={() => onEditStrategy(strategy)}
+                            >
                               <EditIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>

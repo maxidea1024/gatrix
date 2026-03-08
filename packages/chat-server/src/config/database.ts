@@ -18,7 +18,14 @@ const getMigrationDir = (): string => {
   }
 
   // Fallback to src directory (for development)
-  const srcPath = path.join(__dirname, '..', '..', 'src', 'database', 'migrations');
+  const srcPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    'src',
+    'database',
+    'migrations'
+  );
   return srcPath;
 };
 
@@ -118,7 +125,9 @@ class DatabaseManager {
           `CREATE DATABASE IF NOT EXISTS ?? CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
           [config.database.name]
         );
-        logger.info(`Database '${config.database.name}' created or already exists`);
+        logger.info(
+          `Database '${config.database.name}' created or already exists`
+        );
       } finally {
         await tempKnex.destroy();
       }

@@ -1,5 +1,20 @@
-import React, { useEffect, useRef, useState, useMemo, useLayoutEffect, useCallback } from 'react';
-import { Box, Typography, Paper, useTheme, Avatar, IconButton, Tooltip } from '@mui/material';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useLayoutEffect,
+  useCallback,
+} from 'react';
+import {
+  Box,
+  Typography,
+  Paper,
+  useTheme,
+  Avatar,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
 import {
   Reply as ReplyIcon,
   MoreVert as MoreIcon,
@@ -14,18 +29,30 @@ import dayjsTimezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(dayjsTimezone);
 import { getStoredTimezone } from '../../utils/dateFormat';
-import { extractUrlsFromMessage, extractLinkPreview } from '../../utils/linkPreview';
+import {
+  extractUrlsFromMessage,
+  extractLinkPreview,
+} from '../../utils/linkPreview';
 import LinkPreviewCard from './LinkPreviewCard';
 import { LinkPreview } from '../../types/chat';
 import { format } from 'date-fns';
 import { ko, enUS, zhCN } from 'date-fns/locale';
 import EmojiPicker from './EmojiPicker';
 
-const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+const DEFAULT_AVATAR_URL =
+  'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
 // 마크다운 스타일링을 위한 Type 정의
 interface MessagePart {
-  type: 'text' | 'code' | 'codeBlock' | 'bold' | 'italic' | 'strikethrough' | 'underline' | 'link';
+  type:
+    | 'text'
+    | 'code'
+    | 'codeBlock'
+    | 'bold'
+    | 'italic'
+    | 'strikethrough'
+    | 'underline'
+    | 'link';
   content: string;
   url?: string;
 }
@@ -117,7 +144,10 @@ const parseMarkdown = (text: string): MessagePart[] => {
 };
 
 // 링크 미리보기를 포함한 메시지 컴포넌트
-const MessageWithPreview: React.FC<{ content: string; theme: any }> = ({ content, theme }) => {
+const MessageWithPreview: React.FC<{ content: string; theme: any }> = ({
+  content,
+  theme,
+}) => {
   const [linkPreviews, setLinkPreviews] = useState<LinkPreview[]>([]);
   const [loadingPreviews, setLoadingPreviews] = useState(false);
 
@@ -128,7 +158,9 @@ const MessageWithPreview: React.FC<{ content: string; theme: any }> = ({ content
       setLoadingPreviews(true);
       Promise.all(urls.map((url) => extractLinkPreview(url)))
         .then((previews) => {
-          const validPreviews = previews.filter((preview) => preview !== null) as LinkPreview[];
+          const validPreviews = previews.filter(
+            (preview) => preview !== null
+          ) as LinkPreview[];
           setLinkPreviews(validPreviews);
         })
         .catch((error) => {
@@ -141,9 +173,12 @@ const MessageWithPreview: React.FC<{ content: string; theme: any }> = ({ content
   }, [content]);
 
   // 좌표 텍스트(예: "📍 현재 위치: 37.503400, 127.052500" 또는 "37.5034, 127.0525") 감지
-  const parseCoordinatesFromText = (text: string): { lat: number; lng: number } | null => {
+  const parseCoordinatesFromText = (
+    text: string
+  ): { lat: number; lng: number } | null => {
     const trimmed = text.trim();
-    const regex = /(?:📍\s*현재\s*위치[:：]?\s*)?(-?\d{1,2}(?:\.\d+)?)[,\s]+(-?\d{1,3}(?:\.\d+)?)/;
+    const regex =
+      /(?:📍\s*현재\s*위치[:：]?\s*)?(-?\d{1,2}(?:\.\d+)?)[,\s]+(-?\d{1,3}(?:\.\d+)?)/;
     const m = trimmed.match(regex);
     if (!m) return null;
     const lat = parseFloat(m[1]);
@@ -174,7 +209,8 @@ const MessageWithPreview: React.FC<{ content: string; theme: any }> = ({ content
               position: 'relative',
               width: '100%',
               aspectRatio: '4 / 3',
-              backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5',
+              backgroundColor:
+                theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5',
             }}
           >
             <iframe
@@ -195,7 +231,9 @@ const MessageWithPreview: React.FC<{ content: string; theme: any }> = ({ content
               justifyContent: 'space-between',
               alignItems: 'center',
               backgroundColor:
-                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.04)'
+                  : 'rgba(0,0,0,0.02)',
             }}
           >
             <Typography variant="caption" color="text.secondary">
@@ -206,7 +244,10 @@ const MessageWithPreview: React.FC<{ content: string; theme: any }> = ({ content
               sx={{ color: theme.palette.primary.main, cursor: 'pointer' }}
               onClick={(e) => {
                 e.stopPropagation();
-                window.open(`https://maps.google.com/?q=${coords.lat},${coords.lng}`, '_blank');
+                window.open(
+                  `https://maps.google.com/?q=${coords.lat},${coords.lng}`,
+                  '_blank'
+                );
               }}
             >
               Google 지도에서 열기
@@ -227,7 +268,10 @@ const MessageWithPreview: React.FC<{ content: string; theme: any }> = ({ content
 };
 
 // 마크다운 렌더링 컴포넌트
-const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({ content, theme }) => {
+const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({
+  content,
+  theme,
+}) => {
   const parts = parseMarkdown(content);
 
   return (
@@ -240,7 +284,8 @@ const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({ content, t
                 key={index}
                 component="pre"
                 sx={{
-                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f6f8fa',
+                  backgroundColor:
+                    theme.palette.mode === 'dark' ? '#2d2d2d' : '#f6f8fa',
                   border: `1px solid ${theme.palette.mode === 'dark' ? '#444' : '#e1e4e8'}`,
                   borderRadius: 0,
                   padding: '12px',
@@ -264,7 +309,8 @@ const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({ content, t
                 key={index}
                 component="code"
                 sx={{
-                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f6f8fa',
+                  backgroundColor:
+                    theme.palette.mode === 'dark' ? '#2d2d2d' : '#f6f8fa',
                   border: `1px solid ${theme.palette.mode === 'dark' ? '#444' : '#e1e4e8'}`,
                   borderRadius: '3px',
                   padding: '2px 4px',
@@ -292,13 +338,21 @@ const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({ content, t
             );
           case 'strikethrough':
             return (
-              <Box key={index} component="span" sx={{ textDecoration: 'line-through' }}>
+              <Box
+                key={index}
+                component="span"
+                sx={{ textDecoration: 'line-through' }}
+              >
                 {part.content}
               </Box>
             );
           case 'underline':
             return (
-              <Box key={index} component="span" sx={{ textDecoration: 'underline' }}>
+              <Box
+                key={index}
+                component="span"
+                sx={{ textDecoration: 'underline' }}
+              >
                 {part.content}
               </Box>
             );
@@ -420,7 +474,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
   // EmojiPicker 관련 state
   const [emojiAnchorEl, setEmojiAnchorEl] = useState<HTMLElement | null>(null);
-  const [emojiPickerMessageId, setEmojiPickerMessageId] = useState<number | null>(null);
+  const [emojiPickerMessageId, setEmojiPickerMessageId] = useState<
+    number | null
+  >(null);
   useEffect(() => {
     const handler = () => setFocusBump((prev) => prev + 1);
     window.addEventListener('focus-main-chat-input', handler);
@@ -695,7 +751,11 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
     // Don't focus input if user clicked on a link or interactive element
     const target = e.target as HTMLElement;
-    if (target.tagName === 'A' || target.closest('a') || target.closest('button')) {
+    if (
+      target.tagName === 'A' ||
+      target.closest('a') ||
+      target.closest('button')
+    ) {
       return;
     }
     // AdvancedMessageInput이 포커스를 처리함
@@ -705,7 +765,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
     const threshold = 100;
-    wasAtBottomRef.current = el.scrollTop + el.clientHeight >= el.scrollHeight - threshold;
+    wasAtBottomRef.current =
+      el.scrollTop + el.clientHeight >= el.scrollHeight - threshold;
   }, []);
 
   // Theme 변경 시 스타일 업데이트
@@ -817,7 +878,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             sx={{ width: 40, height: 40 }}
           />
           <Box sx={{ flex: 1 }}>
-            <Typography variant="h6">{currentChannel?.name || t('chat.selectChannel')}</Typography>
+            <Typography variant="h6">
+              {currentChannel?.name || t('chat.selectChannel')}
+            </Typography>
             {currentChannel?.description && (
               <Typography variant="body2" color="text.secondary">
                 {currentChannel.description}
@@ -1011,7 +1074,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
           // 날짜 구분선 체크
           const currentDate = new Date(message.createdAt).toDateString();
           const previousDate =
-            index > 0 ? new Date(messages[index - 1].createdAt).toDateString() : null;
+            index > 0
+              ? new Date(messages[index - 1].createdAt).toDateString()
+              : null;
           const showDateSeparator = index === 0 || currentDate !== previousDate;
 
           return (
@@ -1047,9 +1112,18 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                       border: `1px solid ${colors.inputBorder}`,
                     }}
                   >
-                    {format(new Date(message.createdAt), 'yyyy년 M월 d일 EEEE', {
-                      locale: i18n.language === 'ko' ? ko : i18n.language === 'zh' ? zhCN : enUS,
-                    })}
+                    {format(
+                      new Date(message.createdAt),
+                      'yyyy년 M월 d일 EEEE',
+                      {
+                        locale:
+                          i18n.language === 'ko'
+                            ? ko
+                            : i18n.language === 'zh'
+                              ? zhCN
+                              : enUS,
+                      }
+                    )}
                   </Typography>
                   <Box
                     sx={{
@@ -1074,7 +1148,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                   userSelect: 'text', // 메시지 컨테이너에서 텍스트 선택 허용
                   '&:hover': {
                     backgroundColor:
-                      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.05)'
+                        : 'rgba(0,0,0,0.03)',
                   },
                 }}
               >
@@ -1087,7 +1163,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                     height: '36px',
                     fontSize: '14px',
                     fontWeight: 'bold',
-                    backgroundColor: theme.palette.mode === 'dark' ? '#5f6368' : '#e0e0e0',
+                    backgroundColor:
+                      theme.palette.mode === 'dark' ? '#5f6368' : '#e0e0e0',
                     color: 'white',
                   }}
                 >
@@ -1109,7 +1186,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                       variant="subtitle2"
                       sx={{
                         fontWeight: 600,
-                        color: theme.palette.mode === 'dark' ? '#e8eaed' : '#1d1c1d',
+                        color:
+                          theme.palette.mode === 'dark' ? '#e8eaed' : '#1d1c1d',
                         fontSize: '15px',
                       }}
                     >
@@ -1118,7 +1196,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                     <Typography
                       variant="caption"
                       sx={{
-                        color: theme.palette.mode === 'dark' ? '#9aa0a6' : '#616061',
+                        color:
+                          theme.palette.mode === 'dark' ? '#9aa0a6' : '#616061',
                         fontSize: '12px',
                       }}
                     >
@@ -1131,7 +1210,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                     variant="body2"
                     component="div"
                     sx={{
-                      color: theme.palette.mode === 'dark' ? '#e8eaed' : '#1d1c1d',
+                      color:
+                        theme.palette.mode === 'dark' ? '#e8eaed' : '#1d1c1d',
                       fontSize: '15px',
                       lineHeight: 1.46,
                       wordBreak: 'break-word',
@@ -1141,7 +1221,10 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                     }}
                     onClick={(e) => e.stopPropagation()} // 클릭 Event 전파 방지
                   >
-                    <MessageWithPreview content={message.content} theme={theme} />
+                    <MessageWithPreview
+                      content={message.content}
+                      theme={theme}
+                    />
                   </Typography>
 
                   {/* 리액션 표시 */}
@@ -1170,7 +1253,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                         <Box
                           key={emoji}
                           onClick={() => {
-                            const userReaction = reactions.find((r) => r.userId === state.user?.id);
+                            const userReaction = reactions.find(
+                              (r) => r.userId === state.user?.id
+                            );
                             if (userReaction) {
                               actions.removeReaction(message.id, emoji);
                             } else {
@@ -1184,7 +1269,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                             px: 1,
                             py: 0.5,
                             borderRadius: 0,
-                            backgroundColor: reactions.some((r) => r.userId === state.user?.id)
+                            backgroundColor: reactions.some(
+                              (r) => r.userId === state.user?.id
+                            )
                               ? theme.palette.primary.main + '20'
                               : colors.inputFieldBackground,
                             border: `1px solid ${
@@ -1194,16 +1281,21 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                             }`,
                             cursor: 'pointer',
                             '&:hover': {
-                              backgroundColor: theme.palette.primary.main + '30',
+                              backgroundColor:
+                                theme.palette.primary.main + '30',
                             },
                           }}
                         >
-                          <Typography sx={{ fontSize: '14px' }}>{emoji}</Typography>
+                          <Typography sx={{ fontSize: '14px' }}>
+                            {emoji}
+                          </Typography>
                           <Typography
                             sx={{
                               fontSize: '12px',
                               color: colors.placeholderText,
-                              fontWeight: reactions.some((r) => r.userId === state.user?.id)
+                              fontWeight: reactions.some(
+                                (r) => r.userId === state.user?.id
+                              )
                                 ? 600
                                 : 400,
                             }}
@@ -1228,12 +1320,15 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                             backgroundColor: colors.inputFieldBackground,
                             border: `1px solid ${colors.inputBorder}`,
                             '&:hover': {
-                              backgroundColor: theme.palette.primary.main + '20',
+                              backgroundColor:
+                                theme.palette.primary.main + '20',
                               borderColor: theme.palette.primary.main,
                             },
                           }}
                         >
-                          <AddReactionIcon sx={{ fontSize: 16, color: colors.placeholderText }} />
+                          <AddReactionIcon
+                            sx={{ fontSize: 16, color: colors.placeholderText }}
+                          />
                         </IconButton>
                       </Tooltip>
                     </Box>
@@ -1332,7 +1427,10 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                       }}
                     >
                       <ReplyIcon sx={{ fontSize: 14 }} />
-                      <Typography variant="caption" sx={{ color: colors.placeholderText }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: colors.placeholderText }}
+                      >
                         {message.replyTo?.user?.username || '누군가'}님에게 답장
                       </Typography>
                     </Box>
@@ -1377,7 +1475,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                       <ReplyIcon sx={{ fontSize: 14 }} />
 
                       {/* 댓글 개수와 스레드 보기 텍스트 */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
                         {/* 댓글 개수는 항상 표시 */}
                         <Typography
                           variant="caption"
@@ -1400,7 +1500,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                               className="thread-time-text"
                               sx={{
                                 color: colors.placeholderText,
-                                transition: 'opacity 0.2s ease, visibility 0.2s ease',
+                                transition:
+                                  'opacity 0.2s ease, visibility 0.2s ease',
                               }}
                             >
                               · {t('chat.lastReply')}:{' '}
@@ -1417,7 +1518,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                               fontWeight: 500,
                               opacity: 0,
                               visibility: 'hidden',
-                              transition: 'opacity 0.2s ease, visibility 0.2s ease',
+                              transition:
+                                'opacity 0.2s ease, visibility 0.2s ease',
                               whiteSpace: 'nowrap',
                               position: 'absolute',
                               top: 0,
@@ -1527,7 +1629,10 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                 />
               ))}
             </Box>
-            <Typography variant="caption" sx={{ color: colors.placeholderText, fontSize: '11px' }}>
+            <Typography
+              variant="caption"
+              sx={{ color: colors.placeholderText, fontSize: '11px' }}
+            >
               {typingUsers.length === 1
                 ? t('chat.userTyping', {
                     username:

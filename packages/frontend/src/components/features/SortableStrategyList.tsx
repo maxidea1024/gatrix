@@ -118,7 +118,14 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
   onDeleteStrategy,
 }) => {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id,
   });
 
@@ -149,7 +156,9 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
 
   // Remove segment
   const handleRemoveSegment = (segmentName: string) => {
-    const newSegments = (strategy.segments || []).filter((s) => s !== segmentName);
+    const newSegments = (strategy.segments || []).filter(
+      (s) => s !== segmentName
+    );
     updateStrategy({ segments: newSegments });
   };
 
@@ -249,9 +258,12 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
             )}
 
             <Box sx={{ flex: 1 }}>
-              <Typography fontWeight={500}>{strategy.title || strategy.name}</Typography>
+              <Typography fontWeight={500}>
+                {strategy.title || strategy.name}
+              </Typography>
               <Typography variant="caption" color="text.secondary">
-                {strategy.constraints?.length || 0} {t('featureFlags.constraints')}
+                {strategy.constraints?.length || 0}{' '}
+                {t('featureFlags.constraints')}
               </Typography>
             </Box>
 
@@ -285,11 +297,15 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                 onChange={(e) => updateStrategy({ name: e.target.value })}
                 disabled={!canManage}
               >
-                <MenuItem value="default">{t('featureFlags.strategyTypes.default')}</MenuItem>
+                <MenuItem value="default">
+                  {t('featureFlags.strategyTypes.default')}
+                </MenuItem>
                 <MenuItem value="flexibleRollout">
                   {t('featureFlags.strategyTypes.flexibleRollout')}
                 </MenuItem>
-                <MenuItem value="userWithId">{t('featureFlags.strategyTypes.userWithId')}</MenuItem>
+                <MenuItem value="userWithId">
+                  {t('featureFlags.strategyTypes.userWithId')}
+                </MenuItem>
                 <MenuItem value="gradualRolloutUserId">
                   {t('featureFlags.strategyTypes.gradualRolloutUserId')}
                 </MenuItem>
@@ -314,7 +330,8 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
             {strategy.name === 'flexibleRollout' && (
               <Box sx={{ px: 1 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  {t('featureFlags.rolloutPercentage')}: {strategy.parameters?.rollout ?? 100}%
+                  {t('featureFlags.rolloutPercentage')}:{' '}
+                  {strategy.parameters?.rollout ?? 100}%
                 </Typography>
                 <Slider
                   value={strategy.parameters?.rollout ?? 100}
@@ -349,11 +366,15 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                     <MenuItem value="default">
                       {t('featureFlags.stickinessOptions.default')}
                     </MenuItem>
-                    <MenuItem value="userId">{t('featureFlags.stickinessOptions.userId')}</MenuItem>
+                    <MenuItem value="userId">
+                      {t('featureFlags.stickinessOptions.userId')}
+                    </MenuItem>
                     <MenuItem value="sessionId">
                       {t('featureFlags.stickinessOptions.sessionId')}
                     </MenuItem>
-                    <MenuItem value="random">{t('featureFlags.stickinessOptions.random')}</MenuItem>
+                    <MenuItem value="random">
+                      {t('featureFlags.stickinessOptions.random')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
                 <TextField
@@ -363,7 +384,10 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                   value={strategy.parameters?.groupId || ''}
                   onChange={(e) =>
                     updateStrategy({
-                      parameters: { ...strategy.parameters, groupId: e.target.value },
+                      parameters: {
+                        ...strategy.parameters,
+                        groupId: e.target.value,
+                      },
                     })
                   }
                   disabled={!canManage}
@@ -384,7 +408,10 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                   value={strategy.parameters?.userIds || ''}
                   onChange={(e) =>
                     updateStrategy({
-                      parameters: { ...strategy.parameters, userIds: e.target.value },
+                      parameters: {
+                        ...strategy.parameters,
+                        userIds: e.target.value,
+                      },
                     })
                   }
                   disabled={!canManage}
@@ -396,7 +423,8 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
             {strategy.name === 'gradualRolloutUserId' && (
               <Box sx={{ px: 1 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  {t('featureFlags.rolloutPercentage')}: {strategy.parameters?.percentage ?? 0}%
+                  {t('featureFlags.rolloutPercentage')}:{' '}
+                  {strategy.parameters?.percentage ?? 0}%
                 </Typography>
                 <Slider
                   value={strategy.parameters?.percentage ?? 0}
@@ -420,7 +448,10 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                   value={strategy.parameters?.groupId || ''}
                   onChange={(e) =>
                     updateStrategy({
-                      parameters: { ...strategy.parameters, groupId: e.target.value },
+                      parameters: {
+                        ...strategy.parameters,
+                        groupId: e.target.value,
+                      },
                     })
                   }
                   disabled={!canManage}
@@ -433,7 +464,8 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
             {strategy.name === 'gradualRolloutRandom' && (
               <Box sx={{ px: 1 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  {t('featureFlags.rolloutPercentage')}: {strategy.parameters?.percentage ?? 0}%
+                  {t('featureFlags.rolloutPercentage')}:{' '}
+                  {strategy.parameters?.percentage ?? 0}%
                 </Typography>
                 <Slider
                   value={strategy.parameters?.percentage ?? 0}
@@ -457,7 +489,8 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
             {strategy.name === 'gradualRolloutSessionId' && (
               <Box sx={{ px: 1 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  {t('featureFlags.rolloutPercentage')}: {strategy.parameters?.percentage ?? 0}%
+                  {t('featureFlags.rolloutPercentage')}:{' '}
+                  {strategy.parameters?.percentage ?? 0}%
                 </Typography>
                 <Slider
                   value={strategy.parameters?.percentage ?? 0}
@@ -481,7 +514,10 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                   value={strategy.parameters?.groupId || ''}
                   onChange={(e) =>
                     updateStrategy({
-                      parameters: { ...strategy.parameters, groupId: e.target.value },
+                      parameters: {
+                        ...strategy.parameters,
+                        groupId: e.target.value,
+                      },
                     })
                   }
                   disabled={!canManage}
@@ -502,7 +538,10 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                   value={strategy.parameters?.IPs || ''}
                   onChange={(e) =>
                     updateStrategy({
-                      parameters: { ...strategy.parameters, IPs: e.target.value },
+                      parameters: {
+                        ...strategy.parameters,
+                        IPs: e.target.value,
+                      },
                     })
                   }
                   disabled={!canManage}
@@ -522,7 +561,10 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                   value={strategy.parameters?.hostNames || ''}
                   onChange={(e) =>
                     updateStrategy({
-                      parameters: { ...strategy.parameters, hostNames: e.target.value },
+                      parameters: {
+                        ...strategy.parameters,
+                        hostNames: e.target.value,
+                      },
                     })
                   }
                   disabled={!canManage}
@@ -552,7 +594,11 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                     <Box key={segmentName}>
                       <Chip
                         label={segInfo.displayName || segmentName}
-                        onDelete={canManage ? () => handleRemoveSegment(segmentName) : undefined}
+                        onDelete={
+                          canManage
+                            ? () => handleRemoveSegment(segmentName)
+                            : undefined
+                        }
                         onClick={() => toggleSegmentExpanded(segmentName)}
                         color="primary"
                         variant={isExpanded ? 'filled' : 'outlined'}
@@ -574,50 +620,55 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                               gap: 1,
                             }}
                           >
-                            {segInfo.constraints.map((c: Constraint, cIdx: number) => (
-                              <React.Fragment key={cIdx}>
-                                {cIdx > 0 && (
-                                  <Chip
-                                    label="AND"
-                                    size="small"
+                            {segInfo.constraints.map(
+                              (c: Constraint, cIdx: number) => (
+                                <React.Fragment key={cIdx}>
+                                  {cIdx > 0 && (
+                                    <Chip
+                                      label="AND"
+                                      size="small"
+                                      sx={{
+                                        alignSelf: 'center',
+                                        height: 18,
+                                        fontSize: '0.65rem',
+                                      }}
+                                    />
+                                  )}
+                                  <Box
                                     sx={{
-                                      alignSelf: 'center',
-                                      height: 18,
-                                      fontSize: '0.65rem',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 1,
+                                      flexWrap: 'wrap',
                                     }}
-                                  />
-                                )}
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 1,
-                                    flexWrap: 'wrap',
-                                  }}
-                                >
-                                  <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                    sx={{ minWidth: 80 }}
                                   >
-                                    {c.contextName}
-                                  </Typography>
-                                  <Chip
-                                    label={
-                                      c.inverted
-                                        ? `NOT ${getOperatorDisplay(c.operator)}`
-                                        : getOperatorDisplay(c.operator)
-                                    }
-                                    size="small"
-                                    variant="outlined"
-                                    sx={{ height: 22, fontSize: '0.75rem' }}
-                                  />
-                                  <Typography variant="body2" fontWeight={600}>
-                                    {getValueDisplay(c)}
-                                  </Typography>
-                                </Box>
-                              </React.Fragment>
-                            ))}
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                      sx={{ minWidth: 80 }}
+                                    >
+                                      {c.contextName}
+                                    </Typography>
+                                    <Chip
+                                      label={
+                                        c.inverted
+                                          ? `NOT ${getOperatorDisplay(c.operator)}`
+                                          : getOperatorDisplay(c.operator)
+                                      }
+                                      size="small"
+                                      variant="outlined"
+                                      sx={{ height: 22, fontSize: '0.75rem' }}
+                                    />
+                                    <Typography
+                                      variant="body2"
+                                      fontWeight={600}
+                                    >
+                                      {getValueDisplay(c)}
+                                    </Typography>
+                                  </Box>
+                                </React.Fragment>
+                              )
+                            )}
                           </Box>
                         </Paper>
                       )}
@@ -630,14 +681,20 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                   size="small"
                   sx={{ minWidth: 200, flexShrink: 0 }}
                   options={segments.filter(
-                    (s: any) => !(strategy.segments || []).includes(s.segmentName)
+                    (s: any) =>
+                      !(strategy.segments || []).includes(s.segmentName)
                   )}
-                  getOptionLabel={(option: any) => option.displayName || option.segmentName}
+                  getOptionLabel={(option: any) =>
+                    option.displayName || option.segmentName
+                  }
                   value={null}
                   onChange={(_, selected) => {
                     if (selected) {
                       updateStrategy({
-                        segments: [...(strategy.segments || []), selected.segmentName],
+                        segments: [
+                          ...(strategy.segments || []),
+                          selected.segmentName,
+                        ],
                       });
                     }
                   }}
@@ -657,10 +714,18 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
             </Box>
 
             {/* AND Indicator */}
-            {(strategy.segments?.length > 0 || strategy.constraints?.length > 0) && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
+            {(strategy.segments?.length > 0 ||
+              strategy.constraints?.length > 0) && (
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}
+              >
                 <Divider sx={{ flexGrow: 1 }} />
-                <Chip label="AND" size="small" variant="outlined" sx={{ fontWeight: 600 }} />
+                <Chip
+                  label="AND"
+                  size="small"
+                  variant="outlined"
+                  sx={{ fontWeight: 600 }}
+                />
                 <Divider sx={{ flexGrow: 1 }} />
               </Box>
             )}
@@ -672,7 +737,9 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
               </Typography>
               <ConstraintEditor
                 constraints={strategy.constraints || []}
-                onChange={(newConstraints) => updateStrategy({ constraints: newConstraints })}
+                onChange={(newConstraints) =>
+                  updateStrategy({ constraints: newConstraints })
+                }
                 contextFields={contextFields}
                 disabled={!canManage}
               />
@@ -767,7 +834,10 @@ const SortableStrategyList: React.FC<SortableStrategyListProps> = ({
       onDragEnd={handleDragEnd}
       modifiers={[restrictToVerticalAxis]}
     >
-      <SortableContext items={strategyIds} strategy={verticalListSortingStrategy}>
+      <SortableContext
+        items={strategyIds}
+        strategy={verticalListSortingStrategy}
+      >
         <Stack spacing={0}>
           {strategies.map((strategy, index) => (
             <SortableStrategyItem

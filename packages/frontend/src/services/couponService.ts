@@ -1,9 +1,15 @@
 import { api } from './api';
-import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
+import {
+  MutationResult,
+  parseChangeRequestResponse,
+} from './changeRequestUtils';
 
 export type CouponType = 'SPECIAL' | 'NORMAL';
 export type CouponStatus = 'ACTIVE' | 'DISABLED' | 'DELETED';
-export type CodePattern = 'ALPHANUMERIC_8' | 'ALPHANUMERIC_16' | 'ALPHANUMERIC_16_HYPHEN';
+export type CodePattern =
+  | 'ALPHANUMERIC_8'
+  | 'ALPHANUMERIC_16'
+  | 'ALPHANUMERIC_16_HYPHEN';
 export type UsageLimitType = 'USER' | 'CHARACTER';
 
 export interface CouponSetting {
@@ -136,7 +142,10 @@ export const couponService = {
     const res = await api.get(`${projectApiPath}/coupon-settings`, { params });
     return res.data;
   },
-  async getSetting(projectApiPath: string, id: string): Promise<{ setting: any }> {
+  async getSetting(
+    projectApiPath: string,
+    id: string
+  ): Promise<{ setting: any }> {
     const res = await api.get(`${projectApiPath}/coupon-settings/${id}`);
     return res.data;
   },
@@ -152,10 +161,16 @@ export const couponService = {
     id: string,
     data: UpdateCouponSettingInput
   ): Promise<MutationResult<any>> {
-    const res = await api.patch(`${projectApiPath}/coupon-settings/${id}`, data);
+    const res = await api.patch(
+      `${projectApiPath}/coupon-settings/${id}`,
+      data
+    );
     return parseChangeRequestResponse<any>(res, (r) => r?.setting);
   },
-  async deleteSetting(projectApiPath: string, id: string): Promise<MutationResult<void>> {
+  async deleteSetting(
+    projectApiPath: string,
+    id: string
+  ): Promise<MutationResult<void>> {
     const res = await api.delete(`${projectApiPath}/coupon-settings/${id}`);
     return parseChangeRequestResponse<void>(res, () => undefined);
   },
@@ -201,9 +216,12 @@ export const couponService = {
     limit: number;
     hasMore: boolean;
   }> {
-    const res = await api.get(`${projectApiPath}/coupon-settings/usage/export-chunked`, {
-      params,
-    });
+    const res = await api.get(
+      `${projectApiPath}/coupon-settings/usage/export-chunked`,
+      {
+        params,
+      }
+    );
     return res.data;
   },
   async exportUsage(
@@ -219,13 +237,21 @@ export const couponService = {
       timezone?: string;
     }
   ): Promise<{ records: any[]; filename: string }> {
-    const res = await api.get(`${projectApiPath}/coupon-settings/usage/export`, {
-      params,
-    });
+    const res = await api.get(
+      `${projectApiPath}/coupon-settings/usage/export`,
+      {
+        params,
+      }
+    );
     return res.data;
   },
-  async getIssuedCodesStats(projectApiPath: string, settingId: string): Promise<IssuedCodesStats> {
-    const res = await api.get(`${projectApiPath}/coupon-settings/${settingId}/issued-codes-stats`);
+  async getIssuedCodesStats(
+    projectApiPath: string,
+    settingId: string
+  ): Promise<IssuedCodesStats> {
+    const res = await api.get(
+      `${projectApiPath}/coupon-settings/${settingId}/issued-codes-stats`
+    );
     console.log('[couponService] getIssuedCodesStats response:', res);
     // API service already unwraps response.data, so res = { success: true, data: { issued, used, unused } }
     return res.data;
@@ -250,15 +276,23 @@ export const couponService = {
     settingId: string,
     params?: { page?: number; limit?: number; search?: string }
   ): Promise<IssuedCodesResponse> {
-    const res = await api.get(`${projectApiPath}/coupon-settings/${settingId}/issued-codes`, {
-      params,
-    });
+    const res = await api.get(
+      `${projectApiPath}/coupon-settings/${settingId}/issued-codes`,
+      {
+        params,
+      }
+    );
     console.log('[couponService] getIssuedCodes response:', res);
     // API service already unwraps response.data, so res = { success: true, data: { codes, total, page, limit } }
     return res.data;
   },
-  async getGenerationStatus(projectApiPath: string, settingId: string): Promise<GenerationStatus> {
-    const res = await api.get(`${projectApiPath}/coupon-settings/${settingId}/generation-status`);
+  async getGenerationStatus(
+    projectApiPath: string,
+    settingId: string
+  ): Promise<GenerationStatus> {
+    const res = await api.get(
+      `${projectApiPath}/coupon-settings/${settingId}/generation-status`
+    );
     return res.data.data;
   },
 };

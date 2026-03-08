@@ -17,11 +17,15 @@ export class MaintenanceEventHandler implements IEventHandler {
   ) {}
 
   async handle(event: StandardEvent, environmentId: string): Promise<void> {
-    this.logger.info('Maintenance settings updated, refreshing cache', { environmentId });
+    this.logger.info('Maintenance settings updated, refreshing cache', {
+      environmentId,
+    });
     try {
       await this.cacheManager.refreshServiceMaintenance(environmentId);
     } catch (error: any) {
-      this.logger.error('Failed to refresh maintenance cache', { error: error.message });
+      this.logger.error('Failed to refresh maintenance cache', {
+        error: error.message,
+      });
     }
   }
 }

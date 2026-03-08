@@ -11,7 +11,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import entityLockService, { LockInfo, PendingCR } from '@/services/entityLockService';
+import entityLockService, {
+  LockInfo,
+  PendingCR,
+} from '@/services/entityLockService';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 
 interface UseEntityLockOptions {
@@ -67,8 +70,12 @@ export function useEntityLock({
 
   // Store environment values in refs for stable access
   const environmentRef = useRef(currentEnvironment?.environmentId || '');
-  const softLockEnabledRef = useRef(currentEnvironment?.enableSoftLock ?? false);
-  const hardLockEnabledRef = useRef(currentEnvironment?.enableHardLock ?? false);
+  const softLockEnabledRef = useRef(
+    currentEnvironment?.enableSoftLock ?? false
+  );
+  const hardLockEnabledRef = useRef(
+    currentEnvironment?.enableHardLock ?? false
+  );
 
   // Update refs when environment changes
   useEffect(() => {
@@ -80,7 +87,8 @@ export function useEntityLock({
   // Release lock (exposed for manual use)
   const releaseLock = useCallback(async () => {
     const environmentId = environmentRef.current;
-    if (!entityId || !environmentId || !table || !lockAcquiredRef.current) return;
+    if (!entityId || !environmentId || !table || !lockAcquiredRef.current)
+      return;
 
     try {
       await entityLockService.releaseLock(table, entityId, environmentId);
@@ -97,7 +105,11 @@ export function useEntityLock({
     if (!entityId || !environmentId || !table) return false;
 
     try {
-      const success = await entityLockService.forceAcquireLock(table, entityId, environmentId);
+      const success = await entityLockService.forceAcquireLock(
+        table,
+        entityId,
+        environmentId
+      );
       if (success) {
         setHasLock(true);
         setLockedBy(null);
@@ -116,7 +128,12 @@ export function useEntityLock({
   useEffect(() => {
     if (!isEditing) {
       // Release lock if we had acquired it
-      if (lockAcquiredRef.current && entityId && environmentRef.current && table) {
+      if (
+        lockAcquiredRef.current &&
+        entityId &&
+        environmentRef.current &&
+        table
+      ) {
         console.log('[useEntityLock] Releasing lock on edit stop');
         entityLockService.releaseLock(table, entityId, environmentRef.current);
         lockAcquiredRef.current = false;
@@ -154,7 +171,9 @@ export function useEntityLock({
         lockedBy !== null && // We were blocked
         !lockAcquiredRef.current // We don't have the lock
       ) {
-        console.log('[useEntityLock] Lock released by other user, retrying acquisition...');
+        console.log(
+          '[useEntityLock] Lock released by other user, retrying acquisition...'
+        );
 
         // Try to acquire the lock
         try {
@@ -172,14 +191,23 @@ export function useEntityLock({
             });
           }
         } catch (error) {
-          console.error('[useEntityLock] Failed to acquire lock after release:', error);
+          console.error(
+            '[useEntityLock] Failed to acquire lock after release:',
+            error
+          );
         }
       }
     };
 
-    window.addEventListener('entity-lock-released', handleLockReleased as EventListener);
+    window.addEventListener(
+      'entity-lock-released',
+      handleLockReleased as EventListener
+    );
     return () => {
-      window.removeEventListener('entity-lock-released', handleLockReleased as EventListener);
+      window.removeEventListener(
+        'entity-lock-released',
+        handleLockReleased as EventListener
+      );
     };
   }, [isEditing, entityId, table, lockedBy, enqueueSnackbar, t]);
 
@@ -235,9 +263,15 @@ export function useEntityLock({
       }
     };
 
-    window.addEventListener('entity-lock-taken-over', handleLockTakenOver as EventListener);
+    window.addEventListener(
+      'entity-lock-taken-over',
+      handleLockTakenOver as EventListener
+    );
     return () => {
-      window.removeEventListener('entity-lock-taken-over', handleLockTakenOver as EventListener);
+      window.removeEventListener(
+        'entity-lock-taken-over',
+        handleLockTakenOver as EventListener
+      );
     };
   }, [isEditing, entityId, table, enqueueSnackbar, t]);
 
@@ -249,7 +283,11 @@ export function useEntityLock({
     }
 
     // Prevent running multiple times for same edit session
-    if (hasRunRef.current || lockAcquiredRef.current || isAcquiringRef.current) {
+    if (
+      hasRunRef.current ||
+      lockAcquiredRef.current ||
+      isAcquiringRef.current
+    ) {
       return;
     }
 
@@ -266,7 +304,11 @@ export function useEntityLock({
       if (softLockEnabled && environmentId) {
         setLoading(true);
         try {
-          const result = await entityLockService.acquireLock(table, entityId, environmentId);
+          const result = await entityLockService.acquireLock(
+            table,
+            entityId,
+            environmentId
+          );
           console.log('[useEntityLock] acquire result:', result);
           if (!isMounted) return;
 
@@ -275,7 +317,10 @@ export function useEntityLock({
             setLockedBy(null);
             lockAcquiredRef.current = true;
           } else {
-            console.log('[useEntityLock] Lock failed, lockedBy:', result.lockedBy);
+            console.log(
+              '[useEntityLock] Lock failed, lockedBy:',
+              result.lockedBy
+            );
             setHasLock(false);
             setLockedBy(result.lockedBy || null);
             // No toast here - the Alert in the form is sufficient
@@ -299,7 +344,11 @@ export function useEntityLock({
       // Hard lock handling (check for pending CRs)
       if (hardLockEnabled && environmentId) {
         try {
-          const result = await entityLockService.checkLock(table, entityId, environmentId);
+          const result = await entityLockService.checkLock(
+            table,
+            entityId,
+            environmentId
+          );
           if (!isMounted) return;
 
           if (result.pendingCR) {
@@ -352,7 +401,12 @@ export function useEntityLock({
   // Effect: Release lock on unmount
   useEffect(() => {
     return () => {
-      if (lockAcquiredRef.current && entityId && environmentRef.current && table) {
+      if (
+        lockAcquiredRef.current &&
+        entityId &&
+        environmentRef.current &&
+        table
+      ) {
         // Fire and forget release
         entityLockService.releaseLock(table, entityId, environmentRef.current);
         lockAcquiredRef.current = false;

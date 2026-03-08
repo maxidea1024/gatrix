@@ -64,7 +64,9 @@ function extractFavicon(html: string, urlStr: string): string | undefined {
     }
   }
   const host = getHostname(urlStr);
-  return host ? `https://www.google.com/s2/favicons?domain=${host}&sz=64` : undefined;
+  return host
+    ? `https://www.google.com/s2/favicons?domain=${host}&sz=64`
+    : undefined;
 }
 
 function decodeHTMLEntities(text: string): string {
@@ -77,10 +79,13 @@ function decodeHTMLEntities(text: string): string {
 }
 
 function buildPreviewFromHtml(html: string, url: string): LinkPreview {
-  const ogTitle = extractMeta(html, 'og:title') || extractMeta(html, 'twitter:title', 'name');
+  const ogTitle =
+    extractMeta(html, 'og:title') || extractMeta(html, 'twitter:title', 'name');
   const ogDesc =
-    extractMeta(html, 'og:description') || extractMeta(html, 'twitter:description', 'name');
-  const ogImage = extractMeta(html, 'og:image') || extractMeta(html, 'twitter:image', 'name');
+    extractMeta(html, 'og:description') ||
+    extractMeta(html, 'twitter:description', 'name');
+  const ogImage =
+    extractMeta(html, 'og:image') || extractMeta(html, 'twitter:image', 'name');
   const ogSite = extractMeta(html, 'og:site_name') || getHostname(url);
   const title = ogTitle || extractTitle(html) || getHostname(url);
   const description = ogDesc;
@@ -96,7 +101,10 @@ function buildPreviewFromHtml(html: string, url: string): LinkPreview {
   else if (ogType?.includes('image')) type = 'image';
 
   // YouTube 특화 처리 (썸네일 보장)
-  if (/youtu\.be\//.test(url) || /youtube\.com\/(watch\?v=|embed\/)/.test(url)) {
+  if (
+    /youtu\.be\//.test(url) ||
+    /youtube\.com\/(watch\?v=|embed\/)/.test(url)
+  ) {
     const idMatch = url.match(/(?:watch\?v=|youtu\.be\/|embed\/)([^&\n?#]+)/);
     const vid = idMatch ? idMatch[1] : undefined;
     if (vid && !image) {
@@ -134,7 +142,9 @@ export class LinkPreviewController {
     try {
       const url = (req.body?.url || req.query?.url) as string;
       if (!url || !/^https?:\/\//i.test(url)) {
-        return res.status(400).json({ success: false, error: '유효한 URL이 필요합니다' });
+        return res
+          .status(400)
+          .json({ success: false, error: '유효한 URL이 필요합니다' });
       }
 
       const response = await axios.get(url, {
@@ -173,7 +183,9 @@ export class LinkPreviewController {
     try {
       const urls = (req.body?.urls as string[]) || [];
       if (!Array.isArray(urls) || urls.length === 0) {
-        return res.status(400).json({ success: false, error: 'urls 배열이 필요합니다' });
+        return res
+          .status(400)
+          .json({ success: false, error: 'urls 배열이 필요합니다' });
       }
 
       // 과도한 Request 방지: 최대 10개로 제한
@@ -203,7 +215,9 @@ export class LinkPreviewController {
 
       return res.json({ success: true, data: results });
     } catch (err: any) {
-      return res.status(500).json({ success: false, error: 'Failed to fetch link previews' });
+      return res
+        .status(500)
+        .json({ success: false, error: 'Failed to fetch link previews' });
     }
   }
 }

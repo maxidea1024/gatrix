@@ -29,7 +29,11 @@ const NamingGuide: React.FC<NamingGuideProps> = ({ type }) => {
   const getGoodExamples = () => {
     switch (type) {
       case 'flag':
-        return ['enable-new-dashboard', 'feature-payment-v2', 'exp-checkout-flow'];
+        return [
+          'enable-new-dashboard',
+          'feature-payment-v2',
+          'exp-checkout-flow',
+        ];
       case 'segment':
         return ['beta-testers', 'premium-users', 'internal-staff'];
       case 'contextField':
@@ -70,7 +74,12 @@ const NamingGuide: React.FC<NamingGuideProps> = ({ type }) => {
         <li>{t('common.namingGuide.rule4')}</li>
       </Box>
 
-      <Typography variant="body2" fontWeight={500} className="good" sx={{ mb: 0.5 }}>
+      <Typography
+        variant="body2"
+        fontWeight={500}
+        className="good"
+        sx={{ mb: 0.5 }}
+      >
         ✓ {t('common.namingGuide.goodExamples')}
       </Typography>
       <Box sx={{ mb: 1.5 }}>
@@ -81,7 +90,12 @@ const NamingGuide: React.FC<NamingGuideProps> = ({ type }) => {
         ))}
       </Box>
 
-      <Typography variant="body2" fontWeight={500} className="bad" sx={{ mb: 0.5 }}>
+      <Typography
+        variant="body2"
+        fontWeight={500}
+        className="bad"
+        sx={{ mb: 0.5 }}
+      >
         ✗ {t('common.namingGuide.badExamples')}
       </Typography>
       <Box sx={{ mb: 1.5 }}>

@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import { MessageModel } from '../models/message';
 import { ChannelModel } from '../models/channel';
-import { CreateMessageData, UpdateMessageData, SearchQuery } from '../types/chat';
+import {
+  CreateMessageData,
+  UpdateMessageData,
+  SearchQuery,
+} from '../types/chat';
 import { getMetrics } from '../services/metrics-service';
 import { createLogger } from '../config/logger';
 
@@ -22,9 +26,13 @@ export class MessageController {
           channelId: parseInt(req.body.channelId),
           content: req.body.content,
           contentType: req.body.type || 'text',
-          replyToMessageId: req.body.replyToId ? parseInt(req.body.replyToId) : undefined,
+          replyToMessageId: req.body.replyToId
+            ? parseInt(req.body.replyToId)
+            : undefined,
           threadId: req.body.threadId ? parseInt(req.body.threadId) : undefined,
-          messageData: req.body.metadata ? JSON.parse(req.body.metadata) : undefined,
+          messageData: req.body.metadata
+            ? JSON.parse(req.body.metadata)
+            : undefined,
         };
       } else {
         // JSON 처리
@@ -143,7 +151,9 @@ export class MessageController {
         message: 'Message created successfully',
       });
 
-      logger.info(`Message created: ${message.id} in channel ${data.channelId} by user ${userId}`);
+      logger.info(
+        `Message created: ${message.id} in channel ${data.channelId} by user ${userId}`
+      );
     } catch (error) {
       logger.error('Error creating message:', error);
       res.status(500).json({
@@ -405,7 +415,10 @@ export class MessageController {
 
       // 채널 ID가 제공된 경우 접근 권한 확인
       if (channelId) {
-        const isMember = await ChannelModel.isMember(parseInt(channelId as string), userId);
+        const isMember = await ChannelModel.isMember(
+          parseInt(channelId as string),
+          userId
+        );
         if (!isMember) {
           res.status(403).json({
             success: false,
@@ -422,8 +435,13 @@ export class MessageController {
         dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
         dateTo: dateTo ? new Date(dateTo as string) : undefined,
         hasAttachments:
-          hasAttachments === 'true' ? true : hasAttachments === 'false' ? false : undefined,
-        isPinned: isPinned === 'true' ? true : isPinned === 'false' ? false : undefined,
+          hasAttachments === 'true'
+            ? true
+            : hasAttachments === 'false'
+              ? false
+              : undefined,
+        isPinned:
+          isPinned === 'true' ? true : isPinned === 'false' ? false : undefined,
         limit: Number(limit),
         offset,
       };
@@ -481,7 +499,10 @@ export class MessageController {
       }
 
       // 채널 접근 권한 확인
-      const isMember = await ChannelModel.isMember(originalMessage.channelId, userId);
+      const isMember = await ChannelModel.isMember(
+        originalMessage.channelId,
+        userId
+      );
       if (!isMember) {
         res.status(403).json({
           success: false,
@@ -567,7 +588,13 @@ export class MessageController {
 
       // multipart/form-data 또는 JSON 데이터 처리
       let content: string;
-      let contentType: 'text' | 'image' | 'video' | 'audio' | 'file' | 'location' = 'text';
+      let contentType:
+        | 'text'
+        | 'image'
+        | 'video'
+        | 'audio'
+        | 'file'
+        | 'location' = 'text';
       let attachments: any[] = [];
 
       if (req.body.content) {
@@ -596,9 +623,13 @@ export class MessageController {
         content,
         contentType,
         channelId,
-        replyToMessageId: req.body.replyToId ? parseInt(req.body.replyToId) : undefined,
+        replyToMessageId: req.body.replyToId
+          ? parseInt(req.body.replyToId)
+          : undefined,
         threadId: req.body.threadId ? parseInt(req.body.threadId) : undefined,
-        messageData: req.body.metadata ? JSON.parse(req.body.metadata) : undefined,
+        messageData: req.body.metadata
+          ? JSON.parse(req.body.metadata)
+          : undefined,
       };
 
       // 채널 접근 권한 확인
@@ -722,7 +753,9 @@ export class MessageController {
         logger.warn('Socket.IO instance not available for message broadcast');
       }
 
-      logger.info(`Message created: ${message.id} in channel ${channelId} by user ${userId}`);
+      logger.info(
+        `Message created: ${message.id} in channel ${channelId} by user ${userId}`
+      );
     } catch (error) {
       logger.error('Error creating message in channel:', error);
       res.status(500).json({

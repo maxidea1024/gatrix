@@ -5,7 +5,11 @@
  * No stickiness - direct userId match.
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
+import {
+  EvaluationContext,
+  StrategyParameters,
+  StrategyEvaluationResult,
+} from '@gatrix/shared';
 import { Strategy } from './strategy';
 
 export class UserWithIdStrategy extends Strategy {
@@ -13,7 +17,10 @@ export class UserWithIdStrategy extends Strategy {
     super('userWithId');
   }
 
-  isEnabled(parameters: StrategyParameters, context: EvaluationContext): boolean {
+  isEnabled(
+    parameters: StrategyParameters,
+    context: EvaluationContext
+  ): boolean {
     return this.isEnabledWithDetails(parameters, context).enabled;
   }
 
@@ -27,7 +34,11 @@ export class UserWithIdStrategy extends Strategy {
     }
 
     if (!context.userId) {
-      return { enabled: false, reason: 'No userId in context', details: { userIds } };
+      return {
+        enabled: false,
+        reason: 'No userId in context',
+        details: { userIds },
+      };
     }
 
     const userIdList = userIds.split(/\s*,\s*/);

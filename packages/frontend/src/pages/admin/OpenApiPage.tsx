@@ -40,7 +40,8 @@ export const OpenApiPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [tabValue, setTabValue] = useState(0);
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => setTabValue(newValue);
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) =>
+    setTabValue(newValue);
   const specs = useMemo(
     () => ({
       admin: createAdminApiSpec(),
@@ -53,7 +54,11 @@ export const OpenApiPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" component="h1" sx={{ mb: 0.5, fontWeight: 700 }}>
+        <Typography
+          variant="h5"
+          component="h1"
+          sx={{ mb: 0.5, fontWeight: 700 }}
+        >
           {t('sidebar.openApi')}
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -77,9 +82,21 @@ export const OpenApiPage: React.FC = () => {
             },
           }}
         >
-          <Tab label="Admin API" id="api-tab-0" aria-controls="api-tabpanel-0" />
-          <Tab label="Server SDK API" id="api-tab-1" aria-controls="api-tabpanel-1" />
-          <Tab label="Client SDK API" id="api-tab-2" aria-controls="api-tabpanel-2" />
+          <Tab
+            label="Admin API"
+            id="api-tab-0"
+            aria-controls="api-tabpanel-0"
+          />
+          <Tab
+            label="Server SDK API"
+            id="api-tab-1"
+            aria-controls="api-tabpanel-1"
+          />
+          <Tab
+            label="Client SDK API"
+            id="api-tab-2"
+            aria-controls="api-tabpanel-2"
+          />
         </Tabs>
         <TabPanel value={tabValue} index={0}>
           <Box sx={{ p: 2 }}>
@@ -229,9 +246,10 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
         '& .swagger-ui .info .description p': { color: textSecondary },
         '& .swagger-ui .info .description a': { color: accentColor },
         '& .swagger-ui .info .base-url': { color: textSecondary },
-        '& .swagger-ui .info li, & .swagger-ui .info p, & .swagger-ui .info table': {
-          color: textSecondary,
-        },
+        '& .swagger-ui .info li, & .swagger-ui .info p, & .swagger-ui .info table':
+          {
+            color: textSecondary,
+          },
         // Version and OAS badges
         '& .swagger-ui .info .title small': {
           backgroundColor: isDark ? 'rgba(255,255,255,0.15)' : undefined,
@@ -246,7 +264,9 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
         },
         // Opblock styles
         '& .swagger-ui .opblock': { borderColor },
-        '& .swagger-ui .opblock .opblock-summary': { backgroundColor: bgSubtle },
+        '& .swagger-ui .opblock .opblock-summary': {
+          backgroundColor: bgSubtle,
+        },
         // Force all text inside opblock-summary to be white in dark mode
         ...(isDark
           ? {
@@ -264,8 +284,12 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
         '& .swagger-ui .opblock-external-docs-url': { color: accentColor },
         '& .swagger-ui .opblock-tag': { color: textPrimary, borderColor },
         '& .swagger-ui .opblock-tag-section': { color: textPrimary },
-        '& .swagger-ui .opblock-tag-section .opblock-tag': { color: textPrimary },
-        '& .swagger-ui .opblock-tag-section .opblock-tag:hover': { color: accentColor },
+        '& .swagger-ui .opblock-tag-section .opblock-tag': {
+          color: textPrimary,
+        },
+        '& .swagger-ui .opblock-tag-section .opblock-tag:hover': {
+          color: accentColor,
+        },
         '& .swagger-ui .opblock-tag small': { color: textSecondary },
         '& .swagger-ui .opblock .opblock-summary-method': { fontWeight: 700 },
         // Opblock section header
@@ -273,10 +297,17 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
           backgroundColor: bgSubtle,
           borderBottomColor: borderColor,
         },
-        '& .swagger-ui .opblock .opblock-section-header h4': { color: textPrimary },
-        '& .swagger-ui .opblock .opblock-section-header label': { color: textPrimary },
+        '& .swagger-ui .opblock .opblock-section-header h4': {
+          color: textPrimary,
+        },
+        '& .swagger-ui .opblock .opblock-section-header label': {
+          color: textPrimary,
+        },
         // Parameters
-        '& .swagger-ui .parameter__name': { color: textPrimary, fontWeight: 600 },
+        '& .swagger-ui .parameter__name': {
+          color: textPrimary,
+          fontWeight: 600,
+        },
         '& .swagger-ui .parameter__type': { color: textSecondary },
         '& .swagger-ui .parameter__in': { color: textSecondary },
         '& .swagger-ui .parameter__deprecated': { color: textSecondary },
@@ -305,15 +336,22 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
         '& .swagger-ui .response-col_status': { color: textPrimary },
         '& .swagger-ui .response-col_description': { color: textPrimary },
         '& .swagger-ui .response-col_description p': { color: textPrimary },
-        '& .swagger-ui .response-col_description__inner': { color: textPrimary },
-        '& .swagger-ui .response-col_description__inner p': { color: textPrimary },
-        '& .swagger-ui .response-col_description__inner a': { color: accentColor },
+        '& .swagger-ui .response-col_description__inner': {
+          color: textPrimary,
+        },
+        '& .swagger-ui .response-col_description__inner p': {
+          color: textPrimary,
+        },
+        '& .swagger-ui .response-col_description__inner a': {
+          color: accentColor,
+        },
         '& .swagger-ui .response-col_links': { color: textPrimary },
         '& .swagger-ui .response-col_links i': { color: textSecondary },
         '& .swagger-ui .responses-inner': { color: textPrimary },
-        '& .swagger-ui .responses-inner h4, & .swagger-ui .responses-inner h5': {
-          color: textPrimary,
-        },
+        '& .swagger-ui .responses-inner h4, & .swagger-ui .responses-inner h5':
+          {
+            color: textPrimary,
+          },
         // Models
         '& .swagger-ui .model': { color: textPrimary },
         '& .swagger-ui .model-title': { color: textPrimary },
@@ -328,7 +366,10 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
         '& .swagger-ui .prop-format': { color: textSecondary },
         // Tabs
         '& .swagger-ui .tab': { color: textPrimary },
-        '& .swagger-ui .tab.active': { color: accentColor, borderBottomColor: accentColor },
+        '& .swagger-ui .tab.active': {
+          color: accentColor,
+          borderBottomColor: accentColor,
+        },
         '& .swagger-ui .tab:hover': { color: textPrimary },
         // Buttons
         '& .swagger-ui .btn': { color: textPrimary, borderColor },
@@ -381,7 +422,9 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
           color: textPrimary,
           borderColor,
         },
-        '& .swagger-ui .scheme-container .schemes > label': { color: textPrimary },
+        '& .swagger-ui .scheme-container .schemes > label': {
+          color: textPrimary,
+        },
         // Sections & Models panel
         '& .swagger-ui section.models': { borderColor },
         '& .swagger-ui section.models h4': { color: textPrimary },
@@ -392,7 +435,9 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
         },
         // SVG icons
         '& .swagger-ui .arrow': { fill: textPrimary },
-        '& .swagger-ui svg:not(:root)': { fill: isDark ? '#e0e0e0' : undefined },
+        '& .swagger-ui svg:not(:root)': {
+          fill: isDark ? '#e0e0e0' : undefined,
+        },
         // Markdown rendered content
         '& .swagger-ui .markdown p, & .swagger-ui .markdown li, & .swagger-ui .markdown td, & .swagger-ui .markdown th':
           {
@@ -409,9 +454,10 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
         },
         // Try it out button and related
         '& .swagger-ui .try-out__btn': { color: textPrimary, borderColor },
-        '& .swagger-ui .opblock-body .opblock-section .opblock-section-header': {
-          backgroundColor: bgSubtle,
-        },
+        '& .swagger-ui .opblock-body .opblock-section .opblock-section-header':
+          {
+            backgroundColor: bgSubtle,
+          },
         // Rendred JSON in response body
         '& .swagger-ui .example': { color: textPrimary },
         '& .swagger-ui .microlight': {
@@ -4019,90 +4065,92 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/environments/{environmentId}/stats': {
-        get: {
-          summary: 'Get environment stats',
-          tags: ['Environments'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/environments/{environmentId}/stats':
+        {
+          get: {
+            summary: 'Get environment stats',
+            tags: ['Environments'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'environmentId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'environmentId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/environments/{environmentId}/related-data': {
-        get: {
-          summary: 'Get environment related data',
-          tags: ['Environments'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/environments/{environmentId}/related-data':
+        {
+          get: {
+            summary: 'Get environment related data',
+            tags: ['Environments'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'environmentId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'environmentId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/environments/validate-name': {
         post: {
           summary: 'Validate environment name',
@@ -4427,340 +4475,347 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/toggle': {
-        post: {
-          summary: 'Toggle feature flag',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/toggle':
+        {
+          post: {
+            summary: 'Toggle feature flag',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/archive': {
-        post: {
-          summary: 'Archive feature flag',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/archive':
+        {
+          post: {
+            summary: 'Archive feature flag',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/revive': {
-        post: {
-          summary: 'Revive archived flag',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/revive':
+        {
+          post: {
+            summary: 'Revive archived flag',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/favorite': {
-        post: {
-          summary: 'Toggle flag favorite',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/favorite':
+        {
+          post: {
+            summary: 'Toggle flag favorite',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/mark-stale': {
-        post: {
-          summary: 'Mark flag as stale',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/mark-stale':
+        {
+          post: {
+            summary: 'Mark flag as stale',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/unmark-stale': {
-        post: {
-          summary: 'Unmark flag as stale',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/unmark-stale':
+        {
+          post: {
+            summary: 'Unmark flag as stale',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/strategies': {
-        post: {
-          summary: 'Add strategy to flag',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/strategies':
+        {
+          post: {
+            summary: 'Add strategy to flag',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
+              },
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
               },
             },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+          },
+          put: {
+            summary: 'Update strategies order',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-        put: {
-          summary: 'Update strategies order',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
-            },
-          },
-        },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/strategies/{strategyId}':
         {
           put: {
@@ -4860,172 +4915,175 @@ function createAdminApiSpec() {
             },
           },
         },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/variants': {
-        put: {
-          summary: 'Update flag variants',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/variants':
+        {
+          put: {
+            summary: 'Update flag variants',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/metrics': {
-        get: {
-          summary: 'Get flag metrics',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/metrics':
+        {
+          get: {
+            summary: 'Get flag metrics',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
+              },
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
               },
             },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+          },
+          post: {
+            summary: 'Submit flag metrics',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-        post: {
-          summary: 'Submit flag metrics',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/metrics/apps':
+        {
+          get: {
+            summary: 'Get flag metrics by app',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/metrics/apps': {
-        get: {
-          summary: 'Get flag metrics by app',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
-            },
-          },
-        },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/features/flag-types': {
         get: {
           summary: 'List flag types',
@@ -5060,48 +5118,49 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/flag-types/{flagType}': {
-        put: {
-          summary: 'Update flag type',
-          tags: ['Feature Flag Types'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/flag-types/{flagType}':
+        {
+          put: {
+            summary: 'Update flag type',
+            tags: ['Feature Flag Types'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagType',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagType',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/features/segments': {
         get: {
           summary: 'List segments',
@@ -5290,48 +5349,49 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/segments/{id}/references': {
-        get: {
-          summary: 'Get segment references',
-          tags: ['Segments'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/segments/{id}/references':
+        {
+          get: {
+            summary: 'Get segment references',
+            tags: ['Segments'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/features/context-fields': {
         get: {
           summary: 'List context fields',
@@ -5398,130 +5458,132 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/context-fields/{fieldName}': {
-        put: {
-          summary: 'Update context field',
-          tags: ['Context Fields'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/context-fields/{fieldName}':
+        {
+          put: {
+            summary: 'Update context field',
+            tags: ['Context Fields'],
+            security: [
+              {
+                bearerAuth: [],
+              },
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'fieldName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
               },
             },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+          },
+          delete: {
+            summary: 'Delete context field',
+            tags: ['Context Fields'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'fieldName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'fieldName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '204': {
+                description: 'Deleted',
+              },
             },
           },
         },
-        delete: {
-          summary: 'Delete context field',
-          tags: ['Context Fields'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/context-fields/{fieldName}/references':
+        {
+          get: {
+            summary: 'Get context field references',
+            tags: ['Context Fields'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'fieldName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '204': {
-              description: 'Deleted',
+              {
+                name: 'fieldName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/context-fields/{fieldName}/references': {
-        get: {
-          summary: 'Get context field references',
-          tags: ['Context Fields'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'fieldName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
-            },
-          },
-        },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/features/traffic': {
         get: {
           summary: 'Get feature traffic',
@@ -5590,40 +5652,41 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/traffic/aggregated/by-app': {
-        get: {
-          summary: 'Get traffic aggregated by app',
-          tags: ['Feature Traffic'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/traffic/aggregated/by-app':
+        {
+          get: {
+            summary: 'Get traffic aggregated by app',
+            tags: ['Feature Traffic'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/features/summary': {
         get: {
           summary: 'Get feature summary',
@@ -5726,74 +5789,76 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/evaluations/timeseries': {
-        get: {
-          summary: 'Get evaluation timeseries',
-          tags: ['Feature Traffic'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/evaluations/timeseries':
+        {
+          get: {
+            summary: 'Get evaluation timeseries',
+            tags: ['Feature Traffic'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/evaluations/timeseries/by-app': {
-        get: {
-          summary: 'Get evaluation timeseries by app',
-          tags: ['Feature Traffic'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/evaluations/timeseries/by-app':
+        {
+          get: {
+            summary: 'Get evaluation timeseries by app',
+            tags: ['Feature Traffic'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/features/playground': {
         post: {
           summary: 'Evaluate feature flag playground',
@@ -5896,40 +5961,41 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/features/code-references/summary': {
-        get: {
-          summary: 'Get code references summary',
-          tags: ['Code References'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/features/code-references/summary':
+        {
+          get: {
+            summary: 'Get code references summary',
+            tags: ['Code References'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/tags': {
         get: {
           summary: 'List tags',
@@ -6376,90 +6442,92 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/game-worlds/{id}/toggle-visibility': {
-        patch: {
-          summary: 'Toggle game world visibility',
-          tags: ['Game Worlds'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/game-worlds/{id}/toggle-visibility':
+        {
+          patch: {
+            summary: 'Toggle game world visibility',
+            tags: ['Game Worlds'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/game-worlds/{id}/toggle-maintenance': {
-        patch: {
-          summary: 'Toggle maintenance mode',
-          tags: ['Game Worlds'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/game-worlds/{id}/toggle-maintenance':
+        {
+          patch: {
+            summary: 'Toggle maintenance mode',
+            tags: ['Game Worlds'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/game-worlds/{id}/maintenance': {
         patch: {
           summary: 'Update maintenance settings',
@@ -6688,40 +6756,41 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/maintenance/isUnderMaintenance': {
-        get: {
-          summary: 'Get maintenance status',
-          tags: ['Maintenance'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/maintenance/isUnderMaintenance':
+        {
+          get: {
+            summary: 'Get maintenance status',
+            tags: ['Maintenance'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/maintenance/templates': {
         get: {
           summary: 'Get maintenance templates',
@@ -6976,40 +7045,41 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/message-templates/bulk-delete': {
-        post: {
-          summary: 'Bulk delete message templates',
-          tags: ['Message Templates'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/message-templates/bulk-delete':
+        {
+          post: {
+            summary: 'Bulk delete message templates',
+            tags: ['Message Templates'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/message-templates/{id}/tags': {
         get: {
           summary: 'Get message template tags',
@@ -7158,74 +7228,76 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/client-versions/meta/platforms': {
-        get: {
-          summary: 'Get available platforms',
-          tags: ['Client Versions'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/client-versions/meta/platforms':
+        {
+          get: {
+            summary: 'Get available platforms',
+            tags: ['Client Versions'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/client-versions/meta/versions': {
-        get: {
-          summary: 'Get version metadata',
-          tags: ['Client Versions'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/client-versions/meta/versions':
+        {
+          get: {
+            summary: 'Get version metadata',
+            tags: ['Client Versions'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/client-versions/export': {
         get: {
           summary: 'Export client versions',
@@ -7788,48 +7860,49 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/service-notices/{id}/toggle-active': {
-        patch: {
-          summary: 'Toggle service notice active',
-          tags: ['Service Notices'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/service-notices/{id}/toggle-active':
+        {
+          patch: {
+            summary: 'Toggle service notice active',
+            tags: ['Service Notices'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/ingame-popup-notices': {
         get: {
           summary: 'List ingame popup notices',
@@ -8018,82 +8091,84 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/ingame-popup-notices/bulk-delete': {
-        post: {
-          summary: 'Bulk delete popup notices',
-          tags: ['Ingame Popup Notices'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/ingame-popup-notices/bulk-delete':
+        {
+          post: {
+            summary: 'Bulk delete popup notices',
+            tags: ['Ingame Popup Notices'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/ingame-popup-notices/{id}/toggle-active': {
-        patch: {
-          summary: 'Toggle popup notice active',
-          tags: ['Ingame Popup Notices'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/ingame-popup-notices/{id}/toggle-active':
+        {
+          patch: {
+            summary: 'Toggle popup notice active',
+            tags: ['Ingame Popup Notices'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/surveys': {
         get: {
           summary: 'List surveys',
@@ -8226,48 +8301,49 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/surveys/platform/{platformSurveyId}': {
-        get: {
-          summary: 'Get survey by platform ID',
-          tags: ['Surveys'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/surveys/platform/{platformSurveyId}':
+        {
+          get: {
+            summary: 'Get survey by platform ID',
+            tags: ['Surveys'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'platformSurveyId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'platformSurveyId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/surveys/{id}': {
         get: {
           summary: 'Get survey',
@@ -8946,74 +9022,76 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/store-products/count-by-filter': {
-        get: {
-          summary: 'Count products by filter',
-          tags: ['Store Products'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/store-products/count-by-filter':
+        {
+          get: {
+            summary: 'Count products by filter',
+            tags: ['Store Products'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/store-products/bulk-active-by-filter': {
-        patch: {
-          summary: 'Bulk toggle active by filter',
-          tags: ['Store Products'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/store-products/bulk-active-by-filter':
+        {
+          patch: {
+            summary: 'Bulk toggle active by filter',
+            tags: ['Store Products'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/store-products/bulk-active': {
         patch: {
           summary: 'Bulk toggle active',
@@ -9170,48 +9248,49 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/store-products/{id}/toggle-active': {
-        patch: {
-          summary: 'Toggle store product active',
-          tags: ['Store Products'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/store-products/{id}/toggle-active':
+        {
+          patch: {
+            summary: 'Toggle store product active',
+            tags: ['Store Products'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/reward-templates': {
         get: {
           summary: 'List reward templates',
@@ -9400,48 +9479,49 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/reward-templates/{id}/references': {
-        get: {
-          summary: 'Get reward template references',
-          tags: ['Reward Templates'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/reward-templates/{id}/references':
+        {
+          get: {
+            summary: 'Get reward template references',
+            tags: ['Reward Templates'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings': {
         get: {
           summary: 'List coupon settings',
@@ -9576,40 +9656,41 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/usage/export-chunked': {
-        get: {
-          summary: 'Export coupon usage chunked',
-          tags: ['Coupon Settings'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/usage/export-chunked':
+        {
+          get: {
+            summary: 'Export coupon usage chunked',
+            tags: ['Coupon Settings'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/{id}': {
         get: {
           summary: 'Get coupon setting',
@@ -9774,250 +9855,256 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/{id}/issued-codes-stats': {
-        get: {
-          summary: 'Get issued codes stats',
-          tags: ['Coupon Settings'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/{id}/issued-codes-stats':
+        {
+          get: {
+            summary: 'Get issued codes stats',
+            tags: ['Coupon Settings'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/{id}/issued-codes-export': {
-        get: {
-          summary: 'Export issued codes',
-          tags: ['Coupon Settings'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/{id}/issued-codes-export':
+        {
+          get: {
+            summary: 'Export issued codes',
+            tags: ['Coupon Settings'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/{id}/issued-codes': {
-        get: {
-          summary: 'Get issued codes',
-          tags: ['Coupon Settings'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/{id}/issued-codes':
+        {
+          get: {
+            summary: 'Get issued codes',
+            tags: ['Coupon Settings'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/{id}/generation-status': {
-        get: {
-          summary: 'Get generation status',
-          tags: ['Coupon Settings'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/{id}/generation-status':
+        {
+          get: {
+            summary: 'Get generation status',
+            tags: ['Coupon Settings'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/{id}/recalculate-cache': {
-        post: {
-          summary: 'Recalculate coupon cache',
-          tags: ['Coupon Settings'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/{id}/recalculate-cache':
+        {
+          post: {
+            summary: 'Recalculate coupon cache',
+            tags: ['Coupon Settings'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/admin/recalculate-cache-all': {
-        post: {
-          summary: 'Recalculate all coupon cache',
-          tags: ['Coupon Settings'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/coupon-settings/admin/recalculate-cache-all':
+        {
+          post: {
+            summary: 'Recalculate all coupon cache',
+            tags: ['Coupon Settings'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/planning-data/reward-lookup': {
         get: {
           summary: 'Reward lookup',
@@ -10086,48 +10173,49 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/planning-data/reward-types/{rewardType}/items': {
-        get: {
-          summary: 'Get reward type items',
-          tags: ['Planning Data'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/planning-data/reward-types/{rewardType}/items':
+        {
+          get: {
+            summary: 'Get reward type items',
+            tags: ['Planning Data'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'rewardType',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'rewardType',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/planning-data/ui-list': {
         get: {
           summary: 'Get UI list',
@@ -10162,48 +10250,49 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/planning-data/ui-list/{category}/items': {
-        get: {
-          summary: 'Get UI list items',
-          tags: ['Planning Data'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/planning-data/ui-list/{category}/items':
+        {
+          get: {
+            summary: 'Get UI list items',
+            tags: ['Planning Data'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'category',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'category',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/planning-data/stats': {
         get: {
           summary: 'Get planning data stats',
@@ -10866,98 +10955,100 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/flag/{flagId}': {
-        get: {
-          summary: 'Get plans by flag',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/flag/{flagId}':
+        {
+          get: {
+            summary: 'Get plans by flag',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{flagId}/{environmentId}': {
-        get: {
-          summary: 'Get plan for flag+env',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{flagId}/{environmentId}':
+        {
+          get: {
+            summary: 'Get plan for flag+env',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'environmentId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'flagId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'environmentId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{planId}/milestones/{milestoneId}/start':
         {
           post: {
@@ -11051,174 +11142,178 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{id}/start': {
-        post: {
-          summary: 'Start plan',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{id}/start':
+        {
+          post: {
+            summary: 'Start plan',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{id}/pause': {
-        post: {
-          summary: 'Pause plan',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{id}/pause':
+        {
+          post: {
+            summary: 'Pause plan',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{id}/resume': {
-        post: {
-          summary: 'Resume plan',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{id}/resume':
+        {
+          post: {
+            summary: 'Resume plan',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{id}/progress': {
-        post: {
-          summary: 'Progress plan',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{id}/progress':
+        {
+          post: {
+            summary: 'Progress plan',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/release-flows/milestones/{milestoneId}/transition':
         {
           put: {
@@ -11422,130 +11517,132 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/safeguards/{safeguardId}': {
-        put: {
-          summary: 'Update safeguard',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/safeguards/{safeguardId}':
+        {
+          put: {
+            summary: 'Update safeguard',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
+              },
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'safeguardId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
               },
             },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+          },
+          delete: {
+            summary: 'Delete safeguard',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'safeguardId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'safeguardId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '204': {
+                description: 'Deleted',
+              },
             },
           },
         },
-        delete: {
-          summary: 'Delete safeguard',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/safeguards/{safeguardId}/reset':
+        {
+          post: {
+            summary: 'Reset safeguard',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'safeguardId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '204': {
-              description: 'Deleted',
+              {
+                name: 'safeguardId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/release-flows/safeguards/{safeguardId}/reset': {
-        post: {
-          summary: 'Reset safeguard',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'safeguardId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
-            },
-          },
-        },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/change-requests': {
         get: {
           summary: 'List change requests',
@@ -11770,56 +11867,57 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/change-requests/{id}/items/{itemId}': {
-        delete: {
-          summary: 'Remove change request item',
-          tags: ['Change Requests'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/change-requests/{id}/items/{itemId}':
+        {
+          delete: {
+            summary: 'Remove change request item',
+            tags: ['Change Requests'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'itemId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '204': {
-              description: 'Deleted',
+              {
+                name: 'itemId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '204': {
+                description: 'Deleted',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/change-requests/{id}/submit': {
         post: {
           summary: 'Submit change request',
@@ -12030,48 +12128,49 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/change-requests/{id}/revert-preview': {
-        get: {
-          summary: 'Preview change request revert',
-          tags: ['Change Requests'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/change-requests/{id}/revert-preview':
+        {
+          get: {
+            summary: 'Preview change request revert',
+            tags: ['Change Requests'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/change-requests/{id}/revert': {
         post: {
           summary: 'Revert change request',
@@ -12386,98 +12485,100 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/signal-endpoints/{id}/tokens/{tokenId}': {
-        delete: {
-          summary: 'Delete endpoint token',
-          tags: ['Signal Endpoints'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/signal-endpoints/{id}/tokens/{tokenId}':
+        {
+          delete: {
+            summary: 'Delete endpoint token',
+            tags: ['Signal Endpoints'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'tokenId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '204': {
-              description: 'Deleted',
+              {
+                name: 'tokenId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '204': {
+                description: 'Deleted',
+              },
             },
           },
         },
-      },
-      '/admin/orgs/{orgId}/projects/{projectId}/signal-endpoints/{id}/signals': {
-        get: {
-          summary: 'Get endpoint signals',
-          tags: ['Signal Endpoints'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/signal-endpoints/{id}/signals':
+        {
+          get: {
+            summary: 'Get endpoint signals',
+            tags: ['Signal Endpoints'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/actions': {
         get: {
           summary: 'List action sets',
@@ -12980,56 +13081,57 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/service-accounts/{id}/tokens/{tokenId}': {
-        delete: {
-          summary: 'Delete service account token',
-          tags: ['Service Accounts'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/service-accounts/{id}/tokens/{tokenId}':
+        {
+          delete: {
+            summary: 'Delete service account token',
+            tags: ['Service Accounts'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'tokenId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '204': {
-              description: 'Deleted',
+              {
+                name: 'tokenId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '204': {
+                description: 'Deleted',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/api-tokens': {
         get: {
           summary: 'List API tokens',
@@ -14110,48 +14212,49 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/impact-metrics/configs/{flagId}': {
-        get: {
-          summary: 'Get metric configs for flag',
-          tags: ['Impact Metrics'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/impact-metrics/configs/{flagId}':
+        {
+          get: {
+            summary: 'Get metric configs for flag',
+            tags: ['Impact Metrics'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'flagId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/impact-metrics/configs': {
         post: {
           summary: 'Create metric config',
@@ -14186,40 +14289,41 @@ function createAdminApiSpec() {
           },
         },
       },
-      '/admin/orgs/{orgId}/projects/{projectId}/impact-metrics/configs/layouts': {
-        put: {
-          summary: 'Update metric layouts',
-          tags: ['Impact Metrics'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+      '/admin/orgs/{orgId}/projects/{projectId}/impact-metrics/configs/layouts':
+        {
+          put: {
+            summary: 'Update metric layouts',
+            tags: ['Impact Metrics'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/impact-metrics/configs/{id}': {
         put: {
           summary: 'Update metric config',
@@ -15531,7 +15635,8 @@ function createClientSdkApiSpec() {
           ],
           responses: {
             '200': {
-              description: 'Server-Sent Events stream for real-time flag invalidation',
+              description:
+                'Server-Sent Events stream for real-time flag invalidation',
             },
           },
         },

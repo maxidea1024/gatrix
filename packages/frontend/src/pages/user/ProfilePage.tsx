@@ -50,7 +50,10 @@ import { useTranslation } from 'react-i18next';
 import { AuthService } from '@/services/auth';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
-import { inferRoleLabelKey, getRoleLabelColor } from '@gatrix/shared/permissions';
+import {
+  inferRoleLabelKey,
+  getRoleLabelColor,
+} from '@gatrix/shared/permissions';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import EffectivePermissionsViewer from '@/components/rbac/EffectivePermissionsViewer';
 import type { EffectivePermissions } from '@/services/rbacService';
@@ -107,7 +110,9 @@ const ProfilePage: React.FC = () => {
   const [accessTree, setAccessTree] = useState<AccessOrg[]>([]);
   const [accessLoading, setAccessLoading] = useState(true);
   const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set());
-  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(
+    new Set()
+  );
 
   // Convert user permissions to EffectivePermissions format for the viewer
   const effectivePermsData = useMemo((): EffectivePermissions | null => {
@@ -165,7 +170,9 @@ const ProfilePage: React.FC = () => {
         setAccessTree(tree);
         // Auto-expand all orgs and projects
         setExpandedOrgs(new Set(tree.map((o) => o.orgId)));
-        setExpandedProjects(new Set(tree.flatMap((o) => o.projects.map((p) => p.projectId))));
+        setExpandedProjects(
+          new Set(tree.flatMap((o) => o.projects.map((p) => p.projectId)))
+        );
       } catch {
         // Silently ignore
       } finally {
@@ -256,13 +263,20 @@ const ProfilePage: React.FC = () => {
       // Upload avatar if a new file is selected
       if (avatarFile) {
         try {
-          const uploadResponse = await api.upload('/upload/avatar', avatarFile, 'avatar');
+          const uploadResponse = await api.upload(
+            '/upload/avatar',
+            avatarFile,
+            'avatar'
+          );
           avatarUrl = uploadResponse.data.url;
           enqueueSnackbar(t('profile.avatarUploaded'), { variant: 'success' });
         } catch (uploadError: any) {
-          enqueueSnackbar(uploadError.message || t('profile.avatarUploadFailed'), {
-            variant: 'error',
-          });
+          enqueueSnackbar(
+            uploadError.message || t('profile.avatarUploadFailed'),
+            {
+              variant: 'error',
+            }
+          );
           return;
         }
       }
@@ -325,7 +339,10 @@ const ProfilePage: React.FC = () => {
 
     setPasswordLoading(true);
     try {
-      await AuthService.changePassword(passwordData.currentPassword, passwordData.newPassword);
+      await AuthService.changePassword(
+        passwordData.currentPassword,
+        passwordData.newPassword
+      );
       enqueueSnackbar(t('profile.passwordChanged'), { variant: 'success' });
       handlePasswordDialogClose();
     } catch (error: any) {
@@ -491,13 +508,21 @@ const ProfilePage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 1, mt: { xs: 2, sm: 2 } }}>
               {isEditing ? (
                 <>
-                  <Button variant="outlined" startIcon={<CancelIcon />} onClick={handleEditToggle}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<CancelIcon />}
+                    onClick={handleEditToggle}
+                  >
                     {t('common.cancel')}
                   </Button>
                   <Button
                     variant="contained"
                     startIcon={
-                      isLoading ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />
+                      isLoading ? (
+                        <CircularProgress size={16} color="inherit" />
+                      ) : (
+                        <SaveIcon />
+                      )
                     }
                     onClick={handleSave}
                     disabled={isLoading}
@@ -506,7 +531,11 @@ const ProfilePage: React.FC = () => {
                   </Button>
                 </>
               ) : (
-                <Button variant="outlined" startIcon={<EditIcon />} onClick={handleEditToggle}>
+                <Button
+                  variant="outlined"
+                  startIcon={<EditIcon />}
+                  onClick={handleEditToggle}
+                >
                   {t('profile.editProfile')}
                 </Button>
               )}
@@ -541,7 +570,9 @@ const ProfilePage: React.FC = () => {
                     {t('profile.memberSince')}
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}
+                    {user.createdAt
+                      ? new Date(user.createdAt).toLocaleDateString()
+                      : '-'}
                   </Typography>
                 </Box>
                 {user.lastLoginAt && (
@@ -555,8 +586,14 @@ const ProfilePage: React.FC = () => {
                     <Typography variant="body2" color="text.secondary">
                       {t('profile.lastLogin')}
                     </Typography>
-                    <Tooltip title={formatDateTimeDetailed(user.lastLoginAt)} arrow>
-                      <Typography variant="body2" sx={{ fontWeight: 500, cursor: 'help' }}>
+                    <Tooltip
+                      title={formatDateTimeDetailed(user.lastLoginAt)}
+                      arrow
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 500, cursor: 'help' }}
+                      >
                         {formatRelativeTime(user.lastLoginAt)}
                       </Typography>
                     </Tooltip>
@@ -572,7 +609,11 @@ const ProfilePage: React.FC = () => {
                   <Typography variant="body2" color="text.secondary">
                     {t('profile.authType')}
                   </Typography>
-                  <Chip label={getAuthTypeLabel(user.authType)} size="small" variant="outlined" />
+                  <Chip
+                    label={getAuthTypeLabel(user.authType)}
+                    size="small"
+                    variant="outlined"
+                  />
                 </Box>
               </Stack>
             </CardContent>
@@ -614,7 +655,11 @@ const ProfilePage: React.FC = () => {
                     {t('profile.permissions')}
                   </Typography>
                 </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   {t('profile.permissionsDesc')}
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
@@ -628,7 +673,14 @@ const ProfilePage: React.FC = () => {
                       border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        mb: 1,
+                      }}
+                    >
                       <SecurityIcon sx={{ color: 'success.main' }} />
                       <Typography
                         variant="subtitle1"
@@ -642,7 +694,10 @@ const ProfilePage: React.FC = () => {
                     </Typography>
                   </Box>
                 ) : (
-                  <EffectivePermissionsViewer data={effectivePermsData} maxHeight={350} />
+                  <EffectivePermissionsViewer
+                    data={effectivePermsData}
+                    maxHeight={350}
+                  />
                 )}
               </CardContent>
             </Card>
@@ -665,8 +720,18 @@ const ProfilePage: React.FC = () => {
               {accessLoading ? (
                 <Stack spacing={1}>
                   <Skeleton variant="rectangular" height={32} width="80%" />
-                  <Skeleton variant="rectangular" height={24} width="60%" sx={{ ml: 3 }} />
-                  <Skeleton variant="rectangular" height={24} width="50%" sx={{ ml: 6 }} />
+                  <Skeleton
+                    variant="rectangular"
+                    height={24}
+                    width="60%"
+                    sx={{ ml: 3 }}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    height={24}
+                    width="50%"
+                    sx={{ ml: 6 }}
+                  />
                 </Stack>
               ) : accessTree.length > 0 ? (
                 <Box
@@ -707,7 +772,10 @@ const ProfilePage: React.FC = () => {
                             sx={{ mr: 0.5, color: 'text.secondary' }}
                           />
                         )}
-                        <OrgIcon fontSize="small" sx={{ mr: 1, color: 'primary.main' }} />
+                        <OrgIcon
+                          fontSize="small"
+                          sx={{ mr: 1, color: 'primary.main' }}
+                        />
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
                           {org.displayName || org.orgName}
                         </Typography>
@@ -755,8 +823,14 @@ const ProfilePage: React.FC = () => {
                               ) : (
                                 <Box sx={{ width: 24, mr: 0.5 }} />
                               )}
-                              <ProjectIcon fontSize="small" sx={{ mr: 1, color: 'warning.main' }} />
-                              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                              <ProjectIcon
+                                fontSize="small"
+                                sx={{ mr: 1, color: 'warning.main' }}
+                              />
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: 500 }}
+                              >
                                 {proj.displayName || proj.projectName}
                               </Typography>
                             </Box>
@@ -781,10 +855,14 @@ const ProfilePage: React.FC = () => {
                                     sx={{
                                       mr: 1,
                                       fontSize: 10,
-                                      color: env.color || theme.palette.info.main,
+                                      color:
+                                        env.color || theme.palette.info.main,
                                     }}
                                   />
-                                  <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{ fontSize: '0.8rem' }}
+                                  >
                                     {env.displayName || env.environmentName}
                                   </Typography>
                                 </Box>
@@ -806,7 +884,9 @@ const ProfilePage: React.FC = () => {
                   }}
                 >
                   <InfoIcon fontSize="small" />
-                  <Typography variant="body2">{t('profile.noAccessScope')}</Typography>
+                  <Typography variant="body2">
+                    {t('profile.noAccessScope')}
+                  </Typography>
                 </Box>
               )}
             </CardContent>
@@ -815,7 +895,12 @@ const ProfilePage: React.FC = () => {
       </Grid>
 
       {/* Password Change Dialog */}
-      <Dialog open={passwordDialog} onClose={handlePasswordDialogClose} maxWidth="sm" fullWidth>
+      <Dialog
+        open={passwordDialog}
+        onClose={handlePasswordDialogClose}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>{t('profile.changePassword')}</DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
@@ -842,7 +927,11 @@ const ProfilePage: React.FC = () => {
                       }
                       edge="end"
                     >
-                      {showPasswords.current ? <VisibilityOff /> : <Visibility />}
+                      {showPasswords.current ? (
+                        <VisibilityOff />
+                      ) : (
+                        <Visibility />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -901,7 +990,11 @@ const ProfilePage: React.FC = () => {
                       }
                       edge="end"
                     >
-                      {showPasswords.confirm ? <VisibilityOff /> : <Visibility />}
+                      {showPasswords.confirm ? (
+                        <VisibilityOff />
+                      ) : (
+                        <Visibility />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -910,7 +1003,9 @@ const ProfilePage: React.FC = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handlePasswordDialogClose}>{t('common.cancel')}</Button>
+          <Button onClick={handlePasswordDialogClose}>
+            {t('common.cancel')}
+          </Button>
           <Button
             onClick={handlePasswordChange}
             variant="contained"
@@ -920,7 +1015,9 @@ const ProfilePage: React.FC = () => {
               !passwordData.newPassword ||
               !passwordData.confirmPassword
             }
-            startIcon={passwordLoading ? <CircularProgress size={16} /> : undefined}
+            startIcon={
+              passwordLoading ? <CircularProgress size={16} /> : undefined
+            }
           >
             {passwordLoading ? t('common.saving') : t('profile.changePassword')}
           </Button>

@@ -84,7 +84,10 @@ export class ChannelModel {
   }
 
   // 채널 생성
-  static async create(data: CreateChannelData, createdBy: number): Promise<ChannelType> {
+  static async create(
+    data: CreateChannelData,
+    createdBy: number
+  ): Promise<ChannelType> {
     const channelData = {
       channelName: data.name, // legacy column for backward compatibility
       name: data.name,
@@ -131,7 +134,11 @@ export class ChannelModel {
     const channel = await this.knex('chat_channels as c')
       .select(['c.*', this.knex.raw('COUNT(cm.userId) as memberCount')])
       .leftJoin('chat_channel_members as cm', function () {
-        this.on('c.id', '=', 'cm.channelId').andOnVal('cm.status', '=', 'active');
+        this.on('c.id', '=', 'cm.channelId').andOnVal(
+          'cm.status',
+          '=',
+          'active'
+        );
       })
       .where({ 'c.id': id, 'c.isArchived': false })
       .groupBy('c.id')
@@ -160,14 +167,24 @@ export class ChannelModel {
       ])
       .join('chat_channel_members as cm', 'c.id', 'cm.channelId')
       .leftJoin('chat_channel_members as cm2', function () {
-        this.on('c.id', '=', 'cm2.channelId').andOnVal('cm2.status', '=', 'active');
+        this.on('c.id', '=', 'cm2.channelId').andOnVal(
+          'cm2.status',
+          '=',
+          'active'
+        );
       })
       .where({
         'cm.userId': userId,
         'cm.status': 'active',
         'c.isArchived': false,
       })
-      .groupBy('c.id', 'cm.role', 'cm.unreadCount', 'cm.lastReadAt', 'cm.notificationSettings');
+      .groupBy(
+        'c.id',
+        'cm.role',
+        'cm.unreadCount',
+        'cm.lastReadAt',
+        'cm.notificationSettings'
+      );
 
     if (options.type) {
       query = query.where('c.type', options.type);
@@ -219,7 +236,11 @@ export class ChannelModel {
   }
 
   // 채널 아카이브
-  static async archive(id: number, reason: string, archivedBy: number): Promise<boolean> {
+  static async archive(
+    id: number,
+    reason: string,
+    archivedBy: number
+  ): Promise<boolean> {
     const result = await this.knex('chat_channels').where({ id }).update({
       isArchived: true,
       archiveReason: reason,
@@ -248,14 +269,21 @@ export class ChannelModel {
     let searchQuery = this.knex('chat_channels as c')
       .select(['c.*', 'cm.role', 'cm.unreadCount'])
       .leftJoin('chat_channel_members as cm', function () {
-        this.on('c.id', '=', 'cm.channelId').andOn('cm.userId', '=', userId.toString());
+        this.on('c.id', '=', 'cm.channelId').andOn(
+          'cm.userId',
+          '=',
+          userId.toString()
+        );
       })
       .where('c.isArchived', false)
       .andWhere(function () {
         this.where('c.type', 'public').orWhere('cm.userId', userId);
       })
       .andWhere(function () {
-        this.whereRaw('MATCH(c.name, c.description) AGAINST(? IN NATURAL LANGUAGE MODE)', [query])
+        this.whereRaw(
+          'MATCH(c.name, c.description) AGAINST(? IN NATURAL LANGUAGE MODE)',
+          [query]
+        )
           .orWhere('c.name', 'like', `%${query}%`)
           .orWhere('c.description', 'like', `%${query}%`);
       });
@@ -263,14 +291,21 @@ export class ChannelModel {
     // 총 개수 조회 - 별도 쿼리로 분리
     const totalQuery = this.knex('chat_channels as c')
       .leftJoin('chat_channel_members as cm', function () {
-        this.on('c.id', '=', 'cm.channelId').andOn('cm.userId', '=', userId.toString());
+        this.on('c.id', '=', 'cm.channelId').andOn(
+          'cm.userId',
+          '=',
+          userId.toString()
+        );
       })
       .where('c.isArchived', false)
       .andWhere(function () {
         this.where('c.type', 'public').orWhere('cm.userId', userId);
       })
       .andWhere(function () {
-        this.whereRaw('MATCH(c.name, c.description) AGAINST(? IN NATURAL LANGUAGE MODE)', [query])
+        this.whereRaw(
+          'MATCH(c.name, c.description) AGAINST(? IN NATURAL LANGUAGE MODE)',
+          [query]
+        )
           .orWhere('c.name', 'like', `%${query}%`)
           .orWhere('c.description', 'like', `%${query}%`);
       })
@@ -303,14 +338,22 @@ export class ChannelModel {
         this.knex.raw('COUNT(m.id) as messageCount'),
       ])
       .leftJoin('chat_channel_members as cm', function () {
-        this.on('c.id', '=', 'cm.channelId').andOnVal('cm.status', '=', 'active');
+        this.on('c.id', '=', 'cm.channelId').andOnVal(
+          'cm.status',
+          '=',
+          'active'
+        );
       })
       .leftJoin('chat_messages as m', 'c.id', 'm.channelId')
       .where({
         'c.type': 'public',
         'c.isArchived': false,
       })
-      .andWhere('m.createdAt', '>=', this.knex.raw('DATE_SUB(NOW(), INTERVAL 7 DAY)'))
+      .andWhere(
+        'm.createdAt',
+        '>=',
+        this.knex.raw('DATE_SUB(NOW(), INTERVAL 7 DAY)')
+      )
       .groupBy('c.id')
       .orderBy('memberCount', 'desc')
       .orderBy('messageCount', 'desc')
@@ -346,7 +389,11 @@ export class ChannelModel {
   }
 
   // 채널을 읽음으로 표시
-  static async markAsRead(channelId: number, userId: number, messageId?: number): Promise<boolean> {
+  static async markAsRead(
+    channelId: number,
+    userId: number,
+    messageId?: number
+  ): Promise<boolean> {
     try {
       const updateData: any = {
         lastReadAt: new Date(),
@@ -391,7 +438,10 @@ export class ChannelModel {
       );
       return result > 0;
     } catch (error) {
-      console.error(`❌ Error marking channel ${channelId} as read for user ${userId}:`, error);
+      console.error(
+        `❌ Error marking channel ${channelId} as read for user ${userId}:`,
+        error
+      );
       return false;
     }
   }
@@ -407,7 +457,12 @@ export class ChannelModel {
       autoDeleteMessages: false,
       autoDeleteDays: 30,
       requireApproval: false,
-      allowedFileTypes: ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'],
+      allowedFileTypes: [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'application/pdf',
+      ],
       maxFileSize: 10485760, // 10MB
     };
   }
@@ -452,7 +507,10 @@ export class ChannelModel {
   }
 
   // 사용자의 채널 권한 조회
-  static async getUserRole(channelId: number, userId: number): Promise<string | null> {
+  static async getUserRole(
+    channelId: number,
+    userId: number
+  ): Promise<string | null> {
     const result = await this.knex('chat_channel_members')
       .select('role')
       .where({

@@ -46,7 +46,10 @@ import changeRequestService, {
   ChangeItem,
   ChangeRequestStatus,
 } from '@/services/changeRequestService';
-import { formatChangeRequestTitle, formatChangeItemTitle } from '@/utils/changeRequestFormatter';
+import {
+  formatChangeRequestTitle,
+  formatChangeItemTitle,
+} from '@/utils/changeRequestFormatter';
 import RevertPreviewDrawer from './RevertPreviewDrawer';
 import SubmitPreviewDrawer from './SubmitPreviewDrawer';
 
@@ -61,7 +64,14 @@ interface ChangeRequestDetailDrawerProps {
 const STATUS_CONFIG: Record<
   ChangeRequestStatus,
   {
-    color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
+    color:
+      | 'default'
+      | 'primary'
+      | 'secondary'
+      | 'error'
+      | 'info'
+      | 'success'
+      | 'warning';
     labelKey: string;
     bgColor: string;
   }
@@ -100,7 +110,13 @@ const STATUS_CONFIG: Record<
 
 // Timeline event type
 interface TimelineEvent {
-  type: 'created' | 'submitted' | 'approved' | 'rejected' | 'reopened' | 'executed';
+  type:
+    | 'created'
+    | 'submitted'
+    | 'approved'
+    | 'rejected'
+    | 'reopened'
+    | 'executed';
   timestamp: string;
   user?: { name?: string; email?: string };
   comment?: string;
@@ -132,9 +148,15 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const [submitPreviewOpen, setSubmitPreviewOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [expandedReasons, setExpandedReasons] = useState<Record<number, boolean>>({});
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [expandedReasons, setExpandedReasons] = useState<
+    Record<number, boolean>
+  >({});
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+    {}
+  );
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
+    {}
+  );
   const [rollbackPreviewOpen, setRollbackPreviewOpen] = useState(false);
   const [rollbackTargetId, setRollbackTargetId] = useState<string | null>(null);
 
@@ -190,7 +212,9 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         const milestones: number[] = [];
 
         if (cr.approvals?.length) {
-          milestones.push(...cr.approvals.map((a) => new Date(a.createdAt).getTime()));
+          milestones.push(
+            ...cr.approvals.map((a) => new Date(a.createdAt).getTime())
+          );
         }
         if (cr.rejectedAt) {
           milestones.push(new Date(cr.rejectedAt).getTime());
@@ -243,7 +267,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     }
 
     return events.sort((a, b) => {
-      const timeDiff = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+      const timeDiff =
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
       if (timeDiff !== 0) return timeDiff;
 
       // Deterministic order for same timestamp
@@ -270,12 +295,21 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         field: op.path,
         oldValue: op.oldValue,
         newValue: op.newValue,
-        operation: op.opType === 'SET' ? 'added' : op.opType === 'DEL' ? 'removed' : 'modified',
+        operation:
+          op.opType === 'SET'
+            ? 'added'
+            : op.opType === 'DEL'
+              ? 'removed'
+              : 'modified',
       }));
 
       // Map backend opType to frontend operation
       const operation =
-        item.opType === 'CREATE' ? 'create' : item.opType === 'DELETE' ? 'delete' : 'update';
+        item.opType === 'CREATE'
+          ? 'create'
+          : item.opType === 'DELETE'
+            ? 'delete'
+            : 'update';
 
       return {
         table: item.targetTable,
@@ -298,11 +332,16 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     return cr.actionGroups
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map((group) => {
-        const groupItems = allChanges.filter((item) => item.actionGroupId === group.id);
+        const groupItems = allChanges.filter(
+          (item) => item.actionGroupId === group.id
+        );
         return {
           ...group,
           items: groupItems,
-          totalChanges: groupItems.reduce((sum, item) => sum + item.changes.length, 0),
+          totalChanges: groupItems.reduce(
+            (sum, item) => sum + item.changes.length,
+            0
+          ),
         };
       });
   }, [cr?.actionGroups, allChanges]);
@@ -364,13 +403,16 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const formatValue = (value: any): string => {
     if (value === null) return t('common.none', '없음');
     if (value === undefined) return '';
-    if (typeof value === 'boolean') return value ? t('common.yes', '예') : t('common.no', '아니오');
+    if (typeof value === 'boolean')
+      return value ? t('common.yes', '예') : t('common.no', '아니오');
     if (typeof value === 'object') {
       // For arrays, show count or items
       if (Array.isArray(value)) {
         if (value.length === 0) return t('common.none', '없음');
         // For simple arrays, join with comma
-        if (value.every((v) => typeof v === 'string' || typeof v === 'number')) {
+        if (
+          value.every((v) => typeof v === 'string' || typeof v === 'number')
+        ) {
           return value.join(', ');
         }
         return JSON.stringify(value, null, 2);
@@ -445,7 +487,9 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         clientVersion: t('clientVersions.clientVersion'),
         clientStatus: t('clientVersions.clientStatus'),
         gameServerAddress: t('clientVersions.gameServerAddress'),
-        gameServerAddressForWhiteList: t('clientVersions.gameServerAddressForWhiteList'),
+        gameServerAddressForWhiteList: t(
+          'clientVersions.gameServerAddressForWhiteList'
+        ),
         patchAddress: t('clientVersions.patchAddress'),
         patchAddressForWhiteList: t('clientVersions.patchAddressForWhiteList'),
         guestModeAllowed: t('clientVersions.guestModeAllowed'),
@@ -456,7 +500,9 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         maintenanceEndDate: t('clientVersions.maintenance.endDate'),
         maintenanceMessage: t('clientVersions.maintenance.defaultMessage'),
         maintenanceLocales: t('gameWorlds.maintenanceLocales'),
-        supportsMultiLanguage: t('clientVersions.maintenance.supportsMultiLanguage'),
+        supportsMultiLanguage: t(
+          'clientVersions.maintenance.supportsMultiLanguage'
+        ),
         tags: t('clientVersions.tags'),
         channel: t('clientVersions.channel'),
         minVersion: t('clientVersions.minVersion'),
@@ -477,13 +523,25 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         rewardMailTitle: t('surveys.rewardMailTitle'),
         rewardMailContent: t('surveys.rewardMailContent'),
         targetPlatforms: t('surveys.targetPlatforms', '대상 플랫폼'),
-        targetPlatformsInverted: t('surveys.targetPlatformsInverted', '플랫폼 제외 모드'),
+        targetPlatformsInverted: t(
+          'surveys.targetPlatformsInverted',
+          '플랫폼 제외 모드'
+        ),
         targetChannels: t('surveys.targetChannels', '대상 채널'),
-        targetChannelsInverted: t('surveys.targetChannelsInverted', '채널 제외 모드'),
+        targetChannelsInverted: t(
+          'surveys.targetChannelsInverted',
+          '채널 제외 모드'
+        ),
         targetSubchannels: t('surveys.targetSubchannels', '대상 서브채널'),
-        targetSubchannelsInverted: t('surveys.targetSubchannelsInverted', '서브채널 제외 모드'),
+        targetSubchannelsInverted: t(
+          'surveys.targetSubchannelsInverted',
+          '서브채널 제외 모드'
+        ),
         targetWorlds: t('surveys.targetWorlds', '대상 월드'),
-        targetWorldsInverted: t('surveys.targetWorldsInverted', '월드 제외 모드'),
+        targetWorldsInverted: t(
+          'surveys.targetWorldsInverted',
+          '월드 제외 모드'
+        ),
       },
       // Banners (g_banners)
       g_banners: {
@@ -513,16 +571,28 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
           '플랫폼 제외 모드'
         ),
         targetChannels: t('ingamePopupNotices.targetChannels', '대상 채널'),
-        targetChannelsInverted: t('ingamePopupNotices.targetChannelsInverted', '채널 제외 모드'),
-        targetSubchannels: t('ingamePopupNotices.targetSubchannels', '대상 서브채널'),
+        targetChannelsInverted: t(
+          'ingamePopupNotices.targetChannelsInverted',
+          '채널 제외 모드'
+        ),
+        targetSubchannels: t(
+          'ingamePopupNotices.targetSubchannels',
+          '대상 서브채널'
+        ),
         targetSubchannelsInverted: t(
           'ingamePopupNotices.targetSubchannelsInverted',
           '서브채널 제외 모드'
         ),
         targetWorlds: t('ingamePopupNotices.targetWorlds', '대상 월드'),
-        targetWorldsInverted: t('ingamePopupNotices.targetWorldsInverted', '월드 제외 모드'),
+        targetWorldsInverted: t(
+          'ingamePopupNotices.targetWorldsInverted',
+          '월드 제외 모드'
+        ),
         targetUserIds: t('ingamePopupNotices.targetUserIds', '대상 유저 ID'),
-        targetUserIdsInverted: t('ingamePopupNotices.targetUserIdsInverted', '유저 ID 제외 모드'),
+        targetUserIdsInverted: t(
+          'ingamePopupNotices.targetUserIdsInverted',
+          '유저 ID 제외 모드'
+        ),
       },
       // Reward Templates (g_reward_templates)
       g_reward_templates: {
@@ -573,7 +643,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const handleApprove = async () => {
     setActionLoading(true);
     try {
-      await changeRequestService.approve(changeRequestId!, comment || undefined);
+      await changeRequestService.approve(
+        changeRequestId!,
+        comment || undefined
+      );
       enqueueSnackbar(t('changeRequest.messages.approved'), {
         variant: 'success',
       });
@@ -666,10 +739,17 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   };
 
   const statusConfig = cr ? STATUS_CONFIG[cr.status] : STATUS_CONFIG.draft;
-  const totalChanges = allChanges.reduce((sum, item) => sum + item.changes.length, 0);
+  const totalChanges = allChanges.reduce(
+    (sum, item) => sum + item.changes.length,
+    0
+  );
 
-  const drawerTitle = cr?.title ? formatChangeRequestTitle(cr.title, t) : t('changeRequest.title');
-  const drawerSubtitle = cr ? `#${cr.id.slice(0, 8)} · ${t(statusConfig.labelKey)}` : '';
+  const drawerTitle = cr?.title
+    ? formatChangeRequestTitle(cr.title, t)
+    : t('changeRequest.title');
+  const drawerSubtitle = cr
+    ? `#${cr.id.slice(0, 8)} · ${t(statusConfig.labelKey)}`
+    : '';
 
   return (
     <>
@@ -714,7 +794,9 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                 borderColor: 'divider',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}
+              >
                 <Chip
                   label={t(statusConfig.labelKey)}
                   size="small"
@@ -727,7 +809,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                 />
                 <Typography variant="body2" color="text.secondary">
                   <strong>{cr.requester?.name || cr.requester?.email}</strong>{' '}
-                  {t('changeRequest.wantsToMerge')} {allChanges.length} {t('changeRequest.changes')}
+                  {t('changeRequest.wantsToMerge')} {allChanges.length}{' '}
+                  {t('changeRequest.changes')}
                 </Typography>
               </Box>
 
@@ -857,13 +940,19 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                           }}
                         >
                           <Typography variant="body2">
-                            <strong>{cr.requester?.name || cr.requester?.email}</strong>{' '}
-                            {t('changeRequest.opened')} <RelativeTime date={cr.createdAt} />
+                            <strong>
+                              {cr.requester?.name || cr.requester?.email}
+                            </strong>{' '}
+                            {t('changeRequest.opened')}{' '}
+                            <RelativeTime date={cr.createdAt} />
                           </Typography>
                         </Box>
                         {(cr.reason || cr.description) && (
                           <Box sx={{ p: 2 }}>
-                            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ whiteSpace: 'pre-wrap' }}
+                            >
                               {cr.reason || cr.description}
                             </Typography>
                           </Box>
@@ -901,11 +990,14 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                               color="text.secondary"
                               sx={{ fontWeight: 600, fontFamily: 'monospace' }}
                             >
-                              {new Date(event.timestamp).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false,
-                              })}
+                              {new Date(event.timestamp).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  hour12: false,
+                                }
+                              )}
                             </Typography>
                             <Box
                               sx={{
@@ -954,10 +1046,18 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                               zIndex: 1,
                             }}
                           >
-                            {event.type === 'submitted' && <SendIcon sx={{ fontSize: 16 }} />}
-                            {event.type === 'approved' && <CheckIcon sx={{ fontSize: 16 }} />}
-                            {event.type === 'rejected' && <CloseIcon sx={{ fontSize: 16 }} />}
-                            {event.type === 'executed' && <MergeIcon sx={{ fontSize: 16 }} />}
+                            {event.type === 'submitted' && (
+                              <SendIcon sx={{ fontSize: 16 }} />
+                            )}
+                            {event.type === 'approved' && (
+                              <CheckIcon sx={{ fontSize: 16 }} />
+                            )}
+                            {event.type === 'rejected' && (
+                              <CloseIcon sx={{ fontSize: 16 }} />
+                            )}
+                            {event.type === 'executed' && (
+                              <MergeIcon sx={{ fontSize: 16 }} />
+                            )}
                           </Avatar>
                           <Box
                             sx={{
@@ -976,11 +1076,19 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                         {/* Content column */}
                         <Box sx={{ flex: 1, pl: 1.5, pb: 2 }}>
                           <Typography variant="body2">
-                            <strong>{event.user?.name || event.user?.email || 'System'}</strong>{' '}
-                            {event.type === 'submitted' && t('changeRequest.timeline.submitted')}
-                            {event.type === 'approved' && t('changeRequest.timeline.approved')}
-                            {event.type === 'rejected' && t('changeRequest.timeline.rejected')}
-                            {event.type === 'executed' && t('changeRequest.timeline.executed')}{' '}
+                            <strong>
+                              {event.user?.name ||
+                                event.user?.email ||
+                                'System'}
+                            </strong>{' '}
+                            {event.type === 'submitted' &&
+                              t('changeRequest.timeline.submitted')}
+                            {event.type === 'approved' &&
+                              t('changeRequest.timeline.approved')}
+                            {event.type === 'rejected' &&
+                              t('changeRequest.timeline.rejected')}
+                            {event.type === 'executed' &&
+                              t('changeRequest.timeline.executed')}{' '}
                             <Typography component="span" color="text.secondary">
                               <RelativeTime date={event.timestamp} />
                             </Typography>
@@ -1022,9 +1130,11 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                 p: 1.5,
                                 bgcolor:
                                   event.type === 'rejected'
-                                    ? (theme) => alpha(theme.palette.error.main, 0.1)
+                                    ? (theme) =>
+                                        alpha(theme.palette.error.main, 0.1)
                                     : event.type === 'approved'
-                                      ? (theme) => alpha(theme.palette.success.main, 0.1)
+                                      ? (theme) =>
+                                          alpha(theme.palette.success.main, 0.1)
                                       : 'action.hover',
                                 borderColor:
                                   event.type === 'rejected'
@@ -1034,7 +1144,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                       : 'divider',
                               }}
                             >
-                              <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                              <Typography
+                                variant="body2"
+                                sx={{ whiteSpace: 'pre-wrap' }}
+                              >
                                 {event.comment}
                               </Typography>
                             </Paper>
@@ -1060,14 +1173,16 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                           justifyContent: 'space-between',
                         }}
                       >
-                        <Typography variant="subtitle2">{t('changeRequest.addReview')}</Typography>
+                        <Typography variant="subtitle2">
+                          {t('changeRequest.addReview')}
+                        </Typography>
                         <Typography
                           variant="caption"
                           color="text.secondary"
                           sx={{ fontWeight: 600 }}
                         >
-                          {t('changeRequest.approvalProgress')}: {currentApprovals} /{' '}
-                          {requiredApprovals}
+                          {t('changeRequest.approvalProgress')}:{' '}
+                          {currentApprovals} / {requiredApprovals}
                         </Typography>
                       </Box>
                       <Box sx={{ p: 2 }}>
@@ -1096,7 +1211,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                 color="error"
                                 startIcon={
                                   actionLoading ? (
-                                    <CircularProgress size={16} color="inherit" />
+                                    <CircularProgress
+                                      size={16}
+                                      color="inherit"
+                                    />
                                   ) : (
                                     <CloseIcon />
                                   )
@@ -1111,7 +1229,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                 color="success"
                                 startIcon={
                                   actionLoading ? (
-                                    <CircularProgress size={16} color="inherit" />
+                                    <CircularProgress
+                                      size={16}
+                                      color="inherit"
+                                    />
                                   ) : (
                                     <CheckIcon />
                                   )
@@ -1134,7 +1255,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                               gap: 1,
                             }}
                           >
-                            <CheckIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
+                            <CheckIcon
+                              color="success"
+                              sx={{ fontSize: 40, mb: 1 }}
+                            />
                             <Typography variant="body2" color="text.secondary">
                               {t('errors.CR_ALREADY_APPROVED')}
                             </Typography>
@@ -1150,7 +1274,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                       <Paper
                         sx={{
                           p: 2,
-                          bgcolor: (theme) => alpha(theme.palette.error.main, 0.1),
+                          bgcolor: (theme) =>
+                            alpha(theme.palette.error.main, 0.1),
                           border: 1,
                           borderColor: 'error.main',
                         }}
@@ -1163,7 +1288,11 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                           }}
                         >
                           <Box>
-                            <Typography variant="body2" fontWeight={500} color="error.main">
+                            <Typography
+                              variant="body2"
+                              fontWeight={500}
+                              color="error.main"
+                            >
                               {t('changeRequest.status.rejected')}
                             </Typography>
                             {cr.rejectionReason && (
@@ -1217,7 +1346,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                       <Paper
                         sx={{
                           p: 2,
-                          bgcolor: (theme) => alpha(theme.palette.warning.main, 0.1),
+                          bgcolor: (theme) =>
+                            alpha(theme.palette.warning.main, 0.1),
                           border: 1,
                           borderColor: 'warning.main',
                         }}
@@ -1230,7 +1360,11 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                           }}
                         >
                           <Box>
-                            <Typography variant="body2" fontWeight={500} color="warning.main">
+                            <Typography
+                              variant="body2"
+                              fontWeight={500}
+                              color="warning.main"
+                            >
                               ⚠️ {t('changeRequest.status.conflict')}
                             </Typography>
                             {cr.rejectionReason && (
@@ -1283,7 +1417,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                     <Paper
                       sx={{
                         p: 2,
-                        bgcolor: (theme) => alpha(theme.palette.success.main, 0.1),
+                        bgcolor: (theme) =>
+                          alpha(theme.palette.success.main, 0.1),
                         border: 1,
                         borderColor: 'success.main',
                       }}
@@ -1296,11 +1431,16 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                         }}
                       >
                         <Box>
-                          <Typography variant="body2" fontWeight={500} color="success.main">
+                          <Typography
+                            variant="body2"
+                            fontWeight={500}
+                            color="success.main"
+                          >
                             ✓ {t('changeRequest.readyToMerge')}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {cr.approvals?.length || 0} {t('changeRequest.approvals')}
+                            {cr.approvals?.length || 0}{' '}
+                            {t('changeRequest.approvals')}
                           </Typography>
                         </Box>
                         <Button
@@ -1339,7 +1479,11 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                         }}
                       >
                         <Box>
-                          <Typography variant="body2" fontWeight={500} color="info.main">
+                          <Typography
+                            variant="body2"
+                            fontWeight={500}
+                            color="info.main"
+                          >
                             ✓ {t('changeRequest.status.applied')}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
@@ -1440,7 +1584,9 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                               <ExpandMoreIcon
                                 sx={{
                                   fontSize: 20,
-                                  transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+                                  transform: isExpanded
+                                    ? 'rotate(0deg)'
+                                    : 'rotate(-90deg)',
                                   transition: 'transform 0.2s',
                                   color: 'text.secondary',
                                 }}
@@ -1459,7 +1605,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                   {formatChangeRequestTitle(group.title, t)}
                                 </Typography>
                                 {group.description && (
-                                  <Typography variant="caption" color="text.secondary">
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
                                     {group.description}
                                   </Typography>
                                 )}
@@ -1476,13 +1625,15 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                               <Box sx={{ pl: 3 }}>
                                 {group.items.map((item, idx) => {
                                   const itemKey = `${group.id}-${idx}`;
-                                  const isItemExpanded = expandedItems[itemKey] === true; // Default collapsed
+                                  const isItemExpanded =
+                                    expandedItems[itemKey] === true; // Default collapsed
 
                                   return (
                                     <Box
                                       key={idx}
                                       sx={{
-                                        borderBottom: idx < group.items.length - 1 ? 1 : 0,
+                                        borderBottom:
+                                          idx < group.items.length - 1 ? 1 : 0,
                                         borderColor: 'divider',
                                       }}
                                     >
@@ -1550,7 +1701,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                         </Typography>
                                       </Box>
                                       {/* Op-based changes - different display based on operation type */}
-                                      <Collapse in={isItemExpanded} timeout="auto">
+                                      <Collapse
+                                        in={isItemExpanded}
+                                        timeout="auto"
+                                      >
                                         <Box sx={{ px: 2, py: 1 }}>
                                           {/* DELETE: No ops detail needed */}
                                           {item.operation === 'delete' && (
@@ -1598,17 +1752,21 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                       <TableRow
                                                         key={i}
                                                         sx={{
-                                                          '&:nth-of-type(odd)': {
-                                                            bgcolor: 'action.hover',
-                                                          },
+                                                          '&:nth-of-type(odd)':
+                                                            {
+                                                              bgcolor:
+                                                                'action.hover',
+                                                            },
                                                         }}
                                                       >
                                                         <TableCell
                                                           sx={{
                                                             fontWeight: 600,
-                                                            color: 'text.secondary',
+                                                            color:
+                                                              'text.secondary',
                                                             width: '35%',
-                                                            fontSize: '0.875rem',
+                                                            fontSize:
+                                                              '0.875rem',
                                                           }}
                                                         >
                                                           {formatFieldName(
@@ -1618,12 +1776,16 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                         </TableCell>
                                                         <TableCell
                                                           sx={{
-                                                            color: 'success.main',
+                                                            color:
+                                                              'success.main',
                                                             fontWeight: 500,
-                                                            fontSize: '0.875rem',
+                                                            fontSize:
+                                                              '0.875rem',
                                                           }}
                                                         >
-                                                          {formatValue(change.newValue)}
+                                                          {formatValue(
+                                                            change.newValue
+                                                          )}
                                                         </TableCell>
                                                       </TableRow>
                                                     ))}
@@ -1652,7 +1814,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                     gap: 1,
                                                     py: 0.75,
                                                     borderBottom:
-                                                      i < item.changes.length - 1 ? 1 : 0,
+                                                      i <
+                                                      item.changes.length - 1
+                                                        ? 1
+                                                        : 0,
                                                     borderColor: 'divider',
                                                     fontSize: 12,
                                                     fontFamily: 'monospace',
@@ -1661,9 +1826,11 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                   {/* Op icon */}
                                                   <Chip
                                                     label={
-                                                      change.operation === 'added'
+                                                      change.operation ===
+                                                      'added'
                                                         ? 'SET'
-                                                        : change.operation === 'removed'
+                                                        : change.operation ===
+                                                            'removed'
                                                           ? 'DEL'
                                                           : 'MOD'
                                                     }
@@ -1674,9 +1841,11 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                       fontWeight: 700,
                                                       minWidth: 36,
                                                       bgcolor:
-                                                        change.operation === 'added'
+                                                        change.operation ===
+                                                        'added'
                                                           ? 'success.main'
-                                                          : change.operation === 'removed'
+                                                          : change.operation ===
+                                                              'removed'
                                                             ? 'error.main'
                                                             : 'primary.main',
                                                       color: '#fff',
@@ -1691,7 +1860,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                       fontSize: 12,
                                                     }}
                                                   >
-                                                    {formatFieldName(item.table, change.field)}
+                                                    {formatFieldName(
+                                                      item.table,
+                                                      change.field
+                                                    )}
                                                   </Typography>
                                                   {/* Op description */}
                                                   <Box
@@ -1700,7 +1872,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                       color: 'text.secondary',
                                                     }}
                                                   >
-                                                    {change.operation === 'added' ? (
+                                                    {change.operation ===
+                                                    'added' ? (
                                                       <Typography
                                                         component="span"
                                                         sx={{ fontSize: 12 }}
@@ -1709,23 +1882,30 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                         <Box
                                                           component="span"
                                                           sx={{
-                                                            color: 'success.main',
+                                                            color:
+                                                              'success.main',
                                                             fontWeight: 500,
                                                           }}
                                                         >
-                                                          {formatValue(change.newValue)}
+                                                          {formatValue(
+                                                            change.newValue
+                                                          )}
                                                         </Box>
                                                       </Typography>
-                                                    ) : change.operation === 'removed' ? (
+                                                    ) : change.operation ===
+                                                      'removed' ? (
                                                       <Typography
                                                         component="span"
                                                         sx={{
                                                           fontSize: 12,
                                                           color: 'error.main',
-                                                          textDecoration: 'line-through',
+                                                          textDecoration:
+                                                            'line-through',
                                                         }}
                                                       >
-                                                        {formatValue(change.oldValue)}
+                                                        {formatValue(
+                                                          change.oldValue
+                                                        )}
                                                       </Typography>
                                                     ) : (
                                                       <Typography
@@ -1736,20 +1916,26 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                           component="span"
                                                           sx={{
                                                             color: 'error.main',
-                                                            textDecoration: 'line-through',
+                                                            textDecoration:
+                                                              'line-through',
                                                           }}
                                                         >
-                                                          {formatValue(change.oldValue)}
+                                                          {formatValue(
+                                                            change.oldValue
+                                                          )}
                                                         </Box>
                                                         {' → '}
                                                         <Box
                                                           component="span"
                                                           sx={{
-                                                            color: 'success.main',
+                                                            color:
+                                                              'success.main',
                                                             fontWeight: 500,
                                                           }}
                                                         >
-                                                          {formatValue(change.newValue)}
+                                                          {formatValue(
+                                                            change.newValue
+                                                          )}
                                                         </Box>
                                                       </Typography>
                                                     )}
@@ -1790,7 +1976,11 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                       })
                     : /* Fallback: Legacy view for items without ActionGroup - now using op-based list */
                       allChanges.map((item, idx) => (
-                        <Paper key={idx} variant="outlined" sx={{ mb: 2, overflow: 'hidden' }}>
+                        <Paper
+                          key={idx}
+                          variant="outlined"
+                          sx={{ mb: 2, overflow: 'hidden' }}
+                        >
                           <Box
                             sx={{
                               px: 2,
@@ -1835,7 +2025,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                   alignItems: 'flex-start',
                                   gap: 1,
                                   py: 0.75,
-                                  borderBottom: i < item.changes.length - 1 ? 1 : 0,
+                                  borderBottom:
+                                    i < item.changes.length - 1 ? 1 : 0,
                                   borderColor: 'divider',
                                   fontSize: 13,
                                   fontFamily: 'monospace',
@@ -1864,12 +2055,18 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                     color: '#fff',
                                   }}
                                 />
-                                <Typography component="span" sx={{ fontWeight: 600, fontSize: 13 }}>
+                                <Typography
+                                  component="span"
+                                  sx={{ fontWeight: 600, fontSize: 13 }}
+                                >
                                   {formatFieldName(item.table, change.field)}
                                 </Typography>
                                 <Box sx={{ flex: 1, color: 'text.secondary' }}>
                                   {change.operation === 'added' ? (
-                                    <Typography component="span" sx={{ fontSize: 13 }}>
+                                    <Typography
+                                      component="span"
+                                      sx={{ fontSize: 13 }}
+                                    >
                                       ={' '}
                                       <Box
                                         component="span"
@@ -1893,7 +2090,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                       {formatValue(change.oldValue)}
                                     </Typography>
                                   ) : (
-                                    <Typography component="span" sx={{ fontSize: 13 }}>
+                                    <Typography
+                                      component="span"
+                                      sx={{ fontSize: 13 }}
+                                    >
                                       <Box
                                         component="span"
                                         sx={{

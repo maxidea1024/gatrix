@@ -89,7 +89,9 @@ const AlertsPage: React.FC = () => {
     updatePage(newPage + 1);
   };
 
-  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRowsPerPageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     updateLimit(parseInt(event.target.value, 10));
   };
 
@@ -115,7 +117,11 @@ const AlertsPage: React.FC = () => {
 
   const renderStatusChip = (status: string) => {
     const color: 'default' | 'primary' | 'success' | 'warning' | 'error' =
-      status === 'firing' ? 'error' : status === 'resolved' ? 'success' : 'default';
+      status === 'firing'
+        ? 'error'
+        : status === 'resolved'
+          ? 'success'
+          : 'default';
 
     return (
       <Chip
@@ -168,12 +174,24 @@ const AlertsPage: React.FC = () => {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>{t('monitoring.alerts.fields.name')}</TableCell>
-                      <TableCell>{t('monitoring.alerts.fields.severity')}</TableCell>
-                      <TableCell>{t('monitoring.alerts.fields.status')}</TableCell>
-                      <TableCell>{t('monitoring.alerts.fields.message')}</TableCell>
-                      <TableCell>{t('monitoring.alerts.fields.startsAt')}</TableCell>
-                      <TableCell>{t('monitoring.alerts.fields.endsAt')}</TableCell>
+                      <TableCell>
+                        {t('monitoring.alerts.fields.name')}
+                      </TableCell>
+                      <TableCell>
+                        {t('monitoring.alerts.fields.severity')}
+                      </TableCell>
+                      <TableCell>
+                        {t('monitoring.alerts.fields.status')}
+                      </TableCell>
+                      <TableCell>
+                        {t('monitoring.alerts.fields.message')}
+                      </TableCell>
+                      <TableCell>
+                        {t('monitoring.alerts.fields.startsAt')}
+                      </TableCell>
+                      <TableCell>
+                        {t('monitoring.alerts.fields.endsAt')}
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -189,14 +207,22 @@ const AlertsPage: React.FC = () => {
                       alerts.map((alert) => (
                         <TableRow key={alert.id} hover>
                           <TableCell>{alert.alertName}</TableCell>
-                          <TableCell>{renderSeverityChip(alert.alertSeverity)}</TableCell>
-                          <TableCell>{renderStatusChip(alert.alertStatus)}</TableCell>
-                          <TableCell>{alert.alertMessage}</TableCell>
                           <TableCell>
-                            {alert.startsAt ? new Date(alert.startsAt).toLocaleString() : '-'}
+                            {renderSeverityChip(alert.alertSeverity)}
                           </TableCell>
                           <TableCell>
-                            {alert.endsAt ? new Date(alert.endsAt).toLocaleString() : '-'}
+                            {renderStatusChip(alert.alertStatus)}
+                          </TableCell>
+                          <TableCell>{alert.alertMessage}</TableCell>
+                          <TableCell>
+                            {alert.startsAt
+                              ? new Date(alert.startsAt).toLocaleString()
+                              : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {alert.endsAt
+                              ? new Date(alert.endsAt).toLocaleString()
+                              : '-'}
                           </TableCell>
                         </TableRow>
                       ))

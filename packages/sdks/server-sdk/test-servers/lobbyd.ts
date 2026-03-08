@@ -51,7 +51,9 @@ class LobbyServer extends BaseTestServer {
     // Handle maintenance started event
     this.sdk.on('local.maintenance.started', (event) => {
       const { source, worldId, actualStartTime, details } = event.data;
-      this.log(`🔧 Maintenance started: source=${source}, worldId=${worldId || 'N/A'}`);
+      this.log(
+        `🔧 Maintenance started: source=${source}, worldId=${worldId || 'N/A'}`
+      );
       this.log(`   actualStartTime=${actualStartTime}`);
       this.log(
         `   forceDisconnect=${details?.forceDisconnect}, gracePeriodMinutes=${details?.gracePeriodMinutes}`
@@ -64,20 +66,26 @@ class LobbyServer extends BaseTestServer {
     // Handle maintenance ended event
     this.sdk.on('local.maintenance.ended', (event) => {
       const { source, worldId } = event.data;
-      this.log(`✅ Maintenance ended: source=${source}, worldId=${worldId || 'N/A'}`);
+      this.log(
+        `✅ Maintenance ended: source=${source}, worldId=${worldId || 'N/A'}`
+      );
     });
 
     // Handle maintenance updated event
     this.sdk.on('local.maintenance.updated', (event) => {
       const { source, worldId, details } = event.data;
-      this.log(`📝 Maintenance updated: source=${source}, worldId=${worldId || 'N/A'}`);
+      this.log(
+        `📝 Maintenance updated: source=${source}, worldId=${worldId || 'N/A'}`
+      );
       this.log(`   New details: ${JSON.stringify(details)}`);
     });
 
     // Handle grace period expired event - THIS IS WHERE WE KICK PLAYERS
     this.sdk.on('local.maintenance.grace_period_expired', (event) => {
       const { source, worldId, actualStartTime, details } = event.data;
-      this.log(`⏰ Grace period expired! source=${source}, worldId=${worldId || 'N/A'}`);
+      this.log(
+        `⏰ Grace period expired! source=${source}, worldId=${worldId || 'N/A'}`
+      );
       this.log(`   Maintenance started at: ${actualStartTime}`);
 
       // Kick all connected players
@@ -104,12 +112,18 @@ class LobbyServer extends BaseTestServer {
 
     if (source === 'service') {
       // Service-level maintenance - notify all players
-      this.log(`📢 Notifying ${this.connectedPlayers.size} players about service maintenance`);
+      this.log(
+        `📢 Notifying ${this.connectedPlayers.size} players about service maintenance`
+      );
       for (const [playerId, player] of this.connectedPlayers) {
-        this.log(`   -> Sending maintenance notice to player ${player.name} (${playerId})`);
+        this.log(
+          `   -> Sending maintenance notice to player ${player.name} (${playerId})`
+        );
         this.log(`      Message: "${message}"`);
         if (details?.forceDisconnect) {
-          this.log(`      ⚠️ Will be disconnected in ${gracePeriodMinutes} minutes`);
+          this.log(
+            `      ⚠️ Will be disconnected in ${gracePeriodMinutes} minutes`
+          );
         }
       }
     } else if (source === 'world' && worldId) {
@@ -120,7 +134,9 @@ class LobbyServer extends BaseTestServer {
             `📢 Notifying ${lobby.players.length} players in lobby ${lobbyId} about world maintenance`
           );
           for (const player of lobby.players) {
-            this.log(`   -> Sending maintenance notice to player ${player.name}`);
+            this.log(
+              `   -> Sending maintenance notice to player ${player.name}`
+            );
           }
         }
       }
@@ -140,7 +156,9 @@ class LobbyServer extends BaseTestServer {
 
     if (source === 'service') {
       // Service-level maintenance - kick all players
-      this.log(`🚫 Kicking all ${this.connectedPlayers.size} players due to service maintenance`);
+      this.log(
+        `🚫 Kicking all ${this.connectedPlayers.size} players due to service maintenance`
+      );
       for (const [playerId, player] of this.connectedPlayers) {
         this.disconnectPlayer(playerId, kickMessage);
       }
@@ -170,7 +188,9 @@ class LobbyServer extends BaseTestServer {
   private disconnectPlayer(playerId: string, reason: string): void {
     const player = this.connectedPlayers.get(playerId);
     if (player) {
-      this.log(`   ❌ Disconnecting player ${player.name} (${playerId}): ${reason}`);
+      this.log(
+        `   ❌ Disconnecting player ${player.name} (${playerId}): ${reason}`
+      );
       this.connectedPlayers.delete(playerId);
     }
   }
@@ -213,7 +233,9 @@ class LobbyServer extends BaseTestServer {
 
     // Check if world is in maintenance
     if (this.sdk.isWorldInMaintenance(world.worldId)) {
-      this.log(`World ${world.name} is in maintenance, skipping lobby creation`);
+      this.log(
+        `World ${world.name} is in maintenance, skipping lobby creation`
+      );
       return;
     }
 

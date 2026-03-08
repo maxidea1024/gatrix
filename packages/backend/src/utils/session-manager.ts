@@ -14,7 +14,9 @@ export class SessionManager {
   static async getUserSessions(userId: string): Promise<string[]> {
     try {
       const client = redisClient.getClient();
-      const sessionIds = await client.smembers(`${this.USER_SESSIONS_PREFIX}${userId}`);
+      const sessionIds = await client.smembers(
+        `${this.USER_SESSIONS_PREFIX}${userId}`
+      );
       return sessionIds;
     } catch (error) {
       logger.error('Error getting user sessions:', error);
@@ -25,7 +27,10 @@ export class SessionManager {
   /**
    * Add session to user's active sessions
    */
-  static async addUserSession(userId: string, sessionId: string): Promise<void> {
+  static async addUserSession(
+    userId: string,
+    sessionId: string
+  ): Promise<void> {
     try {
       const client = redisClient.getClient();
       const userSessionsKey = `${this.USER_SESSIONS_PREFIX}${userId}`;
@@ -43,7 +48,10 @@ export class SessionManager {
   /**
    * Remove session from user's active sessions
    */
-  static async removeUserSession(userId: string, sessionId: string): Promise<void> {
+  static async removeUserSession(
+    userId: string,
+    sessionId: string
+  ): Promise<void> {
     try {
       const client = redisClient.getClient();
       const userSessionsKey = `${this.USER_SESSIONS_PREFIX}${userId}`;
@@ -89,7 +97,9 @@ export class SessionManager {
   static async getSession(sessionId: string): Promise<any> {
     try {
       const client = redisClient.getClient();
-      const sessionData = await client.get(`${this.SESSION_PREFIX}${sessionId}`);
+      const sessionData = await client.get(
+        `${this.SESSION_PREFIX}${sessionId}`
+      );
       return sessionData ? JSON.parse(sessionData) : null;
     } catch (error) {
       logger.error('Error getting session:', error);
@@ -103,7 +113,10 @@ export class SessionManager {
   static async refreshSession(sessionId: string): Promise<void> {
     try {
       const client = redisClient.getClient();
-      await client.expire(`${this.SESSION_PREFIX}${sessionId}`, config.session.ttl);
+      await client.expire(
+        `${this.SESSION_PREFIX}${sessionId}`,
+        config.session.ttl
+      );
     } catch (error) {
       logger.error('Error refreshing session:', error);
     }
@@ -130,7 +143,9 @@ export class SessionManager {
       const client = redisClient.getClient();
 
       // Get all user session tracking keys
-      const userSessionKeys = await client.keys(`${this.USER_SESSIONS_PREFIX}*`);
+      const userSessionKeys = await client.keys(
+        `${this.USER_SESSIONS_PREFIX}*`
+      );
 
       for (const userKey of userSessionKeys) {
         const sessionIds = await client.smembers(userKey);
@@ -138,7 +153,9 @@ export class SessionManager {
 
         // Check which sessions still exist
         for (const sessionId of sessionIds) {
-          const exists = await client.exists(`${this.SESSION_PREFIX}${sessionId}`);
+          const exists = await client.exists(
+            `${this.SESSION_PREFIX}${sessionId}`
+          );
           if (exists) {
             validSessions.push(sessionId);
           }

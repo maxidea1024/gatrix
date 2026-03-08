@@ -622,7 +622,9 @@ function convertCategory(
   badges?: Record<string, string | number>
 ): MenuCategory {
   // A category is admin-only if any of its children require permissions
-  const hasPermissionChild = config.children.some((c) => !!c.requiredPermission);
+  const hasPermissionChild = config.children.some(
+    (c) => !!c.requiredPermission
+  );
   return {
     id: config.id,
     text: config.text,
@@ -650,7 +652,9 @@ export const getMenuCategories = (
   // Filter and convert categories
   const categories = MENU_CONFIG.filter((config) => {
     // Check if category has permission-gated children (admin-only)
-    const hasPermissionChild = config.children.some((c) => !!c.requiredPermission);
+    const hasPermissionChild = config.children.some(
+      (c) => !!c.requiredPermission
+    );
     if (hasPermissionChild && !isAdmin) return false;
     // Check condition
     if (config.condition && !config.condition(mergedOptions)) return false;
@@ -710,7 +714,10 @@ export interface NavItem {
   divider?: boolean;
 }
 
-export const menuItemToNavItem = (item: MenuItem, _parentPath?: string): NavItem => {
+export const menuItemToNavItem = (
+  item: MenuItem,
+  _parentPath?: string
+): NavItem => {
   const iconName = (() => {
     const type = item.icon.type as any;
     if (type) {
@@ -730,7 +737,9 @@ export const menuItemToNavItem = (item: MenuItem, _parentPath?: string): NavItem
     path: item.path,
     roles: item.adminOnly ? ['admin'] : undefined,
     divider: item.divider,
-    children: item.children?.map((child) => menuItemToNavItem(child, item.path)),
+    children: item.children?.map((child) =>
+      menuItemToNavItem(child, item.path)
+    ),
   };
 };
 

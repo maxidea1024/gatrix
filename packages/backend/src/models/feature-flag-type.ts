@@ -30,7 +30,9 @@ export class FeatureFlagTypeModel {
    * Find all flag types for a project.
    * Returns project-specific types + system default types (projectId IS NULL).
    */
-  static async findAll(projectId?: string): Promise<FeatureFlagTypeAttributes[]> {
+  static async findAll(
+    projectId?: string
+  ): Promise<FeatureFlagTypeAttributes[]> {
     try {
       let query = db(this.tableName);
 
@@ -82,9 +84,12 @@ export class FeatureFlagTypeModel {
     try {
       const updateData: Record<string, unknown> = { updatedAt: new Date() };
 
-      if (input.displayName !== undefined) updateData.displayName = input.displayName;
-      if (input.description !== undefined) updateData.description = input.description;
-      if (input.lifetimeDays !== undefined) updateData.lifetimeDays = input.lifetimeDays;
+      if (input.displayName !== undefined)
+        updateData.displayName = input.displayName;
+      if (input.description !== undefined)
+        updateData.description = input.description;
+      if (input.lifetimeDays !== undefined)
+        updateData.lifetimeDays = input.lifetimeDays;
       if (input.iconName !== undefined) updateData.iconName = input.iconName;
       if (input.sortOrder !== undefined) updateData.sortOrder = input.sortOrder;
 

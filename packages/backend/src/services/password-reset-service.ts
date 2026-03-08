@@ -28,7 +28,9 @@ export class PasswordResetService {
     return PasswordResetService.instance;
   }
 
-  async requestPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
+  async requestPasswordReset(
+    email: string
+  ): Promise<{ success: boolean; message: string }> {
     try {
       // Used자 Confirm
       const user = await db('g_users')
@@ -71,7 +73,10 @@ export class PasswordResetService {
       });
 
       // 이메일 발송
-      const emailSent = await emailService.sendPasswordResetEmail(email, resetToken);
+      const emailSent = await emailService.sendPasswordResetEmail(
+        email,
+        resetToken
+      );
 
       if (!emailSent) {
         logger.error('Failed to send password reset email', { email });

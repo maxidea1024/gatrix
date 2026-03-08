@@ -79,7 +79,8 @@ const gracefulShutdown = async (signal: string) => {
       try {
         await apiTokenUsageService.shutdown();
       } catch (error) {
-        if (logger) logger.warn('Error shutting down ApiTokenUsageService:', error);
+        if (logger)
+          logger.warn('Error shutting down ApiTokenUsageService:', error);
       }
     }
 
@@ -106,9 +107,13 @@ const gracefulShutdown = async (signal: string) => {
       try {
         await gatrixSdk.unregisterService();
         await gatrixSdk.close();
-        if (logger) logger.info('Backend service unregistered from Service Discovery via SDK');
+        if (logger)
+          logger.info(
+            'Backend service unregistered from Service Discovery via SDK'
+          );
       } catch (error) {
-        if (logger) logger.warn('Error unregistering backend service via SDK:', error);
+        if (logger)
+          logger.warn('Error unregistering backend service via SDK:', error);
       }
     }
 
@@ -131,7 +136,8 @@ const gracefulShutdown = async (signal: string) => {
       try {
         lifecycleCleanupScheduler.stopLifecycleCleanupScheduler();
       } catch (error) {
-        if (logger) logger.warn('Error stopping lifecycle cleanup scheduler:', error);
+        if (logger)
+          logger.warn('Error stopping lifecycle cleanup scheduler:', error);
       }
     }
 
@@ -181,7 +187,8 @@ const startServer = async () => {
     const queueModule = await import('./services/queue-service');
     queueService = queueModule.queueService;
 
-    apiTokenUsageService = (await import('./services/api-token-usage-service')).default;
+    apiTokenUsageService = (await import('./services/api-token-usage-service'))
+      .default;
     app = (await import('./app')).default;
 
     const dbTimezoneModule = await import('./utils/db-timezone-check');
@@ -190,7 +197,9 @@ const startServer = async () => {
     const appInstanceModule = await import('./utils/app-instance');
     appInstance = appInstanceModule.appInstance;
 
-    SSENotificationService = (await import('./services/sse-notification-service')).default;
+    SSENotificationService = (
+      await import('./services/sse-notification-service')
+    ).default;
 
     logger.info('Starting Gatrix Backend Server...');
 
@@ -233,7 +242,10 @@ const startServer = async () => {
       await pubSubService.initialize();
       logger.info('PubSub service initialized successfully');
     } catch (error) {
-      logger.warn('PubSub service initialization failed, continuing without PubSub:', error);
+      logger.warn(
+        'PubSub service initialization failed, continuing without PubSub:',
+        error
+      );
     }
 
     // Bridge PubSub SSE messages to local SSE service fan-out
@@ -260,11 +272,15 @@ const startServer = async () => {
 
     // Initialize Flag Streaming Service (SSE for SDK clients)
     try {
-      const { flagStreamingService } = await import('./services/flag-streaming-service');
+      const { flagStreamingService } =
+        await import('./services/flag-streaming-service');
       await flagStreamingService.start();
       logger.info('Flag Streaming Service initialized');
     } catch (error) {
-      logger.warn('Flag Streaming Service initialization failed, continuing:', error);
+      logger.warn(
+        'Flag Streaming Service initialization failed, continuing:',
+        error
+      );
     }
 
     // Initialize Queue service
@@ -272,7 +288,10 @@ const startServer = async () => {
       await queueService.initialize();
       logger.info('Queue service initialized successfully');
     } catch (error) {
-      logger.warn('Queue service initialization failed, continuing without queues:', error);
+      logger.warn(
+        'Queue service initialization failed, continuing without queues:',
+        error
+      );
     }
 
     // Initialize ApiTokenUsageService (QueueService Initialization 뒤에 실행)
@@ -288,7 +307,8 @@ const startServer = async () => {
 
     // Initialize Impact Metrics Service
     try {
-      const { impactMetricsService } = await import('./services/impact-metrics-service');
+      const { impactMetricsService } =
+        await import('./services/impact-metrics-service');
       impactMetricsService.initialize();
       logger.info('Impact Metrics Service initialized');
     } catch (error) {
@@ -306,7 +326,8 @@ const startServer = async () => {
 
     // Initialize Planning Data (reward lookup)
     try {
-      const { PlanningDataService } = await import('./services/planning-data-service');
+      const { PlanningDataService } =
+        await import('./services/planning-data-service');
       await PlanningDataService.initialize();
       logger.info('Planning data initialized successfully');
     } catch (error) {
@@ -315,9 +336,11 @@ const startServer = async () => {
 
     // Initialize Service Discovery watch (for Redis keyspace notifications)
     try {
-      const serviceDiscoveryMode = process.env.SERVICE_DISCOVERY_MODE || 'redis';
-      const serviceDiscoveryService = (await import('./services/service-discovery-service'))
-        .default;
+      const serviceDiscoveryMode =
+        process.env.SERVICE_DISCOVERY_MODE || 'redis';
+      const serviceDiscoveryService = (
+        await import('./services/service-discovery-service')
+      ).default;
 
       if (serviceDiscoveryMode === 'redis') {
         // Start watching for Redis keyspace notifications (TTL expiration)
@@ -327,7 +350,9 @@ const startServer = async () => {
             `Service Discovery event: ${event.type} ${event.instance.labels.service}:${event.instance.instanceId}`
           );
         });
-        logger.info('Redis Service Discovery watch initialized (keyspace notifications enabled)');
+        logger.info(
+          'Redis Service Discovery watch initialized (keyspace notifications enabled)'
+        );
       } else if (serviceDiscoveryMode === 'etcd') {
         // Start watching for service changes (required for SSE updates)
         await serviceDiscoveryService.watchServices((event) => {
@@ -343,16 +368,23 @@ const startServer = async () => {
         logger.info('etcd auto-cleanup initialized (with Leader Election)');
       }
     } catch (error) {
-      logger.warn('Service Discovery initialization failed, continuing:', error);
+      logger.warn(
+        'Service Discovery initialization failed, continuing:',
+        error
+      );
     }
 
     // Register lifecycle event cleanup job (BullMQ-based)
     try {
-      lifecycleCleanupScheduler = await import('./services/lifecycle-cleanup-scheduler');
+      lifecycleCleanupScheduler =
+        await import('./services/lifecycle-cleanup-scheduler');
       await lifecycleCleanupScheduler.initializeLifecycleCleanupJob();
       logger.info('Lifecycle event cleanup job registered');
     } catch (error) {
-      logger.warn('Lifecycle cleanup job registration failed, continuing:', error);
+      logger.warn(
+        'Lifecycle cleanup job registration failed, continuing:',
+        error
+      );
     }
 
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)
@@ -362,7 +394,10 @@ const startServer = async () => {
     // Handle WebSocket upgrade for flag streaming
     server.on('upgrade', async (request, socket, head) => {
       try {
-        const url = new URL(request.url || '', `http://${request.headers.host}`);
+        const url = new URL(
+          request.url || '',
+          `http://${request.headers.host}`
+        );
         const wsPathMatch = url.pathname.match(
           /^\/api\/v1\/client\/features\/([^/]+)\/stream\/ws$/
         );
@@ -397,7 +432,8 @@ const startServer = async () => {
           }
         }
 
-        const { flagStreamingService } = await import('./services/flag-streaming-service');
+        const { flagStreamingService } =
+          await import('./services/flag-streaming-service');
         const wss = flagStreamingService.getWebSocketServer();
         if (!wss) {
           socket.destroy();
@@ -407,7 +443,11 @@ const startServer = async () => {
         wss.handleUpgrade(request, socket, head, async (ws) => {
           const { ulid } = await import('ulid');
           const clientId = `flag-ws-${ulid()}`;
-          await flagStreamingService.addWebSocketClient(clientId, environmentId, ws);
+          await flagStreamingService.addWebSocketClient(
+            clientId,
+            environmentId,
+            ws
+          );
         });
       } catch (err) {
         logger.error('WebSocket upgrade error:', err);
@@ -420,9 +460,13 @@ const startServer = async () => {
         `Server running on port ${config.port} in ${config.nodeEnv} mode`,
         appInstance.getLogInfo()
       );
-      logger.info(`Health check available at http://127.0.0.1:${config.port}/health`);
+      logger.info(
+        `Health check available at http://127.0.0.1:${config.port}/health`
+      );
       logger.info(`API available at http://127.0.0.1:${config.port}/api/v1`);
-      logger.info(`Chat API proxy available at http://127.0.0.1:${config.port}/api/v1/chat`);
+      logger.info(
+        `Chat API proxy available at http://127.0.0.1:${config.port}/api/v1/chat`
+      );
       logger.info(`Queue service ready: ${queueService.isReady()}`);
       logger.info(`PubSub service ready: ${pubSubService.isReady()}`);
 
@@ -437,7 +481,9 @@ const startServer = async () => {
             const packageJson = await import('../package.json');
             serverVersion = packageJson.version || '0.0.0';
           } catch (err) {
-            logger.warn('Failed to load package.json version, using default 0.0.0');
+            logger.warn(
+              'Failed to load package.json version, using default 0.0.0'
+            );
           }
         }
 
@@ -506,7 +552,10 @@ const startServer = async () => {
         throw error;
       }
 
-      const bind = typeof config.port === 'string' ? 'Pipe ' + config.port : 'Port ' + config.port;
+      const bind =
+        typeof config.port === 'string'
+          ? 'Pipe ' + config.port
+          : 'Port ' + config.port;
 
       switch (error.code) {
         case 'EACCES':

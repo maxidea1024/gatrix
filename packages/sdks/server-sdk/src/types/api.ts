@@ -93,7 +93,12 @@ export interface ClientVersionByEnvResponse {
 // Service Notice Types
 // ============================================================================
 
-export type ServiceNoticeCategory = 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
+export type ServiceNoticeCategory =
+  | 'maintenance'
+  | 'event'
+  | 'notice'
+  | 'promotion'
+  | 'other';
 
 export interface ServiceNotice {
   id: string;

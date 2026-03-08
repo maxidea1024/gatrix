@@ -1,4 +1,10 @@
-import { MailModel, MailType, MailPriority, ContentType, MailData } from '../models/mail';
+import {
+  MailModel,
+  MailType,
+  MailPriority,
+  ContentType,
+  MailData,
+} from '../models/mail';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('MailService');
@@ -48,7 +54,12 @@ export class MailService {
     options: SendSystemMailOptions = {}
   ) {
     try {
-      const mail = await MailModel.sendSystemMail(recipientId, subject, content, options);
+      const mail = await MailModel.sendSystemMail(
+        recipientId,
+        subject,
+        content,
+        options
+      );
       logger.info(`System mail sent: ${mail.id} to user ${recipientId}`);
       return mail;
     } catch (error) {
@@ -162,7 +173,10 @@ export class MailService {
   async markAllAsRead(userId: string, filters: any = {}): Promise<number> {
     try {
       const count = await MailModel.markAllAsRead(userId, filters);
-      logger.info(`${count} mails marked as read by user ${userId} with filters:`, filters);
+      logger.info(
+        `${count} mails marked as read by user ${userId} with filters:`,
+        filters
+      );
       return count;
     } catch (error) {
       logger.error('Failed to mark all mails as read:', error);
@@ -176,7 +190,9 @@ export class MailService {
   async toggleStarred(mailId: string, userId: string): Promise<boolean> {
     try {
       const isStarred = await MailModel.toggleStarred(mailId, userId);
-      logger.info(`Mail ${mailId} starred status toggled to ${isStarred} by user ${userId}`);
+      logger.info(
+        `Mail ${mailId} starred status toggled to ${isStarred} by user ${userId}`
+      );
       return isStarred;
     } catch (error) {
       logger.error('Failed to toggle starred status:', error);
@@ -220,7 +236,10 @@ export class MailService {
   async deleteAllMails(userId: string, filters: any = {}): Promise<number> {
     try {
       const count = await MailModel.deleteAllMails(userId, filters);
-      logger.info(`${count} mails deleted by user ${userId} with filters:`, filters);
+      logger.info(
+        `${count} mails deleted by user ${userId} with filters:`,
+        filters
+      );
       return count;
     } catch (error) {
       logger.error('Failed to delete all mails:', error);

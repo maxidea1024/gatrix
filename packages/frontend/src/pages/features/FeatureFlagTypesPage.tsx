@@ -51,7 +51,8 @@ interface FlagType {
 }
 
 // Icon mapping
-const getTypeIcon = (iconName: string | null) => getFlagTypeIconByName(iconName);
+const getTypeIcon = (iconName: string | null) =>
+  getFlagTypeIconByName(iconName);
 
 const FeatureFlagTypesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -99,9 +100,12 @@ const FeatureFlagTypesPage: React.FC = () => {
 
     setSaving(true);
     try {
-      await api.put(`${projectApiPath}/features/types/${editingType.flagType}`, {
-        lifetimeDays: editingType.lifetimeDays,
-      });
+      await api.put(
+        `${projectApiPath}/features/types/${editingType.flagType}`,
+        {
+          lifetimeDays: editingType.lifetimeDays,
+        }
+      );
       enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });
       setEditDialogOpen(false);
       setEditingType(null);
@@ -167,8 +171,14 @@ const FeatureFlagTypesPage: React.FC = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell>{t('common.name')}</TableCell>
-                      <TableCell align="center">{t('featureFlags.lifetime')}</TableCell>
-                      {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                      <TableCell align="center">
+                        {t('featureFlags.lifetime')}
+                      </TableCell>
+                      {canManage && (
+                        <TableCell align="center">
+                          {t('common.actions')}
+                        </TableCell>
+                      )}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -185,9 +195,15 @@ const FeatureFlagTypesPage: React.FC = () => {
                             {getTypeIcon(type.iconName)}
                             <Box>
                               <Typography fontWeight={500}>
-                                {t(`featureFlags.flagTypes.${type.flagType}`, type.displayName)}
+                                {t(
+                                  `featureFlags.flagTypes.${type.flagType}`,
+                                  type.displayName
+                                )}
                               </Typography>
-                              <Typography variant="body2" color="text.secondary">
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
                                 {t(
                                   `featureFlags.flagTypes.${type.flagType}.desc`,
                                   type.description || ''
@@ -199,7 +215,11 @@ const FeatureFlagTypesPage: React.FC = () => {
                         <TableCell align="center">
                           <Typography
                             variant="body2"
-                            color={type.lifetimeDays === null ? 'text.secondary' : 'text.primary'}
+                            color={
+                              type.lifetimeDays === null
+                                ? 'text.secondary'
+                                : 'text.primary'
+                            }
                           >
                             {formatLifetime(type.lifetimeDays)}
                           </Typography>
@@ -280,7 +300,9 @@ const FeatureFlagTypesPage: React.FC = () => {
                 value={editingType?.lifetimeDays || ''}
                 onChange={(e) =>
                   setEditingType((prev) =>
-                    prev ? { ...prev, lifetimeDays: parseInt(e.target.value) || 0 } : prev
+                    prev
+                      ? { ...prev, lifetimeDays: parseInt(e.target.value) || 0 }
+                      : prev
                   )
                 }
                 inputProps={{ min: 1, max: 365 }}

@@ -47,11 +47,15 @@ interface SortableColumnItemProps {
   onToggleVisibility: (columnId: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
+  column,
+  onToggleVisibility,
+}) => {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: column.id,
-  });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: column.id,
+    });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -78,7 +82,11 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
         </Box>
       }
     >
-      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -178,7 +186,9 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
               mb: 1,
             }}
           >
-            <Typography variant="subtitle2">{t('common.columnSettings')}</Typography>
+            <Typography variant="subtitle2">
+              {t('common.columnSettings')}
+            </Typography>
             <Button size="small" onClick={onReset}>
               {t('common.reset')}
             </Button>

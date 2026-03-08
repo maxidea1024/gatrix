@@ -22,8 +22,15 @@ export class WeComAddon extends Addon {
     const { key } = parameters;
 
     if (!key) {
-      this.logger.warn(`Missing WeCom webhook key for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing webhook key');
+      this.logger.warn(
+        `Missing WeCom webhook key for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing webhook key'
+      );
       return;
     }
 

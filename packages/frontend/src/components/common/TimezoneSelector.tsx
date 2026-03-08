@@ -12,7 +12,10 @@ import {
   useTheme,
   ClickAwayListener,
 } from '@mui/material';
-import { Settings as SettingsIcon, Public as PublicIcon } from '@mui/icons-material';
+import {
+  Settings as SettingsIcon,
+  Public as PublicIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -34,7 +37,9 @@ const TimezoneSelector: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [timezone, setTimezone] = useState<string>(getStoredTimezone());
   const [serverTime, setServerTime] = useState<Date>(new Date());
-  const [serverTimeData, setServerTimeData] = useState<ServerTimeData | null>(null);
+  const [serverTimeData, setServerTimeData] = useState<ServerTimeData | null>(
+    null
+  );
   const [currentUptime, setCurrentUptime] = useState<number>(0);
 
   const timezoneOptions = Intl.supportedValuesOf('timeZone');
@@ -101,9 +106,13 @@ const TimezoneSelector: React.FC = () => {
             fontSize: '0.75rem',
             color: theme.palette.text.primary,
             borderColor:
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.23)',
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.3)'
+                : 'rgba(0, 0, 0, 0.23)',
             backgroundColor:
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.05)'
+                : 'rgba(0, 0, 0, 0.02)',
             borderRadius: 2,
             cursor: 'pointer',
             '& .MuiChip-icon': {
@@ -112,9 +121,13 @@ const TimezoneSelector: React.FC = () => {
             },
             '&:hover': {
               backgroundColor:
-                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.1)'
+                  : 'rgba(0, 0, 0, 0.05)',
               borderColor:
-                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.4)',
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.5)'
+                  : 'rgba(0, 0, 0, 0.4)',
               '& .MuiChip-label': {
                 color: theme.palette.text.primary,
               },
@@ -155,7 +168,9 @@ const TimezoneSelector: React.FC = () => {
             <Stack spacing={2}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <SettingsIcon fontSize="small" />
-                <Typography variant="subtitle2">{t('settings.timezone')}</Typography>
+                <Typography variant="subtitle2">
+                  {t('settings.timezone')}
+                </Typography>
               </Box>
 
               <Divider />
@@ -177,7 +192,11 @@ const TimezoneSelector: React.FC = () => {
                 <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                   {formatDateTimeDetailed(serverTime)}
                   {serverTimeData && (
-                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ ml: 1 }}
+                    >
                       ({t('common.ping')}: {serverTimeData.ping}ms)
                     </Typography>
                   )}

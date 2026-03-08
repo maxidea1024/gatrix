@@ -101,7 +101,10 @@ async function runClickHouseMigrations(): Promise<void> {
           await clickhouse.exec({ query: statement });
         } catch (error: any) {
           // 이미 존재하는 테이블/뷰는 무시
-          if (error.code === '57' || error.message?.includes('already exists')) {
+          if (
+            error.code === '57' ||
+            error.message?.includes('already exists')
+          ) {
             logger.debug(`⏭️  Skipping already existing object in ${file}`);
           } else {
             throw error;

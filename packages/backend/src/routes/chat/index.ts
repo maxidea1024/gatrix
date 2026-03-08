@@ -29,7 +29,8 @@ const CHAT_API_BASE = `${CHAT_SERVER_URL}/api/v1`;
 const BACKEND_SERVICE_TOKEN =
   process.env.BACKEND_SERVICE_TOKEN ||
   'gatrix-backend-service-token-default-key-change-in-production';
-const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+const DEFAULT_AVATAR_URL =
+  'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
 // 모든 채팅 Route에 Authentication 필요 (디버깅 로깅 추가)
 router.use((req, res, next) => {
@@ -101,7 +102,9 @@ router.use((req, _res, next) => {
     });
 
     // 프록시 도달 여부 Confirm을 위한 로그
-    logger.info(`🚀 About to reach proxy middleware for: ${req.method} ${req.url}`);
+    logger.info(
+      `🚀 About to reach proxy middleware for: ${req.method} ${req.url}`
+    );
   }
 
   next();
@@ -129,7 +132,9 @@ const proxyOptions = {
 
     // Backend -> Chat Server 특수 토큰 추가 (가장 중요!)
     proxyReq.setHeader(HEADERS.X_API_TOKEN, BACKEND_SERVICE_TOKEN);
-    logger.info(`✅ Adding Backend Service Token: ${BACKEND_SERVICE_TOKEN.substring(0, 20)}...`);
+    logger.info(
+      `✅ Adding Backend Service Token: ${BACKEND_SERVICE_TOKEN.substring(0, 20)}...`
+    );
 
     // User info Headers 추가 (Chat Server에서 Used)
     logger.info(`🔍 Proxy request user check:`, {
@@ -170,7 +175,10 @@ const proxyOptions = {
           logger.info(`✅ User ${user.id} ensured synced to Chat Server`);
         })
         .catch((syncError: any) => {
-          logger.warn(`⚠️ Failed to ensure user sync to Chat Server:`, syncError);
+          logger.warn(
+            `⚠️ Failed to ensure user sync to Chat Server:`,
+            syncError
+          );
         });
     } else {
       logger.warn(`❌ No user ID found in request for proxy`);
@@ -201,7 +209,10 @@ const proxyOptions = {
 // 임시 테스트: 간단한 프록시 Middleware
 router.use('/', async (req, res, next) => {
   try {
-    logger.info('Simple proxy middleware reached:', { method: req.method, url: req.url });
+    logger.info('Simple proxy middleware reached:', {
+      method: req.method,
+      url: req.url,
+    });
     logger.debug('Request body:', req.body);
 
     // 채팅서버로 직접 Request
@@ -219,7 +230,10 @@ router.use('/', async (req, res, next) => {
 
     // Used자 동기화 Request인 경우 User info 추가
     let requestData = req.body;
-    if ((targetPath === '/users/upsert' || targetPath === '/users/sync-user') && req.user) {
+    if (
+      (targetPath === '/users/upsert' || targetPath === '/users/sync-user') &&
+      req.user
+    ) {
       const user = req.user as any;
 
       // DB에서 최신 User info 조회 (avatarUrl 포함)

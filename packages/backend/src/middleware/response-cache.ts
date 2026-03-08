@@ -51,7 +51,8 @@ function generateCacheKey(req: Request, options: CacheOptions): string {
     varyParts.push(`user:${userId}`);
   }
 
-  const fullKey = varyParts.length > 0 ? `${baseKey}:${varyParts.join(':')}` : baseKey;
+  const fullKey =
+    varyParts.length > 0 ? `${baseKey}:${varyParts.join(':')}` : baseKey;
 
   // Hash the key if it's too long
   if (fullKey.length > 200) {
@@ -201,7 +202,9 @@ export async function invalidateUserCache(userId: string): Promise<number> {
 }
 
 // Invalidate cache for specific resource
-export async function invalidateResourceCache(resource: string): Promise<number> {
+export async function invalidateResourceCache(
+  resource: string
+): Promise<number> {
   return invalidateCache(`cache:*${resource}*`);
 }
 

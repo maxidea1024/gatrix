@@ -28,7 +28,9 @@ async function main() {
 
     // 1. Check if migration is recorded as executed
     console.log('1. Checking g_migrations table...');
-    const migrations = await knex('g_migrations').where('id', 'like', '%064%').select('*');
+    const migrations = await knex('g_migrations')
+      .where('id', 'like', '%064%')
+      .select('*');
     console.log('   Migration records:', migrations);
 
     // 2. Check if isHidden column exists
@@ -41,7 +43,9 @@ async function main() {
 
     // 3. Check if gatrix-env exists
     console.log('\n3. Checking if gatrix-env environment exists...');
-    const gatrixEnv = await knex('g_environments').where('environmentName', 'gatrix-env').first();
+    const gatrixEnv = await knex('g_environments')
+      .where('environmentName', 'gatrix-env')
+      .first();
     console.log('   gatrix-env:', gatrixEnv ? 'EXISTS' : 'NOT FOUND');
     if (gatrixEnv) {
       console.log('   Details:', {

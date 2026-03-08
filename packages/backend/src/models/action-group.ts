@@ -14,7 +14,8 @@ export const ACTION_GROUP_TYPES = {
   REVERT: 'REVERT',
 } as const;
 
-export type ActionGroupType = (typeof ACTION_GROUP_TYPES)[keyof typeof ACTION_GROUP_TYPES];
+export type ActionGroupType =
+  (typeof ACTION_GROUP_TYPES)[keyof typeof ACTION_GROUP_TYPES];
 
 /**
  * ActionGroup model

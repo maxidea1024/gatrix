@@ -1,4 +1,9 @@
-import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, {
+  useState,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from 'react';
 import {
   Box,
   TextField,
@@ -114,11 +119,12 @@ const MultiLanguageMessageInput = forwardRef<
 
       setIsTranslating(true);
       try {
-        const translations = await translationService.translateMaintenanceMessage(defaultMessage, [
-          'ko',
-          'en',
-          'zh',
-        ]);
+        const translations =
+          await translationService.translateMaintenanceMessage(defaultMessage, [
+            'ko',
+            'en',
+            'zh',
+          ]);
 
         console.log('Translation results:', translations);
 
@@ -129,7 +135,9 @@ const MultiLanguageMessageInput = forwardRef<
           const translatedMessage =
             translationResult?.translatedText || existingLocale?.message || '';
 
-          console.log(`Language ${lang.code}: translatedMessage = "${translatedMessage}"`);
+          console.log(
+            `Language ${lang.code}: translatedMessage = "${translatedMessage}"`
+          );
 
           return {
             lang: lang.code,
@@ -146,9 +154,12 @@ const MultiLanguageMessageInput = forwardRef<
           variant: 'success',
         });
       } catch (error: any) {
-        enqueueSnackbar(error.message || t('multiLanguageMessage.translationFailed'), {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          error.message || t('multiLanguageMessage.translationFailed'),
+          {
+            variant: 'error',
+          }
+        );
       } finally {
         setIsTranslating(false);
       }
@@ -195,7 +206,9 @@ const MultiLanguageMessageInput = forwardRef<
               control={
                 <Switch
                   checked={supportsMultiLanguage}
-                  onChange={(e) => onSupportsMultiLanguageChange(e.target.checked)}
+                  onChange={(e) =>
+                    onSupportsMultiLanguageChange(e.target.checked)
+                  }
                 />
               }
               label={supportsMultiLanguageLabel}
@@ -208,7 +221,13 @@ const MultiLanguageMessageInput = forwardRef<
                   <Button
                     variant="outlined"
                     size="small"
-                    startIcon={isTranslating ? <CircularProgress size={16} /> : <TranslateIcon />}
+                    startIcon={
+                      isTranslating ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        <TranslateIcon />
+                      )
+                    }
                     onClick={handleTranslate}
                     disabled={isTranslating || !defaultMessage?.trim()}
                     sx={{ minWidth: 'auto' }}
@@ -264,10 +283,15 @@ const MultiLanguageMessageInput = forwardRef<
                         multiline
                         rows={3}
                         value={locale?.message || ''}
-                        onChange={(e) => updateLocale(lang.code, e.target.value)}
-                        placeholder={t('multiLanguageMessage.languagePlaceholder', {
-                          language: lang.label,
-                        })}
+                        onChange={(e) =>
+                          updateLocale(lang.code, e.target.value)
+                        }
+                        placeholder={t(
+                          'multiLanguageMessage.languagePlaceholder',
+                          {
+                            language: lang.label,
+                          }
+                        )}
                         helperText={t('multiLanguageMessage.emptyUsesDefault')}
                       />
                     </Box>

@@ -1,5 +1,13 @@
 import React from 'react';
-import { Box, Typography, Container, Paper, IconButton, useTheme, Button } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Container,
+  Paper,
+  IconButton,
+  useTheme,
+  Button,
+} from '@mui/material';
 import {
   ArrowBack,
   Speed,
@@ -38,7 +46,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   leftContent = {
     title: 'Welcome to',
     subtitle: 'GATRIX',
-    description: 'Online gaming service platform with comprehensive dashboard management tools',
+    description:
+      'Online gaming service platform with comprehensive dashboard management tools',
   },
   showLeftPanel = true,
 }) => {
@@ -117,11 +126,13 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                       opacity: 0.8,
                     },
                     '33%': {
-                      transform: 'translateY(-20px) translateX(10px) scale(1.05)',
+                      transform:
+                        'translateY(-20px) translateX(10px) scale(1.05)',
                       opacity: 0.9,
                     },
                     '66%': {
-                      transform: 'translateY(10px) translateX(-15px) scale(0.95)',
+                      transform:
+                        'translateY(10px) translateX(-15px) scale(0.95)',
                       opacity: 0.7,
                     },
                     '100%': {
@@ -151,11 +162,13 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                       opacity: 0.7,
                     },
                     '25%': {
-                      transform: 'translateY(15px) translateX(-10px) scale(1.1)',
+                      transform:
+                        'translateY(15px) translateX(-10px) scale(1.1)',
                       opacity: 0.8,
                     },
                     '50%': {
-                      transform: 'translateY(-10px) translateX(20px) scale(0.9)',
+                      transform:
+                        'translateY(-10px) translateX(20px) scale(0.9)',
                       opacity: 0.6,
                     },
                     '75%': {
@@ -189,7 +202,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                       opacity: 0.6,
                     },
                     '50%': {
-                      transform: 'translateY(-25px) translateX(15px) scale(1.2)',
+                      transform:
+                        'translateY(-25px) translateX(15px) scale(1.2)',
                       opacity: 0.8,
                     },
                     '100%': {
@@ -223,7 +237,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                       opacity: 0.7,
                     },
                     '80%': {
-                      transform: 'translateY(-15px) translateX(12px) scale(0.8)',
+                      transform:
+                        'translateY(-15px) translateX(12px) scale(0.8)',
                       opacity: 0.4,
                     },
                     '100%': {
@@ -252,11 +267,13 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                       opacity: 0.6,
                     },
                     '30%': {
-                      transform: 'translateY(-18px) translateX(-12px) scale(1.15)',
+                      transform:
+                        'translateY(-18px) translateX(-12px) scale(1.15)',
                       opacity: 0.8,
                     },
                     '70%': {
-                      transform: 'translateY(12px) translateX(18px) scale(0.85)',
+                      transform:
+                        'translateY(12px) translateX(18px) scale(0.85)',
                       opacity: 0.5,
                     },
                     '100%': {
@@ -269,7 +286,9 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
 
               {/* Top Back Button */}
               {showBackButton && (
-                <Box sx={{ position: 'absolute', top: 16, right: 16, zIndex: 3 }}>
+                <Box
+                  sx={{ position: 'absolute', top: 16, right: 16, zIndex: 3 }}
+                >
                   <IconButton
                     onClick={handleBackClick}
                     sx={{
@@ -349,7 +368,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                       borderRadius: 1,
                       backgroundColor: 'rgba(255, 255, 255, 0.08)',
                       backdropFilter: 'blur(4px)',
-                      transition: 'transform 0.2s ease, background-color 0.2s ease',
+                      transition:
+                        'transform 0.2s ease, background-color 0.2s ease',
                       '&:hover': {
                         backgroundColor: 'rgba(255, 255, 255, 0.12)',
                         transform: 'translateY(-2px)',
@@ -368,7 +388,9 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                         flexShrink: 0,
                       }}
                     >
-                      <feature.icon sx={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.9)' }} />
+                      <feature.icon
+                        sx={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.9)' }}
+                      />
                     </Box>
                     <Typography
                       variant="caption"

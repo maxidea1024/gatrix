@@ -94,7 +94,9 @@ export class SshCommandJob extends BaseJob {
                     host,
                     username,
                   },
-                  error: success ? undefined : `Command failed with exit code ${code}`,
+                  error: success
+                    ? undefined
+                    : `Command failed with exit code ${code}`,
                   executionTimeMs: 0, // Will be set by executeWithTimeout
                 });
               }

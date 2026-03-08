@@ -39,7 +39,10 @@ export class ServerEnvironmentController {
         },
       });
     } catch (error) {
-      logger.error('Error in ServerEnvironmentController.getEnvironments:', error);
+      logger.error(
+        'Error in ServerEnvironmentController.getEnvironments:',
+        error
+      );
       res.status(500).json({
         success: false,
         error: {

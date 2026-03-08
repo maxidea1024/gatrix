@@ -71,7 +71,9 @@ class AppInstance {
   public get info(): AppInstanceInfo {
     return {
       ...this._instanceInfo,
-      uptime: Math.floor((Date.now() - this._instanceInfo.startedAt.getTime()) / 1000),
+      uptime: Math.floor(
+        (Date.now() - this._instanceInfo.startedAt.getTime()) / 1000
+      ),
     };
   }
 

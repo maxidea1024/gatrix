@@ -100,7 +100,9 @@ const TagsPage: React.FC = () => {
     const q = query.trim().toLowerCase();
     return tags.filter(
       (x) =>
-        !q || x.name.toLowerCase().includes(q) || (x.description || '').toLowerCase().includes(q)
+        !q ||
+        x.name.toLowerCase().includes(q) ||
+        (x.description || '').toLowerCase().includes(q)
     );
   }, [tags, query]);
 
@@ -137,9 +139,12 @@ const TagsPage: React.FC = () => {
       setTags((prev) => prev.filter((t) => t.id !== id));
       enqueueSnackbar(t('common.success'), { variant: 'success' });
     } catch (e: any) {
-      enqueueSnackbar(e?.response?.data?.error?.message || t('errors.deleteError'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        e?.response?.data?.error?.message || t('errors.deleteError'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -266,7 +271,11 @@ const TagsPage: React.FC = () => {
                 sx={{ flex: 1, minWidth: 220 }}
               />
               <Stack direction="row" spacing={1} alignItems="center">
-                <ColorPicker value={newColor} onChange={setNewColor} label={t('common.color')} />
+                <ColorPicker
+                  value={newColor}
+                  onChange={setNewColor}
+                  label={t('common.color')}
+                />
                 <Typography variant="body2" sx={{ minWidth: 80 }}>
                   {newColor}
                 </Typography>
@@ -281,7 +290,11 @@ const TagsPage: React.FC = () => {
                 >
                   {t('common.cancel')}
                 </Button>
-                <Button variant="contained" onClick={handleCreate} disabled={!newName.trim()}>
+                <Button
+                  variant="contained"
+                  onClick={handleCreate}
+                  disabled={!newName.trim()}
+                >
                   {t('tags.addTag')}
                 </Button>
               </Stack>
@@ -292,12 +305,16 @@ const TagsPage: React.FC = () => {
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-          <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+          <Typography color="text.secondary">
+            {t('common.loadingData')}
+          </Typography>
         </Box>
       ) : tags.length === 0 ? (
         <EmptyPagePlaceholder
           message={t('tags.noTagsFound')}
-          onAddClick={canManage ? () => nameInputRef.current?.focus() : undefined}
+          onAddClick={
+            canManage ? () => nameInputRef.current?.focus() : undefined
+          }
           addButtonLabel={t('tags.addTag')}
           subtitle={canManage ? t('common.addFirstItem') : undefined}
         />
@@ -312,11 +329,15 @@ const TagsPage: React.FC = () => {
                   <TableRow>
                     <TableCell>{t('tags.name')}</TableCell>
                     <TableCell>{t('tags.description')}</TableCell>
-                    <TableCell sx={{ width: 100 }}>{t('common.color')}</TableCell>
+                    <TableCell sx={{ width: 100 }}>
+                      {t('common.color')}
+                    </TableCell>
                     <TableCell>{t('common.createdAt')}</TableCell>
                     <TableCell>{t('common.updatedAt')}</TableCell>
                     <TableCell>{t('common.createdBy')}</TableCell>
-                    {canManage && <TableCell align="right">{t('common.actions')}</TableCell>}
+                    {canManage && (
+                      <TableCell align="right">{t('common.actions')}</TableCell>
+                    )}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -334,7 +355,10 @@ const TagsPage: React.FC = () => {
                               }}
                             />
                           ) : (
-                            <Tooltip title={tag.description || t('tags.noDescription')} arrow>
+                            <Tooltip
+                              title={tag.description || t('tags.noDescription')}
+                              arrow
+                            >
                               <Chip
                                 label={tag.name}
                                 size="small"
@@ -406,23 +430,37 @@ const TagsPage: React.FC = () => {
                         )}
                       </TableCell>
                       <TableCell sx={{ width: 180 }}>
-                        <Tooltip title={formatDateTimeDetailed(tag.createdAt || '')}>
+                        <Tooltip
+                          title={formatDateTimeDetailed(tag.createdAt || '')}
+                        >
                           <Typography variant="body2">
-                            {formatRelativeTime(tag.createdAt || '', undefined, language)}
+                            {formatRelativeTime(
+                              tag.createdAt || '',
+                              undefined,
+                              language
+                            )}
                           </Typography>
                         </Tooltip>
                       </TableCell>
                       <TableCell sx={{ width: 180 }}>
-                        <Tooltip title={formatDateTimeDetailed(tag.updatedAt || '')}>
+                        <Tooltip
+                          title={formatDateTimeDetailed(tag.updatedAt || '')}
+                        >
                           <Typography variant="body2">
-                            {formatRelativeTime(tag.updatedAt || '', undefined, language)}
+                            {formatRelativeTime(
+                              tag.updatedAt || '',
+                              undefined,
+                              language
+                            )}
                           </Typography>
                         </Tooltip>
                       </TableCell>
                       <TableCell sx={{ width: 180 }}>
                         {tag.createdByName ? (
                           <Box>
-                            <Typography variant="body2">{tag.createdByName}</Typography>
+                            <Typography variant="body2">
+                              {tag.createdByName}
+                            </Typography>
                             {tag.createdByEmail && (
                               <Typography
                                 variant="caption"
@@ -440,7 +478,11 @@ const TagsPage: React.FC = () => {
                       {canManage && (
                         <TableCell align="right" sx={{ width: 140 }}>
                           {editingId === tag.id ? (
-                            <Stack direction="row" spacing={1} justifyContent="flex-end">
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              justifyContent="flex-end"
+                            >
                               <IconButton
                                 size="small"
                                 color="primary"
@@ -454,8 +496,15 @@ const TagsPage: React.FC = () => {
                               </IconButton>
                             </Stack>
                           ) : (
-                            <Stack direction="row" spacing={1} justifyContent="flex-end">
-                              <IconButton size="small" onClick={() => startEdit(tag)}>
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              justifyContent="flex-end"
+                            >
+                              <IconButton
+                                size="small"
+                                onClick={() => startEdit(tag)}
+                              >
                                 <EditIcon fontSize="small" />
                               </IconButton>
                               <IconButton

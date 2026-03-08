@@ -34,9 +34,14 @@ class TranslationService {
   /**
    * Translate to single language
    */
-  async translateText(request: TranslationRequest): Promise<TranslationResponse> {
+  async translateText(
+    request: TranslationRequest
+  ): Promise<TranslationResponse> {
     try {
-      const response = await api.post<TranslationResponse>('/admin/translation/translate', request);
+      const response = await api.post<TranslationResponse>(
+        '/admin/translation/translate',
+        request
+      );
       // API service already returns response.data, so response is ApiResponse<TranslationResponse>
       // We need to access response.data to get the actual TranslationResponse
       return (response as any).data as TranslationResponse;
@@ -63,14 +68,18 @@ class TranslationService {
       return (response as any).data as MultipleTranslationResponse;
     } catch (error: any) {
       console.error('Multiple translation error:', error);
-      throw new Error(error.response?.data?.message || 'Multiple translation failed');
+      throw new Error(
+        error.response?.data?.message || 'Multiple translation failed'
+      );
     }
   }
 
   /**
    * Detect language
    */
-  async detectLanguage(request: LanguageDetectionRequest): Promise<LanguageDetectionResponse> {
+  async detectLanguage(
+    request: LanguageDetectionRequest
+  ): Promise<LanguageDetectionResponse> {
     try {
       const response = await api.post<LanguageDetectionResponse>(
         '/admin/translation/detect-language',
@@ -81,7 +90,9 @@ class TranslationService {
       return (response as any).data as LanguageDetectionResponse;
     } catch (error: any) {
       console.error('Language detection error:', error);
-      throw new Error(error.response?.data?.message || 'Language detection failed');
+      throw new Error(
+        error.response?.data?.message || 'Language detection failed'
+      );
     }
   }
 

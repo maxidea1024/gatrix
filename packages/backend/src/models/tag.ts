@@ -102,7 +102,10 @@ export default class TagModel {
     return (await this.findById(newId))!;
   }
 
-  static async update(id: string, data: UpdateTagData): Promise<TagAttributes | null> {
+  static async update(
+    id: string,
+    data: UpdateTagData
+  ): Promise<TagAttributes | null> {
     const updateData: any = {};
     Object.entries(data).forEach(([k, v]) => {
       if (v !== undefined) {

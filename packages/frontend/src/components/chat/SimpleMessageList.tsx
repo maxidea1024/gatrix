@@ -23,7 +23,10 @@ interface MessageListProps {
   onSendMessage?: (message: string, attachments?: File[]) => void;
 }
 
-const SimpleMessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) => {
+const SimpleMessageList: React.FC<MessageListProps> = ({
+  channelId,
+  onSendMessage,
+}) => {
   const { state, actions } = useChat();
   const { t, i18n } = useTranslation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -106,7 +109,8 @@ const SimpleMessageList: React.FC<MessageListProps> = ({ channelId, onSendMessag
 
   const formatMessageTime = (timestamp: string) => {
     const date = new Date(timestamp);
-    const locale = i18n.language === 'ko' ? ko : i18n.language === 'zh' ? zhCN : enUS;
+    const locale =
+      i18n.language === 'ko' ? ko : i18n.language === 'zh' ? zhCN : enUS;
     return format(date, 'HH:mm', { locale });
   };
 
@@ -178,7 +182,9 @@ const SimpleMessageList: React.FC<MessageListProps> = ({ channelId, onSendMessag
       {/* Header */}
       <Paper elevation={1} sx={{ p: 2, borderRadius: 0 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <MuiAvatar sx={{ bgcolor: 'primary.main' }}>{currentChannel?.name?.charAt(0)}</MuiAvatar>
+          <MuiAvatar sx={{ bgcolor: 'primary.main' }}>
+            {currentChannel?.name?.charAt(0)}
+          </MuiAvatar>
           <Box>
             <Typography variant="h6">{currentChannel?.name || ''}</Typography>
             <Typography variant="body2" color="text.secondary">
@@ -200,7 +206,9 @@ const SimpleMessageList: React.FC<MessageListProps> = ({ channelId, onSendMessag
           {messages.map((message, index) => {
             const messageUser = state.users[message.userId];
             const senderName =
-              messageUser?.username || messageUser?.name || `User ${message.userId}`;
+              messageUser?.username ||
+              messageUser?.name ||
+              `User ${message.userId}`;
             const isOwn = isMyMessage(message.userId);
 
             return (
@@ -261,7 +269,11 @@ const SimpleMessageList: React.FC<MessageListProps> = ({ channelId, onSendMessag
                     )}
                     <Typography variant="body2">{message.content}</Typography>
                   </Paper>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, px: 1 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mt: 0.5, px: 1 }}
+                  >
                     {formatMessageTime(message.createdAt)}
                   </Typography>
                 </Box>

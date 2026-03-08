@@ -46,22 +46,40 @@ const NotFoundPage: React.FC = () => {
           />
 
           {/* Header */}
-          <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'white' }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            gutterBottom
+            sx={{ color: 'white' }}
+          >
             {t('notFound.title')}
           </Typography>
 
-          <Typography variant="h6" gutterBottom sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+          >
             {t('notFound.subtitle')}
           </Typography>
 
           {/* Message */}
-          <Typography variant="body1" paragraph sx={{ mb: 3, color: 'rgba(255, 255, 255, 0.6)' }}>
+          <Typography
+            variant="body1"
+            paragraph
+            sx={{ mb: 3, color: 'rgba(255, 255, 255, 0.6)' }}
+          >
             {t('notFound.description')}
           </Typography>
 
           {/* Actions */}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button variant="contained" startIcon={<Home />} onClick={handleGoHome} size="large">
+            <Button
+              variant="contained"
+              startIcon={<Home />}
+              onClick={handleGoHome}
+              size="large"
+            >
               {t('common.goToDashboard')}
             </Button>
 

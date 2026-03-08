@@ -133,7 +133,11 @@ const EVENT_CATEGORIES: EventCategory[] = [
   },
   {
     key: 'segments',
-    events: ['feature_segment_created', 'feature_segment_updated', 'feature_segment_deleted'],
+    events: [
+      'feature_segment_created',
+      'feature_segment_updated',
+      'feature_segment_deleted',
+    ],
   },
   {
     key: 'game_world',
@@ -221,14 +225,22 @@ const getEventCategoryKey = (eventType: string): string => {
   return category ? category.key : 'other';
 };
 
-const getEventDescriptionConfig = (log: EventLog): { key: string; params: any } | null => {
+const getEventDescriptionConfig = (
+  log: EventLog
+): { key: string; params: any } | null => {
   if (!log.eventData) return null;
   const data = log.eventData;
 
   const params = {
     ...data,
     // Prefer friendly names if available
-    name: data.segmentName || data.flagName || data.name || data.title || data.id || '',
+    name:
+      data.segmentName ||
+      data.flagName ||
+      data.name ||
+      data.title ||
+      data.id ||
+      '',
     environmentId: data.environmentId || '',
     message: data.message || '',
     email: data.email || '',
@@ -266,7 +278,8 @@ const FallbackDescription: React.FC<{ log: EventLog }> = ({ log }) => {
   const data = log.eventData || {};
   if (data.email) return <>{data.email}</>;
   if (data.displayName) return <>{data.displayName}</>;
-  if (data.name && data.environmentId) return <>{`${data.environmentId}: ${data.name}`}</>;
+  if (data.name && data.environmentId)
+    return <>{`${data.environmentId}: ${data.name}`}</>;
   if (data.name) return <>{data.name}</>;
   if (data.title) return <>{data.title}</>;
   if (data.message) return <>{data.message}</>;
@@ -278,7 +291,10 @@ const LabelChip = ({ children, ...props }: any) => {
   return <Chip label={children} {...props} />;
 };
 
-const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index }) => {
+const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({
+  log,
+  index,
+}) => {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
 
@@ -310,7 +326,11 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
         }}
       >
         <TableCell>
-          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+          >
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>
         </TableCell>
@@ -329,7 +349,9 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
             />
           )}
         </TableCell>
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{log.eventType.replace(/_/g, ' ')}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+          {log.eventType.replace(/_/g, ' ')}
+        </TableCell>
         <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
           {descriptionConfig ? (
             <Trans
@@ -377,7 +399,9 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
         <TableCell>{log.statusCode ?? '-'}</TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>
           <Tooltip title={formatDateTimeUI(log.createdAt)} arrow>
-            <span>{formatRelativeTime(log.createdAt, { showSeconds: true })}</span>
+            <span>
+              {formatRelativeTime(log.createdAt, { showSeconds: true })}
+            </span>
           </Tooltip>
         </TableCell>
       </TableRow>
@@ -406,16 +430,23 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
               {/* Event Data (JSON) */}
               {log.eventData && Object.keys(log.eventData).length > 0 && (
                 <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  <Typography
+                    variant="subtitle2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
                     Payload
                   </Typography>
                   <Box
                     sx={{
                       p: 2,
-                      bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#2b2b2b' : '#f5f5f5'),
-                      color: (theme) => (theme.palette.mode === 'dark' ? '#e6e6e6' : '#333333'),
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark' ? '#2b2b2b' : '#f5f5f5',
+                      color: (theme) =>
+                        theme.palette.mode === 'dark' ? '#e6e6e6' : '#333333',
                       borderRadius: 1,
-                      fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+                      fontFamily:
+                        'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
                       fontSize: '0.85rem',
                       whiteSpace: 'pre-wrap',
                       overflowX: 'auto',
@@ -431,7 +462,11 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
               {/* State Details (Text) */}
               {log.stateDetails && (
                 <Box>
-                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  <Typography
+                    variant="subtitle2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
                     {t('integrations.results')}
                   </Typography>
                   <Box
@@ -465,7 +500,9 @@ export const EditIntegrationPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [tabValue, setTabValue] = useState(parseInt(searchParams.get('tab') || '0', 10));
+  const [tabValue, setTabValue] = useState(
+    parseInt(searchParams.get('tab') || '0', 10)
+  );
   const [providers, setProviders] = useState<ProviderDefinition[]>([]);
   const { environments: envList } = useEnvironments();
   const environments = envList.map((e) => ({
@@ -477,8 +514,12 @@ export const EditIntegrationPage: React.FC = () => {
   const [isEnabled, setIsEnabled] = useState(true);
   const [parameters, setParameters] = useState<Record<string, any>>({});
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
-  const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>([]);
-  const [showSensitive, setShowSensitive] = useState<Record<string, boolean>>({});
+  const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>(
+    []
+  );
+  const [showSensitive, setShowSensitive] = useState<Record<string, boolean>>(
+    {}
+  );
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [eventLogs, setEventLogs] = useState<EventLog[]>([]);
@@ -571,7 +612,8 @@ export const EditIntegrationPage: React.FC = () => {
       await api.post(`/admin/integrations/${id}/test`);
       enqueueSnackbar(t('integrations.testSuccess'), { variant: 'success' });
     } catch (error: any) {
-      const message = error?.response?.data?.error || t('integrations.testFailed');
+      const message =
+        error?.response?.data?.error || t('integrations.testFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setTesting(false);
@@ -593,9 +635,13 @@ export const EditIntegrationPage: React.FC = () => {
   };
 
   const handleCategoryToggle = (category: EventCategory) => {
-    const allSelected = category.events.every((e) => selectedEvents.includes(e));
+    const allSelected = category.events.every((e) =>
+      selectedEvents.includes(e)
+    );
     if (allSelected) {
-      setSelectedEvents((prev) => prev.filter((e) => !category.events.includes(e)));
+      setSelectedEvents((prev) =>
+        prev.filter((e) => !category.events.includes(e))
+      );
     } else {
       setSelectedEvents((prev) => [...new Set([...prev, ...category.events])]);
     }
@@ -631,8 +677,12 @@ export const EditIntegrationPage: React.FC = () => {
 
     if (description !== initialValues.description) return true;
     if (isEnabled !== initialValues.isEnabled) return true;
-    if (JSON.stringify(parameters) !== JSON.stringify(initialValues.parameters)) return true;
-    if (JSON.stringify(selectedEvents.sort()) !== JSON.stringify(initialValues.events.sort()))
+    if (JSON.stringify(parameters) !== JSON.stringify(initialValues.parameters))
+      return true;
+    if (
+      JSON.stringify(selectedEvents.sort()) !==
+      JSON.stringify(initialValues.events.sort())
+    )
       return true;
     if (
       JSON.stringify(selectedEnvironments.sort()) !==
@@ -646,7 +696,9 @@ export const EditIntegrationPage: React.FC = () => {
   const handleSave = async () => {
     if (!integration) return;
     if (!isFormValid()) {
-      enqueueSnackbar(t('integrations.requiredFieldsMissing'), { variant: 'error' });
+      enqueueSnackbar(t('integrations.requiredFieldsMissing'), {
+        variant: 'error',
+      });
       return;
     }
 
@@ -769,7 +821,10 @@ export const EditIntegrationPage: React.FC = () => {
             {t('integrations.editSubtitle')}
           </Typography>
         </Box>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/settings/integrations')}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/settings/integrations')}
+        >
           {t('common.back')}
         </Button>
       </Box>
@@ -785,7 +840,9 @@ export const EditIntegrationPage: React.FC = () => {
               sx={{ width: 48, height: 48 }}
             />
             <Box flex={1}>
-              <Typography variant="h6">{t(currentProvider.displayName)}</Typography>
+              <Typography variant="h6">
+                {t(currentProvider.displayName)}
+              </Typography>
               <Typography variant="body2" color="text.secondary">
                 {t(currentProvider.description)}
               </Typography>
@@ -813,7 +870,13 @@ export const EditIntegrationPage: React.FC = () => {
         <Box display="flex" gap={2} mb={3}>
           <Button
             variant="outlined"
-            startIcon={testing ? <CircularProgress size={16} color="inherit" /> : <SendIcon />}
+            startIcon={
+              testing ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : (
+                <SendIcon />
+              )
+            }
             onClick={handleTestConnection}
             disabled={testing}
           >
@@ -847,21 +910,33 @@ export const EditIntegrationPage: React.FC = () => {
 
               <FormControlLabel
                 control={
-                  <Switch checked={isEnabled} onChange={(e) => setIsEnabled(e.target.checked)} />
+                  <Switch
+                    checked={isEnabled}
+                    onChange={(e) => setIsEnabled(e.target.checked)}
+                  />
                 }
                 label={t('common.enabled')}
                 sx={{ mb: 2 }}
               />
 
-              {currentProvider.parameters.map((param) => renderParameterInput(param))}
+              {currentProvider.parameters.map((param) =>
+                renderParameterInput(param)
+              )}
             </CardContent>
           </Card>
 
           {/* Right Column - Events */}
           <Card>
             <CardContent>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h6">{t('integrations.eventSelection')}</Typography>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={2}
+              >
+                <Typography variant="h6">
+                  {t('integrations.eventSelection')}
+                </Typography>
                 <Stack direction="row" spacing={1}>
                   <Button size="small" onClick={handleSelectAllEvents}>
                     {t('integrations.selectAllEvents')}
@@ -885,14 +960,21 @@ export const EditIntegrationPage: React.FC = () => {
                 return (
                   <Accordion key={category.key} defaultExpanded={false}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Box display="flex" alignItems="center" gap={1} width="100%">
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        gap={1}
+                        width="100%"
+                      >
                         <Checkbox
                           checked={allSelected}
                           indeterminate={selectedCount > 0 && !allSelected}
                           onClick={(e) => e.stopPropagation()}
                           onChange={() => handleCategoryToggle(category)}
                         />
-                        <Typography>{t(`integrations.eventCategories.${category.key}`)}</Typography>
+                        <Typography>
+                          {t(`integrations.eventCategories.${category.key}`)}
+                        </Typography>
                         <Chip
                           label={`${selectedCount}/${category.events.length}`}
                           size="small"
@@ -980,10 +1062,19 @@ export const EditIntegrationPage: React.FC = () => {
 
       {/* Event Logs Tab */}
       <TabPanel value={tabValue} index={1}>
-        <Box display="flex" justifyContent="flex-end" alignItems="center" mb={1}>
+        <Box
+          display="flex"
+          justifyContent="flex-end"
+          alignItems="center"
+          mb={1}
+        >
           <Button
             startIcon={
-              logsLoading ? <CircularProgress size={16} color="inherit" /> : <RefreshIcon />
+              logsLoading ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : (
+                <RefreshIcon />
+              )
             }
             onClick={() => fetchEventLogs(true)}
             size="small"
@@ -1006,10 +1097,16 @@ export const EditIntegrationPage: React.FC = () => {
                 <TableRow>
                   <TableCell width={50} />
                   <TableCell width={60}>{t('common.status')}</TableCell>
-                  <TableCell width={120}>{t('integrations.category')}</TableCell>
-                  <TableCell width={200}>{t('integrations.eventType')}</TableCell>
+                  <TableCell width={120}>
+                    {t('integrations.category')}
+                  </TableCell>
+                  <TableCell width={200}>
+                    {t('integrations.eventType')}
+                  </TableCell>
                   <TableCell>{t('integrations.description')}</TableCell>
-                  <TableCell width={100}>{t('integrations.statusCode')}</TableCell>
+                  <TableCell width={100}>
+                    {t('integrations.statusCode')}
+                  </TableCell>
                   <TableCell width={150}>{t('common.createdAt')}</TableCell>
                 </TableRow>
               </TableHead>

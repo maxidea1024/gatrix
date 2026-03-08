@@ -1,7 +1,12 @@
 import React from 'react';
 import { Box, Paper, Chip, Typography, alpha } from '@mui/material';
 import { ServiceInstance } from '@/services/serviceDiscoveryService';
-import { ServerGroup, GroupingField, collectAllInstances, ServiceStatus } from './types';
+import {
+  ServerGroup,
+  GroupingField,
+  collectAllInstances,
+  ServiceStatus,
+} from './types';
 
 interface StatusStatsProps {
   services: ServiceInstance[];
@@ -9,7 +14,10 @@ interface StatusStatsProps {
 }
 
 // Helper component for status statistics
-export const StatusStatsDisplay: React.FC<StatusStatsProps> = ({ services, t }) => {
+export const StatusStatsDisplay: React.FC<StatusStatsProps> = ({
+  services,
+  t,
+}) => {
   const statusCounts = React.useMemo(() => {
     const counts = {
       initializing: 0,
@@ -26,7 +34,8 @@ export const StatusStatsDisplay: React.FC<StatusStatsProps> = ({ services, t }) 
       else if (status === 'shutting_down') counts.shuttingDown++;
       else if (status === 'terminated') counts.terminated++;
       else if (status === 'error') counts.error++;
-      else if (status === 'no-response' || status === 'no-response') counts.noResponse++;
+      else if (status === 'no-response' || status === 'no-response')
+        counts.noResponse++;
     });
     return counts;
   }, [services]);
@@ -131,9 +140,13 @@ export const ServerGroupHeader: React.FC<ServerGroupHeaderProps> = ({
             fontSize: '0.9rem',
             fontWeight: 700,
             color: (theme) =>
-              theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
+              theme.palette.mode === 'dark'
+                ? theme.palette.grey[900]
+                : theme.palette.grey[100],
             bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? theme.palette.grey[200] : theme.palette.grey[700],
+              theme.palette.mode === 'dark'
+                ? theme.palette.grey[200]
+                : theme.palette.grey[700],
           }}
         >
           {group.name}
@@ -189,7 +202,8 @@ export const ServerGroupContainer: React.FC<ServerGroupContainerProps> = ({
         mb: depth === 0 ? 3 : 2,
         ml: depth * 2,
         p: depth === 0 ? 2.5 : 2,
-        bgcolor: (theme) => alpha(theme.palette.background.paper, depth === 0 ? 0.4 : 0.6),
+        bgcolor: (theme) =>
+          alpha(theme.palette.background.paper, depth === 0 ? 0.4 : 0.6),
         borderRadius: 2,
         backdropFilter: 'blur(8px)',
         boxShadow: (theme) =>
@@ -200,7 +214,11 @@ export const ServerGroupContainer: React.FC<ServerGroupContainerProps> = ({
         borderColor: 'primary.main',
       }}
     >
-      <ServerGroupHeader group={group} getGroupingLabel={getGroupingLabel} t={t} />
+      <ServerGroupHeader
+        group={group}
+        getGroupingLabel={getGroupingLabel}
+        t={t}
+      />
       {hasChildren && renderChildren ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {group.children!.map((child) => renderChildren(child, depth + 1))}

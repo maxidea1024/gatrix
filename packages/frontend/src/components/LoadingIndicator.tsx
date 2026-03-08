@@ -1,5 +1,11 @@
 import React from 'react';
-import { Box, CircularProgress, Backdrop, Typography, LinearProgress } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Backdrop,
+  Typography,
+  LinearProgress,
+} from '@mui/material';
 import { HourglassEmpty } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
@@ -125,7 +131,9 @@ export const PageLoading: React.FC<{ message?: string }> = ({ message }) => {
 };
 
 // Full screen loading component
-export const FullScreenLoading: React.FC<{ message?: string }> = ({ message }) => {
+export const FullScreenLoading: React.FC<{ message?: string }> = ({
+  message,
+}) => {
   const { t } = useTranslation();
 
   return (
@@ -162,9 +170,13 @@ interface ApiLoadingContextType {
   setLoadingMessage: (message: string) => void;
 }
 
-const ApiLoadingContext = React.createContext<ApiLoadingContextType | undefined>(undefined);
+const ApiLoadingContext = React.createContext<
+  ApiLoadingContextType | undefined
+>(undefined);
 
-export const ApiLoadingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ApiLoadingProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [loadingMessage, setLoadingMessage] = React.useState('Loading...');
 
@@ -182,7 +194,11 @@ export const ApiLoadingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   return (
     <ApiLoadingContext.Provider value={value}>
       {children}
-      <LoadingIndicator variant="backdrop" open={isLoading} message={loadingMessage} />
+      <LoadingIndicator
+        variant="backdrop"
+        open={isLoading}
+        message={loadingMessage}
+      />
     </ApiLoadingContext.Provider>
   );
 };

@@ -20,7 +20,9 @@ internalApp.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
-    logger.debug(`[Internal] ${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`);
+    logger.debug(
+      `[Internal] ${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`
+    );
   });
   next();
 });
@@ -29,7 +31,11 @@ internalApp.use((req: Request, res: Response, next: NextFunction) => {
 internalApp.use((req: Request, res: Response, next: NextFunction) => {
   const sdk = sdkManager.getSDK();
   if (sdk) {
-    return sdk.createHttpMetricsMiddleware({ scope: 'private' })(req, res, next);
+    return sdk.createHttpMetricsMiddleware({ scope: 'private' })(
+      req,
+      res,
+      next
+    );
   }
   next();
 });
@@ -52,15 +58,17 @@ internalApp.use((req: Request, res: Response) => {
 });
 
 // Error handler
-internalApp.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
-  logger.error('Unhandled error in internal server:', err);
-  res.status(500).json({
-    success: false,
-    error: {
-      code: 'INTERNAL_SERVER_ERROR',
-      message: 'An unexpected error occurred',
-    },
-  });
-});
+internalApp.use(
+  (err: Error, req: Request, res: Response, _next: NextFunction) => {
+    logger.error('Unhandled error in internal server:', err);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An unexpected error occurred',
+      },
+    });
+  }
+);
 
 export default internalApp;

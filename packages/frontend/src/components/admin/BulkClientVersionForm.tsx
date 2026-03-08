@@ -47,7 +47,10 @@ import { tagService } from '../../services/tagService';
 import { PlatformDefaultsService } from '../../services/platformDefaultsService';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
-import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
+import {
+  MessageTemplate,
+  messageTemplateService,
+} from '../../services/messageTemplateService';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { getContrastColor } from '@/utils/colorUtils';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
@@ -61,7 +64,8 @@ const ClientStatusLabels = {
   [ClientStatus.RECOMMENDED_UPDATE]: 'clientVersions.status.recommendedUpdate',
   [ClientStatus.FORCED_UPDATE]: 'clientVersions.status.forcedUpdate',
   [ClientStatus.UNDER_REVIEW]: 'clientVersions.status.underReview',
-  [ClientStatus.BLOCKED_PATCH_ALLOWED]: 'clientVersions.status.blockedPatchAllowed',
+  [ClientStatus.BLOCKED_PATCH_ALLOWED]:
+    'clientVersions.status.blockedPatchAllowed',
   [ClientStatus.MAINTENANCE]: 'clientVersions.status.maintenance',
 };
 
@@ -90,8 +94,14 @@ const createValidationSchema = (t: any) =>
       .string()
       .max(CLIENT_VERSION_VALIDATION.EXTERNAL_LINK.MAX_LENGTH)
       .optional(),
-    memo: yup.string().max(CLIENT_VERSION_VALIDATION.MEMO.MAX_LENGTH).optional(),
-    customPayload: yup.string().max(CLIENT_VERSION_VALIDATION.CUSTOM_PAYLOAD.MAX_LENGTH).optional(),
+    memo: yup
+      .string()
+      .max(CLIENT_VERSION_VALIDATION.MEMO.MAX_LENGTH)
+      .optional(),
+    customPayload: yup
+      .string()
+      .max(CLIENT_VERSION_VALIDATION.CUSTOM_PAYLOAD.MAX_LENGTH)
+      .optional(),
     platforms: yup
       .array()
       .of(
@@ -124,7 +134,8 @@ const createValidationSchema = (t: any) =>
     maintenanceEndDate: yup.string().optional(),
     maintenanceMessage: yup.string().when('clientStatus', {
       is: ClientStatus.MAINTENANCE,
-      then: (schema) => schema.required(t('clientVersions.maintenance.messageRequired')),
+      then: (schema) =>
+        schema.required(t('clientVersions.maintenance.messageRequired')),
       otherwise: (schema) => schema.optional(),
     }),
     supportsMultiLanguage: yup.boolean().optional(),
@@ -155,9 +166,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   >([]);
 
   // Maintenance-related state
-  const [maintenanceLocales, setMaintenanceLocales] = useState<ClientVersionMaintenanceLocale[]>(
-    []
-  );
+  const [maintenanceLocales, setMaintenanceLocales] = useState<
+    ClientVersionMaintenanceLocale[]
+  >([]);
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
 
   // Message source selection
@@ -280,7 +291,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
               patchAddressForWhiteList: '',
             };
           } catch (error) {
-            console.error(`Failed to get defaults for platform ${platform}:`, error);
+            console.error(
+              `Failed to get defaults for platform ${platform}:`,
+              error
+            );
             return {
               platform,
               gameServerAddress: '',
@@ -319,14 +333,18 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
 
       // Handle message for template mode
       let finalMaintenanceMessage = data.maintenanceMessage;
-      let finalMaintenanceLocales = maintenanceLocales.filter((l) => l.message.trim() !== '');
+      let finalMaintenanceLocales = maintenanceLocales.filter(
+        (l) => l.message.trim() !== ''
+      );
 
       if (
         data.clientStatus === ClientStatus.MAINTENANCE &&
         inputMode === 'template' &&
         selectedTemplateId
       ) {
-        const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
+        const selectedTemplate = templates.find(
+          (t) => t.id === selectedTemplateId
+        );
         if (selectedTemplate) {
           finalMaintenanceMessage = selectedTemplate.defaultMessage || '';
           finalMaintenanceLocales = (selectedTemplate.locales || [])
@@ -351,8 +369,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         maintenanceLocales: finalMaintenanceLocales,
         platforms: data.platforms.map((platform) => ({
           ...platform,
-          gameServerAddressForWhiteList: platform.gameServerAddressForWhiteList || undefined,
-          patchAddressForWhiteList: platform.patchAddressForWhiteList || undefined,
+          gameServerAddressForWhiteList:
+            platform.gameServerAddressForWhiteList || undefined,
+          patchAddressForWhiteList:
+            platform.patchAddressForWhiteList || undefined,
         })),
         // Include selected tags (send only required fields)
         tags:
@@ -370,9 +390,12 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         cleanedData
       );
 
-      enqueueSnackbar(t('clientVersions.bulkCreateSuccess', { count: result?.length || 0 }), {
-        variant: 'success',
-      });
+      enqueueSnackbar(
+        t('clientVersions.bulkCreateSuccess', { count: result?.length || 0 }),
+        {
+          variant: 'success',
+        }
+      );
 
       onSuccess();
       onClose();
@@ -466,10 +489,13 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           </Typography>
                         </Box>
                       }
-                      placeholder={CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE}
+                      placeholder={
+                        CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE
+                      }
                       error={!!errors.clientVersion}
                       helperText={
-                        errors.clientVersion?.message || t('clientVersions.form.versionHelp')
+                        errors.clientVersion?.message ||
+                        t('clientVersions.form.versionHelp')
                       }
                       inputProps={{
                         autoComplete: 'off',
@@ -493,7 +519,11 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                     multiple
                     value={selectedPlatforms}
                     onChange={handlePlatformChange}
-                    input={<OutlinedInput label={`${t('clientVersions.selectPlatforms')} *`} />}
+                    input={
+                      <OutlinedInput
+                        label={`${t('clientVersions.selectPlatforms')} *`}
+                      />
+                    }
                     MenuProps={{
                       anchorOrigin: {
                         vertical: 'bottom',
@@ -507,7 +537,11 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                     renderValue={(selected) => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                         {selected.map((value) => (
-                          <Chip key={value} label={value.toUpperCase()} size="small" />
+                          <Chip
+                            key={value}
+                            label={value.toUpperCase()}
+                            size="small"
+                          />
                         ))}
                       </Box>
                     )}
@@ -518,13 +552,15 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       </MenuItem>
                     ))}
                   </Select>
-                  {(errors.platforms?.message || t('clientVersions.form.bulkPlatformHelp')) && (
+                  {(errors.platforms?.message ||
+                    t('clientVersions.form.bulkPlatformHelp')) && (
                     <Typography
                       variant="caption"
                       color={errors.platforms ? 'error' : 'text.secondary'}
                       sx={{ mt: 0.5, display: 'block' }}
                     >
-                      {errors.platforms?.message || t('clientVersions.form.bulkPlatformHelp')}
+                      {errors.platforms?.message ||
+                        t('clientVersions.form.bulkPlatformHelp')}
                     </Typography>
                   )}
                 </FormControl>
@@ -577,8 +613,12 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                   <MaintenanceSettingsInput
                     startDate={watch('maintenanceStartDate') || ''}
                     endDate={watch('maintenanceEndDate') || ''}
-                    onStartDateChange={(date) => setValue('maintenanceStartDate', date)}
-                    onEndDateChange={(date) => setValue('maintenanceEndDate', date)}
+                    onStartDateChange={(date) =>
+                      setValue('maintenanceStartDate', date)
+                    }
+                    onEndDateChange={(date) =>
+                      setValue('maintenanceEndDate', date)
+                    }
                     inputMode={inputMode}
                     onInputModeChange={setInputMode}
                     maintenanceMessage={watch('maintenanceMessage') || ''}
@@ -586,7 +626,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       setValue('maintenanceMessage', message)
                     }
                     supportsMultiLanguage={supportsMultiLanguage}
-                    onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
+                    onSupportsMultiLanguageChange={
+                      handleSupportsMultiLanguageChange
+                    }
                     maintenanceLocales={maintenanceLocales.map((l) => ({
                       lang: l.lang as 'ko' | 'en' | 'zh',
                       message: l.message,
@@ -700,7 +742,11 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
               />
             </Paper>
 
-            <Accordion defaultExpanded={false} disableGutters variant="outlined">
+            <Accordion
+              defaultExpanded={false}
+              disableGutters
+              variant="outlined"
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography
                   variant="subtitle1"
@@ -716,7 +762,11 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   {t('clientVersions.form.additionalSettingsDescription')}
                 </Typography>
 
@@ -727,7 +777,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                     render={({ field }) => (
                       <Box>
                         <FormControlLabel
-                          control={<Switch {...field} checked={field.value || false} />}
+                          control={
+                            <Switch {...field} checked={field.value || false} />
+                          }
                           label={t('clientVersions.guestModeAllowed')}
                         />
                         <Typography
@@ -777,7 +829,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                         multiline
                         rows={3}
                         error={!!errors.memo}
-                        helperText={errors.memo?.message || t('clientVersions.form.memoHelp')}
+                        helperText={
+                          errors.memo?.message ||
+                          t('clientVersions.form.memoHelp')
+                        }
                       />
                     )}
                   />
@@ -808,13 +863,21 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 >
                   {t('clientVersions.form.serverAddresses')}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   {t('clientVersions.form.platformSpecificDescription')}
                 </Typography>
 
                 <Stack spacing={3}>
                   {selectedPlatforms.map((platform, index) => (
-                    <Paper key={platform} elevation={1} sx={{ p: 2, bgcolor: 'background.paper' }}>
+                    <Paper
+                      key={platform}
+                      elevation={1}
+                      sx={{ p: 2, bgcolor: 'background.paper' }}
+                    >
                       <Typography
                         variant="subtitle1"
                         gutterBottom
@@ -846,9 +909,12 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                                   </Typography>
                                 </Box>
                               }
-                              error={!!errors.platforms?.[index]?.gameServerAddress}
+                              error={
+                                !!errors.platforms?.[index]?.gameServerAddress
+                              }
                               helperText={
-                                errors.platforms?.[index]?.gameServerAddress?.message ||
+                                errors.platforms?.[index]?.gameServerAddress
+                                  ?.message ||
                                 t('clientVersions.form.gameServerAddressHelp')
                               }
                               inputProps={{
@@ -869,11 +935,19 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                               {...field}
                               value={field.value || ''}
                               fullWidth
-                              label={t('clientVersions.gameServerAddressForWhiteList')}
-                              error={!!errors.platforms?.[index]?.gameServerAddressForWhiteList}
+                              label={t(
+                                'clientVersions.gameServerAddressForWhiteList'
+                              )}
+                              error={
+                                !!errors.platforms?.[index]
+                                  ?.gameServerAddressForWhiteList
+                              }
                               helperText={
-                                errors.platforms?.[index]?.gameServerAddressForWhiteList?.message ||
-                                t('clientVersions.form.gameServerAddressForWhiteListHelp')
+                                errors.platforms?.[index]
+                                  ?.gameServerAddressForWhiteList?.message ||
+                                t(
+                                  'clientVersions.form.gameServerAddressForWhiteListHelp'
+                                )
                               }
                               inputProps={{
                                 autoComplete: 'off',
@@ -903,7 +977,8 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                               }
                               error={!!errors.platforms?.[index]?.patchAddress}
                               helperText={
-                                errors.platforms?.[index]?.patchAddress?.message ||
+                                errors.platforms?.[index]?.patchAddress
+                                  ?.message ||
                                 t('clientVersions.form.patchAddressHelp')
                               }
                               inputProps={{
@@ -924,11 +999,19 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                               {...field}
                               value={field.value || ''}
                               fullWidth
-                              label={t('clientVersions.patchAddressForWhiteList')}
-                              error={!!errors.platforms?.[index]?.patchAddressForWhiteList}
+                              label={t(
+                                'clientVersions.patchAddressForWhiteList'
+                              )}
+                              error={
+                                !!errors.platforms?.[index]
+                                  ?.patchAddressForWhiteList
+                              }
                               helperText={
-                                errors.platforms?.[index]?.patchAddressForWhiteList?.message ||
-                                t('clientVersions.form.patchAddressForWhiteListHelp')
+                                errors.platforms?.[index]
+                                  ?.patchAddressForWhiteList?.message ||
+                                t(
+                                  'clientVersions.form.patchAddressForWhiteListHelp'
+                                )
                               }
                               inputProps={{
                                 autoComplete: 'off',
@@ -959,7 +1042,11 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={handleClose} disabled={loading} startIcon={<CancelIcon />}>
+          <Button
+            onClick={handleClose}
+            disabled={loading}
+            startIcon={<CancelIcon />}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -968,7 +1055,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             disabled={loading || isSubmitting}
             startIcon={<SaveIcon />}
           >
-            {loading ? t('clientVersions.creating') : getActionLabel('create', requiresApproval, t)}
+            {loading
+              ? t('clientVersions.creating')
+              : getActionLabel('create', requiresApproval, t)}
           </Button>
         </Box>
       </form>

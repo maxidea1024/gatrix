@@ -33,7 +33,10 @@ export const authenticateApiToken = async (
     // 헤더에서 API 토큰 추출
     const token =
       (req.headers[HEADERS.X_API_TOKEN] as string) ||
-      req.headers[HEADERS.AUTHORIZATION]?.replace(HEADER_VALUES.BEARER_PREFIX, '');
+      req.headers[HEADERS.AUTHORIZATION]?.replace(
+        HEADER_VALUES.BEARER_PREFIX,
+        ''
+      );
 
     if (!token) {
       res.status(401).json({
@@ -90,7 +93,10 @@ export const requirePermission = (permission: string) => {
       return;
     }
 
-    if (!apiToken.permissions.includes(permission) && !apiToken.permissions.includes('admin')) {
+    if (
+      !apiToken.permissions.includes(permission) &&
+      !apiToken.permissions.includes('admin')
+    ) {
       res.status(403).json({
         success: false,
         error: { message: `Permission '${permission}' required` },

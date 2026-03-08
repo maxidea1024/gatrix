@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Popover, IconButton, Typography, TextField, InputAdornment } from '@mui/material';
+import {
+  Box,
+  Popover,
+  IconButton,
+  Typography,
+  TextField,
+  InputAdornment,
+} from '@mui/material';
 import {
   Search as SearchIcon,
   AccessTime,
@@ -493,7 +500,9 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                   width: 60,
                   height: '100%',
                   backgroundColor: (theme) =>
-                    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f5f5f5',
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.05)'
+                      : '#f5f5f5',
                   display: 'flex',
                   flexDirection: 'column',
                   py: 1,
@@ -516,7 +525,9 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                     objects: Devices,
                     symbols: FavoriteBorder,
                     flags: Flag,
-                  }[category as keyof typeof categoryLabels] as React.ElementType;
+                  }[
+                    category as keyof typeof categoryLabels
+                  ] as React.ElementType;
 
                   return (
                     <IconButton
@@ -553,7 +564,9 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                         },
                         '& .MuiTouchRipple-root': { display: 'none' },
                       }}
-                      title={categoryLabels[category as keyof typeof categoryLabels]}
+                      title={
+                        categoryLabels[category as keyof typeof categoryLabels]
+                      }
                       disableRipple
                     >
                       <Icon fontSize="small" />
@@ -626,7 +639,11 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                   letterSpacing: '0.5px',
                 }}
               >
-                {categoryLabels[selectedCategory as keyof typeof categoryLabels]}
+                {
+                  categoryLabels[
+                    selectedCategory as keyof typeof categoryLabels
+                  ]
+                }
               </Typography>
             )}
 
@@ -682,7 +699,9 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                         transition: 'all 0.15s ease-in-out',
                       }}
                     >
-                      <span style={{ display: 'block', lineHeight: 1 }}>{emoji}</span>
+                      <span style={{ display: 'block', lineHeight: 1 }}>
+                        {emoji}
+                      </span>
                     </IconButton>
                   ))}
                 </Box>

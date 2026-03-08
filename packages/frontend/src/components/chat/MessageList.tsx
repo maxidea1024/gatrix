@@ -41,7 +41,10 @@ interface MessageListProps {
   onSendMessage?: (message: string, attachments?: File[]) => void;
 }
 
-const MessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) => {
+const MessageList: React.FC<MessageListProps> = ({
+  channelId,
+  onSendMessage,
+}) => {
   const { t, i18n } = useTranslation();
   const { state, actions } = useChat();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -95,11 +98,13 @@ const MessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) =
   const convertToChatScopeMessages = (messages: Message[]): MessageModel[] => {
     return (messages as any[]).map((msg: any, index: number) => {
       const currentUser = state.user;
-      const direction = msg.userId === currentUser?.id ? 'outgoing' : 'incoming';
+      const direction =
+        msg.userId === currentUser?.id ? 'outgoing' : 'incoming';
 
       // User info 안전하게 가져오기
       const messageUser = state.users[msg.userId];
-      const senderName = messageUser?.username || messageUser?.name || `User ${msg.userId}`;
+      const senderName =
+        messageUser?.username || messageUser?.name || `User ${msg.userId}`;
 
       return {
         message: msg.content,
@@ -113,8 +118,11 @@ const MessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) =
   };
 
   const getMessagePosition = (message: Message, index: number) => {
-    const isFirst = index === 0 || messages[index - 1]?.userId !== message.userId;
-    const isLast = index === messages.length - 1 || messages[index + 1]?.userId !== message.userId;
+    const isFirst =
+      index === 0 || messages[index - 1]?.userId !== message.userId;
+    const isLast =
+      index === messages.length - 1 ||
+      messages[index + 1]?.userId !== message.userId;
 
     if (isFirst && isLast) return 'single';
     if (isFirst) return 'first';
@@ -220,7 +228,9 @@ const MessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) =
 
           {chatScopeMessages.map((message, index) => {
             const originalMessage = messages[index];
-            const messageUser = originalMessage ? state.users[originalMessage.userId] : null;
+            const messageUser = originalMessage
+              ? state.users[originalMessage.userId]
+              : null;
 
             return (
               <ChatMessage key={index} model={message}>

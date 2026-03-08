@@ -175,7 +175,10 @@ export async function updateFeatureFlag(
   data: UpdateFeatureFlagInput,
   projectApiPath: string | null = null
 ): Promise<FeatureFlag> {
-  const response = await api.put(`${basePath(projectApiPath)}/${flagName}`, data);
+  const response = await api.put(
+    `${basePath(projectApiPath)}/${flagName}`,
+    data
+  );
   return response.data.flag;
 }
 
@@ -188,10 +191,13 @@ export async function toggleFeatureFlag(
   environmentId?: string,
   projectApiPath: string | null = null
 ): Promise<FeatureFlag> {
-  const response = await api.post(`${basePath(projectApiPath)}/${flagName}/toggle`, {
-    isEnabled,
-    environmentId,
-  });
+  const response = await api.post(
+    `${basePath(projectApiPath)}/${flagName}/toggle`,
+    {
+      isEnabled,
+      environmentId,
+    }
+  );
   return response.data.flag;
 }
 
@@ -202,7 +208,9 @@ export async function archiveFeatureFlag(
   flagName: string,
   projectApiPath: string | null = null
 ): Promise<FeatureFlag> {
-  const response = await api.post(`${basePath(projectApiPath)}/${flagName}/archive`);
+  const response = await api.post(
+    `${basePath(projectApiPath)}/${flagName}/archive`
+  );
   return response.data.flag;
 }
 
@@ -213,7 +221,9 @@ export async function reviveFeatureFlag(
   flagName: string,
   projectApiPath: string | null = null
 ): Promise<FeatureFlag> {
-  const response = await api.post(`${basePath(projectApiPath)}/${flagName}/revive`);
+  const response = await api.post(
+    `${basePath(projectApiPath)}/${flagName}/revive`
+  );
   return response.data.flag;
 }
 
@@ -225,9 +235,12 @@ export async function toggleFavorite(
   isFavorite: boolean,
   projectApiPath: string | null = null
 ): Promise<FeatureFlag> {
-  const response = await api.post(`${basePath(projectApiPath)}/${flagName}/favorite`, {
-    isFavorite,
-  });
+  const response = await api.post(
+    `${basePath(projectApiPath)}/${flagName}/favorite`,
+    {
+      isFavorite,
+    }
+  );
   return response.data.flag;
 }
 

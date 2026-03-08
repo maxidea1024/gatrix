@@ -27,7 +27,10 @@ export function getScopeLevel(scopeType: string): number {
  * Check if the actor's scope level is high enough to manage the target scope.
  * Lower number = higher privilege.
  */
-export function canManageScope(actorScopeLevel: number, targetScopeType: string): boolean {
+export function canManageScope(
+  actorScopeLevel: number,
+  targetScopeType: string
+): boolean {
   return actorScopeLevel <= getScopeLevel(targetScopeType);
 }
 

@@ -44,7 +44,10 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import { useReleaseFlowTemplates, useReleaseFlowPlan } from '../../hooks/useReleaseFlows';
+import {
+  useReleaseFlowTemplates,
+  useReleaseFlowPlan,
+} from '../../hooks/useReleaseFlows';
 import {
   applyTemplate,
   deletePlan,
@@ -120,7 +123,10 @@ function fromMinutes(totalMinutes: number): { value: number; unit: TimeUnit } {
 }
 
 /** Calculate when the next milestone is scheduled */
-function getScheduledTime(startedAt: string | undefined, intervalMinutes: number): Date | null {
+function getScheduledTime(
+  startedAt: string | undefined,
+  intervalMinutes: number
+): Date | null {
   if (!startedAt) return null;
   const start = new Date(startedAt);
   if (isNaN(start.getTime())) return null;
@@ -154,7 +160,8 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     environments.length > 0 ? environments[0].environmentId : ''
   );
 
-  const { data: templates, isLoading: loadingTemplates } = useReleaseFlowTemplates();
+  const { data: templates, isLoading: loadingTemplates } =
+    useReleaseFlowTemplates();
   const {
     data: plan,
     isLoading: loadingPlan,
@@ -169,16 +176,26 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const [showApplyDialog, setShowApplyDialog] = useState(initialShowTemplates);
 
   const [jumpConfirmOpen, setJumpConfirmOpen] = useState(false);
-  const [targetMilestoneId, setTargetMilestoneId] = useState<string | null>(null);
+  const [targetMilestoneId, setTargetMilestoneId] = useState<string | null>(
+    null
+  );
   const [safeguardExpanded, setSafeguardExpanded] = useState(false);
   const [flowExpanded, setFlowExpanded] = useState(true);
-  const [expandedMilestones, setExpandedMilestones] = useState<Set<string>>(new Set());
+  const [expandedMilestones, setExpandedMilestones] = useState<Set<string>>(
+    new Set()
+  );
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [expandedTemplates, setExpandedTemplates] = useState<Set<string>>(new Set());
-  const [flowMenuAnchor, setFlowMenuAnchor] = useState<null | HTMLElement>(null);
+  const [expandedTemplates, setExpandedTemplates] = useState<Set<string>>(
+    new Set()
+  );
+  const [flowMenuAnchor, setFlowMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
 
   // Transition editing state: tracks which milestone is being edited
-  const [editingTransitionId, setEditingTransitionId] = useState<string | null>(null);
+  const [editingTransitionId, setEditingTransitionId] = useState<string | null>(
+    null
+  );
   const [transitionValue, setTransitionValue] = useState<number>(1);
   const [transitionUnit, setTransitionUnit] = useState<TimeUnit>('hours');
   const [transitionSaving, setTransitionSaving] = useState(false);
@@ -206,7 +223,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           // Environment disabled -> auto-pause
           try {
             await pausePlan(plan.id, projectApiPath);
-            enqueueSnackbar(t('releaseFlow.pausedSuccess'), { variant: 'info' });
+            enqueueSnackbar(t('releaseFlow.pausedSuccess'), {
+              variant: 'info',
+            });
             mutatePlan();
             if (onPlanChange) onPlanChange();
           } catch (error) {
@@ -216,7 +235,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           // Environment re-enabled -> auto-resume
           try {
             await resumePlan(plan.id, projectApiPath);
-            enqueueSnackbar(t('releaseFlow.resumedSuccess'), { variant: 'info' });
+            enqueueSnackbar(t('releaseFlow.resumedSuccess'), {
+              variant: 'info',
+            });
             mutatePlan();
             if (onPlanChange) onPlanChange();
           } catch (error) {
@@ -226,7 +247,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           // Environment enabled with draft plan -> auto-start
           try {
             await startPlan(plan.id, projectApiPath);
-            enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
+            enqueueSnackbar(t('releaseFlow.startedSuccess'), {
+              variant: 'success',
+            });
             mutatePlan();
             if (onPlanChange) onPlanChange();
           } catch (error) {
@@ -254,7 +277,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
 
     window.addEventListener('release-flow-updated', handleReleaseFlowUpdate);
     return () => {
-      window.removeEventListener('release-flow-updated', handleReleaseFlowUpdate);
+      window.removeEventListener(
+        'release-flow-updated',
+        handleReleaseFlowUpdate
+      );
     };
   }, [flagId, selectedEnv, mutatePlan, onPlanChange]);
 
@@ -279,7 +305,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       if (envEnabled && newPlan?.id && canManage) {
         try {
           await startPlan(newPlan.id, projectApiPath);
-          enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
+          enqueueSnackbar(t('releaseFlow.startedSuccess'), {
+            variant: 'success',
+          });
         } catch (startError) {
           // Plan was applied successfully but auto-start failed — not critical
           console.error('Auto-start after apply failed', startError);
@@ -290,7 +318,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       if (onPlanChange) onPlanChange();
       setShowApplyDialog(false);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), {
+        variant: 'error',
+      });
     } finally {
       setApplying(false);
     }
@@ -301,7 +331,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     try {
       setActionLoadingType('delete');
       await deletePlan(plan.id, projectApiPath);
-      enqueueSnackbar(t('releaseFlow.planDeleteSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('releaseFlow.planDeleteSuccess'), {
+        variant: 'success',
+      });
       await mutatePlan();
       if (onPlanChange) onPlanChange();
       setDeleteConfirmOpen(false);
@@ -329,13 +361,17 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         await pausePlan(plan.id, projectApiPath);
       }
 
-      enqueueSnackbar(t('releaseFlow.milestoneStartSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('releaseFlow.milestoneStartSuccess'), {
+        variant: 'success',
+      });
       await mutatePlan();
       if (onPlanChange) onPlanChange();
       setJumpConfirmOpen(false);
       setTargetMilestoneId(null);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('releaseFlow.milestoneStartFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('releaseFlow.milestoneStartFailed'), {
+        variant: 'error',
+      });
     } finally {
       setActionLoadingType(null);
     }
@@ -350,7 +386,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       await mutatePlan();
       if (onPlanChange) onPlanChange();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), {
+        variant: 'error',
+      });
     } finally {
       setActionLoadingType(null);
     }
@@ -365,7 +403,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       await mutatePlan();
       if (onPlanChange) onPlanChange();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), {
+        variant: 'error',
+      });
     } finally {
       setActionLoadingType(null);
     }
@@ -393,16 +433,29 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     try {
       setTransitionSaving(true);
       const totalMinutes = toMinutes(transitionValue, transitionUnit);
-      await setTransitionCondition(editingTransitionId, totalMinutes, projectApiPath);
+      await setTransitionCondition(
+        editingTransitionId,
+        totalMinutes,
+        projectApiPath
+      );
       await mutatePlan();
       if (onPlanChange) onPlanChange();
       setEditingTransitionId(null);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), {
+        variant: 'error',
+      });
     } finally {
       setTransitionSaving(false);
     }
-  }, [editingTransitionId, transitionValue, transitionUnit, mutatePlan, enqueueSnackbar, t]);
+  }, [
+    editingTransitionId,
+    transitionValue,
+    transitionUnit,
+    mutatePlan,
+    enqueueSnackbar,
+    t,
+  ]);
 
   const handleRemoveTransition = useCallback(
     async (milestoneId: string) => {
@@ -413,7 +466,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         if (onPlanChange) onPlanChange();
         setEditingTransitionId(null);
       } catch (error: any) {
-        enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
+        enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), {
+          variant: 'error',
+        });
       } finally {
         setTransitionSaving(false);
       }
@@ -434,8 +489,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   // Resolve the plan display name from the referenced template
   const planDisplayName = useMemo(() => {
     if (!plan) return '';
-    const matchedTemplate = templates?.find((t) => t.flowName === plan.flowName);
-    if (matchedTemplate) return matchedTemplate.displayName || matchedTemplate.flowName;
+    const matchedTemplate = templates?.find(
+      (t) => t.flowName === plan.flowName
+    );
+    if (matchedTemplate)
+      return matchedTemplate.displayName || matchedTemplate.flowName;
     return plan.displayName || plan.flowName;
   }, [plan, templates]);
 
@@ -448,7 +506,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   // ==================== Render Helpers ====================
 
   /** Get milestone visual status */
-  const getMilestoneStatus = (index: number): 'completed' | 'active' | 'paused' | 'pending' => {
+  const getMilestoneStatus = (
+    index: number
+  ): 'completed' | 'active' | 'paused' | 'pending' => {
     if (isCompleted || index < currentMilestoneIndex) return 'completed';
     if (index === currentMilestoneIndex) {
       if (isPaused || !envEnabled) return 'paused';
@@ -458,7 +518,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   };
 
   /** Controls for each milestone row */
-  const renderMilestoneControls = (milestoneId: string, index: number, isScheduled: boolean) => {
+  const renderMilestoneControls = (
+    milestoneId: string,
+    index: number,
+    isScheduled: boolean
+  ) => {
     if (!canManage || isCompleted) return null;
     // Draft plans haven't started yet — no jump controls
     if (plan?.status === 'draft') return null;
@@ -476,18 +540,31 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             color="primary"
             size="small"
             onClick={handleResume}
-            startIcon={isResuming ? <CircularProgress size={14} color="inherit" /> : <StartIcon />}
+            startIcon={
+              isResuming ? (
+                <CircularProgress size={14} color="inherit" />
+              ) : (
+                <StartIcon />
+              )
+            }
             disabled={isResuming}
-            sx={{ width: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            sx={{
+              width: 150,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
           >
             {t('releaseFlow.resume')}
           </Button>
         );
       }
       const currentMilestone = milestones[index];
-      const hasAutomation = !!currentMilestone?.transitionCondition?.intervalMinutes;
+      const hasAutomation =
+        !!currentMilestone?.transitionCondition?.intervalMinutes;
       // No pause on last milestone (nothing to transition to), when already paused, or when there's no automation
-      if (isPaused || index >= milestones.length - 1 || !hasAutomation) return null;
+      if (isPaused || index >= milestones.length - 1 || !hasAutomation)
+        return null;
       const isPausing = actionLoadingType === 'pause';
       return (
         <Button
@@ -495,9 +572,20 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           color="warning"
           size="small"
           onClick={handlePause}
-          startIcon={isPausing ? <CircularProgress size={14} color="inherit" /> : <PauseIcon />}
+          startIcon={
+            isPausing ? (
+              <CircularProgress size={14} color="inherit" />
+            ) : (
+              <PauseIcon />
+            )
+          }
           disabled={isPausing}
-          sx={{ width: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          sx={{
+            width: 150,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
         >
           {t('releaseFlow.pause')}
         </Button>
@@ -514,10 +602,19 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         color="primary"
         onClick={() => handleStartMilestoneClick(milestoneId)}
         startIcon={showStartNow ? <StartIcon /> : undefined}
-        disabled={actionLoadingType === 'jump' || actionLoadingType === 'delete'}
-        sx={{ width: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+        disabled={
+          actionLoadingType === 'jump' || actionLoadingType === 'delete'
+        }
+        sx={{
+          width: 150,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
       >
-        {showStartNow ? t('releaseFlow.startNow') : t('releaseFlow.moveToMilestone')}
+        {showStartNow
+          ? t('releaseFlow.startNow')
+          : t('releaseFlow.moveToMilestone')}
       </Button>
     );
   };
@@ -531,7 +628,8 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     const isEditing = editingTransitionId === milestone.id;
 
     // Is this the currently active milestone?
-    const isCurrentActive = index === currentMilestoneIndex && (isActive || isPaused);
+    const isCurrentActive =
+      index === currentMilestoneIndex && (isActive || isPaused);
     const status = getMilestoneStatus(index);
     const lineColor = status === 'completed' ? 'success.main' : 'divider';
 
@@ -594,7 +692,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             />
           ) : (
             // No transition — just a simple short line, no arrow
-            <Box sx={{ width: 2, flexGrow: 1, bgcolor: lineColor, minHeight: 12 }} />
+            <Box
+              sx={{ width: 2, flexGrow: 1, bgcolor: lineColor, minHeight: 12 }}
+            />
           )}
         </Box>
 
@@ -611,14 +711,20 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           {isEditing ? (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <TimerIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-              <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ whiteSpace: 'nowrap' }}
+              >
                 {t('releaseFlow.proceedAfter')}
               </Typography>
               <TextField
                 type="number"
                 size="small"
                 value={transitionValue}
-                onChange={(e) => setTransitionValue(Math.max(1, parseInt(e.target.value) || 1))}
+                onChange={(e) =>
+                  setTransitionValue(Math.max(1, parseInt(e.target.value) || 1))
+                }
                 inputProps={{
                   min: 1,
                   style: { width: 50, padding: '4px 8px', fontSize: '0.8rem' },
@@ -631,7 +737,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                 onChange={(e) => setTransitionUnit(e.target.value as TimeUnit)}
                 sx={{ height: 28, fontSize: '0.8rem', minWidth: 80 }}
               >
-                <MenuItem value="minutes">{t('releaseFlow.unitMinutes')}</MenuItem>
+                <MenuItem value="minutes">
+                  {t('releaseFlow.unitMinutes')}
+                </MenuItem>
                 <MenuItem value="hours">{t('releaseFlow.unitHours')}</MenuItem>
                 <MenuItem value="days">{t('releaseFlow.unitDays')}</MenuItem>
               </Select>
@@ -642,7 +750,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                 disabled={transitionSaving || transitionValue <= 0}
                 sx={{ minWidth: 0, px: 1.5, height: 28, fontSize: '0.75rem' }}
               >
-                {transitionSaving ? <CircularProgress size={14} /> : t('common.save')}
+                {transitionSaving ? (
+                  <CircularProgress size={14} />
+                ) : (
+                  t('common.save')
+                )}
               </Button>
               <IconButton
                 size="small"
@@ -662,7 +774,8 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
               sx={{ height: 24, '& .MuiChip-label': { fontSize: '0.75rem' } }}
               onClick={
                 canManage && !isCompleted && !envEnabled
-                  ? () => handleOpenTransitionEdit(milestone.id, intervalMinutes)
+                  ? () =>
+                      handleOpenTransitionEdit(milestone.id, intervalMinutes)
                   : undefined
               }
               onDelete={
@@ -715,15 +828,21 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       {/* Environment Selector */}
       {environments.length > 1 && (
         <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="subtitle2">{t('common.environment')}:</Typography>
+          <Typography variant="subtitle2">
+            {t('common.environment')}:
+          </Typography>
           <Stack direction="row" spacing={1}>
             {environments.map((env) => (
               <Chip
                 key={env.environmentId}
                 label={env.displayName}
                 onClick={() => setSelectedEnv(env.environmentId)}
-                color={selectedEnv === env.environmentId ? 'primary' : 'default'}
-                variant={selectedEnv === env.environmentId ? 'filled' : 'outlined'}
+                color={
+                  selectedEnv === env.environmentId ? 'primary' : 'default'
+                }
+                variant={
+                  selectedEnv === env.environmentId ? 'filled' : 'outlined'
+                }
                 size="small"
               />
             ))}
@@ -756,13 +875,22 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                 cursor: 'pointer',
                 '&:hover': {
                   bgcolor: (theme) =>
-                    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.08)'
+                      : 'rgba(0,0,0,0.06)',
                 },
                 transition: 'background-color 0.15s',
               }}
               onClick={() => setFlowExpanded(!flowExpanded)}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  minWidth: 0,
+                }}
+              >
                 <Tooltip title={planDisplayName} enterDelay={500}>
                   <Typography
                     variant="subtitle1"
@@ -786,7 +914,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                         size="small"
                         sx={{
                           height: 22,
-                          '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem', fontWeight: 600 },
+                          '& .MuiChip-label': {
+                            px: 0.75,
+                            fontSize: '0.7rem',
+                            fontWeight: 600,
+                          },
                         }}
                       />
                     );
@@ -807,16 +939,28 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                         size="small"
                         sx={{
                           height: 22,
-                          '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem', fontWeight: 600 },
+                          '& .MuiChip-label': {
+                            px: 0.75,
+                            fontSize: '0.7rem',
+                            fontWeight: 600,
+                          },
                         }}
                       />
                     );
                   }
-                  const statusMap: Record<string, { label: string; color: 'default' | 'primary' }> =
-                    {
-                      draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
-                      active: { label: t('releaseFlow.statusActive'), color: 'primary' },
-                    };
+                  const statusMap: Record<
+                    string,
+                    { label: string; color: 'default' | 'primary' }
+                  > = {
+                    draft: {
+                      label: t('releaseFlow.statusDraft'),
+                      color: 'default',
+                    },
+                    active: {
+                      label: t('releaseFlow.statusActive'),
+                      color: 'primary',
+                    },
+                  };
                   const status = statusMap[plan?.status || 'draft'];
                   return status ? (
                     <Chip
@@ -825,7 +969,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       size="small"
                       sx={{
                         height: 22,
-                        '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem', fontWeight: 600 },
+                        '& .MuiChip-label': {
+                          px: 0.75,
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                        },
                       }}
                     />
                   ) : null;
@@ -903,19 +1051,32 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <ShieldIcon fontSize="small" color="primary" />
-                      <Typography variant="subtitle2">{t('releaseFlow.safeguards')}</Typography>
+                      <Typography variant="subtitle2">
+                        {t('releaseFlow.safeguards')}
+                      </Typography>
                       <Tooltip
-                        title={t('releaseFlow.safeguard.helpTooltip').replace(/\\n/g, '\n')}
+                        title={t('releaseFlow.safeguard.helpTooltip').replace(
+                          /\\n/g,
+                          '\n'
+                        )}
                         arrow
                         placement="right"
                         slotProps={{
                           tooltip: {
-                            sx: { maxWidth: 360, whiteSpace: 'pre-line', fontSize: '0.8rem' },
+                            sx: {
+                              maxWidth: 360,
+                              whiteSpace: 'pre-line',
+                              fontSize: '0.8rem',
+                            },
                           },
                         }}
                       >
                         <HelpOutlineIcon
-                          sx={{ color: 'text.secondary', cursor: 'help', fontSize: 16 }}
+                          sx={{
+                            color: 'text.secondary',
+                            cursor: 'help',
+                            fontSize: 16,
+                          }}
                           onClick={(e: React.MouseEvent) => e.stopPropagation()}
                         />
                       </Tooltip>
@@ -952,8 +1113,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     pending: 'grey.400',
                   };
 
-                  const prevMilestone = index > 0 ? milestones[index - 1] : null;
-                  const prevInterval = prevMilestone?.transitionCondition?.intervalMinutes;
+                  const prevMilestone =
+                    index > 0 ? milestones[index - 1] : null;
+                  const prevInterval =
+                    prevMilestone?.transitionCondition?.intervalMinutes;
                   const scheduledTime =
                     prevInterval && prevMilestone?.startedAt
                       ? getScheduledTime(prevMilestone.startedAt, prevInterval)
@@ -981,7 +1144,8 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                               height: '100%',
                               background:
                                 'linear-gradient(120deg, transparent 0%, rgba(25, 118, 210, 0.06) 40%, rgba(25, 118, 210, 0.12) 50%, rgba(25, 118, 210, 0.06) 60%, transparent 100%)',
-                              animation: 'milestoneShimmer 3s ease-in-out infinite',
+                              animation:
+                                'milestoneShimmer 3s ease-in-out infinite',
                               pointerEvents: 'none',
                               zIndex: 1,
                             },
@@ -1032,7 +1196,12 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                           }}
                         >
                           <Box
-                            sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1.5,
+                              minWidth: 0,
+                            }}
                           >
                             {/* Step number badge */}
                             <Box
@@ -1057,7 +1226,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                 />
                               )}
                               {status === 'completed' ? (
-                                <CompletedIcon sx={{ fontSize: 24, color: 'success.main' }} />
+                                <CompletedIcon
+                                  sx={{ fontSize: 24, color: 'success.main' }}
+                                />
                               ) : (
                                 <Box
                                   sx={{
@@ -1085,35 +1256,63 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             <Box sx={{ minWidth: 0 }}>
                               <Typography
                                 variant="subtitle2"
-                                fontWeight={status === 'active' || status === 'paused' ? 700 : 500}
-                                color={status === 'pending' ? 'text.secondary' : 'text.primary'}
+                                fontWeight={
+                                  status === 'active' || status === 'paused'
+                                    ? 700
+                                    : 500
+                                }
+                                color={
+                                  status === 'pending'
+                                    ? 'text.secondary'
+                                    : 'text.primary'
+                                }
                                 noWrap
                               >
                                 {milestone.name}
                               </Typography>
                               {milestone.startedAt &&
                                 envEnabled &&
-                                (isCompleted || index <= currentMilestoneIndex) && (
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('common.started')}: {formatRelativeTime(milestone.startedAt)}
+                                (isCompleted ||
+                                  index <= currentMilestoneIndex) && (
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    {t('common.started')}:{' '}
+                                    {formatRelativeTime(milestone.startedAt)}
                                   </Typography>
                                 )}
                               {/* Estimated start time for next-up milestone */}
                               {(() => {
                                 if (!envEnabled) return null;
-                                if (index <= 0 || status !== 'pending') return null;
+                                if (index <= 0 || status !== 'pending')
+                                  return null;
                                 const prevMilestone = milestones[index - 1];
                                 const prevInterval =
-                                  prevMilestone?.transitionCondition?.intervalMinutes;
-                                if (!prevInterval || !prevMilestone.startedAt) return null;
+                                  prevMilestone?.transitionCondition
+                                    ?.intervalMinutes;
+                                if (!prevInterval || !prevMilestone.startedAt)
+                                  return null;
                                 const scheduled =
                                   prevInterval && prevMilestone?.startedAt
-                                    ? getScheduledTime(prevMilestone.startedAt, prevInterval)
+                                    ? getScheduledTime(
+                                        prevMilestone.startedAt,
+                                        prevInterval
+                                      )
                                     : null;
-                                if (!scheduled || scheduled <= new Date()) return null;
+                                if (!scheduled || scheduled <= new Date())
+                                  return null;
                                 return (
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <ScheduleIcon sx={{ fontSize: 13, color: 'info.main' }} />
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    <ScheduleIcon
+                                      sx={{ fontSize: 13, color: 'info.main' }}
+                                    />
                                     <Typography
                                       variant="caption"
                                       color="info.main"
@@ -1128,9 +1327,17 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             </Box>
                           </Box>
 
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1.5,
+                            }}
+                          >
                             <Box
-                              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                              onClick={(e: React.MouseEvent) =>
+                                e.stopPropagation()
+                              }
                               sx={{
                                 flexShrink: 0,
                                 minHeight: 32,
@@ -1138,21 +1345,36 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                 alignItems: 'center',
                               }}
                             >
-                              {renderMilestoneControls(milestone.id, index, isScheduled)}
+                              {renderMilestoneControls(
+                                milestone.id,
+                                index,
+                                isScheduled
+                              )}
                             </Box>
                             {expandedMilestones.has(milestone.id) ? (
-                              <ExpandLessIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                              <ExpandLessIcon
+                                sx={{ fontSize: 20, color: 'text.secondary' }}
+                              />
                             ) : (
-                              <ExpandMoreIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                              <ExpandMoreIcon
+                                sx={{ fontSize: 20, color: 'text.secondary' }}
+                              />
                             )}
                           </Box>
                         </Box>
 
                         {/* Card Body */}
-                        <Collapse in={expandedMilestones.has(milestone.id)} timeout={200}>
+                        <Collapse
+                          in={expandedMilestones.has(milestone.id)}
+                          timeout={200}
+                        >
                           <Box sx={{ px: 2, py: 1.5 }}>
                             {milestone.description && (
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ mb: 1.5 }}
+                              >
                                 {milestone.description}
                               </Typography>
                             )}
@@ -1168,12 +1390,14 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                 {t('releaseFlow.appliedStrategies')}
                               </Typography>
                               <StrategyListReadonly
-                                strategies={(milestone.strategies || []).map((s: any) => ({
-                                  strategyName: s.strategyName,
-                                  parameters: s.parameters,
-                                  constraints: s.constraints,
-                                  segments: s.segments,
-                                }))}
+                                strategies={(milestone.strategies || []).map(
+                                  (s: any) => ({
+                                    strategyName: s.strategyName,
+                                    parameters: s.parameters,
+                                    constraints: s.constraints,
+                                    segments: s.segments,
+                                  })
+                                )}
                                 allSegments={allSegments}
                                 contextFields={contextFields}
                               />
@@ -1183,12 +1407,19 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
 
                         {/* Transition Progress Bar */}
                         {(() => {
-                          if (status !== 'active' && status !== 'paused') return null;
-                          const interval = milestone.transitionCondition?.intervalMinutes;
+                          if (status !== 'active' && status !== 'paused')
+                            return null;
+                          const interval =
+                            milestone.transitionCondition?.intervalMinutes;
                           if (!interval || !milestone.startedAt) return null;
                           const totalMs = interval * 60 * 1000;
-                          const elapsedMs = Date.now() - new Date(milestone.startedAt).getTime();
-                          const progress = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100));
+                          const elapsedMs =
+                            Date.now() -
+                            new Date(milestone.startedAt).getTime();
+                          const progress = Math.min(
+                            100,
+                            Math.max(0, (elapsedMs / totalMs) * 100)
+                          );
                           return (
                             <LinearProgress
                               variant="determinate"
@@ -1201,7 +1432,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                     ? 'rgba(255,255,255,0.08)'
                                     : 'rgba(0,0,0,0.06)',
                                 '& .MuiLinearProgress-bar': {
-                                  bgcolor: status === 'paused' ? 'warning.main' : 'primary.main',
+                                  bgcolor:
+                                    status === 'paused'
+                                      ? 'warning.main'
+                                      : 'primary.main',
                                 },
                               }}
                             />
@@ -1232,7 +1466,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           sx: { borderRadius: 2, boxShadow: '0 8px 32px rgba(0,0,0,0.2)' },
         }}
       >
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 2 }}>
+        <DialogTitle
+          sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 2 }}
+        >
           <TemplateIcon color="primary" />
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
@@ -1280,7 +1516,14 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                   >
                     <CardContent sx={{ flexGrow: 1, p: 2.5, pb: 1.5 }}>
                       {/* Template header */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          mb: 1,
+                        }}
+                      >
                         <Box
                           sx={{
                             p: 0.8,
@@ -1292,7 +1535,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                         >
                           <TemplateIcon fontSize="small" />
                         </Box>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: 700, lineHeight: 1.2 }}
+                        >
                           {template.displayName || template.flowName}
                         </Typography>
                         {isCurrentTemplate && (
@@ -1303,13 +1549,20 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             variant="outlined"
                             sx={{
                               height: 20,
-                              '& .MuiChip-label': { px: 0.75, fontSize: '0.65rem' },
+                              '& .MuiChip-label': {
+                                px: 0.75,
+                                fontSize: '0.65rem',
+                              },
                             }}
                           />
                         )}
                       </Box>
                       {template.description && (
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mb: 1.5 }}
+                        >
                           {template.description}
                         </Typography>
                       )}
@@ -1351,7 +1604,14 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       </Box>
 
                       <Collapse in={expandedTemplates.has(template.id)}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1,
+                            mt: 0.5,
+                          }}
+                        >
                           {template.milestones?.map((m: any, idx: number) => (
                             <Paper
                               key={idx}
@@ -1386,7 +1646,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                                     '& .MuiChip-label': { px: 0 },
                                   }}
                                 />
-                                <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                                <Typography
+                                  variant="caption"
+                                  sx={{ fontWeight: 700 }}
+                                >
                                   {m.name}
                                 </Typography>
                                 <Typography
@@ -1402,12 +1665,14 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                               {/* Strategies */}
                               <Box sx={{ p: 1.5 }}>
                                 <StrategyListReadonly
-                                  strategies={(m.strategies || []).map((s: any) => ({
-                                    strategyName: s.strategyName,
-                                    parameters: s.parameters,
-                                    constraints: s.constraints,
-                                    segments: s.segments,
-                                  }))}
+                                  strategies={(m.strategies || []).map(
+                                    (s: any) => ({
+                                      strategyName: s.strategyName,
+                                      parameters: s.parameters,
+                                      constraints: s.constraints,
+                                      segments: s.segments,
+                                    })
+                                  )}
                                   allSegments={allSegments}
                                   contextFields={contextFields}
                                 />

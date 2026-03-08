@@ -54,13 +54,18 @@ export function getEnvironmentFromRequest(req: any): string {
     return bodyEnv;
   }
 
-  throw new Error('Environment not found in request. Environment must be explicitly specified.');
+  throw new Error(
+    'Environment not found in request. Environment must be explicitly specified.'
+  );
 }
 
 /**
  * Validate that an environment exists
  */
-export async function validateEnvironment(db: any, environmentId: string): Promise<boolean> {
+export async function validateEnvironment(
+  db: any,
+  environmentId: string
+): Promise<boolean> {
   if (!isValidEnvironment(environmentId)) {
     return false;
   }
@@ -72,7 +77,9 @@ export async function validateEnvironment(db: any, environmentId: string): Promi
  * Get all available environments
  */
 export async function getAllEnvironments(db: any): Promise<string[]> {
-  const environments = await db('g_environments').select('id').orderBy('displayOrder', 'asc');
+  const environments = await db('g_environments')
+    .select('id')
+    .orderBy('displayOrder', 'asc');
   return environments.map((e: any) => e.id);
 }
 
@@ -90,7 +97,9 @@ export async function hasEnvironmentAccess(
 
 // Deprecated/Removed functions (to be removed after fixing call sites)
 export const getCurrentEnvironment = () => {
-  throw new Error('getCurrentEnvironment is removed. Pass environment explicitly.');
+  throw new Error(
+    'getCurrentEnvironment is removed. Pass environment explicitly.'
+  );
 };
 export const getCurrentEnvironmentId = getCurrentEnvironment;
 export const getDefaultEnvironment = () => {

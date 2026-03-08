@@ -42,7 +42,9 @@ export class GameWorldEventHandler implements IEventHandler {
         this.cacheManager.removeGameWorld(String(event.data.id), environmentId);
         break;
       case 'gameworld.order_changed':
-        this.logger.info('Game world order changed, refreshing cache', { environmentId });
+        this.logger.info('Game world order changed, refreshing cache', {
+          environmentId,
+        });
         await this.cacheManager.refreshGameWorlds(environmentId);
         break;
     }

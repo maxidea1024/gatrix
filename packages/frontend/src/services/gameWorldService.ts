@@ -21,7 +21,9 @@ export const gameWorldService = {
     params?: GameWorldListParams
   ): Promise<GameWorldListResult> {
     try {
-      const response = await api.get(`${projectApiPath}/game-worlds`, { params });
+      const response = await api.get(`${projectApiPath}/game-worlds`, {
+        params,
+      });
 
       // Verify response structure - handle both cases
       let data: any;
@@ -47,14 +49,22 @@ export const gameWorldService = {
   },
 
   // Get game world by ID
-  async getGameWorldById(projectApiPath: string, id: number): Promise<GameWorld> {
+  async getGameWorldById(
+    projectApiPath: string,
+    id: number
+  ): Promise<GameWorld> {
     const response = await api.get(`${projectApiPath}/game-worlds/id/${id}`);
     return response.data?.data?.world || response.data?.world;
   },
 
   // Get game world by world ID
-  async getGameWorldByWorldId(projectApiPath: string, worldId: string): Promise<GameWorld> {
-    const response = await api.get(`${projectApiPath}/game-worlds/world/${worldId}`);
+  async getGameWorldByWorldId(
+    projectApiPath: string,
+    worldId: string
+  ): Promise<GameWorld> {
+    const response = await api.get(
+      `${projectApiPath}/game-worlds/world/${worldId}`
+    );
     return response.data?.data?.world || response.data?.world;
   },
 
@@ -76,7 +86,10 @@ export const gameWorldService = {
         supportsMultiLanguage: Boolean(data.supportsMultiLanguage),
       }),
     };
-    const response: any = await api.post(`${projectApiPath}/game-worlds`, sanitizedData);
+    const response: any = await api.post(
+      `${projectApiPath}/game-worlds`,
+      sanitizedData
+    );
 
     // Check if this is a change request response
     // api.post returns response.data, so we check for changeRequestId in data property
@@ -114,7 +127,10 @@ export const gameWorldService = {
         supportsMultiLanguage: Boolean(data.supportsMultiLanguage),
       }),
     };
-    const response: any = await api.put(`${projectApiPath}/game-worlds/${id}`, sanitizedData);
+    const response: any = await api.put(
+      `${projectApiPath}/game-worlds/${id}`,
+      sanitizedData
+    );
 
     // Check if this is a change request response
     // api.put returns response.data, so we check for changeRequestId in data property
@@ -134,8 +150,13 @@ export const gameWorldService = {
   },
 
   // Delete game world
-  async deleteGameWorld(projectApiPath: string, id: number): Promise<GameWorldMutationResult> {
-    const response: any = await api.delete(`${projectApiPath}/game-worlds/${id}`);
+  async deleteGameWorld(
+    projectApiPath: string,
+    id: number
+  ): Promise<GameWorldMutationResult> {
+    const response: any = await api.delete(
+      `${projectApiPath}/game-worlds/${id}`
+    );
     const responseData = response.data || response;
 
     // Check if this is a change request response
@@ -154,8 +175,13 @@ export const gameWorldService = {
   },
 
   // Toggle visibility
-  async toggleVisibility(projectApiPath: string, id: number): Promise<GameWorldMutationResult> {
-    const response: any = await api.patch(`${projectApiPath}/game-worlds/${id}/toggle-visibility`);
+  async toggleVisibility(
+    projectApiPath: string,
+    id: number
+  ): Promise<GameWorldMutationResult> {
+    const response: any = await api.patch(
+      `${projectApiPath}/game-worlds/${id}/toggle-visibility`
+    );
     const responseData = response.data || response;
 
     // Check if this is a change request response
@@ -174,8 +200,13 @@ export const gameWorldService = {
   },
 
   // Toggle maintenance status
-  async toggleMaintenance(projectApiPath: string, id: number): Promise<GameWorldMutationResult> {
-    const response: any = await api.patch(`${projectApiPath}/game-worlds/${id}/toggle-maintenance`);
+  async toggleMaintenance(
+    projectApiPath: string,
+    id: number
+  ): Promise<GameWorldMutationResult> {
+    const response: any = await api.patch(
+      `${projectApiPath}/game-worlds/${id}/toggle-maintenance`
+    );
     const responseData = response.data || response;
 
     // Check if this is a change request response
@@ -247,21 +278,28 @@ export const gameWorldService = {
     orderUpdates: { id: number; displayOrder: number }[]
   ): Promise<void> {
     console.log('Sending updateDisplayOrders request:', { orderUpdates });
-    const response = await api.patch(`${projectApiPath}/game-worlds/update-orders`, {
-      orderUpdates,
-    });
+    const response = await api.patch(
+      `${projectApiPath}/game-worlds/update-orders`,
+      {
+        orderUpdates,
+      }
+    );
     console.log('updateDisplayOrders response:', response.data);
   },
 
   // Move world up
   async moveUp(projectApiPath: string, id: number): Promise<boolean> {
-    const response = await api.patch(`${projectApiPath}/game-worlds/${id}/move-up`);
+    const response = await api.patch(
+      `${projectApiPath}/game-worlds/${id}/move-up`
+    );
     return response.data?.data?.moved ?? response.data?.moved ?? false;
   },
 
   // Move world down
   async moveDown(projectApiPath: string, id: number): Promise<boolean> {
-    const response = await api.patch(`${projectApiPath}/game-worlds/${id}/move-down`);
+    const response = await api.patch(
+      `${projectApiPath}/game-worlds/${id}/move-down`
+    );
     return response.data?.data?.moved ?? response.data?.moved ?? false;
   },
 };

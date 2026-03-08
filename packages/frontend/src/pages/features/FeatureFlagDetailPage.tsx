@@ -105,7 +105,10 @@ import {
   ConstraintDisplay,
   ConstraintValue,
 } from '../../components/features/ConstraintDisplay';
-import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import {
+  formatDateTimeDetailed,
+  formatRelativeTime,
+} from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { tagService, Tag } from '../../services/tagService';
@@ -115,7 +118,10 @@ import ValueEditorField from '../../components/common/ValueEditorField';
 import BooleanSwitch from '../../components/common/BooleanSwitch';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import EmptyPlaceholder from '../../components/common/EmptyPlaceholder';
-import { environmentService, Environment } from '../../services/environmentService';
+import {
+  environmentService,
+  Environment,
+} from '../../services/environmentService';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import FeatureFlagMetrics from '../../components/features/FeatureFlagMetrics';
@@ -336,7 +342,8 @@ const FLAG_TYPES = [
 ];
 
 // Get icon for flag type
-const getTypeIcon = (type: string, size: number = 16) => getFlagTypeIcon(type, size);
+const getTypeIcon = (type: string, size: number = 16) =>
+  getFlagTypeIcon(type, size);
 
 // ==================== Components ====================
 
@@ -364,7 +371,14 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
   children,
   isDraggable,
 }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id,
   });
   const style: React.CSSProperties = {
@@ -486,33 +500,49 @@ const FeatureFlagDetailPage: React.FC = () => {
   }>({ open: false });
   const [strategyTabValue, setStrategyTabValue] = useState(0);
   const [editingStrategy, setEditingStrategy] = useState<Strategy | null>(null);
-  const [originalEditingStrategy, setOriginalEditingStrategy] = useState<Strategy | null>(null);
-  const [strategyJsonErrors, setStrategyJsonErrors] = useState<Record<number, string | null>>({});
+  const [originalEditingStrategy, setOriginalEditingStrategy] =
+    useState<Strategy | null>(null);
+  const [strategyJsonErrors, setStrategyJsonErrors] = useState<
+    Record<number, string | null>
+  >({});
   const [editingEnv, setEditingEnv] = useState<string | null>(null); // Track which environmentId we're editing strategy for
   const [isAddingStrategy, setIsAddingStrategy] = useState(false); // Explicitly track if we're adding a new strategy
   const [variantDialogOpen, setVariantDialogOpen] = useState(false);
   const [editingVariant, setEditingVariant] = useState<Variant | null>(null);
   const [contextFields, setContextFields] = useState<ContextField[]>([]);
   const [segments, setSegments] = useState<any[]>([]);
-  const [expandedSegments, setExpandedSegments] = useState<Set<string>>(new Set()); // For environmentId cards
-  const [expandedSegmentsDialog, setExpandedSegmentsDialog] = useState<Set<string>>(new Set()); // For strategy editor dialog
-  const [expandedConstraints, setExpandedConstraints] = useState<Set<string>>(new Set());
+  const [expandedSegments, setExpandedSegments] = useState<Set<string>>(
+    new Set()
+  ); // For environmentId cards
+  const [expandedSegmentsDialog, setExpandedSegmentsDialog] = useState<
+    Set<string>
+  >(new Set()); // For strategy editor dialog
+  const [expandedConstraints, setExpandedConstraints] = useState<Set<string>>(
+    new Set()
+  );
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [originalFlag, setOriginalFlag] = useState<FeatureFlag | null>(null);
   const [valueJsonError, setValueJsonError] = useState<string | null>(null);
   // Environment-specific strategies - key is environment name, value is array of strategies
-  const [envStrategies, setEnvStrategies] = useState<Record<string, Strategy[]>>({});
+  const [envStrategies, setEnvStrategies] = useState<
+    Record<string, Strategy[]>
+  >({});
   // Environment-specific variants - key is environment name, value is array of variants
   const [envVariants, setEnvVariants] = useState<Record<string, Variant[]>>({});
-  const [codeReferenceCount, setCodeReferenceCount] = useState<number | null>(null);
+  const [codeReferenceCount, setCodeReferenceCount] = useState<number | null>(
+    null
+  );
   // Track environments where the user chose to use Release Flow (but no plan exists yet)
-  const [envManualReleaseFlow, setEnvManualReleaseFlow] = useState<Set<string>>(new Set());
+  const [envManualReleaseFlow, setEnvManualReleaseFlow] = useState<Set<string>>(
+    new Set()
+  );
 
   // Release flow plan summaries - to detect environments managed by release flow
-  const { data: releaseFlowPlans, mutate: mutateReleaseFlowPlans } = useReleaseFlowPlansByFlag(
-    flag?.id || null
+  const { data: releaseFlowPlans, mutate: mutateReleaseFlowPlans } =
+    useReleaseFlowPlansByFlag(flag?.id || null);
+  const releaseFlowEnvs = new Set(
+    (releaseFlowPlans || []).map((p) => p.environmentId)
   );
-  const releaseFlowEnvs = new Set((releaseFlowPlans || []).map((p) => p.environmentId));
 
   const activeMilestoneByEnv = React.useMemo(() => {
     if (!releaseFlowPlans) return {};
@@ -542,12 +572,14 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   // Playground dialog state
   const [playgroundOpen, setPlaygroundOpen] = useState(false);
-  const [playgroundInitialEnvironments, setPlaygroundInitialEnvironments] = useState<string[]>([]);
+  const [playgroundInitialEnvironments, setPlaygroundInitialEnvironments] =
+    useState<string[]>([]);
   // Embedded playground visibility (for inline testing in overview tab)
-  const [embeddedPlaygroundVisible, setEmbeddedPlaygroundVisibleState] = useState(() => {
-    const saved = localStorage.getItem(PLAYGROUND_VISIBLE_KEY);
-    return saved === 'true';
-  });
+  const [embeddedPlaygroundVisible, setEmbeddedPlaygroundVisibleState] =
+    useState(() => {
+      const saved = localStorage.getItem(PLAYGROUND_VISIBLE_KEY);
+      return saved === 'true';
+    });
   // Wrapper to update localStorage when visibility changes
   const setEmbeddedPlaygroundVisible = (visible: boolean) => {
     setEmbeddedPlaygroundVisibleState(visible);
@@ -557,7 +589,10 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [playgroundPanelWidth, setPlaygroundPanelWidth] = useState(() => {
     const saved = localStorage.getItem(PLAYGROUND_WIDTH_KEY);
     return saved
-      ? Math.min(MAX_PLAYGROUND_WIDTH, Math.max(MIN_PLAYGROUND_WIDTH, parseInt(saved, 10)))
+      ? Math.min(
+          MAX_PLAYGROUND_WIDTH,
+          Math.max(MIN_PLAYGROUND_WIDTH, parseInt(saved, 10))
+        )
       : DEFAULT_PLAYGROUND_WIDTH;
   });
 
@@ -573,7 +608,9 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [environments, setEnvironments] = useState<Environment[]>([]);
   // Auto-expansion is handled by useEffect below
   const [expandedEnvs, setExpandedEnvs] = useState<Set<string>>(new Set());
-  const [selectedEnvForEdit, setSelectedEnvForEdit] = useState<string | null>(null);
+  const [selectedEnvForEdit, setSelectedEnvForEdit] = useState<string | null>(
+    null
+  );
   const [envSettingsDrawerOpen, setEnvSettingsDrawerOpen] = useState(false);
 
   // Edit flag dialog states
@@ -621,9 +658,12 @@ const FeatureFlagDetailPage: React.FC = () => {
         setFlag(data);
         setOriginalFlag(JSON.parse(JSON.stringify(data)));
       } catch (error: any) {
-        enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.loadFailed'), {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          parseApiErrorMessage(error, 'featureFlags.loadFailed'),
+          {
+            variant: 'error',
+          }
+        );
         navigate('/feature-flags');
       } finally {
         if (showLoading) setLoading(false);
@@ -634,9 +674,14 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   const loadContextFields = useCallback(async () => {
     try {
-      const response = await api.get(`${projectApiPath}/features/context-fields`);
+      const response = await api.get(
+        `${projectApiPath}/features/context-fields`
+      );
       // API returns { success: true, data: { contextFields } }
-      const fields = response.data?.contextFields || response.data?.data?.contextFields || [];
+      const fields =
+        response.data?.contextFields ||
+        response.data?.data?.contextFields ||
+        [];
 
       setContextFields(
         fields
@@ -669,7 +714,8 @@ const FeatureFlagDetailPage: React.FC = () => {
     try {
       const response = await api.get(`${projectApiPath}/features/segments`);
       // API returns { success: true, data: { segments } }
-      const segmentsData = response.data?.segments || response.data?.data?.segments || [];
+      const segmentsData =
+        response.data?.segments || response.data?.data?.segments || [];
       setSegments(segmentsData);
     } catch {
       setSegments([]);
@@ -690,7 +736,10 @@ const FeatureFlagDetailPage: React.FC = () => {
       const envs = await environmentService.getEnvironments(projectApiPath);
       setEnvironments(envs);
       // Auto-expand selected environment card immediately after loading
-      if (selectedEnvironment && envs.some((e) => e.environmentId === selectedEnvironment)) {
+      if (
+        selectedEnvironment &&
+        envs.some((e) => e.environmentId === selectedEnvironment)
+      ) {
         setExpandedEnvs((prev) => {
           const newSet = new Set(prev);
           newSet.add(selectedEnvironment);
@@ -707,7 +756,10 @@ const FeatureFlagDetailPage: React.FC = () => {
     async (targetFlagName: string, envList: Environment[]) => {
       if (!targetFlagName || envList.length === 0) return;
 
-      const metricsMap: Record<string, { totalYes: number; totalNo: number; total: number }> = {};
+      const metricsMap: Record<
+        string,
+        { totalYes: number; totalNo: number; total: number }
+      > = {};
       const endDate = new Date();
       const startDate = new Date(endDate.getTime() - 24 * 60 * 60 * 1000); // Last 24 hours
 
@@ -753,9 +805,12 @@ const FeatureFlagDetailPage: React.FC = () => {
       const variantsMap: Record<string, Variant[]> = {};
       for (const env of envList) {
         try {
-          const response = await api.get(`${projectApiPath}/features/${targetFlagName}`, {
-            headers: { 'x-environment-id': env.environmentId },
-          });
+          const response = await api.get(
+            `${projectApiPath}/features/${targetFlagName}`,
+            {
+              headers: { 'x-environment-id': env.environmentId },
+            }
+          );
           const data = response.data?.flag || response.data;
 
           // Get variants from flag level (they're stored at flag level, not strategy level)
@@ -770,13 +825,15 @@ const FeatureFlagDetailPage: React.FC = () => {
           // Store variants separately for environment-specific management
           variantsMap[env.environmentId] = flagVariants;
 
-          const strategies = (data.strategies || []).map((s: any, index: number) => ({
-            ...s,
-            name: s.strategyName || s.name,
-            disabled: s.isEnabled === false,
-            // Attach variants to the first strategy (for UI editing purposes)
-            variants: index === 0 ? flagVariants : [],
-          }));
+          const strategies = (data.strategies || []).map(
+            (s: any, index: number) => ({
+              ...s,
+              name: s.strategyName || s.name,
+              disabled: s.isEnabled === false,
+              // Attach variants to the first strategy (for UI editing purposes)
+              variants: index === 0 ? flagVariants : [],
+            })
+          );
           strategiesMap[env.environmentId] = strategies;
         } catch {
           strategiesMap[env.environmentId] = [];
@@ -798,13 +855,22 @@ const FeatureFlagDetailPage: React.FC = () => {
     loadSegments();
     loadTags();
     loadEnvironments();
-  }, [loadFlag, loadContextFields, loadSegments, loadTags, loadEnvironments, isCreating]);
+  }, [
+    loadFlag,
+    loadContextFields,
+    loadSegments,
+    loadTags,
+    loadEnvironments,
+    isCreating,
+  ]);
 
   // Load environment-specific strategies after environments and flag are loaded
   useEffect(() => {
     if (!isCreating && flag?.flagName && environments.length > 0) {
       setEnvLoading(true);
-      loadEnvStrategies(environments, flag.flagName).finally(() => setEnvLoading(false));
+      loadEnvStrategies(environments, flag.flagName).finally(() =>
+        setEnvLoading(false)
+      );
     }
   }, [isCreating, flag?.flagName, environments, loadEnvStrategies]);
 
@@ -824,7 +890,9 @@ const FeatureFlagDetailPage: React.FC = () => {
       const envParam = searchParams.get('env');
       const targetEnv = envParam || selectedEnvironment;
       if (targetEnv) {
-        const envExists = environments.some((e) => e.environmentId === targetEnv);
+        const envExists = environments.some(
+          (e) => e.environmentId === targetEnv
+        );
         if (envExists) {
           hasAutoExpandedRef.current = true;
           setExpandedEnvs(new Set([targetEnv]));
@@ -860,7 +928,8 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     // Show resize indicator
     if (resizeHandleRef.current) {
-      resizeHandleRef.current.style.backgroundColor = 'var(--mui-palette-primary-main, #1976d2)';
+      resizeHandleRef.current.style.backgroundColor =
+        'var(--mui-palette-primary-main, #1976d2)';
     }
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
@@ -907,13 +976,19 @@ const FeatureFlagDetailPage: React.FC = () => {
         isEnabled: !flag.isEnabled,
       });
       setFlag({ ...flag, isEnabled: !flag.isEnabled });
-      enqueueSnackbar(t(`featureFlags.${!flag.isEnabled ? 'enabled' : 'disabled'}`), {
-        variant: 'success',
-      });
+      enqueueSnackbar(
+        t(`featureFlags.${!flag.isEnabled ? 'enabled' : 'disabled'}`),
+        {
+          variant: 'success',
+        }
+      );
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.toggleFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'featureFlags.toggleFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -922,7 +997,9 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     // Optimistic update - update UI immediately
     const updatedEnvironments = (flag.environments || []).map((env) =>
-      env.environmentId === envKey ? { ...env, isEnabled: !currentEnabled } : env
+      env.environmentId === envKey
+        ? { ...env, isEnabled: !currentEnabled }
+        : env
     );
 
     // If environment doesn't exist in the array yet, add it
@@ -943,7 +1020,8 @@ const FeatureFlagDetailPage: React.FC = () => {
         environmentId: envKey,
       });
       const envDisplayName =
-        environments.find((e) => e.environmentId === envKey)?.displayName || envKey;
+        environments.find((e) => e.environmentId === envKey)?.displayName ||
+        envKey;
       enqueueSnackbar(
         <span>
           <strong>{flag.flagName}</strong> ({envDisplayName}){' '}
@@ -954,9 +1032,12 @@ const FeatureFlagDetailPage: React.FC = () => {
     } catch (error: any) {
       // Rollback on error
       setFlag({ ...flag, environments: flag.environments });
-      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.toggleFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'featureFlags.toggleFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -1002,13 +1083,19 @@ const FeatureFlagDetailPage: React.FC = () => {
       const endpoint = flag.isArchived ? 'revive' : 'archive';
       await api.post(`${projectApiPath}/features/${flag.flagName}/${endpoint}`);
       setFlag({ ...flag, isArchived: !flag.isArchived });
-      enqueueSnackbar(t(`featureFlags.${!flag.isArchived ? 'archived' : 'revived'}`), {
-        variant: 'success',
-      });
+      enqueueSnackbar(
+        t(`featureFlags.${!flag.isArchived ? 'archived' : 'revived'}`),
+        {
+          variant: 'success',
+        }
+      );
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.archiveFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'featureFlags.archiveFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -1023,13 +1110,19 @@ const FeatureFlagDetailPage: React.FC = () => {
       const endpoint = flag.stale ? 'unmark-stale' : 'mark-stale';
       await api.post(`${projectApiPath}/features/${flag.flagName}/${endpoint}`);
       setFlag({ ...flag, stale: !flag.stale });
-      enqueueSnackbar(t(`featureFlags.${!flag.stale ? 'markedAsStale' : 'unmarkedAsStale'}`), {
-        variant: 'success',
-      });
+      enqueueSnackbar(
+        t(`featureFlags.${!flag.stale ? 'markedAsStale' : 'unmarkedAsStale'}`),
+        {
+          variant: 'success',
+        }
+      );
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.staleToggleFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'featureFlags.staleToggleFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -1040,9 +1133,12 @@ const FeatureFlagDetailPage: React.FC = () => {
       enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
       navigate('/feature-flags');
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.deleteFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'featureFlags.deleteFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -1067,7 +1163,9 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     if (editingLinkIndex !== null) {
       // Editing existing link
-      updatedLinks = currentLinks.map((link, i) => (i === editingLinkIndex ? editingLink : link));
+      updatedLinks = currentLinks.map((link, i) =>
+        i === editingLinkIndex ? editingLink : link
+      );
     } else {
       // Adding new link
       updatedLinks = [...currentLinks, editingLink];
@@ -1291,7 +1389,9 @@ const FeatureFlagDetailPage: React.FC = () => {
   ) => {
     if (!flag) return;
     const currentEnvStrategies = envStrategies[envName] || [];
-    const updatedStrategies = currentEnvStrategies.filter((_, i) => i !== index);
+    const updatedStrategies = currentEnvStrategies.filter(
+      (_, i) => i !== index
+    );
 
     try {
       if (!isCreating) {
@@ -1330,7 +1430,10 @@ const FeatureFlagDetailPage: React.FC = () => {
   };
 
   // Handler for saving environment-specific variants from EnvironmentVariantsEditor
-  const handleSaveEnvVariants = async (envName: string, variants: EditorVariant[]) => {
+  const handleSaveEnvVariants = async (
+    envName: string,
+    variants: EditorVariant[]
+  ) => {
     if (!flag) return;
 
     try {
@@ -1353,19 +1456,26 @@ const FeatureFlagDetailPage: React.FC = () => {
         // Reload everything from server after save
         await loadFlag(flag.flagName, false);
         await loadEnvStrategies(environments, flag.flagName);
-        enqueueSnackbar(t('featureFlags.variantsSaved'), { variant: 'success' });
+        enqueueSnackbar(t('featureFlags.variantsSaved'), {
+          variant: 'success',
+        });
       } else {
         // Update environment-specific variants for create mode
         setEnvVariants((prev) => ({
           ...prev,
           [envName]: variants as Variant[],
         }));
-        enqueueSnackbar(t('featureFlags.variantsSaved'), { variant: 'success' });
+        enqueueSnackbar(t('featureFlags.variantsSaved'), {
+          variant: 'success',
+        });
       }
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.variantsSaveFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'featureFlags.variantsSaveFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -1379,10 +1489,16 @@ const FeatureFlagDetailPage: React.FC = () => {
           useFixedWeightVariants: value,
           isGlobal: true,
         });
-        setFlag((prev) => (prev ? { ...prev, useFixedWeightVariants: value } : prev));
-        setOriginalFlag((prev) => (prev ? { ...prev, useFixedWeightVariants: value } : prev));
+        setFlag((prev) =>
+          prev ? { ...prev, useFixedWeightVariants: value } : prev
+        );
+        setOriginalFlag((prev) =>
+          prev ? { ...prev, useFixedWeightVariants: value } : prev
+        );
       } else {
-        setFlag((prev) => (prev ? { ...prev, useFixedWeightVariants: value } : prev));
+        setFlag((prev) =>
+          prev ? { ...prev, useFixedWeightVariants: value } : prev
+        );
       }
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
@@ -1416,11 +1532,16 @@ const FeatureFlagDetailPage: React.FC = () => {
       // Reload everything to ensure sync
       await loadFlag(flag.flagName, false);
       await loadEnvStrategies(environments, flag.flagName);
-      enqueueSnackbar(t('featureFlags.fallbackValueSaved'), { variant: 'success' });
-    } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.fallbackValueSaveFailed'), {
-        variant: 'error',
+      enqueueSnackbar(t('featureFlags.fallbackValueSaved'), {
+        variant: 'success',
       });
+    } catch (error: any) {
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'featureFlags.fallbackValueSaveFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -1442,7 +1563,10 @@ const FeatureFlagDetailPage: React.FC = () => {
   };
 
   const handleConfirmDeleteStrategy = () => {
-    if (strategyDeleteConfirm.index !== undefined && strategyDeleteConfirm.envName) {
+    if (
+      strategyDeleteConfirm.index !== undefined &&
+      strategyDeleteConfirm.envName
+    ) {
       handleDeleteStrategy(
         strategyDeleteConfirm.strategyId,
         strategyDeleteConfirm.index,
@@ -1452,11 +1576,19 @@ const FeatureFlagDetailPage: React.FC = () => {
     handleCloseDeleteStrategyConfirm();
   };
 
-  const handleReorderStrategies = async (envName: string, oldIndex: number, newIndex: number) => {
+  const handleReorderStrategies = async (
+    envName: string,
+    oldIndex: number,
+    newIndex: number
+  ) => {
     if (!flag || oldIndex === newIndex) return;
 
     const currentEnvStrategies = envStrategies[envName] || [];
-    const reorderedStrategies = arrayMove(currentEnvStrategies, oldIndex, newIndex);
+    const reorderedStrategies = arrayMove(
+      currentEnvStrategies,
+      oldIndex,
+      newIndex
+    );
 
     // Update sortOrder for all strategies
     const updatedStrategies = reorderedStrategies.map((s, idx) => ({
@@ -1509,7 +1641,10 @@ const FeatureFlagDetailPage: React.FC = () => {
     disabledValue?: string | null;
   }>({});
 
-  const setJsonError = (field: 'enabledValue' | 'disabledValue', error: string | null) => {
+  const setJsonError = (
+    field: 'enabledValue' | 'disabledValue',
+    error: string | null
+  ) => {
     setValueJsonErrors((prev) => ({ ...prev, [field]: error }));
   };
 
@@ -1525,7 +1660,9 @@ const FeatureFlagDetailPage: React.FC = () => {
         <BooleanSwitch
           checked={value === true || value === 'true'}
           onChange={(e) => {
-            setFlag((prev) => (prev ? { ...prev, [field]: e.target.checked } : prev));
+            setFlag((prev) =>
+              prev ? { ...prev, [field]: e.target.checked } : prev
+            );
           }}
           disabled={!canManage}
         />
@@ -1553,8 +1690,14 @@ const FeatureFlagDetailPage: React.FC = () => {
       <ValueEditorField
         value={(() => {
           if (type === 'json') {
-            if (value === null || value === undefined || value === '[object Object]') return '{}';
-            if (typeof value === 'object') return JSON.stringify(value, null, 2);
+            if (
+              value === null ||
+              value === undefined ||
+              value === '[object Object]'
+            )
+              return '{}';
+            if (typeof value === 'object')
+              return JSON.stringify(value, null, 2);
             return String(value);
           }
           return value ?? '';
@@ -1584,7 +1727,9 @@ const FeatureFlagDetailPage: React.FC = () => {
             ? t('featureFlags.enabledValue')
             : t('featureFlags.disabledValue')
         }
-        onValidationError={type === 'json' ? (err) => setJsonError(field, err) : undefined}
+        onValidationError={
+          type === 'json' ? (err) => setJsonError(field, err) : undefined
+        }
         disabled={!canManage}
       />
     );
@@ -1618,7 +1763,9 @@ const FeatureFlagDetailPage: React.FC = () => {
     if (!flag || !editingVariant) return;
 
     let updatedVariants: Variant[];
-    const existingIndex = (flag.variants || []).findIndex((v) => v.name === editingVariant.name);
+    const existingIndex = (flag.variants || []).findIndex(
+      (v) => v.name === editingVariant.name
+    );
 
     if (existingIndex >= 0) {
       updatedVariants = (flag.variants || []).map((v, i) =>
@@ -1641,7 +1788,9 @@ const FeatureFlagDetailPage: React.FC = () => {
         });
       }
       setFlag({ ...flag, variants: updatedVariants });
-      setOriginalFlag((prev) => (prev ? { ...prev, variants: updatedVariants } : null));
+      setOriginalFlag((prev) =>
+        prev ? { ...prev, variants: updatedVariants } : null
+      );
       setVariantDialogOpen(false);
       setEditingVariant(null);
       enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });
@@ -1663,7 +1812,9 @@ const FeatureFlagDetailPage: React.FC = () => {
         });
       }
       setFlag({ ...flag, variants: updatedVariants });
-      setOriginalFlag((prev) => (prev ? { ...prev, variants: updatedVariants } : null));
+      setOriginalFlag((prev) =>
+        prev ? { ...prev, variants: updatedVariants } : null
+      );
       enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), {
@@ -1680,7 +1831,9 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   const getSegmentNames = (segmentIds: string[] = []) => {
     const segmentsArray = Array.isArray(segments) ? segments : [];
-    return segmentIds.map((id) => segmentsArray.find((s) => s.id === id)?.name || id).join(', ');
+    return segmentIds
+      .map((id) => segmentsArray.find((s) => s.id === id)?.name || id)
+      .join(', ');
   };
 
   // ==================== Render ====================
@@ -1721,7 +1874,11 @@ const FeatureFlagDetailPage: React.FC = () => {
               {flag.displayName || flag.flagName}
             </Typography>
             {flag.isArchived && (
-              <Chip label={t('featureFlags.archived')} size="small" color="warning" />
+              <Chip
+                label={t('featureFlags.archived')}
+                size="small"
+                color="warning"
+              />
             )}
             <Tooltip title={t('common.copyToClipboard')}>
               <IconButton
@@ -1821,7 +1978,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     <FormControl size="small" sx={{ minWidth: 200 }}>
                       <Select
                         value={flag.flagType}
-                        onChange={(e) => setFlag({ ...flag, flagType: e.target.value as any })}
+                        onChange={(e) =>
+                          setFlag({ ...flag, flagType: e.target.value as any })
+                        }
                       >
                         {FLAG_TYPES.map((type) => (
                           <MenuItem key={type.value} value={type.value}>
@@ -1832,7 +1991,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 gap: 1,
                               }}
                             >
-                              <Box sx={{ mt: 0.3 }}>{getTypeIcon(type.value)}</Box>
+                              <Box sx={{ mt: 0.3 }}>
+                                {getTypeIcon(type.value)}
+                              </Box>
                               <Box>
                                 <Typography variant="body2" fontWeight={500}>
                                   {t(type.labelKey)}
@@ -1851,7 +2012,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                       </Select>
                     </FormControl>
                   ) : (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
                       {getTypeIcon(flag.flagType)}
                       <Typography variant="body2">
                         {t(`featureFlags.types.${flag.flagType}`)}
@@ -1862,14 +2025,23 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                 {/* Value Type */}
                 {!isCreating && (
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
                     <Typography variant="body2" color="text.secondary">
                       {t('featureFlags.valueType')}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <FieldTypeIcon type={flag.valueType || 'boolean'} size={16} />
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <FieldTypeIcon
+                        type={flag.valueType || 'boolean'}
+                        size={16}
+                      />
                       <Typography variant="body2">
-                        {t(`featureFlags.valueTypes.${flag.valueType || 'boolean'}`)}
+                        {t(
+                          `featureFlags.valueTypes.${flag.valueType || 'boolean'}`
+                        )}
                       </Typography>
                     </Box>
                   </Box>
@@ -1877,11 +2049,15 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                 {/* Created By */}
                 {flag.createdByName && (
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
                     <Typography variant="body2" color="text.secondary">
                       {t('featureFlags.createdBy')}
                     </Typography>
-                    <Typography variant="body2">{flag.createdByName}</Typography>
+                    <Typography variant="body2">
+                      {flag.createdByName}
+                    </Typography>
                   </Box>
                 )}
 
@@ -1891,18 +2067,27 @@ const FeatureFlagDetailPage: React.FC = () => {
                     {t('featureFlags.createdAt')}
                   </Typography>
                   <Tooltip title={formatDateTimeDetailed(flag.createdAt)} arrow>
-                    <Typography variant="body2">{formatRelativeTime(flag.createdAt)}</Typography>
+                    <Typography variant="body2">
+                      {formatRelativeTime(flag.createdAt)}
+                    </Typography>
                   </Tooltip>
                 </Box>
 
                 {/* Updated At */}
                 {flag.updatedAt && (
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
                     <Typography variant="body2" color="text.secondary">
                       {t('featureFlags.updatedAt')}
                     </Typography>
-                    <Tooltip title={formatDateTimeDetailed(flag.updatedAt)} arrow>
-                      <Typography variant="body2">{formatRelativeTime(flag.updatedAt)}</Typography>
+                    <Tooltip
+                      title={formatDateTimeDetailed(flag.updatedAt)}
+                      arrow
+                    >
+                      <Typography variant="body2">
+                        {formatRelativeTime(flag.updatedAt)}
+                      </Typography>
                     </Tooltip>
                   </Box>
                 )}
@@ -1913,8 +2098,13 @@ const FeatureFlagDetailPage: React.FC = () => {
                     {t('featureFlags.lastSeenAt')}
                   </Typography>
                   {flag.lastSeenAt ? (
-                    <Tooltip title={formatDateTimeDetailed(flag.lastSeenAt)} arrow>
-                      <Typography variant="body2">{formatRelativeTime(flag.lastSeenAt)}</Typography>
+                    <Tooltip
+                      title={formatDateTimeDetailed(flag.lastSeenAt)}
+                      arrow
+                    >
+                      <Typography variant="body2">
+                        {formatRelativeTime(flag.lastSeenAt)}
+                      </Typography>
                     </Tooltip>
                   ) : (
                     <Typography variant="body2" color="text.secondary">
@@ -1927,7 +2117,11 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                 {/* Tags */}
                 <Box>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
                     {t('featureFlags.tags')}
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -1958,7 +2152,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                   <>
                     <Divider />
                     <Box>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        gutterBottom
+                      >
                         {t('common.settings')}
                       </Typography>
                       <Stack spacing={1}>
@@ -1972,12 +2170,17 @@ const FeatureFlagDetailPage: React.FC = () => {
                           <Typography variant="caption" color="text.secondary">
                             {t('featureFlags.displayName')}
                           </Typography>
-                          <Typography variant="body2">{flag.displayName || '-'}</Typography>
+                          <Typography variant="body2">
+                            {flag.displayName || '-'}
+                          </Typography>
                         </Box>
                         {/* Description */}
                         {flag.description && (
                           <Box>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {t('featureFlags.description')}
                             </Typography>
                             <Typography variant="body2" sx={{ mt: 0.5 }}>
@@ -2003,7 +2206,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 : t('common.disabled')
                             }
                             size="small"
-                            color={flag.impressionDataEnabled ? 'success' : 'default'}
+                            color={
+                              flag.impressionDataEnabled ? 'success' : 'default'
+                            }
                             variant="outlined"
                           />
                         </Box>
@@ -2024,7 +2229,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                       fullWidth
                       size="small"
                     >
-                      {flag.isArchived ? t('featureFlags.revive') : t('featureFlags.archive')}
+                      {flag.isArchived
+                        ? t('featureFlags.revive')
+                        : t('featureFlags.archive')}
                     </Button>
                     <Button
                       variant="outlined"
@@ -2034,7 +2241,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                       fullWidth
                       size="small"
                     >
-                      {flag.stale ? t('featureFlags.unmarkStale') : t('featureFlags.markStale')}
+                      {flag.stale
+                        ? t('featureFlags.unmarkStale')
+                        : t('featureFlags.markStale')}
                     </Button>
                     <Button
                       variant="outlined"
@@ -2097,7 +2306,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     size="small"
                     label={t('featureFlags.displayName')}
                     value={flag.displayName || ''}
-                    onChange={(e) => setFlag({ ...flag, displayName: e.target.value })}
+                    onChange={(e) =>
+                      setFlag({ ...flag, displayName: e.target.value })
+                    }
                   />
                   <TextField
                     fullWidth
@@ -2106,7 +2317,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     rows={2}
                     label={t('featureFlags.description')}
                     value={flag.description || ''}
-                    onChange={(e) => setFlag({ ...flag, description: e.target.value })}
+                    onChange={(e) =>
+                      setFlag({ ...flag, description: e.target.value })
+                    }
                   />
                 </Stack>
               </Paper>
@@ -2121,10 +2334,18 @@ const FeatureFlagDetailPage: React.FC = () => {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               }}
             >
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                gutterBottom
+              >
                 {t('featureFlags.links.title')}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', mb: 2 }}
+              >
                 {t('featureFlags.links.helpText')}
               </Typography>
 
@@ -2157,8 +2378,15 @@ const FeatureFlagDetailPage: React.FC = () => {
                           overflow: 'hidden',
                         }}
                       >
-                        <LinkIcon fontSize="small" sx={{ color: 'text.secondary', mr: 0.5 }} />
-                        <Typography variant="body2" noWrap title={link.title || link.url}>
+                        <LinkIcon
+                          fontSize="small"
+                          sx={{ color: 'text.secondary', mr: 0.5 }}
+                        />
+                        <Typography
+                          variant="body2"
+                          noWrap
+                          title={link.title || link.url}
+                        >
                           {link.title || link.url}
                         </Typography>
                       </Box>
@@ -2181,7 +2409,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                             </IconButton>
                           </Tooltip>
                           <Tooltip title={t('common.delete')}>
-                            <IconButton size="small" onClick={() => handleDeleteLink(index)}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDeleteLink(index)}
+                            >
                               <DeleteIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
@@ -2193,8 +2424,14 @@ const FeatureFlagDetailPage: React.FC = () => {
               ) : null}
 
               {canManage && (
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-                  <Button size="small" startIcon={<AddIcon />} onClick={handleOpenAddLink}>
+                <Box
+                  sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}
+                >
+                  <Button
+                    size="small"
+                    startIcon={<AddIcon />}
+                    onClick={handleOpenAddLink}
+                  >
                     {t('featureFlags.links.addLink')}
                   </Button>
                 </Box>
@@ -2219,7 +2456,9 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                   return (
                     <React.Fragment key={env.environmentId}>
-                      {envIndex > 0 && <Divider sx={{ borderStyle: 'dashed', my: 1 }} />}
+                      {envIndex > 0 && (
+                        <Divider sx={{ borderStyle: 'dashed', my: 1 }} />
+                      )}
                       <Box
                         sx={{
                           display: 'flex',
@@ -2271,7 +2510,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                             >
                               {/* Toggle switch */}
                               <Tooltip
-                                title={isEnabled ? t('common.disable') : t('common.enable')}
+                                title={
+                                  isEnabled
+                                    ? t('common.disable')
+                                    : t('common.enable')
+                                }
                                 disableFocusListener
                                 enterDelay={500}
                                 leaveDelay={0}
@@ -2281,7 +2524,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     size="small"
                                     checked={isEnabled}
                                     onChange={() => {
-                                      handleEnvToggle(env.environmentId, isEnabled);
+                                      handleEnvToggle(
+                                        env.environmentId,
+                                        isEnabled
+                                      );
                                     }}
                                     disabled={!canManage || flag.isArchived}
                                     onClick={(e) => {
@@ -2295,7 +2541,10 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                               {/* Environment info */}
                               <Box sx={{ flex: 1 }}>
-                                <Typography variant="caption" color="text.secondary">
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
                                   {t('common.environment')}
                                 </Typography>
                                 <Box
@@ -2305,7 +2554,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     gap: 1,
                                   }}
                                 >
-                                  <Typography variant="subtitle1" fontWeight={600}>
+                                  <Typography
+                                    variant="subtitle1"
+                                    fontWeight={600}
+                                  >
                                     {env.displayName}
                                   </Typography>
                                   {releaseFlowEnvs.has(env.environmentId) ? (
@@ -2325,7 +2577,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         fontSize: '0.75rem',
                                       }}
                                     >
-                                      <ReleaseFlowActiveIcon sx={{ fontSize: 13 }} />
+                                      <ReleaseFlowActiveIcon
+                                        sx={{ fontSize: 13 }}
+                                      />
                                       {activeMilestoneByEnv[env.environmentId]
                                         ? `${t('releaseFlow.tabTitle')}: ${activeMilestoneByEnv[env.environmentId]}`
                                         : t('releaseFlow.tabTitle')}
@@ -2372,13 +2626,16 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     endAngle: number,
                                     r: number
                                   ) => {
-                                    const startRad = ((startAngle - 90) * Math.PI) / 180;
-                                    const endRad = ((endAngle - 90) * Math.PI) / 180;
+                                    const startRad =
+                                      ((startAngle - 90) * Math.PI) / 180;
+                                    const endRad =
+                                      ((endAngle - 90) * Math.PI) / 180;
                                     const x1 = cx + r * Math.cos(startRad);
                                     const y1 = cy + r * Math.sin(startRad);
                                     const x2 = cx + r * Math.cos(endRad);
                                     const y2 = cy + r * Math.sin(endRad);
-                                    const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+                                    const largeArc =
+                                      endAngle - startAngle > 180 ? 1 : 0;
                                     return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
                                   };
 
@@ -2397,18 +2654,37 @@ const FeatureFlagDetailPage: React.FC = () => {
                                           mr: 1,
                                         }}
                                       >
-                                        <svg width="52" height="52" viewBox="0 0 52 52">
+                                        <svg
+                                          width="52"
+                                          height="52"
+                                          viewBox="0 0 52 52"
+                                        >
                                           {/* No (red) - full circle background */}
-                                          <circle cx={cx} cy={cy} r={radius} fill="#ef5350" />
+                                          <circle
+                                            cx={cx}
+                                            cy={cy}
+                                            r={radius}
+                                            fill="#ef5350"
+                                          />
                                           {/* Yes (green) - pie slice */}
-                                          {yesPercent > 0 && yesPercent < 100 && (
-                                            <path
-                                              d={getArcPath(0, yesAngle, radius)}
+                                          {yesPercent > 0 &&
+                                            yesPercent < 100 && (
+                                              <path
+                                                d={getArcPath(
+                                                  0,
+                                                  yesAngle,
+                                                  radius
+                                                )}
+                                                fill="#4caf50"
+                                              />
+                                            )}
+                                          {yesPercent >= 100 && (
+                                            <circle
+                                              cx={cx}
+                                              cy={cy}
+                                              r={radius}
                                               fill="#4caf50"
                                             />
-                                          )}
-                                          {yesPercent >= 100 && (
-                                            <circle cx={cx} cy={cy} r={radius} fill="#4caf50" />
                                           )}
                                           {/* Center text */}
                                           <text
@@ -2421,7 +2697,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                             fontFamily="system-ui, -apple-system, sans-serif"
                                             fill="white"
                                             style={{
-                                              textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                                              textShadow:
+                                                '0 1px 2px rgba(0,0,0,0.8)',
                                             }}
                                           >
                                             {yesPercent}%
@@ -2432,7 +2709,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   );
                                 }
                                 return (
-                                  <Tooltip title={t('featureFlags.noMetricsYetHint')} arrow>
+                                  <Tooltip
+                                    title={t('featureFlags.noMetricsYetHint')}
+                                    arrow
+                                  >
                                     <Box
                                       sx={{
                                         display: 'flex',
@@ -2440,7 +2720,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         mr: 1,
                                       }}
                                     >
-                                      <svg width="52" height="52" viewBox="0 0 52 52">
+                                      <svg
+                                        width="52"
+                                        height="52"
+                                        viewBox="0 0 52 52"
+                                      >
                                         {/* Donut ring for no metrics */}
                                         <circle
                                           cx={26}
@@ -2477,10 +2761,14 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     envEnabled={isEnabled}
                                     allSegments={segments}
                                     contextFields={contextFields}
-                                    onPlanChange={() => mutateReleaseFlowPlans()}
+                                    onPlanChange={() =>
+                                      mutateReleaseFlowPlans()
+                                    }
                                     onPlanDeleted={() => {
                                       mutateReleaseFlowPlans();
-                                      const nextManual = new Set(envManualReleaseFlow);
+                                      const nextManual = new Set(
+                                        envManualReleaseFlow
+                                      );
                                       nextManual.delete(env.environmentId);
                                       setEnvManualReleaseFlow(nextManual);
                                     }}
@@ -2491,7 +2779,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   <EnvironmentVariantsEditor
                                     environmentId={env.environmentId}
                                     variants={
-                                      (envVariants[env.environmentId] || []) as EditorVariant[]
+                                      (envVariants[env.environmentId] ||
+                                        []) as EditorVariant[]
                                     }
                                     valueType={flag.valueType || 'boolean'}
                                     flagType={flag.flagType || 'release'}
@@ -2499,32 +2788,41 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     disabledValue={flag.disabledValue}
                                     envEnabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.enabledValue
                                     }
                                     envDisabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.disabledValue
                                     }
                                     overrideEnabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.overrideEnabledValue ?? false
                                     }
                                     overrideDisabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.overrideDisabledValue ?? false
                                     }
                                     canManage={canManage}
                                     isArchived={flag.isArchived}
-                                    useFixedWeightVariants={flag.useFixedWeightVariants}
+                                    useFixedWeightVariants={
+                                      flag.useFixedWeightVariants
+                                    }
                                     onUseFixedWeightVariantsChange={
                                       handleUseFixedWeightVariantsChange
                                     }
                                     onSave={(variants) =>
-                                      handleSaveEnvVariants(env.environmentId, variants)
+                                      handleSaveEnvVariants(
+                                        env.environmentId,
+                                        variants
+                                      )
                                     }
                                     onSaveValues={(
                                       enabledValue,
@@ -2541,14 +2839,20 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       )
                                     }
                                     onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={env.environmentId === selectedEnvironment}
+                                    defaultExpanded={
+                                      env.environmentId === selectedEnvironment
+                                    }
                                   />
                                 </>
                               ) : strategies.length === 0 ? (
                                 <>
                                   <EmptyPlaceholder
-                                    message={t('featureFlags.noStrategiesTitle')}
-                                    description={t('featureFlags.noStrategiesDescription')}
+                                    message={t(
+                                      'featureFlags.noStrategiesTitle'
+                                    )}
+                                    description={t(
+                                      'featureFlags.noStrategiesDescription'
+                                    )}
                                   >
                                     {canManage && (
                                       <Box
@@ -2563,7 +2867,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                                           variant="contained"
                                           size="small"
                                           startIcon={<AddIcon />}
-                                          onClick={() => handleAddStrategy(env.environmentId)}
+                                          onClick={() =>
+                                            handleAddStrategy(env.environmentId)
+                                          }
                                         >
                                           {t('featureFlags.addFirstStrategy')}
                                         </Button>
@@ -2571,11 +2877,15 @@ const FeatureFlagDetailPage: React.FC = () => {
                                           variant="contained"
                                           size="small"
                                           startIcon={
-                                            <ReleaseFlowActiveIcon sx={{ fontSize: 18 }} />
+                                            <ReleaseFlowActiveIcon
+                                              sx={{ fontSize: 18 }}
+                                            />
                                           }
                                           onClick={() => {
                                             setEnvManualReleaseFlow((prev) =>
-                                              new Set(prev).add(env.environmentId)
+                                              new Set(prev).add(
+                                                env.environmentId
+                                              )
                                             );
                                           }}
                                         >
@@ -2585,7 +2895,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     )}
                                   </EmptyPlaceholder>
 
-                                  {envManualReleaseFlow.has(env.environmentId) && (
+                                  {envManualReleaseFlow.has(
+                                    env.environmentId
+                                  ) && (
                                     <ReleaseFlowTab
                                       flagId={flag.id}
                                       flagName={flag.flagName}
@@ -2600,9 +2912,13 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       envEnabled={isEnabled}
                                       allSegments={segments}
                                       contextFields={contextFields}
-                                      onPlanChange={() => mutateReleaseFlowPlans()}
+                                      onPlanChange={() =>
+                                        mutateReleaseFlowPlans()
+                                      }
                                       onPlanDeleted={() => {
-                                        const nextManual = new Set(envManualReleaseFlow);
+                                        const nextManual = new Set(
+                                          envManualReleaseFlow
+                                        );
                                         nextManual.delete(env.environmentId);
                                         setEnvManualReleaseFlow(nextManual);
                                       }}
@@ -2614,7 +2930,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   <EnvironmentVariantsEditor
                                     environmentId={env.environmentId}
                                     variants={
-                                      (envVariants[env.environmentId] || []) as EditorVariant[]
+                                      (envVariants[env.environmentId] ||
+                                        []) as EditorVariant[]
                                     }
                                     valueType={flag.valueType || 'boolean'}
                                     flagType={flag.flagType || 'release'}
@@ -2622,32 +2939,41 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     disabledValue={flag.disabledValue}
                                     envEnabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.enabledValue
                                     }
                                     envDisabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.disabledValue
                                     }
                                     overrideEnabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.overrideEnabledValue ?? false
                                     }
                                     overrideDisabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.overrideDisabledValue ?? false
                                     }
                                     canManage={canManage}
                                     isArchived={flag.isArchived}
-                                    useFixedWeightVariants={flag.useFixedWeightVariants}
+                                    useFixedWeightVariants={
+                                      flag.useFixedWeightVariants
+                                    }
                                     onUseFixedWeightVariantsChange={
                                       handleUseFixedWeightVariantsChange
                                     }
                                     onSave={(variants) =>
-                                      handleSaveEnvVariants(env.environmentId, variants)
+                                      handleSaveEnvVariants(
+                                        env.environmentId,
+                                        variants
+                                      )
                                     }
                                     onSaveValues={(
                                       enabledValue,
@@ -2664,7 +2990,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       )
                                     }
                                     onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={env.environmentId === selectedEnvironment}
+                                    defaultExpanded={
+                                      env.environmentId === selectedEnvironment
+                                    }
                                   />
                                 </>
                               ) : (
@@ -2695,7 +3023,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     >
                                       <Stack spacing={2}>
                                         {strategies.map((strategy, index) => (
-                                          <React.Fragment key={strategy.id || index}>
+                                          <React.Fragment
+                                            key={strategy.id || index}
+                                          >
                                             {/* OR divider */}
                                             {index > 0 && (
                                               <Box
@@ -2723,15 +3053,19 @@ const FeatureFlagDetailPage: React.FC = () => {
                                             {/* Strategy card wrapped with sortable */}
                                             <SortableStrategyItem
                                               id={strategy.id}
-                                              isDraggable={strategies.length > 1}
+                                              isDraggable={
+                                                strategies.length > 1
+                                              }
                                             >
                                               {({ dragHandleProps }) => (
                                                 <StrategyCardReadonly
                                                   strategy={{
                                                     strategyName: strategy.name,
                                                     title: strategy.title,
-                                                    parameters: strategy.parameters,
-                                                    constraints: strategy.constraints,
+                                                    parameters:
+                                                      strategy.parameters,
+                                                    constraints:
+                                                      strategy.constraints,
                                                     segments: strategy.segments,
                                                     disabled: strategy.disabled,
                                                   }}
@@ -2742,7 +3076,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                       <Box
                                                         {...dragHandleProps}
                                                         sx={{
-                                                          color: 'text.disabled',
+                                                          color:
+                                                            'text.disabled',
                                                           cursor: 'grab',
                                                           display: 'flex',
                                                           alignItems: 'center',
@@ -2763,7 +3098,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                           gap: 0,
                                                         }}
                                                       >
-                                                        <Tooltip title={t('common.edit')}>
+                                                        <Tooltip
+                                                          title={t(
+                                                            'common.edit'
+                                                          )}
+                                                        >
                                                           <IconButton
                                                             size="small"
                                                             onClick={() =>
@@ -2776,7 +3115,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                             <EditIcon fontSize="small" />
                                                           </IconButton>
                                                         </Tooltip>
-                                                        <Tooltip title={t('common.delete')}>
+                                                        <Tooltip
+                                                          title={t(
+                                                            'common.delete'
+                                                          )}
+                                                        >
                                                           <IconButton
                                                             size="small"
                                                             onClick={() =>
@@ -2817,7 +3160,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       <Button
                                         variant="contained"
                                         startIcon={<AddIcon />}
-                                        onClick={() => handleAddStrategy(env.environmentId)}
+                                        onClick={() =>
+                                          handleAddStrategy(env.environmentId)
+                                        }
                                         size="small"
                                       >
                                         {t('featureFlags.addStrategy')}
@@ -2832,7 +3177,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   <EnvironmentVariantsEditor
                                     environmentId={env.environmentId}
                                     variants={
-                                      (envVariants[env.environmentId] || []) as EditorVariant[]
+                                      (envVariants[env.environmentId] ||
+                                        []) as EditorVariant[]
                                     }
                                     valueType={flag.valueType || 'boolean'}
                                     flagType={flag.flagType || 'release'}
@@ -2840,32 +3186,41 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     disabledValue={flag.disabledValue}
                                     envEnabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.enabledValue
                                     }
                                     envDisabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.disabledValue
                                     }
                                     overrideEnabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.overrideEnabledValue ?? false
                                     }
                                     overrideDisabledValue={
                                       flag.environments?.find(
-                                        (e) => e.environmentId === env.environmentId
+                                        (e) =>
+                                          e.environmentId === env.environmentId
                                       )?.overrideDisabledValue ?? false
                                     }
                                     canManage={canManage}
                                     isArchived={flag.isArchived}
-                                    useFixedWeightVariants={flag.useFixedWeightVariants}
+                                    useFixedWeightVariants={
+                                      flag.useFixedWeightVariants
+                                    }
                                     onUseFixedWeightVariantsChange={
                                       handleUseFixedWeightVariantsChange
                                     }
                                     onSave={(variants) =>
-                                      handleSaveEnvVariants(env.environmentId, variants)
+                                      handleSaveEnvVariants(
+                                        env.environmentId,
+                                        variants
+                                      )
                                     }
                                     onSaveValues={(
                                       enabledValue,
@@ -2882,7 +3237,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       )
                                     }
                                     onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={env.environmentId === selectedEnvironment}
+                                    defaultExpanded={
+                                      env.environmentId === selectedEnvironment
+                                    }
                                   />
                                 </>
                               )}
@@ -2955,7 +3312,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                         {t('playground.title')}
                       </Typography>
                     </Box>
-                    <IconButton size="small" onClick={() => setEmbeddedPlaygroundVisible(false)}>
+                    <IconButton
+                      size="small"
+                      onClick={() => setEmbeddedPlaygroundVisible(false)}
+                    >
                       <CloseIcon fontSize="small" />
                     </IconButton>
                   </Box>
@@ -3005,7 +3365,12 @@ const FeatureFlagDetailPage: React.FC = () => {
               <Box>
                 <Typography
                   variant="subtitle2"
-                  sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    mb: 1,
+                  }}
                 >
                   {t('featureFlags.valueType')}
                   <Tooltip title={t('featureFlags.valueTypeHelp')}>
@@ -3026,7 +3391,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                 >
                   <FieldTypeIcon type={flag.valueType || 'boolean'} size={18} />
                   <Typography variant="body2" fontWeight={500}>
-                    {t(`featureFlags.valueTypes.${flag.valueType || 'boolean'}`)}
+                    {t(
+                      `featureFlags.valueTypes.${flag.valueType || 'boolean'}`
+                    )}
                   </Typography>
                 </Box>
               </Box>
@@ -3036,7 +3403,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                 valueType={flag.valueType || 'boolean'}
                 rules={flag.validationRules}
                 onChange={(rules) =>
-                  setFlag((prev) => (prev ? { ...prev, validationRules: rules } : prev))
+                  setFlag((prev) =>
+                    prev ? { ...prev, validationRules: rules } : prev
+                  )
                 }
                 disabled={saving || !canManage}
               />
@@ -3102,13 +3471,22 @@ const FeatureFlagDetailPage: React.FC = () => {
                       <HelpOutlineIcon fontSize="small" color="action" />
                     </Tooltip>
                   </Typography>
-                  <Box sx={{ flex: 1 }}>{renderValueInput('disabledValue')}</Box>
+                  <Box sx={{ flex: 1 }}>
+                    {renderValueInput('disabledValue')}
+                  </Box>
                 </Box>
               </Stack>
 
               {/* Action Buttons - only show for users with edit permission */}
               {canManage && (
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 2 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    gap: 1,
+                    pt: 2,
+                  }}
+                >
                   <Button
                     variant="outlined"
                     onClick={() => {
@@ -3143,12 +3521,15 @@ const FeatureFlagDetailPage: React.FC = () => {
                       if (!flag) return;
                       try {
                         setSaving(true);
-                        await api.put(`${projectApiPath}/features/${flag.flagName}`, {
-                          enabledValue: flag.enabledValue,
-                          disabledValue: flag.disabledValue,
-                          validationRules: flag.validationRules ?? null,
-                          isGlobal: true,
-                        });
+                        await api.put(
+                          `${projectApiPath}/features/${flag.flagName}`,
+                          {
+                            enabledValue: flag.enabledValue,
+                            disabledValue: flag.disabledValue,
+                            validationRules: flag.validationRules ?? null,
+                            isGlobal: true,
+                          }
+                        );
                         setOriginalFlag((prev) =>
                           prev
                             ? {
@@ -3163,9 +3544,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                           variant: 'success',
                         });
                       } catch (error: any) {
-                        enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
-                          variant: 'error',
-                        });
+                        enqueueSnackbar(
+                          parseApiErrorMessage(error, 'common.saveFailed'),
+                          {
+                            variant: 'error',
+                          }
+                        );
                       } finally {
                         setSaving(false);
                       }
@@ -3200,7 +3584,9 @@ const FeatureFlagDetailPage: React.FC = () => {
             environmentId: e.environmentId,
             isEnabled: e.isEnabled,
           }))}
-          currentEnvironment={flag.environments?.[0]?.environmentId || 'production'}
+          currentEnvironment={
+            flag.environments?.[0]?.environmentId || 'production'
+          }
         />
       </TabPanel>
       <TabPanel value={tabValue} index={3}>
@@ -3226,13 +3612,18 @@ const FeatureFlagDetailPage: React.FC = () => {
       />
 
       {/* Strategy Delete Confirmation Dialog */}
-      <Dialog open={strategyDeleteConfirm.open} onClose={handleCloseDeleteStrategyConfirm}>
+      <Dialog
+        open={strategyDeleteConfirm.open}
+        onClose={handleCloseDeleteStrategyConfirm}
+      >
         <DialogTitle>{t('featureFlags.deleteStrategyTitle')}</DialogTitle>
         <DialogContent>
           <Typography>{t('featureFlags.deleteStrategyDescription')}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDeleteStrategyConfirm}>{t('common.cancel')}</Button>
+          <Button onClick={handleCloseDeleteStrategyConfirm}>
+            {t('common.cancel')}
+          </Button>
           <Button
             onClick={handleConfirmDeleteStrategy}
             color="error"
@@ -3258,7 +3649,9 @@ const FeatureFlagDetailPage: React.FC = () => {
             <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
               <Stack spacing={2.5}>
                 {/* Flag Name + Display Name on same row */}
-                <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
+                <Box
+                  sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}
+                >
                   <TextField
                     sx={{ flex: 1 }}
                     label={t('featureFlags.flagName')}
@@ -3299,7 +3692,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                           description: ' ',
                         })
                       }
-                      sx={{ textTransform: 'none', color: 'text.secondary', fontSize: '0.8rem' }}
+                      sx={{
+                        textTransform: 'none',
+                        color: 'text.secondary',
+                        fontSize: '0.8rem',
+                      }}
                     >
                       {t('common.addDescription')}
                     </Button>
@@ -3314,7 +3711,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                           _showTags: true,
                         } as any)
                       }
-                      sx={{ textTransform: 'none', color: 'text.secondary', fontSize: '0.8rem' }}
+                      sx={{
+                        textTransform: 'none',
+                        color: 'text.secondary',
+                        fontSize: '0.8rem',
+                      }}
                     >
                       + {t('common.addTag')}
                     </Button>
@@ -3329,7 +3730,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     rows={3}
                     label={t('featureFlags.description')}
                     value={
-                      editingFlagData.description.trim() === '' ? '' : editingFlagData.description
+                      editingFlagData.description.trim() === ''
+                        ? ''
+                        : editingFlagData.description
                     }
                     onChange={(e) =>
                       setEditingFlagData({
@@ -3366,7 +3769,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                 </Box>
 
                 {/* Collapsible Tags */}
-                {(!!editingFlagData.tags?.length || (editingFlagData as any)._showTags) && (
+                {(!!editingFlagData.tags?.length ||
+                  (editingFlagData as any)._showTags) && (
                   <Autocomplete
                     multiple
                     size="small"
@@ -3414,24 +3818,31 @@ const FeatureFlagDetailPage: React.FC = () => {
                 justifyContent: 'flex-end',
               }}
             >
-              <Button onClick={() => setEditFlagDialogOpen(false)}>{t('common.cancel')}</Button>
+              <Button onClick={() => setEditFlagDialogOpen(false)}>
+                {t('common.cancel')}
+              </Button>
               <Button
                 variant="contained"
                 onClick={async () => {
                   if (!flag || !editingFlagData) return;
                   try {
                     setSaving(true);
-                    await api.put(`${projectApiPath}/features/${flag.flagName}`, {
-                      displayName: editingFlagData.displayName,
-                      description: editingFlagData.description,
-                      impressionDataEnabled: editingFlagData.impressionDataEnabled,
-                      tags: editingFlagData.tags,
-                    });
+                    await api.put(
+                      `${projectApiPath}/features/${flag.flagName}`,
+                      {
+                        displayName: editingFlagData.displayName,
+                        description: editingFlagData.description,
+                        impressionDataEnabled:
+                          editingFlagData.impressionDataEnabled,
+                        tags: editingFlagData.tags,
+                      }
+                    );
                     setFlag({
                       ...flag,
                       displayName: editingFlagData.displayName,
                       description: editingFlagData.description,
-                      impressionDataEnabled: editingFlagData.impressionDataEnabled,
+                      impressionDataEnabled:
+                        editingFlagData.impressionDataEnabled,
                       tags: editingFlagData.tags,
                     });
                     setEditFlagDialogOpen(false);
@@ -3449,8 +3860,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                 disabled={
                   saving ||
                   (editingFlagData?.displayName === (flag?.displayName || '') &&
-                    editingFlagData?.description === (flag?.description || '') &&
-                    editingFlagData?.impressionDataEnabled === flag?.impressionDataEnabled &&
+                    editingFlagData?.description ===
+                      (flag?.description || '') &&
+                    editingFlagData?.impressionDataEnabled ===
+                      flag?.impressionDataEnabled &&
                     JSON.stringify(editingFlagData?.tags || []) ===
                       JSON.stringify(flag?.tags || []))
                 }
@@ -3514,11 +3927,13 @@ const FeatureFlagDetailPage: React.FC = () => {
                   {/* New strategy default disabled notice */}
                   {(() => {
                     // Determine if this is a new strategy in disabled state
-                    const isNewStrategy = editingStrategy.id?.startsWith('new-');
+                    const isNewStrategy =
+                      editingStrategy.id?.startsWith('new-');
                     const isRolloutStrategy =
                       editingStrategy.name === 'flexibleRollout' ||
                       editingStrategy.name?.includes('Rollout');
-                    const rolloutValue = editingStrategy.parameters?.rollout ?? 0;
+                    const rolloutValue =
+                      editingStrategy.parameters?.rollout ?? 0;
                     const isDisabled = editingStrategy.disabled !== false; // disabled by default
                     const hasTargeting =
                       (editingStrategy.constraints?.length || 0) > 0 ||
@@ -3530,7 +3945,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                     // - For non-rollout strategies: disabled and no targeting
                     const shouldShowNotice =
                       isNewStrategy &&
-                      ((isRolloutStrategy && (isDisabled || rolloutValue === 0)) ||
+                      ((isRolloutStrategy &&
+                        (isDisabled || rolloutValue === 0)) ||
                         (!isRolloutStrategy && isDisabled && !hasTargeting));
 
                     return shouldShowNotice ? (
@@ -3557,7 +3973,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                         <MenuItem key={type.name} value={type.name}>
                           <Box>
                             <Typography>{t(type.titleKey)}</Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {t(type.descKey)}
                             </Typography>
                           </Box>
@@ -3626,7 +4045,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                           <FormControl fullWidth size="small">
                             <Typography
                               variant="subtitle2"
-                              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                                mb: 0.5,
+                              }}
                             >
                               {t('featureFlags.stickiness')}
                               <Tooltip title={t('featureFlags.stickinessHelp')}>
@@ -3638,7 +4062,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                               </Tooltip>
                             </Typography>
                             <Select
-                              value={editingStrategy.parameters?.stickiness || 'default'}
+                              value={
+                                editingStrategy.parameters?.stickiness ||
+                                'default'
+                              }
                               onChange={(e) =>
                                 setEditingStrategy({
                                   ...editingStrategy,
@@ -3654,7 +4081,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   <Typography variant="body2">
                                     {t('featureFlags.stickinessDefault')}
                                   </Typography>
-                                  <Typography variant="caption" color="text.secondary">
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
                                     {t('featureFlags.stickinessDefaultDesc')}
                                   </Typography>
                                 </Box>
@@ -3664,7 +4094,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   <Typography variant="body2">
                                     {t('featureFlags.stickinessUserId')}
                                   </Typography>
-                                  <Typography variant="caption" color="text.secondary">
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
                                     {t('featureFlags.stickinessUserIdDesc')}
                                   </Typography>
                                 </Box>
@@ -3674,7 +4107,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   <Typography variant="body2">
                                     {t('featureFlags.stickinessSessionId')}
                                   </Typography>
-                                  <Typography variant="caption" color="text.secondary">
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
                                     {t('featureFlags.stickinessSessionIdDesc')}
                                   </Typography>
                                 </Box>
@@ -3684,7 +4120,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   <Typography variant="body2">
                                     {t('featureFlags.stickinessRandom')}
                                   </Typography>
-                                  <Typography variant="caption" color="text.secondary">
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
                                     {t('featureFlags.stickinessRandomDesc')}
                                   </Typography>
                                 </Box>
@@ -3696,7 +4135,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                           <Box>
                             <Typography
                               variant="subtitle2"
-                              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                                mb: 0.5,
+                              }}
                             >
                               {t('featureFlags.groupId')}
                               <Tooltip title={t('featureFlags.groupIdHelp')}>
@@ -3710,7 +4154,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                             <TextField
                               fullWidth
                               size="small"
-                              value={editingStrategy.parameters?.groupId || flag?.flagName || ''}
+                              value={
+                                editingStrategy.parameters?.groupId ||
+                                flag?.flagName ||
+                                ''
+                              }
                               onChange={(e) =>
                                 setEditingStrategy({
                                   ...editingStrategy,
@@ -3762,7 +4210,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                             {...params}
                             size="small"
                             required
-                            error={!(editingStrategy.parameters?.userIds?.length > 0)}
+                            error={
+                              !(editingStrategy.parameters?.userIds?.length > 0)
+                            }
                             placeholder={t('featureFlags.userIdsPlaceholder')}
                             helperText={t('featureFlags.userIdsHelp')}
                           />
@@ -3793,7 +4243,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                         <Typography component="span" color="error.main">
                           *
                         </Typography>
-                        <Tooltip title={t('featureFlags.remoteAddressesTooltip')}>
+                        <Tooltip
+                          title={t('featureFlags.remoteAddressesTooltip')}
+                        >
                           <HelpOutlineIcon fontSize="small" color="action" />
                         </Tooltip>
                       </Typography>
@@ -3816,8 +4268,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                             {...params}
                             size="small"
                             required
-                            error={!(editingStrategy.parameters?.IPs?.length > 0)}
-                            placeholder={t('featureFlags.remoteAddressesPlaceholder')}
+                            error={
+                              !(editingStrategy.parameters?.IPs?.length > 0)
+                            }
+                            placeholder={t(
+                              'featureFlags.remoteAddressesPlaceholder'
+                            )}
                             helperText={t('featureFlags.remoteAddressesHelp')}
                           />
                         )}
@@ -3870,7 +4326,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                             {...params}
                             size="small"
                             required
-                            error={!(editingStrategy.parameters?.hostNames?.length > 0)}
+                            error={
+                              !(
+                                editingStrategy.parameters?.hostNames?.length >
+                                0
+                              )
+                            }
                             placeholder={t('featureFlags.hostnamesPlaceholder')}
                             helperText={t('featureFlags.hostnamesHelp')}
                           />
@@ -3908,7 +4369,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                       }
                       label={
                         <Box>
-                          <Typography>{t('featureFlags.strategyActive')}</Typography>
+                          <Typography>
+                            {t('featureFlags.strategyActive')}
+                          </Typography>
                           <Typography variant="caption" color="text.secondary">
                             {t('featureFlags.strategyActiveHelp')}
                           </Typography>
@@ -3946,9 +4409,14 @@ const FeatureFlagDetailPage: React.FC = () => {
                     <Autocomplete
                       multiple
                       options={Array.isArray(segments) ? segments : []}
-                      getOptionLabel={(option) => option.displayName || option.segmentName || ''}
-                      value={(Array.isArray(segments) ? segments : []).filter((s) =>
-                        (editingStrategy.segments || []).includes(s.segmentName)
+                      getOptionLabel={(option) =>
+                        option.displayName || option.segmentName || ''
+                      }
+                      value={(Array.isArray(segments) ? segments : []).filter(
+                        (s) =>
+                          (editingStrategy.segments || []).includes(
+                            s.segmentName
+                          )
                       )}
                       onChange={(_, newValue) =>
                         setEditingStrategy({
@@ -3980,7 +4448,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     {(editingStrategy.segments?.length || 0) > 0 && (
                       <Stack spacing={1} sx={{ mt: 2 }}>
                         {editingStrategy.segments?.map((segmentName) => {
-                          const segment = segments.find((s) => s.segmentName === segmentName);
+                          const segment = segments.find(
+                            (s) => s.segmentName === segmentName
+                          );
                           if (!segment) return null;
                           return (
                             <Paper
@@ -4000,7 +4470,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   mb: 1,
                                 }}
                               >
-                                <Typography variant="subtitle2" fontWeight={600}>
+                                <Typography
+                                  variant="subtitle2"
+                                  fontWeight={600}
+                                >
                                   {segment.displayName || segment.segmentName}
                                 </Typography>
                                 <IconButton
@@ -4050,8 +4523,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   </Box>
                                 )}
                               {expandedSegmentsDialog.has(segmentName) &&
-                                (!segment.constraints || segment.constraints.length === 0) && (
-                                  <Typography variant="caption" color="text.secondary">
+                                (!segment.constraints ||
+                                  segment.constraints.length === 0) && (
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
                                     {t('featureFlags.noConstraintsInSegment')}
                                   </Typography>
                                 )}
@@ -4104,7 +4581,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                       onChange={(constraints) =>
                         setEditingStrategy({ ...editingStrategy, constraints })
                       }
-                      contextFields={Array.isArray(contextFields) ? contextFields : []}
+                      contextFields={
+                        Array.isArray(contextFields) ? contextFields : []
+                      }
                     />
                   </Box>
                 </Stack>
@@ -4136,22 +4615,33 @@ const FeatureFlagDetailPage: React.FC = () => {
                 disabled={(() => {
                   // When editing, require changes to be made (check strategy only, valueType/enabledValue/disabledValue are in Values tab)
                   const strategyUnchanged =
-                    JSON.stringify(editingStrategy) === JSON.stringify(originalEditingStrategy);
+                    JSON.stringify(editingStrategy) ===
+                    JSON.stringify(originalEditingStrategy);
                   if (!isAddingStrategy && strategyUnchanged) {
                     return true;
                   }
                   // Disable if any JSON errors
-                  if (Object.values(strategyJsonErrors).some((e) => e !== null)) {
+                  if (
+                    Object.values(strategyJsonErrors).some((e) => e !== null)
+                  ) {
                     return true;
                   }
                   // Disable if any variant has reserved name 'disabled'
-                  if (editingStrategy.variants?.some((v) => v.name.toLowerCase() === 'disabled')) {
+                  if (
+                    editingStrategy.variants?.some(
+                      (v) => v.name.toLowerCase() === 'disabled'
+                    )
+                  ) {
                     return true;
                   }
                   // Validate list-based strategies require non-empty lists
                   if (editingStrategy.name === 'userWithId') {
                     const userIds = editingStrategy.parameters?.userIds;
-                    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+                    if (
+                      !userIds ||
+                      !Array.isArray(userIds) ||
+                      userIds.length === 0
+                    ) {
                       return true;
                     }
                   }
@@ -4163,7 +4653,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                   }
                   if (editingStrategy.name === 'applicationHostname') {
                     const hostNames = editingStrategy.parameters?.hostNames;
-                    if (!hostNames || !Array.isArray(hostNames) || hostNames.length === 0) {
+                    if (
+                      !hostNames ||
+                      !Array.isArray(hostNames) ||
+                      hostNames.length === 0
+                    ) {
                       return true;
                     }
                   }
@@ -4193,7 +4687,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                 required
                 label={t('featureFlags.variantName')}
                 value={editingVariant.name}
-                onChange={(e) => setEditingVariant({ ...editingVariant, name: e.target.value })}
+                onChange={(e) =>
+                  setEditingVariant({ ...editingVariant, name: e.target.value })
+                }
               />
               <Box>
                 <Typography gutterBottom>{t('featureFlags.weight')}</Typography>
@@ -4211,7 +4707,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     max={100}
                     sx={{ flex: 1 }}
                   />
-                  <Typography sx={{ width: 50 }}>{editingVariant.weight}%</Typography>
+                  <Typography sx={{ width: 50 }}>
+                    {editingVariant.weight}%
+                  </Typography>
                 </Box>
               </Box>
             </Stack>
@@ -4227,7 +4725,9 @@ const FeatureFlagDetailPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setVariantDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setVariantDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button variant="contained" onClick={handleSaveVariants}>
             {t('common.save')}
           </Button>
@@ -4254,7 +4754,9 @@ const FeatureFlagDetailPage: React.FC = () => {
               label={t('featureFlags.links.url')}
               placeholder="https://example.com"
               value={editingLink.url}
-              onChange={(e) => setEditingLink({ ...editingLink, url: e.target.value })}
+              onChange={(e) =>
+                setEditingLink({ ...editingLink, url: e.target.value })
+              }
               required
             />
             <TextField
@@ -4263,13 +4765,21 @@ const FeatureFlagDetailPage: React.FC = () => {
               label={t('featureFlags.links.titleLabel')}
               placeholder={t('featureFlags.links.titlePlaceholder')}
               value={editingLink.title || ''}
-              onChange={(e) => setEditingLink({ ...editingLink, title: e.target.value })}
+              onChange={(e) =>
+                setEditingLink({ ...editingLink, title: e.target.value })
+              }
             />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setLinkDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button variant="contained" onClick={handleSaveLink} disabled={!editingLink.url}>
+          <Button onClick={() => setLinkDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSaveLink}
+            disabled={!editingLink.url}
+          >
             {t('common.save')}
           </Button>
         </DialogActions>
@@ -4291,17 +4801,23 @@ const FeatureFlagDetailPage: React.FC = () => {
           <Typography>
             {flag?.isArchived
               ? t('featureFlags.reviveConfirmMessage', { name: flag?.flagName })
-              : t('featureFlags.archiveConfirmMessage', { name: flag?.flagName })}
+              : t('featureFlags.archiveConfirmMessage', {
+                  name: flag?.flagName,
+                })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setArchiveConfirmOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setArchiveConfirmOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             color={flag?.isArchived ? 'success' : 'warning'}
             onClick={handleArchiveConfirm}
           >
-            {flag?.isArchived ? t('featureFlags.revive') : t('featureFlags.archive')}
+            {flag?.isArchived
+              ? t('featureFlags.revive')
+              : t('featureFlags.archive')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -4321,18 +4837,26 @@ const FeatureFlagDetailPage: React.FC = () => {
         <DialogContent>
           <Typography>
             {flag?.stale
-              ? t('featureFlags.unmarkStaleConfirmMessage', { name: flag?.flagName })
-              : t('featureFlags.markStaleConfirmMessage', { name: flag?.flagName })}
+              ? t('featureFlags.unmarkStaleConfirmMessage', {
+                  name: flag?.flagName,
+                })
+              : t('featureFlags.markStaleConfirmMessage', {
+                  name: flag?.flagName,
+                })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setStaleConfirmOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setStaleConfirmOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             color={flag?.stale ? 'info' : 'secondary'}
             onClick={handleStaleConfirm}
           >
-            {flag?.stale ? t('featureFlags.unmarkStale') : t('featureFlags.markStale')}
+            {flag?.stale
+              ? t('featureFlags.unmarkStale')
+              : t('featureFlags.markStale')}
           </Button>
         </DialogActions>
       </Dialog>

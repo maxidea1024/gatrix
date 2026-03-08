@@ -24,13 +24,19 @@ const KEY = 'isMaintenance';
 const KEY_DETAIL = 'maintenanceDetail';
 
 export class MaintenanceController {
-  static async getStatus(req: EnvironmentRequest, res: Response, next: NextFunction) {
+  static async getStatus(
+    req: EnvironmentRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       // Get environment from request (set by resolveEnvironment middleware)
       const environmentId = req.environmentId;
 
       if (!environmentId) {
-        return res.status(400).json({ success: false, message: 'Environment is required.' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'Environment is required.' });
       }
 
       await respondWithEtagCache(res, {
@@ -76,14 +82,20 @@ export class MaintenanceController {
     }
   }
 
-  static async setStatus(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async setStatus(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const payload = req.body as MaintenancePayload;
       // Get environment from request (set by environmentContextMiddleware)
       const environmentId = req.environmentId;
 
       if (!environmentId) {
-        return res.status(400).json({ success: false, message: 'Environment is required.' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'Environment is required.' });
       }
 
       // Validate: when starting maintenance, default message must be provided
@@ -131,7 +143,8 @@ export class MaintenanceController {
         // Validate minimum duration (5 minutes)
         if (endsAt) {
           const effectiveStart = startsAt || now;
-          const durationMinutes = (endsAt.getTime() - effectiveStart.getTime()) / 60000;
+          const durationMinutes =
+            (endsAt.getTime() - effectiveStart.getTime()) / 60000;
 
           if (durationMinutes < 5) {
             logger.warn(
@@ -144,7 +157,10 @@ export class MaintenanceController {
           }
 
           // Validate grace period (kickDelayMinutes) does not exceed duration
-          if (payload.kickExistingPlayers && payload.kickDelayMinutes !== undefined) {
+          if (
+            payload.kickExistingPlayers &&
+            payload.kickDelayMinutes !== undefined
+          ) {
             if (payload.kickDelayMinutes >= durationMinutes) {
               logger.warn(
                 `[Maintenance Validation] Grace period exceeds duration. kickDelayMinutes: ${payload.kickDelayMinutes}, durationMinutes: ${durationMinutes}`
@@ -160,7 +176,12 @@ export class MaintenanceController {
 
       const userId = req.user?.userId || '';
       // Pass environment explicitly to avoid AsyncLocalStorage context issues
-      await VarsModel.set(KEY, payload.isMaintenance ? 'true' : 'false', userId, environmentId);
+      await VarsModel.set(
+        KEY,
+        payload.isMaintenance ? 'true' : 'false',
+        userId,
+        environmentId
+      );
 
       const detail: any = {
         type: payload.type || 'regular',
@@ -169,7 +190,10 @@ export class MaintenanceController {
         message: payload.message,
       };
       // Only include localeMessages if provided
-      if (payload.localeMessages && Object.keys(payload.localeMessages).length > 0) {
+      if (
+        payload.localeMessages &&
+        Object.keys(payload.localeMessages).length > 0
+      ) {
         detail.localeMessages = payload.localeMessages;
       }
       // Include kick options if provided
@@ -179,9 +203,16 @@ export class MaintenanceController {
       if (payload.kickDelayMinutes !== undefined) {
         detail.kickDelayMinutes = payload.kickDelayMinutes;
       }
-      await VarsModel.set(KEY_DETAIL, JSON.stringify(detail), userId, environmentId);
+      await VarsModel.set(
+        KEY_DETAIL,
+        JSON.stringify(detail),
+        userId,
+        environmentId
+      );
 
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.MAINTENANCE}:${environmentId}`);
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.MAINTENANCE}:${environmentId}`
+      );
 
       // Return true if maintenance is being set (regardless of whether it's currently active)
       // The actual active status will be computed by computeActive() when needed
@@ -224,11 +255,17 @@ export class MaintenanceController {
     }
   }
 
-  static async templatesGet(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async templatesGet(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const environmentId = req.environmentId;
       if (!environmentId) {
-        return res.status(400).json({ success: false, message: 'Environment is required.' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'Environment is required.' });
       }
       const raw = await VarsModel.get('maintenanceTemplates', environmentId);
       const templates = raw ? JSON.parse(raw) : [];
@@ -238,16 +275,29 @@ export class MaintenanceController {
     }
   }
 
-  static async templatesSave(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  static async templatesSave(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const environmentId = req.environmentId;
       if (!environmentId) {
-        return res.status(400).json({ success: false, message: 'Environment is required.' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'Environment is required.' });
       }
       // Each template: { message?: string, messages?: { ko?: string, en?: string, zh?: string } }
-      const templates = Array.isArray(req.body?.templates) ? req.body.templates : [];
+      const templates = Array.isArray(req.body?.templates)
+        ? req.body.templates
+        : [];
       const userId = req.user?.userId || '';
-      await VarsModel.set('maintenanceTemplates', JSON.stringify(templates), userId, environmentId);
+      await VarsModel.set(
+        'maintenanceTemplates',
+        JSON.stringify(templates),
+        userId,
+        environmentId
+      );
       res.json({
         success: true,
         message: 'Templates saved',

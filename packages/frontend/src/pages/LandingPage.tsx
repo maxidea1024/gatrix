@@ -152,10 +152,14 @@ const LandingPage: React.FC = () => {
           }}
         >
           {/* Settings fields */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mb: 3.5 }}>
+          <Box
+            sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mb: 3.5 }}
+          >
             {/* Language */}
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}
+              >
                 <LanguageIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                 <Typography
                   variant="caption"
@@ -185,7 +189,9 @@ const LandingPage: React.FC = () => {
 
             {/* Theme */}
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}
+              >
                 <PaletteIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                 <Typography
                   variant="caption"
@@ -202,7 +208,9 @@ const LandingPage: React.FC = () => {
               <FormControl fullWidth size="small">
                 <Select
                   value={selectedTheme}
-                  onChange={(e) => setSelectedTheme(e.target.value as ThemeMode)}
+                  onChange={(e) =>
+                    setSelectedTheme(e.target.value as ThemeMode)
+                  }
                 >
                   {themeOptions.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -215,7 +223,9 @@ const LandingPage: React.FC = () => {
 
             {/* Timezone */}
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}
+              >
                 <TimezoneIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                 <Typography
                   variant="caption"
@@ -237,7 +247,11 @@ const LandingPage: React.FC = () => {
                 options={timezoneOptions}
                 getOptionLabel={formatTimezone}
                 renderInput={(params) => (
-                  <TextField {...params} placeholder={t('common.searchTimezone')} size="small" />
+                  <TextField
+                    {...params}
+                    placeholder={t('common.searchTimezone')}
+                    size="small"
+                  />
                 )}
                 renderOption={(props, option) => (
                   <li {...props}>

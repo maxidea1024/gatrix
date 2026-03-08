@@ -51,7 +51,10 @@ export class ReleaseFlowService {
    * Schedule a delayed job to progress to the next milestone after the
    * transition interval elapses. Cancels any existing job for this plan first.
    */
-  private async scheduleProgressionJob(planId: string, delayMs: number): Promise<void> {
+  private async scheduleProgressionJob(
+    planId: string,
+    delayMs: number
+  ): Promise<void> {
     // Cancel any existing delayed job for this plan
     await this.cancelProgressionJob(planId);
 
@@ -87,14 +90,20 @@ export class ReleaseFlowService {
         }
       }
     } catch (error) {
-      logger.warn(`Failed to cancel progression job for plan ${planId}:`, error);
+      logger.warn(
+        `Failed to cancel progression job for plan ${planId}:`,
+        error
+      );
     }
   }
 
   /**
    * Create a new release flow template
    */
-  async createTemplate(input: CreateTemplateInput, userId: string): Promise<ReleaseFlowAttributes> {
+  async createTemplate(
+    input: CreateTemplateInput,
+    userId: string
+  ): Promise<ReleaseFlowAttributes> {
     const trx = await db.transaction();
     try {
       const flow = await ReleaseFlowModel.create({
@@ -125,7 +134,10 @@ export class ReleaseFlowService {
           });
 
           if (sInput.segments && sInput.segments.length > 0) {
-            await ReleaseFlowStrategyModel.updateSegments(strategy.id, sInput.segments);
+            await ReleaseFlowStrategyModel.updateSegments(
+              strategy.id,
+              sInput.segments
+            );
           }
         }
       }
@@ -160,10 +172,18 @@ export class ReleaseFlowService {
   ): Promise<ReleaseFlowAttributes> {
     const template = await ReleaseFlowModel.findById(templateId);
     if (!template || template.discriminator !== 'template') {
-      throw new GatrixError('Template not found', 404, true, ErrorCodes.NOT_FOUND);
+      throw new GatrixError(
+        'Template not found',
+        404,
+        true,
+        ErrorCodes.NOT_FOUND
+      );
     }
 
-    const existingPlan = await ReleaseFlowModel.findPlanByFlagAndEnv(flagId, environmentId);
+    const existingPlan = await ReleaseFlowModel.findPlanByFlagAndEnv(
+      flagId,
+      environmentId
+    );
     if (existingPlan) {
       throw new GatrixError(
         'A release flow is already active for this flag and environment',
@@ -206,7 +226,10 @@ export class ReleaseFlowService {
           });
 
           if (tStrategy.segments && tStrategy.segments.length > 0) {
-            await ReleaseFlowStrategyModel.updateSegments(pStrategy.id, tStrategy.segments);
+            await ReleaseFlowStrategyModel.updateSegments(
+              pStrategy.id,
+              tStrategy.segments
+            );
           }
         }
       }
@@ -241,12 +264,22 @@ export class ReleaseFlowService {
   ): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
-      throw new GatrixError('Release plan not found', 404, true, ErrorCodes.NOT_FOUND);
+      throw new GatrixError(
+        'Release plan not found',
+        404,
+        true,
+        ErrorCodes.NOT_FOUND
+      );
     }
 
     const milestone = (plan.milestones || []).find((m) => m.id === milestoneId);
     if (!milestone) {
-      throw new GatrixError('Milestone not found in plan', 404, true, ErrorCodes.NOT_FOUND);
+      throw new GatrixError(
+        'Milestone not found in plan',
+        404,
+        true,
+        ErrorCodes.NOT_FOUND
+      );
     }
 
     const trx = await db.transaction();
@@ -296,7 +329,10 @@ export class ReleaseFlowService {
 
         // Copy segments
         if (ms.segments && ms.segments.length > 0) {
-          const segments = await db('g_feature_segments').whereIn('segmentName', ms.segments);
+          const segments = await db('g_feature_segments').whereIn(
+            'segmentName',
+            ms.segments
+          );
           const segmentIds = segments.map((s) => s.id);
           if (segmentIds.length > 0) {
             const links = segmentIds.map((segmentId) => ({
@@ -323,7 +359,10 @@ export class ReleaseFlowService {
 
       // 4. CRITICAL: Bump flag version and notify SDKs about strategy changes
       // Without this, SDKs will not detect the new strategies from the milestone
-      const flag = await db('g_feature_flags').where('id', plan.flagId).select('flagName').first();
+      const flag = await db('g_feature_flags')
+        .where('id', plan.flagId)
+        .select('flagName')
+        .first();
       if (flag && plan.environmentId) {
         await db('g_feature_flags')
           .where('id', plan.flagId)
@@ -332,12 +371,15 @@ export class ReleaseFlowService {
             updatedAt: new Date(),
           });
         const { featureFlagService } = await import('./feature-flag-service');
-        await featureFlagService.invalidateCache(plan.environmentId, [flag.flagName]);
+        await featureFlagService.invalidateCache(plan.environmentId, [
+          flag.flagName,
+        ]);
       }
 
       // 5. Schedule delayed job for automatic progression
       if (milestone.transitionCondition?.intervalMinutes) {
-        const delayMs = milestone.transitionCondition.intervalMinutes * 60 * 1000;
+        const delayMs =
+          milestone.transitionCondition.intervalMinutes * 60 * 1000;
         await this.scheduleProgressionJob(plan.id, delayMs);
       } else {
         // No transition condition — cancel any lingering delayed job
@@ -368,37 +410,70 @@ export class ReleaseFlowService {
   /**
    * Start a plan (begins from the first milestone)
    */
-  async startPlan(planId: string, userId: string): Promise<ReleaseFlowAttributes> {
+  async startPlan(
+    planId: string,
+    userId: string
+  ): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
-      throw new GatrixError('Release plan not found', 404, true, ErrorCodes.NOT_FOUND);
+      throw new GatrixError(
+        'Release plan not found',
+        404,
+        true,
+        ErrorCodes.NOT_FOUND
+      );
     }
 
     if (plan.status === 'active') {
-      throw new GatrixError('Plan is already active', 400, true, ErrorCodes.BAD_REQUEST);
+      throw new GatrixError(
+        'Plan is already active',
+        400,
+        true,
+        ErrorCodes.BAD_REQUEST
+      );
     }
 
     const milestones = plan.milestones || [];
     if (milestones.length === 0) {
-      throw new GatrixError('Plan has no milestones', 400, true, ErrorCodes.BAD_REQUEST);
+      throw new GatrixError(
+        'Plan has no milestones',
+        400,
+        true,
+        ErrorCodes.BAD_REQUEST
+      );
     }
 
     // Start from the first milestone
-    const firstMilestone = milestones.sort((a, b) => a.sortOrder - b.sortOrder)[0];
+    const firstMilestone = milestones.sort(
+      (a, b) => a.sortOrder - b.sortOrder
+    )[0];
     return this.startMilestone(planId, firstMilestone.id, userId);
   }
 
   /**
    * Pause the current plan (stops progression timer)
    */
-  async pausePlan(planId: string, userId: string): Promise<ReleaseFlowAttributes> {
+  async pausePlan(
+    planId: string,
+    userId: string
+  ): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
-      throw new GatrixError('Release plan not found', 404, true, ErrorCodes.NOT_FOUND);
+      throw new GatrixError(
+        'Release plan not found',
+        404,
+        true,
+        ErrorCodes.NOT_FOUND
+      );
     }
 
     if (plan.status !== 'active') {
-      throw new GatrixError('Plan is not active', 400, true, ErrorCodes.BAD_REQUEST);
+      throw new GatrixError(
+        'Plan is not active',
+        400,
+        true,
+        ErrorCodes.BAD_REQUEST
+      );
     }
 
     // Pause the active milestone
@@ -411,7 +486,10 @@ export class ReleaseFlowService {
     // Cancel any pending progression delayed job
     await this.cancelProgressionJob(planId);
 
-    await ReleaseFlowModel.update(planId, { status: 'paused', updatedBy: userId });
+    await ReleaseFlowModel.update(planId, {
+      status: 'paused',
+      updatedBy: userId,
+    });
 
     await AuditLogModel.create({
       action: 'release_flow.pause_plan',
@@ -439,22 +517,42 @@ export class ReleaseFlowService {
   /**
    * Resume a paused plan
    */
-  async resumePlan(planId: string, userId: string): Promise<ReleaseFlowAttributes> {
+  async resumePlan(
+    planId: string,
+    userId: string
+  ): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
-      throw new GatrixError('Release plan not found', 404, true, ErrorCodes.NOT_FOUND);
+      throw new GatrixError(
+        'Release plan not found',
+        404,
+        true,
+        ErrorCodes.NOT_FOUND
+      );
     }
 
     if (plan.status !== 'paused') {
-      throw new GatrixError('Plan is not paused', 400, true, ErrorCodes.BAD_REQUEST);
+      throw new GatrixError(
+        'Plan is not paused',
+        400,
+        true,
+        ErrorCodes.BAD_REQUEST
+      );
     }
 
     // Clear pause on the active milestone
     if (plan.activeMilestoneId) {
-      const activeMilestone = (plan.milestones || []).find((m) => m.id === plan.activeMilestoneId);
-      if (activeMilestone && activeMilestone.pausedAt && activeMilestone.startedAt) {
+      const activeMilestone = (plan.milestones || []).find(
+        (m) => m.id === plan.activeMilestoneId
+      );
+      if (
+        activeMilestone &&
+        activeMilestone.pausedAt &&
+        activeMilestone.startedAt
+      ) {
         // Extend the startedAt by the duration it was paused
-        const pauseDuration = new Date().getTime() - new Date(activeMilestone.pausedAt).getTime();
+        const pauseDuration =
+          new Date().getTime() - new Date(activeMilestone.pausedAt).getTime();
         const newStartedAt = new Date(
           new Date(activeMilestone.startedAt).getTime() + pauseDuration
         );
@@ -472,16 +570,26 @@ export class ReleaseFlowService {
     // Re-schedule delayed job with remaining transition time
     if (plan.activeMilestoneId) {
       // Re-read the milestone to get the updated startedAt
-      const updatedMilestone = await ReleaseFlowMilestoneModel.findById(plan.activeMilestoneId);
-      if (updatedMilestone?.transitionCondition?.intervalMinutes && updatedMilestone.startedAt) {
-        const requiredMs = updatedMilestone.transitionCondition.intervalMinutes * 60 * 1000;
-        const elapsedMs = new Date().getTime() - new Date(updatedMilestone.startedAt).getTime();
+      const updatedMilestone = await ReleaseFlowMilestoneModel.findById(
+        plan.activeMilestoneId
+      );
+      if (
+        updatedMilestone?.transitionCondition?.intervalMinutes &&
+        updatedMilestone.startedAt
+      ) {
+        const requiredMs =
+          updatedMilestone.transitionCondition.intervalMinutes * 60 * 1000;
+        const elapsedMs =
+          new Date().getTime() - new Date(updatedMilestone.startedAt).getTime();
         const remainingMs = Math.max(0, requiredMs - elapsedMs);
         await this.scheduleProgressionJob(planId, remainingMs);
       }
     }
 
-    await ReleaseFlowModel.update(planId, { status: 'active', updatedBy: userId });
+    await ReleaseFlowModel.update(planId, {
+      status: 'active',
+      updatedBy: userId,
+    });
 
     await AuditLogModel.create({
       action: 'release_flow.resume_plan',
@@ -518,8 +626,12 @@ export class ReleaseFlowService {
       return null;
     }
 
-    const milestones = (plan.milestones || []).sort((a, b) => a.sortOrder - b.sortOrder);
-    const currentIndex = milestones.findIndex((m) => m.id === plan.activeMilestoneId);
+    const milestones = (plan.milestones || []).sort(
+      (a, b) => a.sortOrder - b.sortOrder
+    );
+    const currentIndex = milestones.findIndex(
+      (m) => m.id === plan.activeMilestoneId
+    );
 
     if (currentIndex < 0) {
       return null;
@@ -562,7 +674,11 @@ export class ReleaseFlowService {
     // Start the next milestone first, then mark current as progressed
     // This order prevents a stuck state if startMilestone fails
     const nextMilestone = milestones[currentIndex + 1];
-    const result = await this.startMilestone(planId, nextMilestone.id, userId || null);
+    const result = await this.startMilestone(
+      planId,
+      nextMilestone.id,
+      userId || null
+    );
 
     // Only mark as progressed after successful transition
     await ReleaseFlowMilestoneModel.update(milestones[currentIndex].id, {
@@ -582,7 +698,12 @@ export class ReleaseFlowService {
   ): Promise<ReleaseFlowMilestoneAttributes> {
     const milestone = await ReleaseFlowMilestoneModel.findById(milestoneId);
     if (!milestone) {
-      throw new GatrixError('Milestone not found', 404, true, ErrorCodes.NOT_FOUND);
+      throw new GatrixError(
+        'Milestone not found',
+        404,
+        true,
+        ErrorCodes.NOT_FOUND
+      );
     }
 
     if (transitionCondition.intervalMinutes < 1) {
@@ -594,7 +715,9 @@ export class ReleaseFlowService {
       );
     }
 
-    const updated = await ReleaseFlowMilestoneModel.update(milestoneId, { transitionCondition });
+    const updated = await ReleaseFlowMilestoneModel.update(milestoneId, {
+      transitionCondition,
+    });
 
     await AuditLogModel.create({
       action: 'release_flow.set_transition',
@@ -617,7 +740,12 @@ export class ReleaseFlowService {
   ): Promise<ReleaseFlowMilestoneAttributes> {
     const milestone = await ReleaseFlowMilestoneModel.findById(milestoneId);
     if (!milestone) {
-      throw new GatrixError('Milestone not found', 404, true, ErrorCodes.NOT_FOUND);
+      throw new GatrixError(
+        'Milestone not found',
+        404,
+        true,
+        ErrorCodes.NOT_FOUND
+      );
     }
 
     const updated = await ReleaseFlowMilestoneModel.update(milestoneId, {
@@ -644,7 +772,12 @@ export class ReleaseFlowService {
     try {
       const existing = await ReleaseFlowModel.findById(id);
       if (!existing || existing.discriminator !== 'template') {
-        throw new GatrixError('Template not found', 404, true, ErrorCodes.NOT_FOUND);
+        throw new GatrixError(
+          'Template not found',
+          404,
+          true,
+          ErrorCodes.NOT_FOUND
+        );
       }
 
       // Update main flow record
@@ -682,7 +815,10 @@ export class ReleaseFlowService {
             });
 
             if (sInput.segments && sInput.segments.length > 0) {
-              await ReleaseFlowStrategyModel.updateSegments(strategy.id, sInput.segments);
+              await ReleaseFlowStrategyModel.updateSegments(
+                strategy.id,
+                sInput.segments
+              );
             }
           }
         }
@@ -710,7 +846,12 @@ export class ReleaseFlowService {
   async deleteTemplate(id: string, userId: string): Promise<void> {
     const existing = await ReleaseFlowModel.findById(id);
     if (!existing || existing.discriminator !== 'template') {
-      throw new GatrixError('Template not found', 404, true, ErrorCodes.NOT_FOUND);
+      throw new GatrixError(
+        'Template not found',
+        404,
+        true,
+        ErrorCodes.NOT_FOUND
+      );
     }
 
     // Hard delete or soft delete? User rule says "isArchived" columns are common.
@@ -733,7 +874,12 @@ export class ReleaseFlowService {
   async getTemplateById(id: string): Promise<ReleaseFlowAttributes> {
     const template = await ReleaseFlowModel.findById(id);
     if (!template || template.discriminator !== 'template') {
-      throw new GatrixError('Template not found', 404, true, ErrorCodes.NOT_FOUND);
+      throw new GatrixError(
+        'Template not found',
+        404,
+        true,
+        ErrorCodes.NOT_FOUND
+      );
     }
     return template;
   }

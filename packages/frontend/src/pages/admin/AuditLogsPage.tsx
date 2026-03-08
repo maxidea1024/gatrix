@@ -74,16 +74,24 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import { AuditLogService, AuditLogFilters } from '../../services/auditLogService';
+import {
+  AuditLogService,
+  AuditLogFilters,
+} from '../../services/auditLogService';
 import { AuditLog } from '../../types';
-import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import {
+  formatDateTimeDetailed,
+  formatRelativeTime,
+} from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useI18n } from '../../contexts/I18nContext';
 import { koKR, zhCN, enUS } from '@mui/x-date-pickers/locales';
 import dayjs, { Dayjs } from 'dayjs';
-import DateRangePicker, { DateRangePreset } from '../../components/common/DateRangePicker';
+import DateRangePicker, {
+  DateRangePreset,
+} from '../../components/common/DateRangePicker';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -104,9 +112,19 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
+  column,
+  onToggleVisibility,
+}) => {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: column.id,
   });
 
@@ -136,7 +154,11 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
         </Box>
       }
     >
-      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -146,7 +168,10 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
       </ListItemButton>
     </ListItem>
   );
@@ -193,15 +218,20 @@ const AuditLogsPage: React.FC = () => {
 
   // Date range state
   const [dateFrom, setDateFrom] = useState<Dayjs | null>(
-    pageState.filters?.start_date ? dayjs(pageState.filters.start_date) : dayjs().subtract(7, 'day')
+    pageState.filters?.start_date
+      ? dayjs(pageState.filters.start_date)
+      : dayjs().subtract(7, 'day')
   );
   const [dateTo, setDateTo] = useState<Dayjs | null>(
     pageState.filters?.end_date ? dayjs(pageState.filters.end_date) : dayjs()
   );
-  const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>('last7d');
+  const [dateRangePreset, setDateRangePreset] =
+    useState<DateRangePreset>('last7d');
 
   // Filters - localStorage에서 복원
-  const [userFilter, setUserFilter] = useState<string>(pageState.filters?.user || '');
+  const [userFilter, setUserFilter] = useState<string>(
+    pageState.filters?.user || ''
+  );
 
   // 동적 Filter Status
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -240,7 +270,8 @@ const AuditLogsPage: React.FC = () => {
     return defaultColumns;
   });
 
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLButtonElement | null>(null);
 
   const columnSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -298,7 +329,11 @@ const AuditLogsPage: React.FC = () => {
 
       // Add dynamic filters
       activeFilters.forEach((filter) => {
-        if (filter.value !== undefined && filter.value !== null && filter.value !== '') {
+        if (
+          filter.value !== undefined &&
+          filter.value !== null &&
+          filter.value !== ''
+        ) {
           // For multiselect filters, send as array with operator
           if (Array.isArray(filter.value) && filter.value.length > 0) {
             (dateFilters as any)[filter.key] = filter.value;
@@ -337,7 +372,15 @@ const AuditLogsPage: React.FC = () => {
       setLoading(false);
       setIsInitialLoad(false);
     }
-  }, [pageState, dateFrom, dateTo, debouncedUserFilter, activeFilters, enqueueSnackbar, t]);
+  }, [
+    pageState,
+    dateFrom,
+    dateTo,
+    debouncedUserFilter,
+    activeFilters,
+    enqueueSnackbar,
+    t,
+  ]);
 
   useEffect(() => {
     loadAuditLogs();
@@ -348,7 +391,9 @@ const AuditLogsPage: React.FC = () => {
     updatePage(newPage + 1); // MUI는 0부터 시작, 우리는 1부터 시작
   };
 
-  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRowsPerPageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const newLimit = parseInt(event.target.value, 10);
     updateLimit(newLimit);
   };
@@ -381,7 +426,9 @@ const AuditLogsPage: React.FC = () => {
     if (filters.action) {
       restoredFilters.push({
         key: 'action',
-        value: Array.isArray(filters.action) ? filters.action : [filters.action],
+        value: Array.isArray(filters.action)
+          ? filters.action
+          : [filters.action],
         label: t('auditLogs.action'),
         operator: 'any_of',
       });
@@ -425,11 +472,18 @@ const AuditLogsPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, value } : f)));
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === filterKey ? { ...f, value } : f))
+    );
   };
 
-  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
-    setActiveFilters((prev) => prev.map((f) => (f.key === filterKey ? { ...f, operator } : f)));
+  const handleOperatorChange = (
+    filterKey: string,
+    operator: 'any_of' | 'include_all'
+  ) => {
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === filterKey ? { ...f, operator } : f))
+    );
   };
 
   // Column handlers
@@ -492,7 +546,9 @@ const AuditLogsPage: React.FC = () => {
         );
       case 'resource':
         const resourceType =
-          (log as any).resourceType || (log as any).resource_type || (log as any).entityType;
+          (log as any).resourceType ||
+          (log as any).resource_type ||
+          (log as any).entityType;
         return resourceType ? (
           <Box>
             <Typography variant="body2" fontWeight="medium">
@@ -502,9 +558,16 @@ const AuditLogsPage: React.FC = () => {
               const oldVals = (log as any).oldValues || (log as any).old_values;
               const newVals = (log as any).newValues || (log as any).new_values;
               const resourceName =
-                oldVals?.name || newVals?.name || oldVals?.worldId || newVals?.worldId;
+                oldVals?.name ||
+                newVals?.name ||
+                oldVals?.worldId ||
+                newVals?.worldId;
               return resourceName ? (
-                <Typography variant="body2" color="text.primary" sx={{ fontWeight: 500 }}>
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  sx={{ fontWeight: 500 }}
+                >
                   {resourceName}
                 </Typography>
               ) : null;
@@ -517,7 +580,9 @@ const AuditLogsPage: React.FC = () => {
         );
       case 'resourceId':
         const resourceId =
-          (log as any).resourceId || (log as any).resource_id || (log as any).entityId;
+          (log as any).resourceId ||
+          (log as any).resource_id ||
+          (log as any).entityId;
         return resourceId ? (
           <Typography variant="caption" color="text.secondary">
             ID: {resourceId}
@@ -591,7 +656,8 @@ const AuditLogsPage: React.FC = () => {
 
     copyToClipboardWithNotification(
       text,
-      () => enqueueSnackbar(t('auditLogs.detailsCopied'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('auditLogs.detailsCopied'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -715,7 +781,9 @@ const AuditLogsPage: React.FC = () => {
                       {columns
                         .filter((col) => col.visible)
                         .map((column) => (
-                          <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
+                          <TableCell key={column.id}>
+                            {t(column.labelKey)}
+                          </TableCell>
                         ))}
                     </TableRow>
                   </TableHead>
@@ -733,10 +801,15 @@ const AuditLogsPage: React.FC = () => {
                                   ? 'rgba(255, 255, 255, 0.02)'
                                   : 'rgba(0, 0, 0, 0.02)',
                             '& > *': {
-                              borderBottom: expandedRowId === log.id ? 'none' : undefined,
+                              borderBottom:
+                                expandedRowId === log.id ? 'none' : undefined,
                             },
                           }}
-                          onClick={() => setExpandedRowId(expandedRowId === log.id ? null : log.id)}
+                          onClick={() =>
+                            setExpandedRowId(
+                              expandedRowId === log.id ? null : log.id
+                            )
+                          }
                         >
                           <TableCell>
                             <IconButton size="small">
@@ -760,9 +833,15 @@ const AuditLogsPage: React.FC = () => {
                         <TableRow hover>
                           <TableCell
                             style={{ paddingBottom: 0, paddingTop: 0 }}
-                            colSpan={columns.filter((col) => col.visible).length + 1}
+                            colSpan={
+                              columns.filter((col) => col.visible).length + 1
+                            }
                           >
-                            <Collapse in={expandedRowId === log.id} timeout="auto" unmountOnExit>
+                            <Collapse
+                              in={expandedRowId === log.id}
+                              timeout="auto"
+                              unmountOnExit
+                            >
                               <Box
                                 sx={{
                                   py: 3,
@@ -788,7 +867,9 @@ const AuditLogsPage: React.FC = () => {
                                 >
                                   <Chip
                                     label={t(`auditLogs.actions.${log.action}`)}
-                                    color={AuditLogService.getActionColor(log.action)}
+                                    color={AuditLogService.getActionColor(
+                                      log.action
+                                    )}
                                     sx={{
                                       fontWeight: 600,
                                       fontSize: '0.875rem',
@@ -838,9 +919,17 @@ const AuditLogsPage: React.FC = () => {
                                       variant="body1"
                                       sx={{ mt: 0.5, fontFamily: 'monospace' }}
                                     >
-                                      <Tooltip title={formatDateTimeDetailed(log.createdAt)}>
+                                      <Tooltip
+                                        title={formatDateTimeDetailed(
+                                          log.createdAt
+                                        )}
+                                      >
                                         <span>
-                                          {formatRelativeTime(log.createdAt, undefined, language)}
+                                          {formatRelativeTime(
+                                            log.createdAt,
+                                            undefined,
+                                            language
+                                          )}
                                         </span>
                                       </Tooltip>
                                     </Typography>
@@ -864,7 +953,10 @@ const AuditLogsPage: React.FC = () => {
                                     <Box sx={{ mt: 0.5 }}>
                                       {log.userName ? (
                                         <>
-                                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                          <Typography
+                                            variant="body1"
+                                            sx={{ fontWeight: 500 }}
+                                          >
                                             {log.userName}
                                           </Typography>
                                           <Typography
@@ -879,7 +971,10 @@ const AuditLogsPage: React.FC = () => {
                                           </Typography>
                                         </>
                                       ) : (
-                                        <Typography variant="body1" color="text.secondary">
+                                        <Typography
+                                          variant="body1"
+                                          color="text.secondary"
+                                        >
                                           {t('auditLogs.system')}
                                         </Typography>
                                       )}
@@ -908,9 +1003,11 @@ const AuditLogsPage: React.FC = () => {
                                         <Box sx={{ mt: 0.5 }}>
                                           {(() => {
                                             const oldVals =
-                                              (log as any).oldValues || (log as any).old_values;
+                                              (log as any).oldValues ||
+                                              (log as any).old_values;
                                             const newVals =
-                                              (log as any).newValues || (log as any).new_values;
+                                              (log as any).newValues ||
+                                              (log as any).new_values;
                                             const resourceName =
                                               oldVals?.name ||
                                               newVals?.name ||
@@ -1012,9 +1109,11 @@ const AuditLogsPage: React.FC = () => {
                                   {/* Changes - Diff Viewer */}
                                   {(() => {
                                     const oldVals =
-                                      (log as any).oldValues || (log as any).old_values;
+                                      (log as any).oldValues ||
+                                      (log as any).old_values;
                                     const newVals =
-                                      (log as any).newValues || (log as any).new_values;
+                                      (log as any).newValues ||
+                                      (log as any).new_values;
                                     return (
                                       oldVals &&
                                       newVals && (
@@ -1066,7 +1165,9 @@ const AuditLogsPage: React.FC = () => {
                                                         width: '37.5%',
                                                       }}
                                                     >
-                                                      {t('changeRequest.oldValue')}
+                                                      {t(
+                                                        'changeRequest.oldValue'
+                                                      )}
                                                     </TableCell>
                                                     <TableCell
                                                       sx={{
@@ -1074,15 +1175,21 @@ const AuditLogsPage: React.FC = () => {
                                                         width: '37.5%',
                                                       }}
                                                     >
-                                                      {t('changeRequest.newValue')}
+                                                      {t(
+                                                        'changeRequest.newValue'
+                                                      )}
                                                     </TableCell>
                                                   </TableRow>
                                                 </TableHead>
                                                 <TableBody>
                                                   {(() => {
                                                     const allKeys = new Set([
-                                                      ...Object.keys(oldVals || {}),
-                                                      ...Object.keys(newVals || {}),
+                                                      ...Object.keys(
+                                                        oldVals || {}
+                                                      ),
+                                                      ...Object.keys(
+                                                        newVals || {}
+                                                      ),
                                                     ]);
                                                     const changedFields: {
                                                       key: string;
@@ -1090,10 +1197,14 @@ const AuditLogsPage: React.FC = () => {
                                                       newVal: any;
                                                     }[] = [];
                                                     allKeys.forEach((key) => {
-                                                      const oldVal = oldVals?.[key];
-                                                      const newVal = newVals?.[key];
+                                                      const oldVal =
+                                                        oldVals?.[key];
+                                                      const newVal =
+                                                        newVals?.[key];
                                                       if (
-                                                        JSON.stringify(oldVal) !==
+                                                        JSON.stringify(
+                                                          oldVal
+                                                        ) !==
                                                         JSON.stringify(newVal)
                                                       ) {
                                                         changedFields.push({
@@ -1103,74 +1214,104 @@ const AuditLogsPage: React.FC = () => {
                                                         });
                                                       }
                                                     });
-                                                    if (changedFields.length === 0) {
+                                                    if (
+                                                      changedFields.length === 0
+                                                    ) {
                                                       return (
                                                         <TableRow hover>
                                                           <TableCell
                                                             colSpan={3}
                                                             align="center"
                                                             sx={{
-                                                              color: 'text.secondary',
+                                                              color:
+                                                                'text.secondary',
                                                               py: 2,
                                                             }}
                                                           >
-                                                            {t('changeRequest.noChanges')}
+                                                            {t(
+                                                              'changeRequest.noChanges'
+                                                            )}
                                                           </TableCell>
                                                         </TableRow>
                                                       );
                                                     }
                                                     return changedFields.map(
-                                                      ({ key, oldVal, newVal }) => (
+                                                      ({
+                                                        key,
+                                                        oldVal,
+                                                        newVal,
+                                                      }) => (
                                                         <TableRow
                                                           hover
                                                           key={key}
                                                           sx={{
-                                                            '&:nth-of-type(odd)': {
-                                                              bgcolor: 'action.hover',
-                                                            },
+                                                            '&:nth-of-type(odd)':
+                                                              {
+                                                                bgcolor:
+                                                                  'action.hover',
+                                                              },
                                                           }}
                                                         >
                                                           <TableCell
                                                             sx={{
                                                               fontWeight: 500,
-                                                              fontFamily: 'monospace',
-                                                              fontSize: '0.75rem',
+                                                              fontFamily:
+                                                                'monospace',
+                                                              fontSize:
+                                                                '0.75rem',
                                                             }}
                                                           >
                                                             {key}
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily: 'monospace',
-                                                              fontSize: '0.75rem',
+                                                              fontFamily:
+                                                                'monospace',
+                                                              fontSize:
+                                                                '0.75rem',
                                                               bgcolor: alpha(
-                                                                theme.palette.error.main,
+                                                                theme.palette
+                                                                  .error.main,
                                                                 0.08
                                                               ),
-                                                              color: 'text.secondary',
-                                                              wordBreak: 'break-all',
+                                                              color:
+                                                                'text.secondary',
+                                                              wordBreak:
+                                                                'break-all',
                                                             }}
                                                           >
-                                                            {oldVal !== undefined
-                                                              ? typeof oldVal === 'object'
-                                                                ? JSON.stringify(oldVal)
+                                                            {oldVal !==
+                                                            undefined
+                                                              ? typeof oldVal ===
+                                                                'object'
+                                                                ? JSON.stringify(
+                                                                    oldVal
+                                                                  )
                                                                 : String(oldVal)
                                                               : '-'}
                                                           </TableCell>
                                                           <TableCell
                                                             sx={{
-                                                              fontFamily: 'monospace',
-                                                              fontSize: '0.75rem',
+                                                              fontFamily:
+                                                                'monospace',
+                                                              fontSize:
+                                                                '0.75rem',
                                                               bgcolor: alpha(
-                                                                theme.palette.success.main,
+                                                                theme.palette
+                                                                  .success.main,
                                                                 0.08
                                                               ),
-                                                              wordBreak: 'break-all',
+                                                              wordBreak:
+                                                                'break-all',
                                                             }}
                                                           >
-                                                            {newVal !== undefined
-                                                              ? typeof newVal === 'object'
-                                                                ? JSON.stringify(newVal)
+                                                            {newVal !==
+                                                            undefined
+                                                              ? typeof newVal ===
+                                                                'object'
+                                                                ? JSON.stringify(
+                                                                    newVal
+                                                                  )
                                                                 : String(newVal)
                                                               : '-'}
                                                           </TableCell>
@@ -1190,9 +1331,11 @@ const AuditLogsPage: React.FC = () => {
                                   {/* Show only new values if old values don't exist */}
                                   {(() => {
                                     const oldVals =
-                                      (log as any).oldValues || (log as any).old_values;
+                                      (log as any).oldValues ||
+                                      (log as any).old_values;
                                     const newVals =
-                                      (log as any).newValues || (log as any).new_values;
+                                      (log as any).newValues ||
+                                      (log as any).new_values;
                                     return (
                                       !oldVals &&
                                       newVals && (
@@ -1229,10 +1372,15 @@ const AuditLogsPage: React.FC = () => {
                                                   margin: 0,
                                                   fontSize: '0.75rem',
                                                   fontFamily: 'monospace',
-                                                  color: theme.palette.text.primary,
+                                                  color:
+                                                    theme.palette.text.primary,
                                                 }}
                                               >
-                                                {JSON.stringify(newVals, null, 2)}
+                                                {JSON.stringify(
+                                                  newVals,
+                                                  null,
+                                                  2
+                                                )}
                                               </pre>
                                             </Paper>
                                           </Box>
@@ -1244,9 +1392,11 @@ const AuditLogsPage: React.FC = () => {
                                   {/* Show only old values if new values don't exist */}
                                   {(() => {
                                     const oldVals =
-                                      (log as any).oldValues || (log as any).old_values;
+                                      (log as any).oldValues ||
+                                      (log as any).old_values;
                                     const newVals =
-                                      (log as any).newValues || (log as any).new_values;
+                                      (log as any).newValues ||
+                                      (log as any).new_values;
                                     return (
                                       oldVals &&
                                       !newVals && (
@@ -1283,10 +1433,15 @@ const AuditLogsPage: React.FC = () => {
                                                   margin: 0,
                                                   fontSize: '0.75rem',
                                                   fontFamily: 'monospace',
-                                                  color: theme.palette.text.primary,
+                                                  color:
+                                                    theme.palette.text.primary,
                                                 }}
                                               >
-                                                {JSON.stringify(oldVals, null, 2)}
+                                                {JSON.stringify(
+                                                  oldVals,
+                                                  null,
+                                                  2
+                                                )}
                                               </pre>
                                             </Paper>
                                           </Box>

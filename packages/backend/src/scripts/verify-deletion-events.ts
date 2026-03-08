@@ -53,7 +53,9 @@ async function main() {
   // Wait a bit for events to be processed and logs to appear
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  console.log('\nVerification complete. Watch the logs for "removing from cache" messages.');
+  console.log(
+    '\nVerification complete. Watch the logs for "removing from cache" messages.'
+  );
   process.exit(0);
 }
 

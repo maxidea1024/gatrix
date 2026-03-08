@@ -63,7 +63,11 @@ export function validateFlagValue(
 /**
  * Validate string value
  */
-function validateString(value: any, rules: ValidationRules, errors: string[]): any {
+function validateString(
+  value: any,
+  rules: ValidationRules,
+  errors: string[]
+): any {
   const strValue = String(value);
   let result = strValue;
 
@@ -127,7 +131,11 @@ function validateString(value: any, rules: ValidationRules, errors: string[]): a
 /**
  * Validate number value
  */
-function validateNumber(value: any, rules: ValidationRules, errors: string[]): void {
+function validateNumber(
+  value: any,
+  rules: ValidationRules,
+  errors: string[]
+): void {
   const numValue = typeof value === 'number' ? value : Number(value);
 
   if (!numValue) {
@@ -151,7 +159,11 @@ function validateNumber(value: any, rules: ValidationRules, errors: string[]): v
 /**
  * Validate JSON value
  */
-function validateJson(value: any, rules: ValidationRules, errors: string[]): void {
+function validateJson(
+  value: any,
+  rules: ValidationRules,
+  errors: string[]
+): void {
   // Ensure value is a valid object
   let jsonObj: any;
   if (typeof value === 'string') {
@@ -169,7 +181,9 @@ function validateJson(value: any, rules: ValidationRules, errors: string[]): voi
   if (rules.jsonSchema) {
     try {
       const schema =
-        typeof rules.jsonSchema === 'string' ? JSON.parse(rules.jsonSchema) : rules.jsonSchema;
+        typeof rules.jsonSchema === 'string'
+          ? JSON.parse(rules.jsonSchema)
+          : rules.jsonSchema;
 
       // Basic JSON Schema validation without external library
       // Check required fields if defined in schema
@@ -182,13 +196,21 @@ function validateJson(value: any, rules: ValidationRules, errors: string[]): voi
       }
 
       // Check property types if defined
-      if (schema.properties && typeof jsonObj === 'object' && jsonObj !== null) {
+      if (
+        schema.properties &&
+        typeof jsonObj === 'object' &&
+        jsonObj !== null
+      ) {
         for (const [key, propSchema] of Object.entries(schema.properties)) {
           const prop = propSchema as any;
           if (jsonObj[key] !== undefined && prop.type) {
-            const actualType = Array.isArray(jsonObj[key]) ? 'array' : typeof jsonObj[key];
+            const actualType = Array.isArray(jsonObj[key])
+              ? 'array'
+              : typeof jsonObj[key];
             if (actualType !== prop.type) {
-              errors.push(`JSON_TYPE_MISMATCH:${key}:${prop.type}:${actualType}`);
+              errors.push(
+                `JSON_TYPE_MISMATCH:${key}:${prop.type}:${actualType}`
+              );
             }
           }
         }

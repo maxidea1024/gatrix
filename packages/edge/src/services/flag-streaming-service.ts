@@ -101,22 +101,28 @@ class FlagStreamingService {
 
       await this.subscriber.connect();
 
-      this.subscriber.on('pmessage', (_pattern: string, _channel: string, message: string) => {
-        try {
-          const event = JSON.parse(message) as { type: string; data: Record<string, any> };
-          if (event.type === 'feature_flag.changed') {
-            const environmentId = event.data.environmentId as string;
-            const changedKeys = (event.data.changedKeys as string[]) ?? [];
-            if (environmentId) {
-              // Refresh Edge's own cache BEFORE notifying clients
-              // so that clients re-fetching immediately get fresh data
-              this.refreshCacheThenNotify(environmentId, changedKeys);
+      this.subscriber.on(
+        'pmessage',
+        (_pattern: string, _channel: string, message: string) => {
+          try {
+            const event = JSON.parse(message) as {
+              type: string;
+              data: Record<string, any>;
+            };
+            if (event.type === 'feature_flag.changed') {
+              const environmentId = event.data.environmentId as string;
+              const changedKeys = (event.data.changedKeys as string[]) ?? [];
+              if (environmentId) {
+                // Refresh Edge's own cache BEFORE notifying clients
+                // so that clients re-fetching immediately get fresh data
+                this.refreshCacheThenNotify(environmentId, changedKeys);
+              }
             }
+          } catch (err) {
+            logger.error('Failed to parse SDK event:', err);
           }
-        } catch (err) {
-          logger.error('Failed to parse SDK event:', err);
         }
-      });
+      );
 
       await this.subscriber.psubscribe(`${SDK_EVENTS_PREFIX}:*`);
 
@@ -205,7 +211,11 @@ class FlagStreamingService {
   /**
    * Add a new SSE client connection
    */
-  async addClient(clientId: string, environmentId: string, res: Response): Promise<void> {
+  async addClient(
+    clientId: string,
+    environmentId: string,
+    res: Response
+  ): Promise<void> {
     // Set SSE headers
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -259,7 +269,11 @@ class FlagStreamingService {
    * Add a new WebSocket client connection.
    * Called after HTTP upgrade is handled externally.
    */
-  async addWebSocketClient(clientId: string, environmentId: string, ws: WebSocket): Promise<void> {
+  async addWebSocketClient(
+    clientId: string,
+    environmentId: string,
+    ws: WebSocket
+  ): Promise<void> {
     const client: WebSocketClient = {
       id: clientId,
       environmentId,
@@ -336,7 +350,8 @@ class FlagStreamingService {
         // Resolve raw environment ID to cache token key using Edge's environment registry
         const { environmentRegistry } = await import('./environment-registry');
         const cacheKey =
-          environmentRegistry.resolveEnvironmentToken(environmentId) || environmentId;
+          environmentRegistry.resolveEnvironmentToken(environmentId) ||
+          environmentId;
         await sdk.featureFlag.refreshByEnvironment(cacheKey);
         logger.debug(
           `Cache refreshed for env=${environmentId} (cacheKey=${cacheKey}) before notify`
@@ -350,7 +365,10 @@ class FlagStreamingService {
     await this.notifyClients(environmentId, changedKeys);
   }
 
-  private async notifyClients(environmentId: string, changedKeys: string[]): Promise<void> {
+  private async notifyClients(
+    environmentId: string,
+    changedKeys: string[]
+  ): Promise<void> {
     const newRevision = await this.incrementGlobalRevision(environmentId);
     const payload = {
       globalRevision: newRevision,
@@ -386,7 +404,11 @@ class FlagStreamingService {
   /**
    * Send an SSE event to a specific client
    */
-  private sendSseEvent(clientId: string, event: string, data: Record<string, any>): boolean {
+  private sendSseEvent(
+    clientId: string,
+    event: string,
+    data: Record<string, any>
+  ): boolean {
     const client = this.sseClients.get(clientId);
     if (!client) return false;
 
@@ -405,7 +427,11 @@ class FlagStreamingService {
   /**
    * Send a WebSocket event to a specific client
    */
-  private sendWebSocketEvent(clientId: string, event: string, data: Record<string, any>): boolean {
+  private sendWebSocketEvent(
+    clientId: string,
+    event: string,
+    data: Record<string, any>
+  ): boolean {
     const client = this.wsClients.get(clientId);
     if (!client || client.ws.readyState !== WebSocket.OPEN) return false;
 
@@ -437,7 +463,10 @@ class FlagStreamingService {
     }
 
     // WebSocket heartbeat
-    const wsHeartbeat = JSON.stringify({ type: 'heartbeat', data: { timestamp: Date.now() } });
+    const wsHeartbeat = JSON.stringify({
+      type: 'heartbeat',
+      data: { timestamp: Date.now() },
+    });
     for (const [clientId, client] of this.wsClients) {
       try {
         if (client.ws.readyState === WebSocket.OPEN) {
@@ -462,7 +491,10 @@ class FlagStreamingService {
 
     // Cleanup WebSocket
     for (const [clientId, client] of this.wsClients) {
-      if (client.ws.readyState === WebSocket.CLOSED || client.ws.readyState === WebSocket.CLOSING) {
+      if (
+        client.ws.readyState === WebSocket.CLOSED ||
+        client.ws.readyState === WebSocket.CLOSING
+      ) {
         this.removeWebSocketClient(clientId);
       }
     }
@@ -475,7 +507,9 @@ class FlagStreamingService {
   private async getGlobalRevision(environmentId: string): Promise<number> {
     if (!this.redisClient) return 0;
     try {
-      const val = await this.redisClient.get(`${REVISION_KEY_PREFIX}${environmentId}`);
+      const val = await this.redisClient.get(
+        `${REVISION_KEY_PREFIX}${environmentId}`
+      );
       return val ? parseInt(val, 10) : 0;
     } catch (err) {
       logger.warn('Failed to get revision from Redis:', err);
@@ -487,10 +521,14 @@ class FlagStreamingService {
    * Atomically increment and return new global revision for an environment via Redis INCR.
    * This ensures consistency across multiple Edge instances.
    */
-  private async incrementGlobalRevision(environmentId: string): Promise<number> {
+  private async incrementGlobalRevision(
+    environmentId: string
+  ): Promise<number> {
     if (!this.redisClient) return 0;
     try {
-      return await this.redisClient.incr(`${REVISION_KEY_PREFIX}${environmentId}`);
+      return await this.redisClient.incr(
+        `${REVISION_KEY_PREFIX}${environmentId}`
+      );
     } catch (err) {
       logger.warn('Failed to increment revision in Redis:', err);
       return 0;

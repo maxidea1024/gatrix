@@ -45,9 +45,12 @@ export class EmailTemplateService {
     });
 
     // Helper for conditional rendering
-    Handlebars.registerHelper('ifEquals', function (this: any, arg1: any, arg2: any, options: any) {
-      return arg1 === arg2 ? options.fn(this) : options.inverse(this);
-    });
+    Handlebars.registerHelper(
+      'ifEquals',
+      function (this: any, arg1: any, arg2: any, options: any) {
+        return arg1 === arg2 ? options.fn(this) : options.inverse(this);
+      }
+    );
 
     // Helper for URL encoding
     Handlebars.registerHelper('urlEncode', (str: string) => {
@@ -63,7 +66,11 @@ export class EmailTemplateService {
     language: SupportedLanguage,
     extension: 'hbs' | 'txt'
   ): string {
-    return path.join(this.templatesPath, language, `${templateName}.${extension}`);
+    return path.join(
+      this.templatesPath,
+      language,
+      `${templateName}.${extension}`
+    );
   }
 
   /**
@@ -100,7 +107,10 @@ export class EmailTemplateService {
   /**
    * Get subject for email template based on template name and language
    */
-  private getEmailSubject(templateName: string, language: SupportedLanguage): string {
+  private getEmailSubject(
+    templateName: string,
+    language: SupportedLanguage
+  ): string {
     const subjects: Record<string, Record<SupportedLanguage, string>> = {
       'password-reset': {
         en: 'Gatrix - Password Reset',
@@ -132,8 +142,16 @@ export class EmailTemplateService {
   ): Promise<RenderedEmailTemplate> {
     try {
       // Get template paths
-      const htmlTemplatePath = this.getTemplatePath(templateName, language, 'hbs');
-      const textTemplatePath = this.getTemplatePath(templateName, language, 'txt');
+      const htmlTemplatePath = this.getTemplatePath(
+        templateName,
+        language,
+        'hbs'
+      );
+      const textTemplatePath = this.getTemplatePath(
+        templateName,
+        language,
+        'txt'
+      );
 
       // Load and render HTML template
       const htmlTemplate = await this.loadTemplate(htmlTemplatePath);
@@ -155,7 +173,10 @@ export class EmailTemplateService {
         subject,
       };
     } catch (error) {
-      logger.error(`Failed to render email template: ${templateName} (${language})`, error);
+      logger.error(
+        `Failed to render email template: ${templateName} (${language})`,
+        error
+      );
       throw error;
     }
   }
@@ -181,7 +202,10 @@ export class EmailTemplateService {
         // Fallback to default language
         return await this.renderTemplate(templateName, fallbackLanguage, data);
       } catch (fallbackError) {
-        logger.error(`Failed to render template even with fallback language`, fallbackError);
+        logger.error(
+          `Failed to render template even with fallback language`,
+          fallbackError
+        );
         throw fallbackError;
       }
     }

@@ -71,7 +71,10 @@ router.post('/', async (req: Request, res: Response) => {
     res.status(201).json({ data: account });
   } catch (error) {
     logger.error('Error creating service account:', error);
-    const message = error instanceof Error ? error.message : 'Failed to create service account';
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Failed to create service account';
     res.status(400).json({ error: message });
   }
 });
@@ -99,7 +102,10 @@ router.put('/:id', async (req: Request, res: Response) => {
     res.json({ data: account });
   } catch (error) {
     logger.error('Error updating service account:', error);
-    const message = error instanceof Error ? error.message : 'Failed to update service account';
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Failed to update service account';
     res.status(400).json({ error: message });
   }
 });
@@ -162,7 +168,9 @@ router.post('/:id/tokens', async (req: Request, res: Response) => {
   } catch (error) {
     logger.error('Error creating service account token:', error);
     const message =
-      error instanceof Error ? error.message : 'Failed to create service account token';
+      error instanceof Error
+        ? error.message
+        : 'Failed to create service account token';
     res.status(400).json({ error: message });
   }
 });

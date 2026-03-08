@@ -12,7 +12,10 @@ router.get('/stats', StoreProductController.getStats);
 
 // Batch processing routes (must be before /:id to avoid conflict)
 router.get('/count-by-filter', StoreProductController.getCountByFilter);
-router.patch('/bulk-active-by-filter', StoreProductController.bulkUpdateActiveStatusByFilter);
+router.patch(
+  '/bulk-active-by-filter',
+  StoreProductController.bulkUpdateActiveStatusByFilter
+);
 
 // Store product CRUD routes
 router.get('/', StoreProductController.getStoreProducts);

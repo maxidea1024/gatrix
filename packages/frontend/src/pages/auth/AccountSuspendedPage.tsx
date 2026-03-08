@@ -98,7 +98,11 @@ const AccountSuspendedPage: React.FC = () => {
         </Typography>
 
         {/* Subtitle */}
-        <Typography variant="h6" fontWeight={600} sx={{ mb: 1, color: 'error.main' }}>
+        <Typography
+          variant="h6"
+          fontWeight={600}
+          sx={{ mb: 1, color: 'error.main' }}
+        >
           {t('accountSuspended.title')}
         </Typography>
 
@@ -135,7 +139,10 @@ const AccountSuspendedPage: React.FC = () => {
           <Box sx={{ mt: 0.25, color: 'text.disabled', flexShrink: 0 }}>
             <InfoIcon sx={{ fontSize: 22 }} />
           </Box>
-          <Typography variant="body2" sx={{ lineHeight: 1.5, color: 'text.secondary' }}>
+          <Typography
+            variant="body2"
+            sx={{ lineHeight: 1.5, color: 'text.secondary' }}
+          >
             {t('accountSuspended.additionalInfo')}
           </Typography>
         </Box>

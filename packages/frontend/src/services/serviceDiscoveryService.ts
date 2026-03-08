@@ -28,7 +28,13 @@ export interface ServiceInstance {
   externalAddress: string;
   internalAddress: string;
   ports: ServicePorts;
-  status: 'initializing' | 'ready' | 'shutting_down' | 'error' | 'terminated' | 'no-response';
+  status:
+    | 'initializing'
+    | 'ready'
+    | 'shutting_down'
+    | 'error'
+    | 'terminated'
+    | 'no-response';
   createdAt: string; // Creation time (immutable)
   updatedAt: string; // Last update time
   stats?: Record<string, any>; // Renamed from instanceStats
@@ -101,7 +107,9 @@ class ServiceDiscoveryService {
     latency?: number;
     error?: string;
   }> {
-    const response = await api.get(`/admin/services/${serviceType}/${instanceId}/cache/summary`);
+    const response = await api.get(
+      `/admin/services/${serviceType}/${instanceId}/cache/summary`
+    );
     return response.data;
   }
 
@@ -122,7 +130,9 @@ class ServiceDiscoveryService {
     latency?: number;
     error?: string;
   }> {
-    const response = await api.get(`/admin/services/${serviceType}/${instanceId}/cache`);
+    const response = await api.get(
+      `/admin/services/${serviceType}/${instanceId}/cache`
+    );
     return response.data;
   }
 
@@ -141,7 +151,9 @@ class ServiceDiscoveryService {
     error?: string;
     url: string;
   }> {
-    const response = await api.post(`/admin/services/${serviceType}/${instanceId}/health`);
+    const response = await api.post(
+      `/admin/services/${serviceType}/${instanceId}/health`
+    );
     return response.data;
   }
 
@@ -185,7 +197,9 @@ class ServiceDiscoveryService {
     latency?: number;
     error?: string;
   }> {
-    const response = await api.get(`/admin/services/${serviceType}/${instanceId}/stats/requests`);
+    const response = await api.get(
+      `/admin/services/${serviceType}/${instanceId}/stats/requests`
+    );
     return response as any;
   }
 

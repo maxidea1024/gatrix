@@ -89,7 +89,10 @@ import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import TimezoneSelector from '../common/TimezoneSelector';
 import EnvironmentSelector from '@/components/EnvironmentSelector';
-import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
+import {
+  maintenanceService,
+  MaintenanceDetail,
+} from '@/services/maintenanceService';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import changeRequestService from '@/services/changeRequestService';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
@@ -176,17 +179,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
+  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
 
   // Load selected category from localStorage
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(() => {
-    try {
-      const stored = localStorage.getItem('sidebarSelectedCategory');
-      return stored ? stored : null;
-    } catch {
-      return null;
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    () => {
+      try {
+        const stored = localStorage.getItem('sidebarSelectedCategory');
+        return stored ? stored : null;
+      } catch {
+        return null;
+      }
     }
-  });
+  );
 
   // Expanded submenu items state
   const [expandedSubmenus, setExpandedSubmenus] = useState<{
@@ -214,7 +221,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [avatarImageError, setAvatarImageError] = useState(false);
 
   const location = useLocation();
-  const { user, logout, hasPermission, permissions, permissionsLoading } = useAuth();
+  const { user, logout, hasPermission, permissions, permissionsLoading } =
+    useAuth();
   const { toggleTheme, mode, isDark } = useCustomTheme();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -237,7 +245,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
 
   // Check if user has environment access (has permissions + environments loaded)
-  const hasEnvironmentAccess = hasAnyPermissions && !environmentsLoading && environments.length > 0;
+  const hasEnvironmentAccess =
+    hasAnyPermissions && !environmentsLoading && environments.length > 0;
 
   // Show sidebar when user has any permissions
   const showSidebar = hasAnyPermissions;
@@ -330,7 +339,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const findSubmenuIndex = (items: NavMenuItem[], path: string): number => {
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
-        if (item.children && item.children.some((child) => findPathInItem(child, path))) {
+        if (
+          item.children &&
+          item.children.some((child) => findPathInItem(child, path))
+        ) {
           return i;
         }
         if (item.path === path) {
@@ -342,7 +354,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
     // Find which category contains the current path
     for (const category of categories) {
-      const hasPath = category.children.some((item) => findPathInItem(item, currentPath));
+      const hasPath = category.children.some((item) =>
+        findPathInItem(item, currentPath)
+      );
       if (hasPath) {
         // Skip "navigation" category - it's the main menu and should not set selectedCategory
         // This allows "Back to Main" to work properly
@@ -369,7 +383,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             setExpandedSubmenus((prev) => {
               const newState = { ...prev, [submenuKey]: true };
               try {
-                localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState));
+                localStorage.setItem(
+                  'sidebarExpandedSubmenus',
+                  JSON.stringify(newState)
+                );
               } catch (error) {
                 console.warn('Failed to save expanded submenus:', error);
               }
@@ -384,7 +401,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
 
     initialSyncDoneRef.current = true;
-  }, [location.pathname, getFilteredMenuCategories, selectedCategory, expandedSubmenus]);
+  }, [
+    location.pathname,
+    getFilteredMenuCategories,
+    selectedCategory,
+    expandedSubmenus,
+  ]);
 
   // Mail notification state
   const [unreadMailCount, setUnreadMailCount] = useState(0);
@@ -402,9 +424,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       }
     };
 
-    window.addEventListener('user-role-changed', handleRoleChange as EventListener);
+    window.addEventListener(
+      'user-role-changed',
+      handleRoleChange as EventListener
+    );
     return () => {
-      window.removeEventListener('user-role-changed', handleRoleChange as EventListener);
+      window.removeEventListener(
+        'user-role-changed',
+        handleRoleChange as EventListener
+      );
     };
   }, [user?.id]);
 
@@ -437,16 +465,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       }
     };
 
-    window.addEventListener('user-suspended', handleUserSuspended as EventListener);
+    window.addEventListener(
+      'user-suspended',
+      handleUserSuspended as EventListener
+    );
     return () => {
-      window.removeEventListener('user-suspended', handleUserSuspended as EventListener);
+      window.removeEventListener(
+        'user-suspended',
+        handleUserSuspended as EventListener
+      );
     };
   }, [user?.id, navigate]);
 
   // Handle change request notifications
   useEffect(() => {
     const handleCRNotification = (event: CustomEvent) => {
-      const { action, title, requesterName, approverName, rejectorName } = event.detail || {};
+      const { action, title, requesterName, approverName, rejectorName } =
+        event.detail || {};
 
       switch (action) {
         case 'submitted':
@@ -495,10 +530,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           );
           break;
         case 'executed':
-          enqueueSnackbar(t('notifications.changeRequest.executed', { title }), {
-            variant: 'success',
-            autoHideDuration: 5000,
-          });
+          enqueueSnackbar(
+            t('notifications.changeRequest.executed', { title }),
+            {
+              variant: 'success',
+              autoHideDuration: 5000,
+            }
+          );
           break;
       }
       // Refresh pending CR count when CR is submitted
@@ -512,7 +550,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       }
     };
 
-    window.addEventListener('change-request-notification', handleCRNotification as EventListener);
+    window.addEventListener(
+      'change-request-notification',
+      handleCRNotification as EventListener
+    );
     return () => {
       window.removeEventListener(
         'change-request-notification',
@@ -710,7 +751,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         maintenanceTimerRef.current = null;
       }
     };
-  }, [maintenanceStatus.isMaintenance, maintenanceStatus.detail, maintenanceStatus.status]);
+  }, [
+    maintenanceStatus.isMaintenance,
+    maintenanceStatus.detail,
+    maintenanceStatus.status,
+  ]);
 
   // SSE updates - 백엔드 연결 Failed 시 적절히 처리
   const sseConnection = useSSENotifications({
@@ -731,7 +776,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           if (prev.isMaintenance !== nextIsMaintenance) {
             if (nextIsMaintenance) {
               // Check if it's scheduled (start time is in the future)
-              const isScheduled = detail?.startsAt && new Date(detail.startsAt) > new Date();
+              const isScheduled =
+                detail?.startsAt && new Date(detail.startsAt) > new Date();
               enqueueSnackbar(
                 isScheduled
                   ? t('notifications.maintenance.scheduled')
@@ -772,9 +818,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             },
           })
         );
-      } else if (event.type === 'invitation_created' || event.type === 'invitation_deleted') {
+      } else if (
+        event.type === 'invitation_created' ||
+        event.type === 'invitation_deleted'
+      ) {
         // 초대링크 Event를 다른 컴포넌트에 전달
-        window.dispatchEvent(new CustomEvent('invitation-change', { detail: event }));
+        window.dispatchEvent(
+          new CustomEvent('invitation-change', { detail: event })
+        );
       }
     },
     onError: (error) => {
@@ -897,7 +948,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     if (item.children) {
       const submenuKey = `submenu-${index}`;
       const isExpanded = expandedSubmenus[submenuKey];
-      const hasActiveChild = item.children.some((child: any) => isActivePath(child.path));
+      const hasActiveChild = item.children.some((child: any) =>
+        isActivePath(child.path)
+      );
 
       const toggleSubmenu = () => {
         setExpandedSubmenus((prev) => {
@@ -906,7 +959,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             [submenuKey]: !prev[submenuKey],
           };
           try {
-            localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState));
+            localStorage.setItem(
+              'sidebarExpandedSubmenus',
+              JSON.stringify(newState)
+            );
           } catch (error) {
             console.warn('Failed to save expanded submenus:', error);
           }
@@ -930,7 +986,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   backgroundColor: 'transparent',
                   '&:hover': {
                     backgroundColor:
-                      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.1)'
+                        : 'rgba(0,0,0,0.08)',
                   },
                 }}
               >
@@ -963,7 +1021,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 const isChildActive = isActivePath(child.path);
 
                 return (
-                  <Tooltip key={childIndex} title={t(child.text)} placement="right" arrow>
+                  <Tooltip
+                    key={childIndex}
+                    title={t(child.text)}
+                    placement="right"
+                    arrow
+                  >
                     <ListItemButton
                       onClick={() => openOrNavigate(child.path)}
                       sx={{
@@ -1085,14 +1148,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         key={index}
         onClick={() => openOrNavigate(item.path)}
         sx={{
-          color: isActive ? theme.palette.text.primary : theme.palette.text.secondary,
-          backgroundColor: isActive ? `${theme.palette.primary.main}20` : 'transparent',
+          color: isActive
+            ? theme.palette.text.primary
+            : theme.palette.text.secondary,
+          backgroundColor: isActive
+            ? `${theme.palette.primary.main}20`
+            : 'transparent',
           borderRadius: 1,
           py: 0.75,
           my: 0.5,
           '&:hover': {
             backgroundColor:
-              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.1)'
+                : 'rgba(0,0,0,0.08)',
           },
           justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
           px: sidebarCollapsed ? 0 : 2,
@@ -1149,7 +1218,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         '&:hover': sidebarCollapsed
           ? {
               backgroundColor:
-                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.08)'
+                  : 'rgba(0, 0, 0, 0.05)',
             }
           : {},
       }}
@@ -1203,11 +1274,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 justifyContent: 'center',
               }}
             >
-              <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
+              <Typography
+                variant="h6"
+                sx={{ color: 'white', fontWeight: 'bold' }}
+              >
                 G
               </Typography>
             </Box>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 600, color: theme.palette.text.primary }}
+            >
               Gatrix
             </Typography>
           </Box>
@@ -1245,7 +1322,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 justifyContent: 'center',
               }}
             >
-              <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
+              <Typography
+                variant="h6"
+                sx={{ color: 'white', fontWeight: 'bold' }}
+              >
                 G
               </Typography>
             </Box>
@@ -1300,14 +1380,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       try {
                         localStorage.removeItem('sidebarSelectedCategory');
                       } catch (error) {
-                        console.warn('Failed to clear selected category:', error);
+                        console.warn(
+                          'Failed to clear selected category:',
+                          error
+                        );
                       }
                     } else {
                       setSelectedCategory(category.id);
                       try {
-                        localStorage.setItem('sidebarSelectedCategory', category.id);
+                        localStorage.setItem(
+                          'sidebarSelectedCategory',
+                          category.id
+                        );
                       } catch (error) {
-                        console.warn('Failed to save selected category:', error);
+                        console.warn(
+                          'Failed to save selected category:',
+                          error
+                        );
                       }
                     }
                   }}
@@ -1369,7 +1458,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               // Show tooltip when sidebar is collapsed
               if (sidebarCollapsed) {
                 return (
-                  <Tooltip key={category.id} title={t(category.text)} placement="right" arrow>
+                  <Tooltip
+                    key={category.id}
+                    title={t(category.text)}
+                    placement="right"
+                    arrow
+                  >
                     {categoryButton}
                   </Tooltip>
                 );
@@ -1394,14 +1488,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <>
                 {/* Back to main button */}
                 {sidebarCollapsed ? (
-                  <Tooltip title={t('sidebar.backToMain')} placement="right" arrow>
+                  <Tooltip
+                    title={t('sidebar.backToMain')}
+                    placement="right"
+                    arrow
+                  >
                     <ListItemButton
                       onClick={() => {
                         setSelectedCategory(null);
                         try {
                           localStorage.removeItem('sidebarSelectedCategory');
                         } catch (error) {
-                          console.warn('Failed to clear selected category:', error);
+                          console.warn(
+                            'Failed to clear selected category:',
+                            error
+                          );
                         }
                       }}
                       sx={{
@@ -1438,7 +1539,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       try {
                         localStorage.removeItem('sidebarSelectedCategory');
                       } catch (error) {
-                        console.warn('Failed to clear selected category:', error);
+                        console.warn(
+                          'Failed to clear selected category:',
+                          error
+                        );
                       }
                     }}
                     sx={{
@@ -1492,7 +1596,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     }}
                   >
                     {t(
-                      getFilteredMenuCategories().find((c) => c.id === selectedCategory)?.text || ''
+                      getFilteredMenuCategories().find(
+                        (c) => c.id === selectedCategory
+                      )?.text || ''
                     )}
                   </Typography>
                 )}
@@ -1503,11 +1609,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   ?.children.map((item, index, items) => {
                     // Check if previous item has children (is a submenu group)
                     const prevItem = index > 0 ? items[index - 1] : null;
-                    const prevHasChildren = prevItem?.children && prevItem.children.length > 0;
-                    const currentHasChildren = item.children && item.children.length > 0;
+                    const prevHasChildren =
+                      prevItem?.children && prevItem.children.length > 0;
+                    const currentHasChildren =
+                      item.children && item.children.length > 0;
 
                     // Add divider if current item is regular (no children) and previous item is a submenu group
-                    const showDivider = !currentHasChildren && prevHasChildren && sidebarCollapsed;
+                    const showDivider =
+                      !currentHasChildren &&
+                      prevHasChildren &&
+                      sidebarCollapsed;
 
                     return (
                       <React.Fragment key={index}>
@@ -1545,7 +1656,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             display: 'block',
           }}
         >
-          {sidebarCollapsed ? `${__APP_VERSION__}` : `Gatrix ${__APP_VERSION__}`}
+          {sidebarCollapsed
+            ? `${__APP_VERSION__}`
+            : `Gatrix ${__APP_VERSION__}`}
         </Typography>
       </Box>
     </Box>
@@ -1693,14 +1806,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                           px: 1,
                           py: 0.25,
                           borderRadius: 1,
-                          backgroundColor: getMaintenanceStatusDisplay(maintenanceStatus.status)
-                            .color,
+                          backgroundColor: getMaintenanceStatusDisplay(
+                            maintenanceStatus.status
+                          ).color,
                           color: 'white',
                           fontSize: '0.75rem',
                           fontWeight: 'bold',
                         }}
                       >
-                        {t(getMaintenanceStatusDisplay(maintenanceStatus.status).label)}
+                        {t(
+                          getMaintenanceStatusDisplay(maintenanceStatus.status)
+                            .label
+                        )}
                       </Box>
                     </Typography>
 
@@ -1729,7 +1846,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         <strong style={{ minWidth: '60px' }}>
                           {t('maintenance.tooltipStartTime')}:
                         </strong>{' '}
-                        {formatDateTimeDetailed(maintenanceStatus.detail.startsAt)}
+                        {formatDateTimeDetailed(
+                          maintenanceStatus.detail.startsAt
+                        )}
                       </Typography>
                     )}
 
@@ -1739,31 +1858,42 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         <strong style={{ minWidth: '60px' }}>
                           {t('maintenance.tooltipEndTime')}:
                         </strong>{' '}
-                        {formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}
+                        {formatDateTimeDetailed(
+                          maintenanceStatus.detail.endsAt
+                        )}
                       </Typography>
                     )}
 
                     {/* 소요 시간 */}
-                    {maintenanceStatus.detail?.startsAt && maintenanceStatus.detail?.endsAt && (
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong style={{ minWidth: '60px' }}>
-                          {t('maintenance.tooltipDuration')}:
-                        </strong>{' '}
-                        {(() => {
-                          const start = new Date(maintenanceStatus.detail.startsAt);
-                          const end = new Date(maintenanceStatus.detail.endsAt);
-                          const diffMs = end.getTime() - start.getTime();
-                          const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                          const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    {maintenanceStatus.detail?.startsAt &&
+                      maintenanceStatus.detail?.endsAt && (
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                          <strong style={{ minWidth: '60px' }}>
+                            {t('maintenance.tooltipDuration')}:
+                          </strong>{' '}
+                          {(() => {
+                            const start = new Date(
+                              maintenanceStatus.detail.startsAt
+                            );
+                            const end = new Date(
+                              maintenanceStatus.detail.endsAt
+                            );
+                            const diffMs = end.getTime() - start.getTime();
+                            const diffHours = Math.floor(
+                              diffMs / (1000 * 60 * 60)
+                            );
+                            const diffMinutes = Math.floor(
+                              (diffMs % (1000 * 60 * 60)) / (1000 * 60)
+                            );
 
-                          if (diffHours > 0) {
-                            return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
-                          } else {
-                            return `${diffMinutes}${t('maintenance.minutesUnit')}`;
-                          }
-                        })()}
-                      </Typography>
-                    )}
+                            if (diffHours > 0) {
+                              return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
+                            } else {
+                              return `${diffMinutes}${t('maintenance.minutesUnit')}`;
+                            }
+                          })()}
+                        </Typography>
+                      )}
 
                     {/* 메시지 */}
                     {maintenanceStatus.detail?.message && (
@@ -1878,7 +2008,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                           textShadow: '0 1px 2px rgba(0,0,0,0.2)',
                         }}
                       >
-                        {t(getMaintenanceStatusDisplay(maintenanceStatus.status).label)}
+                        {t(
+                          getMaintenanceStatusDisplay(maintenanceStatus.status)
+                            .label
+                        )}
                       </Typography>
                       <Typography
                         sx={{
@@ -1953,7 +2086,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         >
                           {maintenanceStatus.detail?.message
                             ? maintenanceStatus.detail.message
-                            : maintenanceStatus.detail?.startsAt && maintenanceStatus.detail?.endsAt
+                            : maintenanceStatus.detail?.startsAt &&
+                                maintenanceStatus.detail?.endsAt
                               ? `${formatDateTimeDetailed(maintenanceStatus.detail.startsAt)} → ${formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}`
                               : t('maintenance.clickToManageTooltip')}
                         </Typography>
@@ -1975,7 +2109,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               )}
 
               <Tooltip title={t('mailbox.title')}>
-                <IconButton color="inherit" onClick={() => navigate('/mailbox')}>
+                <IconButton
+                  color="inherit"
+                  onClick={() => navigate('/mailbox')}
+                >
                   <Badge badgeContent={unreadMailCount} color="error">
                     <MailIcon />
                   </Badge>
@@ -2012,7 +2149,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
               {/* Documentation button */}
               <Tooltip title={t('header.documentation')}>
-                <IconButton color="inherit" onClick={() => window.open('/docs', '_blank')}>
+                <IconButton
+                  color="inherit"
+                  onClick={() => window.open('/docs', '_blank')}
+                >
                   <MenuBookIcon />
                 </IconButton>
               </Tooltip>
@@ -2120,11 +2260,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               }}
             >
               <LockIcon sx={{ fontSize: 16 }} />
-              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 500, fontSize: '0.8125rem' }}
+              >
                 {t('changeRequest.pendingReviewLockBanner')}
               </Typography>
               <Tooltip title={t('changeRequest.pendingReviewLockTooltip')}>
-                <HelpOutlineIcon sx={{ fontSize: 16, opacity: 0.8, cursor: 'help' }} />
+                <HelpOutlineIcon
+                  sx={{ fontSize: 16, opacity: 0.8, cursor: 'help' }}
+                />
               </Tooltip>
               <Box
                 onClick={() => navigate('/admin/change-requests?status=open')}
@@ -2144,10 +2289,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   transition: 'background-color 0.2s',
                 }}
               >
-                <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.75rem' }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 500, fontSize: '0.75rem' }}
+                >
                   {t('changeRequest.viewMyPendingReviews')}
                 </Typography>
-                <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 12 }} />
+                <ArrowBackIcon
+                  sx={{ transform: 'rotate(180deg)', fontSize: 12 }}
+                />
               </Box>
             </Box>
           )}
@@ -2181,7 +2331,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 {/* My drafts section */}
                 {myDraftCount > 0 && (
                   <Box
-                    onClick={() => navigate('/admin/change-requests?status=draft')}
+                    onClick={() =>
+                      navigate('/admin/change-requests?status=draft')
+                    }
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
@@ -2196,24 +2348,33 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       transition: 'background-color 0.2s',
                     }}
                   >
-                    <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 500, fontSize: '0.8125rem' }}
+                    >
                       {t('changeRequest.myDraftsBanner', {
                         count: myDraftCount,
                       })}
                     </Typography>
-                    <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 14 }} />
+                    <ArrowBackIcon
+                      sx={{ transform: 'rotate(180deg)', fontSize: 14 }}
+                    />
                   </Box>
                 )}
 
                 {/* Separator */}
                 {myDraftCount > 0 && pendingCRCount > 0 && (
-                  <Typography sx={{ opacity: 0.5, fontSize: '0.875rem' }}>|</Typography>
+                  <Typography sx={{ opacity: 0.5, fontSize: '0.875rem' }}>
+                    |
+                  </Typography>
                 )}
 
                 {/* Pending approvals section */}
                 {pendingCRCount > 0 && (
                   <Box
-                    onClick={() => navigate('/admin/change-requests?status=open')}
+                    onClick={() =>
+                      navigate('/admin/change-requests?status=open')
+                    }
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
@@ -2228,12 +2389,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       transition: 'background-color 0.2s',
                     }}
                   >
-                    <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 500, fontSize: '0.8125rem' }}
+                    >
                       {t('changeRequest.pendingReviewBanner', {
                         count: pendingCRCount,
                       })}
                     </Typography>
-                    <ArrowBackIcon sx={{ transform: 'rotate(180deg)', fontSize: 14 }} />
+                    <ArrowBackIcon
+                      sx={{ transform: 'rotate(180deg)', fontSize: 14 }}
+                    />
                   </Box>
                 )}
               </Box>
@@ -2352,7 +2518,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           },
         }}
       >
-        <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid ' + theme.palette.divider }}>
+        <Box
+          sx={{
+            px: 2,
+            py: 1.5,
+            borderBottom: '1px solid ' + theme.palette.divider,
+          }}
+        >
           <Typography variant="subtitle2" fontWeight={600}>
             {user?.name || user?.email}
           </Typography>

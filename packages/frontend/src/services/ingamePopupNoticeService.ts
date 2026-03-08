@@ -1,5 +1,8 @@
 import api from './api';
-import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils';
+import {
+  MutationResult,
+  parseChangeRequestResponse,
+} from './changeRequestUtils';
 
 export interface IngamePopupNotice {
   id: number;
@@ -116,15 +119,22 @@ class IngamePopupNoticeService {
       params.search = filters.search;
     }
 
-    const response = await api.get(`${projectApiPath}/ingame-popup-notices`, { params });
+    const response = await api.get(`${projectApiPath}/ingame-popup-notices`, {
+      params,
+    });
     return response.data;
   }
 
   /**
    * Get ingame popup notice by ID
    */
-  async getIngamePopupNoticeById(projectApiPath: string, id: number): Promise<IngamePopupNotice> {
-    const response = await api.get(`${projectApiPath}/ingame-popup-notices/${id}`);
+  async getIngamePopupNoticeById(
+    projectApiPath: string,
+    id: number
+  ): Promise<IngamePopupNotice> {
+    const response = await api.get(
+      `${projectApiPath}/ingame-popup-notices/${id}`
+    );
     return response.data.notice;
   }
 
@@ -135,8 +145,14 @@ class IngamePopupNoticeService {
     projectApiPath: string,
     data: CreateIngamePopupNoticeData
   ): Promise<IngamePopupNoticeMutationResult> {
-    const response = await api.post(`${projectApiPath}/ingame-popup-notices`, data);
-    return parseChangeRequestResponse<IngamePopupNotice>(response, (r) => r?.notice);
+    const response = await api.post(
+      `${projectApiPath}/ingame-popup-notices`,
+      data
+    );
+    return parseChangeRequestResponse<IngamePopupNotice>(
+      response,
+      (r) => r?.notice
+    );
   }
 
   /**
@@ -147,15 +163,26 @@ class IngamePopupNoticeService {
     id: number,
     data: UpdateIngamePopupNoticeData
   ): Promise<IngamePopupNoticeMutationResult> {
-    const response = await api.put(`${projectApiPath}/ingame-popup-notices/${id}`, data);
-    return parseChangeRequestResponse<IngamePopupNotice>(response, (r) => r?.notice);
+    const response = await api.put(
+      `${projectApiPath}/ingame-popup-notices/${id}`,
+      data
+    );
+    return parseChangeRequestResponse<IngamePopupNotice>(
+      response,
+      (r) => r?.notice
+    );
   }
 
   /**
    * Delete ingame popup notice
    */
-  async deleteIngamePopupNotice(projectApiPath: string, id: number): Promise<MutationResult<void>> {
-    const response = await api.delete(`${projectApiPath}/ingame-popup-notices/${id}`);
+  async deleteIngamePopupNotice(
+    projectApiPath: string,
+    id: number
+  ): Promise<MutationResult<void>> {
+    const response = await api.delete(
+      `${projectApiPath}/ingame-popup-notices/${id}`
+    );
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
@@ -166,18 +193,29 @@ class IngamePopupNoticeService {
     projectApiPath: string,
     ids: number[]
   ): Promise<MutationResult<void>> {
-    const response = await api.post(`${projectApiPath}/ingame-popup-notices/bulk-delete`, {
-      ids,
-    });
+    const response = await api.post(
+      `${projectApiPath}/ingame-popup-notices/bulk-delete`,
+      {
+        ids,
+      }
+    );
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
    * Toggle active status
    */
-  async toggleActive(projectApiPath: string, id: number): Promise<IngamePopupNoticeMutationResult> {
-    const response = await api.patch(`${projectApiPath}/ingame-popup-notices/${id}/toggle-active`);
-    return parseChangeRequestResponse<IngamePopupNotice>(response, (r) => r?.notice);
+  async toggleActive(
+    projectApiPath: string,
+    id: number
+  ): Promise<IngamePopupNoticeMutationResult> {
+    const response = await api.patch(
+      `${projectApiPath}/ingame-popup-notices/${id}/toggle-active`
+    );
+    return parseChangeRequestResponse<IngamePopupNotice>(
+      response,
+      (r) => r?.notice
+    );
   }
 }
 

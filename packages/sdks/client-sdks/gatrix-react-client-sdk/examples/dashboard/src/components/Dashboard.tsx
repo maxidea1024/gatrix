@@ -53,18 +53,24 @@ function Dashboard({ config }: DashboardProps) {
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const initialVersionsRef = useRef<Map<string, number>>(new Map());
-  const [initialVersions, setInitialVersions] = useState<Map<string, number>>(new Map());
+  const [initialVersions, setInitialVersions] = useState<Map<string, number>>(
+    new Map()
+  );
   const [showRecoveryEffect, setShowRecoveryEffect] = useState(false);
   const [showErrorEffect, setShowErrorEffect] = useState(false);
   const prevSdkStateRef = useRef<string | null>(null);
   const [context, setContext] = useState<Record<string, any>>({});
   const [isFetching, setIsFetching] = useState(false);
-  const [viewMode, setViewMode] = useState<'detailed' | 'simple' | 'list'>(() => {
-    return (
-      (localStorage.getItem('gatrix-dashboard-view-mode') as 'detailed' | 'simple' | 'list') ||
-      'simple'
-    );
-  });
+  const [viewMode, setViewMode] = useState<'detailed' | 'simple' | 'list'>(
+    () => {
+      return (
+        (localStorage.getItem('gatrix-dashboard-view-mode') as
+          | 'detailed'
+          | 'simple'
+          | 'list') || 'simple'
+      );
+    }
+  );
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
@@ -98,7 +104,10 @@ function Dashboard({ config }: DashboardProps) {
         if (!initialVersionsRef.current.has(flag.name)) {
           newInitialVersions.set(flag.name, flag.version || 0);
         } else {
-          newInitialVersions.set(flag.name, initialVersionsRef.current.get(flag.name)!);
+          newInitialVersions.set(
+            flag.name,
+            initialVersionsRef.current.get(flag.name)!
+          );
         }
       }
       initialVersionsRef.current = newInitialVersions;
@@ -165,7 +174,9 @@ function Dashboard({ config }: DashboardProps) {
   // Get error message for display - only show when currently in error state
   const isInErrorState = stats?.sdkState === 'error';
   const errorMessage = isInErrorState
-    ? flagsError?.message || (stats?.lastError as Error)?.message || 'Unknown error'
+    ? flagsError?.message ||
+      (stats?.lastError as Error)?.message ||
+      'Unknown error'
     : null;
 
   // Check if we haven't fetched any flags yet (no cached data either)
@@ -178,7 +189,10 @@ function Dashboard({ config }: DashboardProps) {
       className={`dashboard-content ${showRecoveryEffect ? 'recovery-shimmer' : ''} ${showErrorEffect ? 'error-shimmer' : ''}`}
     >
       {selectedFlag && (
-        <FlagDetailModal flag={selectedFlag} onClose={() => setSelectedFlag(null)} />
+        <FlagDetailModal
+          flag={selectedFlag}
+          onClose={() => setSelectedFlag(null)}
+        />
       )}
       <StatsPanel
         config={config}
@@ -269,7 +283,10 @@ function Dashboard({ config }: DashboardProps) {
               </button>
             )}
 
-            <div className="view-mode-selector nes-select is-dark" style={{ width: '200px' }}>
+            <div
+              className="view-mode-selector nes-select is-dark"
+              style={{ width: '200px' }}
+            >
               <select
                 id="view-mode-select"
                 value={viewMode}
@@ -293,7 +310,9 @@ function Dashboard({ config }: DashboardProps) {
                   (SCANNING...)
                 </span>
               </div>
-              <p className="searching-text">WHERE ARE MY FLAGS?... COME BACK!</p>
+              <p className="searching-text">
+                WHERE ARE MY FLAGS?... COME BACK!
+              </p>
             </div>
           ) : flags.length === 0 ? (
             <div className="empty-state">
@@ -321,7 +340,9 @@ function Dashboard({ config }: DashboardProps) {
                     flag={flag}
                     viewMode={viewMode}
                     initialVersion={initialVersions.get(flag.name) ?? null}
-                    lastChangedTime={stats?.flagLastChangedTimes?.[flag.name] ?? null}
+                    lastChangedTime={
+                      stats?.flagLastChangedTimes?.[flag.name] ?? null
+                    }
                     onSelect={() => setSelectedFlag(flag)}
                   />
                 ))}

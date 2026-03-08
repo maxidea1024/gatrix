@@ -10,7 +10,9 @@ export interface EnhancedAuditLogOptions {
   action: string;
   resourceType?: string;
   getResourceId?: (req: any) => string | number | undefined;
-  getResourceIdFromResponse?: (responseBody: any) => string | number | undefined;
+  getResourceIdFromResponse?: (
+    responseBody: any
+  ) => string | number | undefined;
   // Enhanced: Fetch old values from database before the operation
   fetchOldValues?: (req: any) => Promise<any>;
   // Enhanced: Get new values with more context
@@ -27,7 +29,11 @@ export interface EnhancedAuditLogOptions {
  * Follows 5W1H principle (5W1H): Who, What, When, Where, Why, How
  */
 export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
     // Capture old values BEFORE the operation
     let oldValues: any = undefined;
     let captureError: any = undefined;
@@ -72,7 +78,9 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
         }
 
         // Resource ID 결정 (Request에서 또는 Response에서)
-        let resourceId = options.getResourceId ? options.getResourceId(req) : undefined;
+        let resourceId = options.getResourceId
+          ? options.getResourceId(req)
+          : undefined;
         if (!resourceId && options.getResourceIdFromResponse && responseBody) {
           const id = options.getResourceIdFromResponse(responseBody);
           resourceId = id ? id.toString() : undefined;
@@ -89,7 +97,9 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
           : undefined;
 
         // Merge context into newValues if provided
-        const finalNewValues = context ? { ...newValues, _context: context } : newValues;
+        const finalNewValues = context
+          ? { ...newValues, _context: context }
+          : newValues;
 
         // Build description from getDescription callback or context.description
         const description = options.getDescription
@@ -227,7 +237,10 @@ export async function fetchRecordsByIds(
 /**
  * Create context object with request metadata
  */
-export function createAuditContext(req: AuthenticatedRequest, additionalInfo?: any): any {
+export function createAuditContext(
+  req: AuthenticatedRequest,
+  additionalInfo?: any
+): any {
   return {
     timestamp: new Date().toISOString(),
     userId: req.user?.id,

@@ -15,7 +15,9 @@ const emotionCache = createCache({
   insertionPoint: emotionInsertionPoint ?? undefined,
 });
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
 
 root.render(
   <CacheProvider value={emotionCache}>

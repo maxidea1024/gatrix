@@ -58,7 +58,16 @@ router.get('/:id', async (req: Request, res: Response) => {
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { name, description, isEnabled, actorId, source, sourceId, filters, actions } = req.body;
+    const {
+      name,
+      description,
+      isEnabled,
+      actorId,
+      source,
+      sourceId,
+      filters,
+      actions,
+    } = req.body;
     const user = req.user as { id: string; name: string };
     const projectId = (req as any).projectId;
 
@@ -112,14 +121,25 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    const { name, description, isEnabled, actorId, source, sourceId, filters, actions } = req.body;
+    const {
+      name,
+      description,
+      isEnabled,
+      actorId,
+      source,
+      sourceId,
+      filters,
+      actions,
+    } = req.body;
     const user = req.user as { id: string; name: string };
     const projectId = (req as any).projectId;
 
     // Check for duplicate name if name is being changed
     if (name && name.trim()) {
       const allSets = await ActionSetModel.findAll(projectId);
-      const duplicate = allSets.find((s) => s.name === name.trim() && s.id !== id);
+      const duplicate = allSets.find(
+        (s) => s.name === name.trim() && s.id !== id
+      );
       if (duplicate) {
         return sendConflict(
           res,

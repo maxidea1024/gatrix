@@ -35,15 +35,24 @@ export {
 export type { StorageProvider } from '@gatrix/gatrix-js-client-sdk';
 
 // React Context
-export { default as GatrixFlagContext, type GatrixContextValue } from './GatrixContext';
+export {
+  default as GatrixFlagContext,
+  type GatrixContextValue,
+} from './GatrixContext';
 
 // Provider
-export { default as GatrixProvider, type GatrixProviderProps } from './GatrixProvider';
+export {
+  default as GatrixProvider,
+  type GatrixProviderProps,
+} from './GatrixProvider';
 
 // Core Hooks
 export { useGatrixClient } from './useGatrixClient';
 export { useFlagsStatus, type FlagsStatus } from './useFlagsStatus';
-export { useUpdateContext, type UpdateContextFunction } from './useUpdateContext';
+export {
+  useUpdateContext,
+  type UpdateContextFunction,
+} from './useUpdateContext';
 export { useGatrixContext } from './useGatrixContext';
 export { useTrack } from './useTrack';
 

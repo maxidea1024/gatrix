@@ -14,7 +14,13 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
-import { Visibility, VisibilityOff, PersonAdd, Google, GitHub } from '@mui/icons-material';
+import {
+  Visibility,
+  VisibilityOff,
+  PersonAdd,
+  Google,
+  GitHub,
+} from '@mui/icons-material';
 import QQIcon from '@/components/icons/QQIcon';
 import WeChatIcon from '@/components/icons/WeChatIcon';
 import BaiduIcon from '@/components/icons/BaiduIcon';
@@ -30,7 +36,10 @@ import { useSnackbar } from 'notistack';
 import AuthLayout from '../../components/auth/AuthLayout';
 import { invitationService } from '../../services/invitationService';
 import { Invitation, AutoJoinInfo } from '../../types/invitation';
-import { Business as OrgIcon, Folder as ProjectIcon } from '@mui/icons-material';
+import {
+  Business as OrgIcon,
+  Folder as ProjectIcon,
+} from '@mui/icons-material';
 
 // Validation schema - will be created inside component to access t function
 
@@ -53,10 +62,12 @@ const RegisterPage: React.FC = () => {
   const [oauthLoading, setOauthLoading] = useState<string | null>(null); // 'google', 'github', 'qq', etc.
   const [isShaking, setIsShaking] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
-  const [passwordFieldType, setPasswordFieldType] = useState<'text' | 'password'>('text'); // Start as text to prevent autofill
-  const [confirmPasswordFieldType, setConfirmPasswordFieldType] = useState<'text' | 'password'>(
-    'text'
-  ); // Start as text to prevent autofill
+  const [passwordFieldType, setPasswordFieldType] = useState<
+    'text' | 'password'
+  >('text'); // Start as text to prevent autofill
+  const [confirmPasswordFieldType, setConfirmPasswordFieldType] = useState<
+    'text' | 'password'
+  >('text'); // Start as text to prevent autofill
   const isWebkit = useMemo(() => {
     if (typeof navigator === 'undefined') return true;
     return /AppleWebKit|Chrome|Safari|Edg/.test(navigator.userAgent);
@@ -78,7 +89,10 @@ const RegisterPage: React.FC = () => {
           .min(2, t('auth.nameMinLength'))
           .max(100, t('auth.nameMaxLength'))
           .required(t('auth.nameRequired')),
-        email: yup.string().email(t('auth.emailInvalid')).required(t('auth.emailRequired')),
+        email: yup
+          .string()
+          .email(t('auth.emailInvalid'))
+          .required(t('auth.emailRequired')),
         password: yup
           .string()
           .min(6, t('auth.passwordMinLength'))
@@ -86,9 +100,13 @@ const RegisterPage: React.FC = () => {
         confirmPassword: yup
           .string()
           .required(t('auth.confirmPasswordRequired'))
-          .test('passwords-match', t('auth.passwordsNotMatch'), function (value) {
-            return this.parent.password === value;
-          }),
+          .test(
+            'passwords-match',
+            t('auth.passwordsNotMatch'),
+            function (value) {
+              return this.parent.password === value;
+            }
+          ),
       }),
     [t]
   );
@@ -192,7 +210,9 @@ const RegisterPage: React.FC = () => {
     // Map backend error codes to translation keys
     const errorMap: { [key: string]: string } = {
       EMAIL_ALREADY_EXISTS: t('auth.errors.emailAlreadyExists'),
-      'User with this email already exists': t('auth.errors.emailAlreadyExists'), // Legacy message
+      'User with this email already exists': t(
+        'auth.errors.emailAlreadyExists'
+      ), // Legacy message
       REGISTRATION_FAILED: t('auth.errors.registrationFailed'),
       INVALID_EMAIL_FORMAT: t('auth.errors.invalidEmailFormat'),
       PASSWORD_TOO_SHORT: t('auth.errors.passwordTooShort'),
@@ -413,7 +433,8 @@ const RegisterPage: React.FC = () => {
               color="success.main"
               sx={{
                 fontWeight: 600,
-                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3), 0px 0px 8px rgba(76, 175, 80, 0.4)',
+                textShadow:
+                  '2px 2px 4px rgba(0, 0, 0, 0.3), 0px 0px 8px rgba(76, 175, 80, 0.4)',
                 '& > span': {
                   display: 'inline-block',
                   animation: 'wave 1.5s ease-in-out infinite',
@@ -482,7 +503,11 @@ const RegisterPage: React.FC = () => {
       </Box>
 
       {/* Register Form */}
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        autoComplete="off"
+      >
         {/* Hidden real-named fields to absorb browser autofill */}
         <input
           type="text"
@@ -518,13 +543,19 @@ const RegisterPage: React.FC = () => {
             <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
               {t('auth.invitation.receivedTitle')}
             </Typography>
-            <Typography variant="body2">{t('auth.invitation.receivedDesc')}</Typography>
+            <Typography variant="body2">
+              {t('auth.invitation.receivedDesc')}
+            </Typography>
           </Alert>
         )}
 
         {/* Auto-Join Info */}
         {autoJoinInfo && autoJoinInfo.memberships.length > 0 && (
-          <Alert severity="info" sx={{ mb: 3 }} icon={<OrgIcon fontSize="small" />}>
+          <Alert
+            severity="info"
+            sx={{ mb: 3 }}
+            icon={<OrgIcon fontSize="small" />}
+          >
             <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
               {t('autoJoin.acceptInfo')}
             </Typography>
@@ -536,9 +567,16 @@ const RegisterPage: React.FC = () => {
                 {m.projects.map((p) => (
                   <Box
                     key={p.projectId}
-                    sx={{ display: 'flex', alignItems: 'center', ml: 2, mt: 0.25 }}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      ml: 2,
+                      mt: 0.25,
+                    }}
                   >
-                    <ProjectIcon sx={{ fontSize: 14, mr: 0.5, color: 'text.secondary' }} />
+                    <ProjectIcon
+                      sx={{ fontSize: 14, mr: 0.5, color: 'text.secondary' }}
+                    />
                     <Typography variant="body2" color="text.secondary">
                       {p.projectDisplayName || p.projectName}
                     </Typography>
@@ -639,22 +677,27 @@ const RegisterPage: React.FC = () => {
                 '& .MuiInputBase-input': {
                   color: 'white',
                   '&:-webkit-autofill': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                   '&:-webkit-autofill:hover': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                   '&:-webkit-autofill:focus': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                 },
                 '& .MuiFormHelperText-root': {
                   minHeight: '20px',
                   display: 'block',
-                  color: errors.name ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                  color: errors.name
+                    ? 'rgba(255, 182, 193, 0.8)'
+                    : 'rgba(255, 255, 255, 0.6)',
                 },
               }}
             />
@@ -693,15 +736,18 @@ const RegisterPage: React.FC = () => {
                 '& .MuiInputBase-input': {
                   color: 'white',
                   '&:-webkit-autofill': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                   '&:-webkit-autofill:hover': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                   '&:-webkit-autofill:focus': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                 },
@@ -709,7 +755,9 @@ const RegisterPage: React.FC = () => {
                   minHeight: '20px',
                   height: '20px',
                   lineHeight: '20px',
-                  color: errors.email ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                  color: errors.email
+                    ? 'rgba(255, 182, 193, 0.8)'
+                    : 'rgba(255, 255, 255, 0.6)',
                 },
               }}
             />
@@ -725,7 +773,9 @@ const RegisterPage: React.FC = () => {
               {...field}
               fullWidth
               label={`${t('auth.password')} *`}
-              type={isWebkit ? 'text' : showPassword ? 'text' : passwordFieldType}
+              type={
+                isWebkit ? 'text' : showPassword ? 'text' : passwordFieldType
+              }
               helperText={t('auth.passwordHelp')}
               autoComplete="off"
               onFocus={(e) => {
@@ -761,15 +811,18 @@ const RegisterPage: React.FC = () => {
                       }
                     : {}),
                   '&:-webkit-autofill': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                   '&:-webkit-autofill:hover': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                   '&:-webkit-autofill:focus': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                 },
@@ -777,7 +830,9 @@ const RegisterPage: React.FC = () => {
                   minHeight: '20px',
                   height: '20px',
                   lineHeight: '20px',
-                  color: errors.password ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                  color: errors.password
+                    ? 'rgba(255, 182, 193, 0.8)'
+                    : 'rgba(255, 255, 255, 0.6)',
                 },
               }}
               inputProps={{
@@ -815,8 +870,10 @@ const RegisterPage: React.FC = () => {
           render={({ field }) => {
             const isPasswordMatch =
               field.value && watchedPassword && field.value === watchedPassword;
-            const hasConfirmPasswordValue = field.value && field.value.length > 0;
-            const showMatchIndicator = hasConfirmPasswordValue && watchedPassword;
+            const hasConfirmPasswordValue =
+              field.value && field.value.length > 0;
+            const showMatchIndicator =
+              hasConfirmPasswordValue && watchedPassword;
 
             // Determine helper text based on validation state
             let helperText = t('auth.confirmPasswordHelp');
@@ -831,7 +888,13 @@ const RegisterPage: React.FC = () => {
                 {...field}
                 fullWidth
                 label={`${t('auth.confirmPassword')} *`}
-                type={isWebkit ? 'text' : showConfirmPassword ? 'text' : confirmPasswordFieldType}
+                type={
+                  isWebkit
+                    ? 'text'
+                    : showConfirmPassword
+                      ? 'text'
+                      : confirmPasswordFieldType
+                }
                 helperText={helperText}
                 autoComplete="off"
                 onFocus={(e) => {
@@ -879,15 +942,18 @@ const RegisterPage: React.FC = () => {
                         }
                       : {}),
                     '&:-webkit-autofill': {
-                      WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                      WebkitBoxShadow:
+                        '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                       WebkitTextFillColor: 'white !important',
                     },
                     '&:-webkit-autofill:hover': {
-                      WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                      WebkitBoxShadow:
+                        '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                       WebkitTextFillColor: 'white !important',
                     },
                     '&:-webkit-autofill:focus': {
-                      WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                      WebkitBoxShadow:
+                        '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                       WebkitTextFillColor: 'white !important',
                     },
                   },
@@ -921,7 +987,11 @@ const RegisterPage: React.FC = () => {
                         tabIndex={-1}
                         sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                       >
-                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -967,7 +1037,10 @@ const RegisterPage: React.FC = () => {
 
         {/* Login Link */}
         <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+          <Typography
+            variant="body2"
+            sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+          >
             {t('auth.alreadyHaveAccount')}{' '}
             <Link
               component={RouterLink}
@@ -994,7 +1067,10 @@ const RegisterPage: React.FC = () => {
             },
           }}
         >
-          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+          <Typography
+            variant="body2"
+            sx={{ color: 'rgba(255, 255, 255, 0.8)' }}
+          >
             {t('auth.or')}
           </Typography>
         </Divider>

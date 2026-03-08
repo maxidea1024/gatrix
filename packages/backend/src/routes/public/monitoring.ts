@@ -36,7 +36,8 @@ router.get('/prometheus/targets', async (_req, res) => {
         // Docker internal network IPs (172.x.x.x) are accessible directly within Docker network
         // Host machine IPs (10.x.x.x, 192.168.x.x, etc.) need host.docker.internal
         const isDockerInternalNetwork = targetAddress.startsWith('172.');
-        const isLocalhost = targetAddress === '127.0.0.1' || targetAddress === 'localhost';
+        const isLocalhost =
+          targetAddress === '127.0.0.1' || targetAddress === 'localhost';
 
         // Host machine services (non-Docker IPs) need host.docker.internal for Prometheus access
         if (!isDockerInternalNetwork && !isLocalhost) {

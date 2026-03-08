@@ -209,9 +209,10 @@ export const COUNTRY_ALPHA3_MAP: Record<string, string> = {
 /**
  * Reverse map: alpha-3 -> alpha-2
  */
-export const COUNTRY_ALPHA3_REVERSE: Record<string, string> = Object.fromEntries(
-  Object.entries(COUNTRY_ALPHA3_MAP).map(([a2, a3]) => [a3, a2])
-);
+export const COUNTRY_ALPHA3_REVERSE: Record<string, string> =
+  Object.fromEntries(
+    Object.entries(COUNTRY_ALPHA3_MAP).map(([a2, a3]) => [a3, a2])
+  );
 
 /**
  * Set of valid alpha-3 codes for quick lookup

@@ -44,7 +44,11 @@ export class EmailService {
       }
 
       // SMTP Settings Confirm (우선순위 2)
-      if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      if (
+        process.env.SMTP_HOST &&
+        process.env.SMTP_USER &&
+        process.env.SMTP_PASS
+      ) {
         this.transporter = nodemailer.createTransport({
           host: process.env.SMTP_HOST,
           port: parseInt(process.env.SMTP_PORT || '587'),
@@ -61,7 +65,9 @@ export class EmailService {
 
       // Settings이 없는 경우 콘솔 출력 (개발용)
       this.emailProvider = 'console';
-      logger.warn('No email provider configured. Emails will be logged to console.');
+      logger.warn(
+        'No email provider configured. Emails will be logged to console.'
+      );
     } catch (error) {
       logger.error('Failed to initialize email provider:', error);
       this.emailProvider = 'console';
@@ -89,7 +95,8 @@ export class EmailService {
 
   private async sendEmailViaSendGrid(options: EmailOptions): Promise<boolean> {
     try {
-      const fromEmail = process.env.SENDGRID_FROM || process.env.SENDGRID_VERIFIED_SENDER;
+      const fromEmail =
+        process.env.SENDGRID_FROM || process.env.SENDGRID_VERIFIED_SENDER;
 
       if (!fromEmail) {
         throw new Error('SendGrid sender email not configured');
@@ -178,7 +185,10 @@ export class EmailService {
       const user = await UserModel.findByEmailWithoutPassword(email);
       return user?.preferredLanguage || 'en';
     } catch (error) {
-      logger.warn(`Failed to get user language for ${email}, defaulting to 'en'`, error);
+      logger.warn(
+        `Failed to get user language for ${email}, defaulting to 'en'`,
+        error
+      );
       return 'en';
     }
   }
@@ -211,12 +221,18 @@ export class EmailService {
         text: rendered.text,
       });
     } catch (error) {
-      logger.error(`Failed to send templated email: ${templateName} to ${email}`, error);
+      logger.error(
+        `Failed to send templated email: ${templateName} to ${email}`,
+        error
+      );
       return false;
     }
   }
 
-  async sendPasswordResetEmail(email: string, resetToken: string): Promise<boolean> {
+  async sendPasswordResetEmail(
+    email: string,
+    resetToken: string
+  ): Promise<boolean> {
     const resetUrl = `${config.frontendUrl}/reset-password?token=${resetToken}`;
 
     return this.sendTemplatedEmail(email, 'password-reset', {
@@ -230,7 +246,10 @@ export class EmailService {
     });
   }
 
-  async sendAccountApprovalEmail(email: string, name: string): Promise<boolean> {
+  async sendAccountApprovalEmail(
+    email: string,
+    name: string
+  ): Promise<boolean> {
     const loginUrl = `${config.frontendUrl}/login`;
 
     return this.sendTemplatedEmail(email, 'account-approval', {

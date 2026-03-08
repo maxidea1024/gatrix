@@ -155,8 +155,14 @@ export class Environment extends Model implements EnvironmentData {
   /**
    * Get environment by name within a project
    */
-  static async getByName(projectId: string, name: string): Promise<Environment | undefined> {
-    return await this.query().where('projectId', projectId).where('name', name).first();
+  static async getByName(
+    projectId: string,
+    name: string
+  ): Promise<Environment | undefined> {
+    return await this.query()
+      .where('projectId', projectId)
+      .where('name', name)
+      .first();
   }
 
   /**
@@ -176,7 +182,10 @@ export class Environment extends Model implements EnvironmentData {
         this.where('o.orgName', orgNameOrId).orWhere('o.id', orgNameOrId);
       })
       .where(function () {
-        this.where('p.projectName', projectNameOrId).orWhere('p.id', projectNameOrId);
+        this.where('p.projectName', projectNameOrId).orWhere(
+          'p.id',
+          projectNameOrId
+        );
       })
       .where(function () {
         this.where('e.name', envNameOrId).orWhere('e.id', envNameOrId);
@@ -190,7 +199,9 @@ export class Environment extends Model implements EnvironmentData {
    * Get all active environments ordered by displayOrder (excluding hidden ones by default)
    */
   static async getAll(includeHidden: boolean = false): Promise<Environment[]> {
-    const query = this.query().orderBy('displayOrder', 'asc').orderBy('displayName');
+    const query = this.query()
+      .orderBy('displayOrder', 'asc')
+      .orderBy('displayName');
 
     if (!includeHidden) {
       query.where('isHidden', false);
@@ -203,7 +214,9 @@ export class Environment extends Model implements EnvironmentData {
    * Get all environments by project
    */
   static async getByProject(projectId: string): Promise<Environment[]> {
-    return await this.query().where('projectId', projectId).orderBy('displayOrder', 'asc');
+    return await this.query()
+      .where('projectId', projectId)
+      .orderBy('displayOrder', 'asc');
   }
 
   /**
@@ -270,7 +283,10 @@ export class Environment extends Model implements EnvironmentData {
   /**
    * Update environment
    */
-  async updateEnvironment(data: Partial<EnvironmentData>, updatedBy: string): Promise<Environment> {
+  async updateEnvironment(
+    data: Partial<EnvironmentData>,
+    updatedBy: string
+  ): Promise<Environment> {
     // If setting as default, unset other defaults
     if (data.isDefault) {
       await Environment.query().patch({ isDefault: false });
@@ -294,19 +310,55 @@ export class Environment extends Model implements EnvironmentData {
       count: number;
       items: Array<{ id: string; clientVersion: string; platform: string }>;
     };
-    accountWhitelist: { count: number; items: Array<{ id: string; accountId: string }> };
-    ipWhitelist: { count: number; items: Array<{ id: string; ipAddress: string }> };
+    accountWhitelist: {
+      count: number;
+      items: Array<{ id: string; accountId: string }>;
+    };
+    ipWhitelist: {
+      count: number;
+      items: Array<{ id: string; ipAddress: string }>;
+    };
     vars: { count: number; items: Array<{ id: string; varKey: string }> };
-    featureFlags: { count: number; items: Array<{ id: string; flagId: string }> };
-    featureStrategies: { count: number; items: Array<{ id: string; strategyName: string }> };
-    featureVariants: { count: number; items: Array<{ id: string; variantName: string }> };
-    featureSegments: { count: number; items: Array<{ id: string; segmentName: string }> };
-    featureMetrics: { count: number; items: Array<{ id: string; flagName: string }> };
-    featureVariantMetrics: { count: number; items: Array<{ id: string; flagName: string }> };
-    featureNetworkTraffic: { count: number; items: Array<{ id: string; appName: string }> };
-    unknownFlags: { count: number; items: Array<{ id: string; flagName: string }> };
-    changeRequests: { count: number; items: Array<{ id: string; title: string }> };
-    entityLocks: { count: number; items: Array<{ id: string; entityType: string }> };
+    featureFlags: {
+      count: number;
+      items: Array<{ id: string; flagId: string }>;
+    };
+    featureStrategies: {
+      count: number;
+      items: Array<{ id: string; strategyName: string }>;
+    };
+    featureVariants: {
+      count: number;
+      items: Array<{ id: string; variantName: string }>;
+    };
+    featureSegments: {
+      count: number;
+      items: Array<{ id: string; segmentName: string }>;
+    };
+    featureMetrics: {
+      count: number;
+      items: Array<{ id: string; flagName: string }>;
+    };
+    featureVariantMetrics: {
+      count: number;
+      items: Array<{ id: string; flagName: string }>;
+    };
+    featureNetworkTraffic: {
+      count: number;
+      items: Array<{ id: string; appName: string }>;
+    };
+    unknownFlags: {
+      count: number;
+      items: Array<{ id: string; flagName: string }>;
+    };
+    changeRequests: {
+      count: number;
+      items: Array<{ id: string; title: string }>;
+    };
+    entityLocks: {
+      count: number;
+      items: Array<{ id: string; entityType: string }>;
+    };
     messageTemplates: {
       count: number;
       items: Array<{ id: string; name: string }>;
@@ -326,10 +378,22 @@ export class Environment extends Model implements EnvironmentData {
       items: Array<{ id: string; surveyTitle: string }>;
     };
     crashes: { count: number; items: Array<{ id: string; branch: string }> };
-    crashEvents: { count: number; items: Array<{ id: string; platform: string }> };
-    rewardItemTemplates: { count: number; items: Array<{ id: string; name: string }> };
-    rewardTemplates: { count: number; items: Array<{ id: string; name: string }> };
-    couponSettings: { count: number; items: Array<{ id: string; name: string }> };
+    crashEvents: {
+      count: number;
+      items: Array<{ id: string; platform: string }>;
+    };
+    rewardItemTemplates: {
+      count: number;
+      items: Array<{ id: string; name: string }>;
+    };
+    rewardTemplates: {
+      count: number;
+      items: Array<{ id: string; name: string }>;
+    };
+    couponSettings: {
+      count: number;
+      items: Array<{ id: string; name: string }>;
+    };
     coupons: { count: number; items: Array<{ id: string; code: string }> };
     storeProducts: {
       count: number;
@@ -340,8 +404,14 @@ export class Environment extends Model implements EnvironmentData {
       items: Array<{ id: string; name: string }>;
     };
     apiTokens: { count: number; items: Array<{ id: string; name: string }> };
-    serverLifecycleEvents: { count: number; items: Array<{ id: string; eventType: string }> };
-    userEnvironments: { count: number; items: Array<{ id: string; userId: string }> };
+    serverLifecycleEvents: {
+      count: number;
+      items: Array<{ id: string; eventType: string }>;
+    };
+    userEnvironments: {
+      count: number;
+      items: Array<{ id: string; userId: string }>;
+    };
     auditLogs: { count: number; items: Array<{ id: string; action: string }> };
     total: number;
   }> {
@@ -356,7 +426,9 @@ export class Environment extends Model implements EnvironmentData {
     ): Promise<{ count: number; items: T[] }> => {
       try {
         // Check if table has environment column
-        const columns = await knex.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environmentId'`);
+        const columns = await knex.raw(
+          `SHOW COLUMNS FROM ${tableName} LIKE 'environmentId'`
+        );
         if (columns[0].length === 0) {
           return { count: 0, items: [] };
         }
@@ -371,7 +443,10 @@ export class Environment extends Model implements EnvironmentData {
         const countResult = await countQuery;
         const count = Number(countResult?.count || 0);
 
-        const items = count > 0 ? await query.clone().select(selectColumns).limit(maxItems) : [];
+        const items =
+          count > 0
+            ? await query.clone().select(selectColumns).limit(maxItems)
+            : [];
 
         return { count, items: items as T[] };
       } catch {
@@ -414,50 +489,110 @@ export class Environment extends Model implements EnvironmentData {
       userEnvironments,
       auditLogs,
     ] = await Promise.all([
-      safeQuery<{ id: string; worldId: string; name: string }>('g_game_worlds', [
+      safeQuery<{ id: string; worldId: string; name: string }>(
+        'g_game_worlds',
+        ['id', 'worldId', 'name']
+      ),
+      safeQuery<{ id: string; clientVersion: string; platform: string }>(
+        'g_client_versions',
+        ['id', 'clientVersion', 'platform']
+      ),
+      safeQuery<{ id: string; accountId: string }>('g_account_whitelist', [
         'id',
-        'worldId',
-        'name',
+        'accountId',
       ]),
-      safeQuery<{ id: string; clientVersion: string; platform: string }>('g_client_versions', [
+      safeQuery<{ id: string; ipAddress: string }>('g_ip_whitelist', [
         'id',
-        'clientVersion',
-        'platform',
+        'ipAddress',
       ]),
-      safeQuery<{ id: string; accountId: string }>('g_account_whitelist', ['id', 'accountId']),
-      safeQuery<{ id: string; ipAddress: string }>('g_ip_whitelist', ['id', 'ipAddress']),
-      safeQuery<{ id: string; varKey: string }>('g_vars', ['id', 'varKey'], (qb) => {
-        qb.where(function (this: any) {
-          this.where('varKey', 'like', 'kv:%').orWhere('varKey', 'like', '$%');
-        });
-      }),
-      safeQuery<{ id: string; flagId: string }>('g_feature_flag_environments', ['id', 'flagId']),
+      safeQuery<{ id: string; varKey: string }>(
+        'g_vars',
+        ['id', 'varKey'],
+        (qb) => {
+          qb.where(function (this: any) {
+            this.where('varKey', 'like', 'kv:%').orWhere(
+              'varKey',
+              'like',
+              '$%'
+            );
+          });
+        }
+      ),
+      safeQuery<{ id: string; flagId: string }>('g_feature_flag_environments', [
+        'id',
+        'flagId',
+      ]),
       safeQuery<{ id: string; strategyName: string }>('g_feature_strategies', [
         'id',
         'strategyName',
       ]),
-      safeQuery<{ id: string; variantName: string }>('g_feature_variants', ['id', 'variantName']),
-      safeQuery<{ id: string; segmentName: string }>('g_feature_segments', ['id', 'segmentName']),
-      safeQuery<{ id: string; flagName: string }>('g_feature_metrics', ['id', 'flagName']),
-      safeQuery<{ id: string; flagName: string }>('g_feature_variant_metrics', ['id', 'flagName']),
-      safeQuery<{ id: string; appName: string }>('g_feature_network_traffic', ['id', 'appName']),
-      safeQuery<{ id: string; flagName: string }>('g_unknown_flags', ['id', 'flagName']),
-      safeQuery<{ id: string; title: string }>('g_change_requests', ['id', 'title']),
-      safeQuery<{ id: string; entityType: string }>('g_entity_locks', ['id', 'entityType']),
-      safeQuery<{ id: string; name: string }>('g_message_templates', ['id', 'name']),
+      safeQuery<{ id: string; variantName: string }>('g_feature_variants', [
+        'id',
+        'variantName',
+      ]),
+      safeQuery<{ id: string; segmentName: string }>('g_feature_segments', [
+        'id',
+        'segmentName',
+      ]),
+      safeQuery<{ id: string; flagName: string }>('g_feature_metrics', [
+        'id',
+        'flagName',
+      ]),
+      safeQuery<{ id: string; flagName: string }>('g_feature_variant_metrics', [
+        'id',
+        'flagName',
+      ]),
+      safeQuery<{ id: string; appName: string }>('g_feature_network_traffic', [
+        'id',
+        'appName',
+      ]),
+      safeQuery<{ id: string; flagName: string }>('g_unknown_flags', [
+        'id',
+        'flagName',
+      ]),
+      safeQuery<{ id: string; title: string }>('g_change_requests', [
+        'id',
+        'title',
+      ]),
+      safeQuery<{ id: string; entityType: string }>('g_entity_locks', [
+        'id',
+        'entityType',
+      ]),
+      safeQuery<{ id: string; name: string }>('g_message_templates', [
+        'id',
+        'name',
+      ]),
       safeQuery<{ id: string; name: string }>('g_job_types', ['id', 'name']),
       safeQuery<{ id: string; name: string }>('g_jobs', ['id', 'name']),
-      safeQuery<{ id: string; title: string }>('g_service_notices', ['id', 'title']),
+      safeQuery<{ id: string; title: string }>('g_service_notices', [
+        'id',
+        'title',
+      ]),
       safeQuery<{ id: string; description: string }>('g_ingame_popup_notices', [
         'id',
         'description',
       ]),
-      safeQuery<{ id: string; surveyTitle: string }>('g_surveys', ['id', 'surveyTitle']),
+      safeQuery<{ id: string; surveyTitle: string }>('g_surveys', [
+        'id',
+        'surveyTitle',
+      ]),
       safeQuery<{ id: string; branch: string }>('g_crashes', ['id', 'branch']),
-      safeQuery<{ id: string; platform: string }>('g_crash_events', ['id', 'platform']),
-      safeQuery<{ id: string; name: string }>('g_reward_item_templates', ['id', 'name']),
-      safeQuery<{ id: string; name: string }>('g_reward_templates', ['id', 'name']),
-      safeQuery<{ id: string; name: string }>('g_coupon_settings', ['id', 'name']),
+      safeQuery<{ id: string; platform: string }>('g_crash_events', [
+        'id',
+        'platform',
+      ]),
+      safeQuery<{ id: string; name: string }>('g_reward_item_templates', [
+        'id',
+        'name',
+      ]),
+      safeQuery<{ id: string; name: string }>('g_reward_templates', [
+        'id',
+        'name',
+      ]),
+      safeQuery<{ id: string; name: string }>('g_coupon_settings', [
+        'id',
+        'name',
+      ]),
       safeQuery<{ id: string; code: string }>('g_coupons', ['id', 'code']),
       safeQuery<{ id: string; productId: string; productName: string }>(
         'g_store_products',
@@ -467,19 +602,31 @@ export class Environment extends Model implements EnvironmentData {
         }
       ),
       safeQuery<{ id: string; name: string }>('g_banners', ['id', 'name']),
-      safeQuery<{ id: string; tokenName: string }>('g_api_access_tokens', ['id', 'tokenName']),
-      safeQuery<{ id: string; eventType: string }>('g_server_lifecycle_events', [
+      safeQuery<{ id: string; tokenName: string }>('g_api_access_tokens', [
         'id',
-        'eventType',
+        'tokenName',
       ]),
-      safeQuery<{ id: string; userId: string }>('g_user_environments', ['id', 'userId']),
-      safeQuery<{ id: string; action: string }>('g_audit_logs', ['id', 'action']),
+      safeQuery<{ id: string; eventType: string }>(
+        'g_server_lifecycle_events',
+        ['id', 'eventType']
+      ),
+      safeQuery<{ id: string; userId: string }>('g_user_environments', [
+        'id',
+        'userId',
+      ]),
+      safeQuery<{ id: string; action: string }>('g_audit_logs', [
+        'id',
+        'action',
+      ]),
     ]);
 
     // API tokens now have direct environmentId column
     const apiTokens = {
       count: apiTokenEnvs.count,
-      items: apiTokenEnvs.items.map((t: any) => ({ id: t.id, name: t.tokenName })),
+      items: apiTokenEnvs.items.map((t: any) => ({
+        id: t.id,
+        name: t.tokenName,
+      })),
     };
 
     const result = {
@@ -668,7 +815,9 @@ export class Environment extends Model implements EnvironmentData {
       // Helper to safely delete from a table if it has environment column
       const safeDelete = async (trx: any, tableName: string): Promise<void> => {
         try {
-          const columns = await trx.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environmentId'`);
+          const columns = await trx.raw(
+            `SHOW COLUMNS FROM ${tableName} LIKE 'environmentId'`
+          );
           if (columns[0].length > 0) {
             await trx(tableName).where('environmentId', environment).del();
           }

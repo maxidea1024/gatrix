@@ -127,7 +127,12 @@ export const LogViewer: React.FC<LogViewerProps> = ({
       }
     }
 
-    if (lineNumber && !isNaN(lineNumber) && lineNumber > 0 && lineNumber <= lines.length) {
+    if (
+      lineNumber &&
+      !isNaN(lineNumber) &&
+      lineNumber > 0 &&
+      lineNumber <= lines.length
+    ) {
       // Set highlighted line
       setHighlightedLine(lineNumber);
 
@@ -170,7 +175,10 @@ export const LogViewer: React.FC<LogViewerProps> = ({
     }
   }, [initialScrollLine, lines.length, logContent]);
 
-  const handleLineClick = (event: React.MouseEvent<HTMLDivElement>, lineNumber: number) => {
+  const handleLineClick = (
+    event: React.MouseEvent<HTMLDivElement>,
+    lineNumber: number
+  ) => {
     event.preventDefault();
     event.stopPropagation();
     setSelectedLine(lineNumber);
@@ -242,7 +250,9 @@ export const LogViewer: React.FC<LogViewerProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = logFilePath ? logFilePath.split('/').pop() || 'log.txt' : 'log.txt';
+    a.download = logFilePath
+      ? logFilePath.split('/').pop() || 'log.txt'
+      : 'log.txt';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -253,14 +263,20 @@ export const LogViewer: React.FC<LogViewerProps> = ({
   const handleCopyAll = async () => {
     await copyToClipboardWithNotification(
       logContent,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
 
   const handleGoToLine = () => {
     const lineNumber = parseInt(goToLine, 10);
-    if (!isNaN(lineNumber) && lineNumber > 0 && lineNumber <= lines.length && virtuosoRef.current) {
+    if (
+      !isNaN(lineNumber) &&
+      lineNumber > 0 &&
+      lineNumber <= lines.length &&
+      virtuosoRef.current
+    ) {
       virtuosoRef.current.scrollToIndex({
         index: lineNumber - 1,
         align: 'center',
@@ -290,7 +306,10 @@ export const LogViewer: React.FC<LogViewerProps> = ({
       <>
         {parts.map((part, index) =>
           part.toLowerCase() === query.toLowerCase() ? (
-            <span key={index} style={{ backgroundColor: '#ffeb3b', color: '#000' }}>
+            <span
+              key={index}
+              style={{ backgroundColor: '#ffeb3b', color: '#000' }}
+            >
               {part}
             </span>
           ) : (
@@ -394,9 +413,15 @@ export const LogViewer: React.FC<LogViewerProps> = ({
       {/* Toolbar */}
       <Box sx={{ flexShrink: 0, mb: 1 }}>
         {/* First row: File info */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={1}
+        >
           <Typography variant="caption" color="text.secondary">
-            {logFilePath || t('crashes.logFile')} ({lines.length} {t('crashes.lines')})
+            {logFilePath || t('crashes.logFile')} ({lines.length}{' '}
+            {t('crashes.lines')})
             {searchQuery && ` - ${matchingLines.size} matches`}
           </Typography>
         </Box>
@@ -456,7 +481,12 @@ export const LogViewer: React.FC<LogViewerProps> = ({
           />
 
           {/* Right-aligned controls */}
-          <Box display="flex" gap={1} alignItems="center" sx={{ flexShrink: 0 }}>
+          <Box
+            display="flex"
+            gap={1}
+            alignItems="center"
+            sx={{ flexShrink: 0 }}
+          >
             {/* Go to Line */}
             <TextField
               size="small"
@@ -557,7 +587,9 @@ export const LogViewer: React.FC<LogViewerProps> = ({
         onClose={handleClose}
         anchorReference="anchorPosition"
         anchorPosition={
-          contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
         }
       >
         <MenuItem onClick={handleCopyLine}>

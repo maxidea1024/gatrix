@@ -18,7 +18,9 @@ export class PlatformDefaultsService {
   /**
    * 모든 플랫Form의 Default values 조회
    */
-  static async getAllDefaults(environmentId: string): Promise<PlatformDefaultsMap> {
+  static async getAllDefaults(
+    environmentId: string
+  ): Promise<PlatformDefaultsMap> {
     try {
       const data = await VarsModel.get(PLATFORM_DEFAULTS_KEY, environmentId);
       if (!data) {
@@ -131,11 +133,18 @@ export class PlatformDefaultsService {
 
       return {
         ...clientVersionData,
-        gameServerAddress: clientVersionData.gameServerAddress || defaults.gameServerAddress || '',
-        patchAddress: clientVersionData.patchAddress || defaults.patchAddress || '',
+        gameServerAddress:
+          clientVersionData.gameServerAddress ||
+          defaults.gameServerAddress ||
+          '',
+        patchAddress:
+          clientVersionData.patchAddress || defaults.patchAddress || '',
       };
     } catch (error) {
-      logger.error(`Error applying defaults to client version for platform ${platform}:`, error);
+      logger.error(
+        `Error applying defaults to client version for platform ${platform}:`,
+        error
+      );
       return clientVersionData;
     }
   }

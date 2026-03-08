@@ -21,7 +21,11 @@ import { GoogleChatAddon } from './google-chat-addon';
 import { WeComAddon } from './we-com-addon';
 import { DingTalkAddon } from './ding-talk-addon';
 import { DebugAddon } from './debug-addon';
-import { getAllAddonDefinitions, getAddonDefinition, ADDON_DEFINITIONS } from './definitions';
+import {
+  getAllAddonDefinitions,
+  getAddonDefinition,
+  ADDON_DEFINITIONS,
+} from './definitions';
 import type { AddonDefinition } from './definitions';
 
 export type AddonProviders = Record<string, Addon>;

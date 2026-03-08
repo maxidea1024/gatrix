@@ -71,16 +71,22 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
       console.log('[Clipboard] ✓ Modern Clipboard API success');
       return true;
     } catch (error) {
-      console.warn('[Clipboard] Modern Clipboard API failed, trying fallback:', error);
+      console.warn(
+        '[Clipboard] Modern Clipboard API failed, trying fallback:',
+        error
+      );
     }
   }
 
   // For HTTP environments, try execCommand first (it works in many cases)
   // Only fall back to prompt if execCommand fails
-  const isInsecureContext = !window.isSecureContext || window.location.protocol === 'http:';
+  const isInsecureContext =
+    !window.isSecureContext || window.location.protocol === 'http:';
 
   if (isInsecureContext) {
-    console.log('[Clipboard] HTTP environment detected, trying execCommand first...');
+    console.log(
+      '[Clipboard] HTTP environment detected, trying execCommand first...'
+    );
 
     // Try execCommand - it actually works in many HTTP environments
     if (tryExecCommandCopy(text)) {

@@ -15,7 +15,9 @@ export const config = {
   // Edge bypass token - allows access to all environments and internal APIs
   // Can be configured via EDGE_BYPASS_TOKEN or EDGE_API_TOKEN environment variable
   apiToken:
-    process.env.EDGE_BYPASS_TOKEN || process.env.EDGE_API_TOKEN || 'gatrix-infra-server-token',
+    process.env.EDGE_BYPASS_TOKEN ||
+    process.env.EDGE_API_TOKEN ||
+    'gatrix-infra-server-token',
   applicationName: process.env.EDGE_APPLICATION_NAME || 'edge-server',
 
   // SDK required fields for metrics labels and service discovery
@@ -26,16 +28,34 @@ export const config = {
   // Redis configuration (for cache PubSub in event mode)
   // Edge cache-specific Redis settings take priority over global settings
   redis: {
-    host: process.env.EDGE_CACHE_REDIS_HOST || process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.EDGE_CACHE_REDIS_PORT || process.env.REDIS_PORT || '6379', 10),
-    password: process.env.EDGE_CACHE_REDIS_PASSWORD || process.env.REDIS_PASSWORD || undefined,
-    db: parseInt(process.env.EDGE_CACHE_REDIS_DB || process.env.REDIS_DB || '0', 10),
+    host:
+      process.env.EDGE_CACHE_REDIS_HOST ||
+      process.env.REDIS_HOST ||
+      'localhost',
+    port: parseInt(
+      process.env.EDGE_CACHE_REDIS_PORT || process.env.REDIS_PORT || '6379',
+      10
+    ),
+    password:
+      process.env.EDGE_CACHE_REDIS_PASSWORD ||
+      process.env.REDIS_PASSWORD ||
+      undefined,
+    db: parseInt(
+      process.env.EDGE_CACHE_REDIS_DB || process.env.REDIS_DB || '0',
+      10
+    ),
   },
 
   // Cache configuration
   cache: {
-    pollingIntervalMs: parseInt(process.env.EDGE_CACHE_POLLING_INTERVAL_MS || '30000', 10),
-    syncMethod: (process.env.EDGE_CACHE_SYNC_METHOD || 'polling') as 'polling' | 'event' | 'manual',
+    pollingIntervalMs: parseInt(
+      process.env.EDGE_CACHE_POLLING_INTERVAL_MS || '30000',
+      10
+    ),
+    syncMethod: (process.env.EDGE_CACHE_SYNC_METHOD || 'polling') as
+      | 'polling'
+      | 'event'
+      | 'manual',
   },
 
   // Logging
@@ -45,7 +65,8 @@ export const config = {
   // This token bypasses normal token validation and allows access to all environments
   // WARNING: Only use in development/testing environments
   unsecuredClientToken:
-    process.env.EDGE_CLIENT_UNSECURED_TOKEN || 'gatrix-unsecured-edge-api-token',
+    process.env.EDGE_CLIENT_UNSECURED_TOKEN ||
+    'gatrix-unsecured-edge-api-token',
 };
 
 // Validate required configuration

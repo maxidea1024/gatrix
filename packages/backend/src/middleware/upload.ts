@@ -38,12 +38,23 @@ const fileFilter = (
   file: Express.Multer.File,
   cb: (error: Error | null, acceptFile?: boolean) => void
 ) => {
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+  const allowedTypes = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+  ];
 
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new GatrixError('Only image files are allowed (JPEG, PNG, GIF, WebP)', 400));
+    cb(
+      new GatrixError(
+        'Only image files are allowed (JPEG, PNG, GIF, WebP)',
+        400
+      )
+    );
   }
 };
 

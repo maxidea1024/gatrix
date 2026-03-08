@@ -19,10 +19,13 @@ async function testAuditLog() {
     console.log('🔐 Logging in as admin...');
 
     // Login as admin
-    const loginResponse = await axios.post<LoginResponse>(`${API_URL}/auth/login`, {
-      email: 'admin@example.com',
-      password: 'admin123',
-    });
+    const loginResponse = await axios.post<LoginResponse>(
+      `${API_URL}/auth/login`,
+      {
+        email: 'admin@example.com',
+        password: 'admin123',
+      }
+    );
 
     const token = loginResponse.data.data.token;
     const adminId = loginResponse.data.data.user.id;
@@ -44,7 +47,9 @@ async function testAuditLog() {
     console.log(`Found ${users.length} users`);
 
     // Find a test user (not admin)
-    const testUser = users.find((u: any) => u.id !== adminId && u.role === 'user');
+    const testUser = users.find(
+      (u: any) => u.id !== adminId && u.role === 'user'
+    );
 
     if (!testUser) {
       console.log('❌ No test user found. Creating one...');
@@ -79,22 +84,38 @@ async function testAuditLog() {
 
       // Test 2: Promote user
       console.log('\n⬆️ Test 2: Promoting user to admin...');
-      await axios.post(`${API_URL}/admin/users/${newUser.id}/promote`, {}, { headers });
+      await axios.post(
+        `${API_URL}/admin/users/${newUser.id}/promote`,
+        {},
+        { headers }
+      );
       console.log('✅ User promoted');
 
       // Test 3: Demote user
       console.log('\n⬇️ Test 3: Demoting user back to user...');
-      await axios.post(`${API_URL}/admin/users/${newUser.id}/demote`, {}, { headers });
+      await axios.post(
+        `${API_URL}/admin/users/${newUser.id}/demote`,
+        {},
+        { headers }
+      );
       console.log('✅ User demoted');
 
       // Test 4: Suspend user
       console.log('\n⏸️ Test 4: Suspending user...');
-      await axios.post(`${API_URL}/admin/users/${newUser.id}/suspend`, {}, { headers });
+      await axios.post(
+        `${API_URL}/admin/users/${newUser.id}/suspend`,
+        {},
+        { headers }
+      );
       console.log('✅ User suspended');
 
       // Test 5: Unsuspend user
       console.log('\n▶️ Test 5: Unsuspending user...');
-      await axios.post(`${API_URL}/admin/users/${newUser.id}/activate`, {}, { headers });
+      await axios.post(
+        `${API_URL}/admin/users/${newUser.id}/activate`,
+        {},
+        { headers }
+      );
       console.log('✅ User unsuspended');
 
       // Test 6: Delete user
@@ -118,12 +139,20 @@ async function testAuditLog() {
 
       // Test 2: Suspend user
       console.log('\n⏸️ Test 2: Suspending user...');
-      await axios.post(`${API_URL}/admin/users/${testUser.id}/suspend`, {}, { headers });
+      await axios.post(
+        `${API_URL}/admin/users/${testUser.id}/suspend`,
+        {},
+        { headers }
+      );
       console.log('✅ User suspended');
 
       // Test 3: Unsuspend user
       console.log('\n▶️ Test 3: Unsuspending user...');
-      await axios.post(`${API_URL}/admin/users/${testUser.id}/activate`, {}, { headers });
+      await axios.post(
+        `${API_URL}/admin/users/${testUser.id}/activate`,
+        {},
+        { headers }
+      );
       console.log('✅ User unsuspended');
     }
 
@@ -225,7 +254,9 @@ async function testAuditLog() {
     console.log('✅ Invitation deleted');
 
     console.log('\n✅ All tests completed successfully!');
-    console.log('\n📊 Now check the Realtime Events page to see the audit logs with diff view!');
+    console.log(
+      '\n📊 Now check the Realtime Events page to see the audit logs with diff view!'
+    );
     console.log('🌐 Open: http://localhost:3000/admin/realtime-events');
   } catch (error: any) {
     console.error('❌ Error:', error.response?.data || error.message);

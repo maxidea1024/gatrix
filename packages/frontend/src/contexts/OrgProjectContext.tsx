@@ -7,7 +7,13 @@ import React, {
   ReactNode,
   useCallback,
 } from 'react';
-import { Box, Typography, Button, CircularProgress, useTheme } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  useTheme,
+} from '@mui/material';
 import {
   Logout as LogoutIcon,
   CheckCircleOutline as CheckIcon,
@@ -16,7 +22,11 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './AuthContext';
-import { orgProjectService, Organisation, Project } from '../services/orgProjectService';
+import {
+  orgProjectService,
+  Organisation,
+  Project,
+} from '../services/orgProjectService';
 import { devLogger } from '../utils/logger';
 
 const STORAGE_KEY_ORG = 'gatrix_selected_org';
@@ -50,7 +60,9 @@ export interface OrgProjectContextType {
   getProjectApiPath: () => string | null;
 }
 
-const OrgProjectContext = createContext<OrgProjectContextType | undefined>(undefined);
+const OrgProjectContext = createContext<OrgProjectContextType | undefined>(
+  undefined
+);
 
 interface OrgProjectProviderProps {
   children: ReactNode;
@@ -61,10 +73,14 @@ const getStoredOrgId = (): string | null =>
   typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY_ORG) : null;
 
 const getStoredProjectId = (): string | null =>
-  typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY_PROJECT) : null;
+  typeof window !== 'undefined'
+    ? localStorage.getItem(STORAGE_KEY_PROJECT)
+    : null;
 
-const storeOrgId = (orgId: string) => localStorage.setItem(STORAGE_KEY_ORG, orgId);
-const storeProjectId = (projectId: string) => localStorage.setItem(STORAGE_KEY_PROJECT, projectId);
+const storeOrgId = (orgId: string) =>
+  localStorage.setItem(STORAGE_KEY_ORG, orgId);
+const storeProjectId = (projectId: string) =>
+  localStorage.setItem(STORAGE_KEY_PROJECT, projectId);
 
 // Polling interval for checking org access (15 seconds)
 const POLL_INTERVAL_MS = 15000;
@@ -236,7 +252,10 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
                 >
                   {step.title}
                 </Typography>
-                <Typography variant="body2" sx={{ lineHeight: 1.5, color: 'text.secondary' }}>
+                <Typography
+                  variant="body2"
+                  sx={{ lineHeight: 1.5, color: 'text.secondary' }}
+                >
                   {step.desc}
                 </Typography>
               </Box>
@@ -255,8 +274,14 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
             color: 'text.disabled',
           }}
         >
-          <CircularProgress size={12} thickness={5} sx={{ color: 'text.disabled' }} />
-          <Typography variant="caption">{t('onboarding.autoChecking')}</Typography>
+          <CircularProgress
+            size={12}
+            thickness={5}
+            sx={{ color: 'text.disabled' }}
+          />
+          <Typography variant="caption">
+            {t('onboarding.autoChecking')}
+          </Typography>
         </Box>
       </Box>
 
@@ -285,19 +310,26 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
 
 // ==================== Provider ====================
 
-export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children }) => {
+export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({
+  children,
+}) => {
   const { isAuthenticated } = useAuth();
 
   const [organisations, setOrganisations] = useState<Organisation[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [currentOrgId, setCurrentOrgId] = useState<string | null>(getStoredOrgId());
-  const [currentProjectId, setCurrentProjectId] = useState<string | null>(getStoredProjectId());
+  const [currentOrgId, setCurrentOrgId] = useState<string | null>(
+    getStoredOrgId()
+  );
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(
+    getStoredProjectId()
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [noOrgAccess, setNoOrgAccess] = useState(false);
   const { t } = useTranslation();
 
   const currentOrg = organisations.find((o) => o.id === currentOrgId) || null;
-  const currentProject = projects.find((p) => p.id === currentProjectId) || null;
+  const currentProject =
+    projects.find((p) => p.id === currentProjectId) || null;
 
   // Load organisations
   const loadOrgs = useCallback(async () => {
@@ -458,7 +490,11 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
     );
   }
 
-  return <OrgProjectContext.Provider value={value}>{children}</OrgProjectContext.Provider>;
+  return (
+    <OrgProjectContext.Provider value={value}>
+      {children}
+    </OrgProjectContext.Provider>
+  );
 };
 
 export const useOrgProject = (): OrgProjectContextType => {

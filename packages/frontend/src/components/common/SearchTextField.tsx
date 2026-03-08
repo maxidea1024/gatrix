@@ -1,8 +1,16 @@
 import React from 'react';
-import { TextField, InputAdornment, IconButton, TextFieldProps } from '@mui/material';
+import {
+  TextField,
+  InputAdornment,
+  IconButton,
+  TextFieldProps,
+} from '@mui/material';
 import { Search as SearchIcon, Clear as ClearIcon } from '@mui/icons-material';
 
-interface SearchTextFieldProps extends Omit<TextFieldProps, 'value' | 'onChange'> {
+interface SearchTextFieldProps extends Omit<
+  TextFieldProps,
+  'value' | 'onChange'
+> {
   value: string;
   onChange: (value: string) => void;
   onClear?: () => void;

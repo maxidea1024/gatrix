@@ -95,7 +95,8 @@ class ServiceDiscoveryService {
     }
 
     // Extract error info
-    let errorMessage = instance.stats?.lastError || instance.meta?.terminationError;
+    let errorMessage =
+      instance.stats?.lastError || instance.meta?.terminationError;
     let errorStack: string | undefined;
 
     if (errorMessage && typeof errorMessage === 'object') {
@@ -133,13 +134,18 @@ class ServiceDiscoveryService {
       },
     });
 
-    logger.info(`Server lifecycle event recorded: ${labels.service}:${instanceId} -> ${eventType}`);
+    logger.info(
+      `Server lifecycle event recorded: ${labels.service}:${instanceId} -> ${eventType}`
+    );
   }
 
   /**
    * Get all active services or services of a specific type and/or group (Admin monitoring)
    */
-  async getServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
+  async getServices(
+    serviceType?: string,
+    serviceGroup?: string
+  ): Promise<ServiceInstance[]> {
     return await this.provider.getServices(serviceType, serviceGroup);
   }
 
@@ -156,7 +162,10 @@ class ServiceDiscoveryService {
   /**
    * Get a specific service instance (Admin monitoring)
    */
-  async getService(instanceId: string, serviceType: string): Promise<ServiceInstance | null> {
+  async getService(
+    instanceId: string,
+    serviceType: string
+  ): Promise<ServiceInstance | null> {
     return await this.provider.getService(instanceId, serviceType);
   }
 
@@ -235,7 +244,9 @@ class ServiceDiscoveryService {
     }
 
     // Get unique service types
-    const serviceTypes = Array.from(new Set(inactiveServices.map((s) => s.labels.service)));
+    const serviceTypes = Array.from(
+      new Set(inactiveServices.map((s) => s.labels.service))
+    );
 
     // Call provider's cleanup method
     return await this.provider.cleanupInactiveServices(serviceTypes);

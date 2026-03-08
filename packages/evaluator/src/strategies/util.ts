@@ -13,7 +13,11 @@ import murmurhash from 'murmurhash';
  * Formula: (murmurhash3(seed, 0) % 10001) / 100.0
  * This must match the C# StrategyUtils.CalculatePercentage exactly.
  */
-export function normalizedStrategyValue(id: string, groupId: string, suffix = ''): number {
+export function normalizedStrategyValue(
+  id: string,
+  groupId: string,
+  suffix = ''
+): number {
   const seed = suffix ? `${groupId}${suffix}:${id}` : `${groupId}:${id}`;
   const hash = murmurhash.v3(seed, 0);
   return (hash % 10001) / 100.0;

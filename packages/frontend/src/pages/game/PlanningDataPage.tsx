@@ -56,7 +56,10 @@ import planningDataService, {
 } from '../../services/planningDataService';
 import SimplePagination from '../../components/common/SimplePagination';
 import { useDebounce } from '../../hooks/useDebounce';
-import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
+import {
+  formatRelativeTime,
+  formatDateTimeDetailed,
+} from '../../utils/dateFormat';
 import PlanningDataUpload from '../../components/planning-data/PlanningDataUpload';
 import PlanningDataGuideDrawer, {
   PlanningDataGuideContent,
@@ -118,14 +121,22 @@ const PlanningDataPage: React.FC = () => {
   });
 
   // HotTimeBuff state
-  const [hotTimeBuffData, setHotTimeBuffData] = useState<HotTimeBuffLookup | null>(null);
+  const [hotTimeBuffData, setHotTimeBuffData] =
+    useState<HotTimeBuffLookup | null>(null);
   const [loadingHotTimeBuff, setLoadingHotTimeBuff] = useState(false);
   const [hotTimeBuffPage, setHotTimeBuffPage] = useState(0);
   const [hotTimeBuffRowsPerPage, setHotTimeBuffRowsPerPage] = useState(20);
   const [hotTimeBuffSearchTerm, setHotTimeBuffSearchTerm] = useState('');
-  const debouncedHotTimeBuffSearchTerm = useDebounce(hotTimeBuffSearchTerm, 300);
-  const [hotTimeBuffSortBy, setHotTimeBuffSortBy] = useState<'id' | 'startDate'>('id');
-  const [hotTimeBuffSortOrder, setHotTimeBuffSortOrder] = useState<'asc' | 'desc'>('asc');
+  const debouncedHotTimeBuffSearchTerm = useDebounce(
+    hotTimeBuffSearchTerm,
+    300
+  );
+  const [hotTimeBuffSortBy, setHotTimeBuffSortBy] = useState<
+    'id' | 'startDate'
+  >('id');
+  const [hotTimeBuffSortOrder, setHotTimeBuffSortOrder] = useState<
+    'asc' | 'desc'
+  >('asc');
   const [viewAllHotTimeBuff, setViewAllHotTimeBuff] = useState(() => {
     const saved = sessionStorage.getItem('planningDataViewAllHotTimeBuff');
     return saved === 'true';
@@ -159,28 +170,50 @@ const PlanningDataPage: React.FC = () => {
   });
 
   // MateRecruitingGroup state
-  const [mateRecruitingGroupData, setMateRecruitingGroupData] = useState<any>(null);
-  const [loadingMateRecruitingGroup, setLoadingMateRecruitingGroup] = useState(false);
+  const [mateRecruitingGroupData, setMateRecruitingGroupData] =
+    useState<any>(null);
+  const [loadingMateRecruitingGroup, setLoadingMateRecruitingGroup] =
+    useState(false);
   const [mateRecruitingGroupPage, setMateRecruitingGroupPage] = useState(0);
-  const [mateRecruitingGroupRowsPerPage, setMateRecruitingGroupRowsPerPage] = useState(20);
-  const [mateRecruitingGroupSearchTerm, setMateRecruitingGroupSearchTerm] = useState('');
-  const debouncedMateRecruitingGroupSearchTerm = useDebounce(mateRecruitingGroupSearchTerm, 300);
-  const [viewAllMateRecruitingGroup, setViewAllMateRecruitingGroup] = useState(() => {
-    const saved = sessionStorage.getItem('planningDataViewAllMateRecruitingGroup');
-    return saved === 'true';
-  });
+  const [mateRecruitingGroupRowsPerPage, setMateRecruitingGroupRowsPerPage] =
+    useState(20);
+  const [mateRecruitingGroupSearchTerm, setMateRecruitingGroupSearchTerm] =
+    useState('');
+  const debouncedMateRecruitingGroupSearchTerm = useDebounce(
+    mateRecruitingGroupSearchTerm,
+    300
+  );
+  const [viewAllMateRecruitingGroup, setViewAllMateRecruitingGroup] = useState(
+    () => {
+      const saved = sessionStorage.getItem(
+        'planningDataViewAllMateRecruitingGroup'
+      );
+      return saved === 'true';
+    }
+  );
 
   // OceanNpcAreaSpawner state
-  const [oceanNpcAreaSpawnerData, setOceanNpcAreaSpawnerData] = useState<any>(null);
-  const [loadingOceanNpcAreaSpawner, setLoadingOceanNpcAreaSpawner] = useState(false);
+  const [oceanNpcAreaSpawnerData, setOceanNpcAreaSpawnerData] =
+    useState<any>(null);
+  const [loadingOceanNpcAreaSpawner, setLoadingOceanNpcAreaSpawner] =
+    useState(false);
   const [oceanNpcAreaSpawnerPage, setOceanNpcAreaSpawnerPage] = useState(0);
-  const [oceanNpcAreaSpawnerRowsPerPage, setOceanNpcAreaSpawnerRowsPerPage] = useState(20);
-  const [oceanNpcAreaSpawnerSearchTerm, setOceanNpcAreaSpawnerSearchTerm] = useState('');
-  const debouncedOceanNpcAreaSpawnerSearchTerm = useDebounce(oceanNpcAreaSpawnerSearchTerm, 300);
-  const [viewAllOceanNpcAreaSpawner, setViewAllOceanNpcAreaSpawner] = useState(() => {
-    const saved = sessionStorage.getItem('planningDataViewAllOceanNpcAreaSpawner');
-    return saved === 'true';
-  });
+  const [oceanNpcAreaSpawnerRowsPerPage, setOceanNpcAreaSpawnerRowsPerPage] =
+    useState(20);
+  const [oceanNpcAreaSpawnerSearchTerm, setOceanNpcAreaSpawnerSearchTerm] =
+    useState('');
+  const debouncedOceanNpcAreaSpawnerSearchTerm = useDebounce(
+    oceanNpcAreaSpawnerSearchTerm,
+    300
+  );
+  const [viewAllOceanNpcAreaSpawner, setViewAllOceanNpcAreaSpawner] = useState(
+    () => {
+      const saved = sessionStorage.getItem(
+        'planningDataViewAllOceanNpcAreaSpawner'
+      );
+      return saved === 'true';
+    }
+  );
 
   // Load stats on mount
   useEffect(() => {
@@ -264,7 +297,8 @@ const PlanningDataPage: React.FC = () => {
   const loadHotTimeBuff = async () => {
     try {
       setLoadingHotTimeBuff(true);
-      const data = await planningDataService.getHotTimeBuffLookup(projectApiPath);
+      const data =
+        await planningDataService.getHotTimeBuffLookup(projectApiPath);
       console.log('HotTimeBuff data loaded:', data);
       if (data?.items?.[0]) {
         console.log('First HotTimeBuff item:', data.items[0]);
@@ -330,7 +364,8 @@ const PlanningDataPage: React.FC = () => {
   const loadMateRecruitingGroup = async () => {
     try {
       setLoadingMateRecruitingGroup(true);
-      const data = await planningDataService.getMateRecruitingGroupLookup(projectApiPath);
+      const data =
+        await planningDataService.getMateRecruitingGroupLookup(projectApiPath);
       setMateRecruitingGroupData(data);
     } catch (error: any) {
       let errorMessage = t('planningData.errors.loadStatsFailed');
@@ -348,7 +383,8 @@ const PlanningDataPage: React.FC = () => {
   const loadOceanNpcAreaSpawner = async () => {
     try {
       setLoadingOceanNpcAreaSpawner(true);
-      const data = await planningDataService.getOceanNpcAreaSpawnerLookup(projectApiPath);
+      const data =
+        await planningDataService.getOceanNpcAreaSpawnerLookup(projectApiPath);
       setOceanNpcAreaSpawnerData(data);
     } catch (error: any) {
       let errorMessage = t('planningData.errors.loadStatsFailed');
@@ -423,7 +459,10 @@ const PlanningDataPage: React.FC = () => {
       const loadItems = async () => {
         try {
           setLoadingCategory(currentCategory);
-          const items = await planningDataService.getUIListItems(projectApiPath, currentCategory);
+          const items = await planningDataService.getUIListItems(
+            projectApiPath,
+            currentCategory
+          );
           setCategoryItems((prev) => ({ ...prev, [currentCategory]: items }));
         } catch (error: any) {
           // Extract user-friendly error message
@@ -440,7 +479,14 @@ const PlanningDataPage: React.FC = () => {
       };
       loadItems();
     }
-  }, [activeTab, currentCategory, categoryItems, i18n.language, enqueueSnackbar, t]);
+  }, [
+    activeTab,
+    currentCategory,
+    categoryItems,
+    i18n.language,
+    enqueueSnackbar,
+    t,
+  ]);
 
   // Get current selected reward type
   const currentRewardType = useMemo(() => {
@@ -449,8 +495,12 @@ const PlanningDataPage: React.FC = () => {
   }, [stats?.rewardTypes, selectedRewardTypeIndex]);
 
   // Load reward items for current reward type
-  const [rewardTypeItems, setRewardTypeItems] = useState<Record<number, any[]>>({});
-  const [loadingRewardType, setLoadingRewardType] = useState<number | null>(null);
+  const [rewardTypeItems, setRewardTypeItems] = useState<Record<number, any[]>>(
+    {}
+  );
+  const [loadingRewardType, setLoadingRewardType] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     if (
@@ -462,7 +512,12 @@ const PlanningDataPage: React.FC = () => {
       const loadItems = async () => {
         try {
           setLoadingRewardType(currentRewardType.value);
-          const language = i18n.language === 'zh' ? 'zh' : i18n.language === 'en' ? 'en' : 'kr';
+          const language =
+            i18n.language === 'zh'
+              ? 'zh'
+              : i18n.language === 'en'
+                ? 'en'
+                : 'kr';
           const items = await planningDataService.getRewardTypeItems(
             projectApiPath,
             currentRewardType.value,
@@ -487,11 +542,19 @@ const PlanningDataPage: React.FC = () => {
       };
       loadItems();
     }
-  }, [activeTab, currentRewardType, rewardTypeItems, i18n.language, enqueueSnackbar, t]);
+  }, [
+    activeTab,
+    currentRewardType,
+    rewardTypeItems,
+    i18n.language,
+    enqueueSnackbar,
+    t,
+  ]);
 
   // Filtered reward items based on search
   const filteredRewardItems = useMemo(() => {
-    if (!currentRewardType || !rewardTypeItems[currentRewardType.value]) return [];
+    if (!currentRewardType || !rewardTypeItems[currentRewardType.value])
+      return [];
     let items = rewardTypeItems[currentRewardType.value];
 
     // Apply search filter
@@ -518,7 +581,13 @@ const PlanningDataPage: React.FC = () => {
     });
 
     return sorted;
-  }, [currentRewardType, rewardTypeItems, debouncedSearchTerm, sortBy, sortOrder]);
+  }, [
+    currentRewardType,
+    rewardTypeItems,
+    debouncedSearchTerm,
+    sortBy,
+    sortOrder,
+  ]);
 
   // Paginated reward items
   const paginatedRewardItems = useMemo(() => {
@@ -586,7 +655,10 @@ const PlanningDataPage: React.FC = () => {
   const handleRewardTypeChange = (event: any) => {
     const newValue = typeof event === 'number' ? event : event.target.value;
     setSelectedRewardTypeIndex(newValue);
-    sessionStorage.setItem('planningDataSelectedRewardType', newValue.toString());
+    sessionStorage.setItem(
+      'planningDataSelectedRewardType',
+      newValue.toString()
+    );
     setPage(0); // Reset page when changing reward type
     setSearchTerm(''); // Clear search when changing reward type
   };
@@ -632,8 +704,12 @@ const PlanningDataPage: React.FC = () => {
       const searchLower = debouncedHotTimeBuffSearchTerm.toLowerCase();
       items = items.filter((item: HotTimeBuffItem) => {
         const idMatch = item.id.toString().includes(searchLower);
-        const iconMatch = (item as any).icon?.toLowerCase().includes(searchLower);
-        const startDateMatch = item.startDate?.toLowerCase().includes(searchLower);
+        const iconMatch = (item as any).icon
+          ?.toLowerCase()
+          .includes(searchLower);
+        const startDateMatch = item.startDate
+          ?.toLowerCase()
+          .includes(searchLower);
         const endDateMatch = item.endDate?.toLowerCase().includes(searchLower);
         return idMatch || iconMatch || startDateMatch || endDateMatch;
       });
@@ -729,7 +805,11 @@ const PlanningDataPage: React.FC = () => {
               {t('planningData.uploadData')}
             </Button>
           )}
-          <Divider orientation="vertical" flexItem sx={{ height: 32, alignSelf: 'center' }} />
+          <Divider
+            orientation="vertical"
+            flexItem
+            sx={{ height: 32, alignSelf: 'center' }}
+          />
           <Tooltip title={t('planningData.uploadGuide.title')}>
             <IconButton onClick={() => setShowGuideDrawer(true)}>
               <HelpOutlineIcon />
@@ -774,7 +854,9 @@ const PlanningDataPage: React.FC = () => {
                   mb: 2,
                 }}
               >
-                <Typography variant="h6">{t('planningData.upload.title')}</Typography>
+                <Typography variant="h6">
+                  {t('planningData.upload.title')}
+                </Typography>
                 <Button
                   size="small"
                   onClick={() => setShowUploadDialog(false)}
@@ -825,7 +907,11 @@ const PlanningDataPage: React.FC = () => {
                       <Chip
                         size="small"
                         label={latestUpload.uploaderName || 'Unknown'}
-                        color={latestUpload.uploadSource === 'cli' ? 'warning' : 'default'}
+                        color={
+                          latestUpload.uploadSource === 'cli'
+                            ? 'warning'
+                            : 'default'
+                        }
                         variant="outlined"
                       />
                       <Typography variant="body2" color="text.secondary">
@@ -961,10 +1047,18 @@ const PlanningDataPage: React.FC = () => {
                                       width: '100%',
                                     }}
                                   >
-                                    <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{ flexGrow: 1 }}
+                                    >
                                       [{type.value}] {t(type.nameKey)}
                                     </Typography>
-                                    {type.hasTable && <Chip label={type.itemCount} size="small" />}
+                                    {type.hasTable && (
+                                      <Chip
+                                        label={type.itemCount}
+                                        size="small"
+                                      />
+                                    )}
                                   </Box>
                                 </MenuItem>
                               ))}
@@ -998,7 +1092,8 @@ const PlanningDataPage: React.FC = () => {
                                   },
                                   '&.Mui-focused': {
                                     bgcolor: 'background.paper',
-                                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                    boxShadow:
+                                      '0 0 0 2px rgba(25, 118, 210, 0.1)',
                                     '& fieldset': {
                                       borderColor: 'primary.main',
                                       borderWidth: '1px',
@@ -1045,7 +1140,10 @@ const PlanningDataPage: React.FC = () => {
 
                           {/* View All checkbox - only for types with table */}
                           {currentRewardType.hasTable && (
-                            <Tooltip title={t('planningData.viewAllWarning')} arrow>
+                            <Tooltip
+                              title={t('planningData.viewAllWarning')}
+                              arrow
+                            >
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -1085,7 +1183,8 @@ const PlanningDataPage: React.FC = () => {
                               <Box
                                 sx={{
                                   display: 'grid',
-                                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                                  gridTemplateColumns:
+                                    'repeat(auto-fill, minmax(200px, 1fr))',
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
@@ -1098,7 +1197,10 @@ const PlanningDataPage: React.FC = () => {
                                   let displayName = item.name;
                                   if (i18n.language === 'zh' && item.nameCn) {
                                     displayName = item.nameCn;
-                                  } else if (i18n.language === 'en' && item.nameEn) {
+                                  } else if (
+                                    i18n.language === 'en' &&
+                                    item.nameEn
+                                  ) {
                                     displayName = item.nameEn;
                                   } else if (item.nameKr) {
                                     displayName = item.nameKr;
@@ -1134,14 +1236,24 @@ const PlanningDataPage: React.FC = () => {
                             ) : (
                               /* Table view - paginated */
                               <>
-                                <TableContainer component={Paper} variant="outlined">
-                                  <Table size="small" sx={{ tableLayout: 'auto' }}>
+                                <TableContainer
+                                  component={Paper}
+                                  variant="outlined"
+                                >
+                                  <Table
+                                    size="small"
+                                    sx={{ tableLayout: 'auto' }}
+                                  >
                                     <TableHead>
                                       <TableRow>
                                         <TableCell>
                                           <TableSortLabel
                                             active={sortBy === 'id'}
-                                            direction={sortBy === 'id' ? sortOrder : 'asc'}
+                                            direction={
+                                              sortBy === 'id'
+                                                ? sortOrder
+                                                : 'asc'
+                                            }
                                             onClick={() => handleSort('id')}
                                           >
                                             ID
@@ -1150,7 +1262,11 @@ const PlanningDataPage: React.FC = () => {
                                         <TableCell>
                                           <TableSortLabel
                                             active={sortBy === 'name'}
-                                            direction={sortBy === 'name' ? sortOrder : 'asc'}
+                                            direction={
+                                              sortBy === 'name'
+                                                ? sortOrder
+                                                : 'asc'
+                                            }
                                             onClick={() => handleSort('name')}
                                           >
                                             {t('planningData.table.name')}
@@ -1162,9 +1278,15 @@ const PlanningDataPage: React.FC = () => {
                                       {paginatedRewardItems.map((item: any) => {
                                         // Get localized name based on current language
                                         let displayName = item.name;
-                                        if (i18n.language === 'zh' && item.nameCn) {
+                                        if (
+                                          i18n.language === 'zh' &&
+                                          item.nameCn
+                                        ) {
                                           displayName = item.nameCn;
-                                        } else if (i18n.language === 'en' && item.nameEn) {
+                                        } else if (
+                                          i18n.language === 'en' &&
+                                          item.nameEn
+                                        ) {
                                           displayName = item.nameEn;
                                         } else if (item.nameKr) {
                                           displayName = item.nameKr;
@@ -1174,7 +1296,10 @@ const PlanningDataPage: React.FC = () => {
                                           <TableRow key={item.id} hover>
                                             <TableCell
                                               onClick={(e) =>
-                                                handleCellClick(e, item.id.toString())
+                                                handleCellClick(
+                                                  e,
+                                                  item.id.toString()
+                                                )
                                               }
                                               sx={{ cursor: 'pointer' }}
                                             >
@@ -1185,7 +1310,9 @@ const PlanningDataPage: React.FC = () => {
                                               />
                                             </TableCell>
                                             <TableCell
-                                              onClick={(e) => handleCellClick(e, displayName)}
+                                              onClick={(e) =>
+                                                handleCellClick(e, displayName)
+                                              }
                                               sx={{ cursor: 'pointer' }}
                                             >
                                               {displayName}
@@ -1204,7 +1331,9 @@ const PlanningDataPage: React.FC = () => {
                                     page={page}
                                     rowsPerPage={rowsPerPage}
                                     onPageChange={handlePageChange}
-                                    onRowsPerPageChange={handleRowsPerPageChange}
+                                    onRowsPerPageChange={
+                                      handleRowsPerPageChange
+                                    }
                                     rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
                                 )}
@@ -1295,10 +1424,16 @@ const PlanningDataPage: React.FC = () => {
                                           width: '100%',
                                         }}
                                       >
-                                        <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                                        <Typography
+                                          variant="body2"
+                                          sx={{ flexGrow: 1 }}
+                                        >
                                           {category.key}
                                         </Typography>
-                                        <Chip label={category.count} size="small" />
+                                        <Chip
+                                          label={category.count}
+                                          size="small"
+                                        />
                                       </Box>
                                     </MenuItem>
                                   ))}
@@ -1306,7 +1441,9 @@ const PlanningDataPage: React.FC = () => {
                               </FormControl>
 
                               <TextField
-                                placeholder={t('planningData.searchPlaceholder')}
+                                placeholder={t(
+                                  'planningData.searchPlaceholder'
+                                )}
                                 value={searchTerm}
                                 onChange={(e) => {
                                   setSearchTerm(e.target.value);
@@ -1330,7 +1467,8 @@ const PlanningDataPage: React.FC = () => {
                                     },
                                     '&.Mui-focused': {
                                       bgcolor: 'background.paper',
-                                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                      boxShadow:
+                                        '0 0 0 2px rgba(25, 118, 210, 0.1)',
                                       '& fieldset': {
                                         borderColor: 'primary.main',
                                         borderWidth: '1px',
@@ -1375,7 +1513,10 @@ const PlanningDataPage: React.FC = () => {
                               />
 
                               {/* View All checkbox */}
-                              <Tooltip title={t('planningData.viewAllWarning')} arrow>
+                              <Tooltip
+                                title={t('planningData.viewAllWarning')}
+                                arrow
+                              >
                                 <FormControlLabel
                                   control={
                                     <Checkbox
@@ -1401,7 +1542,8 @@ const PlanningDataPage: React.FC = () => {
                               <Box
                                 sx={{
                                   display: 'grid',
-                                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                                  gridTemplateColumns:
+                                    'repeat(auto-fill, minmax(200px, 1fr))',
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
@@ -1414,7 +1556,10 @@ const PlanningDataPage: React.FC = () => {
                                   let displayName = item.name;
                                   if (i18n.language === 'zh' && item.nameCn) {
                                     displayName = item.nameCn;
-                                  } else if (i18n.language === 'en' && item.nameEn) {
+                                  } else if (
+                                    i18n.language === 'en' &&
+                                    item.nameEn
+                                  ) {
                                     displayName = item.nameEn;
                                   } else if (item.nameKr) {
                                     displayName = item.nameKr;
@@ -1426,7 +1571,11 @@ const PlanningDataPage: React.FC = () => {
                                     : label;
 
                                   return (
-                                    <Tooltip key={item.id} title={tooltipTitle} arrow>
+                                    <Tooltip
+                                      key={item.id}
+                                      title={tooltipTitle}
+                                      arrow
+                                    >
                                       <Box
                                         sx={{
                                           p: 1,
@@ -1457,14 +1606,24 @@ const PlanningDataPage: React.FC = () => {
                             ) : (
                               /* Table view - paginated */
                               <>
-                                <TableContainer component={Paper} variant="outlined">
-                                  <Table size="small" sx={{ tableLayout: 'auto' }}>
+                                <TableContainer
+                                  component={Paper}
+                                  variant="outlined"
+                                >
+                                  <Table
+                                    size="small"
+                                    sx={{ tableLayout: 'auto' }}
+                                  >
                                     <TableHead>
                                       <TableRow>
                                         <TableCell>
                                           <TableSortLabel
                                             active={sortBy === 'id'}
-                                            direction={sortBy === 'id' ? sortOrder : 'asc'}
+                                            direction={
+                                              sortBy === 'id'
+                                                ? sortOrder
+                                                : 'asc'
+                                            }
                                             onClick={() => handleSort('id')}
                                           >
                                             ID
@@ -1473,7 +1632,11 @@ const PlanningDataPage: React.FC = () => {
                                         <TableCell>
                                           <TableSortLabel
                                             active={sortBy === 'name'}
-                                            direction={sortBy === 'name' ? sortOrder : 'asc'}
+                                            direction={
+                                              sortBy === 'name'
+                                                ? sortOrder
+                                                : 'asc'
+                                            }
                                             onClick={() => handleSort('name')}
                                           >
                                             {t('planningData.table.name')}
@@ -1485,9 +1648,15 @@ const PlanningDataPage: React.FC = () => {
                                       {paginatedItems.map((item: any) => {
                                         // Get localized name based on current language
                                         let displayName = item.name;
-                                        if (i18n.language === 'zh' && item.nameCn) {
+                                        if (
+                                          i18n.language === 'zh' &&
+                                          item.nameCn
+                                        ) {
                                           displayName = item.nameCn;
-                                        } else if (i18n.language === 'en' && item.nameEn) {
+                                        } else if (
+                                          i18n.language === 'en' &&
+                                          item.nameEn
+                                        ) {
                                           displayName = item.nameEn;
                                         } else if (item.nameKr) {
                                           displayName = item.nameKr;
@@ -1510,7 +1679,10 @@ const PlanningDataPage: React.FC = () => {
                                           >
                                             <TableCell
                                               onClick={(e) =>
-                                                handleCellClick(e, item.id.toString())
+                                                handleCellClick(
+                                                  e,
+                                                  item.id.toString()
+                                                )
                                               }
                                               sx={{ cursor: 'pointer' }}
                                             >
@@ -1521,12 +1693,16 @@ const PlanningDataPage: React.FC = () => {
                                               />
                                             </TableCell>
                                             <TableCell
-                                              onClick={(e) => handleCellClick(e, displayName)}
+                                              onClick={(e) =>
+                                                handleCellClick(e, displayName)
+                                              }
                                               sx={{ cursor: 'pointer' }}
                                             >
                                               <Tooltip
                                                 title={
-                                                  item.hasError ? `⚠️ ${item.errorMessage}` : ''
+                                                  item.hasError
+                                                    ? `⚠️ ${item.errorMessage}`
+                                                    : ''
                                                 }
                                                 arrow
                                               >
@@ -1547,7 +1723,9 @@ const PlanningDataPage: React.FC = () => {
                                     page={page}
                                     rowsPerPage={rowsPerPage}
                                     onPageChange={handlePageChange}
-                                    onRowsPerPageChange={handleRowsPerPageChange}
+                                    onRowsPerPageChange={
+                                      handleRowsPerPageChange
+                                    }
                                     rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
                                 )}
@@ -1612,7 +1790,9 @@ const PlanningDataPage: React.FC = () => {
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
-                              <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                              <SearchIcon
+                                sx={{ color: 'text.secondary', fontSize: 20 }}
+                              />
                             </InputAdornment>
                           ),
                           endAdornment: hotTimeBuffSearchTerm && (
@@ -1669,7 +1849,13 @@ const PlanningDataPage: React.FC = () => {
                     </Box>
 
                     {loadingHotTimeBuff && !hotTimeBuffData ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          py: 4,
+                        }}
+                      >
                         <CircularProgress />
                       </Box>
                     ) : hotTimeBuffData &&
@@ -1681,7 +1867,8 @@ const PlanningDataPage: React.FC = () => {
                           <Box
                             sx={{
                               display: 'grid',
-                              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                              gridTemplateColumns:
+                                'repeat(auto-fill, minmax(200px, 1fr))',
                               gap: 0,
                               border: '1px dashed',
                               borderColor: 'divider',
@@ -1689,42 +1876,47 @@ const PlanningDataPage: React.FC = () => {
                               overflow: 'hidden',
                             }}
                           >
-                            {filteredHotTimeBuffItems.map((item: HotTimeBuffItem) => {
-                              // Get localized world buff names (file is already language-specific)
-                              const buffNames =
-                                item.worldBuffNames?.join(', ') ||
-                                item.worldBuffId?.join(', ') ||
-                                'No Buff';
-                              const label = `${item.id}:${item.name} - ${buffNames}`;
-                              return (
-                                <Tooltip key={item.id} title={label} arrow>
-                                  <Box
-                                    sx={{
-                                      p: 1,
-                                      borderRight: '1px dashed',
-                                      borderBottom: '1px dashed',
-                                      borderColor: 'divider',
-                                      fontSize: '0.8125rem',
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
-                                      whiteSpace: 'nowrap',
-                                      bgcolor: 'background.paper',
-                                      transition: 'background-color 0.2s',
-                                      '&:hover': {
-                                        bgcolor: 'action.hover',
-                                      },
-                                    }}
-                                  >
-                                    {label}
-                                  </Box>
-                                </Tooltip>
-                              );
-                            })}
+                            {filteredHotTimeBuffItems.map(
+                              (item: HotTimeBuffItem) => {
+                                // Get localized world buff names (file is already language-specific)
+                                const buffNames =
+                                  item.worldBuffNames?.join(', ') ||
+                                  item.worldBuffId?.join(', ') ||
+                                  'No Buff';
+                                const label = `${item.id}:${item.name} - ${buffNames}`;
+                                return (
+                                  <Tooltip key={item.id} title={label} arrow>
+                                    <Box
+                                      sx={{
+                                        p: 1,
+                                        borderRight: '1px dashed',
+                                        borderBottom: '1px dashed',
+                                        borderColor: 'divider',
+                                        fontSize: '0.8125rem',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        bgcolor: 'background.paper',
+                                        transition: 'background-color 0.2s',
+                                        '&:hover': {
+                                          bgcolor: 'action.hover',
+                                        },
+                                      }}
+                                    >
+                                      {label}
+                                    </Box>
+                                  </Tooltip>
+                                );
+                              }
+                            )}
                           </Box>
                         ) : (
                           /* Table view - paginated */
                           <>
-                            <TableContainer component={Paper} variant="outlined">
+                            <TableContainer
+                              component={Paper}
+                              variant="outlined"
+                            >
                               <Table size="small" sx={{ tableLayout: 'auto' }}>
                                 <TableHead>
                                   <TableRow>
@@ -1732,7 +1924,9 @@ const PlanningDataPage: React.FC = () => {
                                       <TableSortLabel
                                         active={hotTimeBuffSortBy === 'id'}
                                         direction={hotTimeBuffSortOrder}
-                                        onClick={() => handleHotTimeBuffSort('id')}
+                                        onClick={() =>
+                                          handleHotTimeBuffSort('id')
+                                        }
                                       >
                                         ID
                                       </TableSortLabel>
@@ -1750,142 +1944,208 @@ const PlanningDataPage: React.FC = () => {
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                  {paginatedHotTimeBuffItems.map((item: HotTimeBuffItem) => {
-                                    // Format date - returns { display, utc }
-                                    const formatDate = (isoString: string | null) => {
-                                      if (!isoString) return { display: '-', utc: '' };
-                                      try {
-                                        const date = new Date(isoString);
-                                        const localFormatted = formatDateTimeDetailed(isoString);
-                                        // Remove milliseconds from UTC time (.000Z -> Z)
-                                        const utcDate = date
-                                          .toISOString()
-                                          .replace(/\.\d{3}Z$/, 'Z');
-                                        return {
-                                          display: localFormatted,
-                                          utc: utcDate,
-                                        };
-                                      } catch {
-                                        return { display: '-', utc: '' };
-                                      }
-                                    };
-
-                                    // Calculate period in days
-                                    const calculatePeriod = (
-                                      startDate: string | null,
-                                      endDate: string | null
-                                    ) => {
-                                      if (!startDate || !endDate) return '-';
-                                      try {
-                                        const start = new Date(startDate);
-                                        const end = new Date(endDate);
-                                        const diffTime = Math.abs(end.getTime() - start.getTime());
-                                        const diffDays = Math.ceil(
-                                          diffTime / (1000 * 60 * 60 * 24)
-                                        );
-                                        return `${diffDays} days`;
-                                      } catch {
-                                        return '-';
-                                      }
-                                    };
-
-                                    // Format hour - returns { display, utc }
-                                    const formatHour = (utcHour: number) => {
-                                      // Create a date with the UTC hour
-                                      const utcDate = new Date();
-                                      utcDate.setUTCHours(utcHour, 0, 0, 0);
-
-                                      // Format in user's timezone
-                                      const localFormatted = formatDateTimeDetailed(
-                                        utcDate.toISOString()
-                                      );
-                                      const localTime = localFormatted.split(' ')[1] || '00:00:00';
-                                      const localHourMin = localTime.substring(0, 5); // HH:mm
-
-                                      // Format UTC time
-                                      const utcFormatted = `${utcHour.toString().padStart(2, '0')}:00`;
-
-                                      return {
-                                        display: localHourMin,
-                                        utc: utcFormatted,
+                                  {paginatedHotTimeBuffItems.map(
+                                    (item: HotTimeBuffItem) => {
+                                      // Format date - returns { display, utc }
+                                      const formatDate = (
+                                        isoString: string | null
+                                      ) => {
+                                        if (!isoString)
+                                          return { display: '-', utc: '' };
+                                        try {
+                                          const date = new Date(isoString);
+                                          const localFormatted =
+                                            formatDateTimeDetailed(isoString);
+                                          // Remove milliseconds from UTC time (.000Z -> Z)
+                                          const utcDate = date
+                                            .toISOString()
+                                            .replace(/\.\d{3}Z$/, 'Z');
+                                          return {
+                                            display: localFormatted,
+                                            utc: utcDate,
+                                          };
+                                        } catch {
+                                          return { display: '-', utc: '' };
+                                        }
                                       };
-                                    };
 
-                                    const startDate = formatDate(item.startDate);
-                                    const endDate = formatDate(item.endDate);
-                                    const startHour = formatHour(item.startHour);
-                                    const endHour = formatHour(item.endHour);
+                                      // Calculate period in days
+                                      const calculatePeriod = (
+                                        startDate: string | null,
+                                        endDate: string | null
+                                      ) => {
+                                        if (!startDate || !endDate) return '-';
+                                        try {
+                                          const start = new Date(startDate);
+                                          const end = new Date(endDate);
+                                          const diffTime = Math.abs(
+                                            end.getTime() - start.getTime()
+                                          );
+                                          const diffDays = Math.ceil(
+                                            diffTime / (1000 * 60 * 60 * 24)
+                                          );
+                                          return `${diffDays} days`;
+                                        } catch {
+                                          return '-';
+                                        }
+                                      };
 
-                                    return (
-                                      <TableRow key={item.id} hover>
-                                        <TableCell
-                                          onClick={(e) => handleCellClick(e, item.id.toString())}
-                                          sx={{ cursor: 'pointer' }}
-                                        >
-                                          <Chip label={item.id} size="small" variant="outlined" />
-                                        </TableCell>
-                                        <TableCell
-                                          onClick={(e) => handleCellClick(e, item.name || '-')}
-                                          sx={{ cursor: 'pointer' }}
-                                        >
-                                          {item.name || '-'}
-                                        </TableCell>
-                                        <Tooltip title={`UTC: ${startDate.utc}`} arrow>
+                                      // Format hour - returns { display, utc }
+                                      const formatHour = (utcHour: number) => {
+                                        // Create a date with the UTC hour
+                                        const utcDate = new Date();
+                                        utcDate.setUTCHours(utcHour, 0, 0, 0);
+
+                                        // Format in user's timezone
+                                        const localFormatted =
+                                          formatDateTimeDetailed(
+                                            utcDate.toISOString()
+                                          );
+                                        const localTime =
+                                          localFormatted.split(' ')[1] ||
+                                          '00:00:00';
+                                        const localHourMin =
+                                          localTime.substring(0, 5); // HH:mm
+
+                                        // Format UTC time
+                                        const utcFormatted = `${utcHour.toString().padStart(2, '0')}:00`;
+
+                                        return {
+                                          display: localHourMin,
+                                          utc: utcFormatted,
+                                        };
+                                      };
+
+                                      const startDate = formatDate(
+                                        item.startDate
+                                      );
+                                      const endDate = formatDate(item.endDate);
+                                      const startHour = formatHour(
+                                        item.startHour
+                                      );
+                                      const endHour = formatHour(item.endHour);
+
+                                      return (
+                                        <TableRow key={item.id} hover>
                                           <TableCell
-                                            onClick={(e) => handleCellClick(e, startDate.display)}
+                                            onClick={(e) =>
+                                              handleCellClick(
+                                                e,
+                                                item.id.toString()
+                                              )
+                                            }
                                             sx={{ cursor: 'pointer' }}
                                           >
-                                            {startDate.display}
+                                            <Chip
+                                              label={item.id}
+                                              size="small"
+                                              variant="outlined"
+                                            />
                                           </TableCell>
-                                        </Tooltip>
-                                        <Tooltip title={`UTC: ${endDate.utc}`} arrow>
                                           <TableCell
-                                            onClick={(e) => handleCellClick(e, endDate.display)}
+                                            onClick={(e) =>
+                                              handleCellClick(
+                                                e,
+                                                item.name || '-'
+                                              )
+                                            }
                                             sx={{ cursor: 'pointer' }}
                                           >
-                                            {endDate.display}
+                                            {item.name || '-'}
                                           </TableCell>
-                                        </Tooltip>
-                                        <TableCell>
-                                          {calculatePeriod(item.startDate, item.endDate)}
-                                        </TableCell>
-                                        <Tooltip title={`UTC: ${startHour.utc}`} arrow>
-                                          <TableCell>{startHour.display}</TableCell>
-                                        </Tooltip>
-                                        <Tooltip title={`UTC: ${endHour.utc}`} arrow>
-                                          <TableCell>{endHour.display}</TableCell>
-                                        </Tooltip>
-                                        <TableCell>{item.minLv}</TableCell>
-                                        <TableCell>{item.maxLv}</TableCell>
-                                        <TableCell>{item.bitFlagDayOfWeek}</TableCell>
-                                        <TableCell>
-                                          <Box
-                                            sx={{
-                                              display: 'flex',
-                                              flexWrap: 'wrap',
-                                              gap: 0.5,
-                                            }}
+                                          <Tooltip
+                                            title={`UTC: ${startDate.utc}`}
+                                            arrow
                                           >
-                                            {item.worldBuffId && item.worldBuffId.length > 0
-                                              ? item.worldBuffId.map((buffId, index) => {
-                                                  // worldBuffNames is already localized by the backend service
-                                                  const buffName =
-                                                    item.worldBuffNames?.[index] || String(buffId);
-                                                  return (
-                                                    <Chip
-                                                      key={buffId}
-                                                      label={`${buffId}: ${buffName}`}
-                                                      size="small"
-                                                      variant="outlined"
-                                                    />
-                                                  );
-                                                })
-                                              : '-'}
-                                          </Box>
-                                        </TableCell>
-                                      </TableRow>
-                                    );
-                                  })}
+                                            <TableCell
+                                              onClick={(e) =>
+                                                handleCellClick(
+                                                  e,
+                                                  startDate.display
+                                                )
+                                              }
+                                              sx={{ cursor: 'pointer' }}
+                                            >
+                                              {startDate.display}
+                                            </TableCell>
+                                          </Tooltip>
+                                          <Tooltip
+                                            title={`UTC: ${endDate.utc}`}
+                                            arrow
+                                          >
+                                            <TableCell
+                                              onClick={(e) =>
+                                                handleCellClick(
+                                                  e,
+                                                  endDate.display
+                                                )
+                                              }
+                                              sx={{ cursor: 'pointer' }}
+                                            >
+                                              {endDate.display}
+                                            </TableCell>
+                                          </Tooltip>
+                                          <TableCell>
+                                            {calculatePeriod(
+                                              item.startDate,
+                                              item.endDate
+                                            )}
+                                          </TableCell>
+                                          <Tooltip
+                                            title={`UTC: ${startHour.utc}`}
+                                            arrow
+                                          >
+                                            <TableCell>
+                                              {startHour.display}
+                                            </TableCell>
+                                          </Tooltip>
+                                          <Tooltip
+                                            title={`UTC: ${endHour.utc}`}
+                                            arrow
+                                          >
+                                            <TableCell>
+                                              {endHour.display}
+                                            </TableCell>
+                                          </Tooltip>
+                                          <TableCell>{item.minLv}</TableCell>
+                                          <TableCell>{item.maxLv}</TableCell>
+                                          <TableCell>
+                                            {item.bitFlagDayOfWeek}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Box
+                                              sx={{
+                                                display: 'flex',
+                                                flexWrap: 'wrap',
+                                                gap: 0.5,
+                                              }}
+                                            >
+                                              {item.worldBuffId &&
+                                              item.worldBuffId.length > 0
+                                                ? item.worldBuffId.map(
+                                                    (buffId, index) => {
+                                                      // worldBuffNames is already localized by the backend service
+                                                      const buffName =
+                                                        item.worldBuffNames?.[
+                                                          index
+                                                        ] || String(buffId);
+                                                      return (
+                                                        <Chip
+                                                          key={buffId}
+                                                          label={`${buffId}: ${buffName}`}
+                                                          size="small"
+                                                          variant="outlined"
+                                                        />
+                                                      );
+                                                    }
+                                                  )
+                                                : '-'}
+                                            </Box>
+                                          </TableCell>
+                                        </TableRow>
+                                      );
+                                    }
+                                  )}
                                 </TableBody>
                               </Table>
                             </TableContainer>
@@ -1897,7 +2157,9 @@ const PlanningDataPage: React.FC = () => {
                                 page={hotTimeBuffPage}
                                 rowsPerPage={hotTimeBuffRowsPerPage}
                                 onPageChange={handleHotTimeBuffPageChange}
-                                onRowsPerPageChange={handleHotTimeBuffRowsPerPageChange}
+                                onRowsPerPageChange={
+                                  handleHotTimeBuffRowsPerPageChange
+                                }
                                 rowsPerPageOptions={[10, 20, 50, 100]}
                               />
                             )}
@@ -1905,7 +2167,10 @@ const PlanningDataPage: React.FC = () => {
                         )}
                       </>
                     ) : (
-                      <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                      <Typography
+                        color="text.secondary"
+                        sx={{ py: 4, textAlign: 'center' }}
+                      >
                         {t('planningData.noData')}
                       </Typography>
                     )}
@@ -1916,7 +2181,13 @@ const PlanningDataPage: React.FC = () => {
                 {activeTab === 3 && (
                   <Box>
                     {loadingEventPage && !eventPageData ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          py: 4,
+                        }}
+                      >
                         <CircularProgress />
                       </Box>
                     ) : (
@@ -1958,7 +2229,8 @@ const PlanningDataPage: React.FC = () => {
                                 },
                                 '&.Mui-focused': {
                                   bgcolor: 'background.paper',
-                                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                  boxShadow:
+                                    '0 0 0 2px rgba(25, 118, 210, 0.1)',
                                   '& fieldset': {
                                     borderColor: 'primary.main',
                                     borderWidth: '1px',
@@ -1972,7 +2244,12 @@ const PlanningDataPage: React.FC = () => {
                             InputProps={{
                               startAdornment: (
                                 <InputAdornment position="start">
-                                  <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                  <SearchIcon
+                                    sx={{
+                                      color: 'text.secondary',
+                                      fontSize: 20,
+                                    }}
+                                  />
                                 </InputAdornment>
                               ),
                               endAdornment: eventPageSearchTerm && (
@@ -2002,7 +2279,10 @@ const PlanningDataPage: React.FC = () => {
                               gap: 1,
                             }}
                           >
-                            <Tooltip title={t('planningData.viewAllWarning')} arrow>
+                            <Tooltip
+                              title={t('planningData.viewAllWarning')}
+                              arrow
+                            >
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -2023,14 +2303,17 @@ const PlanningDataPage: React.FC = () => {
                             </Tooltip>
                           </Box>
                         </Box>
-                        {eventPageData && eventPageData.items && eventPageData.items.length > 0 ? (
+                        {eventPageData &&
+                        eventPageData.items &&
+                        eventPageData.items.length > 0 ? (
                           <>
                             {viewAllEventPage ? (
                               /* Grid view - show all items in table-like layout */
                               <Box
                                 sx={{
                                   display: 'grid',
-                                  gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                                  gridTemplateColumns:
+                                    'repeat(auto-fill, minmax(250px, 1fr))',
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
@@ -2040,15 +2323,25 @@ const PlanningDataPage: React.FC = () => {
                               >
                                 {eventPageData.items.map((item: any) => {
                                   const localizedName = item.name;
-                                  const groupType = [item.pageGroupName, item.typeName]
-                                    .filter((v: any) => v && !String(v).startsWith('Unknown'))
+                                  const groupType = [
+                                    item.pageGroupName,
+                                    item.typeName,
+                                  ]
+                                    .filter(
+                                      (v: any) =>
+                                        v && !String(v).startsWith('Unknown')
+                                    )
                                     .join('/');
                                   const label = groupType
                                     ? `${item.id}: ${localizedName} (${groupType})`
                                     : `${item.id}: ${localizedName}`;
                                   const fullLabel = `ID: ${item.id}\nName: ${localizedName}\nPageGroup: ${!item.pageGroupName || String(item.pageGroupName).startsWith('Unknown') ? '-' : item.pageGroupName}\nType: ${!item.typeName || String(item.typeName).startsWith('Unknown') ? '-' : item.typeName}`;
                                   return (
-                                    <Tooltip key={item.id} title={fullLabel} arrow>
+                                    <Tooltip
+                                      key={item.id}
+                                      title={fullLabel}
+                                      arrow
+                                    >
                                       <Box
                                         sx={{
                                           p: 1,
@@ -2075,8 +2368,14 @@ const PlanningDataPage: React.FC = () => {
                             ) : (
                               /* Table view - paginated */
                               <>
-                                <TableContainer component={Paper} variant="outlined">
-                                  <Table size="small" sx={{ tableLayout: 'auto' }}>
+                                <TableContainer
+                                  component={Paper}
+                                  variant="outlined"
+                                >
+                                  <Table
+                                    size="small"
+                                    sx={{ tableLayout: 'auto' }}
+                                  >
                                     <TableHead>
                                       <TableRow>
                                         <TableCell>ID</TableCell>
@@ -2089,7 +2388,8 @@ const PlanningDataPage: React.FC = () => {
                                       {eventPageData.items
                                         .slice(
                                           eventPagePage * eventPageRowsPerPage,
-                                          (eventPagePage + 1) * eventPageRowsPerPage
+                                          (eventPagePage + 1) *
+                                            eventPageRowsPerPage
                                         )
                                         .map((item: any) => (
                                           <TableRow key={item.id} hover>
@@ -2103,13 +2403,17 @@ const PlanningDataPage: React.FC = () => {
                                             <TableCell>{item.name}</TableCell>
                                             <TableCell>
                                               {!item.pageGroupName ||
-                                              String(item.pageGroupName).startsWith('Unknown')
+                                              String(
+                                                item.pageGroupName
+                                              ).startsWith('Unknown')
                                                 ? '-'
                                                 : item.pageGroupName}
                                             </TableCell>
                                             <TableCell>
                                               {!item.typeName ||
-                                              String(item.typeName).startsWith('Unknown')
+                                              String(item.typeName).startsWith(
+                                                'Unknown'
+                                              )
                                                 ? '-'
                                                 : item.typeName}
                                             </TableCell>
@@ -2123,9 +2427,13 @@ const PlanningDataPage: React.FC = () => {
                                     count={eventPageData.items.length}
                                     page={eventPagePage}
                                     rowsPerPage={eventPageRowsPerPage}
-                                    onPageChange={(_event, newPage) => setEventPagePage(newPage)}
+                                    onPageChange={(_event, newPage) =>
+                                      setEventPagePage(newPage)
+                                    }
                                     onRowsPerPageChange={(event) =>
-                                      setEventPageRowsPerPage(Number(event.target.value))
+                                      setEventPageRowsPerPage(
+                                        Number(event.target.value)
+                                      )
                                     }
                                     rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
@@ -2134,7 +2442,10 @@ const PlanningDataPage: React.FC = () => {
                             )}
                           </>
                         ) : (
-                          <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                          <Typography
+                            color="text.secondary"
+                            sx={{ py: 4, textAlign: 'center' }}
+                          >
                             {t('planningData.noData')}
                           </Typography>
                         )}
@@ -2147,7 +2458,13 @@ const PlanningDataPage: React.FC = () => {
                 {activeTab === 4 && (
                   <Box>
                     {loadingLiveEvent && !liveEventData ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          py: 4,
+                        }}
+                      >
                         <CircularProgress />
                       </Box>
                     ) : (
@@ -2189,7 +2506,8 @@ const PlanningDataPage: React.FC = () => {
                                 },
                                 '&.Mui-focused': {
                                   bgcolor: 'background.paper',
-                                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                  boxShadow:
+                                    '0 0 0 2px rgba(25, 118, 210, 0.1)',
                                   '& fieldset': {
                                     borderColor: 'primary.main',
                                     borderWidth: '1px',
@@ -2203,7 +2521,12 @@ const PlanningDataPage: React.FC = () => {
                             InputProps={{
                               startAdornment: (
                                 <InputAdornment position="start">
-                                  <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                  <SearchIcon
+                                    sx={{
+                                      color: 'text.secondary',
+                                      fontSize: 20,
+                                    }}
+                                  />
                                 </InputAdornment>
                               ),
                               endAdornment: liveEventSearchTerm && (
@@ -2233,7 +2556,10 @@ const PlanningDataPage: React.FC = () => {
                               gap: 1,
                             }}
                           >
-                            <Tooltip title={t('planningData.viewAllWarning')} arrow>
+                            <Tooltip
+                              title={t('planningData.viewAllWarning')}
+                              arrow
+                            >
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -2254,14 +2580,17 @@ const PlanningDataPage: React.FC = () => {
                             </Tooltip>
                           </Box>
                         </Box>
-                        {liveEventData && liveEventData.items && liveEventData.items.length > 0 ? (
+                        {liveEventData &&
+                        liveEventData.items &&
+                        liveEventData.items.length > 0 ? (
                           <>
                             {viewAllLiveEvent ? (
                               /* Grid view - show all items in table-like layout */
                               <Box
                                 sx={{
                                   display: 'grid',
-                                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                                  gridTemplateColumns:
+                                    'repeat(auto-fill, minmax(200px, 1fr))',
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
@@ -2300,8 +2629,14 @@ const PlanningDataPage: React.FC = () => {
                             ) : (
                               /* Table view - paginated */
                               <>
-                                <TableContainer component={Paper} variant="outlined">
-                                  <Table size="small" sx={{ tableLayout: 'auto' }}>
+                                <TableContainer
+                                  component={Paper}
+                                  variant="outlined"
+                                >
+                                  <Table
+                                    size="small"
+                                    sx={{ tableLayout: 'auto' }}
+                                  >
                                     <TableHead>
                                       <TableRow>
                                         <TableCell>ID</TableCell>
@@ -2317,19 +2652,28 @@ const PlanningDataPage: React.FC = () => {
                                       {liveEventData.items
                                         .slice(
                                           liveEventPage * liveEventRowsPerPage,
-                                          (liveEventPage + 1) * liveEventRowsPerPage
+                                          (liveEventPage + 1) *
+                                            liveEventRowsPerPage
                                         )
                                         .map((item: any) => {
                                           // Format date - returns { display, utc }
-                                          const formatDate = (isoString: string | null) => {
-                                            if (!isoString) return { display: '-', utc: '' };
+                                          const formatDate = (
+                                            isoString: string | null
+                                          ) => {
+                                            if (!isoString)
+                                              return { display: '-', utc: '' };
                                             try {
                                               // Convert to ISO8601 if needed
-                                              const iso = isoString.includes('T')
+                                              const iso = isoString.includes(
+                                                'T'
+                                              )
                                                 ? isoString
-                                                : new Date(isoString).toISOString();
+                                                : new Date(
+                                                    isoString
+                                                  ).toISOString();
                                               const date = new Date(iso);
-                                              const localFormatted = formatDateTimeDetailed(iso);
+                                              const localFormatted =
+                                                formatDateTimeDetailed(iso);
                                               // Remove milliseconds from UTC time (.000Z -> Z)
                                               const utcDate = date
                                                 .toISOString()
@@ -2348,14 +2692,22 @@ const PlanningDataPage: React.FC = () => {
                                             startDate: string | null,
                                             endDate: string | null
                                           ) => {
-                                            if (!startDate || !endDate) return '-';
+                                            if (!startDate || !endDate)
+                                              return '-';
                                             try {
-                                              const startISO = startDate.includes('T')
-                                                ? startDate
-                                                : new Date(startDate).toISOString();
-                                              const endISO = endDate.includes('T')
+                                              const startISO =
+                                                startDate.includes('T')
+                                                  ? startDate
+                                                  : new Date(
+                                                      startDate
+                                                    ).toISOString();
+                                              const endISO = endDate.includes(
+                                                'T'
+                                              )
                                                 ? endDate
-                                                : new Date(endDate).toISOString();
+                                                : new Date(
+                                                    endDate
+                                                  ).toISOString();
                                               const start = new Date(startISO);
                                               const end = new Date(endISO);
                                               const diffTime = Math.abs(
@@ -2370,8 +2722,12 @@ const PlanningDataPage: React.FC = () => {
                                             }
                                           };
 
-                                          const startDate = formatDate(item.startDate);
-                                          const endDate = formatDate(item.endDate);
+                                          const startDate = formatDate(
+                                            item.startDate
+                                          );
+                                          const endDate = formatDate(
+                                            item.endDate
+                                          );
 
                                           return (
                                             <TableRow key={item.id} hover>
@@ -2382,21 +2738,35 @@ const PlanningDataPage: React.FC = () => {
                                                   variant="outlined"
                                                 />
                                               </TableCell>
-                                              <TableCell>{item.name ?? item.id}</TableCell>
-                                              <Tooltip title={`UTC: ${startDate.utc}`} arrow>
+                                              <TableCell>
+                                                {item.name ?? item.id}
+                                              </TableCell>
+                                              <Tooltip
+                                                title={`UTC: ${startDate.utc}`}
+                                                arrow
+                                              >
                                                 <TableCell
                                                   onClick={(e) =>
-                                                    handleCellClick(e, startDate.display)
+                                                    handleCellClick(
+                                                      e,
+                                                      startDate.display
+                                                    )
                                                   }
                                                   sx={{ cursor: 'pointer' }}
                                                 >
                                                   {startDate.display}
                                                 </TableCell>
                                               </Tooltip>
-                                              <Tooltip title={`UTC: ${endDate.utc}`} arrow>
+                                              <Tooltip
+                                                title={`UTC: ${endDate.utc}`}
+                                                arrow
+                                              >
                                                 <TableCell
                                                   onClick={(e) =>
-                                                    handleCellClick(e, endDate.display)
+                                                    handleCellClick(
+                                                      e,
+                                                      endDate.display
+                                                    )
                                                   }
                                                   sx={{ cursor: 'pointer' }}
                                                 >
@@ -2404,10 +2774,17 @@ const PlanningDataPage: React.FC = () => {
                                                 </TableCell>
                                               </Tooltip>
                                               <TableCell>
-                                                {calculatePeriod(item.startDate, item.endDate)}
+                                                {calculatePeriod(
+                                                  item.startDate,
+                                                  item.endDate
+                                                )}
                                               </TableCell>
-                                              <TableCell>{item.localBitflag || '-'}</TableCell>
-                                              <TableCell>{item.isQuest ? 'Yes' : 'No'}</TableCell>
+                                              <TableCell>
+                                                {item.localBitflag || '-'}
+                                              </TableCell>
+                                              <TableCell>
+                                                {item.isQuest ? 'Yes' : 'No'}
+                                              </TableCell>
                                             </TableRow>
                                           );
                                         })}
@@ -2419,9 +2796,13 @@ const PlanningDataPage: React.FC = () => {
                                     count={liveEventData.items.length}
                                     page={liveEventPage}
                                     rowsPerPage={liveEventRowsPerPage}
-                                    onPageChange={(_event, newPage) => setLiveEventPage(newPage)}
+                                    onPageChange={(_event, newPage) =>
+                                      setLiveEventPage(newPage)
+                                    }
                                     onRowsPerPageChange={(event) =>
-                                      setLiveEventRowsPerPage(Number(event.target.value))
+                                      setLiveEventRowsPerPage(
+                                        Number(event.target.value)
+                                      )
                                     }
                                     rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
@@ -2430,7 +2811,10 @@ const PlanningDataPage: React.FC = () => {
                             )}
                           </>
                         ) : (
-                          <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                          <Typography
+                            color="text.secondary"
+                            sx={{ py: 4, textAlign: 'center' }}
+                          >
                             {t('planningData.noData')}
                           </Typography>
                         )}
@@ -2443,7 +2827,13 @@ const PlanningDataPage: React.FC = () => {
                 {activeTab === 5 && (
                   <Box>
                     {loadingMateRecruitingGroup && !mateRecruitingGroupData ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          py: 4,
+                        }}
+                      >
                         <CircularProgress />
                       </Box>
                     ) : (
@@ -2485,7 +2875,8 @@ const PlanningDataPage: React.FC = () => {
                                 },
                                 '&.Mui-focused': {
                                   bgcolor: 'background.paper',
-                                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                  boxShadow:
+                                    '0 0 0 2px rgba(25, 118, 210, 0.1)',
                                   '& fieldset': {
                                     borderColor: 'primary.main',
                                     borderWidth: '1px',
@@ -2499,7 +2890,12 @@ const PlanningDataPage: React.FC = () => {
                             InputProps={{
                               startAdornment: (
                                 <InputAdornment position="start">
-                                  <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                  <SearchIcon
+                                    sx={{
+                                      color: 'text.secondary',
+                                      fontSize: 20,
+                                    }}
+                                  />
                                 </InputAdornment>
                               ),
                               endAdornment: mateRecruitingGroupSearchTerm && (
@@ -2529,7 +2925,10 @@ const PlanningDataPage: React.FC = () => {
                               gap: 1,
                             }}
                           >
-                            <Tooltip title={t('planningData.viewAllWarning')} arrow>
+                            <Tooltip
+                              title={t('planningData.viewAllWarning')}
+                              arrow
+                            >
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -2559,7 +2958,8 @@ const PlanningDataPage: React.FC = () => {
                               <Box
                                 sx={{
                                   display: 'grid',
-                                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                                  gridTemplateColumns:
+                                    'repeat(auto-fill, minmax(200px, 1fr))',
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
@@ -2567,49 +2967,61 @@ const PlanningDataPage: React.FC = () => {
                                   overflow: 'hidden',
                                 }}
                               >
-                                {mateRecruitingGroupData.items.map((item: any) => {
-                                  const itemName = item.name;
-                                  const label = `${item.id}: ${itemName ?? item.mateId ?? ''}`;
-                                  const tooltipTitle =
-                                    item.mateExists === false
-                                      ? `⚠️ 오류: 항해사가 MateTemplate에 존재하지 않습니다.\n${label}`
-                                      : label;
-                                  return (
-                                    <Tooltip key={item.id} title={tooltipTitle} arrow>
-                                      <Box
-                                        sx={{
-                                          p: 1,
-                                          borderRight: '1px dashed',
-                                          borderBottom: '1px dashed',
-                                          borderColor: 'divider',
-                                          fontSize: '0.8125rem',
-                                          overflow: 'hidden',
-                                          textOverflow: 'ellipsis',
-                                          whiteSpace: 'nowrap',
-                                          bgcolor:
-                                            item.mateExists === false
-                                              ? 'rgba(255, 205, 210, 0.3)'
-                                              : 'background.paper',
-                                          transition: 'background-color 0.2s',
-                                          '&:hover': {
+                                {mateRecruitingGroupData.items.map(
+                                  (item: any) => {
+                                    const itemName = item.name;
+                                    const label = `${item.id}: ${itemName ?? item.mateId ?? ''}`;
+                                    const tooltipTitle =
+                                      item.mateExists === false
+                                        ? `⚠️ 오류: 항해사가 MateTemplate에 존재하지 않습니다.\n${label}`
+                                        : label;
+                                    return (
+                                      <Tooltip
+                                        key={item.id}
+                                        title={tooltipTitle}
+                                        arrow
+                                      >
+                                        <Box
+                                          sx={{
+                                            p: 1,
+                                            borderRight: '1px dashed',
+                                            borderBottom: '1px dashed',
+                                            borderColor: 'divider',
+                                            fontSize: '0.8125rem',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
                                             bgcolor:
                                               item.mateExists === false
-                                                ? 'rgba(255, 205, 210, 0.5)'
-                                                : 'action.hover',
-                                          },
-                                        }}
-                                      >
-                                        {label}
-                                      </Box>
-                                    </Tooltip>
-                                  );
-                                })}
+                                                ? 'rgba(255, 205, 210, 0.3)'
+                                                : 'background.paper',
+                                            transition: 'background-color 0.2s',
+                                            '&:hover': {
+                                              bgcolor:
+                                                item.mateExists === false
+                                                  ? 'rgba(255, 205, 210, 0.5)'
+                                                  : 'action.hover',
+                                            },
+                                          }}
+                                        >
+                                          {label}
+                                        </Box>
+                                      </Tooltip>
+                                    );
+                                  }
+                                )}
                               </Box>
                             ) : (
                               /* Table view - paginated */
                               <>
-                                <TableContainer component={Paper} variant="outlined">
-                                  <Table size="small" sx={{ tableLayout: 'auto' }}>
+                                <TableContainer
+                                  component={Paper}
+                                  variant="outlined"
+                                >
+                                  <Table
+                                    size="small"
+                                    sx={{ tableLayout: 'auto' }}
+                                  >
                                     <TableHead>
                                       <TableRow>
                                         <TableCell>ID</TableCell>
@@ -2623,7 +3035,8 @@ const PlanningDataPage: React.FC = () => {
                                     <TableBody>
                                       {mateRecruitingGroupData.items
                                         .slice(
-                                          mateRecruitingGroupPage * mateRecruitingGroupRowsPerPage,
+                                          mateRecruitingGroupPage *
+                                            mateRecruitingGroupRowsPerPage,
                                           (mateRecruitingGroupPage + 1) *
                                             mateRecruitingGroupRowsPerPage
                                         )
@@ -2664,7 +3077,9 @@ const PlanningDataPage: React.FC = () => {
                                                   }
                                                   arrow
                                                 >
-                                                  <span>{itemName ?? item.mateId}</span>
+                                                  <span>
+                                                    {itemName ?? item.mateId}
+                                                  </span>
                                                 </Tooltip>
                                               </TableCell>
                                               <TableCell>
@@ -2684,7 +3099,9 @@ const PlanningDataPage: React.FC = () => {
                                                   />
                                                 </Tooltip>
                                               </TableCell>
-                                              <TableCell>{item.group}</TableCell>
+                                              <TableCell>
+                                                {item.group}
+                                              </TableCell>
                                               <TableCell>
                                                 <Box
                                                   sx={{
@@ -2693,20 +3110,25 @@ const PlanningDataPage: React.FC = () => {
                                                     gap: 0.5,
                                                   }}
                                                 >
-                                                  {item.towns && item.towns.length > 0
-                                                    ? item.towns.map((town: any) => (
-                                                        <Chip
-                                                          key={town.id}
-                                                          label={`${town.id}: ${town.name}`}
-                                                          size="small"
-                                                          variant="outlined"
-                                                        />
-                                                      ))
+                                                  {item.towns &&
+                                                  item.towns.length > 0
+                                                    ? item.towns.map(
+                                                        (town: any) => (
+                                                          <Chip
+                                                            key={town.id}
+                                                            label={`${town.id}: ${town.name}`}
+                                                            size="small"
+                                                            variant="outlined"
+                                                          />
+                                                        )
+                                                      )
                                                     : '-'}
                                                 </Box>
                                               </TableCell>
                                               <TableCell>
-                                                {item.probability ? `${item.probability}%` : '-'}
+                                                {item.probability
+                                                  ? `${item.probability}%`
+                                                  : '-'}
                                               </TableCell>
                                             </TableRow>
                                           );
@@ -2723,7 +3145,9 @@ const PlanningDataPage: React.FC = () => {
                                       setMateRecruitingGroupPage(newPage)
                                     }
                                     onRowsPerPageChange={(event) =>
-                                      setMateRecruitingGroupRowsPerPage(Number(event.target.value))
+                                      setMateRecruitingGroupRowsPerPage(
+                                        Number(event.target.value)
+                                      )
                                     }
                                     rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
@@ -2732,7 +3156,10 @@ const PlanningDataPage: React.FC = () => {
                             )}
                           </>
                         ) : (
-                          <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                          <Typography
+                            color="text.secondary"
+                            sx={{ py: 4, textAlign: 'center' }}
+                          >
                             {t('planningData.noData')}
                           </Typography>
                         )}
@@ -2745,7 +3172,13 @@ const PlanningDataPage: React.FC = () => {
                 {activeTab === 6 && (
                   <Box>
                     {loadingOceanNpcAreaSpawner && !oceanNpcAreaSpawnerData ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          py: 4,
+                        }}
+                      >
                         <CircularProgress />
                       </Box>
                     ) : (
@@ -2787,7 +3220,8 @@ const PlanningDataPage: React.FC = () => {
                                 },
                                 '&.Mui-focused': {
                                   bgcolor: 'background.paper',
-                                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                  boxShadow:
+                                    '0 0 0 2px rgba(25, 118, 210, 0.1)',
                                   '& fieldset': {
                                     borderColor: 'primary.main',
                                     borderWidth: '1px',
@@ -2801,7 +3235,12 @@ const PlanningDataPage: React.FC = () => {
                             InputProps={{
                               startAdornment: (
                                 <InputAdornment position="start">
-                                  <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                  <SearchIcon
+                                    sx={{
+                                      color: 'text.secondary',
+                                      fontSize: 20,
+                                    }}
+                                  />
                                 </InputAdornment>
                               ),
                               endAdornment: oceanNpcAreaSpawnerSearchTerm && (
@@ -2831,7 +3270,10 @@ const PlanningDataPage: React.FC = () => {
                               gap: 1,
                             }}
                           >
-                            <Tooltip title={t('planningData.viewAllWarning')} arrow>
+                            <Tooltip
+                              title={t('planningData.viewAllWarning')}
+                              arrow
+                            >
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -2861,7 +3303,8 @@ const PlanningDataPage: React.FC = () => {
                               <Box
                                 sx={{
                                   display: 'grid',
-                                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                                  gridTemplateColumns:
+                                    'repeat(auto-fill, minmax(200px, 1fr))',
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
@@ -2869,52 +3312,64 @@ const PlanningDataPage: React.FC = () => {
                                   overflow: 'hidden',
                                 }}
                               >
-                                {oceanNpcAreaSpawnerData.items.map((item: any) => {
-                                  // Use localized name
-                                  const itemName = item.name;
-                                  const label = itemName
-                                    ? `${item.id}:${itemName}`
-                                    : `${item.id}: ${item.oceanNpcId}`;
-                                  const tooltipTitle =
-                                    item.npcExists === false
-                                      ? `${t('planningData.error.npcNotFound')}\n${label}`
-                                      : label;
-                                  return (
-                                    <Tooltip key={item.id} title={tooltipTitle} arrow>
-                                      <Box
-                                        sx={{
-                                          p: 1,
-                                          borderRight: '1px dashed',
-                                          borderBottom: '1px dashed',
-                                          borderColor: 'divider',
-                                          fontSize: '0.8125rem',
-                                          overflow: 'hidden',
-                                          textOverflow: 'ellipsis',
-                                          whiteSpace: 'nowrap',
-                                          bgcolor:
-                                            item.npcExists === false
-                                              ? 'rgba(255, 205, 210, 0.3)'
-                                              : 'background.paper',
-                                          transition: 'background-color 0.2s',
-                                          '&:hover': {
+                                {oceanNpcAreaSpawnerData.items.map(
+                                  (item: any) => {
+                                    // Use localized name
+                                    const itemName = item.name;
+                                    const label = itemName
+                                      ? `${item.id}:${itemName}`
+                                      : `${item.id}: ${item.oceanNpcId}`;
+                                    const tooltipTitle =
+                                      item.npcExists === false
+                                        ? `${t('planningData.error.npcNotFound')}\n${label}`
+                                        : label;
+                                    return (
+                                      <Tooltip
+                                        key={item.id}
+                                        title={tooltipTitle}
+                                        arrow
+                                      >
+                                        <Box
+                                          sx={{
+                                            p: 1,
+                                            borderRight: '1px dashed',
+                                            borderBottom: '1px dashed',
+                                            borderColor: 'divider',
+                                            fontSize: '0.8125rem',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
                                             bgcolor:
                                               item.npcExists === false
-                                                ? 'rgba(255, 205, 210, 0.5)'
-                                                : 'action.hover',
-                                          },
-                                        }}
-                                      >
-                                        {label}
-                                      </Box>
-                                    </Tooltip>
-                                  );
-                                })}
+                                                ? 'rgba(255, 205, 210, 0.3)'
+                                                : 'background.paper',
+                                            transition: 'background-color 0.2s',
+                                            '&:hover': {
+                                              bgcolor:
+                                                item.npcExists === false
+                                                  ? 'rgba(255, 205, 210, 0.5)'
+                                                  : 'action.hover',
+                                            },
+                                          }}
+                                        >
+                                          {label}
+                                        </Box>
+                                      </Tooltip>
+                                    );
+                                  }
+                                )}
                               </Box>
                             ) : (
                               /* Table view - paginated */
                               <>
-                                <TableContainer component={Paper} variant="outlined">
-                                  <Table size="small" sx={{ tableLayout: 'auto' }}>
+                                <TableContainer
+                                  component={Paper}
+                                  variant="outlined"
+                                >
+                                  <Table
+                                    size="small"
+                                    sx={{ tableLayout: 'auto' }}
+                                  >
                                     <TableHead>
                                       <TableRow>
                                         <TableCell>ID</TableCell>
@@ -2934,31 +3389,52 @@ const PlanningDataPage: React.FC = () => {
                                     <TableBody>
                                       {oceanNpcAreaSpawnerData.items
                                         .slice(
-                                          oceanNpcAreaSpawnerPage * oceanNpcAreaSpawnerRowsPerPage,
+                                          oceanNpcAreaSpawnerPage *
+                                            oceanNpcAreaSpawnerRowsPerPage,
                                           (oceanNpcAreaSpawnerPage + 1) *
                                             oceanNpcAreaSpawnerRowsPerPage
                                         )
                                         .map((item: any) => {
                                           // Radius type mapping with localization
-                                          const radiusTypeMap: Record<number, string> = {
-                                            0: t('planningData.radiusType.none'),
-                                            1: t('planningData.radiusType.circle'),
-                                            2: t('planningData.radiusType.square'),
-                                            3: t('planningData.radiusType.region'),
+                                          const radiusTypeMap: Record<
+                                            number,
+                                            string
+                                          > = {
+                                            0: t(
+                                              'planningData.radiusType.none'
+                                            ),
+                                            1: t(
+                                              'planningData.radiusType.circle'
+                                            ),
+                                            2: t(
+                                              'planningData.radiusType.square'
+                                            ),
+                                            3: t(
+                                              'planningData.radiusType.region'
+                                            ),
                                           };
                                           const radiusTypeName =
-                                            radiusTypeMap[item.radiusType] || item.radiusType;
+                                            radiusTypeMap[item.radiusType] ||
+                                            item.radiusType;
 
                                           // Format date - returns { display, utc }
-                                          const formatDate = (isoString: string | null) => {
-                                            if (!isoString) return { display: '-', utc: '' };
+                                          const formatDate = (
+                                            isoString: string | null
+                                          ) => {
+                                            if (!isoString)
+                                              return { display: '-', utc: '' };
                                             try {
                                               // Convert to ISO8601 if needed
-                                              const iso = isoString.includes('T')
+                                              const iso = isoString.includes(
+                                                'T'
+                                              )
                                                 ? isoString
-                                                : new Date(isoString).toISOString();
+                                                : new Date(
+                                                    isoString
+                                                  ).toISOString();
                                               const date = new Date(iso);
-                                              const localFormatted = formatDateTimeDetailed(iso);
+                                              const localFormatted =
+                                                formatDateTimeDetailed(iso);
                                               // Remove milliseconds from UTC time (.000Z -> Z)
                                               const utcDate = date
                                                 .toISOString()
@@ -2977,14 +3453,22 @@ const PlanningDataPage: React.FC = () => {
                                             startDate: string | null,
                                             endDate: string | null
                                           ) => {
-                                            if (!startDate || !endDate) return '-';
+                                            if (!startDate || !endDate)
+                                              return '-';
                                             try {
-                                              const startISO = startDate.includes('T')
-                                                ? startDate
-                                                : new Date(startDate).toISOString();
-                                              const endISO = endDate.includes('T')
+                                              const startISO =
+                                                startDate.includes('T')
+                                                  ? startDate
+                                                  : new Date(
+                                                      startDate
+                                                    ).toISOString();
+                                              const endISO = endDate.includes(
+                                                'T'
+                                              )
                                                 ? endDate
-                                                : new Date(endDate).toISOString();
+                                                : new Date(
+                                                    endDate
+                                                  ).toISOString();
                                               const start = new Date(startISO);
                                               const end = new Date(endISO);
                                               const diffTime = Math.abs(
@@ -3000,7 +3484,9 @@ const PlanningDataPage: React.FC = () => {
                                           };
 
                                           // Format spawn hours - returns { display, utc }
-                                          const formatSpawnHours = (hours: number[] | null) => {
+                                          const formatSpawnHours = (
+                                            hours: number[] | null
+                                          ) => {
                                             if (
                                               !hours ||
                                               !Array.isArray(hours) ||
@@ -3008,32 +3494,45 @@ const PlanningDataPage: React.FC = () => {
                                             )
                                               return { display: '-', utc: '' };
 
-                                            const formatted = hours.map((utcHour) => {
-                                              // Create a date with the UTC hour
-                                              const utcDate = new Date();
-                                              utcDate.setUTCHours(utcHour, 0, 0, 0);
+                                            const formatted = hours.map(
+                                              (utcHour) => {
+                                                // Create a date with the UTC hour
+                                                const utcDate = new Date();
+                                                utcDate.setUTCHours(
+                                                  utcHour,
+                                                  0,
+                                                  0,
+                                                  0
+                                                );
 
-                                              // Format in user's timezone
-                                              const localFormatted = formatDateTimeDetailed(
-                                                utcDate.toISOString()
-                                              );
-                                              const localTime =
-                                                localFormatted.split(' ')[1] || '00:00:00';
-                                              const localHourMin = localTime.substring(0, 5); // HH:mm
+                                                // Format in user's timezone
+                                                const localFormatted =
+                                                  formatDateTimeDetailed(
+                                                    utcDate.toISOString()
+                                                  );
+                                                const localTime =
+                                                  localFormatted.split(
+                                                    ' '
+                                                  )[1] || '00:00:00';
+                                                const localHourMin =
+                                                  localTime.substring(0, 5); // HH:mm
 
-                                              // Format UTC time
-                                              const utcFormatted = `${utcHour.toString().padStart(2, '0')}:00`;
+                                                // Format UTC time
+                                                const utcFormatted = `${utcHour.toString().padStart(2, '0')}:00`;
 
-                                              return {
-                                                local: localHourMin,
-                                                utc: utcFormatted,
-                                              };
-                                            });
+                                                return {
+                                                  local: localHourMin,
+                                                  utc: utcFormatted,
+                                                };
+                                              }
+                                            );
 
                                             const displayText = formatted
                                               .map((h) => h.local)
                                               .join(', ');
-                                            const utcText = formatted.map((h) => h.utc).join(', ');
+                                            const utcText = formatted
+                                              .map((h) => h.utc)
+                                              .join(', ');
                                             return {
                                               display: displayText,
                                               utc: utcText,
@@ -3044,9 +3543,15 @@ const PlanningDataPage: React.FC = () => {
                                           const itemName = item.name;
                                           const npcName = item.npcName;
 
-                                          const startDate = formatDate(item.startDate);
-                                          const endDate = formatDate(item.endDate);
-                                          const spawnHours = formatSpawnHours(item.spawnHours);
+                                          const startDate = formatDate(
+                                            item.startDate
+                                          );
+                                          const endDate = formatDate(
+                                            item.endDate
+                                          );
+                                          const spawnHours = formatSpawnHours(
+                                            item.spawnHours
+                                          );
 
                                           return (
                                             <TableRow
@@ -3076,13 +3581,16 @@ const PlanningDataPage: React.FC = () => {
                                                 <Tooltip
                                                   title={
                                                     item.npcExists === false
-                                                      ? t('planningData.error.npcNotFound')
+                                                      ? t(
+                                                          'planningData.error.npcNotFound'
+                                                        )
                                                       : ''
                                                   }
                                                   arrow
                                                 >
                                                   <span>
-                                                    {itemName ?? `${item.id}: ${item.oceanNpcId}`}
+                                                    {itemName ??
+                                                      `${item.id}: ${item.oceanNpcId}`}
                                                   </span>
                                                 </Tooltip>
                                               </TableCell>
@@ -3090,7 +3598,9 @@ const PlanningDataPage: React.FC = () => {
                                                 <Tooltip
                                                   title={
                                                     item.npcExists === false
-                                                      ? t('planningData.error.npcNotFound')
+                                                      ? t(
+                                                          'planningData.error.npcNotFound'
+                                                        )
                                                       : ''
                                                   }
                                                   arrow
@@ -3103,31 +3613,51 @@ const PlanningDataPage: React.FC = () => {
                                                   />
                                                 </Tooltip>
                                               </TableCell>
-                                              <TableCell>{radiusTypeName}</TableCell>
-                                              <TableCell>{item.radius ?? '-'}</TableCell>
                                               <TableCell>
-                                                {item.latitude?.toFixed(2) ?? '-'}
+                                                {radiusTypeName}
                                               </TableCell>
                                               <TableCell>
-                                                {item.longitude?.toFixed(2) ?? '-'}
+                                                {item.radius ?? '-'}
                                               </TableCell>
                                               <TableCell>
-                                                {item.regenTime ? `${item.regenTime}s` : '-'}
+                                                {item.latitude?.toFixed(2) ??
+                                                  '-'}
                                               </TableCell>
-                                              <Tooltip title={`UTC: ${startDate.utc}`} arrow>
+                                              <TableCell>
+                                                {item.longitude?.toFixed(2) ??
+                                                  '-'}
+                                              </TableCell>
+                                              <TableCell>
+                                                {item.regenTime
+                                                  ? `${item.regenTime}s`
+                                                  : '-'}
+                                              </TableCell>
+                                              <Tooltip
+                                                title={`UTC: ${startDate.utc}`}
+                                                arrow
+                                              >
                                                 <TableCell
                                                   onClick={(e) =>
-                                                    handleCellClick(e, startDate.display)
+                                                    handleCellClick(
+                                                      e,
+                                                      startDate.display
+                                                    )
                                                   }
                                                   sx={{ cursor: 'pointer' }}
                                                 >
                                                   {startDate.display}
                                                 </TableCell>
                                               </Tooltip>
-                                              <Tooltip title={`UTC: ${endDate.utc}`} arrow>
+                                              <Tooltip
+                                                title={`UTC: ${endDate.utc}`}
+                                                arrow
+                                              >
                                                 <TableCell
                                                   onClick={(e) =>
-                                                    handleCellClick(e, endDate.display)
+                                                    handleCellClick(
+                                                      e,
+                                                      endDate.display
+                                                    )
                                                   }
                                                   sx={{ cursor: 'pointer' }}
                                                 >
@@ -3135,10 +3665,18 @@ const PlanningDataPage: React.FC = () => {
                                                 </TableCell>
                                               </Tooltip>
                                               <TableCell>
-                                                {calculatePeriod(item.startDate, item.endDate)}
+                                                {calculatePeriod(
+                                                  item.startDate,
+                                                  item.endDate
+                                                )}
                                               </TableCell>
-                                              <Tooltip title={`UTC: ${spawnHours.utc}`} arrow>
-                                                <TableCell>{spawnHours.display}</TableCell>
+                                              <Tooltip
+                                                title={`UTC: ${spawnHours.utc}`}
+                                                arrow
+                                              >
+                                                <TableCell>
+                                                  {spawnHours.display}
+                                                </TableCell>
                                               </Tooltip>
                                             </TableRow>
                                           );
@@ -3155,7 +3693,9 @@ const PlanningDataPage: React.FC = () => {
                                       setOceanNpcAreaSpawnerPage(newPage)
                                     }
                                     onRowsPerPageChange={(event) =>
-                                      setOceanNpcAreaSpawnerRowsPerPage(Number(event.target.value))
+                                      setOceanNpcAreaSpawnerRowsPerPage(
+                                        Number(event.target.value)
+                                      )
                                     }
                                     rowsPerPageOptions={[10, 20, 50, 100]}
                                   />
@@ -3164,7 +3704,10 @@ const PlanningDataPage: React.FC = () => {
                             )}
                           </>
                         ) : (
-                          <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                          <Typography
+                            color="text.secondary"
+                            sx={{ py: 4, textAlign: 'center' }}
+                          >
                             {t('planningData.noData')}
                           </Typography>
                         )}
@@ -3180,11 +3723,17 @@ const PlanningDataPage: React.FC = () => {
           <Card>
             <CardContent sx={{ py: 6 }}>
               <Box sx={{ textAlign: 'center', maxWidth: 800, mx: 'auto' }}>
-                <CloudUploadIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+                <CloudUploadIcon
+                  sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }}
+                />
                 <Typography variant="h5" gutterBottom>
                   {t('planningData.noDataTitle')}
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ mb: 3 }}
+                >
                   {t('planningData.noDataDescription')}
                 </Typography>
 
@@ -3210,7 +3759,10 @@ const PlanningDataPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Guide Drawer */}
-      <PlanningDataGuideDrawer open={showGuideDrawer} onClose={() => setShowGuideDrawer(false)} />
+      <PlanningDataGuideDrawer
+        open={showGuideDrawer}
+        onClose={() => setShowGuideDrawer(false)}
+      />
     </Box>
   );
 };

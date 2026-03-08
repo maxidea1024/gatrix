@@ -1,6 +1,10 @@
 import express from 'express';
 import { queueService } from '../../services/queue-service';
-import { sendSuccessResponse, sendNotFound, sendInternalError } from '../../utils/api-response';
+import {
+  sendSuccessResponse,
+  sendNotFound,
+  sendInternalError,
+} from '../../utils/api-response';
 
 const router = express.Router();
 
@@ -91,7 +95,10 @@ router.delete('/:queueName/jobs/:jobId', async (req, res) => {
 router.delete('/:queueName/repeatable/:key', async (req, res) => {
   try {
     const { queueName, key } = req.params;
-    const result = await queueService.removeRepeatable(queueName, decodeURIComponent(key));
+    const result = await queueService.removeRepeatable(
+      queueName,
+      decodeURIComponent(key)
+    );
     if (!result) {
       return sendNotFound(res, 'Repeatable job not found');
     }

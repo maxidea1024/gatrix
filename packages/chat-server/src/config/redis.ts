@@ -21,7 +21,10 @@ export class RedisManager {
 
   public async initialize(): Promise<void> {
     try {
-      if (config.redis.cluster.enabled && config.redis.cluster.nodes.length > 0) {
+      if (
+        config.redis.cluster.enabled &&
+        config.redis.cluster.nodes.length > 0
+      ) {
         // Redis Cluster mode for high availability
         await this.initializeCluster();
       } else {
@@ -124,7 +127,11 @@ export class RedisManager {
   }
 
   // High-performance operations for chat
-  public async setUserOnline(userId: number, socketId: string, serverId: string): Promise<void> {
+  public async setUserOnline(
+    userId: number,
+    socketId: string,
+    serverId: string
+  ): Promise<void> {
     const pipeline = this.redisClient!.pipeline();
     pipeline.hset(`user:${userId}`, {
       socketId,
@@ -150,7 +157,11 @@ export class RedisManager {
   public async getUserSocketInfo(
     userId: number
   ): Promise<{ socketId?: string; serverId?: string } | null> {
-    const userInfo = await this.redisClient!.hmget(`user:${userId}`, 'socketId', 'serverId');
+    const userInfo = await this.redisClient!.hmget(
+      `user:${userId}`,
+      'socketId',
+      'serverId'
+    );
     if (!userInfo[0] || !userInfo[1]) return null;
     return { socketId: userInfo[0], serverId: userInfo[1] };
   }
@@ -160,14 +171,20 @@ export class RedisManager {
   }
 
   // Channel membership caching for fast lookups
-  public async addUserToChannel(userId: number, channelId: number): Promise<void> {
+  public async addUserToChannel(
+    userId: number,
+    channelId: number
+  ): Promise<void> {
     const pipeline = this.redisClient!.pipeline();
     pipeline.sadd(`channel:${channelId}:members`, userId);
     pipeline.sadd(`user:${userId}:channels`, channelId);
     await pipeline.exec();
   }
 
-  public async removeUserFromChannel(userId: number, channelId: number): Promise<void> {
+  public async removeUserFromChannel(
+    userId: number,
+    channelId: number
+  ): Promise<void> {
     const pipeline = this.redisClient!.pipeline();
     pipeline.srem(`channel:${channelId}:members`, userId);
     pipeline.srem(`user:${userId}:channels`, channelId);
@@ -175,7 +192,9 @@ export class RedisManager {
   }
 
   public async getChannelMembers(channelId: number): Promise<number[]> {
-    const members = await this.redisClient!.smembers(`channel:${channelId}:members`);
+    const members = await this.redisClient!.smembers(
+      `channel:${channelId}:members`
+    );
     return members.map((id) => parseInt(id, 10));
   }
 
@@ -187,7 +206,10 @@ export class RedisManager {
     await this.redisClient!.expire(key, 3600); // 1 hour TTL
   }
 
-  public async getRecentMessages(channelId: number, limit = 50): Promise<any[]> {
+  public async getRecentMessages(
+    channelId: number,
+    limit = 50
+  ): Promise<any[]> {
     const messages = await this.redisClient!.lrange(
       `channel:${channelId}:recent_messages`,
       0,

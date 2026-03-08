@@ -102,13 +102,37 @@ class ConsoleService {
       this.echoCommand,
       'Echo back arguments. Supports color flags: --red|--green|--yellow|--blue|--magenta|--cyan|--white'
     );
-    this.register('date', this.dateCommand, 'Print server date (supports +FORMAT, --iso, --rfc)');
-    this.register('time', this.timeCommand, 'Print server time (supports +FORMAT)');
-    this.register('timezone', this.timezoneCommand, 'Print server timezone and offset');
-    this.register('uptime', this.uptimeCommand, 'Show server uptime in human readable form');
+    this.register(
+      'date',
+      this.dateCommand,
+      'Print server date (supports +FORMAT, --iso, --rfc)'
+    );
+    this.register(
+      'time',
+      this.timeCommand,
+      'Print server time (supports +FORMAT)'
+    );
+    this.register(
+      'timezone',
+      this.timezoneCommand,
+      'Print server timezone and offset'
+    );
+    this.register(
+      'uptime',
+      this.uptimeCommand,
+      'Show server uptime in human readable form'
+    );
     this.register('clear', this.clearCommand, 'Clear the console');
-    this.register('sysinfo', this.sysinfoCommand, 'Show Node/OS/Process information');
-    this.register('env', this.envCommand, 'Show whitelisted environment variables');
+    this.register(
+      'sysinfo',
+      this.sysinfoCommand,
+      'Show Node/OS/Process information'
+    );
+    this.register(
+      'env',
+      this.envCommand,
+      'Show whitelisted environment variables'
+    );
     this.register('uuid', this.uuidCommand, 'Generate a random UUID v4');
     this.register(
       'ulid',
@@ -126,7 +150,11 @@ class ConsoleService {
       .action(async (_args, ctx) => {
         const u = ctx?.user;
         if (!u) return { output: 'Not authenticated' };
-        const lines = [`ID: ${u.id ?? ''}`, `Name: ${u.name ?? ''}`, `Email: ${u.email ?? ''}`];
+        const lines = [
+          `ID: ${u.id ?? ''}`,
+          `Name: ${u.name ?? ''}`,
+          `Email: ${u.email ?? ''}`,
+        ];
         return { output: lines.join('\n') };
       });
 
@@ -156,7 +184,9 @@ class ConsoleService {
       .option('--length', 'Length in bytes (default: 64)')
       .audit(true)
       .register()
-      .action(async (args, ctx, opts) => this.jwtSecretCommand(args, ctx, opts));
+      .action(async (args, ctx, opts) =>
+        this.jwtSecretCommand(args, ctx, opts)
+      );
 
     this.command('hash')
       .description('Hash text using bcrypt')
@@ -167,8 +197,14 @@ class ConsoleService {
 
     this.command('encrypt')
       .description('Encrypt text using specified algorithm')
-      .option('--key', 'Encryption key (hex). If not provided, generates a new key')
-      .option('--algo', 'Algorithm: aes256-gcm (default), aes256-cbc, chacha20-poly1305')
+      .option(
+        '--key',
+        'Encryption key (hex). If not provided, generates a new key'
+      )
+      .option(
+        '--algo',
+        'Algorithm: aes256-gcm (default), aes256-cbc, chacha20-poly1305'
+      )
       .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.encryptCommand(args, ctx, opts));
@@ -176,7 +212,10 @@ class ConsoleService {
     this.command('decrypt')
       .description('Decrypt text using specified algorithm')
       .option('--key', 'Encryption key (hex, required)')
-      .option('--algo', 'Algorithm: aes256-gcm (default), aes256-cbc, chacha20-poly1305')
+      .option(
+        '--algo',
+        'Algorithm: aes256-gcm (default), aes256-cbc, chacha20-poly1305'
+      )
       .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.decryptCommand(args, ctx, opts));
@@ -197,7 +236,9 @@ class ConsoleService {
       .option('--name', 'Token name (alternative to ID)')
       .audit(true)
       .register()
-      .action(async (args, ctx, opts) => this.apiTokenDeleteCommand(args, ctx, opts));
+      .action(async (args, ctx, opts) =>
+        this.apiTokenDeleteCommand(args, ctx, opts)
+      );
 
     this.command('random')
       .description('Generate random string')
@@ -210,12 +251,16 @@ class ConsoleService {
       .action(async (args, ctx, opts) => this.randomCommand(args, ctx, opts));
 
     this.command('gen-login-id')
-      .description('Generate login-friendly user ID (starts with a letter, contains digits)')
+      .description(
+        'Generate login-friendly user ID (starts with a letter, contains digits)'
+      )
       .option('--length', 'Total length (default: 12)')
       .option('--count', 'How many to generate (default: 1)')
       .audit(true)
       .register()
-      .action(async (args, ctx, opts) => this.genLoginIdCommand(args, ctx, opts));
+      .action(async (args, ctx, opts) =>
+        this.genLoginIdCommand(args, ctx, opts)
+      );
 
     this.command('gen-login-password')
       .description(
@@ -225,7 +270,9 @@ class ConsoleService {
       .option('--count', 'How many to generate (default: 1)')
       .audit(true)
       .register()
-      .action(async (args, ctx, opts) => this.genLoginPasswordCommand(args, ctx, opts));
+      .action(async (args, ctx, opts) =>
+        this.genLoginPasswordCommand(args, ctx, opts)
+      );
 
     this.command('db-stats')
       .description('Show database statistics')
@@ -238,13 +285,17 @@ class ConsoleService {
       .option('--pattern', 'Cache key pattern (default: all)')
       .audit(true)
       .register()
-      .action(async (args, ctx, opts) => this.cacheClearCommand(args, ctx, opts));
+      .action(async (args, ctx, opts) =>
+        this.cacheClearCommand(args, ctx, opts)
+      );
 
     this.command('cache-stats')
       .description('Show Redis cache statistics')
       .audit(true)
       .register()
-      .action(async (args, ctx, opts) => this.cacheStatsCommand(args, ctx, opts));
+      .action(async (args, ctx, opts) =>
+        this.cacheStatsCommand(args, ctx, opts)
+      );
 
     this.command('api-token-list')
       .description('List API tokens')
@@ -252,7 +303,9 @@ class ConsoleService {
       .option('--limit', 'Limit results (default: 10)')
       .audit(true)
       .register()
-      .action(async (args, ctx, opts) => this.tokenListCommand(args, ctx, opts));
+      .action(async (args, ctx, opts) =>
+        this.tokenListCommand(args, ctx, opts)
+      );
 
     this.command('user-info')
       .description('Get user information by ID or email')
@@ -266,14 +319,18 @@ class ConsoleService {
       .option('--iso', 'Output in ISO format')
       .audit(true)
       .register()
-      .action(async (args, ctx, opts) => this.timestampCommand(args, ctx, opts));
+      .action(async (args, ctx, opts) =>
+        this.timestampCommand(args, ctx, opts)
+      );
 
     this.command('unixtimestamp')
       .description('Get current Unix timestamp')
       .option('--ms', 'Output in milliseconds (default: seconds)')
       .audit(true)
       .register()
-      .action(async (args, ctx, opts) => this.unixtimestampCommand(args, ctx, opts));
+      .action(async (args, ctx, opts) =>
+        this.unixtimestampCommand(args, ctx, opts)
+      );
 
     this.command('md5')
       .description('Generate MD5 hash')
@@ -290,10 +347,15 @@ class ConsoleService {
     this.command('chat-token')
       .description('Generate Chat Server API token')
       .option('--name', 'Token name (default: gatrix-backend-token)')
-      .option('--permissions', 'Comma-separated permissions (default: read,write,admin)')
+      .option(
+        '--permissions',
+        'Comma-separated permissions (default: read,write,admin)'
+      )
       .audit(true)
       .register()
-      .action(async (args, ctx, opts) => this.chatTokenCommand(args, ctx, opts));
+      .action(async (args, ctx, opts) =>
+        this.chatTokenCommand(args, ctx, opts)
+      );
   }
 
   public listCommands(): string[] {
@@ -315,20 +377,30 @@ class ConsoleService {
     return this.legacyAuditFlags.get(command) === true;
   }
 
-  private showCommandHelp(command: string, built: BuiltCommandDef): ConsoleExecutionResult {
-    const lines = [`\u001b[1m${command}\u001b[0m - ${built.description || 'No description'}`, ''];
+  private showCommandHelp(
+    command: string,
+    built: BuiltCommandDef
+  ): ConsoleExecutionResult {
+    const lines = [
+      `\u001b[1m${command}\u001b[0m - ${built.description || 'No description'}`,
+      '',
+    ];
 
     if (built.options && built.options.length > 0) {
       lines.push('\u001b[1mOptions:\u001b[0m');
       for (const opt of built.options) {
-        lines.push(`  \u001b[36m${opt.flag.padEnd(20)}\u001b[0m ${opt.description}`);
+        lines.push(
+          `  \u001b[36m${opt.flag.padEnd(20)}\u001b[0m ${opt.description}`
+        );
       }
       lines.push('');
     }
 
     lines.push('\u001b[1mUsage:\u001b[0m');
     if (built.options && built.options.length > 0) {
-      const optStr = built.options.map((o) => `[${o.flag.split(' ')[0]}]`).join(' ');
+      const optStr = built.options
+        .map((o) => `[${o.flag.split(' ')[0]}]`)
+        .join(' ');
       lines.push(`  ${command} ${optStr} [arguments]`);
     } else {
       lines.push(`  ${command} [arguments]`);
@@ -403,10 +475,25 @@ class ConsoleService {
   private helpCommand = async (): Promise<ConsoleExecutionResult> => {
     const categories: Record<string, string[]> = {
       Basic: ['help', 'echo', 'clear', 'whoami'],
-      'Date & Time': ['date', 'time', 'timezone', 'uptime', 'timestamp', 'unixtimestamp'],
+      'Date & Time': [
+        'date',
+        'time',
+        'timezone',
+        'uptime',
+        'timestamp',
+        'unixtimestamp',
+      ],
       'ID Generation': ['uuid', 'ulid'],
       'Auth Utilities': ['gen-login-id', 'gen-login-password'],
-      'Security & Crypto': ['jwt-secret', 'hash', 'encrypt', 'decrypt', 'random', 'md5', 'sha256'],
+      'Security & Crypto': [
+        'jwt-secret',
+        'hash',
+        'encrypt',
+        'decrypt',
+        'random',
+        'md5',
+        'sha256',
+      ],
       'API Management': ['api-token', 'api-token-delete', 'api-token-list'],
       'Chat Management': ['chat-token'],
       Database: ['db-stats'],
@@ -480,7 +567,9 @@ class ConsoleService {
   };
 
   // Built-in: date (Ubuntu-like)
-  private dateCommand = async (args: string[] = []): Promise<ConsoleExecutionResult> => {
+  private dateCommand = async (
+    args: string[] = []
+  ): Promise<ConsoleExecutionResult> => {
     const now = new Date();
 
     // Support: date +"%Y-%m-%d %H:%M:%S %Z"
@@ -533,7 +622,9 @@ class ConsoleService {
   };
 
   // Built-in: time (Ubuntu-like)
-  private timeCommand = async (args: string[] = []): Promise<ConsoleExecutionResult> => {
+  private timeCommand = async (
+    args: string[] = []
+  ): Promise<ConsoleExecutionResult> => {
     const now = new Date();
     const pad = (n: number) => String(n).padStart(2, '0');
     if (args.find((a) => a.startsWith('+'))) {
@@ -563,7 +654,10 @@ class ConsoleService {
     const hh = String(Math.floor(abs / 60)).padStart(2, '0');
     const mm = String(abs % 60).padStart(2, '0');
     const short =
-      now.toLocaleTimeString('en-US', { timeZoneName: 'short' }).split(' ').pop() || 'UTC';
+      now
+        .toLocaleTimeString('en-US', { timeZoneName: 'short' })
+        .split(' ')
+        .pop() || 'UTC';
     return { output: `Time zone: ${tz} (${short}, ${sign}${hh}:${mm})` };
   };
 
@@ -635,7 +729,8 @@ class ConsoleService {
     if (hasDecode && !hasEncode) {
       if (!text) {
         return {
-          output: '\u001b[31mError:\u001b[0m Please provide base64 text to decode',
+          output:
+            '\u001b[31mError:\u001b[0m Please provide base64 text to decode',
         };
       }
       try {
@@ -659,7 +754,9 @@ class ConsoleService {
   };
 
   // Extra: ulid - Generate ULID
-  private ulidCommand = async (args: string[] = []): Promise<ConsoleExecutionResult> => {
+  private ulidCommand = async (
+    args: string[] = []
+  ): Promise<ConsoleExecutionResult> => {
     const count = args[0] ? parseInt(args[0], 10) : 1;
     if (isNaN(count) || count < 1 || count > 100) {
       return {
@@ -714,7 +811,8 @@ class ConsoleService {
     const length = opts?.length ? parseInt(opts.length, 10) : 64;
     if (isNaN(length) || length < 32 || length > 256) {
       return {
-        output: '\u001b[31mError:\u001b[0m Length must be between 32 and 256 bytes',
+        output:
+          '\u001b[31mError:\u001b[0m Length must be between 32 and 256 bytes',
       };
     }
 
@@ -889,7 +987,8 @@ class ConsoleService {
 
     try {
       const parts = encryptedData.split(':');
-      const requiresAuthTag = algo === 'aes256-gcm' || algo === 'chacha20-poly1305';
+      const requiresAuthTag =
+        algo === 'aes256-gcm' || algo === 'chacha20-poly1305';
 
       if (requiresAuthTag && parts.length !== 3) {
         return {
@@ -916,17 +1015,20 @@ class ConsoleService {
         const authTag = Buffer.from(authTagHex, 'hex');
         const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
         decipher.setAuthTag(authTag);
-        decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
+        decrypted =
+          decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
       } else if (algo === 'aes256-cbc') {
         const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-        decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
+        decrypted =
+          decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
       } else if (algo === 'chacha20-poly1305') {
         const authTag = Buffer.from(authTagHex, 'hex');
         const decipher = crypto.createDecipheriv('chacha20-poly1305', key, iv, {
           authTagLength: 16,
         } as any);
         decipher.setAuthTag(authTag);
-        decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
+        decrypted =
+          decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
       } else {
         return {
           output: '\u001b[31mError:\u001b[0m Algorithm not implemented',
@@ -959,7 +1061,8 @@ class ConsoleService {
 
     if (!tokenType || !['client', 'server'].includes(tokenType)) {
       return {
-        output: '\u001b[31mError:\u001b[0m --type must be either "client" or "server"',
+        output:
+          '\u001b[31mError:\u001b[0m --type must be either "client" or "server"',
       };
     }
 
@@ -1083,7 +1186,8 @@ class ConsoleService {
     const length = opts?.length ? parseInt(opts.length, 10) : 32;
     if (isNaN(length) || length < 1 || length > 256) {
       return {
-        output: '\u001b[31mError:\u001b[0m Length must be between 1 and 256 bytes',
+        output:
+          '\u001b[31mError:\u001b[0m Length must be between 1 and 256 bytes',
       };
     }
 
@@ -1093,7 +1197,8 @@ class ConsoleService {
     if (opts?.base64) {
       output = bytes.toString('base64');
     } else if (opts?.alphanumeric) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      const chars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       output = '';
       for (let i = 0; i < length; i++) {
         output += chars[bytes[i] % chars.length];
@@ -1138,7 +1243,9 @@ class ConsoleService {
       const lines = [
         '\u001b[32mDatabase Statistics:\u001b[0m',
         '',
-        ...stats.map((s) => `  ${s.table.padEnd(30)} ${String(s.count).padStart(10)}`),
+        ...stats.map(
+          (s) => `  ${s.table.padEnd(30)} ${String(s.count).padStart(10)}`
+        ),
         '',
         `\u001b[90mTotal tables: ${stats.length}\u001b[0m`,
       ];
@@ -1243,8 +1350,12 @@ class ConsoleService {
           const id = String(t.id).padEnd(6);
           const name = (t.tokenName || '').substring(0, 24).padEnd(25);
           const type = (t.tokenType || '').padEnd(10);
-          const creator = (t.createdByName || 'Unknown').substring(0, 19).padEnd(20);
-          const expires = t.expiresAt ? new Date(t.expiresAt).toISOString().split('T')[0] : 'Never';
+          const creator = (t.createdByName || 'Unknown')
+            .substring(0, 19)
+            .padEnd(20);
+          const expires = t.expiresAt
+            ? new Date(t.expiresAt).toISOString().split('T')[0]
+            : 'Never';
           return `${id}${name}${type}${creator}${expires}`;
         }),
       ];
@@ -1275,7 +1386,9 @@ class ConsoleService {
       let user;
       if (/^\d+$/.test(identifier)) {
         // Numeric ID
-        user = await db('g_users').where('id', parseInt(identifier, 10)).first();
+        user = await db('g_users')
+          .where('id', parseInt(identifier, 10))
+          .first();
       } else {
         // Email
         user = await db('g_users').where('email', identifier).first();
@@ -1290,7 +1403,9 @@ class ConsoleService {
         .join('g_roles as r', 'rb.roleId', 'r.id')
         .where('rb.userId', user.id)
         .select('r.name as roleName');
-      const roles = roleBindings.map((rb: any) => rb.roleName).join(', ') || 'No roles assigned';
+      const roles =
+        roleBindings.map((rb: any) => rb.roleName).join(', ') ||
+        'No roles assigned';
 
       const lines = [
         '\u001b[32mUser Information:\u001b[0m',
@@ -1418,7 +1533,8 @@ class ConsoleService {
       let out = letters[crypto.randomBytes(1)[0] % letters.length];
       // Ensure at least one digit in the remaining part
       const remaining = length - 1;
-      const requiredDigitPos = remaining > 0 ? crypto.randomBytes(1)[0] % remaining : 0;
+      const requiredDigitPos =
+        remaining > 0 ? crypto.randomBytes(1)[0] % remaining : 0;
       for (let i = 0; i < remaining; i++) {
         if (i === requiredDigitPos) {
           out += digits[crypto.randomBytes(1)[0] % digits.length];
@@ -1540,7 +1656,10 @@ class ConsoleService {
       }
 
       // Generate token via Chat Server
-      const token = await chatServerService.generateChatApiToken(tokenName, permissions);
+      const token = await chatServerService.generateChatApiToken(
+        tokenName,
+        permissions
+      );
 
       const output = [
         `\x1b[32m✅ Chat Server API Token Generated\x1b[0m`,

@@ -20,7 +20,12 @@ import {
   ImageNotSupported as NoImageIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { Sequence, Frame, FrameEffectType, TransitionType } from '../../services/bannerService';
+import {
+  Sequence,
+  Frame,
+  FrameEffectType,
+  TransitionType,
+} from '../../services/bannerService';
 
 // Keyframe animations for frame effects
 const fadeIn = keyframes`
@@ -81,7 +86,10 @@ const slideTransition = keyframes`
 `;
 
 // Map effect types to keyframe animations
-const effectAnimations: Record<FrameEffectType, ReturnType<typeof keyframes> | null> = {
+const effectAnimations: Record<
+  FrameEffectType,
+  ReturnType<typeof keyframes> | null
+> = {
   fadeIn,
   fadeOut,
   slideLeft,
@@ -95,7 +103,10 @@ const effectAnimations: Record<FrameEffectType, ReturnType<typeof keyframes> | n
 };
 
 // Map transition types to keyframe animations
-const transitionAnimations: Record<TransitionType, ReturnType<typeof keyframes> | null> = {
+const transitionAnimations: Record<
+  TransitionType,
+  ReturnType<typeof keyframes> | null
+> = {
   fade: fadeIn,
   crossfade,
   slide: slideTransition,
@@ -161,7 +172,9 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
   const [isEnterEffectActive, setIsEnterEffectActive] = useState(false); // For enter effect animation
   const [playDirection, setPlayDirection] = useState<1 | -1>(1); // 1 = forward, -1 = backward (for pingpong)
   const [currentTime, setCurrentTime] = useState(0);
-  const [selectedSequenceIndex, setSelectedSequenceIndex] = useState<number | 'all'>('all');
+  const [selectedSequenceIndex, setSelectedSequenceIndex] = useState<
+    number | 'all'
+  >('all');
   const [isHovering, setIsHovering] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -197,7 +210,10 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
     return targetSequences.flatMap((seq, seqIdx) =>
       seq.frames.map((frame, frameIdx) => ({
         ...frame,
-        sequenceIndex: selectedSequenceIndex === 'all' ? seqIdx : (selectedSequenceIndex as number),
+        sequenceIndex:
+          selectedSequenceIndex === 'all'
+            ? seqIdx
+            : (selectedSequenceIndex as number),
         frameIndex: frameIdx,
         sequenceName: seq.name,
         speedMultiplier: seq.speedMultiplier,
@@ -208,10 +224,15 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
 
   // Handle external frame selection
   useEffect(() => {
-    if (externalSequenceIndex !== undefined && externalFrameIndex !== undefined) {
+    if (
+      externalSequenceIndex !== undefined &&
+      externalFrameIndex !== undefined
+    ) {
       // Find the frame index in allFrames that matches the external selection
       const targetIndex = allFrames.findIndex(
-        (f) => f.sequenceIndex === externalSequenceIndex && f.frameIndex === externalFrameIndex
+        (f) =>
+          f.sequenceIndex === externalSequenceIndex &&
+          f.frameIndex === externalFrameIndex
       );
       if (targetIndex >= 0 && targetIndex !== currentFrameIndex) {
         setIsPlaying(false);
@@ -234,9 +255,12 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
     return { totalDuration: total, frameCumulativeTimes: cumulatives };
   }, [allFrames, playbackSpeed]);
 
-  const currentFrame = allFrames.length > 0 ? allFrames[currentFrameIndex] : null;
+  const currentFrame =
+    allFrames.length > 0 ? allFrames[currentFrameIndex] : null;
   const previousFrame =
-    prevFrameIndex !== null && allFrames.length > 0 ? allFrames[prevFrameIndex] : null;
+    prevFrameIndex !== null && allFrames.length > 0
+      ? allFrames[prevFrameIndex]
+      : null;
 
   // Get transition animation style (for frame transitions like fade, crossfade, slide)
   const getTransitionStyle = (frame: ExtendedFrame) => {
@@ -279,7 +303,8 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
   // Calculate preview dimensions - fit to container while maintaining aspect ratio
   // Subtract 16px (8px margin on each side) so image doesn't touch the container border
   const imageMargin = 16;
-  const availableWidth = containerWidth > 0 ? containerWidth - imageMargin : 400;
+  const availableWidth =
+    containerWidth > 0 ? containerWidth - imageMargin : 400;
   const scale = Math.min(1, availableWidth / width); // Don't scale up, only down
   const previewWidth = width * scale;
   const previewHeight = height * scale;
@@ -289,7 +314,8 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
     const newFrame = allFrames[newIndex];
     const transitionDuration = newFrame?.transition?.duration || 300;
     const effectDuration = newFrame?.effects?.duration || 300;
-    const hasEnterEffect = newFrame?.effects?.enter && newFrame.effects.enter !== 'none';
+    const hasEnterEffect =
+      newFrame?.effects?.enter && newFrame.effects.enter !== 'none';
 
     // Start transition
     setPrevFrameIndex(currentFrameIndex);
@@ -323,7 +349,10 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
 
   // Update current time when frame changes
   useEffect(() => {
-    if (frameCumulativeTimes.length > 0 && currentFrameIndex < frameCumulativeTimes.length) {
+    if (
+      frameCumulativeTimes.length > 0 &&
+      currentFrameIndex < frameCumulativeTimes.length
+    ) {
       setCurrentTime(frameCumulativeTimes[currentFrameIndex]);
     }
   }, [currentFrameIndex, frameCumulativeTimes]);
@@ -409,7 +438,8 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
 
   const handlePrevFrame = () => {
     setIsPlaying(false);
-    const newIndex = (currentFrameIndex - 1 + allFrames.length) % allFrames.length;
+    const newIndex =
+      (currentFrameIndex - 1 + allFrames.length) % allFrames.length;
     changeFrame(newIndex);
   };
 
@@ -586,7 +616,8 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
         {/* Action Info Overlay - shown on hover when link or action exists */}
         {isHovering &&
           (currentFrame?.clickUrl ||
-            (currentFrame?.action?.type && currentFrame.action.type !== 'none')) && (
+            (currentFrame?.action?.type &&
+              currentFrame.action.type !== 'none')) && (
             <Box
               sx={{
                 position: 'absolute',
@@ -628,37 +659,39 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
                   </Typography>
                 </Box>
               )}
-              {currentFrame?.action?.type && currentFrame.action.type !== 'none' && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    mt: currentFrame?.clickUrl ? 0.5 : 0,
-                  }}
-                >
-                  <Typography
-                    variant="caption"
+              {currentFrame?.action?.type &&
+                currentFrame.action.type !== 'none' && (
+                  <Box
                     sx={{
-                      color: 'rgba(255,255,255,0.7)',
-                      fontSize: '0.65rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                      mt: currentFrame?.clickUrl ? 0.5 : 0,
                     }}
                   >
-                    ⚡ {t('banners.action')}:
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: '#fff',
-                      fontSize: '0.65rem',
-                      fontWeight: 500,
-                    }}
-                  >
-                    {t(`banners.actionTypes.${currentFrame.action.type}`)}{' '}
-                    {currentFrame.action.value && `(${currentFrame.action.value})`}
-                  </Typography>
-                </Box>
-              )}
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'rgba(255,255,255,0.7)',
+                        fontSize: '0.65rem',
+                      }}
+                    >
+                      ⚡ {t('banners.action')}:
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: '#fff',
+                        fontSize: '0.65rem',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {t(`banners.actionTypes.${currentFrame.action.type}`)}{' '}
+                      {currentFrame.action.value &&
+                        `(${currentFrame.action.value})`}
+                    </Typography>
+                  </Box>
+                )}
             </Box>
           )}
 
@@ -695,7 +728,10 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
               {currentFrame?.sequenceName} - {t('banners.frame')}{' '}
               {(currentFrame?.frameIndex || 0) + 1}
               {currentFrame?.imageUrl && (
-                <Box component="span" sx={{ color: 'rgba(255,255,255,0.6)', ml: 0.5 }}>
+                <Box
+                  component="span"
+                  sx={{ color: 'rgba(255,255,255,0.6)', ml: 0.5 }}
+                >
                   ({getFileNameFromUrl(currentFrame.imageUrl)})
                 </Box>
               )}
@@ -727,14 +763,22 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
             px: 1,
           }}
         >
-          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
+          <Typography
+            variant="caption"
+            sx={{ color: 'text.disabled', fontSize: '0.65rem' }}
+          >
             {width}×{height}px {scale < 1 && `(${Math.round(scale * 100)}%)`}
           </Typography>
         </Box>
         {/* Sequence selector - only show when multiple sequences */}
         {sequences.length > 1 && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1, px: 1 }}>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1, px: 1 }}
+          >
+            <Typography
+              variant="caption"
+              sx={{ color: 'text.secondary', fontSize: '0.7rem' }}
+            >
               {t('banners.sequence')}:
             </Typography>
             <FormControl size="small" sx={{ minWidth: 120, flex: 1 }}>
@@ -779,7 +823,9 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
             px: 1,
             py: 0.75,
             bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.05)'
+                : 'rgba(0,0,0,0.04)',
             borderRadius: 1,
           }}
         >
@@ -815,7 +861,11 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
               },
             }}
           >
-            {isPlaying ? <PauseIcon fontSize="small" /> : <PlayIcon fontSize="small" />}
+            {isPlaying ? (
+              <PauseIcon fontSize="small" />
+            ) : (
+              <PlayIcon fontSize="small" />
+            )}
           </IconButton>
           <IconButton
             size="small"

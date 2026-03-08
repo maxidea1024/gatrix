@@ -18,7 +18,8 @@ router.get(
     const { repository, branch } = req.query;
 
     try {
-      const { FeatureCodeReferenceModel } = await import('../../../models/feature-code-reference');
+      const { FeatureCodeReferenceModel } =
+        await import('../../../models/feature-code-reference');
 
       const summary = await FeatureCodeReferenceModel.getSummary({
         repository: repository as string,
@@ -39,7 +40,10 @@ router.get(
       });
     } catch (error: any) {
       // Code references are non-critical - return empty on any error
-      logger.warn('Code references summary error:', error.message || error.code);
+      logger.warn(
+        'Code references summary error:',
+        error.message || error.code
+      );
       res.json({
         success: true,
         data: {
@@ -67,13 +71,17 @@ flagCodeReferencesRouter.get(
     const { repository, branch, limit } = req.query;
 
     try {
-      const { FeatureCodeReferenceModel } = await import('../../../models/feature-code-reference');
+      const { FeatureCodeReferenceModel } =
+        await import('../../../models/feature-code-reference');
 
-      const references = await FeatureCodeReferenceModel.findByFlagName(flagName, {
-        repository: repository as string,
-        branch: branch as string,
-        limit: limit ? parseInt(limit as string, 10) : undefined,
-      });
+      const references = await FeatureCodeReferenceModel.findByFlagName(
+        flagName,
+        {
+          repository: repository as string,
+          branch: branch as string,
+          limit: limit ? parseInt(limit as string, 10) : undefined,
+        }
+      );
 
       const scanInfo = await FeatureCodeReferenceModel.getLatestScanInfo({
         repository: repository as string,

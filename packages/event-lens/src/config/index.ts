@@ -6,7 +6,10 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 export const config = {
   // Server
-  port: parseInt(process.env.EVENT_LENS_PORT || process.env.PORT || '45200', 10),
+  port: parseInt(
+    process.env.EVENT_LENS_PORT || process.env.PORT || '45200',
+    10
+  ),
   nodeEnv: process.env.NODE_ENV || 'development',
   logLevel: process.env.LOG_LEVEL || 'info',
 
@@ -54,12 +57,14 @@ export const config = {
 
   // GeoIP
   geoip: {
-    databasePath: process.env.GEOIP_DATABASE_PATH || './data/GeoLite2-City.mmdb',
+    databasePath:
+      process.env.GEOIP_DATABASE_PATH || './data/GeoLite2-City.mmdb',
   },
 
   // Monitoring
   monitoring: {
-    enabled: String(process.env.MONITORING_ENABLED || '').toLowerCase() === 'true',
+    enabled:
+      String(process.env.MONITORING_ENABLED || '').toLowerCase() === 'true',
     metricsPath: process.env.METRICS_PATH || '/metrics',
   },
 };

@@ -4,7 +4,11 @@ import { DataManagementService } from '../services/data-management-service';
 import { createLogger } from '../config/logger';
 const logger = createLogger('DataManagementController');
 
-export const exportData = async (req: Request, res: Response, next: NextFunction) => {
+export const exportData = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const buffer = await DataManagementService.exportData();
 
@@ -19,7 +23,11 @@ export const exportData = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-export const importData = async (req: Request, res: Response, next: NextFunction) => {
+export const importData = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     if (!req.file) {
       throw new Error('No file uploaded');

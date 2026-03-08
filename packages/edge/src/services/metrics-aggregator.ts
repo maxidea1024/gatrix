@@ -7,7 +7,10 @@ const logger = createLogger('MetricsAggregator');
 interface ClientMetricBucket {
   start: Date;
   stop: Date;
-  flags: Record<string, { yes: number; no: number; variants: Record<string, number> }>;
+  flags: Record<
+    string,
+    { yes: number; no: number; variants: Record<string, number> }
+  >;
   missing: Record<string, number>;
   sdkVersion?: string;
 }
@@ -49,7 +52,12 @@ class MetricsAggregator {
   /**
    * Add Client SDK metrics to buffer
    */
-  addClientMetrics(environmentId: string, appName: string, bucket: any, sdkVersion?: string): void {
+  addClientMetrics(
+    environmentId: string,
+    appName: string,
+    bucket: any,
+    sdkVersion?: string
+  ): void {
     const key = `${environmentId}:${appName}`;
     let buffer = this.clientBuffers.get(key);
 
@@ -90,7 +98,8 @@ class MetricsAggregator {
 
         if (incoming.variants) {
           for (const [vName, count] of Object.entries(incoming.variants)) {
-            bFlag.variants[vName] = (bFlag.variants[vName] || 0) + (count as number);
+            bFlag.variants[vName] =
+              (bFlag.variants[vName] || 0) + (count as number);
           }
         }
       }
@@ -99,7 +108,8 @@ class MetricsAggregator {
     // Aggregate missing (unknown) flags
     if (bucket.missing) {
       for (const [flagName, count] of Object.entries(bucket.missing as any)) {
-        buffer.missing[flagName] = (buffer.missing[flagName] || 0) + (count as number);
+        buffer.missing[flagName] =
+          (buffer.missing[flagName] || 0) + (count as number);
       }
     }
   }
@@ -186,7 +196,11 @@ class MetricsAggregator {
     const serverJobs = Array.from(this.serverBuffers.entries());
     const unknownJobs = Array.from(this.serverUnknownBuffers.entries());
 
-    if (clientJobs.length === 0 && serverJobs.length === 0 && unknownJobs.length === 0) {
+    if (
+      clientJobs.length === 0 &&
+      serverJobs.length === 0 &&
+      unknownJobs.length === 0
+    ) {
       return;
     }
 
@@ -224,7 +238,10 @@ class MetricsAggregator {
           }
         );
       } catch (error: any) {
-        logger.error(`Failed to flush client metrics for ${key}:`, error.message);
+        logger.error(
+          `Failed to flush client metrics for ${key}:`,
+          error.message
+        );
       }
     });
 
@@ -253,37 +270,48 @@ class MetricsAggregator {
           }
         );
       } catch (error: any) {
-        logger.error(`Failed to flush server metrics for ${key}:`, error.message);
+        logger.error(
+          `Failed to flush server metrics for ${key}:`,
+          error.message
+        );
       }
     });
 
     // Process Server Unknown Reports
     const unknownPromises = unknownJobs.flatMap(([key, buffer]) => {
       const [environmentId, appName] = key.split(':');
-      return Array.from(buffer.flags.entries()).map(async ([flagName, count]) => {
-        try {
-          await axios.post(
-            `${config.gatrixUrl}/api/v1/server/${environmentId}/features/unknown`,
-            { flagName, count, sdkVersion: buffer.sdkVersion },
-            {
-              headers: {
-                'x-api-token': config.apiToken,
-                'x-application-name': appName,
-                ...(buffer.sdkVersion && { 'x-sdk-version': buffer.sdkVersion }),
-              },
-              timeout: 10_000,
-            }
-          );
-        } catch (error: any) {
-          logger.error(
-            `Failed to flush server unknown report for ${flagName} in ${key}:`,
-            error.message
-          );
+      return Array.from(buffer.flags.entries()).map(
+        async ([flagName, count]) => {
+          try {
+            await axios.post(
+              `${config.gatrixUrl}/api/v1/server/${environmentId}/features/unknown`,
+              { flagName, count, sdkVersion: buffer.sdkVersion },
+              {
+                headers: {
+                  'x-api-token': config.apiToken,
+                  'x-application-name': appName,
+                  ...(buffer.sdkVersion && {
+                    'x-sdk-version': buffer.sdkVersion,
+                  }),
+                },
+                timeout: 10_000,
+              }
+            );
+          } catch (error: any) {
+            logger.error(
+              `Failed to flush server unknown report for ${flagName} in ${key}:`,
+              error.message
+            );
+          }
         }
-      });
+      );
     });
 
-    await Promise.allSettled([...clientPromises, ...serverPromises, ...unknownPromises]);
+    await Promise.allSettled([
+      ...clientPromises,
+      ...serverPromises,
+      ...unknownPromises,
+    ]);
   }
 
   /**

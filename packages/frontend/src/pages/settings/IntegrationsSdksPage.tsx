@@ -363,8 +363,18 @@ const SdkCard: React.FC<{ sdk: SdkProvider }> = ({ sdk }) => {
       }}
     >
       <CardContent sx={{ flex: 1, py: 1.5, px: 2 }}>
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
-          <Box display="flex" alignItems="center" gap={1.2} sx={{ minWidth: 0, flex: 1 }}>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          mb={1}
+        >
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={1.2}
+            sx={{ minWidth: 0, flex: 1 }}
+          >
             {sdk.adaptive ? (
               <Box
                 sx={{
@@ -391,7 +401,12 @@ const SdkCard: React.FC<{ sdk: SdkProvider }> = ({ sdk }) => {
               />
             )}
             <Box sx={{ minWidth: 0 }}>
-              <Typography variant="body1" fontWeight="bold" noWrap sx={{ lineHeight: 1.2 }}>
+              <Typography
+                variant="body1"
+                fontWeight="bold"
+                noWrap
+                sx={{ lineHeight: 1.2 }}
+              >
                 {sdk.displayName}
               </Typography>
               <Chip
@@ -496,8 +511,8 @@ const IntegrationsSdksPage: React.FC = () => {
       >
         <InfoIcon color="info" fontSize="small" />
         <Typography variant="body2" color="info.main" sx={{ fontWeight: 500 }}>
-          SDK들은 현재 준비 중이며, 추후 순차적으로 공개될 예정입니다. 준비가 완료되면 문서와 함께
-          활성화됩니다.
+          SDK들은 현재 준비 중이며, 추후 순차적으로 공개될 예정입니다. 준비가
+          완료되면 문서와 함께 활성화됩니다.
         </Typography>
       </Box>
 

@@ -12,19 +12,31 @@ router.use((req, res, next) => {
 
 // 메�??�이???�우??(/:id보다 먼�? ?�의?�야 ??
 // ?�랫??Get list (관리자�?
-router.get('/meta/platforms' as any, ClientVersionController.getPlatforms as any);
+router.get(
+  '/meta/platforms' as any,
+  ClientVersionController.getPlatforms as any
+);
 
 // ?�용 가?�한 버전 Get list (관리자�?
-router.get('/meta/versions' as any, ClientVersionController.getAvailableVersions as any);
+router.get(
+  '/meta/versions' as any,
+  ClientVersionController.getAvailableVersions as any
+);
 
 // ?�라?�언??버전 Get list (관리자�?
 router.get('/' as any, ClientVersionController.getClientVersions as any);
 
 // ?�라?�언??버전 ?�보?�기 (관리자�?
-router.get('/export' as any, ClientVersionController.exportClientVersions as any);
+router.get(
+  '/export' as any,
+  ClientVersionController.exportClientVersions as any
+);
 
 // ?�괄 ?�태 변�?(관리자�?
-router.patch('/bulk-status' as any, ClientVersionController.bulkUpdateStatus as any);
+router.patch(
+  '/bulk-status' as any,
+  ClientVersionController.bulkUpdateStatus as any
+);
 
 // ?�라?�언??버전 ?�세 조회 (관리자�?
 router.get('/:id' as any, ClientVersionController.getClientVersionById as any);
@@ -51,7 +63,8 @@ router.post(
     resourceType: 'client_version',
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.[0]?.id,
-    getDescription: (req) => `${req.body?.versions?.length || 0} client version(s) bulk created`,
+    getDescription: (req) =>
+      `${req.body?.versions?.length || 0} client version(s) bulk created`,
   }) as any,
   ClientVersionController.bulkCreateClientVersions as any
 );
@@ -88,6 +101,9 @@ router.get('/:id/tags' as any, ClientVersionController.getTags as any);
 router.put('/:id/tags' as any, ClientVersionController.setTags as any);
 
 // Reset all client versions and cache (for testing)
-router.delete('/reset/all' as any, ClientVersionController.resetAllClientVersions as any);
+router.delete(
+  '/reset/all' as any,
+  ClientVersionController.resetAllClientVersions as any
+);
 
 export default router;

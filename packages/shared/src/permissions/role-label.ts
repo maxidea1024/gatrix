@@ -23,7 +23,10 @@ export function inferRoleLabelKey(permissions: string[]): string {
 
   // Check for super admin (wildcard)
   for (const perm of permissions) {
-    if (perm === '*' || perm === `${WILDCARD}${PERMISSION_SEPARATOR}${WILDCARD}`) {
+    if (
+      perm === '*' ||
+      perm === `${WILDCARD}${PERMISSION_SEPARATOR}${WILDCARD}`
+    ) {
       return 'roles.superAdmin';
     }
   }
@@ -69,7 +72,9 @@ export function inferRoleLabelKey(permissions: string[]): string {
 /**
  * Get a Chip color variant for the inferred role.
  */
-export function getRoleLabelColor(roleLabelKey: string): 'error' | 'primary' | 'info' | 'default' {
+export function getRoleLabelColor(
+  roleLabelKey: string
+): 'error' | 'primary' | 'info' | 'default' {
   switch (roleLabelKey) {
     case 'roles.superAdmin':
       return 'error';

@@ -99,11 +99,17 @@ export class ClientVersionModel {
     }
   }
 
-  static async findAll(filters: ClientVersionFilters): Promise<ClientVersionListResult> {
+  static async findAll(
+    filters: ClientVersionFilters
+  ): Promise<ClientVersionListResult> {
     try {
       // Set default values
-      const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
-      const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
+      const limit = filters?.limit
+        ? parseInt(filters.limit.toString(), 10)
+        : 10;
+      const offset = filters?.offset
+        ? parseInt(filters.offset.toString(), 10)
+        : 0;
       const sortBy = filters?.sortBy || 'clientVersion';
       const sortOrder = filters?.sortOrder || 'DESC';
       const environmentId = filters.environmentId;
@@ -148,7 +154,9 @@ export class ClientVersionModel {
         if (filters?.guestModeAllowed !== undefined) {
           if (Array.isArray(filters.guestModeAllowed)) {
             // Convert boolean array to number array (true -> 1, false -> 0)
-            const guestModeValues = filters.guestModeAllowed.map((val) => (val ? 1 : 0));
+            const guestModeValues = filters.guestModeAllowed.map((val) =>
+              val ? 1 : 0
+            );
             query.whereIn('cv.guestModeAllowed', guestModeValues);
           } else {
             // TINYINT Type이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
@@ -202,7 +210,9 @@ export class ClientVersionModel {
       };
 
       // Count Query
-      const countQuery = applyFilters(baseQuery()).count('cv.id as total').first();
+      const countQuery = applyFilters(baseQuery())
+        .count('cv.id as total')
+        .first();
 
       // Data Query
       const dataQuery = applyFilters(baseQuery())
@@ -218,7 +228,10 @@ export class ClientVersionModel {
         .offset(offset);
 
       // 병렬 실행
-      const [countResult, dataResults] = await Promise.all([countQuery, dataQuery]);
+      const [countResult, dataResults] = await Promise.all([
+        countQuery,
+        dataQuery,
+      ]);
 
       const total = countResult?.total || 0;
 
@@ -243,9 +256,15 @@ export class ClientVersionModel {
     }
   }
 
-  static async findById(id: string, environmentId: string, trx?: any): Promise<any | null> {
+  static async findById(
+    id: string,
+    environmentId: string,
+    trx?: any
+  ): Promise<any | null> {
     try {
-      const query = trx ? trx('g_client_versions as cv') : db('g_client_versions as cv');
+      const query = trx
+        ? trx('g_client_versions as cv')
+        : db('g_client_versions as cv');
       const clientVersion = await query
         .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
@@ -314,7 +333,9 @@ export class ClientVersionModel {
             updatedAt: new Date(),
           }));
 
-          await trx('g_client_version_maintenance_locales').insert(localeInserts);
+          await trx('g_client_version_maintenance_locales').insert(
+            localeInserts
+          );
         }
 
         return await this.findById(id, environmentId, trx);
@@ -325,7 +346,11 @@ export class ClientVersionModel {
     }
   }
 
-  static async update(id: string, data: any, environmentId: string): Promise<any> {
+  static async update(
+    id: string,
+    data: any,
+    environmentId: string
+  ): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
@@ -342,7 +367,9 @@ export class ClientVersionModel {
         // 점검 메시지 Locale 처리
         if (maintenanceLocales !== undefined) {
           // Existing Locale Delete
-          await trx('g_client_version_maintenance_locales').where('clientVersionId', id).del();
+          await trx('g_client_version_maintenance_locales')
+            .where('clientVersionId', id)
+            .del();
 
           // 새 Locale 추가
           if (maintenanceLocales.length > 0) {
@@ -356,7 +383,9 @@ export class ClientVersionModel {
               updatedAt: new Date(),
             }));
 
-            await trx('g_client_version_maintenance_locales').insert(localeInserts);
+            await trx('g_client_version_maintenance_locales').insert(
+              localeInserts
+            );
           }
         }
 
@@ -370,7 +399,10 @@ export class ClientVersionModel {
 
   static async delete(id: string, environmentId: string): Promise<void> {
     try {
-      await db('g_client_versions').where('id', id).where('environmentId', environmentId).del();
+      await db('g_client_versions')
+        .where('id', id)
+        .where('environmentId', environmentId)
+        .del();
     } catch (error) {
       logger.error('Error deleting client version:', error);
       throw error;
@@ -413,7 +445,11 @@ export class ClientVersionModel {
         } else {
           logger.warn(`Failed to find created client version with id: ${cvId}`);
           // 기본 객체라도 반환하여 null 방지
-          results.push({ id: cvId, platform: 'unknown', clientVersion: 'unknown' });
+          results.push({
+            id: cvId,
+            platform: 'unknown',
+            clientVersion: 'unknown',
+          });
         }
       }
 
@@ -424,7 +460,10 @@ export class ClientVersionModel {
     }
   }
 
-  static async bulkUpdateStatus(data: any, environmentId: string): Promise<any> {
+  static async bulkUpdateStatus(
+    data: any,
+    environmentId: string
+  ): Promise<any> {
     try {
       const updateData: any = {
         clientStatus: data.clientStatus,
@@ -457,7 +496,9 @@ export class ClientVersionModel {
       // 언어별 메시지 처리
       if (data.maintenanceLocales && Array.isArray(data.maintenanceLocales)) {
         // Existing 언어별 메시지 Delete
-        await db('g_client_version_maintenance_locales').whereIn('clientVersionId', data.ids).del();
+        await db('g_client_version_maintenance_locales')
+          .whereIn('clientVersionId', data.ids)
+          .del();
 
         // New 언어별 메시지 추가
         if (data.maintenanceLocales.length > 0) {
@@ -474,7 +515,9 @@ export class ClientVersionModel {
             }
           }
           if (localeInserts.length > 0) {
-            await db('g_client_version_maintenance_locales').insert(localeInserts);
+            await db('g_client_version_maintenance_locales').insert(
+              localeInserts
+            );
           }
         }
       }
@@ -509,7 +552,9 @@ export class ClientVersionModel {
   ): Promise<boolean> {
     try {
       if (!environmentId) {
-        throw new Error('Environment is required for checking duplicate client versions');
+        throw new Error(
+          'Environment is required for checking duplicate client versions'
+        );
       }
 
       let query = db('g_client_versions')
@@ -536,7 +581,10 @@ export class ClientVersionModel {
     createdBy?: string
   ): Promise<void> {
     try {
-      logger.info(`Setting tags for client version ${clientVersionId}:`, tagIds);
+      logger.info(
+        `Setting tags for client version ${clientVersionId}:`,
+        tagIds
+      );
 
       await db.transaction(async (trx) => {
         // Existing 태그 할당 Delete
@@ -559,7 +607,10 @@ export class ClientVersionModel {
             createdAt: new Date(),
           }));
 
-          logger.info(`Inserting ${assignments.length} new tag assignments:`, assignments);
+          logger.info(
+            `Inserting ${assignments.length} new tag assignments:`,
+            assignments
+          );
           await trx('g_tag_assignments').insert(assignments);
           logger.info(
             `Successfully inserted tag assignments for client version ${clientVersionId}`
@@ -574,7 +625,9 @@ export class ClientVersionModel {
 
   static async getTags(clientVersionId: string, trx?: any): Promise<any[]> {
     try {
-      const query = trx ? trx('g_tag_assignments as ta') : db('g_tag_assignments as ta');
+      const query = trx
+        ? trx('g_tag_assignments as ta')
+        : db('g_tag_assignments as ta');
       const tags = await query
         .join('g_tags as t', 'ta.tagId', 't.id')
         .select(['t.id', 't.name', 't.color', 't.description'])

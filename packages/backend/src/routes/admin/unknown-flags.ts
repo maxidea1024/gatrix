@@ -23,7 +23,9 @@ router.get('/', async (req, res) => {
     res.json({ success: true, data: { flags, total: flags.length } });
   } catch (error) {
     logger.error('Error fetching unknown flags:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch unknown flags' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to fetch unknown flags' });
   }
 });
 
@@ -70,7 +72,9 @@ router.post('/:id/unresolve', async (req, res) => {
     res.json({ success: true, data: { success: true } });
   } catch (error) {
     logger.error('Error unresolving unknown flag:', error);
-    res.status(500).json({ success: false, message: 'Failed to unresolve flag' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to unresolve flag' });
   }
 });
 

@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, Alert, CircularProgress, Link } from '@mui/material';
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  CircularProgress,
+  Link,
+} from '@mui/material';
 import { ArrowBack, Email } from '@mui/icons-material';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -232,7 +240,9 @@ const ForgotPasswordPage: React.FC = () => {
               sx={{
                 width: '100%',
                 backgroundColor:
-                  message.type === 'error' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(76, 175, 80, 0.1)',
+                  message.type === 'error'
+                    ? 'rgba(244, 67, 54, 0.1)'
+                    : 'rgba(76, 175, 80, 0.1)',
                 color: message.type === 'error' ? '#ff6b6b' : '#4caf50',
                 border: `1px solid ${message.type === 'error' ? 'rgba(244, 67, 54, 0.2)' : 'rgba(76, 175, 80, 0.2)'}`,
                 '& .MuiAlert-icon': {
@@ -292,15 +302,18 @@ const ForgotPasswordPage: React.FC = () => {
                 WebkitTextFillColor: 'rgba(255, 255, 255, 0.7)',
               },
               '&:-webkit-autofill': {
-                WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                WebkitBoxShadow:
+                  '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                 WebkitTextFillColor: 'white !important',
               },
               '&:-webkit-autofill:hover': {
-                WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                WebkitBoxShadow:
+                  '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                 WebkitTextFillColor: 'white !important',
               },
               '&:-webkit-autofill:focus': {
-                WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                WebkitBoxShadow:
+                  '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                 WebkitTextFillColor: 'white !important',
               },
             },
@@ -341,7 +354,10 @@ const ForgotPasswordPage: React.FC = () => {
         </Button>
 
         <Box sx={{ textAlign: 'center', mb: 2 }}>
-          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+          <Typography
+            variant="body2"
+            sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+          >
             {t('auth.rememberPassword')}{' '}
             <Link
               component={RouterLink}

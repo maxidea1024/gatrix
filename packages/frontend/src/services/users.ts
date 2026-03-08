@@ -19,7 +19,9 @@ export class UserService {
       });
     }
 
-    const response = await apiService.get<UserListResponse>(`/admin/users?${params.toString()}`);
+    const response = await apiService.get<UserListResponse>(
+      `/admin/users?${params.toString()}`
+    );
 
     if (response.success && response.data) {
       return response.data;
@@ -39,7 +41,10 @@ export class UserService {
   }
 
   static async createUser(data: any): Promise<User> {
-    const response = await apiService.post<{ user: User }>('/admin/users', data);
+    const response = await apiService.post<{ user: User }>(
+      '/admin/users',
+      data
+    );
 
     if (response.success && response.data) {
       return response.data.user;
@@ -49,7 +54,10 @@ export class UserService {
   }
 
   static async updateUser(id: number, data: Partial<User>): Promise<User> {
-    const response = await apiService.put<{ user: User }>(`/admin/users/${id}`, data);
+    const response = await apiService.put<{ user: User }>(
+      `/admin/users/${id}`,
+      data
+    );
 
     if (response.success && response.data) {
       return response.data.user;
@@ -67,7 +75,9 @@ export class UserService {
   }
 
   static async approveUser(id: number): Promise<User> {
-    const response = await apiService.post<{ user: User }>(`/admin/users/${id}/approve`);
+    const response = await apiService.post<{ user: User }>(
+      `/admin/users/${id}/approve`
+    );
 
     if (response.success && response.data) {
       return response.data.user;
@@ -85,7 +95,9 @@ export class UserService {
   }
 
   static async suspendUser(id: number): Promise<User> {
-    const response = await apiService.post<{ user: User }>(`/admin/users/${id}/suspend`);
+    const response = await apiService.post<{ user: User }>(
+      `/admin/users/${id}/suspend`
+    );
 
     if (response.success && response.data) {
       return response.data.user;
@@ -95,7 +107,9 @@ export class UserService {
   }
 
   static async unsuspendUser(id: number): Promise<User> {
-    const response = await apiService.post<{ user: User }>(`/admin/users/${id}/activate`);
+    const response = await apiService.post<{ user: User }>(
+      `/admin/users/${id}/activate`
+    );
 
     if (response.success && response.data) {
       return response.data.user;
@@ -105,27 +119,37 @@ export class UserService {
   }
 
   static async promoteToAdmin(id: number): Promise<User> {
-    const response = await apiService.post<{ user: User }>(`/admin/users/${id}/promote`);
+    const response = await apiService.post<{ user: User }>(
+      `/admin/users/${id}/promote`
+    );
 
     if (response.success && response.data) {
       return response.data.user;
     }
 
-    throw new Error(response.error?.message || 'Failed to promote user to admin');
+    throw new Error(
+      response.error?.message || 'Failed to promote user to admin'
+    );
   }
 
   static async demoteFromAdmin(id: number): Promise<User> {
-    const response = await apiService.post<{ user: User }>(`/admin/users/${id}/demote`);
+    const response = await apiService.post<{ user: User }>(
+      `/admin/users/${id}/demote`
+    );
 
     if (response.success && response.data) {
       return response.data.user;
     }
 
-    throw new Error(response.error?.message || 'Failed to demote user from admin');
+    throw new Error(
+      response.error?.message || 'Failed to demote user from admin'
+    );
   }
 
   static async getPendingUsers(): Promise<User[]> {
-    const response = await apiService.get<{ users: User[] }>('/admin/pending-users');
+    const response = await apiService.get<{ users: User[] }>(
+      '/admin/pending-users'
+    );
 
     if (response.success && response.data) {
       return response.data.users;
@@ -147,7 +171,9 @@ export class UserService {
       return response.data.stats;
     }
 
-    throw new Error(response.error?.message || 'Failed to fetch user statistics');
+    throw new Error(
+      response.error?.message || 'Failed to fetch user statistics'
+    );
   }
 
   // Tag related methods
@@ -182,7 +208,9 @@ export class UserService {
   }
 
   static async removeUserTag(userId: number, tagId: number): Promise<void> {
-    const response = await apiService.delete(`/admin/users/${userId}/tags/${tagId}`);
+    const response = await apiService.delete(
+      `/admin/users/${userId}/tags/${tagId}`
+    );
 
     if (!response.success) {
       throw new Error(response.error?.message || 'Failed to remove user tag');
@@ -191,7 +219,9 @@ export class UserService {
 
   // Administrator forcibly verifies user email
   static async verifyUserEmail(userId: number): Promise<void> {
-    const response = await apiService.post(`/admin/users/${userId}/verify-email`);
+    const response = await apiService.post(
+      `/admin/users/${userId}/verify-email`
+    );
 
     if (!response.success) {
       throw new Error(response.error?.message || 'Failed to verify user email');
@@ -200,10 +230,14 @@ export class UserService {
 
   // Resend email verification email to user
   static async resendVerificationEmail(userId: number): Promise<void> {
-    const response = await apiService.post(`/admin/users/${userId}/resend-verification`);
+    const response = await apiService.post(
+      `/admin/users/${userId}/resend-verification`
+    );
 
     if (!response.success) {
-      throw new Error(response.error?.message || 'Failed to resend verification email');
+      throw new Error(
+        response.error?.message || 'Failed to resend verification email'
+      );
     }
   }
 
@@ -214,7 +248,9 @@ export class UserService {
     });
 
     if (!response.success) {
-      throw new Error(response.error?.message || 'Failed to update language preference');
+      throw new Error(
+        response.error?.message || 'Failed to update language preference'
+      );
     }
   }
 }

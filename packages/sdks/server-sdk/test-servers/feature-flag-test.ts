@@ -59,7 +59,9 @@ async function main() {
     });
 
     if (allFlags.length === 0) {
-      console.log('\n    ⚠ No flags found. Please create some feature flags first.');
+      console.log(
+        '\n    ⚠ No flags found. Please create some feature flags first.'
+      );
       console.log('    Test completed with limited scope.');
       process.exit(0);
     }
@@ -71,7 +73,9 @@ async function main() {
     if (flag) {
       console.log(`    ✓ Found flag: ${flag.name}`);
       console.log(`      - isEnabled: ${flag.isEnabled}`);
-      console.log(`      - impressionDataEnabled: ${flag.impressionDataEnabled}`);
+      console.log(
+        `      - impressionDataEnabled: ${flag.impressionDataEnabled}`
+      );
       console.log(`      - strategies count: ${flag.strategies.length}`);
     } else {
       console.log(`    ✗ Flag not found: ${testFlagName}`);
@@ -91,8 +95,14 @@ async function main() {
       // Test up to 3 flags
       console.log(`\n    Flag: ${testFlag.name}`);
       for (const context of testContexts) {
-        const result = sdk.featureFlag.evaluate(testFlag.name, context, environmentId);
-        const variantInfo = result.variant ? `, variant=${result.variant.name}` : '';
+        const result = sdk.featureFlag.evaluate(
+          testFlag.name,
+          context,
+          environmentId
+        );
+        const variantInfo = result.variant
+          ? `, variant=${result.variant.name}`
+          : '';
         console.log(
           `      userId=${context.userId} → enabled=${result.enabled}, reason=${result.reason}${variantInfo}`
         );
@@ -142,7 +152,12 @@ async function main() {
     console.log(`    numberVariation: ${numberResult}`);
 
     // JSON variation
-    const jsonResult = sdk.featureFlag.jsonVariation(testFlagName, testContext, environmentId, {});
+    const jsonResult = sdk.featureFlag.jsonVariation(
+      testFlagName,
+      testContext,
+      environmentId,
+      {}
+    );
     console.log(`    jsonVariation: ${JSON.stringify(jsonResult)}`);
 
     // Test 5: Test rollout consistency (stickiness)
@@ -153,11 +168,17 @@ async function main() {
     const consistentContext = { userId: 'sticky-user-123' };
     const results: boolean[] = [];
     for (let i = 0; i < 10; i++) {
-      const result = sdk.featureFlag.evaluate(testFlagName, consistentContext, environmentId);
+      const result = sdk.featureFlag.evaluate(
+        testFlagName,
+        consistentContext,
+        environmentId
+      );
       results.push(result.enabled);
     }
     const allSame = results.every((r) => r === results[0]);
-    console.log(`    ✓ Same user gets consistent result: ${allSame ? 'PASS' : 'FAIL'}`);
+    console.log(
+      `    ✓ Same user gets consistent result: ${allSame ? 'PASS' : 'FAIL'}`
+    );
     console.log(`      Results: [${results.join(', ')}]`);
 
     // Test complete

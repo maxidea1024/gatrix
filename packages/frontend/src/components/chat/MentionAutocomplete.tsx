@@ -57,11 +57,15 @@ const MentionAutocomplete: React.FC<MentionAutocompleteProps> = ({
       switch (event.key) {
         case 'ArrowDown':
           event.preventDefault();
-          setSelectedIndex((prev) => (prev < filteredUsers.length - 1 ? prev + 1 : 0));
+          setSelectedIndex((prev) =>
+            prev < filteredUsers.length - 1 ? prev + 1 : 0
+          );
           break;
         case 'ArrowUp':
           event.preventDefault();
-          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : filteredUsers.length - 1));
+          setSelectedIndex((prev) =>
+            prev > 0 ? prev - 1 : filteredUsers.length - 1
+          );
           break;
         case 'Enter':
           event.preventDefault();
@@ -83,7 +87,9 @@ const MentionAutocomplete: React.FC<MentionAutocompleteProps> = ({
   // Scroll selected item into view
   useEffect(() => {
     if (listRef.current) {
-      const selectedElement = listRef.current.children[selectedIndex] as HTMLElement;
+      const selectedElement = listRef.current.children[
+        selectedIndex
+      ] as HTMLElement;
       if (selectedElement) {
         selectedElement.scrollIntoView({
           block: 'nearest',
@@ -143,7 +149,10 @@ const MentionAutocomplete: React.FC<MentionAutocompleteProps> = ({
               }}
             >
               <ListItemAvatar sx={{ minWidth: 36 }}>
-                <Avatar src={user.avatarUrl} sx={{ width: 24, height: 24, fontSize: '0.75rem' }}>
+                <Avatar
+                  src={user.avatarUrl}
+                  sx={{ width: 24, height: 24, fontSize: '0.75rem' }}
+                >
                   {user.username.charAt(0).toUpperCase()}
                 </Avatar>
               </ListItemAvatar>

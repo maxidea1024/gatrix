@@ -123,28 +123,44 @@ export class EnvironmentCopyService {
       ipWhitelist,
       jobs,
     ] = await Promise.all([
-      knex('g_game_worlds').where('environmentId', sourceEnvironment).select('worldId'),
+      knex('g_game_worlds')
+        .where('environmentId', sourceEnvironment)
+        .select('worldId'),
       knex('g_banners').where('environmentId', sourceEnvironment).select('id'),
       knex('g_client_versions')
         .where('environmentId', sourceEnvironment)
         .select('id', 'platform', 'version'),
-      knex('g_coupons').where('environmentId', sourceEnvironment).select('id', 'code'),
-      knex('g_ingame_popup_notices').where('environmentId', sourceEnvironment).select('id'),
+      knex('g_coupons')
+        .where('environmentId', sourceEnvironment)
+        .select('id', 'code'),
+      knex('g_ingame_popup_notices')
+        .where('environmentId', sourceEnvironment)
+        .select('id'),
       knex('g_message_templates')
         .where('environmentId', sourceEnvironment)
         .select('id', 'templateKey'),
       knex('g_reward_templates')
         .where('environmentId', sourceEnvironment)
         .select('id', 'templateKey'),
-      knex('g_service_maintenance').where('environmentId', sourceEnvironment).select('id'),
-      knex('g_service_notices').where('environmentId', sourceEnvironment).select('id'),
+      knex('g_service_maintenance')
+        .where('environmentId', sourceEnvironment)
+        .select('id'),
+      knex('g_service_notices')
+        .where('environmentId', sourceEnvironment)
+        .select('id'),
       knex('g_surveys').where('environmentId', sourceEnvironment).select('id'),
-      knex('g_vars').where('environmentId', sourceEnvironment).select('id', 'varKey'),
+      knex('g_vars')
+        .where('environmentId', sourceEnvironment)
+        .select('id', 'varKey'),
       knex('g_account_whitelist')
         .where('environmentId', sourceEnvironment)
         .select('id', 'accountId'),
-      knex('g_ip_whitelist').where('environmentId', sourceEnvironment).select('id', 'ipAddress'),
-      knex('g_jobs').where('environmentId', sourceEnvironment).select('id', 'name'),
+      knex('g_ip_whitelist')
+        .where('environmentId', sourceEnvironment)
+        .select('id', 'ipAddress'),
+      knex('g_jobs')
+        .where('environmentId', sourceEnvironment)
+        .select('id', 'name'),
     ]);
 
     // Get target existing items
@@ -164,45 +180,74 @@ export class EnvironmentCopyService {
       existingIpWhitelist,
       existingJobs,
     ] = await Promise.all([
-      knex('g_game_worlds').where('environmentId', targetEnvironment).select('worldId'),
+      knex('g_game_worlds')
+        .where('environmentId', targetEnvironment)
+        .select('worldId'),
       knex('g_banners').where('environmentId', targetEnvironment).select('id'),
       knex('g_client_versions')
         .where('environmentId', targetEnvironment)
         .select('platform', 'version'),
-      knex('g_coupons').where('environmentId', targetEnvironment).select('code'),
-      knex('g_ingame_popup_notices').where('environmentId', targetEnvironment).select('id'),
-      knex('g_message_templates').where('environmentId', targetEnvironment).select('templateKey'),
-      knex('g_reward_templates').where('environmentId', targetEnvironment).select('templateKey'),
-      knex('g_service_maintenance').where('environmentId', targetEnvironment).select('id'),
-      knex('g_service_notices').where('environmentId', targetEnvironment).select('id'),
+      knex('g_coupons')
+        .where('environmentId', targetEnvironment)
+        .select('code'),
+      knex('g_ingame_popup_notices')
+        .where('environmentId', targetEnvironment)
+        .select('id'),
+      knex('g_message_templates')
+        .where('environmentId', targetEnvironment)
+        .select('templateKey'),
+      knex('g_reward_templates')
+        .where('environmentId', targetEnvironment)
+        .select('templateKey'),
+      knex('g_service_maintenance')
+        .where('environmentId', targetEnvironment)
+        .select('id'),
+      knex('g_service_notices')
+        .where('environmentId', targetEnvironment)
+        .select('id'),
       knex('g_surveys').where('environmentId', targetEnvironment).select('id'),
       knex('g_vars').where('environmentId', targetEnvironment).select('varKey'),
-      knex('g_account_whitelist').where('environmentId', targetEnvironment).select('accountId'),
-      knex('g_ip_whitelist').where('environmentId', targetEnvironment).select('ipAddress'),
+      knex('g_account_whitelist')
+        .where('environmentId', targetEnvironment)
+        .select('accountId'),
+      knex('g_ip_whitelist')
+        .where('environmentId', targetEnvironment)
+        .select('ipAddress'),
       knex('g_jobs').where('environmentId', targetEnvironment).select('name'),
     ]);
 
-    const existingWorldId = new Set(existingWorlds.map((w: { worldId: string }) => w.worldId));
+    const existingWorldId = new Set(
+      existingWorlds.map((w: { worldId: string }) => w.worldId)
+    );
     const existingClientVersionKey = new Set(
       existingClientVersions.map(
-        (c: { platform: string; version: string }) => `${c.platform}:${c.version}`
+        (c: { platform: string; version: string }) =>
+          `${c.platform}:${c.version}`
       )
     );
-    const existingCouponCode = new Set(existingCoupons.map((c: { code: string }) => c.code));
+    const existingCouponCode = new Set(
+      existingCoupons.map((c: { code: string }) => c.code)
+    );
     const existingMessageTemplateKey = new Set(
-      existingMessageTemplates.map((m: { templateKey: string }) => m.templateKey)
+      existingMessageTemplates.map(
+        (m: { templateKey: string }) => m.templateKey
+      )
     );
     const existingRewardTemplateKey = new Set(
       existingRewardTemplates.map((r: { templateKey: string }) => r.templateKey)
     );
-    const existingVarKey = new Set(existingVars.map((v: { varKey: string }) => v.varKey));
+    const existingVarKey = new Set(
+      existingVars.map((v: { varKey: string }) => v.varKey)
+    );
     const existingAccountId = new Set(
       existingAccountWhitelist.map((a: { accountId: string }) => a.accountId)
     );
     const existingIpAddress = new Set(
       existingIpWhitelist.map((i: { ipAddress: string }) => i.ipAddress)
     );
-    const existingJobName = new Set(existingJobs.map((j: { name: string }) => j.name));
+    const existingJobName = new Set(
+      existingJobs.map((j: { name: string }) => j.name)
+    );
 
     return {
       source: { environmentId: '', displayName: '' }, // Will be filled by controller
@@ -211,8 +256,9 @@ export class EnvironmentCopyService {
         templates: { total: 0, conflicts: 0 }, // Remote config templates removed - will be reimplemented
         gameWorlds: {
           total: gameWorlds.length,
-          conflicts: gameWorlds.filter((w: { worldId: string }) => existingWorldId.has(w.worldId))
-            .length,
+          conflicts: gameWorlds.filter((w: { worldId: string }) =>
+            existingWorldId.has(w.worldId)
+          ).length,
         },
         segments: { total: 0, conflicts: 0 }, // Remote config segments removed - will be reimplemented
         banners: {
@@ -221,13 +267,16 @@ export class EnvironmentCopyService {
         },
         clientVersions: {
           total: clientVersions.length,
-          conflicts: clientVersions.filter((c: { platform: string; version: string }) =>
-            existingClientVersionKey.has(`${c.platform}:${c.version}`)
+          conflicts: clientVersions.filter(
+            (c: { platform: string; version: string }) =>
+              existingClientVersionKey.has(`${c.platform}:${c.version}`)
           ).length,
         },
         coupons: {
           total: coupons.length,
-          conflicts: coupons.filter((c: { code: string }) => existingCouponCode.has(c.code)).length,
+          conflicts: coupons.filter((c: { code: string }) =>
+            existingCouponCode.has(c.code)
+          ).length,
         },
         ingamePopupNotices: {
           total: ingamePopupNotices.length,
@@ -259,7 +308,9 @@ export class EnvironmentCopyService {
         },
         vars: {
           total: vars.length,
-          conflicts: vars.filter((v: { varKey: string }) => existingVarKey.has(v.varKey)).length,
+          conflicts: vars.filter((v: { varKey: string }) =>
+            existingVarKey.has(v.varKey)
+          ).length,
         },
         contextFields: { total: 0, conflicts: 0 }, // Remote config context fields removed - will be reimplemented
         campaigns: { total: 0, conflicts: 0 }, // Remote config campaigns removed - will be reimplemented
@@ -277,7 +328,9 @@ export class EnvironmentCopyService {
         },
         jobs: {
           total: jobs.length,
-          conflicts: jobs.filter((j: { name: string }) => existingJobName.has(j.name)).length,
+          conflicts: jobs.filter((j: { name: string }) =>
+            existingJobName.has(j.name)
+          ).length,
         },
         planningData: {
           total: 1, // Planning data is treated as a single unit
@@ -495,7 +548,11 @@ export class EnvironmentCopyService {
 
     // Copy Planning Data (Redis cache + files)
     if (options.copyPlanningData !== false) {
-      await this.copyPlanningData(sourceEnvironment, targetEnvironment, result.planningData);
+      await this.copyPlanningData(
+        sourceEnvironment,
+        targetEnvironment,
+        result.planningData
+      );
     }
 
     return result;
@@ -511,7 +568,10 @@ export class EnvironmentCopyService {
   ): Promise<void> {
     try {
       logger.info('Copying planning data...', { sourceEnv, targetEnv });
-      const copyResult = await PlanningDataService.copyPlanningData(sourceEnv, targetEnv);
+      const copyResult = await PlanningDataService.copyPlanningData(
+        sourceEnv,
+        targetEnv
+      );
       result.copied = copyResult.filesCopied;
       logger.info('Planning data copied successfully', {
         sourceEnv,
@@ -519,7 +579,9 @@ export class EnvironmentCopyService {
         filesCopied: copyResult.filesCopied,
       });
     } catch (e) {
-      result.errors.push(`Planning data: ${e instanceof Error ? e.message : 'Error'}`);
+      result.errors.push(
+        `Planning data: ${e instanceof Error ? e.message : 'Error'}`
+      );
       logger.error('Failed to copy planning data', {
         error: e,
         sourceEnv,
@@ -565,8 +627,12 @@ export class EnvironmentCopyService {
           displayOrder: item.displayOrder,
           tags: item.tags,
           worldServerAddress: item.worldServerAddress,
-          customPayload: item.customPayload ? JSON.stringify(item.customPayload) : null,
-          infraSettings: item.infraSettings ? JSON.stringify(item.infraSettings) : null,
+          customPayload: item.customPayload
+            ? JSON.stringify(item.customPayload)
+            : null,
+          infraSettings: item.infraSettings
+            ? JSON.stringify(item.infraSettings)
+            : null,
           infraSettingsRaw: item.infraSettingsRaw,
           updatedAt: new Date(),
         };
@@ -614,7 +680,12 @@ export class EnvironmentCopyService {
       const sources = await knex(tableName).where('environmentId', sourceEnv);
       for (const item of sources) {
         try {
-          const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
+          const {
+            id: _id,
+            createdAt: _createdAt,
+            updatedAt: _updatedAt,
+            ...data
+          } = item;
           await knex(tableName).insert({
             ...data,
             environmentId: targetEnv,
@@ -630,7 +701,9 @@ export class EnvironmentCopyService {
         }
       }
     } catch (e) {
-      result.errors.push(`${tableName}: ${e instanceof Error ? e.message : 'Error'}`);
+      result.errors.push(
+        `${tableName}: ${e instanceof Error ? e.message : 'Error'}`
+      );
     }
   }
 
@@ -641,7 +714,10 @@ export class EnvironmentCopyService {
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
-    const sources = await knex('g_client_versions').where('environmentId', sourceEnv);
+    const sources = await knex('g_client_versions').where(
+      'environmentId',
+      sourceEnv
+    );
     for (const item of sources) {
       try {
         const existing = await knex('g_client_versions')
@@ -653,7 +729,12 @@ export class EnvironmentCopyService {
           result.skipped++;
           continue;
         }
-        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
+        const {
+          id: _id,
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
+          ...data
+        } = item;
         if (existing) {
           await knex('g_client_versions')
             .where('id', existing.id)
@@ -729,7 +810,9 @@ export class EnvironmentCopyService {
         }
         result.copied++;
       } catch (e) {
-        result.errors.push(`Coupon ${item.code}: ${e instanceof Error ? e.message : 'Error'}`);
+        result.errors.push(
+          `Coupon ${item.code}: ${e instanceof Error ? e.message : 'Error'}`
+        );
       }
     }
   }
@@ -741,7 +824,10 @@ export class EnvironmentCopyService {
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
-    const sources = await knex('g_message_templates').where('environmentId', sourceEnv);
+    const sources = await knex('g_message_templates').where(
+      'environmentId',
+      sourceEnv
+    );
     for (const item of sources) {
       try {
         const existing = await knex('g_message_templates')
@@ -752,7 +838,12 @@ export class EnvironmentCopyService {
           result.skipped++;
           continue;
         }
-        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
+        const {
+          id: _id,
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
+          ...data
+        } = item;
         let newId: string;
         if (existing) {
           await knex('g_message_templates')
@@ -765,7 +856,9 @@ export class EnvironmentCopyService {
             });
           newId = existing.id;
           // Delete old locales
-          await knex('g_message_template_locales').where('templateId', existing.id).del();
+          await knex('g_message_template_locales')
+            .where('templateId', existing.id)
+            .del();
         } else {
           const id = generateULID();
           await knex('g_message_templates').insert({
@@ -779,9 +872,16 @@ export class EnvironmentCopyService {
           newId = id;
         }
         // Copy locales
-        const locales = await knex('g_message_template_locales').where('templateId', item.id);
+        const locales = await knex('g_message_template_locales').where(
+          'templateId',
+          item.id
+        );
         for (const locale of locales) {
-          const { id: _localeId, templateId: _templateId, ...localeData } = locale;
+          const {
+            id: _localeId,
+            templateId: _templateId,
+            ...localeData
+          } = locale;
           await knex('g_message_template_locales').insert({
             ...localeData,
             templateId: newId,
@@ -803,7 +903,10 @@ export class EnvironmentCopyService {
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
-    const sources = await knex('g_reward_templates').where('environmentId', sourceEnv);
+    const sources = await knex('g_reward_templates').where(
+      'environmentId',
+      sourceEnv
+    );
     for (const item of sources) {
       try {
         const existing = await knex('g_reward_templates')
@@ -814,7 +917,12 @@ export class EnvironmentCopyService {
           result.skipped++;
           continue;
         }
-        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
+        const {
+          id: _id,
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
+          ...data
+        } = item;
         let newId: string;
         if (existing) {
           await knex('g_reward_templates')
@@ -843,7 +951,11 @@ export class EnvironmentCopyService {
         // Copy reward items
         const items = await knex('g_reward_items').where('templateId', item.id);
         for (const rewardItem of items) {
-          const { id: _itemId, templateId: _templateId, ...itemData } = rewardItem;
+          const {
+            id: _itemId,
+            templateId: _templateId,
+            ...itemData
+          } = rewardItem;
           await knex('g_reward_items').insert({
             ...itemData,
             templateId: newId,
@@ -864,10 +976,18 @@ export class EnvironmentCopyService {
     userId: string,
     result: CopyResultItem
   ): Promise<void> {
-    const sources = await knex('g_service_maintenance').where('environmentId', sourceEnv);
+    const sources = await knex('g_service_maintenance').where(
+      'environmentId',
+      sourceEnv
+    );
     for (const item of sources) {
       try {
-        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
+        const {
+          id: _id,
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
+          ...data
+        } = item;
         const [newId] = await knex('g_service_maintenance').insert({
           ...data,
           environmentId: targetEnv,
@@ -877,9 +997,16 @@ export class EnvironmentCopyService {
           updatedAt: new Date(),
         });
         // Copy locales
-        const locales = await knex('g_service_maintenance_locales').where('maintenanceId', item.id);
+        const locales = await knex('g_service_maintenance_locales').where(
+          'maintenanceId',
+          item.id
+        );
         for (const locale of locales) {
-          const { id: _localeId, maintenanceId: _maintenanceId, ...localeData } = locale;
+          const {
+            id: _localeId,
+            maintenanceId: _maintenanceId,
+            ...localeData
+          } = locale;
           await knex('g_service_maintenance_locales').insert({
             ...localeData,
             maintenanceId: newId,
@@ -912,7 +1039,12 @@ export class EnvironmentCopyService {
           result.skipped++;
           continue;
         }
-        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
+        const {
+          id: _id,
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
+          ...data
+        } = item;
         if (existing) {
           await knex('g_vars')
             .where('id', existing.id)
@@ -933,7 +1065,9 @@ export class EnvironmentCopyService {
         }
         result.copied++;
       } catch (e) {
-        result.errors.push(`Var ${item.varKey}: ${e instanceof Error ? e.message : 'Error'}`);
+        result.errors.push(
+          `Var ${item.varKey}: ${e instanceof Error ? e.message : 'Error'}`
+        );
       }
     }
   }
@@ -967,7 +1101,10 @@ export class EnvironmentCopyService {
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
-    const sources = await knex('g_account_whitelist').where('environmentId', sourceEnv);
+    const sources = await knex('g_account_whitelist').where(
+      'environmentId',
+      sourceEnv
+    );
     for (const item of sources) {
       try {
         const existing = await knex('g_account_whitelist')
@@ -978,7 +1115,12 @@ export class EnvironmentCopyService {
           result.skipped++;
           continue;
         }
-        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
+        const {
+          id: _id,
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
+          ...data
+        } = item;
         if (existing) {
           await knex('g_account_whitelist')
             .where('id', existing.id)
@@ -1013,7 +1155,10 @@ export class EnvironmentCopyService {
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
-    const sources = await knex('g_ip_whitelist').where('environmentId', sourceEnv);
+    const sources = await knex('g_ip_whitelist').where(
+      'environmentId',
+      sourceEnv
+    );
     for (const item of sources) {
       try {
         const existing = await knex('g_ip_whitelist')
@@ -1024,7 +1169,12 @@ export class EnvironmentCopyService {
           result.skipped++;
           continue;
         }
-        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
+        const {
+          id: _id,
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
+          ...data
+        } = item;
         if (existing) {
           await knex('g_ip_whitelist')
             .where('id', existing.id)
@@ -1070,7 +1220,12 @@ export class EnvironmentCopyService {
           result.skipped++;
           continue;
         }
-        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
+        const {
+          id: _id,
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
+          ...data
+        } = item;
         if (existing) {
           await knex('g_jobs')
             .where('id', existing.id)
@@ -1091,7 +1246,9 @@ export class EnvironmentCopyService {
         }
         result.copied++;
       } catch (e) {
-        result.errors.push(`Job ${item.name}: ${e instanceof Error ? e.message : 'Error'}`);
+        result.errors.push(
+          `Job ${item.name}: ${e instanceof Error ? e.message : 'Error'}`
+        );
       }
     }
   }

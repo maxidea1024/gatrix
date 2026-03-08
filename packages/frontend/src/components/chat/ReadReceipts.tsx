@@ -1,5 +1,12 @@
 import React from 'react';
-import { Box, Avatar, AvatarGroup, Tooltip, Typography, Chip } from '@mui/material';
+import {
+  Box,
+  Avatar,
+  AvatarGroup,
+  Tooltip,
+  Typography,
+  Chip,
+} from '@mui/material';
 import {
   Done as SentIcon,
   DoneAll as DeliveredIcon,
@@ -41,7 +48,9 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
   const getStatusIcon = (status: MessageStatus) => {
     switch (status) {
       case 'sending':
-        return <PendingIcon fontSize="small" sx={{ color: 'text.secondary' }} />;
+        return (
+          <PendingIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+        );
       case 'sent':
         return <SentIcon fontSize="small" sx={{ color: 'text.secondary' }} />;
       case 'delivered':
@@ -102,7 +111,9 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
       {/* Status indicator for own messages */}
       {isOwnMessage && (
         <Tooltip title={getStatusText(message.status)}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>{getStatusIcon(message.status)}</Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {getStatusIcon(message.status)}
+          </Box>
         </Tooltip>
       )}
 
@@ -117,7 +128,11 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
                     {t('chat.readBy')}
                   </Typography>
                   {readByUsers.map((user) => (
-                    <Typography key={user.id} variant="caption" sx={{ display: 'block' }}>
+                    <Typography
+                      key={user.id}
+                      variant="caption"
+                      sx={{ display: 'block' }}
+                    >
                       {user.username}
                     </Typography>
                   ))}
@@ -139,8 +154,13 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
                     {t('chat.readBy')}
                   </Typography>
                   {readByUsers.map((user) => (
-                    <Typography key={user.id} variant="caption" sx={{ display: 'block' }}>
-                      {user.username} at {formatTime(new Date(user.readAt || message.createdAt))}
+                    <Typography
+                      key={user.id}
+                      variant="caption"
+                      sx={{ display: 'block' }}
+                    >
+                      {user.username} at{' '}
+                      {formatTime(new Date(user.readAt || message.createdAt))}
                     </Typography>
                   ))}
                 </Box>
@@ -159,7 +179,11 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
                 }}
               >
                 {readByUsers.map((user) => (
-                  <Avatar key={user.id} src={user.avatarUrl} alt={user.username}>
+                  <Avatar
+                    key={user.id}
+                    src={user.avatarUrl}
+                    alt={user.username}
+                  >
                     {user.username.charAt(0).toUpperCase()}
                   </Avatar>
                 ))}

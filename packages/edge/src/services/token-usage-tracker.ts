@@ -21,7 +21,9 @@ class TokenUsageTracker {
   private readonly edgeInstanceId: string;
 
   constructor() {
-    this.reportIntervalMs = parseInt(process.env.TOKEN_USAGE_REPORT_INTERVAL_MS || '60000');
+    this.reportIntervalMs = parseInt(
+      process.env.TOKEN_USAGE_REPORT_INTERVAL_MS || '60000'
+    );
     this.edgeInstanceId = `edge-${config.group}-${process.pid}`;
   }
 

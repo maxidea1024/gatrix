@@ -23,8 +23,15 @@ export class LarkAddon extends Addon {
     const { url, secret, customHeaders } = parameters;
 
     if (!url) {
-      this.logger.warn(`Missing Lark webhook URL for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing webhook URL');
+      this.logger.warn(
+        `Missing Lark webhook URL for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing webhook URL'
+      );
       return;
     }
 

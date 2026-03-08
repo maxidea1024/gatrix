@@ -126,7 +126,10 @@ export function useAuditLogs(
   }
 
   const url = `/admin/audit-logs?${params.toString()}`;
-  return useApi<{ logs: any[]; total: number; page: number; limit: number }>(url, config);
+  return useApi<{ logs: any[]; total: number; page: number; limit: number }>(
+    url,
+    config
+  );
 }
 
 // Mutation hooks for common operations
@@ -146,7 +149,10 @@ export function useUserMutations() {
 }
 
 // Helper to create optimistic updates
-export function createOptimisticUpdate<T>(key: string, updateFn: (data: T) => T) {
+export function createOptimisticUpdate<T>(
+  key: string,
+  updateFn: (data: T) => T
+) {
   return async (asyncFn: () => Promise<any>) => {
     // Get current data from cache (simplified approach)
     const { data: currentData } = useSWR(key, null, {
@@ -206,7 +212,10 @@ export function useConditionalApi<T = any>(
 }
 
 // Hook for tags
-export function useTags(projectApiPath: string | null = null, config?: SWRConfiguration) {
+export function useTags(
+  projectApiPath: string | null = null,
+  config?: SWRConfiguration
+) {
   const url = projectApiPath ? `${projectApiPath}/tags` : null;
   const { data, ...rest } = useApi<{ tags: any[] }>(url, config);
   return {
@@ -258,14 +267,24 @@ export function useClientVersions(
 }
 
 // Hook for available client versions
-export function useAvailableVersions(projectApiPath: string | null, config?: SWRConfiguration) {
-  const url = projectApiPath ? `${projectApiPath}/client-versions/meta/versions` : null;
+export function useAvailableVersions(
+  projectApiPath: string | null,
+  config?: SWRConfiguration
+) {
+  const url = projectApiPath
+    ? `${projectApiPath}/client-versions/meta/versions`
+    : null;
   return useApi<string[]>(url, config);
 }
 
 // Hook for available platforms
-export function useAvailablePlatforms(projectApiPath: string | null, config?: SWRConfiguration) {
-  const url = projectApiPath ? `${projectApiPath}/client-versions/meta/platforms` : null;
+export function useAvailablePlatforms(
+  projectApiPath: string | null,
+  config?: SWRConfiguration
+) {
+  const url = projectApiPath
+    ? `${projectApiPath}/client-versions/meta/platforms`
+    : null;
   return useApi<string[]>(url, config);
 }
 
@@ -312,12 +331,17 @@ export function useAllUsers(config?: SWRConfiguration) {
 
 // Mutation helper
 export function mutateClientVersions(projectApiPath: string | null = null) {
-  const prefix = projectApiPath ? `${projectApiPath}/client-versions` : '/client-versions';
+  const prefix = projectApiPath
+    ? `${projectApiPath}/client-versions`
+    : '/client-versions';
   return mutate((key) => typeof key === 'string' && key.includes(prefix));
 }
 
 export function mutateMessageTemplates() {
-  return mutate((key) => typeof key === 'string' && key.startsWith('/admin/message-templates'));
+  return mutate(
+    (key) =>
+      typeof key === 'string' && key.startsWith('/admin/message-templates')
+  );
 }
 
 export function mutateTags(projectApiPath: string | null = null) {

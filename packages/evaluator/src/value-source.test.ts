@@ -7,7 +7,11 @@
  */
 import { describe, it, expect } from 'vitest';
 import { FeatureFlagEvaluator } from './feature-flag-evaluator';
-import type { FeatureFlag, EvaluationContext, FeatureSegment } from '@gatrix/shared';
+import type {
+  FeatureFlag,
+  EvaluationContext,
+  FeatureSegment,
+} from '@gatrix/shared';
 
 const emptySegmentsMap = new Map<string, FeatureSegment>();
 const defaultContext: EvaluationContext = {
@@ -34,7 +38,11 @@ describe('Value Source Naming', () => {
   describe('Enabled flag with no variants and no strategies', () => {
     it('should return $flag-default-enabled variant name', () => {
       const flag = createFlag({ isEnabled: true, enabledValue: true });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.enabled).toBe(true);
       expect(result.variant.name).toBe('$flag-default-enabled');
       expect(result.variant.value).toBe(true);
@@ -47,7 +55,11 @@ describe('Value Source Naming', () => {
         valueType: 'string',
         enabledValue: 'hello',
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.variant.name).toBe('$flag-default-enabled');
       expect(result.variant.value).toBe('hello');
     });
@@ -58,7 +70,11 @@ describe('Value Source Naming', () => {
         valueType: 'number',
         enabledValue: 42,
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.variant.name).toBe('$flag-default-enabled');
       expect(result.variant.value).toBe(42);
     });
@@ -69,7 +85,11 @@ describe('Value Source Naming', () => {
         valueType: 'json',
         enabledValue: { key: 'value' },
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.variant.name).toBe('$flag-default-enabled');
       expect(result.variant.value).toEqual({ key: 'value' });
     });
@@ -78,7 +98,11 @@ describe('Value Source Naming', () => {
   describe('Disabled flag', () => {
     it('should return $flag-default-disabled variant name', () => {
       const flag = createFlag({ isEnabled: false, disabledValue: false });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.enabled).toBe(false);
       expect(result.variant.name).toBe('$flag-default-disabled');
       expect(result.variant.value).toBe(false);
@@ -91,7 +115,11 @@ describe('Value Source Naming', () => {
         valueType: 'string',
         disabledValue: 'off',
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.variant.name).toBe('$flag-default-disabled');
       expect(result.variant.value).toBe('off');
     });
@@ -110,7 +138,11 @@ describe('Value Source Naming', () => {
           },
         ],
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.enabled).toBe(true);
       expect(result.variant.name).toBe('$flag-default-enabled');
       expect(result.reason).toBe('strategy_match');
@@ -138,7 +170,11 @@ describe('Value Source Naming', () => {
           },
         ],
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.enabled).toBe(true);
       expect(result.variant.name).toBe('variant-a');
       expect(result.variant.value).toBe('value-a');
@@ -164,7 +200,11 @@ describe('Value Source Naming', () => {
           },
         ],
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.enabled).toBe(false);
       expect(result.variant.name).toBe('$flag-default-disabled');
       expect(result.reason).toBe('default');
@@ -173,17 +213,29 @@ describe('Value Source Naming', () => {
 
   describe('getFallbackValue', () => {
     it('should return type-appropriate defaults when value is null/undefined', () => {
-      expect(FeatureFlagEvaluator.getFallbackValue(undefined, 'boolean')).toBe(false);
-      expect(FeatureFlagEvaluator.getFallbackValue(undefined, 'string')).toBe('');
-      expect(FeatureFlagEvaluator.getFallbackValue(undefined, 'number')).toBe(0);
-      expect(FeatureFlagEvaluator.getFallbackValue(undefined, 'json')).toEqual({});
+      expect(FeatureFlagEvaluator.getFallbackValue(undefined, 'boolean')).toBe(
+        false
+      );
+      expect(FeatureFlagEvaluator.getFallbackValue(undefined, 'string')).toBe(
+        ''
+      );
+      expect(FeatureFlagEvaluator.getFallbackValue(undefined, 'number')).toBe(
+        0
+      );
+      expect(FeatureFlagEvaluator.getFallbackValue(undefined, 'json')).toEqual(
+        {}
+      );
     });
 
     it('should return the value itself when it is defined', () => {
       expect(FeatureFlagEvaluator.getFallbackValue(true, 'boolean')).toBe(true);
-      expect(FeatureFlagEvaluator.getFallbackValue('hello', 'string')).toBe('hello');
+      expect(FeatureFlagEvaluator.getFallbackValue('hello', 'string')).toBe(
+        'hello'
+      );
       expect(FeatureFlagEvaluator.getFallbackValue(42, 'number')).toBe(42);
-      expect(FeatureFlagEvaluator.getFallbackValue({ a: 1 }, 'json')).toEqual({ a: 1 });
+      expect(FeatureFlagEvaluator.getFallbackValue({ a: 1 }, 'json')).toEqual({
+        a: 1,
+      });
     });
   });
 
@@ -195,7 +247,11 @@ describe('Value Source Naming', () => {
         enabledValue: 'env-value',
         valueSource: 'environment',
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.enabled).toBe(true);
       expect(result.variant.name).toBe('$env-default-enabled');
       expect(result.variant.value).toBe('env-value');
@@ -208,7 +264,11 @@ describe('Value Source Naming', () => {
         disabledValue: 'env-off',
         valueSource: 'environment',
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.enabled).toBe(false);
       expect(result.variant.name).toBe('$env-default-disabled');
       expect(result.variant.value).toBe('env-off');
@@ -228,7 +288,11 @@ describe('Value Source Naming', () => {
           },
         ],
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.enabled).toBe(true);
       expect(result.variant.name).toBe('$env-default-enabled');
       expect(result.reason).toBe('strategy_match');
@@ -240,7 +304,11 @@ describe('Value Source Naming', () => {
         enabledValue: true,
         valueSource: 'flag',
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.variant.name).toBe('$flag-default-enabled');
     });
 
@@ -249,7 +317,11 @@ describe('Value Source Naming', () => {
         isEnabled: true,
         enabledValue: true,
       });
-      const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+      const result = FeatureFlagEvaluator.evaluate(
+        flag,
+        defaultContext,
+        emptySegmentsMap
+      );
       expect(result.variant.name).toBe('$flag-default-enabled');
     });
   });

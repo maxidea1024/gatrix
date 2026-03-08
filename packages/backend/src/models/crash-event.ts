@@ -109,8 +109,14 @@ export class CrashEvent extends Model {
     crashEventUserAgent?: string;
   }) {
     // Truncate user message if too long
-    if (data.userMessage && data.userMessage.length > CRASH_CONSTANTS.MaxUserMsgLen) {
-      data.userMessage = data.userMessage.substring(0, CRASH_CONSTANTS.MaxUserMsgLen);
+    if (
+      data.userMessage &&
+      data.userMessage.length > CRASH_CONSTANTS.MaxUserMsgLen
+    ) {
+      data.userMessage = data.userMessage.substring(
+        0,
+        CRASH_CONSTANTS.MaxUserMsgLen
+      );
     }
 
     const eventId = generateULID();
@@ -133,7 +139,10 @@ export class CrashEvent extends Model {
    * Get events by crash ID
    */
   static async getByCrashId(crashId: string, limit: number = 100) {
-    return await this.query().where('crashId', crashId).orderBy('createdAt', 'desc').limit(limit);
+    return await this.query()
+      .where('crashId', crashId)
+      .orderBy('createdAt', 'desc')
+      .limit(limit);
   }
 
   /**
@@ -190,7 +199,10 @@ export class CrashEvent extends Model {
    * Get latest events for a crash
    */
   static async getLatestEvents(crashId: string, limit: number = 10) {
-    return await this.query().where('crashId', crashId).orderBy('createdAt', 'desc').limit(limit);
+    return await this.query()
+      .where('crashId', crashId)
+      .orderBy('createdAt', 'desc')
+      .limit(limit);
   }
 
   /**

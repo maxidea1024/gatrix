@@ -22,7 +22,10 @@ import orgProjectService, {
   type AccessTree,
 } from '@/services/orgProjectService';
 import rbacService, { type Role } from '@/services/rbacService';
-import type { AutoJoinMembership, AutoJoinRoleBinding } from '@/types/invitation';
+import type {
+  AutoJoinMembership,
+  AutoJoinRoleBinding,
+} from '@/types/invitation';
 
 // ==================== Types ====================
 
@@ -38,7 +41,10 @@ interface OrgProjectTreeSelectorProps {
 
 // ==================== Component ====================
 
-const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, onChange }) => {
+const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({
+  value,
+  onChange,
+}) => {
   const { t } = useTranslation();
 
   // Data
@@ -114,9 +120,13 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
     return !!m?.projectIds.includes(projectId);
   };
 
-  const getOrgRoleBinding = (orgId: string): AutoJoinRoleBinding | undefined => {
+  const getOrgRoleBinding = (
+    orgId: string
+  ): AutoJoinRoleBinding | undefined => {
     const m = getMembership(orgId);
-    return m?.roleBindings.find((rb) => rb.scopeType === 'org' && rb.scopeId === orgId);
+    return m?.roleBindings.find(
+      (rb) => rb.scopeType === 'org' && rb.scopeId === orgId
+    );
   };
 
   const getProjectRoleBinding = (
@@ -124,7 +134,9 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
     projectId: string
   ): AutoJoinRoleBinding | undefined => {
     const m = getMembership(orgId);
-    return m?.roleBindings.find((rb) => rb.scopeType === 'project' && rb.scopeId === projectId);
+    return m?.roleBindings.find(
+      (rb) => rb.scopeType === 'project' && rb.scopeId === projectId
+    );
   };
 
   // ─── Handlers ─────────────────────────
@@ -139,7 +151,10 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
       const defaultBindings: AutoJoinRoleBinding[] = defaultRoleId
         ? [{ roleId: defaultRoleId, scopeType: 'org', scopeId: orgId }]
         : [];
-      onChange([...value, { orgId, projectIds: [], roleBindings: defaultBindings }]);
+      onChange([
+        ...value,
+        { orgId, projectIds: [], roleBindings: defaultBindings },
+      ]);
       // Auto-expand
       setExpandedOrgs((prev) => new Set([...prev, orgId]));
     }
@@ -156,7 +171,10 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
             { roleId: defaultRoleId, scopeType: 'project', scopeId: projectId },
           ]
         : [];
-      onChange([...value, { orgId, projectIds: [projectId], roleBindings: defaultBindings }]);
+      onChange([
+        ...value,
+        { orgId, projectIds: [projectId], roleBindings: defaultBindings },
+      ]);
       setExpandedOrgs((prev) => new Set([...prev, orgId]));
       return;
     }
@@ -178,14 +196,20 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
       newBindings = defaultRoleId
         ? [
             ...existing.roleBindings,
-            { roleId: defaultRoleId, scopeType: 'project' as const, scopeId: projectId },
+            {
+              roleId: defaultRoleId,
+              scopeType: 'project' as const,
+              scopeId: projectId,
+            },
           ]
         : existing.roleBindings;
     }
 
     onChange(
       value.map((m) =>
-        m.orgId === orgId ? { ...m, projectIds: newProjectIds, roleBindings: newBindings } : m
+        m.orgId === orgId
+          ? { ...m, projectIds: newProjectIds, roleBindings: newBindings }
+          : m
       )
     );
   };
@@ -208,7 +232,11 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
       ? [...filteredBindings, { roleId, scopeType, scopeId }]
       : filteredBindings;
 
-    onChange(value.map((m) => (m.orgId === orgId ? { ...m, roleBindings: newBindings } : m)));
+    onChange(
+      value.map((m) =>
+        m.orgId === orgId ? { ...m, roleBindings: newBindings } : m
+      )
+    );
   };
 
   const toggleExpand = (orgId: string) => {
@@ -239,7 +267,11 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
 
   if (tree.length === 0) {
     return (
-      <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ py: 2, textAlign: 'center' }}
+      >
         {t('autoJoin.noOrgsAvailable')}
       </Typography>
     );
@@ -250,7 +282,11 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
       <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
         {t('autoJoin.title')}
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, fontSize: '0.8rem' }}>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ mb: 1.5, fontSize: '0.8rem' }}
+      >
         {t('autoJoin.description')}
       </Typography>
 
@@ -277,13 +313,20 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
                 alignItems: 'center',
                 px: 1,
                 py: 0.5,
-                bgcolor: isOrgChecked(node.org.id) ? 'action.selected' : 'transparent',
+                bgcolor: isOrgChecked(node.org.id)
+                  ? 'action.selected'
+                  : 'transparent',
                 '&:hover': { bgcolor: 'action.hover' },
               }}
             >
               {/* Expand toggle */}
               <Box
-                sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', mr: 0.5 }}
+                sx={{
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  mr: 0.5,
+                }}
                 onClick={() => toggleExpand(node.org.id)}
               >
                 {node.projects.length > 0 ? (
@@ -304,7 +347,10 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
                 sx={{ p: 0.5 }}
               />
 
-              <OrgIcon fontSize="small" sx={{ mx: 0.5, color: 'primary.main' }} />
+              <OrgIcon
+                fontSize="small"
+                sx={{ mx: 0.5, color: 'primary.main' }}
+              />
               <Typography variant="body2" sx={{ flex: 1, fontWeight: 500 }}>
                 {node.org.displayName || node.org.orgName}
               </Typography>
@@ -316,7 +362,12 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
                   value={getOrgRoleBinding(node.org.id)?.roleId || ''}
                   displayEmpty
                   onChange={(e) =>
-                    setRoleBinding(node.org.id, 'org', node.org.id, e.target.value as string)
+                    setRoleBinding(
+                      node.org.id,
+                      'org',
+                      node.org.id,
+                      e.target.value as string
+                    )
                   }
                   sx={{ minWidth: 140, fontSize: '0.8rem', height: 30 }}
                   MenuProps={{ sx: { zIndex: 2000 } }}
@@ -357,7 +408,10 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
                     sx={{ p: 0.5 }}
                   />
 
-                  <ProjectIcon fontSize="small" sx={{ mx: 0.5, color: 'text.secondary' }} />
+                  <ProjectIcon
+                    fontSize="small"
+                    sx={{ mx: 0.5, color: 'text.secondary' }}
+                  />
                   <Typography variant="body2" sx={{ flex: 1 }}>
                     {project.displayName || project.projectName}
                   </Typography>
@@ -366,10 +420,18 @@ const OrgProjectTreeSelector: React.FC<OrgProjectTreeSelectorProps> = ({ value, 
                   {isProjectChecked(node.org.id, project.id) && (
                     <Select
                       size="small"
-                      value={getProjectRoleBinding(node.org.id, project.id)?.roleId || ''}
+                      value={
+                        getProjectRoleBinding(node.org.id, project.id)
+                          ?.roleId || ''
+                      }
                       displayEmpty
                       onChange={(e) =>
-                        setRoleBinding(node.org.id, 'project', project.id, e.target.value as string)
+                        setRoleBinding(
+                          node.org.id,
+                          'project',
+                          project.id,
+                          e.target.value as string
+                        )
                       }
                       sx={{ minWidth: 140, fontSize: '0.8rem', height: 30 }}
                       MenuProps={{ sx: { zIndex: 2000 } }}

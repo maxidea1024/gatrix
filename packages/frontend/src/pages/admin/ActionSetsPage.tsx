@@ -52,13 +52,18 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { enqueueSnackbar } from 'notistack';
-import actionSetService, { ActionSet, ActionSetEvent } from '@/services/actionSetService';
+import actionSetService, {
+  ActionSet,
+  ActionSetEvent,
+} from '@/services/actionSetService';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import featureFlagService from '@/services/featureFlagService';
 import environmentService, { Environment } from '@/services/environmentService';
-import signalEndpointService, { SignalEndpoint } from '@/services/signalEndpointService';
+import signalEndpointService, {
+  SignalEndpoint,
+} from '@/services/signalEndpointService';
 import { ErrorCodes, extractErrorCode } from '@gatrix/shared';
 
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -96,7 +101,12 @@ interface ActionItem {
   params: { flagName: string; environmentId: string };
 }
 
-const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onClose, onSave }) => {
+const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
+  open,
+  actionSet,
+  onClose,
+  onSave,
+}) => {
   const { t } = useTranslation();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
@@ -104,7 +114,11 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
   const [description, setDescription] = useState('');
   const [selectedEndpointId, setSelectedEndpointId] = useState<number | ''>('');
   const [actions, setActions] = useState<ActionItem[]>([
-    { actionType: 'TOGGLE_FLAG', sortOrder: 0, params: { flagName: '', environmentId: '' } },
+    {
+      actionType: 'TOGGLE_FLAG',
+      sortOrder: 0,
+      params: { flagName: '', environmentId: '' },
+    },
   ]);
   const [flagOptions, setFlagOptions] = useState<string[]>([]);
   const [environments, setEnvironments] = useState<Environment[]>([]);
@@ -116,7 +130,10 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
     const loadData = async () => {
       try {
         const [flagResult, envResult, endpointResult] = await Promise.all([
-          featureFlagService.getFeatureFlags({ limit: 1000, isArchived: false }, projectApiPath),
+          featureFlagService.getFeatureFlags(
+            { limit: 1000, isArchived: false },
+            projectApiPath
+          ),
           environmentService.getEnvironments(projectApiPath),
           signalEndpointService.getAll(projectApiPath),
         ]);
@@ -141,8 +158,11 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
             actionType: a.actionType,
             sortOrder: a.sortOrder,
             params: {
-              flagName: (a.executionParams as Record<string, string>)?.flagName || '',
-              environmentId: (a.executionParams as Record<string, string>)?.environmentId || '',
+              flagName:
+                (a.executionParams as Record<string, string>)?.flagName || '',
+              environmentId:
+                (a.executionParams as Record<string, string>)?.environmentId ||
+                '',
             },
           }))
         );
@@ -219,13 +239,19 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
   const isValid =
     name.trim() &&
     selectedEndpointId &&
-    actions.some((a) => a.params.flagName.trim() && a.params.environmentId.trim());
+    actions.some(
+      (a) => a.params.flagName.trim() && a.params.environmentId.trim()
+    );
 
   return (
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={actionSet ? t('actionSets.editActionSet') : t('actionSets.createActionSet')}
+      title={
+        actionSet
+          ? t('actionSets.editActionSet')
+          : t('actionSets.createActionSet')
+      }
       subtitle={t('actionSets.drawerSubtitle')}
       storageKey="actionSetDrawerWidth"
       defaultWidth={600}
@@ -245,7 +271,10 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
       >
         {/* Basic Information */}
         <Paper variant="outlined" sx={{ p: 2 }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+          >
             {t('actionSets.basicInfo')}
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -272,19 +301,29 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
               <Select
                 value={selectedEndpointId}
                 label={t('actionSets.signalEndpoint')}
-                onChange={(e) => setSelectedEndpointId(e.target.value as number)}
+                onChange={(e) =>
+                  setSelectedEndpointId(e.target.value as number)
+                }
               >
                 {signalEndpoints.map((ep) => (
                   <MenuItem key={ep.id} value={ep.id}>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}
+                    >
                       <SensorsIcon
                         fontSize="small"
-                        sx={{ mt: 0.3, color: ep.isEnabled ? 'success.main' : 'text.disabled' }}
+                        sx={{
+                          mt: 0.3,
+                          color: ep.isEnabled
+                            ? 'success.main'
+                            : 'text.disabled',
+                        }}
                       />
                       <Box>
                         <Typography variant="body2">
                           {ep.name}
-                          {!ep.isEnabled && ` (${t('signalEndpoints.disabled')})`}
+                          {!ep.isEnabled &&
+                            ` (${t('signalEndpoints.disabled')})`}
                         </Typography>
                         {ep.description && (
                           <Typography variant="caption" color="text.secondary">
@@ -310,10 +349,17 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
               mb: 2,
             }}
           >
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 600, color: 'primary.main' }}
+            >
               {t('actionSets.actionList')}
             </Typography>
-            <Button size="small" startIcon={<AddIcon />} onClick={handleAddAction}>
+            <Button
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={handleAddAction}
+            >
               {t('actionSets.addAction')}
             </Button>
           </Box>
@@ -336,7 +382,9 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
                 <Select
                   value={action.actionType}
                   label={t('actionSets.actionType')}
-                  onChange={(e) => handleActionChange(index, 'actionType', e.target.value)}
+                  onChange={(e) =>
+                    handleActionChange(index, 'actionType', e.target.value)
+                  }
                 >
                   {ACTION_TYPES.map((type) => (
                     <MenuItem key={type.value} value={type.value}>
@@ -350,8 +398,12 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
                 freeSolo
                 options={flagOptions}
                 value={action.params.flagName}
-                onInputChange={(_e, value) => handleActionChange(index, 'flagName', value)}
-                renderInput={(params) => <TextField {...params} label={t('actionSets.flagName')} />}
+                onInputChange={(_e, value) =>
+                  handleActionChange(index, 'flagName', value)
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={t('actionSets.flagName')} />
+                )}
                 sx={{ flex: 1, minWidth: 150 }}
               />
               <FormControl size="small" sx={{ flex: 1, minWidth: 120 }}>
@@ -359,7 +411,9 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
                 <Select
                   value={action.params.environmentId}
                   label={t('common.environment')}
-                  onChange={(e) => handleActionChange(index, 'environmentId', e.target.value)}
+                  onChange={(e) =>
+                    handleActionChange(index, 'environmentId', e.target.value)
+                  }
                 >
                   {environments.map((env) => (
                     <MenuItem key={env.environmentId} value={env.environmentId}>
@@ -418,14 +472,21 @@ interface DeleteDialogProps {
   onConfirm: () => void;
 }
 
-const DeleteDialog: React.FC<DeleteDialogProps> = ({ open, name, onClose, onConfirm }) => {
+const DeleteDialog: React.FC<DeleteDialogProps> = ({
+  open,
+  name,
+  onClose,
+  onConfirm,
+}) => {
   const { t } = useTranslation();
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle>{t('actionSets.deleteActionSet')}</DialogTitle>
       <DialogContent>
-        <Typography>{t('actionSets.deleteConfirmMessage', { name })}</Typography>
+        <Typography>
+          {t('actionSets.deleteConfirmMessage', { name })}
+        </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t('common.cancel')}</Button>
@@ -466,7 +527,10 @@ const ActionSetsPage: React.FC = () => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [menuTarget, setMenuTarget] = useState<ActionSet | null>(null);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, item: ActionSet) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    item: ActionSet
+  ) => {
     setMenuAnchorEl(event.currentTarget);
     setMenuTarget(item);
   };
@@ -535,7 +599,11 @@ const ActionSetsPage: React.FC = () => {
     };
     try {
       if (editDialog.actionSet) {
-        await actionSetService.update(projectApiPath, editDialog.actionSet.id, transformedData);
+        await actionSetService.update(
+          projectApiPath,
+          editDialog.actionSet.id,
+          transformedData
+        );
         enqueueSnackbar(t('actionSets.updateSuccess'), { variant: 'success' });
       } else {
         await actionSetService.create(projectApiPath, transformedData);
@@ -549,7 +617,9 @@ const ActionSetsPage: React.FC = () => {
         enqueueSnackbar(t('actionSets.duplicateName'), { variant: 'error' });
       } else {
         enqueueSnackbar(
-          editDialog.actionSet ? t('actionSets.updateFailed') : t('actionSets.createFailed'),
+          editDialog.actionSet
+            ? t('actionSets.updateFailed')
+            : t('actionSets.createFailed'),
           { variant: 'error' }
         );
       }
@@ -610,7 +680,11 @@ const ActionSetsPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchActionSets}>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={fetchActionSets}
+          >
             {t('common.refresh')}
           </Button>
           {actionSets.length > 0 && (
@@ -631,7 +705,9 @@ const ActionSetsPage: React.FC = () => {
           <EmptyPagePlaceholder
             message={t('actionSets.noActionSets')}
             onAddClick={
-              canManage ? () => setEditDialog({ open: true, actionSet: null }) : undefined
+              canManage
+                ? () => setEditDialog({ open: true, actionSet: null })
+                : undefined
             }
             addButtonLabel={t('actionSets.createActionSet')}
           />
@@ -645,7 +721,9 @@ const ActionSetsPage: React.FC = () => {
                   <TableCell>{t('common.description')}</TableCell>
                   <TableCell>{t('actionSets.source')}</TableCell>
                   <TableCell align="center">{t('actionSets.status')}</TableCell>
-                  <TableCell align="center">{t('actionSets.actionCount')}</TableCell>
+                  <TableCell align="center">
+                    {t('actionSets.actionCount')}
+                  </TableCell>
                   <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
@@ -666,17 +744,27 @@ const ActionSetsPage: React.FC = () => {
                       hover
                       sx={{
                         '& > td': {
-                          borderBottom: expandedId === actionSet.id ? 'none' : undefined,
+                          borderBottom:
+                            expandedId === actionSet.id ? 'none' : undefined,
                         },
                       }}
                     >
                       <TableCell>
-                        <IconButton size="small" onClick={() => handleExpand(actionSet.id)}>
-                          {expandedId === actionSet.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                        <IconButton
+                          size="small"
+                          onClick={() => handleExpand(actionSet.id)}
+                        >
+                          {expandedId === actionSet.id ? (
+                            <ExpandLessIcon />
+                          ) : (
+                            <ExpandMoreIcon />
+                          )}
                         </IconButton>
                       </TableCell>
                       <TableCell>
-                        <Typography fontWeight="medium">{actionSet.name}</Typography>
+                        <Typography fontWeight="medium">
+                          {actionSet.name}
+                        </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">
@@ -685,7 +773,9 @@ const ActionSetsPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">
-                          {(actionSet as any).sourceName || actionSet.source || '-'}
+                          {(actionSet as any).sourceName ||
+                            actionSet.source ||
+                            '-'}
                         </Typography>
                       </TableCell>
                       <TableCell align="center">
@@ -704,7 +794,10 @@ const ActionSetsPage: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton size="small" onClick={(e) => handleMenuOpen(e, actionSet)}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleMenuOpen(e, actionSet)}
+                        >
                           <MoreVertIcon fontSize="small" />
                         </IconButton>
                       </TableCell>
@@ -716,26 +809,45 @@ const ActionSetsPage: React.FC = () => {
                         colSpan={7}
                         sx={{
                           py: 0,
-                          borderBottom: expandedId === actionSet.id ? undefined : 'none',
+                          borderBottom:
+                            expandedId === actionSet.id ? undefined : 'none',
                         }}
                       >
                         <Collapse in={expandedId === actionSet.id}>
-                          <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1, my: 1 }}>
+                          <Box
+                            sx={{
+                              p: 2,
+                              bgcolor: 'action.hover',
+                              borderRadius: 1,
+                              my: 1,
+                            }}
+                          >
                             <Typography variant="subtitle2" sx={{ mb: 1 }}>
                               {t('actionSets.recentEvents')}
                             </Typography>
                             <Divider sx={{ mb: 1 }} />
-                            {!events[actionSet.id] || events[actionSet.id].length === 0 ? (
-                              <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
+                            {!events[actionSet.id] ||
+                            events[actionSet.id].length === 0 ? (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ py: 1 }}
+                              >
                                 {t('actionSets.noEvents')}
                               </Typography>
                             ) : (
                               <Table size="small">
                                 <TableHead>
                                   <TableRow hover>
-                                    <TableCell>{t('actionSets.eventState')}</TableCell>
-                                    <TableCell>{t('actionSets.eventSignalId')}</TableCell>
-                                    <TableCell>{t('actionSets.eventDate')}</TableCell>
+                                    <TableCell>
+                                      {t('actionSets.eventState')}
+                                    </TableCell>
+                                    <TableCell>
+                                      {t('actionSets.eventSignalId')}
+                                    </TableCell>
+                                    <TableCell>
+                                      {t('actionSets.eventDate')}
+                                    </TableCell>
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -743,7 +855,9 @@ const ActionSetsPage: React.FC = () => {
                                     <TableRow key={event.id} hover>
                                       <TableCell>
                                         <Chip
-                                          label={t(`actionSets.states.${event.eventState}`)}
+                                          label={t(
+                                            `actionSets.states.${event.eventState}`
+                                          )}
                                           size="small"
                                           color={
                                             getStateColor(event.eventState) as
@@ -754,11 +868,19 @@ const ActionSetsPage: React.FC = () => {
                                           }
                                         />
                                       </TableCell>
-                                      <TableCell>{event.signalId || '-'}</TableCell>
                                       <TableCell>
-                                        <Tooltip title={formatDateTimeDetailed(event.createdAt)}>
+                                        {event.signalId || '-'}
+                                      </TableCell>
+                                      <TableCell>
+                                        <Tooltip
+                                          title={formatDateTimeDetailed(
+                                            event.createdAt
+                                          )}
+                                        >
                                           <Typography variant="body2">
-                                            {formatRelativeTime(event.createdAt)}
+                                            {formatRelativeTime(
+                                              event.createdAt
+                                            )}
                                           </Typography>
                                         </Tooltip>
                                       </TableCell>
@@ -780,10 +902,15 @@ const ActionSetsPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+      >
         <MenuItem
           onClick={() => {
-            if (menuTarget) setEditDialog({ open: true, actionSet: menuTarget });
+            if (menuTarget)
+              setEditDialog({ open: true, actionSet: menuTarget });
             handleMenuClose();
           }}
         >
@@ -795,7 +922,11 @@ const ActionSetsPage: React.FC = () => {
         <MenuItem
           onClick={() => {
             if (menuTarget)
-              setDeleteDialog({ open: true, id: menuTarget.id, name: menuTarget.name });
+              setDeleteDialog({
+                open: true,
+                id: menuTarget.id,
+                name: menuTarget.name,
+              });
             handleMenuClose();
           }}
         >

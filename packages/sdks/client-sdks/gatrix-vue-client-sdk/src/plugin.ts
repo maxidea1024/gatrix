@@ -1,5 +1,9 @@
 import { ref, type App, type Plugin } from 'vue';
-import { GatrixClient, EVENTS, type GatrixClientConfig } from '@gatrix/gatrix-js-client-sdk';
+import {
+  GatrixClient,
+  EVENTS,
+  type GatrixClientConfig,
+} from '@gatrix/gatrix-js-client-sdk';
 import {
   GATRIX_CLIENT_KEY,
   GATRIX_READY_KEY,

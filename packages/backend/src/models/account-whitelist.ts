@@ -124,7 +124,9 @@ export class WhitelistModel {
             if (index === 0) {
               this.whereRaw('JSON_CONTAINS(w.tags, ?)', [JSON.stringify(tag)]);
             } else {
-              this.orWhereRaw('JSON_CONTAINS(w.tags, ?)', [JSON.stringify(tag)]);
+              this.orWhereRaw('JSON_CONTAINS(w.tags, ?)', [
+                JSON.stringify(tag),
+              ]);
             }
           });
         });
@@ -139,12 +141,19 @@ export class WhitelistModel {
       }
 
       // Get total count
-      const countQuery = query.clone().clearSelect().count('* as total').first();
+      const countQuery = query
+        .clone()
+        .clearSelect()
+        .count('* as total')
+        .first();
       const countResult = await countQuery;
       const total = Number(countResult?.total || 0);
 
       // Get paginated results
-      const whitelists = await query.orderBy('w.createdAt', 'desc').limit(limit).offset(offset);
+      const whitelists = await query
+        .orderBy('w.createdAt', 'desc')
+        .limit(limit)
+        .offset(offset);
 
       return {
         whitelists: whitelists.map(this.mapRowToWhitelist),
@@ -159,7 +168,10 @@ export class WhitelistModel {
     }
   }
 
-  static async findById(id: string, environmentId: string): Promise<Whitelist | null> {
+  static async findById(
+    id: string,
+    environmentId: string
+  ): Promise<Whitelist | null> {
     try {
       const result = await db('g_account_whitelist as w')
         .leftJoin('g_users as c', 'w.createdBy', 'c.id')
@@ -193,7 +205,10 @@ export class WhitelistModel {
     }
   }
 
-  static async create(data: CreateWhitelistData, environmentId: string): Promise<Whitelist> {
+  static async create(
+    data: CreateWhitelistData,
+    environmentId: string
+  ): Promise<Whitelist> {
     try {
       const id = generateULID();
       await db('g_account_whitelist').insert({
@@ -229,12 +244,15 @@ export class WhitelistModel {
       const updateData: any = {};
 
       if (data.accountId !== undefined) updateData.accountId = data.accountId;
-      if (data.ipAddress !== undefined) updateData.ipAddress = data.ipAddress || null;
+      if (data.ipAddress !== undefined)
+        updateData.ipAddress = data.ipAddress || null;
       if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
-      if (data.startDate !== undefined) updateData.startDate = data.startDate || null;
+      if (data.startDate !== undefined)
+        updateData.startDate = data.startDate || null;
       if (data.endDate !== undefined) updateData.endDate = data.endDate || null;
       if (data.purpose !== undefined) updateData.purpose = data.purpose || null;
-      if (data.tags !== undefined) updateData.tags = data.tags ? JSON.stringify(data.tags) : null;
+      if (data.tags !== undefined)
+        updateData.tags = data.tags ? JSON.stringify(data.tags) : null;
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       if (Object.keys(updateData).length === 0) {
@@ -266,7 +284,10 @@ export class WhitelistModel {
     }
   }
 
-  static async bulkCreate(entries: CreateWhitelistData[], environmentId: string): Promise<number> {
+  static async bulkCreate(
+    entries: CreateWhitelistData[],
+    environmentId: string
+  ): Promise<number> {
     try {
       if (entries.length === 0) {
         return 0;
@@ -300,7 +321,9 @@ export class WhitelistModel {
           tags = JSON.parse(row.tags);
         } catch (error) {
           // JSON 파싱 Failed 시 문자열을 배열로 변환
-          logger.warn(`Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`);
+          logger.warn(
+            `Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`
+          );
           // 쉼표로 구분된 문자열을 배열로 변환
           tags = row.tags
             .split(',')
@@ -333,7 +356,10 @@ export class WhitelistModel {
     };
   }
 
-  static async findByAccountId(accountId: string, environmentId: string): Promise<Whitelist[]> {
+  static async findByAccountId(
+    accountId: string,
+    environmentId: string
+  ): Promise<Whitelist[]> {
     try {
       const rows = await db('g_account_whitelist as w')
         .leftJoin('g_users as c', 'w.createdBy', 'c.id')
@@ -351,13 +377,25 @@ export class WhitelistModel {
 
       return rows.map(this.mapRowToWhitelist);
     } catch (error) {
-      throw new GatrixError('Failed to find whitelist entries by account ID', 500);
+      throw new GatrixError(
+        'Failed to find whitelist entries by account ID',
+        500
+      );
     }
   }
 
   // 태그 관련 메서드들
-  static async setTags(whitelistId: string, tagIds: string[], createdBy?: string): Promise<void> {
-    await TagAssignmentModel.setTagsForEntity('whitelist', whitelistId, tagIds, createdBy);
+  static async setTags(
+    whitelistId: string,
+    tagIds: string[],
+    createdBy?: string
+  ): Promise<void> {
+    await TagAssignmentModel.setTagsForEntity(
+      'whitelist',
+      whitelistId,
+      tagIds,
+      createdBy
+    );
   }
 
   static async getTags(whitelistId: string): Promise<any[]> {

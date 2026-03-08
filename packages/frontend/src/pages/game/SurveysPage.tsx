@@ -45,7 +45,9 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import surveyService, { Survey } from '../../services/surveyService';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
-import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
@@ -84,16 +86,21 @@ const SurveysPage: React.FC = () => {
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
   const [editingSurvey, setEditingSurvey] = useState<Survey | null>(null);
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<null | HTMLElement>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingSurvey, setDeletingSurvey] = useState<Survey | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
   // Action menu state
-  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] =
+    useState<null | HTMLElement>(null);
   const [actionMenuTarget, setActionMenuTarget] = useState<Survey | null>(null);
 
-  const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, survey: Survey) => {
+  const handleActionMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    survey: Survey
+  ) => {
     setActionMenuAnchorEl(event.currentTarget);
     setActionMenuTarget(survey);
   };
@@ -237,11 +244,18 @@ const SurveysPage: React.FC = () => {
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters(activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f)));
+    setActiveFilters(
+      activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f))
+    );
   };
 
-  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
-    setActiveFilters(activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f)));
+  const handleOperatorChange = (
+    filterKey: string,
+    operator: 'any_of' | 'include_all'
+  ) => {
+    setActiveFilters(
+      activeFilters.map((f) => (f.key === filterKey ? { ...f, operator } : f))
+    );
   };
 
   // Column handlers
@@ -271,7 +285,9 @@ const SurveysPage: React.FC = () => {
   };
 
   const handleSelectOne = (id: string) => {
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
   };
 
   // CRUD handlers
@@ -320,7 +336,9 @@ const SurveysPage: React.FC = () => {
     if (selectedIds.length === 0) return;
 
     try {
-      await Promise.all(selectedIds.map((id) => surveyService.deleteSurvey(projectApiPath, id)));
+      await Promise.all(
+        selectedIds.map((id) => surveyService.deleteSurvey(projectApiPath, id))
+      );
       enqueueSnackbar(t('surveys.bulkDeleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadSurveys();
@@ -337,7 +355,10 @@ const SurveysPage: React.FC = () => {
 
   const handleToggleActive = async (survey: Survey) => {
     try {
-      const result = await surveyService.toggleActive(projectApiPath, survey.id);
+      const result = await surveyService.toggleActive(
+        projectApiPath,
+        survey.id
+      );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
@@ -382,13 +403,23 @@ const SurveysPage: React.FC = () => {
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
               {t('surveys.createSurvey')}
             </Button>
           )}
-          {canManage && <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />}
           {canManage && (
-            <Button variant="outlined" startIcon={<SettingsIcon />} onClick={handleConfigOpen}>
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          )}
+          {canManage && (
+            <Button
+              variant="outlined"
+              startIcon={<SettingsIcon />}
+              onClick={handleConfigOpen}
+            >
               {t('surveys.config')}
             </Button>
           )}
@@ -455,7 +486,9 @@ const SurveysPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -537,10 +570,12 @@ const SurveysPage: React.FC = () => {
                             <TableCell key={column.id} padding="checkbox">
                               <Checkbox
                                 indeterminate={
-                                  selectedIds.length > 0 && selectedIds.length < surveys.length
+                                  selectedIds.length > 0 &&
+                                  selectedIds.length < surveys.length
                                 }
                                 checked={
-                                  surveys.length > 0 && selectedIds.length === surveys.length
+                                  surveys.length > 0 &&
+                                  selectedIds.length === surveys.length
                                 }
                                 onChange={handleSelectAll}
                               />
@@ -555,13 +590,21 @@ const SurveysPage: React.FC = () => {
                             </TableCell>
                           );
                         }
-                        return <TableCell key={column.id}>{t(column.labelKey)}</TableCell>;
+                        return (
+                          <TableCell key={column.id}>
+                            {t(column.labelKey)}
+                          </TableCell>
+                        );
                       })}
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {surveys.map((survey) => (
-                      <TableRow key={survey.id} hover selected={selectedIds.includes(survey.id)}>
+                      <TableRow
+                        key={survey.id}
+                        hover
+                        selected={selectedIds.includes(survey.id)}
+                      >
                         {visibleColumns.map((column) => {
                           if (column.id === 'checkbox') {
                             if (!canManage) return null;
@@ -619,35 +662,41 @@ const SurveysPage: React.FC = () => {
                                     alignItems: 'center',
                                   }}
                                 >
-                                  {survey.triggerConditions.map((condition, idx) => {
-                                    // Format condition label with unit
-                                    let label = '';
-                                    if (condition.type === 'userLevel') {
-                                      label = `${t('surveys.condition.userLevel')}: ${condition.value}${t('surveys.conditionUnit.levelOrMore')}`;
-                                    } else if (condition.type === 'joinDays') {
-                                      label = `${t('surveys.condition.joinDays')}: ${condition.value}${t('surveys.conditionUnit.daysOrMore')}`;
-                                    } else {
-                                      label = `${t(`surveys.condition.${condition.type}` as any)}: ${condition.value}`;
-                                    }
+                                  {survey.triggerConditions.map(
+                                    (condition, idx) => {
+                                      // Format condition label with unit
+                                      let label = '';
+                                      if (condition.type === 'userLevel') {
+                                        label = `${t('surveys.condition.userLevel')}: ${condition.value}${t('surveys.conditionUnit.levelOrMore')}`;
+                                      } else if (
+                                        condition.type === 'joinDays'
+                                      ) {
+                                        label = `${t('surveys.condition.joinDays')}: ${condition.value}${t('surveys.conditionUnit.daysOrMore')}`;
+                                      } else {
+                                        label = `${t(`surveys.condition.${condition.type}` as any)}: ${condition.value}`;
+                                      }
 
-                                    return (
-                                      <React.Fragment key={idx}>
-                                        <Chip label={label} size="small" />
-                                        {idx < survey.triggerConditions.length - 1 && (
-                                          <Typography
-                                            variant="caption"
-                                            sx={{
-                                              fontWeight: 600,
-                                              color: 'primary.main',
-                                              px: 0.5,
-                                            }}
-                                          >
-                                            AND
-                                          </Typography>
-                                        )}
-                                      </React.Fragment>
-                                    );
-                                  })}
+                                      return (
+                                        <React.Fragment key={idx}>
+                                          <Chip label={label} size="small" />
+                                          {idx <
+                                            survey.triggerConditions.length -
+                                              1 && (
+                                            <Typography
+                                              variant="caption"
+                                              sx={{
+                                                fontWeight: 600,
+                                                color: 'primary.main',
+                                                px: 0.5,
+                                              }}
+                                            >
+                                              AND
+                                            </Typography>
+                                          )}
+                                        </React.Fragment>
+                                      );
+                                    }
+                                  )}
                                 </Box>
                               </TableCell>
                             );
@@ -668,9 +717,13 @@ const SurveysPage: React.FC = () => {
                               <TableCell key={column.id}>
                                 <Chip
                                   label={
-                                    survey.isActive ? t('common.active') : t('common.inactive')
+                                    survey.isActive
+                                      ? t('common.active')
+                                      : t('common.inactive')
                                   }
-                                  color={survey.isActive ? 'success' : 'default'}
+                                  color={
+                                    survey.isActive ? 'success' : 'default'
+                                  }
                                   size="small"
                                 />
                               </TableCell>
@@ -689,7 +742,9 @@ const SurveysPage: React.FC = () => {
                               <TableCell key={column.id} align="center">
                                 <IconButton
                                   size="small"
-                                  onClick={(e) => handleActionMenuOpen(e, survey)}
+                                  onClick={(e) =>
+                                    handleActionMenuOpen(e, survey)
+                                  }
                                 >
                                   <MoreVertIcon fontSize="small" />
                                 </IconButton>
@@ -754,7 +809,9 @@ const SurveysPage: React.FC = () => {
       <ColumnSettingsDialog
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        columns={columns.filter((col) => col.id !== 'checkbox' && col.id !== 'actions')}
+        columns={columns.filter(
+          (col) => col.id !== 'checkbox' && col.id !== 'actions'
+        )}
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
       />
@@ -768,7 +825,10 @@ const SurveysPage: React.FC = () => {
       />
 
       {/* Config Dialog */}
-      <SurveyConfigDialog open={configDialogOpen} onClose={() => setConfigDialogOpen(false)} />
+      <SurveyConfigDialog
+        open={configDialogOpen}
+        onClose={() => setConfigDialogOpen(false)}
+      />
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDeleteDialog

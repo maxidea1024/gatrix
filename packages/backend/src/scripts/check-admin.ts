@@ -34,14 +34,22 @@ async function checkAdmin() {
 
         // Also test with environment variable
         const envPassword = process.env.ADMIN_PASSWORD || 'admin123';
-        const isValidEnv = await bcrypt.compare(envPassword, admin.passwordHash);
-        console.log(`Password verification for env password "${envPassword}":`, isValidEnv);
+        const isValidEnv = await bcrypt.compare(
+          envPassword,
+          admin.passwordHash
+        );
+        console.log(
+          `Password verification for env password "${envPassword}":`,
+          isValidEnv
+        );
       }
     } else {
       console.log('No admin user found!');
 
       // Check all users
-      const allUsers = await database.query('SELECT id, name, email, role FROM g_users');
+      const allUsers = await database.query(
+        'SELECT id, name, email, role FROM g_users'
+      );
       console.log('All users:', allUsers);
     }
   } catch (error) {

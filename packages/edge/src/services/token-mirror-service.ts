@@ -89,13 +89,16 @@ class TokenMirrorService {
    */
   async fetchAllTokens(): Promise<void> {
     try {
-      const response = await axios.get(`${config.gatrixUrl}/api/v1/server/internal/tokens`, {
-        headers: {
-          'x-api-token': config.apiToken,
-          'x-application-name': config.applicationName,
-        },
-        timeout: 10000,
-      });
+      const response = await axios.get(
+        `${config.gatrixUrl}/api/v1/server/internal/tokens`,
+        {
+          headers: {
+            'x-api-token': config.apiToken,
+            'x-application-name': config.applicationName,
+          },
+          timeout: 10000,
+        }
+      );
 
       if (response.data?.success && response.data?.data?.tokens) {
         const tokens: MirroredToken[] = response.data.data.tokens;
@@ -135,9 +138,12 @@ class TokenMirrorService {
 
       await this.subscriber.connect();
 
-      this.subscriber.on('pmessage', (_pattern: string, _channel: string, message: string) => {
-        this.handleEvent(message);
-      });
+      this.subscriber.on(
+        'pmessage',
+        (_pattern: string, _channel: string, message: string) => {
+          this.handleEvent(message);
+        }
+      );
 
       await this.subscriber.psubscribe(`${this.CHANNEL_PREFIX}:*`);
 
@@ -183,7 +189,10 @@ class TokenMirrorService {
   ): TokenValidationResult {
     // Check for unsecured tokens (for testing purposes)
     // Note: id=0 is used for unsecured tokens to skip usage tracking
-    if (tokenValue === config.unsecuredClientToken || UNSECURED_TOKENS.includes(tokenValue)) {
+    if (
+      tokenValue === config.unsecuredClientToken ||
+      UNSECURED_TOKENS.includes(tokenValue)
+    ) {
       logger.debug('Unsecured token used for testing');
       const unsecuredToken: MirroredToken = {
         id: 0, // 0 indicates unsecured token, usage tracking will be skipped
@@ -221,7 +230,10 @@ class TokenMirrorService {
 
     // Check environment access
     if (environmentId && !token.allowAllEnvironments) {
-      if (!token.environments.includes(environmentId) && !token.environments.includes('*')) {
+      if (
+        !token.environments.includes(environmentId) &&
+        !token.environments.includes('*')
+      ) {
         return { valid: false, token, reason: 'invalid_environment' };
       }
     }

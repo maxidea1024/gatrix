@@ -24,9 +24,13 @@ export async function initializeOutboxProcessorJob(): Promise<void> {
   try {
     // Check if job already exists
     const repeatables = await queueService.listRepeatable('scheduler');
-    const processorExists = repeatables.some((r) => r.name === 'outbox:process');
+    const processorExists = repeatables.some(
+      (r) => r.name === 'outbox:process'
+    );
     const cleanupExists = repeatables.some((r) => r.name === 'outbox:cleanup');
-    const lockCleanupExists = repeatables.some((r) => r.name === 'lock:cleanup');
+    const lockCleanupExists = repeatables.some(
+      (r) => r.name === 'lock:cleanup'
+    );
 
     // Register outbox processor job - runs every 30 seconds
     if (!processorExists) {
@@ -38,7 +42,9 @@ export async function initializeOutboxProcessorJob(): Promise<void> {
           repeat: { pattern: '*/30 * * * * *' }, // Every 30 seconds
         }
       );
-      logger.info('Registered repeatable job: outbox:process (every 30 seconds)');
+      logger.info(
+        'Registered repeatable job: outbox:process (every 30 seconds)'
+      );
     } else {
       logger.info('Repeatable job already exists: outbox:process');
     }
@@ -53,7 +59,9 @@ export async function initializeOutboxProcessorJob(): Promise<void> {
           repeat: { pattern: '0 4 * * *' }, // Every day at 4:00 AM
         }
       );
-      logger.info('Registered repeatable job: outbox:cleanup (daily at 4:00 AM)');
+      logger.info(
+        'Registered repeatable job: outbox:cleanup (daily at 4:00 AM)'
+      );
     } else {
       logger.info('Repeatable job already exists: outbox:cleanup');
     }

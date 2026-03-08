@@ -5,11 +5,16 @@ import { apiService } from '../services/api';
 const URL_REGEX = /(https?:\/\/[^\s<>"{}|\\^`[\]]+)/gi;
 
 // Cache Save소 (메모리 캐시)
-const previewCache = new Map<string, { data: LinkPreview; timestamp: number }>();
+const previewCache = new Map<
+  string,
+  { data: LinkPreview; timestamp: number }
+>();
 const CACHE_DURATION = 1000 * 60 * 60; // 1시간
 
 // URL에서 미리보기 데이터를 추출하는 함수 (백엔드 API Used)
-export const extractLinkPreview = async (url: string): Promise<LinkPreview | null> => {
+export const extractLinkPreview = async (
+  url: string
+): Promise<LinkPreview | null> => {
   try {
     // Cache Confirm
     const cached = previewCache.get(url);
@@ -46,7 +51,9 @@ export const extractLinkPreview = async (url: string): Promise<LinkPreview | nul
 };
 
 // 클라이언트 사이드 폴백 함수 (Existing 로직)
-const extractLinkPreviewFallback = async (url: string): Promise<LinkPreview | null> => {
+const extractLinkPreviewFallback = async (
+  url: string
+): Promise<LinkPreview | null> => {
   try {
     // 기본 링크 미리보기 객체
     const linkPreview: LinkPreview = {
@@ -77,7 +84,8 @@ const extractLinkPreviewFallback = async (url: string): Promise<LinkPreview | nu
       if (repoInfo) {
         linkPreview.siteName = 'GitHub';
         linkPreview.title = `${repoInfo.owner}/${repoInfo.repo}`;
-        linkPreview.description = 'GitHub에서 호스팅되는 오픈소스 프로젝트입니다.';
+        linkPreview.description =
+          'GitHub에서 호스팅되는 오픈소스 프로젝트입니다.';
         linkPreview.author = repoInfo.owner;
         linkPreview.readingTime = '코드 저장소';
         linkPreview.type = 'website';
@@ -108,7 +116,9 @@ export const extractUrlsFromMessage = (message: string): string[] => {
 };
 
 // 여러 URL 일괄 처리
-export const extractMultipleLinkPreviews = async (urls: string[]): Promise<LinkPreview[]> => {
+export const extractMultipleLinkPreviews = async (
+  urls: string[]
+): Promise<LinkPreview[]> => {
   if (urls.length === 0) return [];
 
   try {
@@ -157,7 +167,9 @@ export const extractMultipleLinkPreviews = async (urls: string[]): Promise<LinkP
     console.error('일괄 링크 미리보기 실패:', error);
 
     // 폴백: 개별적으로 처리
-    const results = await Promise.allSettled(urls.map((url) => extractLinkPreviewFallback(url)));
+    const results = await Promise.allSettled(
+      urls.map((url) => extractLinkPreviewFallback(url))
+    );
 
     return results
       .filter(
@@ -204,7 +216,9 @@ const extractSiteNameFromUrl = (url: string): string => {
 
 // YouTube URL Confirm
 const isYouTubeUrl = (url: string): boolean => {
-  return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(url);
+  return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(
+    url
+  );
 };
 
 // YouTube Videos ID 추출
@@ -221,7 +235,9 @@ const isGitHubUrl = (url: string): boolean => {
 };
 
 // GitHub Save소 정보 추출 (개선됨)
-const extractGitHubRepoInfo = (url: string): { owner: string; repo: string } | null => {
+const extractGitHubRepoInfo = (
+  url: string
+): { owner: string; repo: string } | null => {
   const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
   if (match) {
     return {

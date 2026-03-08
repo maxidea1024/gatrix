@@ -11,7 +11,9 @@ class InvitationService {
   private readonly PUBLIC_BASE_URL = '/invitations';
 
   // Admin: create invitation
-  async createInvitation(data: CreateInvitationRequest): Promise<InvitationResponse> {
+  async createInvitation(
+    data: CreateInvitationRequest
+  ): Promise<InvitationResponse> {
     const response = await apiService.post(this.ADMIN_BASE_URL, data);
     return response.data;
   }
@@ -41,7 +43,9 @@ class InvitationService {
     invitation?: Invitation;
     autoJoinInfo?: AutoJoinInfo | null;
   }> {
-    const response = await apiService.get(`${this.PUBLIC_BASE_URL}/validate/${token}`);
+    const response = await apiService.get(
+      `${this.PUBLIC_BASE_URL}/validate/${token}`
+    );
     return response.data;
   }
 

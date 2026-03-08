@@ -1,6 +1,10 @@
 // Gatrix Svelte SDK - Status store
 import { getContext } from 'svelte';
-import { GATRIX_READY_KEY, GATRIX_HEALTHY_KEY, GATRIX_ERROR_KEY } from '../context';
+import {
+  GATRIX_READY_KEY,
+  GATRIX_HEALTHY_KEY,
+  GATRIX_ERROR_KEY,
+} from '../context';
 import type { Readable } from 'svelte/store';
 
 export interface FlagsStatus {
@@ -31,7 +35,9 @@ export function flagsStatus(): FlagsStatus {
   const error = getContext<Readable<Error | null>>(GATRIX_ERROR_KEY);
 
   if (!ready) {
-    throw new Error('Gatrix not initialized. Call initGatrix() in a parent component.');
+    throw new Error(
+      'Gatrix not initialized. Call initGatrix() in a parent component.'
+    );
   }
 
   return { ready, healthy, error };

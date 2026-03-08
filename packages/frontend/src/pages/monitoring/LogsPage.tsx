@@ -9,7 +9,9 @@ const LogsPage: React.FC = () => {
 
   const grafanaUrl = useMemo(() => {
     // Priority 1: Check runtime config (from docker-entrypoint.sh / config.js)
-    const runtimeEnv = (window as any)?.ENV?.VITE_GRAFANA_URL as string | undefined;
+    const runtimeEnv = (window as any)?.ENV?.VITE_GRAFANA_URL as
+      | string
+      | undefined;
     if (runtimeEnv && runtimeEnv.trim()) {
       return runtimeEnv.trim();
     }

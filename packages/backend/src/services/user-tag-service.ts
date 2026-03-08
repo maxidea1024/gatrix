@@ -16,7 +16,11 @@ export class UserTagService {
   }
 
   // Used자 태그 Settings (Existing 태그 All 교체)
-  static async setUserTags(userId: string, tagIds: string[], updatedBy: string): Promise<void> {
+  static async setUserTags(
+    userId: string,
+    tagIds: string[],
+    updatedBy: string
+  ): Promise<void> {
     try {
       // Check if user exists
       const user = await UserModel.findById(userId);
@@ -35,7 +39,11 @@ export class UserTagService {
   }
 
   // Used자에게 태그 추가
-  static async addUserTag(userId: string, tagId: string, createdBy: string): Promise<void> {
+  static async addUserTag(
+    userId: string,
+    tagId: string,
+    createdBy: string
+  ): Promise<void> {
     try {
       // Check if user exists
       const user = await UserModel.findById(userId);

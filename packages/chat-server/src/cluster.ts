@@ -29,7 +29,9 @@ if (cluster.isPrimary) {
 
   // Handle worker exit
   cluster.on('exit', (worker, code, signal) => {
-    logger.warn(`Worker ${worker.process.pid} died with code ${code} and signal ${signal}`);
+    logger.warn(
+      `Worker ${worker.process.pid} died with code ${code} and signal ${signal}`
+    );
     logger.info('Starting a new worker');
     cluster.fork();
   });

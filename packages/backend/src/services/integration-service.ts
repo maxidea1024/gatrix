@@ -12,7 +12,12 @@ import {
   UpdateIntegrationData,
 } from '../models/integration';
 import { IntegrationEventModel } from '../models/integration-event';
-import { getAddons, getProviderDefinitions, AddonDefinition, ADDON_DEFINITIONS } from '../addons';
+import {
+  getAddons,
+  getProviderDefinitions,
+  AddonDefinition,
+  ADDON_DEFINITIONS,
+} from '../addons';
 import {
   IntegrationSystemEvent,
   IntegrationEventType,
@@ -84,7 +89,9 @@ export class IntegrationService {
       },
     });
 
-    logger.info(`User ${auditUser.name} created integration ${integration.id} (${data.provider})`);
+    logger.info(
+      `User ${auditUser.name} created integration ${integration.id} (${data.provider})`
+    );
 
     return this.filterSensitiveFields(integration);
   }
@@ -114,7 +121,10 @@ export class IntegrationService {
 
     // Validate parameters if provided
     if (data.parameters) {
-      this.validateParameters(data.provider || existing.provider, data.parameters);
+      this.validateParameters(
+        data.provider || existing.provider,
+        data.parameters
+      );
     }
 
     const updated = await IntegrationModel.update(id, {
@@ -149,7 +159,10 @@ export class IntegrationService {
   /**
    * Delete an integration
    */
-  static async delete(id: string, auditUser: { id: string; name: string }): Promise<boolean> {
+  static async delete(
+    id: string,
+    auditUser: { id: string; name: string }
+  ): Promise<boolean> {
     const existing = await IntegrationModel.findById(id);
     if (!existing) {
       return false;
@@ -170,7 +183,9 @@ export class IntegrationService {
         },
       });
 
-      logger.info(`User ${auditUser.name} deleted integration ${id} (${existing.provider})`);
+      logger.info(
+        `User ${auditUser.name} deleted integration ${id} (${existing.provider})`
+      );
     }
 
     return success;
@@ -247,7 +262,9 @@ export class IntegrationService {
         return;
       }
 
-      logger.info(`Dispatching event ${event.type} to ${integrations.length} integration(s)`);
+      logger.info(
+        `Dispatching event ${event.type} to ${integrations.length} integration(s)`
+      );
 
       const addons = getAddonInstances();
 
@@ -259,9 +276,16 @@ export class IntegrationService {
         }
 
         try {
-          await addon.handleEvent(event, integration.parameters, integration.id);
+          await addon.handleEvent(
+            event,
+            integration.parameters,
+            integration.id
+          );
         } catch (error) {
-          logger.error(`Error handling event for integration ${integration.id}:`, error);
+          logger.error(
+            `Error handling event for integration ${integration.id}:`,
+            error
+          );
         }
       });
 
@@ -274,8 +298,16 @@ export class IntegrationService {
   /**
    * Get integration event logs
    */
-  static async getIntegrationEvents(integrationId: string, page: number = 1, limit: number = 20) {
-    return IntegrationEventModel.findByIntegrationId(integrationId, page, limit);
+  static async getIntegrationEvents(
+    integrationId: string,
+    page: number = 1,
+    limit: number = 20
+  ) {
+    return IntegrationEventModel.findByIntegrationId(
+      integrationId,
+      page,
+      limit
+    );
   }
 
   /**
@@ -315,21 +347,33 @@ export class IntegrationService {
     // Wait a bit for the event to be registered
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    const result = await IntegrationEventModel.findByIntegrationId(integrationId, 1, 1);
+    const result = await IntegrationEventModel.findByIntegrationId(
+      integrationId,
+      1,
+      1
+    );
     if (result.events.length > 0) {
       const lastEvent = result.events[0];
-      if (lastEvent.eventType === 'integration_test' && lastEvent.state === 'failed') {
+      if (
+        lastEvent.eventType === 'integration_test' &&
+        lastEvent.state === 'failed'
+      ) {
         throw new Error(lastEvent.stateDetails || 'Test message failed');
       }
     }
 
-    logger.info(`Test message sent for integration ${integrationId} by ${auditUser.name}`);
+    logger.info(
+      `Test message sent for integration ${integrationId} by ${auditUser.name}`
+    );
   }
 
   /**
    * Validate provider parameters
    */
-  private static validateParameters(provider: string, parameters: Record<string, any>): void {
+  private static validateParameters(
+    provider: string,
+    parameters: Record<string, any>
+  ): void {
     const definition = ADDON_DEFINITIONS[provider];
     if (!definition) {
       throw new Error(`Unknown provider: ${provider}`);
@@ -349,7 +393,9 @@ export class IntegrationService {
     }
 
     if (missingParams.length > 0) {
-      throw new Error(`Missing required parameters: ${missingParams.join(', ')}`);
+      throw new Error(
+        `Missing required parameters: ${missingParams.join(', ')}`
+      );
     }
   }
 

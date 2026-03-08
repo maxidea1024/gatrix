@@ -82,7 +82,9 @@ const trackRoutes: FastifyPluginAsync = async (fastify) => {
         }
 
         if (body.events.length > 100) {
-          return reply.code(400).send({ error: 'Maximum 100 events per batch' });
+          return reply
+            .code(400)
+            .send({ error: 'Maximum 100 events per batch' });
         }
 
         if (!request.client) {

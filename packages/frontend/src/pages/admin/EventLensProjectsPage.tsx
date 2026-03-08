@@ -1,6 +1,9 @@
 import React from 'react';
 import { Box, Card, CardContent, Typography, keyframes } from '@mui/material';
-import { Folder as FolderIcon, Construction as ConstructionIcon } from '@mui/icons-material';
+import {
+  Folder as FolderIcon,
+  Construction as ConstructionIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 // Animation keyframes
@@ -65,7 +68,11 @@ const EventLensProjectsPage: React.FC = () => {
               gap: 0.5,
             }}
           >
-            <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
+            <Typography
+              variant="h6"
+              color="text.secondary"
+              sx={{ fontWeight: 500 }}
+            >
               {t('common.comingSoon')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 0.5 }}>

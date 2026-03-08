@@ -71,7 +71,9 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
   const [recipients, setRecipients] = useState<User[]>([]);
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
-  const [priority, setPriority] = useState<'low' | 'normal' | 'high' | 'urgent'>('normal');
+  const [priority, setPriority] = useState<
+    'low' | 'normal' | 'high' | 'urgent'
+  >('normal');
 
   // User search state
   const [userSearchQuery, setUserSearchQuery] = useState('');
@@ -81,7 +83,9 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
   // Translation state
   const [translationEnabled, setTranslationEnabled] = useState(false);
   const [translatedContent, setTranslatedContent] = useState('');
-  const [translationLanguage, setTranslationLanguage] = useState<'ko' | 'en' | 'zh'>('en');
+  const [translationLanguage, setTranslationLanguage] = useState<
+    'ko' | 'en' | 'zh'
+  >('en');
   const [translating, setTranslating] = useState(false);
 
   // Sending state
@@ -151,7 +155,9 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
         content,
         priority,
         translatedContent: translationEnabled ? translatedContent : undefined,
-        translationLanguage: translationEnabled ? translationLanguage : undefined,
+        translationLanguage: translationEnabled
+          ? translationLanguage
+          : undefined,
       });
       handleClose();
     } catch (error) {
@@ -229,7 +235,11 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
           pt: 2.5,
         }}
       >
-        <Box display="flex" alignItems="flex-start" justifyContent="space-between">
+        <Box
+          display="flex"
+          alignItems="flex-start"
+          justifyContent="space-between"
+        >
           <Box>
             <Typography
               variant="h5"
@@ -247,7 +257,11 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
             >
               {t('mailbox.compose')}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontWeight: 500 }}
+            >
               {t('mailbox.composeSubtitle')}
             </Typography>
           </Box>
@@ -292,9 +306,15 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
               },
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
+            >
               <PersonAddIcon sx={{ color: 'primary.main', fontSize: 20 }} />
-              <Typography variant="subtitle2" fontWeight="600" color="text.primary">
+              <Typography
+                variant="subtitle2"
+                fontWeight="600"
+                color="text.primary"
+              >
                 {t('mailbox.recipients')}
               </Typography>
             </Box>
@@ -304,13 +324,19 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
               value={recipients}
               onChange={(_, newValue) => setRecipients(newValue)}
               inputValue={userSearchQuery}
-              onInputChange={(_, newInputValue) => setUserSearchQuery(newInputValue)}
+              onInputChange={(_, newInputValue) =>
+                setUserSearchQuery(newInputValue)
+              }
               getOptionLabel={(option) => option.name || option.email || ''}
               loading={userSearching}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  placeholder={recipients.length === 0 ? t('mailbox.recipientsPlaceholder') : ''}
+                  placeholder={
+                    recipients.length === 0
+                      ? t('mailbox.recipientsPlaceholder')
+                      : ''
+                  }
                   required
                   inputRef={recipientInputRef}
                   variant="outlined"
@@ -319,7 +345,9 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                     ...params.InputProps,
                     endAdornment: (
                       <>
-                        {userSearching ? <CircularProgress color="inherit" size={20} /> : null}
+                        {userSearching ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
                         {params.InputProps.endAdornment}
                       </>
                     ),
@@ -356,7 +384,10 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                         fontWeight: 500,
                         backgroundColor: alpha(theme.palette.primary.main, 0.1),
                         '&:hover': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                          backgroundColor: alpha(
+                            theme.palette.primary.main,
+                            0.2
+                          ),
                         },
                       }}
                     />
@@ -398,7 +429,9 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                   </li>
                 );
               }}
-              noOptionsText={userSearchQuery ? t('chat.noUsersFound') : t('chat.searchUsers')}
+              noOptionsText={
+                userSearchQuery ? t('chat.noUsersFound') : t('chat.searchUsers')
+              }
             />
           </Paper>
 
@@ -490,8 +523,13 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                   : alpha(theme.palette.primary.main, 0.02),
             }}
           >
-            <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5, fontWeight: 600 }}>
-              {t('mailbox.content')} <span style={{ color: theme.palette.error.main }}>*</span>
+            <Typography
+              variant="subtitle2"
+              gutterBottom
+              sx={{ mb: 1.5, fontWeight: 600 }}
+            >
+              {t('mailbox.content')}{' '}
+              <span style={{ color: theme.palette.error.main }}>*</span>
             </Typography>
             <RichTextEditor
               value={content}
@@ -542,7 +580,9 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                 <InputLabel>{t('mailbox.translateTo')}</InputLabel>
                 <Select
                   value={translationLanguage}
-                  onChange={(e) => setTranslationLanguage(e.target.value as any)}
+                  onChange={(e) =>
+                    setTranslationLanguage(e.target.value as any)
+                  }
                   label={t('mailbox.translateTo')}
                 >
                   <MenuItem value="ko">🇰🇷 한국어</MenuItem>
@@ -555,7 +595,11 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                 <Button
                   variant="contained"
                   startIcon={
-                    translating ? <CircularProgress size={16} color="inherit" /> : <TranslateIcon />
+                    translating ? (
+                      <CircularProgress size={16} color="inherit" />
+                    ) : (
+                      <TranslateIcon />
+                    )
                   }
                   onClick={handleTranslate}
                   disabled={translating || !content.trim()}
@@ -566,7 +610,9 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                     },
                   }}
                 >
-                  {translating ? t('mailbox.translating') : t('mailbox.autoTranslate')}
+                  {translating
+                    ? t('mailbox.translating')
+                    : t('mailbox.autoTranslate')}
                 </Button>
               ) : (
                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -585,9 +631,15 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                       background: `linear-gradient(135deg, ${theme.palette.info.main} 0%, ${theme.palette.info.dark} 100%)`,
                     }}
                   >
-                    {translating ? t('mailbox.translating') : t('mailbox.retranslate')}
+                    {translating
+                      ? t('mailbox.translating')
+                      : t('mailbox.retranslate')}
                   </Button>
-                  <Button variant="outlined" color="secondary" onClick={handleCancelTranslation}>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={handleCancelTranslation}
+                  >
                     {t('mailbox.cancelTranslation')}
                   </Button>
                 </Box>
@@ -656,8 +708,19 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
         <Button
           variant="contained"
           onClick={handleSend}
-          disabled={sending || recipients.length === 0 || !subject.trim() || !content.trim()}
-          startIcon={sending ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
+          disabled={
+            sending ||
+            recipients.length === 0 ||
+            !subject.trim() ||
+            !content.trim()
+          }
+          startIcon={
+            sending ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              <SendIcon />
+            )
+          }
           size="large"
           sx={{
             fontWeight: 600,

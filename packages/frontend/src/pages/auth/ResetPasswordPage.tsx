@@ -10,8 +10,19 @@ import {
   InputAdornment,
   IconButton,
 } from '@mui/material';
-import { Visibility, VisibilityOff, CheckCircle, Error, Lock, Login } from '@mui/icons-material';
-import { useNavigate, useSearchParams, Link as RouterLink } from 'react-router-dom';
+import {
+  Visibility,
+  VisibilityOff,
+  CheckCircle,
+  Error,
+  Lock,
+  Login,
+} from '@mui/icons-material';
+import {
+  useNavigate,
+  useSearchParams,
+  Link as RouterLink,
+} from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthService } from '@/services/auth';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -367,7 +378,9 @@ const ResetPasswordPage: React.FC = () => {
               sx={{
                 width: '100%',
                 backgroundColor:
-                  message.type === 'error' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(76, 175, 80, 0.1)',
+                  message.type === 'error'
+                    ? 'rgba(244, 67, 54, 0.1)'
+                    : 'rgba(76, 175, 80, 0.1)',
                 color: message.type === 'error' ? '#ff6b6b' : '#4caf50',
                 border: `1px solid ${message.type === 'error' ? 'rgba(244, 67, 54, 0.2)' : 'rgba(76, 175, 80, 0.2)'}`,
                 '& .MuiAlert-icon': {
@@ -525,7 +538,11 @@ const ResetPasswordPage: React.FC = () => {
             fontWeight: 600,
           }}
         >
-          {isSubmitting ? <CircularProgress size={24} color="inherit" /> : t('auth.resetPassword')}
+          {isSubmitting ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            t('auth.resetPassword')
+          )}
         </Button>
 
         <Box sx={{ textAlign: 'center' }}>

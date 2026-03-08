@@ -105,7 +105,10 @@ export const errorHandler = (
     statusCode = 400;
     errorCode = ErrorCodes.BAD_REQUEST;
     message = 'Invalid ID format';
-  } else if ((error as any).errno === 1062 || (error as any).code === 'ER_DUP_ENTRY') {
+  } else if (
+    (error as any).errno === 1062 ||
+    (error as any).code === 'ER_DUP_ENTRY'
+  ) {
     statusCode = 409;
     errorCode = ErrorCodes.DUPLICATE_ENTRY;
     // Extract duplicate value from MySQL error message if possible: "Duplicate entry '...' for key '...'"
@@ -173,6 +176,7 @@ export const notFoundHandler = (req: Request, res: Response): void => {
   });
 };
 
-export const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
-};
+export const asyncHandler =
+  (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };

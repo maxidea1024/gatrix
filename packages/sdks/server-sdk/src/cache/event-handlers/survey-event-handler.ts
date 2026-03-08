@@ -31,18 +31,26 @@ export class SurveyEventHandler implements IEventHandler {
             : event.data.isActive === 1
               ? true
               : event.data.isActive;
-        await this.cacheManager.updateSingleSurvey(String(event.data.id), environmentId, isActive);
+        await this.cacheManager.updateSingleSurvey(
+          String(event.data.id),
+          environmentId,
+          isActive
+        );
         break;
       }
       case 'survey.deleted':
         this.cacheManager.removeSurvey(String(event.data.id), environmentId);
         break;
       case 'survey.settings.updated':
-        this.logger.info('Survey settings updated, refreshing', { environmentId });
+        this.logger.info('Survey settings updated, refreshing', {
+          environmentId,
+        });
         try {
           await this.cacheManager.refreshSurveySettings(environmentId);
         } catch (error: any) {
-          this.logger.error('Failed to refresh survey settings', { error: error.message });
+          this.logger.error('Failed to refresh survey settings', {
+            error: error.message,
+          });
         }
         break;
     }

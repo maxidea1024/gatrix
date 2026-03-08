@@ -182,7 +182,9 @@ export interface RendererObjects {
   heroShadow: PIXI.Graphics;
 }
 
-export async function createRenderer(container: HTMLDivElement): Promise<RendererObjects> {
+export async function createRenderer(
+  container: HTMLDivElement
+): Promise<RendererObjects> {
   const app = new PIXI.Application();
   await app.init({
     width: CANVAS_W,
@@ -303,7 +305,9 @@ export function renderFrame(r: RendererObjects, gs: GameState): void {
   const dashX = gs.isAttacking ? Math.min(10, gs.attackAnimFrame * 2) : 0;
   r.heroSprite.x = HERO_X + dashX;
   r.heroSprite.y = 305 + Math.sin(gs.heroFrame * 0.15) * 2;
-  r.heroSprite.texture = gs.isAttacking ? r.textures.heroAttack : r.textures.hero;
+  r.heroSprite.texture = gs.isAttacking
+    ? r.textures.heroAttack
+    : r.textures.hero;
   r.heroSprite.tint = gs.shakeTimer > 0 ? 0xff8888 : 0xffffff;
 
   r.heroShadow.x = r.heroSprite.x;
@@ -381,9 +385,12 @@ export function renderFrame(r: RendererObjects, gs: GameState): void {
         hp.clear()
           .rect(e.x + e.knockbackX - barW / 2, e.y - 45 * e.size, barW, 5)
           .fill(0x000000);
-        hp.rect(e.x + e.knockbackX - barW / 2 + 1, e.y - 45 * e.size + 1, (barW - 2) * pct, 3).fill(
-          0xff0000
-        );
+        hp.rect(
+          e.x + e.knockbackX - barW / 2 + 1,
+          e.y - 45 * e.size + 1,
+          (barW - 2) * pct,
+          3
+        ).fill(0xff0000);
       }
     } else {
       sprite.visible = false;

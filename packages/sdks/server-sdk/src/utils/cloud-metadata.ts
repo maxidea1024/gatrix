@@ -186,7 +186,8 @@ async function detectGCP(): Promise<CloudMetadata | null> {
   // Extract region from zone (remove the last part after the last hyphen)
   // us-central1-a -> us-central1
   const zoneSplit = zone.split('-');
-  const region = zoneSplit.length >= 3 ? zoneSplit.slice(0, -1).join('-') : zone;
+  const region =
+    zoneSplit.length >= 3 ? zoneSplit.slice(0, -1).join('-') : zone;
 
   // Get instance ID
   const instanceId = await httpGet(`${endpoint.base}${endpoint.instanceId}`, {
@@ -265,9 +266,12 @@ async function detectTencentCloud(): Promise<CloudMetadata | null> {
   });
 
   // Get instance ID
-  const instanceIdResponse = await httpGet(`${endpoint.base}${endpoint.instanceId}`, {
-    timeout: endpoint.timeout,
-  });
+  const instanceIdResponse = await httpGet(
+    `${endpoint.base}${endpoint.instanceId}`,
+    {
+      timeout: endpoint.timeout,
+    }
+  );
 
   return {
     provider: 'tencentcloud',
@@ -298,14 +302,20 @@ async function detectAlibabaCloud(): Promise<CloudMetadata | null> {
   });
 
   // Get instance ID
-  const instanceIdResponse = await httpGet(`${endpoint.base}${endpoint.instanceId}`, {
-    timeout: endpoint.timeout,
-  });
+  const instanceIdResponse = await httpGet(
+    `${endpoint.base}${endpoint.instanceId}`,
+    {
+      timeout: endpoint.timeout,
+    }
+  );
 
   // Get instance type
-  const instanceTypeResponse = await httpGet(`${endpoint.base}${endpoint.instanceType}`, {
-    timeout: endpoint.timeout,
-  });
+  const instanceTypeResponse = await httpGet(
+    `${endpoint.base}${endpoint.instanceType}`,
+    {
+      timeout: endpoint.timeout,
+    }
+  );
 
   return {
     provider: 'alibabacloud',

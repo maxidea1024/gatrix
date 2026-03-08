@@ -18,12 +18,19 @@ interface AuthContextType {
   error: string | null;
   permissions: Permission[];
   permissionsLoading: boolean;
-  login: (credentials: { email: string; password: string; rememberMe?: boolean }) => Promise<void>;
+  login: (credentials: {
+    email: string;
+    password: string;
+    rememberMe?: boolean;
+  }) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<void>;
   register?: (data: any) => Promise<void>;
   updateProfile?: (data: any) => Promise<User>;
-  changePassword?: (currentPassword: string, newPassword: string) => Promise<void>;
+  changePassword?: (
+    currentPassword: string,
+    newPassword: string
+  ) => Promise<void>;
   clearError: () => void;
 
   canAccess: (requiredRoles?: string[]) => boolean;
@@ -197,11 +204,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       // Check for wildcard permission '*' or '*:*' that grants all permissions
-      if (permissions.includes('*' as Permission) || permissions.includes('*:*' as Permission)) {
+      if (
+        permissions.includes('*' as Permission) ||
+        permissions.includes('*:*' as Permission)
+      ) {
         return true;
       }
 
-      const requiredPermissions = Array.isArray(permission) ? permission : [permission];
+      const requiredPermissions = Array.isArray(permission)
+        ? permission
+        : [permission];
 
       // Use wildcard matching: check if any granted permission matches any required permission
       return requiredPermissions.some((required) =>
@@ -266,11 +278,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } else {
             // Token was expired and cleared
             setUser(null);
-            devLogger.info('AuthContext: Stored token expired, user logged out');
+            devLogger.info(
+              'AuthContext: Stored token expired, user logged out'
+            );
           }
         } else if (storedToken && !storedUser) {
           // Token exists but no user data - fetch profile (OAuth callback scenario)
-          devLogger.info('AuthContext: Token exists but no user data, fetching profile...');
+          devLogger.info(
+            'AuthContext: Token exists but no user data, fetching profile...'
+          );
           const isValid = AuthService.initializeAuth();
           if (isValid) {
             try {
@@ -278,7 +294,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               setUser(user);
               devLogger.info('AuthContext: User profile fetched successfully');
             } catch (error: any) {
-              devLogger.error('AuthContext: Failed to fetch user profile:', error);
+              devLogger.error(
+                'AuthContext: Failed to fetch user profile:',
+                error
+              );
 
               // Check if this is a "user not found" error
               if (
@@ -289,7 +308,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               ) {
                 // User was deleted - redirect to session expired page
                 // The API interceptor will handle the redirect, just clear data here
-                devLogger.warn('️ AuthContext: User not found - account may have been deleted');
+                devLogger.warn(
+                  '️ AuthContext: User not found - account may have been deleted'
+                );
               }
 
               AuthService.clearAuthData();
@@ -298,12 +319,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } else {
             // Token was expired
             setUser(null);
-            devLogger.info('AuthContext: Stored token expired, user logged out');
+            devLogger.info(
+              'AuthContext: Stored token expired, user logged out'
+            );
           }
         } else {
           // No stored auth data
           setUser(null);
-          devLogger.info('AuthContext: No stored auth data, user not authenticated');
+          devLogger.info(
+            'AuthContext: No stored auth data, user not authenticated'
+          );
         }
       } catch (error) {
         devLogger.error('AuthContext: Auth initialization error:', error);
@@ -315,14 +340,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const remainingTime = Math.max(0, MIN_LOADING_TIME - elapsedTime);
 
         if (remainingTime > 0) {
-          devLogger.debug(`⏱️ AuthContext: Waiting ${remainingTime}ms for minimum loading time...`);
+          devLogger.debug(
+            `⏱️ AuthContext: Waiting ${remainingTime}ms for minimum loading time...`
+          );
           setTimeout(() => {
             setIsLoading(false);
-            devLogger.info('AuthContext: Initialization complete, isLoading = false');
+            devLogger.info(
+              'AuthContext: Initialization complete, isLoading = false'
+            );
           }, remainingTime);
         } else {
           setIsLoading(false);
-          devLogger.info('AuthContext: Initialization complete, isLoading = false');
+          devLogger.info(
+            'AuthContext: Initialization complete, isLoading = false'
+          );
         }
       }
     };

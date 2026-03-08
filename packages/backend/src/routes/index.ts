@@ -31,7 +31,8 @@ router.get('/ready', async (req, res) => {
   };
 
   // If API token is provided, resolve and return environment info
-  const token = (req.headers['x-api-token'] as string) || (req.query.token as string);
+  const token =
+    (req.headers['x-api-token'] as string) || (req.query.token as string);
   if (token) {
     try {
       const tokenData = await ApiAccessToken.validateAndUse(token);
@@ -50,7 +51,10 @@ router.get('/ready', async (req, res) => {
 });
 
 // Public webhook endpoint for Grafana alert notifications
-router.post('/monitoring/alerts', MonitoringAlertController.receiveAlert as any);
+router.post(
+  '/monitoring/alerts',
+  MonitoringAlertController.receiveAlert as any
+);
 
 // Mount all route modules
 router.use('/client', clientRoutes);

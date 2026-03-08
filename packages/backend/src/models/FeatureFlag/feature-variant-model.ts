@@ -7,7 +7,9 @@ import { parseJsonField } from '../../utils/db-utils';
 import { FeatureVariantAttributes } from './types';
 
 export class FeatureVariantModel {
-  static async findByFlagId(flagId: string): Promise<FeatureVariantAttributes[]> {
+  static async findByFlagId(
+    flagId: string
+  ): Promise<FeatureVariantAttributes[]> {
     try {
       const variants = await db('g_feature_variants').where('flagId', flagId);
 
@@ -51,7 +53,10 @@ export class FeatureVariantModel {
         environmentId: data.environmentId,
         variantName: data.variantName,
         weight: data.weight,
-        value: data.value !== null && data.value !== undefined ? JSON.stringify(data.value) : null,
+        value:
+          data.value !== null && data.value !== undefined
+            ? JSON.stringify(data.value)
+            : null,
         valueType: data.valueType || 'json',
         createdBy: data.createdBy,
         createdAt: new Date(),
@@ -78,7 +83,10 @@ export class FeatureVariantModel {
     }
   }
 
-  static async deleteByFlagIdAndEnvironment(flagId: string, environmentId: string): Promise<void> {
+  static async deleteByFlagIdAndEnvironment(
+    flagId: string,
+    environmentId: string
+  ): Promise<void> {
     try {
       await db('g_feature_variants')
         .where('flagId', flagId)

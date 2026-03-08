@@ -23,7 +23,11 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { Tag } from '@/services/tagService';
-import { GameWorld, GameWorldMaintenanceLocale, CreateGameWorldData } from '@/types/gameWorld';
+import {
+  GameWorld,
+  GameWorldMaintenanceLocale,
+  CreateGameWorldData,
+} from '@/types/gameWorld';
 import MaintenanceSettingsInput from '@/components/common/MaintenanceSettingsInput';
 import JsonEditor, { parseJson5 } from '@/components/common/JsonEditor';
 import Json5Editor from '@/components/common/Json5Editor';
@@ -95,7 +99,8 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
   const [internalActiveTab, setInternalActiveTab] = useState(0);
 
   // Use controlled or internal state
-  const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
+  const activeTab =
+    controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
   const setActiveTab = (tab: number) => {
     if (onActiveTabChange) {
       onActiveTabChange(tab);
@@ -169,7 +174,10 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
     const settings = infraSettingsText.trim() || '{}';
     copyToClipboardWithNotification(
       settings,
-      () => enqueueSnackbar(t('gameWorlds.form.settingsCopied'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('gameWorlds.form.settingsCopied'), {
+          variant: 'success',
+        }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -204,7 +212,8 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
 
                     if (
                       !editingWorld &&
-                      (formData.name === '' || formData.name === formData.worldId)
+                      (formData.name === '' ||
+                        formData.name === formData.worldId)
                     ) {
                       newFormData.name = newWorldId;
                     }
@@ -212,7 +221,9 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                     onFormDataChange(newFormData);
                   }}
                   error={!!formErrors.worldId}
-                  helperText={formErrors.worldId || t('gameWorlds.form.worldIdHelp')}
+                  helperText={
+                    formErrors.worldId || t('gameWorlds.form.worldIdHelp')
+                  }
                   required
                   inputRef={refToUse}
                   autoFocus
@@ -224,7 +235,9 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                   fullWidth
                   label={t('gameWorlds.name')}
                   value={formData.name}
-                  onChange={(e) => onFormDataChange({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    onFormDataChange({ ...formData, name: e.target.value })
+                  }
                   error={!!formErrors.name}
                   helperText={formErrors.name || t('gameWorlds.form.nameHelp')}
                   required
@@ -238,7 +251,9 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                 fullWidth
                 label={t('gameWorlds.description')}
                 value={formData.description}
-                onChange={(e) => onFormDataChange({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  onFormDataChange({ ...formData, description: e.target.value })
+                }
                 multiline
                 rows={3}
                 placeholder={t('gameWorlds.description')}
@@ -267,7 +282,8 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                 required
                 error={!!formErrors.worldServerAddress}
                 helperText={
-                  formErrors.worldServerAddress || t('gameWorlds.form.worldServerAddressHelp')
+                  formErrors.worldServerAddress ||
+                  t('gameWorlds.form.worldServerAddressHelp')
                 }
               />
             </Box>
@@ -276,7 +292,9 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
             <Box>
               <Autocomplete
                 multiple
-                options={allRegistryTags.filter((tag) => typeof tag !== 'string')}
+                options={allRegistryTags.filter(
+                  (tag) => typeof tag !== 'string'
+                )}
                 getOptionLabel={(option) => option.name}
                 filterSelectedOptions
                 isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -306,7 +324,9 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                     );
                   })
                 }
-                renderInput={(params) => <TextField {...params} label={t('gameWorlds.tags')} />}
+                renderInput={(params) => (
+                  <TextField {...params} label={t('gameWorlds.tags')} />
+                )}
                 renderOption={(props, option) => {
                   const { key, ...otherProps } = props;
                   return (
@@ -455,7 +475,12 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
             }}
           >
             {/* Action Buttons */}
-            <Stack direction="row" spacing={1} justifyContent="flex-end" flexShrink={0}>
+            <Stack
+              direction="row"
+              spacing={1}
+              justifyContent="flex-end"
+              flexShrink={0}
+            >
               <Button
                 size="small"
                 variant="outlined"
@@ -496,7 +521,9 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                 onChange={(val) => onInfraSettingsTextChange(val)}
                 height="100%"
                 error={infraSettingsError}
-                onValidationError={(err) => onInfraSettingsErrorChange(err || '')}
+                onValidationError={(err) =>
+                  onInfraSettingsErrorChange(err || '')
+                }
               />
             </Box>
           </Box>

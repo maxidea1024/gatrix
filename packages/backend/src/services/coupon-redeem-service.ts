@@ -32,7 +32,8 @@ export const CouponErrorCode = {
   INVALID_USER: 'COUPON_INVALID_USER',
 } as const;
 
-export type CouponErrorCodeType = (typeof CouponErrorCode)[keyof typeof CouponErrorCode];
+export type CouponErrorCodeType =
+  (typeof CouponErrorCode)[keyof typeof CouponErrorCode];
 
 export interface RedeemRequest {
   userId: string;
@@ -133,12 +134,22 @@ export class CouponRedeemService {
       }
 
       if (!setting) {
-        throw new GatrixError('Coupon code not found', 404, true, CouponErrorCode.CODE_NOT_FOUND);
+        throw new GatrixError(
+          'Coupon code not found',
+          404,
+          true,
+          CouponErrorCode.CODE_NOT_FOUND
+        );
       }
 
       // Check if setting is active
       if (setting.status !== 'ACTIVE') {
-        throw new GatrixError('Coupon is not active', 422, true, CouponErrorCode.NOT_ACTIVE);
+        throw new GatrixError(
+          'Coupon is not active',
+          422,
+          true,
+          CouponErrorCode.NOT_ACTIVE
+        );
       }
 
       // Check date range
@@ -156,7 +167,12 @@ export class CouponRedeemService {
       }
 
       if (now > expiresAt) {
-        throw new GatrixError('Coupon has expired', 422, true, CouponErrorCode.EXPIRED);
+        throw new GatrixError(
+          'Coupon has expired',
+          422,
+          true,
+          CouponErrorCode.EXPIRED
+        );
       }
 
       // Check targeting conditions
@@ -227,11 +243,17 @@ export class CouponRedeemService {
       });
 
       // Update usedCount cache
-      await trx('g_coupon_settings').where('id', setting.id).increment('usedCount', 1);
+      await trx('g_coupon_settings')
+        .where('id', setting.id)
+        .increment('usedCount', 1);
 
       // Check if all coupons are now used and auto-disable if needed
       let shouldAutoDisable = false;
-      if (setting.type === 'SPECIAL' && setting.maxTotalUses && setting.maxTotalUses > 0) {
+      if (
+        setting.type === 'SPECIAL' &&
+        setting.maxTotalUses &&
+        setting.maxTotalUses > 0
+      ) {
         const newUsedCount = (setting.usedCount || 0) + 1;
         if (newUsedCount >= setting.maxTotalUses) {
           shouldAutoDisable = true;
@@ -327,18 +349,34 @@ export class CouponRedeemService {
     setting: any
   ): Promise<void> {
     // Check if any targeting conditions are set (parallel queries)
-    const [worldCount, platformCount, channelCount, subchannelCount, userCount] = await Promise.all(
-      [
-        trx('g_coupon_target_worlds').where('settingId', settingId).count('* as count').first(),
-        trx('g_coupon_target_platforms').where('settingId', settingId).count('* as count').first(),
-        trx('g_coupon_target_channels').where('settingId', settingId).count('* as count').first(),
-        trx('g_coupon_target_subchannels')
-          .where('settingId', settingId)
-          .count('* as count')
-          .first(),
-        trx('g_coupon_target_users').where('settingId', settingId).count('* as count').first(),
-      ]
-    );
+    const [
+      worldCount,
+      platformCount,
+      channelCount,
+      subchannelCount,
+      userCount,
+    ] = await Promise.all([
+      trx('g_coupon_target_worlds')
+        .where('settingId', settingId)
+        .count('* as count')
+        .first(),
+      trx('g_coupon_target_platforms')
+        .where('settingId', settingId)
+        .count('* as count')
+        .first(),
+      trx('g_coupon_target_channels')
+        .where('settingId', settingId)
+        .count('* as count')
+        .first(),
+      trx('g_coupon_target_subchannels')
+        .where('settingId', settingId)
+        .count('* as count')
+        .first(),
+      trx('g_coupon_target_users')
+        .where('settingId', settingId)
+        .count('* as count')
+        .first(),
+    ]);
 
     const hasWorldTargeting = Number(worldCount?.count || 0) > 0;
     const hasPlatformTargeting = Number(platformCount?.count || 0) > 0;

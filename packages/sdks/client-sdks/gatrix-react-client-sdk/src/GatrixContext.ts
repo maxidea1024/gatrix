@@ -2,7 +2,10 @@
  * GatrixContext - React Context for Gatrix SDK
  */
 import React from 'react';
-import type { GatrixClient, FeaturesClient } from '@gatrix/gatrix-js-client-sdk';
+import type {
+  GatrixClient,
+  FeaturesClient,
+} from '@gatrix/gatrix-js-client-sdk';
 
 export interface GatrixContextValue {
   /** GatrixClient instance */

@@ -378,7 +378,9 @@ export class ChannelController {
       const userId = (req as any).user.id;
       const limit = parseInt(req.query.limit as string) || 50;
       const offset = parseInt(req.query.offset as string) || 0;
-      const before = req.query.before ? parseInt(req.query.before as string) : undefined;
+      const before = req.query.before
+        ? parseInt(req.query.before as string)
+        : undefined;
 
       if (isNaN(channelId)) {
         res.status(400).json({

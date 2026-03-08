@@ -50,10 +50,15 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
-import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import {
+  formatDateTimeDetailed,
+  formatRelativeTime,
+} from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import ReferenceCheckDialog, {
@@ -82,7 +87,15 @@ const TRIM_LABEL_MAP: Record<string, string> = {
 const TrimIconNone = (props: any) => (
   <SvgIcon {...props} viewBox="0 0 20 20">
     {/* Horizontal line with no trim indicators - represents "as-is" */}
-    <rect x="2" y="9" width="16" height="2" rx="1" fill="currentColor" opacity="0.4" />
+    <rect
+      x="2"
+      y="9"
+      width="16"
+      height="2"
+      rx="1"
+      fill="currentColor"
+      opacity="0.4"
+    />
     <text
       x="10"
       y="14"
@@ -100,10 +113,36 @@ const TrimIconNone = (props: any) => (
 const TrimIconAuto = (props: any) => (
   <SvgIcon {...props} viewBox="0 0 20 20">
     {/* Scissors icon - trim both sides */}
-    <path d="M5 3L8 8" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-    <path d="M5 13L8 8" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-    <circle cx="4" cy="3" r="2" stroke="currentColor" strokeWidth="1.2" fill="none" />
-    <circle cx="4" cy="13" r="2" stroke="currentColor" strokeWidth="1.2" fill="none" />
+    <path
+      d="M5 3L8 8"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      fill="none"
+      strokeLinecap="round"
+    />
+    <path
+      d="M5 13L8 8"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      fill="none"
+      strokeLinecap="round"
+    />
+    <circle
+      cx="4"
+      cy="3"
+      r="2"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      fill="none"
+    />
+    <circle
+      cx="4"
+      cy="13"
+      r="2"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      fill="none"
+    />
     <path
       d="M8 8H17"
       stroke="currentColor"
@@ -118,7 +157,13 @@ const TrimIconAuto = (props: any) => (
 const TrimIconStart = (props: any) => (
   <SvgIcon {...props} viewBox="0 0 20 20">
     {/* Arrow pushing content from left */}
-    <path d="M3 10H17" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+    <path
+      d="M3 10H17"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      fill="none"
+      strokeLinecap="round"
+    />
     <path
       d="M7 6L3 10L7 14"
       stroke="currentColor"
@@ -134,7 +179,13 @@ const TrimIconStart = (props: any) => (
 const TrimIconEnd = (props: any) => (
   <SvgIcon {...props} viewBox="0 0 20 20">
     {/* Arrow pushing content from right */}
-    <path d="M3 10H17" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+    <path
+      d="M3 10H17"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      fill="none"
+      strokeLinecap="round"
+    />
     <path
       d="M13 6L17 10L13 14"
       stroke="currentColor"
@@ -143,15 +194,34 @@ const TrimIconEnd = (props: any) => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    <rect x="17.5" y="4" width="1.5" height="12" rx="0.75" fill="currentColor" />
+    <rect
+      x="17.5"
+      y="4"
+      width="1.5"
+      height="12"
+      rx="0.75"
+      fill="currentColor"
+    />
   </SvgIcon>
 );
 
 const TrimIconReject = (props: any) => (
   <SvgIcon {...props} viewBox="0 0 20 20">
     {/* Circle with X - reject whitespace */}
-    <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5" fill="none" />
-    <path d="M7 7L13 13M13 7L7 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <circle
+      cx="10"
+      cy="10"
+      r="7"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      fill="none"
+    />
+    <path
+      d="M7 7L13 13M13 7L7 13"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
   </SvgIcon>
 );
 
@@ -218,18 +288,26 @@ const FeatureContextFieldsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [deletingField, setDeletingField] = useState<FeatureContextField | null>(null);
+  const [deletingField, setDeletingField] =
+    useState<FeatureContextField | null>(null);
   const [referenceDialogOpen, setReferenceDialogOpen] = useState(false);
-  const [referenceDialogMode, setReferenceDialogMode] = useState<'view' | 'delete'>('view');
+  const [referenceDialogMode, setReferenceDialogMode] = useState<
+    'view' | 'delete'
+  >('view');
   const [references, setReferences] = useState<ResourceReference | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingField, setEditingField] = useState<Partial<FeatureContextField> | null>(null);
-  const [originalField, setOriginalField] = useState<Partial<FeatureContextField> | null>(null);
-  const [expandedLegalValues, setExpandedLegalValues] = useState<Set<string>>(new Set());
+  const [editingField, setEditingField] =
+    useState<Partial<FeatureContextField> | null>(null);
+  const [originalField, setOriginalField] =
+    useState<Partial<FeatureContextField> | null>(null);
+  const [expandedLegalValues, setExpandedLegalValues] = useState<Set<string>>(
+    new Set()
+  );
   const [allTags, setAllTags] = useState<
     { id: number; name: string; color: string; description?: string }[]
   >([]);
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<null | HTMLElement>(null);
   const [showFieldDescription, setShowFieldDescription] = useState(false);
   const [showFieldTags, setShowFieldTags] = useState(false);
 
@@ -260,7 +338,10 @@ const FeatureContextFieldsPage: React.FC = () => {
     }
     return defaultColumns;
   });
-  const visibleColumns = useMemo(() => columns.filter((col) => col.visible), [columns]);
+  const visibleColumns = useMemo(
+    () => columns.filter((col) => col.visible),
+    [columns]
+  );
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -268,12 +349,15 @@ const FeatureContextFieldsPage: React.FC = () => {
   const loadFields = async () => {
     setLoading(true);
     try {
-      const result = await api.get(`${projectApiPath}/features/context-fields`, {
-        params: {
-          search: debouncedSearchTerm || undefined,
-          projectId: currentProjectId || undefined,
-        },
-      });
+      const result = await api.get(
+        `${projectApiPath}/features/context-fields`,
+        {
+          params: {
+            search: debouncedSearchTerm || undefined,
+            projectId: currentProjectId || undefined,
+          },
+        }
+      );
       const allData = result.data?.contextFields || [];
       setAllFields(allData);
       setTotal(allData.length);
@@ -310,7 +394,9 @@ const FeatureContextFieldsPage: React.FC = () => {
 
     // Apply tag filter
     if (tagFilter && tagFilter.length > 0) {
-      filtered = filtered.filter((f) => tagFilter.some((tag) => f.tags?.includes(tag)));
+      filtered = filtered.filter((f) =>
+        tagFilter.some((tag) => f.tags?.includes(tag))
+      );
     }
 
     const start = page * rowsPerPage;
@@ -324,7 +410,9 @@ const FeatureContextFieldsPage: React.FC = () => {
       filtered = filtered.filter((f) => typeFilter.includes(f.fieldType));
     }
     if (tagFilter && tagFilter.length > 0) {
-      filtered = filtered.filter((f) => tagFilter.some((tag) => f.tags?.includes(tag)));
+      filtered = filtered.filter((f) =>
+        tagFilter.some((tag) => f.tags?.includes(tag))
+      );
     }
     return filtered.length;
   }, [allFields, typeFilter, tagFilter]);
@@ -438,7 +526,9 @@ const FeatureContextFieldsPage: React.FC = () => {
   };
 
   const handleFilterChange = (filterKey: string, value: any) => {
-    const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f));
+    const newFilters = activeFilters.map((f) =>
+      f.key === filterKey ? { ...f, value } : f
+    );
     setActiveFilters(newFilters);
     setPage(0);
   };
@@ -451,7 +541,10 @@ const FeatureContextFieldsPage: React.FC = () => {
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
-    localStorage.setItem('contextFieldsColumns', JSON.stringify(defaultColumns));
+    localStorage.setItem(
+      'contextFieldsColumns',
+      JSON.stringify(defaultColumns)
+    );
   };
 
   // Get type icon
@@ -488,14 +581,17 @@ const FeatureContextFieldsPage: React.FC = () => {
     if (!originalField) return true; // New field always has "changes"
 
     // Compare each field explicitly to avoid JSON.stringify key order issues
-    const fieldNameChanged = (editingField.fieldName || '') !== (originalField.fieldName || '');
+    const fieldNameChanged =
+      (editingField.fieldName || '') !== (originalField.fieldName || '');
     const displayNameChanged =
       (editingField.displayName || '') !== (originalField.displayName || '');
     const descriptionChanged =
       (editingField.description || '') !== (originalField.description || '');
     const fieldTypeChanged =
-      (editingField.fieldType || 'string') !== (originalField.fieldType || 'string');
-    const sortOrderChanged = (editingField.sortOrder || 0) !== (originalField.sortOrder || 0);
+      (editingField.fieldType || 'string') !==
+      (originalField.fieldType || 'string');
+    const sortOrderChanged =
+      (editingField.sortOrder || 0) !== (originalField.sortOrder || 0);
 
     // Compare validationRules
     const validationRulesChanged =
@@ -559,7 +655,9 @@ const FeatureContextFieldsPage: React.FC = () => {
       const refs = result.data?.references;
       if (
         refs &&
-        (refs.flags?.length > 0 || refs.segments?.length > 0 || refs.templates?.length > 0)
+        (refs.flags?.length > 0 ||
+          refs.segments?.length > 0 ||
+          refs.templates?.length > 0)
       ) {
         setReferences(refs);
         setReferenceDialogMode('delete');
@@ -592,21 +690,27 @@ const FeatureContextFieldsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingField) return;
     try {
-      await api.delete(`${projectApiPath}/features/context-fields/${deletingField.fieldName}`);
+      await api.delete(
+        `${projectApiPath}/features/context-fields/${deletingField.fieldName}`
+      );
       enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
       loadFields();
     } catch (error: any) {
       const errorCode = extractErrorCode(error?.response?.data);
       if (errorCode === 'RESOURCE_IN_USE') {
         const payload =
-          error?.response?.data?.error?.details?.payload || error?.response?.data?.error?.payload;
+          error?.response?.data?.error?.details?.payload ||
+          error?.response?.data?.error?.payload;
         setReferences(payload?.references || null);
         setReferenceDialogMode('delete');
         setReferenceDialogOpen(true);
       } else {
-        enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.deleteFailed'), {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          parseApiErrorMessage(error, 'featureFlags.deleteFailed'),
+          {
+            variant: 'error',
+          }
+        );
       }
     } finally {
       setDeleteConfirmOpen(false);
@@ -668,7 +772,11 @@ const FeatureContextFieldsPage: React.FC = () => {
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
           {canManage && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
               {t('featureFlags.addContextField')}
             </Button>
           )}
@@ -732,7 +840,9 @@ const FeatureContextFieldsPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -793,7 +903,11 @@ const FeatureContextFieldsPage: React.FC = () => {
                           {t(col.labelKey)}
                         </TableCell>
                       ))}
-                      {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                      {canManage && (
+                        <TableCell align="center">
+                          {t('common.actions')}
+                        </TableCell>
+                      )}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -811,7 +925,9 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       const newEnabled = !field.isEnabled;
                                       setAllFields((prev) =>
                                         prev.map((f) =>
-                                          f.id === field.id ? { ...f, isEnabled: newEnabled } : f
+                                          f.id === field.id
+                                            ? { ...f, isEnabled: newEnabled }
+                                            : f
                                         )
                                       );
                                       try {
@@ -822,11 +938,16 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       } catch (error: any) {
                                         setAllFields((prev) =>
                                           prev.map((f) =>
-                                            f.id === field.id ? { ...f, isEnabled: !newEnabled } : f
+                                            f.id === field.id
+                                              ? { ...f, isEnabled: !newEnabled }
+                                              : f
                                           )
                                         );
                                         enqueueSnackbar(
-                                          parseApiErrorMessage(error, t('common.saveFailed')),
+                                          parseApiErrorMessage(
+                                            error,
+                                            t('common.saveFailed')
+                                          ),
                                           { variant: 'error' }
                                         );
                                       }
@@ -844,7 +965,9 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       alignItems: 'center',
                                     }}
                                   >
-                                    <Tooltip title={getFieldTypeLabel(field.fieldType)}>
+                                    <Tooltip
+                                      title={getFieldTypeLabel(field.fieldType)}
+                                    >
                                       <Box
                                         sx={{
                                           display: 'flex',
@@ -882,13 +1005,19 @@ const FeatureContextFieldsPage: React.FC = () => {
                                               copyToClipboardWithNotification(
                                                 field.fieldName,
                                                 () =>
-                                                  enqueueSnackbar(t('common.copySuccess'), {
-                                                    variant: 'success',
-                                                  }),
+                                                  enqueueSnackbar(
+                                                    t('common.copySuccess'),
+                                                    {
+                                                      variant: 'success',
+                                                    }
+                                                  ),
                                                 () =>
-                                                  enqueueSnackbar(t('common.copyFailed'), {
-                                                    variant: 'error',
-                                                  })
+                                                  enqueueSnackbar(
+                                                    t('common.copyFailed'),
+                                                    {
+                                                      variant: 'error',
+                                                    }
+                                                  )
                                               );
                                             }}
                                             sx={{
@@ -901,7 +1030,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                                         </Tooltip>
                                       </Box>
                                       {field.displayName &&
-                                        field.displayName !== field.fieldName && (
+                                        field.displayName !==
+                                          field.fieldName && (
                                           <Typography
                                             variant="body2"
                                             color="text.secondary"
@@ -932,9 +1062,11 @@ const FeatureContextFieldsPage: React.FC = () => {
                                 </TableCell>
                               );
                             case 'legalValues': {
-                              const rulesActive = field.validationRules?.enabled === true;
+                              const rulesActive =
+                                field.validationRules?.enabled === true;
                               const legalVals =
-                                rulesActive && field.validationRules?.legalValues
+                                rulesActive &&
+                                field.validationRules?.legalValues
                                   ? field.validationRules.legalValues
                                   : [];
                               return (
@@ -991,7 +1123,10 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       )}
                                     </Box>
                                   ) : (
-                                    <Typography variant="body2" color="text.disabled">
+                                    <Typography
+                                      variant="body2"
+                                      color="text.disabled"
+                                    >
                                       -
                                     </Typography>
                                   )}
@@ -1010,8 +1145,11 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       }}
                                     >
                                       {field.tags.map((tagName, idx) => {
-                                        const tagData = allTags.find((t) => t.name === tagName);
-                                        const color = tagData?.color || '#888888';
+                                        const tagData = allTags.find(
+                                          (t) => t.name === tagName
+                                        );
+                                        const color =
+                                          tagData?.color || '#888888';
                                         return (
                                           <Tooltip
                                             key={idx}
@@ -1032,7 +1170,10 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       })}
                                     </Box>
                                   ) : (
-                                    <Typography variant="body2" color="text.disabled">
+                                    <Typography
+                                      variant="body2"
+                                      color="text.disabled"
+                                    >
                                       -
                                     </Typography>
                                   )}
@@ -1048,12 +1189,17 @@ const FeatureContextFieldsPage: React.FC = () => {
                                         size="small"
                                         color="primary"
                                         variant="outlined"
-                                        onClick={() => handleViewReferences(field)}
+                                        onClick={() =>
+                                          handleViewReferences(field)
+                                        }
                                         sx={{ cursor: 'pointer', minWidth: 32 }}
                                       />
                                     </Tooltip>
                                   ) : (
-                                    <Typography variant="body2" color="text.disabled">
+                                    <Typography
+                                      variant="body2"
+                                      color="text.disabled"
+                                    >
                                       {t('common.noReferences')}
                                     </Typography>
                                   )}
@@ -1063,7 +1209,10 @@ const FeatureContextFieldsPage: React.FC = () => {
                               return (
                                 <TableCell key={col.id}>
                                   <Box>
-                                    <Typography variant="body2" fontWeight={500}>
+                                    <Typography
+                                      variant="body2"
+                                      fontWeight={500}
+                                    >
                                       {field.createdByName || '-'}
                                     </Typography>
                                     {field.createdByEmail && (
@@ -1081,8 +1230,14 @@ const FeatureContextFieldsPage: React.FC = () => {
                             case 'createdAt':
                               return (
                                 <TableCell key={col.id}>
-                                  <Tooltip title={formatDateTimeDetailed(field.createdAt)}>
-                                    <span>{formatRelativeTime(field.createdAt)}</span>
+                                  <Tooltip
+                                    title={formatDateTimeDetailed(
+                                      field.createdAt
+                                    )}
+                                  >
+                                    <span>
+                                      {formatRelativeTime(field.createdAt)}
+                                    </span>
                                   </Tooltip>
                                 </TableCell>
                               );
@@ -1100,12 +1255,18 @@ const FeatureContextFieldsPage: React.FC = () => {
                               }}
                             >
                               <Tooltip title={t('common.edit')}>
-                                <IconButton size="small" onClick={() => handleEdit(field)}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleEdit(field)}
+                                >
                                   <EditIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
                               <Tooltip title={t('common.delete')}>
-                                <IconButton size="small" onClick={() => handleDelete(field)}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleDelete(field)}
+                                >
                                   <DeleteIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
@@ -1197,7 +1358,9 @@ const FeatureContextFieldsPage: React.FC = () => {
                     displayName: e.target.value,
                   }))
                 }
-                helperText={canManage ? t('featureFlags.displayNameHelp') : undefined}
+                helperText={
+                  canManage ? t('featureFlags.displayNameHelp') : undefined
+                }
                 disabled={!canManage}
               />
             </Box>
@@ -1208,7 +1371,11 @@ const FeatureContextFieldsPage: React.FC = () => {
                 <Button
                   size="small"
                   onClick={() => setShowFieldDescription(true)}
-                  sx={{ textTransform: 'none', color: 'text.secondary', fontSize: '0.8rem' }}
+                  sx={{
+                    textTransform: 'none',
+                    color: 'text.secondary',
+                    fontSize: '0.8rem',
+                  }}
                 >
                   {t('common.addDescription')}
                 </Button>
@@ -1217,7 +1384,11 @@ const FeatureContextFieldsPage: React.FC = () => {
                 <Button
                   size="small"
                   onClick={() => setShowFieldTags(true)}
-                  sx={{ textTransform: 'none', color: 'text.secondary', fontSize: '0.8rem' }}
+                  sx={{
+                    textTransform: 'none',
+                    color: 'text.secondary',
+                    fontSize: '0.8rem',
+                  }}
                 >
                   + {t('common.addTag')}
                 </Button>
@@ -1247,11 +1418,15 @@ const FeatureContextFieldsPage: React.FC = () => {
               <Autocomplete
                 multiple
                 options={allTags}
-                getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}
+                getOptionLabel={(option) =>
+                  typeof option === 'string' ? option : option.name
+                }
                 filterSelectedOptions
                 isOptionEqualToValue={(option, value) => {
-                  const optName = typeof option === 'string' ? option : option.name;
-                  const valName = typeof value === 'string' ? value : value.name;
+                  const optName =
+                    typeof option === 'string' ? option : option.name;
+                  const valName =
+                    typeof value === 'string' ? value : value.name;
                   return optName === valName;
                 }}
                 value={(editingField?.tags || []).map((tagName) => {
@@ -1259,7 +1434,9 @@ const FeatureContextFieldsPage: React.FC = () => {
                   return found || { id: 0, name: tagName, color: '#888888' };
                 })}
                 onChange={(_, newValue) => {
-                  const tagNames = newValue.map((v) => (typeof v === 'string' ? v : v.name));
+                  const tagNames = newValue.map((v) =>
+                    typeof v === 'string' ? v : v.name
+                  );
                   setEditingField((prev) => ({ ...prev, tags: tagNames }));
                 }}
                 renderTags={(value, getTagProps) =>
@@ -1270,7 +1447,11 @@ const FeatureContextFieldsPage: React.FC = () => {
                         ? { name: option, color: '#888888', description: '' }
                         : option;
                     return (
-                      <Tooltip key={key} title={tagData.description || ''} arrow>
+                      <Tooltip
+                        key={key}
+                        title={tagData.description || ''}
+                        arrow
+                      >
                         <Chip
                           size="small"
                           label={tagData.name}
@@ -1335,19 +1516,53 @@ const FeatureContextFieldsPage: React.FC = () => {
                 )}
               >
                 {[
-                  { value: 'string', descKey: 'featureFlags.fieldTypeDesc.string' },
-                  { value: 'number', descKey: 'featureFlags.fieldTypeDesc.number' },
-                  { value: 'boolean', descKey: 'featureFlags.fieldTypeDesc.boolean' },
+                  {
+                    value: 'string',
+                    descKey: 'featureFlags.fieldTypeDesc.string',
+                  },
+                  {
+                    value: 'number',
+                    descKey: 'featureFlags.fieldTypeDesc.number',
+                  },
+                  {
+                    value: 'boolean',
+                    descKey: 'featureFlags.fieldTypeDesc.boolean',
+                  },
                   { value: 'date', descKey: 'featureFlags.fieldTypeDesc.date' },
-                  { value: 'semver', descKey: 'featureFlags.fieldTypeDesc.semver' },
-                  { value: 'array', descKey: 'featureFlags.fieldTypeDesc.array' },
-                  { value: 'country', descKey: 'featureFlags.fieldTypeDesc.country' },
-                  { value: 'countryCode3', descKey: 'featureFlags.fieldTypeDesc.countryCode3' },
-                  { value: 'languageCode', descKey: 'featureFlags.fieldTypeDesc.languageCode' },
-                  { value: 'localeCode', descKey: 'featureFlags.fieldTypeDesc.localeCode' },
-                  { value: 'timezone', descKey: 'featureFlags.fieldTypeDesc.timezone' },
+                  {
+                    value: 'semver',
+                    descKey: 'featureFlags.fieldTypeDesc.semver',
+                  },
+                  {
+                    value: 'array',
+                    descKey: 'featureFlags.fieldTypeDesc.array',
+                  },
+                  {
+                    value: 'country',
+                    descKey: 'featureFlags.fieldTypeDesc.country',
+                  },
+                  {
+                    value: 'countryCode3',
+                    descKey: 'featureFlags.fieldTypeDesc.countryCode3',
+                  },
+                  {
+                    value: 'languageCode',
+                    descKey: 'featureFlags.fieldTypeDesc.languageCode',
+                  },
+                  {
+                    value: 'localeCode',
+                    descKey: 'featureFlags.fieldTypeDesc.localeCode',
+                  },
+                  {
+                    value: 'timezone',
+                    descKey: 'featureFlags.fieldTypeDesc.timezone',
+                  },
                 ].map((item) => (
-                  <MenuItem key={item.value} value={item.value} sx={{ py: 1.5 }}>
+                  <MenuItem
+                    key={item.value}
+                    value={item.value}
+                    sx={{ py: 1.5 }}
+                  >
                     <Box>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         {getTypeIcon(item.value)}
@@ -1356,7 +1571,12 @@ const FeatureContextFieldsPage: React.FC = () => {
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ ml: 3.5, display: 'block', mt: 0.25, lineHeight: 1.3 }}
+                        sx={{
+                          ml: 3.5,
+                          display: 'block',
+                          mt: 0.25,
+                          lineHeight: 1.3,
+                        }}
                       >
                         {t(item.descKey)}
                       </Typography>
@@ -1374,7 +1594,9 @@ const FeatureContextFieldsPage: React.FC = () => {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={editingField.validationRules?.isRequired === true}
+                      checked={
+                        editingField.validationRules?.isRequired === true
+                      }
                       onChange={(e) =>
                         setEditingField((prev) => ({
                           ...prev,
@@ -1398,9 +1620,13 @@ const FeatureContextFieldsPage: React.FC = () => {
                 {/* Trim Whitespace - always shown as requested */}
                 {editingField.fieldType && (
                   <FormControl size="small" sx={{ minWidth: 180, flex: 1 }}>
-                    <InputLabel>{t('featureFlags.validation.trimWhitespace')}</InputLabel>
+                    <InputLabel>
+                      {t('featureFlags.validation.trimWhitespace')}
+                    </InputLabel>
                     <Select
-                      value={editingField.validationRules?.trimWhitespace || 'none'}
+                      value={
+                        editingField.validationRules?.trimWhitespace || 'none'
+                      }
                       label={t('featureFlags.validation.trimWhitespace')}
                       onChange={(e) =>
                         setEditingField((prev) => ({
@@ -1408,17 +1634,25 @@ const FeatureContextFieldsPage: React.FC = () => {
                           validationRules: {
                             ...prev.validationRules,
                             trimWhitespace:
-                              e.target.value === 'none' ? undefined : (e.target.value as any),
+                              e.target.value === 'none'
+                                ? undefined
+                                : (e.target.value as any),
                           },
                         }))
                       }
                       renderValue={(value) => {
-                        const IconComp = TRIM_ICONS[value as string] || TrimIconNone;
-                        const color = TRIM_COLORS[value as string] || 'text.secondary';
-                        const labelKey = TRIM_LABEL_MAP[value as string] || TRIM_LABEL_MAP.none;
+                        const IconComp =
+                          TRIM_ICONS[value as string] || TrimIconNone;
+                        const color =
+                          TRIM_COLORS[value as string] || 'text.secondary';
+                        const labelKey =
+                          TRIM_LABEL_MAP[value as string] ||
+                          TRIM_LABEL_MAP.none;
                         return (
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <IconComp sx={{ mr: 1, fontSize: '1.1rem', color }} />
+                            <IconComp
+                              sx={{ mr: 1, fontSize: '1.1rem', color }}
+                            />
                             {t(labelKey)}
                           </Box>
                         );
@@ -1429,7 +1663,9 @@ const FeatureContextFieldsPage: React.FC = () => {
                         const color = TRIM_COLORS[val];
                         return (
                           <MenuItem key={val} value={val}>
-                            <IconComp sx={{ mr: 1, fontSize: '1.1rem', color }} />
+                            <IconComp
+                              sx={{ mr: 1, fontSize: '1.1rem', color }}
+                            />
                             {t(labelKey)}
                           </MenuItem>
                         );
@@ -1517,7 +1753,11 @@ const FeatureContextFieldsPage: React.FC = () => {
       <ReferenceCheckDialog
         open={referenceDialogOpen}
         onClose={() => setReferenceDialogOpen(false)}
-        title={referenceDialogMode === 'delete' ? t('common.cannotDelete') : t('common.references')}
+        title={
+          referenceDialogMode === 'delete'
+            ? t('common.cannotDelete')
+            : t('common.references')
+        }
         references={references}
         mode={referenceDialogMode}
       />

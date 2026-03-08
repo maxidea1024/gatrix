@@ -86,9 +86,14 @@ export class EnvironmentKey {
    * Find active key by its value (for SDK auth)
    * This is the critical lookup used during every SDK request.
    */
-  static async findByKeyValue(keyValue: string): Promise<EnvironmentKeyRecord | null> {
+  static async findByKeyValue(
+    keyValue: string
+  ): Promise<EnvironmentKeyRecord | null> {
     try {
-      const row = await db(this.TABLE).where('keyValue', keyValue).where('isActive', true).first();
+      const row = await db(this.TABLE)
+        .where('keyValue', keyValue)
+        .where('isActive', true)
+        .first();
       return row || null;
     } catch (error) {
       logger.error('Error finding environment key by value:', error);
@@ -99,9 +104,13 @@ export class EnvironmentKey {
   /**
    * Find all keys for an environment
    */
-  static async findByEnvironment(environmentId: string): Promise<EnvironmentKeyRecord[]> {
+  static async findByEnvironment(
+    environmentId: string
+  ): Promise<EnvironmentKeyRecord[]> {
     try {
-      return db(this.TABLE).where('environmentId', environmentId).orderBy('createdAt', 'desc');
+      return db(this.TABLE)
+        .where('environmentId', environmentId)
+        .orderBy('createdAt', 'desc');
     } catch (error) {
       logger.error('Error finding keys for environment:', error);
       throw error;

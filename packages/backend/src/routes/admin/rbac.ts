@@ -8,7 +8,10 @@
 
 import express from 'express';
 import { authenticate } from '../../middleware/auth';
-import { requireOrgPermission, requireOrgAdmin } from '../../middleware/rbac-middleware';
+import {
+  requireOrgPermission,
+  requireOrgAdmin,
+} from '../../middleware/rbac-middleware';
 import { ORG_PERMISSIONS } from '../../types/permissions';
 import { P } from '@gatrix/shared/permissions';
 import { AuthenticatedRequest } from '../../types/auth';
@@ -54,41 +57,59 @@ router.get('/organisations', async (req: any, res) => {
     res.json({ success: true, data: orgs });
   } catch (error) {
     logger.error('Error listing organisations:', error);
-    res.status(500).json({ success: false, message: 'Failed to list organisations' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to list organisations' });
   }
 });
 
 // GET /api/admin/rbac/organisations/:id
-router.get('/organisations/:id', requireOrgAdmin as any, async (req: any, res) => {
-  try {
-    const org = await Organisation.findById(req.params.id);
-    if (!org) {
-      return res.status(404).json({ success: false, message: 'Organisation not found' });
+router.get(
+  '/organisations/:id',
+  requireOrgAdmin as any,
+  async (req: any, res) => {
+    try {
+      const org = await Organisation.findById(req.params.id);
+      if (!org) {
+        return res
+          .status(404)
+          .json({ success: false, message: 'Organisation not found' });
+      }
+      const members = await Organisation.getMembers(org.id);
+      res.json({ success: true, data: { ...org, members } });
+    } catch (error) {
+      logger.error('Error getting organisation:', error);
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to get organisation' });
     }
-    const members = await Organisation.getMembers(org.id);
-    res.json({ success: true, data: { ...org, members } });
-  } catch (error) {
-    logger.error('Error getting organisation:', error);
-    res.status(500).json({ success: false, message: 'Failed to get organisation' });
   }
-});
+);
 
 // PUT /api/admin/rbac/organisations/:id
-router.put('/organisations/:id', requireOrgAdmin as any, async (req: any, res) => {
-  try {
-    const updated = await Organisation.update(req.params.id, {
-      ...req.body,
-      updatedBy: req.user.id,
-    });
-    if (!updated) {
-      return res.status(404).json({ success: false, message: 'Organisation not found' });
+router.put(
+  '/organisations/:id',
+  requireOrgAdmin as any,
+  async (req: any, res) => {
+    try {
+      const updated = await Organisation.update(req.params.id, {
+        ...req.body,
+        updatedBy: req.user.id,
+      });
+      if (!updated) {
+        return res
+          .status(404)
+          .json({ success: false, message: 'Organisation not found' });
+      }
+      res.json({ success: true, data: updated });
+    } catch (error) {
+      logger.error('Error updating organisation:', error);
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to update organisation' });
     }
-    res.json({ success: true, data: updated });
-  } catch (error) {
-    logger.error('Error updating organisation:', error);
-    res.status(500).json({ success: false, message: 'Failed to update organisation' });
   }
-});
+);
 
 // POST /api/admin/rbac/organisations
 router.post('/organisations', requireOrgAdmin as any, async (req: any, res) => {
@@ -97,12 +118,17 @@ router.post('/organisations', requireOrgAdmin as any, async (req: any, res) => {
     if (!orgName || !displayName) {
       return res
         .status(400)
-        .json({ success: false, message: 'orgName and displayName are required' });
+        .json({
+          success: false,
+          message: 'orgName and displayName are required',
+        });
     }
 
     const existing = await Organisation.findByName(orgName);
     if (existing) {
-      return res.status(409).json({ success: false, message: 'Organisation name already exists' });
+      return res
+        .status(409)
+        .json({ success: false, message: 'Organisation name already exists' });
     }
 
     const org = await Organisation.create({
@@ -117,7 +143,9 @@ router.post('/organisations', requireOrgAdmin as any, async (req: any, res) => {
 
     // Auto-bind Manager role (with *:*) at org scope so creator has full access
     try {
-      const managerRole = await db('g_roles').where('roleName', 'Manager').first();
+      const managerRole = await db('g_roles')
+        .where('roleName', 'Manager')
+        .first();
       if (managerRole) {
         await db('g_role_bindings').insert({
           id: generateULID(),
@@ -139,7 +167,9 @@ router.post('/organisations', requireOrgAdmin as any, async (req: any, res) => {
     res.status(201).json({ success: true, data: org });
   } catch (error) {
     logger.error('Error creating organisation:', error);
-    res.status(500).json({ success: false, message: 'Failed to create organisation' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to create organisation' });
   }
 });
 
@@ -152,51 +182,63 @@ router.get('/organisations/:id/members', async (req: any, res) => {
     res.json({ success: true, data: members });
   } catch (error) {
     logger.error('Error getting organisation members:', error);
-    res.status(500).json({ success: false, message: 'Failed to get organisation members' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to get organisation members' });
   }
 });
 
 // POST /api/admin/rbac/organisations/:id/members
-router.post('/organisations/:id/members', requireOrgAdmin as any, async (req: any, res) => {
-  try {
-    const { userId } = req.body;
-    if (!userId) {
-      return res.status(400).json({ success: false, message: 'userId is required' });
+router.post(
+  '/organisations/:id/members',
+  requireOrgAdmin as any,
+  async (req: any, res) => {
+    try {
+      const { userId } = req.body;
+      if (!userId) {
+        return res
+          .status(400)
+          .json({ success: false, message: 'userId is required' });
+      }
+
+      // Check if user is already a member
+      const existing = await Organisation.getMember(req.params.id, userId);
+      if (existing) {
+        return res
+          .status(409)
+          .json({ success: false, message: 'User is already a member' });
+      }
+
+      await Organisation.addMember(req.params.id, userId, req.user.id);
+
+      // SSE notification to the added user
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: { userId },
+        targetUsers: [userId],
+        excludeUsers: [req.user.id],
+      });
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'org_member_add',
+        resourceType: 'organisation',
+        resourceId: req.params.id,
+        newValues: { targetUserId: userId, orgId: req.params.id },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
+      res
+        .status(201)
+        .json({ success: true, message: 'Member added successfully' });
+    } catch (error) {
+      logger.error('Error adding organisation member:', error);
+      res.status(500).json({ success: false, message: 'Failed to add member' });
     }
-
-    // Check if user is already a member
-    const existing = await Organisation.getMember(req.params.id, userId);
-    if (existing) {
-      return res.status(409).json({ success: false, message: 'User is already a member' });
-    }
-
-    await Organisation.addMember(req.params.id, userId, req.user.id);
-
-    // SSE notification to the added user
-    await pubSubService.publishNotification({
-      type: 'user_role_changed',
-      data: { userId },
-      targetUsers: [userId],
-      excludeUsers: [req.user.id],
-    });
-
-    // Audit log
-    await AuditLogModel.create({
-      userId: req.user.id,
-      action: 'org_member_add',
-      resourceType: 'organisation',
-      resourceId: req.params.id,
-      newValues: { targetUserId: userId, orgId: req.params.id },
-      ipAddress: req.ip,
-      userAgent: req.get('User-Agent'),
-    });
-
-    res.status(201).json({ success: true, message: 'Member added successfully' });
-  } catch (error) {
-    logger.error('Error adding organisation member:', error);
-    res.status(500).json({ success: false, message: 'Failed to add member' });
   }
-});
+);
 
 // DELETE /api/admin/rbac/organisations/:id/members/:userId
 router.delete(
@@ -208,11 +250,19 @@ router.delete(
       if (String(req.user.id) === String(req.params.userId)) {
         return res
           .status(403)
-          .json({ success: false, message: 'Cannot remove yourself from organisation' });
+          .json({
+            success: false,
+            message: 'Cannot remove yourself from organisation',
+          });
       }
-      const result = await Organisation.removeMember(req.params.id, req.params.userId);
+      const result = await Organisation.removeMember(
+        req.params.id,
+        req.params.userId
+      );
       if (!result) {
-        return res.status(404).json({ success: false, message: 'Member not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Member not found' });
       }
 
       // SSE notification to the removed user
@@ -237,7 +287,9 @@ router.delete(
       res.json({ success: true, message: 'Member removed successfully' });
     } catch (error) {
       logger.error('Error removing organisation member:', error);
-      res.status(500).json({ success: false, message: 'Failed to remove member' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to remove member' });
     }
   }
 );
@@ -264,7 +316,9 @@ router.get('/my-access', async (req: any, res) => {
     }
 
     if (isSuperAdmin) {
-      const allOrgs = await db('g_organisations').where('isActive', true).select('id');
+      const allOrgs = await db('g_organisations')
+        .where('isActive', true)
+        .select('id');
       orgIds = allOrgs.map((o: any) => o.id);
     } else {
       orgIds = orgMemberships.map((m) => m.orgId);
@@ -279,7 +333,10 @@ router.get('/my-access', async (req: any, res) => {
     > = {};
 
     for (const orgId of orgIds) {
-      const projectIds = await permissionService.getAccessibleProjectIds(userId, orgId);
+      const projectIds = await permissionService.getAccessibleProjectIds(
+        userId,
+        orgId
+      );
 
       const environments: Record<string, string[]> = {};
       for (const projectId of projectIds) {
@@ -297,7 +354,9 @@ router.get('/my-access', async (req: any, res) => {
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('Error getting user access tree:', error);
-    res.status(500).json({ success: false, message: 'Failed to get access tree' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to get access tree' });
   }
 });
 
@@ -321,13 +380,17 @@ router.get('/projects', async (req: any, res) => {
         'p.*',
         'o.orgName',
         'o.displayName as orgDisplayName',
-        db.raw('(SELECT COUNT(*) FROM g_project_members WHERE projectId = p.id) as memberCount')
+        db.raw(
+          '(SELECT COUNT(*) FROM g_project_members WHERE projectId = p.id) as memberCount'
+        )
       );
 
     res.json({ success: true, data: projects });
   } catch (error) {
     logger.error('Error listing projects:', error);
-    res.status(500).json({ success: false, message: 'Failed to list projects' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to list projects' });
   }
 });
 
@@ -341,7 +404,10 @@ router.post(
       if (!projectName || !displayName) {
         return res
           .status(400)
-          .json({ success: false, message: 'projectName and displayName are required' });
+          .json({
+            success: false,
+            message: 'projectName and displayName are required',
+          });
       }
 
       // Use the provided orgId if specified, otherwise default to user's current org
@@ -349,7 +415,9 @@ router.post(
 
       const existing = await ProjectModel.findByName(targetOrgId, projectName);
       if (existing) {
-        return res.status(409).json({ success: false, message: 'Project name already exists' });
+        return res
+          .status(409)
+          .json({ success: false, message: 'Project name already exists' });
       }
 
       const project = await ProjectModel.create({
@@ -415,7 +483,9 @@ router.post(
       res.status(201).json({ success: true, data: project });
     } catch (error) {
       logger.error('Error creating project:', error);
-      res.status(500).json({ success: false, message: 'Failed to create project' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to create project' });
     }
   }
 );
@@ -431,12 +501,16 @@ router.put(
         updatedBy: req.user.id,
       });
       if (!updated) {
-        return res.status(404).json({ success: false, message: 'Project not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Project not found' });
       }
       res.json({ success: true, data: updated });
     } catch (error) {
       logger.error('Error updating project:', error);
-      res.status(500).json({ success: false, message: 'Failed to update project' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to update project' });
     }
   }
 );
@@ -449,12 +523,16 @@ router.delete(
     try {
       const deleted = await ProjectModel.delete(req.params.id);
       if (!deleted) {
-        return res.status(404).json({ success: false, message: 'Project not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Project not found' });
       }
       res.json({ success: true, message: 'Project deleted' });
     } catch (error) {
       logger.error('Error deleting project:', error);
-      res.status(500).json({ success: false, message: 'Failed to delete project' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to delete project' });
     }
   }
 );
@@ -479,7 +557,9 @@ router.get('/projects/:id/members', async (req: any, res) => {
     res.json({ success: true, data: members });
   } catch (error) {
     logger.error('Error getting project members:', error);
-    res.status(500).json({ success: false, message: 'Failed to get project members' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to get project members' });
   }
 });
 
@@ -491,7 +571,9 @@ router.post(
     try {
       const { userId, projectRole } = req.body;
       if (!userId) {
-        return res.status(400).json({ success: false, message: 'userId is required' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'userId is required' });
       }
 
       // Check if user is already a member
@@ -499,7 +581,9 @@ router.post(
         .where({ projectId: req.params.id, userId })
         .first();
       if (existing) {
-        return res.status(409).json({ success: false, message: 'User is already a member' });
+        return res
+          .status(409)
+          .json({ success: false, message: 'User is already a member' });
       }
 
       const id = generateULID();
@@ -535,7 +619,9 @@ router.post(
         userAgent: req.get('User-Agent'),
       });
 
-      res.status(201).json({ success: true, message: 'Member added successfully' });
+      res
+        .status(201)
+        .json({ success: true, message: 'Member added successfully' });
     } catch (error) {
       logger.error('Error adding project member:', error);
       res.status(500).json({ success: false, message: 'Failed to add member' });
@@ -560,7 +646,9 @@ router.put(
         .where({ projectId: req.params.id, userId: req.params.userId })
         .update({ projectRole });
       if (result === 0) {
-        return res.status(404).json({ success: false, message: 'Member not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Member not found' });
       }
       await permissionService.invalidateUserCache(req.params.userId);
 
@@ -578,7 +666,11 @@ router.put(
         action: 'project_member_update',
         resourceType: 'project',
         resourceId: req.params.id,
-        newValues: { targetUserId: req.params.userId, projectId: req.params.id, projectRole },
+        newValues: {
+          targetUserId: req.params.userId,
+          projectId: req.params.id,
+          projectRole,
+        },
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
       });
@@ -586,7 +678,9 @@ router.put(
       res.json({ success: true, message: 'Member role updated successfully' });
     } catch (error) {
       logger.error('Error updating project member role:', error);
-      res.status(500).json({ success: false, message: 'Failed to update member role' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to update member role' });
     }
   }
 );
@@ -601,7 +695,9 @@ router.delete(
         .where({ projectId: req.params.id, userId: req.params.userId })
         .del();
       if (result === 0) {
-        return res.status(404).json({ success: false, message: 'Member not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Member not found' });
       }
       await permissionService.invalidateUserCache(req.params.userId);
 
@@ -619,7 +715,10 @@ router.delete(
         action: 'project_member_remove',
         resourceType: 'project',
         resourceId: req.params.id,
-        newValues: { targetUserId: req.params.userId, projectId: req.params.id },
+        newValues: {
+          targetUserId: req.params.userId,
+          projectId: req.params.id,
+        },
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
       });
@@ -627,7 +726,9 @@ router.delete(
       res.json({ success: true, message: 'Member removed successfully' });
     } catch (error) {
       logger.error('Error removing project member:', error);
-      res.status(500).json({ success: false, message: 'Failed to remove member' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to remove member' });
     }
   }
 );
@@ -635,41 +736,47 @@ router.delete(
 // ==================== Roles ====================
 
 // GET /api/admin/rbac/roles
-router.get('/roles', requireOrgPermission(P.ROLES_READ) as any, async (req: any, res) => {
-  try {
-    const query = db('g_roles')
-      .select(
-        'g_roles.*',
-        db.raw(
-          '(SELECT COUNT(*) FROM g_role_permissions WHERE roleId = g_roles.id) as permissionCount'
-        ),
-        db.raw(
-          '(SELECT COUNT(DISTINCT userId) FROM g_role_bindings WHERE roleId = g_roles.id AND userId IS NOT NULL) as userCount'
-        ),
-        db.raw(
-          '(SELECT COUNT(DISTINCT groupId) FROM g_role_bindings WHERE roleId = g_roles.id AND groupId IS NOT NULL) as groupCount'
+router.get(
+  '/roles',
+  requireOrgPermission(P.ROLES_READ) as any,
+  async (req: any, res) => {
+    try {
+      const query = db('g_roles')
+        .select(
+          'g_roles.*',
+          db.raw(
+            '(SELECT COUNT(*) FROM g_role_permissions WHERE roleId = g_roles.id) as permissionCount'
+          ),
+          db.raw(
+            '(SELECT COUNT(DISTINCT userId) FROM g_role_bindings WHERE roleId = g_roles.id AND userId IS NOT NULL) as userCount'
+          ),
+          db.raw(
+            '(SELECT COUNT(DISTINCT groupId) FROM g_role_bindings WHERE roleId = g_roles.id AND groupId IS NOT NULL) as groupCount'
+          )
         )
-      )
-      .where('g_roles.orgId', req.user.orgId)
-      .orderBy('g_roles.roleName', 'asc');
+        .where('g_roles.orgId', req.user.orgId)
+        .orderBy('g_roles.roleName', 'asc');
 
-    // Filter roles by actor's scope level (hierarchy-based)
-    const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
-    query.where(
-      'g_roles.scopeType',
-      'in',
-      Object.entries(require('../../utils/scope-hierarchy').SCOPE_LEVELS)
-        .filter(([, level]) => (level as number) >= actorScopeLevel)
-        .map(([key]) => key)
-    );
+      // Filter roles by actor's scope level (hierarchy-based)
+      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(
+        req.user.id
+      );
+      query.where(
+        'g_roles.scopeType',
+        'in',
+        Object.entries(require('../../utils/scope-hierarchy').SCOPE_LEVELS)
+          .filter(([, level]) => (level as number) >= actorScopeLevel)
+          .map(([key]) => key)
+      );
 
-    const roles = await query;
-    res.json({ success: true, data: roles });
-  } catch (error) {
-    logger.error('Error listing roles:', error);
-    res.status(500).json({ success: false, message: 'Failed to list roles' });
+      const roles = await query;
+      res.json({ success: true, data: roles });
+    } catch (error) {
+      logger.error('Error listing roles:', error);
+      res.status(500).json({ success: false, message: 'Failed to list roles' });
+    }
   }
-});
+);
 
 // GET /api/admin/rbac/roles/:id/effective-permissions
 // Returns the role's own + inherited (from parent roles) permissions
@@ -681,7 +788,9 @@ router.get(
       const roleId = req.params.id;
 
       // Get own permissions
-      const ownPerms = await db('g_role_permissions').where('roleId', roleId).select('permission');
+      const ownPerms = await db('g_role_permissions')
+        .where('roleId', roleId)
+        .select('permission');
       const ownPermSet = new Set(ownPerms.map((p: any) => p.permission));
 
       // Get inherited permissions via parent roles (recursively)
@@ -692,7 +801,10 @@ router.get(
       }> = [];
 
       // Recursive parent resolution
-      const resolveParents = async (rIds: string[], depth: number = 0): Promise<void> => {
+      const resolveParents = async (
+        rIds: string[],
+        depth: number = 0
+      ): Promise<void> => {
         if (depth >= 5 || rIds.length === 0) return;
         const parents = await db('g_role_inheritance as ri')
           .join('g_roles as r', 'ri.parentRoleId', 'r.id')
@@ -732,7 +844,12 @@ router.get(
       });
     } catch (error) {
       logger.error('Error getting effective permissions:', error);
-      res.status(500).json({ success: false, message: 'Failed to get effective permissions' });
+      res
+        .status(500)
+        .json({
+          success: false,
+          message: 'Failed to get effective permissions',
+        });
     }
   }
 );
@@ -745,15 +862,23 @@ router.get(
     try {
       const role = await RoleModel.getWithDetails(req.params.id);
       if (!role) {
-        return res.status(404).json({ success: false, message: 'Role not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Role not found' });
       }
       // Verify actor can view roles at this scope level
-      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(
+        req.user.id
+      );
       if (role.orgId !== req.user.orgId) {
-        return res.status(404).json({ success: false, message: 'Role not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Role not found' });
       }
       if (getScopeLevel(role.scopeType) < actorScopeLevel) {
-        return res.status(404).json({ success: false, message: 'Role not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Role not found' });
       }
       res.json({ success: true, data: role });
     } catch (error) {
@@ -771,7 +896,9 @@ router.post(
     try {
       const { roleName, description, permissions } = req.body;
       if (!roleName) {
-        return res.status(400).json({ success: false, message: 'roleName is required' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'roleName is required' });
       }
 
       // Prevent creating roles with permissions above actor's scope level
@@ -780,17 +907,24 @@ router.post(
         Array.isArray(permissions) &&
         permissions.some((p: any) => p.permission === '*:*' || p === '*:*')
       ) {
-        const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+        const actorScopeLevel = await permissionService.getUserMaxScopeLevel(
+          req.user.id
+        );
         if (actorScopeLevel > getScopeLevel('system')) {
           return res
             .status(403)
-            .json({ success: false, message: 'Cannot create roles with wildcard permissions' });
+            .json({
+              success: false,
+              message: 'Cannot create roles with wildcard permissions',
+            });
         }
       }
 
       const existing = await RoleModel.findByName(req.user.orgId, roleName);
       if (existing) {
-        return res.status(409).json({ success: false, message: 'Role name already exists' });
+        return res
+          .status(409)
+          .json({ success: false, message: 'Role name already exists' });
       }
 
       const role = await RoleModel.create({
@@ -809,7 +943,9 @@ router.post(
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating role:', error);
-      res.status(500).json({ success: false, message: 'Failed to create role' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to create role' });
     }
   }
 );
@@ -823,15 +959,24 @@ router.put(
       const { roleName, description, permissions } = req.body;
 
       // IDOR prevention + scope hierarchy protection
-      const existingRole = await db('g_roles').where('id', req.params.id).first();
+      const existingRole = await db('g_roles')
+        .where('id', req.params.id)
+        .first();
       if (!existingRole || existingRole.orgId !== req.user.orgId) {
-        return res.status(404).json({ success: false, message: 'Role not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Role not found' });
       }
-      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(
+        req.user.id
+      );
       if (getScopeLevel(existingRole.scopeType) < actorScopeLevel) {
         return res
           .status(403)
-          .json({ success: false, message: 'Insufficient scope level to modify this role' });
+          .json({
+            success: false,
+            message: 'Insufficient scope level to modify this role',
+          });
       }
 
       // Block wildcard permissions for actors below system scope
@@ -843,7 +988,10 @@ router.put(
         if (actorScopeLevel > getScopeLevel('system')) {
           return res
             .status(403)
-            .json({ success: false, message: 'Cannot set wildcard permissions' });
+            .json({
+              success: false,
+              message: 'Cannot set wildcard permissions',
+            });
         }
       }
 
@@ -868,7 +1016,9 @@ router.put(
         .whereNotNull('rb.groupId')
         .select('gm.userId');
       const affectedUserIds = [
-        ...new Set([...boundUsers, ...boundGroupUsers].map((u: any) => u.userId)),
+        ...new Set(
+          [...boundUsers, ...boundGroupUsers].map((u: any) => u.userId)
+        ),
       ];
 
       if (affectedUserIds.length > 0) {
@@ -886,7 +1036,10 @@ router.put(
         action: 'role_update',
         resourceType: 'role',
         resourceId: req.params.id,
-        oldValues: { roleName: existingRole.roleName, description: existingRole.description },
+        oldValues: {
+          roleName: existingRole.roleName,
+          description: existingRole.description,
+        },
         newValues: { roleName, description, permissions },
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
@@ -896,7 +1049,9 @@ router.put(
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error updating role:', error);
-      res.status(500).json({ success: false, message: 'Failed to update role' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to update role' });
     }
   }
 );
@@ -908,25 +1063,38 @@ router.delete(
   async (req: any, res) => {
     try {
       // IDOR prevention + scope hierarchy protection
-      const existingRole = await db('g_roles').where('id', req.params.id).first();
+      const existingRole = await db('g_roles')
+        .where('id', req.params.id)
+        .first();
       if (!existingRole || existingRole.orgId !== req.user.orgId) {
-        return res.status(404).json({ success: false, message: 'Role not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Role not found' });
       }
-      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(
+        req.user.id
+      );
       if (getScopeLevel(existingRole.scopeType) < actorScopeLevel) {
         return res
           .status(403)
-          .json({ success: false, message: 'Insufficient scope level to delete this role' });
+          .json({
+            success: false,
+            message: 'Insufficient scope level to delete this role',
+          });
       }
 
       const deleted = await RoleModel.delete(req.params.id);
       if (!deleted) {
-        return res.status(404).json({ success: false, message: 'Role not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Role not found' });
       }
       res.json({ success: true, message: 'Role deleted' });
     } catch (error) {
       logger.error('Error deleting role:', error);
-      res.status(500).json({ success: false, message: 'Failed to delete role' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to delete role' });
     }
   }
 );
@@ -943,7 +1111,9 @@ router.get(
       res.json({ success: true, data: groups });
     } catch (error) {
       logger.error('Error listing groups:', error);
-      res.status(500).json({ success: false, message: 'Failed to list groups' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to list groups' });
     }
   }
 );
@@ -956,7 +1126,9 @@ router.get(
     try {
       const group = await GroupModel.findById(req.params.id);
       if (!group) {
-        return res.status(404).json({ success: false, message: 'Group not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Group not found' });
       }
       const [members, roles] = await Promise.all([
         GroupModel.getMembers(group.id),
@@ -978,12 +1150,16 @@ router.post(
     try {
       const { groupName, description, addNewUsersByDefault } = req.body;
       if (!groupName) {
-        return res.status(400).json({ success: false, message: 'groupName is required' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'groupName is required' });
       }
 
       const existing = await GroupModel.findByName(req.user.orgId, groupName);
       if (existing) {
-        return res.status(409).json({ success: false, message: 'Group name already exists' });
+        return res
+          .status(409)
+          .json({ success: false, message: 'Group name already exists' });
       }
 
       const group = await GroupModel.create({
@@ -996,7 +1172,9 @@ router.post(
       res.status(201).json({ success: true, data: group });
     } catch (error) {
       logger.error('Error creating group:', error);
-      res.status(500).json({ success: false, message: 'Failed to create group' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to create group' });
     }
   }
 );
@@ -1012,12 +1190,16 @@ router.put(
         updatedBy: req.user.id,
       });
       if (!updated) {
-        return res.status(404).json({ success: false, message: 'Group not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Group not found' });
       }
       res.json({ success: true, data: updated });
     } catch (error) {
       logger.error('Error updating group:', error);
-      res.status(500).json({ success: false, message: 'Failed to update group' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to update group' });
     }
   }
 );
@@ -1030,12 +1212,16 @@ router.delete(
     try {
       const deleted = await GroupModel.delete(req.params.id);
       if (!deleted) {
-        return res.status(404).json({ success: false, message: 'Group not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Group not found' });
       }
       res.json({ success: true, message: 'Group deleted' });
     } catch (error) {
       logger.error('Error deleting group:', error);
-      res.status(500).json({ success: false, message: 'Failed to delete group' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to delete group' });
     }
   }
 );
@@ -1048,9 +1234,16 @@ router.post(
     try {
       const { userId, isGroupAdmin } = req.body;
       if (!userId) {
-        return res.status(400).json({ success: false, message: 'userId is required' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'userId is required' });
       }
-      await GroupModel.addMember(req.params.id, userId, isGroupAdmin, req.user.id);
+      await GroupModel.addMember(
+        req.params.id,
+        userId,
+        isGroupAdmin,
+        req.user.id
+      );
 
       // SSE notification to the added user (group roles now apply to them)
       await pubSubService.publishNotification({
@@ -1066,7 +1259,11 @@ router.post(
         action: 'group_member_add',
         resourceType: 'group',
         resourceId: req.params.id,
-        newValues: { targetUserId: userId, groupId: req.params.id, isGroupAdmin },
+        newValues: {
+          targetUserId: userId,
+          groupId: req.params.id,
+          isGroupAdmin,
+        },
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
       });
@@ -1074,7 +1271,9 @@ router.post(
       res.status(201).json({ success: true, message: 'Member added' });
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
-        return res.status(409).json({ success: false, message: 'User is already a member' });
+        return res
+          .status(409)
+          .json({ success: false, message: 'User is already a member' });
       }
       logger.error('Error adding group member:', error);
       res.status(500).json({ success: false, message: 'Failed to add member' });
@@ -1088,9 +1287,14 @@ router.delete(
   requireOrgPermission(ORG_PERMISSIONS.GROUP_MEMBERSHIP_WRITE) as any,
   async (req: any, res) => {
     try {
-      const removed = await GroupModel.removeMember(req.params.id, req.params.userId);
+      const removed = await GroupModel.removeMember(
+        req.params.id,
+        req.params.userId
+      );
       if (!removed) {
-        return res.status(404).json({ success: false, message: 'Member not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Member not found' });
       }
 
       // SSE notification to the removed user (group roles no longer apply)
@@ -1115,7 +1319,9 @@ router.delete(
       res.json({ success: true, message: 'Member removed' });
     } catch (error) {
       logger.error('Error removing group member:', error);
-      res.status(500).json({ success: false, message: 'Failed to remove member' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to remove member' });
     }
   }
 );
@@ -1128,25 +1334,39 @@ router.post(
     try {
       const { roleId } = req.body;
       if (!roleId) {
-        return res.status(400).json({ success: false, message: 'roleId is required' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'roleId is required' });
       }
 
       // Prevent assigning roles above actor's scope level (privilege escalation)
       const targetRole = await db('g_roles').where('id', roleId).first();
       if (targetRole) {
-        const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+        const actorScopeLevel = await permissionService.getUserMaxScopeLevel(
+          req.user.id
+        );
         if (getScopeLevel(targetRole.scopeType) < actorScopeLevel) {
           return res
             .status(403)
-            .json({ success: false, message: 'Cannot assign roles above your scope level' });
+            .json({
+              success: false,
+              message: 'Cannot assign roles above your scope level',
+            });
         }
       }
 
-      await GroupModel.addRole(req.params.id, roleId, req.user.orgId, req.user.id);
+      await GroupModel.addRole(
+        req.params.id,
+        roleId,
+        req.user.orgId,
+        req.user.id
+      );
 
       // SSE notification to all group members
       const groupMembers = await GroupModel.getMembers(req.params.id);
-      const memberUserIds = groupMembers.map((m: any) => m.userId).filter(Boolean);
+      const memberUserIds = groupMembers
+        .map((m: any) => m.userId)
+        .filter(Boolean);
       if (memberUserIds.length > 0) {
         await pubSubService.publishNotification({
           type: 'user_role_changed',
@@ -1162,18 +1382,28 @@ router.post(
         action: 'group_role_assign',
         resourceType: 'group',
         resourceId: req.params.id,
-        newValues: { groupId: req.params.id, roleId, roleName: targetRole?.roleName },
+        newValues: {
+          groupId: req.params.id,
+          roleId,
+          roleName: targetRole?.roleName,
+        },
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
       });
 
-      res.status(201).json({ success: true, message: 'Role assigned to group' });
+      res
+        .status(201)
+        .json({ success: true, message: 'Role assigned to group' });
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
-        return res.status(409).json({ success: false, message: 'Role already assigned' });
+        return res
+          .status(409)
+          .json({ success: false, message: 'Role already assigned' });
       }
       logger.error('Error adding group role:', error);
-      res.status(500).json({ success: false, message: 'Failed to assign role' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to assign role' });
     }
   }
 );
@@ -1187,13 +1417,20 @@ router.delete(
       // Get group members before removing role (for SSE notification)
       const groupMembersForNotify = await GroupModel.getMembers(req.params.id);
 
-      const removed = await GroupModel.removeRole(req.params.id, req.params.roleId);
+      const removed = await GroupModel.removeRole(
+        req.params.id,
+        req.params.roleId
+      );
       if (!removed) {
-        return res.status(404).json({ success: false, message: 'Role not assigned to this group' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Role not assigned to this group' });
       }
 
       // SSE notification to all group members
-      const memberIds = groupMembersForNotify.map((m: any) => m.userId).filter(Boolean);
+      const memberIds = groupMembersForNotify
+        .map((m: any) => m.userId)
+        .filter(Boolean);
       if (memberIds.length > 0) {
         await pubSubService.publishNotification({
           type: 'user_role_changed',
@@ -1217,7 +1454,9 @@ router.delete(
       res.json({ success: true, message: 'Role removed from group' });
     } catch (error) {
       logger.error('Error removing group role:', error);
-      res.status(500).json({ success: false, message: 'Failed to remove role' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to remove role' });
     }
   }
 );
@@ -1247,7 +1486,10 @@ router.get(
         }
 
         // Get inherited permissions via parent roles (recursively)
-        const resolveParents = async (rIds: string[], depth: number = 0): Promise<void> => {
+        const resolveParents = async (
+          rIds: string[],
+          depth: number = 0
+        ): Promise<void> => {
           if (depth >= 5 || rIds.length === 0) return;
           const parents = await db('g_role_inheritance as ri')
             .join('g_roles as r', 'ri.parentRoleId', 'r.id')
@@ -1262,7 +1504,8 @@ router.get(
             for (const pp of parentPerms) {
               if (!ownPermSet.has(pp.permission)) {
                 ownPermSet.add(pp.permission);
-                permSources[pp.permission] = `${role.roleName} ← ${parent.roleName}`;
+                permSources[pp.permission] =
+                  `${role.roleName} ← ${parent.roleName}`;
               }
             }
             nextIds.push(parent.parentRoleId);
@@ -1283,13 +1526,22 @@ router.get(
         success: true,
         data: {
           own: allPerms.map((p) => p.permission),
-          inherited: [] as Array<{ permission: string; fromRoleId: string; fromRoleName: string }>,
+          inherited: [] as Array<{
+            permission: string;
+            fromRoleId: string;
+            fromRoleName: string;
+          }>,
           sources: allPerms,
         },
       });
     } catch (error) {
       logger.error('Error getting group effective permissions:', error);
-      res.status(500).json({ success: false, message: 'Failed to get effective permissions' });
+      res
+        .status(500)
+        .json({
+          success: false,
+          message: 'Failed to get effective permissions',
+        });
     }
   }
 );
@@ -1315,7 +1567,9 @@ router.get(
       res.json({ success: true, data: userBindings });
     } catch (error) {
       logger.error('Error getting user roles:', error);
-      res.status(500).json({ success: false, message: 'Failed to get user roles' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to get user roles' });
     }
   }
 );
@@ -1328,17 +1582,23 @@ router.post(
     try {
       // Prevent self-modification
       if (String(req.user.id) === String(req.params.id)) {
-        return res.status(403).json({ success: false, message: 'Cannot modify your own roles' });
+        return res
+          .status(403)
+          .json({ success: false, message: 'Cannot modify your own roles' });
       }
       const { roleId } = req.body;
       if (!roleId) {
-        return res.status(400).json({ success: false, message: 'roleId is required' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'roleId is required' });
       }
 
       // Prevent assigning roles above actor's scope level (privilege escalation)
       const targetRole = await db('g_roles').where('id', roleId).first();
       if (targetRole) {
-        const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+        const actorScopeLevel = await permissionService.getUserMaxScopeLevel(
+          req.user.id
+        );
         if (getScopeLevel(targetRole.scopeType) < actorScopeLevel) {
           return res.status(403).json({
             success: false,
@@ -1373,7 +1633,11 @@ router.post(
         action: 'user_role_assign',
         resourceType: 'user',
         resourceId: req.params.id,
-        newValues: { targetUserId: req.params.id, roleId, roleName: targetRole?.roleName },
+        newValues: {
+          targetUserId: req.params.id,
+          roleId,
+          roleName: targetRole?.roleName,
+        },
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
       });
@@ -1381,10 +1645,14 @@ router.post(
       res.status(201).json({ success: true, message: 'Role assigned to user' });
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
-        return res.status(409).json({ success: false, message: 'Role already assigned' });
+        return res
+          .status(409)
+          .json({ success: false, message: 'Role already assigned' });
       }
       logger.error('Error assigning user role:', error);
-      res.status(500).json({ success: false, message: 'Failed to assign role' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to assign role' });
     }
   }
 );
@@ -1397,20 +1665,31 @@ router.delete(
     try {
       // Prevent self-modification
       if (String(req.user.id) === String(req.params.id)) {
-        return res.status(403).json({ success: false, message: 'Cannot modify your own roles' });
+        return res
+          .status(403)
+          .json({ success: false, message: 'Cannot modify your own roles' });
       }
 
       // Prevent removing roles above actor's scope level
-      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
-      const targetRole = await db('g_roles').where('id', req.params.roleId).first();
+      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(
+        req.user.id
+      );
+      const targetRole = await db('g_roles')
+        .where('id', req.params.roleId)
+        .first();
       if (targetRole && getScopeLevel(targetRole.scopeType) < actorScopeLevel) {
         return res
           .status(403)
-          .json({ success: false, message: 'Cannot remove roles above your scope level' });
+          .json({
+            success: false,
+            message: 'Cannot remove roles above your scope level',
+          });
       }
 
       // Prevent managing users with higher scope level
-      const targetUserScopeLevel = await permissionService.getUserMaxScopeLevel(req.params.id);
+      const targetUserScopeLevel = await permissionService.getUserMaxScopeLevel(
+        req.params.id
+      );
       if (targetUserScopeLevel < actorScopeLevel) {
         return res.status(403).json({
           success: false,
@@ -1423,7 +1702,9 @@ router.delete(
         .where('roleId', req.params.roleId)
         .del();
       if (result === 0) {
-        return res.status(404).json({ success: false, message: 'Role not assigned to this user' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Role not assigned to this user' });
       }
       await permissionService.invalidateUserCache(req.params.id);
 
@@ -1453,7 +1734,9 @@ router.delete(
       res.json({ success: true, message: 'Role removed from user' });
     } catch (error) {
       logger.error('Error removing user role:', error);
-      res.status(500).json({ success: false, message: 'Failed to remove role' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to remove role' });
     }
   }
 );
@@ -1492,7 +1775,9 @@ router.get(
       });
     } catch (error) {
       logger.error('Error getting user permissions:', error);
-      res.status(500).json({ success: false, message: 'Failed to get permissions' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to get permissions' });
     }
   }
 );
@@ -1514,7 +1799,9 @@ router.get(
       res.json({ success: true, data: masked });
     } catch (error) {
       logger.error('Error listing admin tokens:', error);
-      res.status(500).json({ success: false, message: 'Failed to list admin tokens' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to list admin tokens' });
     }
   }
 );
@@ -1527,7 +1814,9 @@ router.post(
     try {
       const { tokenName, description, roleId, expiresAt } = req.body;
       if (!tokenName) {
-        return res.status(400).json({ success: false, message: 'tokenName is required' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'tokenName is required' });
       }
 
       const result = await AdminApiToken.create({
@@ -1549,7 +1838,9 @@ router.post(
       });
     } catch (error) {
       logger.error('Error creating admin token:', error);
-      res.status(500).json({ success: false, message: 'Failed to create admin token' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to create admin token' });
     }
   }
 );
@@ -1562,12 +1853,16 @@ router.delete(
     try {
       const deleted = await AdminApiToken.delete(req.params.id);
       if (!deleted) {
-        return res.status(404).json({ success: false, message: 'Admin token not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'Admin token not found' });
       }
       res.json({ success: true, message: 'Admin token deleted' });
     } catch (error) {
       logger.error('Error deleting admin token:', error);
-      res.status(500).json({ success: false, message: 'Failed to delete admin token' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to delete admin token' });
     }
   }
 );
@@ -1577,7 +1872,9 @@ router.delete(
 // GET /api/admin/rbac/environment-keys/:environmentId
 router.get('/environment-keys/:environmentId', async (req: any, res) => {
   try {
-    const keys = await EnvironmentKey.findByEnvironment(req.params.environmentId);
+    const keys = await EnvironmentKey.findByEnvironment(
+      req.params.environmentId
+    );
     // Mask key values
     const masked = keys.map((k) => ({
       ...k,
@@ -1586,7 +1883,9 @@ router.get('/environment-keys/:environmentId', async (req: any, res) => {
     res.json({ success: true, data: masked });
   } catch (error) {
     logger.error('Error listing environment keys:', error);
-    res.status(500).json({ success: false, message: 'Failed to list environment keys' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to list environment keys' });
   }
 });
 
@@ -1618,7 +1917,9 @@ router.post('/environment-keys', async (req: any, res) => {
     });
   } catch (error) {
     logger.error('Error creating environment key:', error);
-    res.status(500).json({ success: false, message: 'Failed to create environment key' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to create environment key' });
   }
 });
 
@@ -1627,12 +1928,19 @@ router.patch('/environment-keys/:id/deactivate', async (req: any, res) => {
   try {
     const key = await EnvironmentKey.deactivate(req.params.id);
     if (!key) {
-      return res.status(404).json({ success: false, message: 'Environment key not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'Environment key not found' });
     }
     res.json({ success: true, data: key });
   } catch (error) {
     logger.error('Error deactivating environment key:', error);
-    res.status(500).json({ success: false, message: 'Failed to deactivate environment key' });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: 'Failed to deactivate environment key',
+      });
   }
 });
 
@@ -1641,12 +1949,16 @@ router.patch('/environment-keys/:id/activate', async (req: any, res) => {
   try {
     const key = await EnvironmentKey.activate(req.params.id);
     if (!key) {
-      return res.status(404).json({ success: false, message: 'Environment key not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'Environment key not found' });
     }
     res.json({ success: true, data: key });
   } catch (error) {
     logger.error('Error activating environment key:', error);
-    res.status(500).json({ success: false, message: 'Failed to activate environment key' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to activate environment key' });
   }
 });
 
@@ -1655,12 +1967,16 @@ router.delete('/environment-keys/:id', async (req: any, res) => {
   try {
     const deleted = await EnvironmentKey.delete(req.params.id);
     if (!deleted) {
-      return res.status(404).json({ success: false, message: 'Environment key not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'Environment key not found' });
     }
     res.json({ success: true, message: 'Environment key deleted' });
   } catch (error) {
     logger.error('Error deleting environment key:', error);
-    res.status(500).json({ success: false, message: 'Failed to delete environment key' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to delete environment key' });
   }
 });
 
@@ -1669,12 +1985,19 @@ router.delete('/environment-keys/:id', async (req: any, res) => {
 // GET /api/admin/rbac/permissions - list all available permissions (for role editor UI)
 router.get('/permissions', async (req: any, res) => {
   try {
-    const { ALL_PERMISSIONS, PERMISSION_CATEGORIES, RESOURCE_ACTIONS, PERMISSION_SEPARATOR } =
-      await import('../../types/permissions');
+    const {
+      ALL_PERMISSIONS,
+      PERMISSION_CATEGORIES,
+      RESOURCE_ACTIONS,
+      PERMISSION_SEPARATOR,
+    } = await import('../../types/permissions');
 
     // Transform array categories into Record format for FE consumption
     // FE expects: Record<string, { label: string; scope: string; permissions: string[] }>
-    const categories: Record<string, { label: string; scope: string; permissions: string[] }> = {};
+    const categories: Record<
+      string,
+      { label: string; scope: string; permissions: string[] }
+    > = {};
     for (const cat of PERMISSION_CATEGORIES) {
       // Extract key from labelKey (e.g. 'permissions.category.workspace' -> 'workspace')
       const key = cat.labelKey.split('.').pop() || cat.labelKey;
@@ -1703,85 +2026,124 @@ router.get('/permissions', async (req: any, res) => {
     });
   } catch (error) {
     logger.error('Error listing permissions:', error);
-    res.status(500).json({ success: false, message: 'Failed to list permissions' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to list permissions' });
   }
 });
 
 // ==================== Role Inheritance ====================
 
 // GET /api/admin/rbac/roles/:roleId/inheritance - Get parent roles for a role
-router.get('/roles/:roleId/inheritance', requireOrgAdmin as any, async (req: any, res) => {
-  try {
-    const { roleId } = req.params;
+router.get(
+  '/roles/:roleId/inheritance',
+  requireOrgAdmin as any,
+  async (req: any, res) => {
+    try {
+      const { roleId } = req.params;
 
-    const parents = await db('g_role_inheritance as ri')
-      .join('g_roles as r', 'ri.parentRoleId', 'r.id')
-      .where('ri.roleId', roleId)
-      .select('ri.id', 'ri.parentRoleId', 'r.roleName as parentRoleName', 'ri.createdAt');
+      const parents = await db('g_role_inheritance as ri')
+        .join('g_roles as r', 'ri.parentRoleId', 'r.id')
+        .where('ri.roleId', roleId)
+        .select(
+          'ri.id',
+          'ri.parentRoleId',
+          'r.roleName as parentRoleName',
+          'ri.createdAt'
+        );
 
-    res.json({ success: true, data: parents });
-  } catch (error) {
-    logger.error('Error getting role inheritance:', error);
-    res.status(500).json({ success: false, message: 'Failed to get role inheritance' });
+      res.json({ success: true, data: parents });
+    } catch (error) {
+      logger.error('Error getting role inheritance:', error);
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to get role inheritance' });
+    }
   }
-});
+);
 
 // POST /api/admin/rbac/roles/:roleId/inheritance - Add parent role (with cycle detection)
-router.post('/roles/:roleId/inheritance', requireOrgAdmin as any, async (req: any, res) => {
-  try {
-    const { roleId } = req.params;
-    const { parentRoleId } = req.body;
+router.post(
+  '/roles/:roleId/inheritance',
+  requireOrgAdmin as any,
+  async (req: any, res) => {
+    try {
+      const { roleId } = req.params;
+      const { parentRoleId } = req.body;
 
-    if (!parentRoleId) {
-      return res.status(400).json({ success: false, message: 'parentRoleId is required' });
+      if (!parentRoleId) {
+        return res
+          .status(400)
+          .json({ success: false, message: 'parentRoleId is required' });
+      }
+
+      if (roleId === parentRoleId) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: 'A role cannot inherit from itself',
+          });
+      }
+
+      // Check both roles exist
+      const [role, parentRole] = await Promise.all([
+        db('g_roles').where('id', roleId).first(),
+        db('g_roles').where('id', parentRoleId).first(),
+      ]);
+
+      if (!role) {
+        return res
+          .status(404)
+          .json({ success: false, message: 'Role not found' });
+      }
+      if (!parentRole) {
+        return res
+          .status(404)
+          .json({ success: false, message: 'Parent role not found' });
+      }
+
+      // Check for circular reference
+      const wouldCycle = await permissionService.wouldCreateCycle(
+        roleId,
+        parentRoleId
+      );
+      if (wouldCycle) {
+        return res.status(400).json({
+          success: false,
+          message:
+            'Adding this parent role would create a circular inheritance chain',
+        });
+      }
+
+      // Check for duplicate
+      const existing = await db('g_role_inheritance')
+        .where({ roleId, parentRoleId })
+        .first();
+      if (existing) {
+        return res
+          .status(409)
+          .json({
+            success: false,
+            message: 'Inheritance relationship already exists',
+          });
+      }
+
+      const id = generateULID();
+      await db('g_role_inheritance').insert({ id, roleId, parentRoleId });
+
+      // Invalidate cache for affected users
+      await permissionService.invalidateRoleCache(roleId);
+
+      res.json({ success: true, data: { id, roleId, parentRoleId } });
+    } catch (error) {
+      logger.error('Error adding role inheritance:', error);
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to add role inheritance' });
     }
-
-    if (roleId === parentRoleId) {
-      return res.status(400).json({ success: false, message: 'A role cannot inherit from itself' });
-    }
-
-    // Check both roles exist
-    const [role, parentRole] = await Promise.all([
-      db('g_roles').where('id', roleId).first(),
-      db('g_roles').where('id', parentRoleId).first(),
-    ]);
-
-    if (!role) {
-      return res.status(404).json({ success: false, message: 'Role not found' });
-    }
-    if (!parentRole) {
-      return res.status(404).json({ success: false, message: 'Parent role not found' });
-    }
-
-    // Check for circular reference
-    const wouldCycle = await permissionService.wouldCreateCycle(roleId, parentRoleId);
-    if (wouldCycle) {
-      return res.status(400).json({
-        success: false,
-        message: 'Adding this parent role would create a circular inheritance chain',
-      });
-    }
-
-    // Check for duplicate
-    const existing = await db('g_role_inheritance').where({ roleId, parentRoleId }).first();
-    if (existing) {
-      return res
-        .status(409)
-        .json({ success: false, message: 'Inheritance relationship already exists' });
-    }
-
-    const id = generateULID();
-    await db('g_role_inheritance').insert({ id, roleId, parentRoleId });
-
-    // Invalidate cache for affected users
-    await permissionService.invalidateRoleCache(roleId);
-
-    res.json({ success: true, data: { id, roleId, parentRoleId } });
-  } catch (error) {
-    logger.error('Error adding role inheritance:', error);
-    res.status(500).json({ success: false, message: 'Failed to add role inheritance' });
   }
-});
+);
 
 // DELETE /api/admin/rbac/roles/:roleId/inheritance/:inheritanceId - Remove parent role
 router.delete(
@@ -1791,12 +2153,17 @@ router.delete(
     try {
       const { roleId, inheritanceId } = req.params;
 
-      const deleted = await db('g_role_inheritance').where({ id: inheritanceId, roleId }).del();
+      const deleted = await db('g_role_inheritance')
+        .where({ id: inheritanceId, roleId })
+        .del();
 
       if (!deleted) {
         return res
           .status(404)
-          .json({ success: false, message: 'Inheritance relationship not found' });
+          .json({
+            success: false,
+            message: 'Inheritance relationship not found',
+          });
       }
 
       // Invalidate cache for affected users
@@ -1805,7 +2172,9 @@ router.delete(
       res.json({ success: true, message: 'Inheritance removed' });
     } catch (error) {
       logger.error('Error removing role inheritance:', error);
-      res.status(500).json({ success: false, message: 'Failed to remove role inheritance' });
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to remove role inheritance' });
     }
   }
 );
@@ -1822,18 +2191,23 @@ router.get(
       const orgId = req.user.orgId;
 
       if (!orgId) {
-        return res.status(400).json({ success: false, message: 'Organisation context required' });
+        return res
+          .status(400)
+          .json({ success: false, message: 'Organisation context required' });
       }
 
-      const effectivePermissions = await permissionService.getUserEffectivePermissions(
-        userId,
-        orgId
-      );
+      const effectivePermissions =
+        await permissionService.getUserEffectivePermissions(userId, orgId);
 
       res.json({ success: true, data: effectivePermissions });
     } catch (error) {
       logger.error('Error getting effective permissions:', error);
-      res.status(500).json({ success: false, message: 'Failed to get effective permissions' });
+      res
+        .status(500)
+        .json({
+          success: false,
+          message: 'Failed to get effective permissions',
+        });
     }
   }
 );

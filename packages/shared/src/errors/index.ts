@@ -159,7 +159,10 @@ export interface ApiResponse<T = any> {
 /**
  * Check if error code matches any of the given codes
  */
-export function isErrorCode(code: string | undefined, ...codes: ErrorCode[]): boolean {
+export function isErrorCode(
+  code: string | undefined,
+  ...codes: ErrorCode[]
+): boolean {
   if (!code) return false;
   return codes.includes(code as ErrorCode);
 }
@@ -174,6 +177,9 @@ export function extractErrorCode(error: any): string | undefined {
 /**
  * Extract error message from various error structures
  */
-export function extractErrorMessage(error: any, defaultMessage = 'An error occurred'): string {
+export function extractErrorMessage(
+  error: any,
+  defaultMessage = 'An error occurred'
+): string {
   return error?.error?.message || error?.message || defaultMessage;
 }

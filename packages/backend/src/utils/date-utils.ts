@@ -21,7 +21,9 @@ const logger = createLogger('dateUtils');
  * convertToMySQLDateTime(null) // null
  * convertToMySQLDateTime("invalid") // null
  */
-export function convertToMySQLDateTime(dateValue: string | Date | null | undefined): string | null {
+export function convertToMySQLDateTime(
+  dateValue: string | Date | null | undefined
+): string | null {
   if (!dateValue) return null;
 
   try {
@@ -98,7 +100,12 @@ export const COMMON_DATE_FIELDS = {
   AUDIT: ['createdAt', 'updatedAt'],
   AUDIT_WITH_DELETED: ['createdAt', 'updatedAt', 'deletedAt'],
   USER: ['createdAt', 'updatedAt', 'lastLoginAt', 'emailVerifiedAt'],
-  GAME_WORLD: ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate'],
+  GAME_WORLD: [
+    'createdAt',
+    'updatedAt',
+    'maintenanceStartDate',
+    'maintenanceEndDate',
+  ],
   MESSAGE: ['createdAt', 'updatedAt', 'deletedAt'],
   CHANNEL: ['createdAt', 'updatedAt'] as const,
 } as const;
@@ -181,7 +188,9 @@ export function convertDateFieldsFromMySQL<T extends Record<string, any>>(
 
   dateFields.forEach((field) => {
     if (converted[field] !== undefined) {
-      converted[field] = convertFromMySQLDateTime(converted[field] as any) as any;
+      converted[field] = convertFromMySQLDateTime(
+        converted[field] as any
+      ) as any;
     }
   });
 
@@ -247,7 +256,10 @@ export function convertMySQLDateTimeToTimezone(
 
     return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
   } catch (error) {
-    logger.error(`Error converting MySQL datetime to timezone: ${mysqlDateTimeStr}`, error);
+    logger.error(
+      `Error converting MySQL datetime to timezone: ${mysqlDateTimeStr}`,
+      error
+    );
     return null;
   }
 }

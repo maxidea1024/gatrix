@@ -11,7 +11,11 @@ import { CacheStorageProvider } from '../cache/storage-provider';
 import { Banner, BannerListResponse } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
 
-export class BannerService extends BaseEnvironmentService<Banner, BannerListResponse, string> {
+export class BannerService extends BaseEnvironmentService<
+  Banner,
+  BannerListResponse,
+  string
+> {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
@@ -156,7 +160,10 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
    * @param status Banner status
    * @param environmentId environment ID (required)
    */
-  getByStatus(status: 'draft' | 'published' | 'archived', environmentId: string): Banner[] {
+  getByStatus(
+    status: 'draft' | 'published' | 'archived',
+    environmentId: string
+  ): Banner[] {
     const banners = this.getCached(environmentId);
     return banners.filter((b) => b.status === status);
   }

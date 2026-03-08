@@ -56,8 +56,10 @@ export class UnknownFlagService {
 
       // Store metadata (will be overwritten if already exists, which is fine)
       if (input.appName || input.sdkVersion) {
-        if (input.appName) await client.hset(metadataKey, 'appName', input.appName);
-        if (input.sdkVersion) await client.hset(metadataKey, 'sdkVersion', input.sdkVersion);
+        if (input.appName)
+          await client.hset(metadataKey, 'appName', input.appName);
+        if (input.sdkVersion)
+          await client.hset(metadataKey, 'sdkVersion', input.sdkVersion);
       }
 
       // Set TTL to expire old data (24 hours) - auto cleanup if not flushed
@@ -155,7 +157,11 @@ export class UnknownFlagService {
           });
 
           flushed++;
-          logger.debug('Flushed unknown flag to DB', { flagName, environmentId, count });
+          logger.debug('Flushed unknown flag to DB', {
+            flagName,
+            environmentId,
+            count,
+          });
         } catch (error) {
           errors++;
           logger.error('Failed to flush buffer key', { bufferKey, error });
@@ -163,7 +169,10 @@ export class UnknownFlagService {
       }
 
       if (flushed > 0 || errors > 0) {
-        logger.info('Unknown flags buffer flush completed', { flushed, errors });
+        logger.info('Unknown flags buffer flush completed', {
+          flushed,
+          errors,
+        });
       }
     } catch (error) {
       logger.error('Failed to flush unknown flags buffer', { error });
@@ -299,6 +308,9 @@ export const unknownFlagService = new UnknownFlagService();
  * Scheduled job handler for flushing buffer
  * Register this in QueueService scheduler
  */
-export async function processUnknownFlagsFlushJob(): Promise<{ flushed: number; errors: number }> {
+export async function processUnknownFlagsFlushJob(): Promise<{
+  flushed: number;
+  errors: number;
+}> {
   return unknownFlagService.flushBufferToDb();
 }

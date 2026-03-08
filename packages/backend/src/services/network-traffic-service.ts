@@ -111,7 +111,9 @@ class NetworkTrafficService {
       query = query.whereIn('appName', params.appNames);
     }
 
-    const rows = await query.groupBy('trafficBucket').orderBy('trafficBucket', 'asc');
+    const rows = await query
+      .groupBy('trafficBucket')
+      .orderBy('trafficBucket', 'asc');
 
     return rows.map((row: any) => ({
       bucket: row.bucket,
@@ -304,7 +306,9 @@ class NetworkTrafficService {
     };
 
     const bucketCount = Number(row.bucketCount) || 1;
-    const avgRequestsPerHour = Math.round(Number(row.totalRequests) / bucketCount);
+    const avgRequestsPerHour = Math.round(
+      Number(row.totalRequests) / bucketCount
+    );
 
     return {
       totalRequests: Number(row.totalRequests) || 0,
@@ -401,7 +405,9 @@ class NetworkTrafficService {
       query = query.whereIn('appName', params.appNames);
     }
 
-    const rows = await query.groupBy('metricsBucket').orderBy('metricsBucket', 'asc');
+    const rows = await query
+      .groupBy('metricsBucket')
+      .orderBy('metricsBucket', 'asc');
 
     return rows.map((row: any) => ({
       bucket: row.bucket,

@@ -49,7 +49,10 @@ interface ClientVersionGuideDrawerProps {
   onClose: () => void;
 }
 
-const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ open, onClose }) => {
+const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({
+  open,
+  onClose,
+}) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -77,12 +80,18 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
   const [testDuration, setTestDuration] = useState<number | null>(null);
   const [testStatus, setTestStatus] = useState<number | null>(null);
   const [responseTime, setResponseTime] = useState<Date | null>(null);
-  const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
-  const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
+  const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>(
+    {}
+  );
+  const [responseHeaders, setResponseHeaders] = useState<
+    Record<string, string>
+  >({});
   const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
-  const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] = useState(false);
-  const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] = useState(false);
+  const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] =
+    useState(false);
+  const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] =
+    useState(false);
 
   // Load saved values from localStorage on mount
   useEffect(() => {
@@ -205,7 +214,8 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
   const handleCopyCode = (code: string) => {
     copyToClipboardWithNotification(
       code,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -214,13 +224,15 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
     // Validation
     if (!platform.trim()) {
       setValidationError(
-        t('clientVersions.sdkGuideDrawer.platformRequired') || 'Platform is required'
+        t('clientVersions.sdkGuideDrawer.platformRequired') ||
+          'Platform is required'
       );
       return;
     }
     if (!apiToken.trim()) {
       setValidationError(
-        t('clientVersions.sdkGuideDrawer.apiTokenRequired') || 'API Token is required'
+        t('clientVersions.sdkGuideDrawer.apiTokenRequired') ||
+          'API Token is required'
       );
       return;
     }
@@ -291,13 +303,17 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
       setExpandedResponseHeaders(true);
 
       if (!response.ok) {
-        setTestError(`HTTP ${response.status}: ${data.message || 'Request failed'}`);
+        setTestError(
+          `HTTP ${response.status}: ${data.message || 'Request failed'}`
+        );
       } else {
         // Clear error on success
         setTestError(null);
       }
     } catch (error) {
-      setTestError(error instanceof Error ? error.message : 'Unknown error occurred');
+      setTestError(
+        error instanceof Error ? error.message : 'Unknown error occurred'
+      );
     } finally {
       setTestLoading(false);
     }
@@ -327,7 +343,8 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
             display: 'flex',
             justifyContent: 'flex-end',
             p: 0.5,
-            backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+            backgroundColor:
+              theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
             borderBottom: `1px solid ${theme.palette.divider}`,
           }}
         >
@@ -375,7 +392,10 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {/* Main Tabs */}
         <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3, pt: 2 }}>
-          <Tabs value={mainTabValue} onChange={(e, newValue) => setMainTabValue(newValue)}>
+          <Tabs
+            value={mainTabValue}
+            onChange={(e, newValue) => setMainTabValue(newValue)}
+          >
             <Tab label={t('clientVersions.sdkGuideDrawer.tabGuide')} />
             <Tab label={t('clientVersions.sdkGuideDrawer.tabTest')} />
           </Tabs>
@@ -399,13 +419,15 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                 sx={{
                   p: 2,
                   mb: 3,
-                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                  backgroundColor:
+                    theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
                   fontFamily: 'monospace',
                   fontSize: '0.9rem',
                 }}
               >
                 <Typography component="div" sx={{ mb: 1 }}>
-                  <strong>{t('clientVersions.sdkGuideDrawer.method')}:</strong> GET
+                  <strong>{t('clientVersions.sdkGuideDrawer.method')}:</strong>{' '}
+                  GET
                 </Typography>
                 <Typography component="div" sx={{ wordBreak: 'break-all' }}>
                   /api/v1/client/{'{ environmentId }'}/client-version
@@ -428,7 +450,8 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                   {t('clientVersions.sdkGuideDrawer.paramClientVersion')}
                 </Typography>
                 <Typography variant="body2">
-                  • <strong>lang</strong> (optional): {t('clientVersions.sdkGuideDrawer.paramLang')}
+                  • <strong>lang</strong> (optional):{' '}
+                  {t('clientVersions.sdkGuideDrawer.paramLang')}
                 </Typography>
               </Stack>
 
@@ -486,17 +509,22 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                   <TableHead>
                     <TableRow
                       sx={{
-                        backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                        backgroundColor:
+                          theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
                       }}
                     >
                       <TableCell sx={{ fontWeight: 600, width: '15%' }}>
                         {t('clientVersions.sdkGuideDrawer.statusTableStatus')}
                       </TableCell>
                       <TableCell sx={{ fontWeight: 600, width: '35%' }}>
-                        {t('clientVersions.sdkGuideDrawer.statusTableDescription')}
+                        {t(
+                          'clientVersions.sdkGuideDrawer.statusTableDescription'
+                        )}
                       </TableCell>
                       <TableCell sx={{ fontWeight: 600, width: '50%' }}>
-                        {t('clientVersions.sdkGuideDrawer.statusTableClientAction')}
+                        {t(
+                          'clientVersions.sdkGuideDrawer.statusTableClientAction'
+                        )}
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -504,8 +532,12 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                     {/* ONLINE */}
                     <TableRow>
                       <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
+                          <CheckCircleIcon
+                            sx={{ color: 'success.main', fontSize: 20 }}
+                          />
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             ONLINE
                           </Typography>
@@ -518,7 +550,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('clientVersions.sdkGuideDrawer.statusOnlineAction')}
+                          {t(
+                            'clientVersions.sdkGuideDrawer.statusOnlineAction'
+                          )}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -526,8 +560,12 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                     {/* MAINTENANCE */}
                     <TableRow>
                       <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <WarningIcon sx={{ color: 'warning.main', fontSize: 20 }} />
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
+                          <WarningIcon
+                            sx={{ color: 'warning.main', fontSize: 20 }}
+                          />
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             MAINTENANCE
                           </Typography>
@@ -540,7 +578,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('clientVersions.sdkGuideDrawer.statusMaintenanceAction')}
+                          {t(
+                            'clientVersions.sdkGuideDrawer.statusMaintenanceAction'
+                          )}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -548,8 +588,12 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                     {/* OFFLINE */}
                     <TableRow>
                       <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <ErrorIcon sx={{ color: 'error.main', fontSize: 20 }} />
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
+                          <ErrorIcon
+                            sx={{ color: 'error.main', fontSize: 20 }}
+                          />
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             OFFLINE
                           </Typography>
@@ -562,7 +606,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('clientVersions.sdkGuideDrawer.statusOfflineAction')}
+                          {t(
+                            'clientVersions.sdkGuideDrawer.statusOfflineAction'
+                          )}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -570,7 +616,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                     {/* RECOMMENDED_UPDATE */}
                     <TableRow>
                       <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
                           <InfoIcon sx={{ color: 'info.main', fontSize: 20 }} />
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             RECOMMENDED_UPDATE
@@ -579,12 +627,16 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('clientVersions.sdkGuideDrawer.statusRecommendedUpdate')}
+                          {t(
+                            'clientVersions.sdkGuideDrawer.statusRecommendedUpdate'
+                          )}
                         </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('clientVersions.sdkGuideDrawer.statusRecommendedUpdateAction')}
+                          {t(
+                            'clientVersions.sdkGuideDrawer.statusRecommendedUpdateAction'
+                          )}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -592,8 +644,12 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                     {/* FORCED_UPDATE */}
                     <TableRow>
                       <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <ErrorIcon sx={{ color: 'error.main', fontSize: 20 }} />
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
+                          <ErrorIcon
+                            sx={{ color: 'error.main', fontSize: 20 }}
+                          />
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             FORCED_UPDATE
                           </Typography>
@@ -601,12 +657,16 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('clientVersions.sdkGuideDrawer.statusForcedUpdate')}
+                          {t(
+                            'clientVersions.sdkGuideDrawer.statusForcedUpdate'
+                          )}
                         </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('clientVersions.sdkGuideDrawer.statusForcedUpdateAction')}
+                          {t(
+                            'clientVersions.sdkGuideDrawer.statusForcedUpdateAction'
+                          )}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -614,8 +674,12 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                     {/* BLOCKED_PATCH_ALLOWED */}
                     <TableRow>
                       <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <ErrorIcon sx={{ color: 'error.main', fontSize: 20 }} />
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
+                          <ErrorIcon
+                            sx={{ color: 'error.main', fontSize: 20 }}
+                          />
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             BLOCKED_PATCH_ALLOWED
                           </Typography>
@@ -623,12 +687,16 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('clientVersions.sdkGuideDrawer.statusBlockedPatchAllowed')}
+                          {t(
+                            'clientVersions.sdkGuideDrawer.statusBlockedPatchAllowed'
+                          )}
                         </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('clientVersions.sdkGuideDrawer.statusBlockedPatchAllowedAction')}
+                          {t(
+                            'clientVersions.sdkGuideDrawer.statusBlockedPatchAllowedAction'
+                          )}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -636,8 +704,12 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                     {/* UNDER_REVIEW */}
                     <TableRow>
                       <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <WarningIcon sx={{ color: 'warning.main', fontSize: 20 }} />
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
+                          <WarningIcon
+                            sx={{ color: 'warning.main', fontSize: 20 }}
+                          />
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             UNDER_REVIEW
                           </Typography>
@@ -650,7 +722,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {t('clientVersions.sdkGuideDrawer.statusUnderReviewAction')}
+                          {t(
+                            'clientVersions.sdkGuideDrawer.statusUnderReviewAction'
+                          )}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -690,21 +764,33 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                 {t('clientVersions.sdkGuideDrawer.errorResponses')}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+              <Typography
+                variant="body2"
+                sx={{ mb: 2, color: 'text.secondary' }}
+              >
                 {t('clientVersions.sdkGuideDrawer.errorResponsesDesc')}
               </Typography>
 
               <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-                <Tabs value={errorTabValue} onChange={(e, newValue) => setErrorTabValue(newValue)}>
+                <Tabs
+                  value={errorTabValue}
+                  onChange={(e, newValue) => setErrorTabValue(newValue)}
+                >
                   <Tab label="400 - Missing Params" />
                   <Tab label="400 - Missing Headers" />
                   <Tab label="404 - Not Found" />
                 </Tabs>
               </Box>
 
-              {errorTabValue === 0 && <CodeBlock code={errorMissingParams} language="json" />}
-              {errorTabValue === 1 && <CodeBlock code={errorMissingHeaders} language="json" />}
-              {errorTabValue === 2 && <CodeBlock code={errorNotFound} language="json" />}
+              {errorTabValue === 0 && (
+                <CodeBlock code={errorMissingParams} language="json" />
+              )}
+              {errorTabValue === 1 && (
+                <CodeBlock code={errorMissingHeaders} language="json" />
+              )}
+              {errorTabValue === 2 && (
+                <CodeBlock code={errorNotFound} language="json" />
+              )}
 
               <Divider sx={{ my: 3 }} />
 
@@ -728,10 +814,13 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
               {/* REQUEST SECTION */}
               <Box sx={{ mb: 3 }}>
                 <Box
-                  onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
+                  onClick={() =>
+                    setExpandedRequestHeaders(!expandedRequestHeaders)
+                  }
                   sx={{
                     p: 1.5,
-                    backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
+                    backgroundColor:
+                      theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
                     borderRadius: 1,
                     cursor: 'pointer',
                     display: 'flex',
@@ -739,7 +828,8 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                     justifyContent: 'space-between',
                     border: `2px solid ${theme.palette.primary.main}`,
                     '&:hover': {
-                      backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
+                      backgroundColor:
+                        theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
                     },
                   }}
                 >
@@ -751,7 +841,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                   </Typography>
                   <Box
                     sx={{
-                      transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transform: expandedRequestHeaders
+                        ? 'rotate(180deg)'
+                        : 'rotate(0deg)',
                       transition: 'transform 0.3s',
                       color: theme.palette.primary.main,
                     }}
@@ -763,14 +855,18 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                   <Box
                     sx={{
                       p: 2,
-                      backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
+                      backgroundColor:
+                        theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
                       borderRadius: 1,
                       mt: 0.5,
                     }}
                   >
                     {/* Parameters Table */}
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ mb: 1.5, fontWeight: 600 }}
+                      >
                         Parameters
                       </Typography>
                       <Box
@@ -792,7 +888,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                             sx={{
                               p: 1.5,
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                                theme.palette.mode === 'dark'
+                                  ? '#2a2a2a'
+                                  : '#f5f5f5',
                               borderBottom: `1px solid ${theme.palette.divider}`,
                               display: 'flex',
                               alignItems: 'center',
@@ -828,7 +926,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                             sx={{
                               p: 1.5,
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                                theme.palette.mode === 'dark'
+                                  ? '#2a2a2a'
+                                  : '#f5f5f5',
                               borderBottom: `1px solid ${theme.palette.divider}`,
                               display: 'flex',
                               alignItems: 'center',
@@ -850,7 +950,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                               onChange={(e) => setVersion(e.target.value)}
                               size="small"
                               fullWidth
-                              placeholder={t('clientVersions.sdkGuideDrawer.versionPlaceholder')}
+                              placeholder={t(
+                                'clientVersions.sdkGuideDrawer.versionPlaceholder'
+                              )}
                               sx={{
                                 '& .MuiInputBase-root': {
                                   fontSize: '0.875rem',
@@ -864,7 +966,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                             sx={{
                               p: 1.5,
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                                theme.palette.mode === 'dark'
+                                  ? '#2a2a2a'
+                                  : '#f5f5f5',
                               borderBottom: `1px solid ${theme.palette.divider}`,
                               display: 'flex',
                               alignItems: 'center',
@@ -893,14 +997,24 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                                 }}
                               >
                                 <MenuItem value="">
-                                  {t('clientVersions.sdkGuideDrawer.statusNone')}
+                                  {t(
+                                    'clientVersions.sdkGuideDrawer.statusNone'
+                                  )}
                                 </MenuItem>
                                 <MenuItem value="ONLINE">ONLINE</MenuItem>
                                 <MenuItem value="OFFLINE">OFFLINE</MenuItem>
-                                <MenuItem value="MAINTENANCE">MAINTENANCE</MenuItem>
-                                <MenuItem value="RECOMMENDED_UPDATE">RECOMMENDED_UPDATE</MenuItem>
-                                <MenuItem value="FORCED_UPDATE">FORCED_UPDATE</MenuItem>
-                                <MenuItem value="UNDER_REVIEW">UNDER_REVIEW</MenuItem>
+                                <MenuItem value="MAINTENANCE">
+                                  MAINTENANCE
+                                </MenuItem>
+                                <MenuItem value="RECOMMENDED_UPDATE">
+                                  RECOMMENDED_UPDATE
+                                </MenuItem>
+                                <MenuItem value="FORCED_UPDATE">
+                                  FORCED_UPDATE
+                                </MenuItem>
+                                <MenuItem value="UNDER_REVIEW">
+                                  UNDER_REVIEW
+                                </MenuItem>
                                 <MenuItem value="BLOCKED_PATCH_ALLOWED">
                                   BLOCKED_PATCH_ALLOWED
                                 </MenuItem>
@@ -913,7 +1027,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                             sx={{
                               p: 1.5,
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                                theme.palette.mode === 'dark'
+                                  ? '#2a2a2a'
+                                  : '#f5f5f5',
                               display: 'flex',
                               alignItems: 'center',
                               fontWeight: 500,
@@ -940,7 +1056,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                                 }}
                               >
                                 <MenuItem value="">
-                                  {t('clientVersions.sdkGuideDrawer.statusNone')}
+                                  {t(
+                                    'clientVersions.sdkGuideDrawer.statusNone'
+                                  )}
                                 </MenuItem>
                                 <MenuItem value="ko">ko</MenuItem>
                                 <MenuItem value="en">en</MenuItem>
@@ -957,11 +1075,16 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       <Box sx={{ mb: 2 }}>
                         <Box
                           onClick={() =>
-                            setExpandedRequestHeadersDetail(!expandedRequestHeadersDetail)
+                            setExpandedRequestHeadersDetail(
+                              !expandedRequestHeadersDetail
+                            )
                           }
                           sx={{
                             p: 1,
-                            backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f0f0f0',
+                            backgroundColor:
+                              theme.palette.mode === 'dark'
+                                ? '#1a1a1a'
+                                : '#f0f0f0',
                             borderRadius: 0.5,
                             cursor: 'pointer',
                             display: 'flex',
@@ -969,11 +1092,16 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                             justifyContent: 'space-between',
                             '&:hover': {
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#252525' : '#e8e8e8',
+                                theme.palette.mode === 'dark'
+                                  ? '#252525'
+                                  : '#e8e8e8',
                             },
                           }}
                         >
-                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ fontWeight: 600 }}
+                          >
                             Headers ({Object.keys(requestHeaders).length})
                           </Typography>
                           <Box
@@ -990,29 +1118,31 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                         </Box>
                         <Collapse in={expandedRequestHeadersDetail}>
                           <Stack spacing={0.5} sx={{ pl: 1, pt: 1 }}>
-                            {Object.entries(requestHeaders).map(([key, value]) => (
-                              <Box key={key} sx={{ display: 'flex', gap: 1 }}>
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    fontWeight: 600,
-                                    minWidth: 150,
-                                    color: 'primary.main',
-                                  }}
-                                >
-                                  {key}:
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    color: 'text.secondary',
-                                    wordBreak: 'break-all',
-                                  }}
-                                >
-                                  {String(value)}
-                                </Typography>
-                              </Box>
-                            ))}
+                            {Object.entries(requestHeaders).map(
+                              ([key, value]) => (
+                                <Box key={key} sx={{ display: 'flex', gap: 1 }}>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      fontWeight: 600,
+                                      minWidth: 150,
+                                      color: 'primary.main',
+                                    }}
+                                  >
+                                    {key}:
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      color: 'text.secondary',
+                                      wordBreak: 'break-all',
+                                    }}
+                                  >
+                                    {String(value)}
+                                  </Typography>
+                                </Box>
+                              )
+                            )}
                           </Stack>
                         </Collapse>
                       </Box>
@@ -1028,7 +1158,10 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                           mb: 1,
                         }}
                       >
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600 }}
+                        >
                           {t('common.curlPreview') || 'curl Preview'}
                         </Typography>
                         <Tooltip title={t('common.copy') || 'Copy'}>
@@ -1048,7 +1181,10 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       <Box
                         sx={{
                           p: 1.5,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+                          backgroundColor:
+                            theme.palette.mode === 'dark'
+                              ? '#1e1e1e'
+                              : '#f5f5f5',
                           borderRadius: 1,
                           border: `1px solid ${theme.palette.divider}`,
                           fontFamily: 'monospace',
@@ -1078,7 +1214,10 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       variant="contained"
                       startIcon={
                         testLoading ? (
-                          <CircularProgress size={16} sx={{ color: 'inherit' }} />
+                          <CircularProgress
+                            size={16}
+                            sx={{ color: 'inherit' }}
+                          />
                         ) : (
                           <PlayArrowIcon />
                         )
@@ -1097,10 +1236,13 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
               {testResponse && (
                 <Box sx={{ mb: 3 }}>
                   <Box
-                    onClick={() => setExpandedResponseHeaders(!expandedResponseHeaders)}
+                    onClick={() =>
+                      setExpandedResponseHeaders(!expandedResponseHeaders)
+                    }
                     sx={{
                       p: 1.5,
-                      backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
+                      backgroundColor:
+                        theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
                       borderRadius: 1,
                       cursor: 'pointer',
                       display: 'flex',
@@ -1108,7 +1250,8 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       justifyContent: 'space-between',
                       border: `2px solid ${theme.palette.primary.main}`,
                       '&:hover': {
-                        backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
+                        backgroundColor:
+                          theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
                       },
                     }}
                   >
@@ -1125,10 +1268,16 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                       {testStatus && (
                         <Box sx={{ display: 'flex', gap: 2 }}>
                           <Box>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                            <Typography
+                              variant="caption"
+                              sx={{ color: 'text.secondary' }}
+                            >
                               {t('clientVersions.sdkGuideDrawer.status')}
                             </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: 600 }}
+                            >
                               {testStatus}{' '}
                               {testStatus === 200
                                 ? 'OK'
@@ -1141,30 +1290,49 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                           </Box>
                           {testDuration !== null && (
                             <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'text.secondary' }}
+                              >
                                 {t('clientVersions.sdkGuideDrawer.time')}
                               </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: 600 }}
+                              >
                                 {testDuration}ms
                               </Typography>
                             </Box>
                           )}
                           {Object.keys(responseHeaders).length > 0 && (
                             <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'text.secondary' }}
+                              >
                                 {t('clientVersions.sdkGuideDrawer.size')}
                               </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {new Blob([JSON.stringify(testResponse)]).size} bytes
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: 600 }}
+                              >
+                                {new Blob([JSON.stringify(testResponse)]).size}{' '}
+                                bytes
                               </Typography>
                             </Box>
                           )}
                           {responseTime && (
                             <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'text.secondary' }}
+                              >
                                 {t('common.receivedAt') || 'Received At'}
                               </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: 600 }}
+                              >
                                 {responseTime.toLocaleTimeString()}
                               </Typography>
                             </Box>
@@ -1174,7 +1342,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                     </Box>
                     <Box
                       sx={{
-                        transform: expandedResponseHeaders ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transform: expandedResponseHeaders
+                          ? 'rotate(180deg)'
+                          : 'rotate(0deg)',
                         transition: 'transform 0.3s',
                         color: theme.palette.primary.main,
                       }}
@@ -1186,7 +1356,8 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                     <Box
                       sx={{
                         p: 2,
-                        backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
+                        backgroundColor:
+                          theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
                         borderRadius: 1,
                         mt: 0.5,
                       }}
@@ -1203,12 +1374,16 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                         <Box sx={{ mb: 2 }}>
                           <Box
                             onClick={() =>
-                              setExpandedResponseHeadersDetail(!expandedResponseHeadersDetail)
+                              setExpandedResponseHeadersDetail(
+                                !expandedResponseHeadersDetail
+                              )
                             }
                             sx={{
                               p: 1,
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#1a1a1a' : '#f0f0f0',
+                                theme.palette.mode === 'dark'
+                                  ? '#1a1a1a'
+                                  : '#f0f0f0',
                               borderRadius: 0.5,
                               cursor: 'pointer',
                               display: 'flex',
@@ -1216,11 +1391,16 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                               justifyContent: 'space-between',
                               '&:hover': {
                                 backgroundColor:
-                                  theme.palette.mode === 'dark' ? '#252525' : '#e8e8e8',
+                                  theme.palette.mode === 'dark'
+                                    ? '#252525'
+                                    : '#e8e8e8',
                               },
                             }}
                           >
-                            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ fontWeight: 600 }}
+                            >
                               Headers ({Object.keys(responseHeaders).length})
                             </Typography>
                             <Box
@@ -1237,29 +1417,34 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                           </Box>
                           <Collapse in={expandedResponseHeadersDetail}>
                             <Stack spacing={0.5} sx={{ pl: 1, pt: 1 }}>
-                              {Object.entries(responseHeaders).map(([key, value]) => (
-                                <Box key={key} sx={{ display: 'flex', gap: 1 }}>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      fontWeight: 600,
-                                      minWidth: 150,
-                                      color: 'primary.main',
-                                    }}
+                              {Object.entries(responseHeaders).map(
+                                ([key, value]) => (
+                                  <Box
+                                    key={key}
+                                    sx={{ display: 'flex', gap: 1 }}
                                   >
-                                    {key}:
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      color: 'text.secondary',
-                                      wordBreak: 'break-all',
-                                    }}
-                                  >
-                                    {String(value)}
-                                  </Typography>
-                                </Box>
-                              ))}
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        fontWeight: 600,
+                                        minWidth: 150,
+                                        color: 'primary.main',
+                                      }}
+                                    >
+                                      {key}:
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        color: 'text.secondary',
+                                        wordBreak: 'break-all',
+                                      }}
+                                    >
+                                      {String(value)}
+                                    </Typography>
+                                  </Box>
+                                )
+                              )}
                             </Stack>
                           </Collapse>
                         </Box>
@@ -1267,7 +1452,10 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
 
                       {/* Response Body */}
                       <Box>
-                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ mb: 1, fontWeight: 600 }}
+                        >
                           Body
                         </Typography>
                         <Box
@@ -1284,7 +1472,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                               justifyContent: 'flex-end',
                               p: 0.5,
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#0e0e0e' : '#f0f0f0',
+                                theme.palette.mode === 'dark'
+                                  ? '#0e0e0e'
+                                  : '#f0f0f0',
                               borderBottom: `1px solid ${theme.palette.divider}`,
                             }}
                           >
@@ -1292,7 +1482,9 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                               <IconButton
                                 size="small"
                                 onClick={() => {
-                                  handleCopyCode(JSON.stringify(testResponse, null, 2));
+                                  handleCopyCode(
+                                    JSON.stringify(testResponse, null, 2)
+                                  );
                                 }}
                                 sx={{ color: 'primary.main' }}
                               >

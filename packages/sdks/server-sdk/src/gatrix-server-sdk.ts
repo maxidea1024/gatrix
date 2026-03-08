@@ -22,12 +22,18 @@ import { CacheManager } from './cache/cache-manager';
 import { EventListener } from './cache/event-listener';
 import { EventCallback, SdkEvent } from './types/events';
 import { SdkMetrics } from './utils/sdk-metrics';
-import { createMetricsServer, MetricsServerInstance } from './services/metrics-server';
+import {
+  createMetricsServer,
+  MetricsServerInstance,
+} from './services/metrics-server';
 import { createHttpMetricsMiddleware } from './utils/http-metrics';
 import { MaintenanceEventData } from './cache/maintenance-watcher';
 import { InMemoryMetricRegistry } from './impact-metrics/metric-types';
 import type { ImpactMetricsDataSource } from './impact-metrics/metric-types';
-import { MetricsAPI, ImpactMetricsStaticContext } from './impact-metrics/metric-api';
+import {
+  MetricsAPI,
+  ImpactMetricsStaticContext,
+} from './impact-metrics/metric-api';
 import {
   RedeemCouponRequest,
   RedeemCouponResponse,
@@ -46,7 +52,11 @@ import {
   Banner,
   StoreProduct,
 } from './types/api';
-import { detectCloudMetadata, CloudMetadata, CloudProvider } from './utils/cloud-metadata';
+import {
+  detectCloudMetadata,
+  CloudMetadata,
+  CloudProvider,
+} from './utils/cloud-metadata';
 
 /**
  * GatrixServerSDK
@@ -87,7 +97,8 @@ export class GatrixServerSDK {
   private connectionEventListeners: Map<string, EventCallback[]> = new Map();
 
   // Impact metrics flush interval
-  private impactMetricsFlushInterval: ReturnType<typeof setInterval> | null = null;
+  private impactMetricsFlushInterval: ReturnType<typeof setInterval> | null =
+    null;
 
   /**
    * Create SDK instance with optional overrides
@@ -149,12 +160,16 @@ export class GatrixServerSDK {
     if (overrides.group !== undefined) merged.group = overrides.group;
     if (overrides.apiUrl !== undefined) merged.apiUrl = overrides.apiUrl;
     if (overrides.apiToken !== undefined) merged.apiToken = overrides.apiToken;
-    if (overrides.applicationName !== undefined) merged.applicationName = overrides.applicationName;
+    if (overrides.applicationName !== undefined)
+      merged.applicationName = overrides.applicationName;
     if (overrides.worldId !== undefined) merged.worldId = overrides.worldId;
     if (overrides.version !== undefined) merged.version = overrides.version;
-    if (overrides.commitHash !== undefined) merged.commitHash = overrides.commitHash;
-    if (overrides.gitBranch !== undefined) merged.gitBranch = overrides.gitBranch;
-    if (overrides.tokenProvider !== undefined) merged.tokenProvider = overrides.tokenProvider;
+    if (overrides.commitHash !== undefined)
+      merged.commitHash = overrides.commitHash;
+    if (overrides.gitBranch !== undefined)
+      merged.gitBranch = overrides.gitBranch;
+    if (overrides.tokenProvider !== undefined)
+      merged.tokenProvider = overrides.tokenProvider;
 
     // Deep merge nested objects
     if (overrides.redis) {
@@ -179,7 +194,10 @@ export class GatrixServerSDK {
       merged.uses = { ...baseConfig.uses, ...overrides.uses };
     }
     if (overrides.featureFlags) {
-      merged.featureFlags = { ...baseConfig.featureFlags, ...overrides.featureFlags };
+      merged.featureFlags = {
+        ...baseConfig.featureFlags,
+        ...overrides.featureFlags,
+      };
     }
     if (overrides.cloud) {
       merged.cloud = { ...baseConfig.cloud, ...overrides.cloud };
@@ -250,7 +268,8 @@ export class GatrixServerSDK {
 
         // Use the primary SDK metrics registry if available to avoid merge issues
         // All metrics will be in one place, distinguished by their names (sdk_ vs app_ vs game_)
-        const mainRegistry = this.metrics?.getRegistry() || new promClient.Registry();
+        const mainRegistry =
+          this.metrics?.getRegistry() || new promClient.Registry();
 
         // Registry for HTTP middleware metrics (both private/public)
         this.httpRegistry = mainRegistry;
@@ -293,7 +312,10 @@ export class GatrixServerSDK {
     // Cacheable services (gameWorld, popupNotice, survey, whitelist, serviceMaintenance, storeProduct, etc.)
     // are created by CacheManager based on feature flags
     this.coupon = new CouponService(this.apiClient, this.logger);
-    this.serviceDiscovery = new ServiceDiscoveryService(this.apiClient, this.logger);
+    this.serviceDiscovery = new ServiceDiscoveryService(
+      this.apiClient,
+      this.logger
+    );
 
     // Initialize impact metrics registry + API
     this.impactMetricRegistry = new InMemoryMetricRegistry();
@@ -302,7 +324,11 @@ export class GatrixServerSDK {
       appName: configWithDefaults.applicationName,
       service: configWithDefaults.service || '',
     };
-    this._impactMetrics = new MetricsAPI(this.impactMetricRegistry, impactContext, this.logger);
+    this._impactMetrics = new MetricsAPI(
+      this.impactMetricRegistry,
+      impactContext,
+      this.logger
+    );
 
     this.logger.info('GatrixServerSDK created', {
       apiUrl: configWithDefaults.apiUrl,
@@ -329,7 +355,10 @@ export class GatrixServerSDK {
     }
 
     if (!config.applicationName) {
-      throw createError(ErrorCode.INVALID_CONFIG, 'applicationName is required');
+      throw createError(
+        ErrorCode.INVALID_CONFIG,
+        'applicationName is required'
+      );
     }
 
     // service and group are optional
@@ -349,14 +378,23 @@ export class GatrixServerSDK {
     // Validate worldId format if provided
     if (config.worldId !== undefined) {
       if (typeof config.worldId !== 'string' || config.worldId.trim() === '') {
-        throw createError(ErrorCode.INVALID_CONFIG, 'worldId must be a non-empty string');
+        throw createError(
+          ErrorCode.INVALID_CONFIG,
+          'worldId must be a non-empty string'
+        );
       }
     }
 
     // Validate metrics config
     if (config.metrics) {
-      if (config.metrics.enabled !== undefined && typeof config.metrics.enabled !== 'boolean') {
-        throw createError(ErrorCode.INVALID_CONFIG, 'metrics.enabled must be a boolean');
+      if (
+        config.metrics.enabled !== undefined &&
+        typeof config.metrics.enabled !== 'boolean'
+      ) {
+        throw createError(
+          ErrorCode.INVALID_CONFIG,
+          'metrics.enabled must be a boolean'
+        );
       }
     }
 
@@ -364,7 +402,10 @@ export class GatrixServerSDK {
     if (config.cache) {
       if (config.cache.ttl !== undefined) {
         if (typeof config.cache.ttl !== 'number' || config.cache.ttl < 0) {
-          throw createError(ErrorCode.INVALID_CONFIG, 'cache.ttl must be a non-negative number');
+          throw createError(
+            ErrorCode.INVALID_CONFIG,
+            'cache.ttl must be a non-negative number'
+          );
         }
       }
 
@@ -421,7 +462,9 @@ export class GatrixServerSDK {
     try {
       // Auto-detect cloud provider and metadata (region, zone, instance ID, etc.)
       // This runs in the background and doesn't block initialization
-      const cloudProvider = this.config.cloud?.provider as CloudProvider | undefined;
+      const cloudProvider = this.config.cloud?.provider as
+        | CloudProvider
+        | undefined;
       this.cloudMetadata = await detectCloudMetadata(cloudProvider);
       if (this.cloudMetadata.provider !== 'unknown') {
         this.logger.info('Cloud metadata detected', {
@@ -431,7 +474,9 @@ export class GatrixServerSDK {
           instanceId: this.cloudMetadata.instanceId,
         });
       } else {
-        this.logger.debug('No cloud metadata detected (not running in a cloud environment)');
+        this.logger.debug(
+          'No cloud metadata detected (not running in a cloud environment)'
+        );
       }
 
       // Initialize cache manager
@@ -517,9 +562,14 @@ export class GatrixServerSDK {
       // Auto-start feature flag metrics collection if enabled
       if (this.config.uses?.featureFlag !== false) {
         const featureFlagService = this.cacheManager?.getFeatureFlagService();
-        if (featureFlagService && featureFlagService.getMetricsConfig().enabled) {
+        if (
+          featureFlagService &&
+          featureFlagService.getMetricsConfig().enabled
+        ) {
           featureFlagService.startMetricsCollection();
-          this.logger.info('Feature flag metrics collection started automatically');
+          this.logger.info(
+            'Feature flag metrics collection started automatically'
+          );
         }
       }
 
@@ -544,42 +594,51 @@ export class GatrixServerSDK {
     }
 
     // Register callback with ApiClient
-    this.connectionRecoveryUnsubscribe = this.apiClient.onConnectionRecovered(() => {
-      // Emit connection.restored event to listeners
-      this.emitConnectionEvent('connection.restored');
+    this.connectionRecoveryUnsubscribe = this.apiClient.onConnectionRecovered(
+      () => {
+        // Emit connection.restored event to listeners
+        this.emitConnectionEvent('connection.restored');
 
-      // Skip if already refreshing (prevents concurrent refresh attempts)
-      if (this.isRefreshingAfterRecovery) {
-        this.logger.debug('Skipping cache refresh - already in progress');
-        return;
-      }
+        // Skip if already refreshing (prevents concurrent refresh attempts)
+        if (this.isRefreshingAfterRecovery) {
+          this.logger.debug('Skipping cache refresh - already in progress');
+          return;
+        }
 
-      // Skip if cache manager is not available
-      if (!this.cacheManager) {
-        this.logger.debug('Skipping cache refresh - cache manager not initialized');
-        return;
-      }
+        // Skip if cache manager is not available
+        if (!this.cacheManager) {
+          this.logger.debug(
+            'Skipping cache refresh - cache manager not initialized'
+          );
+          return;
+        }
 
-      this.isRefreshingAfterRecovery = true;
+        this.isRefreshingAfterRecovery = true;
 
-      this.logger.info('Refreshing cache after connection recovery');
+        this.logger.info('Refreshing cache after connection recovery');
 
-      // Refresh cache asynchronously - don't block the request completion
-      this.cacheManager
-        .refreshAll()
-        .then(() => {
-          this.logger.info('Cache refreshed successfully after connection recovery');
-        })
-        .catch((error: any) => {
-          // Log error but don't throw - cache refresh failure should not affect server operation
-          this.logger.warn('Failed to refresh cache after connection recovery', {
-            error: error.message,
+        // Refresh cache asynchronously - don't block the request completion
+        this.cacheManager
+          .refreshAll()
+          .then(() => {
+            this.logger.info(
+              'Cache refreshed successfully after connection recovery'
+            );
+          })
+          .catch((error: any) => {
+            // Log error but don't throw - cache refresh failure should not affect server operation
+            this.logger.warn(
+              'Failed to refresh cache after connection recovery',
+              {
+                error: error.message,
+              }
+            );
+          })
+          .finally(() => {
+            this.isRefreshingAfterRecovery = false;
           });
-        })
-        .finally(() => {
-          this.isRefreshingAfterRecovery = false;
-        });
-    });
+      }
+    );
 
     this.logger.debug('Connection recovery handler registered');
   }
@@ -841,7 +900,9 @@ export class GatrixServerSDK {
 
       this.logger.debug('Impact metrics sent successfully');
     } catch (error: any) {
-      this.logger.error('Failed to flush impact metrics', { error: error.message });
+      this.logger.error('Failed to flush impact metrics', {
+        error: error.message,
+      });
       // On failure, metrics are already consumed from registry.
       // We could restore them, but for simplicity we just log the error.
       // In production, the next collection cycle will have fresh metrics.
@@ -925,7 +986,10 @@ export class GatrixServerSDK {
    * @param id Game world ID
    * @param environmentId Optional in single-env mode, required in multi-env mode
    */
-  async fetchGameWorldById(id: string, environmentId?: string): Promise<GameWorld> {
+  async fetchGameWorldById(
+    id: string,
+    environmentId?: string
+  ): Promise<GameWorld> {
     const env = this.resolveToken(environmentId, 'fetchGameWorldById');
     return await this.gameWorld.getById(id, env);
   }
@@ -935,7 +999,10 @@ export class GatrixServerSDK {
    * @param worldId World ID string
    * @param environmentId Optional in single-env mode, required in multi-env mode
    */
-  async fetchGameWorldByWorldId(worldId: string, environmentId?: string): Promise<GameWorld> {
+  async fetchGameWorldByWorldId(
+    worldId: string,
+    environmentId?: string
+  ): Promise<GameWorld> {
     const env = this.resolveToken(environmentId, 'fetchGameWorldByWorldId');
     return await this.gameWorld.getByWorldId(worldId, env);
   }
@@ -979,7 +1046,10 @@ export class GatrixServerSDK {
    * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async fetchServiceMaintenanceStatus(environmentId?: string) {
-    const env = this.resolveToken(environmentId, 'fetchServiceMaintenanceStatus');
+    const env = this.resolveToken(
+      environmentId,
+      'fetchServiceMaintenanceStatus'
+    );
     return await this.serviceMaintenance.getStatusByEnvironment(env);
   }
 
@@ -1010,7 +1080,10 @@ export class GatrixServerSDK {
     lang: 'ko' | 'en' | 'zh' = 'en',
     environmentId?: string
   ): string | null {
-    const env = this.resolveToken(environmentId, 'getServiceMaintenanceMessage');
+    const env = this.resolveToken(
+      environmentId,
+      'getServiceMaintenanceMessage'
+    );
     return this.serviceMaintenance.getMessage(lang, env);
   }
 
@@ -1026,7 +1099,9 @@ export class GatrixServerSDK {
    * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    * @returns CurrentMaintenanceStatus with isMaintenanceActive, source, and detail
    */
-  getCurrentMaintenanceStatus(environmentId?: string): CurrentMaintenanceStatus {
+  getCurrentMaintenanceStatus(
+    environmentId?: string
+  ): CurrentMaintenanceStatus {
     const env = this.resolveToken(environmentId, 'getCurrentMaintenanceStatus');
 
     // Check global service maintenance first (uses time calculation internally)
@@ -1049,14 +1124,21 @@ export class GatrixServerSDK {
     // Check world-level maintenance
     const targetWorldId = this.config.worldId;
 
-    if (targetWorldId && this.gameWorld.isWorldMaintenanceActive(targetWorldId, env)) {
+    if (
+      targetWorldId &&
+      this.gameWorld.isWorldMaintenanceActive(targetWorldId, env)
+    ) {
       const world = this.gameWorld.getWorldByWorldId(targetWorldId, env);
       if (world) {
         // Convert maintenanceLocales array to localeMessages object
         const localeMessages: { ko?: string; en?: string; zh?: string } = {};
         if (world.maintenanceLocales) {
           for (const locale of world.maintenanceLocales) {
-            if (locale.lang === 'ko' || locale.lang === 'en' || locale.lang === 'zh') {
+            if (
+              locale.lang === 'ko' ||
+              locale.lang === 'en' ||
+              locale.lang === 'zh'
+            ) {
               localeMessages[locale.lang] = locale.message;
             }
           }
@@ -1070,7 +1152,10 @@ export class GatrixServerSDK {
             startsAt: world.maintenanceStartDate,
             endsAt: world.maintenanceEndDate,
             message: world.maintenanceMessage,
-            localeMessages: Object.keys(localeMessages).length > 0 ? localeMessages : undefined,
+            localeMessages:
+              Object.keys(localeMessages).length > 0
+                ? localeMessages
+                : undefined,
             forceDisconnect: world.forceDisconnect,
             gracePeriodMinutes: world.gracePeriodMinutes,
           },
@@ -1108,7 +1193,10 @@ export class GatrixServerSDK {
     environmentId?: string;
   }): CurrentMaintenanceStatus {
     const { clientIp, accountId, environmentId } = options;
-    const env = this.resolveToken(environmentId, 'getMaintenanceStatusForClient');
+    const env = this.resolveToken(
+      environmentId,
+      'getMaintenanceStatusForClient'
+    );
 
     // First get the raw maintenance status
     const status = this.getCurrentMaintenanceStatus(env);
@@ -1131,7 +1219,10 @@ export class GatrixServerSDK {
 
     // Check account whitelist
     if (accountId) {
-      const isAccountWhitelisted = this.whitelist.isAccountWhitelisted(accountId, env);
+      const isAccountWhitelisted = this.whitelist.isAccountWhitelisted(
+        accountId,
+        env
+      );
       if (isAccountWhitelisted) {
         return {
           isMaintenanceActive: false,
@@ -1183,7 +1274,10 @@ export class GatrixServerSDK {
     // If no worldId specified, check ALL worlds (world-wide service mode)
     const allWorlds = this.gameWorld.getCached(env);
     for (const world of allWorlds) {
-      if (world.worldId && this.gameWorld.isWorldMaintenanceActive(world.worldId, env)) {
+      if (
+        world.worldId &&
+        this.gameWorld.isWorldMaintenanceActive(world.worldId, env)
+      ) {
         return true;
       }
     }
@@ -1215,7 +1309,8 @@ export class GatrixServerSDK {
     // Check global service maintenance first
     if (this.serviceMaintenance.isMaintenanceActive(env)) {
       const status = this.serviceMaintenance.getCached(env);
-      const actualStartTime = this.cacheManager?.getServiceMaintenanceActualStartTime() ?? null;
+      const actualStartTime =
+        this.cacheManager?.getServiceMaintenanceActualStartTime() ?? null;
       return {
         isMaintenanceActive: true,
         source: 'service',
@@ -1229,15 +1324,23 @@ export class GatrixServerSDK {
     }
 
     // If specific worldId is specified, check that world
-    if (targetWorldId && this.gameWorld.isWorldMaintenanceActive(targetWorldId, env)) {
+    if (
+      targetWorldId &&
+      this.gameWorld.isWorldMaintenanceActive(targetWorldId, env)
+    ) {
       const world = this.gameWorld.getWorldByWorldId(targetWorldId, env);
       const actualStartTime =
-        this.cacheManager?.getWorldMaintenanceActualStartTime(targetWorldId) ?? null;
+        this.cacheManager?.getWorldMaintenanceActualStartTime(targetWorldId) ??
+        null;
       return {
         isMaintenanceActive: true,
         source: 'world',
         worldId: targetWorldId,
-        message: this.gameWorld.getWorldMaintenanceMessage(targetWorldId, env, lang),
+        message: this.gameWorld.getWorldMaintenanceMessage(
+          targetWorldId,
+          env,
+          lang
+        ),
         forceDisconnect: world?.forceDisconnect ?? false,
         gracePeriodMinutes: world?.gracePeriodMinutes ?? 0,
         startsAt: world?.maintenanceStartDate ?? null,
@@ -1250,14 +1353,23 @@ export class GatrixServerSDK {
     if (!targetWorldId) {
       const allWorlds = this.gameWorld.getCached(env);
       for (const world of allWorlds) {
-        if (world.worldId && this.gameWorld.isWorldMaintenanceActive(world.worldId, env)) {
+        if (
+          world.worldId &&
+          this.gameWorld.isWorldMaintenanceActive(world.worldId, env)
+        ) {
           const actualStartTime =
-            this.cacheManager?.getWorldMaintenanceActualStartTime(world.worldId) ?? null;
+            this.cacheManager?.getWorldMaintenanceActualStartTime(
+              world.worldId
+            ) ?? null;
           return {
             isMaintenanceActive: true,
             source: 'world',
             worldId: world.worldId,
-            message: this.gameWorld.getWorldMaintenanceMessage(world.worldId, env, lang),
+            message: this.gameWorld.getWorldMaintenanceMessage(
+              world.worldId,
+              env,
+              lang
+            ),
             forceDisconnect: world.forceDisconnect ?? false,
             gracePeriodMinutes: world.gracePeriodMinutes ?? 0,
             startsAt: world.maintenanceStartDate ?? null,
@@ -1308,7 +1420,10 @@ export class GatrixServerSDK {
    * @param worldId World ID
    * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
-  getPopupNoticesForWorld(worldId: string, environmentId?: string): PopupNotice[] {
+  getPopupNoticesForWorld(
+    worldId: string,
+    environmentId?: string
+  ): PopupNotice[] {
     const env = this.resolveToken(environmentId, 'getPopupNoticesForWorld');
     return this.popupNotice.getNoticesForWorld(worldId, env);
   }
@@ -1327,7 +1442,10 @@ export class GatrixServerSDK {
     userId?: string;
     environmentId?: string;
   }): PopupNotice[] {
-    const env = this.resolveToken(options?.environmentId, 'getActivePopupNotices');
+    const env = this.resolveToken(
+      options?.environmentId,
+      'getActivePopupNotices'
+    );
     return this.popupNotice.getActivePopupNotices({
       ...options,
       environmentId: env,
@@ -1370,7 +1488,10 @@ export class GatrixServerSDK {
    * @param id Store product ID
    * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
-  async getStoreProductById(id: string, environmentId?: string): Promise<StoreProduct> {
+  async getStoreProductById(
+    id: string,
+    environmentId?: string
+  ): Promise<StoreProduct> {
     const env = this.resolveToken(environmentId, 'getStoreProductById');
     return await this.storeProduct.getById(id, env);
   }
@@ -1421,7 +1542,10 @@ export class GatrixServerSDK {
    * Called when survey settings change (e.g., survey configuration updates)
    * @param environmentId environment ID. Only used in multi-environment mode.
    */
-  updateSurveySettings(newSettings: SurveySettings, environmentId?: string): void {
+  updateSurveySettings(
+    newSettings: SurveySettings,
+    environmentId?: string
+  ): void {
     const env = this.resolveToken(environmentId, 'updateSurveySettings');
     this.survey.updateSettings(newSettings, env);
   }
@@ -1468,7 +1592,10 @@ export class GatrixServerSDK {
    */
   async refreshCache(): Promise<void> {
     if (!this.cacheManager) {
-      throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
+      throw createError(
+        ErrorCode.NOT_INITIALIZED,
+        'Cache manager not initialized'
+      );
     }
 
     await this.cacheManager.refreshAll();
@@ -1480,7 +1607,10 @@ export class GatrixServerSDK {
    */
   async refreshGameWorldsCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
-      throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
+      throw createError(
+        ErrorCode.NOT_INITIALIZED,
+        'Cache manager not initialized'
+      );
     }
     const env = this.resolveToken(environmentId, 'refreshGameWorldsCache');
     await this.cacheManager.refreshGameWorlds(env);
@@ -1492,7 +1622,10 @@ export class GatrixServerSDK {
    */
   async refreshPopupNoticesCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
-      throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
+      throw createError(
+        ErrorCode.NOT_INITIALIZED,
+        'Cache manager not initialized'
+      );
     }
     const env = this.resolveToken(environmentId, 'refreshPopupNoticesCache');
     await this.cacheManager.refreshPopupNotices(env);
@@ -1504,7 +1637,10 @@ export class GatrixServerSDK {
    */
   async refreshSurveysCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
-      throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
+      throw createError(
+        ErrorCode.NOT_INITIALIZED,
+        'Cache manager not initialized'
+      );
     }
     const env = this.resolveToken(environmentId, 'refreshSurveysCache');
     await this.cacheManager.refreshSurveys(env);
@@ -1516,9 +1652,15 @@ export class GatrixServerSDK {
    */
   async refreshServiceMaintenanceCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
-      throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
+      throw createError(
+        ErrorCode.NOT_INITIALIZED,
+        'Cache manager not initialized'
+      );
     }
-    const env = this.resolveToken(environmentId, 'refreshServiceMaintenanceCache');
+    const env = this.resolveToken(
+      environmentId,
+      'refreshServiceMaintenanceCache'
+    );
     await this.cacheManager.refreshServiceMaintenance(env);
   }
 
@@ -1579,7 +1721,8 @@ export class GatrixServerSDK {
 
       // Return unsubscribe function
       return () => {
-        const currentListeners = this.connectionEventListeners.get(eventType) || [];
+        const currentListeners =
+          this.connectionEventListeners.get(eventType) || [];
         this.connectionEventListeners.set(
           eventType,
           currentListeners.filter((cb) => cb !== callback)
@@ -1600,7 +1743,8 @@ export class GatrixServerSDK {
 
       // Return unsubscribe function
       return () => {
-        const currentListeners = this.maintenanceEventListeners.get(eventType) || [];
+        const currentListeners =
+          this.maintenanceEventListeners.get(eventType) || [];
         this.maintenanceEventListeners.set(
           eventType,
           currentListeners.filter((cb) => cb !== callback)
@@ -1613,7 +1757,9 @@ export class GatrixServerSDK {
     // For event-based refresh, use EventListener
     if (refreshMethod === 'event') {
       if (!this.eventListener) {
-        this.logger.warn('Event listener not initialized. Events will not be received.');
+        this.logger.warn(
+          'Event listener not initialized. Events will not be received.'
+        );
         return () => {}; // Return no-op function
       }
       return this.eventListener.on(eventType, callback);
@@ -1624,22 +1770,24 @@ export class GatrixServerSDK {
         this.logger.warn('Cache manager not initialized.');
         return () => {}; // Return no-op function
       }
-      const unsubscribe = this.cacheManager.onRefresh((type: string, data: any) => {
-        // Convert cache refresh events to SDK events
-        // Wrap in try-catch to prevent user callback errors from affecting SDK
-        try {
-          callback({
-            type: type,
-            data: data,
-            timestamp: new Date().toISOString(),
-          });
-        } catch (error: any) {
-          this.logger.error('Error in user event callback', {
-            eventType: type,
-            error: error.message,
-          });
+      const unsubscribe = this.cacheManager.onRefresh(
+        (type: string, data: any) => {
+          // Convert cache refresh events to SDK events
+          // Wrap in try-catch to prevent user callback errors from affecting SDK
+          try {
+            callback({
+              type: type,
+              data: data,
+              timestamp: new Date().toISOString(),
+            });
+          } catch (error: any) {
+            this.logger.error('Error in user event callback', {
+              eventType: type,
+              error: error.message,
+            });
+          }
         }
-      });
+      );
       return unsubscribe;
     }
 
@@ -1651,8 +1799,12 @@ export class GatrixServerSDK {
    */
   off(eventType: string, callback: EventCallback): void {
     // Handle maintenance events separately
-    if (eventType === 'maintenance.started' || eventType === 'maintenance.ended') {
-      const currentListeners = this.maintenanceEventListeners.get(eventType) || [];
+    if (
+      eventType === 'maintenance.started' ||
+      eventType === 'maintenance.ended'
+    ) {
+      const currentListeners =
+        this.maintenanceEventListeners.get(eventType) || [];
       this.maintenanceEventListeners.set(
         eventType,
         currentListeners.filter((cb) => cb !== callback)
@@ -1723,7 +1875,8 @@ export class GatrixServerSDK {
     const enhancedPorts = { ...input.ports };
     if (!enhancedPorts.metricsApi) {
       const metricsPort =
-        this.config.metrics?.port ?? parseInt(process.env.SDK_METRICS_PORT || '9337', 10);
+        this.config.metrics?.port ??
+        parseInt(process.env.SDK_METRICS_PORT || '9337', 10);
       enhancedPorts.metricsApi = metricsPort;
     }
 
@@ -1755,9 +1908,12 @@ export class GatrixServerSDK {
           projectId: result.projectId || undefined,
         });
       } catch (error: any) {
-        this.logger.warn('Failed to subscribe to org/project channels after registration', {
-          error: error.message,
-        });
+        this.logger.warn(
+          'Failed to subscribe to org/project channels after registration',
+          {
+            error: error.message,
+          }
+        );
       }
     }
 
@@ -1789,7 +1945,10 @@ export class GatrixServerSDK {
   /**
    * Fetch a specific service instance via Backend API
    */
-  async fetchService(serviceType: string, instanceId: string): Promise<ServiceInstance | null> {
+  async fetchService(
+    serviceType: string,
+    instanceId: string
+  ): Promise<ServiceInstance | null> {
     return await this.serviceDiscovery.fetchService(serviceType, instanceId);
   }
 
@@ -1854,7 +2013,11 @@ export class GatrixServerSDK {
    */
   getUserMetricsProvider():
     | {
-        createCounter: (name: string, help: string, labelNames?: string[]) => any;
+        createCounter: (
+          name: string,
+          help: string,
+          labelNames?: string[]
+        ) => any;
         createGauge: (name: string, help: string, labelNames?: string[]) => any;
         createHistogram: (
           name: string,
@@ -1871,7 +2034,11 @@ export class GatrixServerSDK {
     const registry = this.userRegistry;
 
     return {
-      createCounter(name: string, help: string, labelNames: string[] = []): any {
+      createCounter(
+        name: string,
+        help: string,
+        labelNames: string[] = []
+      ): any {
         return new promClient.Counter({
           name,
           help,
@@ -1931,7 +2098,10 @@ export class GatrixServerSDK {
    * @param accountId Account ID to check
    * @param environmentId Optional in single-env mode, required in multi-env mode
    */
-  async isAccountWhitelisted(accountId: string, environmentId?: string): Promise<boolean> {
+  async isAccountWhitelisted(
+    accountId: string,
+    environmentId?: string
+  ): Promise<boolean> {
     const env = this.resolveToken(environmentId, 'isAccountWhitelisted');
     return this.whitelist.isAccountWhitelisted(accountId, env);
   }
@@ -1960,7 +2130,10 @@ export class GatrixServerSDK {
    */
   async refreshWhitelistCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
-      throw createError(ErrorCode.INVALID_CONFIG, 'Cache manager not initialized');
+      throw createError(
+        ErrorCode.INVALID_CONFIG,
+        'Cache manager not initialized'
+      );
     }
     const env = this.resolveToken(environmentId, 'refreshWhitelistCache');
     await this.cacheManager.refreshWhitelists(env);
@@ -1992,14 +2165,21 @@ export class GatrixServerSDK {
    * });
    * ```
    */
-  async publishCustomEvent(eventType: string, data: Record<string, any>): Promise<void> {
+  async publishCustomEvent(
+    eventType: string,
+    data: Record<string, any>
+  ): Promise<void> {
     if (!this.eventListener) {
-      this.logger.warn('Event listener not initialized, custom event not published');
+      this.logger.warn(
+        'Event listener not initialized, custom event not published'
+      );
       return;
     }
 
     // Ensure event type is prefixed with 'custom:'
-    const prefixedEventType = eventType.startsWith('custom:') ? eventType : `custom:${eventType}`;
+    const prefixedEventType = eventType.startsWith('custom:')
+      ? eventType
+      : `custom:${eventType}`;
 
     try {
       const timestamp = data.timestamp || Date.now();
@@ -2142,7 +2322,10 @@ export class GatrixServerSDK {
    */
   async refreshVarsCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
-      throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
+      throw createError(
+        ErrorCode.NOT_INITIALIZED,
+        'Cache manager not initialized'
+      );
     }
     const env = this.resolveToken(environmentId, 'refreshVarsCache');
     await this.vars.refreshByEnvironment(env);

@@ -40,7 +40,10 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
   const totalPages = Math.max(1, Math.ceil(count / rowsPerPage));
   const currentPage = page + 1; // Convert 0-based to 1-based
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    newPage: number
+  ) => {
     // Ensure newPage is a valid number before converting
     const pageNumber = typeof newPage === 'number' ? newPage - 1 : 0;
     onPageChange(event, pageNumber); // Convert 1-based to 0-based

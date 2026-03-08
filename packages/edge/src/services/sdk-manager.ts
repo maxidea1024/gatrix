@@ -1,4 +1,8 @@
-import { GatrixServerSDK, GatrixSDKConfig, ITokenProvider } from '@gatrix/server-sdk';
+import {
+  GatrixServerSDK,
+  GatrixSDKConfig,
+  ITokenProvider,
+} from '@gatrix/server-sdk';
 import { config } from '../config/env';
 import { createLogger } from '../config/logger';
 import { environmentRegistry } from './environment-registry';
@@ -24,18 +28,26 @@ class EdgeTokenProvider implements ITokenProvider {
     for (const org of tree) {
       for (const project of org.projects) {
         for (const env of project.environments) {
-          tokens.push(`unsecured-${org.id}:${project.id}:${env.id}-server-api-token`);
+          tokens.push(
+            `unsecured-${org.id}:${project.id}:${env.id}-server-api-token`
+          );
         }
       }
     }
     return tokens;
   }
 
-  onTokensChanged(callback: (added: string[], removed: string[]) => void): () => void {
+  onTokensChanged(
+    callback: (added: string[], removed: string[]) => void
+  ): () => void {
     return environmentRegistry.onTreeChanged(() => {
       const currentTokens = new Set(this.getTokens());
-      const added = [...currentTokens].filter((t) => !this.previousTokens.has(t));
-      const removed = [...this.previousTokens].filter((t) => !currentTokens.has(t));
+      const added = [...currentTokens].filter(
+        (t) => !this.previousTokens.has(t)
+      );
+      const removed = [...this.previousTokens].filter(
+        (t) => !currentTokens.has(t)
+      );
       this.previousTokens = currentTokens;
       if (added.length > 0 || removed.length > 0) {
         callback(added, removed);
@@ -127,7 +139,9 @@ class SDKManager {
           const packageJson = require('../../package.json');
           serverVersion = packageJson.version || '0.0.0';
         } catch (err) {
-          logger.warn('Failed to load package.json version, using default 0.0.0');
+          logger.warn(
+            'Failed to load package.json version, using default 0.0.0'
+          );
         }
       }
 

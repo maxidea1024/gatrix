@@ -46,7 +46,12 @@ const ArchivedIcon: React.FC<SvgIconProps> = (props) => (
  */
 const StaleStatusIcon: React.FC<SvgIconProps> = (props) => (
   <SvgIcon {...props} viewBox="0 0 20 20">
-    <path d="M10 2L18.66 17H1.34L10 2z" fill="#ef4444" stroke="#dc2626" strokeWidth="0.5" />
+    <path
+      d="M10 2L18.66 17H1.34L10 2z"
+      fill="#ef4444"
+      stroke="#dc2626"
+      strokeWidth="0.5"
+    />
     <rect x="9" y="7" width="2" height="5" rx="1" fill="white" />
     <circle cx="10" cy="14.5" r="1.2" fill="white" />
   </SvgIcon>
@@ -63,7 +68,14 @@ const PotentiallyStaleIcon: React.FC<SvgIconProps> = (props) => (
       stroke="#d97706"
       strokeWidth="0.5"
     />
-    <circle cx="10" cy="10" r="4" fill="none" stroke="white" strokeWidth="1.5" />
+    <circle
+      cx="10"
+      cy="10"
+      r="4"
+      fill="none"
+      stroke="white"
+      strokeWidth="1.5"
+    />
     <path
       d="M10 8v2.5l1.5 1"
       stroke="white"
@@ -85,7 +97,10 @@ interface FlagStatusIconProps {
 /**
  * Returns a custom SVG icon for the given flag status.
  */
-const FlagStatusIcon: React.FC<FlagStatusIconProps> = ({ status, size = 16 }) => {
+const FlagStatusIcon: React.FC<FlagStatusIconProps> = ({
+  status,
+  size = 16,
+}) => {
   const iconProps: SvgIconProps = { sx: { fontSize: size } };
   switch (status) {
     case 'active':

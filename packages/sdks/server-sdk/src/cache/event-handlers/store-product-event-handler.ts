@@ -39,7 +39,10 @@ export class StoreProductEventHandler implements IEventHandler {
         break;
       }
       case 'store_product.deleted':
-        this.cacheManager.removeStoreProduct(String(event.data.id), environmentId);
+        this.cacheManager.removeStoreProduct(
+          String(event.data.id),
+          environmentId
+        );
         break;
       case 'store_product.bulk_updated':
         this.logger.info('Store product bulk update, refreshing cache', {

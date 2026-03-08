@@ -1,14 +1,22 @@
 import React from 'react';
 import { IconButton, Box, Typography } from '@mui/material';
 import { ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
-import { OptionsObject, SnackbarKey, SnackbarMessage, useSnackbar } from 'notistack';
+import {
+  OptionsObject,
+  SnackbarKey,
+  SnackbarMessage,
+  useSnackbar,
+} from 'notistack';
 import i18n from 'i18next';
 
 /**
  * Show a consistent Change Request created notification with navigation arrow
  */
 export function showChangeRequestCreatedToast(
-  enqueueSnackbar: (message: SnackbarMessage, options?: OptionsObject) => SnackbarKey,
+  enqueueSnackbar: (
+    message: SnackbarMessage,
+    options?: OptionsObject
+  ) => SnackbarKey,
   closeSnackbar: (key?: SnackbarKey) => void,
   navigate: (path: string) => void
 ): void {

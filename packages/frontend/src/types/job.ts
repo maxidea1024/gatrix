@@ -23,7 +23,15 @@ export interface JobSchema {
 }
 
 export interface JobSchemaField {
-  type: 'string' | 'number' | 'boolean' | 'text' | 'password' | 'select' | 'array' | 'object';
+  type:
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'text'
+    | 'password'
+    | 'select'
+    | 'array'
+    | 'object';
   required: boolean;
   description: string;
   label?: string;

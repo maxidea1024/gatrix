@@ -74,10 +74,14 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
   const { enqueueSnackbar } = useSnackbar();
 
   const [currentTab, setCurrentTab] = useState(0);
-  const [receivedInvitations, setReceivedInvitations] = useState<Invitation[]>([]);
+  const [receivedInvitations, setReceivedInvitations] = useState<Invitation[]>(
+    []
+  );
   const [sentInvitations, setSentInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(false);
-  const [processingInvitations, setProcessingInvitations] = useState<Set<number>>(new Set());
+  const [processingInvitations, setProcessingInvitations] = useState<
+    Set<number>
+  >(new Set());
 
   // 받은 초대 Get list
   const fetchReceivedInvitations = async () => {
@@ -120,7 +124,11 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
           setSentInvitations(data.data);
         }
       } else {
-        console.error('Failed to fetch sent invitations:', response.status, response.statusText);
+        console.error(
+          'Failed to fetch sent invitations:',
+          response.status,
+          response.statusText
+        );
       }
     } catch (error) {
       console.error('Failed to fetch sent invitations:', error);
@@ -128,18 +136,24 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
   };
 
   // 초대 Response (수락/거절)
-  const respondToInvitation = async (invitationId: number, action: 'accept' | 'decline') => {
+  const respondToInvitation = async (
+    invitationId: number,
+    action: 'accept' | 'decline'
+  ) => {
     setProcessingInvitations((prev) => new Set(prev).add(invitationId));
 
     try {
-      const response = await fetch(`/api/v1/chat/invitations/${invitationId}/respond`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-        body: JSON.stringify({ action }),
-      });
+      const response = await fetch(
+        `/api/v1/chat/invitations/${invitationId}/respond`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+          body: JSON.stringify({ action }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -182,7 +196,9 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
     } catch (error) {
       console.error(`Failed to ${action} invitation:`, error);
       enqueueSnackbar(
-        action === 'accept' ? t('chat.invitationAcceptFailed') : t('chat.invitationDeclineFailed'),
+        action === 'accept'
+          ? t('chat.invitationAcceptFailed')
+          : t('chat.invitationDeclineFailed'),
         { variant: 'error' }
       );
     } finally {
@@ -237,8 +253,8 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
   useEffect(() => {
     if (open) {
       setLoading(true);
-      Promise.all([fetchReceivedInvitations(), fetchSentInvitations()]).finally(() =>
-        setLoading(false)
+      Promise.all([fetchReceivedInvitations(), fetchSentInvitations()]).finally(
+        () => setLoading(false)
       );
     }
   }, [open]);
@@ -248,17 +264,39 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
     switch (status) {
       case 'pending':
         return (
-          <Chip label={t('chat.pending')} color="warning" size="small" icon={<ScheduleIcon />} />
+          <Chip
+            label={t('chat.pending')}
+            color="warning"
+            size="small"
+            icon={<ScheduleIcon />}
+          />
         );
       case 'accepted':
         return (
-          <Chip label={t('chat.accepted')} color="success" size="small" icon={<CheckIcon />} />
+          <Chip
+            label={t('chat.accepted')}
+            color="success"
+            size="small"
+            icon={<CheckIcon />}
+          />
         );
       case 'declined':
-        return <Chip label={t('chat.declined')} color="error" size="small" icon={<CloseIcon />} />;
+        return (
+          <Chip
+            label={t('chat.declined')}
+            color="error"
+            size="small"
+            icon={<CloseIcon />}
+          />
+        );
       case 'cancelled':
         return (
-          <Chip label={t('chat.cancelled')} color="default" size="small" icon={<CancelIcon />} />
+          <Chip
+            label={t('chat.cancelled')}
+            color="default"
+            size="small"
+            icon={<CancelIcon />}
+          />
         );
       case 'expired':
         return <Chip label={t('chat.expired')} color="default" size="small" />;
@@ -271,7 +309,9 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
   const renderReceivedInvitation = (invitation: Invitation) => (
     <ListItem key={invitation.id} divider>
       <ListItemAvatar>
-        <Avatar>{invitation.channel?.name?.charAt(0).toUpperCase() || 'C'}</Avatar>
+        <Avatar>
+          {invitation.channel?.name?.charAt(0).toUpperCase() || 'C'}
+        </Avatar>
       </ListItemAvatar>
 
       <ListItemText
@@ -286,7 +326,8 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
         secondary={
           <Box>
             <Typography variant="body2" color="text.secondary">
-              {t('chat.invitedBy')}: {invitation.inviter?.name || t('chat.unknownUser')}
+              {t('chat.invitedBy')}:{' '}
+              {invitation.inviter?.name || t('chat.unknownUser')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               {formatDistanceToNow(new Date(invitation.createdAt), {
@@ -341,7 +382,9 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
   const renderSentInvitation = (invitation: Invitation) => (
     <ListItem key={invitation.id} divider>
       <ListItemAvatar>
-        <Avatar>{invitation.invitee?.name?.charAt(0).toUpperCase() || 'U'}</Avatar>
+        <Avatar>
+          {invitation.invitee?.name?.charAt(0).toUpperCase() || 'U'}
+        </Avatar>
       </ListItemAvatar>
 
       <ListItemText
@@ -356,7 +399,8 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
         secondary={
           <Box>
             <Typography variant="body2" color="text.secondary">
-              {t('chat.invitedTo')}: {invitation.channel?.name || t('chat.unknownChannel')}
+              {t('chat.invitedTo')}:{' '}
+              {invitation.channel?.name || t('chat.unknownChannel')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               {formatDistanceToNow(new Date(invitation.createdAt), {
@@ -413,9 +457,15 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
       <DialogTitle>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box>
-            <Typography variant="h6">{title || t('chat.manageInvitations')}</Typography>
+            <Typography variant="h6">
+              {title || t('chat.manageInvitations')}
+            </Typography>
             {subtitle && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              >
                 {subtitle}
               </Typography>
             )}
@@ -435,10 +485,19 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
           p: 0,
         }}
       >
-        <Box sx={{ px: 3, pt: 2, pb: 1, borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
-            <Tab label={`${t('chat.receivedInvitations')} (${receivedInvitations.length})`} />
-            <Tab label={`${t('chat.sentInvitations')} (${sentInvitations.length})`} />
+        <Box
+          sx={{ px: 3, pt: 2, pb: 1, borderBottom: 1, borderColor: 'divider' }}
+        >
+          <Tabs
+            value={currentTab}
+            onChange={(_, newValue) => setCurrentTab(newValue)}
+          >
+            <Tab
+              label={`${t('chat.receivedInvitations')} (${receivedInvitations.length})`}
+            />
+            <Tab
+              label={`${t('chat.sentInvitations')} (${sentInvitations.length})`}
+            />
           </Tabs>
         </Box>
 

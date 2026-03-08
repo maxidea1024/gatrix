@@ -86,11 +86,17 @@ const safeJsonStringify = (data: any): string => {
 };
 
 export class JobModel {
-  static async findAllWithPagination(filters: JobFilters): Promise<JobListResult> {
+  static async findAllWithPagination(
+    filters: JobFilters
+  ): Promise<JobListResult> {
     try {
       // Set default values
-      const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 20;
-      const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
+      const limit = filters?.limit
+        ? parseInt(filters.limit.toString(), 10)
+        : 20;
+      const offset = filters?.offset
+        ? parseInt(filters.offset.toString(), 10)
+        : 0;
       const environmentId = filters.environmentId;
 
       // 기본 Query 빌더 with environment filter
@@ -123,7 +129,9 @@ export class JobModel {
       };
 
       // Count Query
-      const countQuery = applyFilters(baseQuery()).count('j.id as total').first();
+      const countQuery = applyFilters(baseQuery())
+        .count('j.id as total')
+        .first();
 
       // Data Query - 태그 정보 포함
       const dataQuery = applyFilters(baseQuery())
@@ -141,7 +149,10 @@ export class JobModel {
         .offset(offset);
 
       // 병렬 실행
-      const [countResult, dataResults] = await Promise.all([countQuery, dataQuery]);
+      const [countResult, dataResults] = await Promise.all([
+        countQuery,
+        dataQuery,
+      ]);
 
       const total = countResult?.total || 0;
 
@@ -207,7 +218,10 @@ export class JobModel {
     }
   }
 
-  static async findById(id: string, environmentId: string): Promise<any | null> {
+  static async findById(
+    id: string,
+    environmentId: string
+  ): Promise<any | null> {
     try {
       const job = await db('g_jobs as j')
         .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
@@ -298,27 +312,40 @@ export class JobModel {
     }
   }
 
-  static async update(id: string, jobData: UpdateJobData, environmentId: string): Promise<any> {
+  static async update(
+    id: string,
+    jobData: UpdateJobData,
+    environmentId: string
+  ): Promise<any> {
     const trx = await db.transaction();
     try {
       const updateData: any = {};
 
       if (jobData.name !== undefined) updateData.name = jobData.name;
       if (jobData.memo !== undefined) updateData.memo = jobData.memo;
-      if (jobData.jobTypeId !== undefined) updateData.jobTypeId = jobData.jobTypeId;
-      if (jobData.isEnabled !== undefined) updateData.isEnabled = jobData.isEnabled;
+      if (jobData.jobTypeId !== undefined)
+        updateData.jobTypeId = jobData.jobTypeId;
+      if (jobData.isEnabled !== undefined)
+        updateData.isEnabled = jobData.isEnabled;
       if (jobData.jobDataMap !== undefined)
         updateData.jobDataMap = safeJsonStringify(jobData.jobDataMap);
-      if (jobData.updatedBy !== undefined) updateData.updatedBy = jobData.updatedBy;
+      if (jobData.updatedBy !== undefined)
+        updateData.updatedBy = jobData.updatedBy;
 
       updateData.updatedAt = new Date();
 
-      await trx('g_jobs').where('id', id).where('environmentId', environmentId).update(updateData);
+      await trx('g_jobs')
+        .where('id', id)
+        .where('environmentId', environmentId)
+        .update(updateData);
 
       // 태그 업데이트
       if (jobData.tagIds !== undefined) {
         // Existing 태그 연결 Delete
-        await trx('g_tag_assignments').where('entityType', 'job').where('entityId', id).del();
+        await trx('g_tag_assignments')
+          .where('entityType', 'job')
+          .where('entityId', id)
+          .del();
 
         // 새 태그 연결 추가
         if (jobData.tagIds.length > 0) {
@@ -345,10 +372,16 @@ export class JobModel {
     const trx = await db.transaction();
     try {
       // 태그 할당 Delete
-      await trx('g_tag_assignments').where('entityType', 'job').where('entityId', id).del();
+      await trx('g_tag_assignments')
+        .where('entityType', 'job')
+        .where('entityId', id)
+        .del();
 
       // Job Delete
-      await trx('g_jobs').where('id', id).where('environmentId', environmentId).del();
+      await trx('g_jobs')
+        .where('id', id)
+        .where('environmentId', environmentId)
+        .del();
 
       await trx.commit();
     } catch (error) {
@@ -359,11 +392,18 @@ export class JobModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(jobId: string, tagIds: string[], createdBy?: string): Promise<void> {
+  static async setTags(
+    jobId: string,
+    tagIds: string[],
+    createdBy?: string
+  ): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         // Existing 태그 할당 Delete
-        await trx('g_tag_assignments').where('entityType', 'job').where('entityId', jobId).del();
+        await trx('g_tag_assignments')
+          .where('entityType', 'job')
+          .where('entityId', jobId)
+          .del();
 
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
@@ -397,7 +437,10 @@ export class JobModel {
     }
   }
 
-  static async findByName(name: string, environmentId: string): Promise<any | null> {
+  static async findByName(
+    name: string,
+    environmentId: string
+  ): Promise<any | null> {
     try {
       const job = await db('g_jobs')
         .where('name', name)

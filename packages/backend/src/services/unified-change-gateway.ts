@@ -29,7 +29,13 @@ export class UnifiedChangeGateway {
     targetId: string,
     newData: any
   ): Promise<ChangeGatewayResult> {
-    return this.processChange(userId, environmentName, targetTable, targetId, newData);
+    return this.processChange(
+      userId,
+      environmentName,
+      targetTable,
+      targetId,
+      newData
+    );
   }
 
   /**
@@ -232,7 +238,8 @@ export class UnifiedChangeGateway {
       // 4. Branching Logic
       // CASE A: Direct Update
       if (!env.requiresApproval) {
-        if (!/^[a-zA-Z0-9_]+$/.test(targetTable)) throw new Error('Invalid table name');
+        if (!/^[a-zA-Z0-9_]+$/.test(targetTable))
+          throw new Error('Invalid table name');
 
         let result;
         if (directChangeFunction) {

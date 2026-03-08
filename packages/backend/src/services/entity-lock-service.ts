@@ -28,7 +28,11 @@ class EntityLockService {
   /**
    * Generate Redis key for entity lock
    */
-  private getLockKey(table: string, entityId: string, environmentId: string): string {
+  private getLockKey(
+    table: string,
+    entityId: string,
+    environmentId: string
+  ): string {
     return `${LOCK_KEY_PREFIX}:${environmentId}:${table}:${entityId}`;
   }
 
@@ -145,7 +149,10 @@ class EntityLockService {
             },
           });
         } catch (sseError) {
-          logger.warn('Failed to send SSE notification for force takeover', sseError);
+          logger.warn(
+            'Failed to send SSE notification for force takeover',
+            sseError
+          );
         }
       }
 
@@ -193,7 +200,10 @@ class EntityLockService {
           },
         });
       } catch (sseError) {
-        logger.warn('Failed to send SSE notification for lock release', sseError);
+        logger.warn(
+          'Failed to send SSE notification for lock release',
+          sseError
+        );
       }
 
       return true;
@@ -286,7 +296,9 @@ class EntityLockService {
         .first();
 
       if (pendingItem) {
-        const cr = await ChangeRequest.query().findById(pendingItem.changeRequestId);
+        const cr = await ChangeRequest.query().findById(
+          pendingItem.changeRequestId
+        );
 
         return {
           hasPending: true,

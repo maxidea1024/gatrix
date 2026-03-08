@@ -4,8 +4,18 @@
  * Wraps your application to provide Gatrix feature flag functionality.
  * Either pass a config object or an existing GatrixClient instance.
  */
-import React, { type FC, type PropsWithChildren, useEffect, useMemo, useState } from 'react';
-import { GatrixClient, EVENTS, type GatrixClientConfig } from '@gatrix/gatrix-js-client-sdk';
+import React, {
+  type FC,
+  type PropsWithChildren,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import {
+  GatrixClient,
+  EVENTS,
+  type GatrixClientConfig,
+} from '@gatrix/gatrix-js-client-sdk';
 import GatrixFlagContext, { type GatrixContextValue } from './GatrixContext';
 
 export interface GatrixProviderProps {
@@ -37,7 +47,8 @@ const offlineConfig: GatrixClientConfig = {
 
 // Fallback for React <18 which doesn't support startTransition
 const _startTransition = 'startTransition';
-const defaultStartTransition = (React as any)[_startTransition] || ((fn: () => void) => fn());
+const defaultStartTransition =
+  (React as any)[_startTransition] || ((fn: () => void) => fn());
 
 const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
   config: customConfig,
@@ -62,11 +73,14 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
         ? (customConfig?.features?.bootstrap &&
             customConfig?.features?.bootstrapOverride !== false) ||
             gatrixClient.isReady?.()
-        : config.features?.bootstrap && config.features?.bootstrapOverride !== false
+        : config.features?.bootstrap &&
+            config.features?.bootstrapOverride !== false
     )
   );
 
-  const [flagsError, setFlagsError] = useState<any>(client.current!.getError?.() || null);
+  const [flagsError, setFlagsError] = useState<any>(
+    client.current!.getError?.() || null
+  );
 
   useEffect(() => {
     if (!config && !gatrixClient) {
@@ -135,18 +149,27 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
       setFlagsError,
       on: (...args: any[]) => client.current!.on(args[0], args[1]),
       off: (...args: any[]) => client.current!.off(args[0], args[1]),
-      isEnabled: (flagName: string) => client.current!.features.isEnabled(flagName),
-      getVariant: (flagName: string) => client.current!.features.getVariant(flagName),
-      updateContext: async (context: any) => await client.current!.features.updateContext(context),
-      isExplicitSyncEnabled: () => client.current!.features.isExplicitSyncEnabled(),
+      isEnabled: (flagName: string) =>
+        client.current!.features.isEnabled(flagName),
+      getVariant: (flagName: string) =>
+        client.current!.features.getVariant(flagName),
+      updateContext: async (context: any) =>
+        await client.current!.features.updateContext(context),
+      isExplicitSyncEnabled: () =>
+        client.current!.features.isExplicitSyncEnabled(),
       hasPendingSyncFlags: () => client.current!.features.hasPendingSyncFlags(),
       fetchFlags: async () => await client.current!.features.fetchFlags(),
-      syncFlags: async (fetchNow?: boolean) => await client.current!.features.syncFlags(fetchNow),
+      syncFlags: async (fetchNow?: boolean) =>
+        await client.current!.features.syncFlags(fetchNow),
     }),
     [flagsReady, flagsError]
   );
 
-  return <GatrixFlagContext.Provider value={context}>{children}</GatrixFlagContext.Provider>;
+  return (
+    <GatrixFlagContext.Provider value={context}>
+      {children}
+    </GatrixFlagContext.Provider>
+  );
 };
 
 export default GatrixProvider;

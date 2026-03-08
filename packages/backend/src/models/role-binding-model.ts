@@ -122,7 +122,11 @@ export class RoleBindingModel {
     scopeId?: string
   ): Promise<RoleBindingRecord[]> {
     const query = db(this.TABLE)
-      .select([`${this.TABLE}.*`, 'r.roleName', 'r.description as roleDescription'])
+      .select([
+        `${this.TABLE}.*`,
+        'r.roleName',
+        'r.description as roleDescription',
+      ])
       .leftJoin('g_roles as r', `${this.TABLE}.roleId`, 'r.id')
       .where(`${this.TABLE}.userId`, userId);
 
@@ -141,7 +145,11 @@ export class RoleBindingModel {
     scopeId?: string
   ): Promise<RoleBindingRecord[]> {
     const query = db(this.TABLE)
-      .select([`${this.TABLE}.*`, 'r.roleName', 'r.description as roleDescription'])
+      .select([
+        `${this.TABLE}.*`,
+        'r.roleName',
+        'r.description as roleDescription',
+      ])
       .leftJoin('g_roles as r', `${this.TABLE}.roleId`, 'r.id')
       .where(`${this.TABLE}.groupId`, groupId);
 
@@ -154,7 +162,10 @@ export class RoleBindingModel {
   /**
    * Get all bindings for a specific scope (e.g., all bindings for a project)
    */
-  static async getByScope(scopeType: ScopeType, scopeId: string): Promise<RoleBindingRecord[]> {
+  static async getByScope(
+    scopeType: ScopeType,
+    scopeId: string
+  ): Promise<RoleBindingRecord[]> {
     return db(this.TABLE)
       .select([
         `${this.TABLE}.*`,
@@ -185,19 +196,31 @@ export class RoleBindingModel {
     // Check most specific scope first, then fall back
 
     if (scopeType === 'environment') {
-      const envRoles = await this.getBindingRoleIds(userId, 'environment', scopeId);
+      const envRoles = await this.getBindingRoleIds(
+        userId,
+        'environment',
+        scopeId
+      );
       if (envRoles.length > 0) return envRoles;
 
       // Fallback to project
       const projectId = await this.getProjectFromEnv(scopeId);
       if (projectId) {
-        const projRoles = await this.getBindingRoleIds(userId, 'project', projectId);
+        const projRoles = await this.getBindingRoleIds(
+          userId,
+          'project',
+          projectId
+        );
         if (projRoles.length > 0) return projRoles;
       }
     }
 
     if (scopeType === 'project') {
-      const projRoles = await this.getBindingRoleIds(userId, 'project', scopeId);
+      const projRoles = await this.getBindingRoleIds(
+        userId,
+        'project',
+        scopeId
+      );
       if (projRoles.length > 0) return projRoles;
     }
 
@@ -209,7 +232,11 @@ export class RoleBindingModel {
     }
 
     // Fallback to system
-    const systemRoles = await this.getBindingRoleIds(userId, 'system', 'SYSTEM');
+    const systemRoles = await this.getBindingRoleIds(
+      userId,
+      'system',
+      'SYSTEM'
+    );
     return systemRoles;
   }
 
@@ -245,7 +272,9 @@ export class RoleBindingModel {
   /**
    * Count bindings for a role (for display in role list)
    */
-  static async countByRoleId(roleId: string): Promise<{ userCount: number; groupCount: number }> {
+  static async countByRoleId(
+    roleId: string
+  ): Promise<{ userCount: number; groupCount: number }> {
     const [userResult, groupResult] = await Promise.all([
       db(this.TABLE)
         .where('roleId', roleId)
@@ -267,32 +296,53 @@ export class RoleBindingModel {
 
   // ─── Helper: resolve scope IDs ─────────────────────────
 
-  private static async getProjectFromEnv(environmentId: string): Promise<string | null> {
-    const env = await db('g_environments').where('id', environmentId).select('projectId').first();
+  private static async getProjectFromEnv(
+    environmentId: string
+  ): Promise<string | null> {
+    const env = await db('g_environments')
+      .where('id', environmentId)
+      .select('projectId')
+      .first();
     return env?.projectId || null;
   }
 
-  private static async resolveOrgId(scopeType: ScopeType, scopeId: string): Promise<string | null> {
+  private static async resolveOrgId(
+    scopeType: ScopeType,
+    scopeId: string
+  ): Promise<string | null> {
     if (scopeType === 'org') return scopeId;
     if (scopeType === 'system') return null;
 
     if (scopeType === 'project') {
-      const proj = await db('g_projects').where('id', scopeId).select('orgId').first();
+      const proj = await db('g_projects')
+        .where('id', scopeId)
+        .select('orgId')
+        .first();
       return proj?.orgId || null;
     }
 
     if (scopeType === 'environment') {
-      const env = await db('g_environments').where('id', scopeId).select('projectId').first();
+      const env = await db('g_environments')
+        .where('id', scopeId)
+        .select('projectId')
+        .first();
       if (!env?.projectId) return null;
-      const proj = await db('g_projects').where('id', env.projectId).select('orgId').first();
+      const proj = await db('g_projects')
+        .where('id', env.projectId)
+        .select('orgId')
+        .first();
       return proj?.orgId || null;
     }
 
     return null;
   }
 
-  private static async invalidateGroupMembersCaches(groupId: string): Promise<void> {
-    const members = await db('g_group_members').where('groupId', groupId).select('userId');
+  private static async invalidateGroupMembersCaches(
+    groupId: string
+  ): Promise<void> {
+    const members = await db('g_group_members')
+      .where('groupId', groupId)
+      .select('userId');
     for (const member of members) {
       await permissionService.invalidateUserCache(member.userId);
     }

@@ -27,7 +27,13 @@ export interface ContextOperator {
   name: string;
   description: string;
   valueType: 'single' | 'multiple' | 'none';
-  supportedFieldTypes: ('string' | 'number' | 'boolean' | 'array' | 'version')[];
+  supportedFieldTypes: (
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'array'
+    | 'version'
+  )[];
 }
 
 export interface TargetCondition {
@@ -138,7 +144,12 @@ export const CONTEXT_FIELDS: ContextFieldDefinition[] = [
     name: 'Registration Date',
     description: 'User registration date (days ago)',
     type: 'number',
-    operators: ['greater_than', 'less_than', 'greater_than_or_equal', 'less_than_or_equal'],
+    operators: [
+      'greater_than',
+      'less_than',
+      'greater_than_or_equal',
+      'less_than_or_equal',
+    ],
     defaultValue: 0,
     validation: { min: 0 },
   },
@@ -147,7 +158,12 @@ export const CONTEXT_FIELDS: ContextFieldDefinition[] = [
     name: 'Last Login',
     description: 'Days since last login',
     type: 'number',
-    operators: ['greater_than', 'less_than', 'greater_than_or_equal', 'less_than_or_equal'],
+    operators: [
+      'greater_than',
+      'less_than',
+      'greater_than_or_equal',
+      'less_than_or_equal',
+    ],
     defaultValue: 0,
     validation: { min: 0 },
   },

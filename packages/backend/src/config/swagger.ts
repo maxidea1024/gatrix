@@ -231,7 +231,8 @@ const options: swaggerJSDoc.Options = {
               type: 'string',
               format: 'date-time',
               nullable: true,
-              description: 'Maintenance start (MySQL DATETIME formatted string)',
+              description:
+                'Maintenance start (MySQL DATETIME formatted string)',
             },
             maintenanceEndDate: {
               type: 'string',
@@ -246,7 +247,8 @@ const options: swaggerJSDoc.Options = {
             },
             supportsMultiLanguage: {
               type: 'boolean',
-              description: 'Whether maintenance message supports multiple languages',
+              description:
+                'Whether maintenance message supports multiple languages',
             },
             maintenanceLocales: {
               type: 'array',
@@ -586,7 +588,8 @@ const options: swaggerJSDoc.Options = {
       },
       {
         name: 'Client',
-        description: 'Public client endpoints (no authentication required, cached)',
+        description:
+          'Public client endpoints (no authentication required, cached)',
       },
       {
         name: 'GameWorlds',
@@ -606,7 +609,8 @@ const options: swaggerJSDoc.Options = {
       },
       {
         name: 'ClientSDK',
-        description: 'Client SDK endpoints (require API token and application name headers)',
+        description:
+          'Client SDK endpoints (require API token and application name headers)',
       },
       {
         name: 'RemoteConfig',

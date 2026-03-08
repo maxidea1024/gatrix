@@ -5,7 +5,14 @@
  */
 
 import React, { useState } from 'react';
-import { Box, Chip, Popover, Typography, IconButton, Tooltip } from '@mui/material';
+import {
+  Box,
+  Chip,
+  Popover,
+  Typography,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import FieldTypeIcon from './FieldTypeIcon';
@@ -40,7 +47,11 @@ interface ContextFieldChipProps {
   fieldType?: string;
 }
 
-const ContextFieldChip: React.FC<ContextFieldChipProps> = ({ fieldName, fieldInfo, fieldType }) => {
+const ContextFieldChip: React.FC<ContextFieldChipProps> = ({
+  fieldName,
+  fieldInfo,
+  fieldType,
+}) => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -60,7 +71,10 @@ const ContextFieldChip: React.FC<ContextFieldChipProps> = ({ fieldName, fieldInf
   const chipLabel = (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
       {resolvedType && (
-        <FieldTypeIcon type={resolvedType} sx={{ fontSize: 13, color: 'text.secondary' }} />
+        <FieldTypeIcon
+          type={resolvedType}
+          sx={{ fontSize: 13, color: 'text.secondary' }}
+        />
       )}
       <span>{fieldName}</span>
     </Box>
@@ -121,7 +135,11 @@ const ContextFieldChip: React.FC<ContextFieldChipProps> = ({ fieldName, fieldInf
                   type={fieldInfo.fieldType}
                   sx={{ fontSize: 18, color: 'primary.main' }}
                 />
-                <Typography variant="subtitle2" fontWeight={600} sx={{ fontFamily: 'monospace' }}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight={600}
+                  sx={{ fontFamily: 'monospace' }}
+                >
                   {fieldInfo.fieldName}
                 </Typography>
               </Box>
@@ -155,12 +173,13 @@ const ContextFieldChip: React.FC<ContextFieldChipProps> = ({ fieldName, fieldInf
               }}
             >
               <tbody>
-                {fieldInfo.displayName && fieldInfo.displayName !== fieldInfo.fieldName && (
-                  <tr>
-                    <td>{t('common.displayName')}</td>
-                    <td>{fieldInfo.displayName}</td>
-                  </tr>
-                )}
+                {fieldInfo.displayName &&
+                  fieldInfo.displayName !== fieldInfo.fieldName && (
+                    <tr>
+                      <td>{t('common.displayName')}</td>
+                      <td>{fieldInfo.displayName}</td>
+                    </tr>
+                  )}
                 <tr>
                   <td>{t('common.type')}</td>
                   <td>{fieldInfo.fieldType}</td>
@@ -168,7 +187,9 @@ const ContextFieldChip: React.FC<ContextFieldChipProps> = ({ fieldName, fieldInf
                 {fieldInfo.description && (
                   <tr>
                     <td>{t('common.description')}</td>
-                    <td style={{ whiteSpace: 'pre-wrap' }}>{fieldInfo.description}</td>
+                    <td style={{ whiteSpace: 'pre-wrap' }}>
+                      {fieldInfo.description}
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -176,7 +197,14 @@ const ContextFieldChip: React.FC<ContextFieldChipProps> = ({ fieldName, fieldInf
 
             {/* Validation Rules */}
             {fieldInfo.validationRules && (
-              <Box sx={{ mt: 1.5, pt: 1.5, borderTop: '1px dashed', borderColor: 'divider' }}>
+              <Box
+                sx={{
+                  mt: 1.5,
+                  pt: 1.5,
+                  borderTop: '1px dashed',
+                  borderColor: 'divider',
+                }}
+              >
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -227,17 +255,22 @@ const ContextFieldChip: React.FC<ContextFieldChipProps> = ({ fieldName, fieldInf
                       fieldInfo.validationRules.legalValues.length > 0 && (
                         <tr>
                           <td>{t('featureFlags.validation.legalValues')}</td>
-                          <td>{fieldInfo.validationRules.legalValues.join(', ')}</td>
+                          <td>
+                            {fieldInfo.validationRules.legalValues.join(', ')}
+                          </td>
                         </tr>
                       )}
                     {fieldInfo.validationRules.pattern &&
                       (() => {
-                        const desc = fieldInfo.validationRules!.patternDescription;
+                        const desc =
+                          fieldInfo.validationRules!.patternDescription;
                         // Try to resolve as preset key (e.g. 'email' -> 'featureFlags.validation.presetEmail')
                         const presetLabelKey = desc
                           ? `featureFlags.validation.preset${desc.charAt(0).toUpperCase()}${desc.slice(1)}`
                           : '';
-                        const resolvedLabel = desc ? t(presetLabelKey, { defaultValue: desc }) : '';
+                        const resolvedLabel = desc
+                          ? t(presetLabelKey, { defaultValue: desc })
+                          : '';
                         return (
                           <tr>
                             <td>

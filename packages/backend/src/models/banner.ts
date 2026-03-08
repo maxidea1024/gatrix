@@ -172,7 +172,9 @@ export class BannerModel {
         return query;
       };
 
-      const countQuery = applyFilters(baseQuery()).count('b.id as total').first();
+      const countQuery = applyFilters(baseQuery())
+        .count('b.id as total')
+        .first();
 
       const dataQuery = applyFilters(baseQuery())
         .select([
@@ -194,7 +196,10 @@ export class BannerModel {
       const parsedBanners = banners.map((b: any) => ({
         ...b,
         shuffle: Boolean(b.shuffle),
-        sequences: typeof b.sequences === 'string' ? JSON.parse(b.sequences) : b.sequences,
+        sequences:
+          typeof b.sequences === 'string'
+            ? JSON.parse(b.sequences)
+            : b.sequences,
         metadata: b.metadata
           ? typeof b.metadata === 'string'
             ? JSON.parse(b.metadata)
@@ -209,7 +214,10 @@ export class BannerModel {
     }
   }
 
-  static async findById(bannerId: string, environmentId: string): Promise<BannerAttributes | null> {
+  static async findById(
+    bannerId: string,
+    environmentId: string
+  ): Promise<BannerAttributes | null> {
     try {
       const banner = await db('g_banners as b')
         .leftJoin('g_users as creator', 'b.createdBy', 'creator.id')
@@ -233,7 +241,9 @@ export class BannerModel {
         ...banner,
         shuffle: Boolean(banner.shuffle),
         sequences:
-          typeof banner.sequences === 'string' ? JSON.parse(banner.sequences) : banner.sequences,
+          typeof banner.sequences === 'string'
+            ? JSON.parse(banner.sequences)
+            : banner.sequences,
         metadata: banner.metadata
           ? typeof banner.metadata === 'string'
             ? JSON.parse(banner.metadata)
@@ -257,7 +267,9 @@ export class BannerModel {
     excludeBannerId?: string
   ): Promise<BannerAttributes | null> {
     try {
-      let query = db('g_banners').where('name', name).where('environmentId', environmentId);
+      let query = db('g_banners')
+        .where('name', name)
+        .where('environmentId', environmentId);
       if (excludeBannerId) {
         query = query.whereNot('id', excludeBannerId);
       }
@@ -269,7 +281,9 @@ export class BannerModel {
         ...banner,
         shuffle: Boolean(banner.shuffle),
         sequences:
-          typeof banner.sequences === 'string' ? JSON.parse(banner.sequences) : banner.sequences,
+          typeof banner.sequences === 'string'
+            ? JSON.parse(banner.sequences)
+            : banner.sequences,
         metadata: banner.metadata
           ? typeof banner.metadata === 'string'
             ? JSON.parse(banner.metadata)
@@ -328,13 +342,17 @@ export class BannerModel {
       };
 
       if (data.name !== undefined) updateData.name = data.name;
-      if (data.description !== undefined) updateData.description = data.description;
+      if (data.description !== undefined)
+        updateData.description = data.description;
       if (data.width !== undefined) updateData.width = data.width;
       if (data.height !== undefined) updateData.height = data.height;
-      if (data.metadata !== undefined) updateData.metadata = JSON.stringify(data.metadata);
-      if (data.playbackSpeed !== undefined) updateData.playbackSpeed = data.playbackSpeed;
+      if (data.metadata !== undefined)
+        updateData.metadata = JSON.stringify(data.metadata);
+      if (data.playbackSpeed !== undefined)
+        updateData.playbackSpeed = data.playbackSpeed;
       if (data.shuffle !== undefined) updateData.shuffle = data.shuffle ? 1 : 0;
-      if (data.sequences !== undefined) updateData.sequences = JSON.stringify(data.sequences);
+      if (data.sequences !== undefined)
+        updateData.sequences = JSON.stringify(data.sequences);
       if (data.status !== undefined) updateData.status = data.status;
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
@@ -360,7 +378,10 @@ export class BannerModel {
 
   static async delete(bannerId: string, environmentId: string): Promise<void> {
     try {
-      await db('g_banners').where('id', bannerId).where('environmentId', environmentId).del();
+      await db('g_banners')
+        .where('id', bannerId)
+        .where('environmentId', environmentId)
+        .del();
     } catch (error) {
       logger.error('Error deleting banner:', error);
       throw error;
@@ -430,7 +451,9 @@ export class BannerModel {
   }
 
   // Get only published banners for client API
-  static async findPublished(environmentId: string): Promise<BannerAttributes[]> {
+  static async findPublished(
+    environmentId: string
+  ): Promise<BannerAttributes[]> {
     try {
       const banners = await db('g_banners')
         .select('*')
@@ -440,7 +463,10 @@ export class BannerModel {
 
       return banners.map((b: any) => ({
         ...b,
-        sequences: typeof b.sequences === 'string' ? JSON.parse(b.sequences) : b.sequences,
+        sequences:
+          typeof b.sequences === 'string'
+            ? JSON.parse(b.sequences)
+            : b.sequences,
         metadata: b.metadata
           ? typeof b.metadata === 'string'
             ? JSON.parse(b.metadata)

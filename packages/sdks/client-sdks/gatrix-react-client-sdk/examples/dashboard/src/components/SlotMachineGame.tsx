@@ -21,7 +21,11 @@ function TitleScreen({ onStart }: { onStart: () => void }) {
     <div className="slot-title-screen">
       <div className="slot-title-bg" />
       <div className="slot-title-content">
-        <img src="/assets/slot/logo.png" alt="logo" className="slot-title-logo" />
+        <img
+          src="/assets/slot/logo.png"
+          alt="logo"
+          className="slot-title-logo"
+        />
         <h1 className="slot-title-text">GATRIX SLOT SAGA</h1>
         <p className="slot-title-sub">Feature Flag Showcase</p>
         <button className="slot-title-btn" onClick={onStart}>
@@ -34,7 +38,11 @@ function TitleScreen({ onStart }: { onStart: () => void }) {
 }
 
 // ==================== Login Screen ====================
-function LoginScreen({ onLogin }: { onLogin: (name: string, vip: number) => void }) {
+function LoginScreen({
+  onLogin,
+}: {
+  onLogin: (name: string, vip: number) => void;
+}) {
   const [name, setName] = useState('Player1');
   const [vip, setVip] = useState(1);
   return (
@@ -63,7 +71,9 @@ function LoginScreen({ onLogin }: { onLogin: (name: string, vip: number) => void
               </button>
             ))}
           </div>
-          <p className="slot-login-hint">VIP level affects flag targeting (context field)</p>
+          <p className="slot-login-hint">
+            VIP level affects flag targeting (context field)
+          </p>
         </div>
         <button
           className="slot-title-btn"
@@ -101,8 +111,18 @@ function FlagStatusPanel({
 }: FlagPanelProps) {
   // Real-time flags (applied immediately via watchFlag)
   const realTimeFlags = [
-    { name: FLAG_NAMES.SOUND, label: 'Sound', value: String(config.soundEnabled), type: 'bool' },
-    { name: FLAG_NAMES.THEME, label: 'Theme', value: config.theme, type: 'string' },
+    {
+      name: FLAG_NAMES.SOUND,
+      label: 'Sound',
+      value: String(config.soundEnabled),
+      type: 'bool',
+    },
+    {
+      name: FLAG_NAMES.THEME,
+      label: 'Theme',
+      value: config.theme,
+      type: 'string',
+    },
     {
       name: FLAG_NAMES.WILD_SYMBOL,
       label: 'Wild Symbol',
@@ -198,7 +218,10 @@ function FlagStatusPanel({
             <span className="slot-flag-badge sync">SYNC</span>
           </div>
         ))}
-        <button className={`slot-sync-btn ${hasPending ? 'pending' : ''}`} onClick={onSync}>
+        <button
+          className={`slot-sync-btn ${hasPending ? 'pending' : ''}`}
+          onClick={onSync}
+        >
           {hasPending ? 'Sync Pending -> Click to Apply' : 'Synced'}
         </button>
       </div>
@@ -228,9 +251,15 @@ function FlagStatusPanel({
         <div className="slot-payout-table">
           {SYMBOL_CONFIGS.filter((s) => s.key !== 'wild').map((s) => (
             <div key={s.key} className="slot-payout-row">
-              <img src={`/assets/slot/${s.imageFile}`} alt={s.label} className="slot-payout-icon" />
+              <img
+                src={`/assets/slot/${s.imageFile}`}
+                alt={s.label}
+                className="slot-payout-icon"
+              />
               <span>{s.label}</span>
-              <span className="slot-payout-val">x{config.payoutTable?.[s.key] ?? s.payout3}</span>
+              <span className="slot-payout-val">
+                x{config.payoutTable?.[s.key] ?? s.payout3}
+              </span>
             </div>
           ))}
         </div>
@@ -241,7 +270,9 @@ function FlagStatusPanel({
         <h4>Flag Changes</h4>
         <div className="slot-flag-log">
           {flagLogs.length === 0 ? (
-            <p className="slot-log-empty">No changes yet. Modify flags in the admin panel.</p>
+            <p className="slot-log-empty">
+              No changes yet. Modify flags in the admin panel.
+            </p>
           ) : (
             flagLogs
               .slice(-8)
@@ -283,12 +314,21 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
   const forceTick = useCallback(() => setTick((t) => t + 1), []);
 
   // Add flag change to log
-  const addFlagLog = useCallback((flagName: string, oldValue: string, newValue: string) => {
-    setFlagLogs((prev) => [
-      ...prev,
-      { id: logIdRef.current++, timestamp: Date.now(), flagName, oldValue, newValue },
-    ]);
-  }, []);
+  const addFlagLog = useCallback(
+    (flagName: string, oldValue: string, newValue: string) => {
+      setFlagLogs((prev) => [
+        ...prev,
+        {
+          id: logIdRef.current++,
+          timestamp: Date.now(),
+          flagName,
+          oldValue,
+          newValue,
+        },
+      ]);
+    },
+    []
+  );
 
   // Setup real-time flag watchers (watchRealtimeFlag via WatchFlagGroup)
   useEffect(() => {
@@ -304,7 +344,9 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
       setConfig((c) => ({ ...c, soundEnabled: val }));
       if (old !== val) addFlagLog(FLAG_NAMES.SOUND, String(old), String(val));
       // Immediately apply to scene
-      const scene = phaserGameRef.current?.scene.getScene('SlotScene') as SlotScene | undefined;
+      const scene = phaserGameRef.current?.scene.getScene('SlotScene') as
+        | SlotScene
+        | undefined;
       scene?.updateSoundEnabled(val);
     });
 
@@ -314,7 +356,9 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
       const old = config.theme;
       setConfig((c) => ({ ...c, theme: val }));
       if (old !== val) addFlagLog(FLAG_NAMES.THEME, old, val);
-      const scene = phaserGameRef.current?.scene.getScene('SlotScene') as SlotScene | undefined;
+      const scene = phaserGameRef.current?.scene.getScene('SlotScene') as
+        | SlotScene
+        | undefined;
       scene?.updateTheme(val);
     });
 
@@ -323,7 +367,8 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
       const val = flag.boolVariation(false);
       const old = config.wildSymbolEnabled;
       setConfig((c) => ({ ...c, wildSymbolEnabled: val }));
-      if (old !== val) addFlagLog(FLAG_NAMES.WILD_SYMBOL, String(old), String(val));
+      if (old !== val)
+        addFlagLog(FLAG_NAMES.WILD_SYMBOL, String(old), String(val));
     });
 
     // Real-time: bonus round
@@ -331,7 +376,8 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
       const val = flag.boolVariation(false);
       const old = config.bonusRoundEnabled;
       setConfig((c) => ({ ...c, bonusRoundEnabled: val }));
-      if (old !== val) addFlagLog(FLAG_NAMES.BONUS_ROUND, String(old), String(val));
+      if (old !== val)
+        addFlagLog(FLAG_NAMES.BONUS_ROUND, String(old), String(val));
     });
 
     // Real-time: auto spin
@@ -339,14 +385,17 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
       const val = flag.boolVariation(false);
       const old = config.autoSpinEnabled;
       setConfig((c) => ({ ...c, autoSpinEnabled: val }));
-      if (old !== val) addFlagLog(FLAG_NAMES.AUTO_SPIN, String(old), String(val));
+      if (old !== val)
+        addFlagLog(FLAG_NAMES.AUTO_SPIN, String(old), String(val));
       if (bridgeRef.current) {
         bridgeRef.current.autoSpinActive = val;
         bridgeRef.current.config.autoSpinEnabled = val;
       }
       // Trigger auto-spin if flag is now true
       if (val) {
-        const scene = phaserGameRef.current?.scene.getScene('SlotScene') as SlotScene | undefined;
+        const scene = phaserGameRef.current?.scene.getScene('SlotScene') as
+          | SlotScene
+          | undefined;
         scene?.triggerAutoSpin();
       }
     });
@@ -378,7 +427,9 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     const autoSpin = features.boolVariation(FLAG_NAMES.AUTO_SPIN, false);
     const payoutRaw = features.jsonVariation(FLAG_NAMES.PAYOUT_TABLE, null);
     const payout =
-      payoutRaw && typeof payoutRaw === 'object' ? (payoutRaw as Record<string, number>) : null;
+      payoutRaw && typeof payoutRaw === 'object'
+        ? (payoutRaw as Record<string, number>)
+        : null;
 
     setConfig((c) => {
       const newConfig = {
@@ -404,8 +455,15 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     (newVip: number) => {
       setVipLevel(newVip);
       if (client) {
-        client.features.updateContext({ vipLevel: newVip } as Record<string, unknown>);
-        addFlagLog('updateContext', `vipLevel=${vipLevel}`, `vipLevel=${newVip}`);
+        client.features.updateContext({ vipLevel: newVip } as Record<
+          string,
+          unknown
+        >);
+        addFlagLog(
+          'updateContext',
+          `vipLevel=${vipLevel}`,
+          `vipLevel=${newVip}`
+        );
       }
       if (bridgeRef.current) bridgeRef.current.vipLevel = newVip;
     },
@@ -418,10 +476,10 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
       setPlayerName(name);
       setVipLevel(vip);
       if (client) {
-        client.features.updateContext({ playerName: name, vipLevel: vip } as Record<
-          string,
-          unknown
-        >);
+        client.features.updateContext({
+          playerName: name,
+          vipLevel: vip,
+        } as Record<string, unknown>);
       }
       setPhase('playing');
     },
@@ -446,7 +504,10 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
       const bonusNow = features.boolVariation(FLAG_NAMES.BONUS_ROUND, false);
       const speedNow = features.numberVariation(FLAG_NAMES.SPIN_SPEED, 1);
       const multNow = features.numberVariation(FLAG_NAMES.WIN_MULTIPLIER, 1);
-      const creditsNow = features.numberVariation(FLAG_NAMES.INITIAL_CREDITS, 1000);
+      const creditsNow = features.numberVariation(
+        FLAG_NAMES.INITIAL_CREDITS,
+        1000
+      );
       const themeNow = (features.stringVariation(FLAG_NAMES.THEME, 'classic') ||
         'classic') as SlotConfig['theme'];
 

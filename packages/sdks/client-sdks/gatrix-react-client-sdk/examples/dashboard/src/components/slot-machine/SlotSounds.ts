@@ -109,7 +109,13 @@ export class SlotSounds {
     });
     // Add shimmer
     for (let i = 0; i < 15; i++) {
-      this.playNote(2000 + Math.random() * 3000, 0.08, 'sine', 0.06, 0.7 + i * 0.06);
+      this.playNote(
+        2000 + Math.random() * 3000,
+        0.08,
+        'sine',
+        0.06,
+        0.7 + i * 0.06
+      );
     }
   }
 
@@ -123,7 +129,13 @@ export class SlotSounds {
     }
     // Shimmer rain
     for (let i = 0; i < 30; i++) {
-      this.playNote(1500 + Math.random() * 4000, 0.1, 'sine', 0.05, 1.5 + i * 0.05);
+      this.playNote(
+        1500 + Math.random() * 4000,
+        0.1,
+        'sine',
+        0.05,
+        1.5 + i * 0.05
+      );
     }
   }
 

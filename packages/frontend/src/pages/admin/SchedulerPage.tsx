@@ -409,7 +409,11 @@ const SchedulerPage: React.FC = () => {
           </Box>
         </Box>
         {canManage && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAdd}
+          >
             {t('scheduler.addEvent')}
           </Button>
         )}
@@ -454,7 +458,12 @@ const SchedulerPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Add/Edit Event Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <FormDialogHeader
           title={editingEvent ? '스케줄 이벤트 편집' : '스케줄 이벤트 추가'}
           description={
@@ -513,7 +522,9 @@ const SchedulerPage: React.FC = () => {
               <Select
                 value={formData.calendar || '--- Not Set ---'}
                 label="Calendar"
-                onChange={(e) => setFormData({ ...formData, calendar: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, calendar: e.target.value })
+                }
               >
                 <MenuItem value="--- Not Set ---">--- Not Set ---</MenuItem>
                 <MenuItem value="BusinessCalendar">Business Calendar</MenuItem>
@@ -536,7 +547,9 @@ const SchedulerPage: React.FC = () => {
                     }
                   >
                     <MenuItem value="Smart Policy">Smart Policy</MenuItem>
-                    <MenuItem value="Ignore Misfire Policy">Ignore Misfire Policy</MenuItem>
+                    <MenuItem value="Ignore Misfire Policy">
+                      Ignore Misfire Policy
+                    </MenuItem>
                     <MenuItem value="Do Nothing">Do Nothing</MenuItem>
                     <MenuItem value="Fire Now">Fire Now</MenuItem>
                   </Select>
@@ -580,7 +593,8 @@ const SchedulerPage: React.FC = () => {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      intervalMinutes: e.target.value === '' ? 1 : Number(e.target.value) || 1,
+                      intervalMinutes:
+                        e.target.value === '' ? 1 : Number(e.target.value) || 1,
                     })
                   }
                   inputProps={{ min: 1 }}
@@ -602,11 +616,17 @@ const SchedulerPage: React.FC = () => {
                   <Select
                     value={formData.timeZone || 'Asia/Seoul'}
                     label="Time Zone"
-                    onChange={(e) => setFormData({ ...formData, timeZone: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, timeZone: e.target.value })
+                    }
                   >
-                    <MenuItem value="Asia/Seoul">(GMT+09:00) Asia/Seoul</MenuItem>
+                    <MenuItem value="Asia/Seoul">
+                      (GMT+09:00) Asia/Seoul
+                    </MenuItem>
                     <MenuItem value="UTC">(GMT+00:00) UTC</MenuItem>
-                    <MenuItem value="America/New_York">(GMT-05:00) America/New_York</MenuItem>
+                    <MenuItem value="America/New_York">
+                      (GMT-05:00) America/New_York
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -618,7 +638,9 @@ const SchedulerPage: React.FC = () => {
                   fullWidth
                   label="Repeat Count"
                   type="number"
-                  value={formData.repeatCount === -1 ? '' : formData.repeatCount}
+                  value={
+                    formData.repeatCount === -1 ? '' : formData.repeatCount
+                  }
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -628,7 +650,10 @@ const SchedulerPage: React.FC = () => {
                   placeholder="Leave empty for infinite"
                 />
               </Grid>
-              <Grid size={{ xs: 6 }} sx={{ display: 'flex', alignItems: 'center' }}>
+              <Grid
+                size={{ xs: 6 }}
+                sx={{ display: 'flex', alignItems: 'center' }}
+              >
                 <FormControl>
                   <Stack direction="row" spacing={2} alignItems="center">
                     <Typography variant="body2">Repeat Forever</Typography>
@@ -656,7 +681,9 @@ const SchedulerPage: React.FC = () => {
                   label="Start Time of Day"
                   type="time"
                   value={formData.startTimeOfDay || '00:00:00'}
-                  onChange={(e) => setFormData({ ...formData, startTimeOfDay: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, startTimeOfDay: e.target.value })
+                  }
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
@@ -666,7 +693,9 @@ const SchedulerPage: React.FC = () => {
                   label="End Time of Day"
                   type="time"
                   value={formData.endTimeOfDay || '23:59:59'}
-                  onChange={(e) => setFormData({ ...formData, endTimeOfDay: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, endTimeOfDay: e.target.value })
+                  }
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
@@ -678,35 +707,41 @@ const SchedulerPage: React.FC = () => {
                 Days of Week
               </Typography>
               <Grid container spacing={1}>
-                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(
-                  (day) => (
-                    <Grid key={day}>
-                      <FormControl>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <input
-                            type="checkbox"
-                            checked={formData.daysOfWeek?.includes(day) || false}
-                            onChange={(e) => {
-                              const days = formData.daysOfWeek || [];
-                              if (e.target.checked) {
-                                setFormData({
-                                  ...formData,
-                                  daysOfWeek: [...days, day],
-                                });
-                              } else {
-                                setFormData({
-                                  ...formData,
-                                  daysOfWeek: days.filter((d) => d !== day),
-                                });
-                              }
-                            }}
-                          />
-                          <Typography variant="body2">{day}</Typography>
-                        </Stack>
-                      </FormControl>
-                    </Grid>
-                  )
-                )}
+                {[
+                  'Monday',
+                  'Tuesday',
+                  'Wednesday',
+                  'Thursday',
+                  'Friday',
+                  'Saturday',
+                  'Sunday',
+                ].map((day) => (
+                  <Grid key={day}>
+                    <FormControl>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <input
+                          type="checkbox"
+                          checked={formData.daysOfWeek?.includes(day) || false}
+                          onChange={(e) => {
+                            const days = formData.daysOfWeek || [];
+                            if (e.target.checked) {
+                              setFormData({
+                                ...formData,
+                                daysOfWeek: [...days, day],
+                              });
+                            } else {
+                              setFormData({
+                                ...formData,
+                                daysOfWeek: days.filter((d) => d !== day),
+                              });
+                            }
+                          }}
+                        />
+                        <Typography variant="body2">{day}</Typography>
+                      </Stack>
+                    </FormControl>
+                  </Grid>
+                ))}
               </Grid>
             </Box>
 
@@ -769,7 +804,11 @@ const SchedulerPage: React.FC = () => {
               {/* 추가 Parameters */}
               <Grid container spacing={2}>
                 <Grid size={{ xs: 4 }}>
-                  <TextField fullWidth size="small" placeholder="Parameter Name" />
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Parameter Name"
+                  />
                 </Grid>
                 <Grid size={{ xs: 4 }}>
                   <TextField fullWidth size="small" placeholder="String" />

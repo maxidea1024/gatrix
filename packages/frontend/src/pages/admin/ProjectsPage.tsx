@@ -43,9 +43,17 @@ import {
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams, Link as RouterLink } from 'react-router-dom';
+import {
+  useNavigate,
+  useSearchParams,
+  Link as RouterLink,
+} from 'react-router-dom';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
-import { orgProjectService, Project, AccessTree } from '@/services/orgProjectService';
+import {
+  orgProjectService,
+  Project,
+  AccessTree,
+} from '@/services/orgProjectService';
 import { environmentService, Environment } from '@/services/environmentService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
@@ -59,7 +67,8 @@ const ProjectsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { refreshProjects, currentOrg, currentProjectId, organisations } = useOrgProject();
+  const { refreshProjects, currentOrg, currentProjectId, organisations } =
+    useOrgProject();
 
   // Resolve the parent org from URL param or current context
   const urlOrgId = searchParams.get('orgId');
@@ -71,9 +80,15 @@ const ProjectsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [accessTree, setAccessTree] = useState<AccessTree>({});
-  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
-  const [projectEnvMap, setProjectEnvMap] = useState<Record<string, Environment[]>>({});
-  const [loadingEnvProjects, setLoadingEnvProjects] = useState<Set<string>>(new Set());
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(
+    new Set()
+  );
+  const [projectEnvMap, setProjectEnvMap] = useState<
+    Record<string, Environment[]>
+  >({});
+  const [loadingEnvProjects, setLoadingEnvProjects] = useState<Set<string>>(
+    new Set()
+  );
 
   // Create/Edit dialog
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -98,7 +113,10 @@ const ProjectsPage: React.FC = () => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [menuTarget, setMenuTarget] = useState<Project | null>(null);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, proj: Project) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    proj: Project
+  ) => {
     setMenuAnchorEl(event.currentTarget);
     setMenuTarget(proj);
   };
@@ -114,7 +132,12 @@ const ProjectsPage: React.FC = () => {
   const [memberLoading, setMemberLoading] = useState(false);
   const [members, setMembers] = useState<any[]>([]);
   const [pendingChanges, setPendingChanges] = useState<{
-    add: { userId: string; name: string; email: string; projectRole: 'admin' | 'member' }[];
+    add: {
+      userId: string;
+      name: string;
+      email: string;
+      projectRole: 'admin' | 'member';
+    }[];
     remove: string[];
     roleChanges: Record<string, 'admin' | 'member'>;
   }>({ add: [], remove: [], roleChanges: {} });
@@ -136,7 +159,10 @@ const ProjectsPage: React.FC = () => {
     (async () => {
       setUserSearchLoading(true);
       try {
-        const results = await rbacService.searchUsers(debouncedUserSearch, effectiveOrg?.id);
+        const results = await rbacService.searchUsers(
+          debouncedUserSearch,
+          effectiveOrg?.id
+        );
         if (!cancelled) setUserSearchResults(results);
       } catch {
         // ignore
@@ -158,7 +184,9 @@ const ProjectsPage: React.FC = () => {
       const data = await rbacService.getProjectMembers(proj.id);
       setMembers(data);
     } catch {
-      enqueueSnackbar(t('rbac.projects.memberUpdateFailed'), { variant: 'error' });
+      enqueueSnackbar(t('rbac.projects.memberUpdateFailed'), {
+        variant: 'error',
+      });
     } finally {
       setMemberLoading(false);
     }
@@ -174,19 +202,31 @@ const ProjectsPage: React.FC = () => {
       }
       // Apply additions
       for (const m of pendingChanges.add) {
-        await rbacService.addProjectMember(memberProject.id, m.userId, m.projectRole);
+        await rbacService.addProjectMember(
+          memberProject.id,
+          m.userId,
+          m.projectRole
+        );
       }
       // Apply role changes
       for (const [userId, role] of Object.entries(pendingChanges.roleChanges)) {
-        await rbacService.updateProjectMemberRole(memberProject.id, userId, role);
+        await rbacService.updateProjectMemberRole(
+          memberProject.id,
+          userId,
+          role
+        );
       }
-      enqueueSnackbar(t('rbac.projects.membersUpdated'), { variant: 'success' });
+      enqueueSnackbar(t('rbac.projects.membersUpdated'), {
+        variant: 'success',
+      });
       // Reload members
       const data = await rbacService.getProjectMembers(memberProject.id);
       setMembers(data);
       setPendingChanges({ add: [], remove: [], roleChanges: {} });
     } catch {
-      enqueueSnackbar(t('rbac.projects.memberUpdateFailed'), { variant: 'error' });
+      enqueueSnackbar(t('rbac.projects.memberUpdateFailed'), {
+        variant: 'error',
+      });
     } finally {
       setMemberApplying(false);
     }
@@ -205,7 +245,9 @@ const ProjectsPage: React.FC = () => {
         const projectData = await orgProjectService.getProjects();
         // Filter by the effective org (URL param or current context)
         const orgId = effectiveOrg?.id;
-        setProjects(orgId ? projectData.filter((p) => p.orgId === orgId) : projectData);
+        setProjects(
+          orgId ? projectData.filter((p) => p.orgId === orgId) : projectData
+        );
 
         // Load access tree (non-blocking)
         try {
@@ -296,7 +338,8 @@ const ProjectsPage: React.FC = () => {
   };
 
   const isEditDirty =
-    dialogMode === 'create' || JSON.stringify(formData) !== JSON.stringify(initialFormData);
+    dialogMode === 'create' ||
+    JSON.stringify(formData) !== JSON.stringify(initialFormData);
 
   // Save
   const handleSave = async () => {
@@ -312,19 +355,24 @@ const ProjectsPage: React.FC = () => {
           ...formData,
           orgId: effectiveOrg?.id,
         });
-        enqueueSnackbar(t('rbac.projects.createSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('rbac.projects.createSuccess'), {
+          variant: 'success',
+        });
       } else if (editId) {
         await orgProjectService.updateProject(editId, {
           displayName: formData.displayName,
           description: formData.description,
         });
-        enqueueSnackbar(t('rbac.projects.updateSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('rbac.projects.updateSuccess'), {
+          variant: 'success',
+        });
       }
       setDialogOpen(false);
       loadProjects(true);
       refreshProjects();
     } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.projects.saveFailed');
+      const message =
+        error?.response?.data?.message || t('rbac.projects.saveFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setSaving(false);
@@ -343,7 +391,8 @@ const ProjectsPage: React.FC = () => {
       loadProjects(true);
       refreshProjects();
     } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.projects.deleteFailed');
+      const message =
+        error?.response?.data?.message || t('rbac.projects.deleteFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setSaving(false);
@@ -353,7 +402,10 @@ const ProjectsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Breadcrumb */}
-      <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 2 }}>
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize="small" />}
+        sx={{ mb: 2 }}
+      >
         <Link
           component={RouterLink}
           to="/admin/workspace"
@@ -364,12 +416,21 @@ const ProjectsPage: React.FC = () => {
           {t('workspace.title')}
         </Link>
         <Typography color="text.primary" fontWeight={500}>
-          {effectiveOrg?.displayName || effectiveOrg?.orgName || t('common.organisation')}
+          {effectiveOrg?.displayName ||
+            effectiveOrg?.orgName ||
+            t('common.organisation')}
         </Typography>
       </Breadcrumbs>
 
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 600 }}>
             {t('rbac.projects.title')}
@@ -378,7 +439,11 @@ const ProjectsPage: React.FC = () => {
             {t('rbac.projects.description')}
           </Typography>
         </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleCreate}
+        >
           {t('rbac.projects.create')}
         </Button>
       </Box>
@@ -407,7 +472,8 @@ const ProjectsPage: React.FC = () => {
                 sx={{
                   borderRadius: 3,
                   border: '1px solid',
-                  borderColor: proj.id === currentProjectId ? 'primary.main' : 'divider',
+                  borderColor:
+                    proj.id === currentProjectId ? 'primary.main' : 'divider',
                   boxShadow:
                     proj.id === currentProjectId
                       ? (theme) =>
@@ -440,12 +506,22 @@ const ProjectsPage: React.FC = () => {
                 <CardActionArea
                   disableRipple
                   onClick={() => {
-                    navigate(`/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`);
+                    navigate(
+                      `/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`
+                    );
                   }}
                 >
                   <CardContent sx={{ p: 3 }}>
                     {/* Header */}
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 2, pr: 4 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 1.5,
+                        mb: 2,
+                        pr: 4,
+                      }}
+                    >
                       <Box
                         sx={{
                           width: 40,
@@ -483,9 +559,15 @@ const ProjectsPage: React.FC = () => {
                     </Box>
 
                     {/* Chips */}
-                    <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                    <Box
+                      sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}
+                    >
                       <Chip
-                        label={proj.isActive ? t('common.active') : t('common.inactive')}
+                        label={
+                          proj.isActive
+                            ? t('common.active')
+                            : t('common.inactive')
+                        }
                         size="small"
                         color={proj.isActive ? 'success' : 'default'}
                         variant="outlined"
@@ -529,15 +611,26 @@ const ProjectsPage: React.FC = () => {
                         borderColor: 'divider',
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <PeopleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
+                        <PeopleIcon
+                          sx={{ fontSize: 16, color: 'text.secondary' }}
+                        />
                         <Typography variant="caption" color="text.secondary">
                           {proj.memberCount ?? 0}
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Tooltip title={formatDateTimeDetailed(proj.createdAt)} arrow>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
+                        <CalendarTodayIcon
+                          sx={{ fontSize: 16, color: 'text.secondary' }}
+                        />
+                        <Tooltip
+                          title={formatDateTimeDetailed(proj.createdAt)}
+                          arrow
+                        >
                           <Typography variant="caption" color="text.secondary">
                             {formatRelativeTime(proj.createdAt)}
                           </Typography>
@@ -577,7 +670,13 @@ const ProjectsPage: React.FC = () => {
                   </ListItemButton>
                   <Collapse in={expandedProjects.has(proj.id)}>
                     {loadingEnvProjects.has(proj.id) ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          py: 1,
+                        }}
+                      >
                         <CircularProgress size={16} />
                       </Box>
                     ) : (
@@ -594,7 +693,9 @@ const ProjectsPage: React.FC = () => {
                           >
                             {' '}
                             <ListItemIcon sx={{ minWidth: 24 }}>
-                              <EnvironmentIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                              <EnvironmentIcon
+                                sx={{ fontSize: 16, opacity: 0.7 }}
+                              />
                             </ListItemIcon>
                             <ListItemText
                               primary={env.displayName || env.environmentName}
@@ -635,7 +736,11 @@ const ProjectsPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+      >
         <MenuItem
           onClick={() => {
             if (menuTarget) handleEdit(menuTarget);
@@ -681,7 +786,9 @@ const ProjectsPage: React.FC = () => {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         title={
-          dialogMode === 'create' ? t('rbac.projects.createTitle') : t('rbac.projects.editTitle')
+          dialogMode === 'create'
+            ? t('rbac.projects.createTitle')
+            : t('rbac.projects.editTitle')
         }
         storageKey="projectsDrawerWidth"
         defaultWidth={450}
@@ -693,14 +800,23 @@ const ProjectsPage: React.FC = () => {
         }
       >
         <Box
-          sx={{ flex: 1, p: 3, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
+          sx={{
+            flex: 1,
+            p: 3,
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
         >
           <TextField
             fullWidth
             size="small"
             label={t('rbac.projects.name')}
             value={formData.projectName}
-            onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, projectName: e.target.value })
+            }
             disabled={dialogMode === 'edit'}
             autoFocus
             required
@@ -716,7 +832,9 @@ const ProjectsPage: React.FC = () => {
             size="small"
             label={t('rbac.projects.displayName')}
             value={formData.displayName}
-            onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, displayName: e.target.value })
+            }
             required
             helperText={t('rbac.projects.displayNameHelp')}
           />
@@ -725,7 +843,9 @@ const ProjectsPage: React.FC = () => {
             size="small"
             label={t('rbac.projects.descriptionColumn')}
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
             multiline
             rows={3}
             helperText={t('rbac.projects.descriptionHelp')}
@@ -769,7 +889,10 @@ const ProjectsPage: React.FC = () => {
       </ResizableDrawer>
 
       {/* Delete Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>{t('rbac.projects.deleteTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
@@ -779,8 +902,15 @@ const ProjectsPage: React.FC = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button variant="contained" color="error" onClick={handleDelete} disabled={saving}>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDelete}
+            disabled={saving}
+          >
             {saving ? <CircularProgress size={20} /> : t('common.delete')}
           </Button>
         </DialogActions>
@@ -809,14 +939,20 @@ const ProjectsPage: React.FC = () => {
                   sx={{ flex: 1 }}
                   size="small"
                   options={userSearchResults}
-                  getOptionLabel={(option) => `${option.name} (${option.email})`}
+                  getOptionLabel={(option) =>
+                    `${option.name} (${option.email})`
+                  }
                   loading={userSearchLoading}
                   onInputChange={(_, value) => setUserSearchInput(value)}
                   onChange={(_, value) => {
                     if (!value) return;
                     // Check if already a member or already pending add
-                    const alreadyMember = members.some((m) => m.userId === value.id);
-                    const alreadyPending = pendingChanges.add.some((m) => m.userId === value.id);
+                    const alreadyMember = members.some(
+                      (m) => m.userId === value.id
+                    );
+                    const alreadyPending = pendingChanges.add.some(
+                      (m) => m.userId === value.id
+                    );
                     if (alreadyMember || alreadyPending) return;
                     setPendingChanges((prev) => ({
                       ...prev,
@@ -836,7 +972,9 @@ const ProjectsPage: React.FC = () => {
                     <TextField {...params} placeholder={t('common.search')} />
                   )}
                   value={null}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
                   filterOptions={(x) => x}
                   noOptionsText={t('common.noResults')}
                 />
@@ -869,17 +1007,25 @@ const ProjectsPage: React.FC = () => {
                         <Typography variant="body2" fontWeight={500} noWrap>
                           {m.name}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary" noWrap>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          noWrap
+                        >
                           {m.email}
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
                         <IconButton
                           size="small"
                           onClick={() => {
                             setPendingChanges((prev) => ({
                               ...prev,
-                              add: prev.add.filter((a) => a.userId !== m.userId),
+                              add: prev.add.filter(
+                                (a) => a.userId !== m.userId
+                              ),
                             }));
                           }}
                         >
@@ -903,7 +1049,9 @@ const ProjectsPage: React.FC = () => {
                           py: 1,
                           borderBottom:
                             index < arr.length - 1 ||
-                            members.some((rm) => pendingChanges.remove.includes(rm.userId))
+                            members.some((rm) =>
+                              pendingChanges.remove.includes(rm.userId)
+                            )
                               ? 1
                               : 0,
                           borderColor: 'divider',
@@ -913,11 +1061,17 @@ const ProjectsPage: React.FC = () => {
                           <Typography variant="body2" fontWeight={500} noWrap>
                             {m.name}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary" noWrap>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            noWrap
+                          >
                             {m.email}
                           </Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
                           <IconButton
                             size="small"
                             onClick={() => {
@@ -925,7 +1079,9 @@ const ProjectsPage: React.FC = () => {
                                 ...prev,
                                 remove: [...prev.remove, m.userId],
                                 roleChanges: Object.fromEntries(
-                                  Object.entries(prev.roleChanges).filter(([k]) => k !== m.userId)
+                                  Object.entries(prev.roleChanges).filter(
+                                    ([k]) => k !== m.userId
+                                  )
                                 ),
                               }));
                             }}
@@ -953,11 +1109,21 @@ const ProjectsPage: React.FC = () => {
                           opacity: 0.5,
                         }}
                       >
-                        <Box sx={{ flex: 1, minWidth: 0, textDecoration: 'line-through' }}>
+                        <Box
+                          sx={{
+                            flex: 1,
+                            minWidth: 0,
+                            textDecoration: 'line-through',
+                          }}
+                        >
                           <Typography variant="body2" fontWeight={500} noWrap>
                             {m.name}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary" noWrap>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            noWrap
+                          >
                             {m.email}
                           </Typography>
                         </Box>
@@ -966,7 +1132,9 @@ const ProjectsPage: React.FC = () => {
                           onClick={() => {
                             setPendingChanges((prev) => ({
                               ...prev,
-                              remove: prev.remove.filter((id) => id !== m.userId),
+                              remove: prev.remove.filter(
+                                (id) => id !== m.userId
+                              ),
                             }));
                           }}
                         >
@@ -999,13 +1167,19 @@ const ProjectsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setMemberDrawerOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setMemberDrawerOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             onClick={handleApplyMembers}
             disabled={memberApplying || !hasPendingMemberChanges}
           >
-            {memberApplying ? <CircularProgress size={20} /> : t('common.apply')}
+            {memberApplying ? (
+              <CircularProgress size={20} />
+            ) : (
+              t('common.apply')
+            )}
           </Button>
         </Box>
       </ResizableDrawer>

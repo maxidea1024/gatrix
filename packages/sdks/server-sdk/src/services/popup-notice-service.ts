@@ -62,7 +62,9 @@ export class PopupNoticeService extends BaseEnvironmentService<
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch popup notice');
+      throw new Error(
+        response.error?.message || 'Failed to fetch popup notice'
+      );
     }
 
     this.logger.info('Popup notice fetched', { id });
@@ -111,10 +113,13 @@ export class PopupNoticeService extends BaseEnvironmentService<
         updatedNotice = await this.getById(id, environmentId);
       } catch (_error: any) {
         // If notice not found (404), it's no longer active or visible
-        this.logger.debug('Popup notice not found or not active, removing from cache', {
-          id,
-          environmentId,
-        });
+        this.logger.debug(
+          'Popup notice not found or not active, removing from cache',
+          {
+            id,
+            environmentId,
+          }
+        );
         this.removeFromCache(id, environmentId);
         return;
       }
@@ -162,7 +167,8 @@ export class PopupNoticeService extends BaseEnvironmentService<
     environmentId: string;
   }): PopupNotice[] {
     const now = new Date();
-    const { platform, channel, subChannel, worldId, userId, environmentId } = options;
+    const { platform, channel, subChannel, worldId, userId, environmentId } =
+      options;
     const notices = this.getCached(environmentId);
     const filtered = notices.filter((notice) => {
       // Check startDate: if set, current time must be after startDate
@@ -182,7 +188,11 @@ export class PopupNoticeService extends BaseEnvironmentService<
       }
 
       // Platform targeting
-      if (platform && notice.targetPlatforms && notice.targetPlatforms.length > 0) {
+      if (
+        platform &&
+        notice.targetPlatforms &&
+        notice.targetPlatforms.length > 0
+      ) {
         const isInPlatformList = notice.targetPlatforms.includes(platform);
         const inverted = Boolean(notice.targetPlatformsInverted);
         if (inverted ? isInPlatformList : !isInPlatformList) {
@@ -191,7 +201,11 @@ export class PopupNoticeService extends BaseEnvironmentService<
       }
 
       // Channel targeting
-      if (channel && notice.targetChannels && notice.targetChannels.length > 0) {
+      if (
+        channel &&
+        notice.targetChannels &&
+        notice.targetChannels.length > 0
+      ) {
         const isInChannelList = notice.targetChannels.includes(channel);
         const inverted = Boolean(notice.targetChannelsInverted);
         if (inverted ? isInChannelList : !isInChannelList) {
@@ -207,7 +221,8 @@ export class PopupNoticeService extends BaseEnvironmentService<
         notice.targetSubchannels.length > 0
       ) {
         const subchannelKey = `${channel}:${subChannel}`;
-        const isInSubchannelList = notice.targetSubchannels.includes(subchannelKey);
+        const isInSubchannelList =
+          notice.targetSubchannels.includes(subchannelKey);
         const inverted = Boolean(notice.targetSubchannelsInverted);
         if (inverted ? isInSubchannelList : !isInSubchannelList) {
           return false;

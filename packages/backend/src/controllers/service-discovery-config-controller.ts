@@ -15,20 +15,24 @@ export class ServiceDiscoveryConfigController {
   static async getConfig(req: Request, res: Response) {
     try {
       const environmentId = 'development'; // Global settings stored in development environmentId
-      const [mode, etcdHosts, defaultTtl, heartbeatInterval] = await Promise.all([
-        VarsModel.get('serviceDiscovery.mode', environmentId),
-        VarsModel.get('serviceDiscovery.etcdHosts', environmentId),
-        VarsModel.get('serviceDiscovery.defaultTtl', environmentId),
-        VarsModel.get('serviceDiscovery.heartbeatInterval', environmentId),
-      ]);
+      const [mode, etcdHosts, defaultTtl, heartbeatInterval] =
+        await Promise.all([
+          VarsModel.get('serviceDiscovery.mode', environmentId),
+          VarsModel.get('serviceDiscovery.etcdHosts', environmentId),
+          VarsModel.get('serviceDiscovery.defaultTtl', environmentId),
+          VarsModel.get('serviceDiscovery.heartbeatInterval', environmentId),
+        ]);
 
       res.json({
         success: true,
         data: {
           mode: mode || process.env.SERVICE_DISCOVERY_MODE || 'redis',
-          etcdHosts: etcdHosts || process.env.ETCD_HOSTS || 'http://localhost:2379',
+          etcdHosts:
+            etcdHosts || process.env.ETCD_HOSTS || 'http://localhost:2379',
           defaultTtl: defaultTtl ? parseInt(defaultTtl, 10) : 30,
-          heartbeatInterval: heartbeatInterval ? parseInt(heartbeatInterval, 10) : 15,
+          heartbeatInterval: heartbeatInterval
+            ? parseInt(heartbeatInterval, 10)
+            : 15,
         },
       });
     } catch (error: any) {
@@ -65,7 +69,10 @@ export class ServiceDiscoveryConfigController {
       }
 
       // Validate heartbeat interval
-      if (heartbeatInterval !== undefined && (heartbeatInterval < 5 || heartbeatInterval > 60)) {
+      if (
+        heartbeatInterval !== undefined &&
+        (heartbeatInterval < 5 || heartbeatInterval > 60)
+      ) {
         return res.status(400).json({
           success: false,
           error: 'Heartbeat interval must be between 5 and 60 seconds',
@@ -77,16 +84,30 @@ export class ServiceDiscoveryConfigController {
       const updates: Promise<void>[] = [];
 
       if (mode !== undefined) {
-        updates.push(VarsModel.set('serviceDiscovery.mode', mode, userId, environmentId));
+        updates.push(
+          VarsModel.set('serviceDiscovery.mode', mode, userId, environmentId)
+        );
       }
 
       if (etcdHosts !== undefined) {
-        updates.push(VarsModel.set('serviceDiscovery.etcdHosts', etcdHosts, userId, environmentId));
+        updates.push(
+          VarsModel.set(
+            'serviceDiscovery.etcdHosts',
+            etcdHosts,
+            userId,
+            environmentId
+          )
+        );
       }
 
       if (defaultTtl !== undefined) {
         updates.push(
-          VarsModel.set('serviceDiscovery.defaultTtl', defaultTtl.toString(), userId, environmentId)
+          VarsModel.set(
+            'serviceDiscovery.defaultTtl',
+            defaultTtl.toString(),
+            userId,
+            environmentId
+          )
         );
       }
 

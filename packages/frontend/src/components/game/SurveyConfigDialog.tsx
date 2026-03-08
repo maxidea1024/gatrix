@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Button, TextField, Box, Typography, IconButton } from '@mui/material';
+import {
+  AppBar,
+  Toolbar,
+  Button,
+  TextField,
+  Box,
+  Typography,
+  IconButton,
+} from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +20,10 @@ interface SurveyConfigDialogProps {
   onClose: () => void;
 }
 
-const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({ open, onClose }) => {
+const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({
+  open,
+  onClose,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { getProjectApiPath } = useOrgProject();
@@ -92,7 +103,9 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({ open, onClose }
           <TextField
             label={t('surveys.baseSurveyUrl')}
             value={config.baseSurveyUrl}
-            onChange={(e) => setConfig({ ...config, baseSurveyUrl: e.target.value })}
+            onChange={(e) =>
+              setConfig({ ...config, baseSurveyUrl: e.target.value })
+            }
             fullWidth
             disabled={loading}
             helperText={t('surveys.baseSurveyUrlHelp')}
@@ -100,7 +113,9 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({ open, onClose }
           <TextField
             label={t('surveys.baseJoinedUrl')}
             value={config.baseJoinedUrl}
-            onChange={(e) => setConfig({ ...config, baseJoinedUrl: e.target.value })}
+            onChange={(e) =>
+              setConfig({ ...config, baseJoinedUrl: e.target.value })
+            }
             fullWidth
             disabled={loading}
             helperText={t('surveys.baseJoinedUrlHelp')}
@@ -108,7 +123,9 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({ open, onClose }
           <TextField
             label={t('surveys.linkCaption')}
             value={config.linkCaption}
-            onChange={(e) => setConfig({ ...config, linkCaption: e.target.value })}
+            onChange={(e) =>
+              setConfig({ ...config, linkCaption: e.target.value })
+            }
             fullWidth
             disabled={loading}
             helperText={t('surveys.linkCaptionHelp')}
@@ -116,7 +133,9 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({ open, onClose }
           <TextField
             label={t('surveys.joinedSecretKey')}
             value={config.joinedSecretKey}
-            onChange={(e) => setConfig({ ...config, joinedSecretKey: e.target.value })}
+            onChange={(e) =>
+              setConfig({ ...config, joinedSecretKey: e.target.value })
+            }
             fullWidth
             disabled={loading}
             helperText={t('surveys.joinedSecretKeyHelp')}
@@ -139,7 +158,11 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({ open, onClose }
         <Button onClick={onClose} disabled={submitting}>
           {t('common.cancel')}
         </Button>
-        <Button onClick={handleSubmit} variant="contained" disabled={loading || submitting}>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          disabled={loading || submitting}
+        >
           {submitting ? t('common.saving') : t('common.save')}
         </Button>
       </Box>

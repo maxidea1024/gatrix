@@ -203,7 +203,11 @@ const isMultiValueOperator = (operator: ConstraintOperator): boolean => {
 
 // Check if operator requires no value input
 const isValuelessOperator = (operator: ConstraintOperator): boolean => {
-  return operator === 'exists' || operator === 'not_exists' || operator === 'arr_empty';
+  return (
+    operator === 'exists' ||
+    operator === 'not_exists' ||
+    operator === 'arr_empty'
+  );
 };
 
 // Sortable constraint card component
@@ -220,7 +224,11 @@ interface SortableConstraintCardProps {
   contextFields: ContextField[];
   showDragHandle: boolean;
   t: any;
-  handleConstraintChange: (index: number, field: keyof Constraint, value: any) => void;
+  handleConstraintChange: (
+    index: number,
+    field: keyof Constraint,
+    value: any
+  ) => void;
   handleRemoveConstraint: (index: number) => void;
   renderValueInput: (constraint: Constraint, index: number) => React.ReactNode;
 }
@@ -242,7 +250,14 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
   handleRemoveConstraint,
   renderValueInput,
 }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id,
   });
 
@@ -283,36 +298,60 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
         {/* Context Field Selector */}
         <Tooltip
           title={
-            contextFields.find((f) => f.fieldName === constraint.contextName)?.description || ''
+            contextFields.find((f) => f.fieldName === constraint.contextName)
+              ?.description || ''
           }
           disableFocusListener
           placement="top"
         >
-          <FormControl size="small" sx={{ minWidth: 150, flex: '1 1 150px' }} error={isFieldEmpty}>
+          <FormControl
+            size="small"
+            sx={{ minWidth: 150, flex: '1 1 150px' }}
+            error={isFieldEmpty}
+          >
             <Select
               value={constraint.contextName}
-              onChange={(e) => handleConstraintChange(index, 'contextName', e.target.value)}
+              onChange={(e) =>
+                handleConstraintChange(index, 'contextName', e.target.value)
+              }
               displayEmpty
               disabled={disabled}
               renderValue={(selected) => {
                 if (!selected) {
-                  return <em style={{ color: 'gray' }}>{t('featureFlags.selectContextField')}</em>;
+                  return (
+                    <em style={{ color: 'gray' }}>
+                      {t('featureFlags.selectContextField')}
+                    </em>
+                  );
                 }
-                const selectedField = contextFields.find((f) => f.fieldName === selected);
+                const selectedField = contextFields.find(
+                  (f) => f.fieldName === selected
+                );
                 // Show missing icon for deleted/unknown fields
                 if (!selectedField) {
                   return (
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Tooltip title={t('featureFlags.missingContextField')} disableFocusListener>
-                        <MissingIcon sx={{ fontSize: 16, color: 'error.main', mr: 1 }} />
+                      <Tooltip
+                        title={t('featureFlags.missingContextField')}
+                        disableFocusListener
+                      >
+                        <MissingIcon
+                          sx={{ fontSize: 16, color: 'error.main', mr: 1 }}
+                        />
                       </Tooltip>
-                      <Typography sx={{ color: 'error.main' }}>{selected}</Typography>
+                      <Typography sx={{ color: 'error.main' }}>
+                        {selected}
+                      </Typography>
                     </Box>
                   );
                 }
                 return (
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <FieldTypeIcon type={selectedField.fieldType} size={16} sx={{ mr: 1 }} />
+                    <FieldTypeIcon
+                      type={selectedField.fieldType}
+                      size={16}
+                      sx={{ mr: 1 }}
+                    />
                     {selectedField.displayName || selectedField.fieldName}
                   </Box>
                 );
@@ -336,7 +375,9 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                     }}
                   >
                     <Tooltip title={field.fieldType} disableFocusListener>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}
+                      >
                         <FieldTypeIcon type={field.fieldType} size={16} />
                       </Box>
                     </Tooltip>
@@ -359,7 +400,9 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                 );
               })}
             </Select>
-            {isFieldEmpty && <FormHelperText>{t('featureFlags.fieldRequired')}</FormHelperText>}
+            {isFieldEmpty && (
+              <FormHelperText>{t('featureFlags.fieldRequired')}</FormHelperText>
+            )}
           </FormControl>
         </Tooltip>
 
@@ -368,13 +411,17 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
           <span>
             <IconButton
               size="small"
-              onClick={() => handleConstraintChange(index, 'inverted', !constraint.inverted)}
+              onClick={() =>
+                handleConstraintChange(index, 'inverted', !constraint.inverted)
+              }
               disabled={disabled}
               sx={{
                 width: 32,
                 height: 32,
                 color: constraint.inverted ? 'warning.main' : 'text.disabled',
-                bgcolor: constraint.inverted ? 'action.selected' : 'transparent',
+                bgcolor: constraint.inverted
+                  ? 'action.selected'
+                  : 'transparent',
                 '&:hover': {
                   bgcolor: 'action.hover',
                 },
@@ -394,7 +441,9 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
           <FormControl size="small" sx={{ minWidth: 130, flex: '1 1 130px' }}>
             <Select
               value={validOperator}
-              onChange={(e) => handleConstraintChange(index, 'operator', e.target.value)}
+              onChange={(e) =>
+                handleConstraintChange(index, 'operator', e.target.value)
+              }
               disabled={disabled}
               renderValue={(selected) => {
                 const label = getOperatorLabel(
@@ -411,7 +460,10 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                       showTooltip={true}
                     />
                     {constraint.inverted && (
-                      <Typography component="span" sx={{ color: 'warning.main', fontWeight: 600 }}>
+                      <Typography
+                        component="span"
+                        sx={{ color: 'warning.main', fontWeight: 600 }}
+                      >
                         NOT
                       </Typography>
                     )}
@@ -431,7 +483,12 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                 <MenuItem
                   key={op.value}
                   value={op.value}
-                  sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, py: 1 }}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 1,
+                    py: 1,
+                  }}
                 >
                   <OperatorIcon
                     operator={op.value}
@@ -445,7 +502,11 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                     </Typography>
                     <Typography
                       variant="caption"
-                      sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.3 }}
+                      sx={{
+                        color: 'text.secondary',
+                        display: 'block',
+                        lineHeight: 1.3,
+                      }}
                     >
                       {t(`constraints.operatorDesc.${op.value}`, '')}
                     </Typography>
@@ -460,7 +521,11 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
         <Box sx={{ flex: '2 1 200px', minWidth: 150 }}>
           {renderValueInput(constraint, index)}
           {!isFieldEmpty && isValueEmpty && (
-            <Typography variant="caption" color="error" sx={{ display: 'block', mt: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="error"
+              sx={{ display: 'block', mt: 0.5 }}
+            >
               {t('featureFlags.valueRequired')}
             </Typography>
           )}
@@ -476,19 +541,30 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
           }}
         >
           {/* Case Insensitive - always show but disable for non-string operators */}
-          <Tooltip title={t('featureFlags.caseInsensitiveHelp')} disableFocusListener>
+          <Tooltip
+            title={t('featureFlags.caseInsensitiveHelp')}
+            disableFocusListener
+          >
             <span>
               <IconButton
                 size="small"
                 onClick={() =>
-                  handleConstraintChange(index, 'caseInsensitive', !constraint.caseInsensitive)
+                  handleConstraintChange(
+                    index,
+                    'caseInsensitive',
+                    !constraint.caseInsensitive
+                  )
                 }
                 disabled={disabled || !validOperator.startsWith('str_')}
                 sx={{
                   width: 32,
                   height: 32,
-                  color: constraint.caseInsensitive ? 'primary.main' : 'text.disabled',
-                  bgcolor: constraint.caseInsensitive ? 'action.selected' : 'transparent',
+                  color: constraint.caseInsensitive
+                    ? 'primary.main'
+                    : 'text.disabled',
+                  bgcolor: constraint.caseInsensitive
+                    ? 'action.selected'
+                    : 'transparent',
                   '&:hover': {
                     bgcolor: 'action.hover',
                   },
@@ -611,7 +687,10 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
   };
 
   // Get valid operator value - ensure operator is in the list for current field type
-  const getValidOperator = (contextName: string, currentOperator: ConstraintOperator): string => {
+  const getValidOperator = (
+    contextName: string,
+    currentOperator: ConstraintOperator
+  ): string => {
     const operators = getOperatorsForField(contextName);
     const isValid = operators.some((op) => op.value === currentOperator);
     return isValid ? currentOperator : operators[0]?.value || 'str_eq';
@@ -639,7 +718,11 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
     onChange(newConstraints);
   };
 
-  const handleConstraintChange = (index: number, field: keyof Constraint, value: any) => {
+  const handleConstraintChange = (
+    index: number,
+    field: keyof Constraint,
+    value: any
+  ) => {
     const newConstraints = [...constraints];
     const constraint = { ...newConstraints[index] };
 
@@ -647,7 +730,8 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
       // When context field changes, reset operator to first valid one for the new type
       const newField = contextFields.find((f) => f.fieldName === value);
       const newType = newField?.fieldType || 'string';
-      const newOperators = OPERATORS_BY_TYPE[newType] || OPERATORS_BY_TYPE.string;
+      const newOperators =
+        OPERATORS_BY_TYPE[newType] || OPERATORS_BY_TYPE.string;
       constraint.contextName = value;
       constraint.operator = newOperators[0].value as ConstraintOperator;
       constraint.value = '';
@@ -678,7 +762,11 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
     // Valueless operators (exists, not_exists, arr_empty) - no input needed
     if (isValuelessOperator(constraint.operator)) {
       return (
-        <Typography variant="body2" color="text.secondary" sx={{ py: 1, fontStyle: 'italic' }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ py: 1, fontStyle: 'italic' }}
+        >
           {t('featureFlags.noValueRequired')}
         </Typography>
       );
@@ -694,7 +782,9 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
         <FormControl fullWidth size="small">
           <Select
             value={constraint.value || ''}
-            onChange={(e) => handleConstraintChange(index, 'value', e.target.value)}
+            onChange={(e) =>
+              handleConstraintChange(index, 'value', e.target.value)
+            }
             displayEmpty
             disabled={disabled}
           >
@@ -715,7 +805,9 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
           <CountrySelect
             multiple
             value={constraint.values || []}
-            onChange={(newValue) => handleConstraintChange(index, 'values', newValue || [])}
+            onChange={(newValue) =>
+              handleConstraintChange(index, 'values', newValue || [])
+            }
             placeholder={t('featureFlags.selectValues')}
             disabled={disabled}
             size="small"
@@ -725,7 +817,9 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
       return (
         <CountrySelect
           value={constraint.value || null}
-          onChange={(newValue) => handleConstraintChange(index, 'value', newValue || '')}
+          onChange={(newValue) =>
+            handleConstraintChange(index, 'value', newValue || '')
+          }
           placeholder={t('featureFlags.selectValue')}
           disabled={disabled}
           size="small"
@@ -742,14 +836,25 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
             multiple
             options={legalValues}
             value={constraint.values || []}
-            onChange={(_, newValue) => handleConstraintChange(index, 'values', newValue)}
+            onChange={(_, newValue) =>
+              handleConstraintChange(index, 'values', newValue)
+            }
             renderTags={(value, getTagProps) =>
               value.map((option, idx) => (
-                <Chip size="small" label={option} {...getTagProps({ index: idx })} key={idx} />
+                <Chip
+                  size="small"
+                  label={option}
+                  {...getTagProps({ index: idx })}
+                  key={idx}
+                />
               ))
             }
             renderInput={(params) => (
-              <TextField {...params} size="small" placeholder={t('featureFlags.selectValues')} />
+              <TextField
+                {...params}
+                size="small"
+                placeholder={t('featureFlags.selectValues')}
+              />
             )}
             disabled={disabled}
           />
@@ -762,14 +867,25 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
           freeSolo
           options={[]}
           value={constraint.values || []}
-          onChange={(_, newValue) => handleConstraintChange(index, 'values', newValue)}
+          onChange={(_, newValue) =>
+            handleConstraintChange(index, 'values', newValue)
+          }
           renderTags={(value, getTagProps) =>
             value.map((option, idx) => (
-              <Chip size="small" label={option} {...getTagProps({ index: idx })} key={idx} />
+              <Chip
+                size="small"
+                label={option}
+                {...getTagProps({ index: idx })}
+                key={idx}
+              />
             ))
           }
           renderInput={(params) => (
-            <TextField {...params} size="small" placeholder={t('featureFlags.typeAndPressEnter')} />
+            <TextField
+              {...params}
+              size="small"
+              placeholder={t('featureFlags.typeAndPressEnter')}
+            />
           )}
           disabled={disabled}
         />
@@ -782,7 +898,9 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
         <FormControl fullWidth size="small">
           <Select
             value={constraint.value || ''}
-            onChange={(e) => handleConstraintChange(index, 'value', e.target.value)}
+            onChange={(e) =>
+              handleConstraintChange(index, 'value', e.target.value)
+            }
             displayEmpty
             disabled={disabled}
           >
@@ -822,7 +940,9 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
           type="number"
           placeholder="0"
           value={constraint.value || ''}
-          onChange={(e) => handleConstraintChange(index, 'value', e.target.value)}
+          onChange={(e) =>
+            handleConstraintChange(index, 'value', e.target.value)
+          }
           disabled={disabled}
         />
       );
@@ -833,7 +953,9 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
       <TextField
         fullWidth
         size="small"
-        placeholder={fieldType === 'semver' ? 'e.g., 1.0.0' : t('featureFlags.enterValue')}
+        placeholder={
+          fieldType === 'semver' ? 'e.g., 1.0.0' : t('featureFlags.enterValue')
+        }
         value={constraint.value || ''}
         onChange={(e) => handleConstraintChange(index, 'value', e.target.value)}
         disabled={disabled}
@@ -879,11 +1001,17 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
           onDragEnd={handleDragEnd}
           modifiers={[restrictToVerticalAxis]}
         >
-          <SortableContext items={constraintIds} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={constraintIds}
+            strategy={verticalListSortingStrategy}
+          >
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
               {constraints.map((constraint, index) => {
                 // Get valid operator for current field type
-                const validOperator = getValidOperator(constraint.contextName, constraint.operator);
+                const validOperator = getValidOperator(
+                  constraint.contextName,
+                  constraint.operator
+                );
                 const operators = getOperatorsForField(constraint.contextName);
                 const usedFieldNames = getUsedFieldNames(index);
                 const isFieldEmpty = !constraint.contextName;

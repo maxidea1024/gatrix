@@ -93,13 +93,21 @@ export class AdminController {
       const status = req.query.status;
       let statusValue: string | string[] | undefined;
       if (status) {
-        statusValue = Array.isArray(status) ? status.map((s) => String(s)) : String(status);
+        statusValue = Array.isArray(status)
+          ? status.map((s) => String(s))
+          : String(status);
       }
-      const statusOperator = req.query.status_operator as 'any_of' | 'include_all' | undefined;
+      const statusOperator = req.query.status_operator as
+        | 'any_of'
+        | 'include_all'
+        | undefined;
 
       const search = req.query.search as string;
       const tags = req.query.tags;
-      const tagsOperator = req.query.tags_operator as 'any_of' | 'include_all' | undefined;
+      const tagsOperator = req.query.tags_operator as
+        | 'any_of'
+        | 'include_all'
+        | undefined;
 
       const filters: Record<string, any> = {};
       if (statusValue) {
@@ -160,7 +168,14 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { name, email, password, tagIds, allowAllEnvironments, environments } = req.body;
+      const {
+        name,
+        email,
+        password,
+        tagIds,
+        allowAllEnvironments,
+        environments,
+      } = req.body;
 
       if (!req.user?.userId) {
         throw new GatrixError('User not authenticated', 401);
@@ -218,7 +233,9 @@ export class AdminController {
 
       // Protect org admin from being modified by others
       const orgId = req.user?.orgId;
-      const isTargetOrgAdmin = orgId ? await permissionService.isOrgAdmin(userId, orgId) : false;
+      const isTargetOrgAdmin = orgId
+        ? await permissionService.isOrgAdmin(userId, orgId)
+        : false;
       const isOwnAccount = req.user.userId === userId;
       if (isTargetOrgAdmin && !isOwnAccount) {
         throw new GatrixError('Cannot modify org admin account', 403);
@@ -415,12 +432,20 @@ export class AdminController {
         : req.query.user_id
           ? parseInt(req.query.user_id as string)
           : undefined; // backward compatibility
-      const ipAddress = (req.query.ipAddress as string) || (req.query.ip_address as string); // backward compatibility
+      const ipAddress =
+        (req.query.ipAddress as string) || (req.query.ip_address as string); // backward compatibility
 
       // Handle action as single value or array
       const action = req.query.action;
-      const actionValue = Array.isArray(action) ? action : action ? [action as string] : undefined;
-      const actionOperator = req.query.action_operator as 'any_of' | 'include_all' | undefined;
+      const actionValue = Array.isArray(action)
+        ? action
+        : action
+          ? [action as string]
+          : undefined;
+      const actionOperator = req.query.action_operator as
+        | 'any_of'
+        | 'include_all'
+        | undefined;
 
       // Handle resourceType as single value or array
       const resourceType = req.query.resourceType || req.query.resource_type; // backward compatibility
@@ -435,11 +460,14 @@ export class AdminController {
         | undefined;
 
       // Handle resourceId filter
-      const resourceId = (req.query.resourceId as string) || (req.query.resource_id as string);
+      const resourceId =
+        (req.query.resourceId as string) || (req.query.resource_id as string);
 
       // Keep as ISO string, don't convert to Date object
-      const startDate = (req.query.startDate as string) || (req.query.start_date as string);
-      const endDate = (req.query.endDate as string) || (req.query.end_date as string);
+      const startDate =
+        (req.query.startDate as string) || (req.query.start_date as string);
+      const endDate =
+        (req.query.endDate as string) || (req.query.end_date as string);
 
       const filters: any = {};
       if (userId) filters.userId = userId;
@@ -451,7 +479,8 @@ export class AdminController {
       }
       if (resourceTypeValue && resourceTypeValue.length > 0) {
         filters.resourceType = resourceTypeValue;
-        if (resourceTypeOperator) filters.resource_type_operator = resourceTypeOperator;
+        if (resourceTypeOperator)
+          filters.resource_type_operator = resourceTypeOperator;
       }
       if (resourceId) filters.resourceId = resourceId;
       if (startDate) filters.startDate = startDate;
@@ -479,11 +508,19 @@ export class AdminController {
         ...result,
         logs: (result.logs || []).map((log: any) => {
           const created = log.createdAt ?? log.created_at;
-          const date = created instanceof Date ? created : created ? new Date(created) : null;
-          const iso = date && !isNaN(date.getTime()) ? date.toISOString() : null;
+          const date =
+            created instanceof Date
+              ? created
+              : created
+                ? new Date(created)
+                : null;
+          const iso =
+            date && !isNaN(date.getTime()) ? date.toISOString() : null;
 
-          const resourceType = log.entityType ?? log.resourceType ?? log.resource_type ?? null;
-          const resourceId = log.entityId ?? log.resourceId ?? log.resource_id ?? null;
+          const resourceType =
+            log.entityType ?? log.resourceType ?? log.resource_type ?? null;
+          const resourceId =
+            log.entityId ?? log.resourceId ?? log.resource_id ?? null;
           const ipAddress = log.ipAddress ?? log.ip_address ?? null;
           const userAgent = log.userAgent ?? log.user_agent ?? null;
 
@@ -979,7 +1016,8 @@ export class AdminController {
   ): Promise<void> {
     try {
       // Dynamic import to avoid circular dependencies
-      const { ALL_PERMISSIONS, PERMISSION_CATEGORIES } = await import('../types/permissions');
+      const { ALL_PERMISSIONS, PERMISSION_CATEGORIES } =
+        await import('../types/permissions');
 
       res.json({
         success: true,

@@ -5,7 +5,13 @@
  * Users can register metric chart configs, resize and reposition them freely.
  */
 
-import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+} from 'react';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
 import {
   Box,
@@ -193,7 +199,9 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [seriesData, setSeriesData] = useState<TimeSeriesResponse | null>(null);
   const range = globalRange;
-  const [localChartType, setLocalChartType] = useState<ChartType>(config.chartType);
+  const [localChartType, setLocalChartType] = useState<ChartType>(
+    config.chartType
+  );
   const hasLoadedRef = useRef(false);
 
   const fetchData = useCallback(async () => {
@@ -220,7 +228,9 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         globalLabelFilter.split(',').forEach((pair) => {
           const [key, val] = pair.split('=').map((s) => s.trim());
           if (key && val) {
-            mergedLabels[key] = mergedLabels[key] ? [...mergedLabels[key], val] : [val];
+            mergedLabels[key] = mergedLabels[key]
+              ? [...mergedLabels[key], val]
+              : [val];
           }
         });
       }
@@ -232,9 +242,12 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         params.groupBy = config.groupBy;
       }
 
-      const response = await api.get<TimeSeriesResponse>(`${projectApiPath}/impact-metrics`, {
-        params,
-      });
+      const response = await api.get<TimeSeriesResponse>(
+        `${projectApiPath}/impact-metrics`,
+        {
+          params,
+        }
+      );
       setSeriesData(response.data);
       hasLoadedRef.current = true;
     } catch (err: any) {
@@ -257,7 +270,10 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
     fetchData();
   }, [fetchData, refreshKey]);
 
-  const handleChartTypeChange = (_: React.MouseEvent<HTMLElement>, newType: ChartType | null) => {
+  const handleChartTypeChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newType: ChartType | null
+  ) => {
     if (newType) {
       setLocalChartType(newType);
       onChartTypeChange?.(newType);
@@ -274,11 +290,20 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
     });
     const sorted = Array.from(allTimestamps).sort((a, b) => a - b);
 
-    const locale = i18n.language === 'ko' ? 'ko-KR' : i18n.language === 'zh' ? 'zh-CN' : 'en-US';
+    const locale =
+      i18n.language === 'ko'
+        ? 'ko-KR'
+        : i18n.language === 'zh'
+          ? 'zh-CN'
+          : 'en-US';
     const formatLabel = (ts: number) => {
       const d = new Date(ts * 1000);
       if (range === 'hour' || range === 'day') {
-        return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false });
+        return d.toLocaleTimeString(locale, {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        });
       }
       return d.toLocaleDateString(locale, {
         month: 'short',
@@ -296,12 +321,16 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
 
       let label = config.metricName;
       if (config.groupBy && config.groupBy.length > 0) {
-        const groupParts = config.groupBy.map((key) => s.metric[key] || '').filter((v) => v);
+        const groupParts = config.groupBy
+          .map((key) => s.metric[key] || '')
+          .filter((v) => v);
         if (groupParts.length > 0) {
           label = groupParts.join(' / ');
         }
       } else {
-        const metricLabels = Object.entries(s.metric || {}).filter(([k]) => k !== '__name__');
+        const metricLabels = Object.entries(s.metric || {}).filter(
+          ([k]) => k !== '__name__'
+        );
         if (metricLabels.length > 0 && metricLabels.length < 3) {
           label = metricLabels.map(([k, v]) => `${k}=${v}`).join(', ');
         } else if (metricLabels.length >= 3) {
@@ -313,7 +342,8 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         label,
         data: sorted.map((ts) => tsMap.get(ts) ?? null),
         borderColor: color.border,
-        backgroundColor: localChartType === 'line' ? color.bg.replace('0.4', '0.1') : color.bg,
+        backgroundColor:
+          localChartType === 'line' ? color.bg.replace('0.4', '0.1') : color.bg,
         borderWidth: 2,
         tension: 0.3,
         pointRadius: isExpanded ? 2 : 1,
@@ -363,7 +393,10 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
       scales: {
         x: {
           grid: {
-            color: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+            color:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.05)'
+                : 'rgba(0,0,0,0.05)',
           },
           ticks: {
             color: theme.palette.text.secondary,
@@ -376,7 +409,10 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         y: {
           beginAtZero: true,
           grid: {
-            color: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+            color:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.05)'
+                : 'rgba(0,0,0,0.05)',
           },
           ticks: {
             color: theme.palette.text.secondary,
@@ -415,7 +451,10 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
           px: 1.5,
           py: 0.8,
           minWidth: 0,
-          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
+          bgcolor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.04)'
+              : 'rgba(0,0,0,0.02)',
           borderBottom: `1px solid ${theme.palette.divider}`,
           borderRadius: isExpanded ? 0 : '12px 12px 0 0',
           cursor: canManage ? 'grab' : 'default',
@@ -551,7 +590,12 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
           )}
           <Tooltip title={t('common.refresh')}>
             <span>
-              <IconButton size="small" onClick={fetchData} disabled={loading} sx={{ p: 0.4 }}>
+              <IconButton
+                size="small"
+                onClick={fetchData}
+                disabled={loading}
+                sx={{ p: 0.4 }}
+              >
                 <RefreshIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </span>
@@ -568,7 +612,12 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
               )}
               {onDelete && (
                 <Tooltip title={t('common.delete')}>
-                  <IconButton size="small" onClick={onDelete} color="error" sx={{ p: 0.4 }}>
+                  <IconButton
+                    size="small"
+                    onClick={onDelete}
+                    color="error"
+                    sx={{ p: 0.4 }}
+                  >
                     <DeleteIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
@@ -594,7 +643,12 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
           </Box>
         ) : loading ? (
           <Box
-            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%',
+            }}
           >
             <CircularProgress size={24} thickness={4} />
           </Box>
@@ -645,7 +699,14 @@ const ChartConfigDialog: React.FC<{
   availableMetrics: AvailableMetric[];
   loadingMetrics: boolean;
   initialValues?: MetricConfig;
-}> = ({ open, onClose, onSave, availableMetrics, loadingMetrics, initialValues }) => {
+}> = ({
+  open,
+  onClose,
+  onSave,
+  availableMetrics,
+  loadingMetrics,
+  initialValues,
+}) => {
   const { t } = useTranslation();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
@@ -653,7 +714,8 @@ const ChartConfigDialog: React.FC<{
   const [metricName, setMetricName] = useState('');
   const [chartType, setChartType] = useState<'line' | 'area' | 'bar'>('line');
   const [groupBy, setGroupBy] = useState<string[]>([]);
-  const [aggregationMode, setAggregationMode] = useState<AggregationMode>('count');
+  const [aggregationMode, setAggregationMode] =
+    useState<AggregationMode>('count');
 
   const [availableLabels, setAvailableLabels] = useState<string[]>([]);
   const [loadingLabels, setLoadingLabels] = useState(false);
@@ -683,9 +745,12 @@ const ChartConfigDialog: React.FC<{
     const timer = setTimeout(async () => {
       setLoadingLabels(true);
       try {
-        const response = await api.get<string[]>(`${projectApiPath}/impact-metrics/labels`, {
-          params: { metric: metricName },
-        });
+        const response = await api.get<string[]>(
+          `${projectApiPath}/impact-metrics/labels`,
+          {
+            params: { metric: metricName },
+          }
+        );
         setAvailableLabels(response.data || []);
       } catch (err) {
         console.error('Failed to fetch labels:', err);
@@ -713,7 +778,9 @@ const ChartConfigDialog: React.FC<{
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        {initialValues ? t('impactMetrics.editChart') : t('impactMetrics.addChart')}
+        {initialValues
+          ? t('impactMetrics.editChart')
+          : t('impactMetrics.addChart')}
       </DialogTitle>
       <DialogContent dividers>
         <Stack spacing={2.5} sx={{ pt: 1 }}>
@@ -769,7 +836,9 @@ const ChartConfigDialog: React.FC<{
                   ...params.InputProps,
                   endAdornment: (
                     <React.Fragment>
-                      {loadingLabels ? <CircularProgress color="inherit" size={20} /> : null}
+                      {loadingLabels ? (
+                        <CircularProgress color="inherit" size={20} />
+                      ) : null}
                       {params.InputProps.endAdornment}
                     </React.Fragment>
                   ),
@@ -778,7 +847,12 @@ const ChartConfigDialog: React.FC<{
             )}
             renderTags={(value, getTagProps) =>
               value.map((option, index) => (
-                <Chip variant="outlined" label={option} size="small" {...getTagProps({ index })} />
+                <Chip
+                  variant="outlined"
+                  label={option}
+                  size="small"
+                  {...getTagProps({ index })}
+                />
               ))
             }
           />
@@ -801,9 +875,15 @@ const ChartConfigDialog: React.FC<{
                   setChartType(e.target.value as any)
                 }
               >
-                <MenuItem value="line">{t('impactMetrics.chartType.line')}</MenuItem>
-                <MenuItem value="area">{t('impactMetrics.chartType.area')}</MenuItem>
-                <MenuItem value="bar">{t('impactMetrics.chartType.bar')}</MenuItem>
+                <MenuItem value="line">
+                  {t('impactMetrics.chartType.line')}
+                </MenuItem>
+                <MenuItem value="area">
+                  {t('impactMetrics.chartType.area')}
+                </MenuItem>
+                <MenuItem value="bar">
+                  {t('impactMetrics.chartType.bar')}
+                </MenuItem>
               </Select>
             </FormControl>
 
@@ -816,10 +896,18 @@ const ChartConfigDialog: React.FC<{
                   setAggregationMode(e.target.value as AggregationMode)
                 }
               >
-                <MenuItem value="count">{t('impactMetrics.aggregation.count')}</MenuItem>
-                <MenuItem value="sum">{t('impactMetrics.aggregation.sum')}</MenuItem>
-                <MenuItem value="avg">{t('impactMetrics.aggregation.avg')}</MenuItem>
-                <MenuItem value="rps">{t('impactMetrics.aggregation.rps')}</MenuItem>
+                <MenuItem value="count">
+                  {t('impactMetrics.aggregation.count')}
+                </MenuItem>
+                <MenuItem value="sum">
+                  {t('impactMetrics.aggregation.sum')}
+                </MenuItem>
+                <MenuItem value="avg">
+                  {t('impactMetrics.aggregation.avg')}
+                </MenuItem>
+                <MenuItem value="rps">
+                  {t('impactMetrics.aggregation.rps')}
+                </MenuItem>
                 <MenuItem value="p50">P50</MenuItem>
                 <MenuItem value="p95">P95</MenuItem>
                 <MenuItem value="p99">P99</MenuItem>
@@ -855,15 +943,21 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   // State
   const [configs, setConfigs] = useState<MetricConfig[]>([]);
   const [loading, setLoading] = useState(true);
-  const [availableMetrics, setAvailableMetrics] = useState<AvailableMetric[]>([]);
+  const [availableMetrics, setAvailableMetrics] = useState<AvailableMetric[]>(
+    []
+  );
   const [loadingMetrics, setLoadingMetrics] = useState(false);
 
   // Dialog state
   const [showConfigDialog, setShowConfigDialog] = useState(false);
-  const [editingConfig, setEditingConfig] = useState<MetricConfig | undefined>(undefined);
+  const [editingConfig, setEditingConfig] = useState<MetricConfig | undefined>(
+    undefined
+  );
 
   // Expanded chart state
-  const [expandedConfig, setExpandedConfig] = useState<MetricConfig | null>(null);
+  const [expandedConfig, setExpandedConfig] = useState<MetricConfig | null>(
+    null
+  );
 
   // Delete confirm
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -885,12 +979,19 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   // URL params + localStorage persistence for dashboard controls
   const [searchParams, setSearchParams] = useSearchParams();
   const STORAGE_KEY = 'impactMetrics';
-  const validRanges: RangeOption[] = ['hour', 'sixhour', 'day', 'week', 'month'];
+  const validRanges: RangeOption[] = [
+    'hour',
+    'sixhour',
+    'day',
+    'week',
+    'month',
+  ];
   const validIntervals = [0, 5, 10, 30, 60, 300];
 
   const resolveInitialRange = (): RangeOption => {
     const fromUrl = searchParams.get('range');
-    if (fromUrl && validRanges.includes(fromUrl as RangeOption)) return fromUrl as RangeOption;
+    if (fromUrl && validRanges.includes(fromUrl as RangeOption))
+      return fromUrl as RangeOption;
     const fromStorage = localStorage.getItem(`${STORAGE_KEY}.range`);
     if (fromStorage && validRanges.includes(fromStorage as RangeOption))
       return fromStorage as RangeOption;
@@ -912,8 +1013,11 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   };
 
   // Global dashboard controls (Grafana-style)
-  const [globalRange, setGlobalRangeState] = useState<RangeOption>(resolveInitialRange);
-  const [refreshInterval, setRefreshIntervalState] = useState<number>(resolveInitialRefresh);
+  const [globalRange, setGlobalRangeState] =
+    useState<RangeOption>(resolveInitialRange);
+  const [refreshInterval, setRefreshIntervalState] = useState<number>(
+    resolveInitialRefresh
+  );
   const [refreshKey, setRefreshKey] = useState(0);
   const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -1135,11 +1239,19 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   }) => {
     try {
       if (editingConfig) {
-        await api.put(`${projectApiPath}/impact-metrics/configs/${editingConfig.id}`, { ...data });
-        enqueueSnackbar(t('impactMetrics.chartUpdated'), { variant: 'success' });
+        await api.put(
+          `${projectApiPath}/impact-metrics/configs/${editingConfig.id}`,
+          { ...data }
+        );
+        enqueueSnackbar(t('impactMetrics.chartUpdated'), {
+          variant: 'success',
+        });
       } else {
         // Find the next available position
-        const maxY = configs.reduce((max, c) => Math.max(max, c.layoutY + c.layoutH), 0);
+        const maxY = configs.reduce(
+          (max, c) => Math.max(max, c.layoutY + c.layoutH),
+          0
+        );
         await api.post(`${projectApiPath}/impact-metrics/configs`, {
           flagId,
           ...data,
@@ -1154,16 +1266,25 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
       fetchConfigs();
     } catch (err) {
       enqueueSnackbar(
-        editingConfig ? t('impactMetrics.chartUpdateFailed') : t('impactMetrics.chartAddFailed'),
+        editingConfig
+          ? t('impactMetrics.chartUpdateFailed')
+          : t('impactMetrics.chartAddFailed'),
         { variant: 'error' }
       );
     }
   };
 
-  const handleChartTypeChange = async (configId: string, chartType: ChartType) => {
+  const handleChartTypeChange = async (
+    configId: string,
+    chartType: ChartType
+  ) => {
     try {
-      await api.put(`${projectApiPath}/impact-metrics/configs/${configId}`, { chartType });
-      setConfigs((prev) => prev.map((c) => (c.id === configId ? { ...c, chartType } : c)));
+      await api.put(`${projectApiPath}/impact-metrics/configs/${configId}`, {
+        chartType,
+      });
+      setConfigs((prev) =>
+        prev.map((c) => (c.id === configId ? { ...c, chartType } : c))
+      );
     } catch (err) {
       console.error('Failed to update chart type:', err);
     }
@@ -1180,7 +1301,9 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
       enqueueSnackbar(t('impactMetrics.chartDeleted'), { variant: 'success' });
       setConfigs((prev) => prev.filter((c) => c.id !== deleteId));
     } catch (err) {
-      enqueueSnackbar(t('impactMetrics.chartDeleteFailed'), { variant: 'error' });
+      enqueueSnackbar(t('impactMetrics.chartDeleteFailed'), {
+        variant: 'error',
+      });
     } finally {
       setDeleteId(null);
     }
@@ -1243,7 +1366,12 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
             <Typography variant={compact ? 'subtitle1' : 'h6'} fontWeight={600}>
               {t('impactMetrics.chartTitle')}
             </Typography>
-            <Chip label={configs.length} size="small" color="primary" sx={{ height: 20 }} />
+            <Chip
+              label={configs.length}
+              size="small"
+              color="primary"
+              sx={{ height: 20 }}
+            />
           </Box>
         )}
 
@@ -1257,7 +1385,9 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
             onChange={(e) => setLabelFilterInput(e.target.value)}
             InputProps={{
               startAdornment: (
-                <FilterListIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />
+                <FilterListIcon
+                  sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }}
+                />
               ),
             }}
             sx={{
@@ -1312,7 +1442,12 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
               sx={{
                 height: 30,
                 fontSize: '0.75rem',
-                '& .MuiSelect-select': { py: 0.3, display: 'flex', alignItems: 'center', gap: 0.5 },
+                '& .MuiSelect-select': {
+                  py: 0.3,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                },
               }}
               renderValue={(val) => (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -1332,7 +1467,11 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
 
           {/* Manual Refresh */}
           <Tooltip title={t('common.refresh')}>
-            <IconButton size="small" onClick={handleManualRefresh} sx={{ p: 0.5 }}>
+            <IconButton
+              size="small"
+              onClick={handleManualRefresh}
+              sx={{ p: 0.5 }}
+            >
               <RefreshIcon
                 fontSize="small"
                 sx={{
@@ -1354,7 +1493,10 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
           {/* Auto-arrange */}
           {canManage && (
             <Tooltip title={t('impactMetrics.autoArrange')}>
-              <IconButton size="small" onClick={() => setShowAutoArrangeConfirm(true)}>
+              <IconButton
+                size="small"
+                onClick={() => setShowAutoArrangeConfirm(true)}
+              >
                 <GridViewIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -1451,7 +1593,9 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
                 onDelete={() => handleDeleteClick(config.id)}
                 onEdit={() => handleOpenEditDialog(config)}
                 onExpand={() => setExpandedConfig(config)}
-                onChartTypeChange={(chartType) => handleChartTypeChange(config.id, chartType)}
+                onChartTypeChange={(chartType) =>
+                  handleChartTypeChange(config.id, chartType)
+                }
                 globalRange={globalRange}
                 refreshKey={refreshKey}
                 globalLabelFilter={debouncedLabelFilter}
@@ -1488,7 +1632,11 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
           <Typography variant="h6" fontWeight={700} sx={{ flex: 1 }}>
             {expandedConfig?.title || t('impactMetrics.expandedView')}
           </Typography>
-          <Button variant="outlined" onClick={() => setExpandedConfig(null)} size="small">
+          <Button
+            variant="outlined"
+            onClick={() => setExpandedConfig(null)}
+            size="small"
+          >
             {t('common.close')}
           </Button>
         </DialogTitle>

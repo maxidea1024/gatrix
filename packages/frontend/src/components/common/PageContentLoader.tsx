@@ -1,5 +1,11 @@
 import React from 'react';
-import { Box, CircularProgress, SxProps, Theme, keyframes } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  SxProps,
+  Theme,
+  keyframes,
+} from '@mui/material';
 import { DeferredComponent } from './DeferredComponent';
 
 const slideUpFadeIn = keyframes`
@@ -43,7 +49,14 @@ const PageContentLoader: React.FC<PageContentLoaderProps> = ({
   if (loading) {
     return (
       <DeferredComponent shouldRender={loading} delay={spinnerDelay}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8, ...((sx as object) || {}) }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            py: 8,
+            ...((sx as object) || {}),
+          }}
+        >
           <CircularProgress size={28} />
         </Box>
       </DeferredComponent>

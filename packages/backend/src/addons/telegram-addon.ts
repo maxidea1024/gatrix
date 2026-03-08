@@ -22,8 +22,15 @@ export class TelegramAddon extends Addon {
     const { botToken, chatId, parse_mode } = parameters;
 
     if (!botToken || !chatId) {
-      this.logger.warn(`Missing Telegram configuration for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing bot token or chat ID');
+      this.logger.warn(
+        `Missing Telegram configuration for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing bot token or chat ID'
+      );
       return;
     }
 

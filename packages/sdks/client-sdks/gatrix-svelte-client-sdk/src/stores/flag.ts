@@ -18,7 +18,8 @@ function proxyToFlagState(proxy: FlagProxy): FlagState {
     enabled: proxy.enabled,
     variantName: proxy.variant.name,
     variantEnabled: proxy.variant.enabled,
-    variantValue: proxy.variant.value != null ? String(proxy.variant.value) : '',
+    variantValue:
+      proxy.variant.value != null ? String(proxy.variant.value) : '',
   };
 }
 
@@ -39,7 +40,10 @@ function proxyToFlagState(proxy: FlagProxy): FlagState {
  * {/if}
  * ```
  */
-export function flagState(flagName: string, forceRealtime = true): Readable<FlagState> {
+export function flagState(
+  flagName: string,
+  forceRealtime = true
+): Readable<FlagState> {
   const client = getGatrixClient();
   const initial: FlagState = {
     enabled: client.features.isEnabled(flagName, forceRealtime),
@@ -77,14 +81,22 @@ export function flagState(flagName: string, forceRealtime = true): Readable<Flag
  * {/if}
  * ```
  */
-export function flag(flagName: string, forceRealtime = true): Readable<boolean> {
+export function flag(
+  flagName: string,
+  forceRealtime = true
+): Readable<boolean> {
   const client = getGatrixClient();
-  return readable<boolean>(client.features.isEnabled(flagName, forceRealtime), (set) => {
-    const watchFn = forceRealtime
-      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
-      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
-    return watchFn(flagName, (proxy) => {
-      set(proxy.enabled);
-    });
-  });
+  return readable<boolean>(
+    client.features.isEnabled(flagName, forceRealtime),
+    (set) => {
+      const watchFn = forceRealtime
+        ? client.features.watchRealtimeFlagWithInitialState.bind(
+            client.features
+          )
+        : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+      return watchFn(flagName, (proxy) => {
+        set(proxy.enabled);
+      });
+    }
+  );
 }

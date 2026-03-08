@@ -168,7 +168,11 @@ const UserPresence: React.FC<UserPresenceProps> = ({
   const renderUserInfo = () => (
     <Box sx={{ minWidth: 0, flex: 1 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Typography variant={size === 'small' ? 'body2' : 'body1'} sx={{ fontWeight: 500 }} noWrap>
+        <Typography
+          variant={size === 'small' ? 'body2' : 'body1'}
+          sx={{ fontWeight: 500 }}
+          noWrap
+        >
           {user.name || user.username}
         </Typography>
       </Box>
@@ -214,7 +218,9 @@ const UserPresence: React.FC<UserPresenceProps> = ({
           </Typography>
           {showStatus && (
             <Tooltip title={getStatusText(user.status)}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>{getStatusIcon(user.status)}</Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                {getStatusIcon(user.status)}
+              </Box>
             </Tooltip>
           )}
         </Box>
@@ -234,11 +240,19 @@ const UserPresence: React.FC<UserPresenceProps> = ({
                   @{user.username}
                 </Typography>
               )}
-              <Typography variant="caption" color="inherit" sx={{ display: 'block' }}>
+              <Typography
+                variant="caption"
+                color="inherit"
+                sx={{ display: 'block' }}
+              >
                 {getStatusText(user.status)}
               </Typography>
               {showLastSeen && user.status === 'offline' && (
-                <Typography variant="caption" color="inherit" sx={{ display: 'block' }}>
+                <Typography
+                  variant="caption"
+                  color="inherit"
+                  sx={{ display: 'block' }}
+                >
                   {formatLastSeen(user.lastSeenAt)}
                 </Typography>
               )}

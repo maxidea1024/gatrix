@@ -3,7 +3,11 @@
 
 import { setContext } from 'svelte';
 import { writable, type Writable } from 'svelte/store';
-import { GatrixClient, EVENTS, type GatrixClientConfig } from '@gatrix/gatrix-js-client-sdk';
+import {
+  GatrixClient,
+  EVENTS,
+  type GatrixClientConfig,
+} from '@gatrix/gatrix-js-client-sdk';
 import {
   GATRIX_CLIENT_KEY,
   GATRIX_READY_KEY,

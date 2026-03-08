@@ -114,7 +114,11 @@ const TypingIndicator: React.FC<TypingIndicatorProps> = ({ users }) => {
       </Box>
 
       {/* Typing Text */}
-      <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ fontStyle: 'italic' }}
+      >
         {getTypingText()}
       </Typography>
 

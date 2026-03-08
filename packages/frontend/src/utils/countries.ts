@@ -27,7 +27,11 @@ export const getFlagUrl = (countryCode: string, displaySize = 20): string => {
  */
 export const COUNTRIES: Country[] = [
   { code: 'ad', name: 'Andorra', native: 'Andorra' },
-  { code: 'ae', name: 'United Arab Emirates', native: 'الإمارات العربية المتحدة' },
+  {
+    code: 'ae',
+    name: 'United Arab Emirates',
+    native: 'الإمارات العربية المتحدة',
+  },
   { code: 'af', name: 'Afghanistan', native: 'افغانستان' },
   { code: 'ag', name: 'Antigua and Barbuda', native: 'Antigua and Barbuda' },
   { code: 'ai', name: 'Anguilla', native: 'Anguilla' },
@@ -60,7 +64,11 @@ export const COUNTRIES: Country[] = [
   { code: 'bz', name: 'Belize', native: 'Belize' },
   { code: 'ca', name: 'Canada', native: 'Canada' },
   { code: 'cd', name: 'DR Congo', native: 'République démocratique du Congo' },
-  { code: 'cf', name: 'Central African Republic', native: 'République centrafricaine' },
+  {
+    code: 'cf',
+    name: 'Central African Republic',
+    native: 'République centrafricaine',
+  },
   { code: 'cg', name: 'Republic of the Congo', native: 'République du Congo' },
   { code: 'ch', name: 'Switzerland', native: 'Schweiz' },
   { code: 'ci', name: "Côte d'Ivoire", native: "Côte d'Ivoire" },
@@ -122,7 +130,11 @@ export const COUNTRIES: Country[] = [
   { code: 'kh', name: 'Cambodia', native: 'កម្ពុជា' },
   { code: 'ki', name: 'Kiribati', native: 'Kiribati' },
   { code: 'km', name: 'Comoros', native: 'جزر القمر' },
-  { code: 'kn', name: 'Saint Kitts and Nevis', native: 'Saint Kitts and Nevis' },
+  {
+    code: 'kn',
+    name: 'Saint Kitts and Nevis',
+    native: 'Saint Kitts and Nevis',
+  },
   { code: 'kp', name: 'North Korea', native: '조선민주주의인민공화국' },
   { code: 'kr', name: 'South Korea', native: '대한민국' },
   { code: 'kw', name: 'Kuwait', native: 'الكويت' },

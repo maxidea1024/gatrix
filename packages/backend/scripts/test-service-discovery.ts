@@ -41,7 +41,13 @@ try {
 }
 
 const SERVER_TYPES = ['world', 'auth', 'channel', 'chat', 'lobby', 'match'];
-const STATUSES = ['initializing', 'ready', 'shutting_down', 'error', 'terminated'] as const;
+const STATUSES = [
+  'initializing',
+  'ready',
+  'shutting_down',
+  'error',
+  'terminated',
+] as const;
 const DEFAULT_TTL = 30; // seconds
 const HEARTBEAT_INTERVAL = 15; // seconds
 const INACTIVE_KEEP_TTL = 60; // How long to keep inactive services visible in UI
@@ -225,7 +231,10 @@ async function registerToStorage(server: ActiveServer) {
       await redisClient.setex(key, DEFAULT_TTL, value);
     }
   } catch (error) {
-    console.error(`❌ Failed to register ${server.type}:${server.instanceId}:`, error);
+    console.error(
+      `❌ Failed to register ${server.type}:${server.instanceId}:`,
+      error
+    );
   }
 }
 
@@ -268,7 +277,10 @@ async function updateStatusInStorage(server: ActiveServer) {
       await redisClient.setex(key, DEFAULT_TTL, value);
     }
   } catch (error) {
-    console.error(`❌ Failed to update ${server.type}:${server.instanceId}:`, error);
+    console.error(
+      `❌ Failed to update ${server.type}:${server.instanceId}:`,
+      error
+    );
   }
 }
 
@@ -300,7 +312,10 @@ async function unregisterFromStorage(server: ActiveServer) {
       await redisClient.del(key);
     }
   } catch (error) {
-    console.error(`❌ Failed to unregister ${server.type}:${server.instanceId}:`, error);
+    console.error(
+      `❌ Failed to unregister ${server.type}:${server.instanceId}:`,
+      error
+    );
   }
 }
 
@@ -381,13 +396,17 @@ async function registerServer(
           }, 2000);
         } else {
           server.status = 'shutting_down';
-          console.log(`🔴 Server shutting down: ${server.type}:${server.instanceId}`);
+          console.log(
+            `🔴 Server shutting down: ${server.type}:${server.instanceId}`
+          );
           await updateStatusInStorage(server);
 
           // Change to terminated after 2 seconds
           setTimeout(async () => {
             server.status = 'terminated';
-            console.log(`⚫ Server terminated: ${server.type}:${server.instanceId}`);
+            console.log(
+              `⚫ Server terminated: ${server.type}:${server.instanceId}`
+            );
 
             // Update with long TTL (1 hour)
             const key =
@@ -416,8 +435,10 @@ async function registerServer(
             }
 
             // Stop heartbeat
-            if (server.heartbeatInterval) clearInterval(server.heartbeatInterval);
-            if (server.stateUpdateInterval) clearInterval(server.stateUpdateInterval);
+            if (server.heartbeatInterval)
+              clearInterval(server.heartbeatInterval);
+            if (server.stateUpdateInterval)
+              clearInterval(server.stateUpdateInterval);
           }, 2000);
         }
       }, server.lifespan);
@@ -434,7 +455,9 @@ async function registerServer(
  * Unregister a server
  */
 async function unregisterServer(instanceId: string, type: string) {
-  const index = activeServers.findIndex((s) => s.instanceId === instanceId && s.type === type);
+  const index = activeServers.findIndex(
+    (s) => s.instanceId === instanceId && s.type === type
+  );
   if (index === -1) {
     console.error(`❌ Server not found: ${type}:${instanceId}`);
     return;
@@ -546,7 +569,8 @@ async function main() {
     for (let i = 0; i < count; i++) {
       let lifespan: number | undefined;
       if (minLifespan && maxLifespan) {
-        lifespan = minLifespan + Math.floor(Math.random() * (maxLifespan - minLifespan));
+        lifespan =
+          minLifespan + Math.floor(Math.random() * (maxLifespan - minLifespan));
       }
       await registerServer(false, undefined, lifespan);
       // Small delay between spawns

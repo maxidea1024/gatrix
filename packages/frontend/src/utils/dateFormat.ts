@@ -80,7 +80,9 @@ export const formatDate = (date: string | Date | null | undefined): string => {
 /**
  * Format date/time - using user settings format
  */
-export const formatDateTime = (date: string | Date | null | undefined): string => {
+export const formatDateTime = (
+  date: string | Date | null | undefined
+): string => {
   if (!date) return '-';
   try {
     const d = toDayjs(date);
@@ -93,7 +95,9 @@ export const formatDateTime = (date: string | Date | null | undefined): string =
 /**
  * Detailed format - using user settings format as-is
  */
-export const formatDateTimeDetailed = (date: string | Date | null | undefined): string => {
+export const formatDateTimeDetailed = (
+  date: string | Date | null | undefined
+): string => {
   return formatDateTime(date);
 };
 
@@ -101,7 +105,9 @@ export const formatDateTimeDetailed = (date: string | Date | null | undefined): 
  * Unified format for UI display (YYYY-MM-DD HH:mm:ss 고정)
  * 테이블, 리스트 등에서 일관된 시간 표시를 위해 Used
  */
-export const formatDateTimeUI = (date: string | Date | null | undefined): string => {
+export const formatDateTimeUI = (
+  date: string | Date | null | undefined
+): string => {
   if (!date) return '-';
   try {
     const d = toDayjs(date);
@@ -114,7 +120,10 @@ export const formatDateTimeUI = (date: string | Date | null | undefined): string
 /**
  * Output with custom format (using configured timezone)
  */
-export const formatWith = (date: string | Date | null | undefined, format: string): string => {
+export const formatWith = (
+  date: string | Date | null | undefined,
+  format: string
+): string => {
   if (!date) return '-';
   const d = toDayjs(date);
   return d ? d.format(format) : '-';
@@ -136,7 +145,9 @@ export const formatDuration = (milliseconds: number): string => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
   if (minutes < 60) {
-    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+    return remainingSeconds > 0
+      ? `${minutes}m ${remainingSeconds}s`
+      : `${minutes}m`;
   }
 
   const hours = Math.floor(minutes / 60);
@@ -249,7 +260,9 @@ export const isToday = (date: string | Date | null | undefined): boolean => {
   }
 };
 
-export const isYesterday = (date: string | Date | null | undefined): boolean => {
+export const isYesterday = (
+  date: string | Date | null | undefined
+): boolean => {
   if (!date) return false;
   try {
     const d = toDayjs(date);
@@ -296,7 +309,9 @@ export const getDateLocale = (currentLang?: string): string => {
  * const date = parseUTCForPicker("2025-10-20T03:00:00.000Z");
  * <DateTimePicker value={date} />
  */
-export const parseUTCForPicker = (utcDateString: string | null | undefined): Dayjs | null => {
+export const parseUTCForPicker = (
+  utcDateString: string | null | undefined
+): Dayjs | null => {
   if (!utcDateString) return null;
 
   try {

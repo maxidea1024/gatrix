@@ -30,7 +30,10 @@ import changeRequestService, {
   ActionGroup,
   ChangeItem,
 } from '@/services/changeRequestService';
-import { formatChangeRequestTitle, getTableLocalizationKey } from '@/utils/changeRequestFormatter';
+import {
+  formatChangeRequestTitle,
+  getTableLocalizationKey,
+} from '@/utils/changeRequestFormatter';
 
 interface SubmitPreviewDrawerProps {
   open: boolean;
@@ -60,9 +63,13 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
   const [reason, setReason] = useState('');
 
   // Track checked state for action groups and items
-  const [checkedGroups, setCheckedGroups] = useState<Record<string, boolean>>({});
+  const [checkedGroups, setCheckedGroups] = useState<Record<string, boolean>>(
+    {}
+  );
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+    {}
+  );
 
   // Initialize checked state when CR changes
   useEffect(() => {
@@ -108,7 +115,11 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
     }
   };
 
-  const handleItemCheck = (itemId: string, groupId: string | undefined, checked: boolean) => {
+  const handleItemCheck = (
+    itemId: string,
+    groupId: string | undefined,
+    checked: boolean
+  ) => {
     setCheckedItems((prev) => ({ ...prev, [itemId]: checked }));
 
     // Update group check state based on its items
@@ -116,8 +127,12 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
       const group = changeRequest?.actionGroups?.find((g) => g.id === groupId);
       if (group?.changeItems) {
         const newItemsState = { ...checkedItems, [itemId]: checked };
-        const allChecked = group.changeItems.every((item) => newItemsState[item.id]);
-        const someChecked = group.changeItems.some((item) => newItemsState[item.id]);
+        const allChecked = group.changeItems.every(
+          (item) => newItemsState[item.id]
+        );
+        const someChecked = group.changeItems.some(
+          (item) => newItemsState[item.id]
+        );
         setCheckedGroups((prev) => ({ ...prev, [groupId]: allChecked }));
       }
     }
@@ -214,12 +229,16 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
       defaultWidth={650}
       minWidth={500}
     >
-      <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box
+        sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}
+      >
         {/* Header */}
         <Paper sx={{ p: 2, mb: 3, bgcolor: alpha('#2196f3', 0.1) }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
             <SendIcon color="primary" />
-            <Typography variant="h6">{t('changeRequest.submitPreviewTitle')}</Typography>
+            <Typography variant="h6">
+              {t('changeRequest.submitPreviewTitle')}
+            </Typography>
           </Box>
           <Typography variant="body2" color="text.secondary">
             {t('changeRequest.submitPreviewDesc')}
@@ -257,7 +276,11 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
         {/* Action Groups */}
         <Box sx={{ flex: 1, overflow: 'auto', mb: 3 }}>
           {changeRequest.actionGroups?.map((group) => (
-            <Paper key={group.id} variant="outlined" sx={{ mb: 2, overflow: 'hidden' }}>
+            <Paper
+              key={group.id}
+              variant="outlined"
+              sx={{ mb: 2, overflow: 'hidden' }}
+            >
               {/* Group Header */}
               <Box
                 sx={{
@@ -286,7 +309,9 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
                 />
                 <ExpandMoreIcon
                   sx={{
-                    transform: expandedGroups[group.id] ? 'rotate(0deg)' : 'rotate(-90deg)',
+                    transform: expandedGroups[group.id]
+                      ? 'rotate(0deg)'
+                      : 'rotate(-90deg)',
                     transition: 'transform 0.2s',
                     fontSize: 20,
                   }}
@@ -313,14 +338,18 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
                         gap: 1,
                         p: 1,
                         borderRadius: 1,
-                        bgcolor: checkedItems[item.id] ? 'transparent' : alpha('#f44336', 0.05),
+                        bgcolor: checkedItems[item.id]
+                          ? 'transparent'
+                          : alpha('#f44336', 0.05),
                         opacity: checkedItems[item.id] ? 1 : 0.6,
                         '&:hover': { bgcolor: 'action.hover' },
                       }}
                     >
                       <Checkbox
                         checked={checkedItems[item.id] ?? true}
-                        onChange={(e) => handleItemCheck(item.id, group.id, e.target.checked)}
+                        onChange={(e) =>
+                          handleItemCheck(item.id, group.id, e.target.checked)
+                        }
                         size="small"
                       />
                       <Box sx={{ flex: 1 }}>
@@ -334,20 +363,28 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
                         >
                           {getOpTypeIcon((item as any).opType || 'UPDATE')}
                           <Typography variant="body2" fontWeight={500}>
-                            {t(getTableLocalizationKey(item.targetTable))}: {item.targetId}
+                            {t(getTableLocalizationKey(item.targetTable))}:{' '}
+                            {item.targetId}
                           </Typography>
                           <Chip
-                            label={getOpTypeLabel((item as any).opType || 'UPDATE')}
+                            label={getOpTypeLabel(
+                              (item as any).opType || 'UPDATE'
+                            )}
                             size="small"
                             sx={{ height: 20, fontSize: 11 }}
                           />
                         </Box>
                         {/* Show ops count for UPDATE */}
-                        {(item as any).opType === 'UPDATE' && (item as any).ops?.length > 0 && (
-                          <Typography variant="caption" color="text.secondary">
-                            {(item as any).ops.length} {t('changeRequest.fieldChanges')}
-                          </Typography>
-                        )}
+                        {(item as any).opType === 'UPDATE' &&
+                          (item as any).ops?.length > 0 && (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {(item as any).ops.length}{' '}
+                              {t('changeRequest.fieldChanges')}
+                            </Typography>
+                          )}
                       </Box>
                     </Box>
                   ))}
@@ -364,12 +401,15 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Checkbox
                     checked={checkedItems[item.id] ?? true}
-                    onChange={(e) => handleItemCheck(item.id, undefined, e.target.checked)}
+                    onChange={(e) =>
+                      handleItemCheck(item.id, undefined, e.target.checked)
+                    }
                     size="small"
                   />
                   {getOpTypeIcon((item as any).opType || 'UPDATE')}
                   <Typography variant="body2">
-                    {t(getTableLocalizationKey(item.targetTable))}: {item.targetId}
+                    {t(getTableLocalizationKey(item.targetTable))}:{' '}
+                    {item.targetId}
                   </Typography>
                 </Box>
               </Paper>
@@ -393,7 +433,9 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
           <Button
             variant="contained"
             color="primary"
-            startIcon={isSubmitting ? <CircularProgress size={16} /> : <SendIcon />}
+            startIcon={
+              isSubmitting ? <CircularProgress size={16} /> : <SendIcon />
+            }
             onClick={handleSubmit}
             disabled={isSubmitting || selectedCount === 0}
           >

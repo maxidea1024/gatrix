@@ -9,7 +9,9 @@ const router = Router();
 const createMessageSchema = Joi.object({
   channelId: Joi.number().integer().required(),
   content: Joi.string().min(1).max(10000).required(),
-  contentType: Joi.string().valid('text', 'image', 'video', 'audio', 'file', 'location').optional(),
+  contentType: Joi.string()
+    .valid('text', 'image', 'video', 'audio', 'file', 'location')
+    .optional(),
   messageData: Joi.object({
     mentions: Joi.array().items(Joi.number().integer()).optional(),
     hashtags: Joi.array().items(Joi.string()).optional(),
@@ -172,7 +174,11 @@ const updateMessageSchema = Joi.object({
 });
 
 const batchDeleteSchema = Joi.object({
-  messageIds: Joi.array().items(Joi.number().integer()).min(1).max(100).required(),
+  messageIds: Joi.array()
+    .items(Joi.number().integer())
+    .min(1)
+    .max(100)
+    .required(),
 });
 
 // 모든 라우트에 인증 미들웨어 적용

@@ -7,7 +7,15 @@ const logger = createLogger('jobExecutionController');
 // Job 실행 이력 Get list
 export const getJobExecutions = async (req: Request, res: Response) => {
   try {
-    const { jobId, scheduleId, status, dateFrom, dateTo, limit = 50, offset = 0 } = req.query;
+    const {
+      jobId,
+      scheduleId,
+      status,
+      dateFrom,
+      dateTo,
+      limit = 50,
+      offset = 0,
+    } = req.query;
 
     const filters: any = {};
     if (jobId) filters.jobId = parseInt(jobId as string);
@@ -62,7 +70,10 @@ export const getJobExecution = async (req: Request, res: Response) => {
 };
 
 // Job 실행 통계 조회
-export const getJobExecutionStatistics = async (req: Request, res: Response) => {
+export const getJobExecutionStatistics = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const { date_from, date_to } = req.query;
 

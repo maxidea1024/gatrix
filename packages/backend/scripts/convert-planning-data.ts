@@ -38,7 +38,10 @@ class PlanningDataConverter {
     this.options = options;
   }
 
-  private log(message: string, level: 'info' | 'warn' | 'error' | 'success' = 'info') {
+  private log(
+    message: string,
+    level: 'info' | 'warn' | 'error' | 'success' = 'info'
+  ) {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}]`;
 
@@ -92,7 +95,10 @@ class PlanningDataConverter {
 
       // Run adminToolDataBuilder
       // The builder is located in src/contents/cms directory
-      const builderPath = path.join(__dirname, '../src/contents/cms/adminToolDataBuilder.js');
+      const builderPath = path.join(
+        __dirname,
+        '../src/contents/cms/adminToolDataBuilder.js'
+      );
 
       this.log('Running adminToolDataBuilder...');
 

@@ -88,7 +88,9 @@ if (config.oauth.google.clientId && config.oauth.google.clientSecret) {
       async (accessToken: string, refreshToken: string, profile: any, done) => {
         try {
           // Check if user already exists with this Google account
-          const existingUser = await UserModel.findByEmail(profile.emails[0].value);
+          const existingUser = await UserModel.findByEmail(
+            profile.emails[0].value
+          );
 
           if (existingUser) {
             // User exists, update last login
@@ -130,10 +132,16 @@ if (config.oauth.github.clientId && config.oauth.github.clientSecret) {
         clientSecret: config.oauth.github.clientSecret,
         callbackURL: '/api/v1/auth/github/callback',
       },
-      async (accessToken: string, refreshToken: string, profile: any, done: any) => {
+      async (
+        accessToken: string,
+        refreshToken: string,
+        profile: any,
+        done: any
+      ) => {
         try {
           // GitHub might not provide email in profile, so we need to handle that
-          const email = profile.emails?.[0]?.value || `${profile.username}@github.local`;
+          const email =
+            profile.emails?.[0]?.value || `${profile.username}@github.local`;
 
           // Check if user already exists
           const existingUser = await UserModel.findByEmail(email);
@@ -178,7 +186,12 @@ if (config.oauth.qq.clientId && config.oauth.qq.clientSecret) {
         clientSecret: config.oauth.qq.clientSecret,
         callbackURL: '/api/v1/auth/qq/callback',
       },
-      async (accessToken: string, refreshToken: string, profile: any, done: any) => {
+      async (
+        accessToken: string,
+        refreshToken: string,
+        profile: any,
+        done: any
+      ) => {
         try {
           // QQ profile structure: { id, nickname, figureurl_qq_1, gender, etc. }
           const email = `${profile.id}@qq.local`; // QQ doesn't provide email by default

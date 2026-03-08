@@ -146,7 +146,12 @@ function addDamageText(
   });
 }
 
-function dealDamageToEnemy(gs: GameState, enemy: Enemy, rawDamage: number, isSkill: boolean): void {
+function dealDamageToEnemy(
+  gs: GameState,
+  enemy: Enemy,
+  rawDamage: number,
+  isSkill: boolean
+): void {
   const dmg = Math.max(1, rawDamage);
   enemy.hp -= dmg;
   enemy.hitTimer = 4; // Shorter flash for snappier feel
@@ -179,7 +184,9 @@ function processEnemyDeath(
   const expMult = flags.numberVariation('idle-exp-booster', 1);
   const baseExp = 10 + gs.hero.wave * 5;
   const baseGold = 5 + gs.hero.wave * 3;
-  const gainExp = Math.floor(baseExp * expMult * (enemy.type === 'boss' ? 5 : 1));
+  const gainExp = Math.floor(
+    baseExp * expMult * (enemy.type === 'boss' ? 5 : 1)
+  );
   const gainGold = Math.floor(baseGold * (enemy.type === 'boss' ? 5 : 1));
 
   gs.hero.exp += gainExp;
@@ -388,7 +395,9 @@ export function tick(
   const atkSpeed = 50;
   if (gs.autoAttackTimer >= atkSpeed) {
     gs.autoAttackTimer = 0;
-    const alive = gs.enemies.filter((e) => !e.dead && e.x < CANVAS_W).sort((a, b) => a.x - b.x);
+    const alive = gs.enemies
+      .filter((e) => !e.dead && e.x < CANVAS_W)
+      .sort((a, b) => a.x - b.x);
     if (alive.length > 0) {
       gs.isAttacking = true;
       gs.attackAnimFrame = 0;
@@ -540,7 +549,11 @@ export function tick(
   updateVisuals(gs, d, addLog); // No-op now as it moved up, can remove
 }
 
-function updateVisuals(gs: GameState, d: number, addLog?: (m: string) => void): void {
+function updateVisuals(
+  gs: GameState,
+  d: number,
+  addLog?: (m: string) => void
+): void {
   // Update particles
   for (let i = gs.particles.length - 1; i >= 0; i--) {
     const p = gs.particles[i];
@@ -582,7 +595,8 @@ function updateVisuals(gs: GameState, d: number, addLog?: (m: string) => void): 
           } else {
             gs.inventory.push(item.item);
           }
-          if (addLog) addLog(`📦 Item Acquired: ${item.icon} ${item.item.name}`);
+          if (addLog)
+            addLog(`📦 Item Acquired: ${item.icon} ${item.item.name}`);
           gs.droppedItems.splice(i, 1);
         }
       } else {

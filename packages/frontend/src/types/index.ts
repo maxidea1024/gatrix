@@ -1,6 +1,12 @@
 // User types
 export type SupportedLanguage = 'en' | 'ko' | 'zh';
-export type AuthType = 'local' | 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
+export type AuthType =
+  | 'local'
+  | 'google'
+  | 'github'
+  | 'qq'
+  | 'wechat'
+  | 'baidu';
 
 // 태그 Interface
 export interface Tag {

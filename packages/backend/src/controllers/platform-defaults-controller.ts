@@ -24,125 +24,139 @@ export class PlatformDefaultsController {
    * 모든 플랫Form의 Default values 조회
    * GET /api/v1/admin/platform-defaults
    */
-  static getAllDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = req.environmentId!;
-    const defaults = await PlatformDefaultsService.getAllDefaults(environmentId);
+  static getAllDefaults = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId!;
+      const defaults =
+        await PlatformDefaultsService.getAllDefaults(environmentId);
 
-    res.json({
-      success: true,
-      data: defaults,
-    });
-  });
+      res.json({
+        success: true,
+        data: defaults,
+      });
+    }
+  );
 
   /**
    * 특정 플랫Form의 Default values 조회
    * GET /api/v1/admin/platform-defaults/:platform
    */
-  static getPlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { platform } = req.params;
-    const environmentId = req.environmentId!;
+  static getPlatformDefaults = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { platform } = req.params;
+      const environmentId = req.environmentId!;
 
-    if (!platform) {
-      throw new GatrixError('Platform parameter is required', 400);
-    }
+      if (!platform) {
+        throw new GatrixError('Platform parameter is required', 400);
+      }
 
-    const defaults = await PlatformDefaultsService.getPlatformDefaults(platform, environmentId);
-
-    res.json({
-      success: true,
-      data: {
+      const defaults = await PlatformDefaultsService.getPlatformDefaults(
         platform,
-        defaults,
-      },
-    });
-  });
+        environmentId
+      );
+
+      res.json({
+        success: true,
+        data: {
+          platform,
+          defaults,
+        },
+      });
+    }
+  );
 
   /**
    * 특정 플랫Form의 Set default values
    * PUT /api/v1/admin/platform-defaults/:platform
    */
-  static setPlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { platform } = req.params;
-    const environmentId = req.environmentId!;
+  static setPlatformDefaults = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { platform } = req.params;
+      const environmentId = req.environmentId!;
 
-    if (!platform) {
-      throw new GatrixError('Platform parameter is required', 400);
-    }
+      if (!platform) {
+        throw new GatrixError('Platform parameter is required', 400);
+      }
 
-    // Validate request body
-    const { error, value } = platformDefaultsSchema.validate(req.body);
-    if (error) {
-      throw new GatrixError(error.details[0].message, 400);
-    }
+      // Validate request body
+      const { error, value } = platformDefaultsSchema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
 
-    const defaults: PlatformDefaults = value;
+      const defaults: PlatformDefaults = value;
 
-    await PlatformDefaultsService.setPlatformDefaults(
-      platform,
-      defaults,
-      (req.user as any).userId,
-      environmentId
-    );
-
-    res.json({
-      success: true,
-      message: `Platform defaults updated for ${platform}`,
-      data: {
+      await PlatformDefaultsService.setPlatformDefaults(
         platform,
         defaults,
-      },
-    });
-  });
+        (req.user as any).userId,
+        environmentId
+      );
+
+      res.json({
+        success: true,
+        message: `Platform defaults updated for ${platform}`,
+        data: {
+          platform,
+          defaults,
+        },
+      });
+    }
+  );
 
   /**
    * 모든 플랫Form의 Default values 일괄 Settings
    * PUT /api/v1/admin/platform-defaults
    */
-  static setAllDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = req.environmentId!;
+  static setAllDefaults = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = req.environmentId!;
 
-    // Validate request body
-    const { error, value } = allDefaultsSchema.validate(req.body);
-    if (error) {
-      throw new GatrixError(error.details[0].message, 400);
+      // Validate request body
+      const { error, value } = allDefaultsSchema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
+
+      const defaultsMap: PlatformDefaultsMap = value;
+
+      await PlatformDefaultsService.setAllDefaults(
+        defaultsMap,
+        (req.user as any).userId,
+        environmentId
+      );
+
+      res.json({
+        success: true,
+        message: 'All platform defaults updated',
+        data: defaultsMap,
+      });
     }
-
-    const defaultsMap: PlatformDefaultsMap = value;
-
-    await PlatformDefaultsService.setAllDefaults(
-      defaultsMap,
-      (req.user as any).userId,
-      environmentId
-    );
-
-    res.json({
-      success: true,
-      message: 'All platform defaults updated',
-      data: defaultsMap,
-    });
-  });
+  );
 
   /**
    * 특정 플랫Form의 Default values Delete
    * DELETE /api/v1/admin/platform-defaults/:platform
    */
-  static deletePlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { platform } = req.params;
-    const environmentId = req.environmentId!;
+  static deletePlatformDefaults = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { platform } = req.params;
+      const environmentId = req.environmentId!;
 
-    if (!platform) {
-      throw new GatrixError('Platform parameter is required', 400);
+      if (!platform) {
+        throw new GatrixError('Platform parameter is required', 400);
+      }
+
+      await PlatformDefaultsService.deletePlatformDefaults(
+        platform,
+        (req.user as any).userId,
+        environmentId
+      );
+
+      res.json({
+        success: true,
+        message: `Platform defaults deleted for ${platform}`,
+      });
     }
-
-    await PlatformDefaultsService.deletePlatformDefaults(
-      platform,
-      (req.user as any).userId,
-      environmentId
-    );
-
-    res.json({
-      success: true,
-      message: `Platform defaults deleted for ${platform}`,
-    });
-  });
+  );
 }

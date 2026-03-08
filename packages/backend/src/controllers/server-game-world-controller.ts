@@ -34,7 +34,8 @@ export class ServerGameWorldController {
       const toBoolean = (value: any): boolean => {
         if (typeof value === 'boolean') return value;
         if (typeof value === 'number') return value === 1;
-        if (typeof value === 'string') return value === '1' || value.toLowerCase() === 'true';
+        if (typeof value === 'string')
+          return value === '1' || value.toLowerCase() === 'true';
         return false;
       };
 
@@ -71,7 +72,10 @@ export class ServerGameWorldController {
           const { TagService } = await import('../services/tag-service');
           const worldsWithTags = await Promise.all(
             allWorlds.map(async (world) => {
-              const tags = await TagService.listTagsForEntity('game_world', world.id);
+              const tags = await TagService.listTagsForEntity(
+                'game_world',
+                world.id
+              );
               // Convert tags to array of tag names only
               const tagNames = tags ? tags.map((tag: any) => tag.name) : [];
 
@@ -100,11 +104,16 @@ export class ServerGameWorldController {
                   worldData.maintenanceMessage = world.maintenanceMessage;
                 }
                 // Include all maintenance locales if they exist
-                if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
-                  worldData.maintenanceLocales = world.maintenanceLocales.map((locale: any) => ({
-                    lang: locale.lang,
-                    message: locale.message,
-                  }));
+                if (
+                  world.maintenanceLocales &&
+                  world.maintenanceLocales.length > 0
+                ) {
+                  worldData.maintenanceLocales = world.maintenanceLocales.map(
+                    (locale: any) => ({
+                      lang: locale.lang,
+                      message: locale.message,
+                    })
+                  );
                 }
               }
 
@@ -167,15 +176,21 @@ export class ServerGameWorldController {
         });
       }
 
-      const world = await GameWorldService.getGameWorldById(worldId, environmentId);
+      const world = await GameWorldService.getGameWorldById(
+        worldId,
+        environmentId
+      );
 
-      logger.info(`Server SDK: Retrieved game world ${worldId} for environmentId ${environmentId}`);
+      logger.info(
+        `Server SDK: Retrieved game world ${worldId} for environmentId ${environmentId}`
+      );
 
       // Helper function to convert MySQL BOOLEAN (0/1) to boolean
       const toBoolean = (value: any): boolean => {
         if (typeof value === 'boolean') return value;
         if (typeof value === 'number') return value === 1;
-        if (typeof value === 'string') return value === '1' || value.toLowerCase() === 'true';
+        if (typeof value === 'string')
+          return value === '1' || value.toLowerCase() === 'true';
         return false;
       };
 
@@ -224,10 +239,12 @@ export class ServerGameWorldController {
         }
         // Include all maintenance locales if they exist
         if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
-          worldData.maintenanceLocales = world.maintenanceLocales.map((locale: any) => ({
-            lang: locale.lang,
-            message: locale.message,
-          }));
+          worldData.maintenanceLocales = world.maintenanceLocales.map(
+            (locale: any) => ({
+              lang: locale.lang,
+              message: locale.message,
+            })
+          );
         }
       }
 
@@ -240,7 +257,10 @@ export class ServerGameWorldController {
         },
       });
     } catch (error) {
-      logger.error('Error in ServerGameWorldController.getGameWorldById:', error);
+      logger.error(
+        'Error in ServerGameWorldController.getGameWorldById:',
+        error
+      );
       res.status(500).json({
         success: false,
         error: {
@@ -281,7 +301,10 @@ export class ServerGameWorldController {
         });
       }
 
-      const world = await GameWorldService.getGameWorldByWorldId(worldId, environmentId);
+      const world = await GameWorldService.getGameWorldByWorldId(
+        worldId,
+        environmentId
+      );
 
       logger.info(
         `Server SDK: Retrieved game world by worldId: ${worldId} for environmentId ${environmentId}`
@@ -291,7 +314,8 @@ export class ServerGameWorldController {
       const toBoolean = (value: any): boolean => {
         if (typeof value === 'boolean') return value;
         if (typeof value === 'number') return value === 1;
-        if (typeof value === 'string') return value === '1' || value.toLowerCase() === 'true';
+        if (typeof value === 'string')
+          return value === '1' || value.toLowerCase() === 'true';
         return false;
       };
 
@@ -334,10 +358,12 @@ export class ServerGameWorldController {
         }
         // Include all maintenance locales if they exist
         if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
-          worldData.maintenanceLocales = world.maintenanceLocales.map((locale: any) => ({
-            lang: locale.lang,
-            message: locale.message,
-          }));
+          worldData.maintenanceLocales = world.maintenanceLocales.map(
+            (locale: any) => ({
+              lang: locale.lang,
+              message: locale.message,
+            })
+          );
         }
       }
 
@@ -350,7 +376,10 @@ export class ServerGameWorldController {
         },
       });
     } catch (error) {
-      logger.error('Error in ServerGameWorldController.getGameWorldByWorldId:', error);
+      logger.error(
+        'Error in ServerGameWorldController.getGameWorldByWorldId:',
+        error
+      );
       res.status(500).json({
         success: false,
         error: {

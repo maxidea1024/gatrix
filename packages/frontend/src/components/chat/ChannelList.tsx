@@ -47,7 +47,10 @@ interface ChannelListProps {
   onChannelSettings?: (channel: Channel) => void;
 }
 
-const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSettings }) => {
+const ChannelList: React.FC<ChannelListProps> = ({
+  onCreateChannel,
+  onChannelSettings,
+}) => {
   const { t, i18n } = useTranslation();
   const { state, actions } = useChat();
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,7 +73,8 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
   const filteredChannels = state.channels.filter(
     (channel) =>
       channel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (channel.description && channel.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      (channel.description &&
+        channel.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   // 채널 Status 디버깅 (필요시 주석 Unregister)
@@ -105,7 +109,10 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
     [state.currentChannelId, actions]
   );
 
-  const handleChannelMenu = (event: React.MouseEvent<HTMLElement>, channel: Channel) => {
+  const handleChannelMenu = (
+    event: React.MouseEvent<HTMLElement>,
+    channel: Channel
+  ) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
     setSelectedChannel(channel);
@@ -163,10 +170,13 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
 
   const getChannelSubtitle = (channel: Channel) => {
     if (channel.lastMessage) {
-      const timeAgo = formatDistanceToNow(new Date(channel.lastMessage.createdAt), {
-        addSuffix: true,
-        locale: getDateLocale(),
-      });
+      const timeAgo = formatDistanceToNow(
+        new Date(channel.lastMessage.createdAt),
+        {
+          addSuffix: true,
+          locale: getDateLocale(),
+        }
+      );
 
       const content =
         channel.lastMessage.content.length > 30
@@ -278,7 +288,9 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
                   >
                     <ListItemIcon sx={{ minWidth: 40 }}>
                       {channel.type === 'direct' ? (
-                        <Avatar sx={{ width: 24, height: 24, fontSize: '0.75rem' }}>
+                        <Avatar
+                          sx={{ width: 24, height: 24, fontSize: '0.75rem' }}
+                        >
                           {channel.name.charAt(0).toUpperCase()}
                         </Avatar>
                       ) : (
@@ -295,7 +307,9 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
                             gap: '8px',
                           }}
                         >
-                          <span style={{ fontWeight: 500 }}>{channel.name}</span>
+                          <span style={{ fontWeight: 500 }}>
+                            {channel.name}
+                          </span>
                           {channel.type === 'private' && (
                             <Chip
                               label={t('chat.private')}
@@ -318,22 +332,29 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
                     />
 
                     <ListItemSecondaryAction>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        {channel.unreadCount > 0 && state.currentChannelId !== channel.id && (
-                          <Chip
-                            label={channel.unreadCount > 99 ? '99+' : channel.unreadCount}
-                            size="small"
-                            color="error"
-                            sx={{
-                              height: 18,
-                              fontSize: '0.65rem',
-                              fontWeight: 'bold',
-                              '& .MuiChip-label': {
-                                px: 0.75,
-                              },
-                            }}
-                          />
-                        )}
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
+                        {channel.unreadCount > 0 &&
+                          state.currentChannelId !== channel.id && (
+                            <Chip
+                              label={
+                                channel.unreadCount > 99
+                                  ? '99+'
+                                  : channel.unreadCount
+                              }
+                              size="small"
+                              color="error"
+                              sx={{
+                                height: 18,
+                                fontSize: '0.65rem',
+                                fontWeight: 'bold',
+                                '& .MuiChip-label': {
+                                  px: 0.75,
+                                },
+                              }}
+                            />
+                          )}
 
                         <IconButton
                           size="small"
@@ -389,7 +410,9 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
         aria-labelledby="leave-channel-dialog-title"
         aria-describedby="leave-channel-dialog-description"
       >
-        <DialogTitle id="leave-channel-dialog-title">{t('chat.leaveChannelConfirm')}</DialogTitle>
+        <DialogTitle id="leave-channel-dialog-title">
+          {t('chat.leaveChannelConfirm')}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="leave-channel-dialog-description">
             {t('chat.leaveChannelMessage')} "{channelToLeave?.name}"?
@@ -401,7 +424,11 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
           <Button onClick={handleCancelLeave} color="primary">
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleConfirmLeave} color="error" variant="contained">
+          <Button
+            onClick={handleConfirmLeave}
+            color="error"
+            variant="contained"
+          >
             {t('chat.leaveChannel')}
           </Button>
         </DialogActions>

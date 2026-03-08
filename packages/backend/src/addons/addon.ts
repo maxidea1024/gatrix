@@ -7,7 +7,10 @@
 
 import { createLogger } from '../config/logger';
 import type { Logger as WinstonLogger } from 'winston';
-import { IntegrationEventModel, IntegrationEventState } from '../models/integration-event';
+import {
+  IntegrationEventModel,
+  IntegrationEventState,
+} from '../models/integration-event';
 import { IntegrationSystemEvent } from '../types/integration-events';
 import type { AddonDefinition } from './definitions';
 
@@ -89,8 +92,15 @@ export abstract class Addon {
         }
 
         // Non-retryable status codes
-        if (response.status >= 400 && response.status < 500 && response.status !== 429) {
-          throw new HttpError(response.status, `HTTP ${response.status}: ${response.statusText}`);
+        if (
+          response.status >= 400 &&
+          response.status < 500 &&
+          response.status !== 429
+        ) {
+          throw new HttpError(
+            response.status,
+            `HTTP ${response.status}: ${response.statusText}`
+          );
         }
 
         // Retryable error
@@ -99,13 +109,17 @@ export abstract class Addon {
           `HTTP ${response.status}: ${response.statusText}`
         );
         lastStatusCode = response.status;
-        this.logger.warn(`Attempt ${attempt + 1}/${retries + 1} failed: ${lastError.message}`);
+        this.logger.warn(
+          `Attempt ${attempt + 1}/${retries + 1} failed: ${lastError.message}`
+        );
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         if (error instanceof HttpError) {
           lastStatusCode = error.statusCode;
         }
-        this.logger.warn(`Attempt ${attempt + 1}/${retries + 1} failed: ${lastError.message}`);
+        this.logger.warn(
+          `Attempt ${attempt + 1}/${retries + 1} failed: ${lastError.message}`
+        );
       }
 
       // Wait before retry (exponential backoff)
@@ -182,7 +196,9 @@ export abstract class Addon {
   /**
    * Parse custom headers from string format
    */
-  protected parseCustomHeaders(headersString: string | undefined): Record<string, string> {
+  protected parseCustomHeaders(
+    headersString: string | undefined
+  ): Record<string, string> {
     if (!headersString) {
       return {};
     }

@@ -8,7 +8,11 @@
 
 import { Request, Response } from 'express';
 import serviceDiscoveryService from '../services/service-discovery-service';
-import { sendInternalError, sendSuccessResponse, ErrorCodes } from '../utils/api-response';
+import {
+  sendInternalError,
+  sendSuccessResponse,
+  ErrorCodes,
+} from '../utils/api-response';
 
 class ServiceDiscoveryController {
   /**
@@ -18,7 +22,10 @@ class ServiceDiscoveryController {
   async getServices(req: Request, res: Response) {
     try {
       const { type, group } = req.query;
-      const services = await serviceDiscoveryService.getServices(type as string, group as string);
+      const services = await serviceDiscoveryService.getServices(
+        type as string,
+        group as string
+      );
 
       return sendSuccessResponse(res, services);
     } catch (error) {

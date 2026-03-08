@@ -97,7 +97,11 @@ interface AccountDialogProps {
   open: boolean;
   account: ServiceAccount | null;
   onClose: () => void;
-  onSave: (data: { name: string; roleIds: string[]; environmentId: string }) => void;
+  onSave: (data: {
+    name: string;
+    roleIds: string[];
+    environmentId: string;
+  }) => void;
 }
 
 // Environment type to color mapping (same as EnvironmentSelector)
@@ -122,51 +126,68 @@ interface CachedEnv {
   color?: string;
 }
 
-const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, onSave }) => {
+const AccountDialog: React.FC<AccountDialogProps> = ({
+  open,
+  account,
+  onClose,
+  onSave,
+}) => {
   const { t } = useTranslation();
   const { organisations, projects } = useOrgProject();
   const [name, setName] = useState('');
-  const [selectedEnvironmentId, setSelectedEnvironmentId] = useState<string>('');
+  const [selectedEnvironmentId, setSelectedEnvironmentId] =
+    useState<string>('');
   const [selectedEnvLabel, setSelectedEnvLabel] = useState<string>('');
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
   const [rolesLoading, setRolesLoading] = useState(false);
 
   // Environment tree picker state
-  const [envPickerAnchor, setEnvPickerAnchor] = useState<HTMLElement | null>(null);
+  const [envPickerAnchor, setEnvPickerAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set());
-  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
-  const [projectEnvCache, setProjectEnvCache] = useState<Record<string, CachedEnv[]>>({});
-  const [loadingProjectIds, setLoadingProjectIds] = useState<Set<string>>(new Set());
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(
+    new Set()
+  );
+  const [projectEnvCache, setProjectEnvCache] = useState<
+    Record<string, CachedEnv[]>
+  >({});
+  const [loadingProjectIds, setLoadingProjectIds] = useState<Set<string>>(
+    new Set()
+  );
   const loadedRef = useRef<Set<string>>(new Set());
 
   // Lazy-load environments for a project on expand
-  const loadProjectEnvs = useCallback(async (projectId: string, orgId: string) => {
-    if (loadedRef.current.has(projectId)) return;
-    loadedRef.current.add(projectId);
-    setLoadingProjectIds((prev) => new Set(prev).add(projectId));
-    try {
-      const apiPath = `/admin/orgs/${orgId}/projects/${projectId}`;
-      const envs = await environmentService.getEnvironments(apiPath, true);
-      setProjectEnvCache((prev) => ({
-        ...prev,
-        [projectId]: envs.map((e) => ({
-          environmentId: e.environmentId,
-          displayName: e.displayName,
-          environmentType: e.environmentType,
-          color: e.color,
-        })),
-      }));
-    } catch {
-      loadedRef.current.delete(projectId);
-    } finally {
-      setLoadingProjectIds((prev) => {
-        const next = new Set(prev);
-        next.delete(projectId);
-        return next;
-      });
-    }
-  }, []);
+  const loadProjectEnvs = useCallback(
+    async (projectId: string, orgId: string) => {
+      if (loadedRef.current.has(projectId)) return;
+      loadedRef.current.add(projectId);
+      setLoadingProjectIds((prev) => new Set(prev).add(projectId));
+      try {
+        const apiPath = `/admin/orgs/${orgId}/projects/${projectId}`;
+        const envs = await environmentService.getEnvironments(apiPath, true);
+        setProjectEnvCache((prev) => ({
+          ...prev,
+          [projectId]: envs.map((e) => ({
+            environmentId: e.environmentId,
+            displayName: e.displayName,
+            environmentType: e.environmentType,
+            color: e.color,
+          })),
+        }));
+      } catch {
+        loadedRef.current.delete(projectId);
+      } finally {
+        setLoadingProjectIds((prev) => {
+          const next = new Set(prev);
+          next.delete(projectId);
+          return next;
+        });
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (open) {
@@ -185,7 +206,9 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
           const roles = await rbacService.getRoles();
           setAllRoles(roles);
           if (account) {
-            const userRoles = await rbacService.getUserRoles(String(account.id));
+            const userRoles = await rbacService.getUserRoles(
+              String(account.id)
+            );
             setSelectedRoleIds(userRoles.map((ur) => ur.roleId));
           }
         } catch {
@@ -200,13 +223,19 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
 
   const handleToggleRole = (roleId: string) => {
     setSelectedRoleIds((prev) =>
-      prev.includes(roleId) ? prev.filter((id) => id !== roleId) : [...prev, roleId]
+      prev.includes(roleId)
+        ? prev.filter((id) => id !== roleId)
+        : [...prev, roleId]
     );
   };
 
   const handleSave = () => {
     if (!name.trim() || !selectedEnvironmentId) return;
-    onSave({ name: name.trim(), roleIds: selectedRoleIds, environmentId: selectedEnvironmentId });
+    onSave({
+      name: name.trim(),
+      roleIds: selectedRoleIds,
+      environmentId: selectedEnvironmentId,
+    });
   };
 
   // Environment tree handlers
@@ -320,15 +349,24 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                 height: 10,
                 borderRadius: 0.5,
                 backgroundColor: envColor,
-                boxShadow: isSelected ? `0 0 6px ${alpha(envColor, 0.6)}` : 'none',
+                boxShadow: isSelected
+                  ? `0 0 6px ${alpha(envColor, 0.6)}`
+                  : 'none',
               }}
             />
           </ListItemIcon>
           <ListItemText
             primary={env.displayName}
-            primaryTypographyProps={{ variant: 'body2', fontWeight: isSelected ? 600 : 400 }}
+            primaryTypographyProps={{
+              variant: 'body2',
+              fontWeight: isSelected ? 600 : 400,
+            }}
           />
-          {isSelected && <CheckIcon sx={{ fontSize: 18, color: 'success.main', ml: 'auto' }} />}
+          {isSelected && (
+            <CheckIcon
+              sx={{ fontSize: 18, color: 'success.main', ml: 'auto' }}
+            />
+          )}
         </ListItemButton>
       );
     });
@@ -338,7 +376,11 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={account ? t('serviceAccounts.editAccount') : t('serviceAccounts.createAccount')}
+      title={
+        account
+          ? t('serviceAccounts.editAccount')
+          : t('serviceAccounts.createAccount')
+      }
       subtitle={t('serviceAccounts.drawerSubtitle')}
       storageKey="serviceAccountDrawerWidth"
       defaultWidth={500}
@@ -358,7 +400,10 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
       >
         {/* Basic Info */}
         <Paper variant="outlined" sx={{ p: 2 }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+          >
             {t('serviceAccounts.basicInfo')}
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -392,7 +437,9 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                   py: 1,
                   borderRadius: 1,
                   border: '1px solid',
-                  borderColor: selectedEnvironmentId ? 'primary.main' : 'divider',
+                  borderColor: selectedEnvironmentId
+                    ? 'primary.main'
+                    : 'divider',
                   bgcolor: selectedEnvironmentId
                     ? (theme) =>
                         alpha(
@@ -411,20 +458,26 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                   <PublicIcon
                     sx={{
                       fontSize: 18,
-                      color: selectedEnvironmentId ? 'primary.main' : 'text.disabled',
+                      color: selectedEnvironmentId
+                        ? 'primary.main'
+                        : 'text.disabled',
                     }}
                   />
                   <Typography
                     variant="body2"
                     sx={{
                       fontWeight: selectedEnvironmentId ? 600 : 400,
-                      color: selectedEnvironmentId ? 'text.primary' : 'text.secondary',
+                      color: selectedEnvironmentId
+                        ? 'text.primary'
+                        : 'text.secondary',
                     }}
                   >
                     {selectedEnvLabel || t('serviceAccounts.selectEnvironment')}
                   </Typography>
                 </Box>
-                <ArrowDropDownIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                <ArrowDropDownIcon
+                  sx={{ fontSize: 20, color: 'text.secondary' }}
+                />
               </ButtonBase>
 
               {/* Environment tree popover */}
@@ -450,8 +503,11 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
               >
                 <Box sx={{ py: 0.5 }}>
                   {organisations.map((org) => {
-                    const isOrgExpanded = expandedOrgs.has(org.id) || !isMultiOrg;
-                    const orgProjects = projects.filter((p) => p.orgId === org.id);
+                    const isOrgExpanded =
+                      expandedOrgs.has(org.id) || !isMultiOrg;
+                    const orgProjects = projects.filter(
+                      (p) => p.orgId === org.id
+                    );
 
                     return (
                       <React.Fragment key={org.id}>
@@ -470,11 +526,16 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                               )}
                             </ListItemIcon>
                             <ListItemIcon sx={{ minWidth: 24 }}>
-                              <BusinessIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                              <BusinessIcon
+                                sx={{ fontSize: 16, opacity: 0.7 }}
+                              />
                             </ListItemIcon>
                             <ListItemText
                               primary={org.displayName || org.orgName}
-                              primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }}
+                              primaryTypographyProps={{
+                                variant: 'body2',
+                                fontWeight: 500,
+                              }}
                             />
                           </ListItemButton>
                         )}
@@ -482,14 +543,18 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                         {/* Projects */}
                         <Collapse in={isOrgExpanded} timeout="auto">
                           {orgProjects.map((proj) => {
-                            const isProjExpanded = expandedProjects.has(proj.id);
+                            const isProjExpanded = expandedProjects.has(
+                              proj.id
+                            );
                             const projIndent = isMultiOrg ? 4 : 1.5;
                             const envIndent = projIndent + 3.5;
 
                             return (
                               <React.Fragment key={proj.id}>
                                 <ListItemButton
-                                  onClick={() => handleToggleProject(proj.id, org.id)}
+                                  onClick={() =>
+                                    handleToggleProject(proj.id, org.id)
+                                  }
                                   dense
                                   sx={{ py: 0.5, pl: projIndent }}
                                 >
@@ -501,11 +566,18 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                                     )}
                                   </ListItemIcon>
                                   <ListItemIcon sx={{ minWidth: 24 }}>
-                                    <FolderIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                                    <FolderIcon
+                                      sx={{ fontSize: 16, opacity: 0.7 }}
+                                    />
                                   </ListItemIcon>
                                   <ListItemText
-                                    primary={proj.displayName || proj.projectName}
-                                    primaryTypographyProps={{ variant: 'body2', fontWeight: 400 }}
+                                    primary={
+                                      proj.displayName || proj.projectName
+                                    }
+                                    primaryTypographyProps={{
+                                      variant: 'body2',
+                                      fontWeight: 400,
+                                    }}
                                   />
                                 </ListItemButton>
 
@@ -527,19 +599,34 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
 
         {/* RBAC Role Assignment */}
         <Paper variant="outlined" sx={{ p: 2 }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+          >
             {t('rbac.roles.title')}
           </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mb: 2, display: 'block' }}
+          >
             {t('serviceAccounts.roleSelectionGuide')}
           </Typography>
 
           {rolesLoading ? (
-            <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ py: 2, textAlign: 'center' }}
+            >
               {t('common.loading')}
             </Typography>
           ) : allRoles.length === 0 ? (
-            <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ py: 2, textAlign: 'center' }}
+            >
               {t('serviceAccounts.noRolesAvailable')}
             </Typography>
           ) : (
@@ -556,7 +643,11 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                       cursor: 'pointer',
                       borderColor: isSelected ? 'primary.main' : 'divider',
                       bgcolor: isSelected ? 'action.selected' : 'transparent',
-                      '&:hover': { bgcolor: isSelected ? 'action.selected' : 'action.hover' },
+                      '&:hover': {
+                        bgcolor: isSelected
+                          ? 'action.selected'
+                          : 'action.hover',
+                      },
                       transition: 'all 0.15s',
                     }}
                     onClick={() => handleToggleRole(role.id)}
@@ -568,7 +659,10 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                           color: isSelected ? 'primary.main' : 'text.disabled',
                         }}
                       />
-                      <Typography variant="body2" fontWeight={isSelected ? 600 : 400}>
+                      <Typography
+                        variant="body2"
+                        fontWeight={isSelected ? 600 : 400}
+                      >
                         {role.roleName}
                       </Typography>
                       {isSelected && (
@@ -581,7 +675,11 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                       )}
                     </Box>
                     {role.description && (
-                      <Typography variant="caption" color="text.secondary" sx={{ ml: 3 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ ml: 3 }}
+                      >
                         {role.description}
                       </Typography>
                     )}
@@ -629,7 +727,12 @@ interface TokenDialogProps {
   onCreated: () => void;
 }
 
-const TokenDialog: React.FC<TokenDialogProps> = ({ open, accountId, onClose, onCreated }) => {
+const TokenDialog: React.FC<TokenDialogProps> = ({
+  open,
+  accountId,
+  onClose,
+  onCreated,
+}) => {
   const { t } = useTranslation();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
@@ -650,15 +753,23 @@ const TokenDialog: React.FC<TokenDialogProps> = ({ open, accountId, onClose, onC
     if (!accountId || !tokenName.trim()) return;
     setLoading(true);
     try {
-      const result = await serviceAccountService.createToken(projectApiPath, accountId, {
-        name: tokenName.trim(),
-        description: description.trim() || undefined,
-      });
+      const result = await serviceAccountService.createToken(
+        projectApiPath,
+        accountId,
+        {
+          name: tokenName.trim(),
+          description: description.trim() || undefined,
+        }
+      );
       setCreatedToken(result.secret);
       onCreated();
-      enqueueSnackbar(t('serviceAccounts.tokenCreatedSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('serviceAccounts.tokenCreatedSuccess'), {
+        variant: 'success',
+      });
     } catch {
-      enqueueSnackbar(t('serviceAccounts.tokenCreateFailed'), { variant: 'error' });
+      enqueueSnackbar(t('serviceAccounts.tokenCreateFailed'), {
+        variant: 'error',
+      });
     } finally {
       setLoading(false);
     }
@@ -705,8 +816,13 @@ const TokenDialog: React.FC<TokenDialogProps> = ({ open, accountId, onClose, onC
                       copyToClipboardWithNotification(
                         createdToken,
                         () =>
-                          enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                          enqueueSnackbar(t('common.copiedToClipboard'), {
+                            variant: 'success',
+                          }),
+                        () =>
+                          enqueueSnackbar(t('common.copyFailed'), {
+                            variant: 'error',
+                          })
                       )
                     }
                   >
@@ -807,7 +923,9 @@ const ServiceAccountsPage: React.FC = () => {
 
   // Detail drawer state
   const [detailOpen, setDetailOpen] = useState(false);
-  const [detailAccount, setDetailAccount] = useState<ServiceAccount | null>(null);
+  const [detailAccount, setDetailAccount] = useState<ServiceAccount | null>(
+    null
+  );
   const [detailTab, setDetailTab] = useState(0);
   const [detailTokens, setDetailTokens] = useState<ServiceAccountToken[]>([]);
   const [detailRoles, setDetailRoles] = useState<UserRole[]>([]);
@@ -816,7 +934,8 @@ const ServiceAccountsPage: React.FC = () => {
 
   // Menu state
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [menuTargetAccount, setMenuTargetAccount] = useState<ServiceAccount | null>(null);
+  const [menuTargetAccount, setMenuTargetAccount] =
+    useState<ServiceAccount | null>(null);
 
   const fetchAccounts = useCallback(async () => {
     setLoading(true);
@@ -874,12 +993,18 @@ const ServiceAccountsPage: React.FC = () => {
   const handleAssignRole = async () => {
     if (!detailAccount || !selectedRoleId) return;
     try {
-      await rbacService.assignUserRole(String(detailAccount.id), selectedRoleId);
-      enqueueSnackbar(t('serviceAccounts.roleAssignSuccess'), { variant: 'success' });
+      await rbacService.assignUserRole(
+        String(detailAccount.id),
+        selectedRoleId
+      );
+      enqueueSnackbar(t('serviceAccounts.roleAssignSuccess'), {
+        variant: 'success',
+      });
       setSelectedRoleId(null);
       refreshDetail();
     } catch (error: any) {
-      const msg = error?.response?.data?.message || t('serviceAccounts.roleAssignFailed');
+      const msg =
+        error?.response?.data?.message || t('serviceAccounts.roleAssignFailed');
       enqueueSnackbar(msg, { variant: 'error' });
     }
   };
@@ -888,10 +1013,13 @@ const ServiceAccountsPage: React.FC = () => {
     if (!detailAccount) return;
     try {
       await rbacService.removeUserRole(String(detailAccount.id), roleId);
-      enqueueSnackbar(t('serviceAccounts.roleRemoveSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('serviceAccounts.roleRemoveSuccess'), {
+        variant: 'success',
+      });
       refreshDetail();
     } catch (error: any) {
-      const msg = error?.response?.data?.message || t('serviceAccounts.roleRemoveFailed');
+      const msg =
+        error?.response?.data?.message || t('serviceAccounts.roleRemoveFailed');
       enqueueSnackbar(msg, { variant: 'error' });
     }
   };
@@ -905,16 +1033,24 @@ const ServiceAccountsPage: React.FC = () => {
     try {
       if (editDialog.account) {
         // Update name
-        await serviceAccountService.update(projectApiPath, editDialog.account.id, {
-          name: data.name,
-          environmentId: data.environmentId,
-        });
+        await serviceAccountService.update(
+          projectApiPath,
+          editDialog.account.id,
+          {
+            name: data.name,
+            environmentId: data.environmentId,
+          }
+        );
 
         // Sync roles: get current roles, compute adds/removes
-        const currentRoles = await rbacService.getUserRoles(String(editDialog.account.id));
+        const currentRoles = await rbacService.getUserRoles(
+          String(editDialog.account.id)
+        );
         const currentRoleIds = currentRoles.map((r) => r.roleId);
         const toAdd = data.roleIds.filter((id) => !currentRoleIds.includes(id));
-        const toRemove = currentRoleIds.filter((id) => !data.roleIds.includes(id));
+        const toRemove = currentRoleIds.filter(
+          (id) => !data.roleIds.includes(id)
+        );
 
         await Promise.all([
           ...toAdd.map((roleId) =>
@@ -925,7 +1061,9 @@ const ServiceAccountsPage: React.FC = () => {
           ),
         ]);
 
-        enqueueSnackbar(t('serviceAccounts.updateSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('serviceAccounts.updateSuccess'), {
+          variant: 'success',
+        });
       } else {
         // Create account then assign roles
         const created = await serviceAccountService.create(projectApiPath, {
@@ -935,17 +1073,23 @@ const ServiceAccountsPage: React.FC = () => {
 
         if (data.roleIds.length > 0) {
           await Promise.all(
-            data.roleIds.map((roleId) => rbacService.assignUserRole(String(created.id), roleId))
+            data.roleIds.map((roleId) =>
+              rbacService.assignUserRole(String(created.id), roleId)
+            )
           );
         }
 
-        enqueueSnackbar(t('serviceAccounts.createSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('serviceAccounts.createSuccess'), {
+          variant: 'success',
+        });
       }
       setEditDialog({ open: false, account: null });
       fetchAccounts();
     } catch {
       enqueueSnackbar(
-        editDialog.account ? t('serviceAccounts.updateFailed') : t('serviceAccounts.createFailed'),
+        editDialog.account
+          ? t('serviceAccounts.updateFailed')
+          : t('serviceAccounts.createFailed'),
         { variant: 'error' }
       );
     }
@@ -955,15 +1099,22 @@ const ServiceAccountsPage: React.FC = () => {
     if (!deleteDialog) return;
     try {
       if (deleteDialog.type === 'account') {
-        await serviceAccountService.delete(projectApiPath, deleteDialog.accountId);
-        enqueueSnackbar(t('serviceAccounts.deleteSuccess'), { variant: 'success' });
+        await serviceAccountService.delete(
+          projectApiPath,
+          deleteDialog.accountId
+        );
+        enqueueSnackbar(t('serviceAccounts.deleteSuccess'), {
+          variant: 'success',
+        });
       } else if (deleteDialog.tokenId) {
         await serviceAccountService.deleteToken(
           projectApiPath,
           deleteDialog.accountId,
           deleteDialog.tokenId
         );
-        enqueueSnackbar(t('serviceAccounts.tokenDeleteSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('serviceAccounts.tokenDeleteSuccess'), {
+          variant: 'success',
+        });
         refreshDetail();
       }
       setDeleteDialog(null);
@@ -974,7 +1125,9 @@ const ServiceAccountsPage: React.FC = () => {
   };
 
   // Compute available roles (exclude already assigned)
-  const availableRoles = allRoles.filter((r) => !detailRoles.some((ur) => ur.roleId === r.id));
+  const availableRoles = allRoles.filter(
+    (r) => !detailRoles.some((ur) => ur.roleId === r.id)
+  );
 
   return (
     <Box sx={{ p: 3 }}>
@@ -996,7 +1149,11 @@ const ServiceAccountsPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchAccounts}>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={fetchAccounts}
+          >
             {t('common.refresh')}
           </Button>
           {accounts.length > 0 && canCreate && (
@@ -1016,8 +1173,14 @@ const ServiceAccountsPage: React.FC = () => {
         {accounts.length === 0 ? (
           <EmptyPagePlaceholder
             message={t('serviceAccounts.noAccounts')}
-            onAddClick={canCreate ? () => setEditDialog({ open: true, account: null }) : undefined}
-            addButtonLabel={canCreate ? t('serviceAccounts.createAccount') : undefined}
+            onAddClick={
+              canCreate
+                ? () => setEditDialog({ open: true, account: null })
+                : undefined
+            }
+            addButtonLabel={
+              canCreate ? t('serviceAccounts.createAccount') : undefined
+            }
           />
         ) : (
           <TableContainer component={Paper} variant="outlined">
@@ -1028,7 +1191,9 @@ const ServiceAccountsPage: React.FC = () => {
                   <TableCell>{t('serviceAccounts.environment')}</TableCell>
                   <TableCell align="center">{t('rbac.roles.title')}</TableCell>
                   <TableCell>{t('serviceAccounts.status')}</TableCell>
-                  <TableCell align="center">{t('serviceAccounts.tokens')}</TableCell>
+                  <TableCell align="center">
+                    {t('serviceAccounts.tokens')}
+                  </TableCell>
                   <TableCell>{t('serviceAccounts.createdAt')}</TableCell>
                   <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
@@ -1037,7 +1202,9 @@ const ServiceAccountsPage: React.FC = () => {
                 {loading ? (
                   <TableRow>
                     <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
-                      <Typography color="text.secondary">{t('common.loading')}</Typography>
+                      <Typography color="text.secondary">
+                        {t('common.loading')}
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -1049,7 +1216,9 @@ const ServiceAccountsPage: React.FC = () => {
                       onClick={() => handleViewDetails(account)}
                     >
                       <TableCell>
-                        <Typography fontWeight="medium">{account.name}</Typography>
+                        <Typography fontWeight="medium">
+                          {account.name}
+                        </Typography>
                         <Typography variant="caption" color="text.secondary">
                           {account.email}
                         </Typography>
@@ -1085,7 +1254,9 @@ const ServiceAccountsPage: React.FC = () => {
                               : t('serviceAccounts.inactive')
                           }
                           size="small"
-                          color={account.status === 'active' ? 'success' : 'default'}
+                          color={
+                            account.status === 'active' ? 'success' : 'default'
+                          }
                           sx={{ borderRadius: '8px' }}
                         />
                       </TableCell>
@@ -1099,7 +1270,9 @@ const ServiceAccountsPage: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        <Tooltip title={formatDateTimeDetailed(account.createdAt)}>
+                        <Tooltip
+                          title={formatDateTimeDetailed(account.createdAt)}
+                        >
                           <Typography variant="body2">
                             {formatRelativeTime(account.createdAt)}
                           </Typography>
@@ -1138,7 +1311,8 @@ const ServiceAccountsPage: React.FC = () => {
         {canUpdate && (
           <MenuItem
             onClick={() => {
-              if (menuTargetAccount) setEditDialog({ open: true, account: menuTargetAccount });
+              if (menuTargetAccount)
+                setEditDialog({ open: true, account: menuTargetAccount });
               setMenuAnchorEl(null);
               setMenuTargetAccount(null);
             }}
@@ -1182,7 +1356,14 @@ const ServiceAccountsPage: React.FC = () => {
         defaultWidth={550}
         minWidth={450}
       >
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
           <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
             <Tabs value={detailTab} onChange={(_, v) => setDetailTab(v)}>
               <Tab
@@ -1207,7 +1388,10 @@ const ServiceAccountsPage: React.FC = () => {
                   variant="contained"
                   startIcon={<AddIcon />}
                   onClick={() =>
-                    setTokenDialog({ open: true, accountId: detailAccount?.id || null })
+                    setTokenDialog({
+                      open: true,
+                      accountId: detailAccount?.id || null,
+                    })
                   }
                 >
                   {t('serviceAccounts.addToken')}
@@ -1234,8 +1418,17 @@ const ServiceAccountsPage: React.FC = () => {
                         }}
                       >
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                            <TokenIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1,
+                              mb: 0.5,
+                            }}
+                          >
+                            <TokenIcon
+                              sx={{ fontSize: 16, color: 'primary.main' }}
+                            />
                             <Typography variant="body2" fontWeight={600} noWrap>
                               {token.name}
                             </Typography>
@@ -1249,8 +1442,12 @@ const ServiceAccountsPage: React.FC = () => {
                               {token.description}
                             </Typography>
                           )}
-                          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                            <Tooltip title={formatDateTimeDetailed(token.createdAt)}>
+                          <Box
+                            sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}
+                          >
+                            <Tooltip
+                              title={formatDateTimeDetailed(token.createdAt)}
+                            >
                               <Chip
                                 label={`${t('serviceAccounts.createdAt')}: ${formatRelativeTime(token.createdAt)}`}
                                 size="small"
@@ -1259,13 +1456,17 @@ const ServiceAccountsPage: React.FC = () => {
                               />
                             </Tooltip>
                             {token.expiresAt && (
-                              <Tooltip title={formatDateTimeDetailed(token.expiresAt)}>
+                              <Tooltip
+                                title={formatDateTimeDetailed(token.expiresAt)}
+                              >
                                 <Chip
                                   label={`${t('serviceAccounts.expiresAt')}: ${formatRelativeTime(token.expiresAt)}`}
                                   size="small"
                                   variant="outlined"
                                   color={
-                                    new Date(token.expiresAt) < new Date() ? 'error' : 'default'
+                                    new Date(token.expiresAt) < new Date()
+                                      ? 'error'
+                                      : 'default'
                                   }
                                   sx={{ height: 22, fontSize: '0.7rem' }}
                                 />
@@ -1306,7 +1507,9 @@ const ServiceAccountsPage: React.FC = () => {
                   size="small"
                   options={availableRoles}
                   getOptionLabel={(opt) => opt.roleName}
-                  value={availableRoles.find((r) => r.id === selectedRoleId) || null}
+                  value={
+                    availableRoles.find((r) => r.id === selectedRoleId) || null
+                  }
                   onChange={(_, val) => setSelectedRoleId(val?.id || null)}
                   renderInput={(params) => (
                     <TextField
@@ -1318,7 +1521,9 @@ const ServiceAccountsPage: React.FC = () => {
                   renderOption={(props, option) => (
                     <li {...props} key={option.id}>
                       <Box>
-                        <Typography variant="body2">{option.roleName}</Typography>
+                        <Typography variant="body2">
+                          {option.roleName}
+                        </Typography>
                         {option.description && (
                           <Typography variant="caption" color="text.secondary">
                             {option.description}
@@ -1351,9 +1556,15 @@ const ServiceAccountsPage: React.FC = () => {
                   {t('serviceAccounts.noRoles')}
                 </Typography>
               ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                <Box
+                  sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}
+                >
                   {detailRoles.map((ur) => (
-                    <Paper key={ur.id} variant="outlined" sx={{ px: 1.5, py: 1 }}>
+                    <Paper
+                      key={ur.id}
+                      variant="outlined"
+                      sx={{ px: 1.5, py: 1 }}
+                    >
                       <Box
                         sx={{
                           display: 'flex',
@@ -1370,13 +1581,19 @@ const ServiceAccountsPage: React.FC = () => {
                             minWidth: 0,
                           }}
                         >
-                          <ShieldIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                          <ShieldIcon
+                            sx={{ fontSize: 16, color: 'primary.main' }}
+                          />
                           <Box sx={{ minWidth: 0 }}>
                             <Typography variant="body2" fontWeight={600} noWrap>
                               {ur.roleName}
                             </Typography>
                             {ur.roleDescription && (
-                              <Typography variant="caption" color="text.secondary" noWrap>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                noWrap
+                              >
                                 {ur.roleDescription}
                               </Typography>
                             )}
@@ -1425,7 +1642,9 @@ const ServiceAccountsPage: React.FC = () => {
               ? t('serviceAccounts.deleteAccount')
               : t('serviceAccounts.deleteToken')
           }
-          message={t('serviceAccounts.deleteConfirmMessage', { name: deleteDialog.name })}
+          message={t('serviceAccounts.deleteConfirmMessage', {
+            name: deleteDialog.name,
+          })}
           onClose={() => setDeleteDialog(null)}
           onConfirm={handleDeleteConfirm}
         />

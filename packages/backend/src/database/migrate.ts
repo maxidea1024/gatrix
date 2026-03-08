@@ -82,7 +82,9 @@ async function main() {
       console.log('Usage:');
       console.log('  npm run migrate up|run     - Run pending migrations');
       console.log('  npm run migrate status     - Show migration status');
-      console.log('  npm run migrate rollback <id> - Rollback specific migration');
+      console.log(
+        '  npm run migrate rollback <id> - Rollback specific migration'
+      );
       process.exit(1);
   }
 

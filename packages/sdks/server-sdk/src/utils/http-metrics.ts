@@ -53,7 +53,11 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
     }
   };
 
-  const getOrCreateCounter = (mName: string, mHelp: string, mLabelNames: string[]) => {
+  const getOrCreateCounter = (
+    mName: string,
+    mHelp: string,
+    mLabelNames: string[]
+  ) => {
     try {
       const existing = registry.getSingleMetric(mName);
       if (existing) return existing;
@@ -103,7 +107,9 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
 
         // Priority: req.route.path (Express route) > req.path (literal path)
 
-        const route = req.route ? (req.route.path as string) : req.path || '/unknown';
+        const route = req.route
+          ? (req.route.path as string)
+          : req.path || '/unknown';
 
         const labels = {
           method: String(req.method || 'GET'),

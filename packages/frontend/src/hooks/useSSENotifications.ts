@@ -226,7 +226,9 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
 
         case 'planning_data_updated':
           // Dispatch custom event for PlanningDataContext to listen
-          window.dispatchEvent(new CustomEvent('planning-data-updated', { detail: event.data }));
+          window.dispatchEvent(
+            new CustomEvent('planning-data-updated', { detail: event.data })
+          );
           break;
 
         case 'maintenance_status_change':
@@ -251,12 +253,16 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
 
         case 'user_role_changed':
           // Dispatch custom event for AuthContext or MainLayout to listen
-          window.dispatchEvent(new CustomEvent('user-role-changed', { detail: event.data }));
+          window.dispatchEvent(
+            new CustomEvent('user-role-changed', { detail: event.data })
+          );
           break;
 
         case 'user_suspended':
           // Dispatch custom event for immediate redirect to suspended page
-          window.dispatchEvent(new CustomEvent('user-suspended', { detail: event.data }));
+          window.dispatchEvent(
+            new CustomEvent('user-suspended', { detail: event.data })
+          );
           break;
 
         case 'change_request_submitted':
@@ -297,12 +303,16 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
 
         case 'entity_lock.released':
           // Dispatch custom event for entity lock release
-          window.dispatchEvent(new CustomEvent('entity-lock-released', { detail: event.data }));
+          window.dispatchEvent(
+            new CustomEvent('entity-lock-released', { detail: event.data })
+          );
           break;
 
         case 'entity_lock.taken_over':
           // Dispatch custom event for entity lock takeover
-          window.dispatchEvent(new CustomEvent('entity-lock-taken-over', { detail: event.data }));
+          window.dispatchEvent(
+            new CustomEvent('entity-lock-taken-over', { detail: event.data })
+          );
           break;
 
         case 'release_flow.milestone_started':
@@ -311,7 +321,9 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         case 'release_flow.plan_resumed':
         case 'release_flow.plan_completed':
           // Dispatch custom event for release flow updates
-          window.dispatchEvent(new CustomEvent('release-flow-updated', { detail: event.data }));
+          window.dispatchEvent(
+            new CustomEvent('release-flow-updated', { detail: event.data })
+          );
           break;
 
         default:
@@ -349,7 +361,8 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   const handleMailReceived = useCallback(
     (data: any) => {
       const { senderName, subject, priority } = data;
-      const priorityIcon = priority === 'urgent' || priority === 'high' ? '🔴 ' : '';
+      const priorityIcon =
+        priority === 'urgent' || priority === 'high' ? '🔴 ' : '';
       enqueueSnackbar(
         `${priorityIcon}${t('mailbox.newMailFrom', { sender: senderName })}: ${subject}`,
         {
@@ -373,17 +386,20 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       }
 
       try {
-        const response = await fetch('/api/v1/admin/notifications/sse/subscribe', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            clientId: 'current', // Server will identify client by session
-            channels,
-          }),
-        });
+        const response = await fetch(
+          '/api/v1/admin/notifications/sse/subscribe',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              clientId: 'current', // Server will identify client by session
+              channels,
+            }),
+          }
+        );
 
         if (response.ok) {
           return true;
@@ -408,17 +424,20 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       }
 
       try {
-        const response = await fetch('/api/v1/admin/notifications/sse/unsubscribe', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            clientId: 'current',
-            channels,
-          }),
-        });
+        const response = await fetch(
+          '/api/v1/admin/notifications/sse/unsubscribe',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              clientId: 'current',
+              channels,
+            }),
+          }
+        );
 
         if (response.ok) {
           return true;

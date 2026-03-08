@@ -35,7 +35,9 @@ async function main(): Promise<void> {
     // Initialize token mirror service (for local token validation)
     // This comes after SDK initialization since backend should be ready at this point
     await tokenMirrorService.initialize();
-    logger.info(`Token mirror initialized with ${tokenMirrorService.getTokenCount()} tokens`);
+    logger.info(
+      `Token mirror initialized with ${tokenMirrorService.getTokenCount()} tokens`
+    );
 
     // Initialize environment registry (org/project/env tree management)
     await environmentRegistry.initialize();
@@ -47,7 +49,8 @@ async function main(): Promise<void> {
     await tokenUsageTracker.initialize();
 
     // Initialize Flag Streaming Service (SSE for SDK clients)
-    const { flagStreamingService } = await import('./services/flag-streaming-service');
+    const { flagStreamingService } =
+      await import('./services/flag-streaming-service');
     await flagStreamingService.start();
     logger.info('Flag Streaming Service initialized');
 
@@ -57,7 +60,10 @@ async function main(): Promise<void> {
     // Handle WebSocket upgrade for flag streaming
     server.on('upgrade', async (request, socket, head) => {
       try {
-        const url = new URL(request.url || '', `http://${request.headers.host}`);
+        const url = new URL(
+          request.url || '',
+          `http://${request.headers.host}`
+        );
         const wsPathMatch = url.pathname.match(
           /^\/api\/v1\/client\/features\/([^/]+)\/stream\/ws$/
         );
@@ -88,7 +94,11 @@ async function main(): Promise<void> {
         }
 
         // Validate token via tokenMirrorService
-        const result = tokenMirrorService.validateToken(apiToken, 'client', environmentId);
+        const result = tokenMirrorService.validateToken(
+          apiToken,
+          'client',
+          environmentId
+        );
         const isUnsecured = UNSECURED_TOKENS.includes(apiToken);
         if (!result.valid && !isUnsecured) {
           socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
@@ -103,9 +113,11 @@ async function main(): Promise<void> {
         }
 
         const connectionId =
-          url.searchParams.get('connectionId') || (request.headers['x-connection-id'] as string);
+          url.searchParams.get('connectionId') ||
+          (request.headers['x-connection-id'] as string);
         const sdkVersion =
-          url.searchParams.get('sdkVersion') || (request.headers['x-sdk-version'] as string);
+          url.searchParams.get('sdkVersion') ||
+          (request.headers['x-sdk-version'] as string);
 
         wss.handleUpgrade(request, socket, head, async (ws) => {
           const { ulid } = await import('ulid');
@@ -117,7 +129,11 @@ async function main(): Promise<void> {
             connectionId,
             sdkVersion,
           });
-          await flagStreamingService.addWebSocketClient(clientId, environmentId, ws);
+          await flagStreamingService.addWebSocketClient(
+            clientId,
+            environmentId,
+            ws
+          );
         });
       } catch (err) {
         logger.error('Edge WebSocket upgrade error:', err);

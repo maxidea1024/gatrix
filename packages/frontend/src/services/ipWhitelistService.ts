@@ -78,8 +78,10 @@ export class IpWhitelistService {
     filters: IpWhitelistFilters = {}
   ): Promise<IpWhitelistListResponse> {
     // Ensure page and limit are valid numbers
-    const validPage = typeof page === 'number' && !isNaN(page) && page > 0 ? page : 1;
-    const validLimit = typeof limit === 'number' && !isNaN(limit) && limit > 0 ? limit : 10;
+    const validPage =
+      typeof page === 'number' && !isNaN(page) && page > 0 ? page : 1;
+    const validLimit =
+      typeof limit === 'number' && !isNaN(limit) && limit > 0 ? limit : 10;
 
     const params = new URLSearchParams({
       page: validPage.toString(),
@@ -90,8 +92,10 @@ export class IpWhitelistService {
 
     if (filters.ipAddress) params.append('ipAddress', filters.ipAddress);
     if (filters.purpose) params.append('purpose', filters.purpose);
-    if (filters.isEnabled !== undefined) params.append('isEnabled', filters.isEnabled.toString());
-    if (filters.createdBy) params.append('createdBy', filters.createdBy.toString());
+    if (filters.isEnabled !== undefined)
+      params.append('isEnabled', filters.isEnabled.toString());
+    if (filters.createdBy)
+      params.append('createdBy', filters.createdBy.toString());
     if (filters.search) params.append('search', filters.search);
     if (filters.tags && filters.tags.length > 0) {
       filters.tags.forEach((tag) => params.append('tags', tag));
@@ -124,7 +128,9 @@ export class IpWhitelistService {
     throw new Error('Failed to fetch IP whitelist entry');
   }
 
-  static async createIpWhitelist(data: CreateIpWhitelistData): Promise<IpWhitelist> {
+  static async createIpWhitelist(
+    data: CreateIpWhitelistData
+  ): Promise<IpWhitelist> {
     const response = await apiService.post<any>('/admin/ip-whitelist', data);
 
     if (response?.success && response?.data) {
@@ -134,8 +140,14 @@ export class IpWhitelistService {
     throw new Error('Failed to create IP whitelist entry');
   }
 
-  static async updateIpWhitelist(id: number, data: UpdateIpWhitelistData): Promise<IpWhitelist> {
-    const response = await apiService.put<any>(`/admin/ip-whitelist/${id}`, data);
+  static async updateIpWhitelist(
+    id: number,
+    data: UpdateIpWhitelistData
+  ): Promise<IpWhitelist> {
+    const response = await apiService.put<any>(
+      `/admin/ip-whitelist/${id}`,
+      data
+    );
 
     if (response?.success && response?.data) {
       return response.data;
@@ -153,7 +165,9 @@ export class IpWhitelistService {
   }
 
   static async toggleIpWhitelistStatus(id: number): Promise<IpWhitelist> {
-    const response = await apiService.patch<any>(`/admin/ip-whitelist/${id}/toggle`);
+    const response = await apiService.patch<any>(
+      `/admin/ip-whitelist/${id}/toggle`
+    );
 
     if (response?.success && response?.data) {
       return response.data;
@@ -162,8 +176,12 @@ export class IpWhitelistService {
     throw new Error('Failed to toggle IP whitelist status');
   }
 
-  static async bulkCreateIpWhitelists(entries: BulkCreateIpEntry[]): Promise<BulkCreateResponse> {
-    const response = await apiService.post<any>('/admin/ip-whitelist/bulk', { entries });
+  static async bulkCreateIpWhitelists(
+    entries: BulkCreateIpEntry[]
+  ): Promise<BulkCreateResponse> {
+    const response = await apiService.post<any>('/admin/ip-whitelist/bulk', {
+      entries,
+    });
 
     if (response?.success && response?.data) {
       return response.data;
@@ -174,7 +192,9 @@ export class IpWhitelistService {
 
   static async checkIpWhitelist(ipAddress: string): Promise<IpCheckResponse> {
     const params = new URLSearchParams({ ipAddress });
-    const response = await apiService.get<any>(`/admin/ip-whitelist/check?${params}`);
+    const response = await apiService.get<any>(
+      `/admin/ip-whitelist/check?${params}`
+    );
 
     if (response?.success && response?.data) {
       return response.data;

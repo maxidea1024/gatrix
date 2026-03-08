@@ -30,7 +30,8 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
     },
 
     'lifecycle:cleanup': async (job) => {
-      const { processLifecycleCleanupJob } = await import('./lifecycle-cleanup-scheduler');
+      const { processLifecycleCleanupJob } =
+        await import('./lifecycle-cleanup-scheduler');
       const retentionDays = job.data?.payload?.retentionDays ?? 14;
       const deleted = await processLifecycleCleanupJob(retentionDays);
       logger.info('lifecycle:cleanup completed', { jobId: job.id, deleted });
@@ -67,27 +68,39 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
       const { cleanupOutboxJob } = await import('./outbox-scheduler');
       const outboxRetentionDays = job.data?.payload?.retentionDays ?? 7;
       const outboxDeleted = await cleanupOutboxJob(outboxRetentionDays);
-      logger.info('outbox:cleanup completed', { jobId: job.id, deleted: outboxDeleted });
+      logger.info('outbox:cleanup completed', {
+        jobId: job.id,
+        deleted: outboxDeleted,
+      });
     },
 
     'lock:cleanup': async (job) => {
       const { cleanupLocksJob } = await import('./outbox-scheduler');
       const locksDeleted = await cleanupLocksJob();
-      logger.info('lock:cleanup completed', { jobId: job.id, deleted: locksDeleted });
+      logger.info('lock:cleanup completed', {
+        jobId: job.id,
+        deleted: locksDeleted,
+      });
     },
 
     'unknown-flags:flush': async (job) => {
-      const { processUnknownFlagsFlushJob } = await import('./unknown-flag-service');
+      const { processUnknownFlagsFlushJob } =
+        await import('./unknown-flag-service');
       const result = await processUnknownFlagsFlushJob();
       if (result.flushed > 0 || result.errors > 0) {
-        logger.info('unknown-flags:flush completed', { jobId: job.id, ...result });
+        logger.info('unknown-flags:flush completed', {
+          jobId: job.id,
+          ...result,
+        });
       }
     },
 
     'release-flow:milestone-progression': async (job) => {
       const planId = job.data?.payload?.planId;
       if (!planId) {
-        logger.warn('release-flow:milestone-progression missing planId', { jobId: job.id });
+        logger.warn('release-flow:milestone-progression missing planId', {
+          jobId: job.id,
+        });
         return;
       }
       const { releaseFlowService } = await import('./release-flow-service');
@@ -96,19 +109,23 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
 
       const plan = await ReleaseFlowModel.findById(planId);
       if (!plan || plan.status !== 'active' || plan.discriminator !== 'plan') {
-        logger.info('release-flow:milestone-progression skipped (plan not active)', {
-          jobId: job.id,
-          planId,
-          status: plan?.status,
-        });
+        logger.info(
+          'release-flow:milestone-progression skipped (plan not active)',
+          {
+            jobId: job.id,
+            planId,
+            status: plan?.status,
+          }
+        );
         return;
       }
 
       // Evaluate safeguards before progression
       if (plan.activeMilestoneId) {
-        const { anyTriggered, results } = await safeguardService.evaluateMilestoneSafeguards(
-          plan.activeMilestoneId
-        );
+        const { anyTriggered, results } =
+          await safeguardService.evaluateMilestoneSafeguards(
+            plan.activeMilestoneId
+          );
         if (anyTriggered) {
           const triggeredNames = results
             .filter((r) => r.triggered)
@@ -122,21 +139,30 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
         }
       }
 
-      logger.info(`release-flow:milestone-progression progressing plan ${planId}`);
+      logger.info(
+        `release-flow:milestone-progression progressing plan ${planId}`
+      );
       await releaseFlowService.progressToNextMilestone(planId);
     },
 
     'release-flow:progression-check': async (job) => {
       const { ReleaseFlowScheduler } = await import('./release-flow-scheduler');
       await ReleaseFlowScheduler.getInstance().checkAndProgressMilestones();
-      logger.info('release-flow:progression-check completed', { jobId: job.id });
+      logger.info('release-flow:progression-check completed', {
+        jobId: job.id,
+      });
     },
 
     'signal:process': async (job) => {
-      const { ActionExecutionService } = await import('./action-execution-service');
-      const signalResult = await ActionExecutionService.processUnprocessedSignals();
+      const { ActionExecutionService } =
+        await import('./action-execution-service');
+      const signalResult =
+        await ActionExecutionService.processUnprocessedSignals();
       if (signalResult.processed > 0 || signalResult.errors > 0) {
-        logger.info('signal:process completed', { jobId: job.id, ...signalResult });
+        logger.info('signal:process completed', {
+          jobId: job.id,
+          ...signalResult,
+        });
       }
     },
   };

@@ -12,7 +12,10 @@ export * from './types';
 export { ITokenProvider } from './utils/token-provider';
 
 // Export maintenance watcher types
-export { MaintenanceEventData, MaintenanceStateSnapshot } from './cache/maintenance-watcher';
+export {
+  MaintenanceEventData,
+  MaintenanceStateSnapshot,
+} from './cache/maintenance-watcher';
 
 // Export errors
 export {
@@ -40,10 +43,16 @@ export {
   MetricsServerConfig,
   MetricsServerInstance,
 } from './services/metrics-server';
-export { createHttpMetricsMiddleware, HttpMetricsOptions } from './utils/http-metrics';
+export {
+  createHttpMetricsMiddleware,
+  HttpMetricsOptions,
+} from './utils/http-metrics';
 
 // Export Impact Metrics API
-export { MetricsAPI, ImpactMetricsStaticContext } from './impact-metrics/metric-api';
+export {
+  MetricsAPI,
+  ImpactMetricsStaticContext,
+} from './impact-metrics/metric-api';
 export {
   InMemoryMetricRegistry,
   Counter,
@@ -58,7 +67,11 @@ export {
 // Export environment resolver
 
 // Export cloud metadata detection utilities
-export { CloudMetadata, CloudProvider, detectCloudMetadata } from './utils/cloud-metadata';
+export {
+  CloudMetadata,
+  CloudProvider,
+  detectCloudMetadata,
+} from './utils/cloud-metadata';
 
 // Export Feature Flag Evaluator (from @gatrix/shared)
 export { FeatureFlagEvaluator } from '@gatrix/evaluator';

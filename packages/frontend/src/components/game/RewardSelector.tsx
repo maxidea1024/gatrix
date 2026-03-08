@@ -59,7 +59,8 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
   const [loadingTemplates, setLoadingTemplates] = useState(false);
   const [showModeChangeWarning, setShowModeChangeWarning] = useState(false);
   const [pendingMode, setPendingMode] = useState<RewardMode | null>(null);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>(initialTemplateId);
+  const [selectedTemplateId, setSelectedTemplateId] =
+    useState<string>(initialTemplateId);
 
   // Load templates on mount
   useEffect(() => {
@@ -90,9 +91,12 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
   const loadTemplates = async () => {
     try {
       setLoadingTemplates(true);
-      const response = await rewardTemplateService.getRewardTemplates(projectApiPath, {
-        limit: 100,
-      });
+      const response = await rewardTemplateService.getRewardTemplates(
+        projectApiPath,
+        {
+          limit: 100,
+        }
+      );
       setTemplates(response.templates);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('rewardTemplates.errors.loadFailed'), {
@@ -173,7 +177,9 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
           disabled={disabled}
         >
           <MenuItem value="direct">{t('rewardSelector.directMode')}</MenuItem>
-          <MenuItem value="template">{t('rewardSelector.templateMode')}</MenuItem>
+          <MenuItem value="template">
+            {t('rewardSelector.templateMode')}
+          </MenuItem>
         </Select>
       </FormControl>
 
@@ -183,12 +189,19 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
           <Typography variant="subtitle2" sx={{ mb: 2 }}>
             {t('rewardSelector.rewards')}
           </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: 'block', mb: 2 }}
+          >
             {t('rewardSelector.directModeHelp')}
           </Typography>
           <Stack spacing={2}>
             {value.map((reward, index) => (
-              <Box key={index} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+              <Box
+                key={index}
+                sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}
+              >
                 <Box sx={{ flex: 1 }}>
                   <RewardItemSelector
                     value={{
@@ -196,7 +209,9 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
                       itemId: reward.itemId,
                       quantity: reward.quantity,
                     }}
-                    onChange={(selection) => handleRewardChange(index, selection)}
+                    onChange={(selection) =>
+                      handleRewardChange(index, selection)
+                    }
                     disabled={disabled}
                     minQuantity={minQuantity}
                   />
@@ -225,7 +240,10 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
                   borderRadius: 1,
                 }}
               >
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'warning.dark', mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 600, color: 'warning.dark', mb: 2 }}
+                >
                   ⚠️ {t('rewardSelector.noRewards')}
                 </Typography>
                 <Button
@@ -257,7 +275,11 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
       {/* Template Mode */}
       {mode === 'template' && (
         <Box>
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: 'block', mb: 2 }}
+          >
             {t('rewardSelector.templateModeHelp')}
           </Typography>
 
@@ -266,7 +288,11 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
               <CircularProgress />
             </Box>
           ) : templates.length === 0 ? (
-            <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ py: 2, textAlign: 'center' }}
+            >
               {t('rewardSelector.noTemplates')}
             </Typography>
           ) : (
@@ -284,15 +310,20 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
                 {templates.map((template) => (
                   <MenuItem key={template.id} value={template.id}>
                     {template.name}
-                    {template.rewardItems && template.rewardItems.length > 0 && (
-                      <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                        (
-                        {t('rewardSelector.itemCount', {
-                          count: template.rewardItems.length,
-                        })}
-                        )
-                      </Typography>
-                    )}
+                    {template.rewardItems &&
+                      template.rewardItems.length > 0 && (
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ ml: 1 }}
+                        >
+                          (
+                          {t('rewardSelector.itemCount', {
+                            count: template.rewardItems.length,
+                          })}
+                          )
+                        </Typography>
+                      )}
                   </MenuItem>
                 ))}
               </Select>
@@ -304,12 +335,19 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
                 {t('rewardSelector.appliedRewards')}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', mb: 1 }}
+              >
                 {t('rewardSelector.templateReadOnlyHelp')}
               </Typography>
               <Stack spacing={1}>
                 {value.map((reward, index) => (
-                  <Box key={index} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                  <Box
+                    key={index}
+                    sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}
+                  >
                     <Box sx={{ flex: 1 }}>
                       <RewardItemSelector
                         value={{
@@ -331,14 +369,25 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
       )}
 
       {/* Mode Change Warning Dialog */}
-      <Dialog open={showModeChangeWarning} onClose={() => setShowModeChangeWarning(false)}>
+      <Dialog
+        open={showModeChangeWarning}
+        onClose={() => setShowModeChangeWarning(false)}
+      >
         <DialogTitle>{t('rewardSelector.modeChangeWarning')}</DialogTitle>
         <DialogContent>
-          <Typography>{t('rewardSelector.modeChangeWarningMessage')}</Typography>
+          <Typography>
+            {t('rewardSelector.modeChangeWarningMessage')}
+          </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowModeChangeWarning(false)}>{t('common.cancel')}</Button>
-          <Button onClick={handleConfirmModeChange} variant="contained" color="error">
+          <Button onClick={() => setShowModeChangeWarning(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={handleConfirmModeChange}
+            variant="contained"
+            color="error"
+          >
             {t('common.confirm')}
           </Button>
         </DialogActions>

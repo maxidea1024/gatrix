@@ -26,10 +26,14 @@ export function boolVariation(
     client.features.boolVariation(flagName, fallbackValue, forceRealtime),
     (set) => {
       const watchFn = forceRealtime
-        ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+        ? client.features.watchRealtimeFlagWithInitialState.bind(
+            client.features
+          )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
       return watchFn(flagName, () => {
-        set(client.features.boolVariation(flagName, fallbackValue, forceRealtime));
+        set(
+          client.features.boolVariation(flagName, fallbackValue, forceRealtime)
+        );
       });
     }
   );
@@ -51,10 +55,18 @@ export function stringVariation(
     client.features.stringVariation(flagName, fallbackValue, forceRealtime),
     (set) => {
       const watchFn = forceRealtime
-        ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+        ? client.features.watchRealtimeFlagWithInitialState.bind(
+            client.features
+          )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
       return watchFn(flagName, () => {
-        set(client.features.stringVariation(flagName, fallbackValue, forceRealtime));
+        set(
+          client.features.stringVariation(
+            flagName,
+            fallbackValue,
+            forceRealtime
+          )
+        );
       });
     }
   );
@@ -76,10 +88,18 @@ export function numberVariation(
     client.features.numberVariation(flagName, fallbackValue, forceRealtime),
     (set) => {
       const watchFn = forceRealtime
-        ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+        ? client.features.watchRealtimeFlagWithInitialState.bind(
+            client.features
+          )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
       return watchFn(flagName, () => {
-        set(client.features.numberVariation(flagName, fallbackValue, forceRealtime));
+        set(
+          client.features.numberVariation(
+            flagName,
+            fallbackValue,
+            forceRealtime
+          )
+        );
       });
     }
   );
@@ -101,10 +121,14 @@ export function jsonVariation<T = unknown>(
     client.features.jsonVariation(flagName, fallbackValue, forceRealtime),
     (set) => {
       const watchFn = forceRealtime
-        ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+        ? client.features.watchRealtimeFlagWithInitialState.bind(
+            client.features
+          )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
       return watchFn(flagName, () => {
-        set(client.features.jsonVariation(flagName, fallbackValue, forceRealtime));
+        set(
+          client.features.jsonVariation(flagName, fallbackValue, forceRealtime)
+        );
       });
     }
   );
@@ -115,14 +139,25 @@ export function jsonVariation<T = unknown>(
  * @param flagName - Feature flag key
  * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  */
-export function variant(flagName: string, forceRealtime = true): Readable<Variant> {
+export function variant(
+  flagName: string,
+  forceRealtime = true
+): Readable<Variant> {
   const client = getGatrixClient();
-  return readable<Variant>(client.features.getVariant(flagName, forceRealtime), (set) => {
-    const watchFn = forceRealtime
-      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
-      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
-    return watchFn(flagName, (proxy: import('@gatrix/gatrix-js-client-sdk').FlagProxy) => {
-      set(proxy.variant);
-    });
-  });
+  return readable<Variant>(
+    client.features.getVariant(flagName, forceRealtime),
+    (set) => {
+      const watchFn = forceRealtime
+        ? client.features.watchRealtimeFlagWithInitialState.bind(
+            client.features
+          )
+        : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+      return watchFn(
+        flagName,
+        (proxy: import('@gatrix/gatrix-js-client-sdk').FlagProxy) => {
+          set(proxy.variant);
+        }
+      );
+    }
+  );
 }

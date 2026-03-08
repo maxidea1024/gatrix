@@ -96,13 +96,16 @@ const getErrorMessage = (error: any, t: any): string => {
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading, error, clearError, isAuthenticated, user } = useAuth();
+  const { login, isLoading, error, clearError, isAuthenticated, user } =
+    useAuth();
   const { t } = useTranslation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [oauthLoading, setOauthLoading] = useState<string | null>(null); // 'google', 'github', 'qq', etc.
-  const [passwordFieldType, setPasswordFieldType] = useState<'text' | 'password'>('text'); // Start as text to prevent autofill
+  const [passwordFieldType, setPasswordFieldType] = useState<
+    'text' | 'password'
+  >('text'); // Start as text to prevent autofill
   const isWebkit = useMemo(() => {
     if (typeof navigator === 'undefined') return true;
     return /AppleWebKit|Chrome|Safari|Edg/.test(navigator.userAgent);
@@ -134,7 +137,10 @@ const LoginPage: React.FC = () => {
     });
 
     if (!isLoading && isAuthenticated && user?.status === 'active') {
-      devLogger.info('[LoginPage] User already authenticated, redirecting to:', from);
+      devLogger.info(
+        '[LoginPage] User already authenticated, redirecting to:',
+        from
+      );
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, isLoading, user, from, navigate]);
@@ -162,7 +168,10 @@ const LoginPage: React.FC = () => {
   const loginSchema = useMemo(
     () =>
       yup.object({
-        email: yup.string().email(t('auth.emailInvalid')).required(t('auth.emailRequired')),
+        email: yup
+          .string()
+          .email(t('auth.emailInvalid'))
+          .required(t('auth.emailRequired')),
         password: yup
           .string()
           .min(6, t('auth.passwordMinLength'))
@@ -282,7 +291,11 @@ const LoginPage: React.FC = () => {
       devLogger.error('[LoginPage] Login error:', err);
 
       // Handle network errors explicitly
-      if (err.message === 'Network Error' || err.code === 'ERR_NETWORK' || !err.status) {
+      if (
+        err.message === 'Network Error' ||
+        err.code === 'ERR_NETWORK' ||
+        !err.status
+      ) {
         const networkError =
           t('auth.errors.networkError') ||
           '서버에 연결할 수 없습니다. 네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.';
@@ -301,7 +314,10 @@ const LoginPage: React.FC = () => {
         setLoginError(errorMsg);
       } else if (err.status === 403) {
         // Check specific account status
-        if (err.message === 'ACCOUNT_PENDING' || err.error?.message === 'ACCOUNT_PENDING') {
+        if (
+          err.message === 'ACCOUNT_PENDING' ||
+          err.error?.message === 'ACCOUNT_PENDING'
+        ) {
           // Account is pending approval
           navigate('/pending-approval', {
             state: {
@@ -380,7 +396,10 @@ const LoginPage: React.FC = () => {
   };
 
   // 이메일 기억하기 체크박스 변경 핸들러
-  const handleRememberMeChange = (checked: boolean, onChange: (value: boolean) => void) => {
+  const handleRememberMeChange = (
+    checked: boolean,
+    onChange: (value: boolean) => void
+  ) => {
     if (checked) {
       // 체크하려고 할 때 보안 경고 표시
       setPendingRememberMe(true);
@@ -428,7 +447,11 @@ const LoginPage: React.FC = () => {
       </Box>
 
       {/* Login Form */}
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        autoComplete="off"
+      >
         {/* Hidden real-named fields to absorb browser autofill */}
         <input
           type="text"
@@ -528,15 +551,18 @@ const LoginPage: React.FC = () => {
                 '& .MuiInputBase-input': {
                   color: 'white',
                   '&:-webkit-autofill': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                   '&:-webkit-autofill:hover': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                   '&:-webkit-autofill:focus': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                 },
@@ -544,7 +570,9 @@ const LoginPage: React.FC = () => {
                   minHeight: '20px',
                   height: '20px',
                   lineHeight: '20px',
-                  color: errors.email ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                  color: errors.email
+                    ? 'rgba(255, 182, 193, 0.8)'
+                    : 'rgba(255, 255, 255, 0.6)',
                 },
               }}
               inputProps={{
@@ -565,7 +593,9 @@ const LoginPage: React.FC = () => {
               {...field}
               fullWidth
               label={t('auth.password')}
-              type={isWebkit ? 'text' : showPassword ? 'text' : passwordFieldType}
+              type={
+                isWebkit ? 'text' : showPassword ? 'text' : passwordFieldType
+              }
               error={false}
               helperText={t('auth.passwordLoginHelp')}
               margin="normal"
@@ -604,15 +634,18 @@ const LoginPage: React.FC = () => {
                       }
                     : {}),
                   '&:-webkit-autofill': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                   '&:-webkit-autofill:hover': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                   '&:-webkit-autofill:focus': {
-                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitBoxShadow:
+                      '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
                     WebkitTextFillColor: 'white !important',
                   },
                 },
@@ -667,7 +700,9 @@ const LoginPage: React.FC = () => {
                 control={
                   <Checkbox
                     checked={field.value}
-                    onChange={(e) => handleRememberMeChange(e.target.checked, field.onChange)}
+                    onChange={(e) =>
+                      handleRememberMeChange(e.target.checked, field.onChange)
+                    }
                     sx={{
                       color: 'rgba(255, 255, 255, 0.7)',
                       '&.Mui-checked': {
@@ -719,7 +754,13 @@ const LoginPage: React.FC = () => {
             !!errors.email ||
             !!errors.password
           }
-          startIcon={isSubmitting || isLoading ? <CircularProgress size={20} /> : <LoginIcon />}
+          startIcon={
+            isSubmitting || isLoading ? (
+              <CircularProgress size={20} />
+            ) : (
+              <LoginIcon />
+            )
+          }
           sx={{
             mt: 1,
             mb: 3,
@@ -743,7 +784,10 @@ const LoginPage: React.FC = () => {
 
         {/* Register Link */}
         <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+          <Typography
+            variant="body2"
+            sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+          >
             {t('auth.dontHaveAccount')}{' '}
             <Link
               component={RouterLink}
@@ -770,7 +814,10 @@ const LoginPage: React.FC = () => {
             },
           }}
         >
-          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+          <Typography
+            variant="body2"
+            sx={{ color: 'rgba(255, 255, 255, 0.8)' }}
+          >
             {t('auth.or')}
           </Typography>
         </Divider>

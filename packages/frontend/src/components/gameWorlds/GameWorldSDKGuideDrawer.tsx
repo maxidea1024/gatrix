@@ -34,7 +34,10 @@ interface GameWorldSDKGuideDrawerProps {
   onClose: () => void;
 }
 
-const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open, onClose }) => {
+const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({
+  open,
+  onClose,
+}) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -54,12 +57,18 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
-  const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
+  const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>(
+    {}
+  );
+  const [responseHeaders, setResponseHeaders] = useState<
+    Record<string, string>
+  >({});
   const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
-  const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] = useState(false);
-  const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] = useState(false);
+  const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] =
+    useState(false);
+  const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] =
+    useState(false);
   const [testDuration, setTestDuration] = useState<number | null>(null);
   const [testStatus, setTestStatus] = useState<number | null>(null);
   const [responseTime, setResponseTime] = useState<Date | null>(null);
@@ -164,7 +173,8 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
   const handleCopyCode = (code: string) => {
     copyToClipboardWithNotification(
       code,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -172,7 +182,9 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
   const handleTestAPI = async () => {
     // Validation
     if (!apiToken.trim()) {
-      setValidationError(t('gameWorlds.sdkGuide.apiTokenRequired') || 'API Token is required');
+      setValidationError(
+        t('gameWorlds.sdkGuide.apiTokenRequired') || 'API Token is required'
+      );
       return;
     }
 
@@ -216,19 +228,24 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
       });
 
       setResponseHeaders({
-        'Content-Type': response.headers.get('Content-Type') || 'application/json',
+        'Content-Type':
+          response.headers.get('Content-Type') || 'application/json',
         Status: `${response.status} ${response.statusText}`,
       });
 
       setExpandedResponseHeaders(true);
 
       if (!response.ok) {
-        setTestError(`HTTP ${response.status}: ${data.error?.message || 'Request failed'}`);
+        setTestError(
+          `HTTP ${response.status}: ${data.error?.message || 'Request failed'}`
+        );
       } else {
         setTestError(null);
       }
     } catch (error) {
-      setTestError(error instanceof Error ? error.message : 'Unknown error occurred');
+      setTestError(
+        error instanceof Error ? error.message : 'Unknown error occurred'
+      );
     } finally {
       setTestLoading(false);
     }
@@ -258,7 +275,8 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
             display: 'flex',
             justifyContent: 'flex-end',
             p: 0.5,
-            backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+            backgroundColor:
+              theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
             borderBottom: `1px solid ${theme.palette.divider}`,
           }}
         >
@@ -306,7 +324,10 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {/* Main Tabs */}
         <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3, pt: 2 }}>
-          <Tabs value={mainTabValue} onChange={(e, newValue) => setMainTabValue(newValue)}>
+          <Tabs
+            value={mainTabValue}
+            onChange={(e, newValue) => setMainTabValue(newValue)}
+          >
             <Tab label={t('gameWorlds.sdkGuide.tabGuide')} />
             <Tab label={t('gameWorlds.sdkGuide.tabApiTest')} />
           </Tabs>
@@ -330,7 +351,8 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                 sx={{
                   p: 2,
                   mb: 3,
-                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                  backgroundColor:
+                    theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
                   fontFamily: 'monospace',
                   fontSize: '0.9rem',
                 }}
@@ -349,10 +371,16 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                 {t('gameWorlds.sdkGuide.parameters')}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+              <Typography
+                variant="body2"
+                sx={{ mb: 2, color: 'text.secondary' }}
+              >
                 {t('gameWorlds.sdkGuide.noParameters')}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 3, color: 'text.secondary' }}>
+              <Typography
+                variant="body2"
+                sx={{ mb: 3, color: 'text.secondary' }}
+              >
                 {t('gameWorlds.sdkGuide.optionalParameters')}
               </Typography>
 
@@ -364,13 +392,16 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
               </Typography>
               <Stack spacing={1} sx={{ mb: 3 }}>
                 <Typography variant="body2">
-                  • <strong>X-API-Token</strong>: {t('gameWorlds.sdkGuide.headerApiToken')}
+                  • <strong>X-API-Token</strong>:{' '}
+                  {t('gameWorlds.sdkGuide.headerApiToken')}
                 </Typography>
                 <Typography variant="body2">
-                  • <strong>X-Application-Name</strong>: {t('gameWorlds.sdkGuide.headerAppName')}
+                  • <strong>X-Application-Name</strong>:{' '}
+                  {t('gameWorlds.sdkGuide.headerAppName')}
                 </Typography>
                 <Typography variant="body2">
-                  • <strong>Content-Type</strong>: {t('gameWorlds.sdkGuide.headerContentType')}
+                  • <strong>Content-Type</strong>:{' '}
+                  {t('gameWorlds.sdkGuide.headerContentType')}
                 </Typography>
               </Stack>
 
@@ -407,7 +438,8 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                   <thead>
                     <tr
                       style={{
-                        backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                        backgroundColor:
+                          theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
                         borderBottom: `2px solid ${theme.palette.divider}`,
                       }}
                     >
@@ -493,7 +525,10 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                             padding: '12px',
                             borderRight: `1px solid ${theme.palette.divider}`,
                             fontFamily: 'monospace',
-                            color: theme.palette.mode === 'dark' ? '#64b5f6' : '#1976d2',
+                            color:
+                              theme.palette.mode === 'dark'
+                                ? '#64b5f6'
+                                : '#1976d2',
                           }}
                         >
                           {row.type}
@@ -501,7 +536,10 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                         <td
                           style={{
                             padding: '12px',
-                            color: theme.palette.mode === 'dark' ? '#b0bec5' : '#666',
+                            color:
+                              theme.palette.mode === 'dark'
+                                ? '#b0bec5'
+                                : '#666',
                           }}
                         >
                           {t(`gameWorlds.sdkGuide.${row.desc}`)}
@@ -514,9 +552,13 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
 
               <Alert severity="info" sx={{ mb: 3 }}>
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>{t('gameWorlds.sdkGuide.maintenanceMessageNote')}</strong>
+                  <strong>
+                    {t('gameWorlds.sdkGuide.maintenanceMessageNote')}
+                  </strong>
                 </Typography>
-                <Typography variant="body2">{t('gameWorlds.sdkGuide.langParameter')}</Typography>
+                <Typography variant="body2">
+                  {t('gameWorlds.sdkGuide.langParameter')}
+                </Typography>
               </Alert>
 
               <Divider sx={{ my: 3 }} />
@@ -525,7 +567,10 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                 {t('gameWorlds.sdkGuide.errorCodes')}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+              <Typography
+                variant="body2"
+                sx={{ mb: 2, color: 'text.secondary' }}
+              >
                 {t('gameWorlds.sdkGuide.errorCodesDesc')}
               </Typography>
 
@@ -536,15 +581,27 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                   variant="scrollable"
                   scrollButtons="auto"
                 >
-                  <Tab label={`400 - ${t('gameWorlds.sdkGuide.missingHeaders')}`} />
-                  <Tab label={`401 - ${t('gameWorlds.sdkGuide.unauthorized')}`} />
-                  <Tab label={`400 - ${t('gameWorlds.sdkGuide.invalidParams')}`} />
+                  <Tab
+                    label={`400 - ${t('gameWorlds.sdkGuide.missingHeaders')}`}
+                  />
+                  <Tab
+                    label={`401 - ${t('gameWorlds.sdkGuide.unauthorized')}`}
+                  />
+                  <Tab
+                    label={`400 - ${t('gameWorlds.sdkGuide.invalidParams')}`}
+                  />
                 </Tabs>
               </Box>
 
-              {errorTabValue === 0 && <CodeBlock code={errorMissingHeaders} language="json" />}
-              {errorTabValue === 1 && <CodeBlock code={errorUnauthorized} language="json" />}
-              {errorTabValue === 2 && <CodeBlock code={errorInvalidParams} language="json" />}
+              {errorTabValue === 0 && (
+                <CodeBlock code={errorMissingHeaders} language="json" />
+              )}
+              {errorTabValue === 1 && (
+                <CodeBlock code={errorUnauthorized} language="json" />
+              )}
+              {errorTabValue === 2 && (
+                <CodeBlock code={errorInvalidParams} language="json" />
+              )}
             </>
           )}
 
@@ -554,10 +611,13 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
               {/* REQUEST SECTION */}
               <Box sx={{ mb: 3 }}>
                 <Box
-                  onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
+                  onClick={() =>
+                    setExpandedRequestHeaders(!expandedRequestHeaders)
+                  }
                   sx={{
                     p: 1.5,
-                    backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
+                    backgroundColor:
+                      theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
                     borderRadius: 1,
                     cursor: 'pointer',
                     display: 'flex',
@@ -565,7 +625,8 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                     justifyContent: 'space-between',
                     border: `2px solid ${theme.palette.primary.main}`,
                     '&:hover': {
-                      backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
+                      backgroundColor:
+                        theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
                     },
                   }}
                 >
@@ -577,7 +638,9 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                   </Typography>
                   <Box
                     sx={{
-                      transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transform: expandedRequestHeaders
+                        ? 'rotate(180deg)'
+                        : 'rotate(0deg)',
                       transition: 'transform 0.3s',
                       color: theme.palette.primary.main,
                     }}
@@ -589,14 +652,18 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                   <Box
                     sx={{
                       p: 2,
-                      backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
+                      backgroundColor:
+                        theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
                       borderRadius: 1,
                       mt: 0.5,
                     }}
                   >
                     {/* Parameters Table */}
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ mb: 1.5, fontWeight: 600 }}
+                      >
                         {t('common.queryParameters') || 'Query Parameters'}
                       </Typography>
                       <Box
@@ -618,7 +685,9 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                             sx={{
                               p: 1.5,
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                                theme.palette.mode === 'dark'
+                                  ? '#2a2a2a'
+                                  : '#f5f5f5',
                               borderBottom: `1px solid ${theme.palette.divider}`,
                               display: 'flex',
                               alignItems: 'center',
@@ -656,11 +725,16 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                       <Box sx={{ mb: 2 }}>
                         <Box
                           onClick={() =>
-                            setExpandedRequestHeadersDetail(!expandedRequestHeadersDetail)
+                            setExpandedRequestHeadersDetail(
+                              !expandedRequestHeadersDetail
+                            )
                           }
                           sx={{
                             p: 1,
-                            backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f0f0f0',
+                            backgroundColor:
+                              theme.palette.mode === 'dark'
+                                ? '#1a1a1a'
+                                : '#f0f0f0',
                             borderRadius: 0.5,
                             cursor: 'pointer',
                             display: 'flex',
@@ -668,11 +742,16 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                             justifyContent: 'space-between',
                             '&:hover': {
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#252525' : '#e8e8e8',
+                                theme.palette.mode === 'dark'
+                                  ? '#252525'
+                                  : '#e8e8e8',
                             },
                           }}
                         >
-                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ fontWeight: 600 }}
+                          >
                             {t('gameWorlds.sdkGuide.requestHeaders')} (
                             {Object.keys(requestHeaders).length})
                           </Typography>
@@ -690,29 +769,31 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                         </Box>
                         <Collapse in={expandedRequestHeadersDetail}>
                           <Stack spacing={0.5} sx={{ pl: 1, pt: 1 }}>
-                            {Object.entries(requestHeaders).map(([key, value]) => (
-                              <Box key={key} sx={{ display: 'flex', gap: 1 }}>
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    fontWeight: 600,
-                                    minWidth: 150,
-                                    color: 'primary.main',
-                                  }}
-                                >
-                                  {key}:
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    color: 'text.secondary',
-                                    wordBreak: 'break-all',
-                                  }}
-                                >
-                                  {String(value)}
-                                </Typography>
-                              </Box>
-                            ))}
+                            {Object.entries(requestHeaders).map(
+                              ([key, value]) => (
+                                <Box key={key} sx={{ display: 'flex', gap: 1 }}>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      fontWeight: 600,
+                                      minWidth: 150,
+                                      color: 'primary.main',
+                                    }}
+                                  >
+                                    {key}:
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      color: 'text.secondary',
+                                      wordBreak: 'break-all',
+                                    }}
+                                  >
+                                    {String(value)}
+                                  </Typography>
+                                </Box>
+                              )
+                            )}
                           </Stack>
                         </Collapse>
                       </Box>
@@ -729,7 +810,10 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                           mb: 1,
                         }}
                       >
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600 }}
+                        >
                           {t('common.curlPreview') || 'curl Preview'}
                         </Typography>
                         <Tooltip title={t('common.copy') || 'Copy'}>
@@ -749,7 +833,10 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                       <Box
                         sx={{
                           p: 1.5,
-                          backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+                          backgroundColor:
+                            theme.palette.mode === 'dark'
+                              ? '#1e1e1e'
+                              : '#f5f5f5',
                           borderRadius: 1,
                           border: `1px solid ${theme.palette.divider}`,
                           fontFamily: 'monospace',
@@ -778,7 +865,10 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                       variant="contained"
                       startIcon={
                         testLoading ? (
-                          <CircularProgress size={16} sx={{ color: 'inherit' }} />
+                          <CircularProgress
+                            size={16}
+                            sx={{ color: 'inherit' }}
+                          />
                         ) : (
                           <PlayArrowIcon />
                         )
@@ -797,10 +887,13 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
               {testResponse && (
                 <Box sx={{ mb: 3 }}>
                   <Box
-                    onClick={() => setExpandedResponseHeaders(!expandedResponseHeaders)}
+                    onClick={() =>
+                      setExpandedResponseHeaders(!expandedResponseHeaders)
+                    }
                     sx={{
                       p: 1.5,
-                      backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
+                      backgroundColor:
+                        theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
                       borderRadius: 1,
                       cursor: 'pointer',
                       display: 'flex',
@@ -808,7 +901,8 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                       justifyContent: 'space-between',
                       border: `2px solid ${theme.palette.primary.main}`,
                       '&:hover': {
-                        backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
+                        backgroundColor:
+                          theme.palette.mode === 'dark' ? '#252525' : '#bbdefb',
                       },
                     }}
                   >
@@ -825,10 +919,16 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                       {testStatus && (
                         <Box sx={{ display: 'flex', gap: 2 }}>
                           <Box>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                            <Typography
+                              variant="caption"
+                              sx={{ color: 'text.secondary' }}
+                            >
                               {t('gameWorlds.sdkGuide.testStatus')}
                             </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: 600 }}
+                            >
                               {testStatus}{' '}
                               {testStatus === 200
                                 ? 'OK'
@@ -841,30 +941,49 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                           </Box>
                           {testDuration !== null && (
                             <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'text.secondary' }}
+                              >
                                 {t('gameWorlds.sdkGuide.testDuration')}
                               </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: 600 }}
+                              >
                                 {testDuration}ms
                               </Typography>
                             </Box>
                           )}
                           {Object.keys(responseHeaders).length > 0 && (
                             <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'text.secondary' }}
+                              >
                                 {t('gameWorlds.sdkGuide.testSize')}
                               </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {new Blob([JSON.stringify(testResponse)]).size} bytes
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: 600 }}
+                              >
+                                {new Blob([JSON.stringify(testResponse)]).size}{' '}
+                                bytes
                               </Typography>
                             </Box>
                           )}
                           {responseTime && (
                             <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: 'text.secondary' }}
+                              >
                                 {t('common.receivedAt') || 'Received At'}
                               </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: 600 }}
+                              >
                                 {responseTime.toLocaleTimeString()}
                               </Typography>
                             </Box>
@@ -874,7 +993,9 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                     </Box>
                     <Box
                       sx={{
-                        transform: expandedResponseHeaders ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transform: expandedResponseHeaders
+                          ? 'rotate(180deg)'
+                          : 'rotate(0deg)',
                         transition: 'transform 0.3s',
                         color: theme.palette.primary.main,
                       }}
@@ -886,7 +1007,8 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                     <Box
                       sx={{
                         p: 2,
-                        backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
+                        backgroundColor:
+                          theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
                         borderRadius: 1,
                         mt: 0.5,
                       }}
@@ -903,12 +1025,16 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                         <Box sx={{ mb: 2 }}>
                           <Box
                             onClick={() =>
-                              setExpandedResponseHeadersDetail(!expandedResponseHeadersDetail)
+                              setExpandedResponseHeadersDetail(
+                                !expandedResponseHeadersDetail
+                              )
                             }
                             sx={{
                               p: 1,
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#1a1a1a' : '#f0f0f0',
+                                theme.palette.mode === 'dark'
+                                  ? '#1a1a1a'
+                                  : '#f0f0f0',
                               borderRadius: 0.5,
                               cursor: 'pointer',
                               display: 'flex',
@@ -916,11 +1042,16 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                               justifyContent: 'space-between',
                               '&:hover': {
                                 backgroundColor:
-                                  theme.palette.mode === 'dark' ? '#252525' : '#e8e8e8',
+                                  theme.palette.mode === 'dark'
+                                    ? '#252525'
+                                    : '#e8e8e8',
                               },
                             }}
                           >
-                            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ fontWeight: 600 }}
+                            >
                               {t('gameWorlds.sdkGuide.responseHeaders')} (
                               {Object.keys(responseHeaders).length})
                             </Typography>
@@ -938,29 +1069,34 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                           </Box>
                           <Collapse in={expandedResponseHeadersDetail}>
                             <Stack spacing={0.5} sx={{ pl: 1, pt: 1 }}>
-                              {Object.entries(responseHeaders).map(([key, value]) => (
-                                <Box key={key} sx={{ display: 'flex', gap: 1 }}>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      fontWeight: 600,
-                                      minWidth: 150,
-                                      color: 'primary.main',
-                                    }}
+                              {Object.entries(responseHeaders).map(
+                                ([key, value]) => (
+                                  <Box
+                                    key={key}
+                                    sx={{ display: 'flex', gap: 1 }}
                                   >
-                                    {key}:
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      color: 'text.secondary',
-                                      wordBreak: 'break-all',
-                                    }}
-                                  >
-                                    {String(value)}
-                                  </Typography>
-                                </Box>
-                              ))}
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        fontWeight: 600,
+                                        minWidth: 150,
+                                        color: 'primary.main',
+                                      }}
+                                    >
+                                      {key}:
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        color: 'text.secondary',
+                                        wordBreak: 'break-all',
+                                      }}
+                                    >
+                                      {String(value)}
+                                    </Typography>
+                                  </Box>
+                                )
+                              )}
                             </Stack>
                           </Collapse>
                         </Box>
@@ -968,7 +1104,10 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
 
                       {/* Response Body */}
                       <Box>
-                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ mb: 1, fontWeight: 600 }}
+                        >
                           {t('gameWorlds.sdkGuide.responseBody')}
                         </Typography>
                         <Box
@@ -985,7 +1124,9 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                               justifyContent: 'flex-end',
                               p: 0.5,
                               backgroundColor:
-                                theme.palette.mode === 'dark' ? '#0e0e0e' : '#f0f0f0',
+                                theme.palette.mode === 'dark'
+                                  ? '#0e0e0e'
+                                  : '#f0f0f0',
                               borderBottom: `1px solid ${theme.palette.divider}`,
                             }}
                           >
@@ -993,7 +1134,9 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                               <IconButton
                                 size="small"
                                 onClick={() => {
-                                  handleCopyCode(JSON.stringify(testResponse, null, 2));
+                                  handleCopyCode(
+                                    JSON.stringify(testResponse, null, 2)
+                                  );
                                 }}
                                 sx={{ color: 'primary.main' }}
                               >

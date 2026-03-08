@@ -16,9 +16,8 @@ class ApiService {
 
     // Only use runtime config in production (when explicitly set)
     if (import.meta.env.PROD) {
-      const runtimeEnv = (typeof window !== 'undefined' && (window as any)?.ENV?.VITE_API_URL) as
-        | string
-        | undefined;
+      const runtimeEnv = (typeof window !== 'undefined' &&
+        (window as any)?.ENV?.VITE_API_URL) as string | undefined;
       if (runtimeEnv && runtimeEnv.trim()) {
         baseURL = runtimeEnv.trim();
       }
@@ -65,7 +64,8 @@ class ApiService {
         // Add environment header for multi-environment support
         // Only set from localStorage if not explicitly provided in the request config
         const hasEnvironmentHeader =
-          config.headers['x-environment-id'] || config.headers['X-Environment-Id'];
+          config.headers['x-environment-id'] ||
+          config.headers['X-Environment-Id'];
         if (!hasEnvironmentHeader) {
           const environmentId =
             typeof window !== 'undefined'
@@ -109,7 +109,10 @@ class ApiService {
             localStorage.removeItem('accessToken');
           }
           // Redirect to session expired page
-          if (typeof window !== 'undefined' && window.location.pathname !== '/session-expired') {
+          if (
+            typeof window !== 'undefined' &&
+            window.location.pathname !== '/session-expired'
+          ) {
             window.location.href = '/session-expired';
           }
           return Promise.reject(error);
@@ -127,7 +130,10 @@ class ApiService {
               localStorage.removeItem('user');
               localStorage.removeItem('accessToken');
             }
-            if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+            if (
+              typeof window !== 'undefined' &&
+              window.location.pathname !== '/login'
+            ) {
               window.location.href = '/login';
             }
             return Promise.reject(error);
@@ -151,7 +157,10 @@ class ApiService {
               localStorage.removeItem('user');
               localStorage.removeItem('accessToken');
             }
-            if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+            if (
+              typeof window !== 'undefined' &&
+              window.location.pathname !== '/login'
+            ) {
               window.location.href = '/login';
             }
             return Promise.reject(error);
@@ -162,7 +171,9 @@ class ApiService {
           const attemptCount = this.refreshAttempts.get(tokenKey) || 0;
 
           if (attemptCount >= this.MAX_REFRESH_ATTEMPTS) {
-            console.warn('[ApiService] Max refresh attempts reached - JWT Secret may have changed');
+            console.warn(
+              '[ApiService] Max refresh attempts reached - JWT Secret may have changed'
+            );
             this.clearTokens();
             this.refreshAttempts.delete(tokenKey);
             // Clear localStorage to prevent infinite loop
@@ -170,7 +181,10 @@ class ApiService {
               localStorage.removeItem('user');
               localStorage.removeItem('accessToken');
             }
-            if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+            if (
+              typeof window !== 'undefined' &&
+              window.location.pathname !== '/login'
+            ) {
               window.location.href = '/login';
             }
             return Promise.reject(error);
@@ -208,7 +222,10 @@ class ApiService {
               localStorage.removeItem('user');
               localStorage.removeItem('accessToken');
             }
-            if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+            if (
+              typeof window !== 'undefined' &&
+              window.location.pathname !== '/login'
+            ) {
               window.location.href = '/login';
             }
             return Promise.reject(refreshError);
@@ -218,7 +235,8 @@ class ApiService {
         // Handle 403 Forbidden - dispatch a global event for the UI layer to display a snackbar
         // Deduplicate: only fire once within a cooldown window
         if (error.response?.status === 403) {
-          error.message = error.response?.data?.error?.message || 'Insufficient permissions';
+          error.message =
+            error.response?.data?.error?.message || 'Insufficient permissions';
           if (typeof window !== 'undefined') {
             const now = Date.now();
             const lastForbidden = (window as any).__lastForbiddenAt || 0;
@@ -234,7 +252,10 @@ class ApiService {
         }
 
         // Enhance error message for better user experience
-        if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
+        if (
+          error.code === 'ECONNABORTED' &&
+          error.message.includes('timeout')
+        ) {
           error.message = i18next.t('errors.timeout');
         } else if (error.code === 'ERR_NETWORK' || !error.response) {
           error.message = i18next.t('errors.networkError');
@@ -277,7 +298,9 @@ class ApiService {
   }
 
   // Generic request method
-  private async request<T = any>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  private async request<T = any>(
+    config: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
     try {
       // console.log('[ApiService] Request:', {
       //   url: config.url,
@@ -318,7 +341,10 @@ class ApiService {
   }
 
   // HTTP methods
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  async get<T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, method: 'GET', url });
   }
 
@@ -346,7 +372,10 @@ class ApiService {
     return this.request<T>({ ...config, method: 'PATCH', url, data });
   }
 
-  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  async delete<T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, method: 'DELETE', url });
   }
 
@@ -372,7 +401,11 @@ class ApiService {
   }
 
   // Download file
-  async download(url: string, filename?: string, config?: AxiosRequestConfig): Promise<void> {
+  async download(
+    url: string,
+    filename?: string,
+    config?: AxiosRequestConfig
+  ): Promise<void> {
     try {
       const response = await this.api.request({
         ...config,

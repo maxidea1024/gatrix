@@ -53,7 +53,11 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
-import EmojiPicker, { EmojiClickData, Theme as EmojiTheme, Categories } from 'emoji-picker-react';
+import EmojiPicker, {
+  EmojiClickData,
+  Theme as EmojiTheme,
+  Categories,
+} from 'emoji-picker-react';
 
 // Register custom image blot for Quill to preserve style attribute
 const ImageBlot = Quill.import('formats/image') as any;
@@ -181,19 +185,27 @@ const TEXT_EFFECT_STYLES: { [key: string]: string } = {
   'shadow-multi': 'text-shadow: 1px 1px 0 #000, 2px 2px 0 #333, 3px 3px 0 #666',
   // Glow effects
   glow: 'text-shadow: 0 0 10px currentColor, 0 0 20px currentColor',
-  'glow-blue': 'text-shadow: 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff',
-  'glow-gold': 'text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffd700',
-  'glow-red': 'text-shadow: 0 0 10px #ff4444, 0 0 20px #ff4444, 0 0 30px #ff4444',
-  'glow-green': 'text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88',
-  'glow-purple': 'text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7, 0 0 30px #a855f7',
+  'glow-blue':
+    'text-shadow: 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff',
+  'glow-gold':
+    'text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffd700',
+  'glow-red':
+    'text-shadow: 0 0 10px #ff4444, 0 0 20px #ff4444, 0 0 30px #ff4444',
+  'glow-green':
+    'text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88',
+  'glow-purple':
+    'text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7, 0 0 30px #a855f7',
   // Outline effects
   outline: '-webkit-text-stroke: 1px currentColor; paint-order: stroke fill',
   'outline-white': '-webkit-text-stroke: 1px white; paint-order: stroke fill',
   'outline-black': '-webkit-text-stroke: 1px black; paint-order: stroke fill',
-  'outline-thick': '-webkit-text-stroke: 2px currentColor; paint-order: stroke fill',
+  'outline-thick':
+    '-webkit-text-stroke: 2px currentColor; paint-order: stroke fill',
   // 3D effects
-  emboss: 'text-shadow: -1px -1px 0 rgba(255,255,255,0.5), 1px 1px 0 rgba(0,0,0,0.5)',
-  engrave: 'text-shadow: 1px 1px 0 rgba(255,255,255,0.5), -1px -1px 0 rgba(0,0,0,0.5)',
+  emboss:
+    'text-shadow: -1px -1px 0 rgba(255,255,255,0.5), 1px 1px 0 rgba(0,0,0,0.5)',
+  engrave:
+    'text-shadow: 1px 1px 0 rgba(255,255,255,0.5), -1px -1px 0 rgba(0,0,0,0.5)',
   '3d': 'text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1)',
   retro: 'text-shadow: 3px 3px 0 #f0f, 6px 6px 0 #0ff',
   // Neon effects
@@ -217,17 +229,22 @@ const TEXT_EFFECT_STYLES: { [key: string]: string } = {
     'background: linear-gradient(90deg, #ff512f, #dd2476); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text',
   // Animation effects (pure CSS)
   'anim-blink': 'animation: ql-blink 1s step-end infinite',
-  'anim-pulse': 'animation: ql-pulse 1.5s ease-in-out infinite; display: inline-block',
-  'anim-shake': 'animation: ql-shake 0.5s ease-in-out infinite; display: inline-block',
-  'anim-bounce': 'animation: ql-bounce 0.6s ease infinite; display: inline-block',
+  'anim-pulse':
+    'animation: ql-pulse 1.5s ease-in-out infinite; display: inline-block',
+  'anim-shake':
+    'animation: ql-shake 0.5s ease-in-out infinite; display: inline-block',
+  'anim-bounce':
+    'animation: ql-bounce 0.6s ease infinite; display: inline-block',
   'anim-glow-pulse': 'animation: ql-glow-pulse 1.5s ease-in-out infinite',
   'anim-rainbow':
     'background: linear-gradient(90deg, #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0000ff, #8000ff, #ff0000); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: ql-rainbow 3s linear infinite',
-  'anim-float': 'animation: ql-float 2s ease-in-out infinite; display: inline-block',
+  'anim-float':
+    'animation: ql-float 2s ease-in-out infinite; display: inline-block',
   'anim-jelly': 'animation: ql-jelly 0.8s ease infinite; display: inline-block',
   'anim-swing':
     'animation: ql-swing 1s ease-in-out infinite; display: inline-block; transform-origin: top center',
-  'anim-heartbeat': 'animation: ql-heartbeat 1.2s ease-in-out infinite; display: inline-block',
+  'anim-heartbeat':
+    'animation: ql-heartbeat 1.2s ease-in-out infinite; display: inline-block',
 };
 
 // Get Parchment for creating replacement blots
@@ -346,17 +363,24 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [isEditingImage, setIsEditingImage] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
-  const [imageWidth, setImageWidth] = useState<'original' | '25' | '50' | '75' | '100' | 'custom'>(
-    '100'
-  );
+  const [imageWidth, setImageWidth] = useState<
+    'original' | '25' | '50' | '75' | '100' | 'custom'
+  >('100');
   const [imageCustomWidth, setImageCustomWidth] = useState('');
-  const [imageAlign, setImageAlign] = useState<'left' | 'center' | 'right'>('center');
-  const [imageBorder, setImageBorder] = useState<'none' | 'thin' | 'medium' | 'thick'>('none');
+  const [imageAlign, setImageAlign] = useState<'left' | 'center' | 'right'>(
+    'center'
+  );
+  const [imageBorder, setImageBorder] = useState<
+    'none' | 'thin' | 'medium' | 'thick'
+  >('none');
   const [imageBorderColor, setImageBorderColor] = useState('#cccccc');
   const [imageAltText, setImageAltText] = useState('');
   const [imageAspectRatio, setImageAspectRatio] = useState(true);
-  const [imageShadow, setImageShadow] = useState<'none' | 'small' | 'medium' | 'large'>('none');
-  const [imageShadowColor, setImageShadowColor] = useState('rgba(0, 0, 0, 0.3)');
+  const [imageShadow, setImageShadow] = useState<
+    'none' | 'small' | 'medium' | 'large'
+  >('none');
+  const [imageShadowColor, setImageShadowColor] =
+    useState('rgba(0, 0, 0, 0.3)');
   const [imageShadowDirection, setImageShadowDirection] = useState<
     'all' | 'top' | 'bottom' | 'left' | 'right'
   >('all');
@@ -365,7 +389,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   >('none');
   const [imageCustomBorderRadius, setImageCustomBorderRadius] = useState('');
   const [advancedOptionsExpanded, setAdvancedOptionsExpanded] = useState(() => {
-    const saved = localStorage.getItem('richTextEditor.advancedOptionsExpanded');
+    const saved = localStorage.getItem(
+      'richTextEditor.advancedOptionsExpanded'
+    );
     return saved !== null ? saved === 'true' : false; // Default to collapsed
   });
   const [imageUrlValid, setImageUrlValid] = useState<boolean | null>(null);
@@ -376,15 +402,21 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   } | null>(null);
   const [videoDialogOpen, setVideoDialogOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
-  const [videoWidth, setVideoWidth] = useState<'25' | '50' | '75' | '100' | 'custom'>('100');
+  const [videoWidth, setVideoWidth] = useState<
+    '25' | '50' | '75' | '100' | 'custom'
+  >('100');
   const [videoCustomWidth, setVideoCustomWidth] = useState('');
-  const [videoAlign, setVideoAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [videoAlign, setVideoAlign] = useState<'left' | 'center' | 'right'>(
+    'center'
+  );
   const [videoAutoplay, setVideoAutoplay] = useState(false);
   const [videoMuted, setVideoMuted] = useState(false);
   const [videoLoop, setVideoLoop] = useState(false);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const [videoUrlValidating, setVideoUrlValidating] = useState(false);
-  const savedSelectionRef = useRef<{ index: number; length: number } | null>(null);
+  const savedSelectionRef = useRef<{ index: number; length: number } | null>(
+    null
+  );
   const imageValidationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const videoValidationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -402,9 +434,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [floatingEffectOpen, setFloatingEffectOpen] = useState(false);
 
   // Save advanced options state to localStorage
-  const handleAdvancedOptionsChange = (event: React.SyntheticEvent, isExpanded: boolean) => {
+  const handleAdvancedOptionsChange = (
+    event: React.SyntheticEvent,
+    isExpanded: boolean
+  ) => {
     setAdvancedOptionsExpanded(isExpanded);
-    localStorage.setItem('richTextEditor.advancedOptionsExpanded', String(isExpanded));
+    localStorage.setItem(
+      'richTextEditor.advancedOptionsExpanded',
+      String(isExpanded)
+    );
   };
 
   // Validate image URL
@@ -472,7 +510,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
         // Only apply last used font if content is truly empty (just a newline from Quill)
         if (text === '') {
-          const lastUsedFont = localStorage.getItem('richTextEditor.lastUsedFont');
+          const lastUsedFont = localStorage.getItem(
+            'richTextEditor.lastUsedFont'
+          );
           if (lastUsedFont && fontList.includes(lastUsedFont)) {
             // Set format for the editor so new text will use this font
             editor.format('font', lastUsedFont);
@@ -480,7 +520,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             // Also update the toolbar UI to reflect the selected font
             const toolbar = editor.getModule('toolbar') as any;
             if (toolbar?.container) {
-              const fontPickerLabel = toolbar.container.querySelector('.ql-font .ql-picker-label');
+              const fontPickerLabel = toolbar.container.querySelector(
+                '.ql-font .ql-picker-label'
+              );
               if (fontPickerLabel) {
                 fontPickerLabel.setAttribute('data-value', lastUsedFont);
               }
@@ -499,7 +541,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (quillRef.current) {
       const editor = quillRef.current.getEditor();
 
-      const handleSelectionChange = (range: { index: number; length: number } | null) => {
+      const handleSelectionChange = (
+        range: { index: number; length: number } | null
+      ) => {
         if (range) {
           savedSelectionRef.current = range;
 
@@ -564,7 +608,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       editorRoot.addEventListener('contextmenu', handleImageContextMenu, true);
 
       return () => {
-        editorRoot.removeEventListener('contextmenu', handleImageContextMenu, true);
+        editorRoot.removeEventListener(
+          'contextmenu',
+          handleImageContextMenu,
+          true
+        );
       };
     }
   }, [readOnly]);
@@ -588,7 +636,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
     // Debounce validation
     videoValidationTimeoutRef.current = setTimeout(() => {
-      const videoInfo = getVideoEmbedUrl(videoUrl, videoAutoplay, videoMuted, videoLoop);
+      const videoInfo = getVideoEmbedUrl(
+        videoUrl,
+        videoAutoplay,
+        videoMuted,
+        videoLoop
+      );
       if (videoInfo) {
         setVideoPreviewUrl(videoInfo.embedUrl);
       } else {
@@ -618,7 +671,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const urlObj = new URL(url);
 
       // YouTube
-      if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
+      if (
+        urlObj.hostname.includes('youtube.com') ||
+        urlObj.hostname.includes('youtu.be')
+      ) {
         let videoId = '';
 
         if (urlObj.hostname.includes('youtu.be')) {
@@ -769,7 +825,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (readOnly) return;
     event.preventDefault();
     setContextMenu(
-      contextMenu === null ? { mouseX: event.clientX - 2, mouseY: event.clientY - 4 } : null
+      contextMenu === null
+        ? { mouseX: event.clientX - 2, mouseY: event.clientY - 4 }
+        : null
     );
   };
 
@@ -779,7 +837,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const insertEmoji = () => {
     // Save context menu position for emoji picker
-    const position = contextMenu ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : null;
+    const position = contextMenu
+      ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+      : null;
     handleContextMenuClose();
     // Trigger emoji picker with position
     if (position) {
@@ -870,7 +930,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const handleVideoInsert = () => {
     if (quillRef.current && videoUrl) {
-      const videoInfo = getVideoEmbedUrl(videoUrl, videoAutoplay, videoMuted, videoLoop);
+      const videoInfo = getVideoEmbedUrl(
+        videoUrl,
+        videoAutoplay,
+        videoMuted,
+        videoLoop
+      );
 
       if (!videoInfo) {
         alert(
@@ -903,7 +968,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
       // Calculate height (16:9 aspect ratio)
       const widthValue =
-        videoWidth === 'custom' && videoCustomWidth ? parseInt(videoCustomWidth) : 640;
+        videoWidth === 'custom' && videoCustomWidth
+          ? parseInt(videoCustomWidth)
+          : 640;
       const height = Math.round((widthValue * 9) / 16);
 
       // Build iframe HTML
@@ -911,7 +978,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
       // Alignment
       if (videoAlign === 'center') {
-        iframeStyle += ' display: block; margin-left: auto; margin-right: auto;';
+        iframeStyle +=
+          ' display: block; margin-left: auto; margin-right: auto;';
       } else if (videoAlign === 'left') {
         iframeStyle += ' float: left; margin-right: 10px; margin-bottom: 10px;';
       } else if (videoAlign === 'right') {
@@ -942,7 +1010,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const selection = savedSelectionRef.current;
       if (selection && selection.length > 0) {
         const format = editor.getFormat(selection.index, selection.length);
-        editor.formatText(selection.index, selection.length, 'bold', !format.bold);
+        editor.formatText(
+          selection.index,
+          selection.length,
+          'bold',
+          !format.bold
+        );
         editor.focus();
       }
     }
@@ -955,7 +1028,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const selection = savedSelectionRef.current;
       if (selection && selection.length > 0) {
         const format = editor.getFormat(selection.index, selection.length);
-        editor.formatText(selection.index, selection.length, 'italic', !format.italic);
+        editor.formatText(
+          selection.index,
+          selection.length,
+          'italic',
+          !format.italic
+        );
         editor.focus();
       }
     }
@@ -968,7 +1046,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const selection = savedSelectionRef.current;
       if (selection && selection.length > 0) {
         const format = editor.getFormat(selection.index, selection.length);
-        editor.formatText(selection.index, selection.length, 'underline', !format.underline);
+        editor.formatText(
+          selection.index,
+          selection.length,
+          'underline',
+          !format.underline
+        );
         editor.focus();
       }
     }
@@ -992,7 +1075,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const selection = savedSelectionRef.current;
       if (selection && selection.length > 0) {
         const format = editor.getFormat(selection.index, selection.length);
-        editor.formatText(selection.index, selection.length, 'strike', !format.strike);
+        editor.formatText(
+          selection.index,
+          selection.length,
+          'strike',
+          !format.strike
+        );
         editor.focus();
       }
     }
@@ -1105,13 +1193,18 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           const ops = delta.ops;
           if (ops && ops.length > 0) {
             const lastOp = ops[ops.length - 1];
-            if (typeof lastOp.insert === 'string' && lastOp.insert.endsWith('\n')) {
+            if (
+              typeof lastOp.insert === 'string' &&
+              lastOp.insert.endsWith('\n')
+            ) {
               lastOp.insert = lastOp.insert.slice(0, -1);
             }
           }
 
           // Insert the delta
-          editor.updateContents(new Delta().retain(selection.index).concat(delta));
+          editor.updateContents(
+            new Delta().retain(selection.index).concat(delta)
+          );
           editor.setSelection(selection.index + delta.length(), 0);
         } else if (text) {
           editor.insertText(selection.index, text);
@@ -1187,7 +1280,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         setImageAlign(metadata.align || 'center');
         setImageBorder(metadata.border || 'none');
         setImageBorderColor(metadata.borderColor || '#cccccc');
-        setImageAspectRatio(metadata.aspectRatio !== undefined ? metadata.aspectRatio : true);
+        setImageAspectRatio(
+          metadata.aspectRatio !== undefined ? metadata.aspectRatio : true
+        );
         setImageShadow(metadata.shadow || 'none');
         setImageShadowColor(metadata.shadowColor || 'rgba(0, 0, 0, 0.3)');
         setImageShadowDirection(metadata.shadowDirection || 'all');
@@ -1371,13 +1466,23 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
     // Border
     if (imageBorder !== 'none') {
-      const borderWidth = imageBorder === 'thin' ? '1px' : imageBorder === 'medium' ? '2px' : '3px';
+      const borderWidth =
+        imageBorder === 'thin'
+          ? '1px'
+          : imageBorder === 'medium'
+            ? '2px'
+            : '3px';
       styles.push(`border: ${borderWidth} solid ${imageBorderColor}`);
     }
 
     // Shadow
     if (imageShadow !== 'none') {
-      const blur = imageShadow === 'small' ? '4px' : imageShadow === 'medium' ? '8px' : '16px';
+      const blur =
+        imageShadow === 'small'
+          ? '4px'
+          : imageShadow === 'medium'
+            ? '8px'
+            : '16px';
 
       let shadowValue = '';
       if (imageShadowDirection === 'all') {
@@ -1533,7 +1638,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   attributes.alt = node.getAttribute('alt');
                 }
                 if (node.hasAttribute('data-image-metadata')) {
-                  attributes['data-image-metadata'] = node.getAttribute('data-image-metadata');
+                  attributes['data-image-metadata'] = node.getAttribute(
+                    'data-image-metadata'
+                  );
                 }
 
                 if (Object.keys(attributes).length > 0) {
@@ -1627,7 +1734,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       '.ql-image': t('richTextEditor.image'),
       '.ql-video': t('richTextEditor.video'),
       '.ql-emoji': t('richTextEditor.emoji', 'Emoji'),
-      '.ql-pageBackground': t('richTextEditor.pageBackground', 'Page Background'),
+      '.ql-pageBackground': t(
+        'richTextEditor.pageBackground',
+        'Page Background'
+      ),
       '.ql-clean': t('richTextEditor.clean'),
       '.ql-font .ql-picker-label': t('richTextEditor.font', 'Font'),
       '.ql-font .ql-picker-item': '', // No tooltip for items
@@ -1648,7 +1758,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
 
     // Add emoji icon to emoji button (it doesn't have a default icon)
-    const emojiButton = container.querySelector('.ql-emoji') as HTMLButtonElement;
+    const emojiButton = container.querySelector(
+      '.ql-emoji'
+    ) as HTMLButtonElement;
     if (emojiButton && !emojiButton.innerHTML.includes('svg')) {
       // Use emoji smiley face SVG icon matching Quill's icon style
       emojiButton.innerHTML = `
@@ -1662,8 +1774,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
 
     // Add page background icon (paint bucket)
-    const pageBackgroundButton = container.querySelector('.ql-pageBackground') as HTMLButtonElement;
-    if (pageBackgroundButton && !pageBackgroundButton.innerHTML.includes('svg')) {
+    const pageBackgroundButton = container.querySelector(
+      '.ql-pageBackground'
+    ) as HTMLButtonElement;
+    if (
+      pageBackgroundButton &&
+      !pageBackgroundButton.innerHTML.includes('svg')
+    ) {
       pageBackgroundButton.innerHTML = `
         <svg viewBox="0 0 18 18">
           <rect x="2" y="2" width="14" height="14" rx="2" class="ql-stroke" fill="none" stroke-width="1"/>
@@ -1691,7 +1808,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     const cleanupFunctions: (() => void)[] = [];
 
     // Generic handler factory for picker clicks
-    const createPickerHandlers = (picker: Element | null, formatName: string) => {
+    const createPickerHandlers = (
+      picker: Element | null,
+      formatName: string
+    ) => {
       if (!picker) return;
 
       const handleItemClick = (e: Event) => {
@@ -1703,7 +1823,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           if (formatName === 'font') {
             const selectedValue = pickerItem.getAttribute('data-value');
             if (selectedValue) {
-              localStorage.setItem('richTextEditor.lastUsedFont', selectedValue);
+              localStorage.setItem(
+                'richTextEditor.lastUsedFont',
+                selectedValue
+              );
             }
           }
 
@@ -1726,7 +1849,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const handleMouseDown = (e: Event) => {
         const target = e.target as HTMLElement;
         // Prevent focus loss when clicking on picker label or options
-        if (target.closest('.ql-picker-options') || target.closest('.ql-picker-label')) {
+        if (
+          target.closest('.ql-picker-options') ||
+          target.closest('.ql-picker-label')
+        ) {
           e.preventDefault();
         }
       };
@@ -1833,7 +1959,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             borderRight: 'none',
             borderBottom: `1px dashed ${theme.palette.divider}`,
             backgroundColor:
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)',
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.02)'
+                : 'rgba(0, 0, 0, 0.01)',
             padding: '8px',
             display: 'flex',
             alignItems: 'center',
@@ -1995,7 +2123,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                           e.target.value
                         );
                         // Save as last used font
-                        localStorage.setItem('richTextEditor.lastUsedFont', e.target.value);
+                        localStorage.setItem(
+                          'richTextEditor.lastUsedFont',
+                          e.target.value
+                        );
                       }
                     }
                     setFloatingFontOpen(false);
@@ -2013,7 +2144,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     '& .MuiSelect-select': { py: 0.5, fontSize: '0.75rem' },
                   }}
                   title={t('richTextEditor.font')}
-                  renderValue={() => <SizeIcon fontSize="small" sx={{ mt: 0.5 }} />}
+                  renderValue={() => (
+                    <SizeIcon fontSize="small" sx={{ mt: 0.5 }} />
+                  )}
                 >
                   {fontList.map((font) => (
                     <MenuItem
@@ -2069,9 +2202,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   renderValue={() => t('richTextEditor.size')}
                 >
                   <MenuItem value="">{t('richTextEditor.sizeNormal')}</MenuItem>
-                  <MenuItem value="0.75em">{t('richTextEditor.sizeSmall')}</MenuItem>
-                  <MenuItem value="1.5em">{t('richTextEditor.sizeLarge')}</MenuItem>
-                  <MenuItem value="2.5em">{t('richTextEditor.sizeHuge')}</MenuItem>
+                  <MenuItem value="0.75em">
+                    {t('richTextEditor.sizeSmall')}
+                  </MenuItem>
+                  <MenuItem value="1.5em">
+                    {t('richTextEditor.sizeLarge')}
+                  </MenuItem>
+                  <MenuItem value="2.5em">
+                    {t('richTextEditor.sizeHuge')}
+                  </MenuItem>
                 </Select>
 
                 {/* Text effect selector */}
@@ -2121,17 +2260,29 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     <em>{t('richTextEditor.effectNone', 'None')}</em>
                   </MenuItem>
                   {/* Shadow Effects */}
-                  <MenuItem value="shadow" sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+                  <MenuItem
+                    value="shadow"
+                    sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
+                  >
                     {t('richTextEditor.effectShadow', 'Shadow')}
                   </MenuItem>
-                  <MenuItem value="shadow-light" sx={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}>
+                  <MenuItem
+                    value="shadow-light"
+                    sx={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}
+                  >
                     {t('richTextEditor.effectShadowLight', 'Light Shadow')}
                   </MenuItem>
-                  <MenuItem value="shadow-hard" sx={{ textShadow: '3px 3px 0 rgba(0,0,0,0.8)' }}>
+                  <MenuItem
+                    value="shadow-hard"
+                    sx={{ textShadow: '3px 3px 0 rgba(0,0,0,0.8)' }}
+                  >
                     {t('richTextEditor.effectShadowHard', 'Hard Shadow')}
                   </MenuItem>
                   {/* Glow Effects */}
-                  <MenuItem value="glow" sx={{ textShadow: '0 0 10px currentColor' }}>
+                  <MenuItem
+                    value="glow"
+                    sx={{ textShadow: '0 0 10px currentColor' }}
+                  >
                     {t('richTextEditor.effectGlow', 'Glow')}
                   </MenuItem>
                   <MenuItem
@@ -2165,7 +2316,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     {t('richTextEditor.effectGlowPurple', 'Purple Glow')}
                   </MenuItem>
                   {/* Outline Effects */}
-                  <MenuItem value="outline" sx={{ WebkitTextStroke: '1px currentColor' }}>
+                  <MenuItem
+                    value="outline"
+                    sx={{ WebkitTextStroke: '1px currentColor' }}
+                  >
                     {t('richTextEditor.effectOutline', 'Outline')}
                   </MenuItem>
                   <MenuItem
@@ -2174,14 +2328,18 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   >
                     {t('richTextEditor.effectOutlineWhite', 'White Outline')}
                   </MenuItem>
-                  <MenuItem value="outline-black" sx={{ WebkitTextStroke: '1px black' }}>
+                  <MenuItem
+                    value="outline-black"
+                    sx={{ WebkitTextStroke: '1px black' }}
+                  >
                     {t('richTextEditor.effectOutlineBlack', 'Black Outline')}
                   </MenuItem>
                   {/* 3D Effects */}
                   <MenuItem
                     value="emboss"
                     sx={{
-                      textShadow: '-1px -1px 0 rgba(255,255,255,0.5), 1px 1px 0 rgba(0,0,0,0.5)',
+                      textShadow:
+                        '-1px -1px 0 rgba(255,255,255,0.5), 1px 1px 0 rgba(0,0,0,0.5)',
                     }}
                   >
                     {t('richTextEditor.effectEmboss', 'Emboss')}
@@ -2189,7 +2347,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <MenuItem
                     value="engrave"
                     sx={{
-                      textShadow: '1px 1px 0 rgba(255,255,255,0.5), -1px -1px 0 rgba(0,0,0,0.5)',
+                      textShadow:
+                        '1px 1px 0 rgba(255,255,255,0.5), -1px -1px 0 rgba(0,0,0,0.5)',
                     }}
                   >
                     {t('richTextEditor.effectEngrave', 'Engrave')}
@@ -2202,14 +2361,18 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   >
                     {t('richTextEditor.effect3D', '3D')}
                   </MenuItem>
-                  <MenuItem value="retro" sx={{ textShadow: '3px 3px 0 #f0f, 6px 6px 0 #0ff' }}>
+                  <MenuItem
+                    value="retro"
+                    sx={{ textShadow: '3px 3px 0 #f0f, 6px 6px 0 #0ff' }}
+                  >
                     {t('richTextEditor.effectRetro', 'Retro')}
                   </MenuItem>
                   {/* Neon Effects */}
                   <MenuItem
                     value="neon"
                     sx={{
-                      textShadow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00de',
+                      textShadow:
+                        '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00de',
                     }}
                   >
                     {t('richTextEditor.effectNeon', 'Neon')}
@@ -2217,7 +2380,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <MenuItem
                     value="neon-cyan"
                     sx={{
-                      textShadow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #00ffff',
+                      textShadow:
+                        '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #00ffff',
                     }}
                   >
                     {t('richTextEditor.effectNeonCyan', 'Cyan Neon')}
@@ -2225,7 +2389,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <MenuItem
                     value="neon-orange"
                     sx={{
-                      textShadow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff6b00',
+                      textShadow:
+                        '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff6b00',
                     }}
                   >
                     {t('richTextEditor.effectNeonOrange', 'Orange Neon')}
@@ -2245,7 +2410,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <MenuItem
                     value="gradient-gold"
                     sx={{
-                      background: 'linear-gradient(180deg, #ffd700, #ffb700, #ff9500)',
+                      background:
+                        'linear-gradient(180deg, #ffd700, #ffb700, #ff9500)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                     }}
@@ -2255,17 +2421,22 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <MenuItem
                     value="gradient-silver"
                     sx={{
-                      background: 'linear-gradient(180deg, #e8e8e8, #bbb, #888)',
+                      background:
+                        'linear-gradient(180deg, #e8e8e8, #bbb, #888)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    {t('richTextEditor.effectGradientSilver', 'Silver Gradient')}
+                    {t(
+                      'richTextEditor.effectGradientSilver',
+                      'Silver Gradient'
+                    )}
                   </MenuItem>
                   <MenuItem
                     value="gradient-fire"
                     sx={{
-                      background: 'linear-gradient(180deg, #ff0000, #ff6600, #ffcc00)',
+                      background:
+                        'linear-gradient(180deg, #ff0000, #ff6600, #ffcc00)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                     }}
@@ -2275,7 +2446,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   <MenuItem
                     value="gradient-ice"
                     sx={{
-                      background: 'linear-gradient(180deg, #00bfff, #87ceeb, #e0ffff)',
+                      background:
+                        'linear-gradient(180deg, #00bfff, #87ceeb, #e0ffff)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                     }}
@@ -2290,10 +2462,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    {t('richTextEditor.effectGradientSunset', 'Sunset Gradient')}
+                    {t(
+                      'richTextEditor.effectGradientSunset',
+                      'Sunset Gradient'
+                    )}
                   </MenuItem>
                   {/* Animation Effects */}
-                  <MenuItem value="anim-blink" sx={{ animation: 'ql-blink 1s step-end infinite' }}>
+                  <MenuItem
+                    value="anim-blink"
+                    sx={{ animation: 'ql-blink 1s step-end infinite' }}
+                  >
                     {t('richTextEditor.effectAnimBlink', 'Blink')}
                   </MenuItem>
                   <MenuItem
@@ -2477,7 +2655,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         anchorEl={emojiPosition ? undefined : emojiAnchorEl}
         anchorReference={emojiPosition ? 'anchorPosition' : 'anchorEl'}
         anchorPosition={
-          emojiPosition ? { top: emojiPosition.top, left: emojiPosition.left } : undefined
+          emojiPosition
+            ? { top: emojiPosition.top, left: emojiPosition.left }
+            : undefined
         }
         onClose={handleEmojiClose}
         anchorOrigin={{
@@ -2496,25 +2676,41 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <Box>
             <EmojiPicker
               onEmojiClick={handleEmojiSelect}
-              theme={theme.palette.mode === 'dark' ? EmojiTheme.DARK : EmojiTheme.LIGHT}
+              theme={
+                theme.palette.mode === 'dark'
+                  ? EmojiTheme.DARK
+                  : EmojiTheme.LIGHT
+              }
               width={350}
               height={400}
-              searchPlaceholder={t('richTextEditor.emojiSearch', 'Search emoji...')}
+              searchPlaceholder={t(
+                'richTextEditor.emojiSearch',
+                'Search emoji...'
+              )}
               previewConfig={{
                 showPreview: false,
               }}
               categories={[
                 {
                   category: Categories.SUGGESTED,
-                  name: t('richTextEditor.emojiFrequentlyUsed', 'Frequently Used'),
+                  name: t(
+                    'richTextEditor.emojiFrequentlyUsed',
+                    'Frequently Used'
+                  ),
                 },
                 {
                   category: Categories.SMILEYS_PEOPLE,
-                  name: t('richTextEditor.emojiSmileysAndPeople', 'Smileys & People'),
+                  name: t(
+                    'richTextEditor.emojiSmileysAndPeople',
+                    'Smileys & People'
+                  ),
                 },
                 {
                   category: Categories.ANIMALS_NATURE,
-                  name: t('richTextEditor.emojiAnimalsAndNature', 'Animals & Nature'),
+                  name: t(
+                    'richTextEditor.emojiAnimalsAndNature',
+                    'Animals & Nature'
+                  ),
                 },
                 {
                   category: Categories.FOOD_DRINK,
@@ -2522,7 +2718,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 },
                 {
                   category: Categories.TRAVEL_PLACES,
-                  name: t('richTextEditor.emojiTravelAndPlaces', 'Travel & Places'),
+                  name: t(
+                    'richTextEditor.emojiTravelAndPlaces',
+                    'Travel & Places'
+                  ),
                 },
                 {
                   category: Categories.ACTIVITIES,
@@ -2569,7 +2768,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         onClose={handleContextMenuClose}
         anchorReference="anchorPosition"
         anchorPosition={
-          contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
         }
       >
         <MenuItem
@@ -2610,25 +2811,33 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <ListItemIcon>
             <EmojiIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('richTextEditor.insertEmoji', 'Insert Emoji')}</ListItemText>
+          <ListItemText>
+            {t('richTextEditor.insertEmoji', 'Insert Emoji')}
+          </ListItemText>
         </MenuItem>
         <MenuItem onClick={insertLink}>
           <ListItemIcon>
             <LinkIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('richTextEditor.insertLink', 'Insert Link')}</ListItemText>
+          <ListItemText>
+            {t('richTextEditor.insertLink', 'Insert Link')}
+          </ListItemText>
         </MenuItem>
         <MenuItem onClick={insertImage}>
           <ListItemIcon>
             <ImageIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('richTextEditor.insertImage', 'Insert Image')}</ListItemText>
+          <ListItemText>
+            {t('richTextEditor.insertImage', 'Insert Image')}
+          </ListItemText>
         </MenuItem>
         <MenuItem onClick={insertVideo}>
           <ListItemIcon>
             <VideoIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('richTextEditor.insertVideo', 'Insert Video')}</ListItemText>
+          <ListItemText>
+            {t('richTextEditor.insertVideo', 'Insert Video')}
+          </ListItemText>
         </MenuItem>
         <MenuItem onClick={formatBold}>
           <ListItemIcon>
@@ -2646,13 +2855,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <ListItemIcon>
             <UnderlineIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('richTextEditor.underline', 'Underline')}</ListItemText>
+          <ListItemText>
+            {t('richTextEditor.underline', 'Underline')}
+          </ListItemText>
         </MenuItem>
         <MenuItem onClick={clearFormatting}>
           <ListItemIcon>
             <ClearIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('richTextEditor.clearFormatting', 'Clear Formatting')}</ListItemText>
+          <ListItemText>
+            {t('richTextEditor.clearFormatting', 'Clear Formatting')}
+          </ListItemText>
         </MenuItem>
       </Menu>
 
@@ -2688,8 +2901,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       </Menu>
 
       {/* Link Insert Dialog */}
-      <Dialog open={linkDialogOpen} onClose={handleLinkDialogClose} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('richTextEditor.insertLink', 'Insert Link')}</DialogTitle>
+      <Dialog
+        open={linkDialogOpen}
+        onClose={handleLinkDialogClose}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          {t('richTextEditor.insertLink', 'Insert Link')}
+        </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
             <TextField
@@ -2700,7 +2920,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               onChange={(e) => setLinkUrl(e.target.value)}
               fullWidth
               required
-              helperText={t('richTextEditor.linkUrlHelp', 'Enter the web address (URL)')}
+              helperText={t(
+                'richTextEditor.linkUrlHelp',
+                'Enter the web address (URL)'
+              )}
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && linkUrl) {
                   handleLinkInsert();
@@ -2709,27 +2932,49 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             />
             <TextField
               label={t('richTextEditor.linkText', 'Display Text (Optional)')}
-              placeholder={t('richTextEditor.linkTextPlaceholder', 'Text to display')}
+              placeholder={t(
+                'richTextEditor.linkTextPlaceholder',
+                'Text to display'
+              )}
               value={linkText}
               onChange={(e) => setLinkText(e.target.value)}
               fullWidth
-              helperText={t('richTextEditor.linkTextHelp', 'Leave empty to use URL as text')}
-              disabled={savedSelectionRef.current && savedSelectionRef.current.length > 0}
+              helperText={t(
+                'richTextEditor.linkTextHelp',
+                'Leave empty to use URL as text'
+              )}
+              disabled={
+                savedSelectionRef.current &&
+                savedSelectionRef.current.length > 0
+              }
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleLinkDialogClose}>{t('common.cancel', 'Cancel')}</Button>
-          <Button onClick={handleLinkInsert} variant="contained" disabled={!linkUrl}>
+          <Button onClick={handleLinkDialogClose}>
+            {t('common.cancel', 'Cancel')}
+          </Button>
+          <Button
+            onClick={handleLinkInsert}
+            variant="contained"
+            disabled={!linkUrl}
+          >
             {t('common.insert', 'Insert')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Image Insert Dialog */}
-      <Dialog open={imageDialogOpen} onClose={handleImageDialogClose} maxWidth="lg" fullWidth>
+      <Dialog
+        open={imageDialogOpen}
+        onClose={handleImageDialogClose}
+        maxWidth="lg"
+        fullWidth
+      >
         <DialogTitle>
-          {isEditingImage ? t('richTextEditor.imageEdit') : t('richTextEditor.insertImage')}
+          {isEditingImage
+            ? t('richTextEditor.imageEdit')
+            : t('richTextEditor.insertImage')}
         </DialogTitle>
         <DialogContent sx={{ height: '70vh', p: 0, overflow: 'hidden' }}>
           <Box sx={{ display: 'flex', height: '100%' }}>
@@ -2746,10 +2991,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                 {/* Image Source Group */}
                 <Paper variant="outlined" sx={{ p: 2 }}>
-                  <Typography variant="subtitle2" gutterBottom sx={{ mb: 2, fontWeight: 600 }}>
+                  <Typography
+                    variant="subtitle2"
+                    gutterBottom
+                    sx={{ mb: 2, fontWeight: 600 }}
+                  >
                     {t('richTextEditor.imageSource')}
                   </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+                  >
                     {/* Image URL */}
                     <TextField
                       autoFocus
@@ -2770,7 +3021,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                               : t('richTextEditor.imageUrlHelp')
                       }
                       onKeyPress={(e) => {
-                        if (e.key === 'Enter' && imageUrl && imageUrlValid === true) {
+                        if (
+                          e.key === 'Enter' &&
+                          imageUrl &&
+                          imageUrlValid === true
+                        ) {
                           handleImageInsert();
                         }
                       }}
@@ -2812,21 +3067,35 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       }}
                     >
                       {/* Width Selection and Aspect Ratio */}
-                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                      <Box
+                        sx={{ display: 'flex', gap: 2, alignItems: 'center' }}
+                      >
                         <FormControl fullWidth>
-                          <InputLabel>{t('richTextEditor.imageWidth')}</InputLabel>
+                          <InputLabel>
+                            {t('richTextEditor.imageWidth')}
+                          </InputLabel>
                           <Select
                             value={imageWidth}
                             label={t('richTextEditor.imageWidth')}
-                            onChange={(e) => setImageWidth(e.target.value as any)}
+                            onChange={(e) =>
+                              setImageWidth(e.target.value as any)
+                            }
                           >
                             <MenuItem value="original">
                               {t('richTextEditor.imageWidthOriginal')}
                             </MenuItem>
-                            <MenuItem value="25">{t('richTextEditor.imageWidth25')}</MenuItem>
-                            <MenuItem value="50">{t('richTextEditor.imageWidth50')}</MenuItem>
-                            <MenuItem value="75">{t('richTextEditor.imageWidth75')}</MenuItem>
-                            <MenuItem value="100">{t('richTextEditor.imageWidth100')}</MenuItem>
+                            <MenuItem value="25">
+                              {t('richTextEditor.imageWidth25')}
+                            </MenuItem>
+                            <MenuItem value="50">
+                              {t('richTextEditor.imageWidth50')}
+                            </MenuItem>
+                            <MenuItem value="75">
+                              {t('richTextEditor.imageWidth75')}
+                            </MenuItem>
+                            <MenuItem value="100">
+                              {t('richTextEditor.imageWidth100')}
+                            </MenuItem>
                             <MenuItem value="custom">
                               {t('richTextEditor.imageWidthCustom')}
                             </MenuItem>
@@ -2836,7 +3105,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                           control={
                             <Checkbox
                               checked={imageAspectRatio}
-                              onChange={(e) => setImageAspectRatio(e.target.checked)}
+                              onChange={(e) =>
+                                setImageAspectRatio(e.target.checked)
+                              }
                             />
                           }
                           label={t('richTextEditor.imageAspectRatio')}
@@ -2848,10 +3119,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       {imageWidth === 'custom' && (
                         <TextField
                           label={t('richTextEditor.imageWidthCustom')}
-                          placeholder={t('richTextEditor.imageWidthCustomPlaceholder')}
+                          placeholder={t(
+                            'richTextEditor.imageWidthCustomPlaceholder'
+                          )}
                           value={imageCustomWidth}
                           onChange={(e) =>
-                            setImageCustomWidth(e.target.value.replace(/[^0-9]/g, ''))
+                            setImageCustomWidth(
+                              e.target.value.replace(/[^0-9]/g, '')
+                            )
                           }
                           fullWidth
                           helperText={t('richTextEditor.imageWidthCustomHelp')}
@@ -2861,7 +3136,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
                       {/* Alignment */}
                       <FormControl component="fieldset">
-                        <FormLabel component="legend">{t('richTextEditor.imageAlign')}</FormLabel>
+                        <FormLabel component="legend">
+                          {t('richTextEditor.imageAlign')}
+                        </FormLabel>
                         <RadioGroup
                           row
                           value={imageAlign}
@@ -2894,14 +3171,22 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         }}
                       >
                         <FormControl sx={{ flex: 1 }}>
-                          <InputLabel>{t('richTextEditor.imageBorder')}</InputLabel>
+                          <InputLabel>
+                            {t('richTextEditor.imageBorder')}
+                          </InputLabel>
                           <Select
                             value={imageBorder}
                             label={t('richTextEditor.imageBorder')}
-                            onChange={(e) => setImageBorder(e.target.value as any)}
+                            onChange={(e) =>
+                              setImageBorder(e.target.value as any)
+                            }
                           >
-                            <MenuItem value="none">{t('richTextEditor.imageBorderNone')}</MenuItem>
-                            <MenuItem value="thin">{t('richTextEditor.imageBorderThin')}</MenuItem>
+                            <MenuItem value="none">
+                              {t('richTextEditor.imageBorderNone')}
+                            </MenuItem>
+                            <MenuItem value="thin">
+                              {t('richTextEditor.imageBorderThin')}
+                            </MenuItem>
                             <MenuItem value="medium">
                               {t('richTextEditor.imageBorderMedium')}
                             </MenuItem>
@@ -2924,7 +3209,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                             <TextField
                               label={t('richTextEditor.imageBorderColor')}
                               value={imageBorderColor}
-                              onChange={(e) => setImageBorderColor(e.target.value)}
+                              onChange={(e) =>
+                                setImageBorderColor(e.target.value)
+                              }
                               fullWidth
                               placeholder="#cccccc"
                             />
@@ -2933,7 +3220,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                               type="color"
                               value={imageBorderColor}
                               onChange={(e) =>
-                                setImageBorderColor((e.target as HTMLInputElement).value)
+                                setImageBorderColor(
+                                  (e.target as HTMLInputElement).value
+                                )
                               }
                               sx={{
                                 width: 60,
@@ -2957,11 +3246,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         }}
                       >
                         <FormControl sx={{ flex: 1 }}>
-                          <InputLabel>{t('richTextEditor.imageBorderRadius')}</InputLabel>
+                          <InputLabel>
+                            {t('richTextEditor.imageBorderRadius')}
+                          </InputLabel>
                           <Select
                             value={imageBorderRadius}
                             label={t('richTextEditor.imageBorderRadius')}
-                            onChange={(e) => setImageBorderRadius(e.target.value as any)}
+                            onChange={(e) =>
+                              setImageBorderRadius(e.target.value as any)
+                            }
                           >
                             <MenuItem value="none">
                               {t('richTextEditor.imageBorderRadiusNone')}
@@ -2987,7 +3280,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                             label={t('richTextEditor.imageCustomBorderRadius')}
                             type="number"
                             value={imageCustomBorderRadius}
-                            onChange={(e) => setImageCustomBorderRadius(e.target.value)}
+                            onChange={(e) =>
+                              setImageCustomBorderRadius(e.target.value)
+                            }
                             sx={{ flex: 1 }}
                             placeholder="8"
                             inputProps={{ min: 0 }}
@@ -3004,13 +3299,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         }}
                       >
                         <FormControl sx={{ flex: 1 }}>
-                          <InputLabel>{t('richTextEditor.imageShadow')}</InputLabel>
+                          <InputLabel>
+                            {t('richTextEditor.imageShadow')}
+                          </InputLabel>
                           <Select
                             value={imageShadow}
                             label={t('richTextEditor.imageShadow')}
-                            onChange={(e) => setImageShadow(e.target.value as any)}
+                            onChange={(e) =>
+                              setImageShadow(e.target.value as any)
+                            }
                           >
-                            <MenuItem value="none">{t('richTextEditor.imageShadowNone')}</MenuItem>
+                            <MenuItem value="none">
+                              {t('richTextEditor.imageShadowNone')}
+                            </MenuItem>
                             <MenuItem value="small">
                               {t('richTextEditor.imageShadowSmall')}
                             </MenuItem>
@@ -3026,11 +3327,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                         {/* Shadow Direction (conditional, same line) */}
                         {imageShadow !== 'none' && (
                           <FormControl sx={{ flex: 1 }}>
-                            <InputLabel>{t('richTextEditor.imageShadowDirection')}</InputLabel>
+                            <InputLabel>
+                              {t('richTextEditor.imageShadowDirection')}
+                            </InputLabel>
                             <Select
                               value={imageShadowDirection}
                               label={t('richTextEditor.imageShadowDirection')}
-                              onChange={(e) => setImageShadowDirection(e.target.value as any)}
+                              onChange={(e) =>
+                                setImageShadowDirection(e.target.value as any)
+                              }
                             >
                               <MenuItem value="all">
                                 {t('richTextEditor.imageShadowDirectionAll')}
@@ -3054,11 +3359,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
                       {/* Shadow Color (conditional, separate line) */}
                       {imageShadow !== 'none' && (
-                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                        <Box
+                          sx={{ display: 'flex', gap: 1, alignItems: 'center' }}
+                        >
                           <TextField
                             label={t('richTextEditor.imageShadowColor')}
                             value={imageShadowColor}
-                            onChange={(e) => setImageShadowColor(e.target.value)}
+                            onChange={(e) =>
+                              setImageShadowColor(e.target.value)
+                            }
                             fullWidth
                             placeholder="rgba(0, 0, 0, 0.3)"
                           />
@@ -3072,7 +3381,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                                 : imageShadowColor
                             }
                             onChange={(e) =>
-                              setImageShadowColor((e.target as HTMLInputElement).value)
+                              setImageShadowColor(
+                                (e.target as HTMLInputElement).value
+                              )
                             }
                             sx={{
                               width: 60,
@@ -3099,7 +3410,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 overflow: 'auto',
                 p: 3,
                 bgcolor: (theme) =>
-                  theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.02)',
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(0, 0, 0, 0.2)'
+                    : 'rgba(0, 0, 0, 0.02)',
               }}
             >
               <Box
@@ -3179,7 +3492,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                                     shadowValue = `0 0 ${blur}`;
                                   } else if (imageShadowDirection === 'top') {
                                     shadowValue = `0 -${offset} ${blur}`;
-                                  } else if (imageShadowDirection === 'bottom') {
+                                  } else if (
+                                    imageShadowDirection === 'bottom'
+                                  ) {
                                     shadowValue = `0 ${offset} ${blur}`;
                                   } else if (imageShadowDirection === 'left') {
                                     shadowValue = `-${offset} 0 ${blur}`;
@@ -3197,7 +3512,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                                   ? '8px'
                                   : imageBorderRadius === 'large'
                                     ? '16px'
-                                    : imageBorderRadius === 'custom' && imageCustomBorderRadius
+                                    : imageBorderRadius === 'custom' &&
+                                        imageCustomBorderRadius
                                       ? `${imageCustomBorderRadius}px`
                                       : '0'
                               : '0',
@@ -3208,10 +3524,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                           // Show alt text when image fails to load
                           const parent = target.parentElement;
                           if (parent && imageAltText) {
-                            const altTextElement = document.createElement('div');
+                            const altTextElement =
+                              document.createElement('div');
                             altTextElement.textContent = imageAltText;
                             altTextElement.style.padding = '20px';
-                            altTextElement.style.color = theme.palette.text.secondary;
+                            altTextElement.style.color =
+                              theme.palette.text.secondary;
                             altTextElement.style.textAlign = 'center';
                             parent.appendChild(altTextElement);
                           }
@@ -3262,7 +3580,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       </Dialog>
 
       {/* Video Insert Dialog */}
-      <Dialog open={videoDialogOpen} onClose={handleVideoDialogClose} maxWidth="lg" fullWidth>
+      <Dialog
+        open={videoDialogOpen}
+        onClose={handleVideoDialogClose}
+        maxWidth="lg"
+        fullWidth
+      >
         <DialogTitle>{t('richTextEditor.insertVideo')}</DialogTitle>
         <DialogContent sx={{ height: '60vh', p: 0, overflow: 'hidden' }}>
           <Box sx={{ display: 'flex', height: '100%' }}>
@@ -3301,7 +3624,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       <MenuItem value="50">50%</MenuItem>
                       <MenuItem value="75">75%</MenuItem>
                       <MenuItem value="100">100%</MenuItem>
-                      <MenuItem value="custom">{t('richTextEditor.videoWidthCustom')}</MenuItem>
+                      <MenuItem value="custom">
+                        {t('richTextEditor.videoWidthCustom')}
+                      </MenuItem>
                     </Select>
                   </FormControl>
 
@@ -3310,7 +3635,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     <TextField
                       label={t('richTextEditor.videoWidthPixels')}
                       value={videoCustomWidth}
-                      onChange={(e) => setVideoCustomWidth(e.target.value.replace(/\D/g, ''))}
+                      onChange={(e) =>
+                        setVideoCustomWidth(e.target.value.replace(/\D/g, ''))
+                      }
                       placeholder="640"
                       sx={{ flex: 1 }}
                       type="number"
@@ -3355,7 +3682,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     }
                     label={t('richTextEditor.videoAutoplay')}
                   />
-                  <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ ml: 4 }}
+                  >
                     {t('richTextEditor.videoAutoplayHelp')}
                   </Typography>
                 </FormControl>
@@ -3371,7 +3702,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     }
                     label={t('richTextEditor.videoMuted')}
                   />
-                  <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ ml: 4 }}
+                  >
                     {t('richTextEditor.videoMutedHelp')}
                   </Typography>
                 </FormControl>
@@ -3387,7 +3722,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     }
                     label={t('richTextEditor.videoLoop')}
                   />
-                  <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ ml: 4 }}
+                  >
                     {t('richTextEditor.videoLoopHelp')}
                   </Typography>
                 </FormControl>
@@ -3402,7 +3741,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 overflow: 'auto',
                 p: 3,
                 bgcolor: (theme) =>
-                  theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.02)',
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(0, 0, 0, 0.2)'
+                    : 'rgba(0, 0, 0, 0.02)',
               }}
             >
               <Box
@@ -3421,7 +3762,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     sx={{
                       p: 2,
                       flex: 1,
-                      backgroundColor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+                      backgroundColor:
+                        theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
                     }}
                   >
                     <Box
@@ -3517,7 +3859,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             onClick={handleVideoInsert}
             variant="contained"
             disabled={
-              !videoUrl || !videoPreviewUrl || (videoWidth === 'custom' && !videoCustomWidth)
+              !videoUrl ||
+              !videoPreviewUrl ||
+              (videoWidth === 'custom' && !videoCustomWidth)
             }
           >
             {t('common.insert')}

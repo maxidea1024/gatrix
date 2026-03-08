@@ -138,7 +138,9 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
             selected={language === lang}
           >
             <ListItemIcon>
-              <Box sx={{ fontSize: '1.2rem', minWidth: 'auto', mr: 1 }}>{languageFlags[lang]}</Box>
+              <Box sx={{ fontSize: '1.2rem', minWidth: 'auto', mr: 1 }}>
+                {languageFlags[lang]}
+              </Box>
               {language === lang && <Check fontSize="small" />}
             </ListItemIcon>
             <ListItemText>{getLanguageDisplayName(lang)}</ListItemText>
@@ -196,7 +198,9 @@ export const CompactLanguageSelector: React.FC = () => {
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Box sx={{ fontSize: '1.2rem' }}>{languageFlags[lang]}</Box>
-              <Typography variant="body2">{getLanguageDisplayName(lang)}</Typography>
+              <Typography variant="body2">
+                {getLanguageDisplayName(lang)}
+              </Typography>
               {language === lang && <Check fontSize="small" color="primary" />}
             </Box>
           </MenuItem>

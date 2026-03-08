@@ -40,7 +40,9 @@ export class CmsCashShopService {
    * Get all valid CMS CashShop products for an environment
    * @param environment Environment name
    */
-  static async getProducts(environmentId: string): Promise<CmsCashShopProduct[]> {
+  static async getProducts(
+    environmentId: string
+  ): Promise<CmsCashShopProduct[]> {
     try {
       const data = await PlanningDataService.getCashShopLookup(environmentId);
       const products: CmsCashShopProduct[] = data.items || [];
@@ -62,7 +64,10 @@ export class CmsCashShopService {
    * @param product CMS product
    * @param lang Language code (defaults to 'zh')
    */
-  static getLocalizedName(product: CmsCashShopProduct, lang: SupportedLanguage = 'zh'): string {
+  static getLocalizedName(
+    product: CmsCashShopProduct,
+    lang: SupportedLanguage = 'zh'
+  ): string {
     return product.name[lang] || product.name.zh || product.name.ko || '';
   }
 
@@ -75,6 +80,11 @@ export class CmsCashShopService {
     product: CmsCashShopProduct,
     lang: SupportedLanguage = 'zh'
   ): string {
-    return product.description[lang] || product.description.zh || product.description.ko || '';
+    return (
+      product.description[lang] ||
+      product.description.zh ||
+      product.description.ko ||
+      ''
+    );
   }
 }

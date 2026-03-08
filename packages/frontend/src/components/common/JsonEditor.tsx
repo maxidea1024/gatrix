@@ -61,7 +61,8 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         if (onValidation) onValidation(true, null);
         setInternalError(null);
       } catch (e: any) {
-        const errorMsg = e.message || (json5Mode ? 'Invalid JSON5' : 'Invalid JSON');
+        const errorMsg =
+          e.message || (json5Mode ? 'Invalid JSON5' : 'Invalid JSON');
         if (onValidationError) onValidationError(errorMsg);
         if (onValidation) onValidation(false, errorMsg);
         setInternalError(errorMsg);
@@ -130,7 +131,9 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
           label: 'Format JSON',
           keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF],
           run: () => {
-            const formatAction = editor.getAction('editor.action.formatDocument');
+            const formatAction = editor.getAction(
+              'editor.action.formatDocument'
+            );
             if (formatAction) {
               formatAction.run();
             }
@@ -174,7 +177,11 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 
   return (
     <Box
-      sx={isFlexHeight ? { display: 'flex', flexDirection: 'column', height: '100%' } : undefined}
+      sx={
+        isFlexHeight
+          ? { display: 'flex', flexDirection: 'column', height: '100%' }
+          : undefined
+      }
     >
       {label && (
         <Typography variant="subtitle2" gutterBottom sx={{ flexShrink: 0 }}>
@@ -280,7 +287,11 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
             {error}
           </Alert>
         ) : helperText ? (
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mt: 1, display: 'block' }}
+          >
             {helperText}
           </Typography>
         ) : (
@@ -295,7 +306,9 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 export default JsonEditor;
 
 // Utility function to parse JSON5 and convert to standard JSON object
-export const parseJson5 = (text: string): { success: boolean; data?: any; error?: string } => {
+export const parseJson5 = (
+  text: string
+): { success: boolean; data?: any; error?: string } => {
   try {
     const trimmed = (text || '').trim();
     if (trimmed.length === 0) {

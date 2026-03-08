@@ -57,7 +57,9 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
 
   const handleFlagClick = (flagName: string, environmentId?: string) => {
     onNavigate?.();
-    const envParam = environmentId ? `?env=${encodeURIComponent(environmentId)}` : '';
+    const envParam = environmentId
+      ? `?env=${encodeURIComponent(environmentId)}`
+      : '';
     navigate(`/feature-flags/${encodeURIComponent(flagName)}${envParam}`);
   };
 
@@ -73,7 +75,11 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
 
   if (!hasAny) {
     return (
-      <Typography variant="body2" color="text.secondary" sx={{ py: 1, textAlign: 'center' }}>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ py: 1, textAlign: 'center' }}
+      >
         {t('common.noReferences')}
       </Typography>
     );
@@ -87,13 +93,21 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
           {showHeaders && (
             <Typography
               variant="subtitle2"
-              sx={{ mb: 1, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}
+              sx={{
+                mb: 1,
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+              }}
             >
               <FlagIcon fontSize="small" color="primary" />
               {t('common.referencingFlags')}
             </Typography>
           )}
-          <TableContainer sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
+          <TableContainer
+            sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}
+          >
             <Table size="small">
               <TableHead>
                 <TableRow sx={{ bgcolor: 'action.hover' }}>
@@ -113,11 +127,20 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
                   <TableRow
                     key={`flag-${index}`}
                     hover
-                    onClick={() => handleFlagClick(flag.flagName, flag.environmentId)}
-                    sx={{ cursor: 'pointer', '&:last-child td': { borderBottom: 0 } }}
+                    onClick={() =>
+                      handleFlagClick(flag.flagName, flag.environmentId)
+                    }
+                    sx={{
+                      cursor: 'pointer',
+                      '&:last-child td': { borderBottom: 0 },
+                    }}
                   >
                     <TableCell sx={{ py: 0.75 }}>
-                      <Typography variant="body2" color="primary" sx={{ fontWeight: 500 }}>
+                      <Typography
+                        variant="body2"
+                        color="primary"
+                        sx={{ fontWeight: 500 }}
+                      >
                         {flag.flagName}
                       </Typography>
                     </TableCell>
@@ -152,13 +175,21 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
           {showHeaders && (
             <Typography
               variant="subtitle2"
-              sx={{ mb: 1, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}
+              sx={{
+                mb: 1,
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+              }}
             >
               <SegmentIcon fontSize="small" color="primary" />
               {t('common.referencingSegments')}
             </Typography>
           )}
-          <TableContainer sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
+          <TableContainer
+            sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}
+          >
             <Table size="small">
               <TableHead>
                 <TableRow sx={{ bgcolor: 'action.hover' }}>
@@ -173,10 +204,17 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
                     key={`segment-${index}`}
                     hover
                     onClick={handleSegmentClick}
-                    sx={{ cursor: 'pointer', '&:last-child td': { borderBottom: 0 } }}
+                    sx={{
+                      cursor: 'pointer',
+                      '&:last-child td': { borderBottom: 0 },
+                    }}
                   >
                     <TableCell sx={{ py: 0.75 }}>
-                      <Typography variant="body2" color="primary" sx={{ fontWeight: 500 }}>
+                      <Typography
+                        variant="body2"
+                        color="primary"
+                        sx={{ fontWeight: 500 }}
+                      >
                         {segment.segmentName}
                       </Typography>
                     </TableCell>
@@ -194,13 +232,21 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
           {showHeaders && (
             <Typography
               variant="subtitle2"
-              sx={{ mb: 1, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}
+              sx={{
+                mb: 1,
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+              }}
             >
               <TemplateIcon fontSize="small" color="primary" />
               {t('common.referencingTemplates')}
             </Typography>
           )}
-          <TableContainer sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
+          <TableContainer
+            sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}
+          >
             <Table size="small">
               <TableHead>
                 <TableRow sx={{ bgcolor: 'action.hover' }}>
@@ -218,10 +264,17 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
                     key={`template-${index}`}
                     hover
                     onClick={handleTemplateClick}
-                    sx={{ cursor: 'pointer', '&:last-child td': { borderBottom: 0 } }}
+                    sx={{
+                      cursor: 'pointer',
+                      '&:last-child td': { borderBottom: 0 },
+                    }}
                   >
                     <TableCell sx={{ py: 0.75 }}>
-                      <Typography variant="body2" color="primary" sx={{ fontWeight: 500 }}>
+                      <Typography
+                        variant="body2"
+                        color="primary"
+                        sx={{ fontWeight: 500 }}
+                      >
                         {template.flowName}
                       </Typography>
                     </TableCell>

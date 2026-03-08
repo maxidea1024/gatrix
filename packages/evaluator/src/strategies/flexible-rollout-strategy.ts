@@ -5,7 +5,11 @@
  * This is the only strategy that accepts a user-configurable stickiness parameter.
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
+import {
+  EvaluationContext,
+  StrategyParameters,
+  StrategyEvaluationResult,
+} from '@gatrix/shared';
 import { Strategy } from './strategy';
 import { normalizedStrategyValue } from './util';
 
@@ -14,7 +18,10 @@ export class FlexibleRolloutStrategy extends Strategy {
     super('flexibleRollout');
   }
 
-  private resolveStickiness(stickiness: string, context: EvaluationContext): string | undefined {
+  private resolveStickiness(
+    stickiness: string,
+    context: EvaluationContext
+  ): string | undefined {
     switch (stickiness) {
       case 'default':
         return context.userId || context.sessionId || undefined;
@@ -32,7 +39,10 @@ export class FlexibleRolloutStrategy extends Strategy {
     }
   }
 
-  isEnabled(parameters: StrategyParameters, context: EvaluationContext): boolean {
+  isEnabled(
+    parameters: StrategyParameters,
+    context: EvaluationContext
+  ): boolean {
     return this.isEnabledWithDetails(parameters, context).enabled;
   }
 

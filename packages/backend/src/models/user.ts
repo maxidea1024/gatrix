@@ -4,7 +4,11 @@ import db from '../config/knex';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('UserModel');
-import { CreateUserData, UpdateUserData, UserWithoutPassword } from '../types/user';
+import {
+  CreateUserData,
+  UpdateUserData,
+  UserWithoutPassword,
+} from '../types/user';
 import { Model } from 'objection';
 
 // Export User class for Objection.js models
@@ -78,7 +82,9 @@ export class UserModel {
     }
   }
 
-  static async findByEmailWithoutPassword(email: string): Promise<UserWithoutPassword | null> {
+  static async findByEmailWithoutPassword(
+    email: string
+  ): Promise<UserWithoutPassword | null> {
     try {
       const user = await db('g_users')
         .select([
@@ -141,7 +147,10 @@ export class UserModel {
     }
   }
 
-  static async update(id: string, userData: UpdateUserData): Promise<UserWithoutPassword | null> {
+  static async update(
+    id: string,
+    userData: UpdateUserData
+  ): Promise<UserWithoutPassword | null> {
     try {
       const updateData: any = {};
 
@@ -246,7 +255,9 @@ export class UserModel {
         // Handle status filter (single or multiple)
         if (filters.status) {
           if (Array.isArray(filters.status)) {
-            logger.info(`Applying status filter (array): ${filters.status.join(', ')}`);
+            logger.info(
+              `Applying status filter (array): ${filters.status.join(', ')}`
+            );
             query.whereIn('g_users.status', filters.status);
           } else {
             logger.info(`Applying status filter (single): ${filters.status}`);
@@ -294,11 +305,17 @@ export class UserModel {
       };
 
       // Get total count
-      const countQuery = applyFilters(baseQuery()).count('g_users.id as total').first();
+      const countQuery = applyFilters(baseQuery())
+        .count('g_users.id as total')
+        .first();
 
       // Get users with camelCase field names
       const usersQuery = applyFilters(
-        baseQuery().leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
+        baseQuery().leftJoin(
+          'g_users as creator',
+          'g_users.createdBy',
+          'creator.id'
+        )
       )
         .select([
           'g_users.id',
@@ -364,7 +381,10 @@ export class UserModel {
     }
   }
 
-  static async updatePassword(id: string, newPassword: string): Promise<boolean> {
+  static async updatePassword(
+    id: string,
+    newPassword: string
+  ): Promise<boolean> {
     try {
       const passwordHash = await bcrypt.hash(newPassword, 12);
       const result = await db('g_users').where('id', id).update({
@@ -422,7 +442,10 @@ export class UserModel {
     try {
       await db.transaction(async (trx) => {
         // Existing 태그 할당 Delete
-        await trx('g_tag_assignments').where('entityType', 'user').where('entityId', userId).del();
+        await trx('g_tag_assignments')
+          .where('entityType', 'user')
+          .where('entityId', userId)
+          .del();
 
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
@@ -445,7 +468,11 @@ export class UserModel {
     }
   }
 
-  static async addTag(userId: string, tagId: string, createdBy: string): Promise<void> {
+  static async addTag(
+    userId: string,
+    tagId: string,
+    createdBy: string
+  ): Promise<void> {
     try {
       await db('g_tag_assignments').insert({
         tagId,
@@ -478,7 +505,10 @@ export class UserModel {
   /**
    * Update user's preferred language
    */
-  static async updateLanguage(userId: string, preferredLanguage: string): Promise<void> {
+  static async updateLanguage(
+    userId: string,
+    preferredLanguage: string
+  ): Promise<void> {
     try {
       await db('g_users').where('id', userId).update({
         preferredLanguage,
@@ -523,7 +553,11 @@ export class UserModel {
       // Scope to organisation members if orgId is provided
       if (orgId) {
         q.join('g_organisation_members as om', function () {
-          this.on('om.userId', '=', 'g_users.id').andOn('om.orgId', '=', db.raw('?', [orgId]));
+          this.on('om.userId', '=', 'g_users.id').andOn(
+            'om.orgId',
+            '=',
+            db.raw('?', [orgId])
+          );
         });
       }
 
@@ -555,7 +589,11 @@ export class UserModel {
         .where('status', 'active') // Active Used자만 동기화
         .whereNot('authType', 'service-account')
         .andWhere(function () {
-          this.where('updatedAt', '>=', since).orWhere('createdAt', '>=', since);
+          this.where('updatedAt', '>=', since).orWhere(
+            'createdAt',
+            '>=',
+            since
+          );
         })
         .orderBy('updatedAt', 'desc');
 
@@ -574,7 +612,9 @@ export class UserModel {
   static async getPermissions(userId: string): Promise<string[]> {
     try {
       // Get all role IDs from direct bindings
-      const directBindings = await db('g_role_bindings').where('userId', userId).select('roleId');
+      const directBindings = await db('g_role_bindings')
+        .where('userId', userId)
+        .select('roleId');
 
       // Get all role IDs from group bindings
       const groupBindings = await db('g_role_bindings as rb')
@@ -611,7 +651,10 @@ export class UserModel {
    * Check if user has a specific permission
    * Supports wildcard '*' permission that grants all permissions
    */
-  static async hasPermission(userId: string, permission: string): Promise<boolean> {
+  static async hasPermission(
+    userId: string,
+    permission: string
+  ): Promise<boolean> {
     try {
       const permissions = await this.getPermissions(userId);
       return permissions.includes('*') || permissions.includes(permission);
@@ -625,7 +668,10 @@ export class UserModel {
    * Check if user has any of the specified permissions
    * Supports wildcard '*' permission that grants all permissions
    */
-  static async hasAnyPermission(userId: string, permissions: string[]): Promise<boolean> {
+  static async hasAnyPermission(
+    userId: string,
+    permissions: string[]
+  ): Promise<boolean> {
     try {
       const userPerms = await this.getPermissions(userId);
       if (userPerms.includes('*')) return true;

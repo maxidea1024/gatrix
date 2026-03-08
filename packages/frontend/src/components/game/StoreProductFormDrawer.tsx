@@ -22,7 +22,9 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
-import storeProductService, { StoreProduct } from '../../services/storeProductService';
+import storeProductService, {
+  StoreProduct,
+} from '../../services/storeProductService';
 import { tagService, Tag } from '../../services/tagService';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -208,9 +210,15 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
 
     const originalData = {
       isActive: product.isActive,
-      saleStartAt: product.saleStartAt ? dayjs(product.saleStartAt).toISOString() : null,
-      saleEndAt: product.saleEndAt ? dayjs(product.saleEndAt).toISOString() : null,
-      tagIds: (product.tags || []).map((tag: any) => tag.id).sort((a: number, b: number) => a - b),
+      saleStartAt: product.saleStartAt
+        ? dayjs(product.saleStartAt).toISOString()
+        : null,
+      saleEndAt: product.saleEndAt
+        ? dayjs(product.saleEndAt).toISOString()
+        : null,
+      tagIds: (product.tags || [])
+        .map((tag: any) => tag.id)
+        .sort((a: number, b: number) => a - b),
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
@@ -271,7 +279,11 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
           payload
         );
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           enqueueSnackbar(t('storeProducts.updateSuccess'), {
             variant: 'success',
@@ -279,9 +291,16 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
         }
       } else {
         // Create new product
-        const result = await storeProductService.createStoreProduct(projectApiPath, payload);
+        const result = await storeProductService.createStoreProduct(
+          projectApiPath,
+          payload
+        );
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
         } else {
           const message = isCopy
             ? t('storeProducts.copySuccess')
@@ -326,7 +345,11 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                 <Alert
                   severity="warning"
                   action={
-                    <Button color="inherit" size="small" onClick={forceTakeover}>
+                    <Button
+                      color="inherit"
+                      size="small"
+                      onClick={forceTakeover}
+                    >
                       {t('entityLock.takeOver')}
                     </Button>
                   }
@@ -367,7 +390,11 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
               <Box>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
                   {t('storeProducts.productId')}
-                  {!isEditMode && <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>}
+                  {!isEditMode && (
+                    <span style={{ color: '#d32f2f', marginLeft: '4px' }}>
+                      *
+                    </span>
+                  )}
                 </Typography>
                 <TextField
                   inputRef={nameInputRef}
@@ -387,7 +414,11 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
               <Box>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
                   {t('storeProducts.productName')}
-                  {!isEditMode && <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>}
+                  {!isEditMode && (
+                    <span style={{ color: '#d32f2f', marginLeft: '4px' }}>
+                      *
+                    </span>
+                  )}
                 </Typography>
                 <TextField
                   value={productName}
@@ -411,7 +442,10 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                   p: 2,
                 }}
               >
-                <Typography variant="subtitle2" sx={{ mb: 2, color: 'text.secondary' }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ mb: 2, color: 'text.secondary' }}
+                >
                   {t('storeProducts.multiLangNames')}
                 </Typography>
                 <Stack spacing={1.5}>
@@ -449,7 +483,11 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
               <Box>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
                   {t('storeProducts.store')}
-                  {!isEditMode && <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>}
+                  {!isEditMode && (
+                    <span style={{ color: '#d32f2f', marginLeft: '4px' }}>
+                      *
+                    </span>
+                  )}
                 </Typography>
                 <FormControl fullWidth size="small">
                   <Select
@@ -476,7 +514,11 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                 <Box sx={{ flex: 2 }}>
                   <Typography variant="subtitle2" sx={{ mb: 1 }}>
                     {t('storeProducts.price')}
-                    {!isEditMode && <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>}
+                    {!isEditMode && (
+                      <span style={{ color: '#d32f2f', marginLeft: '4px' }}>
+                        *
+                      </span>
+                    )}
                   </Typography>
                   <TextField
                     type="number"
@@ -584,7 +626,10 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                   p: 2,
                 }}
               >
-                <Typography variant="subtitle2" sx={{ mb: 2, color: 'text.secondary' }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ mb: 2, color: 'text.secondary' }}
+                >
                   {t('storeProducts.multiLangDescriptions')}
                 </Typography>
                 <Stack spacing={1.5}>
@@ -628,10 +673,14 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
               <Box>
                 <Autocomplete
                   multiple
-                  options={availableTags.filter((tag) => typeof tag !== 'string')}
+                  options={availableTags.filter(
+                    (tag) => typeof tag !== 'string'
+                  )}
                   getOptionLabel={(option) => option.name}
                   filterSelectedOptions
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
                   value={selectedTags}
                   onChange={(_, value) => setSelectedTags(value)}
                   loading={loadingTags}
@@ -685,7 +734,9 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
               onClick={handleSave}
               disabled={saving || (!!product?.id && !isDirty)}
             >
-              {saving ? t('common.saving') : getActionLabel('save', requiresApproval, t)}
+              {saving
+                ? t('common.saving')
+                : getActionLabel('save', requiresApproval, t)}
             </Button>
           </Box>
         </Box>

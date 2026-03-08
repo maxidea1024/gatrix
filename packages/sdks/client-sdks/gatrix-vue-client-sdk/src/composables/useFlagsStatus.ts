@@ -1,5 +1,9 @@
 import { inject } from 'vue';
-import { GATRIX_READY_KEY, GATRIX_ERROR_KEY, GATRIX_HEALTHY_KEY } from '../symbols';
+import {
+  GATRIX_READY_KEY,
+  GATRIX_ERROR_KEY,
+  GATRIX_HEALTHY_KEY,
+} from '../symbols';
 
 export function useFlagsStatus() {
   const ready = inject(GATRIX_READY_KEY);

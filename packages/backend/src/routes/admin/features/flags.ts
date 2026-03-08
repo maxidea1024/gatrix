@@ -38,8 +38,14 @@ router.get(
       environmentId,
       search: search as string,
       flagType: flagType as string,
-      isEnabled: isEnabled === 'true' ? true : isEnabled === 'false' ? false : undefined,
-      isArchived: isArchived === 'true' ? true : isArchived === 'false' ? false : undefined,
+      isEnabled:
+        isEnabled === 'true' ? true : isEnabled === 'false' ? false : undefined,
+      isArchived:
+        isArchived === 'true'
+          ? true
+          : isArchived === 'false'
+            ? false
+            : undefined,
       tags: tags ? (tags as string).split(',') : undefined,
       page: parseInt(page as string) || 1,
       limit: parseInt(limit as string) || 50,

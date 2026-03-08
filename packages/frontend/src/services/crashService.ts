@@ -1,12 +1,18 @@
 import api from './api';
-import { CrashEvent, GetCrashEventsRequest, GetCrashEventsResponse } from '@/types/crash';
+import {
+  CrashEvent,
+  GetCrashEventsRequest,
+  GetCrashEventsResponse,
+} from '@/types/crash';
 import { getStoredTimezone } from '@/utils/dateFormat';
 
 class CrashService {
   /**
    * Get all crash events with pagination and filters
    */
-  async getCrashEvents(params: GetCrashEventsRequest = {}): Promise<GetCrashEventsResponse> {
+  async getCrashEvents(
+    params: GetCrashEventsRequest = {}
+  ): Promise<GetCrashEventsResponse> {
     try {
       const response = await api.get('/admin/crash-events', { params });
 
@@ -59,7 +65,11 @@ class CrashService {
   /**
    * Search crash events
    */
-  async searchCrashEvents(query: string, page = 1, limit = 10): Promise<GetCrashEventsResponse> {
+  async searchCrashEvents(
+    query: string,
+    page = 1,
+    limit = 10
+  ): Promise<GetCrashEventsResponse> {
     return this.getCrashEvents({
       search: query,
       page,
@@ -70,7 +80,10 @@ class CrashService {
   /**
    * Get recent crash events (last 24 hours)
    */
-  async getRecentCrashEvents(page = 1, limit = 10): Promise<GetCrashEventsResponse> {
+  async getRecentCrashEvents(
+    page = 1,
+    limit = 10
+  ): Promise<GetCrashEventsResponse> {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
@@ -84,7 +97,9 @@ class CrashService {
   /**
    * Get log file content for a crash event
    */
-  async getLogFile(eventId: string): Promise<{ logContent: string; logFilePath: string }> {
+  async getLogFile(
+    eventId: string
+  ): Promise<{ logContent: string; logFilePath: string }> {
     try {
       const timezone = getStoredTimezone();
       const response = await api.get(`/admin/crash-events/${eventId}/log`, {
@@ -106,7 +121,9 @@ class CrashService {
     firstLine?: string;
   }> {
     try {
-      const response = await api.get(`/admin/crash-events/${eventId}/stack-trace`);
+      const response = await api.get(
+        `/admin/crash-events/${eventId}/stack-trace`
+      );
       return response.data;
     } catch (error) {
       console.error('Error fetching stack trace:', error);

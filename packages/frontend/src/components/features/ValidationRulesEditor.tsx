@@ -37,7 +37,8 @@ const PATTERN_PRESETS = [
   },
   {
     key: 'domain',
-    pattern: '^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$',
+    pattern:
+      '^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$',
     labelKey: 'featureFlags.validation.presetDomain',
     tooltipKey: 'featureFlags.validation.presetDomainTooltip',
   },
@@ -49,7 +50,8 @@ const PATTERN_PRESETS = [
   },
   {
     key: 'ipv4',
-    pattern: '^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$',
+    pattern:
+      '^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$',
     labelKey: 'featureFlags.validation.presetIpv4',
     tooltipKey: 'featureFlags.validation.presetIpv4Tooltip',
   },
@@ -97,7 +99,8 @@ const PATTERN_PRESETS = [
   },
   {
     key: 'dateIso',
-    pattern: '^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}(:\\d{2})?(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?)?$',
+    pattern:
+      '^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}(:\\d{2})?(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})?)?$',
     labelKey: 'featureFlags.validation.presetDateIso',
     tooltipKey: 'featureFlags.validation.presetDateIsoTooltip',
   },
@@ -146,7 +149,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
   // Auto-detect custom pattern mode on mount/rules change
   useEffect(() => {
     if (currentRules.pattern) {
-      const matchesPreset = PATTERN_PRESETS.some((p) => p.pattern === currentRules.pattern);
+      const matchesPreset = PATTERN_PRESETS.some(
+        (p) => p.pattern === currentRules.pattern
+      );
       if (!matchesPreset) {
         setShowCustomPattern(true);
       }
@@ -173,7 +178,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
     (field: keyof ValidationRules, value: any) => {
       const updated = { ...currentRules, [field]: value, enabled: true };
       const cleaned = Object.fromEntries(
-        Object.entries(updated).filter(([, v]) => v !== undefined && v !== null && v !== '')
+        Object.entries(updated).filter(
+          ([, v]) => v !== undefined && v !== null && v !== ''
+        )
       ) as ValidationRules;
       onChange(Object.keys(cleaned).length > 0 ? cleaned : undefined);
     },
@@ -185,7 +192,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
     (changes: Partial<ValidationRules>) => {
       const updated = { ...currentRules, ...changes };
       const cleaned = Object.fromEntries(
-        Object.entries(updated).filter(([, v]) => v !== undefined && v !== null && v !== '')
+        Object.entries(updated).filter(
+          ([, v]) => v !== undefined && v !== null && v !== ''
+        )
       ) as ValidationRules;
       onChange(Object.keys(cleaned).length > 0 ? cleaned : {});
     },
@@ -205,7 +214,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
   // Find the matching preset for the current pattern
   const currentPreset = useMemo(() => {
     if (!currentRules.pattern) return null;
-    return PATTERN_PRESETS.find((p) => p.pattern === currentRules.pattern) || null;
+    return (
+      PATTERN_PRESETS.find((p) => p.pattern === currentRules.pattern) || null
+    );
   }, [currentRules.pattern]);
 
   // Boolean type doesn't need detailed validation rules as common rules (isRequired) are moved out
@@ -247,7 +258,10 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                     fullWidth
                     value={currentRules.minLength ?? ''}
                     onChange={(e) =>
-                      handleChange('minLength', e.target.value ? Number(e.target.value) : undefined)
+                      handleChange(
+                        'minLength',
+                        e.target.value ? Number(e.target.value) : undefined
+                      )
                     }
                     disabled={disabled}
                     inputProps={{ min: 0 }}
@@ -259,7 +273,10 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                     fullWidth
                     value={currentRules.maxLength ?? ''}
                     onChange={(e) =>
-                      handleChange('maxLength', e.target.value ? Number(e.target.value) : undefined)
+                      handleChange(
+                        'maxLength',
+                        e.target.value ? Number(e.target.value) : undefined
+                      )
                     }
                     disabled={disabled}
                     inputProps={{ min: 0 }}
@@ -269,10 +286,14 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
 
                 {/* Pattern presets */}
                 <FormControl size="small" fullWidth disabled={disabled}>
-                  <InputLabel>{t('featureFlags.validation.patternLabel')}</InputLabel>
+                  <InputLabel>
+                    {t('featureFlags.validation.patternLabel')}
+                  </InputLabel>
                   <Select
                     value={
-                      showCustomPattern && !currentPreset ? '__custom__' : currentPreset?.key || ''
+                      showCustomPattern && !currentPreset
+                        ? '__custom__'
+                        : currentPreset?.key || ''
                     }
                     label={t('featureFlags.validation.patternLabel')}
                     onChange={(e) => {
@@ -287,7 +308,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                         setShowCustomPattern(true);
                       } else {
                         // Preset selected
-                        const preset = PATTERN_PRESETS.find((p) => p.key === val);
+                        const preset = PATTERN_PRESETS.find(
+                          (p) => p.key === val
+                        );
                         if (preset) {
                           handleBatchUpdate({
                             pattern: preset.pattern,
@@ -300,8 +323,12 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                     renderValue={(selected) => {
                       if (selected === '__custom__')
                         return t('featureFlags.validation.presetCustom');
-                      const preset = PATTERN_PRESETS.find((p) => p.key === selected);
-                      return preset ? t(preset.labelKey) : t('featureFlags.validation.patternNone');
+                      const preset = PATTERN_PRESETS.find(
+                        (p) => p.key === selected
+                      );
+                      return preset
+                        ? t(preset.labelKey)
+                        : t('featureFlags.validation.patternNone');
                     }}
                   >
                     <MenuItem value="">
@@ -310,9 +337,15 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                       </Typography>
                     </MenuItem>
                     {PATTERN_PRESETS.map((preset) => (
-                      <MenuItem key={preset.key} value={preset.key} sx={{ py: 1 }}>
+                      <MenuItem
+                        key={preset.key}
+                        value={preset.key}
+                        sx={{ py: 1 }}
+                      >
                         <Box>
-                          <Typography variant="body2">{t(preset.labelKey)}</Typography>
+                          <Typography variant="body2">
+                            {t(preset.labelKey)}
+                          </Typography>
                           <Typography
                             variant="caption"
                             color="text.secondary"
@@ -338,7 +371,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                       </Box>
                     </MenuItem>
                   </Select>
-                  <FormHelperText>{t('featureFlags.validation.patternHelp')}</FormHelperText>
+                  <FormHelperText>
+                    {t('featureFlags.validation.patternHelp')}
+                  </FormHelperText>
                 </FormControl>
 
                 {/* Custom pattern input - only visible when Custom is selected */}
@@ -349,7 +384,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                       size="small"
                       fullWidth
                       value={currentRules.pattern ?? ''}
-                      onChange={(e) => handleChange('pattern', e.target.value || undefined)}
+                      onChange={(e) =>
+                        handleChange('pattern', e.target.value || undefined)
+                      }
                       disabled={disabled}
                       placeholder="^[a-z]+$"
                       helperText={
@@ -359,7 +396,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                                 new RegExp(currentRules.pattern);
                                 return undefined;
                               } catch {
-                                return t('featureFlags.validation.invalidPattern');
+                                return t(
+                                  'featureFlags.validation.invalidPattern'
+                                );
                               }
                             })()
                           : undefined
@@ -383,10 +422,15 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                       fullWidth
                       value={currentRules.patternDescription ?? ''}
                       onChange={(e) =>
-                        handleChange('patternDescription', e.target.value || undefined)
+                        handleChange(
+                          'patternDescription',
+                          e.target.value || undefined
+                        )
                       }
                       disabled={disabled}
-                      placeholder={t('featureFlags.validation.patternDescriptionPlaceholder')}
+                      placeholder={t(
+                        'featureFlags.validation.patternDescriptionPlaceholder'
+                      )}
                     />
                   </Stack>
                 )}
@@ -400,7 +444,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                   onChange={(_, newValue) => {
                     // Validate new entries against active rules
                     const existingValues = currentRules.legalValues || [];
-                    const addedValues = newValue.filter((v) => !existingValues.includes(v));
+                    const addedValues = newValue.filter(
+                      (v) => !existingValues.includes(v)
+                    );
                     const invalidValues: string[] = [];
                     let reason = '';
 
@@ -410,9 +456,12 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                         val.length < currentRules.minLength
                       ) {
                         invalidValues.push(val);
-                        reason = t('featureFlags.validation.legalValueTooShort', {
-                          min: currentRules.minLength,
-                        });
+                        reason = t(
+                          'featureFlags.validation.legalValueTooShort',
+                          {
+                            min: currentRules.minLength,
+                          }
+                        );
                         continue;
                       }
                       if (
@@ -420,9 +469,12 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                         val.length > currentRules.maxLength
                       ) {
                         invalidValues.push(val);
-                        reason = t('featureFlags.validation.legalValueTooLong', {
-                          max: currentRules.maxLength,
-                        });
+                        reason = t(
+                          'featureFlags.validation.legalValueTooLong',
+                          {
+                            max: currentRules.maxLength,
+                          }
+                        );
                         continue;
                       }
                       if (currentRules.pattern) {
@@ -438,9 +490,12 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                             const patternName = desc
                               ? t(presetKey, { defaultValue: desc })
                               : t('featureFlags.validation.patternLabel');
-                            reason = t('featureFlags.validation.legalValuePatternMismatch', {
-                              pattern: patternName,
-                            });
+                            reason = t(
+                              'featureFlags.validation.legalValuePatternMismatch',
+                              {
+                                pattern: patternName,
+                              }
+                            );
                             continue;
                           }
                         } catch {
@@ -453,7 +508,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                       // Show friendly feedback
                       enqueueSnackbar(reason, { variant: 'info' });
                       // Filter out invalid values
-                      const validNewValue = newValue.filter((v) => !invalidValues.includes(v));
+                      const validNewValue = newValue.filter(
+                        (v) => !invalidValues.includes(v)
+                      );
                       handleChange(
                         'legalValues',
                         validNewValue.length > 0 ? validNewValue : undefined
@@ -461,7 +518,10 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                       return;
                     }
 
-                    handleChange('legalValues', newValue.length > 0 ? newValue : undefined);
+                    handleChange(
+                      'legalValues',
+                      newValue.length > 0 ? newValue : undefined
+                    );
                   }}
                   disabled={disabled}
                   renderTags={(value, getTagProps) =>
@@ -480,7 +540,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                       {...params}
                       size="small"
                       label={t('featureFlags.validation.legalValues')}
-                      placeholder={t('featureFlags.validation.legalValuesPlaceholder')}
+                      placeholder={t(
+                        'featureFlags.validation.legalValuesPlaceholder'
+                      )}
                       helperText={t('featureFlags.validation.legalValuesHelp')}
                     />
                   )}
@@ -497,7 +559,10 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                       <Checkbox
                         checked={currentRules.integerOnly === true}
                         onChange={(e) =>
-                          handleChange('integerOnly', e.target.checked ? true : undefined)
+                          handleChange(
+                            'integerOnly',
+                            e.target.checked ? true : undefined
+                          )
                         }
                         size="small"
                         disabled={disabled}
@@ -524,7 +589,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                     onChange={(e) =>
                       handleChange(
                         'min',
-                        e.target.value !== '' ? Number(e.target.value) : undefined
+                        e.target.value !== ''
+                          ? Number(e.target.value)
+                          : undefined
                       )
                     }
                     disabled={disabled}
@@ -538,7 +605,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                     onChange={(e) =>
                       handleChange(
                         'max',
-                        e.target.value !== '' ? Number(e.target.value) : undefined
+                        e.target.value !== ''
+                          ? Number(e.target.value)
+                          : undefined
                       )
                     }
                     disabled={disabled}
@@ -553,7 +622,10 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                   options={[]}
                   value={currentRules.legalValues || []}
                   onChange={(_, newValue) =>
-                    handleChange('legalValues', newValue.length > 0 ? newValue : undefined)
+                    handleChange(
+                      'legalValues',
+                      newValue.length > 0 ? newValue : undefined
+                    )
                   }
                   disabled={disabled}
                   renderTags={(value, getTagProps) =>
@@ -572,7 +644,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                       {...params}
                       size="small"
                       label={t('featureFlags.validation.legalValues')}
-                      placeholder={t('featureFlags.validation.legalValuesPlaceholder')}
+                      placeholder={t(
+                        'featureFlags.validation.legalValuesPlaceholder'
+                      )}
                       helperText={t('featureFlags.validation.legalValuesHelp')}
                     />
                   )}
@@ -604,7 +678,13 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
 
             {/* ISO/Timezone format info */}
             {(
-              ['country', 'countryCode3', 'languageCode', 'localeCode', 'timezone'] as string[]
+              [
+                'country',
+                'countryCode3',
+                'languageCode',
+                'localeCode',
+                'timezone',
+              ] as string[]
             ).includes(valueType) && (
               <Typography
                 variant="body2"
@@ -624,7 +704,9 @@ const ValidationRulesEditor: React.FC<ValidationRulesEditorProps> = ({
                 multiline
                 rows={4}
                 value={currentRules.jsonSchema ?? ''}
-                onChange={(e) => handleChange('jsonSchema', e.target.value || undefined)}
+                onChange={(e) =>
+                  handleChange('jsonSchema', e.target.value || undefined)
+                }
                 disabled={disabled}
                 placeholder='{ "type": "object", "required": ["name"], "properties": { "name": { "type": "string" } } }'
                 helperText={

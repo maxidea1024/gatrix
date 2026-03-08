@@ -31,7 +31,9 @@ export interface ImpactMetricConfigAttributes {
 }
 
 export class ImpactMetricConfigModel {
-  static async findByFlag(flagId: string): Promise<ImpactMetricConfigAttributes[]> {
+  static async findByFlag(
+    flagId: string
+  ): Promise<ImpactMetricConfigAttributes[]> {
     try {
       const configs = await db('g_impact_metric_configs')
         .where('flagId', flagId)
@@ -41,8 +43,11 @@ export class ImpactMetricConfigModel {
       return configs.map((c: any) => ({
         ...c,
         labelSelectors:
-          typeof c.labelSelectors === 'string' ? JSON.parse(c.labelSelectors) : c.labelSelectors,
-        groupBy: typeof c.groupBy === 'string' ? JSON.parse(c.groupBy) : c.groupBy,
+          typeof c.labelSelectors === 'string'
+            ? JSON.parse(c.labelSelectors)
+            : c.labelSelectors,
+        groupBy:
+          typeof c.groupBy === 'string' ? JSON.parse(c.groupBy) : c.groupBy,
       }));
     } catch (error) {
       logger.error('Error finding impact metric configs:', error);
@@ -59,8 +64,11 @@ export class ImpactMetricConfigModel {
       return configs.map((c: any) => ({
         ...c,
         labelSelectors:
-          typeof c.labelSelectors === 'string' ? JSON.parse(c.labelSelectors) : c.labelSelectors,
-        groupBy: typeof c.groupBy === 'string' ? JSON.parse(c.groupBy) : c.groupBy,
+          typeof c.labelSelectors === 'string'
+            ? JSON.parse(c.labelSelectors)
+            : c.labelSelectors,
+        groupBy:
+          typeof c.groupBy === 'string' ? JSON.parse(c.groupBy) : c.groupBy,
       }));
     } catch (error) {
       logger.error('Error finding all impact metric configs:', error);
@@ -68,9 +76,13 @@ export class ImpactMetricConfigModel {
     }
   }
 
-  static async findById(id: string): Promise<ImpactMetricConfigAttributes | null> {
+  static async findById(
+    id: string
+  ): Promise<ImpactMetricConfigAttributes | null> {
     try {
-      const config = await db('g_impact_metric_configs').where('id', id).first();
+      const config = await db('g_impact_metric_configs')
+        .where('id', id)
+        .first();
       if (!config) return null;
 
       return {
@@ -79,7 +91,10 @@ export class ImpactMetricConfigModel {
           typeof config.labelSelectors === 'string'
             ? JSON.parse(config.labelSelectors)
             : config.labelSelectors,
-        groupBy: typeof config.groupBy === 'string' ? JSON.parse(config.groupBy) : config.groupBy,
+        groupBy:
+          typeof config.groupBy === 'string'
+            ? JSON.parse(config.groupBy)
+            : config.groupBy,
       };
     } catch (error) {
       logger.error('Error finding impact metric config by ID:', error);
@@ -100,7 +115,9 @@ export class ImpactMetricConfigModel {
         metricName: data.metricName,
         chartType: data.chartType || 'line',
         groupBy: data.groupBy ? JSON.stringify(data.groupBy) : null,
-        labelSelectors: data.labelSelectors ? JSON.stringify(data.labelSelectors) : null,
+        labelSelectors: data.labelSelectors
+          ? JSON.stringify(data.labelSelectors)
+          : null,
         aggregationMode: data.aggregationMode || 'count',
         chartRange: data.chartRange || 'hour',
         displayOrder: data.displayOrder ?? 0,
@@ -120,12 +137,18 @@ export class ImpactMetricConfigModel {
 
   static async update(
     id: string,
-    data: Partial<Omit<ImpactMetricConfigAttributes, 'id' | 'flagId' | 'createdAt' | 'updatedAt'>>
+    data: Partial<
+      Omit<
+        ImpactMetricConfigAttributes,
+        'id' | 'flagId' | 'createdAt' | 'updatedAt'
+      >
+    >
   ): Promise<ImpactMetricConfigAttributes | null> {
     try {
       const updateData: any = {};
       if (data.title !== undefined) updateData.title = data.title;
-      if (data.metricName !== undefined) updateData.metricName = data.metricName;
+      if (data.metricName !== undefined)
+        updateData.metricName = data.metricName;
       if (data.chartType !== undefined) updateData.chartType = data.chartType;
       if (data.groupBy !== undefined) {
         updateData.groupBy = data.groupBy ? JSON.stringify(data.groupBy) : null;
@@ -135,9 +158,12 @@ export class ImpactMetricConfigModel {
           ? JSON.stringify(data.labelSelectors)
           : null;
       }
-      if (data.aggregationMode !== undefined) updateData.aggregationMode = data.aggregationMode;
-      if (data.chartRange !== undefined) updateData.chartRange = data.chartRange;
-      if (data.displayOrder !== undefined) updateData.displayOrder = data.displayOrder;
+      if (data.aggregationMode !== undefined)
+        updateData.aggregationMode = data.aggregationMode;
+      if (data.chartRange !== undefined)
+        updateData.chartRange = data.chartRange;
+      if (data.displayOrder !== undefined)
+        updateData.displayOrder = data.displayOrder;
       if (data.layoutX !== undefined) updateData.layoutX = data.layoutX;
       if (data.layoutY !== undefined) updateData.layoutY = data.layoutY;
       if (data.layoutW !== undefined) updateData.layoutW = data.layoutW;

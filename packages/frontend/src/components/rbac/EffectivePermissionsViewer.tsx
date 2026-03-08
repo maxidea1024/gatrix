@@ -1,5 +1,11 @@
 import React, { useMemo } from 'react';
-import { Box, Typography, Chip, Tooltip, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Chip,
+  Tooltip,
+  CircularProgress,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import type { EffectivePermissions } from '@/services/rbacService';
 
@@ -22,7 +28,9 @@ const getResourceLabel = (t: any, resource: string): string => {
   const key = `rbac.resource.${resource}`;
   const label = t(key, '');
   if (label) return label;
-  return resource.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+  return resource
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c: string) => c.toUpperCase());
 };
 
 // Get action display label — just extract the action part and localize it
@@ -60,7 +68,10 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
   // Detect wildcard permission
   const hasWildcard = useMemo(() => {
     if (!data) return false;
-    return data.own.includes('*:*') || data.inherited.some((ip) => ip.permission === '*:*');
+    return (
+      data.own.includes('*:*') ||
+      data.inherited.some((ip) => ip.permission === '*:*')
+    );
   }, [data]);
 
   // Build resource-grouped tree (exclude wildcard from regular list)
@@ -114,7 +125,11 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
   const totalCount = data.own.length + data.inherited.length;
   if (totalCount === 0) {
     return (
-      <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ textAlign: 'center', py: 2 }}
+      >
         {t('rbac.roles.noPermissions', 'No permissions')}
       </Typography>
     );
@@ -122,9 +137,14 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
 
   return (
     <Box>
-      <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ mb: 0.5, display: 'block' }}
+      >
         {t('rbac.roles.ownPermission')}: {data.own.length} &nbsp;|&nbsp;
-        {t('rbac.roles.inheritedPermission')}: {data.inherited.length} &nbsp;|&nbsp;
+        {t('rbac.roles.inheritedPermission')}: {data.inherited.length}{' '}
+        &nbsp;|&nbsp;
         {t('common.total', 'Total')}: {totalCount}
       </Typography>
 
@@ -143,7 +163,11 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            ✦ {t('rbac.roles.wildcardPermission', 'All Permissions (Wildcard *:*)')}
+            ✦{' '}
+            {t(
+              'rbac.roles.wildcardPermission',
+              'All Permissions (Wildcard *:*)'
+            )}
           </Typography>
         </Box>
       )}
@@ -174,7 +198,12 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
             >
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 500, fontSize: '0.8rem', minWidth: 100, flexShrink: 0 }}
+                sx={{
+                  fontWeight: 500,
+                  fontSize: '0.8rem',
+                  minWidth: 100,
+                  flexShrink: 0,
+                }}
               >
                 {label}
               </Typography>
@@ -191,12 +220,17 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
                     <Chip
                       label={getActionLabel(t, item.perm)}
                       size="small"
-                      variant={item.source === 'inherited' ? 'outlined' : 'filled'}
-                      color={item.source === 'inherited' ? 'default' : 'primary'}
+                      variant={
+                        item.source === 'inherited' ? 'outlined' : 'filled'
+                      }
+                      color={
+                        item.source === 'inherited' ? 'default' : 'primary'
+                      }
                       sx={{
                         fontSize: '0.7rem',
                         height: 20,
-                        fontStyle: item.source === 'inherited' ? 'italic' : 'normal',
+                        fontStyle:
+                          item.source === 'inherited' ? 'italic' : 'normal',
                       }}
                     />
                   </Tooltip>

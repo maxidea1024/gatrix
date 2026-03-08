@@ -5,7 +5,8 @@ import os from 'os';
 import { randomUUID } from 'crypto';
 import * as promClient from 'prom-client';
 
-const { register, collectDefaultMetrics, Counter, Histogram, Gauge } = promClient;
+const { register, collectDefaultMetrics, Counter, Histogram, Gauge } =
+  promClient;
 
 const logger = createLogger('MetricsService');
 
@@ -178,13 +179,25 @@ export const initMetrics = (app: express.Application): void => {
       // Memory usage
       const memUsageData = process.memoryUsage();
       memoryUsage.set({ server_id: serverId, type: 'rss' }, memUsageData.rss);
-      memoryUsage.set({ server_id: serverId, type: 'heap_used' }, memUsageData.heapUsed);
-      memoryUsage.set({ server_id: serverId, type: 'heap_total' }, memUsageData.heapTotal);
-      memoryUsage.set({ server_id: serverId, type: 'external' }, memUsageData.external);
+      memoryUsage.set(
+        { server_id: serverId, type: 'heap_used' },
+        memUsageData.heapUsed
+      );
+      memoryUsage.set(
+        { server_id: serverId, type: 'heap_total' },
+        memUsageData.heapTotal
+      );
+      memoryUsage.set(
+        { server_id: serverId, type: 'external' },
+        memUsageData.external
+      );
 
       // CPU usage (simplified)
       const cpuUsageData = process.cpuUsage();
-      cpuUsage.set({ server_id: serverId }, (cpuUsageData.user + cpuUsageData.system) / 1000000);
+      cpuUsage.set(
+        { server_id: serverId },
+        (cpuUsageData.user + cpuUsageData.system) / 1000000
+      );
     }, 5000); // Collect every 5 seconds
 
     // Export metrics helpers for use in other services

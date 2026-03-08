@@ -52,7 +52,10 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
     Object.entries(jobSchema).forEach(([fieldName, field]) => {
       // 필드에 값이 없고 Default values이 있는 경우에만 Set default values
       const currentValue = data[fieldName];
-      const hasValue = currentValue !== undefined && currentValue !== null && currentValue !== '';
+      const hasValue =
+        currentValue !== undefined &&
+        currentValue !== null &&
+        currentValue !== '';
 
       console.log(
         `Field ${fieldName}: currentValue=${currentValue}, hasValue=${hasValue}, default=${field.default}`
@@ -91,7 +94,11 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
     handleFieldChange(fieldName, newArray);
   };
 
-  const handleArrayItemChange = (fieldName: string, index: number, value: any) => {
+  const handleArrayItemChange = (
+    fieldName: string,
+    index: number,
+    value: any
+  ) => {
     const currentArray = data[fieldName] || [];
     const newArray = [...currentArray];
     newArray[index] = value;
@@ -153,7 +160,9 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
             type="number"
             label={field.description}
             value={value}
-            onChange={(e) => handleFieldChange(fieldName, parseFloat(e.target.value) || 0)}
+            onChange={(e) =>
+              handleFieldChange(fieldName, parseFloat(e.target.value) || 0)
+            }
             required={field.required}
             error={hasError}
             helperText={hasError ? errors[errorKey] : undefined}
@@ -180,7 +189,9 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
       case 'select':
         return (
           <FormControl fullWidth error={hasError}>
-            <InputLabel required={field.required}>{field.description}</InputLabel>
+            <InputLabel required={field.required}>
+              {field.description}
+            </InputLabel>
             <Select
               value={value}
               onChange={(e) => handleFieldChange(fieldName, e.target.value)}
@@ -193,7 +204,11 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
               ))}
             </Select>
             {hasError && (
-              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+              <Typography
+                variant="caption"
+                color="error"
+                sx={{ mt: 0.5, ml: 1.5 }}
+              >
                 {errors[errorKey]}
               </Typography>
             )}
@@ -223,7 +238,9 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
                   fullWidth
                   size="small"
                   value={item}
-                  onChange={(e) => handleArrayItemChange(fieldName, index, e.target.value)}
+                  onChange={(e) =>
+                    handleArrayItemChange(fieldName, index, e.target.value)
+                  }
                   placeholder={`${field.description} ${index + 1}`}
                 />
                 <IconButton
@@ -245,7 +262,9 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
 
       case 'object':
         const jsonValue =
-          typeof value === 'object' ? JSON.stringify(value || {}, null, 2) : value || '{}';
+          typeof value === 'object'
+            ? JSON.stringify(value || {}, null, 2)
+            : value || '{}';
         return (
           <Box>
             <Typography variant="body2" sx={{ mb: 1 }}>
@@ -294,7 +313,8 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
 
   // HTTP Request Type인지 Confirm
   const isHttpRequest =
-    Object.keys(jobSchema).includes('url') && Object.keys(jobSchema).includes('method');
+    Object.keys(jobSchema).includes('url') &&
+    Object.keys(jobSchema).includes('method');
   const httpMethod = data.method || 'GET';
   const shouldHideBody = isHttpRequest && httpMethod === 'GET';
 
@@ -302,7 +322,9 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
   const getFieldOrder = () => {
     if (isHttpRequest) {
       const orderedFields = ['method', 'url', 'headers', 'body'];
-      const otherFields = Object.keys(jobSchema).filter((key) => !orderedFields.includes(key));
+      const otherFields = Object.keys(jobSchema).filter(
+        (key) => !orderedFields.includes(key)
+      );
       return [...orderedFields, ...otherFields];
     }
     return Object.keys(jobSchema);
@@ -322,7 +344,9 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
             color: 'info.contrastText',
           }}
         >
-          <Typography variant="body2">💡 {t('jobs.getRequestNoBody')}</Typography>
+          <Typography variant="body2">
+            💡 {t('jobs.getRequestNoBody')}
+          </Typography>
         </Box>
       )}
 
@@ -339,7 +363,9 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
           <Box key={fieldName}>
             <Box>
               {field.type !== 'boolean' && field.type !== 'array' && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}
+                >
                   <Typography variant="caption" color="text.secondary">
                     {fieldName}
                   </Typography>

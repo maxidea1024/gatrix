@@ -1,4 +1,10 @@
-import { WebSocketEvent, WebSocketEventType, Message, TypingIndicator, User } from '../types/chat';
+import {
+  WebSocketEvent,
+  WebSocketEventType,
+  Message,
+  TypingIndicator,
+  User,
+} from '../types/chat';
 import { io, Socket } from 'socket.io-client';
 import { ChatService } from './chatService';
 import { AuthService } from './auth';
@@ -10,7 +16,8 @@ export class ChatWebSocketService {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
-  private eventHandlers: Map<WebSocketEventType, WebSocketEventHandler[]> = new Map();
+  private eventHandlers: Map<WebSocketEventType, WebSocketEventHandler[]> =
+    new Map();
   private isConnecting = false;
   private shouldReconnect = true;
   private connectionPromise: Promise<void> | null = null;
@@ -93,7 +100,9 @@ export class ChatWebSocketService {
             error.message?.includes('jwt') ||
             error.message?.includes('expired')
           ) {
-            console.log('🔄 WebSocket auth failed, attempting token refresh...');
+            console.log(
+              '🔄 WebSocket auth failed, attempting token refresh...'
+            );
 
             try {
               // Attempt to refresh token
@@ -339,8 +348,12 @@ export class ChatWebSocketService {
     const env = import.meta.env;
 
     // Runtime-injected config (for production docker/nginx)
-    const runtimeUrl = (window as any)?.ENV?.VITE_CHAT_SERVER_URL as string | undefined;
-    const runtimePort = (window as any)?.ENV?.VITE_CHAT_SERVER_PORT as string | undefined;
+    const runtimeUrl = (window as any)?.ENV?.VITE_CHAT_SERVER_URL as
+      | string
+      | undefined;
+    const runtimePort = (window as any)?.ENV?.VITE_CHAT_SERVER_PORT as
+      | string
+      | undefined;
     // Default port: 45100 (docker-compose mapped port for chat-server)
     const defaultPort = runtimePort || env.VITE_CHAT_SERVER_PORT || '45100';
 
@@ -386,8 +399,13 @@ export class ChatWebSocketService {
     }
 
     // Exponential backoff: 1s, 2s, 4s, 8s, 16s
-    const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts), 30000); // Max 30 seconds
-    console.log(`Scheduling reconnection attempt ${this.reconnectAttempts + 1} in ${delay}ms`);
+    const delay = Math.min(
+      this.reconnectDelay * Math.pow(2, this.reconnectAttempts),
+      30000
+    ); // Max 30 seconds
+    console.log(
+      `Scheduling reconnection attempt ${this.reconnectAttempts + 1} in ${delay}ms`
+    );
 
     setTimeout(() => {
       if (!this.shouldReconnect) {
@@ -446,11 +464,15 @@ export class ChatWebSocketService {
     this.on('user_stop_typing_thread', (event) => handler(event.data));
   }
 
-  onUserJoinedChannel(handler: (data: { channelId: number; user: User }) => void): void {
+  onUserJoinedChannel(
+    handler: (data: { channelId: number; user: User }) => void
+  ): void {
     this.on('user_joined_channel', (event) => handler(event.data));
   }
 
-  onUserLeftChannel(handler: (data: { channelId: number; user: User }) => void): void {
+  onUserLeftChannel(
+    handler: (data: { channelId: number; user: User }) => void
+  ): void {
     this.on('user_left_channel', (event) => handler(event.data));
   }
 
@@ -463,13 +485,21 @@ export class ChatWebSocketService {
   }
 
   onReactionAdded(
-    handler: (data: { messageId: number; userId: number; emoji: string }) => void
+    handler: (data: {
+      messageId: number;
+      userId: number;
+      emoji: string;
+    }) => void
   ): void {
     this.on('reaction_added', (event) => handler(event.data));
   }
 
   onReactionRemoved(
-    handler: (data: { messageId: number; userId: number; emoji: string }) => void
+    handler: (data: {
+      messageId: number;
+      userId: number;
+      emoji: string;
+    }) => void
   ): void {
     this.on('reaction_removed', (event) => handler(event.data));
   }

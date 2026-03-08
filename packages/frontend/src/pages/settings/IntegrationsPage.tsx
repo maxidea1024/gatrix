@@ -120,11 +120,16 @@ export const IntegrationsPage: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<Integration | null>(null);
   const [loading, setLoading] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [wizardProvider, setWizardProvider] = useState<string | undefined>(undefined);
+  const [wizardProvider, setWizardProvider] = useState<string | undefined>(
+    undefined
+  );
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [menuTarget, setMenuTarget] = useState<Integration | null>(null);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, integration: Integration) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    integration: Integration
+  ) => {
     setMenuAnchorEl(event.currentTarget);
     setMenuTarget(integration);
   };
@@ -231,7 +236,9 @@ export const IntegrationsPage: React.FC = () => {
                 }}
               >
                 {integrations.map((integration) => {
-                  const provider = providers.find((p) => p.name === integration.provider);
+                  const provider = providers.find(
+                    (p) => p.name === integration.provider
+                  );
                   return (
                     <Card
                       key={integration.id}
@@ -302,12 +309,17 @@ export const IntegrationsPage: React.FC = () => {
                                       );
                                     }}
                                   >
-                                    {integration.lastEvent.state === 'success' ? (
-                                      <CheckCircleIcon color="success" sx={{ fontSize: 16 }} />
+                                    {integration.lastEvent.state ===
+                                    'success' ? (
+                                      <CheckCircleIcon
+                                        color="success"
+                                        sx={{ fontSize: 16 }}
+                                      />
                                     ) : (
                                       <ErrorIcon
                                         color={
-                                          integration.lastEvent.state === 'successWithErrors'
+                                          integration.lastEvent.state ===
+                                          'successWithErrors'
                                             ? 'warning'
                                             : 'error'
                                         }
@@ -328,12 +340,20 @@ export const IntegrationsPage: React.FC = () => {
                             </Typography>
                             <Chip
                               label={
-                                integration.isEnabled ? t('common.enabled') : t('common.disabled')
+                                integration.isEnabled
+                                  ? t('common.enabled')
+                                  : t('common.disabled')
                               }
                               size="small"
-                              color={integration.isEnabled ? 'success' : 'default'}
+                              color={
+                                integration.isEnabled ? 'success' : 'default'
+                              }
                               variant="outlined"
-                              sx={{ height: 20, fontSize: '0.7rem', flexShrink: 0 }}
+                              sx={{
+                                height: 20,
+                                fontSize: '0.7rem',
+                                flexShrink: 0,
+                              }}
                             />
                           </Box>
                           <IconButton
@@ -358,14 +378,19 @@ export const IntegrationsPage: React.FC = () => {
                             lineHeight: '1.4em',
                           }}
                         >
-                          {integration.description || (provider ? t(provider.description) : '')}
+                          {integration.description ||
+                            (provider ? t(provider.description) : '')}
                         </Typography>
                       </CardContent>
                       <Box sx={{ px: 2, pb: 2 }}>
                         <Button
                           size="small"
                           endIcon={<ChevronRightIcon />}
-                          onClick={() => navigate(`/settings/integrations/${integration.id}/edit`)}
+                          onClick={() =>
+                            navigate(
+                              `/settings/integrations/${integration.id}/edit`
+                            )
+                          }
                           sx={{ textTransform: 'none' }}
                         >
                           {t('common.open')}
@@ -491,7 +516,14 @@ export const IntegrationsPage: React.FC = () => {
                   },
                 }}
               >
-                <CardContent sx={{ flex: 1, pb: 0, display: 'flex', flexDirection: 'column' }}>
+                <CardContent
+                  sx={{
+                    flex: 1,
+                    pb: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
                   <Box display="flex" alignItems="center" gap={1.5} mb={1.5}>
                     <Box
                       component="img"
@@ -499,7 +531,12 @@ export const IntegrationsPage: React.FC = () => {
                       alt={t(provider.displayName)}
                       sx={{ width: 28, height: 28, flexShrink: 0 }}
                     />
-                    <Typography variant="subtitle1" fontWeight="bold" noWrap sx={{ flex: 1 }}>
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight="bold"
+                      noWrap
+                      sx={{ flex: 1 }}
+                    >
                       {t(provider.displayName)}
                     </Typography>
                   </Box>
@@ -520,7 +557,11 @@ export const IntegrationsPage: React.FC = () => {
                   </Typography>
                   <Box sx={{ mt: 'auto' }}>
                     {provider.deprecated && (
-                      <Typography variant="caption" color="warning.main" sx={{ display: 'block' }}>
+                      <Typography
+                        variant="caption"
+                        color="warning.main"
+                        sx={{ display: 'block' }}
+                      >
                         {t(provider.deprecated)}
                       </Typography>
                     )}
@@ -550,7 +591,8 @@ export const IntegrationsPage: React.FC = () => {
         title={t('integrations.deleteConfirmTitle')}
         message={t('integrations.deleteConfirmMessage', {
           provider: t(
-            providers.find((p) => p.name === deleteTarget?.provider)?.displayName ||
+            providers.find((p) => p.name === deleteTarget?.provider)
+              ?.displayName ||
               deleteTarget?.provider ||
               ''
           ),
@@ -630,7 +672,9 @@ export const IntegrationsPage: React.FC = () => {
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText sx={{ color: 'error.main' }}>{t('common.delete')}</ListItemText>
+          <ListItemText sx={{ color: 'error.main' }}>
+            {t('common.delete')}
+          </ListItemText>
         </MenuItem>
       </Menu>
 

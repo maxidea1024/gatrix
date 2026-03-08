@@ -6,12 +6,21 @@
  * These should be translated on the frontend using i18n.
  */
 
-import { IntegrationEventType, ALL_INTEGRATION_EVENTS } from '../types/integration-events';
+import {
+  IntegrationEventType,
+  ALL_INTEGRATION_EVENTS,
+} from '../types/integration-events';
 
 /**
  * Parameter type for addon configuration
  */
-export type AddonParameterType = 'text' | 'textfield' | 'url' | 'list' | 'number' | 'boolean';
+export type AddonParameterType =
+  | 'text'
+  | 'textfield'
+  | 'url'
+  | 'list'
+  | 'number'
+  | 'boolean';
 
 /**
  * Parameter definition for addon configuration
@@ -84,9 +93,11 @@ export const slackDefinition: AddonDefinition = {
     },
     {
       name: 'defaultChannel',
-      displayName: 'integrations.providers.slack.params.defaultChannel.displayName',
+      displayName:
+        'integrations.providers.slack.params.defaultChannel.displayName',
       type: 'text',
-      description: 'integrations.providers.slack.params.defaultChannel.description',
+      description:
+        'integrations.providers.slack.params.defaultChannel.description',
       placeholder: '#general',
       required: false,
       sensitive: false,
@@ -117,18 +128,22 @@ export const slackAppDefinition: AddonDefinition = {
   parameters: [
     {
       name: 'accessToken',
-      displayName: 'integrations.providers.slackApp.params.accessToken.displayName',
+      displayName:
+        'integrations.providers.slackApp.params.accessToken.displayName',
       type: 'text',
-      description: 'integrations.providers.slackApp.params.accessToken.description',
+      description:
+        'integrations.providers.slackApp.params.accessToken.description',
       placeholder: 'xoxb-xxx-xxx-xxx',
       required: true,
       sensitive: true,
     },
     {
       name: 'defaultChannels',
-      displayName: 'integrations.providers.slackApp.params.defaultChannels.displayName',
+      displayName:
+        'integrations.providers.slackApp.params.defaultChannels.displayName',
       type: 'text',
-      description: 'integrations.providers.slackApp.params.defaultChannels.description',
+      description:
+        'integrations.providers.slackApp.params.defaultChannels.description',
       placeholder: '#general, #alerts',
       required: false,
       sensitive: false,
@@ -156,9 +171,11 @@ export const webhookDefinition: AddonDefinition = {
     },
     {
       name: 'contentType',
-      displayName: 'integrations.providers.webhook.params.contentType.displayName',
+      displayName:
+        'integrations.providers.webhook.params.contentType.displayName',
       type: 'text',
-      description: 'integrations.providers.webhook.params.contentType.description',
+      description:
+        'integrations.providers.webhook.params.contentType.description',
       placeholder: 'application/json',
       required: false,
       sensitive: false,
@@ -166,9 +183,11 @@ export const webhookDefinition: AddonDefinition = {
     },
     {
       name: 'authorization',
-      displayName: 'integrations.providers.webhook.params.authorization.displayName',
+      displayName:
+        'integrations.providers.webhook.params.authorization.displayName',
       type: 'text',
-      description: 'integrations.providers.webhook.params.authorization.description',
+      description:
+        'integrations.providers.webhook.params.authorization.description',
       placeholder: 'Bearer token or Basic auth',
       required: false,
       sensitive: true,
@@ -184,9 +203,11 @@ export const webhookDefinition: AddonDefinition = {
     },
     {
       name: 'bodyTemplate',
-      displayName: 'integrations.providers.webhook.params.bodyTemplate.displayName',
+      displayName:
+        'integrations.providers.webhook.params.bodyTemplate.displayName',
       type: 'textfield',
-      description: 'integrations.providers.webhook.params.bodyTemplate.description',
+      description:
+        'integrations.providers.webhook.params.bodyTemplate.description',
       placeholder: '{"text": "{{event.type}} by {{createdBy}}"}',
       required: false,
       sensitive: false,
@@ -234,7 +255,8 @@ export const larkDefinition: AddonDefinition = {
   name: 'lark',
   displayName: 'integrations.providers.lark.displayName',
   description: 'integrations.providers.lark.description',
-  documentationUrl: 'https://open.larksuite.com/document/client-docs/bot-v3/add-custom-bot',
+  documentationUrl:
+    'https://open.larksuite.com/document/client-docs/bot-v3/add-custom-bot',
   parameters: [
     {
       name: 'url',
@@ -274,22 +296,26 @@ export const newRelicDefinition: AddonDefinition = {
   name: 'new-relic',
   displayName: 'integrations.providers.newRelic.displayName',
   description: 'integrations.providers.newRelic.description',
-  documentationUrl: 'https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/',
+  documentationUrl:
+    'https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/',
   parameters: [
     {
       name: 'url',
       displayName: 'integrations.providers.newRelic.params.url.displayName',
       type: 'url',
       description: 'integrations.providers.newRelic.params.url.description',
-      placeholder: 'https://insights-collector.newrelic.com/v1/accounts/YOUR_ACCOUNT_ID/events',
+      placeholder:
+        'https://insights-collector.newrelic.com/v1/accounts/YOUR_ACCOUNT_ID/events',
       required: true,
       sensitive: false,
     },
     {
       name: 'licenseKey',
-      displayName: 'integrations.providers.newRelic.params.licenseKey.displayName',
+      displayName:
+        'integrations.providers.newRelic.params.licenseKey.displayName',
       type: 'text',
-      description: 'integrations.providers.newRelic.params.licenseKey.description',
+      description:
+        'integrations.providers.newRelic.params.licenseKey.description',
       placeholder: 'eu01xx0f12a6b3434a8d710110bd862',
       required: true,
       sensitive: true,
@@ -305,9 +331,11 @@ export const newRelicDefinition: AddonDefinition = {
     },
     {
       name: 'bodyTemplate',
-      displayName: 'integrations.providers.newRelic.params.bodyTemplate.displayName',
+      displayName:
+        'integrations.providers.newRelic.params.bodyTemplate.displayName',
       type: 'textfield',
-      description: 'integrations.providers.newRelic.params.bodyTemplate.description',
+      description:
+        'integrations.providers.newRelic.params.bodyTemplate.description',
       placeholder: `{
   "event": "{{event.type}}",
   "eventType": "gatrix",
@@ -327,7 +355,8 @@ export const discordDefinition: AddonDefinition = {
   name: 'discord',
   displayName: 'integrations.providers.discord.displayName',
   description: 'integrations.providers.discord.description',
-  documentationUrl: 'https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks',
+  documentationUrl:
+    'https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks',
   parameters: [
     {
       name: 'url',
@@ -350,9 +379,11 @@ export const discordDefinition: AddonDefinition = {
     },
     {
       name: 'avatar_url',
-      displayName: 'integrations.providers.discord.params.avatar_url.displayName',
+      displayName:
+        'integrations.providers.discord.params.avatar_url.displayName',
       type: 'url',
-      description: 'integrations.providers.discord.params.avatar_url.description',
+      description:
+        'integrations.providers.discord.params.avatar_url.description',
       required: false,
       sensitive: false,
     },
@@ -380,9 +411,11 @@ export const pagerDutyDefinition: AddonDefinition = {
   parameters: [
     {
       name: 'routingKey',
-      displayName: 'integrations.providers.pagerduty.params.routingKey.displayName',
+      displayName:
+        'integrations.providers.pagerduty.params.routingKey.displayName',
       type: 'text',
-      description: 'integrations.providers.pagerduty.params.routingKey.description',
+      description:
+        'integrations.providers.pagerduty.params.routingKey.description',
       placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
       required: true,
       sensitive: true,
@@ -407,7 +440,8 @@ export const lineDefinition: AddonDefinition = {
   name: 'line',
   displayName: 'integrations.providers.line.displayName',
   description: 'integrations.providers.line.description',
-  documentationUrl: 'https://developers.line.biz/en/docs/messaging-api/overview/',
+  documentationUrl:
+    'https://developers.line.biz/en/docs/messaging-api/overview/',
   parameters: [
     {
       name: 'accessToken',
@@ -479,7 +513,8 @@ export const googleChatDefinition: AddonDefinition = {
       displayName: 'integrations.providers.googleChat.params.url.displayName',
       type: 'url',
       description: 'integrations.providers.googleChat.params.url.description',
-      placeholder: 'https://chat.googleapis.com/v1/spaces/xxx/messages?key=xxx&token=xxx',
+      placeholder:
+        'https://chat.googleapis.com/v1/spaces/xxx/messages?key=xxx&token=xxx',
       required: true,
       sensitive: true,
     },
@@ -498,9 +533,11 @@ export const telegramDefinition: AddonDefinition = {
   parameters: [
     {
       name: 'botToken',
-      displayName: 'integrations.providers.telegram.params.botToken.displayName',
+      displayName:
+        'integrations.providers.telegram.params.botToken.displayName',
       type: 'text',
-      description: 'integrations.providers.telegram.params.botToken.description',
+      description:
+        'integrations.providers.telegram.params.botToken.description',
       placeholder: '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11',
       required: true,
       sensitive: true,
@@ -516,9 +553,11 @@ export const telegramDefinition: AddonDefinition = {
     },
     {
       name: 'parse_mode',
-      displayName: 'integrations.providers.telegram.params.parse_mode.displayName',
+      displayName:
+        'integrations.providers.telegram.params.parse_mode.displayName',
       type: 'text',
-      description: 'integrations.providers.telegram.params.parse_mode.description',
+      description:
+        'integrations.providers.telegram.params.parse_mode.description',
       required: false,
       sensitive: false,
       default: 'Markdown',
@@ -534,29 +573,36 @@ export const whatsappDefinition: AddonDefinition = {
   name: 'whatsapp',
   displayName: 'integrations.providers.whatsapp.displayName',
   description: 'integrations.providers.whatsapp.description',
-  documentationUrl: 'https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages',
+  documentationUrl:
+    'https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages',
   parameters: [
     {
       name: 'accessToken',
-      displayName: 'integrations.providers.whatsapp.params.accessToken.displayName',
+      displayName:
+        'integrations.providers.whatsapp.params.accessToken.displayName',
       type: 'text',
-      description: 'integrations.providers.whatsapp.params.accessToken.description',
+      description:
+        'integrations.providers.whatsapp.params.accessToken.description',
       required: true,
       sensitive: true,
     },
     {
       name: 'phoneNumberId',
-      displayName: 'integrations.providers.whatsapp.params.phoneNumberId.displayName',
+      displayName:
+        'integrations.providers.whatsapp.params.phoneNumberId.displayName',
       type: 'text',
-      description: 'integrations.providers.whatsapp.params.phoneNumberId.description',
+      description:
+        'integrations.providers.whatsapp.params.phoneNumberId.description',
       required: true,
       sensitive: false,
     },
     {
       name: 'recipientPhoneNumber',
-      displayName: 'integrations.providers.whatsapp.params.recipientPhoneNumber.displayName',
+      displayName:
+        'integrations.providers.whatsapp.params.recipientPhoneNumber.displayName',
       type: 'text',
-      description: 'integrations.providers.whatsapp.params.recipientPhoneNumber.description',
+      description:
+        'integrations.providers.whatsapp.params.recipientPhoneNumber.description',
       placeholder: '15551234567',
       required: true,
       sensitive: false,
@@ -594,13 +640,16 @@ export const dingtalkDefinition: AddonDefinition = {
   name: 'dingtalk',
   displayName: 'integrations.providers.dingtalk.displayName',
   description: 'integrations.providers.dingtalk.description',
-  documentationUrl: 'https://open.dingtalk.com/document/group/custom-robot-access',
+  documentationUrl:
+    'https://open.dingtalk.com/document/group/custom-robot-access',
   parameters: [
     {
       name: 'accessToken',
-      displayName: 'integrations.providers.dingtalk.params.accessToken.displayName',
+      displayName:
+        'integrations.providers.dingtalk.params.accessToken.displayName',
       type: 'text',
-      description: 'integrations.providers.dingtalk.params.accessToken.description',
+      description:
+        'integrations.providers.dingtalk.params.accessToken.description',
       required: true,
       sensitive: true,
     },
@@ -636,9 +685,11 @@ export const debugDefinition: AddonDefinition = {
     },
     {
       name: 'simulateAttribute',
-      displayName: 'integrations.providers.debug.params.simulateAttribute.displayName',
+      displayName:
+        'integrations.providers.debug.params.simulateAttribute.displayName',
       type: 'text',
-      description: 'integrations.providers.debug.params.simulateAttribute.description',
+      description:
+        'integrations.providers.debug.params.simulateAttribute.description',
       placeholder: 'key=value',
       required: false,
       sensitive: false,
@@ -672,7 +723,9 @@ export const ADDON_DEFINITIONS: Record<string, AddonDefinition> = {
 /**
  * Get addon definition by provider name
  */
-export function getAddonDefinition(provider: string): AddonDefinition | undefined {
+export function getAddonDefinition(
+  provider: string
+): AddonDefinition | undefined {
   return ADDON_DEFINITIONS[provider];
 }
 

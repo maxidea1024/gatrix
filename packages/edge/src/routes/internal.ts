@@ -99,7 +99,8 @@ function buildCacheResponse(sdk: any, includeDetail: boolean = true): any {
   }
 
   // Check if SDK is actually initialized for status reporting
-  const isInitialized = typeof sdk.isInitialized === 'function' && sdk.isInitialized();
+  const isInitialized =
+    typeof sdk.isInitialized === 'function' && sdk.isInitialized();
 
   const response: any = {
     status: isInitialized ? 'ready' : 'initializing',
@@ -292,7 +293,10 @@ router.post('/stats/rate-limit', (req: Request, res: Response) => {
   res.json({
     success: true,
     rateLimit: limit,
-    message: limit === 0 ? 'Request logging disabled' : `Rate limit set to ${limit}/second`,
+    message:
+      limit === 0
+        ? 'Request logging disabled'
+        : `Rate limit set to ${limit}/second`,
   });
 });
 

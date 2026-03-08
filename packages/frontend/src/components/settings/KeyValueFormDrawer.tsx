@@ -87,7 +87,8 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
         varKey: item.varKey.replace('kv:', ''),
         varValue: item.varValue || '',
         valueType: item.valueType,
-        description: item.description?.replace(/\[elementType:\w+\]\s*/, '') || '',
+        description:
+          item.description?.replace(/\[elementType:\w+\]\s*/, '') || '',
         arrayElementType,
       });
       setPreviousArrayElementType(arrayElementType);
@@ -156,7 +157,8 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
       // Prepare description with element type metadata for arrays
       let description = formData.description || '';
       if (formData.valueType === 'array' && formData.arrayElementType) {
-        description = `[elementType:${formData.arrayElementType}] ${description}`.trim();
+        description =
+          `[elementType:${formData.arrayElementType}] ${description}`.trim();
       }
 
       const data: CreateVarData | UpdateVarData = {
@@ -227,7 +229,13 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
             onChange={(e) => {
               const val = e.target.value;
               // Allow empty, negative sign, decimal point, and valid numbers
-              if (val === '' || val === '-' || val === '.' || val === '-.' || !isNaN(Number(val))) {
+              if (
+                val === '' ||
+                val === '-' ||
+                val === '.' ||
+                val === '-.' ||
+                !isNaN(Number(val))
+              ) {
                 setFormData({ ...formData, varValue: val });
               }
             }}
@@ -261,7 +269,12 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
               }
               label={formData.varValue === 'true' ? 'true' : 'false'}
             />
-            <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="block"
+              sx={{ mt: 0.5 }}
+            >
               {t('settings.kv.booleanHelp')}
             </Typography>
           </Box>
@@ -275,10 +288,17 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
             <MuiColorInput
               fullWidth
               value={formData.varValue || '#000000'}
-              onChange={(color) => setFormData({ ...formData, varValue: color })}
+              onChange={(color) =>
+                setFormData({ ...formData, varValue: color })
+              }
               format="hex"
             />
-            <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="block"
+              sx={{ mt: 0.5 }}
+            >
               {formErrors.varValue || t('settings.kv.colorHelp')}
             </Typography>
           </Box>
@@ -288,13 +308,20 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
           <Box>
             <JsonEditor
               value={formData.varValue || '{}'}
-              onChange={(value) => setFormData({ ...formData, varValue: value })}
+              onChange={(value) =>
+                setFormData({ ...formData, varValue: value })
+              }
               height="200px"
               label={`${t('settings.kv.value')} *`}
               placeholder='{\n  "key": "value"\n}'
               error={formErrors.varValue}
             />
-            <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="block"
+              sx={{ mt: 0.5 }}
+            >
               {t('settings.kv.objectHelp')}
             </Typography>
           </Box>
@@ -316,7 +343,9 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
             fullWidth
             label={`${t('settings.kv.value')} *`}
             value={formData.varValue}
-            onChange={(e) => setFormData({ ...formData, varValue: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, varValue: e.target.value })
+            }
             error={!!formErrors.varValue}
             helperText={formErrors.varValue || t('settings.kv.stringHelp')}
           />
@@ -339,7 +368,8 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
         originalArrayElementType = match[1] as VarValueType;
       }
     }
-    const originalDescription = item.description?.replace(/\[elementType:\w+\]\s*/, '') || '';
+    const originalDescription =
+      item.description?.replace(/\[elementType:\w+\]\s*/, '') || '';
 
     return (
       formData.varKey !== item.varKey.replace('kv:', '') ||
@@ -355,7 +385,11 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
       open={open}
       onClose={onClose}
       title={item?.id ? t('settings.kv.edit') : t('settings.kv.create')}
-      subtitle={item?.id ? t('settings.kv.editSubtitle') : t('settings.kv.createSubtitle')}
+      subtitle={
+        item?.id
+          ? t('settings.kv.editSubtitle')
+          : t('settings.kv.createSubtitle')
+      }
       storageKey="kvFormDrawerWidth"
       defaultWidth={700}
       minWidth={500}
@@ -375,12 +409,16 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
             fullWidth
             label={`${t('settings.kv.key')} *`}
             value={formData.varKey}
-            onChange={(e) => setFormData({ ...formData, varKey: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, varKey: e.target.value })
+            }
             disabled={isSystemDefined}
             error={!!formErrors.varKey}
             helperText={
               formErrors.varKey ||
-              (isSystemDefined ? t('settings.kv.systemDefinedKeyHelp') : t('settings.kv.keyHelp'))
+              (isSystemDefined
+                ? t('settings.kv.systemDefinedKeyHelp')
+                : t('settings.kv.keyHelp'))
             }
             autoFocus={!item?.id}
           />
@@ -413,7 +451,9 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
             }}
             disabled={isSystemDefined}
             helperText={
-              isSystemDefined ? t('settings.kv.systemDefinedTypeHelp') : t('settings.kv.typeHelp')
+              isSystemDefined
+                ? t('settings.kv.systemDefinedTypeHelp')
+                : t('settings.kv.typeHelp')
             }
           >
             <MenuItem value="string">String</MenuItem>
@@ -442,10 +482,16 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
                 ) {
                   try {
                     const currentArray = JSON.parse(formData.varValue);
-                    if (Array.isArray(currentArray) && currentArray.length > 0) {
-                      enqueueSnackbar(t('settings.kv.arrayElementTypeChangeWarning'), {
-                        variant: 'warning',
-                      });
+                    if (
+                      Array.isArray(currentArray) &&
+                      currentArray.length > 0
+                    ) {
+                      enqueueSnackbar(
+                        t('settings.kv.arrayElementTypeChangeWarning'),
+                        {
+                          variant: 'warning',
+                        }
+                      );
 
                       // Reset array values to default values for the new type
                       const defaultValue =
@@ -459,7 +505,9 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
                                 ? {}
                                 : '';
 
-                      const newArray = new Array(currentArray.length).fill(defaultValue);
+                      const newArray = new Array(currentArray.length).fill(
+                        defaultValue
+                      );
                       setFormData({
                         ...formData,
                         arrayElementType: newElementType,
@@ -501,7 +549,9 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
             rows={2}
             label={t('settings.kv.description')}
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
             helperText={t('settings.kv.descriptionHelp')}
           />
         </Stack>

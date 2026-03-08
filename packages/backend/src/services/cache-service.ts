@@ -36,7 +36,10 @@ export class CacheService extends EventEmitter {
         });
         logger.info('Redis cache initialized', { url: redisUrl });
       } catch (error) {
-        logger.warn('Failed to initialize Redis cache, using memory cache only', { error });
+        logger.warn(
+          'Failed to initialize Redis cache, using memory cache only',
+          { error }
+        );
         this.l2Cache = undefined;
       }
 
@@ -140,7 +143,11 @@ export class CacheService extends EventEmitter {
   /**
    * Static set method
    */
-  public static async set<T>(key: string, data: T, ttlSeconds?: number): Promise<void> {
+  public static async set<T>(
+    key: string,
+    data: T,
+    ttlSeconds?: number
+  ): Promise<void> {
     const instance = CacheService.getInstance();
     const ttlMs = ttlSeconds ? ttlSeconds * 1000 : undefined;
     await instance.set<T>(key, data, ttlMs);
@@ -306,7 +313,9 @@ export class CacheService extends EventEmitter {
         deletedCount++;
       }
 
-      logger.info(`Cache pattern deletion: ${pattern} - ${deletedCount} keys deleted`);
+      logger.info(
+        `Cache pattern deletion: ${pattern} - ${deletedCount} keys deleted`
+      );
       return deletedCount;
     } catch (error) {
       logger.error(`Cache pattern delete error for ${pattern}:`, error);

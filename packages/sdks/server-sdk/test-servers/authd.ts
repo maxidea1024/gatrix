@@ -30,7 +30,9 @@ class AuthServer extends BaseTestServer {
       ip: `192.168.1.${Math.floor(Math.random() * 255)}`,
     });
 
-    this.log(`User logged in: ${userId} (Total sessions: ${this.userSessions.size})`);
+    this.log(
+      `User logged in: ${userId} (Total sessions: ${this.userSessions.size})`
+    );
 
     // Update service stats (only if service discovery is enabled)
     if (this.config.enableServiceDiscovery) {

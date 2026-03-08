@@ -12,7 +12,11 @@ export class TrafficSplitter {
    * @param salt - Optional salt for additional randomization
    * @returns Hash value between 0 and 1
    */
-  private static generateHash(userId: string, experimentId: string, salt: string = ''): number {
+  private static generateHash(
+    userId: string,
+    experimentId: string,
+    salt: string = ''
+  ): number {
     const input = `${userId}:${experimentId}:${salt}`;
 
     // Use MurmurHash v3 for fast, consistent hashing
@@ -43,9 +47,14 @@ export class TrafficSplitter {
     }
 
     // Validate that traffic percentages sum to <= 100
-    const totalTraffic = variants.reduce((sum, variant) => sum + variant.trafficPercentage, 0);
+    const totalTraffic = variants.reduce(
+      (sum, variant) => sum + variant.trafficPercentage,
+      0
+    );
     if (totalTraffic > 100) {
-      throw new Error(`Total traffic percentage (${totalTraffic}%) exceeds 100%`);
+      throw new Error(
+        `Total traffic percentage (${totalTraffic}%) exceeds 100%`
+      );
     }
 
     // Generate consistent hash for this user and experiment
@@ -97,8 +106,15 @@ export class TrafficSplitter {
    * @returns Object with group assignments
    */
   static multivariateAssignment<
-    T extends Record<string, { variants: Array<{ id: string; percentage: number }> }>,
-  >(userId: string, groups: T, experimentId: string): Record<keyof T, string | number | null> {
+    T extends Record<
+      string,
+      { variants: Array<{ id: string; percentage: number }> }
+    >,
+  >(
+    userId: string,
+    groups: T,
+    experimentId: string
+  ): Record<keyof T, string | number | null> {
     const result: Record<keyof T, string | number | null> = {} as any;
 
     for (const [groupName, groupConfig] of Object.entries(groups)) {
@@ -129,7 +145,9 @@ export class TrafficSplitter {
    * @param experimentId - Experiment identifier
    * @returns Distribution statistics
    */
-  static calculateDistribution<T extends { id: string; trafficPercentage: number }>(
+  static calculateDistribution<
+    T extends { id: string; trafficPercentage: number },
+  >(
     userIds: string[],
     variants: T[],
     experimentId: string
@@ -149,7 +167,11 @@ export class TrafficSplitter {
 
     // Count assignments
     userIds.forEach((userId) => {
-      const selectedVariant = this.selectVariant(userId, variants, experimentId);
+      const selectedVariant = this.selectVariant(
+        userId,
+        variants,
+        experimentId
+      );
       if (selectedVariant) {
         variantCounts[selectedVariant.id.toString()]++;
       } else {
@@ -161,7 +183,8 @@ export class TrafficSplitter {
     const totalUsers = userIds.length;
     const actualPercentages: Record<string, number> = {};
     Object.entries(variantCounts).forEach(([variantId, count]) => {
-      actualPercentages[variantId] = totalUsers > 0 ? (count / totalUsers) * 100 : 0;
+      actualPercentages[variantId] =
+        totalUsers > 0 ? (count / totalUsers) * 100 : 0;
     });
 
     return {
@@ -190,7 +213,11 @@ export class TrafficSplitter {
    * @param bucketCount - Number of buckets (default: 100)
    * @returns Bucket number (0 to bucketCount-1)
    */
-  static getFastBucket(userId: string, experimentId: string, bucketCount: number = 100): number {
+  static getFastBucket(
+    userId: string,
+    experimentId: string,
+    bucketCount: number = 100
+  ): number {
     const input = `${userId}:${experimentId}`;
     const hashValue = murmur.v3(input, 0x12345678);
     return hashValue % bucketCount;
@@ -214,9 +241,14 @@ export class TrafficSplitter {
     }
 
     // Validate traffic percentages
-    const totalTraffic = variants.reduce((sum, variant) => sum + variant.trafficPercentage, 0);
+    const totalTraffic = variants.reduce(
+      (sum, variant) => sum + variant.trafficPercentage,
+      0
+    );
     if (totalTraffic > 100) {
-      throw new Error(`Total traffic percentage (${totalTraffic}%) exceeds 100%`);
+      throw new Error(
+        `Total traffic percentage (${totalTraffic}%) exceeds 100%`
+      );
     }
 
     // Use fast bucket assignment
@@ -242,7 +274,11 @@ export class TrafficSplitter {
    * @param experimentId - Experiment identifier
    * @returns True if user is in the experiment
    */
-  static isUserInExperiment(userId: string, percentage: number, experimentId: string): boolean {
+  static isUserInExperiment(
+    userId: string,
+    percentage: number,
+    experimentId: string
+  ): boolean {
     if (percentage <= 0) return false;
     if (percentage >= 100) return true;
 
@@ -262,7 +298,11 @@ export class CampaignEvaluator {
    * @param now - Current time (defaults to now)
    * @returns True if campaign is active
    */
-  static isCampaignActive(startDate: Date, endDate: Date, now: Date = new Date()): boolean {
+  static isCampaignActive(
+    startDate: Date,
+    endDate: Date,
+    now: Date = new Date()
+  ): boolean {
     return now >= startDate && now <= endDate;
   }
 
@@ -271,7 +311,9 @@ export class CampaignEvaluator {
    * @param campaigns - Array of campaigns with priorities
    * @returns Sorted campaigns by priority (highest first)
    */
-  static sortCampaignsByPriority<T extends { priority: number }>(campaigns: T[]): T[] {
+  static sortCampaignsByPriority<T extends { priority: number }>(
+    campaigns: T[]
+  ): T[] {
     return [...campaigns].sort((a, b) => b.priority - a.priority);
   }
 
@@ -413,7 +455,9 @@ export class TrafficSplitterUtils {
    * @param experimentId - Experiment identifier
    * @returns Accuracy metrics
    */
-  static validateVariantDistribution<T extends { id: string; trafficPercentage: number }>(
+  static validateVariantDistribution<
+    T extends { id: string; trafficPercentage: number },
+  >(
     variants: T[],
     sampleSize: number = 100000,
     experimentId: string = 'test'
@@ -435,7 +479,11 @@ export class TrafficSplitterUtils {
     // Generate samples
     for (let i = 0; i < sampleSize; i++) {
       const userId = `user_${i}`;
-      const selectedVariant = TrafficSplitter.selectVariantFast(userId, variants, experimentId);
+      const selectedVariant = TrafficSplitter.selectVariantFast(
+        userId,
+        variants,
+        experimentId
+      );
 
       if (selectedVariant) {
         variantCounts[selectedVariant.id.toString()]++;
@@ -450,7 +498,8 @@ export class TrafficSplitterUtils {
     variants.forEach((variant) => {
       const variantId = variant.id.toString();
       actual[variantId] = (variantCounts[variantId] / sampleSize) * 100;
-      accuracy[variantId] = 100 - Math.abs(expected[variantId] - actual[variantId]);
+      accuracy[variantId] =
+        100 - Math.abs(expected[variantId] - actual[variantId]);
       totalAccuracy += accuracy[variantId];
     });
 
@@ -471,7 +520,11 @@ export class TrafficSplitterUtils {
    * @param iterations - Number of iterations to test
    * @returns True if all calls return the same result
    */
-  static testConsistency(userId: string, experimentId: string, iterations: number = 1000): boolean {
+  static testConsistency(
+    userId: string,
+    experimentId: string,
+    iterations: number = 1000
+  ): boolean {
     const firstBucket = TrafficSplitter.getUserBucket(userId, experimentId);
 
     for (let i = 1; i < iterations; i++) {

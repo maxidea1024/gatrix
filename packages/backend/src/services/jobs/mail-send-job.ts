@@ -10,7 +10,8 @@ export class MailSendJob extends BaseJob {
       // Validate required fields
       this.validateRequiredFields(['to', 'subject', 'body']);
 
-      const { to, cc, bcc, subject, body, attachments } = this.context.jobDataMap;
+      const { to, cc, bcc, subject, body, attachments } =
+        this.context.jobDataMap;
 
       // 메일 전송 Settings (Get from environment variables)
       const transporter = nodemailer.createTransport({

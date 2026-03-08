@@ -11,7 +11,9 @@ const CouponsPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <ConfirmationNumberIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+          <ConfirmationNumberIcon
+            sx={{ fontSize: 32, color: 'primary.main' }}
+          />
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
               {t('coupons.title')}

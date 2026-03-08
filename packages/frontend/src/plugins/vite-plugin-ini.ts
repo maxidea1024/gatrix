@@ -10,7 +10,8 @@ function parseIni(content: string): Record<string, string> {
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith(';')) continue;
+    if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith(';'))
+      continue;
 
     const eqIndex = trimmed.indexOf('=');
     if (eqIndex === -1) continue;

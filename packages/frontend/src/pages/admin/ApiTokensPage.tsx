@@ -130,9 +130,19 @@ interface SortableColumnItemProps {
   onToggleVisibility: (id: string) => void;
 }
 
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
+  column,
+  onToggleVisibility,
+}) => {
   const { t } = useTranslation();
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: column.id,
   });
 
@@ -162,7 +172,11 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
         </Box>
       }
     >
-      <ListItemButton dense onClick={() => onToggleVisibility(column.id)} sx={{ pr: 6 }}>
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
         <Checkbox
           edge="start"
           checked={column.visible}
@@ -172,7 +186,10 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
           icon={<VisibilityOffIcon fontSize="small" />}
           checkedIcon={<VisibilityIcon fontSize="small" />}
         />
-        <ListItemText primary={t(column.labelKey)} slotProps={{ primary: { variant: 'body2' } }} />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
       </ListItemButton>
     </ListItem>
   );
@@ -207,7 +224,8 @@ const ApiTokensPage: React.FC = () => {
 
   // Check if user can manage (create/edit/delete) tokens
   const canManage = hasPermission([P.IP_WHITELIST_UPDATE]);
-  const { currentProjectId, currentOrgId, projects, getProjectApiPath } = useOrgProject();
+  const { currentProjectId, currentOrgId, projects, getProjectApiPath } =
+    useOrgProject();
   const projectApiPath = getProjectApiPath();
 
   const [tokens, setTokens] = useState<ApiAccessToken[]>([]);
@@ -238,7 +256,8 @@ const ApiTokensPage: React.FC = () => {
     return defaultColumns;
   });
 
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<HTMLButtonElement | null>(null);
 
   const columnSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -268,7 +287,9 @@ const ApiTokensPage: React.FC = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [regenerateDialogOpen, setRegenerateDialogOpen] = useState(false);
-  const [selectedToken, setSelectedToken] = useState<ApiAccessToken | null>(null);
+  const [selectedToken, setSelectedToken] = useState<ApiAccessToken | null>(
+    null
+  );
 
   // Environment state
   const { environments: envList } = useEnvironments();
@@ -292,7 +313,9 @@ const ApiTokensPage: React.FC = () => {
       tokenName: formData.tokenName.trim(),
       description: formData.description?.trim() || '',
       environmentId: formData.environments[0] || '',
-      expiresAt: formData.expiresAt ? new Date(formData.expiresAt).toISOString() : undefined,
+      expiresAt: formData.expiresAt
+        ? new Date(formData.expiresAt).toISOString()
+        : undefined,
     };
 
     const originalData = {
@@ -318,11 +341,14 @@ const ApiTokensPage: React.FC = () => {
   const [selectAll, setSelectAll] = useState<boolean>(false);
 
   // Bulk delete states
-  const [bulkDeleteDrawerOpen, setBulkDeleteDrawerOpen] = useState<boolean>(false);
-  const [bulkDeleteConfirmText, setBulkDeleteConfirmText] = useState<string>('');
+  const [bulkDeleteDrawerOpen, setBulkDeleteDrawerOpen] =
+    useState<boolean>(false);
+  const [bulkDeleteConfirmText, setBulkDeleteConfirmText] =
+    useState<string>('');
 
   // Regenerate confirmation state
-  const [regenerateConfirmText, setRegenerateConfirmText] = useState<string>('');
+  const [regenerateConfirmText, setRegenerateConfirmText] =
+    useState<string>('');
 
   // Refs for focus management
   const tokenNameRef = useRef<HTMLInputElement>(null);
@@ -332,7 +358,9 @@ const ApiTokensPage: React.FC = () => {
 
   // Action Menu state
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [menuTargetToken, setMenuTargetToken] = useState<ApiAccessToken | null>(null);
+  const [menuTargetToken, setMenuTargetToken] = useState<ApiAccessToken | null>(
+    null
+  );
 
   // Column handlers
   const handleToggleColumnVisibility = (columnId: string) => {
@@ -382,7 +410,9 @@ const ApiTokensPage: React.FC = () => {
   };
 
   const handleFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters(activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f)));
+    setActiveFilters(
+      activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f))
+    );
   };
 
   useEffect(() => {
@@ -396,7 +426,11 @@ const ApiTokensPage: React.FC = () => {
       // Build filter params
       const filterParams: any = {};
       activeFilters.forEach((filter) => {
-        if (filter.value !== undefined && filter.value !== null && filter.value !== '') {
+        if (
+          filter.value !== undefined &&
+          filter.value !== null &&
+          filter.value !== ''
+        ) {
           filterParams[filter.key] = filter.value;
         }
       });
@@ -485,7 +519,9 @@ const ApiTokensPage: React.FC = () => {
           </Tooltip>
         );
       case 'environments': {
-        const env = environments.find((e) => e.environmentId === token.environmentId);
+        const env = environments.find(
+          (e) => e.environmentId === token.environmentId
+        );
         return env ? (
           <Chip
             label={env.displayName || env.environmentName}
@@ -502,7 +538,9 @@ const ApiTokensPage: React.FC = () => {
       }
       case 'project': {
         const proj = projects.find((p) => p.id === (token as any).projectId);
-        return <Typography variant="body2">{proj?.projectName || '-'}</Typography>;
+        return (
+          <Typography variant="body2">{proj?.projectName || '-'}</Typography>
+        );
       }
       case 'description':
         return (
@@ -525,23 +563,33 @@ const ApiTokensPage: React.FC = () => {
             sx={{ fontWeight: 500 }}
             color={!token.usageCount ? 'text.secondary' : 'text.primary'}
           >
-            {token.usageCount ? token.usageCount.toLocaleString() : t('apiTokens.neverUsed')}
+            {token.usageCount
+              ? token.usageCount.toLocaleString()
+              : t('apiTokens.neverUsed')}
           </Typography>
         );
       case 'lastUsedAt':
         return (
           <Typography variant="body2">
-            {token.lastUsedAt ? formatRelativeTime(token.lastUsedAt) : t('apiTokens.neverUsed')}
+            {token.lastUsedAt
+              ? formatRelativeTime(token.lastUsedAt)
+              : t('apiTokens.neverUsed')}
           </Typography>
         );
       case 'expiresAt':
         return (
           <Typography variant="body2">
-            {token.expiresAt ? formatRelativeTime(token.expiresAt) : t('apiTokens.noExpiration')}
+            {token.expiresAt
+              ? formatRelativeTime(token.expiresAt)
+              : t('apiTokens.noExpiration')}
           </Typography>
         );
       case 'createdAt':
-        return <Typography variant="body2">{formatRelativeTime(token.createdAt)}</Typography>;
+        return (
+          <Typography variant="body2">
+            {formatRelativeTime(token.createdAt)}
+          </Typography>
+        );
       default:
         return null;
     }
@@ -607,7 +655,9 @@ const ApiTokensPage: React.FC = () => {
       );
       console.log('Create token response:', response); // 디버깅용
 
-      const selectedProject = projects.find((p) => p.id === formData.selectedProjectId);
+      const selectedProject = projects.find(
+        (p) => p.id === formData.selectedProjectId
+      );
       const tokenInfo = {
         tokenName: formData.tokenName,
         description: formData.description,
@@ -623,7 +673,10 @@ const ApiTokensPage: React.FC = () => {
       resetForm();
 
       // 백엔드 Response 구조 Confirm 및 토큰 값 추출
-      const tokenValue = (response as any)?.data?.tokenValue || (response as any)?.tokenValue || '';
+      const tokenValue =
+        (response as any)?.data?.tokenValue ||
+        (response as any)?.tokenValue ||
+        '';
       console.log('Create response structure:', response); // 디버깅용
       console.log('Extracted token value:', tokenValue); // 디버깅용
 
@@ -688,7 +741,10 @@ const ApiTokensPage: React.FC = () => {
     }
 
     try {
-      await apiTokenService.deleteToken(selectedToken.id as any, projectApiPath);
+      await apiTokenService.deleteToken(
+        selectedToken.id as any,
+        projectApiPath
+      );
       await loadTokens();
       setDeleteDialogOpen(false);
       setSelectedToken(null);
@@ -713,7 +769,10 @@ const ApiTokensPage: React.FC = () => {
       console.log('Regenerate token response:', response); // 디버깅용
 
       // 백엔드 Response 구조 Confirm 및 토큰 값 추출
-      const tokenValue = (response as any)?.data?.tokenValue || (response as any)?.tokenValue || '';
+      const tokenValue =
+        (response as any)?.data?.tokenValue ||
+        (response as any)?.tokenValue ||
+        '';
       console.log('Regenerate response structure:', response); // 디버깅용
       console.log('Extracted token value:', tokenValue); // 디버깅용
 
@@ -774,8 +833,11 @@ const ApiTokensPage: React.FC = () => {
       tokenType: token.tokenType,
       allowAllEnvironments: false,
       environments: token.environmentId ? [token.environmentId] : [],
-      expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString().slice(0, 16) : undefined,
-      selectedProjectId: (token as any).projectId || currentProjectId || undefined,
+      expiresAt: token.expiresAt
+        ? new Date(token.expiresAt).toISOString().slice(0, 16)
+        : undefined,
+      selectedProjectId:
+        (token as any).projectId || currentProjectId || undefined,
     });
     setFullEditingData(JSON.parse(JSON.stringify(token)));
     setEditDialogOpen(true);
@@ -799,7 +861,8 @@ const ApiTokensPage: React.FC = () => {
     setTimeout(() => {
       if (regenerateConfirmRef.current) {
         // Try to focus on the actual input element inside TextField
-        const inputElement = regenerateConfirmRef.current.querySelector('input');
+        const inputElement =
+          regenerateConfirmRef.current.querySelector('input');
         if (inputElement) {
           inputElement.focus();
         } else {
@@ -817,7 +880,10 @@ const ApiTokensPage: React.FC = () => {
   };
 
   const copyToClipboard = async (text: string) => {
-    console.log('[ApiTokensPage] copyToClipboard called, text length:', text.length);
+    console.log(
+      '[ApiTokensPage] copyToClipboard called, text length:',
+      text.length
+    );
     await copyToClipboardWithNotification(
       text,
       () => {
@@ -948,7 +1014,8 @@ const ApiTokensPage: React.FC = () => {
     return tokens.filter(
       (token) =>
         token.tokenName.toLowerCase().includes(lowerSearch) ||
-        (token.description && token.description.toLowerCase().includes(lowerSearch)) ||
+        (token.description &&
+          token.description.toLowerCase().includes(lowerSearch)) ||
         token.tokenType.toLowerCase().includes(lowerSearch)
     );
   }, [tokens, debouncedSearchTerm]);
@@ -977,7 +1044,11 @@ const ApiTokensPage: React.FC = () => {
               </Box>
             </Box>
             {canManage && (
-              <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateDialog}>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={openCreateDialog}
+              >
                 {t('apiTokens.createToken')}
               </Button>
             )}
@@ -1063,7 +1134,9 @@ const ApiTokensPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -1094,13 +1167,24 @@ const ApiTokensPage: React.FC = () => {
         <PageContentLoader loading={loading}>
           {!filteredTokens || filteredTokens.length === 0 ? (
             <EmptyPagePlaceholder
-              message={searchTerm ? t('common.noSearchResults') : t('apiTokens.noTokens')}
-              subtitle={canManage && !searchTerm ? t('common.addFirstItem') : undefined}
-              onAddClick={canManage && !searchTerm ? openCreateDialog : undefined}
+              message={
+                searchTerm
+                  ? t('common.noSearchResults')
+                  : t('apiTokens.noTokens')
+              }
+              subtitle={
+                canManage && !searchTerm ? t('common.addFirstItem') : undefined
+              }
+              onAddClick={
+                canManage && !searchTerm ? openCreateDialog : undefined
+              }
               addButtonLabel={t('apiTokens.createToken')}
             />
           ) : (
-            <Paper variant="outlined" sx={{ width: '100%', overflow: 'hidden' }}>
+            <Paper
+              variant="outlined"
+              sx={{ width: '100%', overflow: 'hidden' }}
+            >
               <TableContainer>
                 <Table stickyHeader sx={{ tableLayout: 'auto' }}>
                   <TableHead>
@@ -1121,7 +1205,9 @@ const ApiTokensPage: React.FC = () => {
                       {columns
                         .filter((col) => col.visible)
                         .map((column) => (
-                          <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
+                          <TableCell key={column.id}>
+                            {t(column.labelKey)}
+                          </TableCell>
                         ))}
                       <TableCell align="center" sx={{ width: 150 }}>
                         {t('common.actions')}
@@ -1138,8 +1224,15 @@ const ApiTokensPage: React.FC = () => {
                         {canManage && (
                           <TableCell padding="checkbox">
                             <Checkbox
-                              checked={selectedTokenIds.includes(token.id as any)}
-                              onChange={(e) => handleSelectToken(token.id as any, e.target.checked)}
+                              checked={selectedTokenIds.includes(
+                                token.id as any
+                              )}
+                              onChange={(e) =>
+                                handleSelectToken(
+                                  token.id as any,
+                                  e.target.checked
+                                )
+                              }
                             />
                           </TableCell>
                         )}
@@ -1275,7 +1368,10 @@ const ApiTokensPage: React.FC = () => {
         >
           {/* Basic Information Section */}
           <Paper variant="outlined" sx={{ p: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+            >
               {t('apiTokens.basicInfoSection')}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -1292,9 +1388,13 @@ const ApiTokensPage: React.FC = () => {
                 fullWidth
                 required
                 size="small"
-                error={formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)}
+                error={
+                  formData.tokenName.length > 0 &&
+                  !isValidTokenName(formData.tokenName)
+                }
                 helperText={
-                  formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)
+                  formData.tokenName.length > 0 &&
+                  !isValidTokenName(formData.tokenName)
                     ? t('apiTokens.tokenNameMinLength')
                     : t('apiTokens.tokenNameHelp')
                 }
@@ -1320,7 +1420,10 @@ const ApiTokensPage: React.FC = () => {
 
           {/* Token Type & Scope Section */}
           <Paper variant="outlined" sx={{ p: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+            >
               {t('apiTokens.tokenTypeSection')}
             </Typography>
 
@@ -1377,7 +1480,11 @@ const ApiTokensPage: React.FC = () => {
                     </Box>
                   </MenuItem>
                 </Select>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.5 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mt: 0.5, ml: 1.5 }}
+                >
                   {t('apiTokens.tokenTypeNotEditable')}
                 </Typography>
               </FormControl>
@@ -1402,7 +1509,11 @@ const ApiTokensPage: React.FC = () => {
                     </MenuItem>
                   ))}
                 </Select>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.5 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mt: 0.5, ml: 1.5 }}
+                >
                   {t('apiTokens.projectHelp')}
                 </Typography>
               </FormControl>
@@ -1421,7 +1532,9 @@ const ApiTokensPage: React.FC = () => {
                     }))
                   }
                   renderValue={(value) => {
-                    const env = environments.find((e) => e.environmentId === value);
+                    const env = environments.find(
+                      (e) => e.environmentId === value
+                    );
                     return env ? env.displayName || env.environmentName : '';
                   }}
                 >
@@ -1440,7 +1553,11 @@ const ApiTokensPage: React.FC = () => {
                     </MenuItem>
                   ))}
                 </Select>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.5 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mt: 0.5, ml: 1.5 }}
+                >
                   {t('apiTokens.selectSingleEnvironment')}
                 </Typography>
               </FormControl>
@@ -1449,10 +1566,16 @@ const ApiTokensPage: React.FC = () => {
 
           {/* Expiration Section */}
           <Paper variant="outlined" sx={{ p: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+            >
               {t('apiTokens.expirationSection')}
             </Typography>
-            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
+            <LocalizationProvider
+              dateAdapter={AdapterDayjs}
+              adapterLocale={getDateLocale()}
+            >
               <DateTimePicker
                 label={t('apiTokens.expiresAt')}
                 value={formData.expiresAt ? dayjs(formData.expiresAt) : null}
@@ -1467,7 +1590,9 @@ const ApiTokensPage: React.FC = () => {
                   textField: {
                     fullWidth: true,
                     size: 'small',
-                    helperText: expiresAtValidation.warning || t('apiTokens.expiresAtHelp'),
+                    helperText:
+                      expiresAtValidation.warning ||
+                      t('apiTokens.expiresAtHelp'),
                     error: !expiresAtValidation.isValid,
                     slotProps: { input: { readOnly: true } },
                   },
@@ -1479,7 +1604,9 @@ const ApiTokensPage: React.FC = () => {
             </LocalizationProvider>
             {!expiresAtValidation.isValid && (
               <Alert severity="error" sx={{ mt: 1, py: 0.5 }}>
-                <Typography variant="caption">{expiresAtValidation.warning}</Typography>
+                <Typography variant="caption">
+                  {expiresAtValidation.warning}
+                </Typography>
               </Alert>
             )}
           </Paper>
@@ -1497,7 +1624,10 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setCreateDialogOpen(false)} startIcon={<CancelIcon />}>
+          <Button
+            onClick={() => setCreateDialogOpen(false)}
+            startIcon={<CancelIcon />}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -1541,7 +1671,10 @@ const ApiTokensPage: React.FC = () => {
         >
           {/* Basic Information Section */}
           <Paper variant="outlined" sx={{ p: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+            >
               {t('apiTokens.basicInfoSection')}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -1558,9 +1691,13 @@ const ApiTokensPage: React.FC = () => {
                 fullWidth
                 required
                 size="small"
-                error={formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)}
+                error={
+                  formData.tokenName.length > 0 &&
+                  !isValidTokenName(formData.tokenName)
+                }
                 helperText={
-                  formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)
+                  formData.tokenName.length > 0 &&
+                  !isValidTokenName(formData.tokenName)
                     ? t('apiTokens.tokenNameMinLength')
                     : t('apiTokens.tokenNameHelp')
                 }
@@ -1586,7 +1723,10 @@ const ApiTokensPage: React.FC = () => {
 
           {/* Token Type & Scope Section */}
           <Paper variant="outlined" sx={{ p: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+            >
               {t('apiTokens.tokenTypeSection')}
             </Typography>
 
@@ -1608,10 +1748,17 @@ const ApiTokensPage: React.FC = () => {
                   }}
                 >
                   <MenuItem value={formData.tokenType}>
-                    {t(`apiTokens.${formData.tokenType}TokenType`, formData.tokenType)}
+                    {t(
+                      `apiTokens.${formData.tokenType}TokenType`,
+                      formData.tokenType
+                    )}
                   </MenuItem>
                 </Select>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.5 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mt: 0.5, ml: 1.5 }}
+                >
                   {t('apiTokens.tokenTypeNotEditable')}
                 </Typography>
               </FormControl>
@@ -1636,7 +1783,11 @@ const ApiTokensPage: React.FC = () => {
                     </MenuItem>
                   ))}
                 </Select>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.5 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mt: 0.5, ml: 1.5 }}
+                >
                   {t('apiTokens.projectHelp')}
                 </Typography>
               </FormControl>
@@ -1655,7 +1806,9 @@ const ApiTokensPage: React.FC = () => {
                     }))
                   }
                   renderValue={(value) => {
-                    const env = environments.find((e) => e.environmentId === value);
+                    const env = environments.find(
+                      (e) => e.environmentId === value
+                    );
                     return env ? env.displayName || env.environmentName : '';
                   }}
                 >
@@ -1680,10 +1833,16 @@ const ApiTokensPage: React.FC = () => {
 
           {/* Expiration Section */}
           <Paper variant="outlined" sx={{ p: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+            >
               {t('apiTokens.expirationSection')}
             </Typography>
-            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
+            <LocalizationProvider
+              dateAdapter={AdapterDayjs}
+              adapterLocale={getDateLocale()}
+            >
               <DateTimePicker
                 label={t('apiTokens.expiresAt')}
                 value={formData.expiresAt ? dayjs(formData.expiresAt) : null}
@@ -1698,7 +1857,9 @@ const ApiTokensPage: React.FC = () => {
                   textField: {
                     fullWidth: true,
                     size: 'small',
-                    helperText: expiresAtValidation.warning || t('apiTokens.expiresAtHelp'),
+                    helperText:
+                      expiresAtValidation.warning ||
+                      t('apiTokens.expiresAtHelp'),
                     error: !expiresAtValidation.isValid,
                     slotProps: { input: { readOnly: true } },
                   },
@@ -1710,7 +1871,9 @@ const ApiTokensPage: React.FC = () => {
             </LocalizationProvider>
             {!expiresAtValidation.isValid && (
               <Alert severity="error" sx={{ mt: 1, py: 0.5 }}>
-                <Typography variant="caption">{expiresAtValidation.warning}</Typography>
+                <Typography variant="caption">
+                  {expiresAtValidation.warning}
+                </Typography>
               </Alert>
             )}
           </Paper>
@@ -1728,7 +1891,10 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setEditDialogOpen(false)} startIcon={<CancelIcon />}>
+          <Button
+            onClick={() => setEditDialogOpen(false)}
+            startIcon={<CancelIcon />}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -1777,7 +1943,11 @@ const ApiTokensPage: React.FC = () => {
             zIndex: 1301,
           }}
         >
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600, color: 'error.main' }}>
+          <Typography
+            variant="h6"
+            component="h2"
+            sx={{ fontWeight: 600, color: 'error.main' }}
+          >
             {t('apiTokens.deleteToken')}
           </Typography>
           <IconButton
@@ -1813,7 +1983,11 @@ const ApiTokensPage: React.FC = () => {
                 <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
                   {t('apiTokens.tokenName')}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   {selectedToken.tokenName}
                 </Typography>
 
@@ -1821,7 +1995,10 @@ const ApiTokensPage: React.FC = () => {
                   {t('apiTokens.tokenType')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {t(`apiTokens.types.${selectedToken.tokenType}`, selectedToken.tokenType)}
+                  {t(
+                    `apiTokens.types.${selectedToken.tokenType}`,
+                    selectedToken.tokenType
+                  )}
                 </Typography>
               </Box>
 
@@ -1839,10 +2016,12 @@ const ApiTokensPage: React.FC = () => {
                 placeholder={t('apiTokens.deleteConfirmPlaceholder')}
                 size="medium"
                 error={
-                  deleteConfirmText.length > 0 && deleteConfirmText !== selectedToken.tokenName
+                  deleteConfirmText.length > 0 &&
+                  deleteConfirmText !== selectedToken.tokenName
                 }
                 helperText={
-                  deleteConfirmText.length > 0 && deleteConfirmText !== selectedToken.tokenName
+                  deleteConfirmText.length > 0 &&
+                  deleteConfirmText !== selectedToken.tokenName
                     ? t('apiTokens.deleteConfirmMismatch')
                     : ''
                 }
@@ -1873,7 +2052,9 @@ const ApiTokensPage: React.FC = () => {
             onClick={handleDelete}
             variant="contained"
             color="error"
-            disabled={!selectedToken || deleteConfirmText !== selectedToken.tokenName}
+            disabled={
+              !selectedToken || deleteConfirmText !== selectedToken.tokenName
+            }
             startIcon={<DeleteIcon />}
           >
             {t('common.delete')}
@@ -1953,8 +2134,15 @@ const ApiTokensPage: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
                   {selectedToken.tokenName}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  {t(`apiTokens.${selectedToken.tokenType}TokenType`, selectedToken.tokenType)}
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
+                  {t(
+                    `apiTokens.${selectedToken.tokenType}TokenType`,
+                    selectedToken.tokenType
+                  )}
                 </Typography>
                 {selectedToken.description && (
                   <Typography variant="body2" color="text.secondary">
@@ -1968,7 +2156,11 @@ const ApiTokensPage: React.FC = () => {
                 <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
                   {t('apiTokens.regenerateConfirmInstruction')}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   <strong>{selectedToken.tokenName}</strong>
                 </Typography>
                 <TextField
@@ -2004,7 +2196,11 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={closeRegenerateDialog} variant="outlined" startIcon={<CancelIcon />}>
+          <Button
+            onClick={closeRegenerateDialog}
+            variant="outlined"
+            startIcon={<CancelIcon />}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -2013,7 +2209,9 @@ const ApiTokensPage: React.FC = () => {
             variant="contained"
             startIcon={<RefreshIcon />}
             disabled={
-              !selectedToken || regenerateConfirmText !== selectedToken.tokenName || loading
+              !selectedToken ||
+              regenerateConfirmText !== selectedToken.tokenName ||
+              loading
             }
           >
             {t('apiTokens.regenerate')}
@@ -2140,8 +2338,13 @@ const ApiTokensPage: React.FC = () => {
               size="small"
             />
             {bulkDeleteConfirmText &&
-              bulkDeleteConfirmText !== t('apiTokens.deleteSelectedTokensText') && (
-                <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
+              bulkDeleteConfirmText !==
+                t('apiTokens.deleteSelectedTokensText') && (
+                <Typography
+                  variant="caption"
+                  color="error"
+                  sx={{ mt: 1, display: 'block' }}
+                >
                   {t('apiTokens.bulkDeleteConfirmMismatch')}
                 </Typography>
               )}
@@ -2158,7 +2361,11 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={closeBulkDeleteDrawer} variant="outlined" startIcon={<CancelIcon />}>
+          <Button
+            onClick={closeBulkDeleteDrawer}
+            variant="outlined"
+            startIcon={<CancelIcon />}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -2166,7 +2373,10 @@ const ApiTokensPage: React.FC = () => {
             color="error"
             variant="contained"
             startIcon={<DeleteIcon />}
-            disabled={bulkDeleteConfirmText !== t('apiTokens.deleteSelectedTokensText') || loading}
+            disabled={
+              bulkDeleteConfirmText !==
+                t('apiTokens.deleteSelectedTokensText') || loading
+            }
           >
             {t('apiTokens.bulkDelete')}
           </Button>
@@ -2216,7 +2426,10 @@ const ApiTokensPage: React.FC = () => {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               }}
             >
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+              <Typography
+                variant="h6"
+                sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+              >
                 {t('apiTokens.tokenSummary')}
               </Typography>
               <Box sx={{ display: 'grid', gap: 2 }}>
@@ -2227,10 +2440,18 @@ const ApiTokensPage: React.FC = () => {
                     alignItems: 'center',
                   }}
                 >
-                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontWeight: 500 }}
+                  >
                     {t('apiTokens.tokenName')}
                   </Typography>
-                  <Chip label={newTokenInfo.tokenName} variant="outlined" size="small" />
+                  <Chip
+                    label={newTokenInfo.tokenName}
+                    variant="outlined"
+                    size="small"
+                  />
                 </Box>
                 {newTokenInfo.description && (
                   <Box
@@ -2240,7 +2461,11 @@ const ApiTokensPage: React.FC = () => {
                       alignItems: 'center',
                     }}
                   >
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 500 }}
+                    >
                       {t('apiTokens.description')}
                     </Typography>
                     <Typography
@@ -2259,12 +2484,19 @@ const ApiTokensPage: React.FC = () => {
                     alignItems: 'center',
                   }}
                 >
-                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontWeight: 500 }}
+                  >
                     {t('apiTokens.tokenType')}
                   </Typography>
                   <Chip
                     label={String(
-                      t(`apiTokens.types.${newTokenInfo.tokenType}`, newTokenInfo.tokenType)
+                      t(
+                        `apiTokens.types.${newTokenInfo.tokenType}`,
+                        newTokenInfo.tokenType
+                      )
                     )}
                     color="primary"
                     size="small"
@@ -2279,10 +2511,18 @@ const ApiTokensPage: React.FC = () => {
                       alignItems: 'center',
                     }}
                   >
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 500 }}
+                    >
                       {t('common.project')}
                     </Typography>
-                    <Chip label={newTokenInfo.projectName} variant="outlined" size="small" />
+                    <Chip
+                      label={newTokenInfo.projectName}
+                      variant="outlined"
+                      size="small"
+                    />
                   </Box>
                 )}
 
@@ -2293,7 +2533,11 @@ const ApiTokensPage: React.FC = () => {
                     alignItems: 'center',
                   }}
                 >
-                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontWeight: 500 }}
+                  >
                     {t('apiTokens.expiresAt')}
                   </Typography>
                   <Typography variant="body2" fontWeight={500}>
@@ -2311,7 +2555,11 @@ const ApiTokensPage: React.FC = () => {
                     alignItems: 'flex-start',
                   }}
                 >
-                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontWeight: 500 }}
+                  >
                     {t('apiTokens.environments')}
                   </Typography>
                   <Box
@@ -2325,7 +2573,10 @@ const ApiTokensPage: React.FC = () => {
                   >
                     {(() => {
                       const env = newTokenInfo.environmentId
-                        ? environments.find((e) => e.environmentId === newTokenInfo.environmentId)
+                        ? environments.find(
+                            (e) =>
+                              e.environmentId === newTokenInfo.environmentId
+                          )
                         : null;
                       return env ? (
                         <Chip
@@ -2398,7 +2649,9 @@ const ApiTokensPage: React.FC = () => {
             </Box>
           ) : (
             <Alert severity="error" sx={{ mb: 2 }}>
-              <Typography variant="body2">{t('apiTokens.tokenValueError')}</Typography>
+              <Typography variant="body2">
+                {t('apiTokens.tokenValueError')}
+              </Typography>
             </Alert>
           )}
         </DialogContent>
@@ -2444,7 +2697,9 @@ const ApiTokensPage: React.FC = () => {
                 mb: 1,
               }}
             >
-              <Typography variant="subtitle2">{t('common.columnSettings')}</Typography>
+              <Typography variant="subtitle2">
+                {t('common.columnSettings')}
+              </Typography>
               <Button size="small" onClick={handleResetColumns}>
                 {t('common.reset')}
               </Button>

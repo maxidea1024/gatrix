@@ -54,20 +54,32 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
-import { inferRoleLabelKey, getRoleLabelColor } from '@gatrix/shared/permissions';
+import {
+  inferRoleLabelKey,
+  getRoleLabelColor,
+} from '@gatrix/shared/permissions';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useConditionalApi } from '@/hooks/useSWR';
 import api from '@/services/api';
 import { useNavigate } from 'react-router-dom';
 import { P } from '@/types/permissions';
 import { crashService } from '@/services/crashService';
-import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
+import {
+  maintenanceService,
+  MaintenanceDetail,
+} from '@/services/maintenanceService';
 import { CrashEvent } from '@/types/crash';
 import { BugReport as BugReportIcon } from '@mui/icons-material';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { Environment } from '@/services/environmentService';
-import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
-import serverLifecycleService, { ServerLifecycleEvent } from '@/services/serverLifecycleService';
+import {
+  formatDateTime,
+  formatRelativeTime,
+  formatDateTimeDetailed,
+} from '@/utils/dateFormat';
+import serverLifecycleService, {
+  ServerLifecycleEvent,
+} from '@/services/serverLifecycleService';
 
 // Stats card component with modern design
 interface StatsCardProps {
@@ -130,13 +142,23 @@ const StatsCard: React.FC<StatsCardProps> = ({
           }}
         >
           <Box>
-            <Typography variant="body2" color="text.secondary" fontWeight={500} gutterBottom>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              fontWeight={500}
+              gutterBottom
+            >
               {title}
             </Typography>
             {loading ? (
               <Skeleton width={80} height={40} />
             ) : (
-              <Typography variant="h4" component="div" fontWeight="bold" color={`${color}.main`}>
+              <Typography
+                variant="h4"
+                component="div"
+                fontWeight="bold"
+                color={`${color}.main`}
+              >
                 {value}
               </Typography>
             )}
@@ -150,7 +172,9 @@ const StatsCard: React.FC<StatsCardProps> = ({
               </Typography>
             )}
             {trend && (
-              <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, gap: 0.5 }}>
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', mt: 1, gap: 0.5 }}
+              >
                 <TrendingUpIcon
                   sx={{
                     fontSize: 16,
@@ -158,7 +182,10 @@ const StatsCard: React.FC<StatsCardProps> = ({
                     transform: trend.isUp ? 'none' : 'rotate(180deg)',
                   }}
                 />
-                <Typography variant="caption" color={trend.isUp ? 'success.main' : 'error.main'}>
+                <Typography
+                  variant="caption"
+                  color={trend.isUp ? 'success.main' : 'error.main'}
+                >
                   {trend.value}%
                 </Typography>
               </Box>
@@ -310,13 +337,19 @@ const DashboardPage: React.FC = () => {
     firing: 0,
   });
   const [alertsSummaryLoading, setAlertsSummaryLoading] = useState(false);
-  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>(
+    []
+  );
   const [activitiesLoading, setActivitiesLoading] = useState(false);
-  const [environmentsWithCounts, setEnvironmentsWithCounts] = useState<EnvironmentWithCounts[]>([]);
+  const [environmentsWithCounts, setEnvironmentsWithCounts] = useState<
+    EnvironmentWithCounts[]
+  >([]);
   const [envCountsLoading, setEnvCountsLoading] = useState(false);
   const [recentCrashEvents, setRecentCrashEvents] = useState<CrashEvent[]>([]);
   const [crashEventsLoading, setCrashEventsLoading] = useState(false);
-  const [recentLifecycleEvents, setRecentLifecycleEvents] = useState<ServerLifecycleEvent[]>([]);
+  const [recentLifecycleEvents, setRecentLifecycleEvents] = useState<
+    ServerLifecycleEvent[]
+  >([]);
   const [lifecycleEventsLoading, setLifecycleEventsLoading] = useState(false);
   const [maintenanceStatus, setMaintenanceStatus] = useState<{
     isUnderMaintenance: boolean;
@@ -667,7 +700,10 @@ const DashboardPage: React.FC = () => {
     const loadLifecycleEvents = async () => {
       try {
         setLifecycleEventsLoading(true);
-        const events = await serverLifecycleService.getSummary(getProjectApiPath(), 10);
+        const events = await serverLifecycleService.getSummary(
+          getProjectApiPath(),
+          10
+        );
         if (isMounted) {
           setRecentLifecycleEvents(events || []);
         }
@@ -723,7 +759,10 @@ const DashboardPage: React.FC = () => {
       }
     };
 
-    window.addEventListener('maintenance-status-change', handleMaintenanceChange as EventListener);
+    window.addEventListener(
+      'maintenance-status-change',
+      handleMaintenanceChange as EventListener
+    );
 
     return () => {
       isMounted = false;
@@ -768,7 +807,9 @@ const DashboardPage: React.FC = () => {
         // Filter to accessible environments
         const accessibleEnvs = access?.allowAllEnvironments
           ? allEnvs
-          : allEnvs.filter((env: Environment) => access?.environments?.includes(env.environmentId));
+          : allEnvs.filter((env: Environment) =>
+              access?.environments?.includes(env.environmentId)
+            );
 
         // Show all accessible environments
         const displayEnvs = accessibleEnvs;
@@ -890,7 +931,9 @@ const DashboardPage: React.FC = () => {
                 {getGreeting()}, {user?.name}!
               </Typography>
               <Typography variant="body1" sx={{ opacity: 0.9 }}>
-                {hasAnyPermissions ? t('dashboard.adminWelcome') : t('dashboard.userWelcome')}
+                {hasAnyPermissions
+                  ? t('dashboard.adminWelcome')
+                  : t('dashboard.userWelcome')}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: 1 }}>
@@ -914,7 +957,9 @@ const DashboardPage: React.FC = () => {
                 label={t(`users.statuses.${user?.status}`)}
                 sx={{
                   bgcolor:
-                    user?.status === 'active' ? 'rgba(76, 175, 80, 0.6)' : 'rgba(255, 152, 0, 0.6)',
+                    user?.status === 'active'
+                      ? 'rgba(76, 175, 80, 0.6)'
+                      : 'rgba(255, 152, 0, 0.6)',
                   color: 'white',
                   fontWeight: 600,
                   backdropFilter: 'blur(4px)',
@@ -926,132 +971,150 @@ const DashboardPage: React.FC = () => {
       </Paper>
 
       {/* Maintenance Status - Shown at top when active or scheduled */}
-      {hasAnyPermissions && maintenanceStatus?.isUnderMaintenance && maintenanceStatus?.detail && (
-        <Box sx={{ mb: 4 }}>
-          {(() => {
-            const detail = maintenanceStatus.detail;
-            const now = new Date();
-            const startsAt = detail.startsAt ? new Date(detail.startsAt) : null;
-            const endsAt = detail.endsAt ? new Date(detail.endsAt) : null;
-            const isActive = startsAt ? now >= startsAt : true;
+      {hasAnyPermissions &&
+        maintenanceStatus?.isUnderMaintenance &&
+        maintenanceStatus?.detail && (
+          <Box sx={{ mb: 4 }}>
+            {(() => {
+              const detail = maintenanceStatus.detail;
+              const now = new Date();
+              const startsAt = detail.startsAt
+                ? new Date(detail.startsAt)
+                : null;
+              const endsAt = detail.endsAt ? new Date(detail.endsAt) : null;
+              const isActive = startsAt ? now >= startsAt : true;
 
-            return (
-              <Card
-                sx={{
-                  borderLeft: 4,
-                  borderColor: isActive ? 'error.main' : 'warning.main',
-                }}
-              >
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="h6" fontWeight={600}>
-                      {t('dashboard.maintenanceStatus')}
-                    </Typography>
-                    <Tooltip title={t('dashboard.viewDetails')}>
-                      <IconButton size="small" onClick={() => navigate('/admin/maintenance')}>
-                        <OpenInNewIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                  <Box>
-                    <Chip
-                      label={
-                        isActive
-                          ? t('dashboard.maintenanceActive')
-                          : t('dashboard.maintenanceScheduled')
-                      }
-                      color={isActive ? 'error' : 'warning'}
-                      size="small"
-                      sx={{ mb: 2 }}
-                    />
+              return (
+                <Card
+                  sx={{
+                    borderLeft: 4,
+                    borderColor: isActive ? 'error.main' : 'warning.main',
+                  }}
+                >
+                  <CardContent>
                     <Box
                       sx={{
                         display: 'flex',
-                        flexDirection: 'column',
-                        gap: 1,
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mb: 2,
                       }}
                     >
+                      <Typography variant="h6" fontWeight={600}>
+                        {t('dashboard.maintenanceStatus')}
+                      </Typography>
+                      <Tooltip title={t('dashboard.viewDetails')}>
+                        <IconButton
+                          size="small"
+                          onClick={() => navigate('/admin/maintenance')}
+                        >
+                          <OpenInNewIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                    <Box>
+                      <Chip
+                        label={
+                          isActive
+                            ? t('dashboard.maintenanceActive')
+                            : t('dashboard.maintenanceScheduled')
+                        }
+                        color={isActive ? 'error' : 'warning'}
+                        size="small"
+                        sx={{ mb: 2 }}
+                      />
                       <Box
                         sx={{
                           display: 'flex',
-                          justifyContent: 'space-between',
+                          flexDirection: 'column',
+                          gap: 1,
                         }}
                       >
-                        <Typography variant="body2" color="text.secondary">
-                          {t('dashboard.maintenanceType')}
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          {detail.type === 'emergency'
-                            ? t('maintenance.types.emergency')
-                            : t('maintenance.types.regular')}
-                        </Typography>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            {t('dashboard.maintenanceType')}
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            {detail.type === 'emergency'
+                              ? t('maintenance.types.emergency')
+                              : t('maintenance.types.regular')}
+                          </Typography>
+                        </Box>
+                        {startsAt && (
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <Typography variant="body2" color="text.secondary">
+                              {t('dashboard.maintenanceStartsAt')}
+                            </Typography>
+                            <Tooltip title={formatDateTimeDetailed(startsAt)}>
+                              <Typography variant="body2" fontWeight={500}>
+                                {formatRelativeTime(
+                                  startsAt,
+                                  undefined,
+                                  i18n.language
+                                )}
+                              </Typography>
+                            </Tooltip>
+                          </Box>
+                        )}
+                        {endsAt && (
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <Typography variant="body2" color="text.secondary">
+                              {t('dashboard.maintenanceEndsAt')}
+                            </Typography>
+                            <Tooltip title={formatDateTimeDetailed(endsAt)}>
+                              <Typography variant="body2" fontWeight={500}>
+                                {formatRelativeTime(
+                                  endsAt,
+                                  undefined,
+                                  i18n.language
+                                )}
+                              </Typography>
+                            </Tooltip>
+                          </Box>
+                        )}
+                        {detail.message && (
+                          <Box
+                            sx={{
+                              mt: 1,
+                              p: 1.5,
+                              bgcolor: 'action.hover',
+                              borderRadius: 0,
+                            }}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {t('dashboard.maintenanceMessage')}
+                            </Typography>
+                            <Typography variant="body2" sx={{ mt: 0.5 }}>
+                              {detail.message}
+                            </Typography>
+                          </Box>
+                        )}
                       </Box>
-                      {startsAt && (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <Typography variant="body2" color="text.secondary">
-                            {t('dashboard.maintenanceStartsAt')}
-                          </Typography>
-                          <Tooltip title={formatDateTimeDetailed(startsAt)}>
-                            <Typography variant="body2" fontWeight={500}>
-                              {formatRelativeTime(startsAt, undefined, i18n.language)}
-                            </Typography>
-                          </Tooltip>
-                        </Box>
-                      )}
-                      {endsAt && (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <Typography variant="body2" color="text.secondary">
-                            {t('dashboard.maintenanceEndsAt')}
-                          </Typography>
-                          <Tooltip title={formatDateTimeDetailed(endsAt)}>
-                            <Typography variant="body2" fontWeight={500}>
-                              {formatRelativeTime(endsAt, undefined, i18n.language)}
-                            </Typography>
-                          </Tooltip>
-                        </Box>
-                      )}
-                      {detail.message && (
-                        <Box
-                          sx={{
-                            mt: 1,
-                            p: 1.5,
-                            bgcolor: 'action.hover',
-                            borderRadius: 0,
-                          }}
-                        >
-                          <Typography variant="caption" color="text.secondary">
-                            {t('dashboard.maintenanceMessage')}
-                          </Typography>
-                          <Typography variant="body2" sx={{ mt: 0.5 }}>
-                            {detail.message}
-                          </Typography>
-                        </Box>
-                      )}
                     </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            );
-          })()}
-        </Box>
-      )}
+                  </CardContent>
+                </Card>
+              );
+            })()}
+          </Box>
+        )}
 
       {/* Stats Section - Only for Admins with USERS_VIEW permission */}
       {hasAnyPermissions && hasPermission(P.USERS_READ) && (
@@ -1101,9 +1164,15 @@ const DashboardPage: React.FC = () => {
                 icon={<PersonAddIcon />}
                 color="warning"
                 loading={statsLoading}
-                subtitle={stats.pending > 0 ? t('dashboard.requiresAttention') : undefined}
+                subtitle={
+                  stats.pending > 0
+                    ? t('dashboard.requiresAttention')
+                    : undefined
+                }
                 onClick={
-                  stats.pending > 0 ? () => navigate('/admin/users?status=pending') : undefined
+                  stats.pending > 0
+                    ? () => navigate('/admin/users?status=pending')
+                    : undefined
                 }
               />
             </Grid>
@@ -1115,7 +1184,9 @@ const DashboardPage: React.FC = () => {
                 color="error"
                 loading={statsLoading}
                 onClick={
-                  stats.suspended > 0 ? () => navigate('/admin/users?status=suspended') : undefined
+                  stats.suspended > 0
+                    ? () => navigate('/admin/users?status=suspended')
+                    : undefined
                 }
               />
             </Grid>
@@ -1189,7 +1260,10 @@ const DashboardPage: React.FC = () => {
             </Typography>
             {hasPermission(P.ENVIRONMENTS_UPDATE) && (
               <Tooltip title={t('sidebar.environments')}>
-                <IconButton size="small" onClick={() => navigate('/admin/environments')}>
+                <IconButton
+                  size="small"
+                  onClick={() => navigate('/admin/environments')}
+                >
                   <OpenInNewIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -1203,7 +1277,8 @@ const DashboardPage: React.FC = () => {
               const smSize = 6;
               // Calculate empty cards needed to fill the row (4 columns on md)
               const canManageEnvs = hasPermission(P.ENVIRONMENTS_UPDATE);
-              const emptyCardsCount = (4 - (count % 4)) % 4 || (count < 4 ? 4 - count : 0);
+              const emptyCardsCount =
+                (4 - (count % 4)) % 4 || (count < 4 ? 4 - count : 0);
 
               // Sort environments to put current environment first
               const sortedEnvs = [...environmentsWithCounts].sort((a, b) => {
@@ -1214,9 +1289,13 @@ const DashboardPage: React.FC = () => {
 
               return sortedEnvs
                 .map((env) => {
-                  const isCurrentEnv = env.environmentId === currentEnvironmentId;
+                  const isCurrentEnv =
+                    env.environmentId === currentEnvironmentId;
                   return (
-                    <Grid key={env.environmentId} size={{ xs: 12, sm: smSize, md: mdSize }}>
+                    <Grid
+                      key={env.environmentId}
+                      size={{ xs: 12, sm: smSize, md: mdSize }}
+                    >
                       <Card
                         sx={{
                           height: '100%',
@@ -1245,7 +1324,8 @@ const DashboardPage: React.FC = () => {
                                 width: 8,
                                 height: 8,
                                 borderRadius: '50%',
-                                bgcolor: env.color || theme.palette.primary.main,
+                                bgcolor:
+                                  env.color || theme.palette.primary.main,
                                 mr: 1,
                               }}
                             />
@@ -1266,7 +1346,8 @@ const DashboardPage: React.FC = () => {
                                   py: 0.25,
                                   borderRadius: 0,
                                   bgcolor: `${env.color || theme.palette.primary.main}20`,
-                                  color: env.color || theme.palette.primary.main,
+                                  color:
+                                    env.color || theme.palette.primary.main,
                                   fontWeight: 600,
                                   fontSize: '0.65rem',
                                 }}
@@ -1295,7 +1376,8 @@ const DashboardPage: React.FC = () => {
                                     p: 0.5,
                                     color: 'text.secondary',
                                     '&:hover': {
-                                      color: env.color || theme.palette.primary.main,
+                                      color:
+                                        env.color || theme.palette.primary.main,
                                       bgcolor: `${env.color || theme.palette.primary.main}15`,
                                     },
                                   }}
@@ -1385,7 +1467,9 @@ const DashboardPage: React.FC = () => {
                                 <Box
                                   key={item.label}
                                   onClick={() => {
-                                    if (env.environmentId !== currentEnvironmentId) {
+                                    if (
+                                      env.environmentId !== currentEnvironmentId
+                                    ) {
                                       if (currentOrgId && currentProjectId) {
                                         switchEnvironment(
                                           currentOrgId,
@@ -1456,7 +1540,10 @@ const DashboardPage: React.FC = () => {
                               ))}
                             </Box>
                           ) : (
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {t('dashboard.envNoData')}
                             </Typography>
                           )}
@@ -1468,9 +1555,16 @@ const DashboardPage: React.FC = () => {
                 .concat(
                   // Add empty placeholder cards to fill the row
                   Array.from({ length: emptyCardsCount }).map((_, idx) => (
-                    <Grid key={`empty-${idx}`} size={{ xs: 12, sm: smSize, md: mdSize }}>
+                    <Grid
+                      key={`empty-${idx}`}
+                      size={{ xs: 12, sm: smSize, md: mdSize }}
+                    >
                       <Card
-                        onClick={canManageEnvs ? () => navigate('/admin/environments') : undefined}
+                        onClick={
+                          canManageEnvs
+                            ? () => navigate('/admin/environments')
+                            : undefined
+                        }
                         sx={{
                           height: '100%',
                           border: '1px dashed',
@@ -1616,7 +1710,10 @@ const DashboardPage: React.FC = () => {
                   },
                 }}
               >
-                <CardActionArea onClick={() => navigate('/profile')} sx={{ p: 2.5 }}>
+                <CardActionArea
+                  onClick={() => navigate('/profile')}
+                  sx={{ p: 2.5 }}
+                >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Avatar
                       className="action-icon"
@@ -1632,11 +1729,17 @@ const DashboardPage: React.FC = () => {
                       <Typography variant="subtitle2" fontWeight={600} noWrap>
                         {t('dashboard.welcomeHub.viewProfile')}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary" noWrap>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        noWrap
+                      >
                         {t('dashboard.welcomeHub.viewProfileDesc')}
                       </Typography>
                     </Box>
-                    <ArrowForwardIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                    <ArrowForwardIcon
+                      sx={{ fontSize: 18, color: 'text.disabled' }}
+                    />
                   </Box>
                 </CardActionArea>
               </Card>
@@ -1654,7 +1757,10 @@ const DashboardPage: React.FC = () => {
                   },
                 }}
               >
-                <CardActionArea onClick={() => navigate('/profile')} sx={{ p: 2.5 }}>
+                <CardActionArea
+                  onClick={() => navigate('/profile')}
+                  sx={{ p: 2.5 }}
+                >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Avatar
                       className="action-icon"
@@ -1670,11 +1776,17 @@ const DashboardPage: React.FC = () => {
                       <Typography variant="subtitle2" fontWeight={600} noWrap>
                         {t('dashboard.welcomeHub.changePassword')}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary" noWrap>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        noWrap
+                      >
                         {t('dashboard.welcomeHub.changePasswordDesc')}
                       </Typography>
                     </Box>
-                    <ArrowForwardIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                    <ArrowForwardIcon
+                      sx={{ fontSize: 18, color: 'text.disabled' }}
+                    />
                   </Box>
                 </CardActionArea>
               </Card>
@@ -1692,7 +1804,10 @@ const DashboardPage: React.FC = () => {
                   },
                 }}
               >
-                <CardActionArea onClick={() => navigate('/settings')} sx={{ p: 2.5 }}>
+                <CardActionArea
+                  onClick={() => navigate('/settings')}
+                  sx={{ p: 2.5 }}
+                >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Avatar
                       className="action-icon"
@@ -1708,11 +1823,17 @@ const DashboardPage: React.FC = () => {
                       <Typography variant="subtitle2" fontWeight={600} noWrap>
                         {t('dashboard.welcomeHub.settings')}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary" noWrap>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        noWrap
+                      >
                         {t('dashboard.welcomeHub.settingsDesc')}
                       </Typography>
                     </Box>
-                    <ArrowForwardIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                    <ArrowForwardIcon
+                      sx={{ fontSize: 18, color: 'text.disabled' }}
+                    />
                   </Box>
                 </CardActionArea>
               </Card>
@@ -1728,7 +1849,11 @@ const DashboardPage: React.FC = () => {
               <Divider sx={{ mb: 2 }} />
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 <Box
-                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
                 >
                   <Typography variant="body2" color="text.secondary">
                     {t('users.name')}
@@ -1738,7 +1863,11 @@ const DashboardPage: React.FC = () => {
                   </Typography>
                 </Box>
                 <Box
-                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
                 >
                   <Typography variant="body2" color="text.secondary">
                     {t('users.email')}
@@ -1748,7 +1877,11 @@ const DashboardPage: React.FC = () => {
                   </Typography>
                 </Box>
                 <Box
-                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
                 >
                   <Typography variant="body2" color="text.secondary">
                     {t('users.status')}
@@ -1791,8 +1924,12 @@ const DashboardPage: React.FC = () => {
                   ))}
                 </Grid>
                 {quickActions.length === 0 && (
-                  <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
-                    <Typography variant="body2">{t('dashboard.noQuickActions')}</Typography>
+                  <Box
+                    sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}
+                  >
+                    <Typography variant="body2">
+                      {t('dashboard.noQuickActions')}
+                    </Typography>
                   </Box>
                 )}
               </CardContent>
@@ -1816,7 +1953,10 @@ const DashboardPage: React.FC = () => {
                   </Typography>
                   {hasPermission(P.AUDIT_LOGS_READ) && (
                     <Tooltip title={t('dashboard.viewAll')}>
-                      <IconButton size="small" onClick={() => navigate('/admin/audit-logs')}>
+                      <IconButton
+                        size="small"
+                        onClick={() => navigate('/admin/audit-logs')}
+                      >
                         <OpenInNewIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
@@ -1824,7 +1964,9 @@ const DashboardPage: React.FC = () => {
                 </Box>
 
                 {activitiesLoading ? (
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+                  >
                     {[1, 2, 3].map((i) => (
                       <Box key={i} sx={{ display: 'flex', gap: 2 }}>
                         <Skeleton variant="circular" width={40} height={40} />
@@ -1854,7 +1996,11 @@ const DashboardPage: React.FC = () => {
                           </ListItemIcon>
                           <ListItemText
                             primary={
-                              <Typography variant="body2" fontWeight={500} noWrap>
+                              <Typography
+                                variant="body2"
+                                fontWeight={500}
+                                noWrap
+                              >
                                 {t(`auditLogs.actions.${activity.action}`, {
                                   defaultValue: activity.action,
                                 })}
@@ -1869,14 +2015,27 @@ const DashboardPage: React.FC = () => {
                                   mt: 0.5,
                                 }}
                               >
-                                <Typography variant="caption" color="text.secondary">
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
                                   {activity.userName}
                                 </Typography>
-                                <Typography variant="caption" color="text.disabled">
+                                <Typography
+                                  variant="caption"
+                                  color="text.disabled"
+                                >
                                   •
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                  {formatRelativeTime(activity.timestamp, undefined, i18n.language)}
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  {formatRelativeTime(
+                                    activity.timestamp,
+                                    undefined,
+                                    i18n.language
+                                  )}
                                 </Typography>
                               </Box>
                             }
@@ -1888,9 +2047,13 @@ const DashboardPage: React.FC = () => {
                     ))}
                   </List>
                 ) : (
-                  <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+                  <Box
+                    sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}
+                  >
                     <HistoryIcon sx={{ fontSize: 48, mb: 1, opacity: 0.5 }} />
-                    <Typography variant="body2">{t('dashboard.noRecentActivity')}</Typography>
+                    <Typography variant="body2">
+                      {t('dashboard.noRecentActivity')}
+                    </Typography>
                   </Box>
                 )}
               </CardContent>
@@ -1901,7 +2064,8 @@ const DashboardPage: React.FC = () => {
 
       {/* Recent Crash Events & Server Lifecycle Events */}
       {hasAnyPermissions &&
-        (hasPermission(P.CRASH_EVENTS_READ) || hasPermission(P.SERVERS_READ)) && (
+        (hasPermission(P.CRASH_EVENTS_READ) ||
+          hasPermission(P.SERVERS_READ)) && (
           <Grid container spacing={3} sx={{ mt: 4 }}>
             {/* Recent Crash Events */}
             {hasPermission(P.CRASH_EVENTS_READ) && (
@@ -1916,16 +2080,25 @@ const DashboardPage: React.FC = () => {
                         mb: 2,
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
                         <Typography variant="h6" fontWeight={600}>
                           {t('dashboard.recentCrashEvents')}
                         </Typography>
                         {recentCrashEvents.length > 0 && (
-                          <Chip label={recentCrashEvents.length} size="small" color="error" />
+                          <Chip
+                            label={recentCrashEvents.length}
+                            size="small"
+                            color="error"
+                          />
                         )}
                       </Box>
                       <Tooltip title={t('dashboard.viewAll')}>
-                        <IconButton size="small" onClick={() => navigate('/admin/crash-events')}>
+                        <IconButton
+                          size="small"
+                          onClick={() => navigate('/admin/crash-events')}
+                        >
                           <OpenInNewIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
@@ -1946,75 +2119,94 @@ const DashboardPage: React.FC = () => {
                     ) : recentCrashEvents.length > 0 ? (
                       <Box sx={{ maxHeight: 350, overflow: 'auto' }}>
                         <List disablePadding dense>
-                          {recentCrashEvents.slice(0, 10).map((event, index) => (
-                            <React.Fragment key={event.id}>
-                              <ListItem
-                                disablePadding
-                                sx={{
-                                  py: 1,
-                                  cursor: 'pointer',
-                                  '&:hover': { bgcolor: 'action.hover' },
-                                }}
-                                onClick={() => navigate(`/admin/crash-events?id=${event.id}`)}
-                              >
-                                <ListItemIcon sx={{ minWidth: 36 }}>
-                                  <Avatar
-                                    sx={{
-                                      width: 28,
-                                      height: 28,
-                                      bgcolor: alpha(theme.palette.error.main, 0.1),
-                                      color: 'error.main',
-                                      fontSize: 12,
-                                    }}
-                                  >
-                                    <BugReportIcon sx={{ fontSize: 16 }} />
-                                  </Avatar>
-                                </ListItemIcon>
-                                <ListItemText
-                                  primary={
-                                    <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
-                                      {(event as any).firstLine || event.crashId}
-                                    </Typography>
+                          {recentCrashEvents
+                            .slice(0, 10)
+                            .map((event, index) => (
+                              <React.Fragment key={event.id}>
+                                <ListItem
+                                  disablePadding
+                                  sx={{
+                                    py: 1,
+                                    cursor: 'pointer',
+                                    '&:hover': { bgcolor: 'action.hover' },
+                                  }}
+                                  onClick={() =>
+                                    navigate(
+                                      `/admin/crash-events?id=${event.id}`
+                                    )
                                   }
-                                  secondary={
-                                    <Box
+                                >
+                                  <ListItemIcon sx={{ minWidth: 36 }}>
+                                    <Avatar
                                       sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 1,
-                                        mt: 0.5,
-                                        flexWrap: 'wrap',
+                                        width: 28,
+                                        height: 28,
+                                        bgcolor: alpha(
+                                          theme.palette.error.main,
+                                          0.1
+                                        ),
+                                        color: 'error.main',
+                                        fontSize: 12,
                                       }}
                                     >
-                                      <Chip
-                                        label={event.platform}
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{ height: 18, fontSize: 10 }}
-                                      />
-                                      <Chip
-                                        label={event.branch}
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{ height: 18, fontSize: 10 }}
-                                      />
-                                      <Typography variant="caption" color="text.secondary">
-                                        {formatRelativeTime(
-                                          event.createdAt,
-                                          undefined,
-                                          i18n.language
-                                        )}
+                                      <BugReportIcon sx={{ fontSize: 16 }} />
+                                    </Avatar>
+                                  </ListItemIcon>
+                                  <ListItemText
+                                    primary={
+                                      <Typography
+                                        variant="body2"
+                                        noWrap
+                                        sx={{ fontWeight: 500 }}
+                                      >
+                                        {(event as any).firstLine ||
+                                          event.crashId}
                                       </Typography>
-                                    </Box>
-                                  }
-                                  secondaryTypographyProps={{
-                                    component: 'div',
-                                  }}
-                                />
-                              </ListItem>
-                              {index < Math.min(recentCrashEvents.length, 10) - 1 && <Divider />}
-                            </React.Fragment>
-                          ))}
+                                    }
+                                    secondary={
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 1,
+                                          mt: 0.5,
+                                          flexWrap: 'wrap',
+                                        }}
+                                      >
+                                        <Chip
+                                          label={event.platform}
+                                          size="small"
+                                          variant="outlined"
+                                          sx={{ height: 18, fontSize: 10 }}
+                                        />
+                                        <Chip
+                                          label={event.branch}
+                                          size="small"
+                                          variant="outlined"
+                                          sx={{ height: 18, fontSize: 10 }}
+                                        />
+                                        <Typography
+                                          variant="caption"
+                                          color="text.secondary"
+                                        >
+                                          {formatRelativeTime(
+                                            event.createdAt,
+                                            undefined,
+                                            i18n.language
+                                          )}
+                                        </Typography>
+                                      </Box>
+                                    }
+                                    secondaryTypographyProps={{
+                                      component: 'div',
+                                    }}
+                                  />
+                                </ListItem>
+                                {index <
+                                  Math.min(recentCrashEvents.length, 10) -
+                                    1 && <Divider />}
+                              </React.Fragment>
+                            ))}
                         </List>
                       </Box>
                     ) : (
@@ -2025,7 +2217,9 @@ const DashboardPage: React.FC = () => {
                           color: 'text.secondary',
                         }}
                       >
-                        <Typography variant="body2">{t('dashboard.noCrashEvents')}</Typography>
+                        <Typography variant="body2">
+                          {t('dashboard.noCrashEvents')}
+                        </Typography>
                       </Box>
                     )}
                   </CardContent>
@@ -2046,12 +2240,18 @@ const DashboardPage: React.FC = () => {
                         mb: 2,
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
                         <Typography variant="h6" fontWeight={600}>
                           {t('serverLifecycle.title')}
                         </Typography>
                         {recentLifecycleEvents.length > 0 && (
-                          <Chip label={recentLifecycleEvents.length} size="small" color="primary" />
+                          <Chip
+                            label={recentLifecycleEvents.length}
+                            size="small"
+                            color="primary"
+                          />
                         )}
                       </Box>
                       <Tooltip title={t('dashboard.viewAll')}>
@@ -2138,18 +2338,28 @@ const DashboardPage: React.FC = () => {
                                             }
                                           )}
                                           size="small"
-                                          color={getEventColor(event.eventType) as any}
+                                          color={
+                                            getEventColor(
+                                              event.eventType
+                                            ) as any
+                                          }
                                           sx={{
                                             height: 22,
                                             fontSize: '0.7rem',
                                             fontWeight: 600,
                                           }}
                                         />
-                                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                        <Typography
+                                          variant="body2"
+                                          sx={{ fontWeight: 500 }}
+                                        >
                                           {event.serviceType}
                                         </Typography>
                                         {event.serviceGroup && (
-                                          <Typography variant="caption" color="text.secondary">
+                                          <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                          >
                                             ({event.serviceGroup})
                                           </Typography>
                                         )}
@@ -2184,7 +2394,10 @@ const DashboardPage: React.FC = () => {
                                         >
                                           {event.instanceId}
                                         </Typography>
-                                        <Typography variant="caption" color="text.secondary">
+                                        <Typography
+                                          variant="caption"
+                                          color="text.secondary"
+                                        >
                                           {formatRelativeTime(
                                             event.createdAt,
                                             undefined,
@@ -2211,7 +2424,9 @@ const DashboardPage: React.FC = () => {
                                     }}
                                   />
                                 </ListItem>
-                                {index < recentLifecycleEvents.length - 1 && <Divider />}
+                                {index < recentLifecycleEvents.length - 1 && (
+                                  <Divider />
+                                )}
                               </React.Fragment>
                             );
                           })}
@@ -2225,7 +2440,9 @@ const DashboardPage: React.FC = () => {
                           color: 'text.secondary',
                         }}
                       >
-                        <Typography variant="body2">{t('serverLifecycle.noEvents')}</Typography>
+                        <Typography variant="body2">
+                          {t('serverLifecycle.noEvents')}
+                        </Typography>
                       </Box>
                     )}
                   </CardContent>

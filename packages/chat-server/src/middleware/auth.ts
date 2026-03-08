@@ -32,7 +32,9 @@ export const authenticate = async (
       hasUserId: !!userIdHeader,
       hasAuthHeader: !!authHeader,
       userIdValue: userIdHeader,
-      authHeaderPrefix: authHeader ? authHeader.substring(0, 20) + '...' : 'none',
+      authHeaderPrefix: authHeader
+        ? authHeader.substring(0, 20) + '...'
+        : 'none',
     });
 
     // 1. Backend 서비스 토큰 확인 (가장 먼저 확인)
@@ -44,7 +46,10 @@ export const authenticate = async (
       if (userIdHeader) {
         const gatrixUserId = parseInt(userIdHeader, 10);
         if (isNaN(gatrixUserId)) {
-          logger.warn('Invalid User ID header (service token path):', userIdHeader);
+          logger.warn(
+            'Invalid User ID header (service token path):',
+            userIdHeader
+          );
           res.status(401).json({
             success: false,
             error: { message: 'Invalid user ID' },
@@ -65,7 +70,8 @@ export const authenticate = async (
             res.status(401).json({
               success: false,
               error: {
-                message: 'User not found in chat system. Please sync user first.',
+                message:
+                  'User not found in chat system. Please sync user first.',
               },
             });
             return;

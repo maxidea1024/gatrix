@@ -100,7 +100,8 @@ export const initMetrics = (app: express.Application): void => {
         try {
           if (!chunk) return 0;
           if (Buffer.isBuffer(chunk)) return chunk.length;
-          if (typeof chunk === 'string') return Buffer.byteLength(chunk, encoding || 'utf8');
+          if (typeof chunk === 'string')
+            return Buffer.byteLength(chunk, encoding || 'utf8');
         } catch (_) {
           // ignore
         }
@@ -122,7 +123,9 @@ export const initMetrics = (app: express.Application): void => {
           const end = process.hrtime.bigint();
           const duration = Number(end - start) / 1e9; // seconds
           const route =
-            (req as any).route?.path || (req as any).originalUrl?.split('?')[0] || 'unknown';
+            (req as any).route?.path ||
+            (req as any).originalUrl?.split('?')[0] ||
+            'unknown';
           const labels = [req.method, String(res.statusCode), route] as const;
           httpRequestDuration.labels(...labels).observe(duration);
           // Compute request/response byte deltas with header fallback
@@ -130,10 +133,17 @@ export const initMetrics = (app: express.Application): void => {
           const ioPrev = (res as any)._metrics_io_start as
             | { read: number; written: number }
             | undefined;
-          const endRead = typeof sockNow?.bytesRead === 'number' ? sockNow.bytesRead : 0;
-          const endWritten = typeof sockNow?.bytesWritten === 'number' ? sockNow.bytesWritten : 0;
+          const endRead =
+            typeof sockNow?.bytesRead === 'number' ? sockNow.bytesRead : 0;
+          const endWritten =
+            typeof sockNow?.bytesWritten === 'number'
+              ? sockNow.bytesWritten
+              : 0;
           // Request bytes: prefer Content-Length header, otherwise socket delta
-          const reqCL = req.headers['content-length'] as string | string[] | undefined;
+          const reqCL = req.headers['content-length'] as
+            | string
+            | string[]
+            | undefined;
           let reqBytes = 0;
           if (reqCL) {
             const raw = Array.isArray(reqCL) ? reqCL[0] : reqCL;
@@ -183,11 +193,17 @@ export const initMetrics = (app: express.Application): void => {
             | { read: number; written: number }
             | undefined;
           const route =
-            (req as any).route?.path || (req as any).originalUrl?.split('?')[0] || 'unknown';
+            (req as any).route?.path ||
+            (req as any).originalUrl?.split('?')[0] ||
+            'unknown';
           const labels = [req.method, String(res.statusCode), route] as const;
           if (ioPrev) {
-            const endRead = typeof sockNow?.bytesRead === 'number' ? sockNow.bytesRead : 0;
-            const endWritten = typeof sockNow?.bytesWritten === 'number' ? sockNow.bytesWritten : 0;
+            const endRead =
+              typeof sockNow?.bytesRead === 'number' ? sockNow.bytesRead : 0;
+            const endWritten =
+              typeof sockNow?.bytesWritten === 'number'
+                ? sockNow.bytesWritten
+                : 0;
             const dReq = endRead - ioPrev.read;
             const dRes = endWritten - ioPrev.written;
             if (Number.isFinite(dReq) && dReq > 0) {
@@ -211,7 +227,8 @@ export const initMetrics = (app: express.Application): void => {
     app.get(metricsPath, async (_req, res) => {
       try {
         // Merge impact metrics registry if available
-        const { impactMetricsService } = await import('./impact-metrics-service');
+        const { impactMetricsService } =
+          await import('./impact-metrics-service');
         const impactRegistry = impactMetricsService.getRegistry();
 
         let metricsOutput = await register.metrics();

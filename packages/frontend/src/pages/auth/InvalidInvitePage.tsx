@@ -55,7 +55,9 @@ const InvalidInvitePage: React.FC = () => {
         sx={{
           mb: 4,
           backgroundColor:
-            theme.palette.mode === 'dark' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(244, 67, 54, 0.05)',
+            theme.palette.mode === 'dark'
+              ? 'rgba(244, 67, 54, 0.1)'
+              : 'rgba(244, 67, 54, 0.05)',
           color: 'error.main',
           border: `1px solid ${theme.palette.error.main}20`,
           '& .MuiAlert-icon': {

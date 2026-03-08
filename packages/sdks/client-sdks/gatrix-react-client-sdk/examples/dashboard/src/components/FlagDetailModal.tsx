@@ -48,9 +48,15 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
           flexDirection: 'column',
         }}
       >
-        <div className="flag-header" style={{ margin: '0', padding: '8px 16px' }}>
+        <div
+          className="flag-header"
+          style={{ margin: '0', padding: '8px 16px' }}
+        >
           <span className="flag-name" style={{ fontSize: '12px' }}>
-            <span className="status-dot" style={{ width: '10px', height: '10px' }}></span>{' '}
+            <span
+              className="status-dot"
+              style={{ width: '10px', height: '10px' }}
+            ></span>{' '}
             {flag.name}
           </span>
           <span
@@ -102,7 +108,9 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
               >
                 <span className="flag-detail-label">Type</span>
                 <span className="flag-detail-value">
-                  <span className="pixel-chip type-chip">{flag.valueType || 'none'}</span>
+                  <span className="pixel-chip type-chip">
+                    {flag.valueType || 'none'}
+                  </span>
                 </span>
               </div>
 
@@ -118,13 +126,18 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
               >
                 <span className="flag-detail-label">Variant</span>
                 <span className="flag-detail-value">
-                  <span className="pixel-chip variant-chip">{flag.variant?.name || '-'}</span>
+                  <span className="pixel-chip variant-chip">
+                    {flag.variant?.name || '-'}
+                  </span>
                 </span>
               </div>
             </div>
 
             <div className="flag-payload" style={{ marginTop: '12px' }}>
-              <div className="flag-payload-label" style={{ marginBottom: '6px' }}>
+              <div
+                className="flag-payload-label"
+                style={{ marginBottom: '6px' }}
+              >
                 Value
               </div>
               {hasValue ? (
@@ -144,7 +157,8 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                   >
                     {formatValue(value)}
                   </pre>
-                  {(flag.valueType === 'string' || flag.valueType === 'json') && (
+                  {(flag.valueType === 'string' ||
+                    flag.valueType === 'json') && (
                     <div
                       className="flag-payload-size"
                       style={{
@@ -159,7 +173,10 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                   )}
                 </>
               ) : (
-                <div className="flag-payload-value no-payload" style={{ padding: '20px' }}>
+                <div
+                  className="flag-payload-value no-payload"
+                  style={{ padding: '20px' }}
+                >
                   🚫 NO PAYLOAD
                 </div>
               )}
@@ -178,7 +195,11 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                 <span className="flag-detail-label">Impressions:</span>
                 <span
                   className="pixel-chip"
-                  style={{ backgroundColor: '#e8f5e9', color: '#2e7d32', borderColor: '#2e7d32' }}
+                  style={{
+                    backgroundColor: '#e8f5e9',
+                    color: '#2e7d32',
+                    borderColor: '#2e7d32',
+                  }}
                 >
                   ENABLED
                 </span>

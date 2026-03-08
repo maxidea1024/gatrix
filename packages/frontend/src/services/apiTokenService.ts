@@ -14,7 +14,9 @@ class ApiTokenService {
    * Falls back to legacy path if no project path is provided.
    */
   private basePath(projectApiPath: string | null): string {
-    return projectApiPath ? `${projectApiPath}/api-tokens` : '/admin/api-tokens';
+    return projectApiPath
+      ? `${projectApiPath}/api-tokens`
+      : '/admin/api-tokens';
   }
 
   /**
@@ -46,7 +48,10 @@ class ApiTokenService {
   /**
    * Get API token by ID
    */
-  async getTokenById(id: number, projectApiPath: string | null = null): Promise<ApiAccessToken> {
+  async getTokenById(
+    id: number,
+    projectApiPath: string | null = null
+  ): Promise<ApiAccessToken> {
     try {
       const response = await api.get(`${this.basePath(projectApiPath)}/${id}`);
       return response.data;
@@ -81,7 +86,10 @@ class ApiTokenService {
     projectApiPath: string | null = null
   ): Promise<ApiAccessToken> {
     try {
-      const response = await api.put(`${this.basePath(projectApiPath)}/${id}`, data);
+      const response = await api.put(
+        `${this.basePath(projectApiPath)}/${id}`,
+        data
+      );
       return response.data;
     } catch (error) {
       console.error('Error updating API token:', error);
@@ -97,7 +105,9 @@ class ApiTokenService {
     projectApiPath: string | null = null
   ): Promise<CreateTokenResponse> {
     try {
-      const response = await api.post(`${this.basePath(projectApiPath)}/${id}/regenerate`);
+      const response = await api.post(
+        `${this.basePath(projectApiPath)}/${id}/regenerate`
+      );
       return response.data;
     } catch (error) {
       console.error('Error regenerating API token:', error);
@@ -108,7 +118,10 @@ class ApiTokenService {
   /**
    * Delete API token
    */
-  async deleteToken(id: number, projectApiPath: string | null = null): Promise<void> {
+  async deleteToken(
+    id: number,
+    projectApiPath: string | null = null
+  ): Promise<void> {
     try {
       await api.delete(`${this.basePath(projectApiPath)}/${id}`);
     } catch (error) {
@@ -120,9 +133,14 @@ class ApiTokenService {
   /**
    * Revoke API token (set as inactive)
    */
-  async revokeToken(id: number, projectApiPath: string | null = null): Promise<ApiAccessToken> {
+  async revokeToken(
+    id: number,
+    projectApiPath: string | null = null
+  ): Promise<ApiAccessToken> {
     try {
-      const response = await api.patch(`${this.basePath(projectApiPath)}/${id}/revoke`);
+      const response = await api.patch(
+        `${this.basePath(projectApiPath)}/${id}/revoke`
+      );
       return response.data;
     } catch (error) {
       console.error('Error revoking API token:', error);
@@ -133,9 +151,14 @@ class ApiTokenService {
   /**
    * Activate API token
    */
-  async activateToken(id: number, projectApiPath: string | null = null): Promise<ApiAccessToken> {
+  async activateToken(
+    id: number,
+    projectApiPath: string | null = null
+  ): Promise<ApiAccessToken> {
     try {
-      const response = await api.patch(`${this.basePath(projectApiPath)}/${id}/activate`);
+      const response = await api.patch(
+        `${this.basePath(projectApiPath)}/${id}/activate`
+      );
       return response.data;
     } catch (error) {
       console.error('Error activating API token:', error);
@@ -152,9 +175,12 @@ class ApiTokenService {
     projectApiPath: string | null = null
   ): Promise<ApiAccessToken> {
     try {
-      const response = await api.patch(`${this.basePath(projectApiPath)}/${id}/extend`, {
-        expiresAt,
-      });
+      const response = await api.patch(
+        `${this.basePath(projectApiPath)}/${id}/extend`,
+        {
+          expiresAt,
+        }
+      );
       return response.data;
     } catch (error) {
       console.error('Error extending API token:', error);
@@ -201,7 +227,9 @@ class ApiTokenService {
   /**
    * Get admin tokens
    */
-  async getAdminTokens(projectApiPath: string | null = null): Promise<ApiAccessToken[]> {
+  async getAdminTokens(
+    projectApiPath: string | null = null
+  ): Promise<ApiAccessToken[]> {
     try {
       const response = await api.get(`${this.basePath(projectApiPath)}/admin`);
       return response.data;

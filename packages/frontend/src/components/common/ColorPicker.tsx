@@ -10,7 +10,10 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Palette as PaletteIcon, Refresh as RefreshIcon } from '@mui/icons-material';
+import {
+  Palette as PaletteIcon,
+  Refresh as RefreshIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 interface ColorPickerProps {
@@ -77,7 +80,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     handleClose();
   };
 
-  const handleCustomColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCustomColorChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const newColor = event.target.value;
     setCustomColor(newColor);
     onChange(newColor);
@@ -160,7 +165,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
           {/* 미리 정의된 색상 팔레트 */}
           <Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 1, display: 'block' }}
+            >
               {t('common.colorPicker.presetColors')}
             </Typography>
             <Grid container spacing={0.5}>
@@ -174,7 +183,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                         height: 28,
                         bgcolor: color,
                         border: value === color ? '2px solid' : '1px solid',
-                        borderColor: value === color ? 'primary.main' : 'divider',
+                        borderColor:
+                          value === color ? 'primary.main' : 'divider',
                         borderRadius: 0.5,
                         '&:hover': {
                           bgcolor: color,
@@ -191,7 +201,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
           {/* 커스텀 색상 선택 */}
           <Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 1, display: 'block' }}
+            >
               {t('common.colorPicker.customColor')}
             </Typography>
             <Stack direction="row" spacing={1} alignItems="center">
@@ -224,7 +238,12 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           </Box>
 
           {/* 액션 버튼 */}
-          <Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ pt: 1 }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            justifyContent="flex-end"
+            sx={{ pt: 1 }}
+          >
             <Button onClick={handleClose} size="small" sx={{ minWidth: 60 }}>
               {t('common.colorPicker.cancel')}
             </Button>

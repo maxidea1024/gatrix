@@ -61,9 +61,15 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [invitingUsers, setInvitingUsers] = useState<Set<number>>(new Set<number>());
-  const [pendingInvitedUsers, setPendingInvitedUsers] = useState<Set<number>>(new Set<number>());
-  const [channelMemberIds, setChannelMemberIds] = useState<Set<number>>(new Set<number>());
+  const [invitingUsers, setInvitingUsers] = useState<Set<number>>(
+    new Set<number>()
+  );
+  const [pendingInvitedUsers, setPendingInvitedUsers] = useState<Set<number>>(
+    new Set<number>()
+  );
+  const [channelMemberIds, setChannelMemberIds] = useState<Set<number>>(
+    new Set<number>()
+  );
 
   // Search 입력창 ref
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -91,7 +97,11 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
           setChannelMemberIds(memberIds);
         }
       } else {
-        console.error('Failed to fetch channel members:', response.status, response.statusText);
+        console.error(
+          'Failed to fetch channel members:',
+          response.status,
+          response.statusText
+        );
       }
     } catch (error) {
       console.error('Failed to fetch channel members:', error);
@@ -103,11 +113,14 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     if (!channelId) return;
 
     try {
-      const response = await fetch(`/api/v1/chat/channels/${channelId}/pending-invitations`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      });
+      const response = await fetch(
+        `/api/v1/chat/channels/${channelId}/pending-invitations`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -120,7 +133,11 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
           setPendingInvitedUsers(invitedUserIds);
         }
       } else {
-        console.error('Failed to fetch pending invitations:', response.status, response.statusText);
+        console.error(
+          'Failed to fetch pending invitations:',
+          response.status,
+          response.statusText
+        );
       }
     } catch (error) {
       console.error('Failed to fetch pending invitations:', error);
@@ -159,7 +176,9 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
         }
 
         // 제외할 Used자들 Filter링
-        const filteredUsers = users.filter((user: User) => !excludeUserIds.includes(user.id));
+        const filteredUsers = users.filter(
+          (user: User) => !excludeUserIds.includes(user.id)
+        );
         setSearchResults(filteredUsers);
       } else {
         console.error('Search API failed:', response);
@@ -305,9 +324,15 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       <DialogTitle>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box>
-            <Typography variant="h6">{title || t('chat.inviteUsers')}</Typography>
+            <Typography variant="h6">
+              {title || t('chat.inviteUsers')}
+            </Typography>
             {subtitle && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              >
                 {subtitle}
               </Typography>
             )}
@@ -334,7 +359,9 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           InputProps={{
-            startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+            startAdornment: (
+              <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+            ),
             endAdornment: isSearching && <CircularProgress size={20} />,
           }}
           sx={{
@@ -371,26 +398,36 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                 flex: 1,
               }}
             >
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: 'center' }}
+              >
                 {t('chat.searchMinLength')}
               </Typography>
             </Box>
           )}
 
-          {searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flex: 1,
-              }}
-            >
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-                {t('chat.noUsersFound')}
-              </Typography>
-            </Box>
-          )}
+          {searchQuery.length >= 2 &&
+            searchResults.length === 0 &&
+            !isSearching && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flex: 1,
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ textAlign: 'center' }}
+                >
+                  {t('chat.noUsersFound')}
+                </Typography>
+              </Box>
+            )}
 
           {searchQuery.length === 0 && (
             <Box
@@ -403,7 +440,9 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                 textAlign: 'center',
               }}
             >
-              <SearchIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+              <SearchIcon
+                sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }}
+              />
               <Typography variant="h6" color="text.secondary" gutterBottom>
                 {t('chat.searchUsers')}
               </Typography>
@@ -472,12 +511,18 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                           variant="outlined"
                           size="small"
                           startIcon={
-                            isInviting ? <CircularProgress size={16} /> : <PersonAddIcon />
+                            isInviting ? (
+                              <CircularProgress size={16} />
+                            ) : (
+                              <PersonAddIcon />
+                            )
                           }
                           onClick={() => handleInviteUser(user.id)}
                           disabled={isInviting}
                         >
-                          {isInviting ? t('chat.inviting') : t('chat.inviteButton')}
+                          {isInviting
+                            ? t('chat.inviting')
+                            : t('chat.inviteButton')}
                         </Button>
                       );
                     })()}

@@ -2,7 +2,11 @@ import { Response, NextFunction } from 'express';
 import { AuditLogModel } from '../models/audit-log';
 import { AuthenticatedRequest } from './auth';
 import { createLogger } from '../config/logger';
-import { enhancedAuditLog, fetchGameWorldById, fetchUserById } from '../utils/enhanced-audit-log';
+import {
+  enhancedAuditLog,
+  fetchGameWorldById,
+  fetchUserById,
+} from '../utils/enhanced-audit-log';
 
 const logger = createLogger('AuditLog');
 
@@ -10,7 +14,9 @@ export interface AuditLogOptions {
   action: string;
   resourceType?: string;
   getResourceId?: (req: any) => string | undefined;
-  getResourceIdFromResponse?: (responseBody: any) => string | number | undefined;
+  getResourceIdFromResponse?: (
+    responseBody: any
+  ) => string | number | undefined;
   getOldValues?: (req: any) => any;
   getNewValues?: (req: any, res: any) => any;
   getDescription?: (req: any, res: any) => string;
@@ -18,7 +24,11 @@ export interface AuditLogOptions {
 }
 
 export const auditLog = (options: AuditLogOptions) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
     // Store original res.end to capture response
     const originalEnd = res.end;
     let responseBody: any;
@@ -49,15 +59,23 @@ export const auditLog = (options: AuditLogOptions) => {
         }
 
         // Resource ID 결정
-        let resourceId = options.getResourceId ? options.getResourceId(req) : undefined;
+        let resourceId = options.getResourceId
+          ? options.getResourceId(req)
+          : undefined;
         if (!resourceId && options.getResourceIdFromResponse && responseBody) {
           const id = options.getResourceIdFromResponse(responseBody);
           resourceId = id ? id.toString() : undefined;
         }
 
-        const oldValues = options.getOldValues ? options.getOldValues(req) : undefined;
-        const newValues = options.getNewValues ? options.getNewValues(req, res) : req.body;
-        const description = options.getDescription ? options.getDescription(req, res) : undefined;
+        const oldValues = options.getOldValues
+          ? options.getOldValues(req)
+          : undefined;
+        const newValues = options.getNewValues
+          ? options.getNewValues(req, res)
+          : req.body;
+        const description = options.getDescription
+          ? options.getDescription(req, res)
+          : undefined;
 
         await AuditLogModel.create({
           userId: req.user?.userId,
@@ -101,7 +119,8 @@ export const auditUserRegister = auditLog({
     email: req.body?.email,
     name: req.body?.name,
   }),
-  getDescription: (req) => `User '${req.body?.name}' (${req.body?.email}) registered`,
+  getDescription: (req) =>
+    `User '${req.body?.name}' (${req.body?.email}) registered`,
 });
 
 export const auditUserUpdate = enhancedAuditLog({
@@ -118,8 +137,10 @@ export const auditUserUpdate = enhancedAuditLog({
     const body = req.body;
 
     // Track only changed fields
-    if (body.name !== undefined && body.name !== oldValues?.name) changes.name = body.name;
-    if (body.email !== undefined && body.email !== oldValues?.email) changes.email = body.email;
+    if (body.name !== undefined && body.name !== oldValues?.name)
+      changes.name = body.name;
+    if (body.email !== undefined && body.email !== oldValues?.email)
+      changes.email = body.email;
 
     if (body.status !== undefined && body.status !== oldValues?.status)
       changes.status = body.status;
@@ -159,7 +180,8 @@ export const auditUserDelete = enhancedAuditLog({
     userName: oldValues?.name,
     userEmail: oldValues?.email,
   }),
-  getDescription: (_req, oldValues) => `User '${oldValues?.name}' (${oldValues?.email}) deleted`,
+  getDescription: (_req, oldValues) =>
+    `User '${oldValues?.name}' (${oldValues?.email}) deleted`,
 });
 
 export const auditUserApprove = enhancedAuditLog({
@@ -258,7 +280,8 @@ export const auditUserUnsuspend = enhancedAuditLog({
 export const auditGameWorldCreate = enhancedAuditLog({
   action: 'game_world_create',
   resourceType: 'game_world',
-  getResourceIdFromResponse: (responseBody) => responseBody?.data?.id || responseBody?.id,
+  getResourceIdFromResponse: (responseBody) =>
+    responseBody?.data?.id || responseBody?.id,
   getNewValues: (req) => ({
     worldId: req.body?.worldId,
     name: req.body?.name,
@@ -272,7 +295,8 @@ export const auditGameWorldCreate = enhancedAuditLog({
     worldId: req.body?.worldId,
     worldName: req.body?.name,
   }),
-  getDescription: (req) => `Game world '${req.body?.name}' (${req.body?.worldId}) created`,
+  getDescription: (req) =>
+    `Game world '${req.body?.name}' (${req.body?.worldId}) created`,
 });
 
 export const auditGameWorldUpdate = enhancedAuditLog({
@@ -289,16 +313,26 @@ export const auditGameWorldUpdate = enhancedAuditLog({
     const body = req.body;
 
     // Track only changed fields
-    if (body.name !== undefined && body.name !== oldValues?.name) changes.name = body.name;
+    if (body.name !== undefined && body.name !== oldValues?.name)
+      changes.name = body.name;
     if (body.worldId !== undefined && body.worldId !== oldValues?.worldId)
       changes.worldId = body.worldId;
     if (body.isVisible !== undefined && body.isVisible !== oldValues?.isVisible)
       changes.isVisible = body.isVisible;
-    if (body.isMaintenance !== undefined && body.isMaintenance !== oldValues?.isMaintenance)
+    if (
+      body.isMaintenance !== undefined &&
+      body.isMaintenance !== oldValues?.isMaintenance
+    )
       changes.isMaintenance = body.isMaintenance;
-    if (body.displayOrder !== undefined && body.displayOrder !== oldValues?.displayOrder)
+    if (
+      body.displayOrder !== undefined &&
+      body.displayOrder !== oldValues?.displayOrder
+    )
       changes.displayOrder = body.displayOrder;
-    if (body.description !== undefined && body.description !== oldValues?.description)
+    if (
+      body.description !== undefined &&
+      body.description !== oldValues?.description
+    )
       changes.description = body.description;
     if (
       body.maintenanceMessage !== undefined &&
@@ -384,7 +418,9 @@ export const auditGameWorldToggleMaintenance = enhancedAuditLog({
     return await fetchGameWorldById(id);
   },
   getNewValues: (req, res, oldValues) => {
-    const newIsMaintenance = oldValues ? !oldValues.isMaintenance : req.body?.isMaintenance;
+    const newIsMaintenance = oldValues
+      ? !oldValues.isMaintenance
+      : req.body?.isMaintenance;
     return {
       worldId: oldValues?.worldId,
       name: oldValues?.name,
@@ -431,7 +467,8 @@ export const auditPasswordChange = auditLog({
   action: 'password_change',
   resourceType: 'user',
   getResourceId: (req: AuthenticatedRequest) => req.user?.userId?.toString(),
-  getDescription: (req: AuthenticatedRequest) => `User '${req.user?.email}' changed password`,
+  getDescription: (req: AuthenticatedRequest) =>
+    `User '${req.user?.email}' changed password`,
 });
 
 export const auditProfileUpdate = auditLog({
@@ -439,7 +476,8 @@ export const auditProfileUpdate = auditLog({
   resourceType: 'user',
   getResourceId: (req: AuthenticatedRequest) => req.user?.userId?.toString(),
   getNewValues: (req: AuthenticatedRequest) => req.body,
-  getDescription: (req: AuthenticatedRequest) => `User '${req.user?.email}' updated profile`,
+  getDescription: (req: AuthenticatedRequest) =>
+    `User '${req.user?.email}' updated profile`,
 });
 
 // Service Notice actions
@@ -468,7 +506,8 @@ export const auditServiceNoticeUpdate = enhancedAuditLog({
     const id = req.params?.id;
     if (!id) return null;
     try {
-      const ServiceNoticeService = require('../services/service-notice-service').default;
+      const ServiceNoticeService =
+        require('../services/service-notice-service').default;
       const notice = await ServiceNoticeService.getServiceNoticeById(id);
       return {
         title: notice.title,
@@ -506,7 +545,8 @@ export const auditServiceNoticeDelete = enhancedAuditLog({
     const id = req.params?.id;
     if (!id) return null;
     try {
-      const ServiceNoticeService = require('../services/service-notice-service').default;
+      const ServiceNoticeService =
+        require('../services/service-notice-service').default;
       const notice = await ServiceNoticeService.getServiceNoticeById(id);
       return {
         title: notice.title,
@@ -524,7 +564,8 @@ export const auditServiceNoticeDelete = enhancedAuditLog({
     operation: 'delete_service_notice',
     noticeTitle: oldValues?.title,
   }),
-  getDescription: (_req, oldValues) => `Service notice '${oldValues?.title}' deleted`,
+  getDescription: (_req, oldValues) =>
+    `Service notice '${oldValues?.title}' deleted`,
 });
 
 export const auditServiceNoticeBulkDelete = auditLog({
@@ -534,7 +575,8 @@ export const auditServiceNoticeBulkDelete = auditLog({
     ids: req.body?.ids,
     count: req.body?.ids?.length || 0,
   }),
-  getDescription: (req) => `${req.body?.ids?.length || 0} service notice(s) bulk deleted`,
+  getDescription: (req) =>
+    `${req.body?.ids?.length || 0} service notice(s) bulk deleted`,
 });
 
 export const auditServiceNoticeToggleActive = enhancedAuditLog({
@@ -545,7 +587,8 @@ export const auditServiceNoticeToggleActive = enhancedAuditLog({
     const id = req.params?.id;
     if (!id) return null;
     try {
-      const ServiceNoticeService = require('../services/service-notice-service').default;
+      const ServiceNoticeService =
+        require('../services/service-notice-service').default;
       const notice = await ServiceNoticeService.getServiceNoticeById(id);
       return {
         title: notice.title,

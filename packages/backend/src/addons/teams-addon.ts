@@ -22,8 +22,15 @@ export class TeamsAddon extends Addon {
     const { url, customHeaders } = parameters;
 
     if (!url) {
-      this.logger.warn(`Missing Teams webhook URL for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing webhook URL');
+      this.logger.warn(
+        `Missing Teams webhook URL for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing webhook URL'
+      );
       return;
     }
 

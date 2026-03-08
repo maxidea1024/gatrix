@@ -1,5 +1,13 @@
 import React from 'react';
-import { Box, Paper, Grid, Skeleton, Typography, LinearProgress, Stack } from '@mui/material';
+import {
+  Box,
+  Paper,
+  Grid,
+  Skeleton,
+  Typography,
+  LinearProgress,
+  Stack,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 interface ChatSkeletonProps {
@@ -72,7 +80,12 @@ const ChatSkeleton: React.FC<ChatSkeletonProps> = ({ stage }) => {
         >
           <Box sx={{ p: 2 }}>
             {/* 채널 목록 Headers */}
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              sx={{ mb: 2 }}
+            >
               <Skeleton variant="text" width="70%" height={24} />
               <Skeleton variant="circular" width={24} height={24} />
             </Stack>
@@ -80,7 +93,10 @@ const ChatSkeleton: React.FC<ChatSkeletonProps> = ({ stage }) => {
             {/* 채널 목록 스켈레톤 */}
             <Stack spacing={1}>
               {[...Array(6)].map((_, index) => (
-                <Box key={index} sx={{ display: 'flex', alignItems: 'center', p: 1 }}>
+                <Box
+                  key={index}
+                  sx={{ display: 'flex', alignItems: 'center', p: 1 }}
+                >
                   <Skeleton variant="text" width="80%" height={20} />
                   <Box sx={{ ml: 'auto' }}>
                     <Skeleton variant="circular" width={16} height={16} />
@@ -115,16 +131,32 @@ const ChatSkeleton: React.FC<ChatSkeletonProps> = ({ stage }) => {
           <Box sx={{ flex: 1, p: 2 }}>
             <Stack spacing={2}>
               {[...Array(8)].map((_, index) => (
-                <Box key={index} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                <Box
+                  key={index}
+                  sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}
+                >
                   <Skeleton variant="circular" width={32} height={32} />
                   <Box sx={{ flex: 1 }}>
-                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                      sx={{ mb: 0.5 }}
+                    >
                       <Skeleton variant="text" width="20%" height={16} />
                       <Skeleton variant="text" width="15%" height={14} />
                     </Stack>
-                    <Skeleton variant="text" width={`${Math.random() * 40 + 40}%`} height={20} />
+                    <Skeleton
+                      variant="text"
+                      width={`${Math.random() * 40 + 40}%`}
+                      height={20}
+                    />
                     {Math.random() > 0.7 && (
-                      <Skeleton variant="text" width={`${Math.random() * 30 + 30}%`} height={20} />
+                      <Skeleton
+                        variant="text"
+                        width={`${Math.random() * 30 + 30}%`}
+                        height={20}
+                      />
                     )}
                   </Box>
                 </Box>
@@ -143,7 +175,10 @@ const ChatSkeleton: React.FC<ChatSkeletonProps> = ({ stage }) => {
             }}
           >
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Skeleton variant="rectangular" sx={{ flex: 1, height: 40, borderRadius: 1 }} />
+              <Skeleton
+                variant="rectangular"
+                sx={{ flex: 1, height: 40, borderRadius: 1 }}
+              />
               <Skeleton variant="circular" width={40} height={40} />
             </Stack>
           </Paper>
@@ -161,7 +196,11 @@ const ChatSkeleton: React.FC<ChatSkeletonProps> = ({ stage }) => {
           bgcolor: 'background.paper',
         }}
       >
-        <LinearProgress variant="determinate" value={getProgress()} sx={{ height: 2 }} />
+        <LinearProgress
+          variant="determinate"
+          value={getProgress()}
+          sx={{ height: 2 }}
+        />
       </Box>
     </Box>
   );

@@ -5,7 +5,12 @@ const logger = createLogger('apiResponse');
 
 // Re-export ErrorCodes from shared package for backward compatibility
 // This allows existing imports to continue working
-export { ErrorCodes, isErrorCode, extractErrorCode, extractErrorMessage } from '@gatrix/shared';
+export {
+  ErrorCodes,
+  isErrorCode,
+  extractErrorCode,
+  extractErrorMessage,
+} from '@gatrix/shared';
 export type { ErrorCode, ApiError, ApiResponse } from '@gatrix/shared';
 
 // Import for internal use
@@ -82,7 +87,13 @@ export function sendValidationError(
   message: string,
   details?: Record<string, any>
 ): Response {
-  return sendErrorResponse(res, 400, ErrorCodes.VALIDATION_ERROR, message, details);
+  return sendErrorResponse(
+    res,
+    400,
+    ErrorCodes.VALIDATION_ERROR,
+    message,
+    details
+  );
 }
 
 export function sendUnauthorized(

@@ -11,9 +11,10 @@ const { ulid } = require('ulid');
 // ==================== Default Organisation / Project / Environments ====================
 
 async function createDefaultOrganisation(): Promise<string> {
-  const existing = await database.query('SELECT id FROM g_organisations WHERE orgName = ?', [
-    'default',
-  ]);
+  const existing = await database.query(
+    'SELECT id FROM g_organisations WHERE orgName = ?',
+    ['default']
+  );
   if (existing.length > 0) {
     logger.info('Default organisation already exists, skipping creation');
     return existing[0].id;
@@ -29,7 +30,10 @@ async function createDefaultOrganisation(): Promise<string> {
   return orgId;
 }
 
-async function createDefaultProject(orgId: string, createdBy: string): Promise<string> {
+async function createDefaultProject(
+  orgId: string,
+  createdBy: string
+): Promise<string> {
   const existing = await database.query(
     'SELECT id FROM g_projects WHERE orgId = ? AND projectName = ?',
     [orgId, 'default']
@@ -50,9 +54,10 @@ async function createDefaultProject(orgId: string, createdBy: string): Promise<s
 }
 
 async function createDefaultEnvironments(projectId: string, createdBy: string) {
-  const existing = await database.query('SELECT id FROM g_environments WHERE projectId = ?', [
-    projectId,
-  ]);
+  const existing = await database.query(
+    'SELECT id FROM g_environments WHERE projectId = ?',
+    [projectId]
+  );
   if (existing.length > 0) {
     logger.info('Default environments already exist, skipping creation');
     return;
@@ -123,13 +128,16 @@ async function createInternalInfrastructure(adminUserId: string) {
   const orgName = '__internal__';
 
   // 1. Create internal organisation
-  const existingOrg = await database.query('SELECT id FROM g_organisations WHERE orgName = ?', [
-    orgName,
-  ]);
+  const existingOrg = await database.query(
+    'SELECT id FROM g_organisations WHERE orgName = ?',
+    [orgName]
+  );
   let orgId: string;
   if (existingOrg.length > 0) {
     orgId = existingOrg[0].id;
-    logger.info('Internal infrastructure organisation already exists, skipping');
+    logger.info(
+      'Internal infrastructure organisation already exists, skipping'
+    );
   } else {
     orgId = ulid();
     await database.query(
@@ -186,7 +194,9 @@ async function createInternalInfrastructure(adminUserId: string) {
     [envId]
   );
   if (existingToken.length > 0) {
-    logger.info(`Internal infrastructure token already exists: ${existingToken[0].tokenValue}`);
+    logger.info(
+      `Internal infrastructure token already exists: ${existingToken[0].tokenValue}`
+    );
   } else {
     const crypto = require('crypto');
     const tokenValue = `gatrix_infra_${crypto.randomBytes(24).toString('hex')}`;
@@ -196,7 +206,9 @@ async function createInternalInfrastructure(adminUserId: string) {
       [ulid(), projectId, envId, tokenValue, adminUserId]
     );
     logger.info(`Internal infrastructure token created: ${tokenValue}`);
-    logger.info('>>> Set GATRIX_API_TOKEN in .env.local to this value for Edge server');
+    logger.info(
+      '>>> Set GATRIX_API_TOKEN in .env.local to this value for Edge server'
+    );
   }
 }
 
@@ -346,7 +358,15 @@ async function createDefaultContextFields(projectId: string) {
       `INSERT INTO g_feature_context_fields (id, projectId, fieldName, fieldType, description, stickiness, sortOrder, createdAt, updatedAt)
        VALUES (?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())
        ON DUPLICATE KEY UPDATE description = VALUES(description)`,
-      [ulid(), projectId, f.fieldName, f.fieldType, f.description, f.stickiness, f.sortOrder]
+      [
+        ulid(),
+        projectId,
+        f.fieldName,
+        f.fieldType,
+        f.description,
+        f.stickiness,
+        f.sortOrder,
+      ]
     );
   }
   logger.info('Default context fields created');
@@ -354,7 +374,10 @@ async function createDefaultContextFields(projectId: string) {
 
 // ==================== Default Environment Keys ====================
 
-async function createDefaultEnvironmentKeys(projectId: string, createdBy: string) {
+async function createDefaultEnvironmentKeys(
+  projectId: string,
+  createdBy: string
+) {
   const existing = await database.query(
     `SELECT ek.id FROM g_environment_keys ek
      JOIN g_environments e ON ek.environmentId = e.id
@@ -421,7 +444,13 @@ async function createSampleReleaseFlows(createdBy: string) {
         strategy: {
           name: 'flexibleRollout',
           params: { rollout: 0, stickiness: 'default', groupId: 'default' },
-          constraints: [{ contextName: 'appName', operator: 'IN', values: ['Gatrix-Admin'] }],
+          constraints: [
+            {
+              contextName: 'appName',
+              operator: 'IN',
+              values: ['Gatrix-Admin'],
+            },
+          ],
         },
       },
       {
@@ -483,7 +512,10 @@ async function createSampleReleaseFlows(createdBy: string) {
 // ==================== Default RBAC Roles ====================
 
 async function createDefaultRoles(orgId: string, adminUserId: string) {
-  const existing = await database.query('SELECT id FROM g_roles WHERE orgId = ? LIMIT 1', [orgId]);
+  const existing = await database.query(
+    'SELECT id FROM g_roles WHERE orgId = ? LIMIT 1',
+    [orgId]
+  );
   if (existing.length > 0) {
     logger.info('Default roles already exist, skipping creation');
     return;
@@ -611,7 +643,9 @@ async function createDefaultRoles(orgId: string, adminUserId: string) {
 
     // Bulk insert permissions
     if (perms.length > 0) {
-      const values = perms.map((p) => `('${ulid()}', '${roleId}', '${p}')`).join(',');
+      const values = perms
+        .map((p) => `('${ulid()}', '${roleId}', '${p}')`)
+        .join(',');
       await database.query(
         `INSERT INTO g_role_permissions (id, roleId, permission) VALUES ${values}`
       );
@@ -624,8 +658,15 @@ async function createDefaultRoles(orgId: string, adminUserId: string) {
   const specializedRoles = [
     {
       name: 'System Monitoring',
-      description: 'Read-only access to server infrastructure, monitoring, and real-time events',
-      resources: ['servers', 'monitoring', 'realtime_events', 'event_lens', 'scheduler'],
+      description:
+        'Read-only access to server infrastructure, monitoring, and real-time events',
+      resources: [
+        'servers',
+        'monitoring',
+        'realtime_events',
+        'event_lens',
+        'scheduler',
+      ],
       actions: ['read'],
     },
     {
@@ -672,7 +713,8 @@ async function createDefaultRoles(orgId: string, adminUserId: string) {
     },
     {
       name: 'Security Admin',
-      description: 'Full CRUD access to roles, groups, users, tokens, and access control',
+      description:
+        'Full CRUD access to roles, groups, users, tokens, and access control',
       resources: [
         'users',
         'groups',
@@ -704,7 +746,9 @@ async function createDefaultRoles(orgId: string, adminUserId: string) {
     }
 
     if (perms.length > 0) {
-      const values = perms.map((p) => `('${ulid()}', '${roleId}', '${p}')`).join(',');
+      const values = perms
+        .map((p) => `('${ulid()}', '${roleId}', '${p}')`)
+        .join(',');
       await database.query(
         `INSERT INTO g_role_permissions (id, roleId, permission) VALUES ${values}`
       );

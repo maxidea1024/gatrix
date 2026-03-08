@@ -1,16 +1,30 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 import { varsService } from '../services/varsService';
-import { PlatformOption, ChannelOption, PlatformConfigContextType } from '../types/platformConfig';
+import {
+  PlatformOption,
+  ChannelOption,
+  PlatformConfigContextType,
+} from '../types/platformConfig';
 import { useAuth } from './AuthContext';
 import { useOrgProject } from './OrgProjectContext';
 
-const PlatformConfigContext = createContext<PlatformConfigContextType | undefined>(undefined);
+const PlatformConfigContext = createContext<
+  PlatformConfigContextType | undefined
+>(undefined);
 
 interface PlatformConfigProviderProps {
   children: ReactNode;
 }
 
-export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({ children }) => {
+export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({
+  children,
+}) => {
   const { isAuthenticated, permissions, permissionsLoading } = useAuth();
   const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
   const { getProjectApiPath, currentProjectId } = useOrgProject();
@@ -36,7 +50,9 @@ export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({ 
       setChannels(config.channels);
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to load platform configuration';
+        err instanceof Error
+          ? err.message
+          : 'Failed to load platform configuration';
       setError(errorMessage);
       console.error('Error loading platform config:', err);
     } finally {
@@ -77,13 +93,19 @@ export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({ 
     refresh: loadPlatformConfig,
   };
 
-  return <PlatformConfigContext.Provider value={value}>{children}</PlatformConfigContext.Provider>;
+  return (
+    <PlatformConfigContext.Provider value={value}>
+      {children}
+    </PlatformConfigContext.Provider>
+  );
 };
 
 export const usePlatformConfig = (): PlatformConfigContextType => {
   const context = useContext(PlatformConfigContext);
   if (!context) {
-    throw new Error('usePlatformConfig must be used within PlatformConfigProvider');
+    throw new Error(
+      'usePlatformConfig must be used within PlatformConfigProvider'
+    );
   }
   return context;
 };

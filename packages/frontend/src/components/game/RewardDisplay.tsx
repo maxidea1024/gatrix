@@ -23,11 +23,19 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
   maxDisplay = 3,
 }) => {
   const { t } = useTranslation();
-  const { rewardTypes, rewardLookup, isLoading: contextLoading } = usePlanningData();
+  const {
+    rewardTypes,
+    rewardLookup,
+    isLoading: contextLoading,
+  } = usePlanningData();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
-  const [rewardTypeMap, setRewardTypeMap] = useState<Map<number, RewardTypeInfo>>(new Map());
-  const [rewardItemsMap, setRewardItemsMap] = useState<Map<string, RewardItem>>(new Map());
+  const [rewardTypeMap, setRewardTypeMap] = useState<
+    Map<number, RewardTypeInfo>
+  >(new Map());
+  const [rewardItemsMap, setRewardItemsMap] = useState<Map<string, RewardItem>>(
+    new Map()
+  );
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const [displayRewards, setDisplayRewards] = useState<Reward[]>([]);
@@ -40,7 +48,9 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
         if (rewards && rewards.length > 0) {
           // Convert from backend format (rewardType, itemId) to frontend format (type, id)
           const convertedRewards: Reward[] = rewards.map((reward: any) => ({
-            rewardType: String(reward.type !== undefined ? reward.type : reward.rewardType),
+            rewardType: String(
+              reward.type !== undefined ? reward.type : reward.rewardType
+            ),
             itemId: String(
               reward.id !== undefined
                 ? reward.id
@@ -67,14 +77,20 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
             projectApiPath,
             rewardTemplateId
           );
-          if (template && template.rewardItems && Array.isArray(template.rewardItems)) {
-            const convertedRewards: Reward[] = template.rewardItems.map((item: any) => ({
-              rewardType: String(item.rewardType || item.type || 0),
-              itemId: String(item.itemId || item.id || 0),
-              quantity: item.quantity || 0,
-              type: item.rewardType || item.type || 0,
-              id: item.itemId || item.id || 0,
-            }));
+          if (
+            template &&
+            template.rewardItems &&
+            Array.isArray(template.rewardItems)
+          ) {
+            const convertedRewards: Reward[] = template.rewardItems.map(
+              (item: any) => ({
+                rewardType: String(item.rewardType || item.type || 0),
+                itemId: String(item.itemId || item.id || 0),
+                quantity: item.quantity || 0,
+                type: item.rewardType || item.type || 0,
+                id: item.itemId || item.id || 0,
+              })
+            );
             setDisplayRewards(convertedRewards);
           } else {
             setDisplayRewards([]);
@@ -108,7 +124,9 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
       const itemsMap = new Map<string, RewardItem>();
 
       // Get unique reward types
-      const uniqueTypes = [...new Set(displayRewards.map((r) => parseInt(r.type)))];
+      const uniqueTypes = [
+        ...new Set(displayRewards.map((r) => parseInt(r.type))),
+      ];
 
       // Extract items from reward lookup data if available
       if (rewardLookup) {
@@ -124,7 +142,11 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
 
       setRewardItemsMap(itemsMap);
       setLoading(false);
-    } else if (!contextLoading && displayRewards && displayRewards.length === 0) {
+    } else if (
+      !contextLoading &&
+      displayRewards &&
+      displayRewards.length === 0
+    ) {
       setLoading(false);
     }
   }, [rewardLookup, displayRewards, contextLoading]);
@@ -142,15 +164,17 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
   if (loading) {
     return (
       <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-        {[...Array(Math.min(displayRewards.length, maxDisplay))].map((_, idx) => (
-          <Skeleton
-            key={idx}
-            variant="rectangular"
-            width={120}
-            height={24}
-            sx={{ borderRadius: 1 }}
-          />
-        ))}
+        {[...Array(Math.min(displayRewards.length, maxDisplay))].map(
+          (_, idx) => (
+            <Skeleton
+              key={idx}
+              variant="rectangular"
+              width={120}
+              height={24}
+              sx={{ borderRadius: 1 }}
+            />
+          )
+        )}
       </Box>
     );
   }
@@ -209,14 +233,18 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
   };
 
   // Display rewards
-  const rewardsToDisplay = showAll ? displayRewards : displayRewards.slice(0, maxDisplay);
+  const rewardsToDisplay = showAll
+    ? displayRewards
+    : displayRewards.slice(0, maxDisplay);
   const hasMore = displayRewards.length > maxDisplay;
 
   // Darker orange color (15% darker than #ff9800)
   const orangeColor = '#d98200';
 
   return (
-    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+    <Box
+      sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}
+    >
       {rewardsToDisplay.map((reward, idx) => (
         <Tooltip key={idx} title={getRewardTooltip(reward)} arrow>
           <Chip

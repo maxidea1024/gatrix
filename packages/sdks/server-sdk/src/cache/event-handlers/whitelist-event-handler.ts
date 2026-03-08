@@ -21,7 +21,9 @@ export class WhitelistEventHandler implements IEventHandler {
     try {
       await this.cacheManager.refreshWhitelists(environmentId);
     } catch (error: any) {
-      this.logger.error('Failed to refresh whitelist cache', { error: error.message });
+      this.logger.error('Failed to refresh whitelist cache', {
+        error: error.message,
+      });
     }
   }
 }

@@ -90,7 +90,11 @@ export class IntegrationModel {
       const row = await db(this.TABLE)
         .leftJoin('g_users as cu', 'g_integrations.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'g_integrations.updatedBy', 'uu.id')
-        .select(['g_integrations.*', 'cu.name as createdByName', 'uu.name as updatedByName'])
+        .select([
+          'g_integrations.*',
+          'cu.name as createdByName',
+          'uu.name as updatedByName',
+        ])
         .where('g_integrations.id', id)
         .first();
 
@@ -116,7 +120,11 @@ export class IntegrationModel {
       let query = db(this.TABLE)
         .leftJoin('g_users as cu', 'g_integrations.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'g_integrations.updatedBy', 'uu.id')
-        .select(['g_integrations.*', 'cu.name as createdByName', 'uu.name as updatedByName'])
+        .select([
+          'g_integrations.*',
+          'cu.name as createdByName',
+          'uu.name as updatedByName',
+        ])
         .orderBy('g_integrations.createdAt', 'desc');
 
       if (filters?.isEnabled !== undefined) {
@@ -185,7 +193,10 @@ export class IntegrationModel {
       return integrations.filter((integration) => {
         // First check events (including legacy mapping)
         let eventMatch = false;
-        if (integration.events.includes('*') || integration.events.includes(eventType)) {
+        if (
+          integration.events.includes('*') ||
+          integration.events.includes(eventType)
+        ) {
           eventMatch = true;
         } else if (eventType.startsWith('feature_flag_')) {
           const legacyName = eventType.replace('feature_flag_', 'feature_');
@@ -220,7 +231,10 @@ export class IntegrationModel {
   /**
    * Update an integration
    */
-  static async update(id: string, data: UpdateIntegrationData): Promise<Integration | null> {
+  static async update(
+    id: string,
+    data: UpdateIntegrationData
+  ): Promise<Integration | null> {
     try {
       const existing = await this.findById(id);
       if (!existing) {
@@ -230,10 +244,13 @@ export class IntegrationModel {
       const updateData: Record<string, any> = {};
 
       if (data.provider !== undefined) updateData.provider = data.provider;
-      if (data.description !== undefined) updateData.description = data.description;
+      if (data.description !== undefined)
+        updateData.description = data.description;
       if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
-      if (data.parameters !== undefined) updateData.parameters = JSON.stringify(data.parameters);
-      if (data.events !== undefined) updateData.events = JSON.stringify(data.events);
+      if (data.parameters !== undefined)
+        updateData.parameters = JSON.stringify(data.parameters);
+      if (data.events !== undefined)
+        updateData.events = JSON.stringify(data.events);
       if (data.environmentIds !== undefined)
         updateData.environmentIds = JSON.stringify(data.environmentIds);
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
@@ -268,7 +285,10 @@ export class IntegrationModel {
   /**
    * Toggle integration enabled status
    */
-  static async toggleEnabled(id: string, updatedBy?: string): Promise<Integration | null> {
+  static async toggleEnabled(
+    id: string,
+    updatedBy?: string
+  ): Promise<Integration | null> {
     try {
       const existing = await this.findById(id);
       if (!existing) {
@@ -282,7 +302,9 @@ export class IntegrationModel {
           updatedBy: updatedBy || null,
         });
 
-      logger.info(`Toggled integration ${id} to ${!existing.isEnabled ? 'enabled' : 'disabled'}`);
+      logger.info(
+        `Toggled integration ${id} to ${!existing.isEnabled ? 'enabled' : 'disabled'}`
+      );
       return this.findById(id);
     } catch (error) {
       logger.error('Error toggling integration:', error);
@@ -313,8 +335,13 @@ export class IntegrationModel {
       description: row.description,
       isEnabled: Boolean(row.isEnabled),
       parameters:
-        typeof row.parameters === 'string' ? JSON.parse(row.parameters) : row.parameters || {},
-      events: typeof row.events === 'string' ? JSON.parse(row.events) : row.events || [],
+        typeof row.parameters === 'string'
+          ? JSON.parse(row.parameters)
+          : row.parameters || {},
+      events:
+        typeof row.events === 'string'
+          ? JSON.parse(row.events)
+          : row.events || [],
       environmentIds:
         typeof row.environmentIds === 'string'
           ? JSON.parse(row.environmentIds)

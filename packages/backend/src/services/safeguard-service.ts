@@ -93,7 +93,9 @@ class SafeguardService {
       operator: input.operator || '>',
       threshold: input.threshold,
       timeRangeMinutes: input.timeRangeMinutes || 60,
-      labelFilters: input.labelFilters ? JSON.stringify(input.labelFilters) : null,
+      labelFilters: input.labelFilters
+        ? JSON.stringify(input.labelFilters)
+        : null,
       action: input.action || 'pause',
       isTriggered: false,
       triggeredAt: null,
@@ -136,7 +138,10 @@ class SafeguardService {
   /**
    * Update a safeguard
    */
-  async update(id: string, input: UpdateSafeguardInput): Promise<Safeguard | null> {
+  async update(
+    id: string,
+    input: UpdateSafeguardInput
+  ): Promise<Safeguard | null> {
     const existing = await this.getById(id);
     if (!existing) {
       return null;
@@ -241,7 +246,9 @@ class SafeguardService {
   /**
    * Evaluate a single safeguard against Prometheus
    */
-  private async evaluateSingleSafeguard(safeguard: Safeguard): Promise<SafeguardEvaluationResult> {
+  private async evaluateSingleSafeguard(
+    safeguard: Safeguard
+  ): Promise<SafeguardEvaluationResult> {
     try {
       // Convert minutes to time range string for Prometheus query
       const timeRangeStr = this.minutesToPromRange(safeguard.timeRangeMinutes);
@@ -272,7 +279,11 @@ class SafeguardService {
         };
       }
 
-      const triggered = this.compareValue(currentValue, safeguard.operator, safeguard.threshold);
+      const triggered = this.compareValue(
+        currentValue,
+        safeguard.operator,
+        safeguard.threshold
+      );
 
       return {
         safeguardId: safeguard.id,
@@ -313,7 +324,11 @@ class SafeguardService {
   /**
    * Compare value against threshold using operator
    */
-  private compareValue(value: number, operator: string, threshold: number): boolean {
+  private compareValue(
+    value: number,
+    operator: string,
+    threshold: number
+  ): boolean {
     switch (operator) {
       case '>':
         return value > threshold;

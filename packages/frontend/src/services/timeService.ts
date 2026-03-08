@@ -71,7 +71,9 @@ class TimeService {
 
     const now = Date.now();
     const timeSinceLastSync = now - this.currentServerTime.localTime.getTime();
-    return new Date(this.currentServerTime.serverTime.getTime() + timeSinceLastSync);
+    return new Date(
+      this.currentServerTime.serverTime.getTime() + timeSinceLastSync
+    );
   }
 
   /**
@@ -83,7 +85,8 @@ class TimeService {
     }
 
     const now = Date.now();
-    const timeSinceLastSync = (now - this.currentServerTime.uptimeBaseTime) / 1000; // In seconds
+    const timeSinceLastSync =
+      (now - this.currentServerTime.uptimeBaseTime) / 1000; // In seconds
     return this.currentServerTime.uptime + timeSinceLastSync;
   }
 

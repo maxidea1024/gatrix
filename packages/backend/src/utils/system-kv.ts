@@ -27,7 +27,8 @@ const SYSTEM_KV_DEFINITIONS: SystemKVDefinition[] = [
     key: '$clientVersionPassiveData',
     value: JSON.stringify({}),
     valueType: 'object',
-    description: 'Passive data sent with client version info queries from client SDK',
+    description:
+      'Passive data sent with client version info queries from client SDK',
     isCopyable: false,
   },
   {
@@ -77,7 +78,9 @@ export async function initializeAllSystemKV(): Promise<void> {
       await initializeSystemKV(environmentId);
     }
 
-    logger.info(`Successfully initialized system KV items for ${environments.length} environments`);
+    logger.info(
+      `Successfully initialized system KV items for ${environments.length} environments`
+    );
   } catch (error) {
     logger.error('Error initializing all system KV items:', error);
     throw error;
@@ -89,7 +92,9 @@ export async function initializeAllSystemKV(): Promise<void> {
  */
 export async function initializeSystemKV(environmentId: string): Promise<void> {
   try {
-    logger.info(`Initializing system-defined KV items for environmentId ${environmentId}...`);
+    logger.info(
+      `Initializing system-defined KV items for environmentId ${environmentId}...`
+    );
 
     for (const def of SYSTEM_KV_DEFINITIONS) {
       await VarsModel.defineSystemKV(
@@ -107,7 +112,10 @@ export async function initializeSystemKV(environmentId: string): Promise<void> {
       `Successfully initialized ${SYSTEM_KV_DEFINITIONS.length} system KV items for environmentId ${environmentId}`
     );
   } catch (error) {
-    logger.error(`Error initializing system KV items for environmentId ${environmentId}:`, error);
+    logger.error(
+      `Error initializing system KV items for environmentId ${environmentId}:`,
+      error
+    );
     throw error;
   }
 }
@@ -130,7 +138,13 @@ export async function defineSystemKV(
   description: string
 ): Promise<void> {
   try {
-    await VarsModel.defineSystemKV(key, value, valueType, environmentId, description);
+    await VarsModel.defineSystemKV(
+      key,
+      value,
+      valueType,
+      environmentId,
+      description
+    );
     logger.info(`System KV defined: ${key} in ${environmentId}`);
   } catch (error) {
     logger.error(`Error defining system KV ${key} in ${environmentId}:`, error);

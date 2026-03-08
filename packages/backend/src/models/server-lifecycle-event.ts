@@ -29,7 +29,10 @@ export interface ServerLifecycleEventData {
   createdAt?: string | Date;
 }
 
-export class ServerLifecycleEvent extends Model implements ServerLifecycleEventData {
+export class ServerLifecycleEvent
+  extends Model
+  implements ServerLifecycleEventData
+{
   static tableName = 'g_server_lifecycle_events';
 
   id?: string;
@@ -60,7 +63,13 @@ export class ServerLifecycleEvent extends Model implements ServerLifecycleEventD
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['environmentId', 'instanceId', 'serviceType', 'eventType', 'instanceStatus'],
+      required: [
+        'environmentId',
+        'instanceId',
+        'serviceType',
+        'eventType',
+        'instanceStatus',
+      ],
       properties: {
         id: { type: 'integer' },
         environmentId: { type: 'string', minLength: 1, maxLength: 127 },
@@ -103,11 +112,14 @@ export class ServerLifecycleEvent extends Model implements ServerLifecycleEventD
     this.createdAt = convertToMySQLDateTime(this.createdAt) || this.createdAt;
 
     if (this.lastHeartbeatAt) {
-      this.lastHeartbeatAt = convertToMySQLDateTime(this.lastHeartbeatAt) || this.lastHeartbeatAt;
+      this.lastHeartbeatAt =
+        convertToMySQLDateTime(this.lastHeartbeatAt) || this.lastHeartbeatAt;
     }
   }
 
-  static async recordEvent(data: ServerLifecycleEventData): Promise<ServerLifecycleEvent> {
+  static async recordEvent(
+    data: ServerLifecycleEventData
+  ): Promise<ServerLifecycleEvent> {
     // metadata is already JSON-ready
     return await this.query().insert(data);
   }
@@ -120,9 +132,14 @@ export class ServerLifecycleEvent extends Model implements ServerLifecycleEventD
   static async deleteOldEvents(retentionDays: number): Promise<number> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
-    const cutoffDateStr = cutoffDate.toISOString().slice(0, 19).replace('T', ' ');
+    const cutoffDateStr = cutoffDate
+      .toISOString()
+      .slice(0, 19)
+      .replace('T', ' ');
 
-    const result = await this.query().delete().where('createdAt', '<', cutoffDateStr);
+    const result = await this.query()
+      .delete()
+      .where('createdAt', '<', cutoffDateStr);
 
     return result;
   }

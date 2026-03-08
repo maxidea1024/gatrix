@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { LoadingIndicator, PageLoading, FullScreenLoading } from '../LoadingIndicator';
+import {
+  LoadingIndicator,
+  PageLoading,
+  FullScreenLoading,
+} from '../LoadingIndicator';
 
 describe('LoadingIndicator', () => {
   it('renders circular loading indicator by default', () => {

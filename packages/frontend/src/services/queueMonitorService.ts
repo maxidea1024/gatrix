@@ -47,7 +47,9 @@ export async function fetchAllQueueStats(): Promise<QueueStats[]> {
   return res.data;
 }
 
-export async function fetchRepeatableJobs(queueName: string): Promise<RepeatableJob[]> {
+export async function fetchRepeatableJobs(
+  queueName: string
+): Promise<RepeatableJob[]> {
   const res = await api.get(`${BASE}/${queueName}/repeatable`);
   return res.data;
 }
@@ -64,16 +66,27 @@ export async function fetchQueueJobs(
   return res.data;
 }
 
-export async function retryQueueJob(queueName: string, jobId: string): Promise<void> {
+export async function retryQueueJob(
+  queueName: string,
+  jobId: string
+): Promise<void> {
   await api.post(`${BASE}/${queueName}/jobs/${jobId}/retry`);
 }
 
-export async function removeQueueJob(queueName: string, jobId: string): Promise<void> {
+export async function removeQueueJob(
+  queueName: string,
+  jobId: string
+): Promise<void> {
   await api.delete(`${BASE}/${queueName}/jobs/${jobId}`);
 }
 
-export async function removeRepeatableJob(queueName: string, key: string): Promise<void> {
-  await api.delete(`${BASE}/${queueName}/repeatable/${encodeURIComponent(key)}`);
+export async function removeRepeatableJob(
+  queueName: string,
+  key: string
+): Promise<void> {
+  await api.delete(
+    `${BASE}/${queueName}/repeatable/${encodeURIComponent(key)}`
+  );
 }
 
 export async function cleanQueue(

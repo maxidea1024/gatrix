@@ -51,7 +51,11 @@ export class NewRelicAddon extends Addon {
       // Build event body
       let body: NewRelicRequestBody;
 
-      if (bodyTemplate && typeof bodyTemplate === 'string' && bodyTemplate.length > 1) {
+      if (
+        bodyTemplate &&
+        typeof bodyTemplate === 'string' &&
+        bodyTemplate.length > 1
+      ) {
         // Use custom body template with simple mustache-like replacements
         let renderedBody = bodyTemplate;
         renderedBody = renderedBody.replace(/\{\{event\.type\}\}/g, event.type);
@@ -70,7 +74,9 @@ export class NewRelicAddon extends Addon {
         try {
           body = JSON.parse(renderedBody);
         } catch {
-          this.logger.warn('Failed to parse body template, using default format');
+          this.logger.warn(
+            'Failed to parse body template, using default format'
+          );
           body = this.buildDefaultBody(event);
         }
       } else {
@@ -79,7 +85,11 @@ export class NewRelicAddon extends Addon {
 
       // Parse custom headers
       let extraHeaders: Record<string, string> = {};
-      if (customHeaders && typeof customHeaders === 'string' && customHeaders.length > 1) {
+      if (
+        customHeaders &&
+        typeof customHeaders === 'string' &&
+        customHeaders.length > 1
+      ) {
         try {
           extraHeaders = JSON.parse(customHeaders);
         } catch {

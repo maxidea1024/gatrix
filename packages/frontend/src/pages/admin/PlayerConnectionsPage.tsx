@@ -39,7 +39,10 @@ const PlayerConnectionsPage: React.FC = () => {
         <Typography variant="h6" gutterBottom>
           {t('playerConnections.plannedFeatures')}
         </Typography>
-        <Box component="ul" sx={{ textAlign: 'left', maxWidth: 400, mx: 'auto', mt: 2 }}>
+        <Box
+          component="ul"
+          sx={{ textAlign: 'left', maxWidth: 400, mx: 'auto', mt: 2 }}
+        >
           <li>
             <Typography variant="body2" color="text.secondary">
               {t('playerConnections.feature.monitoring')}

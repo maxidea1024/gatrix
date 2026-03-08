@@ -43,7 +43,10 @@ export class AuthService {
         } else if (user.status === 'suspended') {
           throw new GatrixError('ACCOUNT_SUSPENDED', 403);
         } else {
-          throw new GatrixError('Account is not active. Please contact an administrator.', 403);
+          throw new GatrixError(
+            'Account is not active. Please contact an administrator.',
+            403
+          );
         }
       }
 
@@ -75,8 +78,14 @@ export class AuthService {
         logger.warn('Failed to lookup org membership during login:', err);
       }
 
-      const accessToken = JwtUtils.generateToken(userWithoutPassword as any, orgId);
-      const refreshToken = JwtUtils.generateRefreshToken(userWithoutPassword as any, orgId);
+      const accessToken = JwtUtils.generateToken(
+        userWithoutPassword as any,
+        orgId
+      );
+      const refreshToken = JwtUtils.generateRefreshToken(
+        userWithoutPassword as any,
+        orgId
+      );
 
       logger.info('User logged in successfully:', {
         userId: user.id,
@@ -97,7 +106,9 @@ export class AuthService {
     }
   }
 
-  static async register(registerData: RegisterData): Promise<UserWithoutPassword> {
+  static async register(
+    registerData: RegisterData
+  ): Promise<UserWithoutPassword> {
     try {
       const { email, password, name } = registerData;
 
@@ -141,7 +152,9 @@ export class AuthService {
       // Verify refresh token
       const payload = JwtUtils.verifyRefreshToken(refreshToken);
       if (!payload) {
-        logger.warn('Refresh token verification failed: invalid or expired token');
+        logger.warn(
+          'Refresh token verification failed: invalid or expired token'
+        );
         throw new GatrixError('Invalid or expired refresh token', 401);
       }
 
@@ -168,7 +181,10 @@ export class AuthService {
 
       // Generate new tokens
       const newAccessToken = JwtUtils.generateToken(user, payload.orgId);
-      const newRefreshToken = JwtUtils.generateRefreshToken(user, payload.orgId);
+      const newRefreshToken = JwtUtils.generateRefreshToken(
+        user,
+        payload.orgId
+      );
 
       return {
         accessToken: newAccessToken,
@@ -190,19 +206,27 @@ export class AuthService {
   ): Promise<void> {
     try {
       // Get user with password hash
-      const user = await UserModel.findByEmail((await UserModel.findById(userId))!.email);
+      const user = await UserModel.findByEmail(
+        (await UserModel.findById(userId))!.email
+      );
       if (!user) {
         throw new GatrixError('User not found', 404);
       }
 
       // OAuth Used자들은 비밀번호 변경 불가
       if (user.authType !== 'local') {
-        throw new GatrixError('Password change is not available for OAuth users', 400);
+        throw new GatrixError(
+          'Password change is not available for OAuth users',
+          400
+        );
       }
 
       // Verify current password
       if (user.passwordHash) {
-        const isValidPassword = await UserModel.verifyPassword(user, currentPassword);
+        const isValidPassword = await UserModel.verifyPassword(
+          user,
+          currentPassword
+        );
         if (!isValidPassword) {
           throw new GatrixError('Current password is incorrect', 400);
         }

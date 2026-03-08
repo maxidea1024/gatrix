@@ -18,7 +18,9 @@ export async function checkDatabaseTimezone() {
     );
 
     // Check current MySQL time
-    const [timeResult] = await db.raw('SELECT NOW() as mysql_now, UTC_TIMESTAMP() as mysql_utc');
+    const [timeResult] = await db.raw(
+      'SELECT NOW() as mysql_now, UTC_TIMESTAMP() as mysql_utc'
+    );
 
     // Node.js 시간 Confirm
     const nodeNow = new Date();
@@ -43,17 +45,25 @@ export async function checkDatabaseTimezone() {
     // Check recommendations
     const recommendations = [];
 
-    if (timezoneResult.global_tz !== 'UTC' && timezoneResult.global_tz !== '+00:00') {
+    if (
+      timezoneResult.global_tz !== 'UTC' &&
+      timezoneResult.global_tz !== '+00:00'
+    ) {
       recommendations.push('MySQL global timezone should be set to UTC');
     }
 
-    if (timezoneResult.session_tz !== 'UTC' && timezoneResult.session_tz !== '+00:00') {
+    if (
+      timezoneResult.session_tz !== 'UTC' &&
+      timezoneResult.session_tz !== '+00:00'
+    ) {
       recommendations.push('MySQL session timezone should be set to UTC');
     }
 
     if (recommendations.length > 0) {
       logger.warn('Database timezone recommendations:', recommendations);
-      logger.warn('To fix: SET GLOBAL time_zone = "+00:00"; SET SESSION time_zone = "+00:00";');
+      logger.warn(
+        'To fix: SET GLOBAL time_zone = "+00:00"; SET SESSION time_zone = "+00:00";'
+      );
     } else {
       logger.info('✅ Database timezone is properly configured for UTC');
     }
@@ -108,17 +118,19 @@ export async function testDateHandling() {
     `);
 
     // Insert data
-    await db.raw('INSERT INTO test_dates (test_datetime, test_timestamp) VALUES (?, ?)', [
-      mysqlFormat,
-      mysqlFormat,
-    ]);
+    await db.raw(
+      'INSERT INTO test_dates (test_datetime, test_timestamp) VALUES (?, ?)',
+      [mysqlFormat, mysqlFormat]
+    );
 
     // Query data
     const [result] = await db.raw('SELECT * FROM test_dates LIMIT 1');
 
     logger.info('Database date test result:', {
       stored: result,
-      datetime_reconstructed: new Date(result.test_datetime + 'Z').toISOString(),
+      datetime_reconstructed: new Date(
+        result.test_datetime + 'Z'
+      ).toISOString(),
       timestamp_reconstructed: new Date(result.test_timestamp).toISOString(),
     });
 

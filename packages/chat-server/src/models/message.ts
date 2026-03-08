@@ -15,7 +15,14 @@ export class Message extends Model {
   channelId!: number;
   userId!: number;
   content!: string;
-  contentType!: 'text' | 'image' | 'video' | 'audio' | 'file' | 'location' | 'system';
+  contentType!:
+    | 'text'
+    | 'image'
+    | 'video'
+    | 'audio'
+    | 'file'
+    | 'location'
+    | 'system';
   messageData?: MessageData;
   replyToMessageId?: number;
   threadId?: number;
@@ -39,7 +46,15 @@ export class Message extends Model {
         content: { type: 'string', minLength: 1, maxLength: 10000 },
         contentType: {
           type: 'string',
-          enum: ['text', 'image', 'video', 'audio', 'file', 'location', 'system'],
+          enum: [
+            'text',
+            'image',
+            'video',
+            'audio',
+            'file',
+            'location',
+            'system',
+          ],
         },
         messageData: { type: 'object' },
         replyToMessageId: { type: 'integer' },
@@ -98,7 +113,10 @@ export class MessageModel {
   }
 
   // 메시지 생성
-  static async create(data: CreateMessageData, userId: number): Promise<MessageType> {
+  static async create(
+    data: CreateMessageData,
+    userId: number
+  ): Promise<MessageType> {
     const messageData = {
       channelId: data.channelId,
       userId,
@@ -140,7 +158,12 @@ export class MessageModel {
   // 메시지 조회
   static async findById(id: number): Promise<MessageType | null> {
     const result = await this.knex('chat_messages as m')
-      .select(['m.*', 'u.name as userName', 'u.avatarUrl as userAvatarUrl', 'u.email as userEmail'])
+      .select([
+        'm.*',
+        'u.name as userName',
+        'u.avatarUrl as userAvatarUrl',
+        'u.email as userEmail',
+      ])
       .leftJoin('chat_users as u', 'm.userId', 'u.id')
       .where({ 'm.id': id, 'm.isDeleted': false })
       .first();
@@ -228,7 +251,9 @@ export class MessageModel {
     }
 
     // 2) 총 개수 조회 (ONLY_FULL_GROUP_BY 호환)
-    const totalRow = await base.clone().count<{ count: number }[]>({ count: '*' });
+    const totalRow = await base
+      .clone()
+      .count<{ count: number }[]>({ count: '*' });
     const total = Number((totalRow as any)[0]?.count || 0);
 
     // 3) 실제 데이터 조회 쿼리 (SELECT 컬럼/조인 포함)
@@ -280,7 +305,9 @@ export class MessageModel {
 
       return {
         ...message,
-        messageData: message.messageData ? JSON.parse(message.messageData) : null,
+        messageData: message.messageData
+          ? JSON.parse(message.messageData)
+          : null,
         attachments: attachmentsMap.get(message.id) || [],
         reactions: reactions,
       };
@@ -310,7 +337,9 @@ export class MessageModel {
 
     const updateData = {
       content: data.content || message.content,
-      messageData: data.messageData ? JSON.stringify(data.messageData) : message.messageData,
+      messageData: data.messageData
+        ? JSON.stringify(data.messageData)
+        : message.messageData,
       isEdited: true,
       updatedAt: new Date(),
     };
@@ -325,11 +354,19 @@ export class MessageModel {
     // 권한 확인 (메시지 작성자 또는 채널 관리자)
     const message = await this.knex('chat_messages as m')
       .leftJoin('chat_channel_members as cm', function () {
-        this.on('m.channelId', '=', 'cm.channelId').andOn('cm.userId', '=', userId.toString());
+        this.on('m.channelId', '=', 'cm.channelId').andOn(
+          'cm.userId',
+          '=',
+          userId.toString()
+        );
       })
       .where('m.id', id)
       .andWhere(function () {
-        this.where('m.userId', userId).orWhereIn('cm.role', ['owner', 'admin', 'moderator']);
+        this.where('m.userId', userId).orWhereIn('cm.role', [
+          'owner',
+          'admin',
+          'moderator',
+        ]);
       })
       .first();
 
@@ -351,7 +388,11 @@ export class MessageModel {
     // 권한 확인 (채널 관리자만)
     const message = await this.knex('chat_messages as m')
       .join('chat_channel_members as cm', function () {
-        this.on('m.channelId', '=', 'cm.channelId').andOn('cm.userId', '=', userId.toString());
+        this.on('m.channelId', '=', 'cm.channelId').andOn(
+          'cm.userId',
+          '=',
+          userId.toString()
+        );
       })
       .where('m.id', id)
       .whereIn('cm.role', ['owner', 'admin', 'moderator'])
@@ -389,16 +430,17 @@ export class MessageModel {
         'm.*',
         'u.name as userName',
         'u.avatarUrl as userAvatarUrl',
-        this.knex.raw('MATCH(m.content) AGAINST(? IN NATURAL LANGUAGE MODE) as relevance', [query]),
+        this.knex.raw(
+          'MATCH(m.content) AGAINST(? IN NATURAL LANGUAGE MODE) as relevance',
+          [query]
+        ),
       ])
       .leftJoin('users as u', 'm.userId', 'u.id')
       .where('m.isDeleted', false)
       .andWhere(function () {
-        this.whereRaw('MATCH(m.content) AGAINST(? IN NATURAL LANGUAGE MODE)', [query]).orWhere(
-          'm.content',
-          'like',
-          `%${query}%`
-        );
+        this.whereRaw('MATCH(m.content) AGAINST(? IN NATURAL LANGUAGE MODE)', [
+          query,
+        ]).orWhere('m.content', 'like', `%${query}%`);
       });
 
     // 필터 적용
@@ -449,7 +491,9 @@ export class MessageModel {
       searchQuery = searchQuery.offset(options.offset);
     }
 
-    searchQuery = searchQuery.orderBy('relevance', 'desc').orderBy('m.createdAt', 'desc');
+    searchQuery = searchQuery
+      .orderBy('relevance', 'desc')
+      .orderBy('m.createdAt', 'desc');
 
     const messages = await searchQuery;
     return { messages, total: Number(total) };
@@ -500,7 +544,9 @@ export class MessageModel {
 
       return {
         ...message,
-        messageData: message.messageData ? JSON.parse(message.messageData) : null,
+        messageData: message.messageData
+          ? JSON.parse(message.messageData)
+          : null,
         user: {
           id: message.userId,
           name: message.userName || `User${message.userId}`,
@@ -515,7 +561,9 @@ export class MessageModel {
   }
 
   // 메시지 첨부파일 조회
-  private static async getMessageAttachments(messageId: number): Promise<any[]> {
+  private static async getMessageAttachments(
+    messageId: number
+  ): Promise<any[]> {
     try {
       return await this.knex('chat_message_attachments')
         .where({ messageId, uploadStatus: 'completed' })
@@ -523,7 +571,9 @@ export class MessageModel {
     } catch (error: any) {
       // 테이블이 없으면 빈 배열 반환
       if (error.code === 'ER_NO_SUCH_TABLE') {
-        console.log('chat_message_attachments table does not exist, returning empty array');
+        console.log(
+          'chat_message_attachments table does not exist, returning empty array'
+        );
         return [];
       }
       throw error;
@@ -531,7 +581,9 @@ export class MessageModel {
   }
 
   // 여러 메시지의 첨부파일 조회
-  private static async getMessagesAttachments(messageIds: number[]): Promise<Map<number, any[]>> {
+  private static async getMessagesAttachments(
+    messageIds: number[]
+  ): Promise<Map<number, any[]>> {
     if (messageIds.length === 0) return new Map();
 
     const attachments = await this.knex('chat_message_attachments')
@@ -574,7 +626,9 @@ export class MessageModel {
   }
 
   // 여러 메시지의 반응 조회
-  private static async getMessagesReactions(messageIds: number[]): Promise<Map<number, any[]>> {
+  private static async getMessagesReactions(
+    messageIds: number[]
+  ): Promise<Map<number, any[]>> {
     if (messageIds.length === 0) return new Map();
 
     console.log('🔍 Querying reactions for messages:', messageIds);
@@ -628,7 +682,9 @@ export class MessageModel {
         this.knex.raw(
           'COUNT(CASE WHEN createdAt >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 END) as messagesThisWeek'
         ),
-        this.knex.raw('COUNT(CASE WHEN contentType != "text" THEN 1 END) as mediaMessages'),
+        this.knex.raw(
+          'COUNT(CASE WHEN contentType != "text" THEN 1 END) as mediaMessages'
+        ),
         this.knex.raw('MAX(createdAt) as lastMessageAt'),
       ])
       .where({ channelId, isDeleted: false })
@@ -636,7 +692,10 @@ export class MessageModel {
   }
 
   // 배치 삭제
-  static async batchDelete(messageIds: number[], userId: number): Promise<number> {
+  static async batchDelete(
+    messageIds: number[],
+    userId: number
+  ): Promise<number> {
     // 권한 확인은 각 메시지별로 수행해야 함
     const result = await this.knex('chat_messages')
       .whereIn('id', messageIds)
@@ -668,7 +727,9 @@ export class MessageModel {
 
     return {
       threadCount: threadCount ? Number(threadCount.count) : 0,
-      lastThreadMessageAt: lastThreadMessage ? lastThreadMessage.createdAt : null,
+      lastThreadMessageAt: lastThreadMessage
+        ? lastThreadMessage.createdAt
+        : null,
     };
   }
 }

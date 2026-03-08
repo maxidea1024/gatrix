@@ -40,13 +40,18 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
-import { unknownFlagService, UnknownFlag } from '../../services/unknownFlagService';
+import {
+  unknownFlagService,
+  UnknownFlag,
+} from '../../services/unknownFlagService';
 import RelativeTime from '../../components/common/RelativeTime';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '../../components/common/ColumnSettingsDialog';
 import HelpTip from '../../components/common/HelpTip';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -79,14 +84,19 @@ const UnknownFlagsPage: React.FC = () => {
   }>({ open: false, type: 'resolve', flag: null });
 
   // Column settings state
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<null | HTMLElement>(null);
   const defaultColumns: ColumnConfig[] = [
     { id: 'flagName', labelKey: 'featureFlags.flagName', visible: true },
     { id: 'environment', labelKey: 'common.environment', visible: true },
     { id: 'appName', labelKey: 'featureFlags.appName', visible: true },
     { id: 'sdkVersion', labelKey: 'featureFlags.sdkVersion', visible: true },
     { id: 'accessCount', labelKey: 'featureFlags.accessCount', visible: true },
-    { id: 'lastReportedAt', labelKey: 'featureFlags.lastReported', visible: true },
+    {
+      id: 'lastReportedAt',
+      labelKey: 'featureFlags.lastReported',
+      visible: true,
+    },
     { id: 'status', labelKey: 'common.status', visible: true },
   ];
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
@@ -126,14 +136,24 @@ const UnknownFlagsPage: React.FC = () => {
             value: 'unresolved',
             label: t('featureFlags.unresolved'),
             icon: (
-              <Chip size="small" color="warning" label="" sx={{ width: 16, height: 16, p: 0 }} />
+              <Chip
+                size="small"
+                color="warning"
+                label=""
+                sx={{ width: 16, height: 16, p: 0 }}
+              />
             ),
           },
           {
             value: 'resolved',
             label: t('featureFlags.resolved'),
             icon: (
-              <Chip size="small" color="success" label="" sx={{ width: 16, height: 16, p: 0 }} />
+              <Chip
+                size="small"
+                color="success"
+                label=""
+                sx={{ width: 16, height: 16, p: 0 }}
+              />
             ),
           },
         ],
@@ -147,7 +167,9 @@ const UnknownFlagsPage: React.FC = () => {
     try {
       // Determine includeResolved based on filter
       const includeResolved =
-        statusFilter?.includes('resolved') || statusFilter?.length === 2 || !statusFilter;
+        statusFilter?.includes('resolved') ||
+        statusFilter?.length === 2 ||
+        !statusFilter;
       const result = await unknownFlagService.getUnknownFlags(
         {
           includeResolved,
@@ -172,12 +194,20 @@ const UnknownFlagsPage: React.FC = () => {
     setActiveFilters((prev) => {
       const existing = prev.find((f) => f.key === key);
       if (existing) {
-        if (value === undefined || value === null || (Array.isArray(value) && value.length === 0)) {
+        if (
+          value === undefined ||
+          value === null ||
+          (Array.isArray(value) && value.length === 0)
+        ) {
           return prev.filter((f) => f.key !== key);
         }
         return prev.map((f) => (f.key === key ? { ...f, value } : f));
       }
-      if (value === undefined || value === null || (Array.isArray(value) && value.length === 0)) {
+      if (
+        value === undefined ||
+        value === null ||
+        (Array.isArray(value) && value.length === 0)
+      ) {
         return prev;
       }
       return [...prev, { key, value, label: key }];
@@ -217,7 +247,9 @@ const UnknownFlagsPage: React.FC = () => {
     if (debouncedSearchTerm) {
       const lower = debouncedSearchTerm.toLowerCase();
       result = result.filter(
-        (f) => f.flagName.toLowerCase().includes(lower) || f.appName?.toLowerCase().includes(lower)
+        (f) =>
+          f.flagName.toLowerCase().includes(lower) ||
+          f.appName?.toLowerCase().includes(lower)
       );
     }
 
@@ -233,7 +265,10 @@ const UnknownFlagsPage: React.FC = () => {
     return result;
   }, [flags, debouncedSearchTerm, statusFilter]);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, flag: UnknownFlag) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    flag: UnknownFlag
+  ) => {
     setMenuAnchorEl(event.currentTarget);
     setSelectedFlag(flag);
   };
@@ -243,7 +278,9 @@ const UnknownFlagsPage: React.FC = () => {
     setSelectedFlag(null);
   };
 
-  const handleOpenConfirmDialog = (type: 'resolve' | 'unresolve' | 'delete') => {
+  const handleOpenConfirmDialog = (
+    type: 'resolve' | 'unresolve' | 'delete'
+  ) => {
     setConfirmDialog({ open: true, type, flag: selectedFlag });
     handleMenuClose();
   };
@@ -258,15 +295,28 @@ const UnknownFlagsPage: React.FC = () => {
     try {
       switch (confirmDialog.type) {
         case 'resolve':
-          await unknownFlagService.resolveUnknownFlag(confirmDialog.flag.id, projectApiPath);
-          enqueueSnackbar(t('featureFlags.resolvedSuccessfully'), { variant: 'success' });
+          await unknownFlagService.resolveUnknownFlag(
+            confirmDialog.flag.id,
+            projectApiPath
+          );
+          enqueueSnackbar(t('featureFlags.resolvedSuccessfully'), {
+            variant: 'success',
+          });
           break;
         case 'unresolve':
-          await unknownFlagService.unresolveUnknownFlag(confirmDialog.flag.id, projectApiPath);
-          enqueueSnackbar(t('featureFlags.unresolvedSuccessfully'), { variant: 'success' });
+          await unknownFlagService.unresolveUnknownFlag(
+            confirmDialog.flag.id,
+            projectApiPath
+          );
+          enqueueSnackbar(t('featureFlags.unresolvedSuccessfully'), {
+            variant: 'success',
+          });
           break;
         case 'delete':
-          await unknownFlagService.deleteUnknownFlag(confirmDialog.flag.id, projectApiPath);
+          await unknownFlagService.deleteUnknownFlag(
+            confirmDialog.flag.id,
+            projectApiPath
+          );
           enqueueSnackbar(t('common.deleted'), { variant: 'success' });
           break;
       }
@@ -307,7 +357,8 @@ const UnknownFlagsPage: React.FC = () => {
   const handleCopyFlagName = (flagName: string) => {
     copyToClipboardWithNotification(
       flagName,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -422,7 +473,11 @@ const UnknownFlagsPage: React.FC = () => {
                     {visibleColumns.map((col) => (
                       <TableCell
                         key={col.id}
-                        align={col.id === 'accessCount' || col.id === 'status' ? 'center' : 'left'}
+                        align={
+                          col.id === 'accessCount' || col.id === 'status'
+                            ? 'center'
+                            : 'left'
+                        }
                       >
                         {t(col.labelKey)}
                       </TableCell>
@@ -438,16 +493,33 @@ const UnknownFlagsPage: React.FC = () => {
                           case 'flagName':
                             return (
                               <TableCell key={col.id}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <UnknownIcon fontSize="small" color="warning" />
-                                  <Typography fontWeight={500} sx={{ fontFamily: 'monospace' }}>
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                  }}
+                                >
+                                  <UnknownIcon
+                                    fontSize="small"
+                                    color="warning"
+                                  />
+                                  <Typography
+                                    fontWeight={500}
+                                    sx={{ fontFamily: 'monospace' }}
+                                  >
                                     {flag.flagName}
                                   </Typography>
                                   <Tooltip title={t('common.copy')}>
                                     <IconButton
                                       size="small"
-                                      onClick={() => handleCopyFlagName(flag.flagName)}
-                                      sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
+                                      onClick={() =>
+                                        handleCopyFlagName(flag.flagName)
+                                      }
+                                      sx={{
+                                        opacity: 0.6,
+                                        '&:hover': { opacity: 1 },
+                                      }}
                                     >
                                       <CopyIcon fontSize="small" />
                                     </IconButton>
@@ -476,7 +548,10 @@ const UnknownFlagsPage: React.FC = () => {
                                     sx={{ borderRadius: '16px' }}
                                   />
                                 ) : (
-                                  <Typography variant="body2" color="text.secondary">
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
                                     -
                                   </Typography>
                                 )}
@@ -485,7 +560,10 @@ const UnknownFlagsPage: React.FC = () => {
                           case 'sdkVersion':
                             return (
                               <TableCell key={col.id}>
-                                <Typography variant="body2" color="text.secondary">
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
                                   {flag.sdkVersion || '-'}
                                 </Typography>
                               </TableCell>
@@ -527,7 +605,10 @@ const UnknownFlagsPage: React.FC = () => {
                         }
                       })}
                       <TableCell align="center">
-                        <IconButton size="small" onClick={(e) => handleMenuOpen(e, flag)}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleMenuOpen(e, flag)}
+                        >
                           <MoreVertIcon />
                         </IconButton>
                       </TableCell>
@@ -541,7 +622,11 @@ const UnknownFlagsPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+      >
         {selectedFlag && !selectedFlag.isResolved && (
           <MenuItem onClick={() => handleOpenConfirmDialog('resolve')}>
             <ListItemIcon>
@@ -582,7 +667,9 @@ const UnknownFlagsPage: React.FC = () => {
           <DialogContentText>{dialogContent.message}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseConfirmDialog}>{t('common.cancel')}</Button>
+          <Button onClick={handleCloseConfirmDialog}>
+            {t('common.cancel')}
+          </Button>
           <Button
             onClick={handleConfirmAction}
             color={confirmDialog.type === 'delete' ? 'error' : 'primary'}

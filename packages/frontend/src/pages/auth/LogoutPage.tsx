@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Box, Typography, Button, CircularProgress, Alert, useTheme } from '@mui/material';
-import { Logout as LogoutIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  Alert,
+  useTheme,
+} from '@mui/material';
+import {
+  Logout as LogoutIcon,
+  CheckCircle as CheckCircleIcon,
+} from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSnackbar } from 'notistack';
 import AuthLayout from '@/components/auth/AuthLayout';
@@ -157,7 +167,9 @@ const LogoutPage: React.FC = () => {
           sx={{
             mb: 3,
             backgroundColor:
-              theme.palette.mode === 'dark' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(244, 67, 54, 0.05)',
+              theme.palette.mode === 'dark'
+                ? 'rgba(244, 67, 54, 0.1)'
+                : 'rgba(244, 67, 54, 0.05)',
             color: 'error.main',
             border: `1px solid ${theme.palette.error.main}20`,
             '& .MuiAlert-icon': {
@@ -187,7 +199,11 @@ const LogoutPage: React.FC = () => {
           onClick={handleLogout}
           disabled={isLoggingOut}
           startIcon={
-            isLoggingOut ? <CircularProgress size={20} sx={{ color: 'inherit' }} /> : <LogoutIcon />
+            isLoggingOut ? (
+              <CircularProgress size={20} sx={{ color: 'inherit' }} />
+            ) : (
+              <LogoutIcon />
+            )
           }
           fullWidth
           sx={{
@@ -212,7 +228,9 @@ const LogoutPage: React.FC = () => {
             fontWeight: 600,
           }}
         >
-          {isLoggingOut ? t('auth.logout.processing') : t('auth.logout.confirm')}
+          {isLoggingOut
+            ? t('auth.logout.processing')
+            : t('auth.logout.confirm')}
         </Button>
 
         <Button

@@ -104,7 +104,11 @@ export interface PermissionReference {
 
 export interface EffectivePermissions {
   own: string[];
-  inherited: Array<{ permission: string; fromRoleId: string; fromRoleName: string }>;
+  inherited: Array<{
+    permission: string;
+    fromRoleId: string;
+    fromRoleName: string;
+  }>;
 }
 
 // ==================== Service ====================
@@ -193,7 +197,11 @@ export const rbacService = {
 
   // ─── Group Members ─────────────────────────
 
-  async addGroupMember(groupId: string, userId: string, isGroupAdmin?: boolean): Promise<void> {
+  async addGroupMember(
+    groupId: string,
+    userId: string,
+    isGroupAdmin?: boolean
+  ): Promise<void> {
     await api.post(`${BASE}/groups/${groupId}/members`, {
       userId,
       isGroupAdmin: isGroupAdmin || false,
@@ -214,8 +222,12 @@ export const rbacService = {
     await api.delete(`${BASE}/groups/${groupId}/roles/${roleId}`);
   },
 
-  async getGroupEffectivePermissions(groupId: string): Promise<EffectivePermissions> {
-    const res = await api.get(`${BASE}/groups/${groupId}/effective-permissions`);
+  async getGroupEffectivePermissions(
+    groupId: string
+  ): Promise<EffectivePermissions> {
+    const res = await api.get(
+      `${BASE}/groups/${groupId}/effective-permissions`
+    );
     return res.data;
   },
 
@@ -246,7 +258,10 @@ export const rbacService = {
     userId: string,
     orgRole: 'admin' | 'user' = 'user'
   ): Promise<void> {
-    await api.post(`${BASE}/organisations/${orgId}/members`, { userId, orgRole });
+    await api.post(`${BASE}/organisations/${orgId}/members`, {
+      userId,
+      orgRole,
+    });
   },
 
   async removeOrgMember(orgId: string, userId: string): Promise<void> {
@@ -258,7 +273,9 @@ export const rbacService = {
     userId: string,
     orgRole: 'admin' | 'user'
   ): Promise<void> {
-    await api.put(`${BASE}/organisations/${orgId}/members/${userId}`, { orgRole });
+    await api.put(`${BASE}/organisations/${orgId}/members/${userId}`, {
+      orgRole,
+    });
   },
 
   // ─── Project Members ─────────────────────────
@@ -273,7 +290,10 @@ export const rbacService = {
     userId: string,
     projectRole: 'admin' | 'member' = 'member'
   ): Promise<void> {
-    await api.post(`${BASE}/projects/${projectId}/members`, { userId, projectRole });
+    await api.post(`${BASE}/projects/${projectId}/members`, {
+      userId,
+      projectRole,
+    });
   },
 
   async removeProjectMember(projectId: string, userId: string): Promise<void> {
@@ -285,7 +305,9 @@ export const rbacService = {
     userId: string,
     projectRole: 'admin' | 'member'
   ): Promise<void> {
-    await api.put(`${BASE}/projects/${projectId}/members/${userId}`, { projectRole });
+    await api.put(`${BASE}/projects/${projectId}/members/${userId}`, {
+      projectRole,
+    });
   },
 
   // ─── Admin API Tokens ─────────────────────────
@@ -339,12 +361,20 @@ export const rbacService = {
     return res.data;
   },
 
-  async addRoleInheritance(roleId: string, parentRoleId: string): Promise<{ id: string }> {
-    const res = await api.post(`${BASE}/roles/${roleId}/inheritance`, { parentRoleId });
+  async addRoleInheritance(
+    roleId: string,
+    parentRoleId: string
+  ): Promise<{ id: string }> {
+    const res = await api.post(`${BASE}/roles/${roleId}/inheritance`, {
+      parentRoleId,
+    });
     return res.data;
   },
 
-  async removeRoleInheritance(roleId: string, inheritanceId: string): Promise<void> {
+  async removeRoleInheritance(
+    roleId: string,
+    inheritanceId: string
+  ): Promise<void> {
     await api.delete(`${BASE}/roles/${roleId}/inheritance/${inheritanceId}`);
   },
 };

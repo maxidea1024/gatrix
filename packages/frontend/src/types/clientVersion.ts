@@ -16,7 +16,8 @@ export const ClientStatusLabels: Record<ClientStatus, string> = {
   [ClientStatus.RECOMMENDED_UPDATE]: 'clientVersions.status.recommendedUpdate',
   [ClientStatus.FORCED_UPDATE]: 'clientVersions.status.forcedUpdate',
   [ClientStatus.UNDER_REVIEW]: 'clientVersions.status.underReview',
-  [ClientStatus.BLOCKED_PATCH_ALLOWED]: 'clientVersions.status.blockedPatchAllowed',
+  [ClientStatus.BLOCKED_PATCH_ALLOWED]:
+    'clientVersions.status.blockedPatchAllowed',
   [ClientStatus.MAINTENANCE]: 'clientVersions.status.maintenance',
 };
 

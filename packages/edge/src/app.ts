@@ -47,7 +47,9 @@ app.use(
     },
     // Disable HTTPS-related headers for HTTP environments
     hsts: forceHttps, // HTTP Strict Transport Security
-    crossOriginOpenerPolicy: forceHttps ? { policy: 'same-origin' as const } : false,
+    crossOriginOpenerPolicy: forceHttps
+      ? { policy: 'same-origin' as const }
+      : false,
     crossOriginEmbedderPolicy: false, // Disable to allow loading external resources
     originAgentCluster: false, // Disable to avoid origin-keying issues in HTTP
   })
@@ -74,11 +76,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
   res.on('finish', () => {
     const duration = Date.now() - start;
-    const bytesSent = parseInt((res.getHeader('content-length') as string) || '0', 10);
+    const bytesSent = parseInt(
+      (res.getHeader('content-length') as string) || '0',
+      10
+    );
 
     // Normalize path for stats (remove dynamic segments like IDs)
     const path =
-      req.route?.path || req.path.replace(/\/[0-9a-f-]{36}/gi, '/:id').replace(/\/\d+/g, '/:id');
+      req.route?.path ||
+      req.path.replace(/\/[0-9a-f-]{36}/gi, '/:id').replace(/\/\d+/g, '/:id');
 
     // Record stats and check if should log (rate limited)
     const shouldLog = requestStats.record(
@@ -92,7 +98,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
     // Rate-limited logging
     if (shouldLog) {
-      logger.debug(`${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`);
+      logger.debug(
+        `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`
+      );
     }
   });
   next();
@@ -100,8 +108,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // Use SDK HTTP metrics middleware (public scope)
 // We use a lazy-initialized middleware to ensure it's created only once after the SDK is ready
-let httpMetricsMiddleware: ((req: Request, res: Response, next: NextFunction) => void) | null =
-  null;
+let httpMetricsMiddleware:
+  | ((req: Request, res: Response, next: NextFunction) => void)
+  | null = null;
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   if (!httpMetricsMiddleware) {

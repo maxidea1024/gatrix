@@ -75,8 +75,11 @@ export default class ServerFeatureFlagController {
       const projectId = req.apiToken?.projectId;
 
       // Record network traffic (fire-and-forget)
-      const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      networkTrafficService.recordTraffic(environmentId, appName, 'features').catch(() => {});
+      const appName =
+        (req.headers['x-application-name'] as string) || 'unknown';
+      networkTrafficService
+        .recordTraffic(environmentId, appName, 'features')
+        .catch(() => {});
 
       // Parse optional flagNames filter (comma-separated query parameter)
       const flagNamesParam = req.query.flagNames as string | undefined;
@@ -105,85 +108,96 @@ export default class ServerFeatureFlagController {
 
       // Get strategies and variants for each flag
       const flags: EvaluationFlag[] = await Promise.all(
-        rawFlags.map(async (flag: FeatureFlagAttributes & { isEnabled: boolean }) => {
-          const envOverride = flag.environments?.find((e) => e.environmentId === environmentId);
+        rawFlags.map(
+          async (flag: FeatureFlagAttributes & { isEnabled: boolean }) => {
+            const envOverride = flag.environments?.find(
+              (e) => e.environmentId === environmentId
+            );
 
-          // In compact mode, skip DB queries for disabled flags entirely
-          if (compact && !flag.isEnabled) {
+            // In compact mode, skip DB queries for disabled flags entirely
+            if (compact && !flag.isEnabled) {
+              return {
+                id: flag.id,
+                name: flag.flagName,
+                isEnabled: false,
+                impressionDataEnabled: flag.impressionDataEnabled,
+                valueType: flag.valueType,
+                disabledValue: envOverride?.overrideDisabledValue
+                  ? envOverride.disabledValue
+                  : flag.disabledValue,
+                valueSource: envOverride?.overrideDisabledValue
+                  ? 'environment'
+                  : 'flag',
+                version: flag.version,
+                compact: true,
+              };
+            }
+
+            const strategies =
+              await FeatureStrategyModel.findByFlagIdAndEnvironment(
+                flag.id,
+                environmentId
+              );
+            const variants =
+              await FeatureVariantModel.findByFlagIdAndEnvironment(
+                flag.id,
+                environmentId
+              );
+
+            // Transform to minimal evaluation format
+            const evaluationStrategies: EvaluationStrategy[] = strategies
+              .sort(
+                (a: FeatureStrategyAttributes, b: FeatureStrategyAttributes) =>
+                  a.sortOrder - b.sortOrder
+              )
+              .map((s: FeatureStrategyAttributes) => {
+                // s.segments is already string[] from enrichStrategiesWithSegments
+                const segmentNames: string[] = s.segments || [];
+                // Collect for referenced segments lookup
+                segmentNames.forEach((name) =>
+                  referencedSegmentNames.add(name)
+                );
+
+                return {
+                  name: s.strategyName,
+                  parameters: s.parameters,
+                  constraints: s.constraints || [],
+                  segments: segmentNames, // Segment names only
+                  isEnabled: s.isEnabled,
+                };
+              });
+
+            const evaluationVariants: EvaluationVariant[] = variants.map(
+              (v: FeatureVariantAttributes) => ({
+                name: v.variantName,
+                weight: v.weight,
+                value: v.value,
+              })
+            );
+
+            const hasEnvOverride =
+              envOverride?.overrideEnabledValue ||
+              envOverride?.overrideDisabledValue;
+
             return {
               id: flag.id,
               name: flag.flagName,
-              isEnabled: false,
+              isEnabled: flag.isEnabled,
               impressionDataEnabled: flag.impressionDataEnabled,
+              strategies: evaluationStrategies,
+              variants: evaluationVariants,
               valueType: flag.valueType,
+              enabledValue: envOverride?.overrideEnabledValue
+                ? envOverride.enabledValue
+                : flag.enabledValue,
               disabledValue: envOverride?.overrideDisabledValue
                 ? envOverride.disabledValue
                 : flag.disabledValue,
-              valueSource: envOverride?.overrideDisabledValue ? 'environment' : 'flag',
+              valueSource: hasEnvOverride ? 'environment' : 'flag',
               version: flag.version,
-              compact: true,
             };
           }
-
-          const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
-            flag.id,
-            environmentId
-          );
-          const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(
-            flag.id,
-            environmentId
-          );
-
-          // Transform to minimal evaluation format
-          const evaluationStrategies: EvaluationStrategy[] = strategies
-            .sort(
-              (a: FeatureStrategyAttributes, b: FeatureStrategyAttributes) =>
-                a.sortOrder - b.sortOrder
-            )
-            .map((s: FeatureStrategyAttributes) => {
-              // s.segments is already string[] from enrichStrategiesWithSegments
-              const segmentNames: string[] = s.segments || [];
-              // Collect for referenced segments lookup
-              segmentNames.forEach((name) => referencedSegmentNames.add(name));
-
-              return {
-                name: s.strategyName,
-                parameters: s.parameters,
-                constraints: s.constraints || [],
-                segments: segmentNames, // Segment names only
-                isEnabled: s.isEnabled,
-              };
-            });
-
-          const evaluationVariants: EvaluationVariant[] = variants.map(
-            (v: FeatureVariantAttributes) => ({
-              name: v.variantName,
-              weight: v.weight,
-              value: v.value,
-            })
-          );
-
-          const hasEnvOverride =
-            envOverride?.overrideEnabledValue || envOverride?.overrideDisabledValue;
-
-          return {
-            id: flag.id,
-            name: flag.flagName,
-            isEnabled: flag.isEnabled,
-            impressionDataEnabled: flag.impressionDataEnabled,
-            strategies: evaluationStrategies,
-            variants: evaluationVariants,
-            valueType: flag.valueType,
-            enabledValue: envOverride?.overrideEnabledValue
-              ? envOverride.enabledValue
-              : flag.enabledValue,
-            disabledValue: envOverride?.overrideDisabledValue
-              ? envOverride.disabledValue
-              : flag.disabledValue,
-            valueSource: hasEnvOverride ? 'environment' : 'flag',
-            version: flag.version,
-          };
-        })
+        )
       );
 
       // Fetch only referenced segments (project-scoped)
@@ -200,7 +214,8 @@ export default class ServerFeatureFlagController {
         }));
       }
 
-      const data: { flags: EvaluationFlag[]; segments?: EvaluationSegment[] } = { flags };
+      const data: { flags: EvaluationFlag[]; segments?: EvaluationSegment[] } =
+        { flags };
       if (segments.length > 0) {
         data.segments = segments;
       }
@@ -249,7 +264,9 @@ export default class ServerFeatureFlagController {
 
       // In compact mode, skip DB queries for disabled flags entirely
       if (compact && !flag.isEnabled) {
-        const envOverride = flag.environments?.find((e) => e.environmentId === environmentId);
+        const envOverride = flag.environments?.find(
+          (e) => e.environmentId === environmentId
+        );
 
         res.json({
           success: true,
@@ -263,7 +280,9 @@ export default class ServerFeatureFlagController {
               disabledValue: envOverride?.overrideDisabledValue
                 ? envOverride.disabledValue
                 : flag.disabledValue,
-              valueSource: envOverride?.overrideDisabledValue ? 'environment' : 'flag',
+              valueSource: envOverride?.overrideDisabledValue
+                ? 'environment'
+                : 'flag',
               version: flag.version,
               compact: true,
             },
@@ -276,7 +295,10 @@ export default class ServerFeatureFlagController {
         flag.id,
         environmentId
       );
-      const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environmentId);
+      const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(
+        flag.id,
+        environmentId
+      );
 
       const evaluationFlag: EvaluationFlag = {
         id: flag.id,
@@ -302,12 +324,20 @@ export default class ServerFeatureFlagController {
         })),
         valueType: flag.valueType,
         enabledValue: (() => {
-          const env = flag.environments?.find((e) => e.environmentId === environmentId);
-          return env?.overrideEnabledValue ? env.enabledValue : flag.enabledValue;
+          const env = flag.environments?.find(
+            (e) => e.environmentId === environmentId
+          );
+          return env?.overrideEnabledValue
+            ? env.enabledValue
+            : flag.enabledValue;
         })(),
         disabledValue: (() => {
-          const env = flag.environments?.find((e) => e.environmentId === environmentId);
-          return env?.overrideDisabledValue ? env.disabledValue : flag.disabledValue;
+          const env = flag.environments?.find(
+            (e) => e.environmentId === environmentId
+          );
+          return env?.overrideDisabledValue
+            ? env.disabledValue
+            : flag.disabledValue;
         })(),
         version: flag.version,
       };
@@ -318,7 +348,9 @@ export default class ServerFeatureFlagController {
       });
     } catch (error: any) {
       logger.error('Error fetching feature flag:', error);
-      res.status(500).json({ success: false, error: 'Failed to fetch feature flag' });
+      res
+        .status(500)
+        .json({ success: false, error: 'Failed to fetch feature flag' });
     }
   }
 
@@ -333,9 +365,12 @@ export default class ServerFeatureFlagController {
       const projectId = req.apiToken?.projectId;
 
       // Record network traffic (fire-and-forget)
-      const appName = (req.headers['x-application-name'] as string) || 'unknown';
+      const appName =
+        (req.headers['x-application-name'] as string) || 'unknown';
       const environmentId = req.environmentId!;
-      networkTrafficService.recordTraffic(environmentId, appName, 'segments').catch(() => {});
+      networkTrafficService
+        .recordTraffic(environmentId, appName, 'segments')
+        .catch(() => {});
 
       // Parse optional segmentNames filter (comma-separated query parameter)
       const segmentNamesParam = req.query.segmentNames as string | undefined;
@@ -362,7 +397,12 @@ export default class ServerFeatureFlagController {
         data: { segments },
       });
     } catch (error: any) {
-      sendInternalError(res, 'Failed to fetch segments', error, ErrorCodes.RESOURCE_FETCH_FAILED);
+      sendInternalError(
+        res,
+        'Failed to fetch segments',
+        error,
+        ErrorCodes.RESOURCE_FETCH_FAILED
+      );
     }
   }
 
@@ -379,7 +419,9 @@ export default class ServerFeatureFlagController {
       const appName = req.headers['x-application-name'] as string | undefined;
 
       if (!Array.isArray(metrics)) {
-        res.status(400).json({ success: false, error: 'metrics must be an array' });
+        res
+          .status(400)
+          .json({ success: false, error: 'metrics must be an array' });
         return;
       }
 
@@ -387,7 +429,8 @@ export default class ServerFeatureFlagController {
       const reportedAt = bucket?.stop || timestamp;
       // bucket.start is used for more accurate hourBucket calculation
       const bucketStart = bucket?.start;
-      const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
+      const sdkVersion =
+        (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
 
       // Process aggregated metrics via queue with appName and bucket info
       await featureMetricsService.processAggregatedMetrics(
@@ -402,7 +445,9 @@ export default class ServerFeatureFlagController {
       res.json({ success: true });
     } catch (error: any) {
       logger.error('Error processing metrics:', error);
-      res.status(500).json({ success: false, error: 'Failed to process metrics' });
+      res
+        .status(500)
+        .json({ success: false, error: 'Failed to process metrics' });
     }
   }
 
@@ -410,13 +455,18 @@ export default class ServerFeatureFlagController {
    * Report unknown flag access from SDK
    * POST /api/v1/server/:env/features/unknown
    */
-  static async reportUnknownFlag(req: SDKRequest, res: Response): Promise<void> {
+  static async reportUnknownFlag(
+    req: SDKRequest,
+    res: Response
+  ): Promise<void> {
     try {
       const { flagName } = req.body;
       // environmentId is resolved from token by setSDKEnvironment middleware
       const environmentId = req.environmentId!;
-      const appName = (req.headers['x-application-name'] as string) || req.body.appName;
-      const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
+      const appName =
+        (req.headers['x-application-name'] as string) || req.body.appName;
+      const sdkVersion =
+        (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
 
       if (!flagName || typeof flagName !== 'string') {
         res.status(400).json({ success: false, error: 'flagName is required' });
@@ -424,7 +474,8 @@ export default class ServerFeatureFlagController {
       }
 
       // Import and use unknown flag service
-      const { unknownFlagService } = await import('../services/unknown-flag-service');
+      const { unknownFlagService } =
+        await import('../services/unknown-flag-service');
       await unknownFlagService.reportUnknownFlag({
         flagName,
         environmentId,
@@ -435,7 +486,9 @@ export default class ServerFeatureFlagController {
       res.json({ success: true });
     } catch (error: any) {
       logger.error('Error reporting unknown flag:', error);
-      res.status(500).json({ success: false, error: 'Failed to report unknown flag' });
+      res
+        .status(500)
+        .json({ success: false, error: 'Failed to report unknown flag' });
     }
   }
 
@@ -444,12 +497,20 @@ export default class ServerFeatureFlagController {
    * GET /api/v1/server/features/definitions
    * Returns lightweight flag definitions for code scanner tools
    */
-  static async getFlagDefinitions(req: SDKRequest, res: Response): Promise<void> {
+  static async getFlagDefinitions(
+    req: SDKRequest,
+    res: Response
+  ): Promise<void> {
     try {
       // Get projectId from API token for project-level scoping
       const projectId = req.apiToken?.projectId;
 
-      let query = db('g_feature_flags').select('flagName', 'flagType', 'valueType', 'isArchived');
+      let query = db('g_feature_flags').select(
+        'flagName',
+        'flagType',
+        'valueType',
+        'isArchived'
+      );
 
       if (projectId) {
         query = query.where('projectId', projectId);
@@ -457,7 +518,10 @@ export default class ServerFeatureFlagController {
 
       const rows = await query;
 
-      const flags: Record<string, { type: string; flagType: string; archived: boolean }> = {};
+      const flags: Record<
+        string,
+        { type: string; flagType: string; archived: boolean }
+      > = {};
       for (const row of rows) {
         // Map valueType to scanner-compatible type
         const typeMap: Record<string, string> = {
@@ -492,14 +556,20 @@ export default class ServerFeatureFlagController {
    * Receive code references report from scanner tool
    * POST /api/v1/server/features/code-references/report
    */
-  static async receiveCodeReferences(req: SDKRequest, res: Response): Promise<void> {
+  static async receiveCodeReferences(
+    req: SDKRequest,
+    res: Response
+  ): Promise<void> {
     try {
       const report = req.body;
 
       if (!report || !report.usages) {
         res
           .status(400)
-          .json({ success: false, error: 'Invalid report format: usages array required' });
+          .json({
+            success: false,
+            error: 'Invalid report format: usages array required',
+          });
         return;
       }
 
@@ -507,7 +577,9 @@ export default class ServerFeatureFlagController {
       const branch = report.metadata?.branch || 'unknown';
       const commitHash = report.metadata?.commit || null;
       const scanId = report.metadata?.scanId || `scan-${Date.now()}`;
-      const scanTime = report.metadata?.scanTime ? new Date(report.metadata.scanTime) : new Date();
+      const scanTime = report.metadata?.scanTime
+        ? new Date(report.metadata.scanTime)
+        : new Date();
 
       // Map usages to code reference records
       const references = report.usages.map((usage: any) => ({
@@ -529,7 +601,8 @@ export default class ServerFeatureFlagController {
         scanTime,
       }));
 
-      const { FeatureCodeReferenceModel } = await import('../models/feature-code-reference');
+      const { FeatureCodeReferenceModel } =
+        await import('../models/feature-code-reference');
       const insertedCount = await FeatureCodeReferenceModel.replaceForScan(
         scanId,
         repository,
@@ -557,7 +630,10 @@ export default class ServerFeatureFlagController {
           userAgent: req.get('user-agent'),
         });
       } catch (logError) {
-        logger.error('Failed to create audit log for code references:', logError);
+        logger.error(
+          'Failed to create audit log for code references:',
+          logError
+        );
       }
 
       res.json({
@@ -570,8 +646,14 @@ export default class ServerFeatureFlagController {
         },
       });
     } catch (error: any) {
-      logger.error('Error receiving code references:', error.message, error.stack);
-      res.status(500).json({ success: false, error: 'Failed to store code references' });
+      logger.error(
+        'Error receiving code references:',
+        error.message,
+        error.stack
+      );
+      res
+        .status(500)
+        .json({ success: false, error: 'Failed to store code references' });
     }
   }
 }

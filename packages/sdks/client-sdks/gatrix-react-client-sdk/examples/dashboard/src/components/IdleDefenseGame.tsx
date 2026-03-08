@@ -1,13 +1,29 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { useGatrixClient, useGatrixContext } from '@gatrix/gatrix-react-client-sdk';
-import { createInitialState, tick, useSkill as engineUseSkill } from './idle-defense/GameEngine';
+import {
+  useGatrixClient,
+  useGatrixContext,
+} from '@gatrix/gatrix-react-client-sdk';
+import {
+  createInitialState,
+  tick,
+  useSkill as engineUseSkill,
+} from './idle-defense/GameEngine';
 import type { GameState } from './idle-defense/GameEngine';
 import type { FeatureFlagReader } from './idle-defense/GameEngine';
-import { createRenderer, renderFrame, destroyRenderer } from './idle-defense/GameRenderer';
+import {
+  createRenderer,
+  renderFrame,
+  destroyRenderer,
+} from './idle-defense/GameRenderer';
 import type { RendererObjects } from './idle-defense/GameRenderer';
 import type { UIPanel } from './idle-defense/GameTypes';
 import { shopItemToInventory } from './idle-defense/GameData';
-import { InventoryPanel, ShopPanel, MailPanel, GameHUD } from './idle-defense/GameUI';
+import {
+  InventoryPanel,
+  ShopPanel,
+  MailPanel,
+  GameHUD,
+} from './idle-defense/GameUI';
 
 interface IdleDefenseGameProps {
   onExit: () => void;
@@ -49,8 +65,10 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
   // Feature flag reader adapter
   const flagReader = useCallback(
     (): FeatureFlagReader => ({
-      boolVariation: (key: string, def: boolean) => client.features.boolVariation(key, def),
-      numberVariation: (key: string, def: number) => client.features.numberVariation(key, def),
+      boolVariation: (key: string, def: boolean) =>
+        client.features.boolVariation(key, def),
+      numberVariation: (key: string, def: number) =>
+        client.features.numberVariation(key, def),
     }),
     [client]
   );
@@ -143,7 +161,9 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
       if (idx < 0) return;
       const item = gs.inventory[idx];
       gs.hero.gold += item.sellPrice * item.quantity;
-      addLog(`?�� Sold ${item.icon} ${item.name} for ${item.sellPrice * item.quantity}G`);
+      addLog(
+        `?�� Sold ${item.icon} ${item.name} for ${item.sellPrice * item.quantity}G`
+      );
       gs.inventory.splice(idx, 1);
       syncHud();
     },
@@ -245,7 +265,10 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
     }, 1500);
   }, [syncFlags, addLog]);
 
-  const expPercent = hudHero.maxExp > 0 ? Math.min(100, (hudHero.exp / hudHero.maxExp) * 100) : 0;
+  const expPercent =
+    hudHero.maxExp > 0
+      ? Math.min(100, (hudHero.exp / hudHero.maxExp) * 100)
+      : 0;
 
   const flagStatus = {
     bossMode: client.features.boolVariation('idle-boss-mode', false),
@@ -333,12 +356,20 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
               zIndex: 40,
             }}
           >
-            <div className="nes-container is-dark with-title" style={{ width: '350px' }}>
+            <div
+              className="nes-container is-dark with-title"
+              style={{ width: '350px' }}
+            >
               <p className="title">SYNCING FLAGS</p>
               <div style={{ textAlign: 'center' }}>
                 <i className="nes-icon is-large star"></i>
-                <p style={{ fontSize: '11px', marginTop: '12px' }}>Fetching feature config...</p>
-                <progress className="nes-progress is-success" max={100}></progress>
+                <p style={{ fontSize: '11px', marginTop: '12px' }}>
+                  Fetching feature config...
+                </p>
+                <progress
+                  className="nes-progress is-success"
+                  max={100}
+                ></progress>
               </div>
             </div>
           </div>

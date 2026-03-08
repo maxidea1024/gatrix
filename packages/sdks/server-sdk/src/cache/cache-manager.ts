@@ -28,8 +28,14 @@ import {
   StoreProduct,
 } from '../types/api';
 import { sleep } from '../utils/time';
-import { MaintenanceWatcher, MaintenanceEventCallback } from './maintenance-watcher';
-import { CacheStorageProvider, FileCacheStorageProvider } from './storage-provider';
+import {
+  MaintenanceWatcher,
+  MaintenanceEventCallback,
+} from './maintenance-watcher';
+import {
+  CacheStorageProvider,
+  FileCacheStorageProvider,
+} from './storage-provider';
 
 export class CacheManager {
   private logger: Logger;
@@ -99,8 +105,12 @@ export class CacheManager {
     this.apiClientFactory = new ApiClientFactory(apiClient, defaultToken, {
       baseURL: apiClient.getAxiosInstance().defaults.baseURL || '',
       applicationName:
-        (apiClient.getAxiosInstance().defaults.headers?.common?.['X-Application-Name'] as string) ||
-        (apiClient.getAxiosInstance().defaults.headers?.['X-Application-Name'] as string) ||
+        (apiClient.getAxiosInstance().defaults.headers?.common?.[
+          'X-Application-Name'
+        ] as string) ||
+        (apiClient.getAxiosInstance().defaults.headers?.[
+          'X-Application-Name'
+        ] as string) ||
         '',
       logger: logger,
       metrics: metrics,
@@ -131,7 +141,12 @@ export class CacheManager {
       this.popupNoticeService.setApiClientFactory(this.apiClientFactory);
     }
     if (this.uses.survey !== false) {
-      this.surveyService = new SurveyService(apiClient, logger, this.defaultToken, this.storage);
+      this.surveyService = new SurveyService(
+        apiClient,
+        logger,
+        this.defaultToken,
+        this.storage
+      );
       this.surveyService.setFeatureEnabled(true);
     }
     if (this.uses.whitelist !== false) {
@@ -172,7 +187,12 @@ export class CacheManager {
       this.serviceNoticeService.setFeatureEnabled(true);
     }
     if (this.uses.banner === true) {
-      this.bannerService = new BannerService(apiClient, logger, this.defaultToken, this.storage);
+      this.bannerService = new BannerService(
+        apiClient,
+        logger,
+        this.defaultToken,
+        this.storage
+      );
       this.bannerService.setFeatureEnabled(true);
       this.bannerService.setApiClientFactory(this.apiClientFactory);
     }
@@ -196,10 +216,17 @@ export class CacheManager {
       this.featureFlagService.setFeatureEnabled(true);
       this.featureFlagService.setApiClientFactory(this.apiClientFactory);
       // Apply feature flag specific config (compact defaults to true)
-      this.featureFlagService.setCompactFlags(featureFlagConfig?.compact !== false);
+      this.featureFlagService.setCompactFlags(
+        featureFlagConfig?.compact !== false
+      );
     }
     if (this.uses.vars === true) {
-      this.varsService = new VarsService(apiClient, logger, this.defaultToken, this.storage);
+      this.varsService = new VarsService(
+        apiClient,
+        logger,
+        this.defaultToken,
+        this.storage
+      );
       this.varsService.setFeatureEnabled(true);
       this.varsService.setApiClientFactory(this.apiClientFactory);
     }
@@ -214,7 +241,9 @@ export class CacheManager {
 
     // Return a function to unregister this specific callback
     return () => {
-      this.refreshCallbacks = this.refreshCallbacks.filter((cb) => cb !== callback);
+      this.refreshCallbacks = this.refreshCallbacks.filter(
+        (cb) => cb !== callback
+      );
     };
   }
 
@@ -265,7 +294,9 @@ export class CacheManager {
       if (!this.config.skipBackendReady) {
         await this.waitForBackendReady();
       } else {
-        this.logger.info('Skipping backend ready check (skipBackendReady: true)');
+        this.logger.info(
+          'Skipping backend ready check (skipBackendReady: true)'
+        );
       }
 
       // 1. Initial load from local storage for ALL enabled services
@@ -273,25 +304,35 @@ export class CacheManager {
       const envList = this.tokenProvider.getTokens();
 
       if (envList.length > 0) {
-        this.logger.debug('Loading initial data from local storage for environments', { envList });
+        this.logger.debug(
+          'Loading initial data from local storage for environments',
+          { envList }
+        );
         for (const env of envList) {
-          if (this.gameWorldService) initPromises.push(this.gameWorldService.initializeAsync(env));
+          if (this.gameWorldService)
+            initPromises.push(this.gameWorldService.initializeAsync(env));
           if (this.popupNoticeService)
             initPromises.push(this.popupNoticeService.initializeAsync(env));
-          if (this.surveyService) initPromises.push(this.surveyService.initializeAsync(env));
-          if (this.whitelistService) initPromises.push(this.whitelistService.initializeAsync(env));
+          if (this.surveyService)
+            initPromises.push(this.surveyService.initializeAsync(env));
+          if (this.whitelistService)
+            initPromises.push(this.whitelistService.initializeAsync(env));
           if (this.serviceMaintenanceService)
-            initPromises.push(this.serviceMaintenanceService.initializeAsync(env));
+            initPromises.push(
+              this.serviceMaintenanceService.initializeAsync(env)
+            );
           if (this.clientVersionService)
             initPromises.push(this.clientVersionService.initializeAsync(env));
           if (this.serviceNoticeService)
             initPromises.push(this.serviceNoticeService.initializeAsync(env));
-          if (this.bannerService) initPromises.push(this.bannerService.initializeAsync(env));
+          if (this.bannerService)
+            initPromises.push(this.bannerService.initializeAsync(env));
           if (this.storeProductService)
             initPromises.push(this.storeProductService.initializeAsync(env));
           if (this.featureFlagService)
             initPromises.push(this.featureFlagService.initializeAsync(env));
-          if (this.varsService) initPromises.push(this.varsService.initializeAsync(env));
+          if (this.varsService)
+            initPromises.push(this.varsService.initializeAsync(env));
         }
         await Promise.all(initPromises);
         this.logger.debug('Local cache initialization completed');
@@ -324,12 +365,14 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.gameWorldService.listByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to load game worlds', {
-                  error: error.message,
-                });
-                return [];
-              })
+              this.gameWorldService
+                .listByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn('Failed to load game worlds', {
+                    error: error.message,
+                  });
+                  return [];
+                })
             );
             featureTypes.push('gameWorld');
           }
@@ -337,10 +380,14 @@ export class CacheManager {
         } else {
           const defaultEnv = this.defaultToken;
           promises.push(
-            this.gameWorldService.listByEnvironment(defaultEnv).catch((error) => {
-              this.logger.warn('Failed to load game worlds', { error: error.message });
-              return [];
-            })
+            this.gameWorldService
+              .listByEnvironment(defaultEnv)
+              .catch((error) => {
+                this.logger.warn('Failed to load game worlds', {
+                  error: error.message,
+                });
+                return [];
+              })
           );
           featureTypes.push('gameWorld');
         }
@@ -350,12 +397,14 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.popupNoticeService.listByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to load popup notices', {
-                  error: error.message,
-                });
-                return [];
-              })
+              this.popupNoticeService
+                .listByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn('Failed to load popup notices', {
+                    error: error.message,
+                  });
+                  return [];
+                })
             );
             featureTypes.push('popupNotice');
           }
@@ -363,10 +412,14 @@ export class CacheManager {
         } else {
           const defaultEnv = this.defaultToken;
           promises.push(
-            this.popupNoticeService.listByEnvironment(defaultEnv).catch((error) => {
-              this.logger.warn('Failed to load popup notices', { error: error.message });
-              return [];
-            })
+            this.popupNoticeService
+              .listByEnvironment(defaultEnv)
+              .catch((error) => {
+                this.logger.warn('Failed to load popup notices', {
+                  error: error.message,
+                });
+                return [];
+              })
           );
           featureTypes.push('popupNotice');
         }
@@ -376,10 +429,14 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.surveyService.listByEnvironments(envList, { isActive: true }).catch((error) => {
-                this.logger.warn('Failed to load surveys', { error: error.message });
-                return { surveys: [], settings: null };
-              })
+              this.surveyService
+                .listByEnvironments(envList, { isActive: true })
+                .catch((error) => {
+                  this.logger.warn('Failed to load surveys', {
+                    error: error.message,
+                  });
+                  return { surveys: [], settings: null };
+                })
             );
             featureTypes.push('survey');
           }
@@ -387,10 +444,14 @@ export class CacheManager {
         } else {
           const defaultEnv = this.defaultToken;
           promises.push(
-            this.surveyService.listByEnvironment(defaultEnv, { isActive: true }).catch((error) => {
-              this.logger.warn('Failed to load surveys', { error: error.message });
-              return { surveys: [], settings: null };
-            })
+            this.surveyService
+              .listByEnvironment(defaultEnv, { isActive: true })
+              .catch((error) => {
+                this.logger.warn('Failed to load surveys', {
+                  error: error.message,
+                });
+                return { surveys: [], settings: null };
+              })
           );
           featureTypes.push('survey');
         }
@@ -400,12 +461,14 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.whitelistService.listByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to load whitelists', {
-                  error: error.message,
-                });
-                return [];
-              })
+              this.whitelistService
+                .listByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn('Failed to load whitelists', {
+                    error: error.message,
+                  });
+                  return [];
+                })
             );
             featureTypes.push('whitelist');
           }
@@ -413,27 +476,37 @@ export class CacheManager {
         } else {
           const defaultEnv = this.defaultToken;
           promises.push(
-            this.whitelistService.listByEnvironment(defaultEnv).catch((error) => {
-              this.logger.warn('Failed to load whitelists', {
-                error: error.message,
-              });
-              return { ipWhitelist: [], accountWhitelist: [] };
-            })
+            this.whitelistService
+              .listByEnvironment(defaultEnv)
+              .catch((error) => {
+                this.logger.warn('Failed to load whitelists', {
+                  error: error.message,
+                });
+                return { ipWhitelist: [], accountWhitelist: [] };
+              })
           );
           featureTypes.push('whitelist');
         }
       }
 
-      if (this.uses.serviceMaintenance !== false && this.serviceMaintenanceService) {
+      if (
+        this.uses.serviceMaintenance !== false &&
+        this.serviceMaintenanceService
+      ) {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.serviceMaintenanceService.getStatusByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to load service maintenance status', {
-                  error: error.message,
-                });
-                return [];
-              })
+              this.serviceMaintenanceService
+                .getStatusByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn(
+                    'Failed to load service maintenance status',
+                    {
+                      error: error.message,
+                    }
+                  );
+                  return [];
+                })
             );
             featureTypes.push('serviceMaintenance');
           }
@@ -441,11 +514,13 @@ export class CacheManager {
         } else {
           const defaultEnv = this.defaultToken;
           promises.push(
-            this.refreshServiceMaintenanceInternal(defaultEnv).catch((error) => {
-              this.logger.warn('Failed to load service maintenance status', {
-                error: error.message,
-              });
-            })
+            this.refreshServiceMaintenanceInternal(defaultEnv).catch(
+              (error) => {
+                this.logger.warn('Failed to load service maintenance status', {
+                  error: error.message,
+                });
+              }
+            )
           );
           featureTypes.push('serviceMaintenance');
         }
@@ -456,12 +531,14 @@ export class CacheManager {
       if (this.uses.clientVersion === true && this.clientVersionService) {
         if (envList.length > 0) {
           promises.push(
-            this.clientVersionService.listByEnvironments(envList).catch((error) => {
-              this.logger.warn('Failed to load client versions', {
-                error: error.message,
-              });
-              return [];
-            })
+            this.clientVersionService
+              .listByEnvironments(envList)
+              .catch((error) => {
+                this.logger.warn('Failed to load client versions', {
+                  error: error.message,
+                });
+                return [];
+              })
           );
           featureTypes.push('clientVersion');
         }
@@ -471,12 +548,14 @@ export class CacheManager {
       if (this.uses.serviceNotice === true && this.serviceNoticeService) {
         if (envList.length > 0) {
           promises.push(
-            this.serviceNoticeService.listByEnvironments(envList).catch((error) => {
-              this.logger.warn('Failed to load service notices', {
-                error: error.message,
-              });
-              return [];
-            })
+            this.serviceNoticeService
+              .listByEnvironments(envList)
+              .catch((error) => {
+                this.logger.warn('Failed to load service notices', {
+                  error: error.message,
+                });
+                return [];
+              })
           );
           featureTypes.push('serviceNotice');
         }
@@ -502,12 +581,14 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.storeProductService.listByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to load store products', {
-                  error: error.message,
-                });
-                return [];
-              })
+              this.storeProductService
+                .listByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn('Failed to load store products', {
+                    error: error.message,
+                  });
+                  return [];
+                })
             );
             featureTypes.push('storeProduct');
           }
@@ -515,12 +596,14 @@ export class CacheManager {
         } else {
           const defaultEnv = this.defaultToken;
           promises.push(
-            this.storeProductService.listByEnvironment(defaultEnv).catch((error) => {
-              this.logger.warn('Failed to load store products', {
-                error: error.message,
-              });
-              return [];
-            })
+            this.storeProductService
+              .listByEnvironment(defaultEnv)
+              .catch((error) => {
+                this.logger.warn('Failed to load store products', {
+                  error: error.message,
+                });
+                return [];
+              })
           );
           featureTypes.push('storeProduct');
         }
@@ -531,24 +614,28 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.featureFlagService.listByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to load feature flags', {
-                  error: error.message,
-                });
-                return [];
-              })
+              this.featureFlagService
+                .listByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn('Failed to load feature flags', {
+                    error: error.message,
+                  });
+                  return [];
+                })
             );
             featureTypes.push('featureFlag');
           }
         } else {
           const defaultEnv = this.defaultToken;
           promises.push(
-            this.featureFlagService.listByEnvironment(defaultEnv).catch((error) => {
-              this.logger.warn('Failed to load feature flags', {
-                error: error.message,
-              });
-              return [];
-            })
+            this.featureFlagService
+              .listByEnvironment(defaultEnv)
+              .catch((error) => {
+                this.logger.warn('Failed to load feature flags', {
+                  error: error.message,
+                });
+                return [];
+              })
           );
           featureTypes.push('featureFlag');
         }
@@ -591,11 +678,16 @@ export class CacheManager {
 
       this.logger.info('SDK cache initialized', {
         enabledFeatures: featureTypes,
-        environments: false ? `* (${this.tokenProvider.getTokens().length} envs)` : null,
+        environments: false
+          ? `* (${this.tokenProvider.getTokens().length} envs)`
+          : null,
       });
 
       // Initialize maintenance watcher with current state (no events emitted on first check)
-      if (this.uses.serviceMaintenance !== false || this.uses.gameWorld !== false) {
+      if (
+        this.uses.serviceMaintenance !== false ||
+        this.uses.gameWorld !== false
+      ) {
         this.checkMaintenanceStateChanges();
       }
 
@@ -607,7 +699,10 @@ export class CacheManager {
       // Subscribe to token changes (e.g., environment added/removed)
       if (this.tokenProvider.onTokensChanged) {
         this.tokenProvider.onTokensChanged((added, removed) => {
-          this.logger.info('Token list changed', { added: added.length, removed: removed.length });
+          this.logger.info('Token list changed', {
+            added: added.length,
+            removed: removed.length,
+          });
 
           // Remove cache for deleted tokens
           if (removed.length > 0) {
@@ -617,7 +712,9 @@ export class CacheManager {
           // Fetch data for new tokens
           if (added.length > 0) {
             this.fetchDataForTokens(added).catch((error: any) => {
-              this.logger.error('Failed to fetch data for new tokens', { error: error.message });
+              this.logger.error('Failed to fetch data for new tokens', {
+                error: error.message,
+              });
             });
           }
         });
@@ -639,9 +736,10 @@ export class CacheManager {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         // Check backend ready status via dedicated endpoint
-        const response = await this.apiClient.get<{ status: string; environmentId?: string }>(
-          '/api/v1/ready'
-        );
+        const response = await this.apiClient.get<{
+          status: string;
+          environmentId?: string;
+        }>('/api/v1/ready');
 
         if (response.success && response.data?.status === 'ready') {
           this.logger.info('Gatrix backend is ready');
@@ -660,11 +758,16 @@ export class CacheManager {
       }
 
       if (attempt === maxAttempts) {
-        this.logger.error('Gatrix backend is not ready after maximum attempts', {
-          attempts: maxAttempts,
-          totalTime: `${(maxAttempts * retryInterval) / 1000}s`,
-        });
-        throw new Error('Gatrix backend failed to become ready within timeout period');
+        this.logger.error(
+          'Gatrix backend is not ready after maximum attempts',
+          {
+            attempts: maxAttempts,
+            totalTime: `${(maxAttempts * retryInterval) / 1000}s`,
+          }
+        );
+        throw new Error(
+          'Gatrix backend failed to become ready within timeout period'
+        );
       }
 
       // Wait before retrying
@@ -734,29 +837,51 @@ export class CacheManager {
       const promises: Promise<any>[] = [];
 
       if (this.gameWorldService)
-        promises.push(this.gameWorldService.listByEnvironment(token).catch(() => []));
+        promises.push(
+          this.gameWorldService.listByEnvironment(token).catch(() => [])
+        );
       if (this.popupNoticeService)
-        promises.push(this.popupNoticeService.listByEnvironment(token).catch(() => []));
+        promises.push(
+          this.popupNoticeService.listByEnvironment(token).catch(() => [])
+        );
       if (this.surveyService)
-        promises.push(this.surveyService.listByEnvironment(token).catch(() => []));
+        promises.push(
+          this.surveyService.listByEnvironment(token).catch(() => [])
+        );
       if (this.whitelistService)
-        promises.push(this.whitelistService.listByEnvironment(token).catch(() => []));
+        promises.push(
+          this.whitelistService.listByEnvironment(token).catch(() => [])
+        );
       if (this.serviceMaintenanceService)
         promises.push(
-          this.serviceMaintenanceService.getStatusByEnvironment(token).catch(() => null)
+          this.serviceMaintenanceService
+            .getStatusByEnvironment(token)
+            .catch(() => null)
         );
       if (this.clientVersionService)
-        promises.push(this.clientVersionService.listByEnvironment(token).catch(() => []));
+        promises.push(
+          this.clientVersionService.listByEnvironment(token).catch(() => [])
+        );
       if (this.serviceNoticeService)
-        promises.push(this.serviceNoticeService.listByEnvironment(token).catch(() => []));
+        promises.push(
+          this.serviceNoticeService.listByEnvironment(token).catch(() => [])
+        );
       if (this.bannerService)
-        promises.push(this.bannerService.listByEnvironment(token).catch(() => []));
+        promises.push(
+          this.bannerService.listByEnvironment(token).catch(() => [])
+        );
       if (this.storeProductService)
-        promises.push(this.storeProductService.listByEnvironment(token).catch(() => []));
+        promises.push(
+          this.storeProductService.listByEnvironment(token).catch(() => [])
+        );
       if (this.featureFlagService)
-        promises.push(this.featureFlagService.listByEnvironment(token).catch(() => []));
+        promises.push(
+          this.featureFlagService.listByEnvironment(token).catch(() => [])
+        );
       if (this.varsService)
-        promises.push(this.varsService.listByEnvironment(token).catch(() => []));
+        promises.push(
+          this.varsService.listByEnvironment(token).catch(() => [])
+        );
 
       await Promise.all(promises);
     }
@@ -799,18 +924,22 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.gameWorldService.listByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to refresh game worlds', {
-                  error: error.message,
-                });
-                return [];
-              })
+              this.gameWorldService
+                .listByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn('Failed to refresh game worlds', {
+                    error: error.message,
+                  });
+                  return [];
+                })
             );
             refreshedTypes.push('gameWorld');
           }
         } else {
           const defaultEnv = this.defaultToken;
-          promises.push(this.gameWorldService.refreshByEnvironment(defaultEnv, true)); // suppressWarnings=true for refreshAll
+          promises.push(
+            this.gameWorldService.refreshByEnvironment(defaultEnv, true)
+          ); // suppressWarnings=true for refreshAll
           refreshedTypes.push('gameWorld');
         }
       }
@@ -819,18 +948,22 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.popupNoticeService.listByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to refresh popup notices', {
-                  error: error.message,
-                });
-                return [];
-              })
+              this.popupNoticeService
+                .listByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn('Failed to refresh popup notices', {
+                    error: error.message,
+                  });
+                  return [];
+                })
             );
             refreshedTypes.push('popupNotice');
           }
         } else {
           const defaultEnv = this.defaultToken;
-          promises.push(this.popupNoticeService.refreshByEnvironment(defaultEnv, true)); // suppressWarnings=true for refreshAll
+          promises.push(
+            this.popupNoticeService.refreshByEnvironment(defaultEnv, true)
+          ); // suppressWarnings=true for refreshAll
           refreshedTypes.push('popupNotice');
         }
       }
@@ -839,12 +972,14 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.surveyService.listByEnvironments(envList, { isActive: true }).catch((error) => {
-                this.logger.warn('Failed to refresh surveys', {
-                  error: error.message,
-                });
-                return { surveys: [], settings: null };
-              })
+              this.surveyService
+                .listByEnvironments(envList, { isActive: true })
+                .catch((error) => {
+                  this.logger.warn('Failed to refresh surveys', {
+                    error: error.message,
+                  });
+                  return { surveys: [], settings: null };
+                })
             );
             refreshedTypes.push('survey');
           }
@@ -868,50 +1003,61 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.whitelistService.listByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to refresh whitelists', {
-                  error: error.message,
-                });
-                return [];
-              })
+              this.whitelistService
+                .listByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn('Failed to refresh whitelists', {
+                    error: error.message,
+                  });
+                  return [];
+                })
             );
             refreshedTypes.push('whitelist');
           }
         } else {
           const defaultEnv = this.defaultToken;
           promises.push(
-            this.whitelistService.refreshByEnvironment(defaultEnv, true).catch((error) => {
-              // suppressWarnings=true for refreshAll
-              this.logger.warn('Failed to refresh whitelists', {
-                error: error.message,
-              });
-            })
+            this.whitelistService
+              .refreshByEnvironment(defaultEnv, true)
+              .catch((error) => {
+                // suppressWarnings=true for refreshAll
+                this.logger.warn('Failed to refresh whitelists', {
+                  error: error.message,
+                });
+              })
           );
           refreshedTypes.push('whitelist');
         }
       }
 
-      if (this.uses.serviceMaintenance !== false && this.serviceMaintenanceService) {
+      if (
+        this.uses.serviceMaintenance !== false &&
+        this.serviceMaintenanceService
+      ) {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.serviceMaintenanceService.getStatusByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to refresh service maintenance', {
-                  error: error.message,
-                });
-                return [];
-              })
+              this.serviceMaintenanceService
+                .getStatusByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn('Failed to refresh service maintenance', {
+                    error: error.message,
+                  });
+                  return [];
+                })
             );
             refreshedTypes.push('serviceMaintenance');
           }
         } else {
           const defaultEnv = this.defaultToken;
           promises.push(
-            this.refreshServiceMaintenanceInternal(defaultEnv).catch((error) => {
-              this.logger.warn('Failed to refresh service maintenance', {
-                error: error.message,
-              });
-            })
+            this.refreshServiceMaintenanceInternal(defaultEnv).catch(
+              (error) => {
+                this.logger.warn('Failed to refresh service maintenance', {
+                  error: error.message,
+                });
+              }
+            )
           );
           refreshedTypes.push('serviceMaintenance');
         }
@@ -922,11 +1068,13 @@ export class CacheManager {
       if (this.uses.clientVersion === true && this.clientVersionService) {
         if (envList.length > 0) {
           promises.push(
-            this.clientVersionService.listByEnvironments(envList).catch((error) => {
-              this.logger.warn('Failed to refresh client versions', {
-                error: error.message,
-              });
-            })
+            this.clientVersionService
+              .listByEnvironments(envList)
+              .catch((error) => {
+                this.logger.warn('Failed to refresh client versions', {
+                  error: error.message,
+                });
+              })
           );
           refreshedTypes.push('clientVersion');
         }
@@ -935,11 +1083,13 @@ export class CacheManager {
       if (this.uses.serviceNotice === true && this.serviceNoticeService) {
         if (envList.length > 0) {
           promises.push(
-            this.serviceNoticeService.listByEnvironments(envList).catch((error) => {
-              this.logger.warn('Failed to refresh service notices', {
-                error: error.message,
-              });
-            })
+            this.serviceNoticeService
+              .listByEnvironments(envList)
+              .catch((error) => {
+                this.logger.warn('Failed to refresh service notices', {
+                  error: error.message,
+                });
+              })
           );
           refreshedTypes.push('serviceNotice');
         }
@@ -962,22 +1112,26 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.storeProductService.listByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to refresh store products', {
-                  error: error.message,
-                });
-              })
+              this.storeProductService
+                .listByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn('Failed to refresh store products', {
+                    error: error.message,
+                  });
+                })
             );
             refreshedTypes.push('storeProduct');
           }
         } else {
           const defaultEnv = this.defaultToken;
           promises.push(
-            this.storeProductService.refreshByEnvironment(defaultEnv, true).catch((error) => {
-              this.logger.warn('Failed to refresh store products', {
-                error: error.message,
-              });
-            })
+            this.storeProductService
+              .refreshByEnvironment(defaultEnv, true)
+              .catch((error) => {
+                this.logger.warn('Failed to refresh store products', {
+                  error: error.message,
+                });
+              })
           );
           refreshedTypes.push('storeProduct');
         }
@@ -988,22 +1142,26 @@ export class CacheManager {
         if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
-              this.featureFlagService.listByEnvironments(envList).catch((error) => {
-                this.logger.warn('Failed to refresh feature flags', {
-                  error: error.message,
-                });
-              })
+              this.featureFlagService
+                .listByEnvironments(envList)
+                .catch((error) => {
+                  this.logger.warn('Failed to refresh feature flags', {
+                    error: error.message,
+                  });
+                })
             );
             refreshedTypes.push('featureFlag');
           }
         } else {
           const defaultEnv = this.defaultToken;
           promises.push(
-            this.featureFlagService.refreshByEnvironment(defaultEnv).catch((error) => {
-              this.logger.warn('Failed to refresh feature flags', {
-                error: error.message,
-              });
-            })
+            this.featureFlagService
+              .refreshByEnvironment(defaultEnv)
+              .catch((error) => {
+                this.logger.warn('Failed to refresh feature flags', {
+                  error: error.message,
+                });
+              })
           );
           refreshedTypes.push('featureFlag');
         }
@@ -1054,7 +1212,10 @@ export class CacheManager {
       this.invalidationCount++;
 
       // Check and emit maintenance state changes
-      if (this.uses.serviceMaintenance !== false || this.uses.gameWorld !== false) {
+      if (
+        this.uses.serviceMaintenance !== false ||
+        this.uses.gameWorld !== false
+      ) {
         this.checkMaintenanceStateChanges();
       }
 
@@ -1147,7 +1308,11 @@ export class CacheManager {
     environmentId: string,
     isVisible?: boolean | number
   ): Promise<void> {
-    await this.gameWorldService?.updateSingleWorld(id, environmentId, isVisible);
+    await this.gameWorldService?.updateSingleWorld(
+      id,
+      environmentId,
+      isVisible
+    );
     // Check maintenance state changes after update
     this.checkMaintenanceStateChanges();
   }
@@ -1157,7 +1322,9 @@ export class CacheManager {
    */
   getAllCachedData(): any {
     // Convert Map to plain object for JSON serialization
-    const mapToObject = <T>(map: Map<string, T[]> | undefined): Record<string, T[]> => {
+    const mapToObject = <T>(
+      map: Map<string, T[]> | undefined
+    ): Record<string, T[]> => {
       if (!map) return {};
       const obj: Record<string, T[]> = {};
       for (const [key, value] of map.entries()) {
@@ -1167,7 +1334,9 @@ export class CacheManager {
     };
 
     // Helper to convert Map<string, T> (non-array values like WhitelistData, MaintenanceStatus)
-    const mapToObjectSingle = <T>(map: Map<string, T> | undefined): Record<string, T> => {
+    const mapToObjectSingle = <T>(
+      map: Map<string, T> | undefined
+    ): Record<string, T> => {
       if (!map) return {};
       const obj: Record<string, T> = {};
       for (const [key, value] of map.entries()) {
@@ -1195,7 +1364,9 @@ export class CacheManager {
       popupNotices: mapToObject(this.popupNoticeService?.getAllCached()),
       surveys: mapToObject(this.surveyService?.getAllCached()),
       whitelists: mapToObjectSingle(this.whitelistService?.getAllCached()),
-      serviceMaintenance: mapToObjectSingle(this.serviceMaintenanceService?.getAllCached()),
+      serviceMaintenance: mapToObjectSingle(
+        this.serviceMaintenanceService?.getAllCached()
+      ),
       clientVersions: mapToObject(this.clientVersionService?.getAllCached()),
       serviceNotices: mapToObject(this.serviceNoticeService?.getAllCached()),
       banners: mapToObject(this.bannerService?.getAllCached()),
@@ -1240,7 +1411,11 @@ export class CacheManager {
     environmentId: string,
     isVisible?: boolean | number
   ): Promise<void> {
-    await this.popupNoticeService?.updateSingleNotice(id, environmentId, isVisible);
+    await this.popupNoticeService?.updateSingleNotice(
+      id,
+      environmentId,
+      isVisible
+    );
   }
 
   /**
@@ -1305,12 +1480,17 @@ export class CacheManager {
    * Used by refreshAll() to avoid duplicate state checks
    * @param environmentId environment ID (required)
    */
-  private async refreshServiceMaintenanceInternal(environmentId: string): Promise<void> {
+  private async refreshServiceMaintenanceInternal(
+    environmentId: string
+  ): Promise<void> {
     if (!this.serviceMaintenanceService) return;
     this.logger.info('Refreshing service maintenance cache...');
     const start = process.hrtime.bigint();
     try {
-      const status = await this.serviceMaintenanceService.refreshByEnvironment(environmentId, true); // suppressWarnings=true for refreshAll
+      const status = await this.serviceMaintenanceService.refreshByEnvironment(
+        environmentId,
+        true
+      ); // suppressWarnings=true for refreshAll
       this.emitRefreshEvent('serviceMaintenance', status);
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       try {
@@ -1345,21 +1525,31 @@ export class CacheManager {
     try {
       if (environmentId) {
         // Check specific environment
-        const serviceStatus = this.serviceMaintenanceService?.getCached(environmentId) || null;
-        const gameWorlds = this.gameWorldService?.getCached(environmentId) || [];
+        const serviceStatus =
+          this.serviceMaintenanceService?.getCached(environmentId) || null;
+        const gameWorlds =
+          this.gameWorldService?.getCached(environmentId) || [];
         this.maintenanceWatcher.checkAndEmitChanges(serviceStatus, gameWorlds);
       } else {
         // Check all cached environments (for multi-env mode or when environment is not specified)
-        const allGameWorlds = this.gameWorldService?.getAllCached() || new Map();
-        const allServiceStatus = this.serviceMaintenanceService?.getAllCached() || new Map();
+        const allGameWorlds =
+          this.gameWorldService?.getAllCached() || new Map();
+        const allServiceStatus =
+          this.serviceMaintenanceService?.getAllCached() || new Map();
 
         // Collect all environments from both services
-        const allEnvs = new Set([...allGameWorlds.keys(), ...allServiceStatus.keys()]);
+        const allEnvs = new Set([
+          ...allGameWorlds.keys(),
+          ...allServiceStatus.keys(),
+        ]);
 
         for (const env of allEnvs) {
           const serviceStatus = allServiceStatus.get(env) || null;
           const gameWorlds = allGameWorlds.get(env) || [];
-          this.maintenanceWatcher.checkAndEmitChanges(serviceStatus, gameWorlds);
+          this.maintenanceWatcher.checkAndEmitChanges(
+            serviceStatus,
+            gameWorlds
+          );
         }
       }
     } catch (error: any) {
@@ -1410,7 +1600,10 @@ export class CacheManager {
    * @param item Client version to update
    * @param environmentId environment ID (required)
    */
-  async updateSingleClientVersion(item: any, environmentId: string): Promise<void> {
+  async updateSingleClientVersion(
+    item: any,
+    environmentId: string
+  ): Promise<void> {
     this.clientVersionService?.updateSingleClientVersion(item, environmentId);
   }
 
@@ -1427,7 +1620,10 @@ export class CacheManager {
    * @param notice Service notice to update
    * @param environmentId environment ID (required)
    */
-  async updateSingleServiceNotice(notice: any, environmentId: string): Promise<void> {
+  async updateSingleServiceNotice(
+    notice: any,
+    environmentId: string
+  ): Promise<void> {
     this.serviceNoticeService?.updateSingleServiceNotice(notice, environmentId);
   }
 
@@ -1545,7 +1741,11 @@ export class CacheManager {
     environmentId: string,
     isActive?: boolean | number
   ): Promise<void> {
-    await this.storeProductService?.updateSingleProduct(id, environmentId, isActive);
+    await this.storeProductService?.updateSingleProduct(
+      id,
+      environmentId,
+      isActive
+    );
   }
 
   /**
@@ -1576,7 +1776,11 @@ export class CacheManager {
     environmentId: string,
     status?: string
   ): Promise<void> {
-    await this.bannerService?.updateSingleBanner(bannerId, environmentId, status);
+    await this.bannerService?.updateSingleBanner(
+      bannerId,
+      environmentId,
+      status
+    );
   }
 
   /**
@@ -1606,11 +1810,15 @@ export class CacheManager {
     const envIds = new Set<string>();
     // Collect environment IDs from all active services
     const addEnvIds = (ids: string[]) => ids.forEach((id) => envIds.add(id));
-    if (this.gameWorldService) addEnvIds(this.gameWorldService.getEnvironmentIds());
-    if (this.popupNoticeService) addEnvIds(this.popupNoticeService.getEnvironmentIds());
-    if (this.clientVersionService) addEnvIds(this.clientVersionService.getEnvironmentIds());
+    if (this.gameWorldService)
+      addEnvIds(this.gameWorldService.getEnvironmentIds());
+    if (this.popupNoticeService)
+      addEnvIds(this.popupNoticeService.getEnvironmentIds());
+    if (this.clientVersionService)
+      addEnvIds(this.clientVersionService.getEnvironmentIds());
     if (this.bannerService) addEnvIds(this.bannerService.getEnvironmentIds());
-    if (this.storeProductService) addEnvIds(this.storeProductService.getEnvironmentIds());
+    if (this.storeProductService)
+      addEnvIds(this.storeProductService.getEnvironmentIds());
     if (this.varsService) addEnvIds(this.varsService.getEnvironmentIds());
     // Include environment resolved from /ready endpoint (single-token mode)
     if (this.resolvedEnvironmentId) envIds.add(this.resolvedEnvironmentId);

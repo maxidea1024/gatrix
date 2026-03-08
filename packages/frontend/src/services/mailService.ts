@@ -60,7 +60,10 @@ export class MailService {
   /**
    * Get sent mails for the current user
    */
-  async getSentMails(page: number = 1, limit: number = 20): Promise<MailListResponse> {
+  async getSentMails(
+    page: number = 1,
+    limit: number = 20
+  ): Promise<MailListResponse> {
     const params = { page, limit };
     return apiService.get('/mails/sent', { params }) as any;
   }

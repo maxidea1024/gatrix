@@ -27,7 +27,11 @@ router.post(
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { environments, context, flagNames } = req.body;
 
-    if (!environments || !Array.isArray(environments) || environments.length === 0) {
+    if (
+      !environments ||
+      !Array.isArray(environments) ||
+      environments.length === 0
+    ) {
       return res.status(400).json({
         success: false,
         error: 'At least one environment is required',
@@ -51,7 +55,9 @@ router.post(
     }[] = [];
     // Load context field definitions for validation (used both for provided values and missing-field checks)
     const contextFieldDefs = await featureFlagService.listContextFields();
-    const fieldDefMap = new Map(contextFieldDefs.map((f: any) => [f.fieldName, f]));
+    const fieldDefMap = new Map(
+      contextFieldDefs.map((f: any) => [f.fieldName, f])
+    );
 
     if (context && typeof context === 'object') {
       for (const [key, value] of Object.entries(context)) {
@@ -133,17 +139,27 @@ router.post(
           // Check legal values from validationRules only (when rules are enabled)
           const rulesEnabled = rules?.enabled !== false;
           const legalValues = rulesEnabled ? rules?.legalValues : undefined;
-          if (legalValues && Array.isArray(legalValues) && legalValues.length > 0) {
+          if (
+            legalValues &&
+            Array.isArray(legalValues) &&
+            legalValues.length > 0
+          ) {
             const strValue = String(value);
             if (!legalValues.includes(strValue)) {
               // Check if trimmed value matches
-              const trimmedMatch = legalValues.find((lv: string) => lv === strValue.trim());
+              const trimmedMatch = legalValues.find(
+                (lv: string) => lv === strValue.trim()
+              );
               contextWarnings.push({
                 field: key,
                 type: 'INVALID_VALUE',
                 message: `Value "${strValue}" is not in the allowed values: [${legalValues.join(', ')}]`,
                 suggestion: trimmedMatch || undefined,
-                data: { value: strValue, allowedValues: legalValues, suggestion: trimmedMatch },
+                data: {
+                  value: strValue,
+                  allowedValues: legalValues,
+                  suggestion: trimmedMatch,
+                },
                 severity: 'error',
               });
             }
@@ -173,21 +189,35 @@ router.post(
 
           // Check minLength / maxLength
           if (typeof value === 'string') {
-            if (rules?.minLength !== undefined && value.length < rules.minLength) {
+            if (
+              rules?.minLength !== undefined &&
+              value.length < rules.minLength
+            ) {
               contextWarnings.push({
                 field: key,
                 type: 'MIN_LENGTH',
                 message: `Value "${value}" length (${value.length}) is less than minimum (${rules.minLength})`,
-                data: { value, length: value.length, minLength: rules.minLength },
+                data: {
+                  value,
+                  length: value.length,
+                  minLength: rules.minLength,
+                },
                 severity: 'error',
               });
             }
-            if (rules?.maxLength !== undefined && value.length > rules.maxLength) {
+            if (
+              rules?.maxLength !== undefined &&
+              value.length > rules.maxLength
+            ) {
               contextWarnings.push({
                 field: key,
                 type: 'MAX_LENGTH',
                 message: `Value "${value}" length (${value.length}) exceeds maximum (${rules.maxLength})`,
-                data: { value, length: value.length, maxLength: rules.maxLength },
+                data: {
+                  value,
+                  length: value.length,
+                  maxLength: rules.maxLength,
+                },
                 severity: 'error',
               });
             }
@@ -232,7 +262,9 @@ router.post(
 
     // If specific flags are requested, create a Set for faster lookup
     const flagNamesSet =
-      flagNames && Array.isArray(flagNames) && flagNames.length > 0 ? new Set(flagNames) : null;
+      flagNames && Array.isArray(flagNames) && flagNames.length > 0
+        ? new Set(flagNames)
+        : null;
 
     // Pre-load target flags to collect referenced context fields
     // We'll check if any required fields are missing from the provided context
@@ -327,7 +359,11 @@ router.post(
 
         for (const flagSummary of targetFlags) {
           // Get detailed flag info with environment-specific state
-          const flag = await featureFlagService.getFlag(env, flagSummary.flagName, req.projectId);
+          const flag = await featureFlagService.getFlag(
+            env,
+            flagSummary.flagName,
+            req.projectId
+          );
           if (!flag) continue;
 
           // Evaluate the flag
@@ -355,7 +391,10 @@ router.post(
               (e: any) => e.environmentId === env
             );
             if ((flag as any).isEnabled) {
-              if (envOverride?.overrideEnabledValue && envOverride?.enabledValue !== undefined) {
+              if (
+                envOverride?.overrideEnabledValue &&
+                envOverride?.enabledValue !== undefined
+              ) {
                 value = envOverride.enabledValue;
                 valueSource = 'environment';
               } else if ((flag as any).enabledValue !== undefined) {
@@ -363,7 +402,10 @@ router.post(
                 valueSource = 'flag';
               }
             } else {
-              if (envOverride?.overrideDisabledValue && envOverride?.disabledValue !== undefined) {
+              if (
+                envOverride?.overrideDisabledValue &&
+                envOverride?.disabledValue !== undefined
+              ) {
                 value = envOverride.disabledValue;
                 valueSource = 'environment';
               } else if ((flag as any).disabledValue !== undefined) {
@@ -435,7 +477,10 @@ router.post(
         envResults.sort((a, b) => a.flagName.localeCompare(b.flagName));
         results[env] = envResults;
       } catch (error: any) {
-        logger.error(`Playground evaluation failed for environment '${env}':`, error);
+        logger.error(
+          `Playground evaluation failed for environment '${env}':`,
+          error
+        );
         results[env] = [];
       }
     }
@@ -444,7 +489,8 @@ router.post(
       success: true,
       data: {
         results,
-        contextWarnings: contextWarnings.length > 0 ? contextWarnings : undefined,
+        contextWarnings:
+          contextWarnings.length > 0 ? contextWarnings : undefined,
         referencedFields:
           referencedFields.size > 0
             ? Array.from(referencedFields).map((name) => {
@@ -474,7 +520,12 @@ function evaluateFlagWithDetails(
   contextWarnings?: any[]
 ): {
   enabled: boolean;
-  variant: { name: string; value?: any; valueType?: string; valueSource?: string };
+  variant: {
+    name: string;
+    value?: any;
+    valueType?: string;
+    valueSource?: string;
+  };
   reason: string;
   reasonDetails?: any;
   evaluationSteps?: any[];
@@ -482,7 +533,8 @@ function evaluateFlagWithDetails(
   const evaluationSteps: any[] = [];
 
   // Step 1: Context Validation
-  const errorWarnings = contextWarnings?.filter((w) => w.severity === 'error') || [];
+  const errorWarnings =
+    contextWarnings?.filter((w) => w.severity === 'error') || [];
   let contextFailed = false;
   if (errorWarnings.length > 0) {
     evaluationSteps.push({
@@ -520,7 +572,9 @@ function evaluateFlagWithDetails(
       passed: false,
       message: 'Flag is disabled in this environment',
     });
-    const envOverrideRow = flag.environments?.find((e: any) => e.environmentId === environmentId);
+    const envOverrideRow = flag.environments?.find(
+      (e: any) => e.environmentId === environmentId
+    );
     const envDisabledValue = envOverrideRow?.overrideDisabledValue
       ? envOverrideRow.disabledValue
       : undefined;
@@ -529,8 +583,13 @@ function evaluateFlagWithDetails(
       enabled: false,
       reason: 'FLAG_DISABLED',
       variant: {
-        name: isEnvSource ? VALUE_SOURCE.ENV_DEFAULT_DISABLED : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
-        value: getFallbackValue(envDisabledValue ?? flag.disabledValue, flag.valueType),
+        name: isEnvSource
+          ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
+          : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
+        value: getFallbackValue(
+          envDisabledValue ?? flag.disabledValue,
+          flag.valueType
+        ),
         valueType: flag.valueType || 'string',
         valueSource: isEnvSource ? 'environment' : 'flag',
       },
@@ -556,8 +615,12 @@ function evaluateFlagWithDetails(
         : 'No strategies defined - enabled by default',
     });
     if (contextFailed) {
-      const ctxEnvRow = flag.environments?.find((e: any) => e.environmentId === environmentId);
-      const ctxEnvDisVal = ctxEnvRow?.overrideDisabledValue ? ctxEnvRow.disabledValue : undefined;
+      const ctxEnvRow = flag.environments?.find(
+        (e: any) => e.environmentId === environmentId
+      );
+      const ctxEnvDisVal = ctxEnvRow?.overrideDisabledValue
+        ? ctxEnvRow.disabledValue
+        : undefined;
       const ctxIsEnvSource = ctxEnvRow?.overrideDisabledValue === true;
       return {
         enabled: false,
@@ -566,7 +629,10 @@ function evaluateFlagWithDetails(
           name: ctxIsEnvSource
             ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
             : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
-          value: getFallbackValue(ctxEnvDisVal ?? flag.disabledValue, flag.valueType),
+          value: getFallbackValue(
+            ctxEnvDisVal ?? flag.disabledValue,
+            flag.valueType
+          ),
           valueType: flag.valueType || 'string',
           valueSource: ctxIsEnvSource ? 'environment' : 'flag',
         },
@@ -636,7 +702,8 @@ function evaluateFlagWithDetails(
               segment: segmentName,
               constraint: constraint,
               passed: contextFailed ? null : constraintPassed,
-              contextValue: getContextValue(constraint.contextName, context) ?? null,
+              contextValue:
+                getContextValue(constraint.contextName, context) ?? null,
             });
             if (!constraintPassed) {
               segmentsPassed = false;
@@ -670,7 +737,8 @@ function evaluateFlagWithDetails(
           type: 'STRATEGY_CONSTRAINT',
           constraint: constraint,
           passed: contextFailed ? null : constraintPassed,
-          contextValue: getContextValue(constraint.contextName, context) ?? null,
+          contextValue:
+            getContextValue(constraint.contextName, context) ?? null,
         });
         if (!constraintPassed) {
           constraintsPassed = false;
@@ -706,7 +774,8 @@ function evaluateFlagWithDetails(
     });
 
     // Determine if strategy matched
-    const strategyMatched = segmentsPassed && constraintsPassed && strategyResult.enabled;
+    const strategyMatched =
+      segmentsPassed && constraintsPassed && strategyResult.enabled;
     strategyStep.passed = contextFailed ? null : strategyMatched;
     strategyStep.message = contextFailed
       ? 'Skipped - context validation failed'
@@ -740,7 +809,9 @@ function evaluateFlagWithDetails(
 
   // Context validation failed - return after full evaluation
   if (contextFailed) {
-    const ctxFailEnvRow = flag.environments?.find((e: any) => e.environmentId === environmentId);
+    const ctxFailEnvRow = flag.environments?.find(
+      (e: any) => e.environmentId === environmentId
+    );
     const ctxFailEnvDisVal = ctxFailEnvRow?.overrideDisabledValue
       ? ctxFailEnvRow.disabledValue
       : undefined;
@@ -752,7 +823,10 @@ function evaluateFlagWithDetails(
         name: ctxFailIsEnvSource
           ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
           : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
-        value: getFallbackValue(ctxFailEnvDisVal ?? flag.disabledValue, flag.valueType),
+        value: getFallbackValue(
+          ctxFailEnvDisVal ?? flag.disabledValue,
+          flag.valueType
+        ),
         valueType: flag.valueType || 'string',
         valueSource: ctxFailIsEnvSource ? 'environment' : 'flag',
       },
@@ -762,7 +836,8 @@ function evaluateFlagWithDetails(
 
   // No strategy matched
   const activeStrategies = strategies.filter((s: any) => s.isEnabled);
-  const allStrategiesDisabled = strategies.length > 0 && activeStrategies.length === 0;
+  const allStrategiesDisabled =
+    strategies.length > 0 && activeStrategies.length === 0;
 
   if (allStrategiesDisabled) {
     const variant = selectVariantForFlag(
@@ -780,7 +855,9 @@ function evaluateFlagWithDetails(
     };
   }
 
-  const noMatchEnvRow = flag.environments?.find((e: any) => e.environmentId === environmentId);
+  const noMatchEnvRow = flag.environments?.find(
+    (e: any) => e.environmentId === environmentId
+  );
   const noMatchEnvDisVal = noMatchEnvRow?.overrideDisabledValue
     ? noMatchEnvRow.disabledValue
     : undefined;
@@ -804,7 +881,10 @@ function evaluateFlagWithDetails(
   };
 }
 
-function evaluateConstraint(constraint: any, context: Record<string, any>): boolean {
+function evaluateConstraint(
+  constraint: any,
+  context: Record<string, any>
+): boolean {
   const contextValue = getContextValue(constraint.contextName, context);
 
   // Handle exists / not_exists before undefined check
@@ -831,9 +911,12 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
   if (constraint.operator === 'arr_any' || constraint.operator === 'arr_all') {
     const arr = Array.isArray(contextValue) ? contextValue.map(String) : [];
     const targetValues =
-      constraint.values?.map((v: string) => (constraint.caseInsensitive ? v.toLowerCase() : v)) ||
-      [];
-    const compareArr = constraint.caseInsensitive ? arr.map((v: string) => v.toLowerCase()) : arr;
+      constraint.values?.map((v: string) =>
+        constraint.caseInsensitive ? v.toLowerCase() : v
+      ) || [];
+    const compareArr = constraint.caseInsensitive
+      ? arr.map((v: string) => v.toLowerCase())
+      : arr;
 
     let result = false;
     if (constraint.operator === 'arr_any') {
@@ -842,20 +925,25 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
     } else {
       // All target values are in the array
       result =
-        targetValues.length > 0 && targetValues.every((tv: string) => compareArr.includes(tv));
+        targetValues.length > 0 &&
+        targetValues.every((tv: string) => compareArr.includes(tv));
     }
     return constraint.inverted ? !result : result;
   }
 
   const stringValue = String(contextValue);
-  const compareValue = constraint.caseInsensitive ? stringValue.toLowerCase() : stringValue;
+  const compareValue = constraint.caseInsensitive
+    ? stringValue.toLowerCase()
+    : stringValue;
   const targetValue = constraint.value
     ? constraint.caseInsensitive
       ? constraint.value.toLowerCase()
       : constraint.value
     : '';
   const targetValues =
-    constraint.values?.map((v: string) => (constraint.caseInsensitive ? v.toLowerCase() : v)) || [];
+    constraint.values?.map((v: string) =>
+      constraint.caseInsensitive ? v.toLowerCase() : v
+    ) || [];
 
   let result = false;
 
@@ -910,7 +998,8 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
       break;
     // Date operators
     case 'date_eq':
-      result = new Date(stringValue).getTime() === new Date(targetValue).getTime();
+      result =
+        new Date(stringValue).getTime() === new Date(targetValue).getTime();
       break;
     case 'date_gt':
       result = new Date(stringValue) > new Date(targetValue);
@@ -941,7 +1030,9 @@ function evaluateConstraint(constraint: any, context: Record<string, any>): bool
       result = compareSemver(stringValue, targetValue) <= 0;
       break;
     case 'semver_in':
-      result = targetValues.some((v: string) => compareSemver(stringValue, v) === 0);
+      result = targetValues.some(
+        (v: string) => compareSemver(stringValue, v) === 0
+      );
       break;
     default:
       result = false;
@@ -993,13 +1084,16 @@ function calculatePercentage(
 ): number {
   let stickinessValue = '';
   if (stickiness === 'default' || stickiness === 'userId') {
-    stickinessValue = context.userId || context.sessionId || String(Math.random());
+    stickinessValue =
+      context.userId || context.sessionId || String(Math.random());
   } else if (stickiness === 'sessionId') {
     stickinessValue = context.sessionId || String(Math.random());
   } else if (stickiness === 'random') {
     stickinessValue = String(Math.random());
   } else {
-    stickinessValue = String(getContextValue(stickiness, context) || Math.random());
+    stickinessValue = String(
+      getContextValue(stickiness, context) || Math.random()
+    );
   }
 
   return normalizedStrategyValue(stickinessValue, groupId);
@@ -1019,7 +1113,8 @@ function selectVariantForFlag(
   const resolvedEnabledValue = envSettings?.overrideEnabledValue
     ? envSettings.enabledValue
     : flag.enabledValue;
-  const valueSource = envSettings?.overrideEnabledValue === true ? 'environment' : 'flag';
+  const valueSource =
+    envSettings?.overrideEnabledValue === true ? 'environment' : 'flag';
 
   if (variants.length === 0) {
     return {
@@ -1033,7 +1128,10 @@ function selectVariantForFlag(
     };
   }
 
-  const totalWeight = variants.reduce((sum: number, v: any) => sum + v.weight, 0);
+  const totalWeight = variants.reduce(
+    (sum: number, v: any) => sum + v.weight,
+    0
+  );
   if (totalWeight <= 0) {
     return {
       name:
@@ -1047,7 +1145,11 @@ function selectVariantForFlag(
   }
 
   const stickiness = matchedStrategy?.parameters?.stickiness || 'default';
-  const percentage = calculatePercentage(context, stickiness, `${flag.flagName}-variant`);
+  const percentage = calculatePercentage(
+    context,
+    stickiness,
+    `${flag.flagName}-variant`
+  );
   const targetWeight = (percentage / 100) * totalWeight;
 
   let cumulativeWeight = 0;

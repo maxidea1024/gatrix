@@ -70,7 +70,8 @@ app.use(
     filter: (req, res) => {
       const accept = req.headers['accept'];
       const url = req.url || '';
-      if (typeof accept === 'string' && accept.includes('text/event-stream')) return false;
+      if (typeof accept === 'string' && accept.includes('text/event-stream'))
+        return false;
       if (url.includes('/api/v1/admin/notifications/sse')) return false;
       if (url.includes('/api/v1/admin/services/sse')) return false;
       return compression.filter(req, res);
@@ -179,7 +180,11 @@ if (config.nodeEnv !== 'production') {
     customSiteTitle: 'Gatrix API Documentation',
   };
 
-  app.use('/api-docs', swaggerUi.serve as any, swaggerUi.setup(swaggerSpec, swaggerOptions) as any);
+  app.use(
+    '/api-docs',
+    swaggerUi.serve as any,
+    swaggerUi.setup(swaggerSpec, swaggerOptions) as any
+  );
 
   // Swagger JSON endpoint
   app.get('/api-docs.json', (req, res) => {
@@ -206,7 +211,11 @@ app.use('/api/v1', routes);
 // Bull Board (Admin only)
 const bullBoardAdapter = BullBoardConfig.initialize();
 app.use('/bull-board', bullBoardAdapter.getRouter());
-app.use('/api/v1/bull-board', authenticate as any as any, bullBoardAdapter.getRouter());
+app.use(
+  '/api/v1/bull-board',
+  authenticate as any as any,
+  bullBoardAdapter.getRouter()
+);
 
 // app.use('/api/v1/advanced-settings', advancedSettingsRoutes);
 

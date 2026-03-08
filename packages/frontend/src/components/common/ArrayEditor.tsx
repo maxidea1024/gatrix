@@ -91,7 +91,14 @@ const SortableItem: React.FC<SortableItemProps> = ({
 }) => {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: item.id,
   });
 
@@ -122,7 +129,10 @@ const SortableItem: React.FC<SortableItemProps> = ({
               const val = e.target.value;
               // Allow empty, negative sign, and valid numbers
               if (val === '' || val === '-' || !isNaN(Number(val))) {
-                onChange(item.id, val === '' || val === '-' ? '' : parseFloat(val));
+                onChange(
+                  item.id,
+                  val === '' || val === '-' ? '' : parseFloat(val)
+                );
               }
             }}
             size="small"
@@ -146,7 +156,9 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   size="small"
                 />
               }
-              label={item.value === true || item.value === 'true' ? 'true' : 'false'}
+              label={
+                item.value === true || item.value === 'true' ? 'true' : 'false'
+              }
               sx={{ m: 0 }}
             />
           </Box>
@@ -163,8 +175,11 @@ const SortableItem: React.FC<SortableItemProps> = ({
         );
       case 'object':
         const jsonStr =
-          typeof item.value === 'object' ? JSON.stringify(item.value) : item.value || '{}';
-        const displayStr = jsonStr.length > 50 ? jsonStr.substring(0, 50) + '...' : jsonStr;
+          typeof item.value === 'object'
+            ? JSON.stringify(item.value)
+            : item.value || '{}';
+        const displayStr =
+          jsonStr.length > 50 ? jsonStr.substring(0, 50) + '...' : jsonStr;
         return (
           <Box
             sx={{
@@ -190,7 +205,11 @@ const SortableItem: React.FC<SortableItemProps> = ({
               onClick={() => onEditObject?.(item.id)}
             />
             <Tooltip title={t('common.edit')}>
-              <IconButton size="small" onClick={() => onEditObject?.(item.id)} color="primary">
+              <IconButton
+                size="small"
+                onClick={() => onEditObject?.(item.id)}
+                color="primary"
+              >
                 <EditIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -268,7 +287,11 @@ const SortableItem: React.FC<SortableItemProps> = ({
           </IconButton>
         </Tooltip>
         <Tooltip title={t('common.delete')}>
-          <IconButton size="small" color="error" onClick={() => onDelete(item.id)}>
+          <IconButton
+            size="small"
+            color="error"
+            onClick={() => onDelete(item.id)}
+          >
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Tooltip>
@@ -306,7 +329,8 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
       if (Array.isArray(parsed)) {
         // Only update if the values are actually different
         const currentValues = items.map((item) => item.value);
-        const valuesChanged = JSON.stringify(currentValues) !== JSON.stringify(parsed);
+        const valuesChanged =
+          JSON.stringify(currentValues) !== JSON.stringify(parsed);
 
         if (valuesChanged) {
           const newItems = parsed.map((val, idx) => ({
@@ -394,7 +418,9 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
   };
 
   const handleChange = (id: string, newValue: any) => {
-    const newItems = items.map((item) => (item.id === id ? { ...item, value: newValue } : item));
+    const newItems = items.map((item) =>
+      item.id === id ? { ...item, value: newValue } : item
+    );
     setItems(newItems);
     updateParent(newItems);
   };
@@ -408,7 +434,11 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
       value: items[index].value,
       shouldFocus: true,
     };
-    const newItems = [...items.slice(0, index + 1), duplicatedItem, ...items.slice(index + 1)];
+    const newItems = [
+      ...items.slice(0, index + 1),
+      duplicatedItem,
+      ...items.slice(index + 1),
+    ];
     setItems(newItems);
     updateParent(newItems);
 
@@ -448,7 +478,11 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
       value: items[index].value,
       shouldFocus: true,
     };
-    const newItems = [...items.slice(0, index + 1), newItem, ...items.slice(index + 1)];
+    const newItems = [
+      ...items.slice(0, index + 1),
+      newItem,
+      ...items.slice(index + 1),
+    ];
     setItems(newItems);
     updateParent(newItems);
 
@@ -540,7 +574,8 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
     try {
       switch (elementType) {
         case 'number':
-          parsedValue = fillValue === '' || fillValue === '-' ? '' : parseFloat(fillValue);
+          parsedValue =
+            fillValue === '' || fillValue === '-' ? '' : parseFloat(fillValue);
           if (isNaN(parsedValue)) {
             enqueueSnackbar(t('settings.kv.invalidNumber'), {
               variant: 'error',
@@ -581,7 +616,9 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
     if (!item) return;
 
     const jsonStr =
-      typeof item.value === 'object' ? JSON.stringify(item.value, null, 2) : item.value || '{}';
+      typeof item.value === 'object'
+        ? JSON.stringify(item.value, null, 2)
+        : item.value || '{}';
     setEditingObjectId(id);
     setEditingObjectValue(jsonStr);
     setObjectEditorOpen(true);
@@ -725,7 +762,9 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setResizeDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setResizeDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button onClick={handleResize} variant="contained">
             {t('common.ok')}
           </Button>
@@ -747,12 +786,19 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
                 control={
                   <Switch
                     checked={fillValue === 'true'}
-                    onChange={(e) => setFillValue(e.target.checked ? 'true' : 'false')}
+                    onChange={(e) =>
+                      setFillValue(e.target.checked ? 'true' : 'false')
+                    }
                   />
                 }
                 label={fillValue === 'true' ? 'true' : 'false'}
               />
-              <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 1 }}
+              >
                 {t('settings.kv.fillWithHelp')}
               </Typography>
             </Box>
@@ -764,14 +810,28 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
                 onChange={(color) => setFillValue(color)}
                 format="hex"
               />
-              <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 1 }}
+              >
                 {t('settings.kv.fillWithHelp')}
               </Typography>
             </Box>
           ) : elementType === 'object' ? (
             <Box sx={{ mt: 2 }}>
-              <JsonEditor value={fillValue} onChange={setFillValue} height={300} />
-              <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+              <JsonEditor
+                value={fillValue}
+                onChange={setFillValue}
+                height={300}
+              />
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 1 }}
+              >
                 {t('settings.kv.fillWithHelp')}
               </Typography>
             </Box>
@@ -796,7 +856,9 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setFillDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setFillDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button onClick={handleFill} variant="contained">
             {t('common.ok')}
           </Button>
@@ -813,11 +875,17 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
         <DialogTitle>{t('settings.kv.editObject')}</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
-            <JsonEditor value={editingObjectValue} onChange={setEditingObjectValue} height={400} />
+            <JsonEditor
+              value={editingObjectValue}
+              onChange={setEditingObjectValue}
+              height={400}
+            />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setObjectEditorOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setObjectEditorOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button onClick={handleSaveObject} variant="contained">
             {t('common.save')}
           </Button>
@@ -831,7 +899,11 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
       )}
 
       {helperText && !error && (
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 1, display: 'block' }}
+        >
           {helperText}
         </Typography>
       )}

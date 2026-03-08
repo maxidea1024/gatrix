@@ -3,7 +3,10 @@ import { generateULID } from '../utils/ulid';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('GameWorld');
-import { convertDateFieldsForMySQL, convertDateFieldsFromMySQL } from '../utils/date-utils';
+import {
+  convertDateFieldsForMySQL,
+  convertDateFieldsFromMySQL,
+} from '../utils/date-utils';
 
 export interface GameWorldMaintenanceLocale {
   id?: string;
@@ -103,7 +106,10 @@ export interface GameWorldListParams {
 }
 
 export class GameWorldModel {
-  static async findById(id: string, environmentId: string): Promise<GameWorld | null> {
+  static async findById(
+    id: string,
+    environmentId: string
+  ): Promise<GameWorld | null> {
     try {
       return await this.findByIdWith(db, id, environmentId);
     } catch (error) {
@@ -144,7 +150,10 @@ export class GameWorldModel {
     ) as GameWorld;
   }
 
-  static async findByWorldId(worldId: string, environmentId: string): Promise<GameWorld | null> {
+  static async findByWorldId(
+    worldId: string,
+    environmentId: string
+  ): Promise<GameWorld | null> {
     try {
       const gameWorld = await db('g_game_worlds')
         .where('worldId', worldId)
@@ -166,7 +175,13 @@ export class GameWorldModel {
 
   static async list(params: GameWorldListParams): Promise<GameWorld[]> {
     try {
-      const { environmentId, search = '', isVisible, isMaintenance, tags } = params;
+      const {
+        environmentId,
+        search = '',
+        isVisible,
+        isMaintenance,
+        tags,
+      } = params;
 
       // Convert raw SQL to knex query builder
       let query = db('g_game_worlds as gw')
@@ -225,7 +240,9 @@ export class GameWorldModel {
       // 각 게임월드에 대해 maintenanceLocales 추가
       const worldsWithLocales = await Promise.all(
         worlds.map(async (world: any) => {
-          const maintenanceLocales = await db('g_game_world_maintenance_locales')
+          const maintenanceLocales = await db(
+            'g_game_world_maintenance_locales'
+          )
             .where('gameWorldId', world.id)
             .select('lang', 'message');
 
@@ -234,7 +251,12 @@ export class GameWorldModel {
               ...world,
               maintenanceLocales: maintenanceLocales || [],
             },
-            ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']
+            [
+              'createdAt',
+              'updatedAt',
+              'maintenanceStartDate',
+              'maintenanceEndDate',
+            ]
           ) as GameWorld;
         })
       );
@@ -246,7 +268,10 @@ export class GameWorldModel {
     }
   }
 
-  static async create(worldData: CreateGameWorldData, environmentId: string): Promise<GameWorld> {
+  static async create(
+    worldData: CreateGameWorldData,
+    environmentId: string
+  ): Promise<GameWorld> {
     try {
       // Get the next display order if not provided (within the same environment)
       let displayOrder = worldData.displayOrder;
@@ -372,7 +397,9 @@ export class GameWorldModel {
         // 점검 메시지 Locale 처리
         if (maintenanceLocales !== undefined) {
           // Existing Locale Delete
-          await trx('g_game_world_maintenance_locales').where('gameWorldId', id).del();
+          await trx('g_game_world_maintenance_locales')
+            .where('gameWorldId', id)
+            .del();
 
           // 새 Locale 추가
           if (maintenanceLocales.length > 0) {
@@ -413,7 +440,11 @@ export class GameWorldModel {
     }
   }
 
-  static async exists(worldId: string, id: string, environmentId: string): Promise<boolean> {
+  static async exists(
+    worldId: string,
+    id: string,
+    environmentId: string
+  ): Promise<boolean> {
     try {
       const result = await db('g_game_worlds')
         .where('worldId', worldId)

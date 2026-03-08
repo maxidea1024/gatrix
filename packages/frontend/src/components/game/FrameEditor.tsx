@@ -60,7 +60,9 @@ import {
 } from '../../services/bannerService';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import { useGameWorld } from '../../contexts/GameWorldContext';
-import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGroup';
+import TargetSettingsGroup, {
+  ChannelSubchannelData,
+} from './TargetSettingsGroup';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -86,7 +88,11 @@ interface FrameEditorProps {
   onAddMultipleEmptyAfter: (count: number) => void;
   onAddFromClipboardBefore: (urls: string[]) => void;
   onAddFromClipboardAfter: (urls: string[]) => void;
-  onResizeStart?: (frameIndex: number, edge: 'left' | 'right', startX: number) => void;
+  onResizeStart?: (
+    frameIndex: number,
+    edge: 'left' | 'right',
+    startX: number
+  ) => void;
   onFrameClick?: () => void; // Callback when frame is clicked (for preview sync)
   hasClipboard: boolean;
   timelineWidth?: number; // Optional width for timeline view mode
@@ -190,10 +196,13 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
 
   // Local edit state for dialog (cancel/apply pattern)
   const [editFrame, setEditFrame] = useState<Frame>(frame);
-  const [localDelaySeconds, setLocalDelaySeconds] = useState((frame.delay / 1000).toString());
+  const [localDelaySeconds, setLocalDelaySeconds] = useState(
+    (frame.delay / 1000).toString()
+  );
 
   // Dynamic conditions expand state
-  const [dynamicConditionsExpanded, setDynamicConditionsExpanded] = useState(false);
+  const [dynamicConditionsExpanded, setDynamicConditionsExpanded] =
+    useState(false);
 
   // Sync forceDialogOpen with settingsOpen
   useEffect(() => {
@@ -237,7 +246,14 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
   // Clipboard image URLs state
   const [clipboardUrls, setClipboardUrls] = useState<string[]>([]);
 
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: frame.frameId,
   });
 
@@ -411,14 +427,20 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
     });
   };
 
-  const handlePlatformsChange = (platformsList: string[], inverted: boolean) => {
+  const handlePlatformsChange = (
+    platformsList: string[],
+    inverted: boolean
+  ) => {
     handleTargetingUpdate({
       platforms: platformsList.length > 0 ? platformsList : undefined,
       platformsInverted: inverted,
     });
   };
 
-  const handleChannelsChange = (channelsList: ChannelSubchannelData[], inverted: boolean) => {
+  const handleChannelsChange = (
+    channelsList: ChannelSubchannelData[],
+    inverted: boolean
+  ) => {
     handleTargetingUpdate({
       channelSubchannels: channelsList.length > 0 ? channelsList : undefined,
       channelSubchannelsInverted: inverted,
@@ -513,7 +535,9 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
               {t('banners.type')}
             </Box>
             <Box component="td" sx={{ fontWeight: 500, fontSize: '0.75rem' }}>
-              {frame.imageUrl ? frame.type?.toUpperCase() || '-' : t('banners.imageNotSet')}
+              {frame.imageUrl
+                ? frame.type?.toUpperCase() || '-'
+                : t('banners.imageNotSet')}
             </Box>
           </tr>
           <tr>
@@ -875,7 +899,11 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 </IconButton>
               </Tooltip>
               <Tooltip title={t('common.delete')}>
-                <IconButton size="small" onClick={onDelete} sx={{ color: 'error.light', p: 0.25 }}>
+                <IconButton
+                  size="small"
+                  onClick={onDelete}
+                  sx={{ color: 'error.light', p: 0.25 }}
+                >
                   <DeleteIcon sx={{ fontSize: 14 }} />
                 </IconButton>
               </Tooltip>
@@ -885,7 +913,12 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
       </Tooltip>
 
       {/* Settings Dialog */}
-      <Dialog open={settingsOpen} onClose={handleDialogClose} maxWidth="md" fullWidth>
+      <Dialog
+        open={settingsOpen}
+        onClose={handleDialogClose}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
           {editFrame.imageUrl ? t('banners.editFrame') : t('banners.addFrame')}
         </DialogTitle>
@@ -930,7 +963,9 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                   size="small"
                   sx={{ flex: 1 }}
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">s</InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">s</InputAdornment>
+                    ),
                   }}
                 />
                 {isEditVideo && (
@@ -960,12 +995,22 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                   <Select
                     value={editFrame.action?.type || 'none'}
                     label={t('banners.actionType')}
-                    onChange={(e) => handleActionTypeChange(e.target.value as FrameActionType)}
+                    onChange={(e) =>
+                      handleActionTypeChange(e.target.value as FrameActionType)
+                    }
                   >
-                    <MenuItem value="none">{t('banners.actionTypes.none')}</MenuItem>
-                    <MenuItem value="openUrl">{t('banners.actionTypes.openUrl')}</MenuItem>
-                    <MenuItem value="command">{t('banners.actionTypes.command')}</MenuItem>
-                    <MenuItem value="deepLink">{t('banners.actionTypes.deepLink')}</MenuItem>
+                    <MenuItem value="none">
+                      {t('banners.actionTypes.none')}
+                    </MenuItem>
+                    <MenuItem value="openUrl">
+                      {t('banners.actionTypes.openUrl')}
+                    </MenuItem>
+                    <MenuItem value="command">
+                      {t('banners.actionTypes.command')}
+                    </MenuItem>
+                    <MenuItem value="deepLink">
+                      {t('banners.actionTypes.deepLink')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
                 {editFrame.action?.type && editFrame.action.type !== 'none' && (
@@ -991,15 +1036,31 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                   <Select
                     value={editFrame.effects?.enter || 'none'}
                     label={t('banners.enterEffect')}
-                    onChange={(e) => handleEffectEnterChange(e.target.value as FrameEffectType)}
+                    onChange={(e) =>
+                      handleEffectEnterChange(e.target.value as FrameEffectType)
+                    }
                   >
-                    <MenuItem value="none">{t('banners.effects.none')}</MenuItem>
-                    <MenuItem value="fadeIn">{t('banners.effects.fadeIn')}</MenuItem>
-                    <MenuItem value="slideLeft">{t('banners.effects.slideLeft')}</MenuItem>
-                    <MenuItem value="slideRight">{t('banners.effects.slideRight')}</MenuItem>
-                    <MenuItem value="slideUp">{t('banners.effects.slideUp')}</MenuItem>
-                    <MenuItem value="slideDown">{t('banners.effects.slideDown')}</MenuItem>
-                    <MenuItem value="zoomIn">{t('banners.effects.zoomIn')}</MenuItem>
+                    <MenuItem value="none">
+                      {t('banners.effects.none')}
+                    </MenuItem>
+                    <MenuItem value="fadeIn">
+                      {t('banners.effects.fadeIn')}
+                    </MenuItem>
+                    <MenuItem value="slideLeft">
+                      {t('banners.effects.slideLeft')}
+                    </MenuItem>
+                    <MenuItem value="slideRight">
+                      {t('banners.effects.slideRight')}
+                    </MenuItem>
+                    <MenuItem value="slideUp">
+                      {t('banners.effects.slideUp')}
+                    </MenuItem>
+                    <MenuItem value="slideDown">
+                      {t('banners.effects.slideDown')}
+                    </MenuItem>
+                    <MenuItem value="zoomIn">
+                      {t('banners.effects.zoomIn')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl size="small" sx={{ flex: 1 }}>
@@ -1007,15 +1068,31 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                   <Select
                     value={editFrame.effects?.exit || 'none'}
                     label={t('banners.exitEffect')}
-                    onChange={(e) => handleEffectExitChange(e.target.value as FrameEffectType)}
+                    onChange={(e) =>
+                      handleEffectExitChange(e.target.value as FrameEffectType)
+                    }
                   >
-                    <MenuItem value="none">{t('banners.effects.none')}</MenuItem>
-                    <MenuItem value="fadeOut">{t('banners.effects.fadeOut')}</MenuItem>
-                    <MenuItem value="slideLeft">{t('banners.effects.slideLeft')}</MenuItem>
-                    <MenuItem value="slideRight">{t('banners.effects.slideRight')}</MenuItem>
-                    <MenuItem value="slideUp">{t('banners.effects.slideUp')}</MenuItem>
-                    <MenuItem value="slideDown">{t('banners.effects.slideDown')}</MenuItem>
-                    <MenuItem value="zoomOut">{t('banners.effects.zoomOut')}</MenuItem>
+                    <MenuItem value="none">
+                      {t('banners.effects.none')}
+                    </MenuItem>
+                    <MenuItem value="fadeOut">
+                      {t('banners.effects.fadeOut')}
+                    </MenuItem>
+                    <MenuItem value="slideLeft">
+                      {t('banners.effects.slideLeft')}
+                    </MenuItem>
+                    <MenuItem value="slideRight">
+                      {t('banners.effects.slideRight')}
+                    </MenuItem>
+                    <MenuItem value="slideUp">
+                      {t('banners.effects.slideUp')}
+                    </MenuItem>
+                    <MenuItem value="slideDown">
+                      {t('banners.effects.slideDown')}
+                    </MenuItem>
+                    <MenuItem value="zoomOut">
+                      {t('banners.effects.zoomOut')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Box>
@@ -1032,22 +1109,40 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                   <Select
                     value={editFrame.transition?.type || 'none'}
                     label={t('banners.transitionType')}
-                    onChange={(e) => handleTransitionTypeChange(e.target.value as TransitionType)}
+                    onChange={(e) =>
+                      handleTransitionTypeChange(
+                        e.target.value as TransitionType
+                      )
+                    }
                   >
-                    <MenuItem value="none">{t('banners.transitions.none')}</MenuItem>
-                    <MenuItem value="fade">{t('banners.transitions.fade')}</MenuItem>
-                    <MenuItem value="slide">{t('banners.transitions.slide')}</MenuItem>
-                    <MenuItem value="crossfade">{t('banners.transitions.crossfade')}</MenuItem>
+                    <MenuItem value="none">
+                      {t('banners.transitions.none')}
+                    </MenuItem>
+                    <MenuItem value="fade">
+                      {t('banners.transitions.fade')}
+                    </MenuItem>
+                    <MenuItem value="slide">
+                      {t('banners.transitions.slide')}
+                    </MenuItem>
+                    <MenuItem value="crossfade">
+                      {t('banners.transitions.crossfade')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
                 <TextField
                   label={t('banners.transitionDuration')}
-                  value={((editFrame.transition?.duration || 300) / 1000).toFixed(2)}
-                  onChange={(e) => handleTransitionDurationChange(e.target.value)}
+                  value={(
+                    (editFrame.transition?.duration || 300) / 1000
+                  ).toFixed(2)}
+                  onChange={(e) =>
+                    handleTransitionDurationChange(e.target.value)
+                  }
                   size="small"
                   sx={{ flex: 1 }}
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">s</InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">s</InputAdornment>
+                    ),
                   }}
                 />
               </Box>
@@ -1095,7 +1190,11 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                       }}
                     >
                       <BrokenImageIcon color="disabled" sx={{ fontSize: 48 }} />
-                      <Typography variant="caption" color="error" sx={{ mt: 1 }}>
+                      <Typography
+                        variant="caption"
+                        color="error"
+                        sx={{ mt: 1 }}
+                      >
                         {t('banners.imageLoadError')}
                       </Typography>
                     </Box>
@@ -1134,7 +1233,10 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                     }}
                   >
                     <ImageIcon sx={{ fontSize: 48, color: 'grey.600' }} />
-                    <Typography variant="caption" sx={{ mt: 1, color: 'grey.500' }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ mt: 1, color: 'grey.500' }}
+                    >
                       {t('banners.enterImageUrl')}
                     </Typography>
                   </Box>
@@ -1144,10 +1246,15 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
               {/* Image/Video Info */}
               {editFrame.imageUrl && !imageError && (
                 <Box sx={{ mt: 1, textAlign: 'center' }}>
-                  <Typography variant="caption" color="text.secondary" component="div">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    component="div"
+                  >
                     {editFrame.type && (
                       <span>
-                        {t('banners.type')}: <strong>{editFrame.type.toUpperCase()}</strong>
+                        {t('banners.type')}:{' '}
+                        <strong>{editFrame.type.toUpperCase()}</strong>
                       </span>
                     )}
                     {imageInfo && (
@@ -1173,10 +1280,14 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           {/* Target Settings Group - Platform, Channel, World */}
           <TargetSettingsGroup
             targetPlatforms={editFrame.targeting?.platforms || []}
-            targetPlatformsInverted={editFrame.targeting?.platformsInverted || false}
+            targetPlatformsInverted={
+              editFrame.targeting?.platformsInverted || false
+            }
             platforms={platforms}
             onPlatformsChange={handlePlatformsChange}
-            targetChannelSubchannels={editFrame.targeting?.channelSubchannels || []}
+            targetChannelSubchannels={
+              editFrame.targeting?.channelSubchannels || []
+            }
             targetChannelSubchannelsInverted={
               editFrame.targeting?.channelSubchannelsInverted || false
             }
@@ -1207,9 +1318,15 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 gap: 1,
                 cursor: 'pointer',
               }}
-              onClick={() => setDynamicConditionsExpanded(!dynamicConditionsExpanded)}
+              onClick={() =>
+                setDynamicConditionsExpanded(!dynamicConditionsExpanded)
+              }
             >
-              {dynamicConditionsExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              {dynamicConditionsExpanded ? (
+                <ExpandLessIcon />
+              ) : (
+                <ExpandMoreIcon />
+              )}
               <Typography variant="subtitle1" fontWeight={600}>
                 {t('banners.dynamicConditions')}
               </Typography>
@@ -1225,7 +1342,11 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
 
               {/* User Level Range */}
               <Box sx={{ mb: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   {t('banners.userLevelRange')}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
@@ -1254,7 +1375,11 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
 
               {/* Join Days Range */}
               <Box sx={{ mb: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   {t('banners.joinDaysRange')}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
@@ -1291,7 +1416,11 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
 
               {/* Filter Logic (AND/OR) */}
               <Box>
-                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   {t('banners.filterLogic')}
                 </Typography>
                 <ToggleButtonGroup
@@ -1302,8 +1431,12 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                   }
                   size="small"
                 >
-                  <ToggleButton value="and">{t('banners.filterLogicAnd')}</ToggleButton>
-                  <ToggleButton value="or">{t('banners.filterLogicOr')}</ToggleButton>
+                  <ToggleButton value="and">
+                    {t('banners.filterLogicAnd')}
+                  </ToggleButton>
+                  <ToggleButton value="or">
+                    {t('banners.filterLogicOr')}
+                  </ToggleButton>
                 </ToggleButtonGroup>
                 <Typography
                   variant="caption"
@@ -1330,7 +1463,9 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
         onClose={handleCloseContextMenu}
         anchorReference="anchorPosition"
         anchorPosition={
-          contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
         }
       >
         {/* Edit */}
@@ -1344,11 +1479,16 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
         <Divider />
 
         {/* Duplicate */}
-        <MenuItem onClick={() => handleMenuAction(onDuplicateBefore)} disabled={frameIndex === 0}>
+        <MenuItem
+          onClick={() => handleMenuAction(onDuplicateBefore)}
+          disabled={frameIndex === 0}
+        >
           <ListItemIcon>
             <InsertBeforeIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('banners.contextMenu.duplicateBefore')}</ListItemText>
+          <ListItemText>
+            {t('banners.contextMenu.duplicateBefore')}
+          </ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleMenuAction(onDuplicateAfter)}>
           <ListItemIcon>
@@ -1368,19 +1508,28 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
         </MenuItem>
 
         {/* Paste */}
-        <MenuItem onClick={() => handleMenuAction(onPasteBefore)} disabled={!hasClipboard}>
+        <MenuItem
+          onClick={() => handleMenuAction(onPasteBefore)}
+          disabled={!hasClipboard}
+        >
           <ListItemIcon>
             <PasteIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t('banners.contextMenu.pasteBefore')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => handleMenuAction(onPasteAfter)} disabled={!hasClipboard}>
+        <MenuItem
+          onClick={() => handleMenuAction(onPasteAfter)}
+          disabled={!hasClipboard}
+        >
           <ListItemIcon>
             <PasteIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t('banners.contextMenu.pasteAfter')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => handleMenuAction(onPasteReplace)} disabled={!hasClipboard}>
+        <MenuItem
+          onClick={() => handleMenuAction(onPasteReplace)}
+          disabled={!hasClipboard}
+        >
           <ListItemIcon>
             <ReplaceIcon fontSize="small" />
           </ListItemIcon>
@@ -1405,7 +1554,9 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           <ListItemIcon>
             <AddMultipleIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('banners.contextMenu.addMultipleEmptyBefore')}</ListItemText>
+          <ListItemText>
+            {t('banners.contextMenu.addMultipleEmptyBefore')}
+          </ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleMenuAction(onAddEmptyAfter)}>
           <ListItemIcon>
@@ -1422,7 +1573,9 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           <ListItemIcon>
             <AddMultipleIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('banners.contextMenu.addMultipleEmptyAfter')}</ListItemText>
+          <ListItemText>
+            {t('banners.contextMenu.addMultipleEmptyAfter')}
+          </ListItemText>
         </MenuItem>
 
         {/* Add from Clipboard URLs */}
@@ -1430,7 +1583,9 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           <>
             <Divider />
             <MenuItem
-              onClick={() => handleMenuAction(() => onAddFromClipboardBefore(clipboardUrls))}
+              onClick={() =>
+                handleMenuAction(() => onAddFromClipboardBefore(clipboardUrls))
+              }
             >
               <ListItemIcon>
                 <LinkIcon fontSize="small" color="primary" />
@@ -1444,7 +1599,9 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
               </ListItemText>
             </MenuItem>
             <MenuItem
-              onClick={() => handleMenuAction(() => onAddFromClipboardAfter(clipboardUrls))}
+              onClick={() =>
+                handleMenuAction(() => onAddFromClipboardAfter(clipboardUrls))
+              }
             >
               <ListItemIcon>
                 <LinkIcon fontSize="small" color="primary" />
@@ -1463,7 +1620,10 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
         <Divider />
 
         {/* Move */}
-        <MenuItem onClick={() => handleMenuAction(onMovePrev)} disabled={frameIndex === 0}>
+        <MenuItem
+          onClick={() => handleMenuAction(onMovePrev)}
+          disabled={frameIndex === 0}
+        >
           <ListItemIcon>
             <MovePrevIcon fontSize="small" />
           </ListItemIcon>
@@ -1478,7 +1638,10 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           </ListItemIcon>
           <ListItemText>{t('banners.contextMenu.moveNext')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => handleMenuAction(onMoveFirst)} disabled={frameIndex === 0}>
+        <MenuItem
+          onClick={() => handleMenuAction(onMoveFirst)}
+          disabled={frameIndex === 0}
+        >
           <ListItemIcon>
             <MoveFirstIcon fontSize="small" />
           </ListItemIcon>
@@ -1497,7 +1660,10 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
         <Divider />
 
         {/* Delete */}
-        <MenuItem onClick={() => handleMenuAction(onDelete)} sx={{ color: 'error.main' }}>
+        <MenuItem
+          onClick={() => handleMenuAction(onDelete)}
+          sx={{ color: 'error.main' }}
+        >
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
@@ -1527,11 +1693,15 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEmptyFrameCountDialogOpen(null)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setEmptyFrameCountDialogOpen(null)}>
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             onClick={() => {
-              const input = document.getElementById('empty-frame-count') as HTMLInputElement;
+              const input = document.getElementById(
+                'empty-frame-count'
+              ) as HTMLInputElement;
               const count = parseInt(input?.value || '5', 10);
               if (count > 0 && count <= 100) {
                 if (emptyFrameCountDialogOpen === 'before') {

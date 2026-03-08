@@ -31,8 +31,10 @@ const PaletteBackground: React.FC = () => {
       const data = imageData.data;
 
       // Hyper-winding path: Higher amplitude and depth-based curvature
-      const pathX = (t: number) => Math.sin(t * 0.6) * 60 + Math.cos(t * 0.25) * 35;
-      const pathY = (t: number) => Math.cos(t * 0.5) * 45 + Math.sin(t * 0.35) * 25;
+      const pathX = (t: number) =>
+        Math.sin(t * 0.6) * 60 + Math.cos(t * 0.25) * 35;
+      const pathY = (t: number) =>
+        Math.cos(t * 0.5) * 45 + Math.sin(t * 0.35) * 25;
 
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
@@ -50,10 +52,13 @@ const PaletteBackground: React.FC = () => {
           const correctedDx = dx - shiftX;
           const correctedDy = dy - shiftY;
 
-          const dist = Math.sqrt(correctedDx * correctedDx + correctedDy * correctedDy);
+          const dist = Math.sqrt(
+            correctedDx * correctedDx + correctedDy * correctedDy
+          );
           // Slower forward speed (4.5 -> 2.0)
           const v = (dist < 0.5 ? 1000 : 240.0 / dist) + time * 2.0;
-          const u = (Math.atan2(correctedDy, correctedDx) + Math.PI) / (Math.PI * 2);
+          const u =
+            (Math.atan2(correctedDy, correctedDx) + Math.PI) / (Math.PI * 2);
 
           const segments = 12;
           const pattern = (Math.floor(u * segments) ^ Math.floor(v * 1.5)) & 1;
@@ -120,7 +125,8 @@ const PaletteBackground: React.FC = () => {
           left: 0,
           width: '100vw',
           height: '100vh',
-          background: 'radial-gradient(circle at center, transparent 20%, rgba(0,0,0,0.8) 100%)',
+          background:
+            'radial-gradient(circle at center, transparent 20%, rgba(0,0,0,0.8) 100%)',
           pointerEvents: 'none',
         }}
       />

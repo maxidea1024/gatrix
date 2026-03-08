@@ -24,7 +24,9 @@ export interface ITokenProvider {
    * Used by Edge servers when environments are added/removed.
    * Returns an unsubscribe function.
    */
-  onTokensChanged?(callback: (added: string[], removed: string[]) => void): () => void;
+  onTokensChanged?(
+    callback: (added: string[], removed: string[]) => void
+  ): () => void;
 }
 
 /**

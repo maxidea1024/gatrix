@@ -195,7 +195,11 @@ export class UserController {
         return;
       }
 
-      const success = await UserService.updateUserStatus(userId, status, customStatus);
+      const success = await UserService.updateUserStatus(
+        userId,
+        status,
+        customStatus
+      );
 
       if (!success) {
         res.status(404).json({

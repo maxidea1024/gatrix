@@ -52,7 +52,8 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
   const handleCopyLink = () => {
     copyToClipboardWithNotification(
       inviteUrl,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -97,7 +98,9 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
     }
   };
 
-  const isExpired = invitation.expiresAt ? new Date(invitation.expiresAt) <= new Date() : false;
+  const isExpired = invitation.expiresAt
+    ? new Date(invitation.expiresAt) <= new Date()
+    : false;
 
   const handleDeleteClick = () => {
     setDeleteDrawerOpen(true);
@@ -186,17 +189,32 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
 
             <Box sx={{ display: 'flex', gap: 0.5, ml: 1 }}>
               <Tooltip title={t('invitations.copyLink')}>
-                <IconButton onClick={handleCopyLink} size="small" color="primary" sx={{ p: 0.5 }}>
+                <IconButton
+                  onClick={handleCopyLink}
+                  size="small"
+                  color="primary"
+                  sx={{ p: 0.5 }}
+                >
                   <CopyIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
               <Tooltip title={t('invitations.updateInviteLink')}>
-                <IconButton onClick={onUpdate} size="small" color="info" sx={{ p: 0.5 }}>
+                <IconButton
+                  onClick={onUpdate}
+                  size="small"
+                  color="info"
+                  sx={{ p: 0.5 }}
+                >
                   <EditIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
               <Tooltip title={t('invitations.delete')}>
-                <IconButton onClick={handleDeleteClick} size="small" color="error" sx={{ p: 0.5 }}>
+                <IconButton
+                  onClick={handleDeleteClick}
+                  size="small"
+                  color="error"
+                  sx={{ p: 0.5 }}
+                >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -269,7 +287,10 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
 
           {/* Invitation Details */}
           <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'medium' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 2, fontWeight: 'medium' }}
+            >
               {t('invitations.invitationDetails')}
             </Typography>
             <TableContainer component={Paper} variant="outlined">
@@ -286,13 +307,21 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
                     <TableCell>{invitation.email}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell component="th" scope="row" sx={{ fontWeight: 'medium' }}>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      sx={{ fontWeight: 'medium' }}
+                    >
                       {t('invitations.createdAt')}
                     </TableCell>
                     <TableCell>{formatDate(invitation.createdAt)}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell component="th" scope="row" sx={{ fontWeight: 'medium' }}>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      sx={{ fontWeight: 'medium' }}
+                    >
                       {t('invitations.expiresAt')}
                     </TableCell>
                     <TableCell>
@@ -302,12 +331,20 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
                     </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell component="th" scope="row" sx={{ fontWeight: 'medium' }}>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      sx={{ fontWeight: 'medium' }}
+                    >
                       {t('invitations.status')}
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={isExpired ? t('invitations.expired') : t('invitations.active')}
+                        label={
+                          isExpired
+                            ? t('invitations.expired')
+                            : t('invitations.active')
+                        }
                         color={isExpired ? 'error' : 'success'}
                         size="small"
                         variant="outlined"

@@ -2,7 +2,12 @@
  * HTTP API Client using Axios
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+} from 'axios';
 import { ulid } from 'ulid';
 import { Logger } from '../utils/logger';
 import { ErrorCode, createError, isGatrixSDKError } from '../utils/errors';
@@ -63,7 +68,8 @@ export class ApiClient {
       timeout: config.timeout || 30000,
       headers,
       // Treat 304 Not Modified as a successful response so we can handle ETag logic
-      validateStatus: (status) => (status >= 200 && status < 300) || status === 304,
+      validateStatus: (status) =>
+        (status >= 200 && status < 300) || status === 304,
     });
 
     // Request interceptor
@@ -95,13 +101,20 @@ export class ApiClient {
 
         // Observe HTTP duration and increment counters
         try {
-          const started = (response.config as any).__sdkStartTime as bigint | undefined;
+          const started = (response.config as any).__sdkStartTime as
+            | bigint
+            | undefined;
           if (started && this.metrics) {
             const elapsed = Number(process.hrtime.bigint() - started) / 1e9;
             const method = response.config.method?.toUpperCase() || 'GET';
             const route = response.config.url || 'unknown';
             // Use SDK metrics generic error counter and custom HTTP helpers if present
-            this.metrics.observeHttpDuration?.(method, route, response.status, elapsed);
+            this.metrics.observeHttpDuration?.(
+              method,
+              route,
+              response.status,
+              elapsed
+            );
             this.metrics.incHttpRequestsTotal?.(method, route, response.status);
           }
         } catch {
@@ -232,7 +245,8 @@ export class ApiClient {
    */
   private calculateRetryDelay(attemptNumber: number): number {
     const delay =
-      this.retryConfig.retryDelay * Math.pow(this.retryConfig.retryDelayMultiplier, attemptNumber);
+      this.retryConfig.retryDelay *
+      Math.pow(this.retryConfig.retryDelayMultiplier, attemptNumber);
     return Math.min(delay, this.retryConfig.maxRetryDelay);
   }
 
@@ -274,7 +288,9 @@ export class ApiClient {
   ): Promise<ApiResponse<T>> {
     let lastError: any;
     const isInfiniteRetry = this.retryConfig.maxRetries === -1;
-    const maxAttempts = isInfiniteRetry ? Number.MAX_SAFE_INTEGER : this.retryConfig.maxRetries;
+    const maxAttempts = isInfiniteRetry
+      ? Number.MAX_SAFE_INTEGER
+      : this.retryConfig.maxRetries;
 
     for (let attempt = 0; attempt <= maxAttempts; attempt++) {
       try {
@@ -297,7 +313,8 @@ export class ApiClient {
         lastError = error;
 
         // Check if this is the final failure (not retryable or last attempt)
-        const isFinalFailure = !this.isRetryableError(lastError) || attempt === maxAttempts;
+        const isFinalFailure =
+          !this.isRetryableError(lastError) || attempt === maxAttempts;
 
         if (isFinalFailure) {
           // Log detailed error only on final failure
@@ -305,7 +322,9 @@ export class ApiClient {
             method: context.method,
             url: context.url,
             attempt: attempt + 1,
-            maxRetries: isInfiniteRetry ? 'infinite' : this.retryConfig.maxRetries,
+            maxRetries: isInfiniteRetry
+              ? 'infinite'
+              : this.retryConfig.maxRetries,
             error: this.extractDetailedErrorMessage(lastError),
           });
 
@@ -320,7 +339,9 @@ export class ApiClient {
           method: context.method,
           url: context.url,
           attempt: attempt + 1,
-          maxRetries: isInfiniteRetry ? 'infinite' : this.retryConfig.maxRetries,
+          maxRetries: isInfiniteRetry
+            ? 'infinite'
+            : this.retryConfig.maxRetries,
           retryDelay: delay,
           error: this.extractDetailedErrorMessage(lastError),
         });
@@ -358,7 +379,10 @@ export class ApiClient {
     return error.message || 'Unknown error';
   }
 
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  async get<T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
     const requestConfig: AxiosRequestConfig = { ...(config || {}) };
     const cacheKey = this.buildCacheKey(url, requestConfig);
     const cachedEtag = this.etagStore.get(cacheKey);
@@ -372,11 +396,16 @@ export class ApiClient {
 
     return this.executeWithRetry(
       async () => {
-        const response = await this.client.get<ApiResponse<T>>(url, requestConfig);
+        const response = await this.client.get<ApiResponse<T>>(
+          url,
+          requestConfig
+        );
 
         // Handle 304 Not Modified using cached response body
         if (response.status === 304) {
-          const cachedBody = this.bodyCache.get(cacheKey) as ApiResponse<T> | undefined;
+          const cachedBody = this.bodyCache.get(cacheKey) as
+            | ApiResponse<T>
+            | undefined;
           if (cachedBody) {
             return {
               ...response,
@@ -393,9 +422,14 @@ export class ApiClient {
           delete (retryConfig.headers as any)['If-None-Match'];
           delete (retryConfig.headers as any)['if-none-match'];
 
-          const freshResponse = await this.client.get<ApiResponse<T>>(url, retryConfig);
+          const freshResponse = await this.client.get<ApiResponse<T>>(
+            url,
+            retryConfig
+          );
 
-          const freshEtag = (freshResponse.headers as any)?.etag as string | undefined;
+          const freshEtag = (freshResponse.headers as any)?.etag as
+            | string
+            | undefined;
           if (freshEtag) {
             this.etagStore.set(cacheKey, freshEtag);
             this.bodyCache.set(cacheKey, freshResponse.data);
@@ -434,10 +468,13 @@ export class ApiClient {
 
     requestConfig.headers = headers;
 
-    return this.executeWithRetry(() => this.client.post<ApiResponse<T>>(url, data, requestConfig), {
-      method: 'POST',
-      url,
-    });
+    return this.executeWithRetry(
+      () => this.client.post<ApiResponse<T>>(url, data, requestConfig),
+      {
+        method: 'POST',
+        url,
+      }
+    );
   }
 
   /**
@@ -458,7 +495,11 @@ export class ApiClient {
     requestConfig.headers = headers;
 
     try {
-      const response = await this.client.post<ApiResponse<T>>(url, data, requestConfig);
+      const response = await this.client.post<ApiResponse<T>>(
+        url,
+        data,
+        requestConfig
+      );
       return response.data;
     } catch (error) {
       this.handleError(error as AxiosError);
@@ -483,10 +524,13 @@ export class ApiClient {
 
     requestConfig.headers = headers;
 
-    return this.executeWithRetry(() => this.client.put<ApiResponse<T>>(url, data, requestConfig), {
-      method: 'PUT',
-      url,
-    });
+    return this.executeWithRetry(
+      () => this.client.put<ApiResponse<T>>(url, data, requestConfig),
+      {
+        method: 'PUT',
+        url,
+      }
+    );
   }
 
   /**
@@ -515,18 +559,29 @@ export class ApiClient {
   /**
    * DELETE request (with retry)
    */
-  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    return this.executeWithRetry(() => this.client.delete<ApiResponse<T>>(url, config), {
-      method: 'DELETE',
-      url,
-    });
+  async delete<T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
+    return this.executeWithRetry(
+      () => this.client.delete<ApiResponse<T>>(url, config),
+      {
+        method: 'DELETE',
+        url,
+      }
+    );
   }
 
   /**
    * Manually set ETag and body cache for a URL
    * Used during initialization to restore cache from local storage
    */
-  setCache(url: string, etag: string, data: any, config?: AxiosRequestConfig): void {
+  setCache(
+    url: string,
+    etag: string,
+    data: any,
+    config?: AxiosRequestConfig
+  ): void {
     const cacheKey = this.buildCacheKey(url, config);
     this.etagStore.set(cacheKey, etag);
     this.bodyCache.set(cacheKey, {

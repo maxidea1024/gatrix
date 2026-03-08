@@ -39,7 +39,11 @@ export async function performEvaluation(
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const { environmentId, applicationName, cacheKey: contextCacheKey } = clientContext;
+    const {
+      environmentId,
+      applicationName,
+      cacheKey: contextCacheKey,
+    } = clientContext;
 
     // Use pre-resolved cacheKey from middleware, or resolve here as fallback
     const cacheKey =
@@ -84,14 +88,20 @@ export async function performEvaluation(
           impressionDataEnabled: flagDef?.impressionDataEnabled,
           valueSource: flagDef?.valueSource,
           // SDK already resolved these, but we pass them if needed for formatResult
-          enabledValue: result.enabled ? (result.variant?.value ?? undefined) : undefined,
-          disabledValue: !result.enabled ? (result.variant?.value ?? undefined) : undefined,
+          enabledValue: result.enabled
+            ? (result.variant?.value ?? undefined)
+            : undefined,
+          disabledValue: !result.enabled
+            ? (result.variant?.value ?? undefined)
+            : undefined,
         },
         environmentId
       );
     }
 
-    const flagsArray = Object.values(results).sort((a, b) => a.name.localeCompare(b.name));
+    const flagsArray = Object.values(results).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
 
     const responseData = {
       success: true,

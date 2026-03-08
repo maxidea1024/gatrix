@@ -99,7 +99,8 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
       },
     };
 
-    const config = statusConfig[status] || statusConfig[JobExecutionStatus.PENDING];
+    const config =
+      statusConfig[status] || statusConfig[JobExecutionStatus.PENDING];
     return <Chip label={config.label} color={config.color} size="small" />;
   };
 
@@ -139,18 +140,24 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                   <strong>{t('jobs.executionId')}:</strong> {execution.id}
                 </Typography>
                 <Typography variant="body2">
-                  <strong>{t('jobs.retryAttempt')}:</strong> {execution.retryAttempt}
+                  <strong>{t('jobs.retryAttempt')}:</strong>{' '}
+                  {execution.retryAttempt}
                 </Typography>
                 <Typography variant="body2">
                   <strong>{t('jobs.startedAt')}:</strong>{' '}
-                  {execution.startedAt ? formatDateTimeDetailed(execution.startedAt) : '-'}
+                  {execution.startedAt
+                    ? formatDateTimeDetailed(execution.startedAt)
+                    : '-'}
                 </Typography>
                 <Typography variant="body2">
                   <strong>{t('jobs.completedAt')}:</strong>{' '}
-                  {execution.completedAt ? formatDateTimeDetailed(execution.completedAt) : '-'}
+                  {execution.completedAt
+                    ? formatDateTimeDetailed(execution.completedAt)
+                    : '-'}
                 </Typography>
                 <Typography variant="body2">
-                  <strong>{t('jobs.executionTime')}:</strong> {formatExecutionTime(execution)}
+                  <strong>{t('jobs.executionTime')}:</strong>{' '}
+                  {formatExecutionTime(execution)}
                 </Typography>
               </CardContent>
             </Card>
@@ -187,7 +194,11 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                 <Typography variant="subtitle2" gutterBottom>
                   {t('jobs.errorMessage')}
                 </Typography>
-                <Typography variant="body2" component="pre" sx={{ whiteSpace: 'pre-wrap' }}>
+                <Typography
+                  variant="body2"
+                  component="pre"
+                  sx={{ whiteSpace: 'pre-wrap' }}
+                >
                   {execution.errorMessage}
                 </Typography>
               </Alert>
@@ -251,21 +262,36 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
               <React.Fragment key={execution.id}>
                 <TableRow hover>
                   <TableCell>
-                    <IconButton size="small" onClick={() => toggleRowExpansion(execution.id)}>
-                      {expandedRows.has(execution.id) ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    <IconButton
+                      size="small"
+                      onClick={() => toggleRowExpansion(execution.id)}
+                    >
+                      {expandedRows.has(execution.id) ? (
+                        <ExpandLessIcon />
+                      ) : (
+                        <ExpandMoreIcon />
+                      )}
                     </IconButton>
                   </TableCell>
                   <TableCell>{getStatusChip(execution.status)}</TableCell>
                   <TableCell>
-                    {execution.startedAt ? formatDateTimeDetailed(execution.startedAt) : '-'}
+                    {execution.startedAt
+                      ? formatDateTimeDetailed(execution.startedAt)
+                      : '-'}
                   </TableCell>
                   <TableCell>{formatExecutionTime(execution)}</TableCell>
                   <TableCell>{execution.retryAttempt}</TableCell>
-                  <TableCell>{formatDateTimeDetailed(execution.createdAt)}</TableCell>
+                  <TableCell>
+                    {formatDateTimeDetailed(execution.createdAt)}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell colSpan={6} sx={{ p: 0, border: 0 }}>
-                    <Collapse in={expandedRows.has(execution.id)} timeout="auto" unmountOnExit>
+                    <Collapse
+                      in={expandedRows.has(execution.id)}
+                      timeout="auto"
+                      unmountOnExit
+                    >
                       {renderExecutionDetails(execution)}
                     </Collapse>
                   </TableCell>

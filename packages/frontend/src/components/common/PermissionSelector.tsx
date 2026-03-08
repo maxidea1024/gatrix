@@ -23,7 +23,11 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { Permission } from '@/types';
-import { PERMISSION_CATEGORIES, RESOURCE_ACTIONS, type Resource } from '@gatrix/shared/permissions';
+import {
+  PERMISSION_CATEGORIES,
+  RESOURCE_ACTIONS,
+  type Resource,
+} from '@gatrix/shared/permissions';
 
 export interface Environment {
   environmentId: string;
@@ -58,7 +62,9 @@ function getResourcePermissions(resource: Resource): string[] {
 const categoryEntries = PERMISSION_CATEGORIES.map((category, index) => ({
   id: `cat-${index}`,
   label: category.labelKey,
-  permissions: category.resources.flatMap((resource) => getResourcePermissions(resource)),
+  permissions: category.resources.flatMap((resource) =>
+    getResourcePermissions(resource)
+  ),
 }));
 
 // All permissions from all categories
@@ -85,7 +91,10 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const handleCategoryToggle = (categoryPermissions: Permission[], checked: boolean) => {
+  const handleCategoryToggle = (
+    categoryPermissions: Permission[],
+    checked: boolean
+  ) => {
     if (checked) {
       onChange([...new Set([...permissions, ...categoryPermissions])]);
     } else {
@@ -110,7 +119,9 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
   };
 
   const getCategoryStats = (categoryPermissions: Permission[]) => {
-    const selected = categoryPermissions.filter((p) => permissions.includes(p)).length;
+    const selected = categoryPermissions.filter((p) =>
+      permissions.includes(p)
+    ).length;
     return { selected, total: categoryPermissions.length };
   };
 
@@ -125,14 +136,22 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
   return (
     <Box>
       {showTitle && (
-        <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600, color: 'text.primary' }}>
+        <Typography
+          variant="subtitle2"
+          sx={{ mb: 1.5, fontWeight: 600, color: 'text.primary' }}
+        >
           {t('users.permissions')}
         </Typography>
       )}
 
       {showSelectAll && (
         <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-          <Button size="small" variant="contained" color="primary" onClick={handleSelectAll}>
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            onClick={handleSelectAll}
+          >
             {t('common.selectAll')}
           </Button>
           <Button size="small" variant="outlined" onClick={handleClearAll}>
@@ -146,7 +165,8 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
               color: 'text.secondary',
             }}
           >
-            {permissions.length} / {ALL_PERMISSIONS.length} {t('users.permissionsSelected')}
+            {permissions.length} / {ALL_PERMISSIONS.length}{' '}
+            {t('users.permissionsSelected')}
           </Typography>
         </Box>
       )}
@@ -156,7 +176,8 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
           categoryEntries.map((category) => {
             const stats = getCategoryStats(category.permissions);
             const isAllSelected = stats.selected === stats.total;
-            const isPartialSelected = stats.selected > 0 && stats.selected < stats.total;
+            const isPartialSelected =
+              stats.selected > 0 && stats.selected < stats.total;
 
             return (
               <Accordion
@@ -193,18 +214,30 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                     indeterminate={isPartialSelected}
                     onChange={(e) => {
                       e.stopPropagation();
-                      handleCategoryToggle(category.permissions, e.target.checked);
+                      handleCategoryToggle(
+                        category.permissions,
+                        e.target.checked
+                      );
                     }}
                     onClick={(e) => e.stopPropagation()}
                     sx={{ p: 0.5 }}
                   />
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 600, color: 'text.primary' }}
+                  >
                     {t(category.label)}
                   </Typography>
                   <Chip
                     label={`${stats.selected}/${stats.total}`}
                     size="small"
-                    color={isAllSelected ? 'success' : isPartialSelected ? 'warning' : 'default'}
+                    color={
+                      isAllSelected
+                        ? 'success'
+                        : isPartialSelected
+                          ? 'warning'
+                          : 'default'
+                    }
                     variant={stats.selected > 0 ? 'filled' : 'outlined'}
                     sx={{ ml: 'auto', mr: 1, height: 24, fontSize: '0.75rem' }}
                   />
@@ -213,26 +246,36 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                   <Box
                     sx={{
                       display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                      gridTemplateColumns:
+                        'repeat(auto-fill, minmax(180px, 1fr))',
                       gap: 1,
                     }}
                   >
                     {category.permissions.map((permission) => {
                       const isSelected = permissions.includes(permission);
                       const permissionKey = permission.replace('.', '_');
-                      const tooltipText = t(`permissions.${permissionKey}_desc`, {
-                        defaultValue: '',
-                      });
+                      const tooltipText = t(
+                        `permissions.${permissionKey}_desc`,
+                        {
+                          defaultValue: '',
+                        }
+                      );
                       return (
                         <Tooltip
                           key={permission}
                           title={
                             tooltipText ? (
                               <Box sx={{ p: 0.5 }}>
-                                <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                                <Typography
+                                  variant="body2"
+                                  sx={{ fontWeight: 600, mb: 0.5 }}
+                                >
                                   {t(`permissions.${permissionKey}`)}
                                 </Typography>
-                                <Typography variant="caption" sx={{ opacity: 0.9 }}>
+                                <Typography
+                                  variant="caption"
+                                  sx={{ opacity: 0.9 }}
+                                >
                                   {tooltipText}
                                 </Typography>
                               </Box>
@@ -254,7 +297,9 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                               borderRadius: 1,
                               cursor: 'pointer',
                               border: 1,
-                              borderColor: isSelected ? 'primary.main' : 'divider',
+                              borderColor: isSelected
+                                ? 'primary.main'
+                                : 'divider',
                               bgcolor: isSelected
                                 ? alpha(
                                     theme.palette.primary.main,
@@ -272,14 +317,20 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                             }}
                           >
                             {isSelected ? (
-                              <CheckCircleIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                              <CheckCircleIcon
+                                sx={{ fontSize: 18, color: 'primary.main' }}
+                              />
                             ) : (
-                              <UncheckedIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                              <UncheckedIcon
+                                sx={{ fontSize: 18, color: 'text.disabled' }}
+                              />
                             )}
                             <Typography
                               variant="body2"
                               sx={{
-                                color: isSelected ? 'primary.main' : 'text.secondary',
+                                color: isSelected
+                                  ? 'primary.main'
+                                  : 'text.secondary',
                                 fontWeight: isSelected ? 500 : 400,
                                 fontSize: '0.8125rem',
                                 flex: 1,
@@ -345,7 +396,10 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                 onClick={(e) => e.stopPropagation()}
                 sx={{ p: 0.5 }}
               />
-              <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 600, color: 'text.primary' }}
+              >
                 {t('permissions.categories.environments')}
               </Typography>
               <Chip
@@ -356,9 +410,17 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                 }
                 size="small"
                 color={
-                  allowAllEnvs ? 'warning' : selectedEnvironments.length > 0 ? 'success' : 'default'
+                  allowAllEnvs
+                    ? 'warning'
+                    : selectedEnvironments.length > 0
+                      ? 'success'
+                      : 'default'
                 }
-                variant={allowAllEnvs || selectedEnvironments.length > 0 ? 'filled' : 'outlined'}
+                variant={
+                  allowAllEnvs || selectedEnvironments.length > 0
+                    ? 'filled'
+                    : 'outlined'
+                }
                 sx={{ ml: 'auto', mr: 1, height: 24, fontSize: '0.75rem' }}
               />
             </AccordionSummary>
@@ -369,7 +431,9 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                   icon={<WarningIcon fontSize="small" />}
                   sx={{ mb: 2, py: 0.5 }}
                 >
-                  <Typography variant="body2">{t('users.allowAllEnvironmentsWarning')}</Typography>
+                  <Typography variant="body2">
+                    {t('users.allowAllEnvironmentsWarning')}
+                  </Typography>
                 </Alert>
               )}
               <Box
@@ -383,8 +447,10 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
               >
                 {environments.map((env) => {
                   const isSelected =
-                    allowAllEnvs || selectedEnvironments.includes(env.environmentId);
-                  const displayName = env.displayName || env.environmentName || env.name;
+                    allowAllEnvs ||
+                    selectedEnvironments.includes(env.environmentId);
+                  const displayName =
+                    env.displayName || env.environmentName || env.name;
                   return (
                     <Tooltip
                       key={env.environmentId}
@@ -398,12 +464,19 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                       <Box
                         onClick={() => {
                           if (allowAllEnvs) return;
-                          if (selectedEnvironments.includes(env.environmentId)) {
+                          if (
+                            selectedEnvironments.includes(env.environmentId)
+                          ) {
                             onEnvironmentsChange?.(
-                              selectedEnvironments.filter((id) => id !== env.environmentId)
+                              selectedEnvironments.filter(
+                                (id) => id !== env.environmentId
+                              )
                             );
                           } else {
-                            onEnvironmentsChange?.([...selectedEnvironments, env.environmentId]);
+                            onEnvironmentsChange?.([
+                              ...selectedEnvironments,
+                              env.environmentId,
+                            ]);
                           }
                         }}
                         sx={{
@@ -434,14 +507,20 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                         }}
                       >
                         {isSelected ? (
-                          <CheckCircleIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                          <CheckCircleIcon
+                            sx={{ fontSize: 18, color: 'primary.main' }}
+                          />
                         ) : (
-                          <UncheckedIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                          <UncheckedIcon
+                            sx={{ fontSize: 18, color: 'text.disabled' }}
+                          />
                         )}
                         <Typography
                           variant="body2"
                           sx={{
-                            color: isSelected ? 'primary.main' : 'text.secondary',
+                            color: isSelected
+                              ? 'primary.main'
+                              : 'text.secondary',
                             fontWeight: isSelected ? 500 : 400,
                             fontSize: '0.8125rem',
                             flex: 1,

@@ -22,8 +22,15 @@ export class DiscordAddon extends Addon {
     const { url, username, avatar_url, customHeaders } = parameters;
 
     if (!url) {
-      this.logger.warn(`Missing Discord webhook URL for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing webhook URL');
+      this.logger.warn(
+        `Missing Discord webhook URL for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing webhook URL'
+      );
       return;
     }
 

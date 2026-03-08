@@ -142,16 +142,28 @@ export function generateShopItems(wave: number): ShopItem[] {
 
   // Pick weapons available at current wave
   for (const w of WEAPON_POOL) {
-    const ri = ['common', 'uncommon', 'rare', 'epic', 'legendary'].indexOf(w.rarity);
+    const ri = ['common', 'uncommon', 'rare', 'epic', 'legendary'].indexOf(
+      w.rarity
+    );
     if (ri <= maxRarityIndex) {
-      items.push({ ...w, id: nextItemId(), price: Math.floor(w.price * (1 + wave * 0.1)) });
+      items.push({
+        ...w,
+        id: nextItemId(),
+        price: Math.floor(w.price * (1 + wave * 0.1)),
+      });
     }
   }
   // Pick armors
   for (const a of ARMOR_POOL) {
-    const ri = ['common', 'uncommon', 'rare', 'epic', 'legendary'].indexOf(a.rarity);
+    const ri = ['common', 'uncommon', 'rare', 'epic', 'legendary'].indexOf(
+      a.rarity
+    );
     if (ri <= maxRarityIndex) {
-      items.push({ ...a, id: nextItemId(), price: Math.floor(a.price * (1 + wave * 0.1)) });
+      items.push({
+        ...a,
+        id: nextItemId(),
+        price: Math.floor(a.price * (1 + wave * 0.1)),
+      });
     }
   }
   // Always show consumables
@@ -207,7 +219,8 @@ export function rollDrop(wave: number): InventoryItem | null {
     sellPrice: Math.floor(
       5 *
         (1 + wave * 0.5) *
-        (['common', 'uncommon', 'rare', 'epic', 'legendary'].indexOf(rarity) + 1)
+        (['common', 'uncommon', 'rare', 'epic', 'legendary'].indexOf(rarity) +
+          1)
     ),
   };
 }

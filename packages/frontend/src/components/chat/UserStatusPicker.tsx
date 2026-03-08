@@ -48,7 +48,8 @@ const UserStatusPicker: React.FC<UserStatusPickerProps> = ({
   subtitle,
 }) => {
   const { t } = useTranslation();
-  const [selectedStatus, setSelectedStatus] = useState<UserStatus>(currentStatus);
+  const [selectedStatus, setSelectedStatus] =
+    useState<UserStatus>(currentStatus);
   const [statusMessage, setStatusMessage] = useState(currentMessage);
   const [isEditingMessage, setIsEditingMessage] = useState(false);
 
@@ -118,10 +119,16 @@ const UserStatusPicker: React.FC<UserStatusPickerProps> = ({
           <Box>
             <Box display="flex" alignItems="center" gap={1}>
               {getStatusIcon(currentStatus)}
-              <Typography variant="h6">{title || t('chat.setStatus')}</Typography>
+              <Typography variant="h6">
+                {title || t('chat.setStatus')}
+              </Typography>
             </Box>
             {subtitle && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              >
                 {subtitle}
               </Typography>
             )}
@@ -135,16 +142,25 @@ const UserStatusPicker: React.FC<UserStatusPickerProps> = ({
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {/* Current Status Display */}
-          <Box sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 0 }}>
+          <Box
+            sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 0 }}
+          >
             <Typography variant="subtitle2" gutterBottom>
               {t('chat.currentStatus')}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               {getStatusIcon(currentStatus)}
-              <Typography variant="body1">{getStatusLabel(currentStatus)}</Typography>
+              <Typography variant="body1">
+                {getStatusLabel(currentStatus)}
+              </Typography>
             </Box>
             {currentMessage && (
-              <Chip label={currentMessage} size="small" variant="outlined" sx={{ mt: 1 }} />
+              <Chip
+                label={currentMessage}
+                size="small"
+                variant="outlined"
+                sx={{ mt: 1 }}
+              />
             )}
           </Box>
 
@@ -164,8 +180,13 @@ const UserStatusPicker: React.FC<UserStatusPickerProps> = ({
                       mb: 0.5,
                     }}
                   >
-                    <ListItemIcon sx={{ minWidth: 36 }}>{option.icon}</ListItemIcon>
-                    <ListItemText primary={option.label} secondary={option.description} />
+                    <ListItemIcon sx={{ minWidth: 36 }}>
+                      {option.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={option.label}
+                      secondary={option.description}
+                    />
                   </ListItemButton>
                 </ListItem>
               ))}
@@ -175,8 +196,13 @@ const UserStatusPicker: React.FC<UserStatusPickerProps> = ({
           {/* Status Message */}
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Typography variant="subtitle2">{t('chat.statusMessage')}</Typography>
-              <IconButton size="small" onClick={() => setIsEditingMessage(!isEditingMessage)}>
+              <Typography variant="subtitle2">
+                {t('chat.statusMessage')}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => setIsEditingMessage(!isEditingMessage)}
+              >
                 <EditIcon fontSize="small" />
               </IconButton>
             </Box>
@@ -230,7 +256,9 @@ const UserStatusPicker: React.FC<UserStatusPickerProps> = ({
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={selectedStatus === currentStatus && statusMessage === currentMessage}
+          disabled={
+            selectedStatus === currentStatus && statusMessage === currentMessage
+          }
         >
           {t('chat.updateStatus')}
         </Button>

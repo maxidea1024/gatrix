@@ -2,14 +2,26 @@
  * StrategyDetail - Reusable component for displaying strategy details (constraints, segments, rollout)
  */
 import React, { useState } from 'react';
-import { Box, Typography, Chip, Paper, Stack, Collapse, Link } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Chip,
+  Paper,
+  Stack,
+  Collapse,
+  Link,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowForward as AdvanceIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
-import { ConstraintList, ConstraintValue, ContextFieldInfo } from './ConstraintDisplay';
+import {
+  ConstraintList,
+  ConstraintValue,
+  ContextFieldInfo,
+} from './ConstraintDisplay';
 
 export interface StrategyDetailProps {
   strategyName: string;
@@ -51,17 +63,33 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
   const hasStrategyParams =
     (strategyName === 'userWithId' && parameters?.userIds?.length > 0) ||
     (strategyName === 'remoteAddress' && parameters?.IPs?.length > 0) ||
-    (strategyName === 'applicationHostname' && parameters?.hostNames?.length > 0);
+    (strategyName === 'applicationHostname' &&
+      parameters?.hostNames?.length > 0);
   const hasDetails =
-    segments.length > 0 || constraints.length > 0 || hasStrategyParams || showRollout;
+    segments.length > 0 ||
+    constraints.length > 0 ||
+    hasStrategyParams ||
+    showRollout;
 
   // Compact mode: inline summary
   if (compact) {
     return (
-      <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.75 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 0.75,
+        }}
+      >
         <Typography
           variant="body2"
-          sx={{ fontWeight: 500, display: 'flex', alignItems: 'center', gap: 0.5 }}
+          sx={{
+            fontWeight: 500,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+          }}
         >
           <AdvanceIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
           {getStrategyTitle(strategyName)}
@@ -77,7 +105,8 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
         )}
         {hasDetails && (
           <Typography variant="caption" color="text.secondary">
-            ({segments.length + constraints.length} {t('featureFlags.conditions')})
+            ({segments.length + constraints.length}{' '}
+            {t('featureFlags.conditions')})
           </Typography>
         )}
       </Box>
@@ -96,10 +125,22 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
             justifyContent: 'space-between',
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flexWrap: 'wrap',
+            }}
+          >
             <Typography
               variant="body2"
-              sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}
+              sx={{
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+              }}
             >
               <AdvanceIcon sx={{ fontSize: 16, color: 'primary.main' }} />
               {getStrategyTitle(strategyName)}
@@ -113,23 +154,38 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
               />
             )}
             {strategyName === 'userWithId' && (
-              <Typography component="span" variant="body2" color="text.secondary">
+              <Typography
+                component="span"
+                variant="body2"
+                color="text.secondary"
+              >
                 : {parameters?.userIds?.length || 0} {t('featureFlags.users')}
               </Typography>
             )}
             {strategyName === 'remoteAddress' && (
-              <Typography component="span" variant="body2" color="text.secondary">
+              <Typography
+                component="span"
+                variant="body2"
+                color="text.secondary"
+              >
                 : {parameters?.IPs?.length || 0} {t('featureFlags.addresses')}
               </Typography>
             )}
             {strategyName === 'applicationHostname' && (
-              <Typography component="span" variant="body2" color="text.secondary">
+              <Typography
+                component="span"
+                variant="body2"
+                color="text.secondary"
+              >
                 : {parameters?.hostNames?.length || 0} {t('featureFlags.hosts')}
               </Typography>
             )}
             {hasDetails && !expanded && (
               <Typography variant="caption" color="text.secondary">
-                ({segments.length > 0 ? `${segments.length} ${t('featureFlags.segment')}` : ''}
+                (
+                {segments.length > 0
+                  ? `${segments.length} ${t('featureFlags.segment')}`
+                  : ''}
                 {segments.length > 0 && constraints.length > 0 ? ', ' : ''}
                 {constraints.length > 0
                   ? `${constraints.length} ${t('featureFlags.conditions')}`
@@ -183,11 +239,18 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
             <Stack spacing={0.75}>
               {/* Segments */}
               {segments.map((segName, segIdx) => {
-                const segData = allSegments.find((s) => s.segmentName === segName);
+                const segData = allSegments.find(
+                  (s) => s.segmentName === segName
+                );
                 return (
                   <React.Fragment key={segName}>
-                    <Paper variant="outlined" sx={{ p: 1.25, bgcolor: 'background.paper' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Paper
+                      variant="outlined"
+                      sx={{ p: 1.25, bgcolor: 'background.paper' }}
+                    >
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}
+                      >
                         <Typography
                           variant="caption"
                           color="primary.main"
@@ -208,8 +271,11 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
                       </Box>
                     </Paper>
                     {/* AND marker */}
-                    {(segIdx < segments.length - 1 || constraints.length > 0) && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
+                    {(segIdx < segments.length - 1 ||
+                      constraints.length > 0) && (
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', ml: 2 }}
+                      >
                         <Chip
                           label="AND"
                           size="small"
@@ -232,8 +298,14 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
               {/* Constraints */}
               {constraints.map((constraint, cIdx) => (
                 <React.Fragment key={cIdx}>
-                  <Paper variant="outlined" sx={{ p: 1.25, bgcolor: 'background.paper' }}>
-                    <ConstraintList constraints={[constraint]} contextFields={contextFields} />
+                  <Paper
+                    variant="outlined"
+                    sx={{ p: 1.25, bgcolor: 'background.paper' }}
+                  >
+                    <ConstraintList
+                      constraints={[constraint]}
+                      contextFields={contextFields}
+                    />
                   </Paper>
                   {/* AND marker between constraints */}
                   {cIdx < constraints.length - 1 && (
@@ -276,8 +348,13 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
                       />
                     </Box>
                   )}
-                  <Paper variant="outlined" sx={{ p: 1.25, bgcolor: 'background.paper' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <Paper
+                    variant="outlined"
+                    sx={{ p: 1.25, bgcolor: 'background.paper' }}
+                  >
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}
+                    >
                       <Typography
                         variant="caption"
                         color="warning.main"
@@ -289,7 +366,11 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
                         label={`${rollout}%`}
                         size="small"
                         color="primary"
-                        sx={{ height: 22, fontSize: '0.75rem', fontWeight: 700 }}
+                        sx={{
+                          height: 22,
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                        }}
                       />
                       <Typography variant="caption" color="text.secondary">
                         - {t('featureFlags.rolloutMatchingDesc')}
@@ -300,90 +381,123 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
               )}
 
               {/* UserIds row */}
-              {strategyName === 'userWithId' && parameters?.userIds?.length > 0 && (
-                <Paper variant="outlined" sx={{ p: 1.25, bgcolor: 'background.paper' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                    <Typography
-                      variant="caption"
-                      color="primary.main"
-                      sx={{ fontWeight: 700, minWidth: 60 }}
+              {strategyName === 'userWithId' &&
+                parameters?.userIds?.length > 0 && (
+                  <Paper
+                    variant="outlined"
+                    sx={{ p: 1.25, bgcolor: 'background.paper' }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        flexWrap: 'wrap',
+                      }}
                     >
-                      {t('featureFlags.strategies.userWithId.title')}
-                    </Typography>
-                    {parameters.userIds.map((uid: string) => (
-                      <Chip
-                        key={uid}
-                        label={uid}
-                        size="small"
-                        sx={{
-                          height: 22,
-                          fontSize: '0.75rem',
-                          bgcolor: 'action.selected',
-                          fontWeight: 500,
-                        }}
-                      />
-                    ))}
-                  </Box>
-                </Paper>
-              )}
+                      <Typography
+                        variant="caption"
+                        color="primary.main"
+                        sx={{ fontWeight: 700, minWidth: 60 }}
+                      >
+                        {t('featureFlags.strategies.userWithId.title')}
+                      </Typography>
+                      {parameters.userIds.map((uid: string) => (
+                        <Chip
+                          key={uid}
+                          label={uid}
+                          size="small"
+                          sx={{
+                            height: 22,
+                            fontSize: '0.75rem',
+                            bgcolor: 'action.selected',
+                            fontWeight: 500,
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Paper>
+                )}
 
               {/* IPs row */}
-              {strategyName === 'remoteAddress' && parameters?.IPs?.length > 0 && (
-                <Paper variant="outlined" sx={{ p: 1.25, bgcolor: 'background.paper' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                    <Typography
-                      variant="caption"
-                      color="primary.main"
-                      sx={{ fontWeight: 700, minWidth: 60 }}
+              {strategyName === 'remoteAddress' &&
+                parameters?.IPs?.length > 0 && (
+                  <Paper
+                    variant="outlined"
+                    sx={{ p: 1.25, bgcolor: 'background.paper' }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        flexWrap: 'wrap',
+                      }}
                     >
-                      IP
-                    </Typography>
-                    {parameters.IPs.map((ip: string) => (
-                      <Chip
-                        key={ip}
-                        label={ip}
-                        size="small"
-                        sx={{
-                          height: 22,
-                          fontSize: '0.75rem',
-                          bgcolor: 'action.selected',
-                          fontWeight: 500,
-                          fontFamily: 'monospace',
-                        }}
-                      />
-                    ))}
-                  </Box>
-                </Paper>
-              )}
+                      <Typography
+                        variant="caption"
+                        color="primary.main"
+                        sx={{ fontWeight: 700, minWidth: 60 }}
+                      >
+                        IP
+                      </Typography>
+                      {parameters.IPs.map((ip: string) => (
+                        <Chip
+                          key={ip}
+                          label={ip}
+                          size="small"
+                          sx={{
+                            height: 22,
+                            fontSize: '0.75rem',
+                            bgcolor: 'action.selected',
+                            fontWeight: 500,
+                            fontFamily: 'monospace',
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Paper>
+                )}
 
               {/* Hostnames row */}
-              {strategyName === 'applicationHostname' && parameters?.hostNames?.length > 0 && (
-                <Paper variant="outlined" sx={{ p: 1.25, bgcolor: 'background.paper' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                    <Typography
-                      variant="caption"
-                      color="primary.main"
-                      sx={{ fontWeight: 700, minWidth: 60 }}
+              {strategyName === 'applicationHostname' &&
+                parameters?.hostNames?.length > 0 && (
+                  <Paper
+                    variant="outlined"
+                    sx={{ p: 1.25, bgcolor: 'background.paper' }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        flexWrap: 'wrap',
+                      }}
                     >
-                      Host
-                    </Typography>
-                    {parameters.hostNames.map((host: string) => (
-                      <Chip
-                        key={host}
-                        label={host}
-                        size="small"
-                        sx={{
-                          height: 22,
-                          fontSize: '0.75rem',
-                          bgcolor: 'action.selected',
-                          fontWeight: 500,
-                          fontFamily: 'monospace',
-                        }}
-                      />
-                    ))}
-                  </Box>
-                </Paper>
-              )}
+                      <Typography
+                        variant="caption"
+                        color="primary.main"
+                        sx={{ fontWeight: 700, minWidth: 60 }}
+                      >
+                        Host
+                      </Typography>
+                      {parameters.hostNames.map((host: string) => (
+                        <Chip
+                          key={host}
+                          label={host}
+                          size="small"
+                          sx={{
+                            height: 22,
+                            fontSize: '0.75rem',
+                            bgcolor: 'action.selected',
+                            fontWeight: 500,
+                            fontFamily: 'monospace',
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Paper>
+                )}
             </Stack>
           </Paper>
         </Collapse>
@@ -395,10 +509,21 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
       {/* Strategy Header in Card */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <Typography
           variant="body2"
-          sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}
+          sx={{
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
         >
           <AdvanceIcon sx={{ fontSize: 16, color: 'primary.main' }} />
           {getStrategyTitle(strategyName)}
@@ -427,9 +552,14 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
           <Stack spacing={1}>
             {/* Segments */}
             {segments.map((segName) => {
-              const segData = allSegments.find((s) => s.segmentName === segName);
+              const segData = allSegments.find(
+                (s) => s.segmentName === segName
+              );
               return (
-                <Box key={segName} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box
+                  key={segName}
+                  sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                >
                   <Typography
                     variant="caption"
                     color="primary.main"
@@ -440,7 +570,11 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
                   <Chip
                     label={segData?.displayName || segName}
                     size="small"
-                    sx={{ height: 20, fontSize: '0.7rem', bgcolor: 'background.paper' }}
+                    sx={{
+                      height: 20,
+                      fontSize: '0.7rem',
+                      bgcolor: 'background.paper',
+                    }}
                   />
                 </Box>
               );
@@ -449,7 +583,10 @@ const StrategyDetail: React.FC<StrategyDetailProps> = ({
             {/* Constraints */}
             {constraints.length > 0 && (
               <Box>
-                <ConstraintList constraints={constraints} contextFields={contextFields} />
+                <ConstraintList
+                  constraints={constraints}
+                  contextFields={contextFields}
+                />
               </Box>
             )}
           </Stack>

@@ -93,13 +93,20 @@ export class ClientCrash extends Model {
     chash: string,
     branch: string
   ): Promise<ClientCrash | undefined> {
-    return await this.query().where('chash', chash).where('branch', branch).first();
+    return await this.query()
+      .where('chash', chash)
+      .where('branch', branch)
+      .first();
   }
 
   /**
    * Find crashes with filtering and pagination
    */
-  static async findAll(page: number = 1, limit: number = 10, filters: CrashFilters = {}) {
+  static async findAll(
+    page: number = 1,
+    limit: number = 10,
+    filters: CrashFilters = {}
+  ) {
     const query = this.query();
 
     // Apply filters
@@ -131,7 +138,10 @@ export class ClientCrash extends Model {
   /**
    * Apply filters to query
    */
-  private static applyFilters(query: QueryBuilder<ClientCrash>, filters: CrashFilters) {
+  private static applyFilters(
+    query: QueryBuilder<ClientCrash>,
+    filters: CrashFilters
+  ) {
     // Search in firstLine, assignee, jiraTicket
     if (filters.search) {
       const searchTerm = `%${filters.search}%`;
@@ -238,11 +248,17 @@ export class ClientCrash extends Model {
   async updateMaxVersions(appVersion?: string, resVersion?: string) {
     const updates: any = {};
 
-    if (appVersion && (!this.maxAppVersion || isGreaterThan(appVersion, this.maxAppVersion))) {
+    if (
+      appVersion &&
+      (!this.maxAppVersion || isGreaterThan(appVersion, this.maxAppVersion))
+    ) {
       updates.maxAppVersion = appVersion;
     }
 
-    if (resVersion && (!this.maxResVersion || resVersion > this.maxResVersion)) {
+    if (
+      resVersion &&
+      (!this.maxResVersion || resVersion > this.maxResVersion)
+    ) {
       updates.maxResVersion = resVersion;
     }
 
@@ -280,15 +296,25 @@ export class ClientCrash extends Model {
     const stats = await this.query()
       .select(
         this.raw('COUNT(*) as totalCrashes'),
-        this.raw('SUM(CASE WHEN crashesState = 0 THEN 1 ELSE 0 END) as openCrashes'),
-        this.raw('SUM(CASE WHEN crashesState = 1 THEN 1 ELSE 0 END) as closedCrashes'),
-        this.raw('SUM(CASE WHEN crashesState = 3 THEN 1 ELSE 0 END) as resolvedCrashes'),
-        this.raw('SUM(CASE WHEN crashesState = 4 THEN 1 ELSE 0 END) as repeatedCrashes'),
+        this.raw(
+          'SUM(CASE WHEN crashesState = 0 THEN 1 ELSE 0 END) as openCrashes'
+        ),
+        this.raw(
+          'SUM(CASE WHEN crashesState = 1 THEN 1 ELSE 0 END) as closedCrashes'
+        ),
+        this.raw(
+          'SUM(CASE WHEN crashesState = 3 THEN 1 ELSE 0 END) as resolvedCrashes'
+        ),
+        this.raw(
+          'SUM(CASE WHEN crashesState = 4 THEN 1 ELSE 0 END) as repeatedCrashes'
+        ),
         this.raw('SUM(crashesCount) as totalEvents')
       )
       .first();
 
-    const recentCrashes = await this.query().orderBy('lastCrashAt', 'desc').limit(10);
+    const recentCrashes = await this.query()
+      .orderBy('lastCrashAt', 'desc')
+      .limit(10);
 
     return {
       ...stats,

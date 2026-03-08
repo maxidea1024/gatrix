@@ -9,7 +9,10 @@ import {
   Box,
   Alert,
 } from '@mui/material';
-import { Warning as WarningIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {
+  Warning as WarningIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 interface ConfirmDeleteDialogProps {
@@ -88,7 +91,12 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-        <Button onClick={onClose} variant="outlined" disabled={loading} sx={{ minWidth: 80 }}>
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          disabled={loading}
+          sx={{ minWidth: 80 }}
+        >
           {cancelButtonText || t('common.cancel')}
         </Button>
 

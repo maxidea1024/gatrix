@@ -10,7 +10,10 @@ export class FeatureSegmentModel {
   /**
    * Find all segments filtered by project
    */
-  static async findAll(search?: string, projectId?: string): Promise<FeatureSegmentAttributes[]> {
+  static async findAll(
+    search?: string,
+    projectId?: string
+  ): Promise<FeatureSegmentAttributes[]> {
     try {
       let query = db('g_feature_segments')
         .select(
@@ -35,7 +38,10 @@ export class FeatureSegmentModel {
         });
       }
 
-      const segments = await query.orderBy('g_feature_segments.createdAt', 'desc');
+      const segments = await query.orderBy(
+        'g_feature_segments.createdAt',
+        'desc'
+      );
 
       return segments.map((s: any) => ({
         ...s,
@@ -70,9 +76,13 @@ export class FeatureSegmentModel {
   /**
    * Find segment by name (now global, no environment filter)
    */
-  static async findByName(segmentName: string): Promise<FeatureSegmentAttributes | null> {
+  static async findByName(
+    segmentName: string
+  ): Promise<FeatureSegmentAttributes | null> {
     try {
-      const segment = await db('g_feature_segments').where('segmentName', segmentName).first();
+      const segment = await db('g_feature_segments')
+        .where('segmentName', segmentName)
+        .first();
       if (!segment) return null;
 
       return {
@@ -149,9 +159,12 @@ export class FeatureSegmentModel {
     try {
       const updateData: any = { updatedAt: new Date() };
 
-      if (data.displayName !== undefined) updateData.displayName = data.displayName;
-      if (data.description !== undefined) updateData.description = data.description;
-      if (data.constraints !== undefined) updateData.constraints = JSON.stringify(data.constraints);
+      if (data.displayName !== undefined)
+        updateData.displayName = data.displayName;
+      if (data.description !== undefined)
+        updateData.description = data.description;
+      if (data.constraints !== undefined)
+        updateData.constraints = JSON.stringify(data.constraints);
       if (data.isActive !== undefined) updateData.isActive = data.isActive;
       if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;

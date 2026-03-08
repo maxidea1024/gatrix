@@ -1,6 +1,19 @@
 import React from 'react';
-import { Box, Card, CardContent, Typography, Button, Chip, Divider } from '@mui/material';
-import { Block, Home, ArrowBack, VpnKey as PermissionIcon } from '@mui/icons-material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Chip,
+  Divider,
+} from '@mui/material';
+import {
+  Block,
+  Home,
+  ArrowBack,
+  VpnKey as PermissionIcon,
+} from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
@@ -92,7 +105,9 @@ const UnauthorizedPage: React.FC = () => {
                 textAlign: 'left',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
+              >
                 <PermissionIcon sx={{ fontSize: 20, color: 'warning.main' }} />
                 <Typography variant="subtitle2" color="warning.dark">
                   {t('errors.requiredPermissions')}
@@ -144,17 +159,30 @@ const UnauthorizedPage: React.FC = () => {
 
           {/* Actions */}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button variant="contained" startIcon={<Home />} onClick={handleGoHome} size="large">
+            <Button
+              variant="contained"
+              startIcon={<Home />}
+              onClick={handleGoHome}
+              size="large"
+            >
               {t('common.goToDashboard')}
             </Button>
 
-            <Button variant="outlined" startIcon={<ArrowBack />} onClick={handleGoBack}>
+            <Button
+              variant="outlined"
+              startIcon={<ArrowBack />}
+              onClick={handleGoBack}
+            >
               {t('common.goBack')}
             </Button>
           </Box>
 
           {/* Footer */}
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 3, display: 'block' }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mt: 3, display: 'block' }}
+          >
             {t('errors.contactSupport')}
           </Typography>
         </CardContent>

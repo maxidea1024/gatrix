@@ -145,7 +145,9 @@ export class SdkMetrics {
 
   setLastRefresh(target: string, date: Date = new Date()): void {
     try {
-      this.lastRefreshGauge?.labels(target).set(Math.floor(date.getTime() / 1000));
+      this.lastRefreshGauge
+        ?.labels(target)
+        .set(Math.floor(date.getTime() / 1000));
     } catch (_) {}
   }
 
@@ -180,7 +182,11 @@ export class SdkMetrics {
   }
 
   // HTTP helpers
-  incHttpRequestsTotal(method: string, route: string, status: number | string): void {
+  incHttpRequestsTotal(
+    method: string,
+    route: string,
+    status: number | string
+  ): void {
     try {
       this.httpRequestsCounter?.labels(method, route, String(status)).inc();
     } catch (_) {}
@@ -193,7 +199,9 @@ export class SdkMetrics {
     durationSeconds: number
   ): void {
     try {
-      this.httpRequestDuration?.labels(method, route, String(status)).observe(durationSeconds);
+      this.httpRequestDuration
+        ?.labels(method, route, String(status))
+        .observe(durationSeconds);
     } catch (_) {}
   }
 }

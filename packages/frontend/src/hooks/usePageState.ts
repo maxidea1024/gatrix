@@ -14,16 +14,23 @@ export interface UsePageStateOptions {
   storageKey: string;
 }
 
-export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) => {
+export const usePageState = ({
+  defaultState,
+  storageKey,
+}: UsePageStateOptions) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // URL params에서 초기 Status를 즉시 읽어서 Settings (렌더링 전에 실행)
   const [pageState, setPageState] = useState<PageState>(() => {
     try {
       const page = parseInt(searchParams.get('page') || '1');
-      const limit = parseInt(searchParams.get('limit') || String(defaultState.limit));
+      const limit = parseInt(
+        searchParams.get('limit') || String(defaultState.limit)
+      );
       const sortBy = searchParams.get('sortBy') || defaultState.sortBy;
-      const sortOrder = (searchParams.get('sortOrder') as 'ASC' | 'DESC') || defaultState.sortOrder;
+      const sortOrder =
+        (searchParams.get('sortOrder') as 'ASC' | 'DESC') ||
+        defaultState.sortOrder;
 
       // filters는 나머지 모든 params
       const filters: Record<string, any> = {};
@@ -32,7 +39,9 @@ export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) 
           // 배열 처리: 같은 키가 여러 개 있으면 배열로
           const existing = filters[key];
           if (existing) {
-            filters[key] = Array.isArray(existing) ? [...existing, value] : [existing, value];
+            filters[key] = Array.isArray(existing)
+              ? [...existing, value]
+              : [existing, value];
           } else {
             filters[key] = value;
           }
@@ -44,7 +53,8 @@ export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) 
         limit,
         sortBy,
         sortOrder,
-        filters: Object.keys(filters).length > 0 ? filters : defaultState.filters,
+        filters:
+          Object.keys(filters).length > 0 ? filters : defaultState.filters,
       };
     } catch (error) {
       console.warn(`Failed to load page state from URL params`, error);
@@ -66,7 +76,8 @@ export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) 
         params.set('page', String(updatedState.page));
         params.set('limit', String(updatedState.limit));
         if (updatedState.sortBy) params.set('sortBy', updatedState.sortBy);
-        if (updatedState.sortOrder) params.set('sortOrder', updatedState.sortOrder);
+        if (updatedState.sortOrder)
+          params.set('sortOrder', updatedState.sortOrder);
 
         // filters 추가
         if (updatedState.filters) {

@@ -53,7 +53,11 @@ export class RedisClient {
     return this.client;
   }
 
-  public async set(key: string, value: string, expireInSeconds?: number): Promise<void> {
+  public async set(
+    key: string,
+    value: string,
+    expireInSeconds?: number
+  ): Promise<void> {
     try {
       if (expireInSeconds) {
         await this.client.setex(key, expireInSeconds, value);
@@ -100,9 +104,18 @@ export class RedisClient {
    * @param ttlSeconds - Time-to-live for the lock in seconds
    * @returns true if lock was acquired, false otherwise
    */
-  public async acquireLock(lockKey: string, ttlSeconds: number): Promise<boolean> {
+  public async acquireLock(
+    lockKey: string,
+    ttlSeconds: number
+  ): Promise<boolean> {
     try {
-      const result = await this.client.set(lockKey, Date.now().toString(), 'EX', ttlSeconds, 'NX');
+      const result = await this.client.set(
+        lockKey,
+        Date.now().toString(),
+        'EX',
+        ttlSeconds,
+        'NX'
+      );
       return result === 'OK';
     } catch (error) {
       logger.error('Redis acquireLock error:', error);

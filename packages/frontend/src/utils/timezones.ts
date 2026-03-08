@@ -20,7 +20,11 @@ export const TIMEZONES: TimezoneEntry[] = [
   { tz: 'America/New_York', label: 'New York (Eastern)', offset: 'UTC-5' },
   { tz: 'America/Chicago', label: 'Chicago (Central)', offset: 'UTC-6' },
   { tz: 'America/Denver', label: 'Denver (Mountain)', offset: 'UTC-7' },
-  { tz: 'America/Los_Angeles', label: 'Los Angeles (Pacific)', offset: 'UTC-8' },
+  {
+    tz: 'America/Los_Angeles',
+    label: 'Los Angeles (Pacific)',
+    offset: 'UTC-8',
+  },
   { tz: 'America/Anchorage', label: 'Anchorage (Alaska)', offset: 'UTC-9' },
   { tz: 'Pacific/Honolulu', label: 'Honolulu (Hawaii)', offset: 'UTC-10' },
   { tz: 'America/Toronto', label: 'Toronto', offset: 'UTC-5' },

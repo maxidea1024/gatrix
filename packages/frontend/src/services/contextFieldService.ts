@@ -27,7 +27,13 @@ export interface ContextOperator {
   name: string;
   description: string;
   valueType: 'single' | 'multiple' | 'none';
-  supportedFieldTypes: ('string' | 'number' | 'boolean' | 'array' | 'version')[];
+  supportedFieldTypes: (
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'array'
+    | 'version'
+  )[];
 }
 
 export interface TargetCondition {
@@ -71,7 +77,9 @@ class ContextFieldService {
   /**
    * Get operators for specific field type
    */
-  async getOperatorsForFieldType(fieldType: string): Promise<ContextOperator[]> {
+  async getOperatorsForFieldType(
+    fieldType: string
+  ): Promise<ContextOperator[]> {
     const response = await api.get(`/context-fields/operators/${fieldType}`);
     return response.data;
   }
@@ -123,14 +131,19 @@ class ContextFieldService {
     allOperators: ContextOperator[]
   ): ContextOperator[] {
     return allOperators.filter(
-      (op) => op.supportedFieldTypes.includes(field.type) && field.operators.includes(op.key)
+      (op) =>
+        op.supportedFieldTypes.includes(field.type) &&
+        field.operators.includes(op.key)
     );
   }
 
   /**
    * Helper: Format condition value for display
    */
-  formatConditionValue(condition: TargetCondition, field: ContextFieldDefinition): string {
+  formatConditionValue(
+    condition: TargetCondition,
+    field: ContextFieldDefinition
+  ): string {
     if (condition.value === null || condition.value === undefined) {
       return '';
     }
@@ -154,7 +167,10 @@ class ContextFieldService {
   /**
    * Helper: Get field display name
    */
-  getFieldDisplayName(fieldKey: string, fields: ContextFieldDefinition[]): string {
+  getFieldDisplayName(
+    fieldKey: string,
+    fields: ContextFieldDefinition[]
+  ): string {
     const field = fields.find((f) => f.key === fieldKey);
     return field ? field.name : fieldKey;
   }
@@ -162,7 +178,10 @@ class ContextFieldService {
   /**
    * Helper: Get operator display name
    */
-  getOperatorDisplayName(operatorKey: string, operators: ContextOperator[]): string {
+  getOperatorDisplayName(
+    operatorKey: string,
+    operators: ContextOperator[]
+  ): string {
     const operator = operators.find((op) => op.key === operatorKey);
     return operator ? operator.name : operatorKey;
   }
@@ -203,14 +222,18 @@ class ContextFieldService {
     }
 
     if (!operator.supportedFieldTypes.includes(field.type)) {
-      errors.push(`Operator ${operator.name} not supported for field type ${field.type}`);
+      errors.push(
+        `Operator ${operator.name} not supported for field type ${field.type}`
+      );
       return errors;
     }
 
     // Value validation
     if (
       operator.valueType === 'single' &&
-      (condition.value === null || condition.value === undefined || condition.value === '')
+      (condition.value === null ||
+        condition.value === undefined ||
+        condition.value === '')
     ) {
       errors.push('Value is required');
     }

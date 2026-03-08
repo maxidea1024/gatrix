@@ -29,7 +29,10 @@ interface BatchProcessDialogProps {
     currentIsActive?: boolean;
     targetIsActive: boolean;
   }) => Promise<{ affectedCount: number }>;
-  onGetCount: (params: { search?: string; isActive?: boolean }) => Promise<number>;
+  onGetCount: (params: {
+    search?: string;
+    isActive?: boolean;
+  }) => Promise<number>;
 }
 
 type TargetStatus = 'all' | 'active' | 'inactive';
@@ -167,8 +170,12 @@ const BatchProcessDialog: React.FC<BatchProcessDialogProps> = ({
             onChange={(e) => setTargetStatus(e.target.value as TargetStatus)}
           >
             <MenuItem value="all">{t('storeProducts.batchTargetAll')}</MenuItem>
-            <MenuItem value="active">{t('storeProducts.batchTargetActive')}</MenuItem>
-            <MenuItem value="inactive">{t('storeProducts.batchTargetInactive')}</MenuItem>
+            <MenuItem value="active">
+              {t('storeProducts.batchTargetActive')}
+            </MenuItem>
+            <MenuItem value="inactive">
+              {t('storeProducts.batchTargetInactive')}
+            </MenuItem>
           </Select>
         </FormControl>
 
@@ -180,8 +187,12 @@ const BatchProcessDialog: React.FC<BatchProcessDialogProps> = ({
             label={t('storeProducts.batchAction')}
             onChange={(e) => setAction(e.target.value as BatchAction)}
           >
-            <MenuItem value="activate">{t('storeProducts.batchActionActivate')}</MenuItem>
-            <MenuItem value="deactivate">{t('storeProducts.batchActionDeactivate')}</MenuItem>
+            <MenuItem value="activate">
+              {t('storeProducts.batchActionActivate')}
+            </MenuItem>
+            <MenuItem value="deactivate">
+              {t('storeProducts.batchActionDeactivate')}
+            </MenuItem>
           </Select>
         </FormControl>
 
@@ -224,7 +235,12 @@ const BatchProcessDialog: React.FC<BatchProcessDialogProps> = ({
         <Button
           variant="contained"
           onClick={handleExecute}
-          disabled={loading || countLoading || matchingCount === null || matchingCount === 0}
+          disabled={
+            loading ||
+            countLoading ||
+            matchingCount === null ||
+            matchingCount === 0
+          }
           color={action === 'activate' ? 'success' : 'warning'}
         >
           {loading ? (

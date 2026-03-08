@@ -181,15 +181,21 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   const { t } = useTranslation();
 
   // --- Variants State & Logic ---
-  const initialVariantsJson = useMemo(() => JSON.stringify(initialVariants), [initialVariants]);
+  const initialVariantsJson = useMemo(
+    () => JSON.stringify(initialVariants),
+    [initialVariants]
+  );
 
-  const [editingVariants, setEditingVariants] = useState<Variant[]>(initialVariants);
+  const [editingVariants, setEditingVariants] =
+    useState<Variant[]>(initialVariants);
   const [prevVariantsJson, setPrevVariantsJson] = useState(initialVariantsJson);
 
   const [saving, setSaving] = useState(false);
   const [savingValues, setSavingValues] = useState(false);
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const [jsonErrors, setJsonErrors] = useState<Record<number, string | null>>({});
+  const [jsonErrors, setJsonErrors] = useState<Record<number, string | null>>(
+    {}
+  );
 
   // Ref to preserve expanded state
   const preserveExpandedRef = React.useRef(false);
@@ -267,7 +273,8 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     (val: any) => {
       if (valueType === 'json') {
         try {
-          if (typeof val === 'string') return JSON.parse(val === '' ? '{}' : val);
+          if (typeof val === 'string')
+            return JSON.parse(val === '' ? '{}' : val);
           return val ?? {};
         } catch {
           return {};
@@ -284,8 +291,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       JSON.stringify({
         overrideEnabled: originalOverrideEnabled,
         overrideDisabled: originalOverrideDisabled,
-        enabled: canonicalize(originalOverrideEnabled ? envEnabledValue : enabledValue),
-        disabled: canonicalize(originalOverrideDisabled ? envDisabledValue : disabledValue),
+        enabled: canonicalize(
+          originalOverrideEnabled ? envEnabledValue : enabledValue
+        ),
+        disabled: canonicalize(
+          originalOverrideDisabled ? envDisabledValue : disabledValue
+        ),
       }),
     [
       originalOverrideEnabled,
@@ -298,13 +309,19 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     ]
   );
 
-  const [overrideEnabled, setOverrideEnabled] = useState(originalOverrideEnabled);
-  const [overrideDisabled, setOverrideDisabled] = useState(originalOverrideDisabled);
+  const [overrideEnabled, setOverrideEnabled] = useState(
+    originalOverrideEnabled
+  );
+  const [overrideDisabled, setOverrideDisabled] = useState(
+    originalOverrideDisabled
+  );
   const [editingEnabledValue, setEditingEnabledValue] = useState(
     originalOverrideEnabled ? (envEnabledValue ?? enabledValue) : enabledValue
   );
   const [editingDisabledValue, setEditingDisabledValue] = useState(
-    originalOverrideDisabled ? (envDisabledValue ?? disabledValue) : disabledValue
+    originalOverrideDisabled
+      ? (envDisabledValue ?? disabledValue)
+      : disabledValue
   );
   const [valueJsonErrors, setValueJsonErrors] = useState<{
     enabledValue?: string | null;
@@ -322,10 +339,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       setOverrideEnabled(originalOverrideEnabled);
       setOverrideDisabled(originalOverrideDisabled);
       setEditingEnabledValue(
-        originalOverrideEnabled ? (envEnabledValue ?? enabledValue) : enabledValue
+        originalOverrideEnabled
+          ? (envEnabledValue ?? enabledValue)
+          : enabledValue
       );
       setEditingDisabledValue(
-        originalOverrideDisabled ? (envDisabledValue ?? disabledValue) : disabledValue
+        originalOverrideDisabled
+          ? (envDisabledValue ?? disabledValue)
+          : disabledValue
       );
       setValueJsonErrors({});
     }
@@ -413,7 +434,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       const sendDisabled = overrideDisabled
         ? ensureNonNull(toApiValue(editingDisabledValue))
         : toApiValue(editingDisabledValue);
-      await onSaveValues(sendEnabled, sendDisabled, overrideEnabled, overrideDisabled);
+      await onSaveValues(
+        sendEnabled,
+        sendDisabled,
+        overrideEnabled,
+        overrideDisabled
+      );
 
       // After successful save, sync prevPropsSnapshot to current state
       // so valuesHasChanges becomes false immediately, even if the server
@@ -452,7 +478,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       originalOverrideEnabled ? (envEnabledValue ?? enabledValue) : enabledValue
     );
     setEditingDisabledValue(
-      originalOverrideDisabled ? (envDisabledValue ?? disabledValue) : disabledValue
+      originalOverrideDisabled
+        ? (envDisabledValue ?? disabledValue)
+        : disabledValue
     );
     setValueJsonErrors({});
   }, [
@@ -495,7 +523,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     }
 
     const newVariant: Variant = {
-      name: flagType === 'remoteConfig' ? 'config' : `variant-${editingVariants.length + 1}`,
+      name:
+        flagType === 'remoteConfig'
+          ? 'config'
+          : `variant-${editingVariants.length + 1}`,
       weight: 100, // Will be recalculated by distributeWeights
       stickiness: 'default',
       value: defaultValue,
@@ -523,7 +554,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   const updateVariant = useCallback(
     (index: number, updates: Partial<Variant>) => {
-      const updated = editingVariants.map((v, i) => (i === index ? { ...v, ...updates } : v));
+      const updated = editingVariants.map((v, i) =>
+        i === index ? { ...v, ...updates } : v
+      );
       setEditingVariants(updated);
     },
     [editingVariants]
@@ -608,18 +641,29 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   // Check for duplicate names at component level for save button disabled state
   const variantNames = editingVariants.map((v) => v.name.trim().toLowerCase());
-  const hasDuplicateNames = variantNames.some((name, i) => variantNames.indexOf(name) !== i);
+  const hasDuplicateNames = variantNames.some(
+    (name, i) => variantNames.indexOf(name) !== i
+  );
 
   // Check for JSON errors
   const hasJsonErrors = Object.values(jsonErrors).some((e) => e !== null);
 
-  const VARIANT_COLORS = ['#7C4DFF', '#448AFF', '#00BFA5', '#FF6D00', '#FF4081', '#536DFE'];
+  const VARIANT_COLORS = [
+    '#7C4DFF',
+    '#448AFF',
+    '#00BFA5',
+    '#FF6D00',
+    '#FF4081',
+    '#536DFE',
+  ];
 
   const renderValueInputField = (field: 'enabledValue' | 'disabledValue') => {
-    const isEditing = field === 'enabledValue' ? overrideEnabled : overrideDisabled;
+    const isEditing =
+      field === 'enabledValue' ? overrideEnabled : overrideDisabled;
     const isActuallyEditable = isEditing && canManage && !isArchived;
 
-    const value = field === 'enabledValue' ? editingEnabledValue : editingDisabledValue;
+    const value =
+      field === 'enabledValue' ? editingEnabledValue : editingDisabledValue;
     const globalValue = field === 'enabledValue' ? enabledValue : disabledValue;
     const error = valueJsonErrors[field];
     const updateValue = (val: any) => {
@@ -630,7 +674,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     const viewOnlyStyle = !isActuallyEditable
       ? {
           bgcolor: (theme: any) =>
-            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+            theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.05)'
+              : 'rgba(0, 0, 0, 0.02)',
           '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
           '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
@@ -655,7 +701,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 ? value === true || value === 'true'
                 : globalValue === true || globalValue === 'true'
             }
-            onChange={(e) => isActuallyEditable && updateValue(e.target.checked)}
+            onChange={(e) =>
+              isActuallyEditable && updateValue(e.target.checked)
+            }
             disabled={!isActuallyEditable}
           />
           <Typography
@@ -686,7 +734,8 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           type="number"
           value={isEditing ? (value ?? '') : (globalValue ?? '')}
           onChange={(e) =>
-            isActuallyEditable && updateValue(e.target.value === '' ? 0 : Number(e.target.value))
+            isActuallyEditable &&
+            updateValue(e.target.value === '' ? 0 : Number(e.target.value))
           }
           disabled={!isActuallyEditable}
           sx={viewOnlyStyle}
@@ -720,7 +769,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 setValueJsonErrors((prev) => ({ ...prev, [field]: null }));
               } catch (e: any) {
                 updateValue(val);
-                setValueJsonErrors((prev) => ({ ...prev, [field]: e.message || 'Invalid JSON' }));
+                setValueJsonErrors((prev) => ({
+                  ...prev,
+                  [field]: e.message || 'Invalid JSON',
+                }));
               }
             }
           } else {
@@ -734,7 +786,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             ? t('featureFlags.enabledValue')
             : t('featureFlags.disabledValue')
         }
-        onValidationError={(err) => setValueJsonErrors((prev) => ({ ...prev, [field]: err }))}
+        onValidationError={(err) =>
+          setValueJsonErrors((prev) => ({ ...prev, [field]: err }))
+        }
         sx={viewOnlyStyle}
       />
     );
@@ -808,7 +862,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                       lineHeight: 1.2,
                     }}
                   >
-                    <span style={{ fontSize: '0.65rem' }}>{variant.weight}%</span>
+                    <span style={{ fontSize: '0.65rem' }}>
+                      {variant.weight}%
+                    </span>
                     <span>{variant.name}</span>
                   </Box>
                 )}
@@ -833,7 +889,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
             {/* Fixed weight checkbox - right-aligned above variants */}
             {flagType !== 'remoteConfig' && variantCount > 1 && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.5 }}>
+              <Box
+                sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.5 }}
+              >
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -844,7 +902,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                         onUseFixedWeightVariantsChange?.(newValue);
                         if (!newValue) {
                           // When unchecking, redistribute weights equally
-                          setEditingVariants(distributeWeights(editingVariants));
+                          setEditingVariants(
+                            distributeWeights(editingVariants)
+                          );
                         }
                       }}
                       disabled={!canManage || isArchived}
@@ -861,11 +921,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
             <Stack spacing={1}>
               {editingVariants.map((variant, index) => {
-                const variantColor = VARIANT_COLORS[index % VARIANT_COLORS.length];
+                const variantColor =
+                  VARIANT_COLORS[index % VARIANT_COLORS.length];
                 const showWeightControls = variantCount > 1;
                 const isDuplicateName = editingVariants.some(
                   (v, i) =>
-                    i !== index && v.name.trim().toLowerCase() === variant.name.trim().toLowerCase()
+                    i !== index &&
+                    v.name.trim().toLowerCase() ===
+                      variant.name.trim().toLowerCase()
                 );
 
                 return (
@@ -877,7 +940,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                       py: 1,
                       borderRadius: 1.5,
                       borderColor:
-                        flagType === 'remoteConfig' ? 'divider' : alpha(variantColor, 0.4),
+                        flagType === 'remoteConfig'
+                          ? 'divider'
+                          : alpha(variantColor, 0.4),
                       boxShadow:
                         flagType === 'remoteConfig'
                           ? 'none'
@@ -892,23 +957,32 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                       }}
                     >
                       {/* Value type icon */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
                         <FieldTypeIcon type={valueType} size={18} />
                       </Box>
 
                       {/* Variant name */}
-                      {variant.name !== '$config' && flagType !== 'remoteConfig' && (
-                        <TextField
-                          size="small"
-                          placeholder={t('featureFlags.variantName')}
-                          value={variant.name}
-                          onChange={(e) => updateVariant(index, { name: e.target.value })}
-                          disabled={!canManage || isArchived}
-                          error={isDuplicateName}
-                          sx={{ flex: 1, minWidth: 120 }}
-                          InputProps={{ sx: { height: 36 } }}
-                        />
-                      )}
+                      {variant.name !== '$config' &&
+                        flagType !== 'remoteConfig' && (
+                          <TextField
+                            size="small"
+                            placeholder={t('featureFlags.variantName')}
+                            value={variant.name}
+                            onChange={(e) =>
+                              updateVariant(index, { name: e.target.value })
+                            }
+                            disabled={!canManage || isArchived}
+                            error={isDuplicateName}
+                            sx={{ flex: 1, minWidth: 120 }}
+                            InputProps={{ sx: { height: 36 } }}
+                          />
+                        )}
 
                       {/* Variant value */}
                       <Box sx={{ flex: 2, minWidth: 150 }}>
@@ -917,8 +991,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                             value={(() => {
                               const raw = unwrapValue(variant.value);
                               if (valueType === 'json') {
-                                if (raw === null || raw === undefined) return '{}';
-                                if (typeof raw === 'object') return JSON.stringify(raw, null, 2);
+                                if (raw === null || raw === undefined)
+                                  return '{}';
+                                if (typeof raw === 'object')
+                                  return JSON.stringify(raw, null, 2);
                                 if (raw === '[object Object]') return '{}';
                                 return String(raw);
                               }
@@ -930,12 +1006,18 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                               if (valueType === 'json') {
                                 if (typeof val === 'object' && val !== null) {
                                   updateVariant(index, { value: val });
-                                  setJsonErrors((prev) => ({ ...prev, [index]: null }));
+                                  setJsonErrors((prev) => ({
+                                    ...prev,
+                                    [index]: null,
+                                  }));
                                 } else {
                                   try {
                                     const parsed = JSON.parse(val);
                                     updateVariant(index, { value: parsed });
-                                    setJsonErrors((prev) => ({ ...prev, [index]: null }));
+                                    setJsonErrors((prev) => ({
+                                      ...prev,
+                                      [index]: null,
+                                    }));
                                   } catch (e: any) {
                                     updateVariant(index, { value: val });
                                     setJsonErrors((prev) => ({
@@ -956,7 +1038,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                                 : t('featureFlags.variantValue')
                             }
                             onValidationError={(error) =>
-                              setJsonErrors((prev) => ({ ...prev, [index]: error }))
+                              setJsonErrors((prev) => ({
+                                ...prev,
+                                [index]: error,
+                              }))
                             }
                           />
                         ) : valueType === 'boolean' ? (
@@ -965,7 +1050,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                               unwrapValue(variant.value) === true ||
                               unwrapValue(variant.value) === 'true'
                             }
-                            onChange={(e) => updateVariant(index, { value: e.target.checked })}
+                            onChange={(e) =>
+                              updateVariant(index, { value: e.target.checked })
+                            }
                             disabled={!canManage || isArchived}
                           />
                         ) : (
@@ -976,7 +1063,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                             value={unwrapValue(variant.value) ?? ''}
                             onChange={(e) =>
                               updateVariant(index, {
-                                value: e.target.value === '' ? 0 : Number(e.target.value),
+                                value:
+                                  e.target.value === ''
+                                    ? 0
+                                    : Number(e.target.value),
                               })
                             }
                             disabled={!canManage || isArchived}
@@ -992,28 +1082,37 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                           type="number"
                           value={variant.weight}
                           onChange={(e) =>
-                            updateVariantWeight(index, parseInt(e.target.value) || 0)
+                            updateVariantWeight(
+                              index,
+                              parseInt(e.target.value) || 0
+                            )
                           }
-                          disabled={!canManage || isArchived || !useFixedWeightVariants}
+                          disabled={
+                            !canManage || isArchived || !useFixedWeightVariants
+                          }
                           sx={{ width: 90, flexShrink: 0 }}
                           InputProps={{
-                            endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                            endAdornment: (
+                              <InputAdornment position="end">%</InputAdornment>
+                            ),
                             sx: { height: 36 },
                           }}
                         />
                       )}
 
                       {/* Delete button */}
-                      {canManage && !isArchived && flagType !== 'remoteConfig' && (
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => removeVariant(index)}
-                          sx={{ flexShrink: 0 }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      )}
+                      {canManage &&
+                        !isArchived &&
+                        flagType !== 'remoteConfig' && (
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => removeVariant(index)}
+                            sx={{ flexShrink: 0 }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        )}
                     </Box>
                   </Paper>
                 );
@@ -1021,7 +1120,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             </Stack>
 
             {canManage && !isArchived && (
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+              <Box
+                sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}
+              >
                 {flagType !== 'remoteConfig' && variantCount > 0 ? (
                   !(valueType === 'boolean' && variantCount >= 2) ? (
                     <Button
@@ -1056,7 +1157,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                     size="small"
                     startIcon={<SaveIcon />}
                     onClick={handleSaveVariants}
-                    disabled={saving || !hasChanges || hasDuplicateNames || hasJsonErrors}
+                    disabled={
+                      saving ||
+                      !hasChanges ||
+                      hasDuplicateNames ||
+                      hasJsonErrors
+                    }
                   >
                     {saving ? t('common.saving') : t('common.save')}
                   </Button>
@@ -1100,7 +1206,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   >
                     {t('featureFlags.enabledValue')}
                   </Typography>
-                  <Box sx={{ flex: 1 }}>{renderValueInputField('enabledValue')}</Box>
+                  <Box sx={{ flex: 1 }}>
+                    {renderValueInputField('enabledValue')}
+                  </Box>
                   <OverrideSwitch
                     checked={overrideEnabled}
                     onChange={(e) => {
@@ -1131,7 +1239,8 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   borderRadius: 1,
                   border: '1px solid',
                   borderColor: 'divider',
-                  bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'transparent' : '#fff'),
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark' ? 'transparent' : '#fff',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1.5,
@@ -1148,14 +1257,18 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 >
                   {t('featureFlags.disabledValue')}
                 </Typography>
-                <Box sx={{ flex: 1 }}>{renderValueInputField('disabledValue')}</Box>
+                <Box sx={{ flex: 1 }}>
+                  {renderValueInputField('disabledValue')}
+                </Box>
                 <OverrideSwitch
                   checked={overrideDisabled}
                   onChange={(e) => {
                     const next = e.target.checked;
                     setOverrideDisabled(next);
                     if (next) {
-                      setEditingDisabledValue(envDisabledValue ?? disabledValue);
+                      setEditingDisabledValue(
+                        envDisabledValue ?? disabledValue
+                      );
                     } else {
                       setEditingDisabledValue(disabledValue);
                     }
@@ -1174,7 +1287,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             </Stack>
 
             {canManage && !isArchived && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: 1,
+                  mt: 2,
+                }}
+              >
                 {valuesHasChanges && (
                   <Button
                     variant="text"

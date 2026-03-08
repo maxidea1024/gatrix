@@ -2,7 +2,11 @@ import { Request, Response } from 'express';
 import { asyncHandler, GatrixError } from '../middleware/error-handler';
 import { ClientCrash } from '../models/client-crash';
 import { CrashEvent } from '../models/crash-event';
-import { CrashUploadRequest, CrashState, CRASH_CONSTANTS } from '../types/crash';
+import {
+  CrashUploadRequest,
+  CrashState,
+  CRASH_CONSTANTS,
+} from '../types/crash';
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
@@ -43,7 +47,10 @@ export class ClientCrashController {
 
       if (!crashId) {
         // Check database for existing crash
-        const existingCrash = await ClientCrash.findByHashAndBranch(chash, body.branch);
+        const existingCrash = await ClientCrash.findByHashAndBranch(
+          chash,
+          body.branch
+        );
 
         if (existingCrash) {
           crashId = existingCrash.id;
@@ -57,7 +64,9 @@ export class ClientCrashController {
 
       // Get client IP address and remove IPv6 prefix if present
       let clientIp =
-        (req.headers['x-forwarded-for'] as string)?.split(',')[0] || req.socket.remoteAddress || '';
+        (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
+        req.socket.remoteAddress ||
+        '';
 
       // Remove "::ffff:" prefix from IPv4-mapped IPv6 addresses
       if (clientIp.startsWith('::ffff:')) {
@@ -70,7 +79,9 @@ export class ClientCrashController {
       if (isNewCrash) {
         // Extract first line from stack trace (max 200 chars)
         const firstLine =
-          body.stack.split('\n')[0]?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
+          body.stack
+            .split('\n')[0]
+            ?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
 
         const newCrashId = generateULID();
 
@@ -123,7 +134,9 @@ export class ClientCrashController {
 
       // Extract first line from stack trace (max 200 chars)
       const eventFirstLine =
-        body.stack.split('\n')[0]?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
+        body.stack
+          .split('\n')[0]
+          ?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
 
       // Create crash event
       const event = await CrashEvent.create({
@@ -204,12 +217,21 @@ export class ClientCrashController {
    * Save stack trace to file
    * Returns the relative file path
    */
-  private static async saveStackTraceFile(chash: string, stack: string): Promise<string> {
+  private static async saveStackTraceFile(
+    chash: string,
+    stack: string
+  ): Promise<string> {
     try {
       // Create directory structure: public/crashes/hash[0:2]/hash[2:4]/
       const hashDir1 = chash.substring(0, 2);
       const hashDir2 = chash.substring(2, 4);
-      const dirPath = path.join(process.cwd(), 'public', 'crashes', hashDir1, hashDir2);
+      const dirPath = path.join(
+        process.cwd(),
+        'public',
+        'crashes',
+        hashDir1,
+        hashDir2
+      );
 
       // Ensure directory exists
       await fs.mkdir(dirPath, { recursive: true });
@@ -233,7 +255,10 @@ export class ClientCrashController {
    * Save log file
    * Returns the relative file path
    */
-  private static async saveLogFile(eventId: string, log: string): Promise<string> {
+  private static async saveLogFile(
+    eventId: string,
+    log: string
+  ): Promise<string> {
     try {
       // Check log size limit (1MB)
       if (log.length > CRASH_CONSTANTS.MaxLogTextLen) {
@@ -250,7 +275,15 @@ export class ClientCrashController {
       const year = now.getFullYear().toString();
       const month = (now.getMonth() + 1).toString().padStart(2, '0');
       const day = now.getDate().toString().padStart(2, '0');
-      const dirPath = path.join(process.cwd(), 'public', 'crashes', 'logs', year, month, day);
+      const dirPath = path.join(
+        process.cwd(),
+        'public',
+        'crashes',
+        'logs',
+        year,
+        month,
+        day
+      );
 
       // Ensure directory exists
       await fs.mkdir(dirPath, { recursive: true });
@@ -273,9 +306,15 @@ export class ClientCrashController {
   /**
    * Check reopen logic for closed/resolved crashes
    */
-  private static async checkReopenLogic(crash: ClientCrash, body: CrashUploadRequest) {
+  private static async checkReopenLogic(
+    crash: ClientCrash,
+    body: CrashUploadRequest
+  ) {
     // Only check reopen for CLOSED or RESOLVED crashes
-    if (crash.crashesState !== CrashState.CLOSED && crash.crashesState !== CrashState.RESOLVED) {
+    if (
+      crash.crashesState !== CrashState.CLOSED &&
+      crash.crashesState !== CrashState.RESOLVED
+    ) {
       return;
     }
 

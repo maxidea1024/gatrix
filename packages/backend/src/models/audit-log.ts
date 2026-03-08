@@ -16,8 +16,12 @@ export class AuditLogModel {
         description: auditData.description || null,
         entityType: auditData.resourceType || null,
         entityId: auditData.resourceId || null,
-        oldValues: auditData.oldValues ? JSON.stringify(auditData.oldValues) : null,
-        newValues: auditData.newValues ? JSON.stringify(auditData.newValues) : null,
+        oldValues: auditData.oldValues
+          ? JSON.stringify(auditData.oldValues)
+          : null,
+        newValues: auditData.newValues
+          ? JSON.stringify(auditData.newValues)
+          : null,
         ipAddress: auditData.ipAddress || null,
         userAgent: auditData.userAgent || null,
       });
@@ -30,8 +34,10 @@ export class AuditLogModel {
       // Trigger Integration Event
       // Use dynamic import to avoid circular dependency
       try {
-        const { ALL_INTEGRATION_EVENTS } = await import('../types/integration-events');
-        const { IntegrationService } = await import('../services/integration-service');
+        const { ALL_INTEGRATION_EVENTS } =
+          await import('../types/integration-events');
+        const { IntegrationService } =
+          await import('../services/integration-service');
 
         const eventsToTrigger: string[] = [];
         let primaryEventType = auditData.action;
@@ -40,31 +46,49 @@ export class AuditLogModel {
         primaryEventType = primaryEventType.replace(/\./g, '_');
 
         // 1. Determine primary event type (with mapping)
-        let isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(primaryEventType as any);
+        let isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(
+          primaryEventType as any
+        );
 
         if (!isPrimaryValid) {
           // Special mappings for primary event replacement
-          if (primaryEventType === 'game_world_toggle_maintenance' && auditData.newValues) {
+          if (
+            primaryEventType === 'game_world_toggle_maintenance' &&
+            auditData.newValues
+          ) {
             const isActive =
-              auditData.newValues.isMaintenance === true || auditData.newValues.isMaintenance === 1;
+              auditData.newValues.isMaintenance === true ||
+              auditData.newValues.isMaintenance === 1;
             primaryEventType = isActive
               ? 'game_world_maintenance_on'
               : 'game_world_maintenance_off';
-            isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(primaryEventType as any);
+            isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(
+              primaryEventType as any
+            );
           } else if (primaryEventType === 'game_world_toggle_visibility') {
             primaryEventType = 'game_world_visibility_changed';
-            isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(primaryEventType as any);
+            isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(
+              primaryEventType as any
+            );
           } else {
             // Generic mappings: append 'd' to past-tense-ify
             if (primaryEventType.endsWith('_create')) primaryEventType += 'd';
-            else if (primaryEventType.endsWith('_update')) primaryEventType += 'd';
-            else if (primaryEventType.endsWith('_delete')) primaryEventType += 'd';
-            else if (primaryEventType.endsWith('_archive')) primaryEventType += 'd';
-            else if (primaryEventType.endsWith('_revive')) primaryEventType += 'd';
-            else if (primaryEventType.endsWith('_bulk_create')) primaryEventType += 'd';
-            else if (primaryEventType.endsWith('_bulk_update')) primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_update'))
+              primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_delete'))
+              primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_archive'))
+              primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_revive'))
+              primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_bulk_create'))
+              primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_bulk_update'))
+              primaryEventType += 'd';
 
-            isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(primaryEventType as any);
+            isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(
+              primaryEventType as any
+            );
           }
         }
 
@@ -89,11 +113,22 @@ export class AuditLogModel {
 
           if (newStatus && oldStatus) {
             if (newStatus === 'MAINTENANCE' && oldStatus !== 'MAINTENANCE') {
-              if (ALL_INTEGRATION_EVENTS.includes('client_version_maintenance_on' as any)) {
+              if (
+                ALL_INTEGRATION_EVENTS.includes(
+                  'client_version_maintenance_on' as any
+                )
+              ) {
                 eventsToTrigger.push('client_version_maintenance_on');
               }
-            } else if (newStatus !== 'MAINTENANCE' && oldStatus === 'MAINTENANCE') {
-              if (ALL_INTEGRATION_EVENTS.includes('client_version_maintenance_off' as any)) {
+            } else if (
+              newStatus !== 'MAINTENANCE' &&
+              oldStatus === 'MAINTENANCE'
+            ) {
+              if (
+                ALL_INTEGRATION_EVENTS.includes(
+                  'client_version_maintenance_off' as any
+                )
+              ) {
                 eventsToTrigger.push('client_version_maintenance_off');
               }
             }
@@ -131,11 +166,17 @@ export class AuditLogModel {
             data: eventData,
             createdAt: new Date(),
           }).catch((err) => {
-            logger.error(`Failed to dispatch integration event ${eventType}:`, err);
+            logger.error(
+              `Failed to dispatch integration event ${eventType}:`,
+              err
+            );
           });
         }
       } catch (error) {
-        logger.error('Failed to trigger integration event on audit log creation:', error);
+        logger.error(
+          'Failed to trigger integration event on audit log creation:',
+          error
+        );
         // Continue execution, do not fail audit log creation
       }
 
@@ -199,8 +240,12 @@ export class AuditLogModel {
         await db('g_audit_logs').select(1).limit(1);
       } catch (error: any) {
         if (error.code === 'ER_NO_SUCH_TABLE') {
-          logger.error('g_audit_logs table does not exist. Please run migrations.');
-          throw new Error('Audit logs table not found. Please run database migrations.');
+          logger.error(
+            'g_audit_logs table does not exist. Please run migrations.'
+          );
+          throw new Error(
+            'Audit logs table not found. Please run database migrations.'
+          );
         }
         throw error;
       }
@@ -282,7 +327,9 @@ export class AuditLogModel {
       };
 
       // Get total count
-      const countQuery = applyFilters(baseQuery()).count('al.id as total').first();
+      const countQuery = applyFilters(baseQuery())
+        .count('al.id as total')
+        .first();
 
       // Get audit logs with user information
       const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 1000);
@@ -348,11 +395,17 @@ export class AuditLogModel {
 
       // Provide more specific error messages
       if (error.code === 'ER_NO_SUCH_TABLE') {
-        throw new Error('Audit logs table not found. Please run database migrations.');
+        throw new Error(
+          'Audit logs table not found. Please run database migrations.'
+        );
       } else if (error.code === 'ER_BAD_FIELD_ERROR') {
-        throw new Error('Database schema mismatch. Please check audit logs table structure.');
+        throw new Error(
+          'Database schema mismatch. Please check audit logs table structure.'
+        );
       } else if (error.code === 'ECONNREFUSED') {
-        throw new Error('Database connection failed. Please check database server.');
+        throw new Error(
+          'Database connection failed. Please check database server.'
+        );
       }
 
       throw error;
@@ -388,9 +441,13 @@ export class AuditLogModel {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-      const result = await db('g_audit_logs').where('createdAt', '<', cutoffDate).del();
+      const result = await db('g_audit_logs')
+        .where('createdAt', '<', cutoffDate)
+        .del();
 
-      logger.info(`Deleted ${result} old audit logs older than ${daysToKeep} days`);
+      logger.info(
+        `Deleted ${result} old audit logs older than ${daysToKeep} days`
+      );
       return result;
     } catch (error) {
       logger.error('Error deleting old audit logs:', error);
@@ -417,7 +474,9 @@ export class AuditLogModel {
       }
 
       const whereClause =
-        whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+        whereConditions.length > 0
+          ? `WHERE ${whereConditions.join(' AND ')}`
+          : '';
 
       const query = db('g_audit_logs')
         .select('action')

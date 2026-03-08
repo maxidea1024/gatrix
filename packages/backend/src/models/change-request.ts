@@ -50,7 +50,14 @@ export class ChangeRequest extends Model {
         environmentId: { type: 'string' },
         status: {
           type: 'string',
-          enum: ['draft', 'open', 'approved', 'applied', 'rejected', 'conflict'],
+          enum: [
+            'draft',
+            'open',
+            'approved',
+            'applied',
+            'rejected',
+            'conflict',
+          ],
         },
         title: { type: 'string', minLength: 1, maxLength: 255 },
         description: { type: ['string', 'null'] },

@@ -59,14 +59,23 @@ const LANGUAGE_ALIASES: Record<string, string> = {
  * Returns the appropriate icon for a supported language.
  * Uses locally stored Devicon SVG files for high-quality, recognizable icons.
  */
-export const getLanguageIcon = (language: string | null, size: number = 16): React.ReactElement => {
+export const getLanguageIcon = (
+  language: string | null,
+  size: number = 16
+): React.ReactElement => {
   const normalized = language?.toLowerCase() || '';
   const canonical = LANGUAGE_ALIASES[normalized] || normalized;
   const iconPath = LANGUAGE_ICON_MAP[canonical];
 
   if (iconPath) {
     return (
-      <img src={iconPath} alt={canonical} width={size} height={size} style={{ display: 'block' }} />
+      <img
+        src={iconPath}
+        alt={canonical}
+        width={size}
+        height={size}
+        style={{ display: 'block' }}
+      />
     );
   }
 

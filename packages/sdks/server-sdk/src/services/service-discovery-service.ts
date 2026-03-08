@@ -111,7 +111,8 @@ export class ServiceDiscoveryService {
       throw new Error(response.error?.message || 'Failed to register service');
     }
 
-    const { instanceId, externalAddress, orgId, projectId, environmentId } = response.data;
+    const { instanceId, externalAddress, orgId, projectId, environmentId } =
+      response.data;
     this.instanceId = instanceId;
     this.labels = input.labels;
 
@@ -169,13 +170,18 @@ export class ServiceDiscoveryService {
     });
 
     try {
-      const response = await this.apiClient.postNoRetry('/api/v1/server/services/unregister', {
-        instanceId: this.instanceId,
-        labels: this.labels,
-      });
+      const response = await this.apiClient.postNoRetry(
+        '/api/v1/server/services/unregister',
+        {
+          instanceId: this.instanceId,
+          labels: this.labels,
+        }
+      );
 
       if (!response.success) {
-        throw new Error(response.error?.message || 'Failed to unregister service');
+        throw new Error(
+          response.error?.message || 'Failed to unregister service'
+        );
       }
 
       this.logger.info('Service unregistered via API', {
@@ -239,7 +245,10 @@ export class ServiceDiscoveryService {
 
     let response;
     try {
-      response = await this.apiClient.post('/api/v1/server/services/status', payload);
+      response = await this.apiClient.post(
+        '/api/v1/server/services/status',
+        payload
+      );
     } catch (error: any) {
       // Handle thrown errors from ApiClient (e.g. 404, 500)
       const errorMessage = error.message || String(error);
@@ -252,7 +261,8 @@ export class ServiceDiscoveryService {
     }
 
     if (!response.success) {
-      const errorMessage = response.error?.message || 'Failed to update service status';
+      const errorMessage =
+        response.error?.message || 'Failed to update service status';
 
       // Check if error is "Service not found" and we have backup data
       if (errorMessage.includes('not found')) {
@@ -272,12 +282,17 @@ export class ServiceDiscoveryService {
   /**
    * Handle 'Service not found' error by attempting auto-registration
    */
-  private async handleServiceNotFound(input: UpdateServiceStatusInput): Promise<void> {
+  private async handleServiceNotFound(
+    input: UpdateServiceStatusInput
+  ): Promise<void> {
     if (this.registrationBackup) {
-      this.logger.warn('Service not found in registry, attempting auto-registration', {
-        instanceId: this.instanceId,
-        service: this.labels?.service,
-      });
+      this.logger.warn(
+        'Service not found in registry, attempting auto-registration',
+        {
+          instanceId: this.instanceId,
+          service: this.labels?.service,
+        }
+      );
 
       try {
         // Re-register using backup data
@@ -288,7 +303,9 @@ export class ServiceDiscoveryService {
           internalAddress: this.registrationBackup.internalAddress,
           ports: this.registrationBackup.ports,
           meta: this.registrationBackup.meta,
-          status: (input.status || this.registrationBackup.status || 'ready') as any,
+          status: (input.status ||
+            this.registrationBackup.status ||
+            'ready') as any,
           stats: input.stats,
         });
 
@@ -319,7 +336,9 @@ export class ServiceDiscoveryService {
       this.stopHeartbeat();
       this.instanceId = undefined;
       this.labels = undefined;
-      throw new Error('Service not found. Please call register() to re-register the service.');
+      throw new Error(
+        'Service not found. Please call register() to re-register the service.'
+      );
     }
   }
 
@@ -373,10 +392,13 @@ export class ServiceDiscoveryService {
       headers['X-Instance-Id'] = this.instanceId;
     }
 
-    const response = await this.apiClient.get<ServiceInstance[]>('/api/v1/server/services', {
-      params: queryParams,
-      headers,
-    });
+    const response = await this.apiClient.get<ServiceInstance[]>(
+      '/api/v1/server/services',
+      {
+        params: queryParams,
+        headers,
+      }
+    );
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch services');
@@ -393,7 +415,10 @@ export class ServiceDiscoveryService {
    * Fetch a specific service instance
    * GET /api/v1/server/services/:serviceType/:instanceId
    */
-  async fetchService(serviceType: string, instanceId: string): Promise<ServiceInstance | null> {
+  async fetchService(
+    serviceType: string,
+    instanceId: string
+  ): Promise<ServiceInstance | null> {
     this.logger.debug('Fetching service via API', { serviceType, instanceId });
 
     const response = await this.apiClient.get<ServiceInstance>(
@@ -422,9 +447,12 @@ export class ServiceDiscoveryService {
     this.heartbeatInterval = setInterval(async () => {
       // Skip if previous update is still in progress (e.g., retrying after backend restart)
       if (this.isUpdating) {
-        this.logger.debug('Skipping heartbeat - previous update still in progress', {
-          instanceId: this.instanceId,
-        });
+        this.logger.debug(
+          'Skipping heartbeat - previous update still in progress',
+          {
+            instanceId: this.instanceId,
+          }
+        );
         return;
       }
 

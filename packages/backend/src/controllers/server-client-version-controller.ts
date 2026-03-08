@@ -51,15 +51,24 @@ export class ServerClientVersionController {
           // Get clientVersionPassiveData from KV settings
           let passiveDataStr: string | null = null;
           try {
-            passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environmentId);
+            passiveDataStr = await VarsModel.get(
+              '$clientVersionPassiveData',
+              environmentId
+            );
           } catch (error) {
-            logger.warn('Failed to fetch clientVersionPassiveData for Server SDK:', error);
+            logger.warn(
+              'Failed to fetch clientVersionPassiveData for Server SDK:',
+              error
+            );
           }
 
           // Fetch tags for each client version
           const versionsWithTags = await Promise.all(
             result.clientVersions.map(async (version: any) => {
-              const tags = await TagService.listTagsForEntity('client_version', version.id);
+              const tags = await TagService.listTagsForEntity(
+                'client_version',
+                version.id
+              );
 
               // Parse customPayload and merge with passiveData
               let customPayload = {};
@@ -79,7 +88,11 @@ export class ServerClientVersionController {
                     }
                   }
 
-                  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                  if (
+                    parsed &&
+                    typeof parsed === 'object' &&
+                    !Array.isArray(parsed)
+                  ) {
                     customPayload = parsed;
                   }
                 }
@@ -91,7 +104,10 @@ export class ServerClientVersionController {
               }
 
               // Resolve passive data and merge: passiveData first, then customPayload (customPayload overwrites)
-              const passiveData = resolvePassiveData(passiveDataStr, version.clientVersion);
+              const passiveData = resolvePassiveData(
+                passiveDataStr,
+                version.clientVersion
+              );
               const mergedMeta = { ...passiveData, ...customPayload };
 
               // Remove internal fields from response
@@ -120,7 +136,10 @@ export class ServerClientVersionController {
         },
       });
     } catch (error) {
-      logger.error('Error in ServerClientVersionController.getClientVersions:', error);
+      logger.error(
+        'Error in ServerClientVersionController.getClientVersions:',
+        error
+      );
       res.status(500).json({
         success: false,
         error: {
@@ -162,7 +181,10 @@ export class ServerClientVersionController {
         });
       }
 
-      const version = await ClientVersionService.getClientVersionById(versionId, environmentId);
+      const version = await ClientVersionService.getClientVersionById(
+        versionId,
+        environmentId
+      );
 
       if (!version) {
         return res.status(404).json({
@@ -175,15 +197,24 @@ export class ServerClientVersionController {
       }
 
       // Fetch tags
-      const tags = await TagService.listTagsForEntity('client_version', version.id!);
+      const tags = await TagService.listTagsForEntity(
+        'client_version',
+        version.id!
+      );
 
       // Get clientVersionPassiveData from KV settings and resolve by version
       let passiveData = {};
       try {
-        const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environmentId);
+        const passiveDataStr = await VarsModel.get(
+          '$clientVersionPassiveData',
+          environmentId
+        );
         passiveData = resolvePassiveData(passiveDataStr, version.clientVersion);
       } catch (error) {
-        logger.warn('Failed to resolve clientVersionPassiveData for Server SDK (Single):', error);
+        logger.warn(
+          'Failed to resolve clientVersionPassiveData for Server SDK (Single):',
+          error
+        );
       }
 
       // Parse customPayload and merge with passiveData
@@ -209,7 +240,10 @@ export class ServerClientVersionController {
           }
         }
       } catch (error) {
-        logger.warn(`Failed to parse customPayload for client version ${version.id}:`, error);
+        logger.warn(
+          `Failed to parse customPayload for client version ${version.id}:`,
+          error
+        );
       }
 
       // Merge: passiveData first, then customPayload (customPayload overwrites)
@@ -228,7 +262,10 @@ export class ServerClientVersionController {
         },
       });
     } catch (error) {
-      logger.error('Error in ServerClientVersionController.getClientVersionById:', error);
+      logger.error(
+        'Error in ServerClientVersionController.getClientVersionById:',
+        error
+      );
       res.status(500).json({
         success: false,
         error: {

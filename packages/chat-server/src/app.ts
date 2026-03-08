@@ -168,7 +168,12 @@ class ChatServerApp {
   private setupErrorHandling(): void {
     // Global error handler
     this.app.use(
-      (error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+      (
+        error: Error,
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+      ) => {
         // Check if this is a client abort error (common and expected)
         const isClientAbort =
           error.message?.includes('request aborted') ||
@@ -204,7 +209,9 @@ class ChatServerApp {
 
         res.status(500).json({
           error: 'Internal Server Error',
-          message: config.isDevelopment ? error.message : 'Something went wrong',
+          message: config.isDevelopment
+            ? error.message
+            : 'Something went wrong',
           timestamp: new Date().toISOString(),
         });
       }
@@ -257,13 +264,21 @@ class ChatServerApp {
         const defaultToken = await Promise.race([
           ApiTokenService.ensureDefaultToken(),
           new Promise<string>((_, reject) =>
-            setTimeout(() => reject(new Error('Token generation timeout')), 5000)
+            setTimeout(
+              () => reject(new Error('Token generation timeout')),
+              5000
+            )
           ),
         ]);
-        logger.info(`Default API token ready: ${defaultToken.substring(0, 12)}...`);
+        logger.info(
+          `Default API token ready: ${defaultToken.substring(0, 12)}...`
+        );
         logger.info(`🔑 FULL API TOKEN FOR BACKEND: ${defaultToken}`);
       } catch (tokenError) {
-        logger.warn('Failed to generate default API token, continuing anyway:', tokenError);
+        logger.warn(
+          'Failed to generate default API token, continuing anyway:',
+          tokenError
+        );
       }
 
       // Handle server errors
@@ -273,7 +288,9 @@ class ChatServerApp {
         }
 
         const bind =
-          typeof config.port === 'string' ? 'Pipe ' + config.port : 'Port ' + config.port;
+          typeof config.port === 'string'
+            ? 'Pipe ' + config.port
+            : 'Port ' + config.port;
 
         switch (error.code) {
           case 'EACCES':
@@ -302,7 +319,9 @@ class ChatServerApp {
           });
 
           if (config.monitoring.enabled) {
-            logger.info(`Metrics available at http://${config.host}:${config.port}/metrics`);
+            logger.info(
+              `Metrics available at http://${config.host}:${config.port}/metrics`
+            );
           }
 
           // Register Chat Server service to Service Discovery via SDK
@@ -314,11 +333,15 @@ class ChatServerApp {
                 const packageJson = require('../package.json');
                 serverVersion = packageJson.version || '0.0.0';
               } catch (err) {
-                logger.warn('Failed to load package.json version, using default 0.0.0');
+                logger.warn(
+                  'Failed to load package.json version, using default 0.0.0'
+                );
               }
             }
-            const backendUrl = process.env.GATRIX_URL || 'http://localhost:55000';
-            const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
+            const backendUrl =
+              process.env.GATRIX_URL || 'http://localhost:55000';
+            const apiToken =
+              process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
 
             gatrixSdk = new GatrixServerSDK({
               gatrixUrl: backendUrl,
@@ -369,10 +392,13 @@ class ChatServerApp {
               },
             });
 
-            logger.info('Chat Server service registered to Service Discovery via SDK', {
-              instanceId: result.instanceId,
-              version: serverVersion,
-            });
+            logger.info(
+              'Chat Server service registered to Service Discovery via SDK',
+              {
+                instanceId: result.instanceId,
+                version: serverVersion,
+              }
+            );
           } catch (error: any) {
             logger.warn('Chat Server service registration failed, continuing', {
               error: error instanceof Error ? error.message : String(error),
@@ -430,7 +456,9 @@ class ChatServerApp {
         try {
           await gatrixSdk.unregisterService();
           await gatrixSdk.close();
-          logger.info('Chat Server service unregistered from Service Discovery');
+          logger.info(
+            'Chat Server service unregistered from Service Discovery'
+          );
         } catch (error) {
           logger.warn('Error unregistering Chat Server service:', error);
         }

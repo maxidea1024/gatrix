@@ -17,8 +17,16 @@ const viewPermission = requireProjectPermission([
   P.ENVIRONMENTS_READ,
   P.ENVIRONMENTS_UPDATE,
 ]) as any;
-router.get('/:environmentId', viewPermission, EnvironmentController.getEnvironment);
-router.get('/:environmentId/stats', viewPermission, EnvironmentController.getEnvironmentStats);
+router.get(
+  '/:environmentId',
+  viewPermission,
+  EnvironmentController.getEnvironment
+);
+router.get(
+  '/:environmentId/stats',
+  viewPermission,
+  EnvironmentController.getEnvironmentStats
+);
 router.get(
   '/:environmentId/related-data',
   viewPermission,
@@ -28,9 +36,21 @@ router.get(
 // Write access requires environments.update permission
 const managePermission = requireProjectPermission(P.ENVIRONMENTS_UPDATE) as any;
 router.post('/', managePermission, EnvironmentController.createEnvironment);
-router.put('/:environmentId', managePermission, EnvironmentController.updateEnvironment);
-router.delete('/:environmentId', managePermission, EnvironmentController.deleteEnvironment);
-router.post('/validate-name', managePermission, EnvironmentController.validateEnvironmentName);
+router.put(
+  '/:environmentId',
+  managePermission,
+  EnvironmentController.updateEnvironment
+);
+router.delete(
+  '/:environmentId',
+  managePermission,
+  EnvironmentController.deleteEnvironment
+);
+router.post(
+  '/validate-name',
+  managePermission,
+  EnvironmentController.validateEnvironmentName
+);
 
 // Environment copy routes (requires manage permission)
 router.get(

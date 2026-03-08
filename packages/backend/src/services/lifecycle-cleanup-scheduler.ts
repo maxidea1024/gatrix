@@ -11,9 +11,12 @@ import { queueService } from './queue-service';
  * This ensures only one instance runs the cleanup across all backend instances
  */
 export async function initializeLifecycleCleanupJob(): Promise<void> {
-  const retentionDays = config.serviceDiscovery?.lifecycleEventRetentionDays ?? 14;
+  const retentionDays =
+    config.serviceDiscovery?.lifecycleEventRetentionDays ?? 14;
 
-  logger.info(`Initializing lifecycle event cleanup job (retention: ${retentionDays} days)`);
+  logger.info(
+    `Initializing lifecycle event cleanup job (retention: ${retentionDays} days)`
+  );
 
   try {
     // Check if job already exists
@@ -30,7 +33,9 @@ export async function initializeLifecycleCleanupJob(): Promise<void> {
           repeat: { pattern: '0 3 * * *' }, // Every day at 3:00 AM
         }
       );
-      logger.info('Registered repeatable job: lifecycle:cleanup (daily at 3:00 AM)');
+      logger.info(
+        'Registered repeatable job: lifecycle:cleanup (daily at 3:00 AM)'
+      );
     } else {
       logger.info('Repeatable job already exists: lifecycle:cleanup');
     }
@@ -43,11 +48,16 @@ export async function initializeLifecycleCleanupJob(): Promise<void> {
  * Process lifecycle cleanup job
  * Called by QueueService when the scheduled job runs
  */
-export async function processLifecycleCleanupJob(retentionDays: number): Promise<number> {
+export async function processLifecycleCleanupJob(
+  retentionDays: number
+): Promise<number> {
   try {
-    const deletedCount = await ServerLifecycleEvent.deleteOldEvents(retentionDays);
+    const deletedCount =
+      await ServerLifecycleEvent.deleteOldEvents(retentionDays);
     if (deletedCount > 0) {
-      logger.info(`Deleted ${deletedCount} lifecycle events older than ${retentionDays} days`);
+      logger.info(
+        `Deleted ${deletedCount} lifecycle events older than ${retentionDays} days`
+      );
     } else {
       logger.debug('No old lifecycle events to delete');
     }

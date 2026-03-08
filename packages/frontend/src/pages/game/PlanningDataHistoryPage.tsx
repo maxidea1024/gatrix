@@ -42,9 +42,14 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import planningDataService, { UploadRecord } from '../../services/planningDataService';
+import planningDataService, {
+  UploadRecord,
+} from '../../services/planningDataService';
 import SimplePagination from '../../components/common/SimplePagination';
-import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
+import {
+  formatRelativeTime,
+  formatDateTimeDetailed,
+} from '../../utils/dateFormat';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
@@ -80,7 +85,10 @@ const PlanningDataHistoryPage: React.FC = () => {
   const loadHistory = async () => {
     try {
       setLoading(true);
-      const data = await planningDataService.getUploadHistory(projectApiPath, 100);
+      const data = await planningDataService.getUploadHistory(
+        projectApiPath,
+        100
+      );
       setHistory(data);
     } catch (error: any) {
       console.error('Error loading history:', error);
@@ -102,10 +110,14 @@ const PlanningDataHistoryPage: React.FC = () => {
 
   const handleReset = async () => {
     try {
-      const result = await planningDataService.resetUploadHistory(projectApiPath);
-      enqueueSnackbar(t('planningData.history.resetSuccess', { count: result.deletedCount }), {
-        variant: 'success',
-      });
+      const result =
+        await planningDataService.resetUploadHistory(projectApiPath);
+      enqueueSnackbar(
+        t('planningData.history.resetSuccess', { count: result.deletedCount }),
+        {
+          variant: 'success',
+        }
+      );
       setShowResetDialog(false);
       setResetConfirmText('');
       loadHistory();
@@ -157,7 +169,10 @@ const PlanningDataHistoryPage: React.FC = () => {
     return result;
   }, [history, debouncedSearchTerm, orderBy, order]);
 
-  const paginatedHistory = filteredHistory.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
+  const paginatedHistory = filteredHistory.slice(
+    page * rowsPerPage,
+    (page + 1) * rowsPerPage
+  );
 
   if (!canView) {
     return (
@@ -225,7 +240,10 @@ const PlanningDataHistoryPage: React.FC = () => {
               }}
             >
               <TextField
-                placeholder={t('planningData.history.searchPlaceholder') || t('common.search')}
+                placeholder={
+                  t('planningData.history.searchPlaceholder') ||
+                  t('common.search')
+                }
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -265,7 +283,9 @@ const PlanningDataHistoryPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                   endAdornment: null,
@@ -302,9 +322,15 @@ const PlanningDataHistoryPage: React.FC = () => {
                       bgcolor: 'primary.main',
                     }}
                   />
-                  <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ whiteSpace: 'nowrap' }}
+                  >
                     {t('planningData.history.totalRecords')}{' '}
-                    <strong style={{ color: 'inherit' }}>{history.length}</strong>
+                    <strong style={{ color: 'inherit' }}>
+                      {history.length}
+                    </strong>
                   </Typography>
                 </Box>
               </Box>
@@ -313,7 +339,11 @@ const PlanningDataHistoryPage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Tooltip title={t('common.refresh')}>
                 <span>
-                  <IconButton size="small" onClick={handleRefresh} disabled={loading}>
+                  <IconButton
+                    size="small"
+                    onClick={handleRefresh}
+                    disabled={loading}
+                  >
                     <RefreshIcon fontSize="small" />
                   </IconButton>
                 </span>
@@ -366,13 +396,17 @@ const PlanningDataHistoryPage: React.FC = () => {
                       <TableCell align="center">
                         <TableSortLabel
                           active={orderBy === 'changedFilesCount'}
-                          direction={orderBy === 'changedFilesCount' ? order : 'asc'}
+                          direction={
+                            orderBy === 'changedFilesCount' ? order : 'asc'
+                          }
                           onClick={() => handleSort('changedFilesCount')}
                         >
                           {t('planningData.history.changedFilesCount')}
                         </TableSortLabel>
                       </TableCell>
-                      <TableCell align="center">{t('planningData.history.changes')}</TableCell>
+                      <TableCell align="center">
+                        {t('planningData.history.changes')}
+                      </TableCell>
                       <TableCell>{t('planningData.history.comment')}</TableCell>
                     </TableRow>
                   </TableHead>
@@ -383,7 +417,8 @@ const PlanningDataHistoryPage: React.FC = () => {
                           hover
                           sx={{
                             cursor:
-                              record.fileDiffs && Object.keys(record.fileDiffs).length > 0
+                              record.fileDiffs &&
+                              Object.keys(record.fileDiffs).length > 0
                                 ? 'pointer'
                                 : 'default',
                             bgcolor:
@@ -415,13 +450,17 @@ const PlanningDataHistoryPage: React.FC = () => {
                           }}
                           onClick={() => {
                             // Only toggle if there are diffs to show
-                            if (record.fileDiffs && Object.keys(record.fileDiffs).length > 0) {
+                            if (
+                              record.fileDiffs &&
+                              Object.keys(record.fileDiffs).length > 0
+                            ) {
                               toggleExpand(record.id);
                             }
                           }}
                         >
                           <TableCell>
-                            {record.fileDiffs && Object.keys(record.fileDiffs).length > 0 ? (
+                            {record.fileDiffs &&
+                            Object.keys(record.fileDiffs).length > 0 ? (
                               <IconButton size="small">
                                 {expandedRow === record.id ? (
                                   <ExpandLessIcon />
@@ -439,7 +478,11 @@ const PlanningDataHistoryPage: React.FC = () => {
                                 gap: 1,
                               }}
                             >
-                              <Tooltip title={formatDateTimeDetailed(record.uploadedAt)}>
+                              <Tooltip
+                                title={formatDateTimeDetailed(
+                                  record.uploadedAt
+                                )}
+                              >
                                 <Typography
                                   variant="body2"
                                   sx={{
@@ -471,9 +514,19 @@ const PlanningDataHistoryPage: React.FC = () => {
                           <TableCell>
                             <Chip
                               size="small"
-                              icon={record.uploadSource === 'cli' ? <CliIcon /> : <WebIcon />}
+                              icon={
+                                record.uploadSource === 'cli' ? (
+                                  <CliIcon />
+                                ) : (
+                                  <WebIcon />
+                                )
+                              }
                               label={record.uploadSource.toUpperCase()}
-                              color={record.uploadSource === 'cli' ? 'warning' : 'default'}
+                              color={
+                                record.uploadSource === 'cli'
+                                  ? 'warning'
+                                  : 'default'
+                              }
                               variant="outlined"
                             />
                           </TableCell>
@@ -488,9 +541,12 @@ const PlanningDataHistoryPage: React.FC = () => {
                                   copyToClipboardWithNotification(
                                     record.uploadHash,
                                     () =>
-                                      enqueueSnackbar(t('common.copiedToClipboard'), {
-                                        variant: 'success',
-                                      }),
+                                      enqueueSnackbar(
+                                        t('common.copiedToClipboard'),
+                                        {
+                                          variant: 'success',
+                                        }
+                                      ),
                                     () =>
                                       enqueueSnackbar(t('common.copyFailed'), {
                                         variant: 'error',
@@ -507,7 +563,9 @@ const PlanningDataHistoryPage: React.FC = () => {
                               />
                             </Tooltip>
                           </TableCell>
-                          <TableCell align="center">{record.changedFiles?.length || 0}</TableCell>
+                          <TableCell align="center">
+                            {record.changedFiles?.length || 0}
+                          </TableCell>
                           <TableCell align="center">
                             {record.fileDiffs ? (
                               (() => {
@@ -515,11 +573,13 @@ const PlanningDataHistoryPage: React.FC = () => {
                                 let totalAdded = 0,
                                   totalRemoved = 0,
                                   totalModified = 0;
-                                Object.values(record.fileDiffs).forEach((diff: any) => {
-                                  totalAdded += diff.added?.length || 0;
-                                  totalRemoved += diff.removed?.length || 0;
-                                  totalModified += diff.modified?.length || 0;
-                                });
+                                Object.values(record.fileDiffs).forEach(
+                                  (diff: any) => {
+                                    totalAdded += diff.added?.length || 0;
+                                    totalRemoved += diff.removed?.length || 0;
+                                    totalModified += diff.modified?.length || 0;
+                                  }
+                                );
                                 return (
                                   <Box
                                     sx={{
@@ -550,13 +610,20 @@ const PlanningDataHistoryPage: React.FC = () => {
                                 );
                               })()
                             ) : (
-                              <Typography variant="caption" color="text.secondary">
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
                                 -
                               </Typography>
                             )}
                           </TableCell>
                           <TableCell>
-                            <Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
+                            <Typography
+                              variant="body2"
+                              noWrap
+                              sx={{ maxWidth: 200 }}
+                            >
                               {record.uploadComment || '-'}
                             </Typography>
                           </TableCell>
@@ -592,11 +659,19 @@ const PlanningDataHistoryPage: React.FC = () => {
                           }}
                         >
                           <TableCell colSpan={8} sx={{ py: 0 }}>
-                            <Collapse in={expandedRow === record.id} timeout="auto" unmountOnExit>
+                            <Collapse
+                              in={expandedRow === record.id}
+                              timeout="auto"
+                              unmountOnExit
+                            >
                               <Box sx={{ py: 2, px: 4 }}>
-                                {record.changedFiles && record.changedFiles.length > 0 ? (
+                                {record.changedFiles &&
+                                record.changedFiles.length > 0 ? (
                                   <>
-                                    <Typography variant="subtitle2" gutterBottom>
+                                    <Typography
+                                      variant="subtitle2"
+                                      gutterBottom
+                                    >
                                       {t('planningData.history.changedFiles')} (
                                       {record.changedFiles.length}):
                                     </Typography>
@@ -608,7 +683,8 @@ const PlanningDataHistoryPage: React.FC = () => {
                                       }}
                                     >
                                       {record.changedFiles.map((file) => {
-                                        const fileDiff = record.fileDiffs?.[file];
+                                        const fileDiff =
+                                          record.fileDiffs?.[file];
                                         return (
                                           <Box
                                             key={file}
@@ -629,7 +705,8 @@ const PlanningDataHistoryPage: React.FC = () => {
                                             />
                                             {fileDiff && (
                                               <Box sx={{ mt: 1 }}>
-                                                {fileDiff.modified?.length > 0 && (
+                                                {fileDiff.modified?.length >
+                                                  0 && (
                                                   <Box sx={{ mb: 2 }}>
                                                     <Typography
                                                       variant="caption"
@@ -640,59 +717,84 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                         mb: 0.5,
                                                       }}
                                                     >
-                                                      ~ {t('planningData.history.modified')}:{' '}
+                                                      ~{' '}
+                                                      {t(
+                                                        'planningData.history.modified'
+                                                      )}
+                                                      :{' '}
                                                       {fileDiff.modified.length}
                                                     </Typography>
                                                     <Box
                                                       component="table"
                                                       sx={{
                                                         width: '100%',
-                                                        borderCollapse: 'collapse',
+                                                        borderCollapse:
+                                                          'collapse',
                                                         fontSize: '0.75rem',
                                                         fontFamily: 'monospace',
                                                         border: '1px dashed',
                                                         borderColor: 'divider',
                                                         '& th, & td': {
-                                                          borderBottom: '1px dashed',
-                                                          borderRight: '1px dashed',
-                                                          borderColor: 'divider',
+                                                          borderBottom:
+                                                            '1px dashed',
+                                                          borderRight:
+                                                            '1px dashed',
+                                                          borderColor:
+                                                            'divider',
                                                           p: 0.5,
                                                           textAlign: 'left',
                                                         },
-                                                        '& th:last-child, & td:last-child': {
-                                                          borderRight: 'none',
-                                                        },
+                                                        '& th:last-child, & td:last-child':
+                                                          {
+                                                            borderRight: 'none',
+                                                          },
                                                         '& th': {
-                                                          bgcolor: 'action.hover',
+                                                          bgcolor:
+                                                            'action.hover',
                                                           fontWeight: 'bold',
                                                         },
-                                                        '& tbody tr:nth-of-type(odd)': {
-                                                          bgcolor: 'rgba(255, 255, 255, 0.02)',
-                                                        },
+                                                        '& tbody tr:nth-of-type(odd)':
+                                                          {
+                                                            bgcolor:
+                                                              'rgba(255, 255, 255, 0.02)',
+                                                          },
                                                       }}
                                                     >
                                                       <thead>
                                                         <tr>
-                                                          <Box component="th" sx={{ width: '35%' }}>
-                                                            {t('planningData.history.path')}
+                                                          <Box
+                                                            component="th"
+                                                            sx={{
+                                                              width: '35%',
+                                                            }}
+                                                          >
+                                                            {t(
+                                                              'planningData.history.path'
+                                                            )}
                                                           </Box>
                                                           <Box
                                                             component="th"
                                                             sx={{
                                                               width: '32%',
-                                                              color: 'error.main',
+                                                              color:
+                                                                'error.main',
                                                             }}
                                                           >
-                                                            {t('planningData.history.before')}
+                                                            {t(
+                                                              'planningData.history.before'
+                                                            )}
                                                           </Box>
                                                           <Box
                                                             component="th"
                                                             sx={{
                                                               width: '32%',
-                                                              color: 'success.main',
+                                                              color:
+                                                                'success.main',
                                                             }}
                                                           >
-                                                            {t('planningData.history.after')}
+                                                            {t(
+                                                              'planningData.history.after'
+                                                            )}
                                                           </Box>
                                                         </tr>
                                                       </thead>
@@ -701,35 +803,49 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                           .slice(0, 10)
                                                           .map((item, idx) => (
                                                             <tr key={idx}>
-                                                              <td>{item.path}</td>
+                                                              <td>
+                                                                {item.path}
+                                                              </td>
                                                               <Box
                                                                 component="td"
                                                                 sx={{
-                                                                  color: 'error.main',
-                                                                  textDecoration: 'line-through',
-                                                                  wordBreak: 'break-all',
+                                                                  color:
+                                                                    'error.main',
+                                                                  textDecoration:
+                                                                    'line-through',
+                                                                  wordBreak:
+                                                                    'break-all',
                                                                 }}
                                                               >
-                                                                {typeof item.before === 'string'
+                                                                {typeof item.before ===
+                                                                'string'
                                                                   ? item.before
-                                                                  : JSON.stringify(item.before)}
+                                                                  : JSON.stringify(
+                                                                      item.before
+                                                                    )}
                                                               </Box>
                                                               <Box
                                                                 component="td"
                                                                 sx={{
-                                                                  color: 'success.main',
-                                                                  wordBreak: 'break-all',
+                                                                  color:
+                                                                    'success.main',
+                                                                  wordBreak:
+                                                                    'break-all',
                                                                 }}
                                                               >
-                                                                {typeof item.after === 'string'
+                                                                {typeof item.after ===
+                                                                'string'
                                                                   ? item.after
-                                                                  : JSON.stringify(item.after)}
+                                                                  : JSON.stringify(
+                                                                      item.after
+                                                                    )}
                                                               </Box>
                                                             </tr>
                                                           ))}
                                                       </tbody>
                                                     </Box>
-                                                    {fileDiff.modified.length > 10 && (
+                                                    {fileDiff.modified.length >
+                                                      10 && (
                                                       <Typography
                                                         variant="caption"
                                                         color="text.secondary"
@@ -738,7 +854,10 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                           display: 'block',
                                                         }}
                                                       >
-                                                        +{fileDiff.modified.length - 10} more...
+                                                        +
+                                                        {fileDiff.modified
+                                                          .length - 10}{' '}
+                                                        more...
                                                       </Typography>
                                                     )}
                                                   </Box>
@@ -754,49 +873,70 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                         mb: 0.5,
                                                       }}
                                                     >
-                                                      + {t('planningData.history.added')}:{' '}
-                                                      {fileDiff.added.length}
+                                                      +{' '}
+                                                      {t(
+                                                        'planningData.history.added'
+                                                      )}
+                                                      : {fileDiff.added.length}
                                                     </Typography>
                                                     <Box
                                                       component="table"
                                                       sx={{
                                                         width: '100%',
-                                                        borderCollapse: 'collapse',
+                                                        borderCollapse:
+                                                          'collapse',
                                                         fontSize: '0.75rem',
                                                         fontFamily: 'monospace',
                                                         border: '1px dashed',
                                                         borderColor: 'divider',
                                                         '& th, & td': {
-                                                          borderBottom: '1px dashed',
-                                                          borderRight: '1px dashed',
-                                                          borderColor: 'divider',
+                                                          borderBottom:
+                                                            '1px dashed',
+                                                          borderRight:
+                                                            '1px dashed',
+                                                          borderColor:
+                                                            'divider',
                                                           p: 0.5,
                                                           textAlign: 'left',
                                                         },
-                                                        '& th:last-child, & td:last-child': {
-                                                          borderRight: 'none',
-                                                        },
+                                                        '& th:last-child, & td:last-child':
+                                                          {
+                                                            borderRight: 'none',
+                                                          },
                                                         '& th': {
-                                                          bgcolor: 'action.hover',
+                                                          bgcolor:
+                                                            'action.hover',
                                                           fontWeight: 'bold',
                                                         },
-                                                        '& tbody tr:nth-of-type(odd)': {
-                                                          bgcolor: 'rgba(255, 255, 255, 0.02)',
-                                                        },
+                                                        '& tbody tr:nth-of-type(odd)':
+                                                          {
+                                                            bgcolor:
+                                                              'rgba(255, 255, 255, 0.02)',
+                                                          },
                                                       }}
                                                     >
                                                       <thead>
                                                         <tr>
-                                                          <Box component="th" sx={{ width: '40%' }}>
-                                                            {t('planningData.history.path')}
+                                                          <Box
+                                                            component="th"
+                                                            sx={{
+                                                              width: '40%',
+                                                            }}
+                                                          >
+                                                            {t(
+                                                              'planningData.history.path'
+                                                            )}
                                                           </Box>
                                                           <Box
                                                             component="th"
                                                             sx={{
-                                                              color: 'success.main',
+                                                              color:
+                                                                'success.main',
                                                             }}
                                                           >
-                                                            {t('planningData.history.value')}
+                                                            {t(
+                                                              'planningData.history.value'
+                                                            )}
                                                           </Box>
                                                         </tr>
                                                       </thead>
@@ -805,23 +945,31 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                           .slice(0, 10)
                                                           .map((item, idx) => (
                                                             <tr key={idx}>
-                                                              <td>{item.path}</td>
+                                                              <td>
+                                                                {item.path}
+                                                              </td>
                                                               <Box
                                                                 component="td"
                                                                 sx={{
-                                                                  color: 'success.main',
-                                                                  wordBreak: 'break-all',
+                                                                  color:
+                                                                    'success.main',
+                                                                  wordBreak:
+                                                                    'break-all',
                                                                 }}
                                                               >
-                                                                {typeof item.value === 'string'
+                                                                {typeof item.value ===
+                                                                'string'
                                                                   ? item.value
-                                                                  : JSON.stringify(item.value)}
+                                                                  : JSON.stringify(
+                                                                      item.value
+                                                                    )}
                                                               </Box>
                                                             </tr>
                                                           ))}
                                                       </tbody>
                                                     </Box>
-                                                    {fileDiff.added.length > 10 && (
+                                                    {fileDiff.added.length >
+                                                      10 && (
                                                       <Typography
                                                         variant="caption"
                                                         color="text.secondary"
@@ -830,12 +978,16 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                           display: 'block',
                                                         }}
                                                       >
-                                                        +{fileDiff.added.length - 10} more...
+                                                        +
+                                                        {fileDiff.added.length -
+                                                          10}{' '}
+                                                        more...
                                                       </Typography>
                                                     )}
                                                   </Box>
                                                 )}
-                                                {fileDiff.removed?.length > 0 && (
+                                                {fileDiff.removed?.length >
+                                                  0 && (
                                                   <Box sx={{ mb: 2 }}>
                                                     <Typography
                                                       variant="caption"
@@ -846,49 +998,71 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                         mb: 0.5,
                                                       }}
                                                     >
-                                                      − {t('planningData.history.removed')}:{' '}
+                                                      −{' '}
+                                                      {t(
+                                                        'planningData.history.removed'
+                                                      )}
+                                                      :{' '}
                                                       {fileDiff.removed.length}
                                                     </Typography>
                                                     <Box
                                                       component="table"
                                                       sx={{
                                                         width: '100%',
-                                                        borderCollapse: 'collapse',
+                                                        borderCollapse:
+                                                          'collapse',
                                                         fontSize: '0.75rem',
                                                         fontFamily: 'monospace',
                                                         border: '1px dashed',
                                                         borderColor: 'divider',
                                                         '& th, & td': {
-                                                          borderBottom: '1px dashed',
-                                                          borderRight: '1px dashed',
-                                                          borderColor: 'divider',
+                                                          borderBottom:
+                                                            '1px dashed',
+                                                          borderRight:
+                                                            '1px dashed',
+                                                          borderColor:
+                                                            'divider',
                                                           p: 0.5,
                                                           textAlign: 'left',
                                                         },
-                                                        '& th:last-child, & td:last-child': {
-                                                          borderRight: 'none',
-                                                        },
+                                                        '& th:last-child, & td:last-child':
+                                                          {
+                                                            borderRight: 'none',
+                                                          },
                                                         '& th': {
-                                                          bgcolor: 'action.hover',
+                                                          bgcolor:
+                                                            'action.hover',
                                                           fontWeight: 'bold',
                                                         },
-                                                        '& tbody tr:nth-of-type(odd)': {
-                                                          bgcolor: 'rgba(255, 255, 255, 0.02)',
-                                                        },
+                                                        '& tbody tr:nth-of-type(odd)':
+                                                          {
+                                                            bgcolor:
+                                                              'rgba(255, 255, 255, 0.02)',
+                                                          },
                                                       }}
                                                     >
                                                       <thead>
                                                         <tr>
-                                                          <Box component="th" sx={{ width: '40%' }}>
-                                                            {t('planningData.history.path')}
+                                                          <Box
+                                                            component="th"
+                                                            sx={{
+                                                              width: '40%',
+                                                            }}
+                                                          >
+                                                            {t(
+                                                              'planningData.history.path'
+                                                            )}
                                                           </Box>
                                                           <Box
                                                             component="th"
                                                             sx={{
-                                                              color: 'error.main',
+                                                              color:
+                                                                'error.main',
                                                             }}
                                                           >
-                                                            {t('planningData.history.value')}
+                                                            {t(
+                                                              'planningData.history.value'
+                                                            )}
                                                           </Box>
                                                         </tr>
                                                       </thead>
@@ -897,24 +1071,33 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                           .slice(0, 10)
                                                           .map((item, idx) => (
                                                             <tr key={idx}>
-                                                              <td>{item.path}</td>
+                                                              <td>
+                                                                {item.path}
+                                                              </td>
                                                               <Box
                                                                 component="td"
                                                                 sx={{
-                                                                  color: 'error.main',
-                                                                  textDecoration: 'line-through',
-                                                                  wordBreak: 'break-all',
+                                                                  color:
+                                                                    'error.main',
+                                                                  textDecoration:
+                                                                    'line-through',
+                                                                  wordBreak:
+                                                                    'break-all',
                                                                 }}
                                                               >
-                                                                {typeof item.value === 'string'
+                                                                {typeof item.value ===
+                                                                'string'
                                                                   ? item.value
-                                                                  : JSON.stringify(item.value)}
+                                                                  : JSON.stringify(
+                                                                      item.value
+                                                                    )}
                                                               </Box>
                                                             </tr>
                                                           ))}
                                                       </tbody>
                                                     </Box>
-                                                    {fileDiff.removed.length > 10 && (
+                                                    {fileDiff.removed.length >
+                                                      10 && (
                                                       <Typography
                                                         variant="caption"
                                                         color="text.secondary"
@@ -923,7 +1106,10 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                           display: 'block',
                                                         }}
                                                       >
-                                                        +{fileDiff.removed.length - 10} more...
+                                                        +
+                                                        {fileDiff.removed
+                                                          .length - 10}{' '}
+                                                        more...
                                                       </Typography>
                                                     )}
                                                   </Box>
@@ -931,8 +1117,13 @@ const PlanningDataHistoryPage: React.FC = () => {
                                               </Box>
                                             )}
                                             {!fileDiff && (
-                                              <Typography variant="caption" color="text.secondary">
-                                                {t('planningData.history.noDiffAvailable')}
+                                              <Typography
+                                                variant="caption"
+                                                color="text.secondary"
+                                              >
+                                                {t(
+                                                  'planningData.history.noDiffAvailable'
+                                                )}
                                               </Typography>
                                             )}
                                           </Box>
@@ -941,7 +1132,10 @@ const PlanningDataHistoryPage: React.FC = () => {
                                     </Box>
                                   </>
                                 ) : (
-                                  <Typography variant="body2" color="text.secondary">
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
                                     {t('planningData.history.noChanges')}
                                   </Typography>
                                 )}
@@ -981,7 +1175,9 @@ const PlanningDataHistoryPage: React.FC = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle color="error">{t('planningData.history.resetConfirmTitle')}</DialogTitle>
+        <DialogTitle color="error">
+          {t('planningData.history.resetConfirmTitle')}
+        </DialogTitle>
         <DialogContent>
           <Alert severity="warning" sx={{ mb: 2 }}>
             {t('planningData.history.resetWarning')}
@@ -1015,7 +1211,9 @@ const PlanningDataHistoryPage: React.FC = () => {
             variant="contained"
             color="error"
             onClick={handleReset}
-            disabled={resetConfirmText !== t('planningData.history.resetConfirmText')}
+            disabled={
+              resetConfirmText !== t('planningData.history.resetConfirmText')
+            }
           >
             {t('planningData.history.resetAll')}
           </Button>

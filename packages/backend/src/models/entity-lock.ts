@@ -35,7 +35,13 @@ export class EntityLock extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['entityType', 'entityId', 'environmentId', 'lockedBy', 'lockType'],
+      required: [
+        'entityType',
+        'entityId',
+        'environmentId',
+        'lockedBy',
+        'lockType',
+      ],
       properties: {
         id: { type: 'string' },
         entityType: { type: 'string', maxLength: 100 },

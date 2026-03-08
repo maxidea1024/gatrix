@@ -48,10 +48,15 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
-import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import {
+  formatDateTimeDetailed,
+  formatRelativeTime,
+} from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import ReferenceCheckDialog, {
@@ -103,19 +108,28 @@ const FeatureSegmentsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [deletingSegment, setDeletingSegment] = useState<FeatureSegment | null>(null);
+  const [deletingSegment, setDeletingSegment] = useState<FeatureSegment | null>(
+    null
+  );
   const [referenceDialogOpen, setReferenceDialogOpen] = useState(false);
-  const [referenceDialogMode, setReferenceDialogMode] = useState<'view' | 'delete'>('view');
+  const [referenceDialogMode, setReferenceDialogMode] = useState<
+    'view' | 'delete'
+  >('view');
   const [references, setReferences] = useState<ResourceReference | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingSegment, setEditingSegment] = useState<Partial<FeatureSegment> | null>(null);
-  const [originalSegment, setOriginalSegment] = useState<Partial<FeatureSegment> | null>(null);
+  const [editingSegment, setEditingSegment] =
+    useState<Partial<FeatureSegment> | null>(null);
+  const [originalSegment, setOriginalSegment] =
+    useState<Partial<FeatureSegment> | null>(null);
   const [contextFields, setContextFields] = useState<ContextField[]>([]);
-  const [expandedConstraints, setExpandedConstraints] = useState<Set<string>>(new Set());
+  const [expandedConstraints, setExpandedConstraints] = useState<Set<string>>(
+    new Set()
+  );
   const [allTags, setAllTags] = useState<
     { id: number; name: string; color: string; description?: string }[]
   >([]);
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<null | HTMLElement>(null);
   const [showDescription, setShowDescription] = useState(false);
   const [showTags, setShowTags] = useState(false);
 
@@ -141,7 +155,10 @@ const FeatureSegmentsPage: React.FC = () => {
     }
     return defaultColumns;
   });
-  const visibleColumns = useMemo(() => columns.filter((col) => col.visible), [columns]);
+  const visibleColumns = useMemo(
+    () => columns.filter((col) => col.visible),
+    [columns]
+  );
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -240,7 +257,9 @@ const FeatureSegmentsPage: React.FC = () => {
 
     // Apply tag filter
     if (tagFilter && tagFilter.length > 0) {
-      filtered = filtered.filter((s) => tagFilter.some((tag) => s.tags?.includes(tag)));
+      filtered = filtered.filter((s) =>
+        tagFilter.some((tag) => s.tags?.includes(tag))
+      );
     }
 
     const start = page * rowsPerPage;
@@ -251,7 +270,9 @@ const FeatureSegmentsPage: React.FC = () => {
   const filteredTotal = useMemo(() => {
     let filtered = allSegments;
     if (tagFilter && tagFilter.length > 0) {
-      filtered = filtered.filter((s) => tagFilter.some((tag) => s.tags?.includes(tag)));
+      filtered = filtered.filter((s) =>
+        tagFilter.some((tag) => s.tags?.includes(tag))
+      );
     }
     return filtered.length;
   }, [allSegments, tagFilter]);
@@ -289,7 +310,9 @@ const FeatureSegmentsPage: React.FC = () => {
   };
 
   const handleFilterChange = (filterKey: string, value: any) => {
-    const newFilters = activeFilters.map((f) => (f.key === filterKey ? { ...f, value } : f));
+    const newFilters = activeFilters.map((f) =>
+      f.key === filterKey ? { ...f, value } : f
+    );
     setActiveFilters(newFilters);
     setPage(0);
   };
@@ -337,9 +360,18 @@ const FeatureSegmentsPage: React.FC = () => {
     if (!originalSegment) return true; // New segment always has "changes"
 
     // Compare basic fields
-    if ((editingSegment.segmentName || '') !== (originalSegment.segmentName || '')) return true;
-    if ((editingSegment.displayName || '') !== (originalSegment.displayName || '')) return true;
-    if ((editingSegment.description || '') !== (originalSegment.description || '')) return true;
+    if (
+      (editingSegment.segmentName || '') !== (originalSegment.segmentName || '')
+    )
+      return true;
+    if (
+      (editingSegment.displayName || '') !== (originalSegment.displayName || '')
+    )
+      return true;
+    if (
+      (editingSegment.description || '') !== (originalSegment.description || '')
+    )
+      return true;
 
     // Deep compare constraints
     const editingConstraints = editingSegment.constraints || [];
@@ -354,7 +386,8 @@ const FeatureSegmentsPage: React.FC = () => {
       if (ec.contextName !== oc.contextName) return true;
       if (ec.operator !== oc.operator) return true;
       if ((ec.value ?? '') !== (oc.value ?? '')) return true;
-      if (Boolean(ec.caseInsensitive) !== Boolean(oc.caseInsensitive)) return true;
+      if (Boolean(ec.caseInsensitive) !== Boolean(oc.caseInsensitive))
+        return true;
       if (Boolean(ec.inverted) !== Boolean(oc.inverted)) return true;
 
       // Compare values arrays
@@ -399,7 +432,8 @@ const FeatureSegmentsPage: React.FC = () => {
       if (multiValueOps.includes(constraint.operator)) {
         if (!constraint.values?.length) return false;
       } else {
-        if (constraint.value === undefined || constraint.value === '') return false;
+        if (constraint.value === undefined || constraint.value === '')
+          return false;
       }
     }
 
@@ -410,7 +444,10 @@ const FeatureSegmentsPage: React.FC = () => {
     if (!editingSegment) return;
     try {
       if (editingSegment.id) {
-        await api.put(`${projectApiPath}/features/segments/${editingSegment.id}`, editingSegment);
+        await api.put(
+          `${projectApiPath}/features/segments/${editingSegment.id}`,
+          editingSegment
+        );
         enqueueSnackbar(t('featureFlags.updateSuccess'), {
           variant: 'success',
         });
@@ -436,7 +473,9 @@ const FeatureSegmentsPage: React.FC = () => {
   const handleDelete = async (segment: FeatureSegment) => {
     setDeletingSegment(segment);
     try {
-      const result = await api.get(`${projectApiPath}/features/segments/${segment.id}/references`);
+      const result = await api.get(
+        `${projectApiPath}/features/segments/${segment.id}/references`
+      );
       const refs = result.data?.references;
       if (refs && (refs.flags?.length > 0 || refs.templates?.length > 0)) {
         setReferences(refs);
@@ -453,7 +492,9 @@ const FeatureSegmentsPage: React.FC = () => {
 
   const handleViewReferences = async (segment: FeatureSegment) => {
     try {
-      const result = await api.get(`${projectApiPath}/features/segments/${segment.id}/references`);
+      const result = await api.get(
+        `${projectApiPath}/features/segments/${segment.id}/references`
+      );
       const refs = result.data?.references;
       if (refs) {
         setReferences(refs);
@@ -468,21 +509,27 @@ const FeatureSegmentsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingSegment) return;
     try {
-      await api.delete(`${projectApiPath}/features/segments/${deletingSegment.id}`);
+      await api.delete(
+        `${projectApiPath}/features/segments/${deletingSegment.id}`
+      );
       enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
       loadSegments();
     } catch (error: any) {
       const errorCode = extractErrorCode(error?.response?.data);
       if (errorCode === 'RESOURCE_IN_USE') {
         const payload =
-          error?.response?.data?.error?.details?.payload || error?.response?.data?.error?.payload;
+          error?.response?.data?.error?.details?.payload ||
+          error?.response?.data?.error?.payload;
         setReferences(payload?.references || null);
         setReferenceDialogMode('delete');
         setReferenceDialogOpen(true);
       } else {
-        enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.deleteFailed'), {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          parseApiErrorMessage(error, 'featureFlags.deleteFailed'),
+          {
+            variant: 'error',
+          }
+        );
       }
     } finally {
       setDeleteConfirmOpen(false);
@@ -519,7 +566,11 @@ const FeatureSegmentsPage: React.FC = () => {
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
           {canManage && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
               {t('featureFlags.addSegment')}
             </Button>
           )}
@@ -583,7 +634,9 @@ const FeatureSegmentsPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -644,7 +697,11 @@ const FeatureSegmentsPage: React.FC = () => {
                           {t(col.labelKey)}
                         </TableCell>
                       ))}
-                      {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                      {canManage && (
+                        <TableCell align="center">
+                          {t('common.actions')}
+                        </TableCell>
+                      )}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -662,7 +719,9 @@ const FeatureSegmentsPage: React.FC = () => {
                                       const newActive = !segment.isActive;
                                       setAllSegments((prev) =>
                                         prev.map((s) =>
-                                          s.id === segment.id ? { ...s, isActive: newActive } : s
+                                          s.id === segment.id
+                                            ? { ...s, isActive: newActive }
+                                            : s
                                         )
                                       );
                                       try {
@@ -675,11 +734,16 @@ const FeatureSegmentsPage: React.FC = () => {
                                       } catch (error: any) {
                                         setAllSegments((prev) =>
                                           prev.map((s) =>
-                                            s.id === segment.id ? { ...s, isActive: !newActive } : s
+                                            s.id === segment.id
+                                              ? { ...s, isActive: !newActive }
+                                              : s
                                           )
                                         );
                                         enqueueSnackbar(
-                                          parseApiErrorMessage(error, t('common.saveFailed')),
+                                          parseApiErrorMessage(
+                                            error,
+                                            t('common.saveFailed')
+                                          ),
                                           { variant: 'error' }
                                         );
                                       }
@@ -732,13 +796,19 @@ const FeatureSegmentsPage: React.FC = () => {
                                               copyToClipboardWithNotification(
                                                 segment.segmentName,
                                                 () =>
-                                                  enqueueSnackbar(t('common.copySuccess'), {
-                                                    variant: 'success',
-                                                  }),
+                                                  enqueueSnackbar(
+                                                    t('common.copySuccess'),
+                                                    {
+                                                      variant: 'success',
+                                                    }
+                                                  ),
                                                 () =>
-                                                  enqueueSnackbar(t('common.copyFailed'), {
-                                                    variant: 'error',
-                                                  })
+                                                  enqueueSnackbar(
+                                                    t('common.copyFailed'),
+                                                    {
+                                                      variant: 'error',
+                                                    }
+                                                  )
                                               );
                                             }}
                                             sx={{
@@ -751,7 +821,8 @@ const FeatureSegmentsPage: React.FC = () => {
                                         </Tooltip>
                                       </Box>
                                       {segment.displayName &&
-                                        segment.displayName !== segment.segmentName && (
+                                        segment.displayName !==
+                                          segment.segmentName && (
                                           <Typography
                                             variant="body2"
                                             color="text.secondary"
@@ -767,7 +838,8 @@ const FeatureSegmentsPage: React.FC = () => {
                             case 'constraints':
                               return (
                                 <TableCell key={col.id}>
-                                  {segment.constraints && segment.constraints.length > 0 ? (
+                                  {segment.constraints &&
+                                  segment.constraints.length > 0 ? (
                                     <Box>
                                       <Box
                                         sx={{
@@ -788,7 +860,10 @@ const FeatureSegmentsPage: React.FC = () => {
                                           });
                                         }}
                                       >
-                                        <Chip label={segment.constraints.length} size="small" />
+                                        <Chip
+                                          label={segment.constraints.length}
+                                          size="small"
+                                        />
                                         {expandedConstraints.has(segment.id) ? (
                                           <ExpandLessIcon fontSize="small" />
                                         ) : (
@@ -805,7 +880,10 @@ const FeatureSegmentsPage: React.FC = () => {
                                       )}
                                     </Box>
                                   ) : (
-                                    <Typography variant="body2" color="text.disabled">
+                                    <Typography
+                                      variant="body2"
+                                      color="text.disabled"
+                                    >
                                       -
                                     </Typography>
                                   )}
@@ -823,8 +901,11 @@ const FeatureSegmentsPage: React.FC = () => {
                                       }}
                                     >
                                       {segment.tags.map((tagName, idx) => {
-                                        const tagData = allTags.find((t) => t.name === tagName);
-                                        const color = tagData?.color || '#888888';
+                                        const tagData = allTags.find(
+                                          (t) => t.name === tagName
+                                        );
+                                        const color =
+                                          tagData?.color || '#888888';
                                         return (
                                           <Tooltip
                                             key={idx}
@@ -845,7 +926,10 @@ const FeatureSegmentsPage: React.FC = () => {
                                       })}
                                     </Box>
                                   ) : (
-                                    <Typography variant="body2" color="text.disabled">
+                                    <Typography
+                                      variant="body2"
+                                      color="text.disabled"
+                                    >
                                       -
                                     </Typography>
                                   )}
@@ -861,12 +945,17 @@ const FeatureSegmentsPage: React.FC = () => {
                                         size="small"
                                         color="primary"
                                         variant="outlined"
-                                        onClick={() => handleViewReferences(segment)}
+                                        onClick={() =>
+                                          handleViewReferences(segment)
+                                        }
                                         sx={{ cursor: 'pointer', minWidth: 32 }}
                                       />
                                     </Tooltip>
                                   ) : (
-                                    <Typography variant="body2" color="text.disabled">
+                                    <Typography
+                                      variant="body2"
+                                      color="text.disabled"
+                                    >
                                       {t('common.noReferences')}
                                     </Typography>
                                   )}
@@ -876,7 +965,10 @@ const FeatureSegmentsPage: React.FC = () => {
                               return (
                                 <TableCell key={col.id}>
                                   <Box>
-                                    <Typography variant="body2" fontWeight={500}>
+                                    <Typography
+                                      variant="body2"
+                                      fontWeight={500}
+                                    >
                                       {segment.createdByName || '-'}
                                     </Typography>
                                     {segment.createdByEmail && (
@@ -894,8 +986,14 @@ const FeatureSegmentsPage: React.FC = () => {
                             case 'createdAt':
                               return (
                                 <TableCell key={col.id}>
-                                  <Tooltip title={formatDateTimeDetailed(segment.createdAt)}>
-                                    <span>{formatRelativeTime(segment.createdAt)}</span>
+                                  <Tooltip
+                                    title={formatDateTimeDetailed(
+                                      segment.createdAt
+                                    )}
+                                  >
+                                    <span>
+                                      {formatRelativeTime(segment.createdAt)}
+                                    </span>
                                   </Tooltip>
                                 </TableCell>
                               );
@@ -913,12 +1011,18 @@ const FeatureSegmentsPage: React.FC = () => {
                               }}
                             >
                               <Tooltip title={t('common.edit')}>
-                                <IconButton size="small" onClick={() => handleEdit(segment)}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleEdit(segment)}
+                                >
                                   <EditIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
                               <Tooltip title={t('common.delete')}>
-                                <IconButton size="small" onClick={() => handleDelete(segment)}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleDelete(segment)}
+                                >
                                   <DeleteIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
@@ -949,7 +1053,11 @@ const FeatureSegmentsPage: React.FC = () => {
       <ResizableDrawer
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
-        title={editingSegment?.id ? t('featureFlags.editSegment') : t('featureFlags.addSegment')}
+        title={
+          editingSegment?.id
+            ? t('featureFlags.editSegment')
+            : t('featureFlags.addSegment')
+        }
         subtitle={t('featureFlags.segmentsDescription')}
         storageKey="featureSegmentDrawerWidth"
         defaultWidth={500}
@@ -1014,7 +1122,11 @@ const FeatureSegmentsPage: React.FC = () => {
                 <Button
                   size="small"
                   onClick={() => setShowDescription(true)}
-                  sx={{ textTransform: 'none', color: 'text.secondary', fontSize: '0.8rem' }}
+                  sx={{
+                    textTransform: 'none',
+                    color: 'text.secondary',
+                    fontSize: '0.8rem',
+                  }}
                 >
                   {t('common.addDescription')}
                 </Button>
@@ -1023,7 +1135,11 @@ const FeatureSegmentsPage: React.FC = () => {
                 <Button
                   size="small"
                   onClick={() => setShowTags(true)}
-                  sx={{ textTransform: 'none', color: 'text.secondary', fontSize: '0.8rem' }}
+                  sx={{
+                    textTransform: 'none',
+                    color: 'text.secondary',
+                    fontSize: '0.8rem',
+                  }}
                 >
                   + {t('common.addTag')}
                 </Button>
@@ -1053,11 +1169,15 @@ const FeatureSegmentsPage: React.FC = () => {
               <Autocomplete
                 multiple
                 options={allTags}
-                getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}
+                getOptionLabel={(option) =>
+                  typeof option === 'string' ? option : option.name
+                }
                 filterSelectedOptions
                 isOptionEqualToValue={(option, value) => {
-                  const optName = typeof option === 'string' ? option : option.name;
-                  const valName = typeof value === 'string' ? value : value.name;
+                  const optName =
+                    typeof option === 'string' ? option : option.name;
+                  const valName =
+                    typeof value === 'string' ? value : value.name;
                   return optName === valName;
                 }}
                 value={(editingSegment?.tags || []).map((tagName) => {
@@ -1065,7 +1185,9 @@ const FeatureSegmentsPage: React.FC = () => {
                   return found || { id: 0, name: tagName, color: '#888888' };
                 })}
                 onChange={(_, newValue) => {
-                  const tagNames = newValue.map((v) => (typeof v === 'string' ? v : v.name));
+                  const tagNames = newValue.map((v) =>
+                    typeof v === 'string' ? v : v.name
+                  );
                   setEditingSegment((prev) => ({ ...prev, tags: tagNames }));
                 }}
                 renderTags={(value, getTagProps) =>
@@ -1074,9 +1196,16 @@ const FeatureSegmentsPage: React.FC = () => {
                     const tagData =
                       typeof option === 'string'
                         ? { name: option, color: '#888888', description: '' }
-                        : { ...option, description: (option as any).description || '' };
+                        : {
+                            ...option,
+                            description: (option as any).description || '',
+                          };
                     return (
-                      <Tooltip key={key} title={tagData.description || ''} arrow>
+                      <Tooltip
+                        key={key}
+                        title={tagData.description || ''}
+                        arrow
+                      >
                         <Chip
                           size="small"
                           label={tagData.name}
@@ -1127,7 +1256,11 @@ const FeatureSegmentsPage: React.FC = () => {
               <Typography variant="subtitle2" gutterBottom>
                 {t('featureFlags.constraints')}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', mb: 2 }}
+              >
                 {t('featureFlags.segmentConstraintsHelp')}
               </Typography>
               <ConstraintEditor
@@ -1151,7 +1284,9 @@ const FeatureSegmentsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setEditDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setEditDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             onClick={handleSave}
@@ -1177,7 +1312,11 @@ const FeatureSegmentsPage: React.FC = () => {
       <ReferenceCheckDialog
         open={referenceDialogOpen}
         onClose={() => setReferenceDialogOpen(false)}
-        title={referenceDialogMode === 'delete' ? t('common.cannotDelete') : t('common.references')}
+        title={
+          referenceDialogMode === 'delete'
+            ? t('common.cannotDelete')
+            : t('common.references')
+        }
         references={references}
         mode={referenceDialogMode}
       />

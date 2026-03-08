@@ -81,7 +81,13 @@ export interface CloudConfig {
    * If not specified, SDK will auto-detect by trying all providers.
    * Supported providers: AWS, GCP, Azure, Tencent Cloud, Alibaba Cloud, Oracle Cloud
    */
-  provider?: 'aws' | 'gcp' | 'azure' | 'tencentcloud' | 'alibabacloud' | 'oraclecloud';
+  provider?:
+    | 'aws'
+    | 'gcp'
+    | 'azure'
+    | 'tencentcloud'
+    | 'alibabacloud'
+    | 'oraclecloud';
 }
 
 /**

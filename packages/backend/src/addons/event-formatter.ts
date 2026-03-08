@@ -4,7 +4,10 @@
  * Formats integration events into human-readable messages for various providers.
  */
 
-import { IntegrationSystemEvent, IntegrationEventType } from '../types/integration-events';
+import {
+  IntegrationSystemEvent,
+  IntegrationEventType,
+} from '../types/integration-events';
 
 /**
  * Format an event message for display
@@ -131,7 +134,10 @@ export function formatSlackMessage(
         color,
         fallback: message,
         pretext: `${emoji} ${message}`,
-        fields: details.length > 0 ? [{ value: details.join('\n'), short: false }] : [],
+        fields:
+          details.length > 0
+            ? [{ value: details.join('\n'), short: false }]
+            : [],
         footer: 'Gatrix Integration',
         ts: Math.floor(new Date(event.createdAt).getTime() / 1000),
       },
@@ -148,7 +154,9 @@ export function formatSlackMessage(
 /**
  * Format Microsoft Teams message payload (Adaptive Card)
  */
-export function formatTeamsMessage(event: IntegrationSystemEvent): Record<string, any> {
+export function formatTeamsMessage(
+  event: IntegrationSystemEvent
+): Record<string, any> {
   const emoji = getEventEmoji(event.type);
   const eventName = formatEventType(event.type);
   const actor = event.createdBy || 'System';
@@ -165,7 +173,9 @@ export function formatTeamsMessage(event: IntegrationSystemEvent): Record<string
         activityTitle: `${emoji} ${eventName}`,
         activitySubtitle: `by ${actor}`,
         facts: [
-          ...(event.environmentId ? [{ name: 'Environment', value: event.environmentId }] : []),
+          ...(event.environmentId
+            ? [{ name: 'Environment', value: event.environmentId }]
+            : []),
           { name: 'Time', value: formatTimestamp(event.createdAt) },
         ],
         text: details.length > 0 ? details.join('\n') : undefined,
@@ -178,7 +188,9 @@ export function formatTeamsMessage(event: IntegrationSystemEvent): Record<string
 /**
  * Format Lark message payload
  */
-export function formatLarkMessage(event: IntegrationSystemEvent): Record<string, any> {
+export function formatLarkMessage(
+  event: IntegrationSystemEvent
+): Record<string, any> {
   const emoji = getEventEmoji(event.type);
   const eventName = formatEventType(event.type);
   const actor = event.createdBy || 'System';
@@ -205,7 +217,9 @@ export function formatLarkMessage(event: IntegrationSystemEvent): Record<string,
 /**
  * Format Discord message payload
  */
-export function formatDiscordMessage(event: IntegrationSystemEvent): Record<string, any> {
+export function formatDiscordMessage(
+  event: IntegrationSystemEvent
+): Record<string, any> {
   const emoji = getEventEmoji(event.type);
   const message = formatEventMessage(event);
   const color = parseInt(getEventColor(event.type).replace('#', ''), 16);
@@ -217,7 +231,10 @@ export function formatDiscordMessage(event: IntegrationSystemEvent): Record<stri
         title: `${emoji} ${formatEventType(event.type)}`,
         description: message,
         color,
-        fields: details.length > 0 ? [{ name: 'Details', value: details.join('\n') }] : [],
+        fields:
+          details.length > 0
+            ? [{ name: 'Details', value: details.join('\n') }]
+            : [],
         footer: {
           text: 'Gatrix Integration',
         },
@@ -245,7 +262,9 @@ export function formatPagerDutyMessage(
       summary: `${eventName} by ${actor}`,
       source: 'Gatrix',
       severity:
-        event.type.includes('deleted') || event.type.includes('archived') ? 'warning' : 'info',
+        event.type.includes('deleted') || event.type.includes('archived')
+          ? 'warning'
+          : 'info',
       timestamp: new Date(event.createdAt).toISOString(),
       custom_details: {
         eventType: event.type,
@@ -312,7 +331,10 @@ export function formatWhatsAppMessage(
 /**
  * Format Line message payload
  */
-export function formatLineMessage(event: IntegrationSystemEvent, to: string): Record<string, any> {
+export function formatLineMessage(
+  event: IntegrationSystemEvent,
+  to: string
+): Record<string, any> {
   const emoji = getEventEmoji(event.type);
   const eventName = formatEventType(event.type);
   const actor = event.createdBy || 'System';
@@ -343,7 +365,9 @@ export function formatLineMessage(event: IntegrationSystemEvent, to: string): Re
 /**
  * Format KakaoTalk message payload (Generic Agent format)
  */
-export function formatKakaoMessage(event: IntegrationSystemEvent): Record<string, any> {
+export function formatKakaoMessage(
+  event: IntegrationSystemEvent
+): Record<string, any> {
   const emoji = getEventEmoji(event.type);
   const eventName = formatEventType(event.type);
   const actor = event.createdBy || 'System';
@@ -369,7 +393,9 @@ export function formatKakaoMessage(event: IntegrationSystemEvent): Record<string
 /**
  * Format Google Chat message payload
  */
-export function formatGoogleChatMessage(event: IntegrationSystemEvent): Record<string, any> {
+export function formatGoogleChatMessage(
+  event: IntegrationSystemEvent
+): Record<string, any> {
   const emoji = getEventEmoji(event.type);
   const eventName = formatEventType(event.type);
   const actor = event.createdBy || 'System';
@@ -391,7 +417,9 @@ export function formatGoogleChatMessage(event: IntegrationSystemEvent): Record<s
                 {
                   textParagraph: {
                     text: [
-                      event.environmentId ? `<b>Environment:</b> ${event.environmentId}` : null,
+                      event.environmentId
+                        ? `<b>Environment:</b> ${event.environmentId}`
+                        : null,
                       `<b>Time:</b> ${formatTimestamp(event.createdAt)}`,
                     ]
                       .filter(Boolean)
@@ -415,7 +443,9 @@ export function formatGoogleChatMessage(event: IntegrationSystemEvent): Record<s
 /**
  * Format WeChat Work (WeCom) message payload
  */
-export function formatWeComMessage(event: IntegrationSystemEvent): Record<string, any> {
+export function formatWeComMessage(
+  event: IntegrationSystemEvent
+): Record<string, any> {
   const emoji = getEventEmoji(event.type);
   const eventName = formatEventType(event.type);
   const actor = event.createdBy || 'System';
@@ -443,7 +473,9 @@ export function formatWeComMessage(event: IntegrationSystemEvent): Record<string
 /**
  * Format DingTalk message payload
  */
-export function formatDingTalkMessage(event: IntegrationSystemEvent): Record<string, any> {
+export function formatDingTalkMessage(
+  event: IntegrationSystemEvent
+): Record<string, any> {
   const emoji = getEventEmoji(event.type);
   const eventName = formatEventType(event.type);
   const actor = event.createdBy || 'System';
@@ -472,7 +504,9 @@ export function formatDingTalkMessage(event: IntegrationSystemEvent): Record<str
 /**
  * Format webhook JSON payload
  */
-export function formatWebhookPayload(event: IntegrationSystemEvent): Record<string, any> {
+export function formatWebhookPayload(
+  event: IntegrationSystemEvent
+): Record<string, any> {
   return {
     event: {
       type: event.type,

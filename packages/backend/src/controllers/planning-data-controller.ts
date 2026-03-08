@@ -33,154 +33,191 @@ export class PlanningDataController {
    * Get reward lookup data
    * GET /api/v1/admin/planning-data/reward-lookup?lang=kr|en|zh
    */
-  static getRewardLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
-    const language = mapLanguage(req.query.lang as string);
+  static getRewardLookup = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
+      const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getRewardLookup(environmentId, language);
+      const data = await PlanningDataService.getRewardLookup(
+        environmentId,
+        language
+      );
 
-    res.json({
-      success: true,
-      data,
-      message: 'Reward lookup data retrieved successfully',
-    });
-  });
+      res.json({
+        success: true,
+        data,
+        message: 'Reward lookup data retrieved successfully',
+      });
+    }
+  );
 
   /**
    * Get reward type list
    * GET /api/v1/admin/planning-data/reward-types
    */
-  static getRewardTypeList = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
-    const data = await PlanningDataService.getRewardTypeList(environmentId);
+  static getRewardTypeList = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
+      const data = await PlanningDataService.getRewardTypeList(environmentId);
 
-    res.json({
-      success: true,
-      data,
-      message: 'Reward type list retrieved successfully',
-    });
-  });
+      res.json({
+        success: true,
+        data,
+        message: 'Reward type list retrieved successfully',
+      });
+    }
+  );
 
   /**
    * Get items for a specific reward type
    * GET /api/v1/admin/planning-data/reward-types/:rewardType/items?lang=kr|en|zh
    */
-  static getRewardTypeItems = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
-    const { rewardType } = req.params;
-    const language = mapLanguage(req.query.lang as string);
+  static getRewardTypeItems = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
+      const { rewardType } = req.params;
+      const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getRewardTypeItems(
-      environmentId,
-      parseInt(rewardType),
-      language
-    );
+      const data = await PlanningDataService.getRewardTypeItems(
+        environmentId,
+        parseInt(rewardType),
+        language
+      );
 
-    res.json({
-      success: true,
-      data,
-      message: 'Reward type items retrieved successfully',
-    });
-  });
+      res.json({
+        success: true,
+        data,
+        message: 'Reward type items retrieved successfully',
+      });
+    }
+  );
 
   /**
    * Get UI list data (nations, towns, villages)
    * GET /api/v1/admin/planning-data/ui-list?lang=kr|en|zh
    */
-  static getUIListData = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
-    const language = mapLanguage(req.query.lang as string);
+  static getUIListData = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
+      const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getUIListData(environmentId, language);
+      const data = await PlanningDataService.getUIListData(
+        environmentId,
+        language
+      );
 
-    res.json({
-      success: true,
-      data,
-      message: 'UI list data retrieved successfully',
-    });
-  });
+      res.json({
+        success: true,
+        data,
+        message: 'UI list data retrieved successfully',
+      });
+    }
+  );
 
   /**
    * Get items for a specific UI list category
    * GET /api/v1/admin/planning-data/ui-list/:category/items?lang=kr|en|zh
    */
-  static getUIListItems = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
-    const { category } = req.params;
-    const language = mapLanguage(req.query.lang as string);
+  static getUIListItems = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
+      const { category } = req.params;
+      const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getUIListItems(environmentId, category, language);
+      const data = await PlanningDataService.getUIListItems(
+        environmentId,
+        category,
+        language
+      );
 
-    res.json({
-      success: true,
-      data,
-      message: `UI list items for ${category} retrieved successfully`,
-    });
-  });
+      res.json({
+        success: true,
+        data,
+        message: `UI list items for ${category} retrieved successfully`,
+      });
+    }
+  );
 
   /**
    * Get planning data statistics
    * GET /api/v1/admin/planning-data/stats
    */
-  static getStats = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
-    const stats = await PlanningDataService.getStats(environmentId);
+  static getStats = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
+      const stats = await PlanningDataService.getStats(environmentId);
 
-    res.json({
-      success: true,
-      data: stats,
-      message: 'Planning data statistics retrieved successfully',
-    });
-  });
+      res.json({
+        success: true,
+        data: stats,
+        message: 'Planning data statistics retrieved successfully',
+      });
+    }
+  );
 
   /**
    * Get HotTimeBuff lookup data
    * GET /api/v1/admin/planning-data/hottimebuff?lang=kr|en|zh
    */
-  static getHotTimeBuffLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
-    const language = mapLanguage(req.query.lang as string);
+  static getHotTimeBuffLookup = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
+      const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getHotTimeBuffLookup(environmentId, language);
+      const data = await PlanningDataService.getHotTimeBuffLookup(
+        environmentId,
+        language
+      );
 
-    res.json({
-      success: true,
-      data,
-      message: 'HotTimeBuff lookup data retrieved successfully',
-    });
-  });
+      res.json({
+        success: true,
+        data,
+        message: 'HotTimeBuff lookup data retrieved successfully',
+      });
+    }
+  );
 
   /**
    * Get EventPage lookup data
    * GET /api/v1/admin/planning-data/eventpage?lang=kr|en|zh
    */
-  static getEventPageLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
-    const language = mapLanguage(req.query.lang as string);
+  static getEventPageLookup = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
+      const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getEventPageLookup(environmentId, language);
-    res.json({
-      success: true,
-      data,
-      message: 'EventPage lookup data retrieved successfully',
-    });
-  });
+      const data = await PlanningDataService.getEventPageLookup(
+        environmentId,
+        language
+      );
+      res.json({
+        success: true,
+        data,
+        message: 'EventPage lookup data retrieved successfully',
+      });
+    }
+  );
 
   /**
    * Get LiveEvent lookup data
    * GET /api/v1/admin/planning-data/liveevent?lang=kr|en|zh
    */
-  static getLiveEventLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
-    const language = mapLanguage(req.query.lang as string);
+  static getLiveEventLookup = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
+      const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getLiveEventLookup(environmentId, language);
-    res.json({
-      success: true,
-      data,
-      message: 'LiveEvent lookup data retrieved successfully',
-    });
-  });
+      const data = await PlanningDataService.getLiveEventLookup(
+        environmentId,
+        language
+      );
+      res.json({
+        success: true,
+        data,
+        message: 'LiveEvent lookup data retrieved successfully',
+      });
+    }
+  );
 
   /**
    * Get MateRecruitingGroup lookup data
@@ -191,7 +228,10 @@ export class PlanningDataController {
       const environmentId = getEnvironment(req);
       const language = mapLanguage(req.query.lang as string);
 
-      const data = await PlanningDataService.getMateRecruitingGroupLookup(environmentId, language);
+      const data = await PlanningDataService.getMateRecruitingGroupLookup(
+        environmentId,
+        language
+      );
       res.json({
         success: true,
         data,
@@ -209,7 +249,10 @@ export class PlanningDataController {
       const environmentId = getEnvironment(req);
       const language = mapLanguage(req.query.lang as string);
 
-      const data = await PlanningDataService.getOceanNpcAreaSpawnerLookup(environmentId, language);
+      const data = await PlanningDataService.getOceanNpcAreaSpawnerLookup(
+        environmentId,
+        language
+      );
       res.json({
         success: true,
         data,
@@ -222,134 +265,159 @@ export class PlanningDataController {
    * Upload planning data files (drag & drop)
    * POST /api/v1/admin/planning-data/upload
    */
-  static uploadPlanningData = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
-    const uploadComment = req.body?.comment || req.query?.comment;
-    const forceUpload = req.body?.forceUpload === 'true' || req.body?.forceUpload === true;
+  static uploadPlanningData = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
+      const uploadComment = req.body?.comment || req.query?.comment;
+      const forceUpload =
+        req.body?.forceUpload === 'true' || req.body?.forceUpload === true;
 
-    logger.info('Planning data upload requested', {
-      userId: req.user?.userId,
-      filesCount: req.files ? Object.keys(req.files).length : 0,
-      environmentId,
-      forceUpload,
-    });
-
-    // Determine upload source and uploader info
-    const isCliUpload = req.headers['x-application-name'] === 'gatrix-cli';
-    const uploaderNameOverride = req.headers['x-uploader-name'] as string | undefined;
-    const uploadInfo = {
-      uploadedBy: req.user?.userId,
-      uploaderName:
-        uploaderNameOverride ||
-        req.user?.name ||
-        req.user?.email ||
-        (req as any).apiToken?.tokenName ||
-        'Unknown',
-      uploadSource: (isCliUpload ? 'cli' : 'web') as 'web' | 'cli',
-      uploadComment: uploadComment as string | undefined,
-      forceUpload,
-    };
-
-    const result = await PlanningDataService.uploadPlanningData(
-      environmentId,
-      req.files as any,
-      uploadInfo
-    );
-
-    await pubSubService.invalidateByPattern('*planning_data*');
-
-    logger.info('Planning data cache invalidated across all servers', { environmentId });
-
-    // Notify all clients via SSE about planning data update (via PubSub for cross-instance delivery)
-    await pubSubService.publishNotification({
-      type: 'planning_data_updated',
-      data: {
-        filesUploaded: result.filesUploaded,
+      logger.info('Planning data upload requested', {
+        userId: req.user?.userId,
+        filesCount: req.files ? Object.keys(req.files).length : 0,
         environmentId,
-        timestamp: new Date().toISOString(),
-        uploadRecord: result.uploadRecord,
-      },
-      targetChannels: ['admin'],
-    });
+        forceUpload,
+      });
 
-    res.json({
-      success: true,
-      data: result,
-      message: 'Planning data uploaded and cache invalidated successfully',
-    });
-  });
+      // Determine upload source and uploader info
+      const isCliUpload = req.headers['x-application-name'] === 'gatrix-cli';
+      const uploaderNameOverride = req.headers['x-uploader-name'] as
+        | string
+        | undefined;
+      const uploadInfo = {
+        uploadedBy: req.user?.userId,
+        uploaderName:
+          uploaderNameOverride ||
+          req.user?.name ||
+          req.user?.email ||
+          (req as any).apiToken?.tokenName ||
+          'Unknown',
+        uploadSource: (isCliUpload ? 'cli' : 'web') as 'web' | 'cli',
+        uploadComment: uploadComment as string | undefined,
+        forceUpload,
+      };
+
+      const result = await PlanningDataService.uploadPlanningData(
+        environmentId,
+        req.files as any,
+        uploadInfo
+      );
+
+      await pubSubService.invalidateByPattern('*planning_data*');
+
+      logger.info('Planning data cache invalidated across all servers', {
+        environmentId,
+      });
+
+      // Notify all clients via SSE about planning data update (via PubSub for cross-instance delivery)
+      await pubSubService.publishNotification({
+        type: 'planning_data_updated',
+        data: {
+          filesUploaded: result.filesUploaded,
+          environmentId,
+          timestamp: new Date().toISOString(),
+          uploadRecord: result.uploadRecord,
+        },
+        targetChannels: ['admin'],
+      });
+
+      res.json({
+        success: true,
+        data: result,
+        message: 'Planning data uploaded and cache invalidated successfully',
+      });
+    }
+  );
 
   /**
    * Get planning data upload history
    * GET /api/v1/admin/planning-data/history
    */
-  static getUploadHistory = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
-    const limit = parseInt(req.query.limit as string) || 20;
+  static getUploadHistory = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
+      const limit = parseInt(req.query.limit as string) || 20;
 
-    const history = await PlanningDataService.getUploadHistory(environmentId, limit);
+      const history = await PlanningDataService.getUploadHistory(
+        environmentId,
+        limit
+      );
 
-    res.json({
-      success: true,
-      data: history,
-      message: 'Upload history retrieved successfully',
-    });
-  });
+      res.json({
+        success: true,
+        data: history,
+        message: 'Upload history retrieved successfully',
+      });
+    }
+  );
 
   /**
    * Get latest planning data upload
    * GET /api/v1/admin/planning-data/latest
    */
-  static getLatestUpload = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
+  static getLatestUpload = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
 
-    const latestUpload = await PlanningDataService.getLatestUpload(environmentId);
+      const latestUpload =
+        await PlanningDataService.getLatestUpload(environmentId);
 
-    res.json({
-      success: true,
-      data: latestUpload,
-      message: latestUpload ? 'Latest upload retrieved successfully' : 'No uploads found',
-    });
-  });
+      res.json({
+        success: true,
+        data: latestUpload,
+        message: latestUpload
+          ? 'Latest upload retrieved successfully'
+          : 'No uploads found',
+      });
+    }
+  );
 
   /**
    * Reset all upload history
    * DELETE /api/v1/admin/planning-data/history
    */
-  static resetUploadHistory = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
+  static resetUploadHistory = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
 
-    const deletedCount = await PlanningDataService.resetUploadHistory(environmentId);
+      const deletedCount =
+        await PlanningDataService.resetUploadHistory(environmentId);
 
-    res.json({
-      success: true,
-      data: { deletedCount },
-      message: 'Upload history reset successfully',
-    });
-  });
+      res.json({
+        success: true,
+        data: { deletedCount },
+        message: 'Upload history reset successfully',
+      });
+    }
+  );
 
   /**
    * Preview diff before uploading
    * POST /api/v1/admin/planning-data/preview-diff
    */
-  static previewDiff = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = getEnvironment(req);
+  static previewDiff = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const environmentId = getEnvironment(req);
 
-    logger.info('Preview diff requested', {
-      userId: req.user?.userId,
-      filesCount: req.files ? Object.keys(req.files).length : 0,
-      environmentId,
-    });
+      logger.info('Preview diff requested', {
+        userId: req.user?.userId,
+        filesCount: req.files ? Object.keys(req.files).length : 0,
+        environmentId,
+      });
 
-    const result = await PlanningDataService.previewDiff(environmentId, req.files);
+      const result = await PlanningDataService.previewDiff(
+        environmentId,
+        req.files
+      );
 
-    res.json({
-      success: true,
-      data: result,
-      message:
-        result.changedFiles.length > 0
-          ? `${result.changedFiles.length} files with changes detected`
-          : 'No changes detected',
-    });
-  });
+      res.json({
+        success: true,
+        data: result,
+        message:
+          result.changedFiles.length > 0
+            ? `${result.changedFiles.length} files with changes detected`
+            : 'No changes detected',
+      });
+    }
+  );
 }

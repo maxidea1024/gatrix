@@ -12,7 +12,8 @@ class ServerNotificationController {
   // Notification 전송
   static async sendNotification(req: ServerNotificationRequest, res: Response) {
     try {
-      const { userId, type, title, content, channelId, messageId, metadata } = req.body;
+      const { userId, type, title, content, channelId, messageId, metadata } =
+        req.body;
 
       // Validate required fields
       if (!userId || !type || !title || !content) {
@@ -78,12 +79,22 @@ class ServerNotificationController {
   }
 
   // 여러 Used자에게 Notification 전송
-  static async sendBulkNotification(req: ServerNotificationRequest, res: Response) {
+  static async sendBulkNotification(
+    req: ServerNotificationRequest,
+    res: Response
+  ) {
     try {
-      const { userIds, type, title, content, channelId, messageId, metadata } = req.body;
+      const { userIds, type, title, content, channelId, messageId, metadata } =
+        req.body;
 
       // Validate required fields
-      if (!Array.isArray(userIds) || userIds.length === 0 || !type || !title || !content) {
+      if (
+        !Array.isArray(userIds) ||
+        userIds.length === 0 ||
+        !type ||
+        !title ||
+        !content
+      ) {
         return res.status(400).json({
           success: false,
           error: 'userIds (array), type, title, and content are required',

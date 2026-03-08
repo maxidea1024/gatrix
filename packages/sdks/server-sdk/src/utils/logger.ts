@@ -151,7 +151,11 @@ export class Logger {
     return `${coloredBracket}[${coloredTimestamp}] [${coloredLevel}${coloredBracket}] [${sourceCategory}]${COLORS.reset} ${message}`;
   }
 
-  private formatJsonMessage(level: LogLevel, message: string, meta?: any): string {
+  private formatJsonMessage(
+    level: LogLevel,
+    message: string,
+    meta?: any
+  ): string {
     const logEntry: Record<string, any> = {
       timestamp: this.getFormattedTimestamp(),
       level: level.toUpperCase(),
@@ -401,6 +405,9 @@ export class Logger {
 /**
  * Factory function to create a logger with a specific source category
  */
-export function getLogger(sourceCategory: string, config?: LoggerConfig): Logger {
+export function getLogger(
+  sourceCategory: string,
+  config?: LoggerConfig
+): Logger {
   return new Logger(config, sourceCategory);
 }

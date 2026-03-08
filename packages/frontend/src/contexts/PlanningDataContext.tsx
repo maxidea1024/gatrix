@@ -15,7 +15,9 @@ interface PlanningDataContextType {
   refresh: () => Promise<void>;
 }
 
-const PlanningDataContext = createContext<PlanningDataContextType | undefined>(undefined);
+const PlanningDataContext = createContext<PlanningDataContextType | undefined>(
+  undefined
+);
 
 export const usePlanningData = () => {
   const context = useContext(PlanningDataContext);
@@ -29,13 +31,17 @@ interface PlanningDataProviderProps {
   children: React.ReactNode;
 }
 
-export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({ children }) => {
+export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({
+  children,
+}) => {
   const { i18n } = useTranslation();
   const { currentEnvironmentId } = useEnvironment();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const [rewardTypes, setRewardTypes] = useState<RewardTypeInfo[]>([]);
-  const [rewardLookup, setRewardLookup] = useState<RewardLookupData | null>(null);
+  const [rewardLookup, setRewardLookup] = useState<RewardLookupData | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -56,7 +62,11 @@ export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({ chil
     };
 
     window.addEventListener('planning-data-updated', handlePlanningDataUpdate);
-    return () => window.removeEventListener('planning-data-updated', handlePlanningDataUpdate);
+    return () =>
+      window.removeEventListener(
+        'planning-data-updated',
+        handlePlanningDataUpdate
+      );
   }, []);
 
   const loadPlanningData = async () => {
@@ -96,7 +106,11 @@ export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({ chil
     refresh: loadPlanningData,
   };
 
-  return <PlanningDataContext.Provider value={value}>{children}</PlanningDataContext.Provider>;
+  return (
+    <PlanningDataContext.Provider value={value}>
+      {children}
+    </PlanningDataContext.Provider>
+  );
 };
 
 export default PlanningDataContext;

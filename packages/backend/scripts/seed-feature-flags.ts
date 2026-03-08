@@ -28,7 +28,11 @@ async function main() {
       strategies: [
         {
           name: 'flexibleRollout',
-          parameters: { rollout: 0, stickiness: 'default', groupId: 'test-basic-enabled' },
+          parameters: {
+            rollout: 0,
+            stickiness: 'default',
+            groupId: 'test-basic-enabled',
+          },
           isEnabled: true,
         },
       ],
@@ -71,7 +75,9 @@ async function main() {
             stickiness: 'default',
             groupId: 'test-admin-only',
           },
-          constraints: [{ contextName: 'role', operator: 'str_eq', values: ['admin'] }],
+          constraints: [
+            { contextName: 'role', operator: 'str_eq', values: ['admin'] },
+          ],
           isEnabled: true,
         },
       ],
@@ -152,7 +158,11 @@ async function main() {
       strategies: [
         {
           name: 'flexibleRollout',
-          parameters: { rollout: 0, stickiness: 'default', groupId: 'test-disabled' },
+          parameters: {
+            rollout: 0,
+            stickiness: 'default',
+            groupId: 'test-disabled',
+          },
           isEnabled: true,
         },
       ],
@@ -223,7 +233,9 @@ async function createFlag(config: FlagConfig) {
   const now = new Date();
 
   // Check if flag already exists
-  const existing = await db('g_feature_flags').where('flagName', config.flagName).first();
+  const existing = await db('g_feature_flags')
+    .where('flagName', config.flagName)
+    .first();
   if (existing) {
     console.log(`  ⚠ Flag "${config.flagName}" already exists, skipping`);
     return;

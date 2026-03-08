@@ -56,7 +56,12 @@ export class GatrixSDKError extends Error {
   public readonly statusCode?: number;
   public readonly details?: any;
 
-  constructor(code: ErrorCode, message: string, statusCode?: number, details?: any) {
+  constructor(
+    code: ErrorCode,
+    message: string,
+    statusCode?: number,
+    details?: any
+  ) {
     super(message);
     this.name = 'GatrixSDKError';
     this.code = code;
@@ -87,7 +92,11 @@ export class CouponRedeemError extends Error {
   public readonly code: CouponRedeemErrorCode;
   public readonly statusCode: number;
 
-  constructor(code: CouponRedeemErrorCode, message: string, statusCode: number) {
+  constructor(
+    code: CouponRedeemErrorCode,
+    message: string,
+    statusCode: number
+  ) {
     super(message);
     this.name = 'CouponRedeemError';
     this.code = code;

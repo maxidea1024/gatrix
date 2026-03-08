@@ -14,7 +14,9 @@ interface EnvironmentAwareLayoutProps {
   children: React.ReactNode;
 }
 
-export const EnvironmentAwareLayout: React.FC<EnvironmentAwareLayoutProps> = ({ children }) => {
+export const EnvironmentAwareLayout: React.FC<EnvironmentAwareLayoutProps> = ({
+  children,
+}) => {
   const { currentEnvironmentId } = useEnvironment();
 
   // Apply key only to children wrapper, not MainLayout

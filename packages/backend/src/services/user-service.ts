@@ -74,7 +74,10 @@ export class UserService {
   ): Promise<UserListResponse> {
     try {
       const page = parseInt(pagination.page?.toString() || '1');
-      const limit = Math.min(parseInt(pagination.limit?.toString() || '10'), 100); // Max 100 items per page
+      const limit = Math.min(
+        parseInt(pagination.limit?.toString() || '10'),
+        100
+      ); // Max 100 items per page
 
       const result = await UserModel.findAll(page, limit, filters);
 
@@ -102,7 +105,10 @@ export class UserService {
     }
   }
 
-  static async updateUser(id: string, updateData: any): Promise<UserWithoutPassword> {
+  static async updateUser(
+    id: string,
+    updateData: any
+  ): Promise<UserWithoutPassword> {
     try {
       // Validate updates for admin
       const allowedFields = ['name', 'email', 'status', 'avatarUrl'];
@@ -170,9 +176,15 @@ export class UserService {
     try {
       const [total, active, pending, suspended, admins] = await Promise.all([
         UserModel.findAll(1, 1, {}).then((result) => result.total),
-        UserModel.findAll(1, 1, { status: 'active' }).then((result) => result.total),
-        UserModel.findAll(1, 1, { status: 'pending' }).then((result) => result.total),
-        UserModel.findAll(1, 1, { status: 'suspended' }).then((result) => result.total),
+        UserModel.findAll(1, 1, { status: 'active' }).then(
+          (result) => result.total
+        ),
+        UserModel.findAll(1, 1, { status: 'pending' }).then(
+          (result) => result.total
+        ),
+        UserModel.findAll(1, 1, { status: 'suspended' }).then(
+          (result) => result.total
+        ),
         UserModel.findAll(1, 1, {}).then((result) => result.total),
       ]);
 
@@ -224,7 +236,9 @@ export class UserService {
       });
     } catch (error) {
       logger.error('Error activating user:', error);
-      throw error instanceof GatrixError ? error : new GatrixError('Failed to activate user', 500);
+      throw error instanceof GatrixError
+        ? error
+        : new GatrixError('Failed to activate user', 500);
     }
   }
 
@@ -247,7 +261,9 @@ export class UserService {
       });
     } catch (error) {
       logger.error('Error suspending user:', error);
-      throw error instanceof GatrixError ? error : new GatrixError('Failed to suspend user', 500);
+      throw error instanceof GatrixError
+        ? error
+        : new GatrixError('Failed to suspend user', 500);
     }
   }
 
@@ -270,7 +286,11 @@ export class UserService {
     }
   }
 
-  static async setUserTags(userId: string, tagIds: string[], updatedBy: string): Promise<void> {
+  static async setUserTags(
+    userId: string,
+    tagIds: string[],
+    updatedBy: string
+  ): Promise<void> {
     try {
       // Check if user exists
       const user = await UserModel.findById(userId);
@@ -288,7 +308,11 @@ export class UserService {
     }
   }
 
-  static async addUserTag(userId: string, tagId: string, createdBy: string): Promise<void> {
+  static async addUserTag(
+    userId: string,
+    tagId: string,
+    createdBy: string
+  ): Promise<void> {
     try {
       // Check if user exists
       const user = await UserModel.findById(userId);
@@ -388,7 +412,10 @@ export class UserService {
   /**
    * Update user's preferred language
    */
-  static async updateUserLanguage(userId: string, preferredLanguage: string): Promise<void> {
+  static async updateUserLanguage(
+    userId: string,
+    preferredLanguage: string
+  ): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -423,7 +450,9 @@ export class UserService {
       return users;
     } catch (error) {
       logger.error('Error searching users:', error);
-      throw error instanceof GatrixError ? error : new GatrixError('Failed to search users', 500);
+      throw error instanceof GatrixError
+        ? error
+        : new GatrixError('Failed to search users', 500);
     }
   }
 }

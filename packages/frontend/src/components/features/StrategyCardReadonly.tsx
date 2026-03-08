@@ -14,8 +14,20 @@
  * - ReleaseFlowTab (active plan milestones, template selection cards)
  */
 import React, { useState } from 'react';
-import { Box, Typography, Chip, Paper, Collapse, Button, IconButton, Tooltip } from '@mui/material';
-import { ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  Chip,
+  Paper,
+  Collapse,
+  Button,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
+import {
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
   ConstraintDisplay,
@@ -94,10 +106,17 @@ const StrategyCardReadonly: React.FC<StrategyCardReadonlyProps> = ({
   defaultCollapsed = false,
 }) => {
   const { t } = useTranslation();
-  const [expandedSegments, setExpandedSegments] = useState<Set<string>>(new Set());
+  const [expandedSegments, setExpandedSegments] = useState<Set<string>>(
+    new Set()
+  );
   const [collapsed, setCollapsed] = useState(collapsible && defaultCollapsed);
 
-  const { strategyName, parameters, constraints = [], segments = [] } = strategy;
+  const {
+    strategyName,
+    parameters,
+    constraints = [],
+    segments = [],
+  } = strategy;
 
   // Strategy display name
   const getStrategyTitle = (name: string) => {
@@ -114,11 +133,19 @@ const StrategyCardReadonly: React.FC<StrategyCardReadonlyProps> = ({
   // Check if body has any content
   const hasSegments = segments.length > 0;
   const hasConstraints = constraints.length > 0;
-  const hasUserIds = strategyName === 'userWithId' && parameters?.userIds?.length > 0;
-  const hasIPs = strategyName === 'remoteAddress' && parameters?.IPs?.length > 0;
-  const hasHostnames = strategyName === 'applicationHostname' && parameters?.hostNames?.length > 0;
+  const hasUserIds =
+    strategyName === 'userWithId' && parameters?.userIds?.length > 0;
+  const hasIPs =
+    strategyName === 'remoteAddress' && parameters?.IPs?.length > 0;
+  const hasHostnames =
+    strategyName === 'applicationHostname' && parameters?.hostNames?.length > 0;
   const hasBody =
-    hasSegments || hasConstraints || showRollout || hasUserIds || hasIPs || hasHostnames;
+    hasSegments ||
+    hasConstraints ||
+    showRollout ||
+    hasUserIds ||
+    hasIPs ||
+    hasHostnames;
 
   return (
     <Paper
@@ -142,7 +169,9 @@ const StrategyCardReadonly: React.FC<StrategyCardReadonlyProps> = ({
             cursor: 'pointer',
             '&:hover': {
               bgcolor: (theme: any) =>
-                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.08)'
+                  : 'rgba(0,0,0,0.06)',
             },
             transition: 'background-color 0.15s',
           }),
@@ -161,7 +190,11 @@ const StrategyCardReadonly: React.FC<StrategyCardReadonlyProps> = ({
           {/* Strategy title with summary */}
           <Box sx={{ minWidth: 0 }}>
             <Tooltip
-              title={strategy.title && strategy.title.length > 30 ? strategy.title : ''}
+              title={
+                strategy.title && strategy.title.length > 30
+                  ? strategy.title
+                  : ''
+              }
               arrow
             >
               <Typography
@@ -176,7 +209,9 @@ const StrategyCardReadonly: React.FC<StrategyCardReadonlyProps> = ({
                   verticalAlign: 'middle',
                 }}
               >
-                {strategy.disabled !== undefined && strategy.disabled ? '⏸ ' : ''}
+                {strategy.disabled !== undefined && strategy.disabled
+                  ? '⏸ '
+                  : ''}
                 {strategy.title || getStrategyTitle(strategyName)}
               </Typography>
             </Tooltip>
@@ -250,12 +285,17 @@ const StrategyCardReadonly: React.FC<StrategyCardReadonlyProps> = ({
             {hasSegments && (
               <Box>
                 {segments.map((segmentName: string, segIdx: number) => {
-                  const segmentData = allSegments.find((s) => s.segmentName === segmentName);
+                  const segmentData = allSegments.find(
+                    (s) => s.segmentName === segmentName
+                  );
                   const isExpanded = expandedSegments.has(segmentName);
                   return (
                     <Box key={segmentName} sx={{ position: 'relative' }}>
                       {/* Segment Box */}
-                      <Paper variant="outlined" sx={{ p: 1.5, bgcolor: 'background.paper' }}>
+                      <Paper
+                        variant="outlined"
+                        sx={{ p: 1.5, bgcolor: 'background.paper' }}
+                      >
                         {/* Segment Header */}
                         <Box
                           sx={{
@@ -264,7 +304,13 @@ const StrategyCardReadonly: React.FC<StrategyCardReadonlyProps> = ({
                             justifyContent: 'space-between',
                           }}
                         >
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1.5,
+                            }}
+                          >
                             <Typography
                               variant="body2"
                               color="primary.main"
@@ -301,12 +347,17 @@ const StrategyCardReadonly: React.FC<StrategyCardReadonlyProps> = ({
                               minWidth: 70,
                             }}
                           >
-                            {isExpanded ? t('featureFlags.hide') : t('featureFlags.preview')}
+                            {isExpanded
+                              ? t('featureFlags.hide')
+                              : t('featureFlags.preview')}
                           </Button>
                         </Box>
 
                         {/* Segment Preview with animation */}
-                        <Collapse in={isExpanded && !!segmentData} timeout={200}>
+                        <Collapse
+                          in={isExpanded && !!segmentData}
+                          timeout={200}
+                        >
                           <Box
                             sx={{
                               mt: 1.5,
@@ -315,7 +366,11 @@ const StrategyCardReadonly: React.FC<StrategyCardReadonlyProps> = ({
                               borderColor: 'divider',
                             }}
                           >
-                            <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>
+                            <Typography
+                              variant="body2"
+                              fontWeight={600}
+                              sx={{ mb: 0.5 }}
+                            >
                               {segmentData?.displayName || segmentName}
                             </Typography>
                             {segmentData?.description && (

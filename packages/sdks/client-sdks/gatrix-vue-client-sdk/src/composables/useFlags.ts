@@ -4,7 +4,9 @@ import { EVENTS, type EvaluatedFlag } from '@gatrix/gatrix-js-client-sdk';
 
 export function useFlags(forceRealtime = true) {
   const client = useGatrixClient();
-  const flags = ref<EvaluatedFlag[]>(client.features.getAllFlags(forceRealtime));
+  const flags = ref<EvaluatedFlag[]>(
+    client.features.getAllFlags(forceRealtime)
+  );
 
   const updateFlags = () => {
     flags.value = client.features.getAllFlags(forceRealtime);

@@ -25,7 +25,9 @@ export class TranslationService {
   /**
    * 무료 구글 Translation API를 Used하여 텍스트 번역
    */
-  static async translateText(request: TranslationRequest): Promise<TranslationResponse> {
+  static async translateText(
+    request: TranslationRequest
+  ): Promise<TranslationResponse> {
     try {
       const { text, targetLanguage, sourceLanguage = 'auto' } = request;
 
@@ -71,7 +73,9 @@ export class TranslationService {
       let detectedLang = sourceLanguage;
       if (sourceLanguage === 'auto') {
         detectedLang = await this.detectLanguage(text);
-        logger.debug(`Detected source language: ${detectedLang} for target: ${targetLanguage}`);
+        logger.debug(
+          `Detected source language: ${detectedLang} for target: ${targetLanguage}`
+        );
       }
 
       // 소스 언어와 타겟 언어가 같은 경우에만 원본 반환 (정확히 일치하는 경우만)
@@ -82,8 +86,14 @@ export class TranslationService {
           targetLanguage,
         };
         try {
-          const TRANSLATION_TTL_SECONDS = Math.floor(DEFAULT_CONFIG.TRANSLATION_TTL / 1000);
-          await redisClient.set(cacheKey, JSON.stringify(result), TRANSLATION_TTL_SECONDS);
+          const TRANSLATION_TTL_SECONDS = Math.floor(
+            DEFAULT_CONFIG.TRANSLATION_TTL / 1000
+          );
+          await redisClient.set(
+            cacheKey,
+            JSON.stringify(result),
+            TRANSLATION_TTL_SECONDS
+          );
         } catch (e) {
           logger.debug('Translation cache set failed', e);
         }
@@ -103,15 +113,23 @@ export class TranslationService {
         `Translating from ${detectedLang} to ${targetLang}: "${text.substring(0, 50)}..."`
       );
 
-      const response = await axios.get(`${this.GOOGLE_TRANSLATE_API_URL}?${params}`, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        },
-        timeout: 10000,
-      });
+      const response = await axios.get(
+        `${this.GOOGLE_TRANSLATE_API_URL}?${params}`,
+        {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          },
+          timeout: 10000,
+        }
+      );
 
       // Response 파싱
-      if (!response.data || !Array.isArray(response.data) || !response.data[0]) {
+      if (
+        !response.data ||
+        !Array.isArray(response.data) ||
+        !response.data[0]
+      ) {
         throw new Error('Invalid translation response format');
       }
 
@@ -122,7 +140,9 @@ export class TranslationService {
 
       const finalDetectedLanguage = response.data[2] || detectedLang;
 
-      logger.debug(`Translation result: "${translatedText.substring(0, 50)}..."`);
+      logger.debug(
+        `Translation result: "${translatedText.substring(0, 50)}..."`
+      );
 
       const result: TranslationResponse = {
         translatedText: translatedText.trim(),
@@ -130,8 +150,14 @@ export class TranslationService {
         targetLanguage,
       };
       try {
-        const TRANSLATION_TTL_SECONDS = Math.floor(DEFAULT_CONFIG.TRANSLATION_TTL / 1000);
-        await redisClient.set(cacheKey, JSON.stringify(result), TRANSLATION_TTL_SECONDS);
+        const TRANSLATION_TTL_SECONDS = Math.floor(
+          DEFAULT_CONFIG.TRANSLATION_TTL / 1000
+        );
+        await redisClient.set(
+          cacheKey,
+          JSON.stringify(result),
+          TRANSLATION_TTL_SECONDS
+        );
       } catch (e) {
         logger.debug('Translation cache set failed', e);
       }
@@ -217,18 +243,24 @@ export class TranslationService {
         q: base, // 처음 100자만 Used
       });
 
-      const response = await axios.get(`${this.GOOGLE_TRANSLATE_API_URL}?${params}`, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        },
-        timeout: 5000,
-      });
+      const response = await axios.get(
+        `${this.GOOGLE_TRANSLATE_API_URL}?${params}`,
+        {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          },
+          timeout: 5000,
+        }
+      );
 
       const detected = response.data[2] || 'auto';
 
       // Cache Save
       try {
-        const TRANSLATION_TTL_SECONDS = Math.floor(DEFAULT_CONFIG.TRANSLATION_TTL / 1000);
+        const TRANSLATION_TTL_SECONDS = Math.floor(
+          DEFAULT_CONFIG.TRANSLATION_TTL / 1000
+        );
         await redisClient.set(cacheKey, detected, TRANSLATION_TTL_SECONDS);
       } catch (e) {
         logger.debug('Language detect cache set failed', e);

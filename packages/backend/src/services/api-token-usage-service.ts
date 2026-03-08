@@ -23,7 +23,9 @@ export class ApiTokenUsageService {
   private isInitialized = false;
 
   private constructor() {
-    this.syncIntervalMs = parseInt(process.env.API_TOKEN_SYNC_INTERVAL_MS || '60000');
+    this.syncIntervalMs = parseInt(
+      process.env.API_TOKEN_SYNC_INTERVAL_MS || '60000'
+    );
 
     logger.info('ApiTokenUsageService initialized', {
       instanceId: getInstanceId(),
@@ -228,11 +230,16 @@ export class ApiTokenUsageService {
         try {
           await this.updateTokenUsageInDatabase(tokenId, aggregate);
         } catch (error) {
-          logger.error(`Failed to update token ${tokenId} usage in database:`, error);
+          logger.error(
+            `Failed to update token ${tokenId} usage in database:`,
+            error
+          );
         }
       }
 
-      logger.info(`Successfully synced usage data for ${tokenAggregates.size} tokens`);
+      logger.info(
+        `Successfully synced usage data for ${tokenAggregates.size} tokens`
+      );
     } catch (error) {
       logger.error('Failed to sync token usage to database:', error);
       throw error;
@@ -253,7 +260,8 @@ export class ApiTokenUsageService {
         return;
       }
 
-      const newUsageCount = (currentToken.usageCount || 0) + aggregate.totalUsageCount;
+      const newUsageCount =
+        (currentToken.usageCount || 0) + aggregate.totalUsageCount;
       const newLastUsedAt = aggregate.latestUsedAt;
 
       const formatForMySQL = (date: Date) => {
@@ -266,7 +274,12 @@ export class ApiTokenUsageService {
         SET usageCount = ?, lastUsedAt = ?, updatedAt = ?
         WHERE id = ?
       `,
-        [newUsageCount, formatForMySQL(newLastUsedAt), formatForMySQL(new Date()), tokenId]
+        [
+          newUsageCount,
+          formatForMySQL(newLastUsedAt),
+          formatForMySQL(new Date()),
+          tokenId,
+        ]
       );
 
       logger.debug('Database updated for token', {
@@ -308,7 +321,10 @@ export class ApiTokenUsageService {
         await client.del(...keys);
       }
     } catch (error) {
-      logger.error(`Failed to invalidate token cache for token ${tokenId}:`, error);
+      logger.error(
+        `Failed to invalidate token cache for token ${tokenId}:`,
+        error
+      );
     }
   }
 

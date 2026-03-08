@@ -22,8 +22,26 @@ const platforms = ['android', 'ios', 'windows', 'mac', 'linux'];
 const environments = ['production', 'staging', 'development'];
 const branches = ['main', 'develop', 'feature/new-ui', 'hotfix/crash-fix'];
 const marketTypes = ['google', 'apple', 'steam', 'epic'];
-const appVersions = ['1.0.0', '1.0.1', '1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0', '3.0.0'];
-const resVersions = ['1.0.0', '1.0.1', '1.1.0', '1.2.0', '2.0.0', '2.1.0', '2.2.0', '3.0.0'];
+const appVersions = [
+  '1.0.0',
+  '1.0.1',
+  '1.1.0',
+  '1.2.0',
+  '2.0.0',
+  '2.1.0',
+  '2.2.0',
+  '3.0.0',
+];
+const resVersions = [
+  '1.0.0',
+  '1.0.1',
+  '1.1.0',
+  '1.2.0',
+  '2.0.0',
+  '2.1.0',
+  '2.2.0',
+  '3.0.0',
+];
 
 // 대항해시대 온라인 스타일 사용자 이름
 const userNames = [
@@ -327,7 +345,9 @@ async function generateCrashGroups(count: number = 500): Promise<string[]> {
     const firstVersion = randomElement(appVersions);
     const lastVersion = randomElement(appVersions);
     const firstCrash = randomDate();
-    const lastCrash = new Date(firstCrash.getTime() + randomInt(0, 7 * 24 * 60 * 60 * 1000)); // Up to 7 days later
+    const lastCrash = new Date(
+      firstCrash.getTime() + randomInt(0, 7 * 24 * 60 * 60 * 1000)
+    ); // Up to 7 days later
 
     // Store stack trace file
     const hash = md5Hash;
@@ -336,7 +356,13 @@ async function generateCrashGroups(count: number = 500): Promise<string[]> {
     const stackTraceUrl = `/crashes/${dir1}/${dir2}/${hash}`;
 
     // Create stack trace file
-    const stackTraceDir = path.join(process.cwd(), 'public', 'crashes', dir1, dir2);
+    const stackTraceDir = path.join(
+      process.cwd(),
+      'public',
+      'crashes',
+      dir1,
+      dir2
+    );
     await fs.mkdir(stackTraceDir, { recursive: true });
     await fs.writeFile(path.join(stackTraceDir, hash), stackTrace, 'utf8');
 
@@ -372,9 +398,14 @@ async function generateCrashGroups(count: number = 500): Promise<string[]> {
 }
 
 // Generate crash events
-async function generateCrashEvents(crashIds: string[], eventsPerCrash: number = 20): Promise<void> {
+async function generateCrashEvents(
+  crashIds: string[],
+  eventsPerCrash: number = 20
+): Promise<void> {
   const totalEvents = crashIds.length * eventsPerCrash;
-  console.log(`Generating ${totalEvents} crash events (${eventsPerCrash} per crash group)...`);
+  console.log(
+    `Generating ${totalEvents} crash events (${eventsPerCrash} per crash group)...`
+  );
 
   let eventCount = 0;
   let gameUserIdCounter = 2000; // Starting game user ID
@@ -406,7 +437,11 @@ async function generateCrashEvents(crashIds: string[], eventsPerCrash: number = 
       );
       await fs.mkdir(logDir, { recursive: true });
       const logContent = generateLogContent(logLineCount);
-      await fs.writeFile(path.join(logDir, `${eventId}.txt`), logContent, 'utf8');
+      await fs.writeFile(
+        path.join(logDir, `${eventId}.txt`),
+        logContent,
+        'utf8'
+      );
 
       // Generate account ID in format like "20332433333" (11 digits)
       const accountId = `20${String(randomInt(100000000, 999999999))}`;

@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 import ServerLifecycleEvent from '../models/server-lifecycle-event';
-import { sendInternalError, sendSuccessResponse, ErrorCodes } from '../utils/api-response';
+import {
+  sendInternalError,
+  sendSuccessResponse,
+  ErrorCodes,
+} from '../utils/api-response';
 
 class ServerLifecycleController {
   /**
@@ -52,46 +56,103 @@ class ServerLifecycleController {
       if (search) {
         const searchTerm = `%${search}%`;
         query.where(function () {
-          this.where('g_server_lifecycle_events.serviceType', 'like', searchTerm)
+          this.where(
+            'g_server_lifecycle_events.serviceType',
+            'like',
+            searchTerm
+          )
             .orWhere('g_server_lifecycle_events.instanceId', 'like', searchTerm)
             .orWhere('g_server_lifecycle_events.hostname', 'like', searchTerm)
-            .orWhere('g_server_lifecycle_events.serviceGroup', 'like', searchTerm)
-            .orWhere('g_server_lifecycle_events.environmentId', 'like', searchTerm)
-            .orWhere('g_server_lifecycle_events.externalAddress', 'like', searchTerm)
-            .orWhere('g_server_lifecycle_events.internalAddress', 'like', searchTerm)
-            .orWhere('g_server_lifecycle_events.appVersion', 'like', searchTerm);
+            .orWhere(
+              'g_server_lifecycle_events.serviceGroup',
+              'like',
+              searchTerm
+            )
+            .orWhere(
+              'g_server_lifecycle_events.environmentId',
+              'like',
+              searchTerm
+            )
+            .orWhere(
+              'g_server_lifecycle_events.externalAddress',
+              'like',
+              searchTerm
+            )
+            .orWhere(
+              'g_server_lifecycle_events.internalAddress',
+              'like',
+              searchTerm
+            )
+            .orWhere(
+              'g_server_lifecycle_events.appVersion',
+              'like',
+              searchTerm
+            );
         });
       }
 
       if (serviceType) {
-        query.where('g_server_lifecycle_events.serviceType', serviceType as string);
+        query.where(
+          'g_server_lifecycle_events.serviceType',
+          serviceType as string
+        );
       }
       if (instanceId) {
-        query.where('g_server_lifecycle_events.instanceId', instanceId as string);
+        query.where(
+          'g_server_lifecycle_events.instanceId',
+          instanceId as string
+        );
       }
       if (environmentId) {
-        query.where('g_server_lifecycle_events.environmentId', environmentId as string);
+        query.where(
+          'g_server_lifecycle_events.environmentId',
+          environmentId as string
+        );
       }
       if (eventType) {
         query.where('g_server_lifecycle_events.eventType', eventType as string);
       }
       if (serviceGroup) {
-        query.where('g_server_lifecycle_events.serviceGroup', 'like', `%${serviceGroup}%`);
+        query.where(
+          'g_server_lifecycle_events.serviceGroup',
+          'like',
+          `%${serviceGroup}%`
+        );
       }
       if (hostname) {
-        query.where('g_server_lifecycle_events.hostname', 'like', `%${hostname}%`);
+        query.where(
+          'g_server_lifecycle_events.hostname',
+          'like',
+          `%${hostname}%`
+        );
       }
       if (externalAddress) {
-        query.where('g_server_lifecycle_events.externalAddress', 'like', `%${externalAddress}%`);
+        query.where(
+          'g_server_lifecycle_events.externalAddress',
+          'like',
+          `%${externalAddress}%`
+        );
       }
       if (internalAddress) {
-        query.where('g_server_lifecycle_events.internalAddress', 'like', `%${internalAddress}%`);
+        query.where(
+          'g_server_lifecycle_events.internalAddress',
+          'like',
+          `%${internalAddress}%`
+        );
       }
       if (cloudProvider) {
-        query.where('g_server_lifecycle_events.cloudProvider', 'like', `%${cloudProvider}%`);
+        query.where(
+          'g_server_lifecycle_events.cloudProvider',
+          'like',
+          `%${cloudProvider}%`
+        );
       }
       if (cloudRegion) {
-        query.where('g_server_lifecycle_events.cloudRegion', 'like', `%${cloudRegion}%`);
+        query.where(
+          'g_server_lifecycle_events.cloudRegion',
+          'like',
+          `%${cloudRegion}%`
+        );
       }
 
       const events = await query.page(Number(page) - 1, Number(limit));

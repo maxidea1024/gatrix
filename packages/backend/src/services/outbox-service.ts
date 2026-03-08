@@ -7,7 +7,11 @@
  */
 import { Transaction } from 'objection';
 import { ulid } from 'ulid';
-import { OutboxEvent, OutboxEventType, OUTBOX_EVENT_TYPES } from '../models/outbox-event';
+import {
+  OutboxEvent,
+  OutboxEventType,
+  OUTBOX_EVENT_TYPES,
+} from '../models/outbox-event';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('OutboxService');
@@ -26,7 +30,10 @@ export class OutboxService {
   /**
    * Record an event in the outbox (within a transaction)
    */
-  static async recordEvent(data: OutboxEventData, trx?: Transaction): Promise<OutboxEvent> {
+  static async recordEvent(
+    data: OutboxEventData,
+    trx?: Transaction
+  ): Promise<OutboxEvent> {
     const event = await OutboxEvent.query(trx).insert({
       id: ulid(),
       changeRequestId: data.changeRequestId,
@@ -38,7 +45,9 @@ export class OutboxService {
       retryCount: 0,
     });
 
-    logger.debug(`Event recorded: ${data.entityType}:${data.entityId} (${data.eventType})`);
+    logger.debug(
+      `Event recorded: ${data.entityType}:${data.entityId} (${data.eventType})`
+    );
     return event;
   }
 
@@ -110,9 +119,12 @@ export class OutboxService {
       // Skip if no actual change (before === after)
       if (!entity.wasCreated && !entity.wasDeleted) {
         const hasChange =
-          JSON.stringify(entity.originalBefore) !== JSON.stringify(entity.finalAfter);
+          JSON.stringify(entity.originalBefore) !==
+          JSON.stringify(entity.finalAfter);
         if (!hasChange) {
-          logger.debug(`Pruned event: ${entity.entityType}:${entity.entityId} (no net change)`);
+          logger.debug(
+            `Pruned event: ${entity.entityType}:${entity.entityId} (no net change)`
+          );
           continue;
         }
       }
@@ -189,14 +201,19 @@ export class OutboxService {
             retryCount: newRetryCount,
             errorMessage: error.message,
           });
-          logger.error(`Event ${event.id} failed after ${maxRetries} retries:`, error);
+          logger.error(
+            `Event ${event.id} failed after ${maxRetries} retries:`,
+            error
+          );
         } else {
           await event.$query().patch({
             status: 'pending', // Back to pending for retry
             retryCount: newRetryCount,
             errorMessage: error.message,
           });
-          logger.warn(`Event ${event.id} failed, will retry (${newRetryCount}/${maxRetries})`);
+          logger.warn(
+            `Event ${event.id} failed, will retry (${newRetryCount}/${maxRetries})`
+          );
         }
       }
     }
@@ -221,12 +238,15 @@ export class OutboxService {
       g_message_templates: 'message_template',
     };
 
-    const channel = channelMap[event.entityType] || event.entityType.replace('g_', '');
+    const channel =
+      channelMap[event.entityType] || event.entityType.replace('g_', '');
     const eventName = `${channel}.${event.eventType}`;
 
     // Extract environmentId from event's payload for channel targeting
     const environmentId =
-      event.payload?.after?.environmentId || event.payload?.before?.environmentId || undefined;
+      event.payload?.after?.environmentId ||
+      event.payload?.before?.environmentId ||
+      undefined;
 
     await pubSubService.publishSDKEvent(
       {
@@ -251,7 +271,10 @@ export class OutboxService {
   static async cleanupOldEvents(retentionDays: number = 7): Promise<number> {
     const thresholdDate = new Date();
     thresholdDate.setDate(thresholdDate.getDate() - retentionDays);
-    const isoThreshold = thresholdDate.toISOString().slice(0, 19).replace('T', ' ');
+    const isoThreshold = thresholdDate
+      .toISOString()
+      .slice(0, 19)
+      .replace('T', ' ');
 
     const deleted = await OutboxEvent.query()
       .whereIn('status', ['completed', 'failed'])

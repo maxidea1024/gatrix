@@ -126,9 +126,21 @@ export class ServiceAccountModel {
           `${SA_ENV_TABLE}.environmentId`,
           'g_environments.displayName as environmentName',
         ])
-        .leftJoin(`${this.TABLE} as creator`, `${this.TABLE}.createdBy`, 'creator.id')
-        .leftJoin(SA_ENV_TABLE, `${this.TABLE}.id`, `${SA_ENV_TABLE}.serviceAccountId`)
-        .leftJoin('g_environments', `${SA_ENV_TABLE}.environmentId`, 'g_environments.id')
+        .leftJoin(
+          `${this.TABLE} as creator`,
+          `${this.TABLE}.createdBy`,
+          'creator.id'
+        )
+        .leftJoin(
+          SA_ENV_TABLE,
+          `${this.TABLE}.id`,
+          `${SA_ENV_TABLE}.serviceAccountId`
+        )
+        .leftJoin(
+          'g_environments',
+          `${SA_ENV_TABLE}.environmentId`,
+          'g_environments.id'
+        )
         .where(`${this.TABLE}.id`, id)
         .where(`${this.TABLE}.authType`, 'service-account')
         .first();
@@ -161,9 +173,21 @@ export class ServiceAccountModel {
           `${SA_ENV_TABLE}.environmentId`,
           'g_environments.displayName as environmentName',
         ])
-        .leftJoin(`${this.TABLE} as creator`, `${this.TABLE}.createdBy`, 'creator.id')
-        .leftJoin(SA_ENV_TABLE, `${this.TABLE}.id`, `${SA_ENV_TABLE}.serviceAccountId`)
-        .leftJoin('g_environments', `${SA_ENV_TABLE}.environmentId`, 'g_environments.id')
+        .leftJoin(
+          `${this.TABLE} as creator`,
+          `${this.TABLE}.createdBy`,
+          'creator.id'
+        )
+        .leftJoin(
+          SA_ENV_TABLE,
+          `${this.TABLE}.id`,
+          `${SA_ENV_TABLE}.serviceAccountId`
+        )
+        .leftJoin(
+          'g_environments',
+          `${SA_ENV_TABLE}.environmentId`,
+          'g_environments.id'
+        )
         .where(`${this.TABLE}.authType`, 'service-account')
         .orderBy(`${this.TABLE}.name`, 'asc');
 
@@ -177,7 +201,10 @@ export class ServiceAccountModel {
   /**
    * Update a service account
    */
-  static async update(id: string, data: UpdateServiceAccountData): Promise<ServiceAccount | null> {
+  static async update(
+    id: string,
+    data: UpdateServiceAccountData
+  ): Promise<ServiceAccount | null> {
     try {
       await db.transaction(async (trx) => {
         const updateData: any = {};
@@ -199,7 +226,9 @@ export class ServiceAccountModel {
             await trx(SA_ENV_TABLE).where('serviceAccountId', id).del();
           } else {
             // Upsert assignment
-            const existing = await trx(SA_ENV_TABLE).where('serviceAccountId', id).first();
+            const existing = await trx(SA_ENV_TABLE)
+              .where('serviceAccountId', id)
+              .first();
             if (existing) {
               await trx(SA_ENV_TABLE).where('serviceAccountId', id).update({
                 environmentId: data.environmentId,
@@ -289,7 +318,9 @@ export class ServiceAccountModel {
   /**
    * Find tokens for a service account
    */
-  static async findTokens(serviceAccountId: string): Promise<ServiceAccountToken[]> {
+  static async findTokens(
+    serviceAccountId: string
+  ): Promise<ServiceAccountToken[]> {
     try {
       return db(this.TOKENS_TABLE)
         .select(
@@ -315,7 +346,10 @@ export class ServiceAccountModel {
   /**
    * Delete a token (soft-delete by setting isActive = false)
    */
-  static async deleteToken(tokenId: string, serviceAccountId: string): Promise<boolean> {
+  static async deleteToken(
+    tokenId: string,
+    serviceAccountId: string
+  ): Promise<boolean> {
     try {
       const result = await db(this.TOKENS_TABLE)
         .where('id', tokenId)
@@ -348,7 +382,9 @@ export class ServiceAccountModel {
       }
 
       // Update lastUsedAt
-      await db(this.TOKENS_TABLE).where('id', token.id).update({ lastUsedAt: db.fn.now() });
+      await db(this.TOKENS_TABLE)
+        .where('id', token.id)
+        .update({ lastUsedAt: db.fn.now() });
 
       return this.findById(token.serviceAccountId);
     } catch (error) {

@@ -47,7 +47,14 @@ import changeRequestService, {
 const STATUS_CONFIG: Record<
   ChangeRequestStatus,
   {
-    color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
+    color:
+      | 'default'
+      | 'primary'
+      | 'secondary'
+      | 'error'
+      | 'info'
+      | 'success'
+      | 'warning';
     labelKey: string;
     bgColor: string;
   }
@@ -86,7 +93,13 @@ const STATUS_CONFIG: Record<
 
 // Timeline event type
 interface TimelineEvent {
-  type: 'created' | 'submitted' | 'approved' | 'rejected' | 'reopened' | 'executed';
+  type:
+    | 'created'
+    | 'submitted'
+    | 'approved'
+    | 'rejected'
+    | 'reopened'
+    | 'executed';
   timestamp: string;
   user?: { name?: string; email?: string };
   comment?: string;
@@ -117,7 +130,9 @@ const ChangeRequestDetailPage: React.FC = () => {
   const [submitReason, setSubmitReason] = useState('');
   const [activeTab, setActiveTab] = useState(0);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [expandedReasons, setExpandedReasons] = useState<Record<number, boolean>>({});
+  const [expandedReasons, setExpandedReasons] = useState<
+    Record<number, boolean>
+  >({});
 
   // Delete handler for error dialog
   const handleDeleteFromError = async () => {
@@ -144,9 +159,13 @@ const ChangeRequestDetailPage: React.FC = () => {
     error,
     isLoading,
     mutate,
-  } = useSWR(id ? `change-request-${id}` : null, () => changeRequestService.getById(id!), {
-    revalidateOnFocus: false,
-  });
+  } = useSWR(
+    id ? `change-request-${id}` : null,
+    () => changeRequestService.getById(id!),
+    {
+      revalidateOnFocus: false,
+    }
+  );
 
   // Build timeline from CR data
   const timeline = useMemo<TimelineEvent[]>(() => {
@@ -197,7 +216,10 @@ const ChangeRequestDetailPage: React.FC = () => {
       });
     }
 
-    return events.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    return events.sort(
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
   }, [cr]);
 
   // Compute all field changes
@@ -382,7 +404,10 @@ const ChangeRequestDetailPage: React.FC = () => {
   }
 
   const statusConfig = STATUS_CONFIG[cr.status];
-  const totalChanges = allChanges.reduce((sum, item) => sum + item.changes.length, 0);
+  const totalChanges = allChanges.reduce(
+    (sum, item) => sum + item.changes.length,
+    0
+  );
 
   return (
     <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100vh' }}>
@@ -398,7 +423,9 @@ const ChangeRequestDetailPage: React.FC = () => {
       >
         <Box sx={{ px: 3, py: 2 }}>
           {/* Back + Title */}
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 1 }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 1 }}
+          >
             <IconButton
               size="small"
               onClick={() => navigate('/admin/change-requests')}
@@ -407,7 +434,10 @@ const ChangeRequestDetailPage: React.FC = () => {
               <ArrowBackIcon fontSize="small" />
             </IconButton>
             <Box sx={{ flex: 1 }}>
-              <Typography variant="h5" sx={{ fontWeight: 600, lineHeight: 1.3 }}>
+              <Typography
+                variant="h5"
+                sx={{ fontWeight: 600, lineHeight: 1.3 }}
+              >
                 {cr.title || t('changeRequest.title')}
                 <Typography
                   component="span"
@@ -433,7 +463,8 @@ const ChangeRequestDetailPage: React.FC = () => {
             />
             <Typography variant="body2" color="text.secondary">
               <strong>{cr.requester?.name || cr.requester?.email}</strong>{' '}
-              {t('changeRequest.wantsToMerge')} {allChanges.length} {t('changeRequest.changes')}
+              {t('changeRequest.wantsToMerge')} {allChanges.length}{' '}
+              {t('changeRequest.changes')}
             </Typography>
           </Box>
 
@@ -565,13 +596,19 @@ const ChangeRequestDetailPage: React.FC = () => {
                       }}
                     >
                       <Typography variant="body2">
-                        <strong>{cr.requester?.name || cr.requester?.email}</strong>{' '}
-                        {t('changeRequest.opened')} <RelativeTime date={cr.createdAt} />
+                        <strong>
+                          {cr.requester?.name || cr.requester?.email}
+                        </strong>{' '}
+                        {t('changeRequest.opened')}{' '}
+                        <RelativeTime date={cr.createdAt} />
                       </Typography>
                     </Box>
                     {(cr.reason || cr.description) && (
                       <Box sx={{ p: 2 }}>
-                        <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ whiteSpace: 'pre-wrap' }}
+                        >
                           {cr.reason || cr.description}
                         </Typography>
                       </Box>
@@ -662,10 +699,18 @@ const ChangeRequestDetailPage: React.FC = () => {
                           zIndex: 1,
                         }}
                       >
-                        {event.type === 'submitted' && <SendIcon sx={{ fontSize: 16 }} />}
-                        {event.type === 'approved' && <CheckIcon sx={{ fontSize: 16 }} />}
-                        {event.type === 'rejected' && <CloseIcon sx={{ fontSize: 16 }} />}
-                        {event.type === 'executed' && <MergeIcon sx={{ fontSize: 16 }} />}
+                        {event.type === 'submitted' && (
+                          <SendIcon sx={{ fontSize: 16 }} />
+                        )}
+                        {event.type === 'approved' && (
+                          <CheckIcon sx={{ fontSize: 16 }} />
+                        )}
+                        {event.type === 'rejected' && (
+                          <CloseIcon sx={{ fontSize: 16 }} />
+                        )}
+                        {event.type === 'executed' && (
+                          <MergeIcon sx={{ fontSize: 16 }} />
+                        )}
                       </Avatar>
                       {idx < arr.length - 1 && (
                         <Box
@@ -682,11 +727,17 @@ const ChangeRequestDetailPage: React.FC = () => {
                     {/* Content column */}
                     <Box sx={{ flex: 1, pl: 1.5 }}>
                       <Typography variant="body2">
-                        <strong>{event.user?.name || event.user?.email || 'System'}</strong>{' '}
-                        {event.type === 'submitted' && t('changeRequest.timeline.submitted')}
-                        {event.type === 'approved' && t('changeRequest.timeline.approved')}
-                        {event.type === 'rejected' && t('changeRequest.timeline.rejected')}
-                        {event.type === 'executed' && t('changeRequest.timeline.executed')}{' '}
+                        <strong>
+                          {event.user?.name || event.user?.email || 'System'}
+                        </strong>{' '}
+                        {event.type === 'submitted' &&
+                          t('changeRequest.timeline.submitted')}
+                        {event.type === 'approved' &&
+                          t('changeRequest.timeline.approved')}
+                        {event.type === 'rejected' &&
+                          t('changeRequest.timeline.rejected')}
+                        {event.type === 'executed' &&
+                          t('changeRequest.timeline.executed')}{' '}
                         <Typography component="span" color="text.secondary">
                           <RelativeTime date={event.timestamp} />
                         </Typography>
@@ -703,12 +754,19 @@ const ChangeRequestDetailPage: React.FC = () => {
                               flexWrap: 'wrap',
                             }}
                           >
-                            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: 500 }}
+                            >
                               {event.title}
                             </Typography>
                             {event.reason && (
                               <Chip
-                                label={expandedReasons[idx] ? t('changeRequest.collapse') : '...'}
+                                label={
+                                  expandedReasons[idx]
+                                    ? t('changeRequest.collapse')
+                                    : '...'
+                                }
                                 size="small"
                                 onClick={() =>
                                   setExpandedReasons((prev) => ({
@@ -720,11 +778,13 @@ const ChangeRequestDetailPage: React.FC = () => {
                                   height: 20,
                                   fontSize: 11,
                                   fontWeight: 500,
-                                  bgcolor: (theme) => alpha(theme.palette.text.primary, 0.08),
+                                  bgcolor: (theme) =>
+                                    alpha(theme.palette.text.primary, 0.08),
                                   color: 'text.secondary',
                                   cursor: 'pointer',
                                   '&:hover': {
-                                    bgcolor: (theme) => alpha(theme.palette.text.primary, 0.15),
+                                    bgcolor: (theme) =>
+                                      alpha(theme.palette.text.primary, 0.15),
                                   },
                                 }}
                               />
@@ -740,7 +800,10 @@ const ChangeRequestDetailPage: React.FC = () => {
                                   bgcolor: 'action.hover',
                                 }}
                               >
-                                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                                <Typography
+                                  variant="body2"
+                                  sx={{ whiteSpace: 'pre-wrap' }}
+                                >
                                   {event.reason}
                                 </Typography>
                               </Paper>
@@ -757,9 +820,11 @@ const ChangeRequestDetailPage: React.FC = () => {
                             p: 1.5,
                             bgcolor:
                               event.type === 'rejected'
-                                ? (theme) => alpha(theme.palette.error.main, 0.1)
+                                ? (theme) =>
+                                    alpha(theme.palette.error.main, 0.1)
                                 : event.type === 'approved'
-                                  ? (theme) => alpha(theme.palette.success.main, 0.1)
+                                  ? (theme) =>
+                                      alpha(theme.palette.success.main, 0.1)
                                   : 'action.hover',
                             borderColor:
                               event.type === 'rejected'
@@ -769,7 +834,10 @@ const ChangeRequestDetailPage: React.FC = () => {
                                   : 'divider',
                           }}
                         >
-                          <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ whiteSpace: 'pre-wrap' }}
+                          >
                             {event.comment}
                           </Typography>
                         </Paper>
@@ -795,10 +863,16 @@ const ChangeRequestDetailPage: React.FC = () => {
                       justifyContent: 'space-between',
                     }}
                   >
-                    <Typography variant="subtitle2">{t('changeRequest.addReview')}</Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                      {t('changeRequest.approvalProgress')}: {currentApprovals} /{' '}
-                      {requiredApprovals}
+                    <Typography variant="subtitle2">
+                      {t('changeRequest.addReview')}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600 }}
+                    >
+                      {t('changeRequest.approvalProgress')}: {currentApprovals}{' '}
+                      / {requiredApprovals}
                     </Typography>
                   </Box>
                   <Box sx={{ p: 2 }}>
@@ -854,7 +928,10 @@ const ChangeRequestDetailPage: React.FC = () => {
                       >
                         {hasApproved ? (
                           <>
-                            <CheckIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
+                            <CheckIcon
+                              color="success"
+                              sx={{ fontSize: 40, mb: 1 }}
+                            />
                             <Typography variant="body2" color="text.secondary">
                               {t('errors.CR_ALREADY_APPROVED')}
                             </Typography>
@@ -871,48 +948,53 @@ const ChangeRequestDetailPage: React.FC = () => {
               )}
 
               {/* Status Banners */}
-              {cr.status === 'rejected' && (cr.requesterId === user?.id || hasAnyPermissions) && (
-                <Paper
-                  sx={{
-                    p: 2,
-                    bgcolor: (theme) => alpha(theme.palette.error.main, 0.1),
-                    border: 1,
-                    borderColor: 'error.main',
-                  }}
-                >
-                  <Box
+              {cr.status === 'rejected' &&
+                (cr.requesterId === user?.id || hasAnyPermissions) && (
+                  <Paper
                     sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      p: 2,
+                      bgcolor: (theme) => alpha(theme.palette.error.main, 0.1),
+                      border: 1,
+                      borderColor: 'error.main',
                     }}
                   >
-                    <Box>
-                      <Typography variant="body2" fontWeight={500} color="error.main">
-                        {t('changeRequest.status.rejected')}
-                      </Typography>
-                      {cr.rejectionReason && (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ display: 'block', mt: 0.5 }}
-                        >
-                          {cr.rejectionReason}
-                        </Typography>
-                      )}
-                    </Box>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      startIcon={<DeleteIcon />}
-                      onClick={handleDelete}
-                      disabled={actionLoading}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
                     >
-                      {t('common.delete')}
-                    </Button>
-                  </Box>
-                </Paper>
-              )}
+                      <Box>
+                        <Typography
+                          variant="body2"
+                          fontWeight={500}
+                          color="error.main"
+                        >
+                          {t('changeRequest.status.rejected')}
+                        </Typography>
+                        {cr.rejectionReason && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ display: 'block', mt: 0.5 }}
+                          >
+                            {cr.rejectionReason}
+                          </Typography>
+                        )}
+                      </Box>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        startIcon={<DeleteIcon />}
+                        onClick={handleDelete}
+                        disabled={actionLoading}
+                      >
+                        {t('common.delete')}
+                      </Button>
+                    </Box>
+                  </Paper>
+                )}
 
               {cr.status === 'approved' && (
                 <Paper
@@ -931,11 +1013,16 @@ const ChangeRequestDetailPage: React.FC = () => {
                     }}
                   >
                     <Box>
-                      <Typography variant="body2" fontWeight={500} color="success.main">
+                      <Typography
+                        variant="body2"
+                        fontWeight={500}
+                        color="success.main"
+                      >
                         ✓ {t('changeRequest.readyToMerge')}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {cr.approvals?.length || 0} {t('changeRequest.approvals')}
+                        {cr.approvals?.length || 0}{' '}
+                        {t('changeRequest.approvals')}
                       </Typography>
                     </Box>
                     <Button
@@ -1019,7 +1106,9 @@ const ChangeRequestDetailPage: React.FC = () => {
                       value={submitReason}
                       onChange={(e) => setSubmitReason(e.target.value)}
                       sx={{ mb: 2 }}
-                      helperText={t('changeRequest.submitDialog.reasonOptional')}
+                      helperText={t(
+                        'changeRequest.submitDialog.reasonOptional'
+                      )}
                     />
                     <Box
                       sx={{
@@ -1028,10 +1117,17 @@ const ChangeRequestDetailPage: React.FC = () => {
                         justifyContent: 'flex-end',
                       }}
                     >
-                      <Button onClick={() => setShowSubmitForm(false)} disabled={actionLoading}>
+                      <Button
+                        onClick={() => setShowSubmitForm(false)}
+                        disabled={actionLoading}
+                      >
                         {t('common.cancel')}
                       </Button>
-                      <Button variant="contained" onClick={handleSubmit} disabled={actionLoading}>
+                      <Button
+                        variant="contained"
+                        onClick={handleSubmit}
+                        disabled={actionLoading}
+                      >
                         {t('changeRequest.actions.submit')}
                       </Button>
                     </Box>
@@ -1050,7 +1146,9 @@ const ChangeRequestDetailPage: React.FC = () => {
                 >
                   {t('changeRequest.requester')}
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}
+                >
                   <Avatar sx={{ width: 20, height: 20 }}>
                     <PersonIcon sx={{ fontSize: 14 }} />
                   </Avatar>
@@ -1080,7 +1178,9 @@ const ChangeRequestDetailPage: React.FC = () => {
                           mb: 0.5,
                         }}
                       >
-                        <CheckIcon sx={{ fontSize: 14, color: 'success.main' }} />
+                        <CheckIcon
+                          sx={{ fontSize: 14, color: 'success.main' }}
+                        />
                         <Typography variant="body2">
                           {a.approver?.name || a.approver?.email}
                         </Typography>
@@ -1088,7 +1188,11 @@ const ChangeRequestDetailPage: React.FC = () => {
                     ))}
                   </Box>
                 ) : (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mt: 1 }}
+                  >
                     {t('changeRequest.noReviewersYet')}
                   </Typography>
                 )}
@@ -1112,11 +1216,15 @@ const ChangeRequestDetailPage: React.FC = () => {
                       mt: 1,
                     }}
                   >
-                    <Avatar sx={{ width: 20, height: 20, bgcolor: 'info.main' }}>
+                    <Avatar
+                      sx={{ width: 20, height: 20, bgcolor: 'info.main' }}
+                    >
                       <MergeIcon sx={{ fontSize: 14 }} />
                     </Avatar>
                     <Typography variant="body2">
-                      {cr.executor?.name || cr.executor?.email || t('common.unknown')}
+                      {cr.executor?.name ||
+                        cr.executor?.email ||
+                        t('common.unknown')}
                     </Typography>
                   </Box>
                   <Typography
@@ -1136,7 +1244,11 @@ const ChangeRequestDetailPage: React.FC = () => {
         {activeTab === 1 && (
           <Box>
             {allChanges.map((item, idx) => (
-              <Paper key={idx} variant="outlined" sx={{ mb: 2, overflow: 'hidden' }}>
+              <Paper
+                key={idx}
+                variant="outlined"
+                sx={{ mb: 2, overflow: 'hidden' }}
+              >
                 {/* File header */}
                 <Box
                   sx={{
@@ -1150,7 +1262,10 @@ const ChangeRequestDetailPage: React.FC = () => {
                     gap: 1,
                   }}
                 >
-                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontFamily: 'monospace', fontWeight: 600 }}
+                  >
                     {item.table}/{item.targetId}
                   </Typography>
                   <Chip
@@ -1240,9 +1355,11 @@ const ChangeRequestDetailPage: React.FC = () => {
                           '&:hover': { bgcolor: 'action.hover' },
                           bgcolor:
                             change.operation === 'added'
-                              ? (theme) => alpha(theme.palette.success.main, 0.05)
+                              ? (theme) =>
+                                  alpha(theme.palette.success.main, 0.05)
                               : change.operation === 'removed'
-                                ? (theme) => alpha(theme.palette.error.main, 0.05)
+                                ? (theme) =>
+                                    alpha(theme.palette.error.main, 0.05)
                                 : 'transparent',
                         }}
                       >
@@ -1270,14 +1387,20 @@ const ChangeRequestDetailPage: React.FC = () => {
                             maxWidth: 0,
                             bgcolor:
                               change.operation !== 'added'
-                                ? (theme) => alpha(theme.palette.error.main, 0.08)
+                                ? (theme) =>
+                                    alpha(theme.palette.error.main, 0.08)
                                 : 'transparent',
-                            color: change.operation !== 'added' ? 'error.main' : 'text.disabled',
+                            color:
+                              change.operation !== 'added'
+                                ? 'error.main'
+                                : 'text.disabled',
                             borderRight: 1,
                             borderColor: 'divider',
                           }}
                         >
-                          {change.operation === 'added' ? '-' : formatValue(change.oldValue)}
+                          {change.operation === 'added'
+                            ? '-'
+                            : formatValue(change.oldValue)}
                         </Box>
                         <Box
                           component="td"
@@ -1290,13 +1413,18 @@ const ChangeRequestDetailPage: React.FC = () => {
                             maxWidth: 0,
                             bgcolor:
                               change.operation !== 'removed'
-                                ? (theme) => alpha(theme.palette.success.main, 0.08)
+                                ? (theme) =>
+                                    alpha(theme.palette.success.main, 0.08)
                                 : 'transparent',
                             color:
-                              change.operation !== 'removed' ? 'success.main' : 'text.disabled',
+                              change.operation !== 'removed'
+                                ? 'success.main'
+                                : 'text.disabled',
                           }}
                         >
-                          {change.operation === 'removed' ? '-' : formatValue(change.newValue)}
+                          {change.operation === 'removed'
+                            ? '-'
+                            : formatValue(change.newValue)}
                         </Box>
                       </Box>
                     ))}

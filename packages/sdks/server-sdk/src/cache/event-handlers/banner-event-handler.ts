@@ -21,7 +21,11 @@ export class BannerEventHandler implements IEventHandler {
       case 'banner.created':
       case 'banner.updated': {
         const status = event.data.status as string | undefined;
-        await this.cacheManager.updateSingleBanner(String(event.data.id), environmentId, status);
+        await this.cacheManager.updateSingleBanner(
+          String(event.data.id),
+          environmentId,
+          status
+        );
         break;
       }
       case 'banner.deleted':

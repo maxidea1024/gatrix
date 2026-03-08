@@ -29,7 +29,10 @@ export class WhitelistService {
   ): Promise<WhitelistListResponse> {
     try {
       const page = parseInt(pagination.page?.toString() || '1');
-      const limit = Math.min(parseInt(pagination.limit?.toString() || '10'), 100); // Max 100 items per page
+      const limit = Math.min(
+        parseInt(pagination.limit?.toString() || '10'),
+        100
+      ); // Max 100 items per page
 
       const result = await WhitelistModel.findAll(page, limit, {
         ...filters,
@@ -43,7 +46,10 @@ export class WhitelistService {
     }
   }
 
-  static async getWhitelistById(id: string, environmentId: string): Promise<Whitelist> {
+  static async getWhitelistById(
+    id: string,
+    environmentId: string
+  ): Promise<Whitelist> {
     try {
       const whitelist = await WhitelistModel.findById(id, environmentId);
       if (!whitelist) {
@@ -84,7 +90,9 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+        );
 
         await pubSubService.publishSDKEvent(
           {
@@ -121,8 +129,10 @@ export class WhitelistService {
       const existing = await this.getWhitelistById(id, environmentId);
 
       // Validate dates if provided
-      const startDate = data.startDate !== undefined ? data.startDate : existing.startDate;
-      const endDate = data.endDate !== undefined ? data.endDate : existing.endDate;
+      const startDate =
+        data.startDate !== undefined ? data.startDate : existing.startDate;
+      const endDate =
+        data.endDate !== undefined ? data.endDate : existing.endDate;
 
       if (startDate && endDate && startDate > endDate) {
         throw new GatrixError('Start date cannot be after end date', 400);
@@ -141,7 +151,9 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+        );
 
         await pubSubService.publishSDKEvent(
           {
@@ -168,7 +180,10 @@ export class WhitelistService {
     }
   }
 
-  static async deleteWhitelist(id: string, environmentId: string): Promise<void> {
+  static async deleteWhitelist(
+    id: string,
+    environmentId: string
+  ): Promise<void> {
     try {
       // Check if whitelist exists
       const existing = await this.getWhitelistById(id, environmentId);
@@ -186,7 +201,9 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+        );
 
         await pubSubService.publishSDKEvent(
           {
@@ -222,7 +239,10 @@ export class WhitelistService {
       }
 
       if (entries.length > 1000) {
-        throw new GatrixError('Cannot create more than 1000 entries at once', 400);
+        throw new GatrixError(
+          'Cannot create more than 1000 entries at once',
+          400
+        );
       }
 
       // Validate each entry
@@ -231,8 +251,15 @@ export class WhitelistService {
           throw new GatrixError('All entries must have a nickname', 400);
         }
 
-        if (entry.startDate && entry.endDate && entry.startDate > entry.endDate) {
-          throw new GatrixError(`Invalid date range for entry: ${entry.nickname}`, 400);
+        if (
+          entry.startDate &&
+          entry.endDate &&
+          entry.startDate > entry.endDate
+        ) {
+          throw new GatrixError(
+            `Invalid date range for entry: ${entry.nickname}`,
+            400
+          );
         }
       }
 
@@ -247,7 +274,10 @@ export class WhitelistService {
         isEnabled: true,
       }));
 
-      const createdCount = await WhitelistModel.bulkCreate(createData, environmentId);
+      const createdCount = await WhitelistModel.bulkCreate(
+        createData,
+        environmentId
+      );
 
       logger.info('Bulk whitelist creation completed:', {
         environmentId,
@@ -258,7 +288,9 @@ export class WhitelistService {
 
       try {
         // Publish event for SDK update (using 0 as ID to signify bulk change)
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+        );
 
         await pubSubService.publishSDKEvent(
           {
@@ -271,7 +303,10 @@ export class WhitelistService {
           { environmentId }
         );
       } catch (eventError) {
-        logger.warn('Failed to invalidate whitelist ETag cache after bulk create:', eventError);
+        logger.warn(
+          'Failed to invalidate whitelist ETag cache after bulk create:',
+          eventError
+        );
       }
 
       return createdCount;
@@ -318,7 +353,9 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
+        await pubSubService.invalidateKey(
+          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+        );
 
         await pubSubService.publishSDKEvent(
           {
@@ -369,13 +406,20 @@ export class WhitelistService {
 
       // Check account whitelist
       if (accountId) {
-        const accountWhitelists = await WhitelistModel.findByAccountId(accountId, environmentId);
+        const accountWhitelists = await WhitelistModel.findByAccountId(
+          accountId,
+          environmentId
+        );
         const now = new Date();
 
         for (const whitelist of accountWhitelists) {
           // Check if whitelist is currently active
-          const startDate = whitelist.startDate ? new Date(whitelist.startDate) : null;
-          const endDate = whitelist.endDate ? new Date(whitelist.endDate) : null;
+          const startDate = whitelist.startDate
+            ? new Date(whitelist.startDate)
+            : null;
+          const endDate = whitelist.endDate
+            ? new Date(whitelist.endDate)
+            : null;
 
           if (startDate && startDate > now) continue;
           if (endDate && endDate < now) continue;
@@ -408,8 +452,12 @@ export class WhitelistService {
         for (const ipWhitelist of ipWhitelists.ipWhitelists) {
           if (!ipWhitelist.isEnabled) continue;
 
-          const startDate = ipWhitelist.startDate ? new Date(ipWhitelist.startDate) : null;
-          const endDate = ipWhitelist.endDate ? new Date(ipWhitelist.endDate) : null;
+          const startDate = ipWhitelist.startDate
+            ? new Date(ipWhitelist.startDate)
+            : null;
+          const endDate = ipWhitelist.endDate
+            ? new Date(ipWhitelist.endDate)
+            : null;
 
           if (startDate && startDate > now) continue;
           if (endDate && endDate < now) continue;

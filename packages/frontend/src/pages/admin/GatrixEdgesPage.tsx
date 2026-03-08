@@ -39,7 +39,9 @@ import {
 
 import { useTranslation } from 'react-i18next';
 import Editor from '@monaco-editor/react';
-import serviceDiscoveryService, { ServiceInstance } from '../../services/serviceDiscoveryService';
+import serviceDiscoveryService, {
+  ServiceInstance,
+} from '../../services/serviceDiscoveryService';
 import { RelativeTime } from '../../components/common/RelativeTime';
 import { useDebounce } from '../../hooks/useDebounce';
 import SearchTextField from '../../components/common/SearchTextField';
@@ -70,7 +72,9 @@ const GatrixEdgesPage: React.FC = () => {
   const [services, setServices] = useState<ServiceInstance[]>([]);
   const [groups, setGroups] = useState<EdgeGroup[]>([]);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
-  const [expandedInstances, setExpandedInstances] = useState<Set<string>>(new Set());
+  const [expandedInstances, setExpandedInstances] = useState<Set<string>>(
+    new Set()
+  );
 
   // Grouping - support multiple levels (cloud-related only)
   // Load from localStorage or default to empty array
@@ -82,7 +86,9 @@ const GatrixEdgesPage: React.FC = () => {
         // Validate that parsed values are valid GroupingField types
         if (
           Array.isArray(parsed) &&
-          parsed.every((item) => ['cloudProvider', 'cloudRegion'].includes(item))
+          parsed.every((item) =>
+            ['cloudProvider', 'cloudRegion'].includes(item)
+          )
         ) {
           return parsed;
         }
@@ -121,7 +127,14 @@ const GatrixEdgesPage: React.FC = () => {
     }
 
     // Search: case-insensitive
-    const matches = model.findMatches(debouncedJsonSearchQuery, false, false, false, null, true);
+    const matches = model.findMatches(
+      debouncedJsonSearchQuery,
+      false,
+      false,
+      false,
+      null,
+      true
+    );
     setJsonSearchMatches(matches);
     setJsonSearchIndex(0);
 
@@ -141,7 +154,9 @@ const GatrixEdgesPage: React.FC = () => {
 
   const handlePrevMatch = () => {
     if (jsonSearchMatches.length === 0) return;
-    const prev = (jsonSearchIndex - 1 + jsonSearchMatches.length) % jsonSearchMatches.length;
+    const prev =
+      (jsonSearchIndex - 1 + jsonSearchMatches.length) %
+      jsonSearchMatches.length;
     setJsonSearchIndex(prev);
     editorRef.current.setSelection(jsonSearchMatches[prev].range);
     editorRef.current.revealRangeInCenter(jsonSearchMatches[prev].range);
@@ -228,12 +243,20 @@ const GatrixEdgesPage: React.FC = () => {
           .map(([name, instances]) => {
             const group: EdgeGroup = {
               id: `${currentLevel} -${name} `,
-              name: name === 'unknown' ? `(${getGroupingLabel(currentLevel)} N / A)` : name,
+              name:
+                name === 'unknown'
+                  ? `(${getGroupingLabel(currentLevel)} N / A)`
+                  : name,
               instances:
                 nextLevels.length === 0
-                  ? instances.sort((a, b) => a.instanceId.localeCompare(b.instanceId))
+                  ? instances.sort((a, b) =>
+                      a.instanceId.localeCompare(b.instanceId)
+                    )
                   : [],
-              children: nextLevels.length > 0 ? buildGroups(instances, nextLevels) : undefined,
+              children:
+                nextLevels.length > 0
+                  ? buildGroups(instances, nextLevels)
+                  : undefined,
             };
             return group;
           });
@@ -259,7 +282,10 @@ const GatrixEdgesPage: React.FC = () => {
     setFullJsonLoading(instance.instanceId);
     try {
       const serviceType = instance.labels.service;
-      const result = await serviceDiscoveryService.getCacheStatus(serviceType, instance.instanceId);
+      const result = await serviceDiscoveryService.getCacheStatus(
+        serviceType,
+        instance.instanceId
+      );
       openJsonDialog(result, t('gatrixEdges.cacheStatus'));
     } catch (err: any) {
       console.error('Failed to fetch full cache status:', err);
@@ -289,7 +315,10 @@ const GatrixEdgesPage: React.FC = () => {
   // Save grouping levels to localStorage whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem('gatrixEdges.groupingLevels', JSON.stringify(groupingLevels));
+      localStorage.setItem(
+        'gatrixEdges.groupingLevels',
+        JSON.stringify(groupingLevels)
+      );
     } catch (e) {
       console.warn('Failed to save grouping levels to localStorage:', e);
     }
@@ -336,9 +365,9 @@ const GatrixEdgesPage: React.FC = () => {
 
   const addGroupingLevel = () => {
     const usedLevels = new Set(groupingLevels);
-    const available = (['cloudProvider', 'cloudRegion'] as GroupingField[]).find(
-      (o) => !usedLevels.has(o)
-    );
+    const available = (
+      ['cloudProvider', 'cloudRegion'] as GroupingField[]
+    ).find((o) => !usedLevels.has(o));
     if (available) {
       setGroupingLevels([...groupingLevels, available]);
     }
@@ -374,7 +403,10 @@ const GatrixEdgesPage: React.FC = () => {
       const text = JSON.stringify(jsonDialogData, null, 2);
       copyToClipboardWithNotification(
         text,
-        () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+        () =>
+          enqueueSnackbar(t('common.copiedToClipboard'), {
+            variant: 'success',
+          }),
         () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
       );
     }
@@ -382,7 +414,14 @@ const GatrixEdgesPage: React.FC = () => {
 
   // Render instance details
   const renderInstanceDetails = (instance: ServiceInstance) => {
-    const { ports, labels, externalAddress, internalAddress, createdAt, updatedAt } = instance;
+    const {
+      ports,
+      labels,
+      externalAddress,
+      internalAddress,
+      createdAt,
+      updatedAt,
+    } = instance;
 
     return (
       <Box sx={{ p: 2, bgcolor: theme.palette.action.hover }}>
@@ -395,13 +434,18 @@ const GatrixEdgesPage: React.FC = () => {
             mb: 1,
           }}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 'bold', color: 'text.secondary' }}
+          >
             {t('gatrixEdges.basicInfo')}
           </Typography>
           <Tooltip title={t('gatrixEdges.viewJson')} leaveDelay={0}>
             <IconButton
               size="small"
-              onClick={() => openJsonDialog(instance, t('gatrixEdges.basicInfo'))}
+              onClick={() =>
+                openJsonDialog(instance, t('gatrixEdges.basicInfo'))
+              }
             >
               <CodeIcon sx={{ fontSize: 16 }} />
             </IconButton>
@@ -525,7 +569,9 @@ const GatrixEdgesPage: React.FC = () => {
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
               {Object.entries(labels)
-                .filter(([k, v]) => v && k !== 'appVersion' && k !== 'sdkVersion')
+                .filter(
+                  ([k, v]) => v && k !== 'appVersion' && k !== 'sdkVersion'
+                )
                 .map(([key, value]) => (
                   <Chip
                     key={key}
@@ -600,12 +646,18 @@ const GatrixEdgesPage: React.FC = () => {
         onClick={() => toggleInstance(instance.instanceId)}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <CircleIcon sx={{ fontSize: 12, color: getStatusColor(instance.status) }} />
+          <CircleIcon
+            sx={{ fontSize: 12, color: getStatusColor(instance.status) }}
+          />
           <Box>
             <Typography variant="body2" fontWeight="bold">
               {instance.hostname}
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ fontFamily: 'monospace' }}
+            >
               ID: {instance.instanceId}
             </Typography>
           </Box>
@@ -622,7 +674,9 @@ const GatrixEdgesPage: React.FC = () => {
           ) : (
             <Chip
               label={
-                instance.status === 'no-response' ? t('gatrixEdges.noResponse') : instance.status
+                instance.status === 'no-response'
+                  ? t('gatrixEdges.noResponse')
+                  : instance.status
               }
               size="small"
               color={instance.status === 'no-response' ? 'error' : 'default'}
@@ -672,7 +726,10 @@ const GatrixEdgesPage: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              bgcolor: depth === 0 ? theme.palette.background.paper : theme.palette.action.hover,
+              bgcolor:
+                depth === 0
+                  ? theme.palette.background.paper
+                  : theme.palette.action.hover,
               cursor: 'pointer',
               '&:hover': {
                 bgcolor: theme.palette.action.selected,
@@ -702,14 +759,19 @@ const GatrixEdgesPage: React.FC = () => {
                   sx={{ height: 20, fontSize: '0.7rem' }}
                 />
               )}
-              {expandedGroups.has(group.id) ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              {expandedGroups.has(group.id) ? (
+                <KeyboardArrowUp />
+              ) : (
+                <KeyboardArrowDown />
+              )}
             </Box>
           </Box>
 
           <Collapse in={expandedGroups.has(group.id)}>
             <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
               {/* Child groups */}
-              {hasChildren && group.children!.map((child) => renderGroup(child, depth + 1))}
+              {hasChildren &&
+                group.children!.map((child) => renderGroup(child, depth + 1))}
 
               {/* Instances */}
               {hasInstances && (
@@ -735,7 +797,11 @@ const GatrixEdgesPage: React.FC = () => {
   };
 
   // Tree item renderer for flat instances
-  const renderInstanceTreeItem = (instance: ServiceInstance, index: number, total: number) => {
+  const renderInstanceTreeItem = (
+    instance: ServiceInstance,
+    index: number,
+    total: number
+  ) => {
     const isFirst = index === 0;
     const isLast = index === total - 1;
     const isOnly = total === 1;
@@ -874,7 +940,11 @@ const GatrixEdgesPage: React.FC = () => {
           </Box>
           <Button
             startIcon={
-              isRefreshing ? <CircularProgress size={20} color="inherit" /> : <RefreshIcon />
+              isRefreshing ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                <RefreshIcon />
+              )
             }
             variant="contained"
             onClick={() => fetchServices(true)}
@@ -892,7 +962,10 @@ const GatrixEdgesPage: React.FC = () => {
             gap: 1,
             py: 1.5,
             px: 2,
-            bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+            bgcolor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.02)'
+                : 'rgba(0,0,0,0.02)',
             borderRadius: 0,
             border: `1px solid ${theme.palette.divider} `,
           }}
@@ -953,7 +1026,10 @@ const GatrixEdgesPage: React.FC = () => {
                 }}
                 renderValue={() => (
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ fontWeight: 600, color: 'primary.main' }}
+                    >
                       {t('gatrixEdges.addGroupBy')}
                     </Typography>
                   </Box>
@@ -1096,7 +1172,9 @@ const GatrixEdgesPage: React.FC = () => {
               <Box sx={{ display: 'flex', gap: 0, pb: 2, m: '0 auto' }}>
                 {[...services]
                   .sort((a, b) => a.instanceId.localeCompare(b.instanceId))
-                  .map((service, index, arr) => renderInstanceTreeItem(service, index, arr.length))}
+                  .map((service, index, arr) =>
+                    renderInstanceTreeItem(service, index, arr.length)
+                  )}
               </Box>
             ) : (
               groups.map((group, index) => (
@@ -1129,7 +1207,9 @@ const GatrixEdgesPage: React.FC = () => {
 
             {services.length === 0 && !initialLoading && (
               <Box sx={{ p: 4, textAlign: 'center' }}>
-                <Typography color="text.secondary">{t('gatrixEdges.noEdges')}</Typography>
+                <Typography color="text.secondary">
+                  {t('gatrixEdges.noEdges')}
+                </Typography>
               </Box>
             )}
           </Box>
@@ -1189,7 +1269,9 @@ const GatrixEdgesPage: React.FC = () => {
             </Typography>
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}
+          >
             <SearchTextField
               value={jsonSearchQuery}
               onChange={setJsonSearchQuery}
@@ -1220,10 +1302,18 @@ const GatrixEdgesPage: React.FC = () => {
                   {jsonSearchIndex + 1} / {jsonSearchMatches.length}
                 </Typography>
                 <Divider orientation="vertical" flexItem sx={{ my: 0.5 }} />
-                <IconButton size="small" onClick={handlePrevMatch} sx={{ p: 0.5 }}>
+                <IconButton
+                  size="small"
+                  onClick={handlePrevMatch}
+                  sx={{ p: 0.5 }}
+                >
                   <KeyboardArrowUp fontSize="small" />
                 </IconButton>
-                <IconButton size="small" onClick={handleNextMatch} sx={{ p: 0.5 }}>
+                <IconButton
+                  size="small"
+                  onClick={handleNextMatch}
+                  sx={{ p: 0.5 }}
+                >
                   <KeyboardArrowDown fontSize="small" />
                 </IconButton>
               </Box>

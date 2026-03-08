@@ -38,7 +38,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
   constructor(hosts: string) {
     if (!Etcd3) {
-      throw new Error('etcd3 module is not installed. Install with: npm install etcd3');
+      throw new Error(
+        'etcd3 module is not installed. Install with: npm install etcd3'
+      );
     }
 
     // Parse hosts string and convert to etcd3 format
@@ -91,7 +93,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         labels: instance.labels,
       });
     } catch (error) {
-      logger.error(`Failed to register service ${serviceType}:${instance.instanceId}:`, error);
+      logger.error(
+        `Failed to register service ${serviceType}:${instance.instanceId}:`,
+        error
+      );
       throw error;
     }
   }
@@ -105,7 +110,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     try {
       const value = await this.client.get(key).string();
       if (!value) {
-        logger.warn(`Service not found for heartbeat: ${serviceType}:${instanceId}`);
+        logger.warn(
+          `Service not found for heartbeat: ${serviceType}:${instanceId}`
+        );
         return;
       }
 
@@ -172,7 +179,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           await this.client.delete().key(key);
         }
 
-        logger.info(`Service deleted permanently: ${serviceType}:${instanceId}`);
+        logger.info(
+          `Service deleted permanently: ${serviceType}:${instanceId}`
+        );
       } else {
         // Graceful unregister
         // Move to Redis as inactive with TTL, then remove from Etcd
@@ -227,7 +236,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         }
       }
     } catch (error) {
-      logger.error(`Failed to unregister service ${serviceType}:${instanceId}:`, error);
+      logger.error(
+        `Failed to unregister service ${serviceType}:${instanceId}:`,
+        error
+      );
       throw error;
     }
   }
@@ -247,7 +259,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       if (!value) {
         if (autoRegisterIfMissing) {
           // Auto-register: try to restore from Redis mirror first to preserve externalAddress, hostname, ports, etc.
-          const mirrorData = await this.getMirrorFromRedis(serviceType, input.instanceId);
+          const mirrorData = await this.getMirrorFromRedis(
+            serviceType,
+            input.instanceId
+          );
           const now = new Date().toISOString();
 
           let newInstance: ServiceInstance;
@@ -259,10 +274,13 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
               updatedAt: now,
               stats: input.stats || mirrorData.stats || {},
             };
-            logger.info(`Service auto-registered from mirror: ${serviceType}:${input.instanceId}`, {
-              externalAddress: newInstance.externalAddress,
-              hostname: newInstance.hostname,
-            });
+            logger.info(
+              `Service auto-registered from mirror: ${serviceType}:${input.instanceId}`,
+              {
+                externalAddress: newInstance.externalAddress,
+                hostname: newInstance.hostname,
+              }
+            );
           } else {
             // Create minimal instance (no mirror available)
             newInstance = {
@@ -277,7 +295,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
               updatedAt: now,
               stats: input.stats || {},
             };
-            logger.info(`Service auto-registered (no mirror): ${serviceType}:${input.instanceId}`);
+            logger.info(
+              `Service auto-registered (no mirror): ${serviceType}:${input.instanceId}`
+            );
           }
 
           // Create new lease with configured TTL
@@ -293,7 +313,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
           return;
         } else {
-          const error: any = new Error(`Service ${serviceType}:${input.instanceId} not found`);
+          const error: any = new Error(
+            `Service ${serviceType}:${input.instanceId} not found`
+          );
           error.status = 404;
           throw error;
         }
@@ -372,7 +394,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           }
         } else {
           // No lease in memory (backend restarted), create new lease with TTL
-          logger.debug(`Creating new lease for ${leaseKey} (no existing lease in memory)`);
+          logger.debug(
+            `Creating new lease for ${leaseKey} (no existing lease in memory)`
+          );
           const newLease = this.client.lease(heartbeatTTL + 60, {
             autoKeepAlive: false,
           });
@@ -388,17 +412,25 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         );
       }
     } catch (error) {
-      logger.error(`Failed to update status for ${serviceType}:${input.instanceId}:`, error);
+      logger.error(
+        `Failed to update status for ${serviceType}:${input.instanceId}:`,
+        error
+      );
       throw error;
     }
   }
 
-  async getServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
+  async getServices(
+    serviceType?: string,
+    serviceGroup?: string
+  ): Promise<ServiceInstance[]> {
     let instances: ServiceInstance[] = [];
 
     try {
       // 1. Get Active services from Etcd
-      const prefix = serviceType ? this.getTypePrefix(serviceType) : '/services/';
+      const prefix = serviceType
+        ? this.getTypePrefix(serviceType)
+        : '/services/';
       const keys = await this.client.getAll().prefix(prefix).keys();
 
       for (const key of keys) {
@@ -418,7 +450,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
       // Filter by serviceGroup if specified
       if (serviceGroup) {
-        instances = instances.filter((instance) => instance.labels.group === serviceGroup);
+        instances = instances.filter(
+          (instance) => instance.labels.group === serviceGroup
+        );
       }
 
       // Sort by createdAt (ascending - oldest first, newest last)
@@ -444,7 +478,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       let inactiveServices = await this.getInactiveFromRedis(serviceType);
 
       if (serviceGroup) {
-        inactiveServices = inactiveServices.filter((s) => s.labels?.group === serviceGroup);
+        inactiveServices = inactiveServices.filter(
+          (s) => s.labels?.group === serviceGroup
+        );
       }
 
       return inactiveServices;
@@ -454,7 +490,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     }
   }
 
-  async getService(instanceId: string, serviceType: string): Promise<ServiceInstance | null> {
+  async getService(
+    instanceId: string,
+    serviceType: string
+  ): Promise<ServiceInstance | null> {
     const key = this.getInstanceKey(serviceType, instanceId);
 
     try {
@@ -467,7 +506,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       }
       return data;
     } catch (error) {
-      logger.error(`Failed to get service ${serviceType}:${instanceId}:`, error);
+      logger.error(
+        `Failed to get service ${serviceType}:${instanceId}:`,
+        error
+      );
       throw error;
     }
   }
@@ -532,20 +574,27 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
                 instanceData = JSON.parse(previous.value.toString());
                 instanceData.status = 'no-response';
                 instanceData.updatedAt = now;
-                logger.info(`Service disappeared (using etcd prevKv): ${serviceType}:${id}`);
+                logger.info(
+                  `Service disappeared (using etcd prevKv): ${serviceType}:${id}`
+                );
               } catch (parseError) {
                 logger.warn(
                   `Failed to parse previous for ${serviceType}:${id}, trying Redis mirror`
                 );
                 // Try to get from Redis mirror
-                const mirrorData = await this.getMirrorFromRedis(serviceType, id);
+                const mirrorData = await this.getMirrorFromRedis(
+                  serviceType,
+                  id
+                );
                 if (mirrorData) {
                   instanceData = {
                     ...mirrorData,
                     status: 'no-response',
                     updatedAt: now,
                   };
-                  logger.info(`Service disappeared (using Redis mirror): ${serviceType}:${id}`);
+                  logger.info(
+                    `Service disappeared (using Redis mirror): ${serviceType}:${id}`
+                  );
                 } else {
                   instanceData = {
                     instanceId: id,
@@ -674,7 +723,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           }
 
           const leaseKey = `${service.labels.service}:${service.instanceId}`;
-          const key = this.getInstanceKey(service.labels.service, service.instanceId);
+          const key = this.getInstanceKey(
+            service.labels.service,
+            service.instanceId
+          );
 
           logger.warn(
             `Service no-response detected (no heartbeat for ${diffSeconds.toFixed(
@@ -773,7 +825,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
             instance: service,
           });
 
-          logger.info(`🗑️ Cleaned up inactive service: ${serviceType}:${instanceId}`);
+          logger.info(
+            `🗑️ Cleaned up inactive service: ${serviceType}:${instanceId}`
+          );
         } catch (error) {
           logger.error(
             `Failed to cleanup service ${service.labels.service}:${service.instanceId}:`,
@@ -782,7 +836,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         }
       }
 
-      logger.info(`✅ Cleanup complete: ${totalDeletedCount} inactive services deleted`);
+      logger.info(
+        `✅ Cleanup complete: ${totalDeletedCount} inactive services deleted`
+      );
     } catch (error) {
       logger.error('Failed to cleanup inactive services:', error);
     }
@@ -905,7 +961,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
    */
   private async saveMirrorToRedis(instance: ServiceInstance): Promise<void> {
     // Only mirror if inactiveKeepTTL > 0 (inactive services should be displayed)
-    const inactiveKeepTTL = parseInt(process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || '60', 10);
+    const inactiveKeepTTL = parseInt(
+      process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || '60',
+      10
+    );
     if (inactiveKeepTTL <= 0) return;
 
     const client = redisClient.getClient();
@@ -939,7 +998,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       try {
         return JSON.parse(value);
       } catch (e) {
-        logger.warn(`Failed to parse mirror data for ${serviceType}:${instanceId}`, e);
+        logger.warn(
+          `Failed to parse mirror data for ${serviceType}:${instanceId}`,
+          e
+        );
       }
     }
     return null;
@@ -948,7 +1010,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
   /**
    * Delete mirrored service data from Redis.
    */
-  private async deleteMirrorFromRedis(serviceType: string, instanceId: string): Promise<void> {
+  private async deleteMirrorFromRedis(
+    serviceType: string,
+    instanceId: string
+  ): Promise<void> {
     const client = redisClient.getClient();
     if (!client) return;
 
@@ -962,17 +1027,25 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     if (!client) return;
 
     // Read TTL directly from environment variable to avoid config initialization issues
-    const ttl = parseInt(process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || '60', 10);
+    const ttl = parseInt(
+      process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || '60',
+      10
+    );
     const key = `service-discovery:inactive:${instance.labels.service}:${instance.instanceId}`;
 
     await client.set(key, JSON.stringify(instance), 'EX', ttl);
     logger.debug(`Saved inactive service to Redis with TTL ${ttl}s: ${key}`);
 
     // Also delete the mirror since service is now inactive
-    await this.deleteMirrorFromRedis(instance.labels.service, instance.instanceId);
+    await this.deleteMirrorFromRedis(
+      instance.labels.service,
+      instance.instanceId
+    );
   }
 
-  private async getInactiveFromRedis(serviceType?: string): Promise<ServiceInstance[]> {
+  private async getInactiveFromRedis(
+    serviceType?: string
+  ): Promise<ServiceInstance[]> {
     const client = redisClient.getClient();
     if (!client) return [];
 
@@ -1016,11 +1089,14 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
   }
 
   private broadcastEvent(event: any) {
-    logger.info(`📢 Broadcasting event to ${this.watchCallbacks.size} SSE clients:`, {
-      type: event.type,
-      instanceId: event.instance?.instanceId,
-      status: event.instance?.status,
-    });
+    logger.info(
+      `📢 Broadcasting event to ${this.watchCallbacks.size} SSE clients:`,
+      {
+        type: event.type,
+        instanceId: event.instance?.instanceId,
+        status: event.instance?.status,
+      }
+    );
     this.watchCallbacks.forEach((cb) => {
       try {
         cb(event);
@@ -1057,11 +1133,15 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
             // Check if this is an inactive service key
             // Format: service-discovery:inactive:{serviceType}:{instanceId}
             if (message.startsWith('service-discovery:inactive:')) {
-              const parts = message.replace('service-discovery:inactive:', '').split(':');
+              const parts = message
+                .replace('service-discovery:inactive:', '')
+                .split(':');
               if (parts.length === 2) {
                 const [serviceType, instanceId] = parts;
 
-                logger.info(`Inactive service TTL expired: ${serviceType}:${instanceId}`);
+                logger.info(
+                  `Inactive service TTL expired: ${serviceType}:${instanceId}`
+                );
 
                 // Broadcast delete event to SSE clients
                 this.broadcastEvent({
@@ -1081,7 +1161,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
               }
             }
           } catch (error) {
-            logger.error('Failed to handle Redis keyspace expired event:', error);
+            logger.error(
+              'Failed to handle Redis keyspace expired event:',
+              error
+            );
           }
         }
       );
@@ -1089,7 +1172,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       // Subscribe to keyspace expired events
       await this.redisKeyspaceSubscriber.psubscribe('__keyevent@0__:expired');
 
-      logger.info('Redis keyspace subscription started for inactive service expiration');
+      logger.info(
+        'Redis keyspace subscription started for inactive service expiration'
+      );
     } catch (error) {
       logger.error('Failed to setup Redis keyspace subscription:', error);
     }

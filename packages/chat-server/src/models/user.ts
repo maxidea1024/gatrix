@@ -21,10 +21,14 @@ export class UserModel {
   /**
    * Gatrix User ID로 Chat User 조회
    */
-  static async findByGatrixUserId(gatrixUserId: number): Promise<ChatUser | null> {
+  static async findByGatrixUserId(
+    gatrixUserId: number
+  ): Promise<ChatUser | null> {
     try {
       const db = databaseManager.getDatabase();
-      const user = await db('chat_users').where('gatrixUserId', gatrixUserId).first();
+      const user = await db('chat_users')
+        .where('gatrixUserId', gatrixUserId)
+        .first();
 
       if (!user) {
         logger.warn(`Chat user not found for Gatrix User ID: ${gatrixUserId}`);
@@ -69,16 +73,18 @@ export class UserModel {
 
       if (existingUser) {
         // 업데이트
-        await db('chat_users').where('gatrixUserId', userData.gatrixUserId).update({
-          email: userData.email,
-          name: userData.name,
-          avatarUrl: userData.avatarUrl,
-          role: userData.role,
-          status: userData.status,
-          lastLoginAt: userData.lastLoginAt,
-          lastActivityAt: userData.lastActivityAt,
-          updatedAt: new Date(),
-        });
+        await db('chat_users')
+          .where('gatrixUserId', userData.gatrixUserId)
+          .update({
+            email: userData.email,
+            name: userData.name,
+            avatarUrl: userData.avatarUrl,
+            role: userData.role,
+            status: userData.status,
+            lastLoginAt: userData.lastLoginAt,
+            lastActivityAt: userData.lastActivityAt,
+            updatedAt: new Date(),
+          });
 
         return await this.findByGatrixUserId(userData.gatrixUserId);
       } else {
@@ -125,7 +131,9 @@ export class UserModel {
   static async findActiveUsers(): Promise<ChatUser[]> {
     try {
       const db = databaseManager.getDatabase();
-      const users = await db('chat_users').where('status', 'active').orderBy('name');
+      const users = await db('chat_users')
+        .where('status', 'active')
+        .orderBy('name');
 
       return users;
     } catch (error) {

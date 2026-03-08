@@ -19,11 +19,19 @@ export class SlackAddon extends Addon {
     parameters: Record<string, any>,
     integrationId: string
   ): Promise<void> {
-    const { url, username, emojiIcon, defaultChannel, customHeaders } = parameters;
+    const { url, username, emojiIcon, defaultChannel, customHeaders } =
+      parameters;
 
     if (!url) {
-      this.logger.warn(`Missing Slack webhook URL for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing webhook URL');
+      this.logger.warn(
+        `Missing Slack webhook URL for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing webhook URL'
+      );
       return;
     }
 

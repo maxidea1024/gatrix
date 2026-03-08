@@ -23,8 +23,15 @@ export class DingTalkAddon extends Addon {
     const { accessToken, secret } = parameters;
 
     if (!accessToken) {
-      this.logger.warn(`Missing DingTalk access token for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing access token');
+      this.logger.warn(
+        `Missing DingTalk access token for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing access token'
+      );
       return;
     }
 
@@ -33,7 +40,10 @@ export class DingTalkAddon extends Addon {
     if (secret) {
       const timestamp = Date.now();
       const stringToSign = `${timestamp}\n${secret}`;
-      const sign = crypto.createHmac('sha256', secret).update(stringToSign).digest('base64');
+      const sign = crypto
+        .createHmac('sha256', secret)
+        .update(stringToSign)
+        .digest('base64');
 
       url += `&timestamp=${timestamp}&sign=${encodeURIComponent(sign)}`;
     }

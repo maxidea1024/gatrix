@@ -11,9 +11,10 @@ async function createDefaultAdmin() {
     const adminName = config.admin.name;
 
     // Check if admin user already exists
-    const existingAdmin = await database.query('SELECT id FROM g_users WHERE email = ? LIMIT 1', [
-      adminEmail,
-    ]);
+    const existingAdmin = await database.query(
+      'SELECT id FROM g_users WHERE email = ? LIMIT 1',
+      [adminEmail]
+    );
 
     if (existingAdmin.length > 0) {
       logger.info('Default admin user already exists');

@@ -79,7 +79,8 @@ const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({
         border: `1px solid ${theme.palette.mode === 'dark' ? '#444' : '#e0e0e0'}`,
         backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f9f9f9',
         '&:hover': {
-          backgroundColor: theme.palette.mode === 'dark' ? '#353535' : '#f0f0f0',
+          backgroundColor:
+            theme.palette.mode === 'dark' ? '#353535' : '#f0f0f0',
           borderColor: theme.palette.primary.main,
           boxShadow: theme.shadows[3],
         },
@@ -122,7 +123,8 @@ const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({
           onError={handleImageError}
           sx={{
             objectFit: 'cover',
-            backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5',
+            backgroundColor:
+              theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5',
           }}
         />
       )}
@@ -202,7 +204,9 @@ const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({
         )}
 
         {/* 메타데이터 (작성자, 읽기시간) */}
-        {(linkPreview.author || linkPreview.readingTime || linkPreview.publishedTime) && (
+        {(linkPreview.author ||
+          linkPreview.readingTime ||
+          linkPreview.publishedTime) && (
           <>
             <Divider sx={{ mb: 1 }} />
             <Box display="flex" alignItems="center" gap={2} mb={1}>

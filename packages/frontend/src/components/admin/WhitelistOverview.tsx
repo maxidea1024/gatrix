@@ -36,7 +36,9 @@ const WhitelistOverview: React.FC = () => {
   // Test state
   const [testAccountId, setTestAccountId] = useState('');
   const [testIpAddress, setTestIpAddress] = useState('');
-  const [testResult, setTestResult] = useState<WhitelistTestResult | null>(null);
+  const [testResult, setTestResult] = useState<WhitelistTestResult | null>(
+    null
+  );
   const [testing, setTesting] = useState(false);
 
   const handleTest = async () => {
@@ -106,10 +108,14 @@ const WhitelistOverview: React.FC = () => {
                 variant="contained"
                 onClick={handleTest}
                 disabled={testing || (!testAccountId && !testIpAddress)}
-                startIcon={testing ? <CircularProgress size={20} /> : <SearchIcon />}
+                startIcon={
+                  testing ? <CircularProgress size={20} /> : <SearchIcon />
+                }
                 sx={{ height: '56px' }}
               >
-                {testing ? t('common.testing') : t('whitelist.overview.testButton')}
+                {testing
+                  ? t('common.testing')
+                  : t('whitelist.overview.testButton')}
               </Button>
             </Grid>
             <Grid size={{ xs: 12, md: 3 }}>

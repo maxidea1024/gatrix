@@ -32,15 +32,22 @@ async function main() {
 
     // 1. Find 'ts' environment
     console.log('Finding "ts" environment...');
-    const tsEnv = await knex('g_environments').where('environmentName', 'ts').first();
+    const tsEnv = await knex('g_environments')
+      .where('environmentName', 'ts')
+      .first();
     if (!tsEnv) {
       console.error('Error: "ts" environment not found in database.');
       // List all environments to help debugging
-      const allEnvs = await knex('g_environments').select('environmentName', 'id');
+      const allEnvs = await knex('g_environments').select(
+        'environmentName',
+        'id'
+      );
       console.log('Available environments:', allEnvs);
       return;
     }
-    console.log(`Found "ts" environment: ${tsEnv.id} (${tsEnv.environmentName})`);
+    console.log(
+      `Found "ts" environment: ${tsEnv.id} (${tsEnv.environmentName})`
+    );
 
     // 2. Find 'ts-only-server-token'
     console.log('Finding "ts-only-server-token"...');
@@ -50,7 +57,10 @@ async function main() {
     if (!token) {
       console.error('Error: "ts-only-server-token" not found in database.');
       // List all tokens to help debugging
-      const allTokens = await knex('g_api_access_tokens').select('tokenName', 'id');
+      const allTokens = await knex('g_api_access_tokens').select(
+        'tokenName',
+        'id'
+      );
       console.log('Available tokens:', allTokens);
       return;
     }

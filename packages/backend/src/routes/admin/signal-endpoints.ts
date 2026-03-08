@@ -197,7 +197,10 @@ router.post('/:id/tokens', async (req: Request, res: Response) => {
     const plainToken = `gse_${crypto.randomBytes(32).toString('hex')}`;
     // For signal endpoint tokens, we store a simple SHA-256 hash
     // (not bcrypt) because we need to look up by hash for incoming signals
-    const tokenHash = crypto.createHash('sha256').update(plainToken).digest('hex');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(plainToken)
+      .digest('hex');
 
     const token = await SignalEndpointModel.createToken(
       endpointId,
@@ -215,7 +218,9 @@ router.post('/:id/tokens', async (req: Request, res: Response) => {
   } catch (error) {
     logger.error('Error creating signal endpoint token:', error);
     const message =
-      error instanceof Error ? error.message : 'Failed to create signal endpoint token';
+      error instanceof Error
+        ? error.message
+        : 'Failed to create signal endpoint token';
     res.status(400).json({ error: message });
   }
 });
@@ -255,7 +260,11 @@ router.get('/:id/signals', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Signal endpoint not found' });
     }
 
-    const result = await SignalEndpointModel.findSignals(endpointId, limit, offset);
+    const result = await SignalEndpointModel.findSignals(
+      endpointId,
+      limit,
+      offset
+    );
 
     res.json({
       data: result.signals,

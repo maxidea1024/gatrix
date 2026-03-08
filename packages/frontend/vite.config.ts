@@ -17,7 +17,8 @@ process.env.ESBUILD_BINARY_PATH = process.env.ESBUILD_BINARY_PATH || '';
 // In Docker: use service name 'backend-dev'
 // In local: use 'localhost'
 // Note: Vite only exposes VITE_* env vars to the client, but in vite.config.ts we can access all env vars
-const isDocker = process.env.VITE_DOCKER_ENV === 'true' || process.env.DOCKER_ENV === 'true';
+const isDocker =
+  process.env.VITE_DOCKER_ENV === 'true' || process.env.DOCKER_ENV === 'true';
 const backendHost = isDocker ? 'backend-dev' : 'localhost';
 const backendPort = isDocker ? '5000' : process.env.BACKEND_PORT || '45000';
 const frontendPort = parseInt(process.env.FRONTEND_PORT || '43000', 10);
@@ -79,7 +80,10 @@ function staticDocsPlugin(): Plugin {
               '.xml': 'application/xml',
               '.txt': 'text/plain',
             };
-            res.setHeader('Content-Type', contentTypes[ext] || 'application/octet-stream');
+            res.setHeader(
+              'Content-Type',
+              contentTypes[ext] || 'application/octet-stream'
+            );
             fs.createReadStream(fullPath).pipe(res);
             return;
           } else if (fs.existsSync(fullPath + '/index.html')) {
@@ -111,8 +115,14 @@ export default defineConfig({
       '@/services': path.resolve(__dirname, './src/services'),
       '@/contexts': path.resolve(__dirname, './src/contexts'),
       // Resolve @gatrix/shared subpath exports for Vite/Rollup (use TS source directly)
-      '@gatrix/shared/permissions': path.resolve(__dirname, '../shared/src/permissions/index.ts'),
-      '@gatrix/shared/errors': path.resolve(__dirname, '../shared/src/errors/index.ts'),
+      '@gatrix/shared/permissions': path.resolve(
+        __dirname,
+        '../shared/src/permissions/index.ts'
+      ),
+      '@gatrix/shared/errors': path.resolve(
+        __dirname,
+        '../shared/src/errors/index.ts'
+      ),
     },
   },
   server: {
@@ -143,7 +153,9 @@ export default defineConfig({
           'coverage',
           '.turbo',
         ];
-        return ignoredPatterns.some((pattern) => normalizedPath.includes(pattern));
+        return ignoredPatterns.some((pattern) =>
+          normalizedPath.includes(pattern)
+        );
       },
     },
     // Let Vite infer the HMR host from the page URL so LAN clients use the correct IP
@@ -161,14 +173,20 @@ export default defineConfig({
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq, req) => {
             // SSE requests need special headers to keep the stream open
-            if (req.url?.includes('/notifications/sse') || req.url?.includes('/services/sse')) {
+            if (
+              req.url?.includes('/notifications/sse') ||
+              req.url?.includes('/services/sse')
+            ) {
               proxyReq.setHeader('Cache-Control', 'no-cache');
               proxyReq.setHeader('Connection', 'keep-alive');
             }
           });
           proxy.on('proxyRes', (proxyRes, req) => {
             // SSE 응답인 경우 특별 처리
-            if (req.url?.includes('/notifications/sse') || req.url?.includes('/services/sse')) {
+            if (
+              req.url?.includes('/notifications/sse') ||
+              req.url?.includes('/services/sse')
+            ) {
               proxyRes.headers['cache-control'] = 'no-cache';
               proxyRes.headers['connection'] = 'keep-alive';
               proxyRes.headers['content-type'] = 'text/event-stream';
@@ -187,7 +205,9 @@ export default defineConfig({
         bypass: undefined, // Don't bypass any requests
       },
       '/grafana': {
-        target: isDocker ? 'http://gatrix-grafana-dev:3000' : 'http://localhost:44000',
+        target: isDocker
+          ? 'http://gatrix-grafana-dev:3000'
+          : 'http://localhost:44000',
         changeOrigin: true,
         secure: false,
         ws: true, // Enable WebSocket proxying for Grafana Live
@@ -227,7 +247,11 @@ export default defineConfig({
             '@emotion/styled',
           ],
           // MUI data components
-          'vendor-mui-x': ['@mui/x-data-grid', '@mui/x-date-pickers', '@mui/x-date-pickers-pro'],
+          'vendor-mui-x': [
+            '@mui/x-data-grid',
+            '@mui/x-date-pickers',
+            '@mui/x-date-pickers-pro',
+          ],
           // Monaco editor - very large, used only in specific pages
           'vendor-monaco': ['monaco-editor', '@monaco-editor/react'],
           // Chart libraries

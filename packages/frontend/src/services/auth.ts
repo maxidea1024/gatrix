@@ -7,7 +7,10 @@ export class AuthService {
     credentials: LoginCredentials & { rememberMe?: boolean }
   ): Promise<AuthResponse> {
     try {
-      const response = await apiService.post<AuthResponse>('/auth/login', credentials);
+      const response = await apiService.post<AuthResponse>(
+        '/auth/login',
+        credentials
+      );
 
       if (response.success && response.data) {
         // Set the access token for future requests
@@ -49,7 +52,10 @@ export class AuthService {
 
   static async register(data: RegisterData): Promise<User> {
     try {
-      const response = await apiService.post<{ user: User }>('/auth/register', data);
+      const response = await apiService.post<{ user: User }>(
+        '/auth/register',
+        data
+      );
 
       if (response.success && response.data) {
         return response.data.user;
@@ -87,7 +93,9 @@ export class AuthService {
   }
 
   static async refreshToken(): Promise<string> {
-    const response = await apiService.post<{ accessToken: string }>('/auth/refresh');
+    const response = await apiService.post<{ accessToken: string }>(
+      '/auth/refresh'
+    );
 
     if (response.success && response.data) {
       const { accessToken } = response.data;
@@ -126,7 +134,10 @@ export class AuthService {
     if (data.preferredLanguage !== undefined)
       backendData.preferredLanguage = data.preferredLanguage;
 
-    const response = await apiService.put<{ user: User }>('/auth/profile', backendData);
+    const response = await apiService.put<{ user: User }>(
+      '/auth/profile',
+      backendData
+    );
 
     if (response.success && response.data) {
       // Update stored user data
@@ -137,7 +148,10 @@ export class AuthService {
     throw new Error(response.error?.message || 'Failed to update profile');
   }
 
-  static async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  static async changePassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
     const response = await apiService.post('/auth/change-password', {
       currentPassword,
       newPassword,
@@ -284,7 +298,9 @@ export class AuthService {
       });
   }
 
-  static async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
+  static async forgotPassword(
+    email: string
+  ): Promise<{ success: boolean; message: string }> {
     const response = await apiService.post<{
       success: boolean;
       message: string;
@@ -297,7 +313,9 @@ export class AuthService {
     throw new Error(response.error?.message || 'Failed to send reset email');
   }
 
-  static async validateResetToken(token: string): Promise<{ success: boolean; message: string }> {
+  static async validateResetToken(
+    token: string
+  ): Promise<{ success: boolean; message: string }> {
     const response = await apiService.get<{
       success: boolean;
       message: string;
@@ -307,7 +325,9 @@ export class AuthService {
       return response.data;
     }
 
-    throw new Error(response.error?.message || 'Failed to validate reset token');
+    throw new Error(
+      response.error?.message || 'Failed to validate reset token'
+    );
   }
 
   static async resetPassword(

@@ -1,7 +1,13 @@
 import db from '../config/knex';
 import { ulid } from 'ulid';
 
-export type VarValueType = 'string' | 'number' | 'boolean' | 'color' | 'object' | 'array';
+export type VarValueType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'color'
+  | 'object'
+  | 'array';
 
 export interface VarItem {
   id: string;
@@ -69,10 +75,16 @@ export default class VarsModel {
     const results = await db('g_vars as v')
       .leftJoin('g_users as creator', 'v.createdBy', 'creator.id')
       .leftJoin('g_users as updater', 'v.updatedBy', 'updater.id')
-      .select('v.*', 'creator.name as createdByName', 'updater.name as updatedByName')
+      .select(
+        'v.*',
+        'creator.name as createdByName',
+        'updater.name as updatedByName'
+      )
       .where('v.environmentId', environmentId)
       .where((builder) => {
-        builder.where('v.varKey', 'like', 'kv:%').orWhere('v.varKey', 'like', '$%');
+        builder
+          .where('v.varKey', 'like', 'kv:%')
+          .orWhere('v.varKey', 'like', '$%');
       })
       .orderBy('v.varKey', 'asc');
 
@@ -87,11 +99,18 @@ export default class VarsModel {
   /**
    * Get a single KV item by key
    */
-  static async getKV(key: string, environmentId: string): Promise<VarItem | null> {
+  static async getKV(
+    key: string,
+    environmentId: string
+  ): Promise<VarItem | null> {
     const result = await db('g_vars as v')
       .leftJoin('g_users as creator', 'v.createdBy', 'creator.id')
       .leftJoin('g_users as updater', 'v.updatedBy', 'updater.id')
-      .select('v.*', 'creator.name as createdByName', 'updater.name as updatedByName')
+      .select(
+        'v.*',
+        'creator.name as createdByName',
+        'updater.name as updatedByName'
+      )
       .where('v.varKey', key)
       .where('v.environmentId', environmentId)
       .first();
@@ -117,7 +136,9 @@ export default class VarsModel {
     environmentId: string
   ): Promise<VarItem> {
     // Ensure key starts with 'kv:'
-    const key = data.varKey.startsWith('kv:') ? data.varKey : `kv:${data.varKey}`;
+    const key = data.varKey.startsWith('kv:')
+      ? data.varKey
+      : `kv:${data.varKey}`;
 
     await db('g_vars').insert({
       id: ulid(),
@@ -152,7 +173,11 @@ export default class VarsModel {
       throw new Error('KV item not found');
     }
 
-    if (existing.isSystemDefined && data.valueType && data.valueType !== existing.valueType) {
+    if (
+      existing.isSystemDefined &&
+      data.valueType &&
+      data.valueType !== existing.valueType
+    ) {
       throw new Error('Cannot change type of system-defined KV item');
     }
 
@@ -195,7 +220,10 @@ export default class VarsModel {
       throw new Error('Cannot delete system-defined KV item');
     }
 
-    await db('g_vars').where('varKey', key).where('environmentId', environmentId).delete();
+    await db('g_vars')
+      .where('varKey', key)
+      .where('environmentId', environmentId)
+      .delete();
   }
 
   /**
@@ -211,7 +239,8 @@ export default class VarsModel {
     description?: string,
     isCopyable: boolean = true
   ): Promise<void> {
-    const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
+    const fullKey =
+      key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
 
     // Check if item already exists
     const existing = await this.getKV(fullKey, environmentId);

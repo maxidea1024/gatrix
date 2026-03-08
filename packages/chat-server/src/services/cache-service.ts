@@ -45,7 +45,10 @@ export class CacheService extends EventEmitter {
           this.l2Cache = new Keyv({ store: redisStore });
           logger.info('Redis cache layer initialized');
         } catch (redisError) {
-          logger.warn('Redis cache initialization failed, using memory only:', redisError);
+          logger.warn(
+            'Redis cache initialization failed, using memory only:',
+            redisError
+          );
           this.l2Cache = null;
         }
       }
@@ -147,7 +150,11 @@ export class CacheService extends EventEmitter {
   /**
    * Static set method
    */
-  public static async set<T>(key: string, data: T, ttlSeconds?: number): Promise<void> {
+  public static async set<T>(
+    key: string,
+    data: T,
+    ttlSeconds?: number
+  ): Promise<void> {
     const instance = CacheService.getInstance();
     const ttlMs = ttlSeconds ? ttlSeconds * 1000 : undefined;
     instance.set<T>(key, data, ttlMs);

@@ -57,7 +57,8 @@ export const requestLogger = (
     contentType: req.get('Content-Type'),
     contentLength: req.get('Content-Length'),
     hasAuthHeader: !!req.get('Authorization'),
-    authHeaderPrefix: req.get('Authorization')?.substring(0, 20) + '...' || 'none',
+    authHeaderPrefix:
+      req.get('Authorization')?.substring(0, 20) + '...' || 'none',
   };
 
   // 개발 환경에서만 추가 정보 로깅
@@ -69,7 +70,11 @@ export const requestLogger = (
 
     // Request body 추가 (Content-Type이 application/json인 경우만)
     const contentType = req.get('Content-Type');
-    if (contentType?.includes('application/json') && req.body && Object.keys(req.body).length > 0) {
+    if (
+      contentType?.includes('application/json') &&
+      req.body &&
+      Object.keys(req.body).length > 0
+    ) {
       requestLogData.requestBody = req.body;
     }
   }
@@ -90,7 +95,11 @@ export const requestLogger = (
     };
 
     // 개발 환경에서만 response body 추가 (Content-Type이 application/json인 경우만)
-    if (isDevelopment && chunk && res.get('Content-Type')?.includes('application/json')) {
+    if (
+      isDevelopment &&
+      chunk &&
+      res.get('Content-Type')?.includes('application/json')
+    ) {
       try {
         let responseText: string | undefined;
 

@@ -27,7 +27,9 @@ import { EVENTS, type EvaluatedFlag } from '@gatrix/gatrix-js-client-sdk';
 
 export function useFlags(forceRealtime = true): EvaluatedFlag[] {
   const { features, client } = useGatrixContext();
-  const [flags, setFlags] = useState<EvaluatedFlag[]>(() => features.getAllFlags(forceRealtime));
+  const [flags, setFlags] = useState<EvaluatedFlag[]>(() =>
+    features.getAllFlags(forceRealtime)
+  );
 
   useEffect(() => {
     if (!client) return;

@@ -24,8 +24,15 @@ export class PagerDutyAddon extends Addon {
     const { routingKey, customHeaders } = parameters;
 
     if (!routingKey) {
-      this.logger.warn(`Missing PagerDuty routing key for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing routing key');
+      this.logger.warn(
+        `Missing PagerDuty routing key for integration ${integrationId}`
+      );
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing routing key'
+      );
       return;
     }
 

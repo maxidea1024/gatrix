@@ -88,7 +88,9 @@ class RewardTemplateService {
 
       // Validate sortBy to prevent SQL injection
       const validSortColumns = ['name', 'createdAt', 'updatedAt'];
-      const safeSortBy = validSortColumns.includes(sortBy) ? sortBy : 'createdAt';
+      const safeSortBy = validSortColumns.includes(sortBy)
+        ? sortBy
+        : 'createdAt';
       const safeSortOrder = sortOrder === 'ASC' ? 'ASC' : 'DESC';
 
       // Get total count
@@ -107,7 +109,10 @@ class RewardTemplateService {
       // Parse JSON fields and load tags
       const parsedTemplates = await Promise.all(
         (templates as RowDataPacket[]).map(async (t) => {
-          const tags = await TagService.listTagsForEntity('reward_template', t.id);
+          const tags = await TagService.listTagsForEntity(
+            'reward_template',
+            t.id
+          );
           logger.debug(`Loaded tags for template ${t.id}:`, {
             templateId: t.id,
             tagCount: tags.length,
@@ -116,7 +121,9 @@ class RewardTemplateService {
           return {
             ...t,
             rewardItems:
-              typeof t.rewardItems === 'string' ? JSON.parse(t.rewardItems) : t.rewardItems,
+              typeof t.rewardItems === 'string'
+                ? JSON.parse(t.rewardItems)
+                : t.rewardItems,
             tags: tags,
           };
         })
@@ -137,7 +144,10 @@ class RewardTemplateService {
   /**
    * Get reward template by ID
    */
-  static async getRewardTemplateById(id: string, environmentId: string): Promise<RewardTemplate> {
+  static async getRewardTemplateById(
+    id: string,
+    environmentId: string
+  ): Promise<RewardTemplate> {
     const pool = database.getPool();
     try {
       const [templates] = await pool.execute<RowDataPacket[]>(
@@ -293,16 +303,19 @@ class RewardTemplateService {
   /**
    * Delete a reward template
    */
-  static async deleteRewardTemplate(id: string, environmentId: string): Promise<void> {
+  static async deleteRewardTemplate(
+    id: string,
+    environmentId: string
+  ): Promise<void> {
     const pool = database.getPool();
     try {
       // Check if template exists
       await this.getRewardTemplateById(id, environmentId);
 
-      await pool.execute('DELETE FROM g_reward_templates WHERE id = ? AND environmentId = ?', [
-        id,
-        environmentId,
-      ]);
+      await pool.execute(
+        'DELETE FROM g_reward_templates WHERE id = ? AND environmentId = ?',
+        [id, environmentId]
+      );
     } catch (error) {
       if (error instanceof GatrixError) throw error;
       logger.error('Failed to delete reward template', { error, id });

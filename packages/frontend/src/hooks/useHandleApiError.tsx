@@ -10,9 +10,9 @@ interface UseHandleApiErrorOptions {
 export function useHandleApiError(options: UseHandleApiErrorOptions = {}) {
   const { enqueueSnackbar } = useSnackbar();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [errorType, setErrorType] = useState<'LOCKED' | 'CONFLICT' | 'DUPLICATE' | 'GENERIC'>(
-    'GENERIC'
-  );
+  const [errorType, setErrorType] = useState<
+    'LOCKED' | 'CONFLICT' | 'DUPLICATE' | 'GENERIC'
+  >('GENERIC');
   const [errorInfo, setErrorInfo] = useState<any>({});
 
   const handleApiError = useCallback(

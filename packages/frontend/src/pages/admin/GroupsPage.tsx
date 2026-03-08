@@ -101,9 +101,8 @@ const GroupsPage: React.FC = () => {
 
   // Selected group
   const [selectedGroup, setSelectedGroup] = useState<GroupDetail | null>(null);
-  const [selectedGroupForDelete, setSelectedGroupForDelete] = useState<GroupWithCounts | null>(
-    null
-  );
+  const [selectedGroupForDelete, setSelectedGroupForDelete] =
+    useState<GroupWithCounts | null>(null);
 
   // Form
   const [formData, setFormData] = useState({
@@ -122,19 +121,25 @@ const GroupsPage: React.FC = () => {
 
   // Pending changes for detail drawer (buffered)
   const [pendingMemberAdds, setPendingMemberAdds] = useState<string[]>([]);
-  const [pendingMemberRemoves, setPendingMemberRemoves] = useState<string[]>([]);
+  const [pendingMemberRemoves, setPendingMemberRemoves] = useState<string[]>(
+    []
+  );
   const [pendingRoleAdds, setPendingRoleAdds] = useState<string[]>([]);
   const [pendingRoleRemoves, setPendingRoleRemoves] = useState<string[]>([]);
 
   // Member/Role add state
-  const [allUsers, setAllUsers] = useState<Array<{ id: string; name: string; email: string }>>([]);
+  const [allUsers, setAllUsers] = useState<
+    Array<{ id: string; name: string; email: string }>
+  >([]);
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
 
   // Effective permissions for group
-  const [groupEffectivePerms, setGroupEffectivePerms] = useState<EffectivePermissions | null>(null);
-  const [groupEffectivePermsLoading, setGroupEffectivePermsLoading] = useState(false);
+  const [groupEffectivePerms, setGroupEffectivePerms] =
+    useState<EffectivePermissions | null>(null);
+  const [groupEffectivePermsLoading, setGroupEffectivePermsLoading] =
+    useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -192,8 +197,12 @@ const GroupsPage: React.FC = () => {
   const filteredGroups = debouncedSearchTerm
     ? groups.filter(
         (g) =>
-          g.groupName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-          (g.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+          g.groupName
+            .toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()) ||
+          (g.description || '')
+            .toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase())
       )
     : groups;
 
@@ -201,7 +210,11 @@ const GroupsPage: React.FC = () => {
 
   const openCreateDialog = () => {
     setDialogMode('create');
-    setFormData({ groupName: '', description: '', addNewUsersByDefault: false });
+    setFormData({
+      groupName: '',
+      description: '',
+      addNewUsersByDefault: false,
+    });
     setDialogOpen(true);
   };
 
@@ -219,7 +232,8 @@ const GroupsPage: React.FC = () => {
   };
 
   const isEditDirty =
-    dialogMode === 'create' || JSON.stringify(formData) !== JSON.stringify(initialFormData);
+    dialogMode === 'create' ||
+    JSON.stringify(formData) !== JSON.stringify(initialFormData);
 
   const openDeleteDialog = (group: GroupWithCounts) => {
     setSelectedGroupForDelete(group);
@@ -279,7 +293,8 @@ const GroupsPage: React.FC = () => {
       setDialogOpen(false);
       loadGroups();
     } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.groups.saveFailed');
+      const message =
+        error?.response?.data?.message || t('rbac.groups.saveFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setSaving(false);
@@ -295,7 +310,8 @@ const GroupsPage: React.FC = () => {
       setDeleteDialogOpen(false);
       loadGroups();
     } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.groups.deleteFailed');
+      const message =
+        error?.response?.data?.message || t('rbac.groups.deleteFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setSaving(false);
@@ -308,7 +324,9 @@ const GroupsPage: React.FC = () => {
     if (!selectedUserId) return;
     // If previously pending remove, just cancel the remove
     if (pendingMemberRemoves.includes(selectedUserId)) {
-      setPendingMemberRemoves((prev) => prev.filter((id) => id !== selectedUserId));
+      setPendingMemberRemoves((prev) =>
+        prev.filter((id) => id !== selectedUserId)
+      );
     } else {
       setPendingMemberAdds((prev) => [...prev, selectedUserId]);
     }
@@ -329,7 +347,9 @@ const GroupsPage: React.FC = () => {
   const handleAddRole = () => {
     if (!selectedRoleId) return;
     if (pendingRoleRemoves.includes(selectedRoleId)) {
-      setPendingRoleRemoves((prev) => prev.filter((id) => id !== selectedRoleId));
+      setPendingRoleRemoves((prev) =>
+        prev.filter((id) => id !== selectedRoleId)
+      );
     } else {
       setPendingRoleAdds((prev) => [...prev, selectedRoleId]);
     }
@@ -369,7 +389,8 @@ const GroupsPage: React.FC = () => {
       setDetailDialogOpen(false);
       loadGroups();
     } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.groups.saveFailed');
+      const message =
+        error?.response?.data?.message || t('rbac.groups.saveFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setSaving(false);
@@ -386,7 +407,10 @@ const GroupsPage: React.FC = () => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [menuTarget, setMenuTarget] = useState<GroupWithCounts | null>(null);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, group: GroupWithCounts) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    group: GroupWithCounts
+  ) => {
     setMenuAnchorEl(event.currentTarget);
     setMenuTarget(group);
   };
@@ -399,7 +423,8 @@ const GroupsPage: React.FC = () => {
   const handleCopyText = (text: string) => {
     copyToClipboardWithNotification(
       text,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () =>
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -407,39 +432,60 @@ const GroupsPage: React.FC = () => {
   // Available members: not already in group AND not pending add; also include pending removes as available again
   const effectiveMembers = selectedGroup
     ? [
-        ...selectedGroup.members.filter((m) => !pendingMemberRemoves.includes(m.userId)),
+        ...selectedGroup.members.filter(
+          (m) => !pendingMemberRemoves.includes(m.userId)
+        ),
         ...(pendingMemberAdds
           .map((userId) => {
             const u = allUsers.find((u) => u.id === userId);
-            return u ? ({ userId: u.id, name: u.name, email: u.email } as GroupMember) : null;
+            return u
+              ? ({ userId: u.id, name: u.name, email: u.email } as GroupMember)
+              : null;
           })
           .filter(Boolean) as GroupMember[]),
       ]
     : [];
 
-  const availableUsers = allUsers.filter((u) => !effectiveMembers.some((m) => m.userId === u.id));
+  const availableUsers = allUsers.filter(
+    (u) => !effectiveMembers.some((m) => m.userId === u.id)
+  );
 
   // Available roles: not already assigned AND not pending add; also include pending removes
   const effectiveRoles = selectedGroup
     ? [
-        ...selectedGroup.roles.filter((r) => !pendingRoleRemoves.includes(r.roleId)),
+        ...selectedGroup.roles.filter(
+          (r) => !pendingRoleRemoves.includes(r.roleId)
+        ),
         ...(pendingRoleAdds
           .map((roleId) => {
             const r = allRoles.find((r) => r.id === roleId);
             return r
-              ? ({ roleId: r.id, roleName: r.roleName, description: r.description } as GroupRole)
+              ? ({
+                  roleId: r.id,
+                  roleName: r.roleName,
+                  description: r.description,
+                } as GroupRole)
               : null;
           })
           .filter(Boolean) as GroupRole[]),
       ]
     : [];
 
-  const availableRoles = allRoles.filter((r) => !effectiveRoles.some((er) => er.roleId === r.id));
+  const availableRoles = allRoles.filter(
+    (r) => !effectiveRoles.some((er) => er.roleId === r.id)
+  );
 
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 600 }}>
             {t('rbac.groups.title')}
@@ -448,7 +494,11 @@ const GroupsPage: React.FC = () => {
             {t('rbac.groups.description')}
           </Typography>
         </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateDialog}>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={openCreateDialog}
+        >
           {t('rbac.groups.create')}
         </Button>
       </Box>
@@ -478,9 +528,13 @@ const GroupsPage: React.FC = () => {
                 <TableRow>
                   <TableCell>{t('rbac.groups.name')}</TableCell>
                   <TableCell>{t('rbac.groups.descriptionColumn')}</TableCell>
-                  <TableCell align="center">{t('rbac.groups.members')}</TableCell>
+                  <TableCell align="center">
+                    {t('rbac.groups.members')}
+                  </TableCell>
                   <TableCell align="center">{t('rbac.groups.roles')}</TableCell>
-                  <TableCell align="center">{t('rbac.groups.autoAdd')}</TableCell>
+                  <TableCell align="center">
+                    {t('rbac.groups.autoAdd')}
+                  </TableCell>
                   <TableCell>{t('common.createdAt')}</TableCell>
                   <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
@@ -489,13 +543,18 @@ const GroupsPage: React.FC = () => {
                 {filteredGroups.map((group) => (
                   <TableRow key={group.id} hover>
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      >
                         <Typography
                           variant="body2"
                           sx={{
                             fontWeight: 500,
                             cursor: 'pointer',
-                            '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                            '&:hover': {
+                              color: 'primary.main',
+                              textDecoration: 'underline',
+                            },
                           }}
                           onClick={() => openDetailDialog(group)}
                         >
@@ -571,7 +630,10 @@ const GroupsPage: React.FC = () => {
                       </Tooltip>
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton size="small" onClick={(e) => handleMenuOpen(e, group)}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => handleMenuOpen(e, group)}
+                      >
                         <MoreVertIcon fontSize="small" />
                       </IconButton>
                     </TableCell>
@@ -584,7 +646,11 @@ const GroupsPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+      >
         <MenuItem
           onClick={() => {
             if (menuTarget) openEditDialog(menuTarget);
@@ -613,18 +679,31 @@ const GroupsPage: React.FC = () => {
       <ResizableDrawer
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        title={dialogMode === 'create' ? t('rbac.groups.createTitle') : t('rbac.groups.editTitle')}
+        title={
+          dialogMode === 'create'
+            ? t('rbac.groups.createTitle')
+            : t('rbac.groups.editTitle')
+        }
         storageKey="groupsDrawerWidth"
         defaultWidth={450}
         minWidth={380}
       >
         <Box
-          sx={{ flex: 1, p: 3, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
+          sx={{
+            flex: 1,
+            p: 3,
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
         >
           <TextField
             label={t('rbac.groups.name')}
             value={formData.groupName}
-            onChange={(e) => setFormData({ ...formData, groupName: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, groupName: e.target.value })
+            }
             required
             fullWidth
             autoFocus
@@ -633,7 +712,9 @@ const GroupsPage: React.FC = () => {
           <TextField
             label={t('rbac.groups.descriptionColumn')}
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
             fullWidth
             multiline
             rows={2}
@@ -644,7 +725,10 @@ const GroupsPage: React.FC = () => {
               <Switch
                 checked={!!formData.addNewUsersByDefault}
                 onChange={(e) =>
-                  setFormData({ ...formData, addNewUsersByDefault: e.target.checked })
+                  setFormData({
+                    ...formData,
+                    addNewUsersByDefault: e.target.checked,
+                  })
                 }
               />
             }
@@ -676,12 +760,17 @@ const GroupsPage: React.FC = () => {
       </ResizableDrawer>
 
       {/* Delete Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>{t('rbac.groups.deleteTitle')}</DialogTitle>
         <DialogContent>
           {selectedGroupForDelete && (
             <Typography>
-              {t('rbac.groups.deleteConfirm', { name: selectedGroupForDelete.groupName })}
+              {t('rbac.groups.deleteConfirm', {
+                name: selectedGroupForDelete.groupName,
+              })}
             </Typography>
           )}
         </DialogContent>
@@ -689,7 +778,12 @@ const GroupsPage: React.FC = () => {
           <Button onClick={() => setDeleteDialogOpen(false)} disabled={saving}>
             {t('common.cancel')}
           </Button>
-          <Button variant="contained" color="error" onClick={handleDelete} disabled={saving}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDelete}
+            disabled={saving}
+          >
             {saving ? <CircularProgress size={20} /> : t('common.delete')}
           </Button>
         </DialogActions>
@@ -704,7 +798,14 @@ const GroupsPage: React.FC = () => {
         defaultWidth={550}
         minWidth={400}
       >
-        <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            flex: 1,
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
             <Tabs value={detailTab} onChange={(_, v) => setDetailTab(v)}>
               <Tab
@@ -729,10 +830,15 @@ const GroupsPage: React.FC = () => {
                   sx={{ flex: 1 }}
                   options={availableUsers}
                   getOptionLabel={(opt) => `${opt.name} (${opt.email})`}
-                  value={availableUsers.find((u) => u.id === selectedUserId) || null}
+                  value={
+                    availableUsers.find((u) => u.id === selectedUserId) || null
+                  }
                   onChange={(_, val) => setSelectedUserId(val?.id || null)}
                   renderInput={(params) => (
-                    <TextField {...params} placeholder={t('rbac.groups.selectUser')} />
+                    <TextField
+                      {...params}
+                      placeholder={t('rbac.groups.selectUser')}
+                    />
                   )}
                 />
                 <Button
@@ -748,23 +854,37 @@ const GroupsPage: React.FC = () => {
               {effectiveMembers.length === 0 ? (
                 <Alert severity="info">{t('rbac.groups.noMembers')}</Alert>
               ) : (
-                <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                <Box
+                  sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}
+                >
                   <List dense disablePadding>
                     {effectiveMembers.map((member) => {
-                      const isPendingAdd = pendingMemberAdds.includes(member.userId);
-                      const isPendingRemove = pendingMemberRemoves.includes(member.userId);
+                      const isPendingAdd = pendingMemberAdds.includes(
+                        member.userId
+                      );
+                      const isPendingRemove = pendingMemberRemoves.includes(
+                        member.userId
+                      );
                       return (
                         <ListItem
                           key={member.userId}
                           divider
                           sx={{
                             opacity: isPendingRemove ? 0.4 : 1,
-                            bgcolor: isPendingAdd ? 'action.selected' : 'transparent',
+                            bgcolor: isPendingAdd
+                              ? 'action.selected'
+                              : 'transparent',
                           }}
                         >
                           <ListItemText
                             primary={
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1,
+                                }}
+                              >
                                 {member.name || member.userId}
                                 {isPendingAdd && (
                                   <Chip
@@ -785,7 +905,9 @@ const GroupsPage: React.FC = () => {
                                 edge="end"
                                 size="small"
                                 color="error"
-                                onClick={() => handleRemoveMember(member.userId)}
+                                onClick={() =>
+                                  handleRemoveMember(member.userId)
+                                }
                               >
                                 <PersonRemoveIcon fontSize="small" />
                               </IconButton>
@@ -807,10 +929,15 @@ const GroupsPage: React.FC = () => {
                   sx={{ flex: 1 }}
                   options={availableRoles}
                   getOptionLabel={(opt) => opt.roleName}
-                  value={availableRoles.find((r) => r.id === selectedRoleId) || null}
+                  value={
+                    availableRoles.find((r) => r.id === selectedRoleId) || null
+                  }
                   onChange={(_, val) => setSelectedRoleId(val?.id || null)}
                   renderInput={(params) => (
-                    <TextField {...params} placeholder={t('rbac.groups.selectRole')} />
+                    <TextField
+                      {...params}
+                      placeholder={t('rbac.groups.selectRole')}
+                    />
                   )}
                 />
                 <Button
@@ -834,12 +961,20 @@ const GroupsPage: React.FC = () => {
                         key={role.roleId}
                         divider
                         sx={{
-                          bgcolor: isPendingAdd ? 'action.selected' : 'transparent',
+                          bgcolor: isPendingAdd
+                            ? 'action.selected'
+                            : 'transparent',
                         }}
                       >
                         <ListItemText
                           primary={
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                              }}
+                            >
                               {role.roleName || role.roleId}
                               {isPendingAdd && (
                                 <Chip
@@ -876,7 +1011,11 @@ const GroupsPage: React.FC = () => {
               {effectiveRoles.length > 0 && (
                 <Box sx={{ mt: 2 }}>
                   <Divider sx={{ mb: 1 }} />
-                  <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight={600}
+                    sx={{ mb: 0.5 }}
+                  >
                     {t('rbac.roles.effectivePermissions')}
                   </Typography>
                   <Typography
@@ -909,7 +1048,9 @@ const GroupsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setDetailDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => setDetailDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             onClick={handleSaveDetail}

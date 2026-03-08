@@ -45,7 +45,10 @@ export class UserOnboardingService {
     for (const membership of config.memberships) {
       // 1. Add to organisation (default role)
       try {
-        const existingOrgMember = await Organisation.getMember(membership.orgId, userId);
+        const existingOrgMember = await Organisation.getMember(
+          membership.orgId,
+          userId
+        );
         if (!existingOrgMember) {
           await Organisation.addMember(membership.orgId, userId, assignedBy);
           logger.info('Added user to organisation', {
@@ -94,13 +97,23 @@ export class UserOnboardingService {
               });
               logger.info('Added user to project', { userId, projectId });
             } else {
-              logger.debug('User already a member of project, skipping', { userId, projectId });
+              logger.debug('User already a member of project, skipping', {
+                userId,
+                projectId,
+              });
             }
           } catch (error: any) {
             if (error.code === 'ER_DUP_ENTRY') {
-              logger.debug('Duplicate project membership, skipping', { userId, projectId });
+              logger.debug('Duplicate project membership, skipping', {
+                userId,
+                projectId,
+              });
             } else {
-              logger.error('Failed to add user to project', { userId, projectId, error });
+              logger.error('Failed to add user to project', {
+                userId,
+                projectId,
+                error,
+              });
               throw error;
             }
           }
@@ -112,7 +125,9 @@ export class UserOnboardingService {
         for (const binding of membership.roleBindings) {
           try {
             // Validate role scope — prevent auto-assigning system-scope roles
-            const role = await db('g_roles').where('id', binding.roleId).first();
+            const role = await db('g_roles')
+              .where('id', binding.roleId)
+              .first();
             if (!role) {
               logger.warn('Role not found in autoJoinConfig, skipping', {
                 userId,
@@ -120,13 +135,19 @@ export class UserOnboardingService {
               });
               continue;
             }
-            const { getScopeLevel, SCOPE_LEVELS } = require('../utils/scope-hierarchy');
+            const {
+              getScopeLevel,
+              SCOPE_LEVELS,
+            } = require('../utils/scope-hierarchy');
             if (getScopeLevel(role.scopeType) < SCOPE_LEVELS.org) {
-              logger.error('AutoJoinConfig attempted to assign a system-scope role, skipping', {
-                userId,
-                roleId: binding.roleId,
-                roleScopeType: role.scopeType,
-              });
+              logger.error(
+                'AutoJoinConfig attempted to assign a system-scope role, skipping',
+                {
+                  userId,
+                  roleId: binding.roleId,
+                  roleScopeType: role.scopeType,
+                }
+              );
               continue;
             }
 

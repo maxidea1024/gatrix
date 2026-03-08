@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { LinkPreviewData, linkPreviewService } from '../services/linkPreviewService';
+import {
+  LinkPreviewData,
+  linkPreviewService,
+} from '../services/linkPreviewService';
 import './LinkPreview.css';
 
 interface LinkPreviewProps {
@@ -7,7 +10,10 @@ interface LinkPreviewProps {
   className?: string;
 }
 
-export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' }) => {
+export const LinkPreview: React.FC<LinkPreviewProps> = ({
+  url,
+  className = '',
+}) => {
   const [preview, setPreview] = useState<LinkPreviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -44,7 +50,10 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
 
   if (loading) {
     return (
-      <div className={`link-preview loading ${className}`} data-link-preview="loading">
+      <div
+        className={`link-preview loading ${className}`}
+        data-link-preview="loading"
+      >
         <div className="link-preview-skeleton">
           <div className="skeleton-image"></div>
           <div className="skeleton-content">
@@ -59,12 +68,17 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
 
   if (error || !preview) {
     return (
-      <div className={`link-preview error ${className}`} data-link-preview="error">
+      <div
+        className={`link-preview error ${className}`}
+        data-link-preview="error"
+      >
         <div className="link-preview-fallback">
           <div className="fallback-icon">🔗</div>
           <div className="fallback-content">
             <div className="fallback-url">{url}</div>
-            <div className="fallback-message">링크 미리보기를 불러올 수 없습니다</div>
+            <div className="fallback-message">
+              링크 미리보기를 불러올 수 없습니다
+            </div>
           </div>
         </div>
       </div>
@@ -83,7 +97,9 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
   };
 
   const isYouTubeUrl = (url: string): boolean => {
-    return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(url);
+    return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(
+      url
+    );
   };
 
   const getYouTubeEmbedUrl = (url: string): string | null => {
@@ -165,19 +181,27 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
             </span>
           </div>
 
-          {preview.title && <h3 className="link-preview-title">{preview.title}</h3>}
+          {preview.title && (
+            <h3 className="link-preview-title">{preview.title}</h3>
+          )}
 
           {preview.description && (
-            <p className="link-preview-description">{formatDescription(preview.description)}</p>
+            <p className="link-preview-description">
+              {formatDescription(preview.description)}
+            </p>
           )}
 
           <div className="link-preview-meta">
             {preview.author && (
-              <span className="link-preview-author">작성자: {preview.author}</span>
+              <span className="link-preview-author">
+                작성자: {preview.author}
+              </span>
             )}
 
             {preview.readingTime && (
-              <span className="link-preview-reading-time">읽기 시간: {preview.readingTime}</span>
+              <span className="link-preview-reading-time">
+                읽기 시간: {preview.readingTime}
+              </span>
             )}
 
             {preview.publishedTime && (
@@ -212,8 +236,13 @@ interface LinkPreviewListProps {
   className?: string;
 }
 
-export const LinkPreviewList: React.FC<LinkPreviewListProps> = ({ urls, className = '' }) => {
-  const [previews, setPreviews] = useState<Map<string, LinkPreviewData | null>>(new Map());
+export const LinkPreviewList: React.FC<LinkPreviewListProps> = ({
+  urls,
+  className = '',
+}) => {
+  const [previews, setPreviews] = useState<Map<string, LinkPreviewData | null>>(
+    new Map()
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -247,7 +276,9 @@ export const LinkPreviewList: React.FC<LinkPreviewListProps> = ({ urls, classNam
     );
   }
 
-  const validPreviews = Array.from(previews.entries()).filter(([_, preview]) => preview !== null);
+  const validPreviews = Array.from(previews.entries()).filter(
+    ([_, preview]) => preview !== null
+  );
 
   if (validPreviews.length === 0) {
     return null;

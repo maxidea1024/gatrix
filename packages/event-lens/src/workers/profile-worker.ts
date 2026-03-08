@@ -7,10 +7,14 @@ export class ProfileWorker {
   private worker: Worker;
 
   constructor() {
-    this.worker = new Worker('event-lens-profiles', this.processJob.bind(this), {
-      connection: redis as any,
-      concurrency: 5,
-    });
+    this.worker = new Worker(
+      'event-lens-profiles',
+      this.processJob.bind(this),
+      {
+        connection: redis as any,
+        concurrency: 5,
+      }
+    );
 
     this.worker.on('completed', (job) => {
       logger.debug('Profile job completed', { jobId: job.id });
@@ -109,7 +113,11 @@ export class ProfileWorker {
 
     try {
       // 현재 값 조회
-      const currentValue = await this.getPropertyValue(projectId, profileId, property);
+      const currentValue = await this.getPropertyValue(
+        projectId,
+        profileId,
+        property
+      );
       const newValue = (currentValue || 0) + value;
 
       // 프로필 업데이트

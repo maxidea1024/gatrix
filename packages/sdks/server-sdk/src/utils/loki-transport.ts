@@ -41,7 +41,11 @@ export class LokiTransport {
   /**
    * Add a log entry to the buffer
    */
-  send(level: string, message: string, extraLabels: Record<string, string> = {}) {
+  send(
+    level: string,
+    message: string,
+    extraLabels: Record<string, string> = {}
+  ) {
     if (!this.config.enabled || this.isShuttingDown) return;
 
     const nanoseconds = (BigInt(Date.now()) * BigInt(1000000)).toString();
@@ -56,7 +60,10 @@ export class LokiTransport {
     if (this.buffer.length >= (this.config.batchSize || 20)) {
       this.flush();
     } else if (!this.timer) {
-      this.timer = setTimeout(() => this.flush(), this.config.batchInterval || 5000);
+      this.timer = setTimeout(
+        () => this.flush(),
+        this.config.batchInterval || 5000
+      );
     }
   }
 

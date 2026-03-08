@@ -4,13 +4,19 @@ import { createLogger } from '../../config/logger';
 const logger = createLogger('FeatureStrategyModel');
 import { ulid } from 'ulid';
 import { parseJsonField } from '../../utils/db-utils';
-import { FeatureStrategyAttributes, StrategyParameters, Constraint } from './types';
+import {
+  FeatureStrategyAttributes,
+  StrategyParameters,
+  Constraint,
+} from './types';
 
 export class FeatureStrategyModel {
   /**
    * Find all strategies for a flag (backward compatibility)
    */
-  static async findByFlagId(flagId: string): Promise<FeatureStrategyAttributes[]> {
+  static async findByFlagId(
+    flagId: string
+  ): Promise<FeatureStrategyAttributes[]> {
     try {
       const strategies = await db('g_feature_strategies')
         .where('flagId', flagId)
@@ -38,7 +44,10 @@ export class FeatureStrategyModel {
 
       return this.enrichStrategiesWithSegments(strategies);
     } catch (error) {
-      logger.error('Error finding strategies by flag ID and environment:', error);
+      logger.error(
+        'Error finding strategies by flag ID and environment:',
+        error
+      );
       throw error;
     }
   }
@@ -54,7 +63,9 @@ export class FeatureStrategyModel {
 
       const segmentNames: string[] = [];
       for (const link of segmentLinks) {
-        const segment = await db('g_feature_segments').where('id', link.segmentId).first();
+        const segment = await db('g_feature_segments')
+          .where('id', link.segmentId)
+          .first();
         if (segment) {
           segmentNames.push(segment.segmentName);
         }
@@ -122,10 +133,13 @@ export class FeatureStrategyModel {
     try {
       const updateData: any = { updatedAt: new Date() };
 
-      if (data.strategyName !== undefined) updateData.strategyName = data.strategyName;
+      if (data.strategyName !== undefined)
+        updateData.strategyName = data.strategyName;
       if (data.title !== undefined) updateData.title = data.title || null;
-      if (data.parameters !== undefined) updateData.parameters = JSON.stringify(data.parameters);
-      if (data.constraints !== undefined) updateData.constraints = JSON.stringify(data.constraints);
+      if (data.parameters !== undefined)
+        updateData.parameters = JSON.stringify(data.parameters);
+      if (data.constraints !== undefined)
+        updateData.constraints = JSON.stringify(data.constraints);
       if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
       if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;

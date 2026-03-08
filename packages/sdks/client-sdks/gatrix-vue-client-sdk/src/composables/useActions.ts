@@ -3,7 +3,8 @@ import type { GatrixContext } from '@gatrix/gatrix-js-client-sdk';
 
 export function useUpdateContext() {
   const client = useGatrixClient();
-  return (context: Partial<GatrixContext>) => client.features.updateContext(context);
+  return (context: Partial<GatrixContext>) =>
+    client.features.updateContext(context);
 }
 
 export function useSyncFlags() {

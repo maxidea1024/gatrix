@@ -309,7 +309,12 @@ export interface ChatState {
   notifications: ChatNotification[];
   isConnected: boolean;
   isLoading: boolean;
-  loadingStage: 'idle' | 'syncing' | 'connecting' | 'loading_channels' | 'complete';
+  loadingStage:
+    | 'idle'
+    | 'syncing'
+    | 'connecting'
+    | 'loading_channels'
+    | 'complete';
   loadingStartTime: number | null; // 로딩 시작 시간
   pendingInvitationsCount: number; // 받은 초대 수
   error: string | null; // error message
@@ -319,11 +324,17 @@ export interface ChatContextType {
   state: ChatState;
   actions: {
     setCurrentChannel: (channelId: number | null) => void;
-    sendMessage: (channelId: number, message: SendMessageRequest) => Promise<Message>;
+    sendMessage: (
+      channelId: number,
+      message: SendMessageRequest
+    ) => Promise<Message>;
     editMessage: (messageId: number, content: string) => Promise<Message>;
     deleteMessage: (messageId: number) => Promise<void>;
     createChannel: (channel: CreateChannelRequest) => Promise<Channel>;
-    updateChannel: (channelId: number, updates: UpdateChannelRequest) => Promise<Channel>;
+    updateChannel: (
+      channelId: number,
+      updates: UpdateChannelRequest
+    ) => Promise<Channel>;
     joinChannel: (channelId: number) => Promise<void>;
     leaveChannel: (channelId: number) => Promise<void>;
     addReaction: (messageId: number, emoji: string) => Promise<void>;
@@ -335,7 +346,11 @@ export interface ChatContextType {
     loadMessages: (channelId: number, forceReload?: boolean) => Promise<void>;
     loadMoreMessages: (channelId: number) => Promise<void>;
     uploadFile: (file: File, channelId: number) => Promise<MessageAttachment>;
-    inviteUser: (channelId: number, userId: number, message?: string) => Promise<void>;
+    inviteUser: (
+      channelId: number,
+      userId: number,
+      message?: string
+    ) => Promise<void>;
     loadPendingInvitationsCount: () => Promise<void>;
     getThreadMessages: (threadId: number) => Promise<Message[]>;
     clearError: () => void;
@@ -360,4 +375,9 @@ export interface RichTextElement {
 
 // Status types
 export type UserStatus = 'online' | 'away' | 'busy' | 'offline' | 'invisible';
-export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
+export type MessageStatus =
+  | 'sending'
+  | 'sent'
+  | 'delivered'
+  | 'read'
+  | 'failed';

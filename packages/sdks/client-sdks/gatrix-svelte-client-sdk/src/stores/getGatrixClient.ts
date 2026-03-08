@@ -11,7 +11,9 @@ import type { GatrixClient } from '@gatrix/gatrix-js-client-sdk';
 export function getGatrixClient(): GatrixClient {
   const client = getContext<GatrixClient>(GATRIX_CLIENT_KEY);
   if (!client) {
-    throw new Error('Gatrix not initialized. Call initGatrix() in a parent component.');
+    throw new Error(
+      'Gatrix not initialized. Call initGatrix() in a parent component.'
+    );
   }
   return client;
 }

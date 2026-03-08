@@ -36,7 +36,11 @@ class ImpactMetricsController {
       this.ensureInitialized();
       const { impactMetrics, sdkVersion } = req.body;
 
-      if (!impactMetrics || !Array.isArray(impactMetrics) || impactMetrics.length === 0) {
+      if (
+        !impactMetrics ||
+        !Array.isArray(impactMetrics) ||
+        impactMetrics.length === 0
+      ) {
         res.status(200).json({ success: true }); // No-op for empty metrics
         return;
       }
@@ -93,7 +97,12 @@ class ImpactMetricsController {
 
       const result = await impactMetricsService.queryTimeSeries({
         series,
-        range: ((range as string) || 'hour') as 'hour' | 'sixhour' | 'day' | 'week' | 'month',
+        range: ((range as string) || 'hour') as
+          | 'hour'
+          | 'sixhour'
+          | 'day'
+          | 'week'
+          | 'month',
         aggregationMode: ((aggregationMode as string) || 'count') as any,
         labels: parsedLabels,
         groupBy: groupBy
@@ -157,7 +166,9 @@ class ImpactMetricsController {
         return;
       }
       logger.error('Failed to get configs', { error: error.message });
-      res.status(500).json({ success: false, error: { message: 'Failed to get configs' } });
+      res
+        .status(500)
+        .json({ success: false, error: { message: 'Failed to get configs' } });
     }
   }
 
@@ -171,7 +182,10 @@ class ImpactMetricsController {
       if (!metric || typeof metric !== 'string') {
         res
           .status(400)
-          .json({ success: false, error: { message: 'metric parameter is required' } });
+          .json({
+            success: false,
+            error: { message: 'metric parameter is required' },
+          });
         return;
       }
 
@@ -179,7 +193,12 @@ class ImpactMetricsController {
       res.json({ success: true, data: labels });
     } catch (error: any) {
       logger.error('Failed to get metric labels', { error: error.message });
-      res.status(500).json({ success: false, error: { message: 'Failed to get metric labels' } });
+      res
+        .status(500)
+        .json({
+          success: false,
+          error: { message: 'Failed to get metric labels' },
+        });
     }
   }
 
@@ -205,7 +224,12 @@ class ImpactMetricsController {
       } = req.body;
 
       if (!metricName) {
-        res.status(400).json({ success: false, error: { message: 'metricName is required' } });
+        res
+          .status(400)
+          .json({
+            success: false,
+            error: { message: 'metricName is required' },
+          });
         return;
       }
 
@@ -229,7 +253,12 @@ class ImpactMetricsController {
       res.status(201).json({ success: true, data: config });
     } catch (error: any) {
       logger.error('Failed to create config', { error: error.message });
-      res.status(500).json({ success: false, error: { message: 'Failed to create config' } });
+      res
+        .status(500)
+        .json({
+          success: false,
+          error: { message: 'Failed to create config' },
+        });
     }
   }
 
@@ -242,13 +271,20 @@ class ImpactMetricsController {
       const { id } = req.params;
       const config = await ImpactMetricConfigModel.update(id, req.body);
       if (!config) {
-        res.status(404).json({ success: false, error: { message: 'Config not found' } });
+        res
+          .status(404)
+          .json({ success: false, error: { message: 'Config not found' } });
         return;
       }
       res.json({ success: true, data: config });
     } catch (error: any) {
       logger.error('Failed to update config', { error: error.message });
-      res.status(500).json({ success: false, error: { message: 'Failed to update config' } });
+      res
+        .status(500)
+        .json({
+          success: false,
+          error: { message: 'Failed to update config' },
+        });
     }
   }
 
@@ -263,7 +299,12 @@ class ImpactMetricsController {
       res.json({ success: true });
     } catch (error: any) {
       logger.error('Failed to delete config', { error: error.message });
-      res.status(500).json({ success: false, error: { message: 'Failed to delete config' } });
+      res
+        .status(500)
+        .json({
+          success: false,
+          error: { message: 'Failed to delete config' },
+        });
     }
   }
 
@@ -275,7 +316,12 @@ class ImpactMetricsController {
     try {
       const { layouts } = req.body;
       if (!Array.isArray(layouts)) {
-        res.status(400).json({ success: false, error: { message: 'layouts array is required' } });
+        res
+          .status(400)
+          .json({
+            success: false,
+            error: { message: 'layouts array is required' },
+          });
         return;
       }
       for (const layout of layouts) {
@@ -291,7 +337,12 @@ class ImpactMetricsController {
       res.json({ success: true });
     } catch (error: any) {
       logger.error('Failed to update layouts', { error: error.message });
-      res.status(500).json({ success: false, error: { message: 'Failed to update layouts' } });
+      res
+        .status(500)
+        .json({
+          success: false,
+          error: { message: 'Failed to update layouts' },
+        });
     }
   }
 }

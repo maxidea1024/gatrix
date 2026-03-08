@@ -1,5 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, TextField, IconButton, Paper, Chip, Typography, Tooltip } from '@mui/material';
+import {
+  Box,
+  TextField,
+  IconButton,
+  Paper,
+  Chip,
+  Typography,
+  Tooltip,
+} from '@mui/material';
 import {
   Send as SendIcon,
   EmojiEmotions as EmojiIcon,
@@ -88,7 +96,14 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
       }, 50); // 딜레이를 더 줄임
       return () => clearTimeout(timer);
     }
-  }, [channelId, disabled, state.isConnected, currentChannel, autoFocus, isThreadOpen]);
+  }, [
+    channelId,
+    disabled,
+    state.isConnected,
+    currentChannel,
+    autoFocus,
+    isThreadOpen,
+  ]);
 
   // Handle typing indicator
   useEffect(() => {
@@ -212,9 +227,12 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
   };
 
   const handleEmojiSelect = (emoji: string) => {
-    const cursorPosition = textFieldRef.current?.selectionStart || message.length;
+    const cursorPosition =
+      textFieldRef.current?.selectionStart || message.length;
     const newMessage =
-      message.substring(0, cursorPosition) + emoji + message.substring(cursorPosition);
+      message.substring(0, cursorPosition) +
+      emoji +
+      message.substring(cursorPosition);
     setMessage(newMessage);
 
     // 이모지 선택창 Close
@@ -224,13 +242,19 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
     requestAnimationFrame(() => {
       textFieldRef.current?.focus();
       const newCursorPosition = cursorPosition + emoji.length;
-      textFieldRef.current?.setSelectionRange(newCursorPosition, newCursorPosition);
+      textFieldRef.current?.setSelectionRange(
+        newCursorPosition,
+        newCursorPosition
+      );
 
       // 추가 보장을 위한 두 번째 시도
       setTimeout(() => {
         if (document.activeElement !== textFieldRef.current) {
           textFieldRef.current?.focus();
-          textFieldRef.current?.setSelectionRange(newCursorPosition, newCursorPosition);
+          textFieldRef.current?.setSelectionRange(
+            newCursorPosition,
+            newCursorPosition
+          );
         }
       }, 100);
     });
@@ -281,7 +305,11 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
       {/* Attachments Preview */}
       {attachments.length > 0 && (
         <Box sx={{ mb: 1 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mb: 1, display: 'block' }}
+          >
             {t('chat.attachments')} ({attachments.length})
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -305,7 +333,9 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
           onFileSelect={handleFileSelect}
           onLocationShare={(location) => {
             // Handle location sharing
-            onSendMessage(`📍 ${location.name || 'Location'}: ${location.address}`);
+            onSendMessage(
+              `📍 ${location.name || 'Location'}: ${location.address}`
+            );
           }}
         />
 
@@ -359,7 +389,9 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
           <span>
             <IconButton
               onClick={handleSendMessage}
-              disabled={disabled || (!message.trim() && attachments.length === 0)}
+              disabled={
+                disabled || (!message.trim() && attachments.length === 0)
+              }
               color="primary"
               sx={{
                 '&:not(:disabled)': {

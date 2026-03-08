@@ -78,7 +78,9 @@ class ImpactMetricsService {
   constructor() {
     // Prometheus URL from config or env var
     this.prometheusUrl =
-      process.env.PROMETHEUS_URL || (config as any).prometheus?.url || 'http://prometheus:9090';
+      process.env.PROMETHEUS_URL ||
+      (config as any).prometheus?.url ||
+      'http://prometheus:9090';
   }
 
   /**
@@ -88,7 +90,9 @@ class ImpactMetricsService {
   initialize(): any | null {
     // Reload Prometheus URL in case environment loaded late or changed
     this.prometheusUrl =
-      process.env.PROMETHEUS_URL || (config as any).prometheus?.url || 'http://prometheus:9090';
+      process.env.PROMETHEUS_URL ||
+      (config as any).prometheus?.url ||
+      'http://prometheus:9090';
 
     try {
       const promClient = require('prom-client');
@@ -120,7 +124,12 @@ class ImpactMetricsService {
    * Registers/updates metrics in the impact registry
    */
   processImpactMetrics(metrics: CollectedMetric[]): void {
-    if (!this.registry || !this.promClient || !metrics || metrics.length === 0) {
+    if (
+      !this.registry ||
+      !this.promClient ||
+      !metrics ||
+      metrics.length === 0
+    ) {
       return;
     }
 
@@ -245,7 +254,9 @@ class ImpactMetricsService {
   /**
    * Extract unique label names from samples
    */
-  private extractLabelNames(samples: (NumericSample | BucketSample)[]): string[] {
+  private extractLabelNames(
+    samples: (NumericSample | BucketSample)[]
+  ): string[] {
     const labelNameSet = new Set<string>();
     for (const sample of samples) {
       if (sample.labels) {
@@ -280,7 +291,13 @@ class ImpactMetricsService {
     // We should detect if it already has the prefix or not, or if we should prepend it.
     // For now, let's assume if we are allowing ANY prometheus metric, we shouldn't force prefix.
 
-    const promqlQuery = this.buildPromQL(series, aggregationMode, labels, range, groupBy);
+    const promqlQuery = this.buildPromQL(
+      series,
+      aggregationMode,
+      labels,
+      range,
+      groupBy
+    );
 
     // Calculate time range (custom from/to overrides range-based calculation)
     let end: number;
@@ -326,7 +343,10 @@ class ImpactMetricsService {
       const result = data.data?.result || [];
       const transformedSeries: TimeSeriesSeries[] = result.map((r: any) => ({
         metric: r.metric || {},
-        data: (r.values || []).map((v: any) => [Number(v[0]), parseFloat(v[1])]),
+        data: (r.values || []).map((v: any) => [
+          Number(v[0]),
+          parseFloat(v[1]),
+        ]),
       }));
 
       return {
@@ -334,7 +354,10 @@ class ImpactMetricsService {
         end: String(end),
         step: String(step),
         series: transformedSeries,
-        debug: { query: promqlQuery, isTruncated: transformedSeries.length > 50 },
+        debug: {
+          query: promqlQuery,
+          isTruncated: transformedSeries.length > 50,
+        },
       };
     } catch (error: any) {
       logger.error('Prometheus query error', {
@@ -435,7 +458,9 @@ class ImpactMetricsService {
   /**
    * Get available metric names from Prometheus
    */
-  async getAvailableMetrics(): Promise<Array<{ name: string; help: string; type: string }>> {
+  async getAvailableMetrics(): Promise<
+    Array<{ name: string; help: string; type: string }>
+  > {
     try {
       // 1. Fetch metadata from Prometheus for all metrics
       const url = new URL(`${this.prometheusUrl}/api/v1/metadata`);
@@ -455,7 +480,10 @@ class ImpactMetricsService {
         return metrics.sort((a, b) => a.name.localeCompare(b.name));
       }
     } catch (error) {
-      logger.warn('Failed to fetch metrics from Prometheus, falling back to local registry', error);
+      logger.warn(
+        'Failed to fetch metrics from Prometheus, falling back to local registry',
+        error
+      );
     }
 
     // Fallback: Return local registry metrics
@@ -492,7 +520,8 @@ class ImpactMetricsService {
     for (const [name, metric] of this.registeredMetrics) {
       const type = this.getMetricType(metric);
       const metricData = await (metric as any).get();
-      const values: Array<{ labels: Record<string, string>; value: number }> = [];
+      const values: Array<{ labels: Record<string, string>; value: number }> =
+        [];
 
       if (metricData && metricData.values) {
         for (const v of metricData.values) {
@@ -547,7 +576,8 @@ class ImpactMetricsService {
     // Build query based on aggregation mode
     // Base query
     let query = '';
-    const byClause = groupBy && groupBy.length > 0 ? ` by (${groupBy.join(',')})` : '';
+    const byClause =
+      groupBy && groupBy.length > 0 ? ` by (${groupBy.join(',')})` : '';
 
     // Prepend prefix if not present and not a rate/increase function call (simple heuristic)
     // If metricName already has "gatrix_" or looks like a system metric, use it as is.
@@ -569,15 +599,18 @@ class ImpactMetricsService {
       case 'p50':
         // For histograms, we need to aggregate by le and groupBy
         // sum by (le, ...groupBy) (rate(...))
-        const histBy = groupBy && groupBy.length ? `, ${groupBy.join(',')}` : '';
+        const histBy =
+          groupBy && groupBy.length ? `, ${groupBy.join(',')}` : '';
         query = `histogram_quantile(0.50, sum by (le${histBy}) (rate(${metricName}_bucket${labelSelector}[${rangeStr}])))`;
         break;
       case 'p95':
-        const histBy95 = groupBy && groupBy.length ? `, ${groupBy.join(',')}` : '';
+        const histBy95 =
+          groupBy && groupBy.length ? `, ${groupBy.join(',')}` : '';
         query = `histogram_quantile(0.95, sum by (le${histBy95}) (rate(${metricName}_bucket${labelSelector}[${rangeStr}])))`;
         break;
       case 'p99':
-        const histBy99 = groupBy && groupBy.length ? `, ${groupBy.join(',')}` : '';
+        const histBy99 =
+          groupBy && groupBy.length ? `, ${groupBy.join(',')}` : '';
         query = `histogram_quantile(0.99, sum by (le${histBy99}) (rate(${metricName}_bucket${labelSelector}[${rangeStr}])))`;
         break;
       case 'count':

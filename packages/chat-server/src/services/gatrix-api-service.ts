@@ -112,7 +112,8 @@ export class GatrixApiService {
       logger.error('Token verification failed:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Token verification failed',
+        error:
+          error instanceof Error ? error.message : 'Token verification failed',
       };
     }
   }
@@ -212,10 +213,8 @@ export class GatrixApiService {
     lastActivityAt: Date;
   }): Promise<boolean> {
     try {
-      const response: AxiosResponse<{ success: boolean }> = await this.apiClient.post(
-        '/api/v1/server/chat/activity',
-        data
-      );
+      const response: AxiosResponse<{ success: boolean }> =
+        await this.apiClient.post('/api/v1/server/chat/activity', data);
 
       return response.data.success;
     } catch (error) {
@@ -233,10 +232,8 @@ export class GatrixApiService {
     timestamp: Date;
   }): Promise<boolean> {
     try {
-      const response: AxiosResponse<{ success: boolean }> = await this.apiClient.post(
-        '/api/v1/server/chat/stats',
-        data
-      );
+      const response: AxiosResponse<{ success: boolean }> =
+        await this.apiClient.post('/api/v1/server/chat/stats', data);
 
       return response.data.success;
     } catch (error) {
@@ -256,10 +253,8 @@ export class GatrixApiService {
     metadata?: any;
   }): Promise<boolean> {
     try {
-      const response: AxiosResponse<{ success: boolean }> = await this.apiClient.post(
-        '/api/v1/server/notifications',
-        data
-      );
+      const response: AxiosResponse<{ success: boolean }> =
+        await this.apiClient.post('/api/v1/server/notifications', data);
 
       return response.data.success;
     } catch (error) {
@@ -293,7 +288,10 @@ export class GatrixApiService {
   }
 
   // 사용자 권한 확인 - Server API에는 권한 확인 기능이 없으므로 제거
-  public async checkUserPermission(_userId: number, _permission: string): Promise<boolean> {
+  public async checkUserPermission(
+    _userId: number,
+    _permission: string
+  ): Promise<boolean> {
     try {
       // Server API에는 권한 확인 기능이 없음
       // 필요시 백엔드에 권한 확인 API 추가 필요
@@ -308,7 +306,8 @@ export class GatrixApiService {
   // 헬스 체크 - Server API 사용
   public async healthCheck(): Promise<boolean> {
     try {
-      const response: AxiosResponse<{ success: boolean }> = await this.apiClient.get('/health');
+      const response: AxiosResponse<{ success: boolean }> =
+        await this.apiClient.get('/health');
       return response.data.success;
     } catch (error) {
       logger.error('Gatrix health check failed:', error);
@@ -319,7 +318,8 @@ export class GatrixApiService {
   // Backend readiness 체크
   public async checkReadiness(): Promise<boolean> {
     try {
-      const response: AxiosResponse<{ status: string }> = await this.apiClient.get('/api/v1/ready');
+      const response: AxiosResponse<{ status: string }> =
+        await this.apiClient.get('/api/v1/ready');
       return response.data.status === 'ready';
     } catch (error) {
       // 네트워크 연결 오류는 로그를 출력하지 않음 (backend가 아직 시작되지 않은 정상적인 상황)
@@ -342,9 +342,8 @@ export class GatrixApiService {
   // 채팅 서버 등록 - Server API 사용
   public async registerChatServer(): Promise<boolean> {
     try {
-      const response: AxiosResponse<{ success: boolean }> = await this.apiClient.post(
-        '/api/v1/server/chat/register',
-        {
+      const response: AxiosResponse<{ success: boolean }> =
+        await this.apiClient.post('/api/v1/server/chat/register', {
           serverId: process.env.SERVER_ID,
           host: config.host,
           port: config.port,
@@ -356,8 +355,7 @@ export class GatrixApiService {
             'video-chat',
             'screen-sharing',
           ],
-        }
-      );
+        });
 
       return response.data.success;
     } catch (error) {
@@ -369,12 +367,10 @@ export class GatrixApiService {
   // 채팅 서버 등록 해제 - Server API 사용
   public async unregisterChatServer(): Promise<boolean> {
     try {
-      const response: AxiosResponse<{ success: boolean }> = await this.apiClient.post(
-        '/api/v1/server/chat/unregister',
-        {
+      const response: AxiosResponse<{ success: boolean }> =
+        await this.apiClient.post('/api/v1/server/chat/unregister', {
           serverId: process.env.SERVER_ID,
-        }
-      );
+        });
 
       return response.data.success;
     } catch (error) {

@@ -1,5 +1,7 @@
 import { Response } from 'express';
-import StoreProductService, { StoreProduct } from '../services/store-product-service';
+import StoreProductService, {
+  StoreProduct,
+} from '../services/store-product-service';
 import { TagService } from '../services/tag-service';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cache-keys';
 import { respondWithEtagCache } from '../utils/server-sdk-etag-cache';
@@ -22,21 +24,34 @@ function getLocalizedName(product: StoreProduct, lang: SdkLanguage): string {
     en: product.nameEn,
     zh: product.nameZh,
   };
-  return langMap[lang] || product.nameZh || product.nameKo || product.productName || '';
+  return (
+    langMap[lang] ||
+    product.nameZh ||
+    product.nameKo ||
+    product.productName ||
+    ''
+  );
 }
 
 /**
  * Get localized description for a product based on language
  * Falls back to zh -> ko -> description if requested language is not available
  */
-function getLocalizedDescription(product: StoreProduct, lang: SdkLanguage): string | null {
+function getLocalizedDescription(
+  product: StoreProduct,
+  lang: SdkLanguage
+): string | null {
   const langMap: Record<SdkLanguage, string | null> = {
     ko: product.descriptionKo,
     en: product.descriptionEn,
     zh: product.descriptionZh,
   };
   return (
-    langMap[lang] || product.descriptionZh || product.descriptionKo || product.description || null
+    langMap[lang] ||
+    product.descriptionZh ||
+    product.descriptionKo ||
+    product.description ||
+    null
   );
 }
 
@@ -45,7 +60,11 @@ function getLocalizedDescription(product: StoreProduct, lang: SdkLanguage): stri
  * Removes: id, isActive, metadata, createdBy, updatedBy, createdAt, updatedAt, environment
  * Also removes multi-language fields and replaces with localized name/description
  */
-function stripInternalFields(product: StoreProduct, tags: any[], lang: SdkLanguage) {
+function stripInternalFields(
+  product: StoreProduct,
+  tags: any[],
+  lang: SdkLanguage
+) {
   const {
     // Keep id for SDK event matching
     isActive: _isActive,
@@ -149,7 +168,10 @@ export class ServerStoreProductController {
           // Fetch tags for each product and strip internal fields with localization
           const productsWithTags = await Promise.all(
             result.products.map(async (product) => {
-              const tags = await TagService.listTagsForEntity('store_product', product.id);
+              const tags = await TagService.listTagsForEntity(
+                'store_product',
+                product.id
+              );
               return stripInternalFields(product, tags, lang);
             })
           );
@@ -168,7 +190,10 @@ export class ServerStoreProductController {
         },
       });
     } catch (error) {
-      logger.error('Error in ServerStoreProductController.getStoreProducts:', error);
+      logger.error(
+        'Error in ServerStoreProductController.getStoreProducts:',
+        error
+      );
       res.status(500).json({
         success: false,
         error: {
@@ -211,7 +236,8 @@ export class ServerStoreProductController {
         });
       }
 
-      const product = await StoreProductService.getStoreProductByIdAcrossEnvironments(id);
+      const product =
+        await StoreProductService.getStoreProductByIdAcrossEnvironments(id);
 
       if (!product) {
         return res.status(404).json({
@@ -235,7 +261,10 @@ export class ServerStoreProductController {
       }
 
       // Fetch tags for the product and strip internal fields with localization
-      const tags = await TagService.listTagsForEntity('store_product', product.id);
+      const tags = await TagService.listTagsForEntity(
+        'store_product',
+        product.id
+      );
       const cleanProduct = stripInternalFields(product, tags, lang);
 
       logger.info(
@@ -249,7 +278,10 @@ export class ServerStoreProductController {
         },
       });
     } catch (error) {
-      logger.error('Error in ServerStoreProductController.getStoreProductById:', error);
+      logger.error(
+        'Error in ServerStoreProductController.getStoreProductById:',
+        error
+      );
       res.status(500).json({
         success: false,
         error: {

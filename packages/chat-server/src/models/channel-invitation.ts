@@ -1,7 +1,12 @@
 import { databaseManager } from '../config/database';
 import logger from '../config/logger';
 
-export type InvitationStatus = 'pending' | 'accepted' | 'declined' | 'expired' | 'cancelled';
+export type InvitationStatus =
+  | 'pending'
+  | 'accepted'
+  | 'declined'
+  | 'expired'
+  | 'cancelled';
 
 export interface ChannelInvitationType {
   id: number;
@@ -30,10 +35,14 @@ export class ChannelInvitationModel {
   }
 
   // 초대 생성
-  static async create(data: CreateInvitationData): Promise<ChannelInvitationType> {
+  static async create(
+    data: CreateInvitationData
+  ): Promise<ChannelInvitationType> {
     try {
       // pending 상태의 중복 초대 체크
-      const existingPendingInvitation = await this.knex('chat_channel_invitations')
+      const existingPendingInvitation = await this.knex(
+        'chat_channel_invitations'
+      )
         .where({
           channelId: data.channelId,
           inviteeId: data.inviteeId,
@@ -42,7 +51,9 @@ export class ChannelInvitationModel {
         .first();
 
       if (existingPendingInvitation) {
-        throw new Error('User already has a pending invitation to this channel');
+        throw new Error(
+          'User already has a pending invitation to this channel'
+        );
       }
 
       // 기본 만료 시간: 7일 후
@@ -55,7 +66,9 @@ export class ChannelInvitationModel {
         status: 'pending' as InvitationStatus,
       };
 
-      const [invitationId] = await this.knex('chat_channel_invitations').insert(invitationData);
+      const [invitationId] = await this.knex('chat_channel_invitations').insert(
+        invitationData
+      );
 
       const invitation = await this.findById(invitationId);
       if (!invitation) {
@@ -72,7 +85,9 @@ export class ChannelInvitationModel {
   // ID로 초대 조회
   static async findById(id: number): Promise<ChannelInvitationType | null> {
     try {
-      const invitation = await this.knex('chat_channel_invitations').where('id', id).first();
+      const invitation = await this.knex('chat_channel_invitations')
+        .where('id', id)
+        .first();
 
       return invitation || null;
     } catch (error) {
@@ -88,7 +103,10 @@ export class ChannelInvitationModel {
     options: { limit?: number; offset?: number } = {}
   ): Promise<{ invitations: ChannelInvitationType[]; total: number }> {
     try {
-      let query = this.knex('chat_channel_invitations').where('inviteeId', inviteeId);
+      let query = this.knex('chat_channel_invitations').where(
+        'inviteeId',
+        inviteeId
+      );
 
       if (status) {
         query = query.where('status', status);
@@ -114,7 +132,10 @@ export class ChannelInvitationModel {
 
       return { invitations, total };
     } catch (error) {
-      logger.error(`Failed to find invitations for invitee ${inviteeId}:`, error);
+      logger.error(
+        `Failed to find invitations for invitee ${inviteeId}:`,
+        error
+      );
       throw error;
     }
   }
@@ -126,7 +147,10 @@ export class ChannelInvitationModel {
     options: { limit?: number; offset?: number } = {}
   ): Promise<{ invitations: ChannelInvitationType[]; total: number }> {
     try {
-      let query = this.knex('chat_channel_invitations').where('inviterId', inviterId);
+      let query = this.knex('chat_channel_invitations').where(
+        'inviterId',
+        inviterId
+      );
 
       if (status) {
         query = query.where('status', status);
@@ -152,7 +176,10 @@ export class ChannelInvitationModel {
 
       return { invitations, total };
     } catch (error) {
-      logger.error(`Failed to find invitations by inviter ${inviterId}:`, error);
+      logger.error(
+        `Failed to find invitations by inviter ${inviterId}:`,
+        error
+      );
       throw error;
     }
   }
@@ -164,7 +191,10 @@ export class ChannelInvitationModel {
     options: { limit?: number; offset?: number } = {}
   ): Promise<{ invitations: ChannelInvitationType[]; total: number }> {
     try {
-      let query = this.knex('chat_channel_invitations').where('channelId', channelId);
+      let query = this.knex('chat_channel_invitations').where(
+        'channelId',
+        channelId
+      );
 
       if (status) {
         query = query.where('status', status);
@@ -190,7 +220,10 @@ export class ChannelInvitationModel {
 
       return { invitations, total };
     } catch (error) {
-      logger.error(`Failed to find invitations for channel ${channelId}:`, error);
+      logger.error(
+        `Failed to find invitations for channel ${channelId}:`,
+        error
+      );
       throw error;
     }
   }
@@ -237,7 +270,10 @@ export class ChannelInvitationModel {
   }
 
   // 초대 취소
-  static async cancel(id: number, cancelledBy: number): Promise<ChannelInvitationType> {
+  static async cancel(
+    id: number,
+    cancelledBy: number
+  ): Promise<ChannelInvitationType> {
     try {
       const invitation = await this.findById(id);
       if (!invitation) {
@@ -290,7 +326,10 @@ export class ChannelInvitationModel {
   }
 
   // 중복 초대 확인
-  static async hasPendingInvitation(channelId: number, inviteeId: number): Promise<boolean> {
+  static async hasPendingInvitation(
+    channelId: number,
+    inviteeId: number
+  ): Promise<boolean> {
     try {
       const result = await this.knex('chat_channel_invitations')
         .where({

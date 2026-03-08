@@ -71,7 +71,9 @@ router.get('/sse', authenticateSSE, (req: Request, res: Response) => {
     // Subscribe to admin channels (this endpoint is admin-only)
     sseService.subscribe(clientId, ['admin', 'remote_config', 'campaigns']);
 
-    logger.info(`SSE connection established for user ${userId} with client ${clientId}`);
+    logger.info(
+      `SSE connection established for user ${userId} with client ${clientId}`
+    );
   } catch (error) {
     logger.error('Error establishing SSE connection:', error);
     res.status(500).json({ error: 'Failed to establish SSE connection' });
@@ -79,7 +81,10 @@ router.get('/sse', authenticateSSE, (req: Request, res: Response) => {
 });
 
 // Apply authentication middleware to non-SSE routes
-router.use(['/sse/subscribe', '/sse/unsubscribe', '/test', '/stats'], authenticate as any);
+router.use(
+  ['/sse/subscribe', '/sse/unsubscribe', '/test', '/stats'],
+  authenticate as any
+);
 
 /**
  * Subscribe to specific channels
@@ -88,7 +93,9 @@ router.post('/sse/subscribe', (req: Request, res: Response) => {
   const { clientId, channels } = req.body;
 
   if (!clientId || !Array.isArray(channels)) {
-    return res.status(400).json({ error: 'clientId and channels array are required' });
+    return res
+      .status(400)
+      .json({ error: 'clientId and channels array are required' });
   }
 
   try {
@@ -110,7 +117,9 @@ router.post('/sse/unsubscribe', (req: Request, res: Response) => {
   const { clientId, channels } = req.body;
 
   if (!clientId || !Array.isArray(channels)) {
-    return res.status(400).json({ error: 'clientId and channels array are required' });
+    return res
+      .status(400)
+      .json({ error: 'clientId and channels array are required' });
   }
 
   try {

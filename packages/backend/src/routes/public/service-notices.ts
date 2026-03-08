@@ -48,16 +48,29 @@ router.get('/', async (req, res) => {
           : undefined,
       category: req.query.category as string,
       platform,
-      platformOperator: req.query.platformOperator as 'any_of' | 'include_all' | undefined,
+      platformOperator: req.query.platformOperator as
+        | 'any_of'
+        | 'include_all'
+        | undefined,
       channel,
-      channelOperator: req.query.channelOperator as 'any_of' | 'include_all' | undefined,
+      channelOperator: req.query.channelOperator as
+        | 'any_of'
+        | 'include_all'
+        | undefined,
       subchannel,
-      subchannelOperator: req.query.subchannelOperator as 'any_of' | 'include_all' | undefined,
+      subchannelOperator: req.query.subchannelOperator as
+        | 'any_of'
+        | 'include_all'
+        | undefined,
       search: req.query.search as string,
       environmentId,
     };
 
-    const result = await ServiceNoticeService.getServiceNotices(page, limit, filters);
+    const result = await ServiceNoticeService.getServiceNotices(
+      page,
+      limit,
+      filters
+    );
 
     res.json({
       success: true,
@@ -80,7 +93,10 @@ router.get('/:id', async (req, res) => {
   try {
     const id = req.params.id;
     const environmentId = (req.query.environmentId as string) || 'production';
-    const notice = await ServiceNoticeService.getServiceNoticeById(id, environmentId);
+    const notice = await ServiceNoticeService.getServiceNoticeById(
+      id,
+      environmentId
+    );
 
     if (!notice) {
       return res.status(404).json({

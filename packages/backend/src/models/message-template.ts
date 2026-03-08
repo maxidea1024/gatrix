@@ -42,8 +42,12 @@ export class MessageTemplateModel {
   ): Promise<MessageTemplateListResult> {
     try {
       // Set default values
-      const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
-      const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
+      const limit = filters?.limit
+        ? parseInt(filters.limit.toString(), 10)
+        : 10;
+      const offset = filters?.offset
+        ? parseInt(filters.offset.toString(), 10)
+        : 0;
       const environmentId = filters.environmentId;
 
       logger.debug('🔍 MessageTemplate query filters:', { filters });
@@ -135,17 +139,26 @@ export class MessageTemplateModel {
       };
 
       // Count Query
-      const countQuery = applyFilters(baseQuery()).count('mt.id as total').first();
+      const countQuery = applyFilters(baseQuery())
+        .count('mt.id as total')
+        .first();
 
       // Data Query
       const dataQuery = applyFilters(baseQuery())
-        .select(['mt.*', 'creator.name as createdByName', 'updater.name as updatedByName'])
+        .select([
+          'mt.*',
+          'creator.name as createdByName',
+          'updater.name as updatedByName',
+        ])
         .orderBy('mt.createdAt', 'desc')
         .limit(limit)
         .offset(offset);
 
       // 병렬 실행
-      const [countResult, dataResults] = await Promise.all([countQuery, dataQuery]);
+      const [countResult, dataResults] = await Promise.all([
+        countQuery,
+        dataQuery,
+      ]);
 
       const total = countResult?.total || 0;
 
@@ -183,12 +196,19 @@ export class MessageTemplateModel {
     }
   }
 
-  static async findById(id: string, environmentId: string): Promise<any | null> {
+  static async findById(
+    id: string,
+    environmentId: string
+  ): Promise<any | null> {
     try {
       const template = await db('g_message_templates as mt')
         .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id')
-        .select(['mt.*', 'creator.name as createdByName', 'updater.name as updatedByName'])
+        .select([
+          'mt.*',
+          'creator.name as createdByName',
+          'updater.name as updatedByName',
+        ])
         .where('mt.id', id)
         .where('mt.environmentId', environmentId)
         .first();
@@ -224,7 +244,8 @@ export class MessageTemplateModel {
           environmentId: environmentId,
           name: data.name,
           type: data.type,
-          defaultMessage: data.defaultMessage || data.default_message || data.content || '',
+          defaultMessage:
+            data.defaultMessage || data.default_message || data.content || '',
           isEnabled:
             data.isEnabled !== undefined
               ? data.isEnabled
@@ -232,7 +253,9 @@ export class MessageTemplateModel {
                 ? data.isEnabled
                 : true,
           supportsMultiLanguage:
-            data.supportsMultiLanguage !== undefined ? data.supportsMultiLanguage : false,
+            data.supportsMultiLanguage !== undefined
+              ? data.supportsMultiLanguage
+              : false,
           createdBy: data.createdBy || data.created_by,
           updatedBy: data.updatedBy || data.updated_by,
           createdAt: new Date(),
@@ -262,7 +285,8 @@ export class MessageTemplateModel {
             id: id,
             name: data.name,
             type: data.type,
-            defaultMessage: data.defaultMessage || data.default_message || data.content || '',
+            defaultMessage:
+              data.defaultMessage || data.default_message || data.content || '',
             isEnabled:
               data.isEnabled !== undefined
                 ? data.isEnabled
@@ -281,7 +305,11 @@ export class MessageTemplateModel {
     }
   }
 
-  static async update(id: string, data: any, environmentId: string): Promise<any> {
+  static async update(
+    id: string,
+    data: any,
+    environmentId: string
+  ): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // 메시지 템플릿 업데이트
@@ -292,9 +320,12 @@ export class MessageTemplateModel {
             name: data.name,
             type: data.type,
             defaultMessage: data.defaultMessage || data.content,
-            isEnabled: data.isEnabled !== undefined ? data.isEnabled : data.isEnabled,
+            isEnabled:
+              data.isEnabled !== undefined ? data.isEnabled : data.isEnabled,
             supportsMultiLanguage:
-              data.supportsMultiLanguage !== undefined ? data.supportsMultiLanguage : false,
+              data.supportsMultiLanguage !== undefined
+                ? data.supportsMultiLanguage
+                : false,
             updatedBy: data.updatedBy || data.updated_by,
             updatedAt: new Date(),
           });
@@ -308,7 +339,11 @@ export class MessageTemplateModel {
             templateId: id,
             lang: locale.lang,
             message: locale.message,
-            createdBy: data.updatedBy || data.updated_by || data.createdBy || data.created_by,
+            createdBy:
+              data.updatedBy ||
+              data.updated_by ||
+              data.createdBy ||
+              data.created_by,
             updatedBy: data.updatedBy || data.updated_by,
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -327,7 +362,10 @@ export class MessageTemplateModel {
 
   static async delete(id: string, environmentId: string): Promise<void> {
     try {
-      await db('g_message_templates').where('id', id).where('environmentId', environmentId).del();
+      await db('g_message_templates')
+        .where('id', id)
+        .where('environmentId', environmentId)
+        .del();
     } catch (error) {
       logger.error('Error deleting message template:', error);
       throw error;
@@ -335,7 +373,10 @@ export class MessageTemplateModel {
   }
 
   // 추가 메서드들
-  static async findByName(name: string, excludeId?: string): Promise<any | null> {
+  static async findByName(
+    name: string,
+    excludeId?: string
+  ): Promise<any | null> {
     try {
       let query = db('g_message_templates').where('name', name);
 
@@ -351,7 +392,11 @@ export class MessageTemplateModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(templateId: string, tagIds: string[], createdBy?: string): Promise<void> {
+  static async setTags(
+    templateId: string,
+    tagIds: string[],
+    createdBy?: string
+  ): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         // Existing 태그 할당 Delete

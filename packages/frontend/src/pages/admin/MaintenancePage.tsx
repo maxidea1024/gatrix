@@ -35,10 +35,16 @@ import 'dayjs/locale/zh';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-import { maintenanceService, MaintenanceType } from '@/services/maintenanceService';
+import {
+  maintenanceService,
+  MaintenanceType,
+} from '@/services/maintenanceService';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
-import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
+import {
+  messageTemplateService,
+  MessageTemplate,
+} from '@/services/messageTemplateService';
 import MultiLanguageMessageInput, {
   MessageLocale,
   MultiLanguageMessageInputRef,
@@ -84,8 +90,10 @@ const MaintenancePage: React.FC = () => {
   // Status
   const [isLoading, setIsLoading] = useState(true); // Initial loading state to prevent flicker
   const [isMaintenance, setIsMaintenance] = useState(false);
-  const [maintenanceStatus, setMaintenanceStatus] = useState<MaintenanceStatusType>('inactive');
-  const [currentMaintenanceDetail, setCurrentMaintenanceDetail] = useState<any>(null);
+  const [maintenanceStatus, setMaintenanceStatus] =
+    useState<MaintenanceStatusType>('inactive');
+  const [currentMaintenanceDetail, setCurrentMaintenanceDetail] =
+    useState<any>(null);
   const [type, setType] = useState<MaintenanceType>('regular');
   const [startsAt, setStartsAt] = useState<Dayjs | null>(null);
   const updatedBySSE = useRef(false);
@@ -100,11 +108,15 @@ const MaintenancePage: React.FC = () => {
   const [kickDelayMinutes, setKickDelayMinutes] = useState<number>(5); // 유예시간 (분) - Default values 5분
 
   // Input mode
-  const [inputMode, setInputMode] = useState<'direct' | 'template' | ''>('direct');
+  const [inputMode, setInputMode] = useState<'direct' | 'template' | ''>(
+    'direct'
+  );
 
   // Direct input state
   const [baseMsg, setBaseMsg] = useState('');
-  const [locales, setLocales] = useState<Array<{ lang: 'ko' | 'en' | 'zh'; message: string }>>([]);
+  const [locales, setLocales] = useState<
+    Array<{ lang: 'ko' | 'en' | 'zh'; message: string }>
+  >([]);
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
 
   // Templates
@@ -118,13 +130,19 @@ const MaintenancePage: React.FC = () => {
       ? !!(
           selectedTpl &&
           ((selectedTpl.defaultMessage && selectedTpl.defaultMessage.trim()) ||
-            (selectedTpl.locales && selectedTpl.locales.some((l) => l.message && l.message.trim())))
+            (selectedTpl.locales &&
+              selectedTpl.locales.some((l) => l.message && l.message.trim())))
         )
-      : !!((baseMsg && baseMsg.trim()) || locales.some((l) => l.message && l.message.trim()));
+      : !!(
+          (baseMsg && baseMsg.trim()) ||
+          locales.some((l) => l.message && l.message.trim())
+        );
 
   // Confirm dialog
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [confirmMode, setConfirmMode] = useState<'start' | 'stop' | 'update' | null>(null);
+  const [confirmMode, setConfirmMode] = useState<
+    'start' | 'stop' | 'update' | null
+  >(null);
   const [confirmInput, setConfirmInput] = useState('');
 
   // Periodically recompute maintenance status when scheduled
@@ -136,7 +154,10 @@ const MaintenancePage: React.FC = () => {
     }
 
     const checkStatusChange = () => {
-      const newStatus = computeMaintenanceStatus(isMaintenance, currentMaintenanceDetail);
+      const newStatus = computeMaintenanceStatus(
+        isMaintenance,
+        currentMaintenanceDetail
+      );
       if (newStatus !== maintenanceStatus) {
         setMaintenanceStatus(newStatus);
       }
@@ -164,15 +185,26 @@ const MaintenancePage: React.FC = () => {
         // This includes: active maintenance, scheduled maintenance (future), and past maintenance with settings
         if (detail && isUnderMaintenance) {
           setType(detail.type);
-          setStartsAt(detail.startsAt ? dayjs.utc(detail.startsAt).tz(getStoredTimezone()) : null);
-          setEndsAt(detail.endsAt ? dayjs.utc(detail.endsAt).tz(getStoredTimezone()) : null);
+          setStartsAt(
+            detail.startsAt
+              ? dayjs.utc(detail.startsAt).tz(getStoredTimezone())
+              : null
+          );
+          setEndsAt(
+            detail.endsAt
+              ? dayjs.utc(detail.endsAt).tz(getStoredTimezone())
+              : null
+          );
           setBaseMsg(detail.message || '');
           setKickExistingPlayers(detail.kickExistingPlayers || false);
           setKickDelayMinutes(detail.kickDelayMinutes || 5);
           const d: any[] = [];
-          if (detail.localeMessages?.ko) d.push({ lang: 'ko', message: detail.localeMessages.ko });
-          if (detail.localeMessages?.en) d.push({ lang: 'en', message: detail.localeMessages.en });
-          if (detail.localeMessages?.zh) d.push({ lang: 'zh', message: detail.localeMessages.zh });
+          if (detail.localeMessages?.ko)
+            d.push({ lang: 'ko', message: detail.localeMessages.ko });
+          if (detail.localeMessages?.en)
+            d.push({ lang: 'en', message: detail.localeMessages.en });
+          if (detail.localeMessages?.zh)
+            d.push({ lang: 'zh', message: detail.localeMessages.zh });
           setLocales(d as any);
         } else {
           // No maintenance configured - start with clean state
@@ -224,10 +256,16 @@ const MaintenancePage: React.FC = () => {
     const originalData = {
       type: currentMaintenanceDetail.type,
       startsAt: currentMaintenanceDetail.startsAt
-        ? dayjs.utc(currentMaintenanceDetail.startsAt).tz(getStoredTimezone()).format()
+        ? dayjs
+            .utc(currentMaintenanceDetail.startsAt)
+            .tz(getStoredTimezone())
+            .format()
         : null,
       endsAt: currentMaintenanceDetail.endsAt
-        ? dayjs.utc(currentMaintenanceDetail.endsAt).tz(getStoredTimezone()).format()
+        ? dayjs
+            .utc(currentMaintenanceDetail.endsAt)
+            .tz(getStoredTimezone())
+            .format()
         : null,
       kickExistingPlayers: !!currentMaintenanceDetail.kickExistingPlayers,
       kickDelayMinutes: currentMaintenanceDetail.kickExistingPlayers
@@ -266,15 +304,26 @@ const MaintenancePage: React.FC = () => {
         // 점검 중일 때만 Existing Settings을 불러옴 (SSE)
         if (detail && !!isUnderMaintenance) {
           setType(detail.type);
-          setStartsAt(detail.startsAt ? dayjs.utc(detail.startsAt).tz(getStoredTimezone()) : null);
-          setEndsAt(detail.endsAt ? dayjs.utc(detail.endsAt).tz(getStoredTimezone()) : null);
+          setStartsAt(
+            detail.startsAt
+              ? dayjs.utc(detail.startsAt).tz(getStoredTimezone())
+              : null
+          );
+          setEndsAt(
+            detail.endsAt
+              ? dayjs.utc(detail.endsAt).tz(getStoredTimezone())
+              : null
+          );
           setBaseMsg(detail.message || '');
           setKickExistingPlayers(detail.kickExistingPlayers || false);
           setKickDelayMinutes(detail.kickDelayMinutes || 5);
           const d: any[] = [];
-          if (detail.localeMessages?.ko) d.push({ lang: 'ko', message: detail.localeMessages.ko });
-          if (detail.localeMessages?.en) d.push({ lang: 'en', message: detail.localeMessages.en });
-          if (detail.localeMessages?.zh) d.push({ lang: 'zh', message: detail.localeMessages.zh });
+          if (detail.localeMessages?.ko)
+            d.push({ lang: 'ko', message: detail.localeMessages.ko });
+          if (detail.localeMessages?.en)
+            d.push({ lang: 'en', message: detail.localeMessages.en });
+          if (detail.localeMessages?.zh)
+            d.push({ lang: 'zh', message: detail.localeMessages.zh });
           setLocales(d as any);
         } else {
           // 점검 중이 아니면 깨끗한 Status로 Initialization
@@ -350,9 +399,12 @@ const MaintenancePage: React.FC = () => {
 
         // 최소 5분 Validation
         if (duration < 5) {
-          enqueueSnackbar(t('maintenance.validationMinDuration', { duration }), {
-            variant: 'error',
-          });
+          enqueueSnackbar(
+            t('maintenance.validationMinDuration', { duration }),
+            {
+              variant: 'error',
+            }
+          );
           endsAtRef.current?.focus();
           return { valid: false };
         }
@@ -396,15 +448,23 @@ const MaintenancePage: React.FC = () => {
               startsAt: startsAt ? startsAt.format() : null,
               endsAt: endsAt ? endsAt.format() : null,
               kickExistingPlayers,
-              kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
+              kickDelayMinutes: kickExistingPlayers
+                ? kickDelayMinutes
+                : undefined,
               message: tpl?.defaultMessage || undefined,
             };
             // Only include localeMessages if multi-language is supported
             if (tpl?.supportsMultiLanguage) {
               result.localeMessages = {
-                ko: tpl?.locales?.find((l) => l.lang === 'ko')?.message || undefined,
-                en: tpl?.locales?.find((l) => l.lang === 'en')?.message || undefined,
-                zh: tpl?.locales?.find((l) => l.lang === 'zh')?.message || undefined,
+                ko:
+                  tpl?.locales?.find((l) => l.lang === 'ko')?.message ||
+                  undefined,
+                en:
+                  tpl?.locales?.find((l) => l.lang === 'en')?.message ||
+                  undefined,
+                zh:
+                  tpl?.locales?.find((l) => l.lang === 'zh')?.message ||
+                  undefined,
               };
             }
             return result;
@@ -415,16 +475,23 @@ const MaintenancePage: React.FC = () => {
             startsAt: startsAt ? startsAt.format() : null,
             endsAt: endsAt ? endsAt.format() : null,
             kickExistingPlayers,
-            kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
+            kickDelayMinutes: kickExistingPlayers
+              ? kickDelayMinutes
+              : undefined,
             message: baseMsg || undefined,
             ...(supportsMultiLanguage && locales.length > 0
               ? {
-                  localeMessages: Object.fromEntries(locales.map((l) => [l.lang, l.message])),
+                  localeMessages: Object.fromEntries(
+                    locales.map((l) => [l.lang, l.message])
+                  ),
                 }
               : {}),
           };
 
-    const response = await maintenanceService.setStatus(projectApiPath, payload as any);
+    const response = await maintenanceService.setStatus(
+      projectApiPath,
+      payload as any
+    );
 
     if (response.isChangeRequest) {
       // showChangeRequestCreatedToast();
@@ -435,7 +502,10 @@ const MaintenancePage: React.FC = () => {
   };
 
   const stopMaintenance = async () => {
-    await maintenanceService.setStatus(projectApiPath, { isMaintenance: false, type });
+    await maintenanceService.setStatus(projectApiPath, {
+      isMaintenance: false,
+      type,
+    });
     setIsMaintenance(false);
   };
 
@@ -456,15 +526,23 @@ const MaintenancePage: React.FC = () => {
               startsAt: startsAt ? startsAt.toISOString() : null,
               endsAt: endsAt ? endsAt.toISOString() : null,
               kickExistingPlayers,
-              kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
+              kickDelayMinutes: kickExistingPlayers
+                ? kickDelayMinutes
+                : undefined,
               message: tpl?.defaultMessage || undefined,
             };
             // Only include localeMessages if multi-language is supported
             if (tpl?.supportsMultiLanguage) {
               result.localeMessages = {
-                ko: tpl?.locales?.find((l) => l.lang === 'ko')?.message || undefined,
-                en: tpl?.locales?.find((l) => l.lang === 'en')?.message || undefined,
-                zh: tpl?.locales?.find((l) => l.lang === 'zh')?.message || undefined,
+                ko:
+                  tpl?.locales?.find((l) => l.lang === 'ko')?.message ||
+                  undefined,
+                en:
+                  tpl?.locales?.find((l) => l.lang === 'en')?.message ||
+                  undefined,
+                zh:
+                  tpl?.locales?.find((l) => l.lang === 'zh')?.message ||
+                  undefined,
               };
             }
             return result;
@@ -475,11 +553,15 @@ const MaintenancePage: React.FC = () => {
             startsAt: startsAt ? startsAt.format() : null,
             endsAt: endsAt ? endsAt.format() : null,
             kickExistingPlayers,
-            kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
+            kickDelayMinutes: kickExistingPlayers
+              ? kickDelayMinutes
+              : undefined,
             message: baseMsg || undefined,
             ...(supportsMultiLanguage && locales.length > 0
               ? {
-                  localeMessages: Object.fromEntries(locales.map((l) => [l.lang, l.message])),
+                  localeMessages: Object.fromEntries(
+                    locales.map((l) => [l.lang, l.message])
+                  ),
                 }
               : {}),
           };
@@ -515,7 +597,9 @@ const MaintenancePage: React.FC = () => {
           <Card
             sx={{
               borderColor: (theme) =>
-                isMaintenance ? theme.palette.error.main : theme.palette.success.main,
+                isMaintenance
+                  ? theme.palette.error.main
+                  : theme.palette.success.main,
               borderWidth: 1,
               borderStyle: 'solid',
               flex: 1,
@@ -538,11 +622,15 @@ const MaintenancePage: React.FC = () => {
                         variant="subtitle1"
                         sx={{
                           fontWeight: 600,
-                          color: getMaintenanceStatusDisplay(maintenanceStatus).color,
+                          color:
+                            getMaintenanceStatusDisplay(maintenanceStatus)
+                              .color,
                         }}
                       >
                         {getMaintenanceStatusDisplay(maintenanceStatus).icon}{' '}
-                        {t(getMaintenanceStatusDisplay(maintenanceStatus).label)}
+                        {t(
+                          getMaintenanceStatusDisplay(maintenanceStatus).label
+                        )}
                       </Typography>
                     </Box>
 
@@ -592,7 +680,13 @@ const MaintenancePage: React.FC = () => {
                             >
                               {t('maintenance.type')}:
                             </Box>
-                            <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                            <Box
+                              component="td"
+                              sx={{
+                                fontSize: '0.875rem',
+                                verticalAlign: 'top',
+                              }}
+                            >
                               {type === 'regular'
                                 ? t('maintenance.types.regular')
                                 : t('maintenance.types.emergency')}
@@ -613,17 +707,30 @@ const MaintenancePage: React.FC = () => {
                             >
                               {t('maintenance.maintenancePeriodLabel')}:
                             </Box>
-                            <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                            <Box
+                              component="td"
+                              sx={{
+                                fontSize: '0.875rem',
+                                verticalAlign: 'top',
+                              }}
+                            >
                               {(() => {
                                 if (startsAt && endsAt) {
-                                  const duration = endsAt.diff(startsAt, 'minute');
+                                  const duration = endsAt.diff(
+                                    startsAt,
+                                    'minute'
+                                  );
                                   const hours = Math.floor(duration / 60);
                                   const minutes = duration % 60;
                                   const durationParts = [];
                                   if (hours > 0)
-                                    durationParts.push(`${hours}${t('maintenance.hoursUnit')}`);
+                                    durationParts.push(
+                                      `${hours}${t('maintenance.hoursUnit')}`
+                                    );
                                   if (minutes > 0)
-                                    durationParts.push(`${minutes}${t('maintenance.minutesUnit')}`);
+                                    durationParts.push(
+                                      `${minutes}${t('maintenance.minutesUnit')}`
+                                    );
                                   const durationText = durationParts.join(' ');
                                   return (
                                     <Box component="span">
@@ -674,7 +781,10 @@ const MaintenancePage: React.FC = () => {
                                 }}
                               >
                                 {startsAt.format('YYYY-MM-DD A h:mm')}
-                                <Box component="span" sx={{ color: 'text.secondary', ml: 0.5 }}>
+                                <Box
+                                  component="span"
+                                  sx={{ color: 'text.secondary', ml: 0.5 }}
+                                >
                                   ({startsAt.toISOString()})
                                 </Box>
                               </Box>
@@ -702,13 +812,15 @@ const MaintenancePage: React.FC = () => {
                                   verticalAlign: 'top',
                                 }}
                               >
-                                {endsAt.format('YYYY-MM-DD A h:mm')} ({endsAt.toISOString()})
+                                {endsAt.format('YYYY-MM-DD A h:mm')} (
+                                {endsAt.toISOString()})
                               </Box>
                             </Box>
                           )}
 
                           {(baseMsg ||
-                            (inputMode === 'template' && selectedTpl?.defaultMessage)) && (
+                            (inputMode === 'template' &&
+                              selectedTpl?.defaultMessage)) && (
                             <Box component="tr">
                               <Box
                                 component="td"
@@ -720,7 +832,8 @@ const MaintenancePage: React.FC = () => {
                                   pr: 2,
                                 }}
                               >
-                                {t('clientVersions.maintenance.defaultMessage')}:
+                                {t('clientVersions.maintenance.defaultMessage')}
+                                :
                               </Box>
                               <Box
                                 component="td"
@@ -733,7 +846,9 @@ const MaintenancePage: React.FC = () => {
                                   whiteSpace: 'nowrap',
                                 }}
                               >
-                                {inputMode === 'template' ? selectedTpl?.defaultMessage : baseMsg}
+                                {inputMode === 'template'
+                                  ? selectedTpl?.defaultMessage
+                                  : baseMsg}
                               </Box>
                             </Box>
                           )}
@@ -757,7 +872,9 @@ const MaintenancePage: React.FC = () => {
                               sx={{
                                 fontSize: '0.875rem',
                                 verticalAlign: 'top',
-                                color: kickExistingPlayers ? 'warning.main' : 'success.main',
+                                color: kickExistingPlayers
+                                  ? 'warning.main'
+                                  : 'success.main',
                               }}
                             >
                               {kickExistingPlayers
@@ -816,9 +933,9 @@ const MaintenancePage: React.FC = () => {
                                   verticalAlign: 'top',
                                 }}
                               >
-                                {dayjs(currentMaintenanceDetail.updatedAt).format(
-                                  'YYYY-MM-DD A h:mm'
-                                )}{' '}
+                                {dayjs(
+                                  currentMaintenanceDetail.updatedAt
+                                ).format('YYYY-MM-DD A h:mm')}{' '}
                                 ({currentMaintenanceDetail.updatedAt})
                               </Box>
                             </Box>
@@ -835,11 +952,17 @@ const MaintenancePage: React.FC = () => {
                         select
                         label={t('maintenance.type')}
                         value={type}
-                        onChange={(e) => setType(e.target.value as MaintenanceType)}
+                        onChange={(e) =>
+                          setType(e.target.value as MaintenanceType)
+                        }
                         fullWidth
                       >
-                        <MenuItem value="regular">{t('maintenance.types.regular')}</MenuItem>
-                        <MenuItem value="emergency">{t('maintenance.types.emergency')}</MenuItem>
+                        <MenuItem value="regular">
+                          {t('maintenance.types.regular')}
+                        </MenuItem>
+                        <MenuItem value="emergency">
+                          {t('maintenance.types.emergency')}
+                        </MenuItem>
                       </TextField>
                       <Typography
                         variant="caption"
@@ -944,7 +1067,9 @@ const MaintenancePage: React.FC = () => {
                             control={
                               <Switch
                                 checked={kickExistingPlayers}
-                                onChange={(e) => setKickExistingPlayers(e.target.checked)}
+                                onChange={(e) =>
+                                  setKickExistingPlayers(e.target.checked)
+                                }
                                 color="warning"
                               />
                             }
@@ -970,15 +1095,27 @@ const MaintenancePage: React.FC = () => {
                               select
                               label={t('maintenance.kickDelayMinutes')}
                               value={kickDelayMinutes}
-                              onChange={(e) => setKickDelayMinutes(Number(e.target.value))}
+                              onChange={(e) =>
+                                setKickDelayMinutes(Number(e.target.value))
+                              }
                               fullWidth
                               size="small"
                             >
-                              <MenuItem value={0}>{t('maintenance.kickDelayImmediate')}</MenuItem>
-                              <MenuItem value={1}>{t('maintenance.kickDelay1Min')}</MenuItem>
-                              <MenuItem value={5}>{t('maintenance.kickDelay5Min')}</MenuItem>
-                              <MenuItem value={10}>{t('maintenance.kickDelay10Min')}</MenuItem>
-                              <MenuItem value={30}>{t('maintenance.kickDelay30Min')}</MenuItem>
+                              <MenuItem value={0}>
+                                {t('maintenance.kickDelayImmediate')}
+                              </MenuItem>
+                              <MenuItem value={1}>
+                                {t('maintenance.kickDelay1Min')}
+                              </MenuItem>
+                              <MenuItem value={5}>
+                                {t('maintenance.kickDelay5Min')}
+                              </MenuItem>
+                              <MenuItem value={10}>
+                                {t('maintenance.kickDelay10Min')}
+                              </MenuItem>
+                              <MenuItem value={30}>
+                                {t('maintenance.kickDelay30Min')}
+                              </MenuItem>
                             </TextField>
                             <Typography
                               variant="caption"
@@ -1015,8 +1152,12 @@ const MaintenancePage: React.FC = () => {
                         onChange={(e) => setInputMode(e.target.value as any)}
                         fullWidth
                       >
-                        <MenuItem value="direct">{t('maintenance.directInput')}</MenuItem>
-                        <MenuItem value="template">{t('maintenance.useTemplate')}</MenuItem>
+                        <MenuItem value="direct">
+                          {t('maintenance.directInput')}
+                        </MenuItem>
+                        <MenuItem value="template">
+                          {t('maintenance.useTemplate')}
+                        </MenuItem>
                       </TextField>
                       <Typography
                         variant="caption"
@@ -1037,7 +1178,9 @@ const MaintenancePage: React.FC = () => {
                             select
                             label={t('maintenance.selectTemplate')}
                             value={selectedTplId}
-                            onChange={(e) => setSelectedTplId(Number(e.target.value))}
+                            onChange={(e) =>
+                              setSelectedTplId(Number(e.target.value))
+                            }
                             fullWidth
                           >
                             <MenuItem value="">{t('common.select')}</MenuItem>
@@ -1064,43 +1207,53 @@ const MaintenancePage: React.FC = () => {
                               <Typography variant="subtitle2" gutterBottom>
                                 {t('clientVersions.maintenance.defaultMessage')}
                               </Typography>
-                              <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                                {tpls.find((t) => t.id === selectedTplId)?.defaultMessage || '-'}
+                              <Typography
+                                variant="body2"
+                                sx={{ whiteSpace: 'pre-wrap' }}
+                              >
+                                {tpls.find((t) => t.id === selectedTplId)
+                                  ?.defaultMessage || '-'}
                               </Typography>
                               <Stack spacing={1} sx={{ mt: 2 }}>
-                                {(tpls.find((t) => t.id === selectedTplId)?.locales || []).map(
-                                  (l) => {
-                                    const langLabels = {
-                                      ko: '한국어',
-                                      en: '영어',
-                                      zh: '중국어',
-                                    };
-                                    return (
-                                      <Box
-                                        key={l.lang}
+                                {(
+                                  tpls.find((t) => t.id === selectedTplId)
+                                    ?.locales || []
+                                ).map((l) => {
+                                  const langLabels = {
+                                    ko: '한국어',
+                                    en: '영어',
+                                    zh: '중국어',
+                                  };
+                                  return (
+                                    <Box
+                                      key={l.lang}
+                                      sx={{
+                                        display: 'flex',
+                                        gap: 1,
+                                        alignItems: 'flex-start',
+                                      }}
+                                    >
+                                      <Chip
+                                        label={
+                                          langLabels[
+                                            l.lang as keyof typeof langLabels
+                                          ] || l.lang
+                                        }
+                                        size="small"
                                         sx={{
-                                          display: 'flex',
-                                          gap: 1,
-                                          alignItems: 'flex-start',
+                                          width: 96,
+                                          justifyContent: 'flex-start',
                                         }}
+                                      />
+                                      <Typography
+                                        variant="body2"
+                                        sx={{ whiteSpace: 'pre-wrap' }}
                                       >
-                                        <Chip
-                                          label={
-                                            langLabels[l.lang as keyof typeof langLabels] || l.lang
-                                          }
-                                          size="small"
-                                          sx={{
-                                            width: 96,
-                                            justifyContent: 'flex-start',
-                                          }}
-                                        />
-                                        <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                                          {l.message}
-                                        </Typography>
-                                      </Box>
-                                    );
-                                  }
-                                )}
+                                        {l.message}
+                                      </Typography>
+                                    </Box>
+                                  );
+                                })}
                               </Stack>
                             </CardContent>
                           </Card>
@@ -1112,7 +1265,9 @@ const MaintenancePage: React.FC = () => {
                       <MultiLanguageMessageInput
                         defaultMessage={baseMsg}
                         onDefaultMessageChange={setBaseMsg}
-                        defaultMessageLabel={t('clientVersions.maintenance.defaultMessage')}
+                        defaultMessageLabel={t(
+                          'clientVersions.maintenance.defaultMessage'
+                        )}
                         defaultMessageHelperText={t(
                           'clientVersions.maintenance.defaultMessageHelp'
                         )}
@@ -1133,8 +1288,12 @@ const MaintenancePage: React.FC = () => {
                             setLocales([]);
                           }
                         }}
-                        supportsMultiLanguageLabel={t('maintenance.useLanguageSpecificMessages')}
-                        supportsMultiLanguageHelperText={t('maintenance.supportsMultiLanguageHelp')}
+                        supportsMultiLanguageLabel={t(
+                          'maintenance.useLanguageSpecificMessages'
+                        )}
+                        supportsMultiLanguageHelperText={t(
+                          'maintenance.supportsMultiLanguageHelp'
+                        )}
                         locales={locales.map((l) => ({
                           lang: l.lang as 'ko' | 'en' | 'zh',
                           message: l.message,
@@ -1154,7 +1313,9 @@ const MaintenancePage: React.FC = () => {
                             setSupportsMultiLanguage(true);
                           }
                         }}
-                        languageSpecificMessagesLabel={t('maintenance.languageSpecificMessages')}
+                        languageSpecificMessagesLabel={t(
+                          'maintenance.languageSpecificMessages'
+                        )}
                         enableTranslation={true}
                         translateButtonLabel={t('common.autoTranslate')}
                         translateTooltip={t('maintenance.translateTooltip')}
@@ -1300,7 +1461,9 @@ const MaintenancePage: React.FC = () => {
             sx={{
               '& .MuiBackdrop-root': {
                 backgroundColor: (theme) =>
-                  theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.3)',
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(0, 0, 0, 0.2)'
+                    : 'rgba(0, 0, 0, 0.3)',
               },
             }}
           >
@@ -1312,7 +1475,10 @@ const MaintenancePage: React.FC = () => {
                     ? t('maintenance.confirmUpdateTitle')
                     : t('maintenance.confirmStopTitle')}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: 'text.secondary', mt: 0.5 }}
+              >
                 {confirmMode === 'start'
                   ? t('maintenance.confirmStartSubtitle')
                   : confirmMode === 'update'
@@ -1338,7 +1504,10 @@ const MaintenancePage: React.FC = () => {
                       : 'rgba(25, 118, 210, 0.2)',
                 }}
               >
-                <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 600, color: 'primary.main' }}>
+                <Typography
+                  variant="h6"
+                  sx={{ mb: 1.5, fontWeight: 600, color: 'primary.main' }}
+                >
                   {confirmMode === 'start'
                     ? t('maintenance.settingsSummaryTitle')
                     : t('maintenance.currentSettingsTitle')}
@@ -1366,7 +1535,10 @@ const MaintenancePage: React.FC = () => {
                       >
                         {t('maintenance.type')}:
                       </Box>
-                      <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                      <Box
+                        component="td"
+                        sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}
+                      >
                         {type === 'regular'
                           ? t('maintenance.types.regular')
                           : t('maintenance.types.emergency')}
@@ -1387,7 +1559,10 @@ const MaintenancePage: React.FC = () => {
                       >
                         {t('maintenance.maintenancePeriodLabel')}:
                       </Box>
-                      <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                      <Box
+                        component="td"
+                        sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}
+                      >
                         {(() => {
                           if (startsAt && endsAt) {
                             const duration = endsAt.diff(startsAt, 'minute');
@@ -1395,9 +1570,13 @@ const MaintenancePage: React.FC = () => {
                             const minutes = duration % 60;
                             const durationParts = [];
                             if (hours > 0)
-                              durationParts.push(`${hours}${t('maintenance.hoursUnit')}`);
+                              durationParts.push(
+                                `${hours}${t('maintenance.hoursUnit')}`
+                              );
                             if (minutes > 0)
-                              durationParts.push(`${minutes}${t('maintenance.minutesUnit')}`);
+                              durationParts.push(
+                                `${minutes}${t('maintenance.minutesUnit')}`
+                              );
                             const durationText = durationParts.join(' ');
                             return (
                               <Box component="span">
@@ -1440,7 +1619,10 @@ const MaintenancePage: React.FC = () => {
                         >
                           {t('maintenance.startsAt')}:
                         </Box>
-                        <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                        <Box
+                          component="td"
+                          sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}
+                        >
                           {startsAt.format('YYYY-MM-DD A h:mm')} (
                           {startsAt.isValid() ? startsAt.toISOString() : '-'})
                         </Box>
@@ -1461,7 +1643,10 @@ const MaintenancePage: React.FC = () => {
                         >
                           {t('maintenance.endsAt')}:
                         </Box>
-                        <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                        <Box
+                          component="td"
+                          sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}
+                        >
                           {endsAt.format('YYYY-MM-DD A h:mm')} (
                           {endsAt.isValid() ? endsAt.toISOString() : '-'})
                         </Box>
@@ -1487,7 +1672,9 @@ const MaintenancePage: React.FC = () => {
                         sx={{
                           fontSize: '0.875rem',
                           verticalAlign: 'top',
-                          color: kickExistingPlayers ? 'warning.main' : 'success.main',
+                          color: kickExistingPlayers
+                            ? 'warning.main'
+                            : 'success.main',
                         }}
                       >
                         {kickExistingPlayers
@@ -1496,7 +1683,9 @@ const MaintenancePage: React.FC = () => {
                       </Box>
                     </Box>
 
-                    {(baseMsg || (inputMode === 'template' && selectedTpl?.defaultMessage)) && (
+                    {(baseMsg ||
+                      (inputMode === 'template' &&
+                        selectedTpl?.defaultMessage)) && (
                       <Box component="tr">
                         <Box
                           component="td"
@@ -1521,7 +1710,9 @@ const MaintenancePage: React.FC = () => {
                             whiteSpace: 'nowrap',
                           }}
                         >
-                          {inputMode === 'template' ? selectedTpl?.defaultMessage : baseMsg}
+                          {inputMode === 'template'
+                            ? selectedTpl?.defaultMessage
+                            : baseMsg}
                         </Box>
                       </Box>
                     )}
@@ -1544,7 +1735,10 @@ const MaintenancePage: React.FC = () => {
                             : t('maintenance.setBy')}
                           :
                         </Box>
-                        <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                        <Box
+                          component="td"
+                          sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}
+                        >
                           {user.name} ({user.email})
                         </Box>
                       </Box>
@@ -1597,13 +1791,25 @@ const MaintenancePage: React.FC = () => {
                     <>
                       {kickExistingPlayers ? (
                         <>
-                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          <Typography
+                            component="li"
+                            variant="body2"
+                            sx={{ mb: 0.5 }}
+                          >
                             {t('maintenance.impactItemKick1')}
                           </Typography>
-                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          <Typography
+                            component="li"
+                            variant="body2"
+                            sx={{ mb: 0.5 }}
+                          >
                             {t('maintenance.impactItemKick2')}
                           </Typography>
-                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          <Typography
+                            component="li"
+                            variant="body2"
+                            sx={{ mb: 0.5 }}
+                          >
                             {t('maintenance.impactItemKick3')}
                           </Typography>
                           <Typography component="li" variant="body2">
@@ -1612,13 +1818,25 @@ const MaintenancePage: React.FC = () => {
                         </>
                       ) : (
                         <>
-                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          <Typography
+                            component="li"
+                            variant="body2"
+                            sx={{ mb: 0.5 }}
+                          >
                             {t('maintenance.impactItemNoKick1')}
                           </Typography>
-                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          <Typography
+                            component="li"
+                            variant="body2"
+                            sx={{ mb: 0.5 }}
+                          >
                             {t('maintenance.impactItemNoKick2')}
                           </Typography>
-                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          <Typography
+                            component="li"
+                            variant="body2"
+                            sx={{ mb: 0.5 }}
+                          >
                             {t('maintenance.impactItemNoKick3')}
                           </Typography>
                           <Typography component="li" variant="body2">
@@ -1629,10 +1847,18 @@ const MaintenancePage: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                      <Typography
+                        component="li"
+                        variant="body2"
+                        sx={{ mb: 0.5 }}
+                      >
                         {t('maintenance.restoreItem1')}
                       </Typography>
-                      <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                      <Typography
+                        component="li"
+                        variant="body2"
+                        sx={{ mb: 0.5 }}
+                      >
                         {t('maintenance.restoreItem2')}
                       </Typography>
                       <Typography component="li" variant="body2">
@@ -1674,7 +1900,9 @@ const MaintenancePage: React.FC = () => {
               />
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setConfirmOpen(false)}>{t('common.cancel')}</Button>
+              <Button onClick={() => setConfirmOpen(false)}>
+                {t('common.cancel')}
+              </Button>
               <Button
                 color={
                   confirmMode === 'start'
@@ -1691,7 +1919,10 @@ const MaintenancePage: React.FC = () => {
                       : confirmMode === 'update'
                         ? t('maintenance.confirmUpdateKeyword')
                         : t('maintenance.confirmStopKeyword');
-                  if (confirmInput.trim().toLowerCase() !== expected.toLowerCase()) return;
+                  if (
+                    confirmInput.trim().toLowerCase() !== expected.toLowerCase()
+                  )
+                    return;
                   setConfirmOpen(false);
                   if (confirmMode === 'start') await startMaintenance();
                   if (confirmMode === 'update') await updateMaintenance();

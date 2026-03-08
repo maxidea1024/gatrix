@@ -67,13 +67,19 @@ function BootScreen({ onComplete }: BootScreenProps) {
             style={{ animationDelay: `${msg.delay}ms` }}
           >
             {msg.text || '\u00A0'}
-            {index === visibleLines - 1 && msg.text && <span className="boot-cursor">_</span>}
+            {index === visibleLines - 1 && msg.text && (
+              <span className="boot-cursor">_</span>
+            )}
           </div>
         ))}
       </div>
 
       <div className="boot-progress">
-        <progress className="nes-progress is-success" value={progress} max="100"></progress>
+        <progress
+          className="nes-progress is-success"
+          value={progress}
+          max="100"
+        ></progress>
       </div>
 
       <div className="boot-text dim" style={{ marginTop: '24px' }}>

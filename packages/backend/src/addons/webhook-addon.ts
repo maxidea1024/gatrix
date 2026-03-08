@@ -21,11 +21,17 @@ export class WebhookAddon extends Addon {
     parameters: Record<string, any>,
     integrationId: string
   ): Promise<void> {
-    const { url, contentType, authorization, customHeaders, bodyTemplate } = parameters;
+    const { url, contentType, authorization, customHeaders, bodyTemplate } =
+      parameters;
 
     if (!url) {
       this.logger.warn(`Missing webhook URL for integration ${integrationId}`);
-      await this.registerEvent(integrationId, event, 'failed', 'Missing webhook URL');
+      await this.registerEvent(
+        integrationId,
+        event,
+        'failed',
+        'Missing webhook URL'
+      );
       return;
     }
 
@@ -68,7 +74,9 @@ export class WebhookAddon extends Addon {
         body,
       });
 
-      this.logger.info(`Webhook sent for event ${event.type} (integration: ${integrationId})`);
+      this.logger.info(
+        `Webhook sent for event ${event.type} (integration: ${integrationId})`
+      );
 
       await this.registerEvent(integrationId, event, 'success', '', {
         url: this.maskUrl(url),
@@ -76,7 +84,10 @@ export class WebhookAddon extends Addon {
         contentType: contentType || 'application/json',
       });
     } catch (error) {
-      this.logger.error(`Failed to send webhook for integration ${integrationId}:`, error);
+      this.logger.error(
+        `Failed to send webhook for integration ${integrationId}:`,
+        error
+      );
 
       await this.registerFailure(integrationId, event, error, {
         url: this.maskUrl(url),
