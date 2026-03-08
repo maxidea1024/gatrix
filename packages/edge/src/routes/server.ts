@@ -72,7 +72,8 @@ function serverAuth(req: ServerRequest, res: Response, next: NextFunction): void
     }
     req.cacheKey = cacheKey;
     // Get actual environment ID
-    req.environmentId = environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME) || LEGACY_ENV_NAME;
+    req.environmentId =
+      environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME) || LEGACY_ENV_NAME;
     req.applicationName = (req.headers['x-application-name'] as string) || 'unknown';
     return next();
   }
@@ -285,7 +286,11 @@ router.post('/features/eval', serverAuth, async (req: ServerRequest, res: Respon
   await performEvaluation(
     req,
     res,
-    { environmentId: req.environmentId, applicationName: req.applicationName, cacheKey: req.cacheKey },
+    {
+      environmentId: req.environmentId,
+      applicationName: req.applicationName,
+      cacheKey: req.cacheKey,
+    },
     true
   );
 });
@@ -297,7 +302,11 @@ router.get('/features/eval', serverAuth, async (req: ServerRequest, res: Respons
   await performEvaluation(
     req,
     res,
-    { environmentId: req.environmentId, applicationName: req.applicationName, cacheKey: req.cacheKey },
+    {
+      environmentId: req.environmentId,
+      applicationName: req.applicationName,
+      cacheKey: req.cacheKey,
+    },
     false
   );
 });

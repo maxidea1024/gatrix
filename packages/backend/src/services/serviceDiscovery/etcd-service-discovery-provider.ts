@@ -917,7 +917,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     const mirrorTTL = heartbeatTTL * 3 + 120;
     const key = `service-discovery:mirror:${instance.labels.service}:${instance.instanceId}`;
 
-    await client.set(key, JSON.stringify(instance), { EX: mirrorTTL });
+    await client.set(key, JSON.stringify(instance), 'EX', mirrorTTL);
     logger.debug(`Mirrored service to Redis with TTL ${mirrorTTL}s: ${key}`);
   }
 
@@ -965,7 +965,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     const ttl = parseInt(process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || '60', 10);
     const key = `service-discovery:inactive:${instance.labels.service}:${instance.instanceId}`;
 
-    await client.set(key, JSON.stringify(instance), { EX: ttl });
+    await client.set(key, JSON.stringify(instance), 'EX', ttl);
     logger.debug(`Saved inactive service to Redis with TTL ${ttl}s: ${key}`);
 
     // Also delete the mirror since service is now inactive
@@ -982,21 +982,25 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
     const instances: ServiceInstance[] = [];
 
-    // Scan keys
+    // Scan keys using ioredis scanStream
     const keys: string[] = [];
-    for await (const key of client.scanIterator({
-      MATCH: pattern,
-      COUNT: 100,
-    })) {
-      keys.push(key);
-    }
+    await new Promise<void>((resolve, reject) => {
+      const stream = client.scanStream({
+        match: pattern,
+        count: 100,
+      });
+      stream.on('data', (resultKeys: string[]) => {
+        keys.push(...resultKeys);
+      });
+      stream.on('end', () => resolve());
+      stream.on('error', (err: Error) => reject(err));
+    });
 
     if (keys.length === 0) return [];
 
     // MGET values
-    // Redis MGET requires keys spread arguments in some clients, or array in others.
-    // node-redis v4 .mGet accepts array.
-    const values = await client.mGet(keys);
+    // ioredis .mget accepts spread arguments
+    const values = await client.mget(...keys);
 
     for (const val of values) {
       if (val) {
@@ -1045,12 +1049,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
       // Create a duplicate connection for pub/sub (ioredis requirement)
       this.redisKeyspaceSubscriber = client.duplicate();
-      await this.redisKeyspaceSubscriber.connect();
 
-      // Subscribe to keyspace expired events
-      await this.redisKeyspaceSubscriber.pSubscribe(
-        '__keyevent@0__:expired',
-        async (message: string, channel: string) => {
+      this.redisKeyspaceSubscriber.on(
+        'pmessage',
+        async (_pattern: string, channel: string, message: string) => {
           try {
             // Check if this is an inactive service key
             // Format: service-discovery:inactive:{serviceType}:{instanceId}
@@ -1083,6 +1085,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           }
         }
       );
+
+      // Subscribe to keyspace expired events
+      await this.redisKeyspaceSubscriber.psubscribe('__keyevent@0__:expired');
 
       logger.info('Redis keyspace subscription started for inactive service expiration');
     } catch (error) {

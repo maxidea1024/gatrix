@@ -1,9 +1,9 @@
 declare module 'connect-redis' {
   import { Store } from 'express-session';
-  import { RedisClientType } from 'redis';
+  import Redis from 'ioredis';
 
   interface RedisStoreOptions {
-    client: RedisClientType;
+    client: Redis;
     prefix?: string;
     ttl?: number;
     disableTTL?: boolean;

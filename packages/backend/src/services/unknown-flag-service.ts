@@ -52,14 +52,12 @@ export class UnknownFlagService {
       const metadataKey = `${REDIS_METADATA_PREFIX}${input.environmentId}:${input.flagName}`;
 
       // Increment count in Redis (atomic operation, handles high volume)
-      await client.hIncrBy(bufferKey, 'count', count);
+      await client.hincrby(bufferKey, 'count', count);
 
       // Store metadata (will be overwritten if already exists, which is fine)
       if (input.appName || input.sdkVersion) {
-        const metadata: Record<string, string> = {};
-        if (input.appName) metadata.appName = input.appName;
-        if (input.sdkVersion) metadata.sdkVersion = input.sdkVersion;
-        await client.hSet(metadataKey, metadata);
+        if (input.appName) await client.hset(metadataKey, 'appName', input.appName);
+        if (input.sdkVersion) await client.hset(metadataKey, 'sdkVersion', input.sdkVersion);
       }
 
       // Set TTL to expire old data (24 hours) - auto cleanup if not flushed
@@ -131,7 +129,7 @@ export class UnknownFlagService {
           const flagName = keyParts.slice(1).join(':'); // flagName might contain ":"
 
           // Get count and delete atomically using GETDEL (or GET + DEL)
-          const countData = await client.hGetAll(bufferKey);
+          const countData = await client.hgetall(bufferKey);
           const count = parseInt(countData.count || '0', 10);
 
           if (count === 0) {
@@ -141,7 +139,7 @@ export class UnknownFlagService {
 
           // Get metadata
           const metadataKey = `${REDIS_METADATA_PREFIX}${environmentId}:${flagName}`;
-          const metadata = await client.hGetAll(metadataKey);
+          const metadata = await client.hgetall(metadataKey);
 
           // Delete keys first (to avoid double counting on retry)
           await client.del(bufferKey);

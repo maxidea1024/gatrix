@@ -21,7 +21,11 @@ const LEGACY_ENV_NAME = 'development';
 export const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
 export const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
 export const UNSECURED_EDGE_TOKEN = 'gatrix-unsecured-edge-api-token';
-export const UNSECURED_TOKENS = [UNSECURED_CLIENT_TOKEN, UNSECURED_SERVER_TOKEN, UNSECURED_EDGE_TOKEN];
+export const UNSECURED_TOKENS = [
+  UNSECURED_CLIENT_TOKEN,
+  UNSECURED_SERVER_TOKEN,
+  UNSECURED_EDGE_TOKEN,
+];
 
 export interface ClientRequest extends Request {
   clientContext?: {
@@ -128,7 +132,8 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
       });
       return;
     }
-    const environmentId = environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME) || LEGACY_ENV_NAME;
+    const environmentId =
+      environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME) || LEGACY_ENV_NAME;
     req.clientContext = {
       apiToken,
       applicationName,

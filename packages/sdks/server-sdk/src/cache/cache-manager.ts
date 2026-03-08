@@ -741,7 +741,10 @@ export class CacheManager {
         promises.push(this.surveyService.listByEnvironment(token).catch(() => []));
       if (this.whitelistService)
         promises.push(this.whitelistService.listByEnvironment(token).catch(() => []));
-      if (this.serviceMaintenanceService) promises.push(this.serviceMaintenanceService.getStatusByEnvironment(token).catch(() => null));
+      if (this.serviceMaintenanceService)
+        promises.push(
+          this.serviceMaintenanceService.getStatusByEnvironment(token).catch(() => null)
+        );
       if (this.clientVersionService)
         promises.push(this.clientVersionService.listByEnvironment(token).catch(() => []));
       if (this.serviceNoticeService)
@@ -1174,7 +1177,9 @@ export class CacheManager {
     };
 
     // Helper to convert Map<string, Map<string, T>> (nested maps like featureFlags)
-    const nestedMapToObject = <T>(map: Map<string, Map<string, T>> | undefined): Record<string, T[]> => {
+    const nestedMapToObject = <T>(
+      map: Map<string, Map<string, T>> | undefined
+    ): Record<string, T[]> => {
       if (!map) return {};
       const obj: Record<string, T[]> = {};
       for (const [key, innerMap] of map.entries()) {

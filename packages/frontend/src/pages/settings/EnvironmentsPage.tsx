@@ -1031,7 +1031,12 @@ const EnvironmentsPage: React.FC = () => {
           <Button
             variant="contained"
             onClick={handleCreateEnvironment}
-            disabled={!newEnv.displayName || !newEnv.name || !isValidResourceName(newEnv.name || '') || creating}
+            disabled={
+              !newEnv.displayName ||
+              !newEnv.name ||
+              !isValidResourceName(newEnv.name || '') ||
+              creating
+            }
             startIcon={creating ? <CircularProgress size={20} /> : <AddIcon />}
           >
             {t('environments.create')}

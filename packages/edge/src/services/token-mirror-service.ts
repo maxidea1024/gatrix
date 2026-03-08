@@ -183,10 +183,7 @@ class TokenMirrorService {
   ): TokenValidationResult {
     // Check for unsecured tokens (for testing purposes)
     // Note: id=0 is used for unsecured tokens to skip usage tracking
-    if (
-      tokenValue === config.unsecuredClientToken ||
-      UNSECURED_TOKENS.includes(tokenValue)
-    ) {
+    if (tokenValue === config.unsecuredClientToken || UNSECURED_TOKENS.includes(tokenValue)) {
       logger.debug('Unsecured token used for testing');
       const unsecuredToken: MirroredToken = {
         id: 0, // 0 indicates unsecured token, usage tracking will be skipped

@@ -490,344 +490,314 @@ router.get('/banners', clientAuth, async (req: ClientRequest, res: Response) => 
   }
 });
 
-router.get(
-  '/banners/:bannerId',
-  clientAuth,
-  async (req: ClientRequest, res: Response) => {
-    try {
-      const sdk = getSDKOrError(res);
-      if (!sdk) return;
+router.get('/banners/:bannerId', clientAuth, async (req: ClientRequest, res: Response) => {
+  try {
+    const sdk = getSDKOrError(res);
+    if (!sdk) return;
 
-      const { bannerId } = req.params;
-      const { environmentId } = req.clientContext!;
+    const { bannerId } = req.params;
+    const { environmentId } = req.clientContext!;
 
-      // Get banners from cache for this environment
-      const envBanners = sdk.getBanners(environmentId) as Banner[];
+    // Get banners from cache for this environment
+    const envBanners = sdk.getBanners(environmentId) as Banner[];
 
-      // Find the specific banner
-      const banner = envBanners.find((b) => b.bannerId === bannerId);
+    // Find the specific banner
+    const banner = envBanners.find((b) => b.bannerId === bannerId);
 
-      if (!banner) {
-        return res.status(404).json({
-          success: false,
-          error: {
-            code: 'NOT_FOUND',
-            message: 'Banner not found',
-          },
-        });
-      }
-
-      // Transform for client (same format as Backend BannerClientController)
-      const clientBanner = {
-        bannerId: banner.bannerId,
-        name: banner.name,
-        width: banner.width,
-        height: banner.height,
-        playbackSpeed: banner.playbackSpeed,
-        sequences: banner.sequences,
-        metadata: banner.metadata,
-        version: banner.version,
-      };
-
-      logger.debug('Banner retrieved', {
-        environmentId,
-        bannerId,
-      });
-
-      res.json({
-        success: true,
-        data: {
-          banner: clientBanner,
-          timestamp: new Date().toISOString(),
-        },
-      });
-    } catch (error) {
-      logger.error('Error getting banner:', error);
-      res.status(500).json({
+    if (!banner) {
+      return res.status(404).json({
         success: false,
         error: {
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve banner',
+          code: 'NOT_FOUND',
+          message: 'Banner not found',
         },
       });
     }
+
+    // Transform for client (same format as Backend BannerClientController)
+    const clientBanner = {
+      bannerId: banner.bannerId,
+      name: banner.name,
+      width: banner.width,
+      height: banner.height,
+      playbackSpeed: banner.playbackSpeed,
+      sequences: banner.sequences,
+      metadata: banner.metadata,
+      version: banner.version,
+    };
+
+    logger.debug('Banner retrieved', {
+      environmentId,
+      bannerId,
+    });
+
+    res.json({
+      success: true,
+      data: {
+        banner: clientBanner,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    logger.error('Error getting banner:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to retrieve banner',
+      },
+    });
   }
-);
+});
 
 // ============================================================================
 // Edge-specific Routes (Not in Backend)
 // ============================================================================
 
-router.get(
-  '/client-versions',
-  clientAuth,
-  async (req: ClientRequest, res: Response) => {
-    try {
-      const sdk = getSDKOrError(res);
-      if (!sdk) return;
+router.get('/client-versions', clientAuth, async (req: ClientRequest, res: Response) => {
+  try {
+    const sdk = getSDKOrError(res);
+    if (!sdk) return;
 
-      const { environmentId, platform } = req.clientContext!;
+    const { environmentId, platform } = req.clientContext!;
 
-      // Get client versions from cache for this environment
-      const envVersions = sdk.getClientVersions(environmentId) as ClientVersion[];
+    // Get client versions from cache for this environment
+    const envVersions = sdk.getClientVersions(environmentId) as ClientVersion[];
 
-      // Optionally filter by platform
-      let filteredVersions = envVersions;
-      if (platform) {
-        filteredVersions = envVersions.filter(
-          (v) => v.platform === platform || v.platform === 'all'
-        );
-      }
-
-      // Record cache hit/miss
-      if (filteredVersions.length > 0) {
-        recordCacheHit('client_versions');
-      } else {
-        recordCacheMiss('client_versions');
-      }
-
-      logger.debug('Client versions retrieved', {
-        environmentId,
-        platform,
-        count: filteredVersions.length,
-      });
-
-      res.json({
-        success: true,
-        data: {
-          versions: filteredVersions,
-          total: filteredVersions.length,
-        },
-      });
-    } catch (error) {
-      logger.error('Error getting client versions:', error);
-      res.status(500).json({
-        success: false,
-        error: {
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve client versions',
-        },
-      });
+    // Optionally filter by platform
+    let filteredVersions = envVersions;
+    if (platform) {
+      filteredVersions = envVersions.filter((v) => v.platform === platform || v.platform === 'all');
     }
-  }
-);
 
-router.get(
-  '/service-notices',
-  clientAuth,
-  async (req: ClientRequest, res: Response) => {
-    try {
-      const sdk = getSDKOrError(res);
-      if (!sdk) return;
-
-      const { environmentId, platform } = req.clientContext!;
-
-      // Get service notices from cache for this environment
-      const envNotices = sdk.getServiceNotices(environmentId);
-
-      // Optionally filter by platform
-      let filteredNotices = envNotices;
-      if (platform) {
-        filteredNotices = envNotices.filter(
-          (n: { platforms?: string[] }) =>
-            !n.platforms || n.platforms.length === 0 || n.platforms.includes(platform)
-        );
-      }
-
-      // Record cache hit/miss
-      if (filteredNotices.length > 0) {
-        recordCacheHit('service_notices');
-      } else {
-        recordCacheMiss('service_notices');
-      }
-
-      logger.debug('Service notices retrieved', {
-        environmentId,
-        platform,
-        count: filteredNotices.length,
-      });
-
-      res.json({
-        success: true,
-        data: {
-          notices: filteredNotices,
-          total: filteredNotices.length,
-        },
-      });
-    } catch (error) {
-      logger.error('Error getting service notices:', error);
-      res.status(500).json({
-        success: false,
-        error: {
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve service notices',
-        },
-      });
+    // Record cache hit/miss
+    if (filteredVersions.length > 0) {
+      recordCacheHit('client_versions');
+    } else {
+      recordCacheMiss('client_versions');
     }
+
+    logger.debug('Client versions retrieved', {
+      environmentId,
+      platform,
+      count: filteredVersions.length,
+    });
+
+    res.json({
+      success: true,
+      data: {
+        versions: filteredVersions,
+        total: filteredVersions.length,
+      },
+    });
+  } catch (error) {
+    logger.error('Error getting client versions:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to retrieve client versions',
+      },
+    });
   }
-);
+});
+
+router.get('/service-notices', clientAuth, async (req: ClientRequest, res: Response) => {
+  try {
+    const sdk = getSDKOrError(res);
+    if (!sdk) return;
+
+    const { environmentId, platform } = req.clientContext!;
+
+    // Get service notices from cache for this environment
+    const envNotices = sdk.getServiceNotices(environmentId);
+
+    // Optionally filter by platform
+    let filteredNotices = envNotices;
+    if (platform) {
+      filteredNotices = envNotices.filter(
+        (n: { platforms?: string[] }) =>
+          !n.platforms || n.platforms.length === 0 || n.platforms.includes(platform)
+      );
+    }
+
+    // Record cache hit/miss
+    if (filteredNotices.length > 0) {
+      recordCacheHit('service_notices');
+    } else {
+      recordCacheMiss('service_notices');
+    }
+
+    logger.debug('Service notices retrieved', {
+      environmentId,
+      platform,
+      count: filteredNotices.length,
+    });
+
+    res.json({
+      success: true,
+      data: {
+        notices: filteredNotices,
+        total: filteredNotices.length,
+      },
+    });
+  } catch (error) {
+    logger.error('Error getting service notices:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to retrieve service notices',
+      },
+    });
+  }
+});
 
 // ============================================================================
 // Crash Upload Proxy (Forward to Backend)
 // ============================================================================
 
-router.post(
-  '/crashes/upload',
-  clientAuth,
-  async (req: ClientRequest, res: Response) => {
-    try {
-      const { environmentId } = req.clientContext!;
+router.post('/crashes/upload', clientAuth, async (req: ClientRequest, res: Response) => {
+  try {
+    const { environmentId } = req.clientContext!;
 
-      // Get client IP and user agent to forward to backend
-      const clientIp =
-        (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown';
-      const userAgent = req.headers['user-agent'] || 'unknown';
+    // Get client IP and user agent to forward to backend
+    const clientIp =
+      (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown';
+    const userAgent = req.headers['user-agent'] || 'unknown';
 
-      logger.debug('Proxying crash upload to backend', {
-        environmentId,
-        platform: req.body.platform,
-        branch: req.body.branch,
-        clientIp,
+    logger.debug('Proxying crash upload to backend', {
+      environmentId,
+      platform: req.body.platform,
+      branch: req.body.branch,
+      clientIp,
+    });
+
+    // Forward the request to backend
+    const backendUrl = `${config.gatrixUrl}/api/v1/client/crashes/upload`;
+
+    const response = await axios.post(backendUrl, req.body, {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-token': config.apiToken,
+        'x-application-name': config.applicationName,
+        'x-environment': environmentId,
+        'x-forwarded-for': clientIp,
+        'user-agent': userAgent,
+      },
+      timeout: 30000, // 30 second timeout for crash uploads
+    });
+
+    logger.info('Crash upload proxied successfully', {
+      environmentId,
+      platform: req.body.platform,
+      branch: req.body.branch,
+      crashId: response.data?.data?.crashId,
+      eventId: response.data?.data?.eventId,
+      isNewCrash: response.data?.data?.isNewCrash,
+    });
+
+    // Return the backend response to the client
+    res.status(response.status).json(response.data);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      logger.error('Error proxying crash upload to backend:', {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        environment: req.clientContext?.environmentId,
+        platform: req.body?.platform,
+        branch: req.body?.branch,
       });
 
-      // Forward the request to backend
-      const backendUrl = `${config.gatrixUrl}/api/v1/client/crashes/upload`;
-
-      const response = await axios.post(backendUrl, req.body, {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-token': config.apiToken,
-          'x-application-name': config.applicationName,
-          'x-environment': environmentId,
-          'x-forwarded-for': clientIp,
-          'user-agent': userAgent,
-        },
-        timeout: 30000, // 30 second timeout for crash uploads
-      });
-
-      logger.info('Crash upload proxied successfully', {
-        environmentId,
-        platform: req.body.platform,
-        branch: req.body.branch,
-        crashId: response.data?.data?.crashId,
-        eventId: response.data?.data?.eventId,
-        isNewCrash: response.data?.data?.isNewCrash,
-      });
-
-      // Return the backend response to the client
-      res.status(response.status).json(response.data);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        logger.error('Error proxying crash upload to backend:', {
-          status: error.response?.status,
-          message: error.response?.data?.message || error.message,
-          environment: req.clientContext?.environmentId,
-          platform: req.body?.platform,
-          branch: req.body?.branch,
-        });
-
-        // Forward backend error response if available
-        if (error.response) {
-          return res.status(error.response.status).json(error.response.data);
-        }
-
-        // Network or timeout error
-        return res.status(503).json({
-          success: false,
-          error: {
-            code: 'SERVICE_UNAVAILABLE',
-            message: 'Failed to connect to backend server',
-          },
-        });
+      // Forward backend error response if available
+      if (error.response) {
+        return res.status(error.response.status).json(error.response.data);
       }
 
-      logger.error('Unexpected error in crash upload proxy:', error);
-      res.status(500).json({
+      // Network or timeout error
+      return res.status(503).json({
         success: false,
         error: {
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to process crash upload',
+          code: 'SERVICE_UNAVAILABLE',
+          message: 'Failed to connect to backend server',
         },
       });
     }
+
+    logger.error('Unexpected error in crash upload proxy:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to process crash upload',
+      },
+    });
   }
-);
+});
 
 // ============================================================================
 // Feature Flag Routes
 // ============================================================================
 
-router.post(
-  '/features/eval',
-  clientAuth,
-  async (req: ClientRequest, res: Response) => {
-    await performEvaluation(req, res, req.clientContext, true);
-  }
-);
+router.post('/features/eval', clientAuth, async (req: ClientRequest, res: Response) => {
+  await performEvaluation(req, res, req.clientContext, true);
+});
 
 router.get('/features/eval', clientAuth, async (req: ClientRequest, res: Response) => {
   await performEvaluation(req, res, req.clientContext, false);
 });
 
-router.get(
-  '/features/stream/sse',
-  clientAuth,
-  async (req: ClientRequest, res: Response) => {
-    try {
-      const { environmentId } = req.clientContext!;
+router.get('/features/stream/sse', clientAuth, async (req: ClientRequest, res: Response) => {
+  try {
+    const { environmentId } = req.clientContext!;
 
-      // Lazy-import to avoid import-time side effects
-      const { flagStreamingService } = await import('../services/flag-streaming-service');
+    // Lazy-import to avoid import-time side effects
+    const { flagStreamingService } = await import('../services/flag-streaming-service');
 
-      // Generate unique client ID
-      const clientId = `edge-flag-stream-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    // Generate unique client ID
+    const clientId = `edge-flag-stream-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
-      // Register SSE client (sets headers, sends 'connected' event, handles cleanup on close)
-      await flagStreamingService.addClient(clientId, environmentId, res);
-    } catch (error) {
-      logger.error('Error establishing flag streaming connection:', error);
-      if (!res.headersSent) {
-        res.status(500).json({
-          success: false,
-          error: {
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Failed to establish streaming connection',
-          },
-        });
-      }
-    }
-  }
-);
-
-router.post(
-  '/features/metrics',
-  clientAuth,
-  async (req: ClientRequest, res: Response) => {
-    try {
-      const { environmentId, applicationName } = req.clientContext!;
-      const { bucket } = req.body;
-      const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
-
-      if (!bucket) {
-        return res.status(400).json({ success: false, error: 'bucket is required' });
-      }
-
-      // Add to aggregator for buffering
-      metricsAggregator.addClientMetrics(environmentId, applicationName, bucket, sdkVersion);
-
-      // Return success immediately (fire and forget from client perspective)
-      res.json({ success: true, buffered: true });
-    } catch (error) {
-      logger.error('Error buffering feature metrics:', error);
+    // Register SSE client (sets headers, sends 'connected' event, handles cleanup on close)
+    await flagStreamingService.addClient(clientId, environmentId, res);
+  } catch (error) {
+    logger.error('Error establishing flag streaming connection:', error);
+    if (!res.headersSent) {
       res.status(500).json({
         success: false,
         error: {
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to process metrics',
+          message: 'Failed to establish streaming connection',
         },
       });
     }
   }
-);
+});
+
+router.post('/features/metrics', clientAuth, async (req: ClientRequest, res: Response) => {
+  try {
+    const { environmentId, applicationName } = req.clientContext!;
+    const { bucket } = req.body;
+    const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
+
+    if (!bucket) {
+      return res.status(400).json({ success: false, error: 'bucket is required' });
+    }
+
+    // Add to aggregator for buffering
+    metricsAggregator.addClientMetrics(environmentId, applicationName, bucket, sdkVersion);
+
+    // Return success immediately (fire and forget from client perspective)
+    res.json({ success: true, buffered: true });
+  } catch (error) {
+    logger.error('Error buffering feature metrics:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to process metrics',
+      },
+    });
+  }
+});
 
 export default router;

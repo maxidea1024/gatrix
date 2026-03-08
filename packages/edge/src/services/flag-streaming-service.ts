@@ -335,7 +335,8 @@ class FlagStreamingService {
       if (sdk) {
         // Resolve raw environment ID to cache token key using Edge's environment registry
         const { environmentRegistry } = await import('./environment-registry');
-        const cacheKey = environmentRegistry.resolveEnvironmentToken(environmentId) || environmentId;
+        const cacheKey =
+          environmentRegistry.resolveEnvironmentToken(environmentId) || environmentId;
         await sdk.featureFlag.refreshByEnvironment(cacheKey);
         logger.debug(
           `Cache refreshed for env=${environmentId} (cacheKey=${cacheKey}) before notify`
@@ -395,10 +396,7 @@ class FlagStreamingService {
       client.lastEventTime = new Date();
       return true;
     } catch (error) {
-      logger.warn(
-        `Failed to send SSE event to client ${clientId}:`,
-        error
-      );
+      logger.warn(`Failed to send SSE event to client ${clientId}:`, error);
       this.removeClient(clientId);
       return false;
     }
@@ -417,10 +415,7 @@ class FlagStreamingService {
       client.lastEventTime = new Date();
       return true;
     } catch (error) {
-      logger.warn(
-        `Failed to send WS event to client ${clientId}:`,
-        error
-      );
+      logger.warn(`Failed to send WS event to client ${clientId}:`, error);
       this.removeWebSocketClient(clientId);
       return false;
     }

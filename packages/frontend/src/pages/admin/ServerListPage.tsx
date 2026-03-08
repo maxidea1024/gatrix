@@ -3644,7 +3644,8 @@ const ServerListPage: React.FC = () => {
           height: size,
           borderRadius: '50% !important',
           border: '1px solid',
-          borderColor: service.status === 'ready' && isActive ? 'error.main' : alpha(statusColor, 0.3),
+          borderColor:
+            service.status === 'ready' && isActive ? 'error.main' : alpha(statusColor, 0.3),
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

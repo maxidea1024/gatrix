@@ -752,7 +752,12 @@ const WorkspacePage: React.FC = () => {
           <Button
             variant="contained"
             onClick={handleCreate}
-            disabled={saving || !createData.orgName.trim() || !createData.displayName.trim() || !isValidResourceName(createData.orgName)}
+            disabled={
+              saving ||
+              !createData.orgName.trim() ||
+              !createData.displayName.trim() ||
+              !isValidResourceName(createData.orgName)
+            }
           >
             {saving ? <CircularProgress size={20} /> : t('common.add')}
           </Button>

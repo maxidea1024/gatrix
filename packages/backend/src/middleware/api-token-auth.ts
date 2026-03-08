@@ -93,11 +93,23 @@ function handleSpecialTokens(token: string): {
     };
   }
 
-// Legacy unsecured tokens — resolve to default/default/development for backward compatibility
+  // Legacy unsecured tokens — resolve to default/default/development for backward compatibility
   const LEGACY_TOKENS: Record<string, { id: string; tokenType: string; tokenName: string }> = {
-    [LEGACY_CLIENT_TOKEN]: { id: 'legacy-unsecured-client', tokenType: 'client', tokenName: 'Legacy Unsecured Client Token' },
-    [LEGACY_SERVER_TOKEN]: { id: 'legacy-unsecured-server', tokenType: 'server', tokenName: 'Legacy Unsecured Server Token' },
-    [LEGACY_EDGE_TOKEN]: { id: 'legacy-unsecured-edge', tokenType: 'server', tokenName: 'Legacy Unsecured Edge Token' },
+    [LEGACY_CLIENT_TOKEN]: {
+      id: 'legacy-unsecured-client',
+      tokenType: 'client',
+      tokenName: 'Legacy Unsecured Client Token',
+    },
+    [LEGACY_SERVER_TOKEN]: {
+      id: 'legacy-unsecured-server',
+      tokenType: 'server',
+      tokenName: 'Legacy Unsecured Server Token',
+    },
+    [LEGACY_EDGE_TOKEN]: {
+      id: 'legacy-unsecured-edge',
+      tokenType: 'server',
+      tokenName: 'Legacy Unsecured Edge Token',
+    },
   };
   const legacyEntry = LEGACY_TOKENS[token];
   if (legacyEntry) {

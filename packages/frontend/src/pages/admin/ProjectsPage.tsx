@@ -704,7 +704,11 @@ const ProjectsPage: React.FC = () => {
             disabled={dialogMode === 'edit'}
             autoFocus
             required
-            error={dialogMode === 'create' && formData.projectName.length > 0 && !isValidResourceName(formData.projectName)}
+            error={
+              dialogMode === 'create' &&
+              formData.projectName.length > 0 &&
+              !isValidResourceName(formData.projectName)
+            }
             helperText={t('rbac.projects.nameHelp')}
           />
           <TextField
@@ -747,7 +751,9 @@ const ProjectsPage: React.FC = () => {
             disabled={
               saving ||
               (dialogMode === 'create'
-                ? !formData.projectName.trim() || !formData.displayName.trim() || !isValidResourceName(formData.projectName)
+                ? !formData.projectName.trim() ||
+                  !formData.displayName.trim() ||
+                  !isValidResourceName(formData.projectName)
                 : !isEditDirty)
             }
           >

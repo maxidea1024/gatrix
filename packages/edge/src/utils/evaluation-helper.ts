@@ -42,7 +42,10 @@ export async function performEvaluation(
     const { environmentId, applicationName, cacheKey: contextCacheKey } = clientContext;
 
     // Use pre-resolved cacheKey from middleware, or resolve here as fallback
-    const cacheKey = contextCacheKey || environmentRegistry.resolveEnvironmentToken(environmentId) || environmentId;
+    const cacheKey =
+      contextCacheKey ||
+      environmentRegistry.resolveEnvironmentToken(environmentId) ||
+      environmentId;
 
     // 1. Extract context and flag names from request
     const { context, flagNames } = EvaluationUtils.extractFromRequest(req);

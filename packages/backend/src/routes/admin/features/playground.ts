@@ -520,10 +520,10 @@ function evaluateFlagWithDetails(
       passed: false,
       message: 'Flag is disabled in this environment',
     });
-    const envOverrideRow = flag.environments?.find(
-      (e: any) => e.environmentId === environmentId
-    );
-    const envDisabledValue = envOverrideRow?.overrideDisabledValue ? envOverrideRow.disabledValue : undefined;
+    const envOverrideRow = flag.environments?.find((e: any) => e.environmentId === environmentId);
+    const envDisabledValue = envOverrideRow?.overrideDisabledValue
+      ? envOverrideRow.disabledValue
+      : undefined;
     const isEnvSource = envOverrideRow?.overrideDisabledValue === true;
     return {
       enabled: false,
@@ -556,9 +556,7 @@ function evaluateFlagWithDetails(
         : 'No strategies defined - enabled by default',
     });
     if (contextFailed) {
-      const ctxEnvRow = flag.environments?.find(
-        (e: any) => e.environmentId === environmentId
-      );
+      const ctxEnvRow = flag.environments?.find((e: any) => e.environmentId === environmentId);
       const ctxEnvDisVal = ctxEnvRow?.overrideDisabledValue ? ctxEnvRow.disabledValue : undefined;
       const ctxIsEnvSource = ctxEnvRow?.overrideDisabledValue === true;
       return {
@@ -742,10 +740,10 @@ function evaluateFlagWithDetails(
 
   // Context validation failed - return after full evaluation
   if (contextFailed) {
-    const ctxFailEnvRow = flag.environments?.find(
-      (e: any) => e.environmentId === environmentId
-    );
-    const ctxFailEnvDisVal = ctxFailEnvRow?.overrideDisabledValue ? ctxFailEnvRow.disabledValue : undefined;
+    const ctxFailEnvRow = flag.environments?.find((e: any) => e.environmentId === environmentId);
+    const ctxFailEnvDisVal = ctxFailEnvRow?.overrideDisabledValue
+      ? ctxFailEnvRow.disabledValue
+      : undefined;
     const ctxFailIsEnvSource = ctxFailEnvRow?.overrideDisabledValue === true;
     return {
       enabled: false,
@@ -782,10 +780,10 @@ function evaluateFlagWithDetails(
     };
   }
 
-  const noMatchEnvRow = flag.environments?.find(
-    (e: any) => e.environmentId === environmentId
-  );
-  const noMatchEnvDisVal = noMatchEnvRow?.overrideDisabledValue ? noMatchEnvRow.disabledValue : undefined;
+  const noMatchEnvRow = flag.environments?.find((e: any) => e.environmentId === environmentId);
+  const noMatchEnvDisVal = noMatchEnvRow?.overrideDisabledValue
+    ? noMatchEnvRow.disabledValue
+    : undefined;
   const noMatchIsEnvSource = noMatchEnvRow?.overrideDisabledValue === true;
   return {
     enabled: false,
@@ -1018,7 +1016,9 @@ function selectVariantForFlag(
     ? flag.environments?.find((e: any) => e.environmentId === environmentId)
     : undefined;
 
-  const resolvedEnabledValue = envSettings?.overrideEnabledValue ? envSettings.enabledValue : flag.enabledValue;
+  const resolvedEnabledValue = envSettings?.overrideEnabledValue
+    ? envSettings.enabledValue
+    : flag.enabledValue;
   const valueSource = envSettings?.overrideEnabledValue === true ? 'environment' : 'flag';
 
   if (variants.length === 0) {

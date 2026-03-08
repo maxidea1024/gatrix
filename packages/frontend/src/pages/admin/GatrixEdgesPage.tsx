@@ -57,8 +57,6 @@ interface EdgeGroup {
   children?: EdgeGroup[];
 }
 
-
-
 const GatrixEdgesPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -95,14 +93,11 @@ const GatrixEdgesPage: React.FC = () => {
     return [];
   });
 
-
-
   // JSON Dialog
   const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
   const [jsonDialogData, setJsonDialogData] = useState<any>(null);
   const [jsonDialogTitle, setJsonDialogTitle] = useState('');
   const [fullJsonLoading, setFullJsonLoading] = useState<string | null>(null);
-
 
   // JSON Search State
   const [jsonSearchQuery, setJsonSearchQuery] = useState('');
@@ -187,8 +182,6 @@ const GatrixEdgesPage: React.FC = () => {
 
       setServices(edgeServices);
       groupServicesMultiLevel(edgeServices, groupingLevels);
-
-
     } catch (err: any) {
       setError(err.message || 'Failed to fetch services');
     } finally {
@@ -261,8 +254,6 @@ const GatrixEdgesPage: React.FC = () => {
     },
     [t]
   );
-
-
 
   const handleViewFullJson = async (instance: ServiceInstance) => {
     setFullJsonLoading(instance.instanceId);
@@ -388,8 +379,6 @@ const GatrixEdgesPage: React.FC = () => {
       );
     }
   };
-
-
 
   // Render instance details
   const renderInstanceDetails = (instance: ServiceInstance) => {
@@ -1246,10 +1235,7 @@ const GatrixEdgesPage: React.FC = () => {
         <DialogContent
           sx={{
             p: 0,
-            bgcolor:
-              theme.palette.mode === 'dark'
-                ? '#1e1e1e'
-                : '#ffffff',
+            bgcolor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
             overflow: 'auto',
           }}
         >
