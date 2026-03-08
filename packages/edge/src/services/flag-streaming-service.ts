@@ -332,7 +332,7 @@ class FlagStreamingService {
         const cacheKey = environmentRegistry.resolveEnvironmentToken(environmentId) || environmentId;
         await sdk.featureFlag.refreshByEnvironment(cacheKey);
         logger.debug(
-          `Edge FlagStreamingService: Cache refreshed for env=${environmentId} (cacheKey=${cacheKey}) before notify`
+          `Cache refreshed for env=${environmentId} (cacheKey=${cacheKey}) before notify`
         );
       }
     } catch (err) {
@@ -371,7 +371,7 @@ class FlagStreamingService {
 
     if (notifiedCount > 0) {
       logger.debug(
-        `Edge FlagStreamingService: Notified ${notifiedCount} clients for env=${environmentId}, rev=${newRevision}, keys=[${changedKeys.join(',')}]`
+        `Notified ${notifiedCount} clients for env=${environmentId}, rev=${newRevision}, keys=[${changedKeys.join(',')}]`
       );
     }
   }
@@ -390,7 +390,7 @@ class FlagStreamingService {
       return true;
     } catch (error) {
       logger.warn(
-        `Edge FlagStreamingService: Failed to send SSE event to client ${clientId}:`,
+        `Failed to send SSE event to client ${clientId}:`,
         error
       );
       this.removeClient(clientId);
@@ -412,7 +412,7 @@ class FlagStreamingService {
       return true;
     } catch (error) {
       logger.warn(
-        `Edge FlagStreamingService: Failed to send WS event to client ${clientId}:`,
+        `Failed to send WS event to client ${clientId}:`,
         error
       );
       this.removeWebSocketClient(clientId);

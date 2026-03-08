@@ -282,6 +282,7 @@ export class FeatureFlagService {
 
   /**
    * Refresh cached flags for a specific environment
+   * Invalidates ETag cache before fetching to ensure fresh data
    */
   async refreshByEnvironment(environmentId: string): Promise<FeatureFlag[]> {
     if (!this.featureEnabled) {
@@ -290,6 +291,11 @@ export class FeatureFlagService {
       });
     }
     this.logger.info('Refreshing feature flags cache', { environmentId });
+
+    // Invalidate ETag cache for features endpoint to avoid stale 304 responses
+    const endpoint = this.compactFlags ? '/api/v1/server/features?compact=true' : '/api/v1/server/features';
+    this.apiClient.invalidateEtagCache('/api/v1/server/features');
+
     return await this.listByEnvironment(environmentId);
   }
 
@@ -1048,6 +1054,9 @@ export class FeatureFlagService {
         this.removeFlag(flagName, environmentId);
         return;
       }
+
+      // Invalidate ETag cache for this specific flag endpoint
+      this.apiClient.invalidateEtagCache(`/api/v1/server/features/${encodeURIComponent(flagName)}`);
 
       // Fetch updated flag from server
       const response = await this.apiClient.get<{ flag: FeatureFlag }>(
