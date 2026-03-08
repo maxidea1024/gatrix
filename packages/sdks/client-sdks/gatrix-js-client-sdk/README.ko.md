@@ -105,16 +105,18 @@ const client = new GatrixClient({
 
 ```typescript
 interface EvaluatedFlag {
-  name: string;        // 플래그 이름
-  enabled: boolean;    // 플래그 활성화 여부
+  id: string;        // 플래그 ID
+  name: string;      // 플래그 이름
+  enabled: boolean;  // 플래그 활성화 여부
   variant: {
-    name: string;      // 배리언트 이름
-    enabled: boolean;  // 배리언트 활성화 여부
-    value?: any;       // 배리언트 값 (선택)
+    name: string;    // 배리언트 이름
+    enabled: boolean; // 배리언트 활성화 여부
+    value?: string | number | boolean | object; // 배리언트 값 (valueType이 'none'일 때 undefined)
   };
-  valueType?: string;  // 예상 타입: 'string' | 'number' | 'json' | 'none'
-  reason?: string;       // 평가 이유
-  version: number;       // 플래그 버전
+  valueType: 'none' | 'string' | 'number' | 'boolean' | 'json'; // 값 타입
+  version: number;   // 플래그 버전
+  reason?: string;   // 평가 이유
+  impressionData?: boolean; // 임프레션 추적 여부
 }
 ```
 

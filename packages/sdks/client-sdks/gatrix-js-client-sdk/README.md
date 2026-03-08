@@ -134,16 +134,18 @@ Each flag from the server contains:
 
 ```typescript
 interface EvaluatedFlag {
-  name: string; // Flag name
-  enabled: boolean; // Whether flag is enabled
+  id: string;        // Flag ID
+  name: string;      // Flag name
+  enabled: boolean;  // Whether flag is enabled
   variant: {
-    name: string; // Variant name
+    name: string;    // Variant name
     enabled: boolean; // Whether variant is enabled
-    value?: any; // Variant value (optional)
+    value?: string | number | boolean | object; // Variant value (undefined when valueType is 'none')
   };
-  valueType?: string; // Expected type: 'string' | 'number' | 'json' | 'none'
-  reason?: string; // Evaluation reason
-  version: number; // Flag version
+  valueType: 'none' | 'string' | 'number' | 'boolean' | 'json'; // Value type
+  version: number;   // Flag version
+  reason?: string;   // Evaluation reason
+  impressionData?: boolean; // Whether to track impressions
 }
 ```
 
