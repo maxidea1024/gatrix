@@ -363,6 +363,7 @@ router.post(
       // Create default environments (same as seed)
       const defaultEnvironments = [
         {
+          name: 'development',
           displayName: 'Development',
           type: 'development',
           color: '#4CAF50',
@@ -371,6 +372,7 @@ router.post(
           requiresApproval: false,
         },
         {
+          name: 'staging',
           displayName: 'Staging',
           type: 'staging',
           color: '#FF9800',
@@ -379,6 +381,7 @@ router.post(
           requiresApproval: false,
         },
         {
+          name: 'production',
           displayName: 'Production',
           type: 'production',
           color: '#F44336',
@@ -392,6 +395,7 @@ router.post(
         const envId = generateULID();
         await db('g_environments').insert({
           id: envId,
+          name: env.name,
           displayName: env.displayName,
           environmentType: env.type,
           isSystemDefined: true,

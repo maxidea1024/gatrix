@@ -15,6 +15,12 @@ import { ErrorCodes } from '../utils/api-response';
 const ALLOW_UNSECURED_TOKENS = process.env.ALLOW_UNSECURED_TOKENS === 'true';
 const UNSECURED_TOKEN_REGEX = /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
 
+// Shorthand infrastructure token — auto-resolves to __internal__/__infrastructure__/default
+export const INFRA_SERVER_TOKEN = process.env.INFRA_SERVER_TOKEN || 'gatrix-infra-server-token';
+const INFRA_ORG = '__internal__';
+const INFRA_PROJECT = '__infrastructure__';
+const INFRA_ENV = 'default';
+
 export const EDGE_BYPASS_TOKEN =
   process.env.EDGE_BYPASS_TOKEN || 'gatrix-edge-internal-bypass-token';
 
@@ -64,6 +70,21 @@ function handleSpecialTokens(token: string): {
   unsecuredProjectId?: string;
   unsecuredEnvironmentId?: string;
 } | null {
+  // Infrastructure shorthand token — resolves to __internal__/__infrastructure__/default
+  if (token === INFRA_SERVER_TOKEN) {
+    return {
+      apiToken: {
+        id: 'infra-server',
+        tokenType: 'server' as any,
+        tokenName: 'Infrastructure Server Token',
+      },
+      isUnsecured: true,
+      unsecuredOrgId: INFRA_ORG,
+      unsecuredProjectId: INFRA_PROJECT,
+      unsecuredEnvironmentId: INFRA_ENV,
+    };
+  }
+
   // Unsecured tokens — always accepted (format is strict: unsecured-{org}:{project}:{env}-{type}-api-token)
   // Used by Edge for multi-environment data fetching in trusted infrastructure
   {
@@ -135,7 +156,13 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       req.isUnsecuredToken = special.isUnsecured || false;
       req.isEdgeBypassToken = special.isEdgeBypass || false;
       req.apiToken = special.apiToken as ApiAccessToken;
-      // For unsecured tokens, auto-set environmentId from parsed token
+      // For unsecured/infra tokens, propagate org/project/env identifiers
+      if (special.unsecuredOrgId) {
+        req.unsecuredOrgId = special.unsecuredOrgId;
+      }
+      if (special.unsecuredProjectId) {
+        req.unsecuredProjectId = special.unsecuredProjectId;
+      }
       if (special.unsecuredEnvironmentId) {
         req.environmentId = special.unsecuredEnvironmentId;
       }
@@ -277,6 +304,18 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
 
     if (!env) {
       env = (await Environment.getById(environmentId)) || null;
+
+      // For unsecured tokens, org/project/env fields are names (not ULIDs)
+      // Resolve via full path: org.orgName → project.projectName → env.name
+      if (!env && req.isUnsecuredToken && req.unsecuredOrgId && req.unsecuredProjectId) {
+        env =
+          (await Environment.getByFullPath(
+            req.unsecuredOrgId,
+            req.unsecuredProjectId,
+            environmentId
+          )) || null;
+      }
+
       if (!env) {
         logger.warn('Auth: Environment not found', { environmentId });
         return res.status(404).json({

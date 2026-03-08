@@ -17,7 +17,7 @@ export const config = {
   apiToken:
     process.env.EDGE_BYPASS_TOKEN ||
     process.env.EDGE_API_TOKEN ||
-    'gatrix-edge-internal-bypass-token',
+    'gatrix-infra-server-token',
   applicationName: process.env.EDGE_APPLICATION_NAME || 'edge-server',
 
   // SDK required fields for metrics labels and service discovery

@@ -3596,40 +3596,64 @@ const ServerListPage: React.FC = () => {
   const renderHeartbeatIcon = (service: ServiceInstance, size = 26, iconSize = 14) => {
     const serviceKey = `${service.labels.service}-${service.instanceId}`;
     const isActive = heartbeatIds.has(serviceKey);
+    const statusColor = getStatusColor(service.status);
+
+    // Determine which icon to show based on status
+    const getIcon = () => {
+      const sx = {
+        fontSize: iconSize,
+        color: statusColor,
+      };
+      switch (service.status) {
+        case 'ready':
+          return (
+            <FavoriteIcon
+              sx={{
+                ...sx,
+                color: isActive ? 'error.main' : statusColor,
+                animation: isActive ? 'heartbeat 0.6s ease-in-out infinite' : 'none',
+                '@keyframes heartbeat': {
+                  '0%': { transform: 'scale(1)' },
+                  '25%': { transform: 'scale(1.3)' },
+                  '50%': { transform: 'scale(1)' },
+                  '75%': { transform: 'scale(1.2)' },
+                  '100%': { transform: 'scale(1)' },
+                },
+              }}
+            />
+          );
+        case 'initializing':
+          return <HourglassEmptyIcon sx={sx} />;
+        case 'error':
+          return <ErrorIcon sx={sx} />;
+        case 'shutting_down':
+          return <PowerSettingsNewIcon sx={sx} />;
+        case 'terminated':
+          return <PowerSettingsNewIcon sx={sx} />;
+        case 'no-response':
+          return <WarningIcon sx={sx} />;
+        default:
+          return <InfoIcon sx={sx} />;
+      }
+    };
 
     return (
-      (service.status === 'initializing' || service.status === 'ready') && (
-        <Box
-          sx={{
-            width: size,
-            height: size,
-            borderRadius: '50% !important',
-            border: '1px solid',
-            borderColor: isActive ? 'error.main' : 'divider',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            bgcolor: 'background.paper',
-            flexShrink: 0,
-          }}
-        >
-          <FavoriteIcon
-            sx={{
-              fontSize: iconSize,
-              color: isActive ? 'error.main' : 'action.disabled',
-              opacity: isActive ? 1 : 0.3,
-              animation: isActive ? 'heartbeat 0.6s ease-in-out infinite' : 'none',
-              '@keyframes heartbeat': {
-                '0%': { transform: 'scale(1)' },
-                '25%': { transform: 'scale(1.3)' },
-                '50%': { transform: 'scale(1)' },
-                '75%': { transform: 'scale(1.2)' },
-                '100%': { transform: 'scale(1)' },
-              },
-            }}
-          />
-        </Box>
-      )
+      <Box
+        sx={{
+          width: size,
+          height: size,
+          borderRadius: '50% !important',
+          border: '1px solid',
+          borderColor: service.status === 'ready' && isActive ? 'error.main' : alpha(statusColor, 0.3),
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          bgcolor: 'background.paper',
+          flexShrink: 0,
+        }}
+      >
+        {getIcon()}
+      </Box>
     );
   };
 
@@ -4252,6 +4276,7 @@ const ServerListPage: React.FC = () => {
                                 size="small"
                                 sx={{
                                   height: 20,
+                                  minWidth: 70,
                                   fontSize: '0.65rem',
                                   fontWeight: 900,
                                   borderRadius: 0,
@@ -4882,6 +4907,7 @@ const ServerListPage: React.FC = () => {
                         size="small"
                         sx={{
                           height: 18,
+                          minWidth: 60,
                           fontSize: '0.6rem',
                           fontWeight: 900,
                           borderRadius: 0,

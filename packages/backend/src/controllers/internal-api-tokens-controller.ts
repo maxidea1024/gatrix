@@ -46,6 +46,9 @@ async function isInternalInfraToken(req: SDKRequest): Promise<boolean> {
 async function requireEdgeAccess(req: SDKRequest, res: Response): Promise<boolean> {
   if (req.isEdgeBypassToken) return true;
 
+  // Infra/unsecured tokens with __internal__ org are always allowed
+  if (req.isUnsecuredToken && req.unsecuredOrgId === INTERNAL_ORG_NAME) return true;
+
   const isInternal = await isInternalInfraToken(req);
   if (!isInternal) {
     sendForbidden(

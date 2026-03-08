@@ -160,6 +160,33 @@ export class Environment extends Model implements EnvironmentData {
   }
 
   /**
+   * Resolve environment by full path: orgName → projectName → envName
+   * Accepts names or IDs for each level of the hierarchy.
+   */
+  static async getByFullPath(
+    orgNameOrId: string,
+    projectNameOrId: string,
+    envNameOrId: string
+  ): Promise<Environment | undefined> {
+    const { default: knex } = await import('../config/knex');
+    const row = await knex('g_environments as e')
+      .join('g_projects as p', 'e.projectId', 'p.id')
+      .join('g_organisations as o', 'p.orgId', 'o.id')
+      .where(function () {
+        this.where('o.orgName', orgNameOrId).orWhere('o.id', orgNameOrId);
+      })
+      .where(function () {
+        this.where('p.projectName', projectNameOrId).orWhere('p.id', projectNameOrId);
+      })
+      .where(function () {
+        this.where('e.name', envNameOrId).orWhere('e.id', envNameOrId);
+      })
+      .select('e.*')
+      .first();
+    return row ? (Environment.fromJson(row) as Environment) : undefined;
+  }
+
+  /**
    * Get all active environments ordered by displayOrder (excluding hidden ones by default)
    */
   static async getAll(includeHidden: boolean = false): Promise<Environment[]> {

@@ -1,5 +1,6 @@
 import { Model } from 'objection';
 import { convertToMySQLDateTime } from '../utils/date-utils';
+import { generateULID } from '../utils/ulid';
 
 export interface ServerLifecycleEventData {
   id?: string;
@@ -90,6 +91,10 @@ export class ServerLifecycleEvent extends Model implements ServerLifecycleEventD
   }
 
   $beforeInsert() {
+    if (!this.id) {
+      this.id = generateULID();
+    }
+
     if (!this.createdAt) {
       this.createdAt = new Date();
     }

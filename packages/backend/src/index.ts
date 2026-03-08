@@ -442,7 +442,8 @@ const startServer = async () => {
         }
 
         const backendUrl = `http://localhost:${config.port}`;
-        const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
+        // Backend is infrastructure — use the shorthand infra token
+        const apiToken = 'gatrix-infra-server-token';
 
         gatrixSdk = new GatrixServerSDK({
           apiUrl: backendUrl,

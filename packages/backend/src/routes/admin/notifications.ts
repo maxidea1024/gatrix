@@ -68,12 +68,8 @@ router.get('/sse', authenticateSSE, (req: Request, res: Response) => {
     // Add client to SSE service
     sseService.addClient(clientId, res, userId);
 
-    // Auto-subscribe admin users to admin channels
-    if ((req as any).user?.role === 'admin') {
-      sseService.subscribe(clientId, ['admin', 'remote_config', 'campaigns']);
-    } else {
-      sseService.subscribe(clientId, ['general']);
-    }
+    // Subscribe to admin channels (this endpoint is admin-only)
+    sseService.subscribe(clientId, ['admin', 'remote_config', 'campaigns']);
 
     logger.info(`SSE connection established for user ${userId} with client ${clientId}`);
   } catch (error) {
@@ -133,10 +129,6 @@ router.post('/sse/unsubscribe', (req: Request, res: Response) => {
  * Send test notification (admin only)
  */
 router.post('/test', async (req: Request, res: Response) => {
-  if ((req as any).user?.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin access required' });
-  }
-
   const { type, data, targetUsers, targetChannels } = req.body;
 
   try {
@@ -162,10 +154,6 @@ router.post('/test', async (req: Request, res: Response) => {
  * Get SSE service statistics (admin only)
  */
 router.get('/stats', (req: Request, res: Response) => {
-  if ((req as any).user?.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin access required' });
-  }
-
   try {
     const stats = sseService.getStats();
     res.json({ success: true, data: stats });
