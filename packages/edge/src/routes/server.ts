@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { tokenMirrorService } from '../services/token-mirror-service';
 import { metricsAggregator } from '../services/metrics-aggregator';
 import { performEvaluation } from '../utils/evaluation-helper';
+import { environmentRegistry } from '../services/environment-registry';
 import {
   ErrorCodes,
   sendUnauthorized,
@@ -50,7 +51,8 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
     if (!sdk) return;
 
     const env = req.params.env;
-    let flags = sdk.featureFlag.getCached(env);
+    const cacheKey = environmentRegistry.resolveEnvironmentToken(env) || env;
+    let flags = sdk.featureFlag.getCached(cacheKey);
 
     // Filter by flagNames query parameter (comma-separated) if provided
     const flagNamesParam = req.query.flagNames as string | undefined;
@@ -205,7 +207,8 @@ router.post('/:env/features/unknown', serverAuth, async (req: Request, res: Resp
  */
 router.post('/:env/features/eval', serverAuth, async (req: Request, res: Response) => {
   const applicationName = (req.headers['x-application-name'] as string) || 'unknown';
-  await performEvaluation(req, res, { environment: req.params.env, applicationName }, true);
+  const envCacheKey = environmentRegistry.resolveEnvironmentToken(req.params.env) || req.params.env;
+  await performEvaluation(req, res, { environmentId: envCacheKey, applicationName }, true);
 });
 
 /**
@@ -213,7 +216,8 @@ router.post('/:env/features/eval', serverAuth, async (req: Request, res: Respons
  */
 router.get('/:env/features/eval', serverAuth, async (req: Request, res: Response) => {
   const applicationName = (req.headers['x-application-name'] as string) || 'unknown';
-  await performEvaluation(req, res, { environment: req.params.env, applicationName }, false);
+  const envCacheKey = environmentRegistry.resolveEnvironmentToken(req.params.env) || req.params.env;
+  await performEvaluation(req, res, { environmentId: envCacheKey, applicationName }, false);
 });
 
 export default router;

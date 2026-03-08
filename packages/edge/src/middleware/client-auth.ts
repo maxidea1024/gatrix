@@ -20,6 +20,12 @@ export interface ClientRequest extends Request {
      * This is the standard external identifier for environments.
      */
     environmentId: string;
+    /**
+     * SDK cache key for this environment.
+     * Format: unsecured-{orgId}:{projectId}:{envId}-server-api-token
+     * Falls back to environmentId if not resolved.
+     */
+    cacheKey: string;
     clientVersion?: string;
     platform?: string;
     tokenName?: string;
@@ -90,15 +96,17 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     apiToken === UNSECURED_SERVER_TOKEN ||
     apiToken === UNSECURED_EDGE_TOKEN
   ) {
+    const cacheKey = environmentRegistry.resolveEnvironmentToken(environmentId) || environmentId;
     req.clientContext = {
       apiToken,
       applicationName,
       environmentId,
+      cacheKey,
       clientVersion,
       platform,
       tokenName: 'Unsecured Testing Token',
     };
-    logger.debug('Authenticated with unsecured token', { token: apiToken, environmentId });
+    logger.debug('Authenticated with unsecured token', { token: apiToken, environmentId, cacheKey });
     return next();
   }
 
@@ -152,10 +160,12 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
   }
 
   // Set client context
+  const cacheKey = environmentRegistry.resolveEnvironmentToken(environmentId) || environmentId;
   req.clientContext = {
     apiToken,
     applicationName,
     environmentId,
+    cacheKey,
     clientVersion,
     platform,
     tokenName: validation.token?.tokenName,

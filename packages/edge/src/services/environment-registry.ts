@@ -49,6 +49,8 @@ class EnvironmentRegistry {
   // Lookup maps for fast access
   private envMap: Map<string, { orgId: string; projectId: string }> = new Map();
   private projectMap: Map<string, { orgId: string }> = new Map();
+  // Name-based lookup: envName -> { orgId, projectId, envId }
+  private envNameMap: Map<string, { orgId: string; projectId: string; envId: string }> = new Map();
 
   /**
    * Initialize the registry
@@ -91,6 +93,7 @@ class EnvironmentRegistry {
     this.tree = [];
     this.envMap.clear();
     this.projectMap.clear();
+    this.envNameMap.clear();
     this.initialized = false;
     logger.info('Shutdown complete');
   }
@@ -144,12 +147,14 @@ class EnvironmentRegistry {
   private rebuildMaps(): void {
     this.envMap.clear();
     this.projectMap.clear();
+    this.envNameMap.clear();
 
     for (const org of this.tree) {
       for (const project of org.projects) {
         this.projectMap.set(project.id, { orgId: org.id });
         for (const env of project.environments) {
           this.envMap.set(env.id, { orgId: org.id, projectId: project.id });
+          this.envNameMap.set(env.name, { orgId: org.id, projectId: project.id, envId: env.id });
         }
       }
     }
@@ -263,6 +268,29 @@ class EnvironmentRegistry {
       }
     }
     return [];
+  }
+
+  /**
+   * Resolve an environment name or ID to the SDK cache token key.
+   * The cache stores data by token string: unsecured-{orgId}:{projectId}:{envId}-server-api-token
+   * Client requests use environment name (e.g. 'development') or environment ID.
+   *
+   * @returns The token key string, or null if environment not found
+   */
+  resolveEnvironmentToken(environmentNameOrId: string): string | null {
+    // Try by name first (most common for client requests)
+    const byName = this.envNameMap.get(environmentNameOrId);
+    if (byName) {
+      return `unsecured-${byName.orgId}:${byName.projectId}:${byName.envId}-server-api-token`;
+    }
+
+    // Try by ID
+    const byId = this.envMap.get(environmentNameOrId);
+    if (byId) {
+      return `unsecured-${byId.orgId}:${byId.projectId}:${environmentNameOrId}-server-api-token`;
+    }
+
+    return null;
   }
 
   /**
