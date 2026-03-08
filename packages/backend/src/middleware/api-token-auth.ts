@@ -21,6 +21,14 @@ const INFRA_ORG = '__internal__';
 const INFRA_PROJECT = '__infrastructure__';
 const INFRA_ENV = 'default';
 
+// Legacy unsecured tokens — auto-resolve to default/default/default for backward compatibility
+const LEGACY_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
+const LEGACY_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
+const LEGACY_EDGE_TOKEN = 'gatrix-unsecured-edge-api-token';
+const LEGACY_ORG = 'default';
+const LEGACY_PROJECT = 'default';
+const LEGACY_ENV = 'development';
+
 export const EDGE_BYPASS_TOKEN =
   process.env.EDGE_BYPASS_TOKEN || 'gatrix-edge-internal-bypass-token';
 
@@ -82,6 +90,27 @@ function handleSpecialTokens(token: string): {
       unsecuredOrgId: INFRA_ORG,
       unsecuredProjectId: INFRA_PROJECT,
       unsecuredEnvironmentId: INFRA_ENV,
+    };
+  }
+
+// Legacy unsecured tokens — resolve to default/default/development for backward compatibility
+  const LEGACY_TOKENS: Record<string, { id: string; tokenType: string; tokenName: string }> = {
+    [LEGACY_CLIENT_TOKEN]: { id: 'legacy-unsecured-client', tokenType: 'client', tokenName: 'Legacy Unsecured Client Token' },
+    [LEGACY_SERVER_TOKEN]: { id: 'legacy-unsecured-server', tokenType: 'server', tokenName: 'Legacy Unsecured Server Token' },
+    [LEGACY_EDGE_TOKEN]: { id: 'legacy-unsecured-edge', tokenType: 'server', tokenName: 'Legacy Unsecured Edge Token' },
+  };
+  const legacyEntry = LEGACY_TOKENS[token];
+  if (legacyEntry) {
+    return {
+      apiToken: {
+        id: legacyEntry.id,
+        tokenType: legacyEntry.tokenType as any,
+        tokenName: legacyEntry.tokenName,
+      },
+      isUnsecured: true,
+      unsecuredOrgId: LEGACY_ORG,
+      unsecuredProjectId: LEGACY_PROJECT,
+      unsecuredEnvironmentId: LEGACY_ENV,
     };
   }
 

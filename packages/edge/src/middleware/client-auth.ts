@@ -5,10 +5,11 @@ const logger = createLogger('ClientAuth');
 import { tokenMirrorService } from '../services/token-mirror-service';
 import { tokenUsageTracker } from '../services/token-usage-tracker';
 
-// Unsecured tokens for testing purposes
-const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
-const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
-const UNSECURED_EDGE_TOKEN = 'gatrix-unsecured-edge-api-token';
+// Unsecured tokens for backward compatibility
+export const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
+export const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
+export const UNSECURED_EDGE_TOKEN = 'gatrix-unsecured-edge-api-token';
+export const UNSECURED_TOKENS = [UNSECURED_CLIENT_TOKEN, UNSECURED_SERVER_TOKEN, UNSECURED_EDGE_TOKEN];
 
 export interface ClientRequest extends Request {
   clientContext?: {

@@ -8,6 +8,7 @@ import { tokenMirrorService } from './services/token-mirror-service';
 import { tokenUsageTracker } from './services/token-usage-tracker';
 import { metricsAggregator } from './services/metrics-aggregator';
 import { environmentRegistry } from './services/environment-registry';
+import { UNSECURED_TOKENS } from './middleware/client-auth';
 
 import { createLogger } from './config/logger';
 const logger = createLogger('EdgeServer');
@@ -88,7 +89,7 @@ async function main(): Promise<void> {
 
         // Validate token via tokenMirrorService
         const result = tokenMirrorService.validateToken(apiToken, 'client', environmentId);
-        const isUnsecured = apiToken === 'gatrix-unsecured-client-api-token';
+        const isUnsecured = UNSECURED_TOKENS.includes(apiToken);
         if (!result.valid && !isUnsecured) {
           socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
           socket.destroy();

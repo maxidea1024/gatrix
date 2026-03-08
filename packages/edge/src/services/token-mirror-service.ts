@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Redis from 'ioredis';
 import { config } from '../config/env';
+import { UNSECURED_TOKENS } from '../middleware/client-auth';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('TokenMirror');
@@ -180,14 +181,17 @@ class TokenMirrorService {
     requiredType: 'client' | 'server' | 'edge' | 'all',
     environmentId?: string
   ): TokenValidationResult {
-    // Check for unsecured client token (for testing purposes, client -> edge)
+    // Check for unsecured tokens (for testing purposes)
     // Note: id=0 is used for unsecured tokens to skip usage tracking
-    if (tokenValue === config.unsecuredClientToken) {
-      logger.debug('Unsecured client token used for testing');
+    if (
+      tokenValue === config.unsecuredClientToken ||
+      UNSECURED_TOKENS.includes(tokenValue)
+    ) {
+      logger.debug('Unsecured token used for testing');
       const unsecuredToken: MirroredToken = {
         id: 0, // 0 indicates unsecured token, usage tracking will be skipped
-        tokenName: 'Unsecured Client Token (Testing)',
-        tokenValue: config.unsecuredClientToken,
+        tokenName: 'Unsecured Token (Testing)',
+        tokenValue,
         tokenType: 'all',
         allowAllEnvironments: true,
         environments: ['*'],
