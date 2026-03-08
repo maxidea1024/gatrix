@@ -382,44 +382,62 @@ await client.features.syncFlags();
 
 ### GatrixClient
 
-| Method                 | Description                  |
-| ---------------------- | ---------------------------- |
-| `start()`              | Initialize and start the SDK |
-| `stop()`               | Stop polling and clean up    |
-| `isReady()`            | Check if SDK is ready        |
-| `getError()`           | Get last error               |
-| `on(event, callback)`  | Subscribe to events          |
-| `off(event, callback)` | Unsubscribe from events      |
-| `features`             | Access FeaturesClient        |
+| Method                    | Description                    |
+| ------------------------- | ------------------------------ |
+| `start()`                 | Initialize and start the SDK   |
+| `stop()`                  | Stop polling and clean up      |
+| `isReady()`               | Check if SDK is ready          |
+| `getError()`              | Get last error                 |
+| `getStats()`              | Get SDK statistics             |
+| `getLightStats()`         | Get lightweight statistics     |
+| `on(event, cb, name?)`    | Subscribe to events            |
+| `once(event, cb, name?)`  | Subscribe once                 |
+| `off(event, cb?)`         | Unsubscribe from events        |
+| `onAny(cb, name?)`        | Subscribe to all events        |
+| `offAny(cb?)`             | Unsubscribe from all events    |
+| `track(eventName, props?)` | Track custom event (reserved) |
+| `features`                | Access FeaturesClient          |
 
 ### FeaturesClient (via `client.features`)
 
-| Method                                                  | Description                             |
-| ------------------------------------------------------- | --------------------------------------- |
-| `isEnabled(flagName)`                                   | Check if flag is enabled                |
-| `boolVariation(flagName, default)`                      | Get boolean (flag.enabled)              |
-| `stringVariation(flagName, default)`                    | Get string value                        |
-| `numberVariation(flagName, default)`                    | Get number value                        |
-| `jsonVariation(flagName, default)`                      | Get JSON value                          |
-| `stringVariationDetails(flagName, default)`             | Get string with details                 |
-| `numberVariationDetails(flagName, default)`             | Get number with details                 |
-| `jsonVariationDetails(flagName, default)`               | Get JSON with details                   |
-| `stringVariationOrThrow(flagName)`                      | Get string or throw                     |
-| `numberVariationOrThrow(flagName)`                      | Get number or throw                     |
-| `jsonVariationOrThrow(flagName)`                        | Get JSON or throw                       |
-| `getVariant(flagName)`                                  | Get raw variant                         |
-| `getAllFlags()`                                         | Get all flags                           |
-| `watchSyncedFlag(flagName, callback)`                   | Watch (respects explicitSyncMode)       |
-| `watchSyncedFlagWithInitialState(flagName, callback)`   | Watch with initial callback (synced)    |
-| `watchRealtimeFlag(flagName, callback)`                 | Watch immediately on server fetch       |
-| `watchRealtimeFlagWithInitialState(flagName, callback)` | Watch immediately with initial callback |
-| `createWatchFlagGroup(name)`                            | Create a watch group                    |
-| `isFetching()`                                          | Check if currently fetching             |
-| `isExplicitSyncEnabled()`                               | Check if explicit sync mode is on       |
-| `hasPendingSyncFlags()`                                 | Check if pending changes exist          |
-| `syncFlags(fetchNow?)`                                  | Manual sync (explicit mode)             |
-| `updateContext(context)`                                | Update evaluation context               |
-| `getContext()`                                          | Get current context                     |
+All flag access methods accept an optional `forceRealtime` parameter (default: `true`). When `true`, reads from the latest server state; when `false`, respects `explicitSyncMode`.
+
+| Method                                                          | Description                             |
+| --------------------------------------------------------------- | --------------------------------------- |
+| `isEnabled(flagName, forceRealtime?)`                           | Check if flag is enabled                |
+| `hasFlag(flagName, forceRealtime?)`                             | Check if flag exists                    |
+| `getFlag(flagName, forceRealtime?)`                             | Get raw EvaluatedFlag or undefined      |
+| `getVariant(flagName, forceRealtime?)`                          | Get raw variant                         |
+| `getAllFlags(forceRealtime?)`                                   | Get all flags                           |
+| `variation(flagName, fallback, forceRealtime?)`                 | Get variant name (string)               |
+| `boolVariation(flagName, fallback, forceRealtime?)`             | Get boolean value                       |
+| `stringVariation(flagName, fallback, forceRealtime?)`           | Get string value                        |
+| `numberVariation(flagName, fallback, forceRealtime?)`           | Get number value                        |
+| `jsonVariation(flagName, fallback, forceRealtime?)`             | Get JSON value                          |
+| `boolVariationDetails(flagName, fallback, forceRealtime?)`      | Get boolean with details                |
+| `stringVariationDetails(flagName, fallback, forceRealtime?)`    | Get string with details                 |
+| `numberVariationDetails(flagName, fallback, forceRealtime?)`    | Get number with details                 |
+| `jsonVariationDetails(flagName, fallback, forceRealtime?)`      | Get JSON with details                   |
+| `boolVariationOrThrow(flagName, forceRealtime?)`                | Get boolean or throw                    |
+| `stringVariationOrThrow(flagName, forceRealtime?)`              | Get string or throw                     |
+| `numberVariationOrThrow(flagName, forceRealtime?)`              | Get number or throw                     |
+| `jsonVariationOrThrow(flagName, forceRealtime?)`                | Get JSON or throw                       |
+| `watchSyncedFlag(flagName, callback)`                           | Watch (respects explicitSyncMode)       |
+| `watchSyncedFlagWithInitialState(flagName, callback)`           | Watch with initial callback (synced)    |
+| `watchRealtimeFlag(flagName, callback)`                         | Watch immediately on server fetch       |
+| `watchRealtimeFlagWithInitialState(flagName, callback)`         | Watch immediately with initial callback |
+| `createWatchFlagGroup(name)`                                    | Create a watch group                    |
+| `fetchFlags()`                                                  | Manually trigger flag fetch             |
+| `syncFlags(fetchNow?)`                                         | Manual sync (explicit mode)             |
+| `isFetching()`                                                  | Check if currently fetching             |
+| `isExplicitSyncEnabled()`                                       | Check if explicit sync mode is on       |
+| `setExplicitSyncMode(enabled)`                                  | Change explicit sync mode at runtime    |
+| `hasPendingSyncFlags()`                                         | Check if pending changes exist          |
+| `isOfflineMode()`                                               | Check if offline mode is enabled        |
+| `updateContext(context)`                                        | Update evaluation context               |
+| `getContext()`                                                  | Get current context                     |
+| `getConfig()`                                                   | Get current features config             |
+| `getConnectionId()`                                             | Get client connection ID                |
 
 ### WatchFlagGroup
 
