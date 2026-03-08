@@ -564,12 +564,10 @@ export default class ServerFeatureFlagController {
       const report = req.body;
 
       if (!report || !report.usages) {
-        res
-          .status(400)
-          .json({
-            success: false,
-            error: 'Invalid report format: usages array required',
-          });
+        res.status(400).json({
+          success: false,
+          error: 'Invalid report format: usages array required',
+        });
         return;
       }
 

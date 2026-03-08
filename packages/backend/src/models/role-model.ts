@@ -141,9 +141,7 @@ export class RoleModel {
   /**
    * Get role with full details (permissions + binding counts)
    */
-  static async getWithDetails(
-    roleId: string
-  ): Promise<
+  static async getWithDetails(roleId: string): Promise<
     | (RoleRecord & {
         permissions: string[];
         userCount: number;

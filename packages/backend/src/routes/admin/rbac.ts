@@ -116,12 +116,10 @@ router.post('/organisations', requireOrgAdmin as any, async (req: any, res) => {
   try {
     const { orgName, displayName, description } = req.body;
     if (!orgName || !displayName) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: 'orgName and displayName are required',
-        });
+      return res.status(400).json({
+        success: false,
+        message: 'orgName and displayName are required',
+      });
     }
 
     const existing = await Organisation.findByName(orgName);
@@ -248,12 +246,10 @@ router.delete(
     try {
       // Prevent self-modification
       if (String(req.user.id) === String(req.params.userId)) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: 'Cannot remove yourself from organisation',
-          });
+        return res.status(403).json({
+          success: false,
+          message: 'Cannot remove yourself from organisation',
+        });
       }
       const result = await Organisation.removeMember(
         req.params.id,
@@ -402,12 +398,10 @@ router.post(
     try {
       const { projectName, displayName, description, orgId } = req.body;
       if (!projectName || !displayName) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: 'projectName and displayName are required',
-          });
+        return res.status(400).json({
+          success: false,
+          message: 'projectName and displayName are required',
+        });
       }
 
       // Use the provided orgId if specified, otherwise default to user's current org
@@ -844,12 +838,10 @@ router.get(
       });
     } catch (error) {
       logger.error('Error getting effective permissions:', error);
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: 'Failed to get effective permissions',
-        });
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get effective permissions',
+      });
     }
   }
 );
@@ -911,12 +903,10 @@ router.post(
           req.user.id
         );
         if (actorScopeLevel > getScopeLevel('system')) {
-          return res
-            .status(403)
-            .json({
-              success: false,
-              message: 'Cannot create roles with wildcard permissions',
-            });
+          return res.status(403).json({
+            success: false,
+            message: 'Cannot create roles with wildcard permissions',
+          });
         }
       }
 
@@ -971,12 +961,10 @@ router.put(
         req.user.id
       );
       if (getScopeLevel(existingRole.scopeType) < actorScopeLevel) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: 'Insufficient scope level to modify this role',
-          });
+        return res.status(403).json({
+          success: false,
+          message: 'Insufficient scope level to modify this role',
+        });
       }
 
       // Block wildcard permissions for actors below system scope
@@ -986,12 +974,10 @@ router.put(
         permissions.some((p: any) => p.permission === '*:*' || p === '*:*')
       ) {
         if (actorScopeLevel > getScopeLevel('system')) {
-          return res
-            .status(403)
-            .json({
-              success: false,
-              message: 'Cannot set wildcard permissions',
-            });
+          return res.status(403).json({
+            success: false,
+            message: 'Cannot set wildcard permissions',
+          });
         }
       }
 
@@ -1075,12 +1061,10 @@ router.delete(
         req.user.id
       );
       if (getScopeLevel(existingRole.scopeType) < actorScopeLevel) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: 'Insufficient scope level to delete this role',
-          });
+        return res.status(403).json({
+          success: false,
+          message: 'Insufficient scope level to delete this role',
+        });
       }
 
       const deleted = await RoleModel.delete(req.params.id);
@@ -1346,12 +1330,10 @@ router.post(
           req.user.id
         );
         if (getScopeLevel(targetRole.scopeType) < actorScopeLevel) {
-          return res
-            .status(403)
-            .json({
-              success: false,
-              message: 'Cannot assign roles above your scope level',
-            });
+          return res.status(403).json({
+            success: false,
+            message: 'Cannot assign roles above your scope level',
+          });
         }
       }
 
@@ -1536,12 +1518,10 @@ router.get(
       });
     } catch (error) {
       logger.error('Error getting group effective permissions:', error);
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: 'Failed to get effective permissions',
-        });
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get effective permissions',
+      });
     }
   }
 );
@@ -1678,12 +1658,10 @@ router.delete(
         .where('id', req.params.roleId)
         .first();
       if (targetRole && getScopeLevel(targetRole.scopeType) < actorScopeLevel) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: 'Cannot remove roles above your scope level',
-          });
+        return res.status(403).json({
+          success: false,
+          message: 'Cannot remove roles above your scope level',
+        });
       }
 
       // Prevent managing users with higher scope level
@@ -1935,12 +1913,10 @@ router.patch('/environment-keys/:id/deactivate', async (req: any, res) => {
     res.json({ success: true, data: key });
   } catch (error) {
     logger.error('Error deactivating environment key:', error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: 'Failed to deactivate environment key',
-      });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to deactivate environment key',
+    });
   }
 });
 
@@ -2078,12 +2054,10 @@ router.post(
       }
 
       if (roleId === parentRoleId) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: 'A role cannot inherit from itself',
-          });
+        return res.status(400).json({
+          success: false,
+          message: 'A role cannot inherit from itself',
+        });
       }
 
       // Check both roles exist
@@ -2121,12 +2095,10 @@ router.post(
         .where({ roleId, parentRoleId })
         .first();
       if (existing) {
-        return res
-          .status(409)
-          .json({
-            success: false,
-            message: 'Inheritance relationship already exists',
-          });
+        return res.status(409).json({
+          success: false,
+          message: 'Inheritance relationship already exists',
+        });
       }
 
       const id = generateULID();
@@ -2158,12 +2130,10 @@ router.delete(
         .del();
 
       if (!deleted) {
-        return res
-          .status(404)
-          .json({
-            success: false,
-            message: 'Inheritance relationship not found',
-          });
+        return res.status(404).json({
+          success: false,
+          message: 'Inheritance relationship not found',
+        });
       }
 
       // Invalidate cache for affected users
@@ -2202,12 +2172,10 @@ router.get(
       res.json({ success: true, data: effectivePermissions });
     } catch (error) {
       logger.error('Error getting effective permissions:', error);
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: 'Failed to get effective permissions',
-        });
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get effective permissions',
+      });
     }
   }
 );

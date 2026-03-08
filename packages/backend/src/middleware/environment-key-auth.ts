@@ -75,9 +75,7 @@ function extractToken(req: Request): string | undefined {
 /**
  * Handle special unsecured/bypass tokens (dev/testing only)
  */
-function handleSpecialTokens(
-  token: string
-): {
+function handleSpecialTokens(token: string): {
   keyType: KeyType | 'all';
   isUnsecured?: boolean;
   isEdgeBypass?: boolean;
