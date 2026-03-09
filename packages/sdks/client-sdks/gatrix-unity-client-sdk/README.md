@@ -20,7 +20,7 @@ A flag can be **enabled while also having a specific value** (e.g. `difficulty =
 #### 1. Feature Toggle (`IsEnabled`)
 
 ```csharp
-if (GatrixBehaviour.Client.Features.IsEnabled("new-shop"))
+if (GatrixSDK.Features.IsEnabled("new-shop"))
     ShowNewShop();
 else
     ShowLegacyShop();
@@ -29,9 +29,9 @@ else
 #### 2. Remote Configuration (`Variation`)
 
 ```csharp
-float speed   = GatrixBehaviour.Client.Features.FloatVariation("game-speed", 1.0f);
-string theme  = GatrixBehaviour.Client.Features.StringVariation("app-theme", "dark");
-int maxLevel  = GatrixBehaviour.Client.Features.IntVariation("max-level", 50);
+float speed   = GatrixSDK.Features.FloatVariation("game-speed", 1.0f);
+string theme  = GatrixSDK.Features.StringVariation("app-theme", "dark");
+int maxLevel  = GatrixSDK.Features.IntVariation("max-level", 50);
 ```
 
 #### 3. Conditional Targeting
@@ -39,7 +39,7 @@ int maxLevel  = GatrixBehaviour.Client.Features.IntVariation("max-level", 50);
 ```csharp
 // The server evaluates context (level, region, tier...) and returns the right value.
 // Your client just reads it — no branching logic needed here!
-string difficulty = GatrixBehaviour.Client.Features.StringVariation("difficulty", "Normal");
+string difficulty = GatrixSDK.Features.StringVariation("difficulty", "Normal");
 ```
 
 ---
@@ -129,7 +129,7 @@ public class GameManager : MonoBehaviour
 
         await GatrixBehaviour.InitializeAsync(config);
 
-        float speed = GatrixBehaviour.Client.Features.FloatVariation("game-speed", 1.0f);
+        float speed = GatrixSDK.Features.FloatVariation("game-speed", 1.0f);
     }
 }
 ```
@@ -139,7 +139,7 @@ public class GameManager : MonoBehaviour
 ## 🏁 Reading Feature Flags
 
 ```csharp
-var features = GatrixBehaviour.Client.Features;
+var features = GatrixSDK.Features;
 
 // Check enabled state
 bool newUI = features.IsEnabled("new-ui");
@@ -168,7 +168,7 @@ Two watch modes available:
 | `WatchSyncedFlag` | After `SyncFlagsAsync()` (when `ExplicitSyncMode = true`) |
 
 ```csharp
-var features = GatrixBehaviour.Client.Features;
+var features = GatrixSDK.Features;
 
 // Realtime watch — fires immediately on change (returns Action to unsubscribe)
 Action unwatch = features.WatchRealtimeFlag("dark-mode", flag =>
@@ -245,7 +245,7 @@ Inspector overlays for `GatrixBehaviour` and Zero-Code components.
 
 ```csharp
 // Full context update (triggers re-fetch)
-await GatrixBehaviour.Client.UpdateContextAsync(new GatrixContext
+await GatrixSDK.Client.UpdateContextAsync(new GatrixContext
 {
     UserId = "player-456",
     Properties = new Dictionary<string, string>
@@ -294,7 +294,7 @@ if (features.HasPendingSyncFlags())
 ## 🔔 Events
 
 ```csharp
-var events = GatrixBehaviour.Client.Events;
+var events = GatrixSDK.Events;
 
 events.On(GatrixEvents.FlagsReady, args =>
     Debug.Log("SDK ready!"));
@@ -378,14 +378,14 @@ WebGL does not support native WebSocket or SSE. The SDK automatically falls back
 ```csharp
 // Automatic: GatrixBehaviour cleans up on OnDestroy
 // Manual:
-GatrixBehaviour.Client.Stop();
+GatrixSDK.Client.Stop();
 ```
 
 ---
 
 ## 📖 API Reference
 
-### FeaturesClient (`GatrixBehaviour.Client.Features`)
+### FeaturesClient (`GatrixSDK.Features`)
 
 | Method | Return | Description |
 |---|---|---|
@@ -429,6 +429,15 @@ GatrixBehaviour.Client.Stop();
 | `CreateWatchFlagGroup(name)` | `WatchFlagGroup` | Create named group for batch management |
 | `GetStats()` | `FeaturesStats` | Full statistics snapshot |
 | `GetLightStats()` | `FeaturesLightStats` | Lightweight stats (no collection copying) |
+
+### GatrixSDK (static shorthand)
+
+| Member | Description |
+|---|---|
+| `GatrixSDK.Features` | Shorthand for `GatrixBehaviour.Client.Features` |
+| `GatrixSDK.Events` | Shorthand for `GatrixBehaviour.Client.Events` |
+| `GatrixSDK.Client` | Active `GatrixClient` instance |
+| `GatrixSDK.IsInitialized` | True if SDK is started |
 
 ### GatrixBehaviour (static)
 
@@ -484,7 +493,7 @@ IEnumerator LoadingScreen()
 ```csharp
 async void OnLogin(string userId, int level)
 {
-    await GatrixBehaviour.Client.UpdateContextAsync(new GatrixContext
+    await GatrixSDK.Client.UpdateContextAsync(new GatrixContext
     {
         UserId = userId,
         Properties = new Dictionary<string, string> { { "level", level.ToString() } }
