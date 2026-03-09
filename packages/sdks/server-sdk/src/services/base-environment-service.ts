@@ -1,13 +1,12 @@
 /**
  * Base Service
- * Generic base class for services that handle per-token data caching.
- * Each API token maps to exactly one environment (1:1).
- * Cache key = token (or token hash) to isolate data per environment.
+ * Generic base class for services that handle per-environment data caching.
  *
  * DESIGN PRINCIPLES:
- * - Single-token mode (game servers): all methods use the default token automatically
- * - Multi-token mode (Edge): callers pass the target token explicitly
- * - Token is used as both the API auth header and the cache partition key
+ * - Cache key = environmentId (NEVER token)
+ * - Token is only used for API authentication (via ApiClientFactory)
+ * - Single-environment mode (game servers): all methods use the default environment automatically
+ * - Multi-environment mode (Edge): callers pass the target environmentId explicitly
  */
 
 import { ApiClient } from '../client/api-client';
@@ -24,7 +23,7 @@ export interface ItemExtractor<T, TResponse> {
 }
 
 /**
- * Abstract base class for token-aware services
+ * Abstract base class for environment-aware services
  * @template T - The item type (e.g., GameWorld, Banner)
  * @template TResponse - The API response type
  * @template TId - The ID type for items (string or number)
@@ -45,26 +44,26 @@ export abstract class BaseEnvironmentService<
   protected featureEnabled: boolean = true;
 
   /**
-   * Default token — the primary apiToken from SDK config.
-   * Used as cache key in single-token mode.
+   * Default environment ID — the primary environment for this SDK instance.
+   * In single-environment mode, this is the apiToken (resolved later to real environmentId).
    */
-  protected defaultToken: string;
+  protected defaultEnvironmentId: string;
 
   /**
-   * Optional factory for multi-token mode.
-   * When set, each token gets its own ApiClient with isolated ETag cache.
+   * Optional factory for multi-environment mode.
+   * When set, each environment gets its own ApiClient with isolated ETag cache.
    */
   protected apiClientFactory?: ApiClientFactory;
 
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    defaultToken: string,
+    defaultEnvironmentId: string,
     storage?: CacheStorageProvider
   ) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.defaultToken = defaultToken;
+    this.defaultEnvironmentId = defaultEnvironmentId;
     this.storage = storage;
   }
 
@@ -84,29 +83,29 @@ export abstract class BaseEnvironmentService<
   }
 
   /**
-   * Set ApiClientFactory for multi-token mode.
-   * When set, listByEnvironment() uses the factory to get a per-token ApiClient.
+   * Set ApiClientFactory for multi-environment mode.
+   * When set, listByEnvironment() uses the factory to get a per-environment ApiClient.
    */
   setApiClientFactory(factory: ApiClientFactory): void {
     this.apiClientFactory = factory;
   }
 
   /**
-   * Get the appropriate ApiClient for a given token.
+   * Get the appropriate ApiClient for a given environment.
    * Uses the factory if available, otherwise falls back to the default client.
    */
-  protected getApiClient(token?: string): ApiClient {
+  protected getApiClient(environmentId?: string): ApiClient {
     if (this.apiClientFactory) {
-      return this.apiClientFactory.getClient(token);
+      return this.apiClientFactory.getClient(environmentId);
     }
     return this.apiClient;
   }
 
   /**
-   * Resolve token — returns provided token or default token
+   * Resolve environment — returns provided environmentId or default
    */
-  protected resolveToken(token?: string): string {
-    return token || this.defaultToken;
+  protected resolveEnvironment(environmentId?: string): string {
+    return environmentId || this.defaultEnvironmentId;
   }
 
   // ==================== Abstract Methods (must be implemented by subclasses) ====================
@@ -128,20 +127,20 @@ export abstract class BaseEnvironmentService<
   /**
    * Initialize the service by loading data from local storage
    */
-  async initializeAsync(token?: string): Promise<void> {
+  async initializeAsync(environmentId?: string): Promise<void> {
     if (!this.storage) return;
 
-    const resolvedToken = this.resolveToken(token);
-    const cacheKey = this.getCacheKey(resolvedToken);
-    const etagKey = this.getEtagKey(resolvedToken);
-    const responseKey = this.getResponseKey(resolvedToken);
+    const resolvedEnv = this.resolveEnvironment(environmentId);
+    const cacheKey = this.getCacheKey(resolvedEnv);
+    const etagKey = this.getEtagKey(resolvedEnv);
+    const responseKey = this.getResponseKey(resolvedEnv);
 
     try {
       const cachedJson = await this.storage.get(cacheKey);
       if (cachedJson) {
         const items = JSON.parse(cachedJson) as T[];
         if (Array.isArray(items)) {
-          this.cachedByEnv.set(resolvedToken, items);
+          this.cachedByEnv.set(resolvedEnv, items);
           this.logger.debug(
             `Loaded ${items.length} ${this.getServiceName()} items from local storage`
           );
@@ -176,20 +175,20 @@ export abstract class BaseEnvironmentService<
   }
 
   /**
-   * Fetch items using a specific token (API call + cache update)
-   * In multi-token mode, uses the provided token for auth.
+   * Fetch items using a specific environment (API call + cache update)
+   * In multi-environment mode, uses the environment's associated token for auth.
    */
-  async listByEnvironment(token?: string): Promise<T[]> {
-    const resolvedToken = this.resolveToken(token);
+  async listByEnvironment(environmentId?: string): Promise<T[]> {
+    const resolvedEnv = this.resolveEnvironment(environmentId);
     const endpoint = this.getEndpoint();
-    const client = this.getApiClient(resolvedToken);
+    const client = this.getApiClient(resolvedEnv);
 
     this.logger.debug(`Fetching ${this.getServiceName()}`);
 
     const response = await client.get<TResponse>(endpoint);
 
     // Safety check: if backend returns failure but we have local data
-    const currentItems = this.cachedByEnv.get(resolvedToken) || [];
+    const currentItems = this.cachedByEnv.get(resolvedEnv) || [];
 
     if (!response.success || !response.data) {
       if (currentItems.length > 0) {
@@ -218,58 +217,47 @@ export abstract class BaseEnvironmentService<
       itemCount: items.length,
     });
 
-    this.cachedByEnv.set(resolvedToken, items);
+    this.cachedByEnv.set(resolvedEnv, items);
 
     // Persist data, raw response body, and ETag to local storage
-    await this.persistCache(resolvedToken);
-    await this.persistEtag(resolvedToken, endpoint, response.data);
+    await this.persistCache(resolvedEnv);
+    await this.persistEtag(resolvedEnv, endpoint, response.data);
 
     return items;
   }
 
-  protected getCacheKey(token: string): string {
-    return `${this.getServiceName()}_${this.hashToken(token)}_data`;
+  protected getCacheKey(environmentId: string): string {
+    return `${this.getServiceName()}_${environmentId}_data`;
   }
 
-  protected getEtagKey(token: string): string {
-    return `${this.getServiceName()}_${this.hashToken(token)}_etag`;
+  protected getEtagKey(environmentId: string): string {
+    return `${this.getServiceName()}_${environmentId}_etag`;
   }
 
-  protected getResponseKey(token: string): string {
-    return `${this.getServiceName()}_${this.hashToken(token)}_response`;
-  }
-
-  /**
-   * Hash a token for use as cache key (avoid storing raw tokens in file names)
-   */
-  private hashToken(token: string): string {
-    // Simple hash: first 8 chars of a basic hash
-    let hash = 0;
-    for (let i = 0; i < token.length; i++) {
-      const char = token.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    return Math.abs(hash).toString(36).substring(0, 8);
+  protected getResponseKey(environmentId: string): string {
+    return `${this.getServiceName()}_${environmentId}_response`;
   }
 
   /**
-   * Fetch items for multiple tokens
+   * Fetch items for multiple environments
    */
-  async listByEnvironments(tokens: string[]): Promise<T[]> {
-    this.logger.debug(`Fetching ${this.getServiceName()} for multiple tokens`, {
-      count: tokens.length,
-    });
+  async listByEnvironments(environmentIds: string[]): Promise<T[]> {
+    this.logger.debug(
+      `Fetching ${this.getServiceName()} for multiple environments`,
+      {
+        count: environmentIds.length,
+      }
+    );
 
     const results: T[] = [];
 
-    for (const token of tokens) {
+    for (const envId of environmentIds) {
       try {
-        const items = await this.listByEnvironment(token);
+        const items = await this.listByEnvironment(envId);
         results.push(...items);
       } catch (error) {
         this.logger.error(
-          `Failed to fetch ${this.getServiceName()} for token`,
+          `Failed to fetch ${this.getServiceName()} for environment`,
           {
             error,
           }
@@ -277,38 +265,38 @@ export abstract class BaseEnvironmentService<
       }
     }
 
-    this.logger.info(`${this.getServiceName()} fetched for all tokens`, {
+    this.logger.info(`${this.getServiceName()} fetched for all environments`, {
       count: results.length,
-      tokenCount: tokens.length,
+      environmentCount: environmentIds.length,
     });
 
     return results;
   }
 
   /**
-   * Get cached items for a specific token
+   * Get cached items for a specific environment
    */
-  getCached(token?: string): T[] {
-    const resolvedToken = this.resolveToken(token);
-    return this.cachedByEnv.get(resolvedToken) || [];
+  getCached(environmentId?: string): T[] {
+    const resolvedEnv = this.resolveEnvironment(environmentId);
+    return this.cachedByEnv.get(resolvedEnv) || [];
   }
 
   /**
-   * Get all cached items across all tokens (flat array)
+   * Get all cached items across all environments (flat array)
    */
   getAllCachedFlat(): T[] {
     return Array.from(this.cachedByEnv.values()).flat();
   }
 
   /**
-   * Get all cached items organized by token (for debugging/monitoring)
+   * Get all cached items organized by environment (for debugging/monitoring)
    */
   getAllCached(): Map<string, T[]> {
     return this.cachedByEnv;
   }
 
   /**
-   * Get list of cached tokens
+   * Get list of cached environment IDs
    */
   getCachedEnvironments(): string[] {
     return Array.from(this.cachedByEnv.keys());
@@ -323,18 +311,18 @@ export abstract class BaseEnvironmentService<
   }
 
   /**
-   * Clear cached data for a specific token
+   * Clear cached data for a specific environment
    */
-  clearCacheForEnvironment(token: string): void {
-    this.cachedByEnv.delete(token);
-    this.logger.debug(`${this.getServiceName()} cache cleared for token`);
+  clearCacheForEnvironment(environmentId: string): void {
+    this.cachedByEnv.delete(environmentId);
+    this.logger.debug(`${this.getServiceName()} cache cleared for environment`);
   }
 
   /**
-   * Refresh cached items for a specific token
+   * Refresh cached items for a specific environment
    */
   async refreshByEnvironment(
-    token?: string,
+    environmentId?: string,
     suppressWarnings?: boolean
   ): Promise<T[]> {
     if (!this.featureEnabled && !suppressWarnings) {
@@ -343,11 +331,11 @@ export abstract class BaseEnvironmentService<
       );
     }
     this.logger.info(`Refreshing ${this.getServiceName()} cache`);
-    return await this.listByEnvironment(token);
+    return await this.listByEnvironment(environmentId);
   }
 
   /**
-   * Refresh cached items for all cached tokens
+   * Refresh cached items for all cached environments
    */
   async refreshAllEnvironments(suppressWarnings?: boolean): Promise<void> {
     if (!this.featureEnabled && !suppressWarnings) {
@@ -355,18 +343,18 @@ export abstract class BaseEnvironmentService<
         `${this.getServiceName()}.refreshAllEnvironments() called but feature is disabled`
       );
     }
-    const tokens = this.getCachedEnvironments();
-    if (tokens.length === 0) {
-      this.logger.debug(`${this.getServiceName()}: No tokens to refresh`);
+    const environments = this.getCachedEnvironments();
+    if (environments.length === 0) {
+      this.logger.debug(`${this.getServiceName()}: No environments to refresh`);
       return;
     }
 
-    for (const token of tokens) {
+    for (const envId of environments) {
       try {
-        await this.listByEnvironment(token);
+        await this.listByEnvironment(envId);
       } catch (error) {
         this.logger.error(
-          `Failed to refresh ${this.getServiceName()} for token`,
+          `Failed to refresh ${this.getServiceName()} for environment`,
           { error }
         );
       }
@@ -376,10 +364,10 @@ export abstract class BaseEnvironmentService<
   /**
    * Update cache with new data
    */
-  updateCache(items: T[], token?: string): void {
-    const resolvedToken = this.resolveToken(token);
-    this.cachedByEnv.set(resolvedToken, items);
-    this.persistCache(resolvedToken).catch(() => {});
+  updateCache(items: T[], environmentId?: string): void {
+    const resolvedEnv = this.resolveEnvironment(environmentId);
+    this.cachedByEnv.set(resolvedEnv, items);
+    this.persistCache(resolvedEnv).catch(() => {});
     this.logger.debug(`${this.getServiceName()} cache updated`, {
       count: items.length,
     });
@@ -388,9 +376,9 @@ export abstract class BaseEnvironmentService<
   /**
    * Update a single item in cache (immutable)
    */
-  protected updateItemInCache(item: T, token?: string): void {
-    const resolvedToken = this.resolveToken(token);
-    const currentItems = this.cachedByEnv.get(resolvedToken) || [];
+  protected updateItemInCache(item: T, environmentId?: string): void {
+    const resolvedEnv = this.resolveEnvironment(environmentId);
+    const currentItems = this.cachedByEnv.get(resolvedEnv) || [];
     const itemId = this.getItemId(item);
 
     const existsInCache = currentItems.some(
@@ -406,8 +394,8 @@ export abstract class BaseEnvironmentService<
       newItems = [...currentItems, item];
     }
 
-    this.cachedByEnv.set(resolvedToken, newItems);
-    this.persistCache(resolvedToken).catch(() => {});
+    this.cachedByEnv.set(resolvedEnv, newItems);
+    this.persistCache(resolvedEnv).catch(() => {});
 
     this.logger.debug(
       `Single ${this.getServiceName()} ${existsInCache ? 'updated' : 'added'} in cache`,
@@ -418,25 +406,25 @@ export abstract class BaseEnvironmentService<
   /**
    * Remove an item from cache by ID (immutable)
    */
-  removeFromCache(id: TId, token?: string): void {
-    const resolvedToken = this.resolveToken(token);
-    const currentItems = this.cachedByEnv.get(resolvedToken) || [];
+  removeFromCache(id: TId, environmentId?: string): void {
+    const resolvedEnv = this.resolveEnvironment(environmentId);
+    const currentItems = this.cachedByEnv.get(resolvedEnv) || [];
     const newItems = currentItems.filter((item) => this.getItemId(item) !== id);
-    this.cachedByEnv.set(resolvedToken, newItems);
-    this.persistCache(resolvedToken).catch(() => {});
+    this.cachedByEnv.set(resolvedEnv, newItems);
+    this.persistCache(resolvedEnv).catch(() => {});
 
     this.logger.debug(`${this.getServiceName()} removed from cache`, { id });
   }
 
   /**
-   * Persist current cache for a token to local storage
+   * Persist current cache for an environment to local storage
    */
-  protected async persistCache(token: string): Promise<void> {
+  protected async persistCache(environmentId: string): Promise<void> {
     if (!this.storage) return;
 
     try {
-      const items = this.cachedByEnv.get(token) || [];
-      const cacheKey = this.getCacheKey(token);
+      const items = this.cachedByEnv.get(environmentId) || [];
+      const cacheKey = this.getCacheKey(environmentId);
       await this.storage.save(cacheKey, JSON.stringify(items));
     } catch (error: any) {
       this.logger.error(
@@ -452,7 +440,7 @@ export abstract class BaseEnvironmentService<
    * Persist the current ETag and raw response body to local storage.
    */
   protected async persistEtag(
-    token: string,
+    environmentId: string,
     endpoint: string,
     responseData?: TResponse
   ): Promise<void> {
@@ -462,12 +450,12 @@ export abstract class BaseEnvironmentService<
       const etag = this.apiClient.getEtag(endpoint);
       if (!etag) return;
 
-      const etagKey = this.getEtagKey(token);
+      const etagKey = this.getEtagKey(environmentId);
       await this.storage.save(etagKey, etag);
 
       // Also persist the raw response body so we can restore bodyCache on restart
       if (responseData !== undefined) {
-        const responseKey = this.getResponseKey(token);
+        const responseKey = this.getResponseKey(environmentId);
         await this.storage.save(responseKey, JSON.stringify(responseData));
       }
     } catch (error: any) {

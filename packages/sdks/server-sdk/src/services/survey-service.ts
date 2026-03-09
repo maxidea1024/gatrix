@@ -17,7 +17,7 @@ import { Survey, SurveyListParams, SurveySettings } from '../types/api';
 export class SurveyService {
   private apiClient: ApiClient;
   private logger: Logger;
-  private defaultToken: string;
+  private defaultEnvironmentId: string;
   private storage?: CacheStorageProvider;
   // Multi-environment cache: Map<environment (environmentName), Survey[]>
   private cachedSurveysByEnv: Map<string, Survey[]> = new Map();
@@ -29,12 +29,12 @@ export class SurveyService {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    defaultToken: string,
+    defaultEnvironmentId: string,
     storage?: CacheStorageProvider
   ) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.defaultToken = defaultToken;
+    this.defaultEnvironmentId = defaultEnvironmentId;
     this.storage = storage;
   }
 

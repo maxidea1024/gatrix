@@ -17,7 +17,7 @@ import { MaintenanceStatus } from '../types/api';
 export class ServiceMaintenanceService {
   private apiClient: ApiClient;
   private logger: Logger;
-  private defaultToken: string;
+  private defaultEnvironmentId: string;
   private storage?: CacheStorageProvider;
   // Multi-environment cache: Map<environment (environmentName), MaintenanceStatus>
   private cachedStatusByEnv: Map<string, MaintenanceStatus> = new Map();
@@ -27,12 +27,12 @@ export class ServiceMaintenanceService {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    defaultToken: string,
+    defaultEnvironmentId: string,
     storage?: CacheStorageProvider
   ) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.defaultToken = defaultToken;
+    this.defaultEnvironmentId = defaultEnvironmentId;
     this.storage = storage;
   }
 

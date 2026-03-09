@@ -39,7 +39,7 @@ export interface WhitelistResponse {
 export class WhitelistService {
   private apiClient: ApiClient;
   private logger: Logger;
-  private defaultToken: string;
+  private defaultEnvironmentId: string;
   private storage?: CacheStorageProvider;
   // Multi-environment cache: Map<environment (environmentName), WhitelistData>
   private cachedWhitelistByEnv: Map<string, WhitelistData> = new Map();
@@ -49,12 +49,12 @@ export class WhitelistService {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    defaultToken: string,
+    defaultEnvironmentId: string,
     storage?: CacheStorageProvider
   ) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.defaultToken = defaultToken;
+    this.defaultEnvironmentId = defaultEnvironmentId;
     this.storage = storage;
   }
 

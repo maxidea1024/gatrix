@@ -30,7 +30,7 @@ import { SDK_VERSION } from '../version';
 export class FeatureFlagService {
   private apiClient: ApiClient;
   private logger: Logger;
-  private defaultToken: string;
+  private defaultEnvironmentId: string;
   private storage?: CacheStorageProvider;
   // Multi-token flag cache: Map<token, Map<flagName, FeatureFlag>>
   // Using nested Map for O(1) flag lookup by name (keyed by token)
@@ -63,12 +63,12 @@ export class FeatureFlagService {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    defaultToken: string,
+    defaultEnvironmentId: string,
     storage?: CacheStorageProvider
   ) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.defaultToken = defaultToken;
+    this.defaultEnvironmentId = defaultEnvironmentId;
     this.storage = storage;
   }
 
@@ -454,10 +454,10 @@ export class FeatureFlagService {
    * @param environmentId environment ID or cache key. Defaults to defaultToken in single-token mode.
    */
   getCached(environmentId?: string): FeatureFlag[] {
-    const key = environmentId || this.defaultToken;
+    const key = environmentId || this.defaultEnvironmentId;
     const envCache =
       this.cachedFlagsByEnv.get(key) ||
-      this.cachedFlagsByEnv.get(this.defaultToken);
+      this.cachedFlagsByEnv.get(this.defaultEnvironmentId);
     return envCache ? Array.from(envCache.values()) : [];
   }
 
@@ -1036,7 +1036,8 @@ export class FeatureFlagService {
     environmentId?: string
   ): EvaluationResult {
     // Resolve environment using the configured resolver
-    const resolvedEnv = environmentId || environmentId || this.defaultToken;
+    const resolvedEnv =
+      environmentId || environmentId || this.defaultEnvironmentId;
 
     // Merge static context with per-evaluation context
     const mergedContext = this.mergeContext(context || {});
