@@ -104,13 +104,13 @@ Or add to `Packages/manifest.json`:
 ### Option A: Zero-Code Setup (Recommended)
 
 1. Add a **GatrixBehaviour** component to a GameObject in your first scene.
-2. Configure in the Inspector: API URL, API Token, App Name, Environment.
+2. Configure in the Inspector: API URL, API Token, App Name.
 3. Use **Gatrix > Setup Wizard** for guided configuration.
 
 ### Option B: Code Setup
 
 ```csharp
-using Gatrix;
+using Gatrix.Unity.SDK;
 
 public class GameManager : MonoBehaviour
 {
@@ -121,14 +121,13 @@ public class GameManager : MonoBehaviour
             ApiUrl      = "https://your-api.example.com/api/v1",
             ApiToken    = "your-client-api-token",
             AppName     = "MyGame",
-            Environment = "production",
             Features    = new FeaturesConfig
             {
                 Context = new GatrixContext { UserId = "player-123" },
             },
         };
 
-        await GatrixBehaviour.Client.StartAsync();
+        await GatrixBehaviour.InitializeAsync(config);
 
         float speed = GatrixBehaviour.Client.Features.FloatVariation("game-speed", 1.0f);
     }
@@ -152,9 +151,9 @@ int    maxRetries = features.IntVariation("max-retries", 3);
 float  gameSpeed  = features.FloatVariation("game-speed", 1.0f);
 double dropRate   = features.DoubleVariation("item-drop-rate", 0.05);
 
-// Full flag proxy
-IFlagProxy proxy = features.GetFlag("feature-x");
-Debug.Log($"Enabled: {proxy.IsEnabled}, Reason: {proxy.Reason}");
+// Full evaluated flag
+EvaluatedFlag flag = features.GetFlag("feature-x");
+Debug.Log($"Enabled: {flag.Enabled}, Variant: {flag.Variant?.Name}");
 ```
 
 ---
@@ -166,31 +165,31 @@ Two watch modes available:
 | Method | Callback timing |
 |---|---|
 | `WatchRealtimeFlag` | Immediately when a fetch brings new data |
-| `WatchSyncedFlag` | After `SyncFlags()` (when `ExplicitSyncMode = true`) |
+| `WatchSyncedFlag` | After `SyncFlagsAsync()` (when `ExplicitSyncMode = true`) |
 
 ```csharp
 var features = GatrixBehaviour.Client.Features;
 
-// Realtime watch — fires immediately on change
-int handle = features.WatchRealtimeFlag("dark-mode", proxy =>
+// Realtime watch — fires immediately on change (returns Action to unsubscribe)
+Action unwatch = features.WatchRealtimeFlag("dark-mode", flag =>
 {
-    ApplyDarkMode(proxy.IsEnabled);
+    ApplyDarkMode(flag.Enabled);
 });
 
 // With initial state (fires immediately with current value, then on changes)
-features.WatchRealtimeFlagWithInitialState("game-speed", proxy =>
+features.WatchRealtimeFlagWithInitialState("game-speed", flag =>
 {
-    SetGameSpeed(proxy.FloatValue(1.0f));
+    SetGameSpeed(flag.FloatValue(1.0f));
 });
 
-// Synced watch — fires only after SyncFlags()
-features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
+// Synced watch — fires only after SyncFlagsAsync()
+features.WatchSyncedFlagWithInitialState("difficulty", flag =>
 {
-    SetDifficulty(proxy.StringValue("normal"));
+    SetDifficulty(flag.StringValue("normal"));
 });
 
-// Unwatch
-features.UnwatchFlag(handle);
+// Unwatch (call the returned Action)
+unwatch();
 ```
 
 ---
@@ -238,7 +237,6 @@ Inspector overlays for `GatrixBehaviour` and Zero-Code components.
 | Field | Type | Description |
 |---|---|---|
 | `AppName` | `string` | App name (set at init, immutable) |
-| `Environment` | `string` | Environment name (set at init, immutable) |
 | `UserId` | `string` | Unique user identifier — most important for targeting |
 | `SessionId` | `string` | Session identifier for session-scoped experiments |
 | `Properties` | `Dictionary<string,string>` | Custom key-value pairs |
@@ -259,7 +257,7 @@ await GatrixBehaviour.Client.UpdateContextAsync(new GatrixContext
 
 ```
 
-> ⚠️ 모든 컨텍스트 변경은 자동 리페치를 트리거합니다. 반복 루프 안에서 컨텍스트를 업데이트하지 마세요. 여러 필드를 동시에 변경하려면 `UpdateContextAsync`를 사용하세요.
+> ⚠️ All context changes trigger an automatic re-fetch. Do not update context in a loop. Use `UpdateContextAsync` to change multiple fields at once.
 
 ---
 
@@ -279,7 +277,7 @@ features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
 
 // Apply at a safe moment (loading screen, between rounds)
 if (features.HasPendingSyncFlags())
-    features.SyncFlags();
+    await features.SyncFlagsAsync();
 ```
 
 ### Typical Sync Points
@@ -389,35 +387,57 @@ GatrixBehaviour.Client.Stop();
 
 ### FeaturesClient (`GatrixBehaviour.Client.Features`)
 
-| Method | Description |
-|---|---|
-| `IsEnabled(flagName)` | Returns `flag.enabled` |
-| `BoolVariation(flagName, fallback)` | Boolean variant value |
-| `StringVariation(flagName, fallback)` | String variant value |
-| `IntVariation(flagName, fallback)` | Integer variant value |
-| `FloatVariation(flagName, fallback)` | Float variant value |
-| `DoubleVariation(flagName, fallback)` | Double variant value |
-| `GetVariant(flagName)` | Full variant object |
-| `GetFlag(flagName)` | Full flag proxy (`IFlagProxy`) |
-| `GetAllFlags()` | All evaluated flags |
-| `HasFlag(flagName)` | Check cache existence |
-| `WatchRealtimeFlag(name, cb)` | Realtime watch |
-| `WatchRealtimeFlagWithInitialState(name, cb)` | Realtime watch + immediate callback |
-| `WatchSyncedFlag(name, cb)` | Synced watch |
-| `WatchSyncedFlagWithInitialState(name, cb)` | Synced watch + immediate callback |
-| `UnwatchFlag(handle)` | Remove a watcher |
-| `CreateWatchGroup(name)` | Batch watcher management |
-| `SyncFlags(fetchNow)` | Apply pending changes (explicit sync mode) |
-| `HasPendingSyncFlags()` | Check if pending changes exist |
-| `FetchFlagsAsync()` | Force server fetch |
+| Method | Return | Description |
+|---|---|---|
+| `StartAsync()` | `UniTask` | Initialize and start fetching |
+| `Stop()` | `void` | Stop polling, streaming, metrics |
+| `IsReady()` | `bool` | True after first successful fetch |
+| `IsOfflineMode()` | `bool` | True if offline mode is enabled |
+| `IsFetching()` | `bool` | True if a fetch is in progress |
+| `GetError()` | `Exception` | Last error, or null |
+| `GetConnectionId()` | `string` | Server-assigned connection ID |
+| `IsEnabled(flagName, forceRealtime = true)` | `bool` | Flag enabled state |
+| `GetFlag(flagName, forceRealtime = true)` | `EvaluatedFlag` | Full evaluated flag (tracks metrics) |
+| `GetFlagRaw(flagName, forceRealtime = true)` | `EvaluatedFlag` | Full evaluated flag (no metrics tracking) |
+| `GetVariant(flagName, forceRealtime = true)` | `Variant` | Variant object (never null) |
+| `HasFlag(flagName)` | `bool` | Check cache existence |
+| `GetAllFlags(forceRealtime = true)` | `List<EvaluatedFlag>` | All evaluated flags |
+| `Variation(flagName, fallback, forceRealtime = true)` | `string` | Variant name |
+| `BoolVariation(flagName, fallback, forceRealtime = true)` | `bool` | Boolean value |
+| `StringVariation(flagName, fallback, forceRealtime = true)` | `string` | String value |
+| `IntVariation(flagName, fallback, forceRealtime = true)` | `int` | Integer value |
+| `FloatVariation(flagName, fallback, forceRealtime = true)` | `float` | Float value |
+| `DoubleVariation(flagName, fallback, forceRealtime = true)` | `double` | Double value |
+| `JsonVariation(flagName, fallback, forceRealtime = true)` | `Dictionary<string,object>` | JSON value |
+| `BoolVariationOrThrow(flagName, forceRealtime = true)` | `bool` | Throws if not found |
+| `StringVariationOrThrow(flagName, forceRealtime = true)` | `string` | Throws if not found |
+| `JsonVariationOrThrow(flagName, forceRealtime = true)` | `Dictionary<string,object>` | Throws if not found |
+| `BoolVariationDetails(flagName, fallback, forceRealtime = true)` | `VariationResult<bool>` | Value + reason + metadata |
+| `StringVariationDetails(flagName, fallback, forceRealtime = true)` | `VariationResult<string>` | Value + reason + metadata |
+| `JsonVariationDetails(flagName, fallback, forceRealtime = true)` | `VariationResult<Dictionary<string,object>>` | Value + reason + metadata |
+| `GetContext()` | `GatrixContext` | Deep copy of current context |
+| `UpdateContextAsync(ctx)` | `UniTask` | Replace context and re-fetch |
+| `SyncFlagsAsync(fetchNow = true)` | `UniTask` | Apply pending changes (explicit sync mode) |
+| `HasPendingSyncFlags()` | `bool` | Check if pending changes exist |
+| `FetchFlagsAsync()` | `UniTask` | Force server fetch |
+| `IsExplicitSync()` | `bool` | Check if explicit sync mode is enabled |
+| `SetExplicitSyncMode(enabled)` | `void` | Toggle explicit sync mode at runtime |
+| `WatchRealtimeFlag(flagName, callback, name?)` | `Action` | Realtime watch (call returned Action to unsubscribe) |
+| `WatchRealtimeFlagWithInitialState(flagName, callback, name?)` | `Action` | Realtime watch + immediate callback |
+| `WatchSyncedFlag(flagName, callback, name?)` | `Action` | Synced watch |
+| `WatchSyncedFlagWithInitialState(flagName, callback, name?)` | `Action` | Synced watch + immediate callback |
+| `CreateWatchFlagGroup(name)` | `WatchFlagGroup` | Create named group for batch management |
+| `GetStats()` | `FeaturesStats` | Full statistics snapshot |
+| `GetLightStats()` | `FeaturesLightStats` | Lightweight stats (no collection copying) |
 
-### GatrixClient (`GatrixBehaviour.Client`)
+### GatrixBehaviour (static)
 
-| Method | Description |
+| Member | Description |
 |---|---|
-| `StartAsync()` | Initialize and start fetching |
-| `Stop()` | Stop and clean up |
-| `UpdateContextAsync(ctx)` | Update full context |
+| `GatrixBehaviour.Client` | Active `GatrixClient` instance |
+| `GatrixBehaviour.IsInitialized` | True if SDK is started |
+| `GatrixBehaviour.InitializeAsync(config)` | Code-based initialization |
+| `GatrixBehaviour.Shutdown()` | Manual shutdown |
 
 ---
 
@@ -455,7 +475,7 @@ features.WatchSyncedFlagWithInitialState("enemy-hp-multiplier", proxy =>
 IEnumerator LoadingScreen()
 {
     yield return SceneManager.LoadSceneAsync("Game");
-    features.SyncFlags();
+    await features.SyncFlagsAsync();
 }
 ```
 
@@ -476,13 +496,13 @@ async void OnLogin(string userId, int level)
 ### Multi-Flag Dependency with Watch Group
 
 ```csharp
-var group = features.CreateWatchGroup("shop-system");
+var group = features.CreateWatchFlagGroup("shop-system");
 group
-    .WatchSyncedFlagWithInitialState("new-shop-enabled", p => SetShopEnabled(p.IsEnabled))
-    .WatchSyncedFlagWithInitialState("discount-rate", p => SetDiscount(p.FloatValue(0f)));
+    .WatchSyncedFlagWithInitialState("new-shop-enabled", f => SetShopEnabled(f.Enabled))
+    .WatchSyncedFlagWithInitialState("discount-rate", f => SetDiscount(f.FloatValue(0f)));
 
 // Both applied together at sync time — no partial state
-features.SyncFlags();
+await features.SyncFlagsAsync();
 
 // Cleanup
 group.Destroy();
@@ -497,18 +517,18 @@ group.Destroy();
 | Cause | Solution |
 |---|---|
 | Polling interval too long | Reduce `RefreshInterval` (default: 30s) |
-| `ExplicitSyncMode` is on | Call `SyncFlags()` at a safe point |
-| Using `WatchSyncedFlag` without sync | Switch to `WatchRealtimeFlag` or call `SyncFlags()` |
+| `ExplicitSyncMode` is on | Call `SyncFlagsAsync()` at a safe point |
+| Using `WatchSyncedFlag` without sync | Switch to `WatchRealtimeFlag` or call `SyncFlagsAsync()` |
 | `OfflineMode` is enabled | Set `Features.OfflineMode = false` |
-| Wrong `AppName` or `Environment` | Double-check config |
+| Wrong `AppName` | Double-check config |
 
 ### 2. `WatchSyncedFlag` callback never fires
 
 Enable `ExplicitSyncMode` and call `SyncFlags()`:
 ```csharp
 config.Features.ExplicitSyncMode = true;
-features.WatchSyncedFlagWithInitialState("my-flag", proxy => { ... });
-features.SyncFlags();
+features.WatchSyncedFlagWithInitialState("my-flag", flag => { ... });
+await features.SyncFlagsAsync();
 ```
 
 ### 3. Flags return fallback values after initialization
@@ -516,7 +536,7 @@ features.SyncFlags();
 | Cause | Solution |
 |---|---|
 | SDK not ready yet | Wait for `flags.ready` event or use `WatchRealtimeFlagWithInitialState` |
-| Wrong `AppName` / `Environment` | Match dashboard settings |
+| Wrong `AppName` | Match dashboard settings |
 | Flag not assigned to this environment | Verify in dashboard |
 | Network error on first fetch | Check `flags.fetch_error` event and logs |
 
@@ -526,11 +546,17 @@ Enable `ExplicitSyncMode` and use `WatchSyncedFlag` for gameplay-critical values
 
 ### 5. Memory leak warnings from callbacks
 
-Always call `UnwatchFlag()` or `group.Destroy()` when the consumer is destroyed:
+Always call the returned unsubscribe `Action` or `group.Destroy()` when the consumer is destroyed:
 ```csharp
+private Action _unwatch;
+
+void Start() {
+    _unwatch = features.WatchRealtimeFlag("my-flag", f => { ... });
+}
+
 void OnDestroy()
 {
-    features.UnwatchFlag(watchHandle);
+    _unwatch?.Invoke();
     watchGroup?.Destroy();
 }
 ```
@@ -538,9 +564,5 @@ void OnDestroy()
 ---
 
 ## 📜 License
-
-Copyright Gatrix. All Rights Reserved.
-
-## License
 
 This project is licensed under the MIT License - see the [LICENSE](../../../../LICENSE) file for details.
