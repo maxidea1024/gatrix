@@ -313,8 +313,8 @@ const FeatureContextFieldsPage: React.FC = () => {
 
   // Column settings
   const defaultColumns: ColumnConfig[] = [
-    { id: 'visibility', labelKey: 'featureFlags.visibility', visible: true },
     { id: 'fieldName', labelKey: 'featureFlags.fieldName', visible: true },
+    { id: 'visibility', labelKey: 'featureFlags.visibility', visible: true },
     { id: 'description', labelKey: 'featureFlags.description', visible: true },
     {
       id: 'legalValues',
@@ -972,6 +972,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                         sx={{
                                           display: 'flex',
                                           alignItems: 'center',
+                                          cursor: 'default',
                                         }}
                                       >
                                         {getTypeIcon(field.fieldType)}
@@ -1006,7 +1007,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                                 field.fieldName,
                                                 () =>
                                                   enqueueSnackbar(
-                                                    t('common.copySuccess'),
+                                                    t('common.copySuccess', { type: field.fieldName }),
                                                     {
                                                       variant: 'success',
                                                     }
