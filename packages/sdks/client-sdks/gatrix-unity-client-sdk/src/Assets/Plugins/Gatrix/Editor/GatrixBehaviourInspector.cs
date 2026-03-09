@@ -354,7 +354,6 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUILayout.Space(2);
             var ctx = client.Features.GetContext();
             DrawRow("AppName",     ctx.AppName     ?? "-");
-            DrawRow("Environment", ctx.Environment ?? "-");
             DrawRow("UserId",      ctx.UserId      ?? "-");
             DrawRow("SessionId",   ctx.SessionId   ?? "-");
             if (ctx.Properties != null)

@@ -21,7 +21,6 @@ namespace Gatrix.Unity.SDK.Editor
             GatrixEditorStyle.DrawSection("System Fields");
             GatrixEditorStyle.BeginBox();
             DrawField("AppName", _cachedContext.AppName ?? "-");
-            DrawField("Environment", _cachedContext.Environment ?? "-");
             GatrixEditorStyle.EndBox();
 
             GatrixEditorStyle.DrawSection("Context Fields");
