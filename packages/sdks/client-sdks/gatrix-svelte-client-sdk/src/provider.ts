@@ -35,7 +35,6 @@ export interface GatrixInitOptions {
  *       apiUrl: 'http://localhost:3400/api/v1',
  *       apiToken: 'your-token',
  *       appName: 'MyApp',
- *       environment: 'development',
  *     }
  *   });
  * </script>

@@ -2,7 +2,10 @@
  * SDK Configuration Types
  */
 
-import { IEnvironmentProvider, ITokenProvider } from '../utils/environment-provider';
+import {
+  IEnvironmentProvider,
+  ITokenProvider,
+} from '../utils/environment-provider';
 
 export interface RedisConfig {
   host: string;

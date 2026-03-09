@@ -16,7 +16,7 @@ const STORAGE_KEY_TOKEN = 'gatrix-dashboard-last-token';
 const STORAGE_KEY_REMEMBER = 'gatrix-dashboard-remember-token';
 const STORAGE_KEY_API_URL = 'gatrix-dashboard-api-url';
 const STORAGE_KEY_APP_NAME = 'gatrix-dashboard-app-name';
-const STORAGE_KEY_ENVIRONMENT = 'gatrix-dashboard-environment';
+
 const STORAGE_KEY_OFFLINE_MODE = 'gatrix-dashboard-offline-mode';
 const STORAGE_KEY_REFRESH_INTERVAL = 'gatrix-dashboard-refresh-interval';
 const STORAGE_KEY_EXPLICIT_SYNC = 'gatrix-dashboard-explicit-sync';
@@ -61,7 +61,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
   const [apiUrl, setApiUrl] = useState('');
   const [apiToken, setApiToken] = useState('');
   const [appName, setAppName] = useState('react-sdk-app');
-  const [environment, setEnvironment] = useState('development');
+
   const [userId, setUserId] = useState(() => {
     return localStorage.getItem(STORAGE_KEY_USER_ID) || generateRandomUserId();
   });
@@ -85,10 +85,8 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     const savedToken = localStorage.getItem(STORAGE_KEY_TOKEN) || '';
     const savedApiUrl = localStorage.getItem(STORAGE_KEY_API_URL);
     const savedAppName = localStorage.getItem(STORAGE_KEY_APP_NAME);
-    const savedEnvironment = localStorage.getItem(STORAGE_KEY_ENVIRONMENT);
 
     if (savedAppName) setAppName(savedAppName);
-    if (savedEnvironment) setEnvironment(savedEnvironment);
 
     setRememberToken(savedRememberToken);
 
@@ -158,7 +156,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     // Save all form values for next session
     localStorage.setItem(STORAGE_KEY_LOCATION, location);
     localStorage.setItem(STORAGE_KEY_SERVER_TYPE, serverType);
-    localStorage.setItem(STORAGE_KEY_ENVIRONMENT, environment);
+
     localStorage.setItem(STORAGE_KEY_USER_ID, userId);
     localStorage.setItem(STORAGE_KEY_OFFLINE_MODE, String(offlineMode));
     localStorage.setItem(
@@ -188,7 +186,6 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
       apiUrl,
       apiToken,
       appName,
-      environment,
       features: {
         context: {
           userId,
@@ -344,29 +341,16 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
 
             <hr className="nes-hr" style={{ margin: '25px 0' }} />
 
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">APP NAME</label>
-                <input
-                  type="text"
-                  className="nes-input is-dark"
-                  value={appName}
-                  onChange={(e) => setAppName(e.target.value)}
-                  placeholder="react-sdk-app"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">ENVIRONMENT</label>
-                <input
-                  type="text"
-                  className="nes-input is-dark"
-                  value={environment}
-                  onChange={(e) => setEnvironment(e.target.value)}
-                  placeholder="development"
-                  required
-                />
-              </div>
+            <div className="form-group">
+              <label className="form-label">APP NAME</label>
+              <input
+                type="text"
+                className="nes-input is-dark"
+                value={appName}
+                onChange={(e) => setAppName(e.target.value)}
+                placeholder="react-sdk-app"
+                required
+              />
             </div>
 
             <div className="form-group">

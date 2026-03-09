@@ -334,6 +334,27 @@ export class CacheManager {
         );
       }
 
+      // In single-env mode, update defaultEnvironmentId with the real value from /ready
+      if (!this.multiMode && this.resolvedEnvironmentId) {
+        this.defaultEnvironmentId = this.resolvedEnvironmentId;
+        // Update SingleEnvironmentProvider so getEnvironmentTokens() returns real environmentId
+        if (this.environmentProvider.updateEnvironmentId) {
+          this.environmentProvider.updateEnvironmentId(
+            this.resolvedEnvironmentId
+          );
+        }
+        // Remap ApiClientFactory so the default client is accessible by real environmentId
+        this.apiClientFactory.remapDefaultEnvironment(
+          this.resolvedEnvironmentId
+        );
+        this.logger.info(
+          'Default environment updated with resolved environmentId',
+          {
+            environmentId: this.resolvedEnvironmentId,
+          }
+        );
+      }
+
       // Register environments to ApiClientFactory (environmentId → token mapping)
       if (this.multiMode) {
         this.registerEnvironments();
@@ -1904,31 +1925,14 @@ export class CacheManager {
   }
 
   /**
-   * Resolve an environment ID to the token key used in cache.
-   * In multi-mode, cache keys are token strings (e.g. unsecured-{orgId}:{projectId}:{envId}-server-api-token)
-   * while events carry raw environment IDs (ULIDs).
-   * This method searches registered tokens for one containing the given environment ID.
+   * Resolve an environment ID for cache lookup.
+   * Previously mapped raw environmentIds to token strings used as cache keys.
+   * Since the cache now uses environmentId as keys directly, this is an identity function.
+   * Kept for backward compatibility with EventListener.
    *
-   * @returns The matching token key, or the original environmentId if not found (single-mode fallback)
+   * @returns The environmentId as-is (no longer needs token resolution)
    */
   resolveTokenForEnvironmentId(environmentId: string): string {
-    if (!this.multiMode) {
-      return environmentId;
-    }
-
-    // Search registered tokens for one containing this environment ID
-    const tokens = this.getEnvironmentIds();
-    for (const token of tokens) {
-      if (token.includes(environmentId)) {
-        return token;
-      }
-    }
-
-    // Fallback: return original (will likely not match cache, but avoids breaking)
-    this.logger.warn('Could not resolve token for environment ID', {
-      environmentId,
-      registeredTokens: tokens.length,
-    });
     return environmentId;
   }
 

@@ -397,9 +397,9 @@ function StatsPanel({
                     </td>
                   </tr>
                   <tr>
-                    <td className="stats-label">APP/ENV:</td>
+                    <td className="stats-label">APP:</td>
                     <td className="stats-value" colSpan={5}>
-                      {config.appName} / {config.environment}
+                      {config.appName}
                     </td>
                   </tr>
                   <tr>

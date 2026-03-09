@@ -42,6 +42,18 @@ export class ApiClientFactory {
   }
 
   /**
+   * Remap the default client from token-based key to real environmentId.
+   * Called after /ready endpoint resolves the actual environmentId.
+   * The default client remains the same, but is now also accessible by the real environmentId.
+   */
+  remapDefaultEnvironment(environmentId: string): void {
+    // Register the real environmentId → token mapping
+    this.envTokenMap.set(environmentId, this.defaultToken);
+    // Register the default client under the real environmentId
+    this.clientsByEnv.set(environmentId, this.defaultClient);
+  }
+
+  /**
    * Unregister an environment and remove its cached client.
    */
   unregisterEnvironment(environmentId: string): void {

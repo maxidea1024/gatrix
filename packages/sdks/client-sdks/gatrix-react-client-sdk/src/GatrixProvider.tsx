@@ -36,7 +36,6 @@ const offlineConfig: GatrixClientConfig = {
   apiUrl: 'http://localhost/api/v1',
   apiToken: 'not-used',
   appName: 'offline',
-  environment: 'offline',
   features: {
     offlineMode: true,
     bootstrap: [],

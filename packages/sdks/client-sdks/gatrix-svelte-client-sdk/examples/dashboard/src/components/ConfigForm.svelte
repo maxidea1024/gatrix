@@ -4,15 +4,14 @@
 
   export let onConnect: (config: GatrixClientConfig) => void;
 
-  const DEV_TOKEN_EDGE = 'gatrix-unsecured-edge-api-token';
-  const DEV_TOKEN_BACKEND = 'gatrix-unsecured-client-api-token';
+  const DEV_TOKEN_EDGE = 'unsecured-edge-api-token';
+  const DEV_TOKEN_BACKEND = 'unsecured-client-api-token';
   const STORAGE_KEY_LOCATION = 'gatrix-dashboard-location';
   const STORAGE_KEY_SERVER_TYPE = 'gatrix-dashboard-server-type';
   const STORAGE_KEY_TOKEN = 'gatrix-dashboard-last-token';
   const STORAGE_KEY_REMEMBER = 'gatrix-dashboard-remember-token';
   const STORAGE_KEY_API_URL = 'gatrix-dashboard-api-url';
   const STORAGE_KEY_APP_NAME = 'gatrix-dashboard-app-name';
-  const STORAGE_KEY_ENVIRONMENT = 'gatrix-dashboard-environment';
   const STORAGE_KEY_OFFLINE_MODE = 'gatrix-dashboard-offline-mode';
   const STORAGE_KEY_REFRESH_INTERVAL = 'gatrix-dashboard-refresh-interval';
   const STORAGE_KEY_EXPLICIT_SYNC = 'gatrix-dashboard-explicit-sync';
@@ -39,7 +38,6 @@
   let apiUrl = '';
   let apiToken = '';
   let appName = 'svelte-sdk-app';
-  let environment = 'development';
   let userId = '';
   let rememberToken = false;
   let showToken = false;
@@ -56,9 +54,7 @@
     userId = localStorage.getItem(STORAGE_KEY_USER_ID) || generateRandomUserId();
 
     const savedAppName = localStorage.getItem(STORAGE_KEY_APP_NAME);
-    const savedEnvironment = localStorage.getItem(STORAGE_KEY_ENVIRONMENT);
     if (savedAppName) appName = savedAppName;
-    if (savedEnvironment) environment = savedEnvironment;
 
     const savedRemember = localStorage.getItem(STORAGE_KEY_REMEMBER) === 'true';
     const savedToken = localStorage.getItem(STORAGE_KEY_TOKEN) || '';
@@ -108,7 +104,6 @@
   function handleSubmit() {
     localStorage.setItem(STORAGE_KEY_LOCATION, location);
     localStorage.setItem(STORAGE_KEY_SERVER_TYPE, serverType);
-    localStorage.setItem(STORAGE_KEY_ENVIRONMENT, environment);
     localStorage.setItem(STORAGE_KEY_USER_ID, userId);
     localStorage.setItem(STORAGE_KEY_APP_NAME, appName);
     localStorage.setItem(STORAGE_KEY_OFFLINE_MODE, String(offlineMode));
@@ -131,7 +126,6 @@
       apiUrl,
       apiToken,
       appName,
-      environment,
       offlineMode,
       context: { userId },
       features: {
@@ -275,16 +269,6 @@
               required
             />
           </div>
-          <div class="form-group">
-            <label class="form-label">ENVIRONMENT</label>
-            <input
-              type="text"
-              class="nes-input is-dark"
-              bind:value={environment}
-              placeholder="development"
-              required
-            />
-          </div>
         </div>
 
         <div class="form-group">
@@ -304,7 +288,7 @@
               title="Generate random User ID"
               style="font-size:10px;white-space:nowrap"
             >
-              ?Ž² RANDOM
+              ?ï¿½ï¿½ RANDOM
             </button>
           </div>
         </div>

@@ -41,22 +41,38 @@ export interface IEnvironmentProvider {
   onEnvironmentsChanged?(
     callback: (added: EnvironmentEntry[], removed: EnvironmentEntry[]) => void
   ): () => void;
+
+  /**
+   * Optional: Update the environmentId after resolving from /ready endpoint.
+   * Used by SingleEnvironmentProvider to replace the token placeholder with the real environmentId.
+   */
+  updateEnvironmentId?(environmentId: string): void;
 }
 
 /**
  * Default provider for single-environment mode (game servers).
- * Uses the configured apiToken as both token and environmentId.
- * The environmentId will be resolved to the real value from /ready endpoint.
+ * Initially uses the configured apiToken as environmentId placeholder.
+ * The environmentId is resolved to the real value from /ready endpoint via updateEnvironmentId().
  */
 export class SingleEnvironmentProvider implements IEnvironmentProvider {
   private readonly token: string;
+  private resolvedEnvironmentId: string | null = null;
 
   constructor(token: string) {
     this.token = token;
   }
 
   getEnvironmentTokens(): EnvironmentEntry[] {
-    return [{ environmentId: this.token, token: this.token }];
+    const environmentId = this.resolvedEnvironmentId || this.token;
+    return [{ environmentId, token: this.token }];
+  }
+
+  /**
+   * Update the environmentId after resolving from /ready endpoint.
+   * Replaces the token placeholder with the real environmentId.
+   */
+  updateEnvironmentId(environmentId: string): void {
+    this.resolvedEnvironmentId = environmentId;
   }
 }
 

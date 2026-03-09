@@ -347,15 +347,9 @@ class FlagStreamingService {
     try {
       const sdk = sdkManager.getSDK();
       if (sdk) {
-        // Resolve raw environment ID to cache token key using Edge's environment registry
-        const { environmentRegistry } = await import('./environment-registry');
-        const cacheKey =
-          environmentRegistry.resolveEnvironmentToken(environmentId) ||
-          environmentId;
-        await sdk.featureFlag.refreshByEnvironment(cacheKey);
-        logger.debug(
-          `Cache refreshed for env=${environmentId} (cacheKey=${cacheKey}) before notify`
-        );
+        // SDK cache uses environmentId as key directly (no longer token-based)
+        await sdk.featureFlag.refreshByEnvironment(environmentId);
+        logger.debug(`Cache refreshed for env=${environmentId} before notify`);
       }
     } catch (err) {
       logger.error('Failed to refresh cache before notify:', err);

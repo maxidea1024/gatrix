@@ -147,8 +147,16 @@ if ($Init) {
         $val = $secrets[$key]
         if (-not $val) { $val = "default_unsafe_value_change_me" } # Fallback if env missing
 
-        docker secret inspect $key > $null 2>&1
-        if ($LASTEXITCODE -eq 0) {
+        $secretExists = $false
+        try {
+            $null = docker secret inspect $key 2>&1
+            if ($LASTEXITCODE -eq 0) { $secretExists = $true }
+        }
+        catch {
+            $secretExists = $false
+        }
+
+        if ($secretExists) {
             Show-Warn "Secret '$key' already exists, skipping..."
         }
         else {

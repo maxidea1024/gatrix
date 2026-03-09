@@ -1,0 +1,71 @@
+# Local/Single-node override
+# Removes placement constraints that require multiple nodes
+# Usage: docker stack deploy -c docker-stack.yml -c docker-stack.local.yml gatrix
+
+version: '3.9'
+
+services:
+  backend:
+    deploy:
+      placement:
+        constraints: []
+
+  frontend:
+    deploy:
+      placement:
+        constraints: []
+
+  event-lens:
+    deploy:
+      placement:
+        constraints: []
+
+  event-lens-worker:
+    deploy:
+      placement:
+        constraints: []
+
+  chat-server:
+    deploy:
+      placement:
+        constraints: []
+
+  edge:
+    deploy:
+      placement:
+        constraints: []
+
+  mysql:
+    deploy:
+      placement:
+        constraints: []
+
+  clickhouse:
+    deploy:
+      placement:
+        constraints: []
+
+  etcd:
+    deploy:
+      placement:
+        constraints: []
+
+  prometheus:
+    deploy:
+      placement:
+        constraints: []
+
+  loki:
+    deploy:
+      placement:
+        constraints: []
+
+  portainer:
+    deploy:
+      placement:
+        constraints: []
+
+  visualizer:
+    deploy:
+      placement:
+        constraints: []
