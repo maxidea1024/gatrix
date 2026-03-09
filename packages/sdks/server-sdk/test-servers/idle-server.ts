@@ -211,6 +211,7 @@ async function main() {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${apiToken}`,
+            'x-application-name': 'idle',
           },
           body: JSON.stringify(payload),
         });
