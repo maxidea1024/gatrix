@@ -632,7 +632,7 @@ namespace Gatrix.Unity.SDK.Editor
             GUILayout.FlexibleSpace();
 
             // Auto-refresh toggle
-            var refreshIcon = _autoRefresh ? "??Auto" : "??Auto";
+            var refreshIcon = _autoRefresh ? "\u25cf Auto" : "\u25cb Auto";
             var refreshColor = _autoRefresh ? new Color(0.4f, 1f, 0.4f) : new Color(0.7f, 0.7f, 0.7f);
             var refreshStyle = new GUIStyle(EditorStyles.toolbarButton)
             {
@@ -952,6 +952,12 @@ namespace Gatrix.Unity.SDK.Editor
             }
 
             _cachedFlags = newFlags;
+
+            // Update missing flags cache (persists after play mode ends)
+            if (_cachedStats?.MissingFlags != null && _cachedStats.MissingFlags.Count > 0)
+            {
+                _cachedMissingFlags = new Dictionary<string, int>(_cachedStats.MissingFlags);
+            }
 
             // Only collect time-series data during Play Mode so the graph doesn't
             // keep growing (and time doesn't appear to advance) in Edit Mode.

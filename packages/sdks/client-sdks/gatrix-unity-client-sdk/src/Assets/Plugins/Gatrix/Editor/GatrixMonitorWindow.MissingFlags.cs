@@ -1,5 +1,6 @@
 // GatrixMonitorWindow - Missing Flags tab
 // Shows flags that were requested by code but not found on the server
+// Data persists across play mode transitions via _cachedMissingFlags
 
 #if UNITY_EDITOR
 using System.Collections.Generic;
@@ -15,19 +16,15 @@ namespace Gatrix.Unity.SDK.Editor
 
         private string _missingFlagSearchFilter = "";
 
+        // Persists across play mode: updated during RefreshData, preserved after stop
+        [NonSerialized] private Dictionary<string, int> _cachedMissingFlags;
+
         private void DrawMissingFlagsTab()
         {
             EditorGUILayout.LabelField("Missing Flags", _headerStyle);
             EditorGUILayout.Space(4);
 
-            var client = GatrixBehaviour.Client;
-            if (client == null || _cachedStats == null)
-            {
-                GatrixEditorStyle.DrawHelpBox("No data available.", MessageType.Info);
-                return;
-            }
-
-            var missingFlags = _cachedStats.MissingFlags;
+            var missingFlags = _cachedMissingFlags;
             if (missingFlags == null || missingFlags.Count == 0)
             {
                 GatrixEditorStyle.DrawHelpBox(
@@ -35,6 +32,28 @@ namespace Gatrix.Unity.SDK.Editor
                     "Missing flags appear when code requests a flag that doesn't exist on the server.",
                     MessageType.Info);
                 return;
+            }
+
+            // Edit mode banner (data from last play session)
+            if (!EditorApplication.isPlaying)
+            {
+                var infoRect = GUILayoutUtility.GetRect(0, 22, GUILayout.ExpandWidth(true));
+                if (Event.current.type == EventType.Repaint)
+                {
+                    EditorGUI.DrawRect(infoRect, new Color(0.15f, 0.35f, 0.55f, 0.30f));
+                }
+                var infoStyle = new GUIStyle(EditorStyles.miniLabel)
+                {
+                    richText = true,
+                    normal = { textColor = EditorGUIUtility.isProSkin
+                        ? new Color(0.65f, 0.80f, 1.00f)
+                        : new Color(0.10f, 0.30f, 0.60f) }
+                };
+                GUI.Label(
+                    new Rect(infoRect.x + 6, infoRect.y, infoRect.width - 12, infoRect.height),
+                    "\u25a3  Edit Mode \u2014 showing data from last Play Mode session",
+                    infoStyle);
+                EditorGUILayout.Space(4);
             }
 
             // Warning banner
@@ -57,7 +76,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             // Search filter
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-            EditorGUILayout.LabelField("\ud83d\udd0d", GUILayout.Width(20));
+            EditorGUILayout.LabelField("\u25c9", GUILayout.Width(16));
             _missingFlagSearchFilter = EditorGUILayout.TextField(
                 _missingFlagSearchFilter, EditorStyles.toolbarSearchField);
             if (GUILayout.Button("\u2715", EditorStyles.toolbarButton, GUILayout.Width(20)))
