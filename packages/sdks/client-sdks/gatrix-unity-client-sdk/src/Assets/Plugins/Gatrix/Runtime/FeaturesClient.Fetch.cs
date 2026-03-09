@@ -43,9 +43,7 @@ namespace Gatrix.Unity.SDK
 
                 // Build URL: {apiUrl}/client/features/eval
                 var urlBuilder = new StringBuilder(_config.ApiUrl);
-                urlBuilder.Append("/client/features/");
-                urlBuilder.Append(Uri.EscapeDataString(_config.Environment));
-                urlBuilder.Append("/eval");
+                urlBuilder.Append("/client/features/eval");
 
                 HttpRequestMessage request;
                 if (FeaturesConfig.UsePOSTRequests)
@@ -389,9 +387,7 @@ namespace Gatrix.Unity.SDK
 
                 // Build URL with flagNames parameter
                 var urlBuilder = new StringBuilder(_config.ApiUrl);
-                urlBuilder.Append("/client/features/");
-                urlBuilder.Append(Uri.EscapeDataString(_config.Environment));
-                urlBuilder.Append("/eval");
+                urlBuilder.Append("/client/features/eval");
 
                 HttpRequestMessage request;
                 if (FeaturesConfig.UsePOSTRequests)

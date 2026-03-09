@@ -4,7 +4,7 @@
  * Manages SSE and WebSocket connections for real-time feature flag change
  * notifications. Clients connect via:
  *   - SSE: GET `/client/features/:environment/stream/sse`
- *   - WebSocket: GET `/client/features/:environment/stream/ws`
+ *   - WebSocket: GET `/client/features/stream/ws`
  *
  * Subscribes to Redis Pub/Sub channel 'gatrix-sdk-events' to receive
  * feature_flag.changed events published by FeatureFlagService.invalidateCache().

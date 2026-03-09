@@ -23,7 +23,6 @@ async function main() {
     apiUrl: config.apiUrl,
     apiToken: config.apiToken,
     appName: config.appName,
-    environment: config.environment,
     features: {
       storageProvider: new InMemoryStorageProvider(),
       context: {

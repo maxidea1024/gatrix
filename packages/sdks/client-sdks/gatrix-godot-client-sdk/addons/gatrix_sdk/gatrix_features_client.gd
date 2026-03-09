@@ -1096,7 +1096,7 @@ func _set_ready() -> void:
 
 func _build_fetch_url() -> String:
 	var base := _config.api_url.rstrip("/")
-	var url := "%s/client/features/%s" % [base, _config.environment.uri_encode()]
+	var url := "%s/client/features/eval" % [base]
 
 	if not _config.features.use_post_requests:
 		var ctx_qs := _config.features.context.to_query_string()
@@ -1267,9 +1267,8 @@ func _do_send_metrics(payload: String) -> void:
 		_scene_tree.root.call_deferred("add_child", _metrics_http)
 		await _scene_tree.process_frame
 
-	var url := "%s/client/features/%s/metrics" % [
-		_config.api_url.rstrip("/"),
-		_config.environment.uri_encode()
+	var url := "%s/client/features/metrics" % [
+		_config.api_url.rstrip("/")
 	]
 
 	var headers: PackedStringArray = [
@@ -1378,7 +1377,7 @@ func fetch_partial_flags(flag_keys: Array) -> void:
 	await _scene_tree.process_frame
 	
 	var base := _config.api_url.rstrip("/")
-	var url := "%s/client/features/%s/eval" % [base, _config.environment.uri_encode()]
+	var url := "%s/client/features/eval" % [base]
 	var params := _config.features.context.to_dict()
 	params["flagNames"] = keys_str
 	

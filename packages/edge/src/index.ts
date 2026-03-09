@@ -8,7 +8,6 @@ import { tokenMirrorService } from './services/token-mirror-service';
 import { tokenUsageTracker } from './services/token-usage-tracker';
 import { metricsAggregator } from './services/metrics-aggregator';
 import { environmentRegistry } from './services/environment-registry';
-import { UNSECURED_TOKENS } from './middleware/client-auth';
 
 import { createLogger } from './config/logger';
 const logger = createLogger('EdgeServer');
@@ -65,15 +64,13 @@ async function main(): Promise<void> {
           `http://${request.headers.host}`
         );
         const wsPathMatch = url.pathname.match(
-          /^\/api\/v1\/client\/features\/([^/]+)\/stream\/ws$/
+          /^\/api\/v1\/client\/features\/stream\/ws$/
         );
 
         if (!wsPathMatch) {
           socket.destroy();
           return;
         }
-
-        const environmentId = wsPathMatch[1];
 
         // Extract metadata from query parameters or headers
         // (browsers cannot send custom headers during WebSocket handshake)
@@ -93,14 +90,41 @@ async function main(): Promise<void> {
           return;
         }
 
-        // Validate token via tokenMirrorService
-        const result = tokenMirrorService.validateToken(
-          apiToken,
-          'client',
-          environmentId
-        );
-        const isUnsecured = UNSECURED_TOKENS.includes(apiToken);
-        if (!result.valid && !isUnsecured) {
+        // Resolve environmentId from token (same logic as clientAuth middleware)
+        let environmentId: string | undefined;
+        const UNSECURED_TOKEN_REGEX =
+          /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
+        const LEGACY_TOKENS: Record<string, boolean> = {
+          'unsecured-client-api-token': true,
+          'unsecured-server-api-token': true,
+          'unsecured-edge-api-token': true,
+        };
+
+        const unsecuredMatch = apiToken.match(UNSECURED_TOKEN_REGEX);
+        if (unsecuredMatch) {
+          const [, , , envId] = unsecuredMatch;
+          environmentId =
+            environmentRegistry.resolveEnvironmentId(envId) || envId;
+        } else if (LEGACY_TOKENS[apiToken]) {
+          environmentId =
+            environmentRegistry.resolveEnvironmentId('development') || undefined;
+        } else {
+          // Validate token via tokenMirrorService
+          const result = tokenMirrorService.validateToken(apiToken, 'client');
+          if (!result.valid) {
+            socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+            socket.destroy();
+            return;
+          }
+          environmentId = result.token?.environmentId ?? undefined;
+          if (environmentId) {
+            environmentId =
+              environmentRegistry.resolveEnvironmentId(environmentId) ||
+              environmentId;
+          }
+        }
+
+        if (!environmentId) {
           socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
           socket.destroy();
           return;

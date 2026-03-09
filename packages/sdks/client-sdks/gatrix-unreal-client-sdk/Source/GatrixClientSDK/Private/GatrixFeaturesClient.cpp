@@ -1337,8 +1337,7 @@ void UGatrixFeaturesClient::SendMetrics() {
   if (PayloadJson.IsEmpty())
     return;
 
-  FString MetricsUrl = FString::Printf(TEXT("%s/client/features/%s/metrics"), *ClientConfig.ApiUrl,
-                                       *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment));
+  FString MetricsUrl = FString::Printf(TEXT("%s/client/features/metrics"), *ClientConfig.ApiUrl);
 
   // Retry with a simple attempt counter via shared pointer
   auto RetryCount = MakeShared<int32>(0);
@@ -1418,8 +1417,7 @@ void UGatrixFeaturesClient::SendMetrics() {
 
 FString UGatrixFeaturesClient::BuildFetchUrl() const {
   // URL pattern: {apiUrl}/client/features/eval
-  FString BaseUrl = FString::Printf(TEXT("%s/client/features/%s/eval"), *ClientConfig.ApiUrl,
-                                    *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment));
+  FString BaseUrl = FString::Printf(TEXT("%s/client/features/eval"), *ClientConfig.ApiUrl);
 
   if (!ClientConfig.Features.bUsePOSTRequests) {
     const FString QueryString = BuildContextQueryString();
@@ -1436,8 +1434,6 @@ FString UGatrixFeaturesClient::BuildContextQueryString() const {
 
   Params.Add(
       FString::Printf(TEXT("appName=%s"), *FGenericPlatformHttp::UrlEncode(ClientConfig.AppName)));
-  Params.Add(FString::Printf(TEXT("environment=%s"),
-                             *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment)));
 
   if (!ClientConfig.Features.Context.UserId.IsEmpty())
     Params.Add(FString::Printf(
@@ -2294,23 +2290,19 @@ FString UGatrixFeaturesClient::BuildStreamingUrl() const {
   // If no custom URL, derive from ApiUrl
   // URL pattern: {apiUrl}/client/features/stream/sse|ws
   if (BaseUrl.IsEmpty()) {
-    FString EncodedEnv = FGenericPlatformHttp::UrlEncode(ClientConfig.Environment);
     if (StreamConfig.Transport == EGatrixStreamingTransport::WebSocket) {
-      BaseUrl = FString::Printf(TEXT("%s/client/features/%s/stream/ws"), *ClientConfig.ApiUrl,
-                                *EncodedEnv);
+      BaseUrl = FString::Printf(TEXT("%s/client/features/stream/ws"), *ClientConfig.ApiUrl);
       // Convert http(s) to ws(s)
       BaseUrl = BaseUrl.Replace(TEXT("https://"), TEXT("wss://"));
       BaseUrl = BaseUrl.Replace(TEXT("http://"), TEXT("ws://"));
     } else {
-      BaseUrl = FString::Printf(TEXT("%s/client/features/%s/stream/sse"), *ClientConfig.ApiUrl,
-                                *EncodedEnv);
+      BaseUrl = FString::Printf(TEXT("%s/client/features/stream/sse"), *ClientConfig.ApiUrl);
     }
   }
 
   // Add query parameters
-  FString QueryString = FString::Printf(TEXT("?appName=%s&environment=%s"),
-                                        *FGenericPlatformHttp::UrlEncode(ClientConfig.AppName),
-                                        *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment));
+  FString QueryString = FString::Printf(TEXT("?appName=%s"),
+                                        *FGenericPlatformHttp::UrlEncode(ClientConfig.AppName));
 
   if (LocalGlobalRevision > 0) {
     QueryString += FString::Printf(TEXT("&globalRevision=%lld"), LocalGlobalRevision);

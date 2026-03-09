@@ -399,7 +399,7 @@ const startServer = async () => {
           `http://${request.headers.host}`
         );
         const wsPathMatch = url.pathname.match(
-          /^\/api\/v1\/client\/features\/([^/]+)\/stream\/ws$/
+          /^\/api\/v1\/client\/features\/stream\/ws$/
         );
 
         if (!wsPathMatch) {
@@ -407,7 +407,6 @@ const startServer = async () => {
           return;
         }
 
-        const environmentId = wsPathMatch[1];
         const apiToken =
           url.searchParams.get('x-api-token') ||
           url.searchParams.get('apiToken') ||
@@ -419,17 +418,51 @@ const startServer = async () => {
           return;
         }
 
-        // Validate token
-        const { ApiAccessToken } = await import('./models/api-access-token');
-        const tokenData = await ApiAccessToken.validateAndUse(apiToken);
-        if (!tokenData) {
-          // Check special tokens
-          const isUnsecured = apiToken === 'unsecured-client-api-token';
-          if (!isUnsecured) {
+        // Resolve environmentId from token
+        let environmentId: string | undefined;
+
+        // Check unsecured token patterns
+        const UNSECURED_TOKEN_REGEX =
+          /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
+        const LEGACY_UNSECURED_TOKENS = [
+          'unsecured-client-api-token',
+          'unsecured-server-api-token',
+          'unsecured-edge-api-token',
+        ];
+
+        const unsecuredMatch = apiToken.match(UNSECURED_TOKEN_REGEX);
+        if (unsecuredMatch) {
+          // Format: unsecured-{org}:{project}:{env}-{type}-api-token
+          const envName = unsecuredMatch[3];
+          // Look up environment by name to get the ID
+          const { Environment } = await import('./models/environment');
+          const env = await Environment.query()
+            .findOne({ name: envName })
+            .select('id');
+          environmentId = env?.id;
+        } else if (LEGACY_UNSECURED_TOKENS.includes(apiToken)) {
+          // Legacy tokens default to 'development' environment
+          const { Environment } = await import('./models/environment');
+          const env = await Environment.query()
+            .findOne({ name: 'development' })
+            .select('id');
+          environmentId = env?.id;
+        } else {
+          // Validate real token
+          const { ApiAccessToken } = await import('./models/api-access-token');
+          const tokenData = await ApiAccessToken.validateAndUse(apiToken);
+          if (!tokenData) {
             socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
             socket.destroy();
             return;
           }
+          environmentId = tokenData.environmentId;
+        }
+
+        if (!environmentId) {
+          socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+          socket.destroy();
+          return;
         }
 
         const { flagStreamingService } =
