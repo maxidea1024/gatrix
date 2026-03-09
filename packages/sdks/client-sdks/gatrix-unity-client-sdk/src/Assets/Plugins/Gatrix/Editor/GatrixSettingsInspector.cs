@@ -23,7 +23,6 @@ namespace Gatrix.Unity.SDK.Editor
         private SerializedProperty _apiUrl;
         private SerializedProperty _apiToken;
         private SerializedProperty _appName;
-        private SerializedProperty _environment;
         private SerializedProperty _userId;
         private SerializedProperty _sessionId;
         private SerializedProperty _contextProperties;
@@ -59,7 +58,6 @@ namespace Gatrix.Unity.SDK.Editor
             _apiUrl = serializedObject.FindProperty("_apiUrl");
             _apiToken = serializedObject.FindProperty("_apiToken");
             _appName = serializedObject.FindProperty("_appName");
-            _environment = serializedObject.FindProperty("_environment");
             _userId = serializedObject.FindProperty("_userId");
             _sessionId = serializedObject.FindProperty("_sessionId");
             _contextProperties = serializedObject.FindProperty("_contextProperties");
@@ -114,7 +112,6 @@ namespace Gatrix.Unity.SDK.Editor
                 DrawRequiredField(_apiUrl, "API URL");
                 DrawRequiredField(_apiToken, "API Token");
                 DrawRequiredField(_appName, "App Name");
-                DrawRequiredField(_environment, "Environment");
                 GatrixEditorStyle.EndBox();
             }
 
