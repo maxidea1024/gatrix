@@ -261,7 +261,7 @@ namespace Gatrix.Unity.SDK
             // Skip start log in offline mode (editor cache init is an internal detail)
             if (!featCfg.OfflineMode)
             {
-                _devLog.Log($"start() called. refreshIntervalMs={_refreshIntervalMs}, explicitSyncMode={featCfg.ExplicitSyncMode}");
+                _devLog.Log($"Start() called. refreshIntervalMs={_refreshIntervalMs}, explicitSyncMode={featCfg.ExplicitSyncMode}");
             }
 
             // Offline mode: use cached/bootstrap flags only

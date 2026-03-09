@@ -20,13 +20,13 @@ namespace Gatrix.Unity.SDK
         {
             if (FeaturesConfig.OfflineMode)
             {
-                _logger.Warn("fetchFlags called but client is in offline mode, ignoring");
+                _logger.Warn("FetchFlags called but client is in offline mode, ignoring");
                 return;
             }
 
             if (_isFetchingFlags) return;
             _isFetchingFlags = true;
-            _devLog.Log($"fetchFlags: starting fetch. etag={_etag}");
+            _devLog.Log($"FetchFlags: starting fetch. etag={_etag}");
 
             try
             {
@@ -125,7 +125,7 @@ namespace Gatrix.Unity.SDK
 
                 if (response == null) return;
 
-                _devLog.Log($"fetchFlags: response received. status={(int)response.StatusCode}");
+                _devLog.Log($"FetchFlags: response received. status={(int)response.StatusCode}");
 
                 // Check for recovery
                 if (_sdkState == SdkState.Error && (int)response.StatusCode < 400)
@@ -154,7 +154,7 @@ namespace Gatrix.Unity.SDK
                     var json = await response.Content.ReadAsStringAsync();
                     var data = GatrixJson.DeserializeFlagsResponse(json);
 
-                    _devLog.Log($"fetchFlags: parsed response. success={data?.Success}, flagCount={data?.Data?.Flags?.Count ?? 0}");
+                    _devLog.Log($"FetchFlags: parsed response. success={data?.Success}, flagCount={data?.Data?.Flags?.Count ?? 0}");
 
                     if (data != null && data.Success && data.Data?.Flags != null)
                     {
@@ -178,7 +178,7 @@ namespace Gatrix.Unity.SDK
                 else if (response.StatusCode == HttpStatusCode.NotModified)
                 {
                     _notModifiedCount++;
-                    _devLog.Log($"fetchFlags: 304 Not Modified (etag={_etag})");
+                    _devLog.Log($"FetchFlags: 304 Not Modified (etag={_etag})");
                     if (!_fetchedFromServer)
                     {
                         _fetchedFromServer = true;
@@ -215,7 +215,7 @@ namespace Gatrix.Unity.SDK
             }
             catch (OperationCanceledException)
             {
-                _devLog.Log("fetchFlags: cancelled (timeout or shutdown)");
+                _devLog.Log("FetchFlags: cancelled (timeout or shutdown)");
             }
             catch (Exception e)
             {
