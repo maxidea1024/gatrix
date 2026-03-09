@@ -5,6 +5,7 @@ import { CrashEvent } from '../models/crash-event';
 import { ClientCrash } from '../models/client-crash';
 import fs from 'fs/promises';
 import path from 'path';
+import database from '../config/database';
 
 import { createLogger } from '../config/logger';
 const logger = createLogger('CrashEventController');
@@ -144,9 +145,32 @@ export class CrashEventController {
         .limit(limitNum)
         .offset((pageNum - 1) * limitNum);
 
+      // Resolve environment names from main DB
+      const envIds = [...new Set(events.map((e: any) => e.environmentId).filter(Boolean))];
+      let envNameMap: Record<string, string> = {};
+      if (envIds.length > 0) {
+        try {
+          const envRows = await database.query(
+            `SELECT id, name, displayName FROM g_environments WHERE id IN (${envIds.map(() => '?').join(',')})`,
+            envIds
+          );
+          for (const row of envRows) {
+            envNameMap[row.id] = row.displayName || row.name || row.id;
+          }
+        } catch (error) {
+          logger.warn('Failed to resolve environment names:', error);
+        }
+      }
+
+      // Attach environmentName to each event
+      const eventsWithEnvName = events.map((e: any) => ({
+        ...e,
+        environmentName: envNameMap[e.environmentId] || e.environmentId,
+      }));
+
       res.json({
         success: true,
-        data: events,
+        data: eventsWithEnvName,
         total,
         page: pageNum,
         limit: limitNum,
@@ -338,7 +362,7 @@ export class CrashEventController {
       ]);
 
       const platforms = platformResults.map((r: any) => r.platform).sort();
-      const environments = environmentResults
+      const environmentIds = environmentResults
         .map((r: any) => r.environmentId)
         .sort();
       const branches = branchResults.map((r: any) => r.branch).sort();
@@ -348,6 +372,27 @@ export class CrashEventController {
       const appVersions = appVersionResults
         .map((r: any) => r.appVersion)
         .sort();
+
+      // Resolve environment names from main DB
+      let environments: { id: string; name: string }[] = environmentIds.map((id: string) => ({ id, name: id }));
+      if (environmentIds.length > 0) {
+        try {
+          const envRows = await database.query(
+            `SELECT id, name, displayName FROM g_environments WHERE id IN (${environmentIds.map(() => '?').join(',')})`,
+            environmentIds
+          );
+          const envNameMap: Record<string, string> = {};
+          for (const row of envRows) {
+            envNameMap[row.id] = row.displayName || row.name || row.id;
+          }
+          environments = environmentIds.map((id: string) => ({
+            id,
+            name: envNameMap[id] || id,
+          }));
+        } catch (error) {
+          logger.warn('Failed to resolve environment names for filter:', error);
+        }
+      }
 
       res.json({
         success: true,

@@ -48,7 +48,7 @@ class CrashService {
   async getFilterOptions(): Promise<{
     branches: string[];
     platforms: string[];
-    environments: string[];
+    environments: { id: string; name: string }[];
     marketTypes: string[];
     appVersions: string[];
     states: { value: number; label: string }[];
