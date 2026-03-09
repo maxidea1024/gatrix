@@ -24,7 +24,7 @@ namespace Gatrix.Unity.SDK
 
         // System context fields that cannot be removed
         private static readonly HashSet<string> SystemContextFields
-            = new HashSet<string> { "appName", "environment" };
+            = new HashSet<string> { "appName" };
         private static readonly HashSet<string> DefinedFields
             = new HashSet<string> { "userId", "sessionId", "currentTime" };
 
@@ -127,7 +127,6 @@ namespace Gatrix.Unity.SDK
                 ApiUrl = config.ApiUrl?.TrimEnd('/'),
                 ApiToken = config.ApiToken,
                 AppName = config.AppName,
-                Environment = config.Environment,
                 EnableDevMode = config.EnableDevMode,
                 CustomHeaders = config.CustomHeaders,
                 Logger = config.Logger,
@@ -160,8 +159,7 @@ namespace Gatrix.Unity.SDK
             // Initial context with system fields
             _context = new GatrixContext
             {
-                AppName = config.AppName,
-                Environment = config.Environment
+                AppName = config.AppName
             };
             if (featCfg.Context != null)
             {
@@ -179,7 +177,6 @@ namespace Gatrix.Unity.SDK
                 config.AppName,
                 _config.ApiUrl,
                 config.ApiToken,
-                config.Environment,
                 config.CustomHeaders,
                 featCfg.DisableMetrics || featCfg.OfflineMode,
                 config.EnableDevMode,
@@ -442,7 +439,6 @@ namespace Gatrix.Unity.SDK
             }
 
             AppendParam("appName", context.AppName);
-            AppendParam("environment", context.Environment);
             AppendParam("userId", context.UserId);
             AppendParam("sessionId", context.SessionId);
             AppendParam("remoteAddress", context.RemoteAddress);
@@ -465,8 +461,6 @@ namespace Gatrix.Unity.SDK
             // Simple hash: concatenate sorted fields
             var sb = new StringBuilder(128);
             sb.Append(context.AppName ?? "");
-            sb.Append('|');
-            sb.Append(context.Environment ?? "");
             sb.Append('|');
             sb.Append(context.UserId ?? "");
             sb.Append('|');

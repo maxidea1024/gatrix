@@ -130,7 +130,7 @@ namespace Gatrix.Unity.SDK
         /// <summary>
         /// Get a deep copy of the current evaluation context.
         /// <para>
-        /// The context includes system fields (AppName, Environment) and user-defined
+        /// The context includes system fields (AppName) and user-defined
         /// fields (UserId, SessionId, custom properties). Modifying the returned object
         /// does not affect the SDK's internal context.
         /// </para>
@@ -142,8 +142,8 @@ namespace Gatrix.Unity.SDK
         /// Replace the entire evaluation context and re-fetch flags.
         /// <para>
         /// This is typically used when the user identity changes (e.g., login/logout).
-        /// The new context completely replaces the old one. System fields (AppName,
-        /// Environment) are preserved from the original config.
+        /// The new context completely replaces the old one. System fields (AppName)
+        /// are preserved from the original config.
         /// </para>
         /// <para>
         /// Emits <see cref="GatrixEvents.FlagsChange"/> after the context is updated,

@@ -56,7 +56,6 @@ namespace Gatrix.Unity.SDK
         private readonly string _appName;
         private readonly string _apiUrl;
         private readonly string _apiToken;
-        private readonly string _environment;
         private readonly Dictionary<string, string> _customHeaders;
         private readonly bool _disabled;
         private readonly GatrixDevLogger _devLog;
@@ -76,7 +75,6 @@ namespace Gatrix.Unity.SDK
             string appName,
             string apiUrl,
             string apiToken,
-            string environment,
             Dictionary<string, string> customHeaders,
             bool disableMetrics,
             bool enableDevMode,
@@ -88,7 +86,6 @@ namespace Gatrix.Unity.SDK
             _appName = appName;
             _apiUrl = apiUrl;
             _apiToken = apiToken;
-            _environment = environment;
             _customHeaders = customHeaders;
             _disabled = disableMetrics;
             _logger = logger;
@@ -321,8 +318,6 @@ namespace Gatrix.Unity.SDK
                 _emitter?.Emit(eventName, data);
             }
         }
-
-
 
         private MetricsBucket CreateEmptyBucket()
         {

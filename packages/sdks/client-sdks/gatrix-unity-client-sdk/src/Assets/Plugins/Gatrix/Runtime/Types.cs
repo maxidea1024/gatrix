@@ -7,15 +7,13 @@ namespace Gatrix.Unity.SDK
 {
     /// <summary>
     /// Evaluation context (global for client-side).
-    /// System fields (AppName, Environment) cannot be removed via UpdateContext.
+    /// System fields (AppName) cannot be removed via UpdateContext.
     /// </summary>
     [Serializable]
     public class GatrixContext
     {
         /// <summary>Application name (system field - cannot be removed)</summary>
         public string AppName { get; set; }
-        /// <summary>Environment name (system field - cannot be removed)</summary>
-        public string Environment { get; set; }
         /// <summary>Remote address / client IP</summary>
         public string RemoteAddress { get; set; }
 
@@ -34,7 +32,6 @@ namespace Gatrix.Unity.SDK
             var clone = new GatrixContext
             {
                 AppName = AppName,
-                Environment = Environment,
                 RemoteAddress = RemoteAddress,
                 UserId = UserId,
                 SessionId = SessionId,
@@ -128,7 +125,6 @@ namespace Gatrix.Unity.SDK
     [Serializable]
     public class FlagsApiResponseMeta
     {
-        public string Environment { get; set; }
         public string EvaluatedAt { get; set; }
     }
 
@@ -290,9 +286,6 @@ namespace Gatrix.Unity.SDK
 
         /// <summary>Application name</summary>
         public string AppName { get; set; }
-
-        /// <summary>Environment name (required, e.g., 'development', 'production')</summary>
-        public string Environment { get; set; }
 
         // ==================== Common Settings ====================
 

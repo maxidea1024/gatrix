@@ -186,8 +186,6 @@ namespace Gatrix.Unity.SDK
                 throw new ArgumentException("apiToken is required", nameof(config));
             if (string.IsNullOrWhiteSpace(config.AppName))
                 throw new ArgumentException("appName is required", nameof(config));
-            if (string.IsNullOrWhiteSpace(config.Environment))
-                throw new ArgumentException("environment is required", nameof(config));
 
             // URL format validation
             if (!Uri.TryCreate(config.ApiUrl, UriKind.Absolute, out var uri) ||

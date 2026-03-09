@@ -54,9 +54,6 @@ namespace Gatrix.Unity.SDK
         [Tooltip("Application name")]
         [SerializeField] private string _appName;
 
-        [Tooltip("Environment name (e.g., development, staging, production)")]
-        [SerializeField] private string _environment;
-
         // ==================== Context ====================
 
         [Header("Initial Context")]
@@ -192,9 +189,6 @@ namespace Gatrix.Unity.SDK
         /// <summary>Application name</summary>
         public string AppName => _appName;
 
-        /// <summary>Environment name</summary>
-        public string Environment => _environment;
-
         /// <summary>Initial user ID</summary>
         public string UserId => _userId;
 
@@ -247,7 +241,6 @@ namespace Gatrix.Unity.SDK
                 ApiUrl = _apiUrl,
                 ApiToken = _apiToken,
                 AppName = _appName,
-                Environment = _environment,
                 Features = new FeaturesConfig
                 {
                     OfflineMode = _offlineMode,
@@ -361,11 +354,7 @@ namespace Gatrix.Unity.SDK
                 error = "App Name is required";
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(_environment))
-            {
-                error = "Environment is required";
-                return false;
-            }
+
             error = null;
             return true;
         }

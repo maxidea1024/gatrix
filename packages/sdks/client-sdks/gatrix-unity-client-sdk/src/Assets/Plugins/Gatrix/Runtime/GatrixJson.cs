@@ -115,7 +115,6 @@ namespace Gatrix.Unity.SDK
             }
 
             AppendField("appName", context.AppName);
-            AppendField("environment", context.Environment);
             AppendField("userId", context.UserId);
             AppendField("sessionId", context.SessionId);
             AppendField("currentTime", context.CurrentTime);
@@ -566,9 +565,8 @@ namespace Gatrix.Unity.SDK
 
             if (obj.TryGetValue("meta", out var meta) && meta is Dictionary<string, object> metaDict)
             {
-                response.Meta = new FlagsApiResponseMeta
+            response.Meta = new FlagsApiResponseMeta
                 {
-                    Environment = metaDict.TryGetValue("environment", out var env) ? env?.ToString() : null,
                     EvaluatedAt = metaDict.TryGetValue("evaluatedAt", out var evalAt) ? evalAt?.ToString() : null
                 };
             }
