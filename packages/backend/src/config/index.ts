@@ -29,6 +29,20 @@ const config = {
     debug: process.env.DB_DEBUG === 'true',
   },
 
+  // Crash database configuration (separated for load isolation)
+  // Falls back to main database settings if CRASH_DB_* is not set
+  crashDatabase: {
+    host: process.env.CRASH_DB_HOST || process.env.DB_HOST || 'localhost',
+    port: parseInt(
+      process.env.CRASH_DB_PORT || process.env.DB_PORT || '3306',
+      10
+    ),
+    user: process.env.CRASH_DB_USER || process.env.DB_USER || 'root',
+    password: process.env.CRASH_DB_PASSWORD || process.env.DB_PASSWORD || '',
+    name: process.env.CRASH_DB_NAME || 'gatrix_crash',
+    debug: process.env.DB_DEBUG === 'true',
+  },
+
   // Redis configuration
   redis: {
     host: process.env.REDIS_HOST || 'localhost',

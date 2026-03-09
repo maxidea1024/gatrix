@@ -100,11 +100,53 @@ const knexConfig = {
   },
 };
 
-// Knex 인스턴스 Create
+// Main Knex instance
 const db = knex(knexConfig);
 
-// Objection.js Initialization
+// Objection.js Initialization - bind default knex to all models
 Model.knex(db);
 
+// Crash DB knex instance (created lazily via initCrashDb)
+let crashDb: ReturnType<typeof knex> | null = null;
+
+// Initialize crash DB connection and bind crash models
+// Called explicitly during server startup to avoid module-load-time access
+// to config.crashDatabase (which may not be available due to load order)
+function initCrashDb() {
+  const crashKnexConfig = {
+    client: 'mysql2',
+    connection: {
+      host: config.crashDatabase.host,
+      port: config.crashDatabase.port,
+      user: config.crashDatabase.user,
+      password: config.crashDatabase.password,
+      database: config.crashDatabase.name,
+      charset: 'utf8mb4',
+      timezone: 'Z',
+    },
+    debug: config.crashDatabase.debug,
+    pool: {
+      min: 1,
+      max: 5,
+      acquireTimeoutMillis: 30000,
+      createTimeoutMillis: 30000,
+      destroyTimeoutMillis: 5000,
+      idleTimeoutMillis: 30000,
+      reapIntervalMillis: 1000,
+      createRetryIntervalMillis: 100,
+    },
+    postProcessResponse: (result: any) => {
+      return convertBitToBoolean(result);
+    },
+  };
+
+  crashDb = knex(crashKnexConfig);
+
+  const { ClientCrash } = require('../models/client-crash');
+  const { CrashEvent } = require('../models/crash-event');
+  ClientCrash.knex(crashDb);
+  CrashEvent.knex(crashDb);
+}
+
 export default db;
-export { knexConfig };
+export { knexConfig, crashDb, initCrashDb };
