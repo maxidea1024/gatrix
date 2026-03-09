@@ -68,6 +68,8 @@ namespace Gatrix.Unity.SDK
         // Lock protects _bucket read/write from concurrent access
         private readonly object _bucketLock = new object();
         private MetricsBucket _bucket;
+        // Cumulative missing flags: persists across bucket resets
+        private readonly Dictionary<string, int> _cumulativeMissing = new Dictionary<string, int>();
         private CancellationTokenSource _cts;
         private bool _started;
 
@@ -174,15 +176,25 @@ namespace Gatrix.Unity.SDK
                 {
                     _bucket.Missing[flagName] = 1;
                 }
+
+                // Also track cumulatively (survives bucket resets)
+                if (_cumulativeMissing.TryGetValue(flagName, out var cumCount))
+                {
+                    _cumulativeMissing[flagName] = cumCount + 1;
+                }
+                else
+                {
+                    _cumulativeMissing[flagName] = 1;
+                }
             }
         }
 
-        /// <summary>Get missing flags record for statistics</summary>
+        /// <summary>Get cumulative missing flags record for statistics (persists across metric sends)</summary>
         public Dictionary<string, int> GetMissingFlags()
         {
             lock (_bucketLock)
             {
-                return new Dictionary<string, int>(_bucket.Missing);
+                return new Dictionary<string, int>(_cumulativeMissing);
             }
         }
 

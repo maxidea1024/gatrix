@@ -27,11 +27,11 @@ namespace Gatrix.Unity.SDK.Editor
         {
             Overview,
             Flags,
+            MissingFlags,
             Events,
             Context,
             Metrics,
-            Statistics,
-            MissingFlags
+            Statistics
         }
 
         private Tab _currentTab = Tab.Overview;
@@ -318,11 +318,11 @@ namespace Gatrix.Unity.SDK.Editor
             {
                 case Tab.Overview:      DrawOverview();        break;
                 case Tab.Flags:         DrawFlags();           break;
+                case Tab.MissingFlags:  DrawMissingFlagsTab(); break;
                 case Tab.Events:        DrawEventsTab();       break;
                 case Tab.Context:       DrawContextTab();      break;
                 case Tab.Metrics:       DrawMetricsTab();      break;
                 case Tab.Statistics:    DrawStatistics();      break;
-                case Tab.MissingFlags:  DrawMissingFlagsTab(); break;
             }
 
             EditorGUILayout.EndVertical();
@@ -611,7 +611,7 @@ namespace Gatrix.Unity.SDK.Editor
         {
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-            var tabNames = new[] { "Overview", "Flags", "Events", "Context", "Metrics", "Stats", "Missing" };
+            var tabNames = new[] { "Overview", "Flags", "Missing", "Events", "Context", "Metrics", "Stats" };
             for (int i = 0; i < tabNames.Length; i++)
             {
                 var isActive = (int)_currentTab == i;
