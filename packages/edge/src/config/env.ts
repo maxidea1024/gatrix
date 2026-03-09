@@ -65,8 +65,7 @@ export const config = {
   // This token bypasses normal token validation and allows access to all environments
   // WARNING: Only use in development/testing environments
   unsecuredClientToken:
-    process.env.EDGE_CLIENT_UNSECURED_TOKEN ||
-    'unsecured-edge-api-token',
+    process.env.EDGE_CLIENT_UNSECURED_TOKEN || 'unsecured-edge-api-token',
 };
 
 // Validate required configuration

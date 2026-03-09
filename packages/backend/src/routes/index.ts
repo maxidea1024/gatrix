@@ -76,8 +76,7 @@ router.get('/ready', async (req, res) => {
             .findById(tokenData.environmentId)
             .withGraphFetched('project')
             .modifiers({
-              selectProject: (builder: any) =>
-                builder.select('id', 'orgId'),
+              selectProject: (builder: any) => builder.select('id', 'orgId'),
             });
           if (env?.project?.orgId) {
             responseData.orgId = env.project.orgId;
@@ -144,10 +143,9 @@ router.get('/ready', async (req, res) => {
             }
           }
         } catch (error) {
-          logger.debug(
-            'Failed to resolve unsecured token in /ready endpoint',
-            { error }
-          );
+          logger.debug('Failed to resolve unsecured token in /ready endpoint', {
+            error,
+          });
         }
       }
     }

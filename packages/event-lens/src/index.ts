@@ -60,8 +60,7 @@ async function start() {
         }
       }
       const backendUrl = process.env.GATRIX_URL || 'http://localhost:55000';
-      const apiToken =
-        process.env.API_TOKEN || 'unsecured-server-api-token';
+      const apiToken = process.env.API_TOKEN || 'unsecured-server-api-token';
 
       gatrixSdk = new GatrixServerSDK({
         gatrixUrl: backendUrl,

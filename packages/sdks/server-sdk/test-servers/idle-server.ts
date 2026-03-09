@@ -192,8 +192,7 @@ async function main() {
         testMetrics[11].value = 120 + Math.floor(Math.random() * 600); // session 2-12min
 
         const apiUrl = process.env.GATRIX_URL || 'http://localhost:45000';
-        const apiToken =
-          process.env.API_TOKEN || 'unsecured-server-api-token';
+        const apiToken = process.env.API_TOKEN || 'unsecured-server-api-token';
 
         const payload = {
           impactMetrics: testMetrics.map((m) => ({
