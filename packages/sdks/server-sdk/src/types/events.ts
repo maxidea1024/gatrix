@@ -70,6 +70,7 @@ export interface StandardEventData {
   serviceNotice?: any; // For service_notice.created, service_notice.updated events
   segmentName?: string; // For segment.created, segment.updated, segment.deleted events
   segment?: any; // For segment.created, segment.updated events (full segment data for direct cache update)
+  projectId?: string; // For segment events (project-scoped segment caching)
   // Feature flag granular event data
   changedKeys?: string[]; // For feature_flag.changed events (list of changed flag names)
   changeType?: 'definition_changed' | 'enabled_changed' | 'deleted'; // For feature_flag.changed events

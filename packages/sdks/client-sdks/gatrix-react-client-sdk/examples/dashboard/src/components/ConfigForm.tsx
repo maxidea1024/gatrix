@@ -6,8 +6,8 @@ interface ConfigFormProps {
 }
 
 // Dev tokens for local development
-const DEV_TOKEN_EDGE = 'gatrix-unsecured-edge-api-token';
-const DEV_TOKEN_BACKEND = 'gatrix-unsecured-client-api-token';
+const DEV_TOKEN_EDGE = 'unsecured-edge-api-token';
+const DEV_TOKEN_BACKEND = 'unsecured-client-api-token';
 
 // Storage keys
 const STORAGE_KEY_LOCATION = 'gatrix-dashboard-location';

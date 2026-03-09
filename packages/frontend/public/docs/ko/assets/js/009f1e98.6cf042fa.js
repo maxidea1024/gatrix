@@ -322,7 +322,7 @@
                           children: (0, s.jsx)(n.code, { children: 'API_TOKEN' }),
                         }),
                         (0, s.jsx)(n.td, { children: 'Internal API token' }),
-                        (0, s.jsx)(n.td, { children: 'gatrix-unsecured-server-api-token' }),
+                        (0, s.jsx)(n.td, { children: 'unsecured-server-api-token' }),
                       ],
                     }),
                   ],

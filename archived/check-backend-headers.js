@@ -8,7 +8,7 @@ const options = {
   path: '/api/v1/server/features?compact=true',
   method: 'GET',
   headers: {
-    'x-api-token': 'gatrix-unsecured-edge-api-token',
+    'x-api-token': 'unsecured-edge-api-token',
     'x-application-name': 'edge-server'
   }
 };

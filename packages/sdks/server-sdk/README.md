@@ -31,7 +31,7 @@ import { GatrixServerSDK } from '@gatrix/server-sdk';
 const sdk = new GatrixServerSDK({
   // Required
   apiUrl: 'https://api.gatrix.com',
-  apiToken: 'your-server-api-token', // Optional: defaults to 'gatrix-unsecured-server-api-token' for testing
+  apiToken: 'your-server-api-token', // Optional: defaults to 'unsecured-server-api-token' for testing
   applicationName: 'your-app-name',
   service: 'worldd', // Optional: Service name (e.g., 'auth', 'lobby', 'world', 'chat')
   group: 'kr-1', // Optional: Service group (e.g., 'kr', 'us', 'production')
@@ -63,8 +63,8 @@ const sdk = new GatrixServerSDK({
 
 **Available Unsecured Tokens:**
 
-- Server SDK: `gatrix-unsecured-server-api-token`
-- Client SDK: `gatrix-unsecured-client-api-token`
+- Server SDK: `unsecured-server-api-token`
+- Client SDK: `unsecured-client-api-token`
 
 ⚠️ **Warning:** Unsecured tokens are for testing only. Always use proper API tokens in production.
 

@@ -22,6 +22,32 @@ import signalIngestionRoutes from './public/signals';
 
 const router = express.Router();
 
+// Unsecured token format: unsecured-{org}:{project}:{env}-{type}-api-token
+const READY_UNSECURED_REGEX =
+  /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
+
+// Legacy unsecured tokens — resolve to default/default/development
+const READY_LEGACY_TOKENS: Record<
+  string,
+  { orgId: string; projectId: string; envId: string }
+> = {
+  'unsecured-client-api-token': {
+    orgId: 'default',
+    projectId: 'default',
+    envId: 'development',
+  },
+  'unsecured-server-api-token': {
+    orgId: 'default',
+    projectId: 'default',
+    envId: 'development',
+  },
+  'unsecured-edge-api-token': {
+    orgId: 'default',
+    projectId: 'default',
+    envId: 'development',
+  },
+};
+
 // Readiness check endpoint
 router.get('/ready', async (req, res) => {
   const responseData: Record<string, any> = {
@@ -34,13 +60,96 @@ router.get('/ready', async (req, res) => {
   const token =
     (req.headers['x-api-token'] as string) || (req.query.token as string);
   if (token) {
+    // 1. Try DB lookup for real tokens
     try {
       const tokenData = await ApiAccessToken.validateAndUse(token);
       if (tokenData?.environmentId) {
         responseData.environmentId = tokenData.environmentId;
+
+        // Resolve orgId and projectId from environment hierarchy
+        if (tokenData.projectId) {
+          responseData.projectId = tokenData.projectId;
+        }
+        try {
+          const { Environment } = await import('../models/environment');
+          const env = await Environment.query()
+            .findById(tokenData.environmentId)
+            .withGraphFetched('project')
+            .modifiers({
+              selectProject: (builder: any) =>
+                builder.select('id', 'orgId'),
+            });
+          if (env?.project?.orgId) {
+            responseData.orgId = env.project.orgId;
+          }
+          if (!responseData.projectId && env?.projectId) {
+            responseData.projectId = env.projectId;
+          }
+        } catch (envError) {
+          logger.debug('Failed to resolve org/project in /ready endpoint', {
+            error: envError,
+          });
+        }
       }
     } catch (error) {
       logger.debug('Failed to resolve token in /ready endpoint', { error });
+    }
+
+    // 2. Fallback: parse unsecured tokens if DB lookup didn't resolve
+    if (!responseData.environmentId) {
+      let orgName: string | undefined;
+      let projectName: string | undefined;
+      let envName: string | undefined;
+
+      // Check new format: unsecured-{org}:{project}:{env}-{type}-api-token
+      const unsecuredMatch = token.match(READY_UNSECURED_REGEX);
+      if (unsecuredMatch) {
+        [, orgName, projectName, envName] = unsecuredMatch;
+      }
+
+      // Check legacy format: unsecured-{type}-api-token
+      const legacyEntry = READY_LEGACY_TOKENS[token];
+      if (legacyEntry) {
+        orgName = legacyEntry.orgId;
+        projectName = legacyEntry.projectId;
+        envName = legacyEntry.envId;
+      }
+
+      // Resolve environment by full path (orgName/projectName/envName)
+      if (orgName && projectName && envName) {
+        try {
+          const { Environment } = await import('../models/environment');
+          const env = await Environment.getByFullPath(
+            orgName,
+            projectName,
+            envName
+          );
+          if (env) {
+            responseData.environmentId = env.id;
+            responseData.projectId = env.projectId;
+            // Resolve orgId from project
+            try {
+              const envWithProject = await Environment.query()
+                .findById(env.id)
+                .withGraphFetched('project')
+                .modifiers({
+                  selectProject: (builder: any) =>
+                    builder.select('id', 'orgId'),
+                });
+              if (envWithProject?.project?.orgId) {
+                responseData.orgId = envWithProject.project.orgId;
+              }
+            } catch (_) {
+              // orgId resolution failure is non-critical
+            }
+          }
+        } catch (error) {
+          logger.debug(
+            'Failed to resolve unsecured token in /ready endpoint',
+            { error }
+          );
+        }
+      }
     }
   }
 

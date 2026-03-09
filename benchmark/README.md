@@ -14,7 +14,7 @@ This folder contains performance testing scripts for the Gatrix Edge server usin
 The test scripts are configured to use the following by default:
 
 - **Target**: `http://localhost:3410` (Edge Server)
-- **Token**: `gatrix-unsecured-edge-api-token`
+- **Token**: `unsecured-edge-api-token`
 - **Environment**: `production`
 
 You can override these values using command-line arguments.

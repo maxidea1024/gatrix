@@ -47,7 +47,7 @@ Gatrix의 각종 설정 방법을 안내합니다.
 | `JWT_SECRET`         | JWT 서명 키          | dev-jwt-secret                    |
 | `JWT_REFRESH_SECRET` | JWT 리프레시 토큰 키 | dev-refresh-secret                |
 | `SESSION_SECRET`     | 세션 암호화 키       | dev-session-secret                |
-| `API_TOKEN`          | 내부 API 토큰        | gatrix-unsecured-server-api-token |
+| `API_TOKEN`          | 내부 API 토큰        | unsecured-server-api-token |
 
 ### 관리자 계정
 

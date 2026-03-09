@@ -48,7 +48,7 @@ Pattern: `gatrix-{platform}-server-sdk`
 For the Feature Flag service, Server SDKs:
 - Fetch raw **flag definitions and segments** (from `GET /api/v1/server/:environment/features`).
 - Periodically poll or listen for invalidation events to update these definitions.
-- Store definitions and segments locally in an optimized in-memory cache (e.g., `Dictionary` or `Map`).
+- Store definitions locally in an optimized in-memory cache: flags are per-environment, segments are per-project.
 - Evaluate flags completely locally using a shared evaluation engine (such as porting or wrapping `@gatrix/shared`'s `FeatureFlagEvaluator`).
 - Buffer usage metrics locally and flush them periodically to the Gatrix Edge API to avoid network spam.
 - **Unlike Client SDKs, Server SDKs DO NOT have `synced` vs `realtime` flag concepts or `explicitSyncMode`.** Every flag evaluation is implicitly realtime, using the absolute latest definitions from the in-memory cache. Mid-session consistency is handled by passing identical contexts across stateless requests.
@@ -131,7 +131,7 @@ When `cache.refreshMethod` is `"event"`, the SDK subscribes to a Redis Pub/Sub c
 | `store_product.created/updated/deleted` | StoreProduct | Refresh store products |
 | `store_product.bulk_updated` | StoreProduct | Full refresh |
 | `feature_flag.changed/created/updated/deleted` | FeatureFlag | Refresh feature flag definitions |
-| `segment.created/updated/deleted` | FeatureFlag | Refresh ALL feature flags (segments are global) |
+| `segment.created/updated/deleted` | FeatureFlag | Refresh segments for the project |
 | `client_version.created/updated/deleted` | ClientVersion | Update/remove from cache |
 | `banner.created/updated/deleted` | Banner | Update/remove from cache |
 | `service_notice.created/updated/deleted` | ServiceNotice | Update/remove from cache |

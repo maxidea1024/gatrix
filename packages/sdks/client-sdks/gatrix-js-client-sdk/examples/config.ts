@@ -24,7 +24,7 @@ export interface ExampleConfig {
 // Default configuration
 const DEFAULTS: ExampleConfig = {
   apiUrl: 'http://localhost:45000/api/v1',
-  apiToken: 'gatrix-unsecured-client-api-token',
+  apiToken: 'unsecured-client-api-token',
   appName: 'test-app',
   environment: 'development',
 };

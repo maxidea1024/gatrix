@@ -212,7 +212,7 @@ services:
       GATRIX_LOKI_URL: ${GATRIX_LOKI_URL:-http://loki:3100/loki/api/v1/push}
       # Service Discovery
       GATRIX_URL: http://backend:5000
-      API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
+      API_TOKEN: ${API_TOKEN:-unsecured-server-api-token}
 
     ports:
       - '${EVENT_LENS_PORT:-45200}:5200'
@@ -336,7 +336,7 @@ services:
       GATRIX_API_SECRET: ${GATRIX_API_SECRET:-shared-secret-between-servers}
       # Service Discovery
       GATRIX_URL: http://backend:5000
-      API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
+      API_TOKEN: ${API_TOKEN:-unsecured-server-api-token}
       BACKEND_SERVICE_TOKEN: ${BACKEND_SERVICE_TOKEN:-gatrix-backend-service-token-default-key-change-in-production}
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-info}

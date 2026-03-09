@@ -12,16 +12,16 @@ const UNSECURED_TOKEN_REGEX =
 
 // Legacy unsecured tokens — auto-resolve to default/default/development
 const LEGACY_TOKENS: Record<string, boolean> = {
-  'gatrix-unsecured-client-api-token': true,
-  'gatrix-unsecured-server-api-token': true,
-  'gatrix-unsecured-edge-api-token': true,
+  'unsecured-client-api-token': true,
+  'unsecured-server-api-token': true,
+  'unsecured-edge-api-token': true,
 };
 const LEGACY_ENV_NAME = 'development';
 
 // Exported constants used by other services
-export const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
-export const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
-export const UNSECURED_EDGE_TOKEN = 'gatrix-unsecured-edge-api-token';
+export const UNSECURED_CLIENT_TOKEN = 'unsecured-client-api-token';
+export const UNSECURED_SERVER_TOKEN = 'unsecured-server-api-token';
+export const UNSECURED_EDGE_TOKEN = 'unsecured-edge-api-token';
 export const UNSECURED_TOKENS = [
   UNSECURED_CLIENT_TOKEN,
   UNSECURED_SERVER_TOKEN,
@@ -202,10 +202,10 @@ export function clientAuth(
     tokenUsageTracker.recordUsage(validation.token.id);
   }
 
-  // Resolve environment from token
+  // Resolve environment from token (token:environment is 1:1)
   const token = validation.token;
-  const envName = token?.environments?.[0];
-  if (!envName || envName === '*') {
+  const tokenEnvId = token?.environmentId;
+  if (!tokenEnvId) {
     res.status(401).json({
       success: false,
       error: {
@@ -216,20 +216,20 @@ export function clientAuth(
     return;
   }
 
-  const cacheKey = environmentRegistry.resolveEnvironmentToken(envName);
+  const cacheKey = environmentRegistry.resolveEnvironmentToken(tokenEnvId);
   if (!cacheKey) {
     res.status(401).json({
       success: false,
       error: {
         code: 'ENVIRONMENT_NOT_FOUND',
-        message: `Could not resolve environment: ${envName}`,
+        message: `Could not resolve environment: ${tokenEnvId}`,
       },
     });
     return;
   }
 
   const environmentId =
-    environmentRegistry.resolveEnvironmentId(envName) || envName;
+    environmentRegistry.resolveEnvironmentId(tokenEnvId) || tokenEnvId;
   req.clientContext = {
     apiToken,
     applicationName,

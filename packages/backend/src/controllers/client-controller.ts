@@ -12,27 +12,16 @@ import {
   withEnvironment,
 } from '../constants/cache-keys';
 import { asyncHandler } from '../utils/async-handler';
-import VarsModel from '../models/vars';
 import { VarsService } from '../services/vars-service';
-import {
-  sendBadRequest,
-  sendSuccessResponse,
-  ErrorCodes,
-} from '../utils/api-response';
+import { sendBadRequest, sendSuccessResponse } from '../utils/api-response';
 import { IpWhitelistService } from '../services/ip-whitelist-service';
 import { SDKRequest } from '../middleware/api-token-auth';
 import { resolvePassiveData } from '../utils/passive-data-utils';
-import {
-  FeatureFlagModel,
-  FeatureSegmentModel,
-  FeatureVariantModel,
-} from '../models/FeatureFlag';
+import { FeatureFlagModel, FeatureSegmentModel } from '../models/FeatureFlag';
 import {
   FeatureFlagEvaluator,
   FeatureFlag,
   FeatureSegment,
-  EvaluationContext,
-  VALUE_SOURCE,
   EvaluationUtils,
 } from '@gatrix/evaluator';
 import db from '../config/knex';
@@ -423,7 +412,7 @@ export class ClientController {
    * GET /api/v1/client/cache-stats
    */
   static getCacheStats = asyncHandler(
-    async (req: SDKRequest, res: Response) => {
+    async (_req: SDKRequest, res: Response) => {
       const cacheStats = cacheService.getStats();
       const queueStats = await pubSubService.getQueueStats();
 

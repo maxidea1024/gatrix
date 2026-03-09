@@ -112,6 +112,9 @@ export class FeatureFlagEventHandler implements IEventHandler {
     const featureFlagService = this.cacheManager.getFeatureFlagService();
     if (!featureFlagService) return;
 
+    // Extract projectId from event data for project-scoped segment caching
+    const projectId = event.data.projectId as string | undefined;
+
     switch (event.type) {
       case 'segment.created':
       case 'segment.updated': {
@@ -120,11 +123,12 @@ export class FeatureFlagEventHandler implements IEventHandler {
         this.logger.info('Segment event received', {
           type: event.type,
           segmentName,
+          projectId,
           hasFullData: !!segmentData,
         });
         try {
           if (segmentData) {
-            featureFlagService.updateSegmentInCache(segmentData);
+            featureFlagService.updateSegmentInCache(segmentData, projectId);
           } else {
             await featureFlagService.refreshSegments();
           }
@@ -138,9 +142,13 @@ export class FeatureFlagEventHandler implements IEventHandler {
       case 'segment.deleted': {
         const deletedSegmentName = event.data.segmentName as string;
         if (deletedSegmentName) {
-          featureFlagService.removeSegmentFromCache(deletedSegmentName);
+          featureFlagService.removeSegmentFromCache(
+            deletedSegmentName,
+            projectId
+          );
           this.logger.info('Segment removed from cache', {
             segmentName: deletedSegmentName,
+            projectId,
           });
         } else {
           await featureFlagService.refreshSegments();

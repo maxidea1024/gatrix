@@ -214,8 +214,14 @@ export default class ServerFeatureFlagController {
         }));
       }
 
-      const data: { flags: EvaluationFlag[]; segments?: EvaluationSegment[] } =
-        { flags };
+      const data: {
+        flags: EvaluationFlag[];
+        segments?: EvaluationSegment[];
+        projectId?: string;
+      } = { flags };
+      if (projectId) {
+        data.projectId = projectId;
+      }
       if (segments.length > 0) {
         data.segments = segments;
       }
@@ -394,7 +400,7 @@ export default class ServerFeatureFlagController {
 
       res.json({
         success: true,
-        data: { segments },
+        data: { segments, projectId: projectId || undefined },
       });
     } catch (error: any) {
       sendInternalError(

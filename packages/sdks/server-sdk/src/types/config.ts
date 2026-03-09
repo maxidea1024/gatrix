@@ -128,7 +128,7 @@ export interface FeatureFlagConfig {
 export interface GatrixSDKConfig {
   // Required — only url + token + applicationName
   apiUrl: string; // Gatrix backend URL (e.g., https://api.gatrix.com)
-  apiToken: string; // Server API Token (required; use 'gatrix-unsecured-server-api-token' for testing)
+  apiToken: string; // Server API Token (required; use 'unsecured-server-api-token' for testing)
   applicationName: string; // Application name
 
   // Optional - Service identification (for metrics labels and service discovery)

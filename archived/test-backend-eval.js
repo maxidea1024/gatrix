@@ -16,7 +16,7 @@ const options = {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'x-api-token': 'gatrix-unsecured-client-api-token',
+    'x-api-token': 'unsecured-client-api-token',
     'x-application-name': 'test-app',
     'Content-Length': Buffer.byteLength(postData)
   }

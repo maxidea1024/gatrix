@@ -29,9 +29,9 @@ import { ErrorCodes } from '../utils/api-response';
 // ==================== Constants ====================
 
 const UNSECURED_TOKENS = {
-  CLIENT: 'gatrix-unsecured-client-api-token',
-  SERVER: 'gatrix-unsecured-server-api-token',
-  EDGE: 'gatrix-unsecured-edge-api-token',
+  CLIENT: 'unsecured-client-api-token',
+  SERVER: 'unsecured-server-api-token',
+  EDGE: 'unsecured-edge-api-token',
 } as const;
 
 export const EDGE_BYPASS_TOKEN =

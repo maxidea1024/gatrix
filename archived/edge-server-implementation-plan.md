@@ -645,7 +645,7 @@ services:
       - NODE_ENV=production
       - PORT=3400
       - GATRIX_URL=http://backend:5000
-      - GATRIX_API_TOKEN=${GATRIX_SERVER_API_TOKEN:-gatrix-unsecured-server-api-token}
+      - GATRIX_API_TOKEN=${GATRIX_SERVER_API_TOKEN:-unsecured-server-api-token}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - CACHE_REFRESH_METHOD=event

@@ -47,7 +47,7 @@ Gatrix 配置说明。
 | `JWT_SECRET`         | JWT 签名密钥     | dev-jwt-secret                    |
 | `JWT_REFRESH_SECRET` | JWT 刷新令牌密钥 | dev-refresh-secret                |
 | `SESSION_SECRET`     | 会话加密密钥     | dev-session-secret                |
-| `API_TOKEN`          | 内部 API 令牌    | gatrix-unsecured-server-api-token |
+| `API_TOKEN`          | 内部 API 令牌    | unsecured-server-api-token |
 
 ### 管理员账户
 

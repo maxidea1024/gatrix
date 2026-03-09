@@ -52,7 +52,7 @@ const IngamePopupNoticeGuideDrawer: React.FC<
 
   const [mainTabValue, setMainTabValue] = useState(0);
   const [errorTabValue, setErrorTabValue] = useState(0);
-  const [apiToken, setApiToken] = useState('gatrix-unsecured-server-api-token'); // Default to unsecured server token
+  const [apiToken, setApiToken] = useState('unsecured-server-api-token'); // Default to unsecured server token
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);

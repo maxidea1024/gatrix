@@ -67,7 +67,7 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({
   const [errorTabValue, setErrorTabValue] = useState(0);
 
   // State for API test
-  const [apiToken, setApiToken] = useState('gatrix-unsecured-client-api-token'); // Default to unsecured client token
+  const [apiToken, setApiToken] = useState('unsecured-client-api-token'); // Default to unsecured client token
   const [platform, setPlatform] = useState('ios');
   const [version, setVersion] = useState(''); // Optional - empty means latest
   const [status, setStatus] = useState(''); // Optional status filter
