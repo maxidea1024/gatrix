@@ -7,6 +7,7 @@
 //   - GatrixMonitorWindow.Context.cs
 //   - GatrixMonitorWindow.Metrics.cs
 //   - GatrixMonitorWindow.Statistics.cs
+//   - GatrixMonitorWindow.MissingFlags.cs
 
 #if UNITY_EDITOR
 using System;
@@ -29,7 +30,8 @@ namespace Gatrix.Unity.SDK.Editor
             Events,
             Context,
             Metrics,
-            Statistics
+            Statistics,
+            MissingFlags
         }
 
         private Tab _currentTab = Tab.Overview;
@@ -314,12 +316,13 @@ namespace Gatrix.Unity.SDK.Editor
 
             switch (_currentTab)
             {
-                case Tab.Overview:    DrawOverview();     break;
-                case Tab.Flags:       DrawFlags();        break;
-                case Tab.Events:      DrawEventsTab();    break;
-                case Tab.Context:     DrawContextTab();   break;
-                case Tab.Metrics:     DrawMetricsTab();   break;
-                case Tab.Statistics:  DrawStatistics();   break;
+                case Tab.Overview:      DrawOverview();        break;
+                case Tab.Flags:         DrawFlags();           break;
+                case Tab.Events:        DrawEventsTab();       break;
+                case Tab.Context:       DrawContextTab();      break;
+                case Tab.Metrics:       DrawMetricsTab();      break;
+                case Tab.Statistics:    DrawStatistics();      break;
+                case Tab.MissingFlags:  DrawMissingFlagsTab(); break;
             }
 
             EditorGUILayout.EndVertical();
@@ -608,7 +611,7 @@ namespace Gatrix.Unity.SDK.Editor
         {
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-            var tabNames = new[] { "Overview", "Flags", "Events", "Context", "Metrics", "Stats" };
+            var tabNames = new[] { "Overview", "Flags", "Events", "Context", "Metrics", "Stats", "Missing" };
             for (int i = 0; i < tabNames.Length; i++)
             {
                 var isActive = (int)_currentTab == i;
@@ -620,7 +623,7 @@ namespace Gatrix.Unity.SDK.Editor
                     }
                     : EditorStyles.toolbarButton;
 
-                if (GUILayout.Button(tabNames[i], style, GUILayout.Width(66)))
+                if (GUILayout.Button(tabNames[i], style, GUILayout.Width(60)))
                 {
                     _currentTab = (Tab)i;
                 }
