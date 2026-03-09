@@ -154,7 +154,7 @@ namespace Gatrix.Unity.SDK
                 try
                 {
                     await _client.StartAsync();
-                    Debug.Log("[GatrixSDK] Auto-initialized from editor settings.");
+                    // Debug.Log("[GatrixSDK] Auto-initialized from editor settings.");
                 }
                 catch (Exception e)
                 {
