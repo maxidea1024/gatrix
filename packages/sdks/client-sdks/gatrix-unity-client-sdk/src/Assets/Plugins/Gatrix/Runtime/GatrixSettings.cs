@@ -241,6 +241,7 @@ namespace Gatrix.Unity.SDK
                 ApiUrl = _apiUrl,
                 ApiToken = _apiToken,
                 AppName = _appName,
+                EnableDevMode = _enableDevMode,
                 Features = new FeaturesConfig
                 {
                     OfflineMode = _offlineMode,
