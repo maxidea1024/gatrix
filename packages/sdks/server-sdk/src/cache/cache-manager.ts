@@ -16,7 +16,10 @@ import { BannerService } from '../services/banner-service';
 import { StoreProductService } from '../services/store-product-service';
 import { FeatureFlagService } from '../services/feature-flag-service';
 import { VarsService } from '../services/vars-service';
-import { ITokenProvider, SingleTokenProvider } from '../utils/token-provider';
+import {
+  IEnvironmentProvider,
+  SingleEnvironmentProvider,
+} from '../utils/environment-provider';
 import { ApiClient } from '../client/api-client';
 import { ApiClientFactory } from '../client/api-client-factory';
 import { SdkMetrics } from '../utils/sdk-metrics';
@@ -42,11 +45,11 @@ export class CacheManager {
   private config: CacheConfig;
   private uses: UsesConfig;
   private storage: CacheStorageProvider;
-  // Default API token (used as cache key in single-token mode)
-  private defaultToken: string;
+  // Default environment ID (used as cache key in single-environment mode)
+  private defaultEnvironmentId: string;
   private readonly multiMode: boolean;
-  // Token provider for multi-token mode
-  private tokenProvider: ITokenProvider;
+  // Environment provider for multi-environment mode
+  private environmentProvider: IEnvironmentProvider;
   // All services are optional - controlled by feature flags
   private gameWorldService?: GameWorldService;
   private popupNoticeService?: PopupNoticeService;
@@ -78,11 +81,11 @@ export class CacheManager {
     config: CacheConfig,
     apiClient: ApiClient,
     logger: Logger,
-    defaultToken: string,
+    defaultEnvironmentId: string,
     metrics?: SdkMetrics,
     configWorldId?: string,
     uses?: UsesConfig,
-    tokenProvider?: ITokenProvider,
+    environmentProvider?: IEnvironmentProvider,
     featureFlagConfig?: FeatureFlagConfig
   ) {
     this.config = {
@@ -98,25 +101,31 @@ export class CacheManager {
     this.maintenanceWatcher = new MaintenanceWatcher(logger, configWorldId);
     this.storage = new FileCacheStorageProvider(logger);
 
-    // Store default token and token provider
-    this.defaultToken = defaultToken;
-    this.multiMode = tokenProvider !== undefined;
-    this.tokenProvider = tokenProvider || new SingleTokenProvider(defaultToken);
+    // Store default environment ID and environment provider
+    this.defaultEnvironmentId = defaultEnvironmentId;
+    this.multiMode = environmentProvider !== undefined;
+    this.environmentProvider =
+      environmentProvider ||
+      new SingleEnvironmentProvider(defaultEnvironmentId);
 
-    // Create ApiClientFactory for multi-token ETag isolation
-    this.apiClientFactory = new ApiClientFactory(apiClient, defaultToken, {
-      baseURL: apiClient.getAxiosInstance().defaults.baseURL || '',
-      applicationName:
-        (apiClient.getAxiosInstance().defaults.headers?.common?.[
-          'X-Application-Name'
-        ] as string) ||
-        (apiClient.getAxiosInstance().defaults.headers?.[
-          'X-Application-Name'
-        ] as string) ||
-        '',
-      logger: logger,
-      metrics: metrics,
-    });
+    // Create ApiClientFactory for multi-environment ETag isolation
+    this.apiClientFactory = new ApiClientFactory(
+      apiClient,
+      defaultEnvironmentId,
+      {
+        baseURL: apiClient.getAxiosInstance().defaults.baseURL || '',
+        applicationName:
+          (apiClient.getAxiosInstance().defaults.headers?.common?.[
+            'X-Application-Name'
+          ] as string) ||
+          (apiClient.getAxiosInstance().defaults.headers?.[
+            'X-Application-Name'
+          ] as string) ||
+          '',
+        logger: logger,
+        metrics: metrics,
+      }
+    );
 
     // Initialize ALL services internally based on feature flags
     // All services are optional and controlled by feature flags
@@ -126,7 +135,7 @@ export class CacheManager {
       this.gameWorldService = new GameWorldService(
         apiClient,
         logger,
-        this.defaultToken,
+        this.defaultEnvironmentId,
         this.storage
       );
       this.gameWorldService.setFeatureEnabled(true);
@@ -136,7 +145,7 @@ export class CacheManager {
       this.popupNoticeService = new PopupNoticeService(
         apiClient,
         logger,
-        this.defaultToken,
+        this.defaultEnvironmentId,
         this.storage
       );
       this.popupNoticeService.setFeatureEnabled(true);
@@ -146,7 +155,7 @@ export class CacheManager {
       this.surveyService = new SurveyService(
         apiClient,
         logger,
-        this.defaultToken,
+        this.defaultEnvironmentId,
         this.storage
       );
       this.surveyService.setFeatureEnabled(true);
@@ -155,7 +164,7 @@ export class CacheManager {
       this.whitelistService = new WhitelistService(
         apiClient,
         logger,
-        this.defaultToken,
+        this.defaultEnvironmentId,
         this.storage
       );
       this.whitelistService.setFeatureEnabled(true);
@@ -164,7 +173,7 @@ export class CacheManager {
       this.serviceMaintenanceService = new ServiceMaintenanceService(
         apiClient,
         logger,
-        this.defaultToken,
+        this.defaultEnvironmentId,
         this.storage
       );
       this.serviceMaintenanceService.setFeatureEnabled(true);
@@ -173,7 +182,7 @@ export class CacheManager {
       this.clientVersionService = new ClientVersionService(
         apiClient,
         logger,
-        this.defaultToken,
+        this.defaultEnvironmentId,
         this.storage
       );
       this.clientVersionService.setFeatureEnabled(true);
@@ -183,7 +192,7 @@ export class CacheManager {
       this.serviceNoticeService = new ServiceNoticeService(
         apiClient,
         logger,
-        this.defaultToken,
+        this.defaultEnvironmentId,
         this.storage
       );
       this.serviceNoticeService.setFeatureEnabled(true);
@@ -192,7 +201,7 @@ export class CacheManager {
       this.bannerService = new BannerService(
         apiClient,
         logger,
-        this.defaultToken,
+        this.defaultEnvironmentId,
         this.storage
       );
       this.bannerService.setFeatureEnabled(true);
@@ -202,7 +211,7 @@ export class CacheManager {
       this.storeProductService = new StoreProductService(
         apiClient,
         logger,
-        this.defaultToken,
+        this.defaultEnvironmentId,
         this.storage
       );
       this.storeProductService.setFeatureEnabled(true);
@@ -212,7 +221,7 @@ export class CacheManager {
       this.featureFlagService = new FeatureFlagService(
         apiClient,
         logger,
-        this.defaultToken,
+        this.defaultEnvironmentId,
         this.storage
       );
       this.featureFlagService.setFeatureEnabled(true);
@@ -226,11 +235,35 @@ export class CacheManager {
       this.varsService = new VarsService(
         apiClient,
         logger,
-        this.defaultToken,
+        this.defaultEnvironmentId,
         this.storage
       );
       this.varsService.setFeatureEnabled(true);
       this.varsService.setApiClientFactory(this.apiClientFactory);
+    }
+  }
+
+  /**
+   * Get environment IDs from the environment provider.
+   * Maps EnvironmentEntry[] to string[] of environmentIds.
+   */
+  private getEnvironmentIds(): string[] {
+    return this.environmentProvider
+      .getEnvironmentTokens()
+      .map((e) => e.environmentId);
+  }
+
+  /**
+   * Register all environments from the provider into ApiClientFactory.
+   * Must be called before fetching data in multi-environment mode.
+   */
+  private registerEnvironments(): void {
+    const entries = this.environmentProvider.getEnvironmentTokens();
+    for (const entry of entries) {
+      this.apiClientFactory.registerEnvironment(
+        entry.environmentId,
+        entry.token
+      );
     }
   }
 
@@ -301,9 +334,14 @@ export class CacheManager {
         );
       }
 
+      // Register environments to ApiClientFactory (environmentId → token mapping)
+      if (this.multiMode) {
+        this.registerEnvironments();
+      }
+
       // 1. Initial load from local storage for ALL enabled services
       const initPromises: Promise<void>[] = [];
-      const envList = this.tokenProvider.getTokens();
+      const envList = this.getEnvironmentIds();
 
       if (envList.length > 0) {
         this.logger.debug(
@@ -345,10 +383,10 @@ export class CacheManager {
       const featureTypes: string[] = [];
 
       // Get target environments for multi-environment mode
-      const isMultiToken = this.multiMode;
+      const isMultiEnv = this.multiMode;
 
       // If multi-env mode but no environments available, skip remote sync
-      if (isMultiToken && envList.length === 0) {
+      if (isMultiEnv && envList.length === 0) {
         this.logger.warn(
           'Multi-environment mode enabled but no environments available. Skipping remote sync.',
           {
@@ -364,7 +402,7 @@ export class CacheManager {
       // Use !== false check to maintain backward compatibility
       // In multi-environment mode, use listByEnvironments for environment-specific features
       if (this.uses.gameWorld !== false && this.gameWorldService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.gameWorldService
@@ -380,7 +418,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.gameWorldService
               .listByEnvironment(defaultEnv)
@@ -396,7 +434,7 @@ export class CacheManager {
       }
 
       if (this.uses.popupNotice !== false && this.popupNoticeService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.popupNoticeService
@@ -412,7 +450,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.popupNoticeService
               .listByEnvironment(defaultEnv)
@@ -428,7 +466,7 @@ export class CacheManager {
       }
 
       if (this.uses.survey !== false && this.surveyService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.surveyService
@@ -444,7 +482,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.surveyService
               .listByEnvironment(defaultEnv, { isActive: true })
@@ -460,7 +498,7 @@ export class CacheManager {
       }
 
       if (this.uses.whitelist !== false && this.whitelistService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.whitelistService
@@ -476,7 +514,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.whitelistService
               .listByEnvironment(defaultEnv)
@@ -495,7 +533,7 @@ export class CacheManager {
         this.uses.serviceMaintenance !== false &&
         this.serviceMaintenanceService
       ) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.serviceMaintenanceService
@@ -514,7 +552,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.refreshServiceMaintenanceInternal(defaultEnv).catch(
               (error) => {
@@ -580,7 +618,7 @@ export class CacheManager {
       }
 
       if (this.uses.storeProduct === true && this.storeProductService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.storeProductService
@@ -596,7 +634,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.storeProductService
               .listByEnvironment(defaultEnv)
@@ -613,7 +651,7 @@ export class CacheManager {
 
       // Feature flags - requires explicit opt-in
       if (this.uses.featureFlag === true && this.featureFlagService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.featureFlagService
@@ -628,7 +666,7 @@ export class CacheManager {
             featureTypes.push('featureFlag');
           }
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.featureFlagService
               .listByEnvironment(defaultEnv)
@@ -645,7 +683,7 @@ export class CacheManager {
 
       // Vars (KV) - requires explicit opt-in
       if (this.uses.vars === true && this.varsService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.varsService.listByEnvironments(envList).catch((error) => {
@@ -658,7 +696,7 @@ export class CacheManager {
             featureTypes.push('vars');
           }
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.varsService.listByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to load vars', {
@@ -681,7 +719,7 @@ export class CacheManager {
       this.logger.info('SDK cache initialized', {
         enabledFeatures: featureTypes,
         environments: false
-          ? `* (${this.tokenProvider.getTokens().length} envs)`
+          ? `* (${this.getEnvironmentIds().length} envs)`
           : null,
       });
 
@@ -699,22 +737,30 @@ export class CacheManager {
       }
 
       // Subscribe to token changes (e.g., environment added/removed)
-      if (this.tokenProvider.onTokensChanged) {
-        this.tokenProvider.onTokensChanged((added, removed) => {
-          this.logger.info('Token list changed', {
+      if (this.environmentProvider.onEnvironmentsChanged) {
+        this.environmentProvider.onEnvironmentsChanged((added, removed) => {
+          this.logger.info('Environment list changed', {
             added: added.length,
             removed: removed.length,
           });
 
-          // Remove cache for deleted tokens
+          // Remove cache for removed environments
           if (removed.length > 0) {
-            this.clearDataForEnvironments(removed);
+            this.clearDataForEnvironments(removed.map((e) => e.environmentId));
           }
 
-          // Fetch data for new tokens
+          // Register new environments and fetch data
           if (added.length > 0) {
-            this.fetchDataForTokens(added).catch((error: any) => {
-              this.logger.error('Failed to fetch data for new tokens', {
+            for (const entry of added) {
+              this.apiClientFactory.registerEnvironment(
+                entry.environmentId,
+                entry.token
+              );
+            }
+            this.fetchDataForEnvironments(
+              added.map((e) => e.environmentId)
+            ).catch((error: any) => {
+              this.logger.error('Failed to fetch data for new environments', {
                 error: error.message,
               });
             });
@@ -840,57 +886,61 @@ export class CacheManager {
   /**
    * Fetch data for newly added tokens (environments)
    */
-  private async fetchDataForTokens(tokens: string[]): Promise<void> {
-    this.logger.info('Fetching data for new tokens', { count: tokens.length });
+  private async fetchDataForEnvironments(
+    environmentIds: string[]
+  ): Promise<void> {
+    this.logger.info('Fetching data for new environments', {
+      count: environmentIds.length,
+    });
 
-    for (const token of tokens) {
+    for (const envId of environmentIds) {
       const promises: Promise<any>[] = [];
 
       if (this.gameWorldService)
         promises.push(
-          this.gameWorldService.listByEnvironment(token).catch(() => [])
+          this.gameWorldService.listByEnvironment(envId).catch(() => [])
         );
       if (this.popupNoticeService)
         promises.push(
-          this.popupNoticeService.listByEnvironment(token).catch(() => [])
+          this.popupNoticeService.listByEnvironment(envId).catch(() => [])
         );
       if (this.surveyService)
         promises.push(
-          this.surveyService.listByEnvironment(token).catch(() => [])
+          this.surveyService.listByEnvironment(envId).catch(() => [])
         );
       if (this.whitelistService)
         promises.push(
-          this.whitelistService.listByEnvironment(token).catch(() => [])
+          this.whitelistService.listByEnvironment(envId).catch(() => [])
         );
       if (this.serviceMaintenanceService)
         promises.push(
           this.serviceMaintenanceService
-            .getStatusByEnvironment(token)
+            .getStatusByEnvironment(envId)
             .catch(() => null)
         );
       if (this.clientVersionService)
         promises.push(
-          this.clientVersionService.listByEnvironment(token).catch(() => [])
+          this.clientVersionService.listByEnvironment(envId).catch(() => [])
         );
       if (this.serviceNoticeService)
         promises.push(
-          this.serviceNoticeService.listByEnvironment(token).catch(() => [])
+          this.serviceNoticeService.listByEnvironment(envId).catch(() => [])
         );
       if (this.bannerService)
         promises.push(
-          this.bannerService.listByEnvironment(token).catch(() => [])
+          this.bannerService.listByEnvironment(envId).catch(() => [])
         );
       if (this.storeProductService)
         promises.push(
-          this.storeProductService.listByEnvironment(token).catch(() => [])
+          this.storeProductService.listByEnvironment(envId).catch(() => [])
         );
       if (this.featureFlagService)
         promises.push(
-          this.featureFlagService.listByEnvironment(token).catch(() => [])
+          this.featureFlagService.listByEnvironment(envId).catch(() => [])
         );
       if (this.varsService)
         promises.push(
-          this.varsService.listByEnvironment(token).catch(() => [])
+          this.varsService.listByEnvironment(envId).catch(() => [])
         );
 
       await Promise.all(promises);
@@ -898,7 +948,9 @@ export class CacheManager {
 
     this.lastRefreshedAt = new Date();
     this.invalidationCount++;
-    this.logger.info('Data fetched for new tokens', { count: tokens.length });
+    this.logger.info('Data fetched for new environments', {
+      count: environmentIds.length,
+    });
   }
 
   /**
@@ -913,12 +965,12 @@ export class CacheManager {
       const refreshedTypes: string[] = [];
 
       // Get target environments for multi-environment mode
-      const envList = this.tokenProvider.getTokens();
-      const isMultiToken = this.multiMode;
+      const envList = this.getEnvironmentIds();
+      const isMultiEnv = this.multiMode;
 
       // In multi-environment mode, if envList is empty, we should skip refresh
       // rather than falling back to default environment
-      if (isMultiToken && envList.length === 0) {
+      if (isMultiEnv && envList.length === 0) {
         this.logger.warn(
           'Multi-environment mode enabled but no environments available. Skipping refresh.',
           {
@@ -931,7 +983,7 @@ export class CacheManager {
       // All services use optional chaining since they are controlled by feature flags
       // In multi-environment mode, use listByEnvironments for environment-specific features
       if (this.uses.gameWorld !== false && this.gameWorldService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.gameWorldService
@@ -946,7 +998,7 @@ export class CacheManager {
             refreshedTypes.push('gameWorld');
           }
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.gameWorldService.refreshByEnvironment(defaultEnv, true)
           ); // suppressWarnings=true for refreshAll
@@ -955,7 +1007,7 @@ export class CacheManager {
       }
 
       if (this.uses.popupNotice !== false && this.popupNoticeService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.popupNoticeService
@@ -970,7 +1022,7 @@ export class CacheManager {
             refreshedTypes.push('popupNotice');
           }
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.popupNoticeService.refreshByEnvironment(defaultEnv, true)
           ); // suppressWarnings=true for refreshAll
@@ -979,7 +1031,7 @@ export class CacheManager {
       }
 
       if (this.uses.survey !== false && this.surveyService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.surveyService
@@ -994,7 +1046,7 @@ export class CacheManager {
             refreshedTypes.push('survey');
           }
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.surveyService
               .refreshByEnvironment(defaultEnv, { isActive: true }, true)
@@ -1010,7 +1062,7 @@ export class CacheManager {
       }
 
       if (this.uses.whitelist !== false && this.whitelistService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.whitelistService
@@ -1025,7 +1077,7 @@ export class CacheManager {
             refreshedTypes.push('whitelist');
           }
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.whitelistService
               .refreshByEnvironment(defaultEnv, true)
@@ -1044,7 +1096,7 @@ export class CacheManager {
         this.uses.serviceMaintenance !== false &&
         this.serviceMaintenanceService
       ) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.serviceMaintenanceService
@@ -1059,7 +1111,7 @@ export class CacheManager {
             refreshedTypes.push('serviceMaintenance');
           }
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.refreshServiceMaintenanceInternal(defaultEnv).catch(
               (error) => {
@@ -1119,7 +1171,7 @@ export class CacheManager {
       }
 
       if (this.uses.storeProduct === true && this.storeProductService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.storeProductService
@@ -1133,7 +1185,7 @@ export class CacheManager {
             refreshedTypes.push('storeProduct');
           }
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.storeProductService
               .refreshByEnvironment(defaultEnv, true)
@@ -1149,7 +1201,7 @@ export class CacheManager {
 
       // Feature flags - requires explicit opt-in
       if (this.uses.featureFlag === true && this.featureFlagService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.featureFlagService
@@ -1163,7 +1215,7 @@ export class CacheManager {
             refreshedTypes.push('featureFlag');
           }
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.featureFlagService
               .refreshByEnvironment(defaultEnv)
@@ -1179,7 +1231,7 @@ export class CacheManager {
 
       // Vars (KV) - requires explicit opt-in
       if (this.uses.vars === true && this.varsService) {
-        if (isMultiToken) {
+        if (isMultiEnv) {
           if (envList.length > 0) {
             promises.push(
               this.varsService.listByEnvironments(envList).catch((error) => {
@@ -1191,7 +1243,7 @@ export class CacheManager {
             refreshedTypes.push('vars');
           }
         } else {
-          const defaultEnv = this.defaultToken;
+          const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.varsService.refreshByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to refresh vars', {
@@ -1865,7 +1917,7 @@ export class CacheManager {
     }
 
     // Search registered tokens for one containing this environment ID
-    const tokens = this.tokenProvider.getTokens();
+    const tokens = this.getEnvironmentIds();
     for (const token of tokens) {
       if (token.includes(environmentId)) {
         return token;
