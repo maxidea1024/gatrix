@@ -105,7 +105,7 @@ yarn upload-planning-data \
 | `--api-url`  |  ✅  | Gatrix 백엔드 API URL                                         |
 | `--env`      |  ✅  | 대상 환경 (dev, qa, production, development)                  |
 | `--dir`      |      | 업로드할 JSON 파일이 있는 폴더 (기본값: `./output`)           |
-| `--token`    |      | Server API 토큰 (기본값: `gatrix-unsecured-server-api-token`) |
+| `--token`    |      | Server API 토큰 (기본값: `unsecured-server-api-token`) |
 | `--uploader` |      | 업로더 이름 (예: "Jenkins CI")                                |
 | `--comment`  |      | 업로드 코멘트                                                 |
 

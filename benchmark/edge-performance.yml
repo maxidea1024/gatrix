@@ -11,7 +11,7 @@ config:
   defaults:
     headers:
       x-application-name: 'benchmark-test'
-      x-api-token: 'gatrix-unsecured-edge-api-token'
+      x-api-token: 'unsecured-edge-api-token'
       x-platform: 'pc'
   variables:
     environment: 'development'

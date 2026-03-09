@@ -424,7 +424,7 @@ const startServer = async () => {
         const tokenData = await ApiAccessToken.validateAndUse(apiToken);
         if (!tokenData) {
           // Check special tokens
-          const isUnsecured = apiToken === 'gatrix-unsecured-client-api-token';
+          const isUnsecured = apiToken === 'unsecured-client-api-token';
           if (!isUnsecured) {
             socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
             socket.destroy();

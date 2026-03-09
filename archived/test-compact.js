@@ -19,7 +19,7 @@ async function main() {
     hostname: 'localhost', port: 45000,
     path: '/api/v1/server/features?compact=true',
     method: 'GET',
-    headers: { 'x-api-token': 'gatrix-unsecured-edge-api-token', 'x-application-name': 'edge-server' }
+    headers: { 'x-api-token': 'unsecured-edge-api-token', 'x-application-name': 'edge-server' }
   });
   const j1 = JSON.parse(r1.body);
   console.log('Full response:');
@@ -31,7 +31,7 @@ async function main() {
     hostname: 'localhost', port: 45000,
     path: '/api/v1/server/features',
     method: 'GET',
-    headers: { 'x-api-token': 'gatrix-unsecured-edge-api-token', 'x-application-name': 'edge-server' }
+    headers: { 'x-api-token': 'unsecured-edge-api-token', 'x-application-name': 'edge-server' }
   });
   const j2 = JSON.parse(r2.body);
   const flags2 = j2.data?.flags || [];

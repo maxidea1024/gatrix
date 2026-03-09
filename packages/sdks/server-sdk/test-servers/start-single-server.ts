@@ -8,7 +8,7 @@ import { GatrixServerSDK } from '../src';
 import chalk from 'chalk';
 
 const GATRIX_URL = process.env.GATRIX_URL || 'http://localhost:45000';
-const API_TOKEN = 'gatrix-unsecured-server-api-token';
+const API_TOKEN = 'unsecured-server-api-token';
 
 // Server configuration
 const SERVER_CONFIG = {

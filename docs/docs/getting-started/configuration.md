@@ -47,7 +47,7 @@ Guide to configuring Gatrix.
 | `JWT_SECRET`         | JWT signing key        | dev-jwt-secret                    |
 | `JWT_REFRESH_SECRET` | JWT refresh token key  | dev-refresh-secret                |
 | `SESSION_SECRET`     | Session encryption key | dev-session-secret                |
-| `API_TOKEN`          | Internal API token     | gatrix-unsecured-server-api-token |
+| `API_TOKEN`          | Internal API token     | unsecured-server-api-token |
 
 ### Admin Account
 

@@ -346,7 +346,7 @@
                           children: (0, n.jsx)(e.code, { children: 'API_TOKEN' }),
                         }),
                         (0, n.jsx)(e.td, { children: '\u5185\u90e8 API \u4ee4\u724c' }),
-                        (0, n.jsx)(e.td, { children: 'gatrix-unsecured-server-api-token' }),
+                        (0, n.jsx)(e.td, { children: 'unsecured-server-api-token' }),
                       ],
                     }),
                   ],

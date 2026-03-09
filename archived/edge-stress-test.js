@@ -11,7 +11,7 @@ const DURATION_SEC = parseInt(process.argv[3]) || 30;
 const BASE_URL = 'http://localhost:51337';
 
 const headers = {
-  'x-api-token': 'gatrix-unsecured-server-api-token',
+  'x-api-token': 'unsecured-server-api-token',
   'x-application-name': 'stress-test',
   'x-environment-id': '01KBP3PMDF4MJPKYVX7ER1VMSH',
 };

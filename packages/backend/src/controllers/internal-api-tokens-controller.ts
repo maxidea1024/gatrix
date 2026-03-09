@@ -80,30 +80,38 @@ class InternalApiTokensController {
     try {
       if (!(await requireEdgeAccess(req, res))) return;
 
-      // Get all valid tokens (not expired)
-      const tokens = await knex('g_api_access_tokens')
+      // Get all valid tokens with org/project info via environment
+      const tokens = await knex('g_api_access_tokens as t')
+        .leftJoin('g_environments as e', 't.environmentId', 'e.id')
+        .leftJoin('g_projects as p', 'e.projectId', 'p.id')
+        .leftJoin('g_organisations as o', 'p.orgId', 'o.id')
         .select(
-          'id',
-          'tokenName',
-          'tokenValue',
-          'tokenType',
-          'environmentId',
-          'expiresAt',
-          'createdAt',
-          'updatedAt'
+          't.id',
+          't.tokenName',
+          't.tokenValue',
+          't.tokenType',
+          't.environmentId',
+          'p.id as projectId',
+          'o.id as orgId',
+          't.expiresAt',
+          't.createdAt',
+          't.updatedAt'
         )
         .where((builder) => {
-          builder.whereNull('expiresAt').orWhere('expiresAt', '>', new Date());
+          builder
+            .whereNull('t.expiresAt')
+            .orWhere('t.expiresAt', '>', new Date());
         });
 
-      // Format tokens for Edge
+      // Format tokens for Edge (token:environment is 1:1)
       const formattedTokens = tokens.map((token: any) => ({
         id: token.id,
         tokenName: token.tokenName,
         tokenValue: token.tokenValue,
         tokenType: token.tokenType,
-        allowAllEnvironments: !token.environmentId,
-        environments: token.environmentId ? [token.environmentId] : ['*'],
+        orgId: token.orgId || null,
+        projectId: token.projectId || null,
+        environmentId: token.environmentId || null,
         expiresAt: token.expiresAt
           ? new Date(token.expiresAt).toISOString()
           : null,

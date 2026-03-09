@@ -24,9 +24,9 @@ const INFRA_PROJECT = '__infrastructure__';
 const INFRA_ENV = 'default';
 
 // Legacy unsecured tokens — auto-resolve to default/default/default for backward compatibility
-const LEGACY_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
-const LEGACY_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
-const LEGACY_EDGE_TOKEN = 'gatrix-unsecured-edge-api-token';
+const LEGACY_CLIENT_TOKEN = 'unsecured-client-api-token';
+const LEGACY_SERVER_TOKEN = 'unsecured-server-api-token';
+const LEGACY_EDGE_TOKEN = 'unsecured-edge-api-token';
 const LEGACY_ORG = 'default';
 const LEGACY_PROJECT = 'default';
 const LEGACY_ENV = 'development';

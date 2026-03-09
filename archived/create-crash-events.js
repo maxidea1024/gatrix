@@ -2,7 +2,7 @@ const axios = require('axios');
 
 // Configuration
 const BASE_URL = process.env.BASE_URL || 'http://localhost:55000';
-const API_TOKEN = process.env.API_TOKEN || 'gatrix-unsecured-client-api-token';
+const API_TOKEN = process.env.API_TOKEN || 'unsecured-client-api-token';
 const APPLICATION_NAME = 'test-game';
 
 // Sample stack traces for variation (creates different crash groups)

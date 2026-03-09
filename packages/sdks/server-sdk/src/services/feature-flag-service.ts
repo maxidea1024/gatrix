@@ -35,8 +35,10 @@ export class FeatureFlagService {
   // Multi-token flag cache: Map<token, Map<flagName, FeatureFlag>>
   // Using nested Map for O(1) flag lookup by name (keyed by token)
   private cachedFlagsByEnv: Map<string, Map<string, FeatureFlag>> = new Map();
-  // Segment cache: Map<segmentName, FeatureSegment> (global, not per-environment)
-  private cachedSegments: Map<string, FeatureSegment> = new Map();
+  // Segment cache: Map<projectId, Map<segmentName, FeatureSegment>> (per-project, not global)
+  private cachedSegments: Map<string, Map<string, FeatureSegment>> = new Map();
+  // Environment-to-project mapping: environmentId/cacheKey -> projectId
+  private envToProjectMap: Map<string, string> = new Map();
   // Metrics buffer for batching
   private metricsBuffer: FlagMetric[] = [];
   private metricsFlushInterval: NodeJS.Timeout | null = null;
@@ -208,12 +210,13 @@ export class FeatureFlagService {
     if (!this.storage) return;
 
     const flagsKey = `FeatureFlags_${environmentId}_flags`;
-    const segmentsKey = `FeatureFlags_${environmentId}_segments`;
+    // Load projectId mapping from local storage
+    const projectIdKey = `FeatureFlags_${environmentId}_projectId`;
 
     try {
-      const [flagsJson, segmentsJson] = await Promise.all([
+      const [flagsJson, projectId] = await Promise.all([
         this.storage.get(flagsKey),
-        this.storage.get(segmentsKey),
+        this.storage.get(projectIdKey),
       ]);
 
       if (flagsJson) {
@@ -228,17 +231,25 @@ export class FeatureFlagService {
         });
       }
 
-      if (segmentsJson) {
-        const segments = JSON.parse(segmentsJson) as FeatureSegment[];
-        for (const segment of segments) {
-          this.cachedSegments.set(segment.name, segment);
-        }
-        this.logger.debug(
-          `Loaded ${segments.length} segments from local storage`,
-          {
-            environmentId,
+      // Load segments per project
+      if (projectId) {
+        this.envToProjectMap.set(environmentId, projectId);
+        const segmentsKey = `FeatureFlags_${projectId}_segments`;
+        const segmentsJson = await this.storage.get(segmentsKey);
+        if (segmentsJson) {
+          const segments = JSON.parse(segmentsJson) as FeatureSegment[];
+          const segmentMap = this.getOrCreateProjectSegments(projectId);
+          for (const segment of segments) {
+            segmentMap.set(segment.name, segment);
           }
-        );
+          this.logger.debug(
+            `Loaded ${segments.length} segments from local storage`,
+            {
+              environmentId,
+              projectId,
+            }
+          );
+        }
       }
     } catch (error: any) {
       this.logger.warn('Failed to load feature flags from local storage', {
@@ -272,6 +283,7 @@ export class FeatureFlagService {
     const response = await client.get<{
       flags: FeatureFlag[];
       segments: FeatureSegment[];
+      projectId?: string;
     }>(endpoint);
 
     if (!response.success || !response.data) {
@@ -280,7 +292,7 @@ export class FeatureFlagService {
       );
     }
 
-    const { flags, segments } = response.data;
+    const { flags, segments, projectId } = response.data;
 
     // Cache flags by name for O(1) lookup
     const flagMap = new Map<string, FeatureFlag>();
@@ -289,31 +301,48 @@ export class FeatureFlagService {
     }
     this.cachedFlagsByEnv.set(environmentId, flagMap);
 
-    // Cache segments (global, not per-environment)
-    if (segments && segments.length > 0) {
-      for (const segment of segments) {
-        this.cachedSegments.set(segment.name, segment);
+    // Cache segments per project (not global)
+    if (projectId) {
+      this.envToProjectMap.set(environmentId, projectId);
+      if (segments && segments.length > 0) {
+        const segmentMap = this.getOrCreateProjectSegments(projectId);
+        for (const segment of segments) {
+          segmentMap.set(segment.name, segment);
+        }
+        this.logger.info('Feature segments cached', {
+          count: segments.length,
+          projectId,
+        });
       }
-      this.logger.info('Feature segments cached', { count: segments.length });
     }
 
     // Save to local storage if available
     if (this.storage) {
-      await Promise.all([
+      const saveOps = [
         this.storage.save(
           `FeatureFlags_${environmentId}_flags`,
           JSON.stringify(flags)
         ),
-        this.storage.save(
-          `FeatureFlags_${environmentId}_segments`,
-          JSON.stringify(segments || [])
-        ),
-      ]);
+      ];
+      if (projectId) {
+        saveOps.push(
+          this.storage.save(
+            `FeatureFlags_${environmentId}_projectId`,
+            projectId
+          ),
+          this.storage.save(
+            `FeatureFlags_${projectId}_segments`,
+            JSON.stringify(segments || [])
+          )
+        );
+      }
+      await Promise.all(saveOps);
     }
 
     this.logger.info('Feature flags fetched', {
       count: flags.length,
       environmentId,
+      projectId,
     });
 
     return flags;
@@ -422,10 +451,13 @@ export class FeatureFlagService {
 
   /**
    * Get all cached flags as array
-   * @param environmentId environment ID (required)
+   * @param environmentId environment ID or cache key. Defaults to defaultToken in single-token mode.
    */
-  getCached(environmentId: string): FeatureFlag[] {
-    const envCache = this.cachedFlagsByEnv.get(environmentId);
+  getCached(environmentId?: string): FeatureFlag[] {
+    const key = environmentId || this.defaultToken;
+    const envCache =
+      this.cachedFlagsByEnv.get(key) ||
+      this.cachedFlagsByEnv.get(this.defaultToken);
     return envCache ? Array.from(envCache.values()) : [];
   }
 
@@ -464,7 +496,28 @@ export class FeatureFlagService {
   // ==================== Segment Methods ====================
 
   /**
-   * Fetch all segments (global, not per-environment)
+   * Get or create the segment map for a given project
+   */
+  private getOrCreateProjectSegments(
+    projectId: string
+  ): Map<string, FeatureSegment> {
+    let segmentMap = this.cachedSegments.get(projectId);
+    if (!segmentMap) {
+      segmentMap = new Map<string, FeatureSegment>();
+      this.cachedSegments.set(projectId, segmentMap);
+    }
+    return segmentMap;
+  }
+
+  /**
+   * Resolve projectId from environmentId/cacheKey
+   */
+  getProjectIdForEnvironment(environmentId: string): string | undefined {
+    return this.envToProjectMap.get(environmentId);
+  }
+
+  /**
+   * Fetch all segments for a project
    * GET /api/v1/server/segments
    */
   async fetchSegments(): Promise<FeatureSegment[]> {
@@ -472,31 +525,38 @@ export class FeatureFlagService {
 
     this.logger.debug('Fetching feature segments');
 
-    const response = await this.apiClient.get<{ segments: FeatureSegment[] }>(
-      endpoint
-    );
+    const response = await this.apiClient.get<{
+      segments: FeatureSegment[];
+      projectId?: string;
+    }>(endpoint);
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch segments');
     }
 
-    const { segments } = response.data;
+    const { segments, projectId } = response.data;
 
-    // Cache segments by name for efficient lookup
-    this.cachedSegments.clear();
-    for (const segment of segments) {
-      this.cachedSegments.set(segment.name, segment);
+    // Cache segments per project
+    if (projectId) {
+      const segmentMap = this.getOrCreateProjectSegments(projectId);
+      segmentMap.clear();
+      for (const segment of segments) {
+        segmentMap.set(segment.name, segment);
+      }
+
+      // Save to local storage if available
+      if (this.storage) {
+        await this.storage.save(
+          `FeatureFlags_${projectId}_segments`,
+          JSON.stringify(segments)
+        );
+      }
     }
 
-    // Save to local storage if available (global segments)
-    if (this.storage) {
-      await this.storage.save(
-        'FeatureFlags_global_segments',
-        JSON.stringify(segments)
-      );
-    }
-
-    this.logger.info('Feature segments fetched', { count: segments.length });
+    this.logger.info('Feature segments fetched', {
+      count: segments.length,
+      projectId,
+    });
 
     return segments;
   }
@@ -510,43 +570,87 @@ export class FeatureFlagService {
   }
 
   /**
-   * Get a segment by name from cache
+   * Get a segment by name from cache for a specific project
    */
-  getSegment(segmentName: string): FeatureSegment | undefined {
-    return this.cachedSegments.get(segmentName);
+  getSegment(
+    segmentName: string,
+    projectId?: string
+  ): FeatureSegment | undefined {
+    if (projectId) {
+      return this.cachedSegments.get(projectId)?.get(segmentName);
+    }
+    // Fallback: search all projects
+    for (const segmentMap of this.cachedSegments.values()) {
+      const seg = segmentMap.get(segmentName);
+      if (seg) return seg;
+    }
+    return undefined;
   }
 
   /**
-   * Get all cached segments
+   * Get all cached segments for a specific project
+   * If no projectId given, returns a merged map of all segments
    */
-  getAllSegments(): Map<string, FeatureSegment> {
-    return this.cachedSegments;
+  getAllSegments(projectId?: string): Map<string, FeatureSegment> {
+    if (projectId) {
+      return this.cachedSegments.get(projectId) || new Map();
+    }
+    // Fallback: merge all projects (for backward compatibility)
+    const merged = new Map<string, FeatureSegment>();
+    for (const segmentMap of this.cachedSegments.values()) {
+      for (const [name, segment] of segmentMap) {
+        merged.set(name, segment);
+      }
+    }
+    return merged;
   }
 
   /**
-   * Clear segments cache
+   * Clear segments cache (all projects or specific project)
    */
-  clearSegmentsCache(): void {
-    this.cachedSegments.clear();
-    this.logger.debug('Feature segments cache cleared');
+  clearSegmentsCache(projectId?: string): void {
+    if (projectId) {
+      this.cachedSegments.delete(projectId);
+    } else {
+      this.cachedSegments.clear();
+    }
+    this.logger.debug('Feature segments cache cleared', { projectId });
   }
 
   /**
    * Update a single segment in cache (for real-time sync)
    */
-  updateSegmentInCache(segment: FeatureSegment): void {
-    this.cachedSegments.set(segment.name, segment);
+  updateSegmentInCache(segment: FeatureSegment, projectId?: string): void {
+    if (projectId) {
+      const segmentMap = this.getOrCreateProjectSegments(projectId);
+      segmentMap.set(segment.name, segment);
+    } else {
+      // Fallback: update in all projects that have this segment
+      for (const segmentMap of this.cachedSegments.values()) {
+        if (segmentMap.has(segment.name)) {
+          segmentMap.set(segment.name, segment);
+        }
+      }
+    }
     this.logger.debug('Segment updated in cache', {
       segmentName: segment.name,
+      projectId,
     });
   }
 
   /**
    * Remove a segment from cache (for real-time sync)
    */
-  removeSegmentFromCache(segmentName: string): void {
-    this.cachedSegments.delete(segmentName);
-    this.logger.debug('Segment removed from cache', { segmentName });
+  removeSegmentFromCache(segmentName: string, projectId?: string): void {
+    if (projectId) {
+      this.cachedSegments.get(projectId)?.delete(segmentName);
+    } else {
+      // Fallback: remove from all projects
+      for (const segmentMap of this.cachedSegments.values()) {
+        segmentMap.delete(segmentName);
+      }
+    }
+    this.logger.debug('Segment removed from cache', { segmentName, projectId });
   }
 
   // ==================== Flag Query Methods ====================
@@ -956,11 +1060,12 @@ export class FeatureFlagService {
     }
 
     // Use the central evaluator from @gatrix/shared for consistency
-    const result = FeatureFlagEvaluator.evaluate(
-      flag,
-      mergedContext,
-      this.cachedSegments
-    );
+    // Resolve project-scoped segments for this environment
+    const projectId = this.envToProjectMap.get(resolvedEnv);
+    const segments = projectId
+      ? this.cachedSegments.get(projectId) || new Map<string, FeatureSegment>()
+      : this.getAllSegments();
+    const result = FeatureFlagEvaluator.evaluate(flag, mergedContext, segments);
 
     // Record metrics
     this.recordMetric(

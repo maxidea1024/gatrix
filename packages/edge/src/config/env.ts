@@ -66,7 +66,7 @@ export const config = {
   // WARNING: Only use in development/testing environments
   unsecuredClientToken:
     process.env.EDGE_CLIENT_UNSECURED_TOKEN ||
-    'gatrix-unsecured-edge-api-token',
+    'unsecured-edge-api-token',
 };
 
 // Validate required configuration

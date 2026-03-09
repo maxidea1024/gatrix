@@ -14,9 +14,10 @@ export interface MirroredToken {
   id: number;
   tokenName: string;
   tokenValue: string;
-  tokenType: 'client' | 'server' | 'edge' | 'all';
-  allowAllEnvironments: boolean;
-  environments: string[]; // ['*'] for all, or list of environmentId names
+  tokenType: 'client' | 'server' | 'edge';
+  orgId: string | null;
+  projectId: string | null;
+  environmentId: string | null; // null means no specific environment binding
   expiresAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -184,7 +185,7 @@ class TokenMirrorService {
    */
   validateToken(
     tokenValue: string,
-    requiredType: 'client' | 'server' | 'edge' | 'all',
+    requiredType: 'client' | 'server' | 'edge',
     environmentId?: string
   ): TokenValidationResult {
     // Check for unsecured tokens (for testing purposes)
@@ -198,9 +199,10 @@ class TokenMirrorService {
         id: 0, // 0 indicates unsecured token, usage tracking will be skipped
         tokenName: 'Unsecured Token (Testing)',
         tokenValue,
-        tokenType: 'all',
-        allowAllEnvironments: true,
-        environments: ['*'],
+        tokenType: 'server',
+        orgId: null,
+        projectId: null,
+        environmentId: null,
         expiresAt: null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -223,17 +225,13 @@ class TokenMirrorService {
     }
 
     // Check token type
-    // 'all' type can access both client and server APIs
-    if (token.tokenType !== 'all' && token.tokenType !== requiredType) {
+    if (token.tokenType !== requiredType) {
       return { valid: false, token, reason: 'invalid_type' };
     }
 
-    // Check environment access
-    if (environmentId && !token.allowAllEnvironments) {
-      if (
-        !token.environments.includes(environmentId) &&
-        !token.environments.includes('*')
-      ) {
+    // Check environment access (token:environment is 1:1)
+    if (environmentId && token.environmentId) {
+      if (token.environmentId !== environmentId) {
         return { valid: false, token, reason: 'invalid_environment' };
       }
     }

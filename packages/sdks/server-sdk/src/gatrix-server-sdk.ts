@@ -210,7 +210,7 @@ export class GatrixServerSDK {
     // Set default API token if not provided (for testing)
     const configWithDefaults = {
       ...config,
-      apiToken: config.apiToken || 'gatrix-unsecured-server-api-token',
+      apiToken: config.apiToken || 'unsecured-server-api-token',
     };
 
     // Auto-configure Loki from environment variables if enabled
@@ -335,7 +335,7 @@ export class GatrixServerSDK {
       applicationName: configWithDefaults.applicationName,
 
       apiToken:
-        configWithDefaults.apiToken === 'gatrix-unsecured-server-api-token'
+        configWithDefaults.apiToken === 'unsecured-server-api-token'
           ? 'unsecured (testing)'
           : '***',
     });
@@ -515,7 +515,9 @@ export class GatrixServerSDK {
           this.logger,
           this.metrics
         );
-        await this.eventListener.initialize();
+        await this.eventListener.initialize(
+          this.cacheManager.getChannelContext()
+        );
       }
 
       this.initialized = true;

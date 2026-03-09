@@ -71,6 +71,8 @@ export class CacheManager {
   private invalidationCount: number = 0;
   // Environment ID resolved from backend /ready endpoint
   private resolvedEnvironmentId: string | null = null;
+  private resolvedOrgId: string | null = null;
+  private resolvedProjectId: string | null = null;
 
   constructor(
     config: CacheConfig,
@@ -739,17 +741,25 @@ export class CacheManager {
         const response = await this.apiClient.get<{
           status: string;
           environmentId?: string;
+          orgId?: string;
+          projectId?: string;
         }>('/api/v1/ready');
 
         if (response.success && response.data?.status === 'ready') {
           this.logger.info('Gatrix backend is ready');
 
-          // Extract environmentId from token-based lookup (single-env mode)
+          // Extract environmentId, orgId, projectId from token-based lookup (single-env mode)
           if (response.data.environmentId) {
             this.resolvedEnvironmentId = response.data.environmentId;
             this.logger.info('Environment resolved from backend', {
               environmentId: this.resolvedEnvironmentId,
             });
+          }
+          if (response.data.orgId) {
+            this.resolvedOrgId = response.data.orgId;
+          }
+          if (response.data.projectId) {
+            this.resolvedProjectId = response.data.projectId;
           }
           return;
         }
@@ -1823,6 +1833,22 @@ export class CacheManager {
     // Include environment resolved from /ready endpoint (single-token mode)
     if (this.resolvedEnvironmentId) envIds.add(this.resolvedEnvironmentId);
     return Array.from(envIds);
+  }
+
+  /**
+   * Get channel context resolved from /ready endpoint.
+   * Used by EventListener for single-env channel subscription.
+   */
+  getChannelContext(): {
+    orgId?: string;
+    projectId?: string;
+    environmentId?: string;
+  } {
+    return {
+      orgId: this.resolvedOrgId || undefined,
+      projectId: this.resolvedProjectId || undefined,
+      environmentId: this.resolvedEnvironmentId || undefined,
+    };
   }
 
   /**

@@ -49,7 +49,7 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({
   const [errorTabValue, setErrorTabValue] = useState(0);
 
   // API test state
-  const [apiToken, setApiToken] = useState('gatrix-unsecured-server-api-token'); // Default to unsecured server token
+  const [apiToken, setApiToken] = useState('unsecured-server-api-token'); // Default to unsecured server token
   const [page, setPage] = useState('1');
   const [limit, setLimit] = useState('10');
   const [lang, setLang] = useState(''); // Optional language parameter for maintenance message

@@ -61,7 +61,7 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const [errorTabValue, setErrorTabValue] = useState(0);
 
   // State for API test
-  const [apiToken, setApiToken] = useState('gatrix-unsecured-server-api-token'); // Default to unsecured server token
+  const [apiToken, setApiToken] = useState('unsecured-server-api-token'); // Default to unsecured server token
   const [couponCode, setCouponCode] = useState('');
   const [userId, setUserId] = useState('user123');
   const [userName, setUserName] = useState('John Doe');

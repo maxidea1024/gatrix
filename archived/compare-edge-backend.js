@@ -20,7 +20,7 @@ async function main() {
     hostname: 'localhost', port: 45000,
     path: '/api/v1/server/features?compact=true',
     method: 'GET',
-    headers: { 'x-api-token': 'gatrix-unsecured-edge-api-token', 'x-application-name': 'edge-server' }
+    headers: { 'x-api-token': 'unsecured-edge-api-token', 'x-application-name': 'edge-server' }
   });
   const backendJson = JSON.parse(backendResp.body);
   const backendFlags = backendJson.data?.flags || [];
@@ -35,7 +35,7 @@ async function main() {
     hostname: 'localhost', port: 3400,
     path: '/api/v1/server/development/features',
     method: 'GET',
-    headers: { 'x-api-token': 'gatrix-unsecured-server-api-token', 'x-application-name': 'test' }
+    headers: { 'x-api-token': 'unsecured-server-api-token', 'x-application-name': 'test' }
   });
   const edgeServerJson = JSON.parse(edgeServerResp.body);
   const edgeFlags = edgeServerJson.data?.flags || [];
@@ -51,7 +51,7 @@ async function main() {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',
-      'x-api-token': 'gatrix-unsecured-edge-api-token', 
+      'x-api-token': 'unsecured-edge-api-token', 
       'x-application-name': 'test-app',
     }
   }, JSON.stringify({ context: { userId: 'test-user' } }));
