@@ -107,7 +107,8 @@ async function main(): Promise<void> {
             environmentRegistry.resolveEnvironmentId(envId) || envId;
         } else if (LEGACY_TOKENS[apiToken]) {
           environmentId =
-            environmentRegistry.resolveEnvironmentId('development') || undefined;
+            environmentRegistry.resolveEnvironmentId('development') ||
+            undefined;
         } else {
           // Validate token via tokenMirrorService
           const result = tokenMirrorService.validateToken(apiToken, 'client');
