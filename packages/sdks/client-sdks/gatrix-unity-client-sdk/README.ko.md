@@ -127,7 +127,7 @@ public class GameManager : MonoBehaviour
             },
         };
 
-        await GatrixBehaviour.InitializeAsync(config);
+        await GatrixSDK.InitializeAsync(config);
 
         float speed = GatrixSDK.Features.FloatVariation("game-speed", 1.0f);
     }
@@ -436,6 +436,8 @@ GatrixSDK.Client.Stop();
 | `GatrixSDK.Events` | `GatrixBehaviour.Client.Events`의 단축 |
 | `GatrixSDK.Client` | 활성 `GatrixClient` 인스턴스 |
 | `GatrixSDK.IsInitialized` | SDK 시작 여부 |
+| `GatrixSDK.InitializeAsync(config)` | 코드 기반 초기화 |
+| `GatrixSDK.Shutdown()` | 수동 종료 |
 
 ### GatrixBehaviour (static)
 
@@ -443,8 +445,8 @@ GatrixSDK.Client.Stop();
 |---|---|
 | `GatrixBehaviour.Client` | 활성 `GatrixClient` 인스턴스 |
 | `GatrixBehaviour.IsInitialized` | SDK 시작 여부 |
-| `GatrixBehaviour.InitializeAsync(config)` | 코드 기반 초기화 |
-| `GatrixBehaviour.Shutdown()` | 수동 종료 |
+| `GatrixSDK.InitializeAsync(config)` | 코드 기반 초기화 |
+| `GatrixSDK.Shutdown()` | 수동 종료 |
 
 ---
 

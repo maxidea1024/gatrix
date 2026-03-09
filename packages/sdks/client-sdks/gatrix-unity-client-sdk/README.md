@@ -127,7 +127,7 @@ public class GameManager : MonoBehaviour
             },
         };
 
-        await GatrixBehaviour.InitializeAsync(config);
+        await GatrixSDK.InitializeAsync(config);
 
         float speed = GatrixSDK.Features.FloatVariation("game-speed", 1.0f);
     }
@@ -438,6 +438,8 @@ GatrixSDK.Client.Stop();
 | `GatrixSDK.Events` | Shorthand for `GatrixBehaviour.Client.Events` |
 | `GatrixSDK.Client` | Active `GatrixClient` instance |
 | `GatrixSDK.IsInitialized` | True if SDK is started |
+| `GatrixSDK.InitializeAsync(config)` | Code-based initialization |
+| `GatrixSDK.Shutdown()` | Manual shutdown |
 
 ### GatrixBehaviour (static)
 
@@ -445,8 +447,8 @@ GatrixSDK.Client.Stop();
 |---|---|
 | `GatrixBehaviour.Client` | Active `GatrixClient` instance |
 | `GatrixBehaviour.IsInitialized` | True if SDK is started |
-| `GatrixBehaviour.InitializeAsync(config)` | Code-based initialization |
-| `GatrixBehaviour.Shutdown()` | Manual shutdown |
+| `GatrixSDK.InitializeAsync(config)` | Code-based initialization |
+| `GatrixSDK.Shutdown()` | Manual shutdown |
 
 ---
 
