@@ -28,6 +28,9 @@ namespace Gatrix.Unity.SDK
         {
             ValidateConfig(config);
 
+            // Normalize: strip trailing slash from API URL
+            config.ApiUrl = config.ApiUrl?.TrimEnd('/');
+
             _config = config;
             _emitter = new GatrixEventEmitter();
             _httpClient = new HttpClient();
