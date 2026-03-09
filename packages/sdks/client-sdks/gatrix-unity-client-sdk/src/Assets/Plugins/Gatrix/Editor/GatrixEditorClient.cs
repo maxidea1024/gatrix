@@ -45,7 +45,7 @@ namespace Gatrix.Unity.SDK.Editor
         /// </summary>
         private static void InitFromCache()
         {
-            if (Application.isPlaying) return;
+            if (Application.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode) return;
 
             _client?.Dispose();
             _client = null;
