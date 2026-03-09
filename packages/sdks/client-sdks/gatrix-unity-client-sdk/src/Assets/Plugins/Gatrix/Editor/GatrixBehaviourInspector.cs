@@ -66,10 +66,10 @@ namespace Gatrix.Unity.SDK.Editor
         {
             InitStyles();
 
-            // ── Title Bar ───────────────────────────────────────
+            // -- Title Bar ---------------------------------------
             DrawTitleBar();
 
-            // ── Edit Mode: show standard fields + cached flag data if available ──
+            // -- Edit Mode: show standard fields + cached flag data if available --
             // GatrixBehaviour.Client may return the offline GatrixEditorClient in Edit Mode,
             // so we gate on Application.isPlaying rather than client == null to decide which
             // sections to render.
@@ -97,7 +97,7 @@ namespace Gatrix.Unity.SDK.Editor
                 return;
             }
 
-            // ── Play Mode below this point ────────────────────────
+            // -- Play Mode below this point ------------------------
             var client = GatrixBehaviour.Client;
 
             if (client == null)
@@ -106,23 +106,23 @@ namespace Gatrix.Unity.SDK.Editor
                 return;
             }
 
-            // ── Status ──────────────────────────────────────────
+            // -- Status ------------------------------------------
             DrawSectionBar("  Status", GatrixEditorStyle.AccentBlue);
             DrawStatusContent(client);
 
-            // ── Context ──────────────────────────────────────────
+            // -- Context ------------------------------------------
             _showContext = DrawCollapsibleSectionBar("  Evaluation Context", _showContext,
                 null, GatrixEditorStyle.AccentTeal);
             if (_showContext)
                 DrawContextContent(client);
 
-            // ── Feature Flags ────────────────────────────────────
+            // -- Feature Flags ------------------------------------
             _showFlags = DrawCollapsibleSectionBar("  Feature Flags", _showFlags,
                 $"({client.Features.GetAllFlags().Count})", GatrixEditorStyle.AccentGreen);
             if (_showFlags)
                 DrawFlagsContent(client);
 
-            // ── Statistics ───────────────────────────────────────
+            // -- Statistics ---------------------------------------
             _showStats = DrawCollapsibleSectionBar("  Runtime Stats", _showStats,
                 null, GatrixEditorStyle.AccentOrange);
             if (_showStats)

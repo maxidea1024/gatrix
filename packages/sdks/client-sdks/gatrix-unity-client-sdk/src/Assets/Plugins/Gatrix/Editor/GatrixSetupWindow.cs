@@ -66,7 +66,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             bool isDark = EditorGUIUtility.isProSkin;
 
-            // ── Title Bar (fixed 40px) ────────────────────────────
+            // -- Title Bar (fixed 40px) ----------------------------
             var titleRect = EditorGUILayout.GetControlRect(false, 40);
             if (Event.current.type == EventType.Repaint)
             {
@@ -86,7 +86,7 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUI.LabelField(new Rect(titleRect.x + 12, titleRect.y + 22, titleRect.width - 20, 14),
                 "SDK Configuration & Scene Setup", ts2);
 
-            // ── Scroll Content ──────────────────────────────────
+            // -- Scroll Content ----------------------------------
             _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
             EditorGUILayout.Space(8);
@@ -380,7 +380,7 @@ namespace Gatrix.Unity.SDK.Editor
                 // Type dropdown
                 entry.Type = (ContextPropertyType)EditorGUILayout.EnumPopup(entry.Type, GUILayout.Width(65));
 
-                // Value field — show appropriate input based on type
+                // Value field - show appropriate input based on type
                 switch (entry.Type)
                 {
                     case ContextPropertyType.Boolean:

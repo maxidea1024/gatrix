@@ -83,7 +83,7 @@ namespace Gatrix.Unity.SDK
                 }
             }
 
-            // Numeric variant value → range only
+            // Numeric variant value -> range only
             if (flag.Variant?.Value != null)
             {
                 try { DetectionRange = Convert.ToSingle(flag.Variant.Value); return; } catch { }

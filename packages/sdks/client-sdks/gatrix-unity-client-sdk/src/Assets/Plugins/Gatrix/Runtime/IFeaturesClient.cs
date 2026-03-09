@@ -391,7 +391,7 @@ namespace Gatrix.Unity.SDK
         /// Explicitly fetch flags from the server.
         /// <para>
         /// This triggers an immediate HTTP request to the Gatrix API, bypassing the
-        /// polling interval. Uses ETag-based caching — if flags haven't changed,
+        /// polling interval. Uses ETag-based caching - if flags haven't changed,
         /// the server returns 304 and no update is applied.
         /// </para>
         /// <para>
@@ -464,7 +464,7 @@ namespace Gatrix.Unity.SDK
         FeaturesStats GetStats();
 
         /// <summary>
-        /// Get lightweight statistics — scalar values only, no collection copying.
+        /// Get lightweight statistics - scalar values only, no collection copying.
         /// Use this for frequent polling or low-overhead diagnostics.
         /// </summary>
         FeaturesLightStats GetLightStats();

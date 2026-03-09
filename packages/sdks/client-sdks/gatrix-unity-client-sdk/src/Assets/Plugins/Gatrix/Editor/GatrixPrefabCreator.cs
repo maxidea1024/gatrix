@@ -47,7 +47,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
             else
             {
-                // TMP not installed — use Legacy Text
+                // TMP not installed - use Legacy Text
                 var text = go.AddComponent<Text>();
                 text.text = "Feature Flag Value";
                 text.alignment = TextAnchor.MiddleCenter;
@@ -115,7 +115,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── UI Components ──
+        // -- UI Components --
 
         [MenuItem(RootMenu + "UI/Flag Color", false, 12)]
         public static void CreateFlagColor(MenuCommand menuCommand)
@@ -133,7 +133,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── Visual Components ──
+        // -- Visual Components --
 
         [MenuItem(RootMenu + "Visual/Flag Material", false, 40)]
         public static void CreateFlagMaterial(MenuCommand menuCommand)
@@ -170,7 +170,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── Logic Components ──
+        // -- Logic Components --
 
         [MenuItem(RootMenu + "Logic/Flag Event", false, 22)]
         public static void CreateFlagEvent(MenuCommand menuCommand)
@@ -205,7 +205,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── Audio & Animation ──
+        // -- Audio & Animation --
 
         [MenuItem(RootMenu + "Audio & Animation/Flag Audio", false, 50)]
         public static void CreateFlagAudio(MenuCommand menuCommand)
@@ -254,7 +254,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── Lighting ──
+        // -- Lighting --
 
         [MenuItem(RootMenu + "Lighting/Flag Light", false, 60)]
         public static void CreateFlagLight(MenuCommand menuCommand)
@@ -268,7 +268,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── Camera ──
+        // -- Camera --
 
         [MenuItem(RootMenu + "Camera/Flag Camera", false, 70)]
         public static void CreateFlagCamera(MenuCommand menuCommand)
@@ -282,7 +282,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── Physics ──
+        // -- Physics --
 
         [MenuItem(RootMenu + "Physics/Flag Rigidbody", false, 80)]
         public static void CreateFlagRigidbody(MenuCommand menuCommand)
@@ -331,7 +331,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── 2D ──
+        // -- 2D --
 
         [MenuItem(RootMenu + "2D/Flag Sprite Renderer", false, 90)]
         public static void CreateFlagSpriteRenderer(MenuCommand menuCommand)
@@ -395,7 +395,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── Navigation / AI ──
+        // -- Navigation / AI --
 
         [MenuItem(RootMenu + "Navigation & AI/Flag NavMesh Agent", false, 100)]
         public static void CreateFlagNavMeshAgent(MenuCommand menuCommand)
@@ -430,7 +430,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── Environment ──
+        // -- Environment --
 
         [MenuItem(RootMenu + "Environment/Flag Fog", false, 110)]
         public static void CreateFlagFog(MenuCommand menuCommand)
@@ -465,7 +465,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── Time ──
+        // -- Time --
 
         [MenuItem(RootMenu + "Time/Flag Time Scale", false, 120)]
         public static void CreateFlagTimeScale(MenuCommand menuCommand)
@@ -489,7 +489,7 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
-        // ── Post FX ──
+        // -- Post FX --
 
         [MenuItem(RootMenu + "PostFX/Flag Post Process Volume", false, 130)]
         public static void CreateFlagPostProcessVolume(MenuCommand menuCommand)

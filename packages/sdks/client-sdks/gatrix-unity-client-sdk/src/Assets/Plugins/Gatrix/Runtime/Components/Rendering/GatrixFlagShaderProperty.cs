@@ -1,5 +1,5 @@
 // GatrixFlagShaderProperty - Set Material shader properties via feature flags
-// More granular than GatrixFlagMaterial — controls individual shader params
+// More granular than GatrixFlagMaterial - controls individual shader params
 
 using System;
 using System.Collections.Generic;

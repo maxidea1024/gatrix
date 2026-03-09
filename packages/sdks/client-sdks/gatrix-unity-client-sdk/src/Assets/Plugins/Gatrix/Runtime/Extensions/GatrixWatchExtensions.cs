@@ -41,7 +41,7 @@ namespace Gatrix.Unity.SDK.Extensions
         /// Watch a flag for realtime changes, bound to this MonoBehaviour's lifecycle.
         /// Callbacks only fire when active and enabled. Auto-cleanup on destroy.
         /// </summary>
-        /// <returns>Unsubscribe action for manual cleanup (optional — destroy cleanup is automatic)</returns>
+        /// <returns>Unsubscribe action for manual cleanup (optional - destroy cleanup is automatic)</returns>
         public static Action WatchRealtimeFlag(this MonoBehaviour owner,
             string flagName, GatrixFlagWatchHandler callback)
         {
@@ -58,7 +58,7 @@ namespace Gatrix.Unity.SDK.Extensions
         /// Watch a flag for realtime changes with initial state, bound to this MonoBehaviour's lifecycle.
         /// If the owner is disabled at registration time, the initial callback is deferred until OnEnable.
         /// </summary>
-        /// <returns>Unsubscribe action for manual cleanup (optional — destroy cleanup is automatic)</returns>
+        /// <returns>Unsubscribe action for manual cleanup (optional - destroy cleanup is automatic)</returns>
         public static Action WatchRealtimeFlagWithInitialState(this MonoBehaviour owner,
             string flagName, GatrixFlagWatchHandler callback)
         {
@@ -98,7 +98,7 @@ namespace Gatrix.Unity.SDK.Extensions
         /// Watch a flag for synced changes, bound to this MonoBehaviour's lifecycle.
         /// Callbacks only fire when active and enabled. Auto-cleanup on destroy.
         /// </summary>
-        /// <returns>Unsubscribe action for manual cleanup (optional — destroy cleanup is automatic)</returns>
+        /// <returns>Unsubscribe action for manual cleanup (optional - destroy cleanup is automatic)</returns>
         public static Action WatchSyncedFlag(this MonoBehaviour owner,
             string flagName, GatrixFlagWatchHandler callback)
         {
@@ -115,7 +115,7 @@ namespace Gatrix.Unity.SDK.Extensions
         /// Watch a flag for synced changes with initial state, bound to this MonoBehaviour's lifecycle.
         /// If the owner is disabled at registration time, the initial callback is deferred until OnEnable.
         /// </summary>
-        /// <returns>Unsubscribe action for manual cleanup (optional — destroy cleanup is automatic)</returns>
+        /// <returns>Unsubscribe action for manual cleanup (optional - destroy cleanup is automatic)</returns>
         public static Action WatchSyncedFlagWithInitialState(this MonoBehaviour owner,
             string flagName, GatrixFlagWatchHandler callback)
         {

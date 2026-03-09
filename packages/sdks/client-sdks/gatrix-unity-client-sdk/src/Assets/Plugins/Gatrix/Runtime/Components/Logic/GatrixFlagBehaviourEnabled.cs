@@ -1,5 +1,5 @@
 // GatrixFlagBehaviourEnabled - Toggle any MonoBehaviour.enabled via feature flags
-// More targeted than GatrixFlagToggle (GameObject active) — controls specific components
+// More targeted than GatrixFlagToggle (GameObject active) - controls specific components
 
 using System.Collections.Generic;
 using UnityEngine;

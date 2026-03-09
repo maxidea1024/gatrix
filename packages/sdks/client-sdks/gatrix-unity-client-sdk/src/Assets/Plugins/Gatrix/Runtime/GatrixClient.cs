@@ -96,7 +96,7 @@ namespace Gatrix.Unity.SDK
                 UnityEngine.Debug.Log(
                     $"[Gatrix] Track() called: eventName=\"{eventName}\", " +
                     $"properties={properties?.Count ?? 0} entries " +
-                    "— tracking is not yet supported but will be available soon.");
+                    "- tracking is not yet supported but will be available soon.");
             }
         }
 
@@ -158,7 +158,7 @@ namespace Gatrix.Unity.SDK
         }
 
         /// <summary>
-        /// Get lightweight statistics — scalar values only, no collection copying.
+        /// Get lightweight statistics - scalar values only, no collection copying.
         /// Use this for frequent polling or low-overhead diagnostics.
         /// </summary>
         public FeaturesLightStats GetLightStats()

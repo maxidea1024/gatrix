@@ -35,7 +35,7 @@ namespace Gatrix.Unity.SDK
         {
             var unsubscribe = WatchRealtimeFlag(flagName, callback, name);
 
-            // Emit initial state — always use realtimeFlags for realtime watchers
+            // Emit initial state - always use realtimeFlags for realtime watchers
             if (_readyEventEmitted)
             {
                 callback(CreateProxyForWatch(flagName, true));
@@ -77,7 +77,7 @@ namespace Gatrix.Unity.SDK
         {
             var unsubscribe = WatchSyncedFlag(flagName, callback, name);
 
-            // Emit initial state — respect explicitSyncMode for synced watchers
+            // Emit initial state - respect explicitSyncMode for synced watchers
             if (_readyEventEmitted)
             {
                 callback(CreateProxyForWatch(flagName, false));

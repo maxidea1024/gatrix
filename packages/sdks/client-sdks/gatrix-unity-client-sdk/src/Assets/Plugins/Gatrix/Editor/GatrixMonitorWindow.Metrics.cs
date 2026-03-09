@@ -55,7 +55,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
         }
 
-        // ── Streaming Connection (shared between both views) ──
+        // -- Streaming Connection (shared between both views) --
 
         private void DrawStreamingStatus()
         {
@@ -79,7 +79,7 @@ namespace Gatrix.Unity.SDK.Editor
             GatrixEditorStyle.EndBox();
         }
 
-        // ── Graph View ──
+        // -- Graph View --
 
         private void DrawMetricsGraphView()
         {
@@ -117,7 +117,7 @@ namespace Gatrix.Unity.SDK.Editor
                     normal = { textColor = isDark ? new Color(0.55f, 0.58f, 0.63f) : new Color(0.42f, 0.45f, 0.50f) }
                 };
 
-                // "Live" button (disabled in Edit Mode — data is frozen)
+                // "Live" button (disabled in Edit Mode - data is frozen)
                 bool isLive = _metricsTimeOffset < 0.5f;
                 var liveColor = GUI.backgroundColor;
                 if (isLive && EditorApplication.isPlaying) GUI.backgroundColor = new Color(0.3f, 0.8f, 0.4f, 0.6f);
@@ -135,7 +135,7 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space(2);
 
-            // Graphs: pixelsPerSec=3 → chart width determines visible time range
+            // Graphs: pixelsPerSec=3 -> chart width determines visible time range
             const float pps = 3f;
 
             // Network Activity graph
@@ -162,7 +162,7 @@ namespace Gatrix.Unity.SDK.Editor
                 EditorGUILayout.Space(4);
             }
 
-            // Flag state counts graph — how many flags are enabled/disabled/missing
+            // Flag state counts graph - how many flags are enabled/disabled/missing
             if (_tsFlagEnabled != null)
             {
                 GatrixEditorStyle.DrawSection("Flag State Counts", "Number of flags per state");
@@ -186,13 +186,13 @@ namespace Gatrix.Unity.SDK.Editor
             return false;
         }
 
-        // ── Report View ──
+        // -- Report View --
 
         private void DrawMetricsReportView()
         {
             var stats = _cachedStats;
 
-            // ── Impression Metrics ──
+            // -- Impression Metrics --
             GatrixEditorStyle.DrawSection("Impression Metrics", "Flag evaluation tracking");
             GatrixEditorStyle.BeginBox();
 
@@ -201,7 +201,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             GatrixEditorStyle.EndBox();
 
-            // ── Metrics Delivery ──
+            // -- Metrics Delivery --
             GatrixEditorStyle.DrawSection("Metrics Delivery", "Backend reporting");
             GatrixEditorStyle.BeginBox();
 
@@ -212,7 +212,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             GatrixEditorStyle.EndBox();
 
-            // ── Network Activity ──
+            // -- Network Activity --
             GatrixEditorStyle.DrawSection("Network Activity", "Fetch and update counters");
             GatrixEditorStyle.BeginBox();
 
@@ -224,7 +224,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             GatrixEditorStyle.EndBox();
 
-            // ── Flag Access Summary ──
+            // -- Flag Access Summary --
             if (stats.FlagEnabledCounts != null && stats.FlagEnabledCounts.Count > 0)
             {
                 GatrixEditorStyle.DrawSection($"Flag Access Summary ({stats.FlagEnabledCounts.Count} flags)", "Evaluation hit counts");
@@ -250,7 +250,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.EndBox();
             }
 
-            // ── Missing Flags ──
+            // -- Missing Flags --
             if (stats.MissingFlags != null && stats.MissingFlags.Count > 0)
             {
                 GatrixEditorStyle.DrawSection($"Missing Flags ({stats.MissingFlags.Count})", "Requested but not found on server");
@@ -264,7 +264,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
         }
 
-        // ── Current Values Summary (compact, used below graphs) ──
+        // -- Current Values Summary (compact, used below graphs) --
 
         private void DrawMetricsCurrentValues()
         {

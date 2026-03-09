@@ -444,7 +444,7 @@ namespace Gatrix.Unity.SDK
     }
 
     /// <summary>
-    /// Lightweight feature flag statistics — scalar values only, no collection copying.
+    /// Lightweight feature flag statistics - scalar values only, no collection copying.
     /// Use this for frequent polling or low-overhead diagnostics.
     /// </summary>
     public class FeaturesLightStats

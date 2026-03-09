@@ -106,7 +106,7 @@ namespace Gatrix.Unity.SDK.Editor
                 EditorGUILayout.Space(2);
             }
 
-            // ── Required ──
+            // -- Required --
             _showRequired = DrawCollapsibleSectionBar("  Connection", _showRequired, null, GatrixEditorStyle.AccentBlue);
             if (_showRequired)
             {
@@ -118,7 +118,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.EndBox();
             }
 
-            // ── Context ──
+            // -- Context --
             _showContext = DrawCollapsibleSectionBar("  Initial Context", _showContext,
                 _contextProperties.arraySize > 0 ? $"{_contextProperties.arraySize} props" : "(optional)",
                 GatrixEditorStyle.AccentTeal);
@@ -134,7 +134,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.EndBox();
             }
 
-            // ── Bootstrap ──
+            // -- Bootstrap --
             string bootstrapBadge = string.IsNullOrWhiteSpace(_bootstrapJson.stringValue) ? null : "configured";
             _showBootstrap = DrawCollapsibleSectionBar("  Bootstrap", _showBootstrap, bootstrapBadge, new Color(0.80f, 0.60f, 0.20f));
             if (_showBootstrap)
@@ -175,7 +175,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.EndBox();
             }
 
-            // ── General ──
+            // -- General --
             _showGeneral = DrawCollapsibleSectionBar("  General", _showGeneral, null, GatrixEditorStyle.AccentGreen);
             if (_showGeneral)
             {
@@ -209,7 +209,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.EndBox();
             }
 
-            // ── Metrics ──
+            // -- Metrics --
             string metricsBadge = _offlineMode.boolValue ? "disabled (offline)" : null;
             _showMetrics = DrawCollapsibleSectionBar("  Metrics", _showMetrics, metricsBadge, new Color(0.60f, 0.40f, 0.90f));
             if (_showMetrics)
@@ -228,7 +228,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.EndBox();
             }
 
-            // ── Network (Polling + Retry + Streaming) ──
+            // -- Network (Polling + Retry + Streaming) --
             string networkBadge = _offlineMode.boolValue ? "disabled (offline)" : null;
             _showNetwork = DrawCollapsibleSectionBar("  Network", _showNetwork, networkBadge, new Color(0.85f, 0.55f, 0.20f));
             if (_showNetwork)
@@ -498,7 +498,7 @@ namespace Gatrix.Unity.SDK.Editor
                 // Type dropdown
                 EditorGUILayout.PropertyField(typeProp, GUIContent.none, GUILayout.Width(65));
 
-                // Value field — show appropriate input based on type
+                // Value field - show appropriate input based on type
                 var propType = (ContextPropertyType)typeProp.enumValueIndex;
                 switch (propType)
                 {

@@ -66,7 +66,7 @@ namespace Gatrix.Unity.SDK
                     {
                         _tmpComponent = cmp;
                         _tmpTextProperty = _cachedTmpTextProp;
-                        return; // TMP found — skip legacy Text detection
+                        return; // TMP found - skip legacy Text detection
                     }
                 }
             }

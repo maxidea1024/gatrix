@@ -15,16 +15,16 @@ namespace Gatrix.Unity.SDK.Editor
     /// </summary>
     internal static class GatrixFlagTable
     {
-        // ─── Public entry point ─────────────────────────────────────────────
+        // --- Public entry point ---------------------------------------------
 
         /// <summary>
         /// Draws the flag table with header, rows, and optional pending sub-rows.
         /// </summary>
         /// <param name="flags">Synchronized (active) flag list to display.</param>
         /// <param name="filter">Lower-case search string; empty = show all.</param>
-        /// <param name="changedTimes">Optional map of flag name → timeSinceStartup when it last changed (for flash highlight).</param>
+        /// <param name="changedTimes">Optional map of flag name -> timeSinceStartup when it last changed (for flash highlight).</param>
         /// <param name="highlightDuration">How long the flash highlight lasts in seconds.</param>
-        /// <param name="pendingMap">Optional map of flag name → realtime flag (for pending sub-rows).</param>
+        /// <param name="pendingMap">Optional map of flag name -> realtime flag (for pending sub-rows).</param>
         public static void Draw(
             List<EvaluatedFlag> flags,
             string filter = "",
@@ -40,7 +40,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             bool isDark = EditorGUIUtility.isProSkin;
 
-            // ─── Column layout ────────────────────────────────────────────────
+            // --- Column layout ------------------------------------------------
             // State | Name | Variant | Type | Value | Rev
             const float stateX = 4f;
             const float stateW = 38f;
@@ -57,7 +57,7 @@ namespace Gatrix.Unity.SDK.Editor
             float valueW   = dynamicW * 0.37f;
             float revX     = valueX + valueW + 4f;
 
-            // ─── Header ──────────────────────────────────────────────────────
+            // --- Header ------------------------------------------------------
             var headerRect = EditorGUILayout.GetControlRect(false, 18);
             if (Event.current.type == EventType.Repaint)
             {
@@ -77,7 +77,7 @@ namespace Gatrix.Unity.SDK.Editor
             GUI.Label(new Rect(headerRect.x + valueX,   headerRect.y, valueW,   headerRect.height), "Value",   hStyle);
             GUI.Label(new Rect(headerRect.x + revX,     headerRect.y, revW,     headerRect.height), "Rev",     revHStyle);
 
-            // ─── Row styles ───────────────────────────────────────────────────
+            // --- Row styles ---------------------------------------------------
             var flagOnStyle = new GUIStyle(EditorStyles.miniLabel)
             {
                 fontStyle = FontStyle.Bold,
@@ -106,7 +106,7 @@ namespace Gatrix.Unity.SDK.Editor
                 normal    = { textColor = new Color(1f, 0.65f, 0.10f, 1f) }
             };
 
-            // ─── Rows ─────────────────────────────────────────────────────────
+            // --- Rows ---------------------------------------------------------
             int visibleIndex = 0;
             for (int i = 0; i < flags.Count; i++)
             {
@@ -178,7 +178,7 @@ namespace Gatrix.Unity.SDK.Editor
 
                 visibleIndex++;
 
-                // ── Pending change sub-row ──────────────────────────────────
+                // -- Pending change sub-row ----------------------------------
                 if (hasPending)
                 {
 
@@ -190,7 +190,7 @@ namespace Gatrix.Unity.SDK.Editor
                         EditorGUI.DrawRect(pBadgeRect, pBadge);
                     GUI.Label(pBadgeRect, pOn ? "ON" : "OFF", pOn ? flagOnStyle : flagOffStyle);
 
-                    // "→ Changed" in Name column
+                    // "-> Changed" in Name column
                     GUI.Label(new Rect(subRect.x + nameX, subRect.y, nameW, subRect.height),
                         "\u2192 Changed", changedLabelStyle);
 
@@ -211,7 +211,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.DrawHelpBox("No flags found matching filter.", MessageType.Info);
         }
 
-        // ─── Helpers ─────────────────────────────────────────────────────────
+        // --- Helpers ---------------------------------------------------------
 
         private static void DrawRow(EvaluatedFlag flag, Rect rowRect,
             float stateX, float stateW, float nameX, float nameW,

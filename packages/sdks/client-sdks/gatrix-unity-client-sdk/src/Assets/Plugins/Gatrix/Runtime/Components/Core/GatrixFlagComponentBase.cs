@@ -97,7 +97,7 @@ namespace Gatrix.Unity.SDK
         /// </summary>
         protected void Resubscribe()
         {
-            // Suppress individual Subscribe/Unsubscribe warnings — this is an intentional replace.
+            // Suppress individual Subscribe/Unsubscribe warnings - this is an intentional replace.
             if (_unwatch != null)
             {
                 _unwatch.Invoke();

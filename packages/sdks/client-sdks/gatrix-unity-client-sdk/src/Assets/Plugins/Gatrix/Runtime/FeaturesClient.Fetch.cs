@@ -156,7 +156,6 @@ namespace Gatrix.Unity.SDK
 
                     _devLog.Log($"fetchFlags: parsed response. success={data?.Success}, flagCount={data?.Data?.Flags?.Count ?? 0}");
 
-
                     if (data != null && data.Success && data.Data?.Flags != null)
                     {
                         var isInitialFetch = !_fetchedFromServer;
@@ -363,7 +362,7 @@ namespace Gatrix.Unity.SDK
 
         /// <summary>
         /// Fetch only specific flag keys from the server (partial fetch).
-        /// Does NOT send or update ETag — the existing ETag remains intact
+        /// Does NOT send or update ETag - the existing ETag remains intact
         /// for the next full polling cycle.
         /// </summary>
         private async UniTask FetchPartialFlagsAsync(HashSet<string> flagKeys)
@@ -410,7 +409,7 @@ namespace Gatrix.Unity.SDK
                     request = new HttpRequestMessage(HttpMethod.Get, urlBuilder.ToString());
                 }
 
-                // Headers — NO If-None-Match (intentionally skip ETag for partial fetch)
+                // Headers - NO If-None-Match (intentionally skip ETag for partial fetch)
                 request.Headers.TryAddWithoutValidation("X-API-Token", _config.ApiToken);
                 request.Headers.TryAddWithoutValidation("X-Application-Name", _config.AppName);
                 request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
