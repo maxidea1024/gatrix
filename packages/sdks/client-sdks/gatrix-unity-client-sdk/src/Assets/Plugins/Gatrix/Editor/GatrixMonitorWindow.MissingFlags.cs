@@ -3,6 +3,7 @@
 // Data persists across play mode transitions via _cachedMissingFlags
 
 #if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
