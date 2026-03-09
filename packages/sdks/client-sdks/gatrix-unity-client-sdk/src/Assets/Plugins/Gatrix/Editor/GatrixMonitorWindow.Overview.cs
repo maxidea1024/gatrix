@@ -18,7 +18,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             var stats = _cachedStats;
 
-            // ── Quick Actions ──
+            // -- Quick Actions --
             EditorGUILayout.Space(4);
             EditorGUILayout.BeginHorizontal();
 
@@ -64,7 +64,7 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space(4);
 
-            // ── SDK Summary ──
+            // -- SDK Summary --
             GatrixEditorStyle.DrawSection("SDK Summary", "Core connectivity and status");
             GatrixEditorStyle.BeginBox();
 
@@ -84,7 +84,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
             GatrixEditorStyle.EndBox();
 
-            // ── Network Activity ──
+            // -- Network Activity --
             GatrixEditorStyle.DrawSection("Network Activity", "Communication metrics");
             GatrixEditorStyle.BeginBox();
 
@@ -104,7 +104,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
             GatrixEditorStyle.EndBox();
 
-            // ── Streaming ──
+            // -- Streaming --
             GatrixEditorStyle.DrawSection("Streaming", "Real-time flag updates");
             GatrixEditorStyle.BeginBox();
 
@@ -147,7 +147,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             GatrixEditorStyle.EndBox();
 
-            // ── Metrics ──
+            // -- Metrics --
             GatrixEditorStyle.DrawSection("Metrics", "Impression and delivery");
             GatrixEditorStyle.BeginBox();
 

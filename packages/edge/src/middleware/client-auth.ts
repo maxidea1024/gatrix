@@ -39,8 +39,7 @@ export interface ClientRequest extends Request {
     environmentId: string;
     /**
      * SDK cache key for this environment.
-     * Format: unsecured-{orgId}:{projectId}:{envId}-server-api-token
-     * Falls back to environmentId if not resolved.
+     * Same as environmentId (SDK uses environmentId as cache key).
      */
     cacheKey: string;
     clientVersion?: string;
@@ -122,7 +121,7 @@ export function clientAuth(
       apiToken,
       applicationName,
       environmentId,
-      cacheKey: apiToken,
+      cacheKey: environmentId,
       clientVersion,
       platform,
       tokenName: `Unsecured Token (${envId})`,
@@ -135,9 +134,8 @@ export function clientAuth(
 
   // 2. Legacy unsecured tokens → resolve to default/default/development
   if (LEGACY_TOKENS[apiToken]) {
-    const cacheKey =
-      environmentRegistry.resolveEnvironmentToken(LEGACY_ENV_NAME);
-    if (!cacheKey) {
+    const envId = environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME);
+    if (!envId) {
       res.status(401).json({
         success: false,
         error: {
@@ -147,21 +145,17 @@ export function clientAuth(
       });
       return;
     }
-    const environmentId =
-      environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME) ||
-      LEGACY_ENV_NAME;
     req.clientContext = {
       apiToken,
       applicationName,
-      environmentId,
-      cacheKey,
+      environmentId: envId,
+      cacheKey: envId,
       clientVersion,
       platform,
       tokenName: 'Legacy Unsecured Token',
     };
     logger.debug('Authenticated with legacy unsecured token', {
-      environmentId,
-      cacheKey,
+      environmentId: envId,
     });
     return next();
   }
@@ -216,8 +210,9 @@ export function clientAuth(
     return;
   }
 
-  const cacheKey = environmentRegistry.resolveEnvironmentToken(tokenEnvId);
-  if (!cacheKey) {
+  const envId =
+    environmentRegistry.resolveEnvironmentId(tokenEnvId) || tokenEnvId;
+  if (!environmentRegistry.hasEnvironment(envId)) {
     res.status(401).json({
       success: false,
       error: {
@@ -228,13 +223,11 @@ export function clientAuth(
     return;
   }
 
-  const environmentId =
-    environmentRegistry.resolveEnvironmentId(tokenEnvId) || tokenEnvId;
   req.clientContext = {
     apiToken,
     applicationName,
-    environmentId,
-    cacheKey,
+    environmentId: envId,
+    cacheKey: envId,
     clientVersion,
     platform,
     tokenName: validation.token?.tokenName,
@@ -242,7 +235,7 @@ export function clientAuth(
 
   logger.debug('Client authenticated', {
     applicationName,
-    environmentId,
+    environmentId: envId,
     clientVersion,
     platform,
     tokenName: validation.token?.tokenName,

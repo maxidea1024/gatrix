@@ -22,10 +22,10 @@ export class PopupNoticeService extends BaseEnvironmentService<
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    defaultToken: string,
+    defaultEnvironmentId: string,
     storage?: CacheStorageProvider
   ) {
-    super(apiClient, logger, defaultToken, storage);
+    super(apiClient, logger, defaultEnvironmentId, storage);
   }
 
   // ==================== Abstract Method Implementations ====================

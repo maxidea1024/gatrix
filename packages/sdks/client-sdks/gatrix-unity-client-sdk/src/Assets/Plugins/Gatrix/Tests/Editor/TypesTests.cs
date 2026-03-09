@@ -18,7 +18,6 @@ namespace Gatrix.Unity.SDK.Tests
             var original = new GatrixContext
             {
                 AppName = "app",
-                Environment = "prod",
                 UserId = "user1",
                 SessionId = "sess1",
                 CurrentTime = "2026-01-01",
@@ -32,7 +31,6 @@ namespace Gatrix.Unity.SDK.Tests
             var clone = original.Clone();
 
             Assert.AreEqual("app", clone.AppName);
-            Assert.AreEqual("prod", clone.Environment);
             Assert.AreEqual("user1", clone.UserId);
             Assert.AreEqual("sess1", clone.SessionId);
             Assert.AreEqual("2026-01-01", clone.CurrentTime);

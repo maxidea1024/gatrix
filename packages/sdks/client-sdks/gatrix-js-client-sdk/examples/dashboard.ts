@@ -34,7 +34,6 @@ async function main() {
     apiUrl: config.apiUrl,
     apiToken: config.apiToken,
     appName: config.appName,
-    environment: config.environment,
     storageProvider: new InMemoryStorageProvider(),
     features: {
       refreshInterval: 1,
@@ -156,7 +155,7 @@ async function main() {
 
     // API info
     output += `  ${'API:'.padEnd(12)} ${DIM}${config.apiUrl}${RESET}\n`;
-    output += `  ${'App/Env:'.padEnd(12)} ${DIM}${config.appName} / ${config.environment}${RESET}\n`;
+    output += `  ${'App:'.padEnd(12)} ${DIM}${config.appName}${RESET}\n`;
 
     // Helper to format error details
     const formatError = (err: any): string => {

@@ -5,8 +5,8 @@ import type { GatrixClientConfig } from '@gatrix/gatrix-js-client-sdk';
 const emit = defineEmits<{ (e: 'connect', config: GatrixClientConfig): void }>();
 
 // Dev tokens for local development
-const DEV_TOKEN_EDGE = 'gatrix-unsecured-edge-api-token';
-const DEV_TOKEN_BACKEND = 'gatrix-unsecured-client-api-token';
+const DEV_TOKEN_EDGE = 'unsecured-edge-api-token';
+const DEV_TOKEN_BACKEND = 'unsecured-client-api-token';
 
 // Storage keys
 const SK = {
@@ -16,7 +16,6 @@ const SK = {
   REMEMBER: 'gatrix-dashboard-remember-token',
   API_URL: 'gatrix-dashboard-api-url',
   APP_NAME: 'gatrix-dashboard-app-name',
-  ENVIRONMENT: 'gatrix-dashboard-environment',
   OFFLINE_MODE: 'gatrix-dashboard-offline-mode',
   REFRESH_INTERVAL: 'gatrix-dashboard-refresh-interval',
   EXPLICIT_SYNC: 'gatrix-dashboard-explicit-sync',
@@ -44,7 +43,6 @@ const serverType = ref<ServerType>((localStorage.getItem(SK.SERVER_TYPE) as Serv
 const apiUrl = ref('');
 const apiToken = ref('');
 const appName = ref('vue-sdk-app');
-const environment = ref('development');
 const userId = ref(localStorage.getItem(SK.USER_ID) || generateRandomUserId());
 const rememberToken = ref(false);
 const showToken = ref(false);
@@ -59,10 +57,8 @@ onMounted(() => {
   const savedRemember = localStorage.getItem(SK.REMEMBER) === 'true';
   const savedToken = localStorage.getItem(SK.TOKEN) || '';
   const savedAppName = localStorage.getItem(SK.APP_NAME);
-  const savedEnv = localStorage.getItem(SK.ENVIRONMENT);
 
   if (savedAppName) appName.value = savedAppName;
-  if (savedEnv) environment.value = savedEnv;
   rememberToken.value = savedRemember;
 
   if (location.value === 'local') {
@@ -102,7 +98,6 @@ function handleManualPollingChange(checked: boolean) {
 function handleSubmit() {
   localStorage.setItem(SK.LOCATION, location.value);
   localStorage.setItem(SK.SERVER_TYPE, serverType.value);
-  localStorage.setItem(SK.ENVIRONMENT, environment.value);
   localStorage.setItem(SK.USER_ID, userId.value);
   localStorage.setItem(SK.OFFLINE_MODE, String(offlineMode.value));
   localStorage.setItem(SK.REFRESH_INTERVAL, String(manualPolling.value ? 0 : refreshInterval.value));
@@ -124,7 +119,6 @@ function handleSubmit() {
     apiUrl: apiUrl.value,
     apiToken: apiToken.value,
     appName: appName.value,
-    environment: environment.value,
     offlineMode: offlineMode.value,
     context: { userId: userId.value },
     features: {
@@ -217,10 +211,7 @@ function handleSubmit() {
                 placeholder="vue-sdk-app" required />
             </div>
             <div class="form-group">
-              <label class="form-label">ENVIRONMENT</label>
-              <input type="text" class="nes-input is-dark" v-model="environment"
                 placeholder="development" required />
-            </div>
           </div>
 
           <div class="form-group">
@@ -231,7 +222,7 @@ function handleSubmit() {
               <button type="button" class="nes-btn is-warning"
                 @click="userId = generateRandomUserId()"
                 title="Generate random User ID" style="font-size: 10px; white-space: nowrap">
-                ?Ž² RANDOM
+                ?ï¿½ï¿½ RANDOM
               </button>
             </div>
           </div>

@@ -10,7 +10,7 @@ namespace Gatrix.Unity.SDK.Editor
     /// <summary>
     /// Custom property drawer for GatrixBehaviour.SdkEventEntry.
     /// Displays: [✓] Event Name
-    ///              └─ UnityEvent callbacks (foldable)
+    ///              `-- UnityEvent callbacks (foldable)
     /// </summary>
     [CustomPropertyDrawer(typeof(GatrixBehaviour.SdkEventEntry))]
     public class SdkEventEntryDrawer : PropertyDrawer

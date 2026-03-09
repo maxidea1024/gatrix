@@ -25,7 +25,7 @@ namespace Gatrix.Unity.SDK.Editor
         {
             bool isDark = EditorGUIUtility.isProSkin;
 
-            // ── Hero Banner ─────────────────────────────────────
+            // -- Hero Banner -------------------------------------
             GatrixEditorStyle.DrawWindowHeader("Gatrix SDK", "Feature Flag Management for Unity", "\u25c6", 60);
 
             // Version badge (right-aligned below header)
@@ -45,7 +45,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             EditorGUILayout.Space(4);
 
-            // ── SDK Info ────────────────────────────────────────
+            // -- SDK Info ----------------------------------------
             GatrixEditorStyle.DrawSectionHeader("SDK Information", GatrixEditorStyle.AccentBlue);
             EditorGUILayout.Space(2);
 
@@ -56,7 +56,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             EditorGUILayout.Space(6);
 
-            // ── Runtime Status ──────────────────────────────────
+            // -- Runtime Status ----------------------------------
             GatrixEditorStyle.DrawSectionHeader("Runtime Status", GatrixEditorStyle.AccentGreen);
             EditorGUILayout.Space(2);
 
@@ -87,7 +87,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             EditorGUILayout.Space(12);
 
-            // ── Buttons ─────────────────────────────────────────
+            // -- Buttons -----------------------------------------
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(12);
             if (GUILayout.Button("Setup Wizard", GUILayout.Height(28)))

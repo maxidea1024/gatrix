@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: GatrixSettings
   m_EditorClassIdentifier: Gatrix.Unity.SDK::Gatrix.Unity.SDK.GatrixSettings
   _apiUrl: http://localhost:3400/api/v1
-  _apiToken: gatrix-unsecured-edge-api-token
+  _apiToken: unsecured-edge-api-token
   _appName: unity-example-app
-  _environment: development
   _userId: 
   _sessionId: 
   _contextProperties:

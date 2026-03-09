@@ -34,6 +34,7 @@ interface EvaluationFlag {
   valueType?: string;
   enabledValue?: any;
   disabledValue?: any;
+  valueSource?: 'environment' | 'flag';
   version?: number;
   compact?: boolean; // true when evaluation data is stripped (disabled flag in compact mode)
 }

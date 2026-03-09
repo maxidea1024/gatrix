@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import { sdkManager } from '../services/sdk-manager';
-import { environmentRegistry } from '../services/environment-registry';
 import { EvaluationUtils } from '@gatrix/evaluator';
 
 import { createLogger } from '../config/logger';
@@ -45,11 +44,9 @@ export async function performEvaluation(
       cacheKey: contextCacheKey,
     } = clientContext;
 
-    // Use pre-resolved cacheKey from middleware, or resolve here as fallback
-    const cacheKey =
-      contextCacheKey ||
-      environmentRegistry.resolveEnvironmentToken(environmentId) ||
-      environmentId;
+    // Use pre-resolved cacheKey from middleware, or environmentId as fallback
+    // SDK cache uses environmentId as key (no longer token-based)
+    const cacheKey = contextCacheKey || environmentId;
 
     // 1. Extract context and flag names from request
     const { context, flagNames } = EvaluationUtils.extractFromRequest(req);
@@ -78,23 +75,11 @@ export async function performEvaluation(
       const flagDef = sdk.featureFlag.getFlagByName(cacheKey, key);
 
       // Format result using common utility
+      // Pass the cached flag definition directly to preserve all fields (especially valueSource)
       results[key] = EvaluationUtils.formatResult(
         key,
         result,
-        {
-          id: flagDef?.id,
-          valueType: flagDef?.valueType,
-          version: flagDef?.version,
-          impressionDataEnabled: flagDef?.impressionDataEnabled,
-          valueSource: flagDef?.valueSource,
-          // SDK already resolved these, but we pass them if needed for formatResult
-          enabledValue: result.enabled
-            ? (result.variant?.value ?? undefined)
-            : undefined,
-          disabledValue: !result.enabled
-            ? (result.variant?.value ?? undefined)
-            : undefined,
-        },
+        flagDef || {},
         environmentId
       );
     }

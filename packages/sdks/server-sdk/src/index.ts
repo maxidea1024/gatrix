@@ -8,8 +8,12 @@ export { GatrixServerSDK } from './gatrix-server-sdk';
 // Export types
 export * from './types';
 
-// Export token provider interface (for Edge multi-env)
-export { ITokenProvider } from './utils/token-provider';
+// Export environment provider interface (for Edge multi-env)
+export {
+  IEnvironmentProvider,
+  EnvironmentEntry,
+  ITokenProvider, // Legacy alias
+} from './utils/environment-provider';
 
 // Export maintenance watcher types
 export {

@@ -188,7 +188,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
 
             // GatrixBehaviour.Client returns the offline editor client in Edit Mode
-            // and the live runtime client in Play Mode — no special-casing needed here.
+            // and the live runtime client in Play Mode - no special-casing needed here.
             var client = GatrixBehaviour.Client;
             if (client == null)
             {
@@ -216,7 +216,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
             else
             {
-                // Edit Mode: GatrixEditorClient loaded cached flags — just display them
+                // Edit Mode: GatrixEditorClient loaded cached flags - just display them
                 DrawFlagStatusForMode(features, flagName, false, "Cached");
             }
         }

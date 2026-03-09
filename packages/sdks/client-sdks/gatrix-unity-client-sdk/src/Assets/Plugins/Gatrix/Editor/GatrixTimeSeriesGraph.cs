@@ -128,7 +128,7 @@ namespace Gatrix.Unity.SDK.Editor
             maxY = Mathf.Ceil(maxY * 1.25f);
             if (maxY < 1f) maxY = 1f;
 
-            // ── GL Rendering (only on Repaint) ──
+            // -- GL Rendering (only on Repaint) --
             if (Event.current.type == EventType.Repaint)
             {
                 GetGLMaterial().SetPass(0);
@@ -168,7 +168,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GL.PopMatrix();
             }
 
-            // ── GUI labels (outside GL) ──
+            // -- GUI labels (outside GL) --
             var labelStyle = new GUIStyle(EditorStyles.miniLabel)
             {
                 fontSize = 9,
@@ -306,7 +306,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
             else if (!started)
             {
-                // No visible points — draw flat line at prevVal
+                // No visible points - draw flat line at prevVal
                 float py = YMap(prevVal, maxY, chart);
                 if (prevVal > 0)
                 {
@@ -316,7 +316,7 @@ namespace Gatrix.Unity.SDK.Editor
             }
         }
 
-        // ── GL Primitives ──
+        // -- GL Primitives --
 
         private static void DrawQuad(Rect r, Color c)
         {
@@ -348,7 +348,7 @@ namespace Gatrix.Unity.SDK.Editor
             DrawGLLine(x, y0, x, y1, c);
         }
 
-        // ── Coordinate Mapping ──
+        // -- Coordinate Mapping --
 
         private static float XMap(float time, float tStart, float tEnd, Rect chart)
         {

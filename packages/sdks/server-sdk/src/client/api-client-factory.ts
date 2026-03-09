@@ -1,10 +1,12 @@
 /**
  * API Client Factory
- * Creates and caches ApiClient instances per token for multi-token mode.
- * In single-token mode, the default ApiClient is reused.
+ * Creates and caches ApiClient instances per environment for multi-environment mode.
+ * In single-environment mode, the default ApiClient is reused.
  *
- * Each token gets its own ApiClient to avoid ETag cache collisions
+ * Each environment gets its own ApiClient to avoid ETag cache collisions
  * when the same endpoint is called with different tokens.
+ *
+ * DESIGN: environmentId is the lookup key, token is used internally for API auth.
  */
 
 import { ApiClient, ApiClientConfig } from './api-client';
@@ -12,7 +14,9 @@ import { ApiClient, ApiClientConfig } from './api-client';
 export class ApiClientFactory {
   private readonly defaultToken: string;
   private readonly defaultClient: ApiClient;
-  private readonly clientsByToken: Map<string, ApiClient> = new Map();
+  private readonly clientsByEnv: Map<string, ApiClient> = new Map();
+  // environmentId → token mapping for creating ApiClients
+  private readonly envTokenMap: Map<string, string> = new Map();
   private readonly baseConfig: Omit<ApiClientConfig, 'apiToken'>;
 
   constructor(
@@ -24,29 +28,70 @@ export class ApiClientFactory {
     this.defaultToken = defaultToken;
     this.baseConfig = baseConfig;
 
-    // Register default client
-    this.clientsByToken.set(defaultToken, defaultClient);
+    // Register default client under its token
+    this.clientsByEnv.set(defaultToken, defaultClient);
+    this.envTokenMap.set(defaultToken, defaultToken);
   }
 
   /**
-   * Get ApiClient for a specific token.
-   * Returns the default client if token matches defaultToken.
-   * Creates a new client lazily for other tokens.
+   * Register an environment with its associated API token.
+   * Must be called before getClient() for non-default environments.
    */
-  getClient(token?: string): ApiClient {
-    const resolvedToken = token || this.defaultToken;
+  registerEnvironment(environmentId: string, token: string): void {
+    this.envTokenMap.set(environmentId, token);
+  }
 
-    if (resolvedToken === this.defaultToken) {
+  /**
+   * Remap the default client from token-based key to real environmentId.
+   * Called after /ready endpoint resolves the actual environmentId.
+   * The default client remains the same, but is now also accessible by the real environmentId.
+   */
+  remapDefaultEnvironment(environmentId: string): void {
+    // Register the real environmentId → token mapping
+    this.envTokenMap.set(environmentId, this.defaultToken);
+    // Register the default client under the real environmentId
+    this.clientsByEnv.set(environmentId, this.defaultClient);
+  }
+
+  /**
+   * Unregister an environment and remove its cached client.
+   */
+  unregisterEnvironment(environmentId: string): void {
+    if (environmentId !== this.defaultToken) {
+      this.clientsByEnv.delete(environmentId);
+      this.envTokenMap.delete(environmentId);
+    }
+  }
+
+  /**
+   * Get ApiClient for a specific environment.
+   * Returns the default client if environmentId matches defaultToken.
+   * Creates a new client lazily for other environments using the registered token.
+   */
+  getClient(environmentId?: string): ApiClient {
+    const resolvedEnv = environmentId || this.defaultToken;
+
+    if (resolvedEnv === this.defaultToken) {
       return this.defaultClient;
     }
 
-    let client = this.clientsByToken.get(resolvedToken);
+    let client = this.clientsByEnv.get(resolvedEnv);
     if (!client) {
-      client = new ApiClient({
-        ...this.baseConfig,
-        apiToken: resolvedToken,
-      });
-      this.clientsByToken.set(resolvedToken, client);
+      // Look up the token for this environment
+      const token = this.envTokenMap.get(resolvedEnv);
+      if (!token) {
+        // Fallback: use environmentId as token (backward compatibility)
+        client = new ApiClient({
+          ...this.baseConfig,
+          apiToken: resolvedEnv,
+        });
+      } else {
+        client = new ApiClient({
+          ...this.baseConfig,
+          apiToken: token,
+        });
+      }
+      this.clientsByEnv.set(resolvedEnv, client);
     }
 
     return client;
@@ -63,15 +108,15 @@ export class ApiClientFactory {
    * Get all cached ApiClient instances
    */
   getAllClients(): Map<string, ApiClient> {
-    return this.clientsByToken;
+    return this.clientsByEnv;
   }
 
   /**
-   * Remove a cached client for a token (e.g., when token is removed)
+   * Remove a cached client for an environment (e.g., when environment is removed)
    */
-  removeClient(token: string): void {
-    if (token !== this.defaultToken) {
-      this.clientsByToken.delete(token);
+  removeClient(environmentId: string): void {
+    if (environmentId !== this.defaultToken) {
+      this.clientsByEnv.delete(environmentId);
     }
   }
 
@@ -79,9 +124,9 @@ export class ApiClientFactory {
    * Clear all non-default clients
    */
   clearNonDefaultClients(): void {
-    for (const [token] of this.clientsByToken) {
-      if (token !== this.defaultToken) {
-        this.clientsByToken.delete(token);
+    for (const [envId] of this.clientsByEnv) {
+      if (envId !== this.defaultToken) {
+        this.clientsByEnv.delete(envId);
       }
     }
   }

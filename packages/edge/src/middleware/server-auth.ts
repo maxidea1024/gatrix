@@ -48,11 +48,11 @@ export function serverAuth(
   const unsecuredMatch = apiToken.match(UNSECURED_TOKEN_REGEX);
   if (unsecuredMatch) {
     const [, , , envId] = unsecuredMatch;
-    // The token IS the cache key for the SDK
-    req.cacheKey = apiToken;
     // Resolve actual environment ID from the registry
     req.environmentId =
       environmentRegistry.resolveEnvironmentId(envId) || envId;
+    // SDK cache uses environmentId as key (no longer token-based)
+    req.cacheKey = req.environmentId;
     req.applicationName =
       (req.headers['x-application-name'] as string) || 'unknown';
     return next();
@@ -60,9 +60,9 @@ export function serverAuth(
 
   // 2. Legacy unsecured tokens → resolve to development
   if (LEGACY_TOKENS[apiToken]) {
-    const cacheKey =
-      environmentRegistry.resolveEnvironmentToken(LEGACY_ENV_NAME);
-    if (!cacheKey) {
+    // Resolve actual environment ID from the registry
+    const envId = environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME);
+    if (!envId) {
       sendUnauthorized(
         res,
         'Could not resolve environment for legacy token',
@@ -70,11 +70,9 @@ export function serverAuth(
       );
       return;
     }
-    req.cacheKey = cacheKey;
-    // Get actual environment ID
-    req.environmentId =
-      environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME) ||
-      LEGACY_ENV_NAME;
+    req.environmentId = envId;
+    // SDK cache uses environmentId as key (no longer token-based)
+    req.cacheKey = envId;
     req.applicationName =
       (req.headers['x-application-name'] as string) || 'unknown';
     return next();
@@ -103,8 +101,10 @@ export function serverAuth(
     return;
   }
 
-  const cacheKey = environmentRegistry.resolveEnvironmentToken(tokenEnvId);
-  if (!cacheKey) {
+  // Resolve actual environment ID from the registry
+  const envId =
+    environmentRegistry.resolveEnvironmentId(tokenEnvId) || tokenEnvId;
+  if (!environmentRegistry.hasEnvironment(envId)) {
     sendUnauthorized(
       res,
       `Could not resolve environment: ${tokenEnvId}`,
@@ -113,9 +113,9 @@ export function serverAuth(
     return;
   }
 
-  req.cacheKey = cacheKey;
-  req.environmentId =
-    environmentRegistry.resolveEnvironmentId(tokenEnvId) || tokenEnvId;
+  req.environmentId = envId;
+  // SDK cache uses environmentId as key (no longer token-based)
+  req.cacheKey = envId;
   req.applicationName =
     (req.headers['x-application-name'] as string) || 'unknown';
 

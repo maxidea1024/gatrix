@@ -19,10 +19,10 @@ export class VarsService extends BaseEnvironmentService<
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    defaultToken: string,
+    defaultEnvironmentId: string,
     storage?: CacheStorageProvider
   ) {
-    super(apiClient, logger, defaultToken, storage);
+    super(apiClient, logger, defaultEnvironmentId, storage);
   }
 
   // ==================== Abstract Method Implementations ====================
@@ -51,7 +51,7 @@ export class VarsService extends BaseEnvironmentService<
    * @param environmentId environment ID (optional if envResolver can provide default)
    */
   getValue(key: string, environmentId?: string): string | null {
-    const env = environmentId || this.resolveToken(environmentId);
+    const env = environmentId || this.resolveEnvironment(environmentId);
     const item = this.getByKey(key, env);
     return item ? item.varValue : null;
   }
@@ -68,7 +68,7 @@ export class VarsService extends BaseEnvironmentService<
     try {
       const item = this.getByKey(
         key,
-        environmentId || this.resolveToken(environmentId)
+        environmentId || this.resolveEnvironment(environmentId)
       );
       if (item && (item.valueType === 'object' || item.valueType === 'array')) {
         return JSON.parse(value) as T;

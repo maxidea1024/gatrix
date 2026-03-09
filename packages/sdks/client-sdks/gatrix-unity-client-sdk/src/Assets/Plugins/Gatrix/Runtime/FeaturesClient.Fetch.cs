@@ -43,9 +43,7 @@ namespace Gatrix.Unity.SDK
 
                 // Build URL: {apiUrl}/client/features/eval
                 var urlBuilder = new StringBuilder(_config.ApiUrl);
-                urlBuilder.Append("/client/features/");
-                urlBuilder.Append(Uri.EscapeDataString(_config.Environment));
-                urlBuilder.Append("/eval");
+                urlBuilder.Append("/client/features/eval");
 
                 HttpRequestMessage request;
                 if (FeaturesConfig.UsePOSTRequests)
@@ -157,7 +155,6 @@ namespace Gatrix.Unity.SDK
                     var data = GatrixJson.DeserializeFlagsResponse(json);
 
                     _devLog.Log($"fetchFlags: parsed response. success={data?.Success}, flagCount={data?.Data?.Flags?.Count ?? 0}");
-
 
                     if (data != null && data.Success && data.Data?.Flags != null)
                     {
@@ -365,7 +362,7 @@ namespace Gatrix.Unity.SDK
 
         /// <summary>
         /// Fetch only specific flag keys from the server (partial fetch).
-        /// Does NOT send or update ETag — the existing ETag remains intact
+        /// Does NOT send or update ETag - the existing ETag remains intact
         /// for the next full polling cycle.
         /// </summary>
         private async UniTask FetchPartialFlagsAsync(HashSet<string> flagKeys)
@@ -389,9 +386,7 @@ namespace Gatrix.Unity.SDK
 
                 // Build URL with flagNames parameter
                 var urlBuilder = new StringBuilder(_config.ApiUrl);
-                urlBuilder.Append("/client/features/");
-                urlBuilder.Append(Uri.EscapeDataString(_config.Environment));
-                urlBuilder.Append("/eval");
+                urlBuilder.Append("/client/features/eval");
 
                 HttpRequestMessage request;
                 if (FeaturesConfig.UsePOSTRequests)
@@ -414,7 +409,7 @@ namespace Gatrix.Unity.SDK
                     request = new HttpRequestMessage(HttpMethod.Get, urlBuilder.ToString());
                 }
 
-                // Headers — NO If-None-Match (intentionally skip ETag for partial fetch)
+                // Headers - NO If-None-Match (intentionally skip ETag for partial fetch)
                 request.Headers.TryAddWithoutValidation("X-API-Token", _config.ApiToken);
                 request.Headers.TryAddWithoutValidation("X-Application-Name", _config.AppName);
                 request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);

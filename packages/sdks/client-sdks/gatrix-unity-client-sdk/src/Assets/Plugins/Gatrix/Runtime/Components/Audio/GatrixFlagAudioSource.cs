@@ -1,5 +1,5 @@
 // GatrixFlagAudioSource - Control AudioSource properties via feature flags
-// More granular than GatrixFlagAudio (clip/play) — controls volume, pitch, etc.
+// More granular than GatrixFlagAudio (clip/play) - controls volume, pitch, etc.
 
 using System;
 using System.Collections.Generic;

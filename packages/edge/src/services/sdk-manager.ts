@@ -1,7 +1,8 @@
 import {
   GatrixServerSDK,
   GatrixSDKConfig,
-  ITokenProvider,
+  IEnvironmentProvider,
+  EnvironmentEntry,
 } from '@gatrix/server-sdk';
 import { config } from '../config/env';
 import { createLogger } from '../config/logger';
@@ -10,45 +11,69 @@ import { environmentRegistry } from './environment-registry';
 const logger = createLogger('SDKManager');
 
 /**
- * EdgeTokenProvider - Generates unsecured tokens from EnvironmentRegistry
+ * EdgeEnvironmentProvider - Generates environment entries from EnvironmentRegistry
  * for SDK's CacheManager multi-environment caching.
  *
+ * Each entry maps environmentId to its unsecured token for API authentication.
  * Token format: unsecured-{orgId}:{projectId}:{envId}-server-api-token
  * environmentRegistry is lazily read — returns empty list until initialized.
  */
-class EdgeTokenProvider implements ITokenProvider {
-  private previousTokens: Set<string> = new Set();
+class EdgeEnvironmentProvider implements IEnvironmentProvider {
+  private previousEntries: Map<string, EnvironmentEntry> = new Map();
+  private cachedEntries: EnvironmentEntry[] = [];
+  private dirty = true;
+  private unsubscribeTreeChanged: (() => void) | null = null;
 
-  getTokens(): string[] {
+  constructor() {
+    // Mark cache as dirty whenever the registry tree changes
+    this.unsubscribeTreeChanged = environmentRegistry.onTreeChanged(() => {
+      this.dirty = true;
+    });
+  }
+
+  getEnvironmentTokens(): EnvironmentEntry[] {
+    if (!this.dirty) {
+      return this.cachedEntries;
+    }
+
     const tree = environmentRegistry.getTree();
     if (tree.length === 0) {
-      return [];
+      this.cachedEntries = [];
+      this.dirty = false;
+      return this.cachedEntries;
     }
-    const tokens: string[] = [];
+    const entries: EnvironmentEntry[] = [];
     for (const org of tree) {
       for (const project of org.projects) {
         for (const env of project.environments) {
-          tokens.push(
-            `unsecured-${org.id}:${project.id}:${env.id}-server-api-token`
-          );
+          entries.push({
+            environmentId: env.id,
+            token: `unsecured-${org.id}:${project.id}:${env.id}-server-api-token`,
+          });
         }
       }
     }
-    return tokens;
+    this.cachedEntries = entries;
+    this.dirty = false;
+    return this.cachedEntries;
   }
 
-  onTokensChanged(
-    callback: (added: string[], removed: string[]) => void
+  onEnvironmentsChanged(
+    callback: (added: EnvironmentEntry[], removed: EnvironmentEntry[]) => void
   ): () => void {
     return environmentRegistry.onTreeChanged(() => {
-      const currentTokens = new Set(this.getTokens());
-      const added = [...currentTokens].filter(
-        (t) => !this.previousTokens.has(t)
+      // Invalidate cache first so getEnvironmentTokens rebuilds
+      this.dirty = true;
+      const currentEntries = new Map(
+        this.getEnvironmentTokens().map((e) => [e.environmentId, e])
       );
-      const removed = [...this.previousTokens].filter(
-        (t) => !currentTokens.has(t)
+      const added = [...currentEntries.values()].filter(
+        (e) => !this.previousEntries.has(e.environmentId)
       );
-      this.previousTokens = currentTokens;
+      const removed = [...this.previousEntries.values()].filter(
+        (e) => !currentEntries.has(e.environmentId)
+      );
+      this.previousEntries = currentEntries;
       if (added.length > 0 || removed.length > 0) {
         callback(added, removed);
       }
@@ -78,7 +103,7 @@ class SDKManager {
   private async doInitialize(): Promise<void> {
     logger.info('Initializing GatrixServerSDK...');
 
-    const tokenProvider = new EdgeTokenProvider();
+    const environmentProvider = new EdgeEnvironmentProvider();
 
     const sdkConfig: GatrixSDKConfig = {
       apiUrl: config.gatrixUrl,
@@ -89,8 +114,8 @@ class SDKManager {
       service: config.service,
       group: config.group,
 
-      // Multi-environment token provider
-      tokenProvider,
+      // Multi-environment provider
+      environmentProvider,
 
       // Redis for PubSub (optional)
       redis: config.redis.host
@@ -148,7 +173,7 @@ class SDKManager {
       this.sdk = new GatrixServerSDK(sdkConfig);
       await this.sdk.initialize();
       logger.info('GatrixServerSDK initialized successfully', {
-        serverTokenCount: tokenProvider.getTokens().length,
+        environmentCount: environmentProvider.getEnvironmentTokens().length,
         syncMethod: config.cache.syncMethod,
       });
 

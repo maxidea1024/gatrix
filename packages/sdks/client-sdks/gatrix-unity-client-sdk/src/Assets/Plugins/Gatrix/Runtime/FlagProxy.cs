@@ -3,7 +3,7 @@
 // Architecture per CLIENT_SDK_SPEC:
 // - Holds only flagName + forceRealtime + client reference.
 // - ALL property reads and variation methods delegate to the client.
-// - No deep copy of flag data — always reads live state from FeaturesClient cache.
+// - No deep copy of flag data - always reads live state from FeaturesClient cache.
 // - isRealtime property indicates the proxy's operational mode.
 // - Client is always present (never null).
 
@@ -14,7 +14,7 @@ namespace Gatrix.Unity.SDK
     /// <summary>
     /// Convenience wrapper for accessing flag values.
     /// Delegates all logic to FeaturesClient via IVariationProvider.
-    /// No internal flag copy — always reads from the client's cache.
+    /// No internal flag copy - always reads from the client's cache.
     /// </summary>
     public class FlagProxy
     {

@@ -29,7 +29,7 @@ x-common-deploy: &common-deploy
   restart_policy:
     condition: on-failure
     delay: 5s
-    max_attempts: 3
+    max_attempts: 10
     window: 120s
 
 x-logging: &default-logging
@@ -48,19 +48,16 @@ services:
     image: mysql:8.0
     command: --innodb-use-native-aio=0
     environment:
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-gatrix_rootpassword}
       MYSQL_DATABASE: ${DB_NAME:-gatrix}
       MYSQL_USER: ${DB_USER:-gatrix_user}
-      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+      MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
     volumes:
       - mysql_data:/var/lib/mysql
       - ../docker/mysql/init:/docker-entrypoint-initdb.d:ro
       - ../docker/mysql/conf.d:/etc/mysql/conf.d:ro
     networks:
       - gatrix-internal
-    secrets:
-      - db_root_password
-      - db_password
     deploy:
       mode: replicated
       replicas: 1
@@ -82,7 +79,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
     networks:
@@ -103,30 +100,30 @@ services:
       start_period: 10s
     logging: *default-logging
 
-  clickhouse:
-    image: clickhouse/clickhouse-server:24.12.2.29
-    volumes:
-      - clickhouse_data:/var/lib/clickhouse
-    networks:
-      - gatrix-internal
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      resources:
-        limits:
-          memory: 4G
-        reservations:
-          memory: 1G
-    healthcheck:
-      test: ['CMD-SHELL', 'wget --spider -q http://127.0.0.1:8123/ping']
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-    logging: *default-logging
+  # clickhouse:
+  #   image: clickhouse/clickhouse-server:24.12.2.29
+  #   volumes:
+  #     - clickhouse_data:/var/lib/clickhouse
+  #   networks:
+  #     - gatrix-internal
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     placement:
+  #       constraints:
+  #         - node.role == manager
+  #     resources:
+  #       limits:
+  #         memory: 4G
+  #       reservations:
+  #         memory: 1G
+  #   healthcheck:
+  #     test: ['CMD-SHELL', 'wget --spider -q http://127.0.0.1:8123/ping']
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 60s
+  #   logging: *default-logging
 
   etcd:
     image: quay.io/coreos/etcd:v3.5.12
@@ -174,19 +171,20 @@ services:
       DB_PORT: 3306
       DB_NAME: ${DB_NAME:-gatrix}
       DB_USER: ${DB_USER:-gatrix_user}
-      DB_PASSWORD_FILE: /run/secrets/db_password
+      DB_PASSWORD: ${DB_PASSWORD:-gatrix_password}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      JWT_SECRET_FILE: /run/secrets/jwt_secret
-      JWT_REFRESH_SECRET_FILE: /run/secrets/jwt_refresh_secret
-      SESSION_SECRET_FILE: /run/secrets/session_secret
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-super-secret-refresh-key}
+      SESSION_SECRET: ${SESSION_SECRET:-your-super-secret-session-key}
       CORS_ORIGIN: '*'
       DISABLE_X_POWERED_BY: 'true'
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
       MONITORING_ENABLED: 'true'
+      DISABLE_RATE_LIMIT: 'true'
       CHAT_SERVER_URL: http://chat-server:5100
-      SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-redis}
+      SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-etcd}
       ETCD_HOSTS: http://etcd:2379
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
@@ -198,18 +196,10 @@ services:
     networks:
       - gatrix-internal
       - gatrix-public
-    secrets:
-      - db_password
-      - jwt_secret
-      - jwt_refresh_secret
-      - session_secret
     deploy:
       <<: *common-deploy
       mode: replicated
-      replicas: ${BACKEND_REPLICAS:-2}
-      placement:
-        constraints:
-          - node.labels.service == backend
+      replicas: ${BACKEND_REPLICAS:-1}
       resources:
         limits:
           memory: 1G
@@ -240,10 +230,7 @@ services:
     deploy:
       <<: *common-deploy
       mode: replicated
-      replicas: ${FRONTEND_REPLICAS:-2}
-      placement:
-        constraints:
-          - node.labels.service != backend
+      replicas: ${FRONTEND_REPLICAS:-1}
       resources:
         limits:
           memory: 256M
@@ -257,163 +244,150 @@ services:
       start_period: 30s
     logging: *default-logging
 
-  event-lens:
-    image: uwocn.tencentcloudcr.com/uwocn/gatrix-event-lens:${GATRIX_VERSION:-latest}
-    environment:
-      NODE_ENV: production
-      LOG_FORMAT: json
-      LOG_SERVICE_NAME: gatrix-event-lens
-      PORT: 5200
-      CLICKHOUSE_HOST: clickhouse
-      CLICKHOUSE_PORT: 8123
-      CLICKHOUSE_DATABASE: event_lens
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
-      MYSQL_DATABASE: ${DB_NAME:-gatrix}
-      MYSQL_USER: ${DB_USER:-gatrix_user}
-      MYSQL_PASSWORD_FILE: /run/secrets/db_password
-      MONITORING_ENABLED: 'true'
-    volumes:
-      - event_lens_logs:/app/logs
-    networks:
-      - gatrix-internal
-      - gatrix-public
-    secrets:
-      - db_password
-    deploy:
-      <<: *common-deploy
-      mode: replicated
-      replicas: ${EVENT_LENS_REPLICAS:-1}
-      placement:
-        constraints:
-          - node.labels.service != backend
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 128M
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'node',
-          '-e',
-          "require('http').get('http://127.0.0.1:5200/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-    logging: *default-logging
+  # event-lens:
+  #   image: uwocn.tencentcloudcr.com/uwocn/gatrix-event-lens:${GATRIX_VERSION:-latest}
+  #   environment:
+  #     NODE_ENV: production
+  #     LOG_FORMAT: json
+  #     LOG_SERVICE_NAME: gatrix-event-lens
+  #     PORT: 5200
+  #     CLICKHOUSE_HOST: clickhouse
+  #     CLICKHOUSE_PORT: 8123
+  #     CLICKHOUSE_DATABASE: event_lens
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #     REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+  #     MYSQL_HOST: mysql
+  #     MYSQL_PORT: 3306
+  #     MYSQL_DATABASE: ${DB_NAME:-gatrix}
+  #     MYSQL_USER: ${DB_USER:-gatrix_user}
+  #     MYSQL_PASSWORD_FILE: /run/secrets/db_password
+  #     MONITORING_ENABLED: 'true'
+  #   volumes:
+  #     - event_lens_logs:/app/logs
+  #   networks:
+  #     - gatrix-internal
+  #     - gatrix-public
+  #   secrets:
+  #     - db_password
+  #   deploy:
+  #     <<: *common-deploy
+  #     mode: replicated
+  #     replicas: ${EVENT_LENS_REPLICAS:-1}
+  #     resources:
+  #       limits:
+  #         memory: 512M
+  #       reservations:
+  #         memory: 128M
+  #   healthcheck:
+  #     test:
+  #       [
+  #         'CMD',
+  #         'node',
+  #         '-e',
+  #         "require('http').get('http://127.0.0.1:5200/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))",
+  #       ]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 60s
+  #   logging: *default-logging
 
-  event-lens-worker:
-    image: uwocn.tencentcloudcr.com/uwocn/gatrix-event-lens:${GATRIX_VERSION:-latest}
-    command: ['node', 'packages/event-lens/dist/worker.js']
-    environment:
-      NODE_ENV: production
-      LOG_FORMAT: json
-      LOG_SERVICE_NAME: gatrix-event-lens-worker
-      CLICKHOUSE_HOST: clickhouse
-      CLICKHOUSE_PORT: 8123
-      CLICKHOUSE_DATABASE: event_lens
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
-      MYSQL_DATABASE: ${DB_NAME:-gatrix}
-      MYSQL_USER: ${DB_USER:-gatrix_user}
-      MYSQL_PASSWORD_FILE: /run/secrets/db_password
-      WORKER_BATCH_SIZE: ${WORKER_BATCH_SIZE:-1000}
-      WORKER_BATCH_TIMEOUT: ${WORKER_BATCH_TIMEOUT:-5000}
-      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-10}
-    volumes:
-      - event_lens_logs:/app/logs
-    networks:
-      - gatrix-internal
-    secrets:
-      - db_password
-    deploy:
-      <<: *common-deploy
-      mode: replicated
-      replicas: ${EVENT_LENS_WORKER_REPLICAS:-2}
-      placement:
-        constraints:
-          - node.labels.service != backend
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 128M
-    logging: *default-logging
+  # event-lens-worker:
+  #   image: uwocn.tencentcloudcr.com/uwocn/gatrix-event-lens:${GATRIX_VERSION:-latest}
+  #   command: ['node', 'packages/event-lens/dist/worker.js']
+  #   environment:
+  #     NODE_ENV: production
+  #     LOG_FORMAT: json
+  #     LOG_SERVICE_NAME: gatrix-event-lens-worker
+  #     CLICKHOUSE_HOST: clickhouse
+  #     CLICKHOUSE_PORT: 8123
+  #     CLICKHOUSE_DATABASE: event_lens
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #     REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+  #     MYSQL_HOST: mysql
+  #     MYSQL_PORT: 3306
+  #     MYSQL_DATABASE: ${DB_NAME:-gatrix}
+  #     MYSQL_USER: ${DB_USER:-gatrix_user}
+  #     MYSQL_PASSWORD_FILE: /run/secrets/db_password
+  #     WORKER_BATCH_SIZE: ${WORKER_BATCH_SIZE:-1000}
+  #     WORKER_BATCH_TIMEOUT: ${WORKER_BATCH_TIMEOUT:-5000}
+  #     WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-10}
+  #   volumes:
+  #     - event_lens_logs:/app/logs
+  #   networks:
+  #     - gatrix-internal
+  #   secrets:
+  #     - db_password
+  #   deploy:
+  #     <<: *common-deploy
+  #     mode: replicated
+  #     replicas: ${EVENT_LENS_WORKER_REPLICAS:-1}
+  #     resources:
+  #       limits:
+  #         memory: 512M
+  #       reservations:
+  #         memory: 128M
+  #   logging: *default-logging
 
-  chat-server:
-    image: uwocn.tencentcloudcr.com/uwocn/gatrix-chat-server:${GATRIX_VERSION:-latest}
-    environment:
-      NODE_ENV: production
-      LOG_FORMAT: json
-      LOG_SERVICE_NAME: gatrix-chat-server
-      PORT: 5100
-      HOST: 0.0.0.0
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_NAME: ${CHAT_DB_NAME:-gatrix_chat}
-      DB_USER: ${DB_USER:-gatrix_user}
-      DB_PASSWORD_FILE: /run/secrets/db_password
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      REDIS_DB: 1
-      JWT_SECRET_FILE: /run/secrets/jwt_secret
-      CORS_ORIGIN: '*'
-      CLUSTER_ENABLED: 'true'
-      STICKY_SESSION: 'true'
-      BROADCAST_BATCH_SIZE: ${CHAT_BROADCAST_BATCH_SIZE:-1000}
-      USE_MESSAGE_PACK: 'true'
-      BROADCAST_COMPRESSION: 'true'
-      WS_MAX_CONNECTIONS: ${CHAT_WS_MAX_CONNECTIONS:-10000}
-      MONITORING_ENABLED: 'true'
-      METRICS_PORT: 9090
-      GATRIX_API_URL: http://backend:5000
-      GATRIX_API_SECRET_FILE: /run/secrets/api_secret
-    volumes:
-      - chat_uploads:/app/uploads
-      - chat_logs:/app/logs
-    networks:
-      - gatrix-internal
-      - gatrix-public
-    secrets:
-      - db_password
-      - jwt_secret
-      - api_secret
-    deploy:
-      <<: *common-deploy
-      mode: replicated
-      replicas: ${CHAT_SERVER_REPLICAS:-2}
-      placement:
-        constraints:
-          - node.labels.service != backend
-      resources:
-        limits:
-          memory: 1G
-        reservations:
-          memory: 256M
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'node',
-          '-e',
-          "require('http').get('http://127.0.0.1:5100/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-    logging: *default-logging
+  # chat-server:
+  #   image: uwocn.tencentcloudcr.com/uwocn/gatrix-chat-server:${GATRIX_VERSION:-latest}
+  #   environment:
+  #     NODE_ENV: production
+  #     LOG_FORMAT: json
+  #     LOG_SERVICE_NAME: gatrix-chat-server
+  #     PORT: 5100
+  #     HOST: 0.0.0.0
+  #     DB_HOST: mysql
+  #     DB_PORT: 3306
+  #     DB_NAME: ${CHAT_DB_NAME:-gatrix_chat}
+  #     DB_USER: ${DB_USER:-gatrix_user}
+  #     DB_PASSWORD: ${DB_PASSWORD:-gatrix_password}
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #     REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+  #     REDIS_DB: 1
+  #     JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key}
+  #     CORS_ORIGIN: '*'
+  #     CLUSTER_ENABLED: 'true'
+  #     STICKY_SESSION: 'true'
+  #     BROADCAST_BATCH_SIZE: ${CHAT_BROADCAST_BATCH_SIZE:-1000}
+  #     USE_MESSAGE_PACK: 'true'
+  #     BROADCAST_COMPRESSION: 'true'
+  #     WS_MAX_CONNECTIONS: ${CHAT_WS_MAX_CONNECTIONS:-10000}
+  #     MONITORING_ENABLED: 'true'
+  #     METRICS_PORT: 9090
+  #     GATRIX_API_URL: http://backend:5000
+  #     GATRIX_API_SECRET: ${GATRIX_API_SECRET:-shared-secret-between-servers}
+  #   volumes:
+  #     - chat_uploads:/app/uploads
+  #     - chat_logs:/app/logs
+  #   networks:
+  #     - gatrix-internal
+  #     - gatrix-public
+  #   deploy:
+  #     <<: *common-deploy
+  #     mode: replicated
+  #     replicas: ${CHAT_SERVER_REPLICAS:-1}
+  #     resources:
+  #       limits:
+  #         memory: 1G
+  #       reservations:
+  #         memory: 256M
+  #   healthcheck:
+  #     test:
+  #       [
+  #         'CMD',
+  #         'node',
+  #         '-e',
+  #         "require('http').get('http://127.0.0.1:5100/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))",
+  #       ]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 60s
+  #   logging: *default-logging
 
   edge:
     image: uwocn.tencentcloudcr.com/uwocn/gatrix-edge:${GATRIX_VERSION:-latest}
@@ -423,7 +397,8 @@ services:
       EDGE_PORT: 1337
       EDGE_METRICS_PORT: 9337
       GATRIX_URL: http://backend:5000
-      EDGE_API_TOKEN_FILE: /run/secrets/edge_api_token
+      EDGE_API_TOKEN: ${EDGE_API_TOKEN:-gatrix-edge-internal-bypass-token}
+      EDGE_BYPASS_TOKEN: ${EDGE_BYPASS_TOKEN:-gatrix-edge-internal-bypass-token}
       EDGE_APPLICATION_NAME: ${EDGE_APPLICATION_NAME:-edge-server}
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -441,15 +416,10 @@ services:
     networks:
       - gatrix-internal
       - gatrix-public
-    secrets:
-      - edge_api_token
     deploy:
       <<: *common-deploy
       mode: replicated
-      replicas: ${EDGE_REPLICAS:-2}
-      placement:
-        constraints:
-          - node.labels.service != backend
+      replicas: ${EDGE_REPLICAS:-1}
       resources:
         limits:
           memory: 256M
@@ -529,86 +499,86 @@ services:
           memory: 128M
     logging: *default-logging
 
-  loki:
-    image: grafana/loki:latest
-    command: -config.file=/etc/loki/local-config.yaml
-    volumes:
-      - loki_data:/loki
-      - ../docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
-    networks:
-      - gatrix-internal
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 128M
-    healthcheck:
-      test: ['CMD-SHELL', 'wget --spider -q http://127.0.0.1:3100/ready']
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    logging: *default-logging
+  # loki:
+  #   image: grafana/loki:latest
+  #   command: -config.file=/etc/loki/local-config.yaml
+  #   volumes:
+  #     - loki_data:/loki
+  #     - ../docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
+  #   networks:
+  #     - gatrix-internal
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     placement:
+  #       constraints:
+  #         - node.role == manager
+  #     resources:
+  #       limits:
+  #         memory: 512M
+  #       reservations:
+  #         memory: 128M
+  #   healthcheck:
+  #     test: ['CMD-SHELL', 'wget --spider -q http://127.0.0.1:3100/ready']
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 30s
+  #   logging: *default-logging
 
   # ============================================
   # Cluster Management Tools
   # ============================================
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    command: -H unix:///var/run/docker.sock
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    networks:
-      - gatrix-public
-    ports:
-      - target: 9000
-        published: ${PORTAINER_PORT:-9000}
-        protocol: tcp
-        mode: ingress
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 64M
-    logging: *default-logging
+  # portainer:
+  #   image: portainer/portainer-ce:latest
+  #   command: -H unix:///var/run/docker.sock
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - portainer_data:/data
+  #   networks:
+  #     - gatrix-public
+  #   ports:
+  #     - target: 9000
+  #       published: ${PORTAINER_PORT:-9000}
+  #       protocol: tcp
+  #       mode: ingress
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     placement:
+  #       constraints:
+  #         - node.role == manager
+  #     resources:
+  #       limits:
+  #         memory: 256M
+  #       reservations:
+  #         memory: 64M
+  #   logging: *default-logging
 
-  visualizer:
-    image: dockersamples/visualizer:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - gatrix-public
-    ports:
-      - target: 8080
-        published: ${VISUALIZER_PORT:-8080}
-        protocol: tcp
-        mode: ingress
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 32M
-    logging: *default-logging
+  # visualizer:
+  #   image: dockersamples/visualizer:latest
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   networks:
+  #     - gatrix-public
+  #   ports:
+  #     - target: 8080
+  #       published: ${VISUALIZER_PORT:-8080}
+  #       protocol: tcp
+  #       mode: ingress
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     placement:
+  #       constraints:
+  #         - node.role == manager
+  #     resources:
+  #       limits:
+  #         memory: 128M
+  #       reservations:
+  #         memory: 32M
+  #   logging: *default-logging
 
   # ============================================
   # Load Balancer / Reverse Proxy
@@ -631,7 +601,8 @@ services:
     networks:
       - gatrix-public
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 1
       resources:
         limits:
           memory: 128M
@@ -664,16 +635,16 @@ volumes:
     driver: local
   redis_data:
     driver: local
-  clickhouse_data:
-    driver: local
+  # clickhouse_data:
+  #   driver: local
   etcd_data:
     driver: local
   backend_logs:
     driver: local
   backend_data:
     driver: local
-  event_lens_logs:
-    driver: local
+  # event_lens_logs:
+  #   driver: local
   chat_uploads:
     driver: local
   chat_logs:
@@ -684,8 +655,8 @@ volumes:
     driver: local
   grafana_data:
     driver: local
-  loki_data:
-    driver: local
+  # loki_data:
+  #   driver: local
   portainer_data:
     driver: local
 

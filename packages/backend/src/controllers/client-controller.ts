@@ -697,6 +697,11 @@ export class ClientController {
             valueType: dbFlag.valueType || 'string',
             enabledValue: resolvedEnabledValue,
             disabledValue: resolvedDisabledValue,
+            valueSource:
+              envSettings?.overrideEnabledValue ||
+              envSettings?.overrideDisabledValue
+                ? 'environment'
+                : 'flag',
             strategies:
               dbFlag.strategies?.map((s: any) => ({
                 name: s.strategyName,

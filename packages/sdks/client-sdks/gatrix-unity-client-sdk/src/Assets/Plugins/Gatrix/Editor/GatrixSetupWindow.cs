@@ -12,7 +12,6 @@ namespace Gatrix.Unity.SDK.Editor
         private string _apiUrl      = "";
         private string _apiToken    = "";
         private string _appName     = "";
-        private string _environment = "development";
 
         private bool   _showContext;
         private string _userId    = "";
@@ -66,7 +65,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             bool isDark = EditorGUIUtility.isProSkin;
 
-            // ── Title Bar (fixed 40px) ────────────────────────────
+            // -- Title Bar (fixed 40px) ----------------------------
             var titleRect = EditorGUILayout.GetControlRect(false, 40);
             if (Event.current.type == EventType.Repaint)
             {
@@ -86,7 +85,7 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUI.LabelField(new Rect(titleRect.x + 12, titleRect.y + 22, titleRect.width - 20, 14),
                 "SDK Configuration & Scene Setup", ts2);
 
-            // ── Scroll Content ──────────────────────────────────
+            // -- Scroll Content ----------------------------------
             _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
             EditorGUILayout.Space(8);
@@ -159,13 +158,10 @@ namespace Gatrix.Unity.SDK.Editor
                 new GUIContent("API Token", "Client API token from your Gatrix dashboard"), _apiToken);
             _appName = EditorGUILayout.TextField(
                 new GUIContent("App Name", "Your application name registered in Gatrix"), _appName);
-            _environment = EditorGUILayout.TextField(
-                new GUIContent("Environment", "Target environment"), _environment);
 
             var hasRequired = !string.IsNullOrWhiteSpace(_apiUrl)
                 && !string.IsNullOrWhiteSpace(_apiToken)
-                && !string.IsNullOrWhiteSpace(_appName)
-                && !string.IsNullOrWhiteSpace(_environment);
+                && !string.IsNullOrWhiteSpace(_appName);
 
             if (!hasRequired)
             {
@@ -275,7 +271,6 @@ namespace Gatrix.Unity.SDK.Editor
             so.FindProperty("_apiUrl").stringValue         = _apiUrl;
             so.FindProperty("_apiToken").stringValue       = _apiToken;
             so.FindProperty("_appName").stringValue        = _appName;
-            so.FindProperty("_environment").stringValue    = _environment;
             so.FindProperty("_userId").stringValue         = _userId;
             so.FindProperty("_sessionId").stringValue      = _sessionId;
             so.FindProperty("_enableDevMode").boolValue    = _enableDevMode;
@@ -380,7 +375,7 @@ namespace Gatrix.Unity.SDK.Editor
                 // Type dropdown
                 entry.Type = (ContextPropertyType)EditorGUILayout.EnumPopup(entry.Type, GUILayout.Width(65));
 
-                // Value field — show appropriate input based on type
+                // Value field - show appropriate input based on type
                 switch (entry.Type)
                 {
                     case ContextPropertyType.Boolean:

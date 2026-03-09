@@ -1,5 +1,5 @@
 // GatrixFlagGlobalShader - Set global shader properties via feature flags
-// Affects ALL materials that reference the global property — powerful for scene-wide A/B effects
+// Affects ALL materials that reference the global property - powerful for scene-wide A/B effects
 
 using System;
 using System.Collections.Generic;

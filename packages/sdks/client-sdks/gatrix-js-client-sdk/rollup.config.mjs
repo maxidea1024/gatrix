@@ -7,6 +7,13 @@ const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
 
 export default {
   input: 'src/index.ts',
+  onwarn(warning, warn) {
+    // Suppress "this is undefined" warnings from node_modules (e.g. @microsoft/fetch-event-source)
+    if (warning.code === 'THIS_IS_UNDEFINED' && warning.id?.includes('node_modules')) {
+      return;
+    }
+    warn(warning);
+  },
   output: [
     {
       file: 'dist/index.cjs.js',

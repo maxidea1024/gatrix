@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: GatrixSettings
   m_EditorClassIdentifier: Gatrix.Unity.SDK::Gatrix.Unity.SDK.GatrixSettings
   _apiUrl: http://localhost:3400/api/v1
-  _apiToken: gatrix-unsecured-edge-api-token
-  _appName: unity-example-app
-  _environment: development
+  _apiToken: unsecured-edge-api-token
+  _appName: unity-app
   _userId: 
   _sessionId: 
   _contextProperties: []
@@ -27,7 +26,7 @@ MonoBehaviour:
   _bootstrapOverride: 1
   _refreshInterval: 30
   _disableRefresh: 0
-  _explicitSyncMode: 0
+  _explicitSyncMode: 1
   _disableMetrics: 0
   _metricsIntervalInitial: 2
   _metricsInterval: 60

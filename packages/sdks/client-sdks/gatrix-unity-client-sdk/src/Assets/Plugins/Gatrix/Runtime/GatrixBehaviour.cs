@@ -80,7 +80,7 @@ namespace Gatrix.Unity.SDK
 #if UNITY_EDITOR
                 // In Edit Mode, return the offline client provided by GatrixEditorClient.
                 // The provider is injected at editor initialization to avoid a
-                // Runtime→Editor assembly reference (which is not allowed).
+                // Runtime->Editor assembly reference (which is not allowed).
                 if (!Application.isPlaying)
                     return _editorClientProvider?.Invoke();
 #endif

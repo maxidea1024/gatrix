@@ -18,7 +18,6 @@ export interface ExampleConfig {
   apiUrl: string;
   apiToken: string;
   appName: string;
-  environment: string;
 }
 
 // Default configuration
@@ -26,7 +25,6 @@ const DEFAULTS: ExampleConfig = {
   apiUrl: 'http://localhost:45000/api/v1',
   apiToken: 'unsecured-client-api-token',
   appName: 'test-app',
-  environment: 'development',
 };
 
 /**
@@ -60,9 +58,6 @@ export function parseConfig(): ExampleConfig {
     } else if (arg === '--app' && next) {
       config.appName = next;
       i++;
-    } else if (arg === '--env' && next) {
-      config.environment = next;
-      i++;
     }
   }
 
@@ -77,5 +72,4 @@ export function printConfig(config: ExampleConfig): void {
   console.log(`  API URL:     ${config.apiUrl}`);
   console.log(`  API Token:   ${config.apiToken.substring(0, 10)}...`);
   console.log(`  App Name:    ${config.appName}`);
-  console.log(`  Environment: ${config.environment}`);
 }

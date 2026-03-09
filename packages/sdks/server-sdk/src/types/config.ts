@@ -2,7 +2,10 @@
  * SDK Configuration Types
  */
 
-import { ITokenProvider } from '../utils/token-provider';
+import {
+  IEnvironmentProvider,
+  ITokenProvider,
+} from '../utils/environment-provider';
 
 export interface RedisConfig {
   host: string;
@@ -135,9 +138,12 @@ export interface GatrixSDKConfig {
   service?: string; // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
   group?: string; // Service group (e.g., 'kr', 'us', 'production')
 
-  // Optional - Token provider for multi-token mode (e.g., Edge server)
-  // When not provided, SDK uses SingleTokenProvider with the apiToken.
-  // Each token maps to exactly one environment (1:1).
+  // Optional - Environment provider for multi-environment mode (e.g., Edge server)
+  // When not provided, SDK uses SingleEnvironmentProvider with the apiToken.
+  // Each entry maps an environmentId to its API token.
+  environmentProvider?: IEnvironmentProvider;
+
+  // Legacy alias for backward compatibility
   tokenProvider?: ITokenProvider;
 
   // Optional - Cloud configuration for auto-detecting region
@@ -215,5 +221,6 @@ export interface GatrixSDKInitOptions {
   uses?: Partial<UsesConfig>;
   featureFlags?: Partial<FeatureFlagConfig>;
   cloud?: Partial<CloudConfig>;
-  tokenProvider?: ITokenProvider;
+  environmentProvider?: IEnvironmentProvider;
+  tokenProvider?: ITokenProvider; // Legacy alias
 }

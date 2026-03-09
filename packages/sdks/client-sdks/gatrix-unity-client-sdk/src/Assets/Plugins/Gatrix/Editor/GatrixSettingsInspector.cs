@@ -23,7 +23,6 @@ namespace Gatrix.Unity.SDK.Editor
         private SerializedProperty _apiUrl;
         private SerializedProperty _apiToken;
         private SerializedProperty _appName;
-        private SerializedProperty _environment;
         private SerializedProperty _userId;
         private SerializedProperty _sessionId;
         private SerializedProperty _contextProperties;
@@ -59,7 +58,6 @@ namespace Gatrix.Unity.SDK.Editor
             _apiUrl = serializedObject.FindProperty("_apiUrl");
             _apiToken = serializedObject.FindProperty("_apiToken");
             _appName = serializedObject.FindProperty("_appName");
-            _environment = serializedObject.FindProperty("_environment");
             _userId = serializedObject.FindProperty("_userId");
             _sessionId = serializedObject.FindProperty("_sessionId");
             _contextProperties = serializedObject.FindProperty("_contextProperties");
@@ -106,7 +104,7 @@ namespace Gatrix.Unity.SDK.Editor
                 EditorGUILayout.Space(2);
             }
 
-            // ── Required ──
+            // -- Required --
             _showRequired = DrawCollapsibleSectionBar("  Connection", _showRequired, null, GatrixEditorStyle.AccentBlue);
             if (_showRequired)
             {
@@ -114,11 +112,10 @@ namespace Gatrix.Unity.SDK.Editor
                 DrawRequiredField(_apiUrl, "API URL");
                 DrawRequiredField(_apiToken, "API Token");
                 DrawRequiredField(_appName, "App Name");
-                DrawRequiredField(_environment, "Environment");
                 GatrixEditorStyle.EndBox();
             }
 
-            // ── Context ──
+            // -- Context --
             _showContext = DrawCollapsibleSectionBar("  Initial Context", _showContext,
                 _contextProperties.arraySize > 0 ? $"{_contextProperties.arraySize} props" : "(optional)",
                 GatrixEditorStyle.AccentTeal);
@@ -134,7 +131,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.EndBox();
             }
 
-            // ── Bootstrap ──
+            // -- Bootstrap --
             string bootstrapBadge = string.IsNullOrWhiteSpace(_bootstrapJson.stringValue) ? null : "configured";
             _showBootstrap = DrawCollapsibleSectionBar("  Bootstrap", _showBootstrap, bootstrapBadge, new Color(0.80f, 0.60f, 0.20f));
             if (_showBootstrap)
@@ -175,7 +172,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.EndBox();
             }
 
-            // ── General ──
+            // -- General --
             _showGeneral = DrawCollapsibleSectionBar("  General", _showGeneral, null, GatrixEditorStyle.AccentGreen);
             if (_showGeneral)
             {
@@ -209,7 +206,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.EndBox();
             }
 
-            // ── Metrics ──
+            // -- Metrics --
             string metricsBadge = _offlineMode.boolValue ? "disabled (offline)" : null;
             _showMetrics = DrawCollapsibleSectionBar("  Metrics", _showMetrics, metricsBadge, new Color(0.60f, 0.40f, 0.90f));
             if (_showMetrics)
@@ -228,7 +225,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.EndBox();
             }
 
-            // ── Network (Polling + Retry + Streaming) ──
+            // -- Network (Polling + Retry + Streaming) --
             string networkBadge = _offlineMode.boolValue ? "disabled (offline)" : null;
             _showNetwork = DrawCollapsibleSectionBar("  Network", _showNetwork, networkBadge, new Color(0.85f, 0.55f, 0.20f));
             if (_showNetwork)
@@ -498,7 +495,7 @@ namespace Gatrix.Unity.SDK.Editor
                 // Type dropdown
                 EditorGUILayout.PropertyField(typeProp, GUIContent.none, GUILayout.Width(65));
 
-                // Value field — show appropriate input based on type
+                // Value field - show appropriate input based on type
                 var propType = (ContextPropertyType)typeProp.enumValueIndex;
                 switch (propType)
                 {

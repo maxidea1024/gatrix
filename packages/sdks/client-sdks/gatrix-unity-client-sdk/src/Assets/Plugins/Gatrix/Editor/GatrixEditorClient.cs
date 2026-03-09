@@ -54,7 +54,7 @@ namespace Gatrix.Unity.SDK.Editor
             if (behaviour?.Settings == null) return;
             if (!behaviour.Settings.IsValid(out _)) return;
 
-            // Read cached flags directly — if none exist, skip editor client creation
+            // Read cached flags directly - if none exist, skip editor client creation
             var cachedJson = FeaturesClient.EditorGetCachedFlagsJson();
             if (string.IsNullOrEmpty(cachedJson)) return;
 

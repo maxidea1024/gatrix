@@ -449,7 +449,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             EditorGUILayout.Space(20);
 
-            // ?€?€ Play button (centered) ?€?€
+            // ?ï¿½?ï¿½ Play button (centered) ?ï¿½?ï¿½
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             EditorGUILayout.BeginVertical(GUILayout.MaxWidth(320));
@@ -485,7 +485,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             EditorGUILayout.Space(16);
 
-            // ?€?€ Scene configuration summary (full width) ?€?€
+            // ?ï¿½?ï¿½ Scene configuration summary (full width) ?ï¿½?ï¿½
 #if UNITY_2023_1_OR_NEWER
             var behaviour = UnityEngine.Object.FindFirstObjectByType<GatrixBehaviour>();
 #else
@@ -505,10 +505,9 @@ namespace Gatrix.Unity.SDK.Editor
                 {
                     var s = behaviour.Settings;
 
-                    // ?€?€ Connection ?€?€
+                    // ?ï¿½?ï¿½ Connection ?ï¿½?ï¿½
                     DrawClickableField("Settings Asset", s.name, s);
                     DrawField("App Name", s.AppName ?? "-");
-                    DrawField("Environment", s.Environment ?? "-");
                     DrawField("API URL", !string.IsNullOrEmpty(s.ApiUrl)
                         ? TruncateMiddle(s.ApiUrl, 40)
                         : "<color=#ff8888>Not set</color>", true);
@@ -519,7 +518,7 @@ namespace Gatrix.Unity.SDK.Editor
                     // Separator
                     DrawSeparator();
 
-                    // ?€?€ Behavior ?€?€
+                    // ?ï¿½?ï¿½ Behavior ?ï¿½?ï¿½
                     DrawField("Offline Mode", s.OfflineMode
                         ? "<color=#ffcc66>Yes</color>"
                         : "No", true);
@@ -533,7 +532,7 @@ namespace Gatrix.Unity.SDK.Editor
                     // Separator
                     DrawSeparator();
 
-                    // ?€?€ Data Refresh (strikethrough when offline) ?€?€
+                    // ?ï¿½?ï¿½ Data Refresh (strikethrough when offline) ?ï¿½?ï¿½
                     var isOffline = s.OfflineMode;
 
                     string pollingText = s.DisableRefresh

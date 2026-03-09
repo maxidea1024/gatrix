@@ -38,7 +38,7 @@ namespace Gatrix.Unity.SDK
             }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-            // WebGL does not support threads — use synchronous read
+            // WebGL does not support threads - use synchronous read
             return File.ReadAllText(path);
 #else
             return await UniTask.RunOnThreadPool(() => File.ReadAllText(path));
@@ -50,7 +50,7 @@ namespace Gatrix.Unity.SDK
             var path = GetFilePath(key);
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-            // WebGL does not support threads — use synchronous write
+            // WebGL does not support threads - use synchronous write
             File.WriteAllText(path, value);
 #else
             var bytes = Encoding.UTF8.GetBytes(value);
