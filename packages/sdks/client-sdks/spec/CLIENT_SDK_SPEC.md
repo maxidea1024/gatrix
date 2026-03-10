@@ -1336,6 +1336,8 @@ unwatch();
 
 SDK emits the following events that you can subscribe to:
 
+| Event Name | Constant | Description | Payload |
+|---|---|---|---|
 | `flags.init`          | `EVENTS.FLAGS_INIT`    | SDK initialized (from storage/bootstrap)             | -                                                   |
 | `flags.ready`         | `EVENTS.FLAGS_READY`   | First successful fetch completed                     | -                                                   |
 | `flags.fetch`         | `EVENTS.FLAGS_FETCH`   | Started fetching flags from server                   | `{ etag: string \| null }`                          |
