@@ -4,6 +4,8 @@
 
 Gatrix Unreal SDK를 위한 Lua 바인딩 플러그인입니다. **순수 Lua C API**(`lua_State*`)를 통해 피처 플래그, 배리언트, 컨텍스트, 이벤트, Watch를 Lua 스크립트에 노출합니다.
 
+> 💡 피처 플래그에 대한 자세한 내용은 하단의 [📚 참고자료](#-참고자료)를 참조하세요.
+
 ### 💡 Quick Examples
 
 #### 1. 피처 전환 (`IsEnabled`)
@@ -55,6 +57,19 @@ end)
 - **🚨 긴급 킬 스위치** — 크래시를 유발하는 기능을 수초 이내에 비활성화. 핫픽스 빌드 불필요.
 - **🔬 A/B 테스트** — 그룹별로 다른 배리언트를 제공하고 영향을 측정.
 - **📅 출시 시점 미정** — 코드는 항상 준비되어 있고, 비즈니스에서 런칭 시점을 결정.
+
+### 🚀 배포(Deploy)와 릴리즈(Release)의 분리
+
+전통적으로 **배포**와 **릴리즈**는 동일한 것이었습니다 — 코드를 배포하면 사용자가 즉시 변경사항을 볼 수 있었습니다. 피처 플래그는 이 두 가지를 분리합니다:
+
+| | 배포 (Deploy) | 릴리즈 (Release) |
+|---|---|---|
+| **무엇** | 코드를 프로덕션 서버에 푸시 | 사용자에게 기능을 노출 |
+| **누가** | 엔지니어링 팀 | 프로덕트 / 비즈니스 팀 |
+| **언제** | 언제든 (CI/CD) | 비즈니스가 결정할 때 |
+| **리스크** | 낮음 (코드는 비활성 상태) | 제어됨 (점진적 배포) |
+
+이로써 **매일 배포**하되 아무것도 릴리즈하지 않다가, 대시보드를 통해 **기능을 독립적으로 릴리즈**할 수 있습니다 — 빌드도, 배포도, 앱 스토어 심사도 필요 없습니다.
 
 ---
 
@@ -591,6 +606,13 @@ lua_close(YourLuaState);
 ```lua
 Group:Destroy()  -- 명시적 정리 (권장, GC 의존 금지)
 ```
+
+## 📚 참고자료
+
+- [Feature Flags — What Are They?](https://launchdarkly.com/feature-flags/) — LaunchDarkly
+- [Feature Flags Best Practices](https://www.flagship.io/feature-flags-best-practices/) — Flagship
+- [Separating Deploys from Releases](https://devcycle.com/blog/separating-deployments-from-releases-with-feature-flags) — DevCycle
+- [Feature Toggles (aka Feature Flags)](https://martinfowler.com/articles/feature-toggles.html) — Martin Fowler
 
 ## License
 

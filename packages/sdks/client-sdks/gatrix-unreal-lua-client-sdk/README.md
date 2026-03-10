@@ -15,6 +15,8 @@ A feature flag has two parts:
 
 A flag can be **enabled while also having a specific value** (e.g. `difficulty = "hard"`). State and value are independent — handle both.
 
+> 💡 For more about feature flags, see [📚 References](#-references) at the bottom of this document.
+
 ### 💡 Quick Examples
 
 #### 1. Feature Toggle (`IsEnabled`)
@@ -81,6 +83,19 @@ end)
 - **🚨 Emergency Kill Switch** — Disable a crashing feature in seconds, not hours. No hotfix build needed.
 - **🔬 A/B Testing** — Show different variants to different groups and measure impact.
 - **📅 Uncertain Timing** — Code is always ready; business decides when to launch.
+
+### 🚀 Separating Deployment from Release
+
+Traditionally, **deployment** and **release** were the same thing — shipping code meant users immediately saw the change. Feature flags decouple these two:
+
+| | Deployment | Release |
+|---|---|---|
+| **What** | Pushing code to production servers | Making a feature visible to users |
+| **Who** | Engineering team | Product / Business team |
+| **When** | Any time (CI/CD) | When business decides |
+| **Risk** | Low (code is dormant) | Controlled (gradual rollout) |
+
+This means you can **deploy daily** without releasing anything, then **release features** independently through the dashboard — no build, no deploy, no app store review.
 
 ---
 
@@ -1131,6 +1146,13 @@ Group:Destroy()
 -- GC will also clean up, but timing is non-deterministic
 -- Don't rely on GC for gameplay-critical cleanup
 ```
+
+## 📚 References
+
+- [Feature Flags — What Are They?](https://launchdarkly.com/feature-flags/) — LaunchDarkly
+- [Feature Flags Best Practices](https://www.flagship.io/feature-flags-best-practices/) — Flagship
+- [Separating Deploys from Releases](https://devcycle.com/blog/separating-deployments-from-releases-with-feature-flags) — DevCycle
+- [Feature Toggles (aka Feature Flags)](https://martinfowler.com/articles/feature-toggles.html) — Martin Fowler
 
 ## License
 

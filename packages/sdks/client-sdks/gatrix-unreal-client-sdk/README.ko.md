@@ -15,6 +15,8 @@
 
 플래그는 **활성화 상태임과 동시에 특정 값을 가질 수 있습니다** (예: `difficulty = "hard"`). 상태와 값은 독립적이므로 두 가지 모두 처리해야 합니다.
 
+> 💡 피처 플래그에 대한 자세한 내용은 하단의 [📚 참고자료](#-참고자료)를 참조하세요.
+
 ### 💡 퀵 스타트 예시
 
 #### 1. 기능 전환 (`IsEnabled`)
@@ -73,6 +75,19 @@ FString difficulty = Client->GetFeatures()->StringVariation(TEXT("difficulty"), 
 - **🚨 긴급 킬 스위치** — 프로덕션 크래시를 유발하는 기능을 핫픽스 빌드 없이 단 몇 초 만에 차단합니다.
 - **🔬 A/B 테스트** — 무기 대미지, 재화 드랍률 등을 그룹별로 나눠 적용하고 사용자 경험에 미치는 영향을 측정합니다.
 - **📅 기능 출시 동기화** — 코드는 미리 배포해두고, 마케팅/비즈니스 팀이 원하는 시점에 정확히 기능을 오픈할 수 있습니다.
+
+### 🚀 배포(Deploy)와 릴리즈(Release)의 분리
+
+전통적으로 **배포**와 **릴리즈**는 동일한 것이었습니다 — 코드를 배포하면 사용자가 즉시 변경사항을 볼 수 있었습니다. 피처 플래그는 이 두 가지를 분리합니다:
+
+| | 배포 (Deploy) | 릴리즈 (Release) |
+|---|---|---|
+| **무엇** | 코드를 프로덕션 서버에 푸시 | 사용자에게 기능을 노출 |
+| **누가** | 엔지니어링 팀 | 프로덕트 / 비즈니스 팀 |
+| **언제** | 언제든 (CI/CD) | 비즈니스가 결정할 때 |
+| **리스크** | 낮음 (코드는 비활성 상태) | 제어됨 (점진적 배포) |
+
+이로써 **매일 배포**하되 아무것도 릴리즈하지 않다가, 대시보드를 통해 **기능을 독립적으로 릴리즈**할 수 있습니다 — 빌드도, 배포도, 앱 스토어 심사도 필요 없습니다.
 
 ---
 
@@ -462,6 +477,13 @@ void AMyActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 ```
 
 ---
+
+## 📚 참고자료
+
+- [Feature Flags — What Are They?](https://launchdarkly.com/feature-flags/) — LaunchDarkly
+- [Feature Flags Best Practices](https://www.flagship.io/feature-flags-best-practices/) — Flagship
+- [Separating Deploys from Releases](https://devcycle.com/blog/separating-deployments-from-releases-with-feature-flags) — DevCycle
+- [Feature Toggles (aka Feature Flags)](https://martinfowler.com/articles/feature-toggles.html) — Martin Fowler
 
 ## License
 
