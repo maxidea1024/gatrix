@@ -66,7 +66,6 @@ public:
   /**
    * Serialize a metrics payload to JSON.
    * @param AppName               Application name
-   * @param Environment           Environment name
    * @param SdkName               SDK name string
    * @param SdkVersion            SDK version string
    * @param ConnectionId          Connection identifier
@@ -75,7 +74,7 @@ public:
    * @param MissingFlags          Missing flag access counts
    * @return JSON string, or empty if no data
    */
-  static FString SerializeMetrics(const FString& AppName, const FString& Environment,
+  static FString SerializeMetrics(const FString& AppName,
                                   const FString& SdkName, const FString& SdkVersion,
                                   const FString& ConnectionId, const FDateTime& BucketStartTime,
                                   const TMap<FString, FFlagMetrics>& FlagBucket,

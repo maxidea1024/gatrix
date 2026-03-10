@@ -62,7 +62,7 @@ end)
 
 Gatrix 클라이언트 SDK는 **원격 평가** 방식만을 사용합니다:
 
-1. SDK가 **컨텍스트**(userId, environment, properties)를 Gatrix 서버로 전송.
+1. SDK가 **컨텍스트**(userId, properties)를 Gatrix 서버로 전송.
 2. 서버가 모든 타겟팅 규칙을 **원격에서** 평가.
 3. SDK는 **최종 평가된 플래그 값만** 수신 — 규칙은 클라이언트에 노출되지 않습니다.
 
@@ -176,7 +176,7 @@ gatrix.Init({
     ApiUrl          = "http://host/api/v1",
     ApiToken        = "your-client-token",
     AppName         = "my-game",
-    Environment     = "production",
+
     EnableDevMode    = false,  -- 상세 디버그 로깅
     Features        = {        -- 피처 플래그 설정
         OfflineMode      = false,  -- 네트워크 요청 없이 시작
@@ -213,26 +213,38 @@ gatrix.Start()
 
 ```lua
 local Enabled     = gatrix.Features.IsEnabled("my_flag")
+local Enabled     = gatrix.Features.IsEnabled("my_flag", true)   -- forceRealtime
 local VariantName = gatrix.Features.Variation("my_flag", "default")
+local VariantName = gatrix.Features.Variation("my_flag", "default", true)
 local Flag        = gatrix.Features.GetFlag("my_flag")
+local Flag        = gatrix.Features.GetFlag("my_flag", true)
 local Variant     = gatrix.Features.GetVariant("my_flag")
+local Variant     = gatrix.Features.GetVariant("my_flag", true)
 local AllFlags    = gatrix.Features.GetAllFlags()
+local AllFlags    = gatrix.Features.GetAllFlags(true)
 local Exists      = gatrix.Features.HasFlag("my_flag")
+local Exists      = gatrix.Features.HasFlag("my_flag", true)
 ```
 
 ### Typed Variations (`gatrix.Features`)
 
 ```lua
 local BoolVal  = gatrix.Features.BoolVariation("flag", false)
+local BoolVal  = gatrix.Features.BoolVariation("flag", false, true)   -- forceRealtime
 local StrVal   = gatrix.Features.StringVariation("flag", "default")
+local StrVal   = gatrix.Features.StringVariation("flag", "default", true)
 local IntVal   = gatrix.Features.IntVariation("flag", 0)
+local IntVal   = gatrix.Features.IntVariation("flag", 0, true)
 local FloatVal = gatrix.Features.FloatVariation("flag", 0.0)
+local FloatVal = gatrix.Features.FloatVariation("flag", 0.0, true)
 
 -- 상세 결과 (이유 포함)
 local Result = gatrix.Features.BoolVariationDetails("flag", false)
+local Result = gatrix.Features.BoolVariationDetails("flag", false, true)
 
 -- 없거나 타입 불일치 시 Lua 에러
 local MustExist = gatrix.Features.BoolVariationOrThrow("critical_flag")
+local MustExist = gatrix.Features.BoolVariationOrThrow("critical_flag", true)
 ```
 
 ### 반환 테이블 형태
@@ -529,7 +541,7 @@ gatrix.Features.SyncFlags()
 | 원인 | 해결책 |
 |-------|----------|
 | SDK 아직 준비 안 됨 | `flags.ready` 이벤트 기다리기 |
-| 잘못된 `AppName`/`Environment` | 대시보드 설정과 일치 확인 |
+| 잘못된 `AppName` | 대시보드 설정과 일치 확인 |
 | 이 환경에 플래그 미할당 | 대시보드에서 확인 |
 
 ```lua

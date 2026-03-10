@@ -1,4 +1,4 @@
-﻿// Copyright Gatrix. All Rights Reserved.
+// Copyright Gatrix. All Rights Reserved.
 // Lua binding implementation for Gatrix Unreal SDK
 
 #include "LuaGatrix.h"
@@ -253,16 +253,15 @@ void FGatrixLuaBindings::PushEvaluatedFlagTable(lua_State* L, const FGatrixEvalu
   lua_setfield(L, -2, "ImpressionData");
 }
 
-// FGatrixContext: { AppName, Environment, UserId, SessionId, CurrentTime,
+// FGatrixContext: { AppName, UserId, SessionId, CurrentTime,
 // Properties }
 void FGatrixLuaBindings::PushContextTable(lua_State* L, const FGatrixContext& Context) {
-  lua_createtable(L, 0, 6);
+  lua_createtable(L, 0, 5);
 
   lua_pushstring(L, TCHAR_TO_UTF8(*Context.AppName));
   lua_setfield(L, -2, "AppName");
 
-  lua_pushstring(L, TCHAR_TO_UTF8(*Context.Environment));
-  lua_setfield(L, -2, "Environment");
+
 
   lua_pushstring(L, TCHAR_TO_UTF8(*Context.UserId));
   lua_setfield(L, -2, "UserId");
@@ -333,10 +332,7 @@ FGatrixContext FGatrixLuaBindings::ReadContextFromTable(lua_State* L, int Index)
     Ctx.AppName = SafeToString(L, -1);
   lua_pop(L, 1);
 
-  lua_getfield(L, AbsIndex, "Environment");
-  if (!lua_isnil(L, -1))
-    Ctx.Environment = SafeToString(L, -1);
-  lua_pop(L, 1);
+
 
   lua_getfield(L, AbsIndex, "UserId");
   if (!lua_isnil(L, -1))
@@ -538,9 +534,7 @@ static FGatrixClientConfig ParseConfigFromLuaTable(lua_State* L, int TableIndex)
   Config.AppName = UTF8_TO_TCHAR(luaL_checkstring(L, -1));
   lua_pop(L, 1);
 
-  lua_getfield(L, AbsIndex, "Environment");
-  Config.Environment = UTF8_TO_TCHAR(luaL_checkstring(L, -1));
-  lua_pop(L, 1);
+
 
   // Root optional fields
   lua_getfield(L, AbsIndex, "EnableDevMode");

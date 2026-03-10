@@ -78,7 +78,7 @@ FString difficulty = Client->GetFeatures()->StringVariation(TEXT("difficulty"), 
 
 ## 📐 Evaluation Model: Remote Evaluation Only
 
-1. The SDK sends **context** (userId, environment, properties) to the Gatrix server.
+1. The SDK sends **context** (userId, properties) to the Gatrix server.
 2. The server evaluates all targeting rules remotely.
 3. The SDK receives only the **final evaluated flag values** — no rules exposed to the client.
 
@@ -118,7 +118,7 @@ FGatrixClientConfig Config;
 Config.ApiUrl = TEXT("https://your-api.example.com/api/v1");
 Config.ApiToken = TEXT("your-client-api-token");
 Config.AppName = TEXT("MyGame");
-Config.Environment = TEXT("production");
+
 
 // Optional context
 Config.Features.Context.UserId = TEXT("player-123");
@@ -213,14 +213,14 @@ Features->UnwatchFlag(WatchHandle);
 
 ### What Is Context?
 
-**Context** is the set of properties describing the current user and environment. The Gatrix server uses context to decide which variant to return for each flag.
+**Context** is the set of properties describing the current user. The Gatrix server uses context to decide which variant to return for each flag.
 
 ### Context Fields
 
 | Field | Type | Description |
 |---|---|---|
 | `AppName` | `FString` | App name (set at init, immutable) |
-| `Environment` | `FString` | Environment name (set at init, immutable) |
+
 | `UserId` | `FString` | Unique user identifier — most important for targeting |
 | `SessionId` | `FString` | Session identifier for session-scoped experiments |
 | `Properties` | `TMap<FString, FString>` | Custom key-value pairs |
@@ -477,7 +477,7 @@ Group->DestroyGroup();
 | `ExplicitSyncMode` is on | Call `SyncFlags()` at a safe point |
 | Using `WatchSyncedFlag` without sync | Switch to `WatchRealtimeFlag` or call `SyncFlags()` |
 | `OfflineMode` is enabled | Set `OfflineMode = false` |
-| Wrong `AppName` or `Environment` | Double-check config |
+| Wrong `AppName` | Double-check config |
 
 ### 2. `WatchSyncedFlag` callback never fires
 
@@ -493,7 +493,7 @@ Features->SyncFlags(false);
 |---|---|
 | SDK not ready yet | Wait for `flags.ready` event or use `WatchRealtimeFlagWithInitialState` |
 | Wrong config | Match dashboard settings |
-| Flag not assigned to this environment | Verify in dashboard |
+
 | Network error | Check `flags.fetch_error` event and log output |
 
 ### 4. Memory leak warnings from callbacks

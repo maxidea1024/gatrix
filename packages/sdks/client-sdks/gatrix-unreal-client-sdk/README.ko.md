@@ -78,7 +78,7 @@ FString difficulty = Client->GetFeatures()->StringVariation(TEXT("difficulty"), 
 
 ## 📐 평가 모델: 원격 평가 방식
 
-1. SDK가 **컨텍스트**(userId, environment, properties)를 서버로 전송합니다.
+1. SDK가 **컨텍스트**(userId, properties)를 서버로 전송합니다.
 2. 서버가 모든 규칙을 평가하고 **최종 플래그 값만** 반환합니다.
 3. 규칙은 클라이언트로 노출되지 않습니다.
 
@@ -118,7 +118,7 @@ FGatrixClientConfig Config;
 Config.ApiUrl = TEXT("https://your-api.example.com/api/v1");
 Config.ApiToken = TEXT("your-client-api-token");
 Config.AppName = TEXT("MyGame");
-Config.Environment = TEXT("production");
+
 
 // 컨텍스트(사용자 정보) 설정 (선택 사항)
 Config.Features.Context.UserId = TEXT("player-123");
@@ -218,7 +218,7 @@ Features->UnwatchFlag(WatchHandle);
 | 필드 | 타입 | 설명 |
 |---|---|---|
 | `AppName` | `FString` | 앱 이름 (초기화 시 결정, 변경 불가) |
-| `Environment` | `FString` | 환경 이름 (초기화 시 결정, 변경 불가) |
+
 | `UserId` | `FString` | 고유 식별자 — 타겟팅에서 가장 중요한 ID |
 | `SessionId` | `FString` | 세션 범위 스코핑을 위한 임시 ID |
 | `Properties` | `TMap<FString, FString>` | 자유롭게 전달할 게임 내 변수 (Level 등) |

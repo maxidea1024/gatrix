@@ -34,10 +34,7 @@ bool UGatrixClient::InitInternal(const FGatrixClientConfig& InConfig) {
     UE_LOG(LogGatrix, Error, TEXT("Config validation failed: appName is required"));
     return false;
   }
-  if (InConfig.Environment.IsEmpty()) {
-    UE_LOG(LogGatrix, Error, TEXT("Config validation failed: environment is required"));
-    return false;
-  }
+
 
   // Validate URL format
   if (!InConfig.ApiUrl.StartsWith(TEXT("http://")) &&
@@ -124,8 +121,8 @@ bool UGatrixClient::InitInternal(const FGatrixClientConfig& InConfig) {
 
   bInitialized = true;
 
-  UE_LOG(LogGatrix, Log, TEXT("Initialized. App=%s Env=%s ConnectionId=%s"), *StoredConfig.AppName,
-         *StoredConfig.Environment, *ClientConnectionId);
+  UE_LOG(LogGatrix, Log, TEXT("Initialized. App=%s ConnectionId=%s"), *StoredConfig.AppName,
+         *ClientConnectionId);
   return true;
 }
 
