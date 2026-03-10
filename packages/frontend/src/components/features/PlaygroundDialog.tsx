@@ -1883,7 +1883,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             mt: 0.5,
                             height: 18,
                             fontSize: '0.65rem',
-                            fontFamily: 'monospace',
+                            fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                             cursor: 'default',
                           }}
                         />
@@ -2284,7 +2284,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   <Typography
                     variant="body2"
                     sx={{
-                      fontFamily: 'monospace',
+                      fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                       fontSize: '0.8rem',
                       fontWeight: 600,
                       overflow: 'hidden',
@@ -2668,7 +2668,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             variant="caption"
                             sx={{
                               color: 'error.main',
-                              fontFamily: 'monospace',
+                              fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                             }}
                           >
                             &quot;&quot;
@@ -2781,7 +2781,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   <TableCell sx={{ py: 0.5 }}>
                                     <Typography
                                       variant="caption"
-                                      sx={{ fontFamily: 'monospace' }}
+                                      sx={{ fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace' }}
                                     >
                                       {renderValue(entry.value, entry.type)}
                                     </Typography>
@@ -2927,7 +2927,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     <TableCell sx={{ py: 0.5 }}>
                                       <Typography
                                         variant="caption"
-                                        sx={{ fontFamily: 'monospace' }}
+                                        sx={{ fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace' }}
                                       >
                                         {!provided ? (
                                           <Typography
@@ -3724,7 +3724,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                   <code
                                                                     style={{
                                                                       fontFamily:
-                                                                        'monospace',
+                                                                        'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                                                       backgroundColor:
                                                                         'rgba(0,0,0,0.1)',
                                                                       padding:
@@ -3856,7 +3856,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                     fontSize:
                                                                       '0.7rem',
                                                                     fontFamily:
-                                                                      'monospace',
+                                                                      'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                                                   }}
                                                                 >
                                                                   {Object.entries(
@@ -3884,7 +3884,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                           variant="caption"
                                                                           sx={{
                                                                             fontFamily:
-                                                                              'monospace',
+                                                                              'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                                                             color:
                                                                               'text.secondary',
                                                                             fontWeight: 600,
@@ -3897,7 +3897,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                           variant="caption"
                                                                           sx={{
                                                                             fontFamily:
-                                                                              'monospace',
+                                                                              'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                                                             color:
                                                                               'text.primary',
                                                                             wordBreak:
@@ -4132,7 +4132,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                       margin: 0,
                                       fontSize: '13px',
                                       fontFamily:
-                                        "'Consolas', 'Monaco', 'Courier New', monospace",
+                                        'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                       fontWeight: 500,
                                       color: 'var(--mui-palette-text-primary)',
                                       whiteSpace: 'pre-wrap',
@@ -4168,7 +4168,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   borderColor: 'divider',
                                   borderRadius: 1,
                                   fontFamily:
-                                    "'Consolas', 'Monaco', 'Courier New', monospace",
+                                    'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                   fontWeight: 500,
                                   wordBreak: 'break-all',
                                   ...(innerValue === '' && {
@@ -4222,7 +4222,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     borderColor: 'divider',
                                     borderRadius: 1,
                                     fontFamily:
-                                      "'Consolas', 'Monaco', 'Courier New', monospace",
+                                      'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                     fontWeight: 500,
                                     fontStyle: 'italic',
                                     color: 'text.disabled',
@@ -4249,7 +4249,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     margin: 0,
                                     fontSize: '13px',
                                     fontFamily:
-                                      "'Consolas', 'Monaco', 'Courier New', monospace",
+                                      'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                     fontWeight: 500,
                                     color: 'var(--mui-palette-text-primary)',
                                     whiteSpace: 'pre-wrap',
@@ -4281,7 +4281,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 borderColor: 'divider',
                                 borderRadius: 1,
                                 fontFamily:
-                                  "'Consolas', 'Monaco', 'Courier New', monospace",
+                                  'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                 fontWeight: 500,
                                 wordBreak: 'break-all',
                                 ...(isEmpty && {
@@ -4409,7 +4409,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           <Typography
                             variant="body2"
                             sx={{
-                              fontFamily: 'monospace',
+                              fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                               wordBreak: 'break-all',
                             }}
                           >

@@ -56,9 +56,17 @@ export class FlexibleRolloutStrategy extends Strategy {
     const stickinessId = this.resolveStickiness(stickiness, context);
 
     if (!stickinessId) {
+      const hint =
+        stickiness === 'default'
+          ? ' (requires userId or sessionId)'
+          : stickiness === 'userId'
+            ? ' (requires userId)'
+            : stickiness === 'sessionId'
+              ? ' (requires sessionId)'
+              : ` (requires context property "${stickiness}")`;
       return {
         enabled: false,
-        reason: `No value found for stickiness "${stickiness}"`,
+        reason: `No value found for stickiness "${stickiness}"${hint}`,
         details: { stickiness, rollout, groupId },
       };
     }

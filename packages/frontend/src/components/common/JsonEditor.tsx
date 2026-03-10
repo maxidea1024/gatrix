@@ -258,6 +258,8 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
               tabSize: 2,
               insertSpaces: true,
               lineNumbers: 'on',
+              fontFamily:
+                'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
               glyphMargin: false,
               folding: true,
               lineDecorationsWidth: 0,
