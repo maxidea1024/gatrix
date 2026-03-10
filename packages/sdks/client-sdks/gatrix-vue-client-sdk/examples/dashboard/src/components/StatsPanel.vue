@@ -267,8 +267,8 @@ function formatEtag(etag: string | null): string {
                 <td class="stats-value" colspan="5">{{ stats?.connectionId || '-' }}</td>
               </tr>
               <tr>
-                <td class="stats-label">APP/ENV:</td>
-                <td class="stats-value" colspan="5">{{ config.appName }} / {{ config.environment }}</td>
+                <td class="stats-label">APP:</td>
+                <td class="stats-value" colspan="5">{{ config.appName }}</td>
               </tr>
               <tr>
                 <td class="stats-label">STATUS:</td>
