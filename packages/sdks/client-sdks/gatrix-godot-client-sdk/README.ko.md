@@ -213,7 +213,6 @@ GatrixClient.start(config, storage)
 | `api_url` | String | `http://localhost:3400/api/v1` | Edge API 기본 URL |
 | `api_token` | String | **필수** | 클라이언트 API 토큰 |
 | `app_name` | String | **필수** | 애플리케이션 이름 |
-| `environment` | String | **필수** | 환경 이름 |
 | `custom_headers` | Dictionary | `{}` | 커스텀 HTTP 헤더 |
 | `features.context` | GatrixContext | `null` | 초기 평가 컨텍스트 |
 | `features.offline_mode` | bool | `false` | 오프라인 모드 시작 |

@@ -74,7 +74,6 @@ GatrixFlagBuilder(
 | `apiUrl`        | (required)         | Gatrix server base URL             |
 | `apiToken`      | (required)         | Client SDK token                   |
 | `appName`       | (required)         | Application name                   |
-| `environment`   | (required)         | Environment name (e.g. production) |
 | `customHeaders` | `null`             | Extra HTTP headers                 |
 | `enableDevMode` | `false`            | Enable debug logging               |
 | `features`      | `FeaturesConfig()` | Feature flag configuration         |
