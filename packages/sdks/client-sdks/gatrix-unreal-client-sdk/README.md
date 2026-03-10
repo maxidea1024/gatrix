@@ -213,7 +213,16 @@ Features->UnwatchFlag(WatchHandle);
 
 ### What Is Context?
 
-**Context** is the set of properties describing the current user. The Gatrix server uses context to decide which variant to return for each flag.
+**Context** is the set of properties describing the current user that the SDK sends to the Gatrix server with every flag evaluation request. The server uses context to evaluate targeting rules and determine which variant each user should receive.
+
+**How context is used:**
+
+- **User targeting** — Show feature A to users in Korea, feature B to users in Japan
+- **Gradual rollout** — Enable a feature for 10% of users based on `UserId`
+- **A/B testing** — Assign users to experiment groups based on their properties
+- **Segmentation** — Different experiences for free vs premium users via `Properties`
+
+> 💡 Context is sent to the server on every fetch. The server evaluates all targeting rules against the context and returns only the final flag values — no rules are exposed to the client.
 
 ### Context Fields
 

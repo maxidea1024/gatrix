@@ -628,6 +628,31 @@ end
 
 ### Context
 
+#### What Is Context?
+
+**Context** is the set of properties describing the current user that the SDK sends to the Gatrix server with every flag evaluation request. The server uses context to evaluate targeting rules and determine which variant each user should receive.
+
+**How context is used:**
+
+- **User targeting** — Show feature A to users in Korea, feature B to users in Japan
+- **Gradual rollout** — Enable a feature for 10% of users based on `UserId`
+- **A/B testing** — Assign users to experiment groups based on their properties
+- **Segmentation** — Different experiences for free vs premium users via `Properties`
+
+> 💡 Context is sent to the server on every fetch. The server evaluates all targeting rules against the context and returns only the final flag values — no rules are exposed to the client.
+
+#### Context Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `AppName` | `string` | App name (set at init, immutable) |
+| `UserId` | `string` | Unique user identifier — most important for targeting |
+| `SessionId` | `string` | Session identifier for session-scoped experiments |
+| `CurrentTime` | `string` | Current time in ISO 8601 format |
+| `Properties` | `table` | Custom key-value pairs for targeting rules |
+
+#### Updating Context
+
 ```lua
 --- Update evaluation context (triggers re-fetch)
 --- @param Ctx table
@@ -645,6 +670,8 @@ gatrix.UpdateContext({
 --- @return table {AppName, UserId, SessionId, CurrentTime, Properties}
 local Ctx = gatrix.GetContext()
 ```
+
+> ⚠️ All context updates trigger an automatic re-fetch. Do not update context inside rapid loops. Use a single table to bulk update fields.
 
 ### Events
 
