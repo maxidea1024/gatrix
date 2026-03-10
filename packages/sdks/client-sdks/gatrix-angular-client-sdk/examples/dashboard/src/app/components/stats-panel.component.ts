@@ -33,7 +33,11 @@ import type { FeaturesStats } from '@gatrix/gatrix-js-client-sdk';
           <tbody>
             <tr>
               <td class="stats-label">STATE</td>
-              <td class="stats-value" [class.status-healthy]="healthy()" [class.status-error]="!healthy()">
+              <td
+                class="stats-value"
+                [class.status-healthy]="healthy()"
+                [class.status-error]="!healthy()"
+              >
                 {{ ready() ? (healthy() ? 'HEALTHY' : 'ERROR') : 'INIT' }}
               </td>
             </tr>
@@ -51,7 +55,10 @@ import type { FeaturesStats } from '@gatrix/gatrix-js-client-sdk';
             </tr>
             <tr>
               <td class="stats-label">ERRORS</td>
-              <td class="stats-value" [class.status-error]="(stats()?.errorCount ?? 0) > 0">
+              <td
+                class="stats-value"
+                [class.status-error]="(stats()?.errorCount ?? 0) > 0"
+              >
                 {{ stats()?.errorCount ?? 0 }}
               </td>
             </tr>
@@ -64,7 +71,9 @@ import type { FeaturesStats } from '@gatrix/gatrix-js-client-sdk';
         <div class="stats-modes-compact">
           <div class="mode-item is-info">
             <span class="mode-label">CTX CHG</span>
-            <span class="mode-value">{{ stats()?.contextChangeCount ?? 0 }}</span>
+            <span class="mode-value">{{
+              stats()?.contextChangeCount ?? 0
+            }}</span>
           </div>
           <div class="mode-item is-warning">
             <span class="mode-label">SYNCS</span>
@@ -79,7 +88,9 @@ import type { FeaturesStats } from '@gatrix/gatrix-js-client-sdk';
         <!-- Error display -->
         @if (error()) {
           <div class="mascot-error">
-            <div class="error-balloon-inline nes-balloon from-left is-dark is-error-border">
+            <div
+              class="error-balloon-inline nes-balloon from-left is-dark is-error-border"
+            >
               <p>{{ error()!.message }}</p>
             </div>
           </div>
@@ -106,5 +117,7 @@ export class StatsPanelComponent {
     return enabled;
   });
 
-  readonly disabledFlags = computed(() => this.totalFlags() - this.enabledFlags());
+  readonly disabledFlags = computed(
+    () => this.totalFlags() - this.enabledFlags()
+  );
 }

@@ -122,7 +122,9 @@ function generateRandomUserId(): string {
 
               <div class="form-group">
                 <label class="form-label">API TOKEN</label>
-                <div style="position: relative; display: flex; align-items: center;">
+                <div
+                  style="position: relative; display: flex; align-items: center;"
+                >
                   <input
                     [type]="showToken() ? 'text' : 'password'"
                     class="nes-input is-dark"
@@ -365,7 +367,7 @@ export class ConfigFormComponent implements OnInit {
       localStorage.getItem(STORAGE_KEY_MANUAL_POLLING) === 'true';
     const savedInterval = parseInt(
       localStorage.getItem(STORAGE_KEY_REFRESH_INTERVAL) || '1',
-      10,
+      10
     );
     this.refreshInterval =
       !this.manualPolling && savedInterval === 0 ? 1 : savedInterval;
@@ -420,16 +422,19 @@ export class ConfigFormComponent implements OnInit {
     localStorage.setItem(STORAGE_KEY_OFFLINE_MODE, String(this.offlineMode));
     localStorage.setItem(
       STORAGE_KEY_REFRESH_INTERVAL,
-      String(this.manualPolling ? 0 : this.refreshInterval),
+      String(this.manualPolling ? 0 : this.refreshInterval)
     );
-    localStorage.setItem(STORAGE_KEY_MANUAL_POLLING, String(this.manualPolling));
+    localStorage.setItem(
+      STORAGE_KEY_MANUAL_POLLING,
+      String(this.manualPolling)
+    );
     localStorage.setItem(
       STORAGE_KEY_EXPLICIT_SYNC,
-      String(this.explicitSyncMode),
+      String(this.explicitSyncMode)
     );
     localStorage.setItem(
       STORAGE_KEY_STREAMING_ENABLED,
-      String(this.streamingEnabled),
+      String(this.streamingEnabled)
     );
     localStorage.setItem(STORAGE_KEY_STREAMING_MODE, this.streamingMode);
 

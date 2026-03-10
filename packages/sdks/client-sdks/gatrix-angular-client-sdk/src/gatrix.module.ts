@@ -25,13 +25,12 @@ import { GATRIX_CONFIG } from './tokens';
  */
 @NgModule({})
 export class GatrixModule {
-  static forRoot(config: GatrixClientConfig): ModuleWithProviders<GatrixModule> {
+  static forRoot(
+    config: GatrixClientConfig
+  ): ModuleWithProviders<GatrixModule> {
     return {
       ngModule: GatrixModule,
-      providers: [
-        { provide: GATRIX_CONFIG, useValue: config },
-        GatrixService,
-      ],
+      providers: [{ provide: GATRIX_CONFIG, useValue: config }, GatrixService],
     };
   }
 }

@@ -17,7 +17,9 @@ function createMockClient() {
       numberVariation: vi.fn().mockReturnValue(0),
       jsonVariation: vi.fn().mockReturnValue({}),
       getAllFlags: vi.fn().mockReturnValue([]),
-      getVariant: vi.fn().mockReturnValue({ name: '$disabled', enabled: false, value: null }),
+      getVariant: vi
+        .fn()
+        .mockReturnValue({ name: '$disabled', enabled: false, value: null }),
       updateContext: vi.fn().mockResolvedValue(undefined),
       syncFlags: vi.fn().mockResolvedValue(undefined),
       fetchFlags: vi.fn().mockResolvedValue(undefined),
@@ -181,27 +183,33 @@ describe('Inject Functions (unit)', () => {
 
   it('should provide watch functions', () => {
     const client = new GatrixClient(testConfig);
-    const unwatch = client.features.watchRealtimeFlagWithInitialState('my-flag', () => {});
-    expect(client.features.watchRealtimeFlagWithInitialState).toHaveBeenCalledWith(
+    const unwatch = client.features.watchRealtimeFlagWithInitialState(
       'my-flag',
-      expect.any(Function),
+      () => {}
     );
+    expect(
+      client.features.watchRealtimeFlagWithInitialState
+    ).toHaveBeenCalledWith('my-flag', expect.any(Function));
     expect(typeof unwatch).toBe('function');
   });
 
   it('should provide synced watch functions', () => {
     const client = new GatrixClient(testConfig);
-    const unwatch = client.features.watchSyncedFlagWithInitialState('my-flag', () => {});
-    expect(client.features.watchSyncedFlagWithInitialState).toHaveBeenCalledWith(
+    const unwatch = client.features.watchSyncedFlagWithInitialState(
       'my-flag',
-      expect.any(Function),
+      () => {}
     );
+    expect(
+      client.features.watchSyncedFlagWithInitialState
+    ).toHaveBeenCalledWith('my-flag', expect.any(Function));
   });
 
   it('should provide context update function', async () => {
     const client = new GatrixClient(testConfig);
     await client.features.updateContext({ userId: 'user-1' });
-    expect(client.features.updateContext).toHaveBeenCalledWith({ userId: 'user-1' });
+    expect(client.features.updateContext).toHaveBeenCalledWith({
+      userId: 'user-1',
+    });
   });
 
   it('should provide sync flags function', async () => {
@@ -254,7 +262,8 @@ describe('Module/Provider (unit)', () => {
   });
 
   it('should export injection tokens', async () => {
-    const { GATRIX_CONFIG, GATRIX_CLIENT, GATRIX_START_CLIENT } = await import('../tokens');
+    const { GATRIX_CONFIG, GATRIX_CLIENT, GATRIX_START_CLIENT } =
+      await import('../tokens');
     expect(GATRIX_CONFIG).toBeDefined();
     expect(GATRIX_CLIENT).toBeDefined();
     expect(GATRIX_START_CLIENT).toBeDefined();

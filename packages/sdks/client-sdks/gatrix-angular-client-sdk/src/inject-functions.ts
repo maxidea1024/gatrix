@@ -15,7 +15,7 @@ function getService(): GatrixService {
   const svc = inject(GatrixService, { optional: true });
   if (!svc) {
     throw new Error(
-      'GatrixService not found. Use GatrixModule.forRoot(config) or provideGatrix(config).',
+      'GatrixService not found. Use GatrixModule.forRoot(config) or provideGatrix(config).'
     );
   }
   return svc;
@@ -92,14 +92,21 @@ export function injectFlagsStatus(): {
  * // template: @if (showNewUI()) { <NewUI /> }
  * ```
  */
-export function injectFlag(flagName: string, forceRealtime = true): Signal<boolean> {
+export function injectFlag(
+  flagName: string,
+  forceRealtime = true
+): Signal<boolean> {
   const svc = getService();
   const destroyRef = inject(DestroyRef);
   const value = signal(svc.client.features.isEnabled(flagName, forceRealtime));
 
   const watchFn = forceRealtime
-    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(svc.client.features)
-    : svc.client.features.watchSyncedFlagWithInitialState.bind(svc.client.features);
+    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
+        svc.client.features
+      )
+    : svc.client.features.watchSyncedFlagWithInitialState.bind(
+        svc.client.features
+      );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.enabled);
@@ -118,15 +125,19 @@ export function injectFlag(flagName: string, forceRealtime = true): Signal<boole
  */
 export function injectFlagProxy(
   flagName: string,
-  forceRealtime = true,
+  forceRealtime = true
 ): Signal<FlagProxy | null> {
   const svc = getService();
   const destroyRef = inject(DestroyRef);
   const value = signal<FlagProxy | null>(null);
 
   const watchFn = forceRealtime
-    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(svc.client.features)
-    : svc.client.features.watchSyncedFlagWithInitialState.bind(svc.client.features);
+    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
+        svc.client.features
+      )
+    : svc.client.features.watchSyncedFlagWithInitialState.bind(
+        svc.client.features
+      );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy);
@@ -145,15 +156,19 @@ export function injectFlagProxy(
  */
 export function injectVariant(
   flagName: string,
-  forceRealtime = true,
+  forceRealtime = true
 ): Signal<Variant | undefined> {
   const svc = getService();
   const destroyRef = inject(DestroyRef);
   const value = signal<Variant | undefined>(undefined);
 
   const watchFn = forceRealtime
-    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(svc.client.features)
-    : svc.client.features.watchSyncedFlagWithInitialState.bind(svc.client.features);
+    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
+        svc.client.features
+      )
+    : svc.client.features.watchSyncedFlagWithInitialState.bind(
+        svc.client.features
+      );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.variant);
@@ -172,7 +187,9 @@ export function injectVariant(
 export function injectFlags(forceRealtime = true): Signal<EvaluatedFlag[]> {
   const svc = getService();
   const destroyRef = inject(DestroyRef);
-  const value = signal<EvaluatedFlag[]>(svc.client.features.getAllFlags(forceRealtime));
+  const value = signal<EvaluatedFlag[]>(
+    svc.client.features.getAllFlags(forceRealtime)
+  );
 
   const updateFlags = () => {
     value.set(svc.client.features.getAllFlags(forceRealtime));
@@ -203,17 +220,21 @@ export function injectFlags(forceRealtime = true): Signal<EvaluatedFlag[]> {
 export function injectBoolVariation(
   flagName: string,
   fallbackValue: boolean,
-  forceRealtime = true,
+  forceRealtime = true
 ): Signal<boolean> {
   const svc = getService();
   const destroyRef = inject(DestroyRef);
   const value = signal(
-    svc.client.features.boolVariation(flagName, fallbackValue, forceRealtime),
+    svc.client.features.boolVariation(flagName, fallbackValue, forceRealtime)
   );
 
   const watchFn = forceRealtime
-    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(svc.client.features)
-    : svc.client.features.watchSyncedFlagWithInitialState.bind(svc.client.features);
+    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
+        svc.client.features
+      )
+    : svc.client.features.watchSyncedFlagWithInitialState.bind(
+        svc.client.features
+      );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.boolVariation(fallbackValue));
@@ -234,17 +255,21 @@ export function injectBoolVariation(
 export function injectStringVariation(
   flagName: string,
   fallbackValue: string,
-  forceRealtime = true,
+  forceRealtime = true
 ): Signal<string> {
   const svc = getService();
   const destroyRef = inject(DestroyRef);
   const value = signal(
-    svc.client.features.stringVariation(flagName, fallbackValue, forceRealtime),
+    svc.client.features.stringVariation(flagName, fallbackValue, forceRealtime)
   );
 
   const watchFn = forceRealtime
-    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(svc.client.features)
-    : svc.client.features.watchSyncedFlagWithInitialState.bind(svc.client.features);
+    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
+        svc.client.features
+      )
+    : svc.client.features.watchSyncedFlagWithInitialState.bind(
+        svc.client.features
+      );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.stringVariation(fallbackValue));
@@ -265,17 +290,21 @@ export function injectStringVariation(
 export function injectNumberVariation(
   flagName: string,
   fallbackValue: number,
-  forceRealtime = true,
+  forceRealtime = true
 ): Signal<number> {
   const svc = getService();
   const destroyRef = inject(DestroyRef);
   const value = signal(
-    svc.client.features.numberVariation(flagName, fallbackValue, forceRealtime),
+    svc.client.features.numberVariation(flagName, fallbackValue, forceRealtime)
   );
 
   const watchFn = forceRealtime
-    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(svc.client.features)
-    : svc.client.features.watchSyncedFlagWithInitialState.bind(svc.client.features);
+    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
+        svc.client.features
+      )
+    : svc.client.features.watchSyncedFlagWithInitialState.bind(
+        svc.client.features
+      );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.numberVariation(fallbackValue));
@@ -296,17 +325,21 @@ export function injectNumberVariation(
 export function injectJsonVariation<T>(
   flagName: string,
   fallbackValue: T,
-  forceRealtime = true,
+  forceRealtime = true
 ): Signal<T> {
   const svc = getService();
   const destroyRef = inject(DestroyRef);
   const value = signal<T>(
-    svc.client.features.jsonVariation<T>(flagName, fallbackValue, forceRealtime),
+    svc.client.features.jsonVariation<T>(flagName, fallbackValue, forceRealtime)
   );
 
   const watchFn = forceRealtime
-    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(svc.client.features)
-    : svc.client.features.watchSyncedFlagWithInitialState.bind(svc.client.features);
+    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
+        svc.client.features
+      )
+    : svc.client.features.watchSyncedFlagWithInitialState.bind(
+        svc.client.features
+      );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.jsonVariation<T>(fallbackValue));
@@ -323,9 +356,12 @@ export function injectJsonVariation<T>(
  * Returns a function to update the evaluation context.
  * Context updates trigger a re-fetch of flags from the server.
  */
-export function injectUpdateContext(): (context: Partial<GatrixContext>) => Promise<void> {
+export function injectUpdateContext(): (
+  context: Partial<GatrixContext>
+) => Promise<void> {
   const svc = getService();
-  return (context: Partial<GatrixContext>) => svc.client.features.updateContext(context);
+  return (context: Partial<GatrixContext>) =>
+    svc.client.features.updateContext(context);
 }
 
 /**
@@ -347,7 +383,10 @@ export function injectFetchFlags(): () => Promise<void> {
 /**
  * Returns a function to track custom events.
  */
-export function injectTrack(): (eventName: string, properties?: Record<string, unknown>) => void {
+export function injectTrack(): (
+  eventName: string,
+  properties?: Record<string, unknown>
+) => void {
   const svc = getService();
   return (eventName: string, properties?: Record<string, unknown>) => {
     svc.client.track(eventName, properties);

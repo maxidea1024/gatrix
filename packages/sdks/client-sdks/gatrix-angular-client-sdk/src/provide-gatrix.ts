@@ -24,7 +24,7 @@ import { GATRIX_CONFIG, GATRIX_CLIENT, GATRIX_START_CLIENT } from './tokens';
  */
 export function provideGatrix(
   config: GatrixClientConfig,
-  options?: { startClient?: boolean },
+  options?: { startClient?: boolean }
 ): Provider[] {
   const providers: Provider[] = [
     { provide: GATRIX_CONFIG, useValue: config },
@@ -51,7 +51,7 @@ export function provideGatrix(
  */
 export function provideGatrixClient(
   client: GatrixClient,
-  options?: { startClient?: boolean },
+  options?: { startClient?: boolean }
 ): Provider[] {
   const providers: Provider[] = [
     { provide: GATRIX_CLIENT, useValue: client },

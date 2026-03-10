@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  Optional,
-  OnDestroy,
-} from '@angular/core';
+import { Injectable, Inject, Optional, OnDestroy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import {
   GatrixClient,
@@ -49,7 +44,7 @@ export class GatrixService implements OnDestroy {
   constructor(
     @Optional() @Inject(GATRIX_CONFIG) config: GatrixClientConfig | null,
     @Optional() @Inject(GATRIX_CLIENT) existingClient: GatrixClient | null,
-    @Optional() @Inject(GATRIX_START_CLIENT) startClient: boolean | null,
+    @Optional() @Inject(GATRIX_START_CLIENT) startClient: boolean | null
   ) {
     if (existingClient) {
       this.client = existingClient;
@@ -58,7 +53,7 @@ export class GatrixService implements OnDestroy {
     } else {
       throw new Error(
         'GatrixService: You must provide either GATRIX_CONFIG or GATRIX_CLIENT. ' +
-        'Use GatrixModule.forRoot(config) or provideGatrix(config) in your app.',
+          'Use GatrixModule.forRoot(config) or provideGatrix(config) in your app.'
       );
     }
 

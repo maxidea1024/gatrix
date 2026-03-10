@@ -28,7 +28,12 @@ export interface LogEntry {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FlagCardComponent, StatsPanelComponent, LogViewerComponent],
+  imports: [
+    CommonModule,
+    FlagCardComponent,
+    StatsPanelComponent,
+    LogViewerComponent,
+  ],
   template: `
     <div class="dashboard-container">
       <!-- Header -->
@@ -36,7 +41,10 @@ export interface LogEntry {
         <h1 class="header-title">⚡ GATRIX ANGULAR DASHBOARD</h1>
         <div style="display: flex; gap: 8px; align-items: center;">
           @if (hasPendingSync()) {
-            <button class="nes-btn is-warning sync-available-rumble" (click)="syncFlags()">
+            <button
+              class="nes-btn is-warning sync-available-rumble"
+              (click)="syncFlags()"
+            >
               ⟳ SYNC
             </button>
           }
@@ -55,7 +63,10 @@ export interface LogEntry {
       />
 
       <!-- Flags Grid -->
-      <div class="flags-section" style="flex: 1; overflow-y: auto; margin-top: 16px;">
+      <div
+        class="flags-section"
+        style="flex: 1; overflow-y: auto; margin-top: 16px;"
+      >
         @if (!ready()) {
           <div class="nes-container is-dark" style="text-align: center;">
             <p style="color: #f7d51d; font-size: 10px;">
@@ -64,9 +75,7 @@ export interface LogEntry {
           </div>
         } @else if (flags().length === 0) {
           <div class="nes-container is-dark" style="text-align: center;">
-            <p style="color: #adafbc; font-size: 10px;">
-              NO FLAGS FOUND
-            </p>
+            <p style="color: #adafbc; font-size: 10px;">NO FLAGS FOUND</p>
           </div>
         } @else {
           <div class="flags-grid">
@@ -81,13 +90,15 @@ export interface LogEntry {
       <app-log-viewer [logs]="logs()" style="margin-top: 16px;" />
     </div>
   `,
-  styles: [`
-    .flags-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 12px;
-    }
-  `],
+  styles: [
+    `
+      .flags-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+      }
+    `,
+  ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly config = input.required<GatrixClientConfig>();
@@ -117,7 +128,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.client.on(EVENTS.FLAGS_CHANGE, () => {
       this.updateFlags();
-      this.addLog('flags.change', `${this.client!.features.getAllFlags().length} flags`, 'info');
+      this.addLog(
+        'flags.change',
+        `${this.client!.features.getAllFlags().length} flags`,
+        'info'
+      );
     });
 
     this.client.on(EVENTS.FLAGS_SYNC, () => {
@@ -152,7 +167,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
 
     this.client.on(EVENTS.FLAGS_FETCH_ERROR, (data: any) => {
-      this.addLog('flags.fetch_error', data?.error?.message || 'Fetch error', 'error');
+      this.addLog(
+        'flags.fetch_error',
+        data?.error?.message || 'Fetch error',
+        'error'
+      );
     });
 
     this.client.on(EVENTS.FLAGS_METRICS_SENT, () => {

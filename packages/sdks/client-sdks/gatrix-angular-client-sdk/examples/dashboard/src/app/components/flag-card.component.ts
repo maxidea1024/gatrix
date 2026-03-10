@@ -20,7 +20,10 @@ import type { EvaluatedFlag } from '@gatrix/gatrix-js-client-sdk';
       <div class="flag-details">
         <div class="flag-detail-row">
           <span class="flag-label">ENABLED</span>
-          <span class="flag-value" [style.color]="flag().enabled ? '#92cc41' : '#e76e55'">
+          <span
+            class="flag-value"
+            [style.color]="flag().enabled ? '#92cc41' : '#e76e55'"
+          >
             {{ flag().enabled ? 'YES' : 'NO' }}
           </span>
         </div>
@@ -36,10 +39,15 @@ import type { EvaluatedFlag } from '@gatrix/gatrix-js-client-sdk';
             {{ flag().valueType }}
           </span>
         </div>
-        @if (flag().variant.value !== null && flag().variant.value !== undefined) {
+        @if (
+          flag().variant.value !== null && flag().variant.value !== undefined
+        ) {
           <div class="flag-detail-row">
             <span class="flag-label">VALUE</span>
-            <span class="flag-value" style="color: #fff; word-break: break-all;">
+            <span
+              class="flag-value"
+              style="color: #fff; word-break: break-all;"
+            >
               {{ formatValue(flag().variant.value) }}
             </span>
           </div>
@@ -53,59 +61,61 @@ import type { EvaluatedFlag } from '@gatrix/gatrix-js-client-sdk';
       </div>
     </div>
   `,
-  styles: [`
-    .flag-card {
-      padding: 12px !important;
-      transition: border-color 0.2s;
-    }
-    .flag-enabled {
-      border-color: #92cc41 !important;
-    }
-    .flag-disabled {
-      border-color: #e76e55 !important;
-      opacity: 0.7;
-    }
-    .flag-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .flag-status-dot {
-      width: 8px;
-      height: 8px;
-      background-color: #e76e55;
-      flex-shrink: 0;
-    }
-    .flag-status-dot.enabled {
-      background-color: #92cc41;
-    }
-    .flag-name {
-      color: #fff;
-      font-size: 8px;
-      word-break: break-all;
-    }
-    .flag-details {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .flag-detail-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
-    }
-    .flag-label {
-      color: #adafbc;
-      font-size: 6px;
-      flex-shrink: 0;
-    }
-    .flag-value {
-      font-size: 7px;
-      text-align: right;
-    }
-  `],
+  styles: [
+    `
+      .flag-card {
+        padding: 12px !important;
+        transition: border-color 0.2s;
+      }
+      .flag-enabled {
+        border-color: #92cc41 !important;
+      }
+      .flag-disabled {
+        border-color: #e76e55 !important;
+        opacity: 0.7;
+      }
+      .flag-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .flag-status-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #e76e55;
+        flex-shrink: 0;
+      }
+      .flag-status-dot.enabled {
+        background-color: #92cc41;
+      }
+      .flag-name {
+        color: #fff;
+        font-size: 8px;
+        word-break: break-all;
+      }
+      .flag-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .flag-detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .flag-label {
+        color: #adafbc;
+        font-size: 6px;
+        flex-shrink: 0;
+      }
+      .flag-value {
+        font-size: 7px;
+        text-align: right;
+      }
+    `,
+  ],
 })
 export class FlagCardComponent {
   readonly flag = input.required<EvaluatedFlag>();
