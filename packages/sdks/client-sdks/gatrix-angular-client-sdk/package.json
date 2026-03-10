@@ -1,0 +1,39 @@
+{
+  "name": "@gatrix/gatrix-angular-client-sdk",
+  "version": "1.0.0",
+  "description": "Gatrix Angular SDK for the Gatrix platform",
+  "peerDependencies": {
+    "@angular/core": ">=17.0.0",
+    "@angular/common": ">=17.0.0",
+    "@gatrix/gatrix-js-client-sdk": "link:../gatrix-js-client-sdk",
+    "rxjs": "^7.0.0"
+  },
+  "devDependencies": {
+    "@angular/compiler": "^18.0.0",
+    "@angular/compiler-cli": "^18.0.0",
+    "@angular/core": "^18.0.0",
+    "@angular/common": "^18.0.0",
+    "@angular/platform-browser": "^18.0.0",
+    "@angular/platform-browser-dynamic": "^18.0.0",
+    "@gatrix/gatrix-js-client-sdk": "link:../gatrix-js-client-sdk",
+    "ng-packagr": "^18.0.0",
+    "rxjs": "^7.8.0",
+    "typescript": "~5.4.0",
+    "zone.js": "^0.14.0",
+    "vitest": "^1.0.0",
+    "rimraf": "^5.0.5"
+  },
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json",
+    "test": "vitest run",
+    "lint": "tsc --noEmit -p tsconfig.lib.json",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "gatrix",
+    "angular",
+    "feature-flags",
+    "feature-toggle"
+  ],
+  "license": "MIT"
+}

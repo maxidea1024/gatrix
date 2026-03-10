@@ -20,6 +20,8 @@ const SK = {
   REFRESH_INTERVAL: 'gatrix-dashboard-refresh-interval',
   EXPLICIT_SYNC: 'gatrix-dashboard-explicit-sync',
   MANUAL_POLLING: 'gatrix-dashboard-manual-polling',
+  STREAMING_ENABLED: 'gatrix-dashboard-streaming-enabled',
+  STREAMING_MODE: 'gatrix-dashboard-streaming-mode',
   USER_ID: 'gatrix-dashboard-user-id',
 };
 
@@ -50,6 +52,8 @@ const offlineMode = ref(false);
 const refreshInterval = ref(1);
 const manualPolling = ref(false);
 const explicitSyncMode = ref(false);
+const streamingEnabled = ref(true);
+const streamingMode = ref<'sse' | 'websocket'>('sse');
 
 const isLocal = () => location.value === 'local';
 
@@ -75,6 +79,8 @@ onMounted(() => {
   manualPolling.value = savedManual;
   refreshInterval.value = !savedManual && savedRefresh === 0 ? 1 : savedRefresh;
   explicitSyncMode.value = localStorage.getItem(SK.EXPLICIT_SYNC) === 'true';
+  streamingEnabled.value = localStorage.getItem(SK.STREAMING_ENABLED) !== 'false';
+  streamingMode.value = (localStorage.getItem(SK.STREAMING_MODE) as 'sse' | 'websocket') || 'sse';
 });
 
 // When location or serverType changes, update URL and token
@@ -99,10 +105,13 @@ function handleSubmit() {
   localStorage.setItem(SK.LOCATION, location.value);
   localStorage.setItem(SK.SERVER_TYPE, serverType.value);
   localStorage.setItem(SK.USER_ID, userId.value);
+  localStorage.setItem(SK.APP_NAME, appName.value);
   localStorage.setItem(SK.OFFLINE_MODE, String(offlineMode.value));
   localStorage.setItem(SK.REFRESH_INTERVAL, String(manualPolling.value ? 0 : refreshInterval.value));
   localStorage.setItem(SK.MANUAL_POLLING, String(manualPolling.value));
   localStorage.setItem(SK.EXPLICIT_SYNC, String(explicitSyncMode.value));
+  localStorage.setItem(SK.STREAMING_ENABLED, String(streamingEnabled.value));
+  localStorage.setItem(SK.STREAMING_MODE, streamingMode.value);
 
   if (location.value === 'remote') {
     localStorage.setItem(SK.API_URL, apiUrl.value);
@@ -119,11 +128,15 @@ function handleSubmit() {
     apiUrl: apiUrl.value,
     apiToken: apiToken.value,
     appName: appName.value,
-    offlineMode: offlineMode.value,
-    context: { userId: userId.value },
     features: {
+      context: { userId: userId.value },
+      offlineMode: offlineMode.value,
       refreshInterval: manualPolling.value ? 0 : refreshInterval.value,
       explicitSyncMode: explicitSyncMode.value,
+      streaming: {
+        enabled: streamingEnabled.value,
+        transport: streamingMode.value,
+      },
     },
   });
 }
@@ -133,9 +146,7 @@ function handleSubmit() {
   <div class="login-container">
     <div class="login-box">
       <div class="nes-container is-dark with-title">
-        <p class="title" style="background-color: #000">
-          <i class="nes-icon coin is-small"></i> CONNECT TO GATRIX
-        </p>
+        <p class="title" style="background-color: #000">CONNECT TO GATRIX</p>
 
         <form @submit.prevent="handleSubmit">
           <!-- Step 1: Server Location -->
@@ -189,8 +200,7 @@ function handleSubmit() {
                   :style="{ position: 'absolute', right: '4px', padding: '4px 8px', height: '38px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center' }"
                   :title="showToken ? 'Hide Token' : 'Show Token'">
-                  <i :class="`nes-icon is-small ${showToken ? 'close' : 'eye'}`"
-                    style="transform: scale(1.2)"></i>
+                  {{ showToken ? '[X]' : '[EYE]' }}
                 </button>
               </div>
             </div>
@@ -204,14 +214,10 @@ function handleSubmit() {
 
           <hr class="nes-hr" style="margin: 25px 0" />
 
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">APP NAME</label>
-              <input type="text" class="nes-input is-dark" v-model="appName"
-                placeholder="vue-sdk-app" required />
-            </div>
-            <div class="form-group">
-                placeholder="development" required />
+          <div class="form-group">
+            <label class="form-label">APP NAME</label>
+            <input type="text" class="nes-input is-dark" v-model="appName"
+              placeholder="vue-sdk-app" required />
           </div>
 
           <div class="form-group">
@@ -222,7 +228,7 @@ function handleSubmit() {
               <button type="button" class="nes-btn is-warning"
                 @click="userId = generateRandomUserId()"
                 title="Generate random User ID" style="font-size: 10px; white-space: nowrap">
-                ?�� RANDOM
+                RANDOM
               </button>
             </div>
           </div>
@@ -256,6 +262,29 @@ function handleSubmit() {
                 <input type="checkbox" class="nes-checkbox is-dark" v-model="explicitSyncMode" />
                 <span class="checkbox-label">EXPLICIT SYNC</span>
               </label>
+            </div>
+
+            <!-- Streaming -->
+            <div class="form-group" style="margin-top: 20px">
+              <label class="form-label">STREAMING (REAL-TIME)</label>
+              <div class="checkbox-group" style="margin-bottom: 10px">
+                <label>
+                  <input type="checkbox" class="nes-checkbox is-dark" v-model="streamingEnabled" />
+                  <span class="checkbox-label">ENABLE STREAMING</span>
+                </label>
+              </div>
+              <div v-if="streamingEnabled" style="display: flex; gap: 30px; margin-left: 35px">
+                <label>
+                  <input type="radio" class="nes-radio is-dark" name="streamingMode"
+                    :checked="streamingMode === 'sse'" @change="streamingMode = 'sse'" />
+                  <span>SSE</span>
+                </label>
+                <label>
+                  <input type="radio" class="nes-radio is-dark" name="streamingMode"
+                    :checked="streamingMode === 'websocket'" @change="streamingMode = 'websocket'" />
+                  <span>WEBSOCKET</span>
+                </label>
+              </div>
             </div>
           </template>
 
