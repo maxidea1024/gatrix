@@ -24,7 +24,6 @@ final client = GatrixClient(
     apiUrl: 'https://your-gatrix-server.com/api/v1',
     apiToken: 'your-client-api-token',
     appName: 'my-app',
-    environment: 'production',
     refreshIntervalSeconds: 60, // 1분마다 자동 폴링
   ),
 );

@@ -75,7 +75,6 @@ bool AppDelegate::applicationDidFinishLaunching() {
     config.apiUrl = "https://edge.your-api.com/api/v1";
     config.apiToken = "your-client-token";
     config.appName = "my-game";
-    config.environment = "production";
     config.features.refreshInterval = 30;
 
     auto* client = gatrix::GatrixClient::getInstance();

@@ -65,7 +65,7 @@ string difficulty = GatrixSDK.Features.StringVariation("difficulty", "Normal");
 
 ## 📐 Evaluation Model: Remote Evaluation Only
 
-1. The SDK sends **context** (userId, environment, properties) to the Gatrix server.
+1. The SDK sends **context** (userId, properties) to the Gatrix server.
 2. The server evaluates all targeting rules remotely.
 3. The SDK receives only the **final evaluated flag values** — no rules exposed to the client.
 
@@ -230,7 +230,7 @@ Inspector overlays for `GatrixBehaviour` and Zero-Code components.
 
 ### What Is Context?
 
-**Context** is the set of properties describing the current user and environment. The Gatrix server uses context to decide which variant to return for each flag.
+**Context** is the set of properties describing the current user and session. The Gatrix server uses context to decide which variant to return for each flag.
 
 ### Context Fields
 
@@ -548,7 +548,7 @@ await features.SyncFlagsAsync();
 |---|---|
 | SDK not ready yet | Wait for `flags.ready` event or use `WatchRealtimeFlagWithInitialState` |
 | Wrong `AppName` | Match dashboard settings |
-| Flag not assigned to this environment | Verify in dashboard |
+| Flag not assigned | Verify in dashboard |
 | Network error on first fetch | Check `flags.fetch_error` event and logs |
 
 ### 4. Flag values change unexpectedly during gameplay

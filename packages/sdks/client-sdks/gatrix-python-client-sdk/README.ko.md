@@ -23,7 +23,6 @@ client = GatrixClient(GatrixClientConfig(
     api_url="https://edge.example.com/api/v1",
     api_token="your-client-token",
     app_name="my-app",
-    environment="production",
 ))
 
 client.start()
@@ -62,7 +61,6 @@ client = GatrixClient(GatrixClientConfig(
     api_url="https://edge.example.com/api/v1",
     api_token="your-token",
     app_name="my-app",
-    environment="production",
     offline_mode=True,
     features=FeaturesConfig(bootstrap=bootstrap_flags),
 ))
@@ -99,7 +97,6 @@ client = GatrixClient(GatrixClientConfig(
     api_url="https://edge.example.com/api/v1",
     api_token="your-token",
     app_name="my-app",
-    environment="production",
     features=FeaturesConfig(explicit_sync_mode=True),
 ))
 

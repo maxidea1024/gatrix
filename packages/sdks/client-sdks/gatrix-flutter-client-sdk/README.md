@@ -24,7 +24,6 @@ final client = GatrixClient(
     apiUrl: 'https://your-gatrix-server.com/api/v1',
     apiToken: 'your-client-api-token',
     appName: 'my-app',
-    environment: 'production',
     features: FeaturesConfig(
       refreshInterval: 60,    // Auto-poll every 60 seconds
       explicitSyncMode: true, // Buffer changes until syncFlags() is called

@@ -24,7 +24,6 @@ yarn add @gatrix/gatrix-svelte-client-sdk @gatrix/gatrix-js-client-sdk
       apiUrl: 'http://localhost:3400/api/v1',
       apiToken: 'your-client-api-token',
       appName: 'MyApp',
-      environment: 'development',
       context: {
         userId: 'user-123',
         properties: { platform: 'web' },

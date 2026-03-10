@@ -16,7 +16,6 @@ func _ready() -> void:
     config.api_url = "http://localhost:3400/api/v1"
     config.api_token = "your-client-api-token"
     config.app_name = "MyGame"
-    config.environment = "development"
 
     # 선택: 사용자 컨텍스트 설정
     config.features.context.user_id = "player-123"
@@ -212,7 +211,6 @@ GatrixClient.start(config, storage)
 | `api_url` | String | `http://localhost:3400/api/v1` | Edge API 기본 URL |
 | `api_token` | String | **필수** | 클라이언트 API 토큰 |
 | `app_name` | String | **필수** | 애플리케이션 이름 |
-| `environment` | String | **필수** | 환경 (예: "production") |
 | `custom_headers` | Dictionary | `{}` | 커스텀 HTTP 헤더 |
 | `features.context` | GatrixContext | `null` | 초기 평가 컨텍스트 |
 | `features.offline_mode` | bool | `false` | 오프라인 모드 시작 |

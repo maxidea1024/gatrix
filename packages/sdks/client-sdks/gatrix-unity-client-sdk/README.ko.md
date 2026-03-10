@@ -13,7 +13,7 @@
 | **상태** (`enabled`) | `bool` | 기능이 켜져 있는가, 꺼져 있는가 — `IsEnabled()`로 확인 |
 | **값** (`variant`) | `bool` `string` `number` `json` | 세부 구성 값 — `BoolVariation()`, `StringVariation()`, `FloatVariation()`으로 읽음 |
 
-플래그는 **켜져 있으면서도** 특정 값을 가질 수 있습니다 (예: `difficulty = "hard"`). 상태와 값은 독립적이므로 두 가지 모두 처리해야 합니다.
+피처 플래그는 **상태(enabled/disabled)**와 **값(variant)**이 분리되어 있습니다. 예를 들어 `difficulty` 플래그가 활성화되어 있으면서 값은 `"hard"`일 수 있습니다. 코드에서는 `IsEnabled()`로 상태를, `StringVariation()` 등으로 값을 각각 확인해야 합니다.
 
 ### 💡 Quick Examples
 
@@ -65,7 +65,7 @@ string difficulty = GatrixSDK.Features.StringVariation("difficulty", "Normal");
 
 ## 📐 평가 모델: 원격 평가 방식
 
-1. SDK가 **컨텍스트**(userId, environment, properties)를 Gatrix 서버로 전송.
+1. SDK가 **컨텍스트**(userId, properties)를 Gatrix 서버로 전송.
 2. 서버가 모든 타겟팅 규칙을 원격에서 평가.
 3. SDK는 **최종 평가된 플래그 값만** 수신 — 규칙은 클라이언트에 노출되지 않습니다.
 
