@@ -174,6 +174,46 @@ function App() {
 }
 ```
 
+## ⚠️ Essential Practices
+
+### Test All Flag States
+
+Every feature flag creates **at least two code paths** (on and off). Both must be tested. Untested paths are ticking time bombs that will eventually reach production.
+
+| What to test | Why |
+|---|---|
+| Flag **ON** | Verify the new behavior works correctly |
+| Flag **OFF** | Verify the original behavior still works — this is often forgotten |
+| Flag **toggled mid-session** | If using real-time mode, verify no crashes or inconsistent state |
+| **Default value** path | Verify behavior when the flag doesn't exist on the server (network error, new environment, etc.) |
+
+### Handle Dependencies Carefully
+
+Toggling a flag can change which objects, modules, or resources are used. If those dependencies aren't ready, you get crashes or undefined behavior.
+
+**Common pitfall:** Flag A enables a feature that depends on an object initialized by Flag B. If A is on but B is off, the object doesn't exist → crash.
+
+**How to prevent:**
+
+- Initialize all resources that _might_ be needed regardless of flag state, or
+- Use lazy initialization with null checks, or
+- Use `ExplicitSyncMode` to apply flag changes only at safe points where all dependencies can be resolved together
+
+### Document Every Flag
+
+When creating a flag, clearly communicate the following to your team:
+
+| Item | Description |
+|---|---|
+| **Purpose** | What does this flag control? Why does it exist? |
+| **Affected areas** | Which screens, systems, or APIs are impacted? |
+| **Side effects** | What changes when flipped? Any performance, data, or UX implications? |
+| **Dependencies** | Does this flag depend on other flags or system state? |
+| **Owner** | Who is responsible for this flag? |
+| **Expiration** | When should this flag be removed? |
+
+Undocumented flags become a source of confusion, and eventually, incidents.
+
 ## 📚 References
 
 **Concepts:**
