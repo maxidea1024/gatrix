@@ -431,6 +431,9 @@ class NetworkTrafficService {
       bucket: string;
       displayTime: string;
       environmentId: string;
+      environmentName: string;
+      projectName: string;
+      orgName: string;
       appName: string;
       evaluations: number;
       yesCount: number;
@@ -441,31 +444,53 @@ class NetworkTrafficService {
       .select(
         'metricsBucket as bucket',
         db.raw("DATE_FORMAT(metricsBucket, '%m/%d %H:00') as displayTime"),
-        'environmentId',
-        'appName',
+        'g_feature_metrics.environmentId',
+        db.raw(
+          'COALESCE(g_environments.displayName, g_feature_metrics.environmentId) as environmentName'
+        ),
+        db.raw("COALESCE(g_projects.displayName, '') as projectName"),
+        db.raw("COALESCE(g_organisations.displayName, '') as orgName"),
+        'g_feature_metrics.appName',
         db.raw('COALESCE(SUM(yesCount + noCount), 0) as evaluations'),
         db.raw('COALESCE(SUM(yesCount), 0) as yesCount'),
         db.raw('COALESCE(SUM(noCount), 0) as noCount')
       )
+      .leftJoin(
+        'g_environments',
+        'g_feature_metrics.environmentId',
+        'g_environments.id'
+      )
+      .leftJoin('g_projects', 'g_environments.projectId', 'g_projects.id')
+      .leftJoin('g_organisations', 'g_projects.orgId', 'g_organisations.id')
       .where('metricsBucket', '>=', params.startDate)
       .where('metricsBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn('environmentId', params.environments);
+      query = query.whereIn('g_feature_metrics.environmentId', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
-      query = query.whereIn('appName', params.appNames);
+      query = query.whereIn('g_feature_metrics.appName', params.appNames);
     }
 
     const rows = await query
-      .groupBy('metricsBucket', 'environmentId', 'appName')
+      .groupBy(
+        'metricsBucket',
+        'g_feature_metrics.environmentId',
+        'g_feature_metrics.appName',
+        'g_environments.displayName',
+        'g_projects.displayName',
+        'g_organisations.displayName'
+      )
       .orderBy('metricsBucket', 'asc');
 
     return rows.map((row: any) => ({
       bucket: row.bucket,
       displayTime: row.displayTime,
       environmentId: row.environmentId,
+      environmentName: row.environmentName || row.environmentId,
+      projectName: row.projectName || '',
+      orgName: row.orgName || '',
       appName: row.appName,
       evaluations: Number(row.evaluations) || 0,
       yesCount: Number(row.yesCount) || 0,

@@ -138,6 +138,9 @@ interface EvaluationTimeSeriesPointByApp {
   bucket: string;
   displayTime: string;
   environmentId: string;
+  environmentName: string;
+  projectName: string;
+  orgName: string;
   appName: string;
   evaluations: number;
   yesCount: number;
@@ -386,6 +389,17 @@ const FeatureNetworkPage: React.FC = () => {
         params.set('appNames', selectedApps.join(','));
       }
 
+      // Evaluations use environment-only params (no appNames filter)
+      // Traffic and metrics tables have different app names, so sharing the
+      // app filter would incorrectly exclude SDK evaluation data.
+      const evalParams = new URLSearchParams({
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      });
+      if (selectedEnvironments.length > 0) {
+        evalParams.set('environments', selectedEnvironments.join(','));
+      }
+
       // Fetch traffic (detailed), aggregated (for chart), summary, evaluations, and evaluation timeseries in parallel
       const [
         trafficRes,
@@ -409,13 +423,13 @@ const FeatureNetworkPage: React.FC = () => {
           `${projectApiPath}/features/network/summary?${params}`
         ),
         api.get<{ evaluations: EvaluationSummary }>(
-          `${projectApiPath}/features/network/evaluations?${params}`
+          `${projectApiPath}/features/network/evaluations?${evalParams}`
         ),
         api.get<{ timeseries: EvaluationTimeSeriesPoint[] }>(
-          `${projectApiPath}/features/network/evaluations/timeseries?${params}`
+          `${projectApiPath}/features/network/evaluations/timeseries?${evalParams}`
         ),
         api.get<{ timeseries: EvaluationTimeSeriesPointByApp[] }>(
-          `${projectApiPath}/features/network/evaluations/timeseries/by-app?${params}`
+          `${projectApiPath}/features/network/evaluations/timeseries/by-app?${evalParams}`
         ),
       ]);
 
@@ -1391,6 +1405,8 @@ const FeatureNetworkPage: React.FC = () => {
                         <TableRow>
                           <TableCell>{t('network.time')}</TableCell>
                           <TableCell>{t('common.environment')}</TableCell>
+                          <TableCell>{t('common.project')}</TableCell>
+                          <TableCell>{t('common.organization')}</TableCell>
                           <TableCell>{t('network.application')}</TableCell>
                           <TableCell align="right">
                             {t('network.flagEvaluations')}
@@ -1401,7 +1417,7 @@ const FeatureNetworkPage: React.FC = () => {
                         {evaluationTimeSeriesByApp.length === 0 ? (
                           <TableRow hover>
                             <TableCell
-                              colSpan={4}
+                              colSpan={6}
                               align="center"
                               sx={{ py: 4 }}
                             >
@@ -1420,7 +1436,7 @@ const FeatureNetworkPage: React.FC = () => {
                                 <TableCell>
                                   <Tooltip title={row.environmentId}>
                                     <Chip
-                                      label={envNameMap.get(row.environmentId) || row.environmentId}
+                                      label={row.environmentName || envNameMap.get(row.environmentId) || row.environmentId}
                                       size="small"
                                       color="primary"
                                       variant="outlined"
@@ -1428,6 +1444,8 @@ const FeatureNetworkPage: React.FC = () => {
                                     />
                                   </Tooltip>
                                 </TableCell>
+                                <TableCell>{row.projectName || '-'}</TableCell>
+                                <TableCell>{row.orgName || '-'}</TableCell>
                                 <TableCell>
                                   {row.appName ? (
                                     <Chip

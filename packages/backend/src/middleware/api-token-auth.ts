@@ -368,7 +368,7 @@ export const setSDKEnvironment = async (
 ) => {
   try {
     // Token determines environment — strict, no fallback
-    // Edge proxy: x-environment header overrides for infra/edge bypass tokens
+    // Edge proxy: x-environment-id header overrides for infra/edge bypass tokens
     const headerEnvId = req.headers['x-environment-id'] as string | undefined;
     const environmentId =
       ((req.isUnsecuredToken || req.isEdgeBypassToken) && headerEnvId)
