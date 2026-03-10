@@ -582,6 +582,19 @@ void AMyActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 | **Deterministic multiplayer** | Ensure all clients see the same flag values in the same session. Use `UserId` for consistent assignment |
 | **Performance-sensitive paths** | Avoid flag checks in tight loops (Update/Tick). Cache the value at session start or sync points |
 
+### 💻 Code Best Practices
+
+Scattering flag checks throughout your codebase leads to tangled, hard-to-maintain code. Martin Fowler describes proven patterns to keep flag logic clean in [Feature Toggles](https://martinfowler.com/articles/feature-toggles.html):
+
+| Practice | Description |
+|---|---|
+| **Minimize toggle points** | Check each flag in [as few places as possible](https://posthog.com/blog/feature-flag-best-practices). Wrap the flag in a single function rather than repeating checks everywhere |
+| **Separate decision from logic** | Don't embed flag checks directly in game logic. Create a `FeatureDecisions` layer that maps flags to named decisions (e.g., `ShouldUseBetaUI()`) |
+| **Use Strategy / Proxy pattern** | Instead of `if (flag) doA() else doB()` everywhere, inject the behavior at initialization. Swap implementations based on the flag once, not at every call site |
+| **Toggles at the edge** | Place flag checks at the outermost layer (UI, scene initialization) rather than deep in core logic. Keep your engine/game logic flag-free |
+| **Limit flag inventory** | Treat flags as inventory with a carrying cost. Set expiration dates and remove flags after permanent rollout — [Knight Capital's $460M loss](http://dougseven.com/2014/04/17/knightmare-a-devops-cautionary-tale/) is a cautionary tale of unmanaged flags |
+| **Cache at session start** | Read flag values once at a safe point (session start, loading screen) and pass the resolved values to your systems. Avoid calling the SDK repeatedly in hot paths |
+
 ## 📚 References
 
 **Concepts:**
