@@ -83,25 +83,11 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     );
   }
 
-  // Default circular variant
+  // Default circular variant - show a subtle top progress bar during Suspense loading.
+  // AuthInitializer handles the full-page loading state with dot-wave animation.
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 2,
-        p: 3,
-      }}
-    >
-      <HourglassEmpty sx={{ fontSize: 48, color: 'primary.main' }} />
-      <CircularProgress size={getSize()} />
-      {message && (
-        <Typography variant="body2" color="text.secondary" align="center">
-          {message}
-        </Typography>
-      )}
+    <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999 }}>
+      <LinearProgress />
     </Box>
   );
 };
