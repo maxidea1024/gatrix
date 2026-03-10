@@ -8,6 +8,7 @@
     "packages/*",
     "packages/sdks/*",
     "packages/sdks/client-sdks/*",
+    "packages/sdks/server-sdks/*",
     "packages/evaluator"
   ],
   "scripts": {
@@ -26,7 +27,7 @@
     "infra:logs": "docker compose -f docker-compose-infra.yml logs -f",
     "build": "yarn build:shared && yarn build:sdk && yarn build:docs && yarn build:apps",
     "build:shared": "yarn workspace @gatrix/shared build && yarn workspace @gatrix/evaluator build",
-    "build:sdk": "yarn workspace @gatrix/server-sdk build",
+    "build:sdk": "yarn workspace @gatrix/gatrix-node-server-sdk build",
     "build:apps": "concurrently -n backend,frontend,edge,event-lens,chat-server -c blue,green,cyan,yellow,magenta \"yarn build:backend\" \"yarn build:frontend\" \"yarn build:edge\" \"yarn build:event-lens\" \"yarn build:chat-server\"",
     "build:backend": "yarn workspace @gatrix/backend build",
     "build:frontend": "yarn workspace @gatrix/frontend build",

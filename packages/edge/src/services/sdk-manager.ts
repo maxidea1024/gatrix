@@ -3,7 +3,7 @@ import {
   GatrixSDKConfig,
   IEnvironmentProvider,
   EnvironmentEntry,
-} from '@gatrix/server-sdk';
+} from '@gatrix/gatrix-node-server-sdk';
 import { config } from '../config/env';
 import { createLogger } from '../config/logger';
 import { environmentRegistry } from './environment-registry';

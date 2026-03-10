@@ -5,7 +5,7 @@ import { clientAuth, ClientRequest } from '../middleware/client-auth';
 import { sdkManager } from '../services/sdk-manager';
 import { config } from '../config/env';
 import logger from '../config/logger';
-import { ClientVersion, Banner, GameWorld } from '@gatrix/server-sdk';
+import { ClientVersion, Banner, GameWorld } from '@gatrix/gatrix-node-server-sdk';
 import { metricsAggregator } from '../services/metrics-aggregator';
 import {
   cacheHitsTotal,

@@ -6,7 +6,7 @@ import {
 } from './config/clickhouse';
 import { testMySQLConnection } from './config/mysql';
 import logger from './utils/logger';
-import { GatrixServerSDK } from '@gatrix/server-sdk';
+import { GatrixServerSDK } from '@gatrix/gatrix-node-server-sdk';
 
 // SDK instance for service discovery
 let gatrixSdk: GatrixServerSDK | null = null;
@@ -65,9 +65,11 @@ async function start() {
       gatrixSdk = new GatrixServerSDK({
         apiUrl: backendUrl,
         apiToken: apiToken,
-        applicationName: 'event-lens',
-        service: 'event-lens',
-        group: process.env.SERVICE_GROUP || 'gatrix',
+        appName: 'event-lens',
+        meta: {
+          service: 'event-lens',
+          group: process.env.SERVICE_GROUP || 'gatrix',
+        },
         logger: { level: 'info' },
         cache: {
           enabled: false, // Disable cache - not needed for service discovery only

@@ -1,4 +1,4 @@
-# @gatrix/server-sdk
+# @gatrix/gatrix-node-server-sdk
 
 Gatrix Server-side SDK for Node.js - Provides easy access to Gatrix backend APIs with caching, event handling, and service discovery.
 
@@ -14,7 +14,7 @@ Gatrix Server-side SDK for Node.js - Provides easy access to Gatrix backend APIs
 ## Installation
 
 ```bash
-npm install @gatrix/server-sdk
+npm install @gatrix/gatrix-node-server-sdk
 ```
 
 ## Requirements
@@ -25,7 +25,7 @@ npm install @gatrix/server-sdk
 ## Quick Start
 
 ```typescript
-import { GatrixServerSDK } from '@gatrix/server-sdk';
+import { GatrixServerSDK } from '@gatrix/gatrix-node-server-sdk';
 
 // Create SDK instance
 const sdk = new GatrixServerSDK({

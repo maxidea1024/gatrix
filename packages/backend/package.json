@@ -51,7 +51,7 @@
     "@bull-board/api": "^6.12.6",
     "@bull-board/express": "^6.12.6",
     "@bull-board/ui": "^6.12.6",
-    "@gatrix/server-sdk": "file:../sdks/server-sdk",
+    "@gatrix/gatrix-node-server-sdk": "file:../sdks/server-sdks/gatrix-node-server-sdk",
     "@gatrix/shared": "file:../shared",
     "@gatrix/evaluator": "file:../evaluator",
     "@keyv/redis": "^5.1.3",

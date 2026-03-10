@@ -1,4 +1,4 @@
-# @gatrix/server-sdk
+# @gatrix/gatrix-node-server-sdk
 
 Gatrix 서버 사이드 SDK for Node.js — 캐싱, 이벤트 처리, 서비스 디스커버리를 지원합니다.
 
@@ -14,7 +14,7 @@ Gatrix 서버 사이드 SDK for Node.js — 캐싱, 이벤트 처리, 서비스 
 ## 설치
 
 ```bash
-npm install @gatrix/server-sdk
+npm install @gatrix/gatrix-node-server-sdk
 ```
 
 ## 요구 사항
@@ -25,7 +25,7 @@ npm install @gatrix/server-sdk
 ## 빠른 시작
 
 ```typescript
-import { GatrixServerSDK } from '@gatrix/server-sdk';
+import { GatrixServerSDK } from '@gatrix/gatrix-node-server-sdk';
 
 // SDK 인스턴스 생성
 const sdk = new GatrixServerSDK({

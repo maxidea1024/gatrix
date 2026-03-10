@@ -14,7 +14,7 @@ import { redisManager } from './config/redis';
 import { ApiTokenService } from './services/api-token-service';
 import { databaseManager } from './config/database';
 import apiRoutes from './routes';
-import { GatrixServerSDK } from '@gatrix/server-sdk';
+import { GatrixServerSDK } from '@gatrix/gatrix-node-server-sdk';
 
 const logger = createLogger('ChatServerApp');
 
@@ -346,9 +346,11 @@ class ChatServerApp {
             gatrixSdk = new GatrixServerSDK({
               apiUrl: backendUrl,
               apiToken: apiToken,
-              applicationName: 'chat-server',
-              service: 'chat',
-              group: process.env.SERVICE_GROUP || 'gatrix',
+              appName: 'chat-server',
+              meta: {
+                service: 'chat',
+                group: process.env.SERVICE_GROUP || 'gatrix',
+              },
               logger: { level: 'info' },
               cache: {
                 enabled: false, // Chat server doesn't need caching for now

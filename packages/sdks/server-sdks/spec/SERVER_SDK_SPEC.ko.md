@@ -36,7 +36,7 @@
 
 | 플랫폼 | 패키지명 |
 |--------|----------|
-| Node.js | `@gatrix/server-sdk` |
+| Node.js | `@gatrix/gatrix-node-server-sdk` |
 | .NET | `Gatrix.Server.Sdk` |
 | Java | `com.gatrix.server.sdk` |
 | Go | `github.com/gatrix/gatrix-go-server-sdk` |

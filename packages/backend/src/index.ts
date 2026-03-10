@@ -1,7 +1,7 @@
 import { config } from './config';
 import { createServer } from 'http';
 import type { SSENotificationBusMessage } from './services/pub-sub-service';
-import type { GatrixServerSDK } from '@gatrix/server-sdk';
+import type { GatrixServerSDK } from '@gatrix/gatrix-node-server-sdk';
 
 // Lazy imports to avoid initialization at import time
 let app: any;
@@ -508,7 +508,7 @@ const startServer = async () => {
       // Register Backend service to Service Discovery via SDK
       // Must be done AFTER server starts listening
       try {
-        const { GatrixServerSDK } = await import('@gatrix/server-sdk');
+        const { GatrixServerSDK } = await import('@gatrix/gatrix-node-server-sdk');
         // Use APP_VERSION env var (set via Docker build-arg) or fallback to package.json
         let serverVersion = process.env.APP_VERSION || '0.0.0';
         if (serverVersion === '0.0.0') {
@@ -529,9 +529,11 @@ const startServer = async () => {
         gatrixSdk = new GatrixServerSDK({
           apiUrl: backendUrl,
           apiToken: apiToken,
-          applicationName: 'backend',
-          service: 'backend',
-          group: process.env.SERVICE_GROUP || 'gatrix',
+          appName: 'backend',
+          meta: {
+            service: 'backend',
+            group: process.env.SERVICE_GROUP || 'gatrix',
+          },
           logger: { level: 'info' },
           cache: {
             enabled: false, // Backend doesn't need caching - it IS the data source

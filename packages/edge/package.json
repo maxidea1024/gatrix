@@ -14,7 +14,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@gatrix/server-sdk": "*",
+    "@gatrix/gatrix-node-server-sdk": "*",
     "@gatrix/shared": "*",
     "@gatrix/evaluator": "*",
     "axios": "^1.13.4",

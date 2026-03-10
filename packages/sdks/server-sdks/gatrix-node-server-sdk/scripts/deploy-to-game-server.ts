@@ -139,7 +139,7 @@ async function main() {
 
   // 5. Pack (using npm pack since it properly handles bundledDependencies)
   console.log('\n📦 Packing SDK...');
-  const tgzFileName = `gatrix-server-sdk-${version}.tgz`;
+  const tgzFileName = `gatrix-gatrix-node-server-sdk-${version}.tgz`;
   run(`npm pack --pack-destination .`);
   if (!fs.existsSync(tgzFileName)) {
     console.error(`❌ Pack file not found: ${tgzFileName}`);
@@ -208,9 +208,15 @@ async function main() {
 
     if (gamePackageJson.dependencies) {
       // Update gatrix-server-sdk
-      const oldSdkDep = gamePackageJson.dependencies['gatrix-server-sdk'];
+      const oldSdkDep = gamePackageJson.dependencies['@gatrix/gatrix-node-server-sdk'] || gamePackageJson.dependencies['gatrix-node-server-sdk'];
       const newSdkDep = `file:./lib/${tgzFileName}`;
-      gamePackageJson.dependencies['gatrix-server-sdk'] = newSdkDep;
+      gamePackageJson.dependencies['@gatrix/gatrix-node-server-sdk'] = newSdkDep;
+      if (gamePackageJson.dependencies['gatrix-node-server-sdk']) {
+        delete gamePackageJson.dependencies['gatrix-node-server-sdk'];
+      }
+      if (gamePackageJson.dependencies['gatrix-server-sdk']) {
+        delete gamePackageJson.dependencies['gatrix-server-sdk'];
+      }
       console.log(`   ✓ SDK: ${oldSdkDep || '(new)'} → ${newSdkDep}`);
 
       // Remove @gatrix/shared if exists (now bundled in SDK)

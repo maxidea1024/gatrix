@@ -36,7 +36,7 @@ Pattern: `gatrix-{platform}-server-sdk`
 
 | Platform | Package Name |
 |----------|-------------|
-| Node.js | `@gatrix/server-sdk` |
+| Node.js | `@gatrix/gatrix-node-server-sdk` |
 | .NET | `Gatrix.Server.Sdk` |
 | Java | `com.gatrix.server.sdk` |
 | Go | `github.com/gatrix/gatrix-go-server-sdk` |
