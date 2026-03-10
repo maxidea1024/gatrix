@@ -20,6 +20,7 @@ import {
   Constraint,
   VALUE_SOURCE,
 } from '@gatrix/shared';
+import { getStrategy } from './strategies';
 
 export class FeatureFlagEvaluator {
   /**
@@ -147,13 +148,12 @@ export class FeatureFlagEvaluator {
       if (!allConstraintsPass) return false;
     }
 
-    // 3. Check rollout percentage
-    const rollout = strategy.parameters?.rollout ?? 100;
-    if (rollout < 100) {
-      const stickiness = strategy.parameters?.stickiness || 'default';
-      const groupId = strategy.parameters?.groupId || flag.name;
-      const percentage = this.calculatePercentage(context, stickiness, groupId);
-      if (percentage > rollout) return false;
+    // 3. Delegate strategy-specific logic (rollout, percentage, etc.) to strategy class
+    const registeredStrategy = getStrategy(strategy.name);
+    if (registeredStrategy) {
+      if (!registeredStrategy.isEnabled(strategy.parameters || {}, context)) {
+        return false;
+      }
     }
 
     return true;

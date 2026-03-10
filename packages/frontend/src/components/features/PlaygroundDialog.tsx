@@ -2126,10 +2126,13 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
           flexDirection: 'column',
           borderRadius: 2,
           overflow: 'hidden',
-          border: 2,
+          border: '1px solid',
           borderColor: selectedEvaluation?.result?.enabled
             ? 'success.light'
             : 'error.light',
+          boxShadow: selectedEvaluation?.result?.enabled
+            ? '0 0 20px rgba(5, 150, 105, 0.25), 0 0 40px rgba(5, 150, 105, 0.1)'
+            : '0 0 20px rgba(220, 38, 38, 0.25), 0 0 40px rgba(220, 38, 38, 0.1)',
         },
       }}
     >
@@ -4064,7 +4067,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           <Chip
                             label={selectedEvaluation.result.variant.name}
                             size="small"
-                            color="secondary"
+                            color={selectedEvaluation.result.enabled ? 'success' : 'error'}
                             sx={{
                               borderRadius: '4px',
                               fontWeight: 600,

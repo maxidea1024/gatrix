@@ -219,7 +219,13 @@ interface Constraint {
 ### 평가 순서 (전략별)
 1. **세그먼트** — 참조된 모든 세그먼트 제약조건이 통과해야 함
 2. **제약조건** — 모든 전략 수준 제약조건이 통과해야 함
-3. **롤아웃** — MurmurHash3 기반 고정 비율 검사
+3. **전략별 고유 로직** — 등록된 전략의 `isEnabled()` 메서드에 위임
+
+> [!CAUTION]
+> **모든 전략에 롤아웃/비율 체크를 일괄 적용하면 안 됩니다.**  
+> 각 전략 클래스가 자체 활성화 로직을 내부적으로 처리해야 합니다 (예: `flexibleRollout`은 롤아웃 비율 처리, `default`는 항상 true 반환, `gradualRolloutUserId`는 userId 기반 비율 처리).  
+> 평가기의 역할은 세그먼트와 제약조건(1~2단계)에 한정됩니다. 3단계는 반드시 전략 자체의 `isEnabled()` 메서드에 위임해야 합니다.  
+> 모든 전략에 일괄적으로 롤아웃 체크를 적용하면 `default` 같은 전략이 `false`로 잘못 평가됩니다.
 
 ## Feature Flag 서비스 API
 
@@ -506,10 +512,10 @@ ASP.NET Core 애플리케이션은 현재 Request Context를 기반으로 플래
 
 | 요소 | 설명 |
 |------|------|
-| **전략 평가 순서** | Segments → Constraints → Rollout (첫 번째 매치 우선) |
+| **전략 평가 순서** | Segments → Constraints → 전략별 `isEnabled()` (첫 번째 매치 우선) |
 | **제약조건 연산자** | `str_eq`, `str_contains`, `str_starts_with`, `str_ends_with`, `str_in`, `str_regex`, `num_eq`, `num_gt`, `num_gte`, `num_lt`, `num_lte`, `num_in`, `bool_is`, `date_eq/gt/gte/lt/lte`, `semver_eq/gt/gte/lt/lte/in`, `exists`, `not_exists`, `arr_any`, `arr_all`, `arr_empty` |
 | **수정자 플래그** | `inverted` (결과 반전), `caseInsensitive` (문자열 비교) |
-| **롤아웃** | MurmurHash3 with stickiness (userId/sessionId/random/custom) |
+| **전략 위임** | 각 전략이 자체 로직을 처리: `default` → 항상 true, `flexibleRollout` → MurmurHash3 롤아웃, `gradualRolloutUserId/SessionId/Random` → 비율 기반 |
 | **배리언트 선택** | murmurhash 비율에 따른 가중치 분배 |
 | **값 변환** | `getFallbackValue(value, valueType)`으로 타입에 맞는 출력 보장 |
 

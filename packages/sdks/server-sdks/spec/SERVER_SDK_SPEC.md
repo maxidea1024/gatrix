@@ -219,7 +219,13 @@ interface Constraint {
 ### Evaluation Order (per strategy)
 1. **Segments** — All referenced segment constraints MUST pass
 2. **Constraints** — All strategy-level constraints MUST pass  
-3. **Rollout** — MurmurHash3-based sticky percentage check
+3. **Strategy-specific logic** — Delegate to registered strategy's `isEnabled()` method
+
+> [!CAUTION]
+> **DO NOT apply rollout/percentage checks generically to all strategies.**  
+> Each strategy class MUST handle its own activation logic internally (e.g., `flexibleRollout` handles rollout percentage, `default` always returns true, `gradualRolloutUserId` handles userId-based percentage).  
+> The evaluator's role is LIMITED to segments and constraints (steps 1-2). Step 3 MUST delegate to the strategy's own `isEnabled()` method.  
+> Applying a generic rollout check to all strategies will cause strategies like `default` to incorrectly evaluate as `false`.
 
 ## Feature Flag Service API
 
@@ -506,10 +512,10 @@ The evaluator MUST be a faithful port of `@gatrix/shared/FeatureFlagEvaluator`. 
 
 | Element | Description |
 |---------|-------------|
-| **Strategy evaluation order** | Segments → Constraints → Rollout (first match wins) |
+| **Strategy evaluation order** | Segments → Constraints → Strategy-specific `isEnabled()` (first match wins) |
 | **Constraint operators** | `str_eq`, `str_contains`, `str_starts_with`, `str_ends_with`, `str_in`, `str_regex`, `num_eq`, `num_gt`, `num_gte`, `num_lt`, `num_lte`, `num_in`, `bool_is`, `date_eq/gt/gte/lt/lte`, `semver_eq/gt/gte/lt/lte/in`, `exists`, `not_exists`, `arr_any`, `arr_all`, `arr_empty` |
 | **Modifier flags** | `inverted` (negate result), `caseInsensitive` (string comparison) |
-| **Rollout** | MurmurHash3 with stickiness (userId/sessionId/random/custom) |
+| **Strategy delegation** | Each strategy handles its own logic: `default` → always true, `flexibleRollout` → MurmurHash3 rollout, `gradualRolloutUserId/SessionId/Random` → percentage-based |
 | **Variant selection** | Weighted distribution via murmurhash percentage |
 | **Value coercion** | `getFallbackValue(value, valueType)` ensures type-correct output |
 
