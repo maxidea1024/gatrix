@@ -631,9 +631,10 @@ Group:Destroy()  -- 명시적 정리 (권장, GC 의존 금지)
 
 **사례 모음:**
 
+- [How We Ship Code Faster and Safer with Feature Flags](https://github.blog/engineering/infrastructure/ship-code-faster-safer-feature-flags/) — GitHub Engineering
+- [Deploys at Slack](https://slack.engineering/deploys-at-slack/) — Slack Engineering
+- [Preparing the Netflix API for Deployment](https://netflixtechblog.com/preparing-the-netflix-api-for-deployment-786d8f58090d) — Netflix Tech Blog
 - [Progressive Experimentation with Feature Flags](https://learn.microsoft.com/en-us/devops/operate/progressive-experimentation-feature-flags) — Microsoft
-- [Feature Flag Use Cases and Benefits](https://www.optimizely.com/optimization-glossary/feature-flags/) — Optimizely
-- [Feature Flag Best Practices](https://posthog.com/blog/feature-flag-best-practices) — PostHog
 
 **트럭기반 개발:**
 

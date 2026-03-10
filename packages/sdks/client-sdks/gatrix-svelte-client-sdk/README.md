@@ -216,9 +216,10 @@ Returns reactive stores for SDK status.
 
 **Use Cases & Case Studies:**
 
+- [How We Ship Code Faster and Safer with Feature Flags](https://github.blog/engineering/infrastructure/ship-code-faster-safer-feature-flags/) — GitHub Engineering
+- [Deploys at Slack](https://slack.engineering/deploys-at-slack/) — Slack Engineering
+- [Preparing the Netflix API for Deployment](https://netflixtechblog.com/preparing-the-netflix-api-for-deployment-786d8f58090d) — Netflix Tech Blog
 - [Progressive Experimentation with Feature Flags](https://learn.microsoft.com/en-us/devops/operate/progressive-experimentation-feature-flags) — Microsoft
-- [Feature Flag Use Cases and Benefits](https://www.optimizely.com/optimization-glossary/feature-flags/) — Optimizely
-- [Feature Flag Best Practices](https://posthog.com/blog/feature-flag-best-practices) — PostHog
 
 **Trunk-Based Development:**
 
