@@ -41,15 +41,41 @@ Pattern: `gatrix-{platform}-server-sdk`
 | Java | `com.gatrix.server.sdk` |
 | Go | `github.com/gatrix/gatrix-go-server-sdk` |
 
+## Data Scope (Organization → Project → Environment)
+
+> [!CAUTION]
+> **Before implementing any caching or data storage**, SDK developers MUST identify the correct **scope** for each data type. Gatrix follows a strict **Organization → Project → Environment** hierarchy. Caching data at the wrong scope will cause cross-project data leaks or missing data.
+
+**For every data type the SDK caches, determine which level it belongs to:**
+
+| Scope | Description | Example |
+|-------|-------------|---------|
+| **Per-Environment** | Data is unique to a specific environment. Cache key MUST include `environmentId`. | Feature Flag definitions, Game Worlds, Popup Notices, Surveys, Whitelists, Maintenance, Banners, Store Products, Client Versions, Service Notices, Vars |
+| **Per-Project** | Data is shared across all environments within a single project, but isolated between projects. Cache key MUST include `projectId`. | **Segments** (Feature Segments) |
+| **Per-Organization** | Data is shared across all projects within an organization. | (None currently) |
+| **Global** | Data is shared across all organizations. | (None currently) |
+
+**Implementation Requirements:**
+
+1. The API response for feature flags (`GET /api/v1/server/features`) includes a `projectId` field.
+2. SDKs MUST maintain an **`environmentId → projectId` mapping** to resolve the correct data scope.
+3. When evaluating a flag for `environmentId=X`, the evaluator MUST look up `projectId` from the mapping, then use `segments[projectId]` — NOT a global segment cache.
+4. When handling Pub/Sub events for segments (`segment.created/updated/deleted`), the `projectId` from the event payload MUST be used to scope the cache operation.
+
+> [!WARNING]
+> A common mistake is to cache segments as a single global map. This is **WRONG**. Segments are per-project and MUST be stored as `Map<projectId, Map<segmentName, Segment>>`.
+
 ## Core Concepts
 
 ### 1. Local Evaluation & Definition Caching
 
 For the Feature Flag service, Server SDKs:
-- Fetch raw **flag definitions and segments** (from `GET /api/v1/server/:environment/features`).
+- Fetch raw **flag definitions and segments** (from `GET /api/v1/server/features`). The environment is resolved server-side from the `X-API-Token` header — it is NOT part of the URL path.
 - Periodically poll or listen for invalidation events to update these definitions.
-- Store definitions locally in an optimized in-memory cache: flags are per-environment, segments are per-project.
-- Evaluate flags completely locally using a shared evaluation engine (such as porting or wrapping `@gatrix/shared`'s `FeatureFlagEvaluator`).
+- Store definitions locally in an optimized in-memory cache:
+  - **Flags** are cached **per-environment** (each environment has its own set of flag definitions).
+  - **Segments** are cached **per-project** (NOT global). Gatrix follows an **Organization → Project → Environment** hierarchy. Segments belong to a project and are shared across all environments within that project, but are isolated between projects. The API response includes a `projectId` field to identify which project the segments belong to, and the SDK MUST maintain an `environmentId → projectId` mapping to resolve the correct segments during evaluation.
+- Evaluate flags completely locally using a shared evaluation engine (such as porting or wrapping `@gatrix/evaluator`'s `FeatureFlagEvaluator`; types are defined in `@gatrix/shared`). When evaluating a flag for a given environment, the evaluator MUST use the segments from the project that the environment belongs to.
 - Buffer usage metrics locally and flush them periodically to the Gatrix Edge API to avoid network spam.
 - **Unlike Client SDKs, Server SDKs DO NOT have `synced` vs `realtime` flag concepts or `explicitSyncMode`.** Every flag evaluation is implicitly realtime, using the absolute latest definitions from the in-memory cache. Mid-session consistency is handled by passing identical contexts across stateless requests.
 
@@ -139,7 +165,7 @@ When `cache.refreshMethod` is `"event"`, the SDK subscribes to a Redis Pub/Sub c
 #### Processing Rules
 
 1. **Feature gate check:** Before processing, check if the relevant feature is enabled in `FeaturesOptions`. Skip silently if disabled.
-2. **Environment required:** All events include `data.environment`. If missing, log a warning and skip.
+2. **Environment / Project scoping:** Events carry `data.environmentId` (or `data.environment`) to identify the target environment. **Segment events (`segment.*`) do NOT require an environment** — they use `data.projectId` instead, since segments are per-project. For non-segment events, if `environmentId` is missing, log a warning and skip.
 3. **Reconnection:** On Redis reconnection, refresh ALL caches immediately to recover missed events.
 4. **Fallback:** If Redis connection fails during initialization, fall back to polling mode.
 
@@ -197,38 +223,38 @@ interface Constraint {
 
 All methods follow this parameter order convention:
 - **Required:** `flagName`, `fallback` (where applicable)
-- **Optional:** `context?`, `environment?` (both can be omitted)
+- **Optional:** `context?`, `environmentId?` (both can be omitted)
 
-When `environment` is omitted, single-environment mode uses the configured default.
-In multi-environment mode (Edge server), `environment` should be specified explicitly.
+When `environmentId` is omitted, single-environment mode uses the configured default.
+In multi-environment mode (Edge server), `environmentId` should be specified explicitly.
 
 ```csharp
 // Core Evaluation
-EvaluationResult Evaluate(string flagName, EvaluationContext? context = null, string? environment = null);
-bool IsEnabled(string flagName, bool fallback, EvaluationContext? context = null, string? environment = null);
+EvaluationResult Evaluate(string flagName, EvaluationContext? context = null, string? environmentId = null);
+bool IsEnabled(string flagName, bool fallback, EvaluationContext? context = null, string? environmentId = null);
 
 // Variant Name (returns matched variant name, not the value)
-string Variation(string flagName, string fallback = "", EvaluationContext? context = null, string? environment = null);
+string Variation(string flagName, string fallback = "", EvaluationContext? context = null, string? environmentId = null);
 
 // Typed Variations (returns the variant VALUE converted to the specified type)
 // IMPORTANT: BoolVariation returns the variant's VALUE parsed as bool, NOT the flag's enabled state.
 //            Use IsEnabled() for the flag's enabled state.
-string StringVariation(string flagName, string fallback, EvaluationContext? context = null, string? environment = null);
-int    IntVariation(string flagName, int fallback, EvaluationContext? context = null, string? environment = null);
-long   LongVariation(string flagName, long fallback, EvaluationContext? context = null, string? environment = null);
-float  FloatVariation(string flagName, float fallback, EvaluationContext? context = null, string? environment = null);
-double DoubleVariation(string flagName, double fallback, EvaluationContext? context = null, string? environment = null);
-bool   BoolVariation(string flagName, bool fallback, EvaluationContext? context = null, string? environment = null);
-T?     JsonVariation<T>(string flagName, T? fallback = default, EvaluationContext? context = null, string? environment = null);
+string StringVariation(string flagName, string fallback, EvaluationContext? context = null, string? environmentId = null);
+int    IntVariation(string flagName, int fallback, EvaluationContext? context = null, string? environmentId = null);
+long   LongVariation(string flagName, long fallback, EvaluationContext? context = null, string? environmentId = null);
+float  FloatVariation(string flagName, float fallback, EvaluationContext? context = null, string? environmentId = null);
+double DoubleVariation(string flagName, double fallback, EvaluationContext? context = null, string? environmentId = null);
+bool   BoolVariation(string flagName, bool fallback, EvaluationContext? context = null, string? environmentId = null);
+T?     JsonVariation<T>(string flagName, T? fallback = default, EvaluationContext? context = null, string? environmentId = null);
 
 // *Details — returns value + evaluation metadata (reason, variant name)
-EvaluationDetail<string> StringVariationDetails(string flagName, string fallback, EvaluationContext? context = null, string? environment = null);
-EvaluationDetail<int>    IntVariationDetails(string flagName, int fallback, EvaluationContext? context = null, string? environment = null);
+EvaluationDetail<string> StringVariationDetails(string flagName, string fallback, EvaluationContext? context = null, string? environmentId = null);
+EvaluationDetail<int>    IntVariationDetails(string flagName, int fallback, EvaluationContext? context = null, string? environmentId = null);
 // ... (all types follow the same pattern)
 
 // *OrThrow — throws FeatureFlagException if flag not found or no value
-string StringVariationOrThrow(string flagName, EvaluationContext? context = null, string? environment = null);
-int    IntVariationOrThrow(string flagName, EvaluationContext? context = null, string? environment = null);
+string StringVariationOrThrow(string flagName, EvaluationContext? context = null, string? environmentId = null);
+int    IntVariationOrThrow(string flagName, EvaluationContext? context = null, string? environmentId = null);
 // ... (all types follow the same pattern)
 ```
 
@@ -303,10 +329,9 @@ All Server SDKs MUST include the following standard headers on every HTTP reques
 
 | Header | Value | Description |
 |--------|-------|-------------|
-| `X-API-Token` | `{apiToken}` | Server API Token for authentication |
+| `X-API-Token` | `{apiToken}` | Server API Token for authentication (environment is resolved from this token) |
 | `X-Application-Name` | `{appName}` | Application name from config |
-| `X-SDK-Version` | `{sdkName}/{version}` | e.g., `gatrix-dotnet-server-sdk/1.0.0` |
-| `X-Environment` | `{environment}` | The target environment (or `*` for Edge modes) |
+| `X-SDK-Version` | `{sdkName}/{version}` | e.g., `gatrix-java-server-sdk/1.0.0` |
 | `Content-Type` | `application/json` | Required for POST/PUT requests |
 
 ## Metrics & Telemetry
@@ -438,7 +463,7 @@ The evaluator MUST be a faithful port of `@gatrix/shared/FeatureFlagEvaluator`. 
 SDK MUST buffer flag evaluation metrics and flush periodically (default: 60s).
 
 ```
-POST /api/v1/client/features/:environment/metrics
+POST /api/v1/server/features/metrics
 {
   appName, sdkVersion,
   bucket: {
