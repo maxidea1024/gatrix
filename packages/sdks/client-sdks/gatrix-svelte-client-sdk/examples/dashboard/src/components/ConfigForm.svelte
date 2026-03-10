@@ -16,6 +16,8 @@
   const STORAGE_KEY_REFRESH_INTERVAL = 'gatrix-dashboard-refresh-interval';
   const STORAGE_KEY_EXPLICIT_SYNC = 'gatrix-dashboard-explicit-sync';
   const STORAGE_KEY_MANUAL_POLLING = 'gatrix-dashboard-manual-polling';
+  const STORAGE_KEY_STREAMING_ENABLED = 'gatrix-dashboard-streaming-enabled';
+  const STORAGE_KEY_STREAMING_MODE = 'gatrix-dashboard-streaming-mode';
   const STORAGE_KEY_USER_ID = 'gatrix-dashboard-user-id';
 
   type ServerLocation = 'local' | 'remote';
@@ -45,6 +47,8 @@
   let refreshInterval = 1;
   let manualPolling = false;
   let explicitSyncMode = false;
+  let streamingEnabled = true;
+  let streamingMode: 'sse' | 'websocket' = 'sse';
 
   $: isLocal = location === 'local';
 
@@ -73,6 +77,8 @@
     const savedInterval = parseInt(localStorage.getItem(STORAGE_KEY_REFRESH_INTERVAL) || '1', 10);
     refreshInterval = !manualPolling && savedInterval === 0 ? 1 : savedInterval;
     explicitSyncMode = localStorage.getItem(STORAGE_KEY_EXPLICIT_SYNC) === 'true';
+    streamingEnabled = localStorage.getItem(STORAGE_KEY_STREAMING_ENABLED) !== 'false';
+    streamingMode = (localStorage.getItem(STORAGE_KEY_STREAMING_MODE) as 'sse' | 'websocket') || 'sse';
   });
 
   function handleLocationChange(loc: ServerLocation) {
@@ -110,6 +116,8 @@
     localStorage.setItem(STORAGE_KEY_REFRESH_INTERVAL, String(manualPolling ? 0 : refreshInterval));
     localStorage.setItem(STORAGE_KEY_MANUAL_POLLING, String(manualPolling));
     localStorage.setItem(STORAGE_KEY_EXPLICIT_SYNC, String(explicitSyncMode));
+    localStorage.setItem(STORAGE_KEY_STREAMING_ENABLED, String(streamingEnabled));
+    localStorage.setItem(STORAGE_KEY_STREAMING_MODE, streamingMode);
 
     if (!isLocal) {
       localStorage.setItem(STORAGE_KEY_API_URL, apiUrl);
@@ -126,11 +134,15 @@
       apiUrl,
       apiToken,
       appName,
-      offlineMode,
-      context: { userId },
       features: {
+        context: { userId },
+        offlineMode,
         refreshInterval: manualPolling ? 0 : refreshInterval,
         explicitSyncMode,
+        streaming: {
+          enabled: streamingEnabled,
+          transport: streamingMode,
+        },
       },
     });
   }
@@ -139,9 +151,7 @@
 <div class="login-container">
   <div class="login-box">
     <div class="nes-container is-dark with-title">
-      <p class="title" style="background-color:#000">
-        <i class="nes-icon coin is-small"></i> CONNECT TO GATRIX
-      </p>
+      <p class="title" style="background-color:#000">CONNECT TO GATRIX</p>
 
       <form on:submit|preventDefault={handleSubmit}>
         <!-- Server Location -->
@@ -241,10 +251,7 @@
                 style="position:absolute;right:4px;padding:4px 8px;height:38px;display:flex;align-items:center;justify-content:center"
                 title={showToken ? 'Hide Token' : 'Show Token'}
               >
-                <i
-                  class="nes-icon is-small {showToken ? 'close' : 'eye'}"
-                  style="transform:scale(1.2)"
-                ></i>
+                {showToken ? '[X]' : '[EYE]'}
               </button>
             </div>
           </div>
@@ -258,17 +265,15 @@
 
         <hr class="nes-hr" style="margin:25px 0" />
 
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">APP NAME</label>
-            <input
-              type="text"
-              class="nes-input is-dark"
-              bind:value={appName}
-              placeholder="my-app"
-              required
-            />
-          </div>
+        <div class="form-group">
+          <label class="form-label">APP NAME</label>
+          <input
+            type="text"
+            class="nes-input is-dark"
+            bind:value={appName}
+            placeholder="svelte-sdk-app"
+            required
+          />
         </div>
 
         <div class="form-group">
@@ -288,7 +293,7 @@
               title="Generate random User ID"
               style="font-size:10px;white-space:nowrap"
             >
-              ?�� RANDOM
+              RANDOM
             </button>
           </div>
         </div>
@@ -336,6 +341,45 @@
               />
               <span class="checkbox-label">EXPLICIT SYNC</span>
             </label>
+          </div>
+
+          <!-- Streaming -->
+          <div class="form-group" style="margin-top:20px">
+            <label class="form-label">STREAMING (REAL-TIME)</label>
+            <div class="checkbox-group" style="margin-bottom:10px">
+              <label>
+                <input
+                  type="checkbox"
+                  class="nes-checkbox is-dark"
+                  bind:checked={streamingEnabled}
+                />
+                <span class="checkbox-label">ENABLE STREAMING</span>
+              </label>
+            </div>
+            {#if streamingEnabled}
+              <div style="display:flex;gap:30px;margin-left:35px">
+                <label>
+                  <input
+                    type="radio"
+                    class="nes-radio is-dark"
+                    name="streamingMode"
+                    checked={streamingMode === 'sse'}
+                    on:change={() => (streamingMode = 'sse')}
+                  />
+                  <span>SSE</span>
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    class="nes-radio is-dark"
+                    name="streamingMode"
+                    checked={streamingMode === 'websocket'}
+                    on:change={() => (streamingMode = 'websocket')}
+                  />
+                  <span>WEBSOCKET</span>
+                </label>
+              </div>
+            {/if}
           </div>
         {/if}
 
