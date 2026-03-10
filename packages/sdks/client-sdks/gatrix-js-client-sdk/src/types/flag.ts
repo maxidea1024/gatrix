@@ -42,7 +42,7 @@ export interface FlagsApiResponse {
     flags: EvaluatedFlag[];
   };
   meta?: {
-    environment: string;
+    environmentId: string;
     evaluatedAt: string;
   };
 }
