@@ -13,7 +13,6 @@ def validate_config(config: GatrixClientConfig) -> None:
     _require_non_empty(config.api_url, "apiUrl")
     _require_non_empty(config.api_token, "apiToken")
     _require_non_empty(config.app_name, "appName")
-    _require_non_empty(config.environment, "environment")
 
     # URL format
     _validate_url(config.api_url)

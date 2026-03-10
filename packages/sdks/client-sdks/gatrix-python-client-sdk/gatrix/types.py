@@ -123,7 +123,6 @@ class GatrixClientConfig:
     api_url: str = ""
     api_token: str = ""
     app_name: str = ""
-    environment: str = ""
 
     # Optional
     custom_headers: Optional[Dict[str, str]] = None

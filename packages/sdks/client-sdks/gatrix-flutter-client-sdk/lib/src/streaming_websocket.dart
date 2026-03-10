@@ -20,7 +20,6 @@ class WebSocketConnection {
   final String apiUrl;
   final String apiToken;
   final String appName;
-  final String environment;
   final String connectionId;
   final String sdkVersion;
   final WebSocketStreamingConfig config;
@@ -52,7 +51,6 @@ class WebSocketConnection {
     required this.apiUrl,
     required this.apiToken,
     required this.appName,
-    required this.environment,
     required this.connectionId,
     required this.sdkVersion,
     required this.config,
@@ -107,7 +105,6 @@ class WebSocketConnection {
       ...uri.queryParameters,
       'x-api-token': apiToken,
       'appName': appName,
-      'environment': environment,
       'connectionId': connectionId,
       'sdkVersion': sdkVersion,
     };

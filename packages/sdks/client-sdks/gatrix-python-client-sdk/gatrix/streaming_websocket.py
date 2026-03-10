@@ -37,7 +37,6 @@ class WebSocketConnection:
         api_url: str,
         api_token: str,
         app_name: str,
-        environment: str,
         connection_id: str,
         sdk_version: str,
         config: WebSocketStreamingConfig,
@@ -47,7 +46,6 @@ class WebSocketConnection:
         self._api_url = api_url
         self._api_token = api_token
         self._app_name = app_name
-        self._environment = environment
         self._connection_id = connection_id
         self._sdk_version = sdk_version
         self._config = config
@@ -147,7 +145,6 @@ class WebSocketConnection:
         params = (
             f"x-api-token={self._api_token}"
             f"&appName={self._app_name}"
-            f"&environment={self._environment}"
             f"&connectionId={self._connection_id}"
             f"&sdkVersion={self._sdk_version}"
         )

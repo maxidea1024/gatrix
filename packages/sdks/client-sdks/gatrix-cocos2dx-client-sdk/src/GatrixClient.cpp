@@ -27,8 +27,6 @@ bool GatrixClient::initInternal(const GatrixClientConfig& config) {
     throw GatrixFeatureError("Config validation failed: apiToken is required");
   if (config.appName.empty())
     throw GatrixFeatureError("Config validation failed: appName is required");
-  if (config.environment.empty())
-    throw GatrixFeatureError("Config validation failed: environment is required");
 
   // Validate URL format
   if (config.apiUrl.substr(0, 7) != "http://" && config.apiUrl.substr(0, 8) != "https://")

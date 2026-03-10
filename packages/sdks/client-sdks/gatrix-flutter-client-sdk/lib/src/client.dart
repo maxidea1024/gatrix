@@ -7,7 +7,6 @@ class GatrixClientConfig {
   final String apiUrl;
   final String apiToken;
   final String appName;
-  final String environment;
   final Map<String, String>? customHeaders;
   final bool enableDevMode;
   final FeaturesConfig features;
@@ -16,7 +15,6 @@ class GatrixClientConfig {
     required this.apiUrl,
     required this.apiToken,
     required this.appName,
-    required this.environment,
     this.customHeaders,
     this.enableDevMode = false,
     this.features = const FeaturesConfig(),
@@ -38,7 +36,6 @@ class GatrixClient {
       apiUrl: config.apiUrl,
       apiToken: config.apiToken,
       appName: config.appName,
-      environment: config.environment,
       context: config.features.context ?? GatrixContext(),
       events: _events,
       explicitSyncMode: config.features.explicitSyncMode,
@@ -56,9 +53,6 @@ class GatrixClient {
     }
     if (config.appName.trim().isEmpty) {
       throw ArgumentError('Config validation failed: appName is required');
-    }
-    if (config.environment.trim().isEmpty) {
-      throw ArgumentError('Config validation failed: environment is required');
     }
 
     // URL format

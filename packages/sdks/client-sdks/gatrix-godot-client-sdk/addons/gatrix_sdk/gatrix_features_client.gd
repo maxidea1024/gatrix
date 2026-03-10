@@ -1327,7 +1327,6 @@ func _build_metrics_payload() -> String:
 
 	var payload := {
 		"appName": _config.app_name,
-		"environment": _config.environment,
 		"sdkName": SDK_NAME,
 		"sdkVersion": SDK_VERSION,
 		"connectionId": _connection_id,

@@ -45,7 +45,6 @@ func start(config: GatrixTypes.GatrixClientConfig, storage: GatrixStorageProvide
 	assert(config.api_url.strip_edges() != "", "GatrixSDK: api_url is required")
 	assert(config.api_token.strip_edges() != "", "GatrixSDK: api_token is required")
 	assert(config.app_name.strip_edges() != "", "GatrixSDK: app_name is required")
-	assert(config.environment.strip_edges() != "", "GatrixSDK: environment is required")
 
 	# Validate URL format
 	assert(
@@ -108,7 +107,7 @@ func start(config: GatrixTypes.GatrixClientConfig, storage: GatrixStorageProvide
 	# Start fetching, polling, metrics
 	_features.start()
 
-	print("[GatrixSDK] Started (app=%s, env=%s)" % [config.app_name, config.environment])
+	print("[GatrixSDK] Started (app=%s)" % config.app_name)
 
 
 ## Stop the SDK (stops polling, cleans up).

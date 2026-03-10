@@ -19,7 +19,6 @@ class SseConnection {
   final String apiUrl;
   final String apiToken;
   final String appName;
-  final String environment;
   final String connectionId;
   final String sdkVersion;
   final SseStreamingConfig config;
@@ -53,7 +52,6 @@ class SseConnection {
     required this.apiUrl,
     required this.apiToken,
     required this.appName,
-    required this.environment,
     required this.connectionId,
     required this.sdkVersion,
     required this.config,
@@ -99,7 +97,6 @@ class SseConnection {
     final params = <String, String>{
       'x-api-token': apiToken,
       'appName': appName,
-      'environment': environment,
       'connectionId': connectionId,
       'sdkVersion': sdkVersion,
     };

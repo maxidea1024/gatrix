@@ -111,7 +111,7 @@ static func _create_missing_flag() -> EvaluatedFlag:
 
 
 # Evaluation context (global for client-side)
-# System fields (app_name, environment) cannot be removed via update_context.
+# System fields (app_name) cannot be removed via update_context.
 class GatrixContext:
 	var user_id: String = ""
 	var session_id: String = ""
@@ -232,7 +232,6 @@ class GatrixClientConfig:
 	var api_url: String = "http://localhost:3400/api/v1"
 	var api_token: String = ""
 	var app_name: String = ""
-	var environment: String = ""
 
 	# Optional
 	var custom_headers: Dictionary = {}

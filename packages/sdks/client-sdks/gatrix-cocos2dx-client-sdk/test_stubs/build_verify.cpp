@@ -18,7 +18,6 @@ int main() {
   config.apiUrl = "https://edge.test.com/api/v1";
   config.apiToken = "test-token";
   config.appName = "test-app";
-  config.environment = "production";
   config.features.refreshInterval = 30;
   config.features.disableRefresh = false;
   config.features.explicitSyncMode = false;

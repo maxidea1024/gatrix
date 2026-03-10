@@ -82,8 +82,7 @@ def _truncate_to_minute(iso_string: str) -> str:
         return iso_string
 
 
-def _context_to_qs(ctx: Optional[GatrixContext], app_name: str,
-                   environment: str) -> str:
+def _context_to_qs(ctx: Optional[GatrixContext], app_name: str) -> str:
     """Build query-string from context for GET requests."""
     params: List[str] = []
 
@@ -93,7 +92,6 @@ def _context_to_qs(ctx: Optional[GatrixContext], app_name: str,
             params.append(f"{key}={quote(val)}")
 
     add("appName", app_name)
-    add("environment", environment)
     if ctx:
         add("userId", ctx.user_id)
         add("sessionId", ctx.session_id)
@@ -106,10 +104,9 @@ def _context_to_qs(ctx: Optional[GatrixContext], app_name: str,
     return "&".join(params)
 
 
-def _context_to_body(ctx: Optional[GatrixContext], app_name: str,
-                     environment: str) -> dict:
+def _context_to_body(ctx: Optional[GatrixContext], app_name: str) -> dict:
     """Build POST body from context."""
-    body: dict = {"appName": app_name, "environment": environment}
+    body: dict = {"appName": app_name}
     if ctx:
         if ctx.user_id:
             body["userId"] = ctx.user_id
@@ -199,7 +196,6 @@ class FeaturesClient:
         self._api_url = config.api_url.rstrip("/")
         self._api_token = config.api_token
         self._app_name = config.app_name
-        self._environment = config.environment
         self._custom_headers = config.custom_headers or {}
         self._offline_mode = feat.offline_mode
         self._dev_mode = config.enable_dev_mode
@@ -1112,13 +1108,13 @@ class FeaturesClient:
             headers["If-None-Match"] = self._etag
 
         if self._use_post:
-            body = _context_to_body(self._context, self._app_name, self._environment)
+            body = _context_to_body(self._context, self._app_name)
             headers["Content-Type"] = "application/json"
             url = f"{self._api_url}/client/features"
             data = json.dumps(body).encode("utf-8")
             return Request(url, data=data, headers=headers, method="POST")
         else:
-            qs = _context_to_qs(self._context, self._app_name, self._environment)
+            qs = _context_to_qs(self._context, self._app_name)
             url = f"{self._api_url}/client/features?{qs}"
             return Request(url, headers=headers, method="GET")
 
@@ -1357,7 +1353,6 @@ class FeaturesClient:
 
         body = {
             "appName": self._app_name,
-            "environment": self._environment,
             "sdkName": SDK_NAME,
             "sdkVersion": SDK_VERSION,
             "connectionId": self._connection_id,
@@ -1541,7 +1536,6 @@ class FeaturesClient:
                 api_url=self._config.api_url,
                 api_token=self._config.api_token,
                 app_name=self._config.app_name,
-                environment=self._config.environment,
                 connection_id=self._connection_id,
                 sdk_version=sdk_version_str,
                 config=config.ws,
@@ -1560,7 +1554,6 @@ class FeaturesClient:
                 api_url=self._config.api_url,
                 api_token=self._config.api_token,
                 app_name=self._config.app_name,
-                environment=self._config.environment,
                 connection_id=self._connection_id,
                 sdk_version=sdk_version_str,
                 config=config.sse,

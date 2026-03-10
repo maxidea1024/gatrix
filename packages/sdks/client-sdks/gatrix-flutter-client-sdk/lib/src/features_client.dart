@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
@@ -19,7 +19,6 @@ class FeaturesClient implements VariationProvider {
   final String _apiUrl;
   final String _apiToken;
   final String _appName;
-  final String _environment;
   final GatrixContext _context;
   final EventEmitter _events;
   final Map<String, String>? _customHeaders;
@@ -92,7 +91,6 @@ class FeaturesClient implements VariationProvider {
     required String apiUrl,
     required String apiToken,
     required String appName,
-    required String environment,
     required GatrixContext context,
     required EventEmitter events,
     bool explicitSyncMode = true,
@@ -106,7 +104,6 @@ class FeaturesClient implements VariationProvider {
   })  : _apiUrl = apiUrl,
         _apiToken = apiToken,
         _appName = appName,
-        _environment = environment,
         _context = context,
         _events = events,
         _explicitSyncMode = explicitSyncMode,
@@ -969,7 +966,6 @@ class FeaturesClient implements VariationProvider {
         headers: headers,
         body: jsonEncode({
           'appName': _appName,
-          'environment': _environment,
           ..._context.toJson(),
         }),
       );
@@ -1276,7 +1272,6 @@ class FeaturesClient implements VariationProvider {
         apiUrl: _apiUrl,
         apiToken: _apiToken,
         appName: _appName,
-        environment: _environment,
         connectionId: _connectionId,
         sdkVersion: sdkVersionStr,
         config: config.ws,
@@ -1294,7 +1289,6 @@ class FeaturesClient implements VariationProvider {
         apiUrl: _apiUrl,
         apiToken: _apiToken,
         appName: _appName,
-        environment: _environment,
         connectionId: _connectionId,
         sdkVersion: sdkVersionStr,
         config: config.sse,

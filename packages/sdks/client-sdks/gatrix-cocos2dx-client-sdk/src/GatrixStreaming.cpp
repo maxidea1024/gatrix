@@ -186,7 +186,6 @@ std::string StreamingManager::buildQueryParams() const {
   std::string params;
   params += "x-api-token=" + _config.apiToken;
   params += "&appName=" + _config.appName;
-  params += "&environment=" + _config.environment;
   params += "&connectionId=" + _connectionId;
   params += "&sdkVersion=" + std::string(SDK_NAME) + "/" + std::string(SDK_VERSION);
   return params;

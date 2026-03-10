@@ -129,7 +129,6 @@ FeaturesClient::FeaturesClient(const GatrixClientConfig& config, GatrixEventEmit
 
   // Set system context
   _context.properties["appName"] = _config.appName;
-  _context.properties["environment"] = _config.environment;
 
   // Storage
   _storage = &_defaultStorage;
@@ -591,7 +590,6 @@ void FeaturesClient::fetchFlags(std::function<void(bool, const std::string&)> on
   headers.push_back("Content-Type: application/json");
   headers.push_back("X-API-Token: " + _config.apiToken);
   headers.push_back("X-Application-Name: " + _config.appName);
-  headers.push_back("X-Environment: " + _config.environment);
   headers.push_back("X-Connection-Id: " + _connectionId);
   headers.push_back("X-SDK-Version: " + std::string(SDK_NAME) + "/" + std::string(SDK_VERSION));
   headers.push_back("X-Gatrix-Context-Hash: " + _lastContextHash);
@@ -1352,7 +1350,6 @@ void FeaturesClient::fetchPartialFlags(const std::vector<std::string>& changedKe
   headers.push_back("Content-Type: application/json");
   headers.push_back("X-API-Token: " + _config.apiToken);
   headers.push_back("X-Application-Name: " + _config.appName);
-  headers.push_back("X-Environment: " + _config.environment);
   headers.push_back("X-Connection-Id: " + _connectionId);
   headers.push_back("X-SDK-Version: " + std::string(GatrixVersion::SDK_NAME) + "/" +
                     GatrixVersion::SDK_VERSION);

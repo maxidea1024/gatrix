@@ -237,7 +237,6 @@ struct GatrixClientConfig {
   std::string apiUrl;
   std::string apiToken;
   std::string appName;
-  std::string environment;
 
   // Optional
   std::map<std::string, std::string> customHeaders;
