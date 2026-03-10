@@ -508,7 +508,8 @@ const startServer = async () => {
       // Register Backend service to Service Discovery via SDK
       // Must be done AFTER server starts listening
       try {
-        const { GatrixServerSDK } = await import('@gatrix/gatrix-node-server-sdk');
+        const { GatrixServerSDK } =
+          await import('@gatrix/gatrix-node-server-sdk');
         // Use APP_VERSION env var (set via Docker build-arg) or fallback to package.json
         let serverVersion = process.env.APP_VERSION || '0.0.0';
         if (serverVersion === '0.0.0') {

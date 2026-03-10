@@ -208,9 +208,12 @@ async function main() {
 
     if (gamePackageJson.dependencies) {
       // Update gatrix-server-sdk
-      const oldSdkDep = gamePackageJson.dependencies['@gatrix/gatrix-node-server-sdk'] || gamePackageJson.dependencies['gatrix-node-server-sdk'];
+      const oldSdkDep =
+        gamePackageJson.dependencies['@gatrix/gatrix-node-server-sdk'] ||
+        gamePackageJson.dependencies['gatrix-node-server-sdk'];
       const newSdkDep = `file:./lib/${tgzFileName}`;
-      gamePackageJson.dependencies['@gatrix/gatrix-node-server-sdk'] = newSdkDep;
+      gamePackageJson.dependencies['@gatrix/gatrix-node-server-sdk'] =
+        newSdkDep;
       if (gamePackageJson.dependencies['gatrix-node-server-sdk']) {
         delete gamePackageJson.dependencies['gatrix-node-server-sdk'];
       }

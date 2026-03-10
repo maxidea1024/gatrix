@@ -787,9 +787,18 @@ export class FeatureFlagService {
     environmentId?: string
   ): boolean {
     if (typeof contextOrFallback === 'boolean') {
-      return this.isEnabled(flagName, contextOrFallback, fallbackOrEnvId as string | undefined);
+      return this.isEnabled(
+        flagName,
+        contextOrFallback,
+        fallbackOrEnvId as string | undefined
+      );
     }
-    return this.isEnabled(flagName, contextOrFallback, fallbackOrEnvId as boolean, environmentId);
+    return this.isEnabled(
+      flagName,
+      contextOrFallback,
+      fallbackOrEnvId as boolean,
+      environmentId
+    );
   }
 
   /**
@@ -1248,10 +1257,7 @@ export class FeatureFlagService {
    * Get JSON variation or throw if not available
    * Throws FeatureFlagError if flag not found, has no value, or value is not valid JSON
    */
-  jsonVariationOrThrow<T = any>(
-    flagName: string,
-    environmentId?: string
-  ): T;
+  jsonVariationOrThrow<T = any>(flagName: string, environmentId?: string): T;
   jsonVariationOrThrow<T = any>(
     flagName: string,
     context: EvaluationContext,
