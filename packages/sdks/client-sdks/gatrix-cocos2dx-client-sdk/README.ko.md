@@ -10,7 +10,7 @@ Cocos2d-x 게임 엔진을 위한 Gatrix 플랫폼 C++ SDK입니다.
 - **Variation Details**: `boolVariationDetails` 등 — 이유, 존재 여부, 활성화 여부 포함
 - **OrThrow Variations**: 플래그 없거나 비활성화 시 예외 발생
 - **FlagProxy**: 전체 속성 접근 (exists, enabled, name, variant 등)
-- **Watch 패턴**: `watchFlag`, `watchFlagWithInitialState`, `WatchFlagGroup` 체인 API
+- **Watch 패턴**: `watchRealtimeFlag`, `watchSyncedFlag`, `watchRealtimeFlagWithInitialState`, `watchSyncedFlagWithInitialState`, `WatchFlagGroup` 체인 API
 - **명시적 동기화 모드**: `isExplicitSync`, `hasPendingSyncFlags`, `syncFlags`
 - **이벤트 시스템**: `on`, `once`, `off`, `onAny`, `offAny` + 핸들러 통계 추적
 - **스토리지 프로바이더**: `IStorageProvider` 인터페이스 + `InMemoryStorageProvider`
@@ -118,7 +118,7 @@ try {
 ### FlagProxy
 
 ```cpp
-features->watchFlagWithInitialState("special-offer", [](FlagProxy flag) {
+features->watchRealtimeFlagWithInitialState("special-offer", [](FlagProxy flag) {
   flag.exists();          // bool
   flag.enabled();         // bool
   flag.name();            // const string&
@@ -150,24 +150,30 @@ features->watchFlagWithInitialState("special-offer", [](FlagProxy flag) {
 
 ```cpp
 // 변경 감시 (초기 상태 제외)
-auto unwatch = features->watchFlag("my-feature", [](gatrix::FlagProxy flag) {
+auto unwatch = features->watchSyncedFlag("my-feature", [](gatrix::FlagProxy flag) {
     updateUI(flag.enabled());
 });
 
 // 초기 상태 포함 감시
-auto unwatchInit = features->watchFlagWithInitialState("my-feature", [](gatrix::FlagProxy flag) {
+auto unwatchInit = features->watchSyncedFlagWithInitialState("my-feature", [](gatrix::FlagProxy flag) {
     updateUI(flag.enabled());
+});
+
+// 실시간 감시 - explicitSyncMode와 관계없이 즉시 반영
+auto unwatchRt = features->watchRealtimeFlag("realtime-feature", [](gatrix::FlagProxy flag) {
+    updateDebugUI(flag.enabled());
 });
 
 // 감시 중지
 unwatch();
 unwatchInit();
+unwatchRt();
 
 // Watch 그룹 (일괄 관리)
 auto* group = features->createWatchFlagGroup("scene-flags");
-group->watchFlag("flag-1", handler1)
-     .watchFlag("flag-2", handler2)
-     .watchFlagWithInitialState("flag-3", handler3);
+group->watchRealtimeFlag("flag-1", handler1)
+     .watchSyncedFlag("flag-2", handler2)
+     .watchSyncedFlagWithInitialState("flag-3", handler3);
 
 // 한번에 모두 구독 해제
 group->unwatchAll();
@@ -253,7 +259,10 @@ stats.flagVariantCounts;    // map<string, map<string, int>>
 | `EVENTS::FLAGS_RECOVERED` | `"flags.recovered"` |
 | `EVENTS::FLAGS_SYNC` | `"flags.sync"` |
 | `EVENTS::FLAGS_IMPRESSION` | `"flags.impression"` |
+| `EVENTS::FLAGS_PENDING_SYNC` | `"flags.pending_sync"` |
+| `EVENTS::FLAGS_REMOVED` | `"flags.removed"` |
 | `EVENTS::FLAGS_METRICS_SENT` | `"flags.metrics.sent"` |
+| `EVENTS::FLAGS_METRICS_ERROR` | `"flags.metrics.error"` |
 | `EVENTS::flagChange("name")` | `"flags.name.change"` |
 
 ## 라이선스

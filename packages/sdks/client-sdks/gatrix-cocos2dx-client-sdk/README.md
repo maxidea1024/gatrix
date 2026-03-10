@@ -270,7 +270,10 @@ stats.flagVariantCounts;    // map<string, map<string, int>>
 | `EVENTS::FLAGS_RECOVERED`     | `"flags.recovered"`     |
 | `EVENTS::FLAGS_SYNC`          | `"flags.sync"`          |
 | `EVENTS::FLAGS_IMPRESSION`    | `"flags.impression"`    |
+| `EVENTS::FLAGS_PENDING_SYNC` | `"flags.pending_sync"` |
+| `EVENTS::FLAGS_REMOVED`      | `"flags.removed"`      |
 | `EVENTS::FLAGS_METRICS_SENT`  | `"flags.metrics.sent"`  |
+| `EVENTS::FLAGS_METRICS_ERROR` | `"flags.metrics.error"` |
 | `EVENTS::flagChange("name")`  | `"flags.name.change"`   |
 
 ## 🎮 Feature Flags in Games
