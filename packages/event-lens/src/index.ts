@@ -63,18 +63,17 @@ async function start() {
       const apiToken = process.env.API_TOKEN || 'unsecured-server-api-token';
 
       gatrixSdk = new GatrixServerSDK({
-        gatrixUrl: backendUrl,
+        apiUrl: backendUrl,
         apiToken: apiToken,
         applicationName: 'event-lens',
         service: 'event-lens',
         group: process.env.SERVICE_GROUP || 'gatrix',
-        environment: process.env.ENVIRONMENT || 'gatrix-env',
         logger: { level: 'info' },
         cache: {
           enabled: false, // Disable cache - not needed for service discovery only
           skipBackendReady: true, // Don't wait for backend - event-lens may start before backend
         },
-        features: {
+        uses: {
           gameWorld: false,
           popupNotice: false,
           survey: false,

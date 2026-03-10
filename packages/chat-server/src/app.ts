@@ -344,17 +344,16 @@ class ChatServerApp {
               process.env.API_TOKEN || 'unsecured-server-api-token';
 
             gatrixSdk = new GatrixServerSDK({
-              gatrixUrl: backendUrl,
+              apiUrl: backendUrl,
               apiToken: apiToken,
               applicationName: 'chat-server',
               service: 'chat',
               group: process.env.SERVICE_GROUP || 'gatrix',
-              environment: process.env.ENVIRONMENT || 'gatrix-env',
               logger: { level: 'info' },
               cache: {
                 enabled: false, // Chat server doesn't need caching for now
               },
-              features: {
+              uses: {
                 gameWorld: false,
                 popupNotice: false,
                 survey: false,
