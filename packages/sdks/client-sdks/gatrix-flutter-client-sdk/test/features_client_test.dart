@@ -35,7 +35,6 @@ FeaturesClient makeClient({
     apiUrl: 'https://test.example.com',
     apiToken: 'test-token',
     appName: 'test-app',
-    environment: 'test',
     context: GatrixContext(userId: 'test-user'),
     events: EventEmitter(),
     explicitSyncMode: explicitSyncMode,

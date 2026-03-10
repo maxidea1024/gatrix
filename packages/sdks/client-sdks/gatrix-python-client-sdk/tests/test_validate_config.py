@@ -11,7 +11,6 @@ def _valid_config(**overrides) -> GatrixClientConfig:
         api_url="https://api.example.com/api/v1",
         api_token="test-token",
         app_name="test-app",
-        environment="development",
     )
     defaults.update(overrides)
     return GatrixClientConfig(**defaults)
@@ -29,10 +28,6 @@ class TestRequiredFields:
     def test_missing_app_name(self):
         with pytest.raises(GatrixConfigError, match="appName is required"):
             validate_config(_valid_config(app_name=""))
-
-    def test_missing_environment(self):
-        with pytest.raises(GatrixConfigError, match="environment is required"):
-            validate_config(_valid_config(environment=""))
 
     def test_whitespace_only_is_empty(self):
         with pytest.raises(GatrixConfigError, match="apiUrl is required"):

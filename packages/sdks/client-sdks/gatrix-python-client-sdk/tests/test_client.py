@@ -14,7 +14,6 @@ def _config(bootstrap=None, offline=True) -> GatrixClientConfig:
         api_url="https://api.example.com/api/v1",
         api_token="test-token",
         app_name="test-app",
-        environment="development",
         features=FeaturesConfig(
             bootstrap=bootstrap,
             offline_mode=offline,
@@ -58,7 +57,6 @@ class TestLifecycle:
                 api_url="https://api.example.com/api/v1",
                 api_token="test-token",
                 app_name="test-app",
-                environment="development",
                 features=FeaturesConfig(
                     offline_mode=True,
                 ),

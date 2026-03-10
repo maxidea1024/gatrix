@@ -1,6 +1,5 @@
 {
   "apiUrl": "http://localhost:45000/api/v1",
   "apiToken": "unsecured-client-api-token",
-  "appName": "my-app",
-  "environment": "development"
+  "appName": "my-app"
 }

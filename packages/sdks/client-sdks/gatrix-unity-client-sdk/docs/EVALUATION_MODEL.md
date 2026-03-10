@@ -1,4 +1,4 @@
-﻿# Gatrix Unity SDK — Evaluation Model
+# Gatrix Unity SDK — Evaluation Model
 
 ---
 
@@ -10,12 +10,12 @@ Gatrix client SDKs use **remote evaluation** exclusively. This is a deliberate a
 
 ```mermaid
 flowchart LR
-    A["🎮 Client SDK"] -->|"context<br/>(userId, env, properties)"| B["🖥️ Gatrix Server"]
+    A["🎮 Client SDK"] -->|"context<br/>(userId, appName, properties)"| B["🖥️ Gatrix Server"]
     B -->|"evaluated flag values"| A
     B -.- C["🔒 Targeting rules,<br/>segments, rollout %<br/>never leave the server"]
 ```
 
-1. The SDK sends **context** (userId, environment, custom properties) to the Gatrix server.
+1. The SDK sends **context** (userId, appName, custom properties) to the Gatrix server.
 2. The server evaluates all targeting rules, segments, and rollout percentages **remotely**.
 3. The SDK receives only the **final evaluated flag values** — no rules, no segments, no raw configuration.
 

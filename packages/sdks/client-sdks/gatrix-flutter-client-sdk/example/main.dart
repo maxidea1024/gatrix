@@ -10,7 +10,6 @@ void main() async {
       apiUrl: 'https://your-gatrix-server.com/api/v1',
       apiToken: 'your-client-api-token',
       appName: 'flutter-example',
-      environment: 'production',
       refreshIntervalSeconds: 30,
     ),
   );

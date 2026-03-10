@@ -33,7 +33,6 @@ def _config(
         api_url="https://api.example.com/api/v1",
         api_token="test-token",
         app_name="test-app",
-        environment="development",
         features=FeaturesConfig(
             bootstrap=bootstrap,
             offline_mode=offline,
