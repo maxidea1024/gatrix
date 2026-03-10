@@ -26,22 +26,19 @@ export const config = {
   environment: process.env.EDGE_ENVIRONMENT || 'gatrix-env',
 
   // Redis configuration (for cache PubSub in event mode)
-  // Edge cache-specific Redis settings take priority over global settings
+  // Priority: EDGE_REDIS_* > REDIS_* (global fallback)
   redis: {
-    host:
-      process.env.EDGE_CACHE_REDIS_HOST ||
-      process.env.REDIS_HOST ||
-      'localhost',
+    host: process.env.EDGE_REDIS_HOST || process.env.REDIS_HOST || 'localhost',
     port: parseInt(
-      process.env.EDGE_CACHE_REDIS_PORT || process.env.REDIS_PORT || '6379',
+      process.env.EDGE_REDIS_PORT || process.env.REDIS_PORT || '6379',
       10
     ),
     password:
-      process.env.EDGE_CACHE_REDIS_PASSWORD ||
+      process.env.EDGE_REDIS_PASSWORD ||
       process.env.REDIS_PASSWORD ||
       undefined,
     db: parseInt(
-      process.env.EDGE_CACHE_REDIS_DB || process.env.REDIS_DB || '0',
+      process.env.EDGE_REDIS_DB || process.env.REDIS_DB || '0',
       10
     ),
   },
@@ -52,7 +49,7 @@ export const config = {
       process.env.EDGE_CACHE_POLLING_INTERVAL_MS || '30000',
       10
     ),
-    syncMethod: (process.env.EDGE_CACHE_SYNC_METHOD || 'polling') as
+    syncMethod: (process.env.EDGE_SYNC_METHOD || 'polling') as
       | 'polling'
       | 'event'
       | 'manual',

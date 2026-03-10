@@ -765,7 +765,7 @@ const AuditLogsPage: React.FC = () => {
         {auditLogs.length === 0 ? (
           <EmptyPagePlaceholder message={t('auditLogs.noLogsFound')} />
         ) : (
-          <Card sx={{ position: 'relative' }}>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer
                 sx={{
@@ -794,12 +794,14 @@ const AuditLogsPage: React.FC = () => {
                           hover
                           sx={{
                             cursor: 'pointer',
-                            bgcolor: (theme) =>
-                              index % 2 === 0
-                                ? 'transparent'
-                                : theme.palette.mode === 'dark'
-                                  ? 'rgba(255, 255, 255, 0.02)'
-                                  : 'rgba(0, 0, 0, 0.02)',
+                            '& > td': {
+                              backgroundColor: (theme) =>
+                                index % 2 === 1
+                                  ? theme.palette.mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'rgba(0, 0, 0, 0.04)'
+                                  : undefined,
+                            },
                             '& > *': {
                               borderBottom:
                                 expandedRowId === log.id ? 'none' : undefined,

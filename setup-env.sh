@@ -1,7 +1,12 @@
 #!/bin/bash
 
 ################################################################################
-# Gatrix .env Setup Script
+# [DEPRECATED] Gatrix .env Setup Script
+#
+# This script is DEPRECATED. Use the new JSON5-based configuration instead:
+#   node scripts/generate-env.js --host <HOST> --force
+#
+# This script is kept for backward compatibility only.
 #
 # Automatically generates .env file during initial setup.
 # Encryption keys are securely auto-generated, only host address is required.

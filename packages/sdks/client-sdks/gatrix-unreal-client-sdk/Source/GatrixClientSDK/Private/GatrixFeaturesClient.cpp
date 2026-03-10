@@ -40,7 +40,7 @@ void UGatrixFeaturesClient::Initialize(const FGatrixClientConfig& Config,
 
   // Ensure context has system fields
   ClientConfig.Features.Context.AppName = ClientConfig.AppName;
-  ClientConfig.Features.Context.Environment = ClientConfig.Environment;
+
 
   // Load cached data from storage
   LoadFromStorage();
@@ -355,7 +355,7 @@ void UGatrixFeaturesClient::UpdateContext(const FGatrixContext& NewContext,
   // Preserve system fields
   FGatrixContext MergedContext = NewContext;
   MergedContext.AppName = ClientConfig.AppName;
-  MergedContext.Environment = ClientConfig.Environment;
+
 
   // Check if context actually changed using hash
   FString NewHash = ComputeContextHash(MergedContext);
@@ -1331,7 +1331,7 @@ void UGatrixFeaturesClient::SendMetrics() {
   }
 
   FString PayloadJson = FGatrixJson::SerializeMetrics(
-      ClientConfig.AppName, ClientConfig.Environment, UGatrixClient::SdkName,
+      ClientConfig.AppName, UGatrixClient::SdkName,
       UGatrixClient::SdkVersion, ConnectionId, BucketStart, BucketCopy, MissingCopy);
 
   if (PayloadJson.IsEmpty())

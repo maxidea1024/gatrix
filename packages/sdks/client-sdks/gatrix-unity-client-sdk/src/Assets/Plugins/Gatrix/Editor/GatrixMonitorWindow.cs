@@ -7,6 +7,7 @@
 //   - GatrixMonitorWindow.Context.cs
 //   - GatrixMonitorWindow.Metrics.cs
 //   - GatrixMonitorWindow.Statistics.cs
+//   - GatrixMonitorWindow.MissingFlags.cs
 
 #if UNITY_EDITOR
 using System;
@@ -26,6 +27,7 @@ namespace Gatrix.Unity.SDK.Editor
         {
             Overview,
             Flags,
+            MissingFlags,
             Events,
             Context,
             Metrics,
@@ -314,12 +316,13 @@ namespace Gatrix.Unity.SDK.Editor
 
             switch (_currentTab)
             {
-                case Tab.Overview:    DrawOverview();     break;
-                case Tab.Flags:       DrawFlags();        break;
-                case Tab.Events:      DrawEventsTab();    break;
-                case Tab.Context:     DrawContextTab();   break;
-                case Tab.Metrics:     DrawMetricsTab();   break;
-                case Tab.Statistics:  DrawStatistics();   break;
+                case Tab.Overview:      DrawOverview();        break;
+                case Tab.Flags:         DrawFlags();           break;
+                case Tab.MissingFlags:  DrawMissingFlagsTab(); break;
+                case Tab.Events:        DrawEventsTab();       break;
+                case Tab.Context:       DrawContextTab();      break;
+                case Tab.Metrics:       DrawMetricsTab();      break;
+                case Tab.Statistics:    DrawStatistics();      break;
             }
 
             EditorGUILayout.EndVertical();
@@ -608,7 +611,7 @@ namespace Gatrix.Unity.SDK.Editor
         {
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-            var tabNames = new[] { "Overview", "Flags", "Events", "Context", "Metrics", "Stats" };
+            var tabNames = new[] { "Overview", "Flags", "Missing", "Events", "Context", "Metrics", "Stats" };
             for (int i = 0; i < tabNames.Length; i++)
             {
                 var isActive = (int)_currentTab == i;
@@ -620,7 +623,7 @@ namespace Gatrix.Unity.SDK.Editor
                     }
                     : EditorStyles.toolbarButton;
 
-                if (GUILayout.Button(tabNames[i], style, GUILayout.Width(66)))
+                if (GUILayout.Button(tabNames[i], style, GUILayout.Width(60)))
                 {
                     _currentTab = (Tab)i;
                 }
@@ -629,7 +632,7 @@ namespace Gatrix.Unity.SDK.Editor
             GUILayout.FlexibleSpace();
 
             // Auto-refresh toggle
-            var refreshIcon = _autoRefresh ? "??Auto" : "??Auto";
+            var refreshIcon = _autoRefresh ? "\u25cf Auto" : "\u25cb Auto";
             var refreshColor = _autoRefresh ? new Color(0.4f, 1f, 0.4f) : new Color(0.7f, 0.7f, 0.7f);
             var refreshStyle = new GUIStyle(EditorStyles.toolbarButton)
             {
@@ -949,6 +952,12 @@ namespace Gatrix.Unity.SDK.Editor
             }
 
             _cachedFlags = newFlags;
+
+            // Update missing flags cache (persists after play mode ends)
+            if (_cachedStats?.MissingFlags != null && _cachedStats.MissingFlags.Count > 0)
+            {
+                _cachedMissingFlags = new Dictionary<string, int>(_cachedStats.MissingFlags);
+            }
 
             // Only collect time-series data during Play Mode so the graph doesn't
             // keep growing (and time doesn't appear to advance) in Edit Mode.

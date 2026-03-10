@@ -76,13 +76,14 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import dayjs, { Dayjs } from 'dayjs';
+import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import { useI18n } from '@/contexts/I18nContext';
 
 // Types and Services
 import {
   CrashEvent,
   GetCrashEventsRequest,
   getPlatformName,
-  getEnvironmentName,
 } from '@/types/crash';
 import crashService from '@/services/crashService';
 import SimplePagination from '../../components/common/SimplePagination';
@@ -184,6 +185,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
 const CrashEventsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { language } = useI18n();
 
   // Page state management (localStorage + URL params)
   const { pageState, updatePage, updateLimit, updateSort } = usePageState({
@@ -225,7 +227,7 @@ const CrashEventsPage: React.FC = () => {
   // Filter options from backend
   const [filterOptions, setFilterOptions] = useState<{
     platforms: string[];
-    environments: string[];
+    environments: { id: string; name: string }[];
     branches: string[];
     marketTypes: string[];
     appVersions: string[];
@@ -277,7 +279,7 @@ const CrashEventsPage: React.FC = () => {
     },
     {
       id: 'environment',
-      labelKey: 'crashes.table.environmentId',
+      labelKey: 'crashes.table.environment',
       sortable: true,
       visible: true,
     },
@@ -408,13 +410,13 @@ const CrashEventsPage: React.FC = () => {
       },
       {
         key: 'environment',
-        label: t('crashes.filters.environmentId'),
+        label: t('crashes.filters.environment'),
         type: 'multiselect',
         operator: 'any_of',
         allowOperatorToggle: false,
         options: filterOptions.environments.map((e) => ({
-          value: e,
-          label: getEnvironmentName(e),
+          value: e.id,
+          label: e.name,
         })),
       },
       {
@@ -758,7 +760,7 @@ const CrashEventsPage: React.FC = () => {
         ['ID', event.id],
         ['Created At', dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss')],
         ['Platform', getPlatformName(event.platform)],
-        ['Environment', getEnvironmentName(event.environmentId)],
+        ['Environment', (event as any).environmentName || event.environmentId],
         ['Branch', event.branch],
         ['App Version', event.appVersion || '-'],
         ['Res Version', event.resVersion || '-'],
@@ -873,7 +875,13 @@ const CrashEventsPage: React.FC = () => {
   const renderCellContent = (event: CrashEvent, columnId: string) => {
     switch (columnId) {
       case 'createdAt':
-        return dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss');
+        return (
+          <Tooltip title={formatDateTimeDetailed(event.createdAt)}>
+            <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+              {formatRelativeTime(event.createdAt, undefined, language)}
+            </Typography>
+          </Tooltip>
+        );
       case 'platform':
         return (
           <Chip
@@ -886,7 +894,7 @@ const CrashEventsPage: React.FC = () => {
       case 'environment':
         return (
           <Chip
-            label={getEnvironmentName(event.environmentId)}
+            label={(event as any).environmentName || event.environmentId}
             size="small"
             color="secondary"
             variant="outlined"
@@ -1170,12 +1178,14 @@ const CrashEventsPage: React.FC = () => {
                         <TableRow
                           hover
                           sx={{
-                            bgcolor: (theme) =>
-                              index % 2 === 0
-                                ? 'transparent'
-                                : theme.palette.mode === 'dark'
-                                  ? 'rgba(255, 255, 255, 0.02)'
-                                  : 'rgba(0, 0, 0, 0.02)',
+                            '& > td': {
+                              backgroundColor: (theme) =>
+                                index % 2 === 1
+                                  ? theme.palette.mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'rgba(0, 0, 0, 0.04)'
+                                  : undefined,
+                            },
                           }}
                         >
                           <TableCell>
@@ -1248,7 +1258,7 @@ const CrashEventsPage: React.FC = () => {
                             </Box>
                           </TableCell>
                         </TableRow>
-                        <TableRow hover>
+                        <TableRow>
                           <TableCell
                             colSpan={
                               columns.filter((col) => col.visible).length + 2
@@ -1427,7 +1437,7 @@ const CrashEventsPage: React.FC = () => {
                                               whiteSpace: 'nowrap',
                                             }}
                                           >
-                                            {t('crashes.table.environmentId')}
+                                            {t('crashes.table.environment')}
                                           </TableCell>
                                           <TableCell>
                                             <Box
@@ -1438,9 +1448,7 @@ const CrashEventsPage: React.FC = () => {
                                               }}
                                             >
                                               <Chip
-                                                label={getEnvironmentName(
-                                                  event.environmentId
-                                                )}
+                                                label={(event as any).environmentName || event.environmentId}
                                                 size="small"
                                                 color="secondary"
                                                 variant="outlined"

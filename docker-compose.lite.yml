@@ -134,6 +134,12 @@ services:
       DISABLE_X_POWERED_BY: true
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
       DISABLE_RATE_LIMIT: true
+      # Crash Database (separated for load isolation)
+      CRASH_DB_HOST: mysql
+      CRASH_DB_PORT: 3306
+      CRASH_DB_NAME: ${CRASH_DB_NAME:-gatrix_crash}
+      CRASH_DB_USER: ${CRASH_DB_USER:-gatrix_user}
+      CRASH_DB_PASSWORD: ${CRASH_DB_PASSWORD:-gatrix_password}
       # Chat Server Integration
       CHAT_SERVER_URL: http://chat-server:5100
       # Service Discovery
@@ -391,12 +397,12 @@ services:
       EDGE_APPLICATION_NAME: ${EDGE_APPLICATION_NAME:-edge-server}
       EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-*}
       # Edge cache Redis configuration (for PubSub in event mode)
-      EDGE_CACHE_REDIS_HOST: ${EDGE_CACHE_REDIS_HOST:-redis}
-      EDGE_CACHE_REDIS_PORT: ${EDGE_CACHE_REDIS_PORT:-6379}
-      EDGE_CACHE_REDIS_PASSWORD: ${EDGE_CACHE_REDIS_PASSWORD:-}
-      EDGE_CACHE_REDIS_DB: ${EDGE_CACHE_REDIS_DB:-0}
+      EDGE_REDIS_HOST: ${EDGE_REDIS_HOST:-redis}
+      EDGE_REDIS_PORT: ${EDGE_REDIS_PORT:-6379}
+      EDGE_REDIS_PASSWORD: ${EDGE_REDIS_PASSWORD:-}
+      EDGE_REDIS_DB: ${EDGE_REDIS_DB:-0}
       # Cache configuration (event mode uses Redis PubSub for real-time sync)
-      EDGE_CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-event}
+      EDGE_SYNC_METHOD: ${EDGE_SYNC_METHOD:-event}
       EDGE_CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
       # HTTPS enforcement (set to 'false' for HTTP-only environments)
       EDGE_FORCE_HTTPS: ${EDGE_FORCE_HTTPS:-true}

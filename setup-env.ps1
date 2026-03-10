@@ -1,6 +1,11 @@
 <#
 .SYNOPSIS
-    Gatrix .env Setup Script for Windows PowerShell
+    [DEPRECATED] Gatrix .env Setup Script for Windows PowerShell
+
+    This script is DEPRECATED. Use the new JSON5-based configuration instead:
+      node scripts/generate-env.js --host <HOST> --force
+
+    This script is kept for backward compatibility only.
 
 .DESCRIPTION
     Automatically generates .env file during initial setup.

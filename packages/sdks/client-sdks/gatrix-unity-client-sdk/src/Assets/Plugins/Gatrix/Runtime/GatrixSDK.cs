@@ -1,6 +1,8 @@
 // GatrixSDK - Static shorthand for accessing the Gatrix SDK
 // Provides convenient access without the verbose GatrixBehaviour.Client path
 
+using Cysharp.Threading.Tasks;
+
 namespace Gatrix.Unity.SDK
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace Gatrix.Unity.SDK
     /// you can write <c>GatrixSDK.Features.IsEnabled("flag")</c>.
     /// </para>
     /// <para>
-    /// All properties delegate to <see cref="GatrixBehaviour.Client"/>.
+    /// All properties delegate to <see cref="GatrixBehaviour"/>.
     /// </para>
     /// </summary>
     public static class GatrixSDK
@@ -26,5 +28,12 @@ namespace Gatrix.Unity.SDK
 
         /// <summary>Check if SDK is initialized (same as GatrixBehaviour.IsInitialized).</summary>
         public static bool IsInitialized => GatrixBehaviour.IsInitialized;
+
+        /// <summary>Initialize the SDK with the given config (delegates to GatrixBehaviour.InitializeAsync).</summary>
+        public static UniTask InitializeAsync(GatrixClientConfig config) =>
+            GatrixBehaviour.InitializeAsync(config);
+
+        /// <summary>Shutdown the SDK (delegates to GatrixBehaviour.Shutdown).</summary>
+        public static void Shutdown() => GatrixBehaviour.Shutdown();
     }
 }

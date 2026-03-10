@@ -1,4 +1,4 @@
-﻿// Copyright Gatrix. All Rights Reserved.
+// Copyright Gatrix. All Rights Reserved.
 // Type definitions for Gatrix Unreal SDK
 
 #pragma once
@@ -80,7 +80,7 @@ struct GATRIXCLIENTSDK_API FGatrixEvaluatedFlag {
 };
 
 /** Evaluation context (global for client-side).
- * System fields (AppName, Environment) cannot be removed via UpdateContext. */
+ * System fields (AppName) cannot be removed via UpdateContext. */
 USTRUCT(BlueprintType)
 struct GATRIXCLIENTSDK_API FGatrixContext {
   GENERATED_BODY()
@@ -88,10 +88,6 @@ struct GATRIXCLIENTSDK_API FGatrixContext {
   /** Application name (system field) */
   UPROPERTY(BlueprintReadWrite, Category = "Gatrix")
   FString AppName;
-
-  /** Environment name (system field) */
-  UPROPERTY(BlueprintReadWrite, Category = "Gatrix")
-  FString Environment;
 
   /** Remote address / client IP */
   UPROPERTY(BlueprintReadWrite, Category = "Gatrix")
@@ -371,10 +367,6 @@ struct GATRIXCLIENTSDK_API FGatrixClientConfig {
   /** Application name */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Required")
   FString AppName;
-
-  /** Environment name (e.g., development, production) */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Required")
-  FString Environment;
 
   /** Custom HTTP headers */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Optional")

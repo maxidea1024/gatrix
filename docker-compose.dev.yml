@@ -501,12 +501,12 @@ services:
       # Target environments - use '*' for all environments (Edge mode)
       EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-*}
       # Edge cache Redis configuration (for PubSub in event mode)
-      EDGE_CACHE_REDIS_HOST: ${EDGE_CACHE_REDIS_HOST:-redis}
-      EDGE_CACHE_REDIS_PORT: ${EDGE_CACHE_REDIS_PORT:-6379}
-      EDGE_CACHE_REDIS_PASSWORD: ${EDGE_CACHE_REDIS_PASSWORD:-}
-      EDGE_CACHE_REDIS_DB: ${EDGE_CACHE_REDIS_DB:-0}
+      EDGE_REDIS_HOST: ${EDGE_REDIS_HOST:-redis}
+      EDGE_REDIS_PORT: ${EDGE_REDIS_PORT:-6379}
+      EDGE_REDIS_PASSWORD: ${EDGE_REDIS_PASSWORD:-}
+      EDGE_REDIS_DB: ${EDGE_REDIS_DB:-0}
       # Cache configuration (event mode uses Redis PubSub for real-time sync)
-      EDGE_CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-event}
+      EDGE_SYNC_METHOD: ${EDGE_SYNC_METHOD:-event}
       EDGE_CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
     ports:
       - '0.0.0.0:${EDGE_PORT:-3400}:3400'

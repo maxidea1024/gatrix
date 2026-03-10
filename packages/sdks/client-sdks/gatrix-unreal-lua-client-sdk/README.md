@@ -88,7 +88,7 @@ end)
 
 Gatrix client SDKs use **remote evaluation** exclusively:
 
-1. The SDK sends **context** (userId, environment, properties) to the Gatrix server.
+1. The SDK sends **context** (userId, properties) to the Gatrix server.
 2. The server evaluates all targeting rules **remotely**.
 3. The SDK receives only the **final evaluated flag values** — no rules are exposed to the client.
 
@@ -110,7 +110,7 @@ Gatrix client SDKs use **remote evaluation** exclusively:
 ```mermaid
 flowchart TD
     subgraph SERVER ["🖥️ Gatrix Server"]
-        S1{"Is flag enabled<br/>in this environment?"}
+        S1{"Is flag enabled?"}
         S1 -->|No| S2{"Value from<br/>env override?"}
         S2 -->|Yes| S2A["variant.name = $env-default-disabled<br/>value = env.disabledValue"]
         S2 -->|No| S2B["variant.name = $flag-default-disabled<br/>value = flag.disabledValue"]
@@ -279,7 +279,7 @@ gatrix.Start({
     ApiUrl          = "http://host/api/v1",  -- string   Edge API URL
     ApiToken        = "your-client-token",   -- string   Client API token
     AppName         = "my-game",             -- string   Application name
-    Environment     = "production",          -- string   Environment name
+
     EnableDevMode   = false,                 -- boolean? Enable detailed debug logging
     Features        = {                      -- table?   Feature flag configurations
         RefreshInterval  = 30,               -- number?  Seconds between polls (default: 30)
@@ -305,7 +305,7 @@ gatrix.Start({
     ApiUrl = "http://host/api/v1",
     ApiToken = "your-client-token",
     AppName = "my-game",
-    Environment = "production",
+
 })
     :next(function()
         print("SDK ready — flags loaded!")
@@ -642,7 +642,7 @@ gatrix.UpdateContext({
 })
 
 --- Get current context
---- @return table {AppName, Environment, UserId, SessionId, CurrentTime, Properties}
+--- @return table {AppName, UserId, SessionId, CurrentTime, Properties}
 local Ctx = gatrix.GetContext()
 ```
 
@@ -775,7 +775,7 @@ gatrix.Init({
     ApiUrl          = "https://api.example.com/api/v1",
     ApiToken        = "token",
     AppName         = "app",
-    Environment     = "production",
+
     ExplicitSyncMode = true,
 })
 
@@ -952,7 +952,7 @@ Group
 | `ExplicitSyncMode` is on         | Flag is updated but buffered — call `SyncFlags()` to apply                       |
 | Using `WatchSyncedFlag`          | Synced watchers don't fire until `SyncFlags()` — use `WatchRealtimeFlag` instead |
 | `OfflineMode` is enabled         | Set `Features = { OfflineMode = false }` for live connections                    |
-| Wrong `AppName` or `Environment` | Double-check config matches dashboard settings                                   |
+| Wrong `AppName` | Double-check config matches dashboard settings                                   |
 
 ---
 
@@ -1032,8 +1032,8 @@ gatrix.Features.SyncFlags()
 | Cause                                 | Solution                                                                |
 | ------------------------------------- | ----------------------------------------------------------------------- |
 | SDK not ready yet                     | Wait for `flags.ready` event or use `WatchRealtimeFlagWithInitialState` |
-| Wrong `AppName` or `Environment`      | Double-check config matches dashboard settings                          |
-| Flag not assigned to this environment | Verify flag is enabled for the target environment in the dashboard      |
+| Wrong `AppName`                       | Double-check config matches dashboard settings                          |
+
 | Network error on first fetch          | Listen for `flags.fetch_error` event and check logs                     |
 
 ```lua

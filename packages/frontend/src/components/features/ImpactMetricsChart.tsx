@@ -81,7 +81,7 @@ import 'react-resizable/css/styles.css';
 import api from '../../services/api';
 import { useSnackbar } from 'notistack';
 import ConfirmDialog from '../common/ConfirmDialog';
-import EmptyPlaceholder from '../common/EmptyPlaceholder';
+import EmptyPagePlaceholder from '../common/EmptyPagePlaceholder';
 
 const GridLayout = WidthProvider(ReactGridLayout);
 
@@ -1329,7 +1329,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
             </Typography>
           </Box>
         )}
-        <EmptyPlaceholder
+        <EmptyPagePlaceholder
           message={t('impactMetrics.noCharts')}
           onAddClick={canManage ? handleOpenAddDialog : undefined}
           addButtonLabel={t('impactMetrics.addChart')}

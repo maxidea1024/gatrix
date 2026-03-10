@@ -1,4 +1,4 @@
-﻿// Copyright Gatrix. All Rights Reserved.
+// Copyright Gatrix. All Rights Reserved.
 // Main client for Gatrix Unreal SDK
 
 #pragma once
@@ -21,7 +21,6 @@
  *   Config.ApiUrl = TEXT("http://localhost:3400/api/v1");
  *   Config.ApiToken = TEXT("your-token");
  *   Config.AppName = TEXT("MyGame");
- *   Config.Environment = TEXT("production");
  *   UGatrixClient::Get()->Start(Config);
  *
  * Usage (Blueprint):

@@ -251,7 +251,7 @@ FString FGatrixJson::SerializeContext(const FGatrixClientConfig& Config) {
   Writer->WriteObjectStart(TEXT("context"));
 
   Writer->WriteValue(TEXT("appName"), Config.AppName);
-  Writer->WriteValue(TEXT("environment"), Config.Environment);
+
 
   if (!Config.Features.Context.UserId.IsEmpty()) {
     Writer->WriteValue(TEXT("userId"), Config.Features.Context.UserId);
@@ -277,7 +277,7 @@ FString FGatrixJson::SerializeContext(const FGatrixClientConfig& Config) {
 
 // ==================== Metrics Serialization ====================
 
-FString FGatrixJson::SerializeMetrics(const FString& AppName, const FString& Environment,
+FString FGatrixJson::SerializeMetrics(const FString& AppName,
                                       const FString& SdkName, const FString& SdkVersion,
                                       const FString& ConnectionId, const FDateTime& BucketStartTime,
                                       const TMap<FString, FFlagMetrics>& FlagBucket,
@@ -290,7 +290,7 @@ FString FGatrixJson::SerializeMetrics(const FString& AppName, const FString& Env
   TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutJson);
   Writer->WriteObjectStart();
   Writer->WriteValue(TEXT("appName"), AppName);
-  Writer->WriteValue(TEXT("environment"), Environment);
+
   Writer->WriteValue(TEXT("sdkName"), SdkName);
   Writer->WriteValue(TEXT("sdkVersion"), SdkVersion);
   Writer->WriteValue(TEXT("connectionId"), ConnectionId);

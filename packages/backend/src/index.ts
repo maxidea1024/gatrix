@@ -176,7 +176,9 @@ const startServer = async () => {
     logger = (await import('./config/logger')).default;
 
     // Initialize knex and Objection.js BEFORE database
-    await import('./config/knex');
+    const knexModule = await import('./config/knex');
+    // Bind crash models to separate crash DB connection
+    knexModule.initCrashDb();
 
     database = (await import('./config/database')).default;
     redisClient = (await import('./config/redis')).default;
