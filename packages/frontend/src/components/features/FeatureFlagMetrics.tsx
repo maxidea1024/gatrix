@@ -127,7 +127,9 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   // Lookup map: environmentId -> displayName
   const envNameMap = useMemo(() => {
     const envList = Array.isArray(allEnvironments) ? allEnvironments : [];
-    return new Map(envList.map((e) => [e.environmentId, e.displayName || e.environmentId]));
+    return new Map(
+      envList.map((e) => [e.environmentId, e.displayName || e.environmentId])
+    );
   }, [allEnvironments]);
 
   // Resolve environment ID to display name

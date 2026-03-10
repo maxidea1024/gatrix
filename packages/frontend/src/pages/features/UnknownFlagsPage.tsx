@@ -534,7 +534,9 @@ const UnknownFlagsPage: React.FC = () => {
                               <TableCell key={col.id}>
                                 <Tooltip title={flag.environmentId}>
                                   <Chip
-                                    label={flag.environmentName || flag.environmentId}
+                                    label={
+                                      flag.environmentName || flag.environmentId
+                                    }
                                     size="small"
                                     sx={{ borderRadius: '16px' }}
                                   />

@@ -114,10 +114,7 @@ const UnauthorizedPage: React.FC = () => {
         </Typography>
 
         {/* Subtitle */}
-        <Typography
-          variant="body2"
-          sx={{ mb: 0.5, color: 'text.secondary' }}
-        >
+        <Typography variant="body2" sx={{ mb: 0.5, color: 'text.secondary' }}>
           403 - {t('errors.unauthorized')}
         </Typography>
 
@@ -231,9 +228,7 @@ const UnauthorizedPage: React.FC = () => {
                     >
                       {t('errors.requiredPermissionsList')}:
                     </Typography>
-                    <Box
-                      sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
-                    >
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {requiredPermissions.map((permission) => (
                         <Chip
                           key={permission}
@@ -266,9 +261,7 @@ const UnauthorizedPage: React.FC = () => {
               py: 1.5,
               px: 2,
               borderRadius: 2,
-              bgcolor: isDark
-                ? 'rgba(255,255,255,0.04)'
-                : 'rgba(0,0,0,0.02)',
+              bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
               border: '1px solid',
               borderColor: 'divider',
             }}

@@ -263,14 +263,14 @@ export class FeaturesClient implements VariationProvider {
     // --- Start phase (formerly start) ---
 
     this.devLog(
-      `start() called. offlineMode=${this.featuresConfig.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}, enableStreaming=${this.featuresConfig.streaming?.enabled !== false}`,
+      `start() called. offlineMode=${this.featuresConfig.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}, enableStreaming=${this.featuresConfig.streaming?.enabled !== false}`
     );
 
     // Offline mode: skip all network requests, use cached/bootstrap flags only
     if (this.featuresConfig.offlineMode) {
       if (this.realtimeFlags.size === 0) {
         const error = new GatrixError(
-          'offlineMode requires bootstrap data or cached flags, but none are available',
+          'offlineMode requires bootstrap data or cached flags, but none are available'
         );
         this.sdkState = 'error';
         this.lastError = error;
@@ -408,7 +408,7 @@ export class FeaturesClient implements VariationProvider {
     flagName: string,
     flag: EvaluatedFlag | undefined,
     eventType: 'isEnabled' | 'getFlag' | 'getVariant' | 'watch',
-    variantName?: string,
+    variantName?: string
   ): void {
     if (!flag) {
       this.metrics.countMissing(flagName);
@@ -524,7 +524,7 @@ export class FeaturesClient implements VariationProvider {
   variationInternal(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): string {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -538,7 +538,7 @@ export class FeaturesClient implements VariationProvider {
   boolVariationInternal(
     flagName: string,
     fallbackValue: boolean,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): boolean {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -556,7 +556,7 @@ export class FeaturesClient implements VariationProvider {
   stringVariationInternal(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): string {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -574,7 +574,7 @@ export class FeaturesClient implements VariationProvider {
   numberVariationInternal(
     flagName: string,
     fallbackValue: number,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): number {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -613,7 +613,7 @@ export class FeaturesClient implements VariationProvider {
   boolVariationDetailsInternal(
     flagName: string,
     fallbackValue: boolean,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): VariationResult<boolean> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -649,7 +649,7 @@ export class FeaturesClient implements VariationProvider {
   stringVariationDetailsInternal(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): VariationResult<string> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -685,7 +685,7 @@ export class FeaturesClient implements VariationProvider {
   numberVariationDetailsInternal(
     flagName: string,
     fallbackValue: number,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): VariationResult<number> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -722,7 +722,7 @@ export class FeaturesClient implements VariationProvider {
   jsonVariationDetailsInternal<T>(
     flagName: string,
     fallbackValue: T,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): VariationResult<T> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -873,7 +873,7 @@ export class FeaturesClient implements VariationProvider {
   boolVariationDetails(
     flagName: string,
     fallbackValue: boolean,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): VariationResult<boolean> {
     return this.boolVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
@@ -881,7 +881,7 @@ export class FeaturesClient implements VariationProvider {
   stringVariationDetails(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): VariationResult<string> {
     return this.stringVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
@@ -889,7 +889,7 @@ export class FeaturesClient implements VariationProvider {
   numberVariationDetails(
     flagName: string,
     fallbackValue: number,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): VariationResult<number> {
     return this.numberVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
@@ -897,7 +897,7 @@ export class FeaturesClient implements VariationProvider {
   jsonVariationDetails<T>(
     flagName: string,
     fallbackValue: T,
-    forceRealtime: boolean = true,
+    forceRealtime: boolean = true
   ): VariationResult<T> {
     return this.jsonVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
@@ -918,7 +918,7 @@ export class FeaturesClient implements VariationProvider {
       this.syncedWatchCallbacks,
       oldSynchronizedFlags,
       this.synchronizedFlags,
-      false,
+      false
     );
 
     this.pendingSync = false;
@@ -990,7 +990,7 @@ export class FeaturesClient implements VariationProvider {
    */
   watchRealtimeFlag(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>,
+    callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
     if (!this.watchCallbacks.has(flagName)) {
       this.watchCallbacks.set(flagName, new Set());
@@ -1008,7 +1008,7 @@ export class FeaturesClient implements VariationProvider {
    */
   watchRealtimeFlagWithInitialState(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>,
+    callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
     if (!this.watchCallbacks.has(flagName)) {
       this.watchCallbacks.set(flagName, new Set());
@@ -1035,7 +1035,7 @@ export class FeaturesClient implements VariationProvider {
    */
   watchSyncedFlag(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>,
+    callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
     if (!this.syncedWatchCallbacks.has(flagName)) {
       this.syncedWatchCallbacks.set(flagName, new Set());
@@ -1053,7 +1053,7 @@ export class FeaturesClient implements VariationProvider {
    */
   watchSyncedFlagWithInitialState(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>,
+    callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
     if (!this.syncedWatchCallbacks.has(flagName)) {
       this.syncedWatchCallbacks.set(flagName, new Set());
@@ -1097,7 +1097,7 @@ export class FeaturesClient implements VariationProvider {
       | 'syncFlags'
       | 'contextChange'
       | 'gap_recovery'
-      | 'pending_invalidation',
+      | 'pending_invalidation'
   ): Promise<void> {
     // Offline mode: no network requests allowed
     if (this.featuresConfig.offlineMode) {
@@ -1228,7 +1228,7 @@ export class FeaturesClient implements VariationProvider {
         this.pollingStopped = true;
         this.logger.error(
           `Polling stopped due to non-retryable status code ${response.status}. ` +
-            'Call fetchFlags() manually to retry.',
+            'Call fetchFlags() manually to retry.'
         );
         this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, {
           status: response.status,
@@ -1313,7 +1313,9 @@ export class FeaturesClient implements VariationProvider {
     // Do not scale refresh if streaming is healthy
     const isStreamingEnabled = this.featuresConfig.streaming?.enabled !== false;
     if (isStreamingEnabled && this.streamingState !== 'degraded') {
-      this.devLog(`scheduleNextRefresh: Skipped because streaming is enabled and state is '${this.streamingState}'`);
+      this.devLog(
+        `scheduleNextRefresh: Skipped because streaming is enabled and state is '${this.streamingState}'`
+      );
       return;
     }
 
@@ -1333,11 +1335,11 @@ export class FeaturesClient implements VariationProvider {
       // Exponential backoff: initialBackoff * 2^(failures-1), capped at maxBackoff (in seconds)
       const backoffDelay = Math.min(
         initialBackoff * Math.pow(2, this.consecutiveFailures - 1),
-        maxBackoff,
+        maxBackoff
       );
       delay = backoffDelay * 1000; // Convert to ms for setTimeout
       this.logger.warn(
-        `Scheduling retry after ${backoffDelay}s (consecutive failures: ${this.consecutiveFailures})`,
+        `Scheduling retry after ${backoffDelay}s (consecutive failures: ${this.consecutiveFailures})`
       );
     }
 
@@ -1350,7 +1352,7 @@ export class FeaturesClient implements VariationProvider {
     }
 
     this.devLog(
-      `scheduleNextRefresh: delay=${delay}ms, consecutiveFailures=${this.consecutiveFailures}, pollingStopped=${this.pollingStopped}`,
+      `scheduleNextRefresh: delay=${delay}ms, consecutiveFailures=${this.consecutiveFailures}, pollingStopped=${this.pollingStopped}`
     );
 
     this.timerRef = setTimeout(async () => {
@@ -1418,7 +1420,7 @@ export class FeaturesClient implements VariationProvider {
       this.realtimeFlags,
       true,
       oldContextHash,
-      newContextHash,
+      newContextHash
     );
 
     // Invoke synced watch callbacks only in non-explicit mode (immediate sync)
@@ -1429,7 +1431,7 @@ export class FeaturesClient implements VariationProvider {
         this.realtimeFlags,
         false,
         oldContextHash,
-        newContextHash,
+        newContextHash
       );
     }
 
@@ -1476,7 +1478,7 @@ export class FeaturesClient implements VariationProvider {
    */
   private async storePartialFlags(
     flags: EvaluatedFlag[],
-    requestedKeys: Set<string>,
+    requestedKeys: Set<string>
   ): Promise<void> {
     const oldFlags = new Map(this.realtimeFlags);
     const oldContextHash = this.flagsContextHash;
@@ -1505,7 +1507,7 @@ export class FeaturesClient implements VariationProvider {
       this.realtimeFlags,
       true,
       oldContextHash,
-      newContextHash,
+      newContextHash
     );
 
     if (!this.featuresConfig.explicitSyncMode) {
@@ -1515,7 +1517,7 @@ export class FeaturesClient implements VariationProvider {
         this.realtimeFlags,
         false,
         oldContextHash,
-        newContextHash,
+        newContextHash
       );
     }
 
@@ -1535,7 +1537,7 @@ export class FeaturesClient implements VariationProvider {
     oldFlags: Map<string, EvaluatedFlag>,
     newFlags: Map<string, EvaluatedFlag>,
     oldContextHash?: string,
-    newContextHash?: string,
+    newContextHash?: string
   ): void {
     // Skip tracking on initial load (oldFlags is empty)
     const isInitialLoad = oldFlags.size === 0;
@@ -1577,7 +1579,7 @@ export class FeaturesClient implements VariationProvider {
     newFlags: Map<string, EvaluatedFlag>,
     forceRealtime: boolean,
     oldContextHash?: string,
-    newContextHash?: string,
+    newContextHash?: string
   ): void {
     const now = new Date();
 
@@ -1656,7 +1658,7 @@ export class FeaturesClient implements VariationProvider {
     enabled: boolean,
     flag: EvaluatedFlag | undefined,
     eventType: 'isEnabled' | 'getFlag' | 'getVariant' | 'watch',
-    variantName?: string,
+    variantName?: string
   ): void {
     // Only track if impressionDataAll is enabled or flag has impressionData set
     const shouldTrack = this.featuresConfig.impressionDataAll || flag?.impressionData;
@@ -1768,7 +1770,7 @@ export class FeaturesClient implements VariationProvider {
           this.streamingState = 'connected';
           this.streamingReconnectAttempt = 0;
           this.devLog(`Streaming connected. URL: ${streamUrl}`);
-          
+
           if (this.timerRef) {
             clearTimeout(this.timerRef);
             this.timerRef = undefined;
@@ -1799,7 +1801,7 @@ export class FeaturesClient implements VariationProvider {
               // Gap recovery: check if we missed any changes
               if (data.globalRevision > this.localGlobalRevision && this.localGlobalRevision > 0) {
                 this.devLog(
-                  `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`,
+                  `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`
                 );
                 void this.fetchFlagsInternal('gap_recovery');
               } else if (this.localGlobalRevision === 0) {
@@ -1818,7 +1820,7 @@ export class FeaturesClient implements VariationProvider {
               const data = JSON.parse(event.data) as FlagsChangedEvent;
               this.devLog(
                 `Streaming 'flags_changed': globalRevision=${data.globalRevision}, ` +
-                  `changedKeys=[${data.changedKeys.join(',')}]`,
+                  `changedKeys=[${data.changedKeys.join(',')}]`
               );
 
               // Only process if server revision is ahead
@@ -1831,7 +1833,7 @@ export class FeaturesClient implements VariationProvider {
                 this.handleStreamingInvalidation(data.changedKeys);
               } else {
                 this.devLog(
-                  `Ignoring stale event: server=${data.globalRevision} <= local=${this.localGlobalRevision}`,
+                  `Ignoring stale event: server=${data.globalRevision} <= local=${this.localGlobalRevision}`
                 );
               }
               this.streamingFlagsChangedCount++;
@@ -1927,12 +1929,12 @@ export class FeaturesClient implements VariationProvider {
       this.streamingState = 'connected';
       this.streamingReconnectAttempt = 0;
       this.devLog(`WebSocket connected. URL: ${wsUrl}`);
-      
+
       if (this.timerRef) {
         clearTimeout(this.timerRef);
         this.timerRef = undefined;
       }
-      
+
       this.emitter.emit(EVENTS.FLAGS_STREAMING_CONNECTED, {});
 
       // Start ping interval
@@ -1961,7 +1963,7 @@ export class FeaturesClient implements VariationProvider {
             // Gap recovery
             if (data.globalRevision > this.localGlobalRevision && this.localGlobalRevision > 0) {
               this.devLog(
-                `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`,
+                `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`
               );
               void this.fetchFlagsInternal('gap_recovery');
             } else if (this.localGlobalRevision === 0) {
@@ -1979,7 +1981,7 @@ export class FeaturesClient implements VariationProvider {
             };
             this.devLog(
               `WS 'flags_changed': globalRevision=${data.globalRevision}, ` +
-                `changedKeys=[${data.changedKeys.join(',')}]`,
+                `changedKeys=[${data.changedKeys.join(',')}]`
             );
 
             if (data.globalRevision > this.localGlobalRevision) {
@@ -1991,7 +1993,7 @@ export class FeaturesClient implements VariationProvider {
               this.handleStreamingInvalidation(data.changedKeys);
             } else {
               this.devLog(
-                `Ignoring stale event: server=${data.globalRevision} <= local=${this.localGlobalRevision}`,
+                `Ignoring stale event: server=${data.globalRevision} <= local=${this.localGlobalRevision}`
               );
             }
             this.streamingFlagsChangedCount++;
@@ -2104,14 +2106,14 @@ export class FeaturesClient implements VariationProvider {
     // Exponential backoff: base * 2^(attempt-1), capped at max
     const exponentialDelay = Math.min(
       baseMs * Math.pow(2, this.streamingReconnectAttempt - 1),
-      maxMs,
+      maxMs
     );
     // Add jitter (0 - 1000ms)
     const jitter = Math.floor(Math.random() * 1000);
     const delayMs = exponentialDelay + jitter;
 
     this.devLog(
-      `Scheduling streaming reconnect: attempt=${this.streamingReconnectAttempt}, delay=${delayMs}ms`,
+      `Scheduling streaming reconnect: attempt=${this.streamingReconnectAttempt}, delay=${delayMs}ms`
     );
 
     this.emitter.emit(EVENTS.FLAGS_STREAMING_RECONNECTING, {
@@ -2175,7 +2177,7 @@ export class FeaturesClient implements VariationProvider {
         this.pendingInvalidationKeys.add(key);
       }
       this.devLog(
-        `Fetch in progress, queued ${changedKeys.length} pending keys for re-fetch after completion`,
+        `Fetch in progress, queued ${changedKeys.length} pending keys for re-fetch after completion`
       );
     }
   }

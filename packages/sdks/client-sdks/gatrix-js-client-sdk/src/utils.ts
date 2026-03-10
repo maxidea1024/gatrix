@@ -165,7 +165,7 @@ export function isEqualFlag(
   a: any,
   b: any,
   oldContextHash?: string,
-  newContextHash?: string,
+  newContextHash?: string
 ): boolean {
   if (!a || !b) {
     return a === b;

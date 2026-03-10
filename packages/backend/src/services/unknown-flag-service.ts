@@ -239,23 +239,18 @@ export class UnknownFlagService {
         'g_unknown_flags.environmentId',
         'g_environments.id'
       )
-      .leftJoin(
-        'g_projects',
-        'g_environments.projectId',
-        'g_projects.id'
-      )
-      .leftJoin(
-        'g_organisations',
-        'g_projects.orgId',
-        'g_organisations.id'
-      );
+      .leftJoin('g_projects', 'g_environments.projectId', 'g_projects.id')
+      .leftJoin('g_organisations', 'g_projects.orgId', 'g_organisations.id');
 
     if (!options.includeResolved) {
       query = query.where('g_unknown_flags.isResolved', false);
     }
 
     if (options.environmentId) {
-      query = query.where('g_unknown_flags.environmentId', options.environmentId);
+      query = query.where(
+        'g_unknown_flags.environmentId',
+        options.environmentId
+      );
     }
 
     query = query.orderBy('g_unknown_flags.lastReportedAt', 'desc');

@@ -853,8 +853,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       {plan && (
         /* ==================== Active Plan ==================== */
         <Box>
-
-
           <Card variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
             {/* ---- Header ---- */}
             <Box

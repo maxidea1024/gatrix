@@ -191,7 +191,7 @@ export class GatrixClient {
       console.log(
         `[Gatrix] track() called: eventName="${eventName}", properties=`,
         properties ?? {},
-        '— tracking is not yet supported but will be available soon.',
+        '— tracking is not yet supported but will be available soon.'
       );
     }
   }

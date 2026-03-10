@@ -466,7 +466,10 @@ class NetworkTrafficService {
       .where('metricsBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn('g_feature_metrics.environmentId', params.environments);
+      query = query.whereIn(
+        'g_feature_metrics.environmentId',
+        params.environments
+      );
     }
 
     if (params.appNames && params.appNames.length > 0) {

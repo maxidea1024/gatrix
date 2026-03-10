@@ -218,7 +218,9 @@ const FeatureNetworkPage: React.FC = () => {
   // Lookup map: environmentId -> displayName
   const envNameMap = useMemo(
     () =>
-      new Map(envList.map((e) => [e.environmentId, e.displayName || e.environmentId])),
+      new Map(
+        envList.map((e) => [e.environmentId, e.displayName || e.environmentId])
+      ),
     [envList]
   );
 
@@ -1233,7 +1235,10 @@ const FeatureNetworkPage: React.FC = () => {
                                 <TableCell>
                                   <Tooltip title={row.environmentId}>
                                     <Chip
-                                      label={envNameMap.get(row.environmentId) || row.environmentId}
+                                      label={
+                                        envNameMap.get(row.environmentId) ||
+                                        row.environmentId
+                                      }
                                       size="small"
                                       color="primary"
                                       variant="outlined"
@@ -1351,8 +1356,7 @@ const FeatureNetworkPage: React.FC = () => {
                   </ToggleButton>
                 </ToggleButtonGroup>
               </Box>
-              {loading &&
-              evaluationTimeSeriesByApp.length === 0 ? (
+              {loading && evaluationTimeSeriesByApp.length === 0 ? (
                 <Skeleton variant="rectangular" height={300} />
               ) : evaluationTimeSeriesByApp.length === 0 ? (
                 <Box
@@ -1436,7 +1440,11 @@ const FeatureNetworkPage: React.FC = () => {
                                 <TableCell>
                                   <Tooltip title={row.environmentId}>
                                     <Chip
-                                      label={row.environmentName || envNameMap.get(row.environmentId) || row.environmentId}
+                                      label={
+                                        row.environmentName ||
+                                        envNameMap.get(row.environmentId) ||
+                                        row.environmentId
+                                      }
                                       size="small"
                                       color="primary"
                                       variant="outlined"

@@ -622,7 +622,8 @@ class FlagStreamingService {
    */
   getDetailedStats(): StreamingStats {
     // Build per-environment breakdown
-    const clientsByEnvironment: Record<string, { sse: number; ws: number }> = {};
+    const clientsByEnvironment: Record<string, { sse: number; ws: number }> =
+      {};
     for (const [, client] of this.sseClients) {
       if (!clientsByEnvironment[client.environmentId]) {
         clientsByEnvironment[client.environmentId] = { sse: 0, ws: 0 };
