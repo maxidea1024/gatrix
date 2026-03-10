@@ -97,7 +97,6 @@ When sending metrics to the backend, the payload MUST follow this structure:
 ```json
 {
   "appName": "MyApp",
-  "environment": "production",
   "sdkName": "@gatrix/gatrix-js-client-sdk",
   "sdkVersion": "1.0.0",
   "connectionId": "uuid-string",
@@ -460,7 +459,6 @@ By default, SDKs use **GET** requests with context in query parameters for flag 
 {
   "context": {
     "appName": "MyApp",
-    "environment": "production",
     "userId": "user-123",
     "sessionId": "session-456",
     "properties": {
@@ -616,7 +614,9 @@ The Unreal SDK uses `FGatrixFileStorageProvider` by default, which persists flag
 interface GatrixContext {
   userId?: string;
   sessionId?: string;
-  currentTime?: string;
+  appName?: string;
+  remoteAddress?: string;
+  currentTime?: string; // ISO 8601 (truncated to minute precision)
   properties?: Record<string, string | number | boolean>;
 }
 ```
@@ -986,7 +986,6 @@ const client = new GatrixClient({
   apiUrl: 'https://edge.your-api.com/api/v1',
   apiToken: 'your-token',
   appName: 'my-app',
-  environment: 'production',
   features: {
     storageProvider: new RedisStorageProvider(redisClient),
   },

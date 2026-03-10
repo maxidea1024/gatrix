@@ -1,7 +1,7 @@
 # Gatrix Cocos2d-x SDK (C++)
 
 Cocos2d-x 게임 엔진을 위한 Gatrix 플랫폼 C++ SDK입니다.
-[CLIENT_SDK_SPEC.md](../CLIENT_SDK_SPEC.md) 사양을 완전히 구현합니다.
+[CLIENT_SDK_SPEC.md](../spec/CLIENT_SDK_SPEC.md) 사양을 완전히 구현합니다.
 
 ## 주요 기능
 
