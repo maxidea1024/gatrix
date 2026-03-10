@@ -70,7 +70,7 @@ interface GatrixInitOptions {
 
 ### Flag Stores
 
-#### `flag(flagName): Readable<boolean>`
+#### `flag(flagName, forceRealtime?): Readable<boolean>`
 
 Reactive boolean store for a flag's enabled state.
 
@@ -84,22 +84,22 @@ Reactive boolean store for a flag's enabled state.
 {/if}
 ```
 
-#### `flagProxy(flagName): Readable<FlagProxy>`
+#### `flagState(flagName, forceRealtime?): Readable<FlagState>`
 
-Full FlagProxy store with access to all variation methods.
+Full flag state store with enabled, variant name, and variant value.
 
 ```svelte
 <script>
-  import { flagProxy } from '@gatrix/gatrix-svelte-client-sdk';
-  const myFlag = flagProxy('my-feature');
+  import { flagState } from '@gatrix/gatrix-svelte-client-sdk';
+  const myFlag = flagState('my-feature');
 </script>
 {#if $myFlag.enabled}
-  <p>Variant: {$myFlag.variant.name}</p>
-  <p>Payload: {$myFlag.stringVariation('default')}</p>
+  <p>Variant: {$myFlag.variantName}</p>
+  <p>Value: {$myFlag.variantValue}</p>
 {/if}
 ```
 
-#### `allFlags(): Readable<EvaluatedFlag[]>`
+#### `allFlags(forceRealtime?): Readable<EvaluatedFlag[]>`
 
 Store for all evaluated flags.
 
@@ -172,6 +172,17 @@ Returns reactive stores for SDK status.
 </button>
 <button on:click={() => sync()}>Sync Flags</button>
 <button on:click={() => fetch()}>Refresh</button>
+```
+
+### Tracking
+
+```svelte
+<script>
+  import { getTrack } from '@gatrix/gatrix-svelte-client-sdk';
+  const track = getTrack();
+
+  track('button_click', { button: 'purchase' });
+</script>
 ```
 
 ### Direct Client Access

@@ -70,7 +70,7 @@ interface GatrixInitOptions {
 
 ### 플래그 스토어
 
-#### `flag(flagName): Readable<boolean>`
+#### `flag(flagName, forceRealtime?): Readable<boolean>`
 
 플래그 활성화 상태를 위한 반응형 불리언 스토어.
 
@@ -84,22 +84,22 @@ interface GatrixInitOptions {
 {/if}
 ```
 
-#### `flagProxy(flagName): Readable<FlagProxy>`
+#### `flagState(flagName, forceRealtime?): Readable<FlagState>`
 
-모든 배리에이션 메서드에 접근 가능한 전체 FlagProxy 스토어.
+활성 상태, 배리언트 이름, 배리언트 값을 포함한 전체 플래그 상태 스토어.
 
 ```svelte
 <script>
-  import { flagProxy } from '@gatrix/gatrix-svelte-client-sdk';
-  const myFlag = flagProxy('my-feature');
+  import { flagState } from '@gatrix/gatrix-svelte-client-sdk';
+  const myFlag = flagState('my-feature');
 </script>
 {#if $myFlag.enabled}
-  <p>배리언트: {$myFlag.variant.name}</p>
-  <p>값: {$myFlag.stringVariation('default')}</p>
+  <p>배리언트: {$myFlag.variantName}</p>
+  <p>값: {$myFlag.variantValue}</p>
 {/if}
 ```
 
-#### `allFlags(): Readable<EvaluatedFlag[]>`
+#### `allFlags(forceRealtime?): Readable<EvaluatedFlag[]>`
 
 모든 평가된 플래그의 스토어.
 
@@ -172,6 +172,17 @@ SDK 상태를 위한 반응형 스토어를 반환합니다.
 </button>
 <button on:click={() => sync()}>플래그 동기화</button>
 <button on:click={() => fetch()}>새로고침</button>
+```
+
+### 트래킹
+
+```svelte
+<script>
+  import { getTrack } from '@gatrix/gatrix-svelte-client-sdk';
+  const track = getTrack();
+
+  track('button_click', { button: 'purchase' });
+</script>
 ```
 
 ### 직접 클라이언트 접근
