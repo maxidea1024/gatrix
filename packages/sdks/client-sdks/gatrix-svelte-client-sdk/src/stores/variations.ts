@@ -27,8 +27,8 @@ export function boolVariation(
     (set) => {
       const watchFn = forceRealtime
         ? client.features.watchRealtimeFlagWithInitialState.bind(
-          client.features
-        )
+            client.features
+          )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
       return watchFn(flagName, (proxy) => {
         set(proxy.boolVariation(fallbackValue));
@@ -54,8 +54,8 @@ export function stringVariation(
     (set) => {
       const watchFn = forceRealtime
         ? client.features.watchRealtimeFlagWithInitialState.bind(
-          client.features
-        )
+            client.features
+          )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
       return watchFn(flagName, (proxy) => {
         set(proxy.stringVariation(fallbackValue));
@@ -81,8 +81,8 @@ export function numberVariation(
     (set) => {
       const watchFn = forceRealtime
         ? client.features.watchRealtimeFlagWithInitialState.bind(
-          client.features
-        )
+            client.features
+          )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
       return watchFn(flagName, (proxy) => {
         set(proxy.numberVariation(fallbackValue));
@@ -108,8 +108,8 @@ export function jsonVariation<T = unknown>(
     (set) => {
       const watchFn = forceRealtime
         ? client.features.watchRealtimeFlagWithInitialState.bind(
-          client.features
-        )
+            client.features
+          )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
       return watchFn(flagName, (proxy) => {
         set(proxy.jsonVariation<T>(fallbackValue));
@@ -133,13 +133,12 @@ export function variant(
     (set) => {
       const watchFn = forceRealtime
         ? client.features.watchRealtimeFlagWithInitialState.bind(
-          client.features
-        )
+            client.features
+          )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
       return watchFn(flagName, (proxy: FlagProxy) => {
         set(proxy.variant);
-      }
-      );
+      });
     }
   );
 }
