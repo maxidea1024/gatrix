@@ -1883,7 +1883,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             mt: 0.5,
                             height: 18,
                             fontSize: '0.65rem',
-                            fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
+                            fontFamily:
+                              'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                             cursor: 'default',
                           }}
                         />
@@ -2287,7 +2288,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   <Typography
                     variant="body2"
                     sx={{
-                      fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
+                      fontFamily:
+                        'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                       fontSize: '0.8rem',
                       fontWeight: 600,
                       overflow: 'hidden',
@@ -2671,7 +2673,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             variant="caption"
                             sx={{
                               color: 'error.main',
-                              fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
+                              fontFamily:
+                                'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                             }}
                           >
                             &quot;&quot;
@@ -2784,7 +2787,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   <TableCell sx={{ py: 0.5 }}>
                                     <Typography
                                       variant="caption"
-                                      sx={{ fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace' }}
+                                      sx={{
+                                        fontFamily:
+                                          'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
+                                      }}
                                     >
                                       {renderValue(entry.value, entry.type)}
                                     </Typography>
@@ -2930,7 +2936,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     <TableCell sx={{ py: 0.5 }}>
                                       <Typography
                                         variant="caption"
-                                        sx={{ fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace' }}
+                                        sx={{
+                                          fontFamily:
+                                            'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
+                                        }}
                                       >
                                         {!provided ? (
                                           <Typography
@@ -4067,7 +4076,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           <Chip
                             label={selectedEvaluation.result.variant.name}
                             size="small"
-                            color={selectedEvaluation.result.enabled ? 'success' : 'error'}
+                            color={
+                              selectedEvaluation.result.enabled
+                                ? 'success'
+                                : 'error'
+                            }
                             sx={{
                               borderRadius: '4px',
                               fontWeight: 600,
@@ -4412,7 +4425,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           <Typography
                             variant="body2"
                             sx={{
-                              fontFamily: 'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
+                              fontFamily:
+                                'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                               wordBreak: 'break-all',
                             }}
                           >
