@@ -264,10 +264,6 @@ MIT
 
 ### 업계 사례
 
-**Riot Games (League of Legends)** — 피처 플래그를 사용하여 실험적인 게임플레이 메커니즘을 특정 지역 서버에서 먼저 테스트한 후 글로벌로 배포합니다. 새로운 챔피언이나 밸런스 변경사항을 플래그 뒤에 배포하여, 전체 플레이어에게 노출하기 전에 데이터 기반으로 의사결정을 합니다.
-
-**Supercell (Clash Royale, Brawl Stars)** — 피처 플래그 기반의 라이브 운영을 통해 시즌 이벤트, 한정 콘텐츠, IP 콜라보레이션을 관리합니다. 콘텐츠를 미리 배포해두고 정확한 시점에 활성화하며, 클라이언트 업데이트 없이 플레이어 데이터 기반으로 빠르게 반복합니다.
-
 **GitHub** — 피처 플래그로 [코드를 더 빠르고 안전하게 배포하는 방법](https://github.blog/engineering/infrastructure/ship-code-faster-safer-feature-flags/)을 공개했습니다 — 배포 위험 감소, 내부 사용자 우선 테스트, 비율 기반 롤아웃 등. 게임 회사는 아니지만 이 패턴은 라이브 서비스 게임에 직접 적용할 수 있습니다.
 
 **Slack** — 단계적 롤아웃(staging → dogfood → canary → percentage production)을 사용하는 [배포 프로세스를 공개](https://slack.engineering/deploys-at-slack/)했습니다. 이 패턴은 실제 플레이어 트래픽으로 변경사항을 검증해야 하는 멀티플레이어 게임에 매우 적합합니다.

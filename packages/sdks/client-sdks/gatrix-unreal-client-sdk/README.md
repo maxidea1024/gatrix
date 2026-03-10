@@ -555,10 +555,6 @@ void AMyActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 ### Industry Case Studies
 
-**Riot Games (League of Legends)** uses feature flags to test experimental gameplay mechanics on specific regional servers before global rollout. New champions or balance changes are deployed behind flags, allowing data-driven decisions before exposing changes to the full player base.
-
-**Supercell (Clash Royale, Brawl Stars)** leverages live ops powered by feature flags for seasonal events, limited-time content, and IP collaborations. Content is pre-deployed and activated at precisely the right moment, enabling rapid iteration based on player metrics without requiring client updates.
-
 **GitHub** [documented their approach](https://github.blog/engineering/infrastructure/ship-code-faster-safer-feature-flags/) to shipping code faster and safer with feature flags — including reducing deployment risk, testing features with internal users first, and using percentage-based rollouts. While not a game company, their patterns directly apply to live service games.
 
 **Slack** [shared their deployment process](https://slack.engineering/deploys-at-slack/) which uses staged rollouts (staging → dogfood → canary → percentage production). This pattern is highly relevant for multiplayer games that need to validate changes against real player traffic before full rollout.
