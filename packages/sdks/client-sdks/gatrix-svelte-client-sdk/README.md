@@ -1,6 +1,6 @@
 # Gatrix Svelte SDK
 
-Svelte SDK for the Gatrix platform ??reactive feature flag stores with automatic cleanup.
+Svelte SDK for the Gatrix platform — reactive feature flag stores with automatic cleanup.
 
 Built on top of `@gatrix/gatrix-js-client-sdk`, providing idiomatic Svelte stores for flag access, variations, and status tracking.
 
@@ -115,7 +115,17 @@ Store for all evaluated flags.
 
 ### Variation Stores
 
-All variation stores return `Readable<T>` ??use with `$` prefix in templates.
+All variation stores accept an optional `forceRealtime` parameter (default: `true`). When `true`, reads from realtime flags regardless of explicit sync mode.
+
+| Store | Description |
+|-------|-------------|
+| `boolVariation(flagName, fallbackValue, forceRealtime?)` | `Readable<boolean>` |
+| `stringVariation(flagName, fallbackValue, forceRealtime?)` | `Readable<string>` |
+| `numberVariation(flagName, fallbackValue, forceRealtime?)` | `Readable<number>` |
+| `jsonVariation<T>(flagName, fallbackValue, forceRealtime?)` | `Readable<T>` (JSON object) |
+| `variant(flagName, forceRealtime?)` | `Readable<Variant>` |
+
+All variation stores return `Readable<T>` — use with `$` prefix in templates.
 
 ```svelte
 <script>
@@ -203,7 +213,7 @@ Returns reactive stores for SDK status.
 
 | Feature | Description |
 |---------|-------------|
-| **Reactive stores** | All values are Svelte `Readable` stores ??auto-update on flag changes |
+| **Reactive stores** | All values are Svelte `Readable` stores — auto-update on flag changes |
 | **Auto-cleanup** | Store subscriptions auto-unsubscribe when components are destroyed |
 | **Typed variations** | `boolVariation`, `stringVariation`, `numberVariation`, `jsonVariation` |
 | **FlagProxy** | Full access to flag details, variant, and all variation methods |

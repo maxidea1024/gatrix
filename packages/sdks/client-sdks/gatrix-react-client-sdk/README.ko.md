@@ -70,10 +70,11 @@ function MyComponent() {
 
 ```tsx
 <GatrixProvider
-  config={GatrixClientConfig}    // 필수: SDK 설정
-  gatrixClient={GatrixClient}    // 선택: 미리 생성된 클라이언트 인스턴스
-  startClient={true}             // 선택: 자동 시작 (기본: true)
-  stopClient={true}              // 선택: 언마운트 시 자동 중지 (기본: true)
+  config={GatrixClientConfig}           // 필수: SDK 설정
+  gatrixClient={GatrixClient}           // 선택: 미리 생성된 클라이언트 인스턴스
+  startClient={true}                    // 선택: 자동 시작 (기본: true)
+  stopClient={true}                     // 선택: 언마운트 시 자동 중지 (기본: true)
+  startTransition={React.startTransition} // 선택: React 18 startTransition (논블로킹 업데이트)
 >
   {children}
 </GatrixProvider>
@@ -84,25 +85,31 @@ function MyComponent() {
 | 훅 | 설명 |
 |----|------|
 | `useGatrixClient()` | `GatrixClient` 인스턴스 반환 |
+| `useGatrixContext()` | Gatrix 컨텍스트 전체 값 반환 (client, features, flags 상태 등) |
 | `useFlagsStatus()` | `{ flagsReady: boolean, flagsError: any }` 반환 |
 | `useUpdateContext()` | 컨텍스트 업데이트 함수 반환 |
+| `useTrack()` | 커스텀 이벤트 트래킹 함수 반환 |
 
 ### 플래그 접근 훅
 
+모든 플래그 접근 훅은 선택적 `forceRealtime` 매개변수를 지원합니다 (기본값: `true`). `true`일 경우, explicit sync mode와 관계없이 실시간 플래그 값을 읽습니다.
+
 | 훅 | 설명 |
 |----|------|
-| `useFlag(flagName)` | `boolean` 반환 — 플래그 활성화 여부 |
-| `useFlags()` | `EvaluatedFlag[]` 반환 — 모든 플래그 |
-| `useVariant(flagName)` | `Variant` 반환 — 배리언트 객체 |
+| `useFlag(flagName, forceRealtime?)` | `boolean` 반환 — 플래그 활성화 여부 |
+| `useFlags(forceRealtime?)` | `EvaluatedFlag[]` 반환 — 모든 플래그 |
+| `useVariant(flagName, forceRealtime?)` | `Variant` 반환 — 배리언트 객체 |
 
 ### Variation 훅
 
+모든 variation 훅은 세 번째 인자로 선택적 `forceRealtime` 매개변수를 지원합니다 (기본값: `true`).
+
 | 훅 | 설명 |
 |----|------|
-| `useBoolVariation(flagName, defaultValue)` | `boolean` 반환 |
-| `useStringVariation(flagName, defaultValue)` | `string` 반환 |
-| `useNumberVariation(flagName, defaultValue)` | `number` 반환 |
-| `useJsonVariation<T>(flagName, defaultValue)` | `T` (JSON 객체) 반환 |
+| `useBoolVariation(flagName, defaultValue, forceRealtime?)` | `boolean` 반환 |
+| `useStringVariation(flagName, defaultValue, forceRealtime?)` | `string` 반환 |
+| `useNumberVariation(flagName, defaultValue, forceRealtime?)` | `number` 반환 |
+| `useJsonVariation<T>(flagName, defaultValue, forceRealtime?)` | `T` (JSON 객체) 반환 |
 
 ## 예제
 

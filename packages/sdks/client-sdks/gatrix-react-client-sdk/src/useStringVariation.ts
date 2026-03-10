@@ -34,10 +34,8 @@ export function useStringVariation(
       ? features.watchRealtimeFlagWithInitialState.bind(features)
       : features.watchSyncedFlagWithInitialState.bind(features);
 
-    return watchFn(flagName, () => {
-      setValue(
-        features.stringVariation(flagName, fallbackValue, forceRealtime)
-      );
+    return watchFn(flagName, (proxy) => {
+      setValue(proxy.stringVariation(fallbackValue));
     });
   }, [features, flagName, fallbackValue, forceRealtime]);
 

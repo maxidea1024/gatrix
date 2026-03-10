@@ -89,6 +89,8 @@ app.use(GatrixPlugin, {
 
 ### 플래그 접근 컴포저블
 
+모든 플래그 접근 컴포저블은 선택적 `forceRealtime` 매개변수를 지원합니다 (기본값: `true`). `true`일 경우, explicit sync mode와 관계없이 실시간 플래그 값을 읽습니다.
+
 | 컴포저블 | 설명 |
 |----------|------|
 | `useFlag(flagName, forceRealtime?)` | `ComputedRef<boolean>` 반환 — 플래그 활성 상태 |
@@ -98,6 +100,8 @@ app.use(GatrixPlugin, {
 | `useTrack()` | 트래킹 함수 `(eventName, properties?) => void` 반환 |
 
 ### Variation 컴포저블
+
+모든 variation 컴포저블은 세 번째 인자로 선택적 `forceRealtime` 매개변수를 지원합니다 (기본값: `true`).
 
 | 컴포저블 | 설명 |
 |----------|------|

@@ -15,12 +15,8 @@ export function useNumberVariation(
     ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
     : client.features.watchSyncedFlagWithInitialState.bind(client.features);
 
-  const unwatch = watchFn(flagName, () => {
-    value.value = client.features.numberVariation(
-      flagName,
-      fallbackValue,
-      forceRealtime
-    );
+  const unwatch = watchFn(flagName, (proxy) => {
+    value.value = proxy.numberVariation(fallbackValue);
   });
 
   onUnmounted(unwatch);

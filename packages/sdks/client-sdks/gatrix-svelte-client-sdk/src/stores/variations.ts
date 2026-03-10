@@ -1,7 +1,7 @@
 // Gatrix Svelte SDK - Variation stores
 import { readable, type Readable } from 'svelte/store';
 import { getGatrixClient } from './getGatrixClient';
-import type { Variant } from '@gatrix/gatrix-js-client-sdk';
+import type { Variant, FlagProxy } from '@gatrix/gatrix-js-client-sdk';
 
 /**
  * Reactive boolean variation store.
@@ -27,13 +27,11 @@ export function boolVariation(
     (set) => {
       const watchFn = forceRealtime
         ? client.features.watchRealtimeFlagWithInitialState.bind(
-            client.features
-          )
+          client.features
+        )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
-      return watchFn(flagName, () => {
-        set(
-          client.features.boolVariation(flagName, fallbackValue, forceRealtime)
-        );
+      return watchFn(flagName, (proxy) => {
+        set(proxy.boolVariation(fallbackValue));
       });
     }
   );
@@ -56,17 +54,11 @@ export function stringVariation(
     (set) => {
       const watchFn = forceRealtime
         ? client.features.watchRealtimeFlagWithInitialState.bind(
-            client.features
-          )
+          client.features
+        )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
-      return watchFn(flagName, () => {
-        set(
-          client.features.stringVariation(
-            flagName,
-            fallbackValue,
-            forceRealtime
-          )
-        );
+      return watchFn(flagName, (proxy) => {
+        set(proxy.stringVariation(fallbackValue));
       });
     }
   );
@@ -89,17 +81,11 @@ export function numberVariation(
     (set) => {
       const watchFn = forceRealtime
         ? client.features.watchRealtimeFlagWithInitialState.bind(
-            client.features
-          )
+          client.features
+        )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
-      return watchFn(flagName, () => {
-        set(
-          client.features.numberVariation(
-            flagName,
-            fallbackValue,
-            forceRealtime
-          )
-        );
+      return watchFn(flagName, (proxy) => {
+        set(proxy.numberVariation(fallbackValue));
       });
     }
   );
@@ -122,13 +108,11 @@ export function jsonVariation<T = unknown>(
     (set) => {
       const watchFn = forceRealtime
         ? client.features.watchRealtimeFlagWithInitialState.bind(
-            client.features
-          )
+          client.features
+        )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
-      return watchFn(flagName, () => {
-        set(
-          client.features.jsonVariation(flagName, fallbackValue, forceRealtime)
-        );
+      return watchFn(flagName, (proxy) => {
+        set(proxy.jsonVariation<T>(fallbackValue));
       });
     }
   );
@@ -149,14 +133,12 @@ export function variant(
     (set) => {
       const watchFn = forceRealtime
         ? client.features.watchRealtimeFlagWithInitialState.bind(
-            client.features
-          )
+          client.features
+        )
         : client.features.watchSyncedFlagWithInitialState.bind(client.features);
-      return watchFn(
-        flagName,
-        (proxy: import('@gatrix/gatrix-js-client-sdk').FlagProxy) => {
-          set(proxy.variant);
-        }
+      return watchFn(flagName, (proxy: FlagProxy) => {
+        set(proxy.variant);
+      }
       );
     }
   );

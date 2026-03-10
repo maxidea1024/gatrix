@@ -15,12 +15,8 @@ export function useStringVariation(
     ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
     : client.features.watchSyncedFlagWithInitialState.bind(client.features);
 
-  const unwatch = watchFn(flagName, () => {
-    value.value = client.features.stringVariation(
-      flagName,
-      fallbackValue,
-      forceRealtime
-    );
+  const unwatch = watchFn(flagName, (proxy) => {
+    value.value = proxy.stringVariation(fallbackValue);
   });
 
   onUnmounted(unwatch);

@@ -115,6 +115,16 @@ interface GatrixInitOptions {
 
 ### Variation 스토어
 
+모든 variation 스토어는 선택적 `forceRealtime` 매개변수를 지원합니다 (기본값: `true`). `true`일 경우, explicit sync mode와 관계없이 실시간 플래그 값을 읽습니다.
+
+| 스토어 | 설명 |
+|--------|------|
+| `boolVariation(flagName, fallbackValue, forceRealtime?)` | `Readable<boolean>` |
+| `stringVariation(flagName, fallbackValue, forceRealtime?)` | `Readable<string>` |
+| `numberVariation(flagName, fallbackValue, forceRealtime?)` | `Readable<number>` |
+| `jsonVariation<T>(flagName, fallbackValue, forceRealtime?)` | `Readable<T>` (JSON 객체) |
+| `variant(flagName, forceRealtime?)` | `Readable<Variant>` |
+
 모든 variation 스토어는 `Readable<T>`를 반환합니다 — 템플릿에서 `$` 접두사로 사용합니다.
 
 ```svelte

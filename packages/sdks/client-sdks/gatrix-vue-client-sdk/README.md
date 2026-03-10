@@ -89,6 +89,8 @@ app.use(GatrixPlugin, {
 
 ### Flag Access Composables
 
+All flag access composables accept an optional `forceRealtime` parameter (default: `true`). When `true`, reads from realtime flags regardless of explicit sync mode.
+
 | Composable             | Description                                 |
 | ---------------------- | ------------------------------------------- |
 | `useFlag(flagName, forceRealtime?)`    | Returns `ComputedRef<boolean>` — flag enabled state |
@@ -98,6 +100,8 @@ app.use(GatrixPlugin, {
 | `useTrack()`                              | Returns track function `(eventName, properties?) => void` |
 
 ### Variation Composables
+
+All variation composables accept an optional `forceRealtime` parameter (default: `true`) as the third argument.
 
 | Composable                                     | Description               |
 | ---------------------------------------------- | ------------------------- |

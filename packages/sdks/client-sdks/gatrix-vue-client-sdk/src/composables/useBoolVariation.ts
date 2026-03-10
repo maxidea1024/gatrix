@@ -15,12 +15,8 @@ export function useBoolVariation(
     ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
     : client.features.watchSyncedFlagWithInitialState.bind(client.features);
 
-  const unwatch = watchFn(flagName, () => {
-    value.value = client.features.boolVariation(
-      flagName,
-      fallbackValue,
-      forceRealtime
-    );
+  const unwatch = watchFn(flagName, (proxy) => {
+    value.value = proxy.boolVariation(fallbackValue);
   });
 
   onUnmounted(unwatch);

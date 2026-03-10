@@ -34,10 +34,8 @@ export function useJsonVariation<T>(
       ? features.watchRealtimeFlagWithInitialState.bind(features)
       : features.watchSyncedFlagWithInitialState.bind(features);
 
-    return watchFn(flagName, () => {
-      setValue(
-        features.jsonVariation<T>(flagName, fallbackValue, forceRealtime)
-      );
+    return watchFn(flagName, (proxy) => {
+      setValue(proxy.jsonVariation<T>(fallbackValue));
     });
   }, [features, flagName, fallbackValue, forceRealtime]);
 

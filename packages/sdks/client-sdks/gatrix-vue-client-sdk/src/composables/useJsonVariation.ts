@@ -15,12 +15,8 @@ export function useJsonVariation<T>(
     ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
     : client.features.watchSyncedFlagWithInitialState.bind(client.features);
 
-  const unwatch = watchFn(flagName, () => {
-    (value as any).value = client.features.jsonVariation<T>(
-      flagName,
-      fallbackValue,
-      forceRealtime
-    );
+  const unwatch = watchFn(flagName, (proxy) => {
+    (value as any).value = proxy.jsonVariation<T>(fallbackValue);
   });
 
   onUnmounted(unwatch);

@@ -70,10 +70,11 @@ Wraps your application to provide Gatrix context.
 
 ```tsx
 <GatrixProvider
-  config={GatrixClientConfig} // Required: SDK configuration
-  gatrixClient={GatrixClient} // Optional: Pre-created client instance
-  startClient={true} // Optional: Auto-start client (default: true)
-  stopClient={true} // Optional: Auto-stop on unmount (default: true)
+  config={GatrixClientConfig}           // Required: SDK configuration
+  gatrixClient={GatrixClient}           // Optional: Pre-created client instance
+  startClient={true}                    // Optional: Auto-start client (default: true)
+  stopClient={true}                     // Optional: Auto-stop on unmount (default: true)
+  startTransition={React.startTransition} // Optional: React 18 startTransition for non-blocking updates
 >
   {children}
 </GatrixProvider>
@@ -81,28 +82,34 @@ Wraps your application to provide Gatrix context.
 
 ### Core Hooks
 
-| Hook                 | Description                                        |
-| -------------------- | -------------------------------------------------- |
-| `useGatrixClient()`  | Returns the `GatrixClient` instance                |
-| `useFlagsStatus()`   | Returns `{ flagsReady: boolean, flagsError: any }` |
-| `useUpdateContext()` | Returns function to update context                 |
+| Hook                  | Description                                        |
+| --------------------- | -------------------------------------------------- |
+| `useGatrixClient()`   | Returns the `GatrixClient` instance                |
+| `useGatrixContext()`  | Returns the full Gatrix context value (client, features, flags state, etc.) |
+| `useFlagsStatus()`    | Returns `{ flagsReady: boolean, flagsError: any }` |
+| `useUpdateContext()`  | Returns function to update context                 |
+| `useTrack()`          | Returns function to track custom events            |
 
 ### Flag Access Hooks
 
-| Hook                   | Description                                 |
-| ---------------------- | ------------------------------------------- |
-| `useFlag(flagName)`    | Returns `boolean` - whether flag is enabled |
-| `useFlags()`           | Returns `EvaluatedFlag[]` - all flags       |
-| `useVariant(flagName)` | Returns `Variant` - variant object          |
+All flag access hooks accept an optional `forceRealtime` parameter (default: `true`). When `true`, the hook reads from realtime flags regardless of explicit sync mode.
+
+| Hook                                | Description                                 |
+| ----------------------------------- | ------------------------------------------- |
+| `useFlag(flagName, forceRealtime?)`    | Returns `boolean` - whether flag is enabled |
+| `useFlags(forceRealtime?)`             | Returns `EvaluatedFlag[]` - all flags       |
+| `useVariant(flagName, forceRealtime?)` | Returns `Variant` - variant object          |
 
 ### Variation Hooks
 
-| Hook                                          | Description               |
-| --------------------------------------------- | ------------------------- |
-| `useBoolVariation(flagName, defaultValue)`    | Returns `boolean`         |
-| `useStringVariation(flagName, defaultValue)`  | Returns `string`          |
-| `useNumberVariation(flagName, defaultValue)`  | Returns `number`          |
-| `useJsonVariation<T>(flagName, defaultValue)` | Returns `T` (JSON object) |
+All variation hooks accept an optional `forceRealtime` parameter (default: `true`) as the third argument.
+
+| Hook                                                       | Description               |
+| ---------------------------------------------------------- | ------------------------- |
+| `useBoolVariation(flagName, defaultValue, forceRealtime?)`    | Returns `boolean`         |
+| `useStringVariation(flagName, defaultValue, forceRealtime?)`  | Returns `string`          |
+| `useNumberVariation(flagName, defaultValue, forceRealtime?)`  | Returns `number`          |
+| `useJsonVariation<T>(flagName, defaultValue, forceRealtime?)` | Returns `T` (JSON object) |
 
 ## Examples
 

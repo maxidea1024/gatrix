@@ -34,8 +34,8 @@ export function useBoolVariation(
       ? features.watchRealtimeFlagWithInitialState.bind(features)
       : features.watchSyncedFlagWithInitialState.bind(features);
 
-    return watchFn(flagName, () => {
-      setValue(features.boolVariation(flagName, fallbackValue, forceRealtime));
+    return watchFn(flagName, (proxy) => {
+      setValue(proxy.boolVariation(fallbackValue));
     });
   }, [features, flagName, fallbackValue, forceRealtime]);
 

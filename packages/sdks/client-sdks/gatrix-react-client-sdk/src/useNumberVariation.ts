@@ -34,10 +34,8 @@ export function useNumberVariation(
       ? features.watchRealtimeFlagWithInitialState.bind(features)
       : features.watchSyncedFlagWithInitialState.bind(features);
 
-    return watchFn(flagName, () => {
-      setValue(
-        features.numberVariation(flagName, fallbackValue, forceRealtime)
-      );
+    return watchFn(flagName, (proxy) => {
+      setValue(proxy.numberVariation(fallbackValue));
     });
   }, [features, flagName, fallbackValue, forceRealtime]);
 
