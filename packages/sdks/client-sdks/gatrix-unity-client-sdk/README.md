@@ -574,10 +574,6 @@ void OnDestroy()
 
 ---
 
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](../../../../LICENSE) file for details.
-
 ## 🎮 Feature Flags in Games
 
 ### Industry Case Studies
@@ -609,3 +605,25 @@ This project is licensed under the MIT License - see the [LICENSE](../../../../L
 | **Deterministic multiplayer** | Ensure all clients see the same flag values in the same session. Use `UserId` for consistent assignment |
 | **Performance-sensitive paths** | Avoid flag checks in tight loops (Update/Tick). Cache the value at session start or sync points |
 
+## 📚 References
+
+**Concepts:**
+
+- [Feature Toggles (aka Feature Flags)](https://martinfowler.com/articles/feature-toggles.html) — Martin Fowler
+- [What are Feature Flags?](https://www.atlassian.com/continuous-delivery/principles/feature-flags) — Atlassian
+
+**Use Cases & Case Studies:**
+
+- [How We Ship Code Faster and Safer with Feature Flags](https://github.blog/engineering/infrastructure/ship-code-faster-safer-feature-flags/) — GitHub Engineering
+- [Deploys at Slack](https://slack.engineering/deploys-at-slack/) — Slack Engineering
+- [Preparing the Netflix API for Deployment](https://netflixtechblog.com/preparing-the-netflix-api-for-deployment-786d8f58090d) — Netflix Tech Blog
+- [Progressive Experimentation with Feature Flags](https://learn.microsoft.com/en-us/devops/operate/progressive-experimentation-feature-flags) — Microsoft
+
+**Trunk-Based Development:**
+
+- [Feature Flags in Trunk-Based Development](https://trunkbaseddevelopment.com/feature-flags/) — trunkbaseddevelopment.com
+- [Trunk-Based Development Best Practices](https://www.atlassian.com/continuous-delivery/continuous-integration/trunk-based-development) — Atlassian
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](../../../../LICENSE) file for details.

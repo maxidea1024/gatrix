@@ -570,9 +570,6 @@ void OnDestroy()
 
 ---
 
-## 📜 라이선스
-
-이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다. 자세한 내용은 [LICENSE](../../../../LICENSE) 파일을 참조하세요.
 
 ## 🎮 게임에서의 피처 플래그 활용
 
@@ -604,4 +601,25 @@ void OnDestroy()
 | **플래그 정리** | 영구 적용 후에는 플래그 제거. 남은 플래그는 기술 부채가 됨 |
 | **결정적 멀티플레이어** | 동일 세션의 모든 클라이언트가 같은 플래그 값을 보도록 보장. `UserId`로 일관된 할당 |
 | **성능 민감 경로** | 타이트 루프(Update/Tick)에서 플래그 조회 피할 것. 세션 시작 또는 싱크 시점에 값을 캐시 |
+## 📚 참고자료
 
+**개념:**
+
+- [Feature Toggles (aka Feature Flags)](https://martinfowler.com/articles/feature-toggles.html) — Martin Fowler
+- [What are Feature Flags?](https://www.atlassian.com/continuous-delivery/principles/feature-flags) — Atlassian
+
+**사례 모음:**
+
+- [How We Ship Code Faster and Safer with Feature Flags](https://github.blog/engineering/infrastructure/ship-code-faster-safer-feature-flags/) — GitHub Engineering
+- [Deploys at Slack](https://slack.engineering/deploys-at-slack/) — Slack Engineering
+- [Preparing the Netflix API for Deployment](https://netflixtechblog.com/preparing-the-netflix-api-for-deployment-786d8f58090d) — Netflix Tech Blog
+- [Progressive Experimentation with Feature Flags](https://learn.microsoft.com/en-us/devops/operate/progressive-experimentation-feature-flags) — Microsoft
+
+**Trunk-Based Development:**
+
+- [Feature Flags in Trunk-Based Development](https://trunkbaseddevelopment.com/feature-flags/) — trunkbaseddevelopment.com
+- [Trunk-Based Development Best Practices](https://www.atlassian.com/continuous-delivery/continuous-integration/trunk-based-development) — Atlassian
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](../../../../LICENSE) file for details.
