@@ -51,11 +51,11 @@ var speed := features.float_variation("game-speed", 1.0)
 var welcome := features.string_variation("welcome-message", "Hello!")
 var ui_config = features.json_variation("ui-config", { "theme": "default" })
 
-# FlagProxy for rich access
-var flag := features.get_flag("my-feature")
-if flag.exists and flag.enabled:
+# EvaluatedFlag for direct access (returns null if flag not found)
+var flag = features.get_flag("my-feature")
+if flag != null and flag.enabled:
     print("Variant: ", flag.variant.name)
-    print("Value: ", flag.string_variation("fallback"))
+    print("Value: ", flag.variant.value)
 ```
 
 ## Variation Details
@@ -105,9 +105,9 @@ var features = GatrixClient.get_features()
 # Batch management for multiple watchers
 var group := GatrixWatchFlagGroup.new(features, "gameplay")
 
-group.watch_flag("speed", func(flag: GatrixFlagProxy):
+group.watch_realtime_flag_with_initial_state("speed", func(flag: GatrixFlagProxy):
     player.speed = flag.float_variation(5.0)
-).watch_flag("dark-mode", func(flag: GatrixFlagProxy):
+).watch_realtime_flag_with_initial_state("dark-mode", func(flag: GatrixFlagProxy):
     apply_theme("dark" if flag.enabled else "light")
 )
 
@@ -182,6 +182,8 @@ GatrixClient.on_any(func(event_name, args):
 | `GatrixEvents.FLAGS_RECOVERED` | `flags.recovered` | Recovered from error state |
 | `GatrixEvents.FLAGS_SYNC` | `flags.sync` | Flags synchronized |
 | `GatrixEvents.FLAGS_IMPRESSION` | `flags.impression` | Impression tracked |
+| `GatrixEvents.FLAGS_PENDING_SYNC` | `flags.pending_sync` | Pending sync flags available |
+| `GatrixEvents.FLAGS_REMOVED` | `flags.removed` | Flags removed from server |
 | `GatrixEvents.FLAGS_METRICS_SENT` | `flags.metrics.sent` | Metrics sent to server |
 
 ## Statistics
@@ -213,6 +215,7 @@ GatrixClient.start(config, storage)
 | `api_url` | String | `http://localhost:3400/api/v1` | Edge API base URL |
 | `api_token` | String | **required** | Client API token |
 | `app_name` | String | **required** | Application name |
+| `environment` | String | **required** | Environment name |
 | `custom_headers` | Dictionary | `{}` | Custom HTTP headers |
 | `features.context` | GatrixContext | `null` | Initial evaluation context |
 | `features.offline_mode` | bool | `false` | Start in offline mode |

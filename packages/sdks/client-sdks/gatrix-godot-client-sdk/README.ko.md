@@ -50,11 +50,11 @@ var speed := features.float_variation("game-speed", 1.0)
 var welcome := features.string_variation("welcome-message", "Hello!")
 var ui_config = features.json_variation("ui-config", { "theme": "default" })
 
-# FlagProxy로 상세 접근
-var flag := features.get_flag("my-feature")
-if flag.exists and flag.enabled:
+# EvaluatedFlag로 직접 접근 (플래그가 없으면 null 반환)
+var flag = features.get_flag("my-feature")
+if flag != null and flag.enabled:
     print("배리언트: ", flag.variant.name)
-    print("값: ", flag.string_variation("fallback"))
+    print("값: ", flag.variant.value)
 ```
 
 ## 배리언트 상세
@@ -104,9 +104,9 @@ var features = GatrixClient.get_features()
 # 여러 워처 일괄 관리
 var group := GatrixWatchFlagGroup.new(features, "gameplay")
 
-group.watch_flag("speed", func(flag: GatrixFlagProxy):
+group.watch_realtime_flag_with_initial_state("speed", func(flag: GatrixFlagProxy):
     player.speed = flag.float_variation(5.0)
-).watch_flag("dark-mode", func(flag: GatrixFlagProxy):
+).watch_realtime_flag_with_initial_state("dark-mode", func(flag: GatrixFlagProxy):
     apply_theme("dark" if flag.enabled else "light")
 )
 
@@ -180,6 +180,8 @@ GatrixClient.on_any(func(event_name, args):
 | `GatrixEvents.FLAGS_RECOVERED` | `flags.recovered` | 에러 상태에서 복구됨 |
 | `GatrixEvents.FLAGS_SYNC` | `flags.sync` | 플래그 동기화됨 |
 | `GatrixEvents.FLAGS_IMPRESSION` | `flags.impression` | 임프레션 추적됨 |
+| `GatrixEvents.FLAGS_PENDING_SYNC` | `flags.pending_sync` | 보류 중인 동기화 가능 |
+| `GatrixEvents.FLAGS_REMOVED` | `flags.removed` | 서버에서 플래그 제거됨 |
 | `GatrixEvents.FLAGS_METRICS_SENT` | `flags.metrics.sent` | 메트릭 서버 전송됨 |
 
 ## 통계
@@ -211,6 +213,7 @@ GatrixClient.start(config, storage)
 | `api_url` | String | `http://localhost:3400/api/v1` | Edge API 기본 URL |
 | `api_token` | String | **필수** | 클라이언트 API 토큰 |
 | `app_name` | String | **필수** | 애플리케이션 이름 |
+| `environment` | String | **필수** | 환경 이름 |
 | `custom_headers` | Dictionary | `{}` | 커스텀 HTTP 헤더 |
 | `features.context` | GatrixContext | `null` | 초기 평가 컨텍스트 |
 | `features.offline_mode` | bool | `false` | 오프라인 모드 시작 |
