@@ -853,12 +853,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       {plan && (
         /* ==================== Active Plan ==================== */
         <Box>
-          {/* Environment disabled warning */}
-          {!envEnabled && !isCompleted && (
-            <Alert severity="warning" sx={{ mb: 2 }}>
-              {t('releaseFlow.envDisabledWarning')}
-            </Alert>
-          )}
+
 
           <Card variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
             {/* ---- Header ---- */}
