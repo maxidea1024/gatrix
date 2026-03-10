@@ -205,20 +205,17 @@ class StreamingConfig {
 }
 
 class GatrixContext {
-  /// Application name (system field - cannot be removed)
-  String? appName;
-  /// Environment name (system field - cannot be removed)
-  String? environment;
-  /// Remote address / client IP
-  String? remoteAddress;
   String? userId;
   String? sessionId;
+  /// Application name (system field - cannot be removed)
+  String? appName;
+  /// Remote address / client IP
+  String? remoteAddress;
   String? currentTime;
   Map<String, dynamic>? properties;
 
   GatrixContext({
     this.appName,
-    this.environment,
     this.remoteAddress,
     this.userId,
     this.sessionId,
@@ -229,7 +226,6 @@ class GatrixContext {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (appName != null) data['appName'] = appName;
-    if (environment != null) data['environment'] = environment;
     if (remoteAddress != null) data['remoteAddress'] = remoteAddress;
     if (userId != null) data['userId'] = userId;
     if (sessionId != null) data['sessionId'] = sessionId;
@@ -247,7 +243,6 @@ class GatrixContext {
       identical(this, other) ||
       other is GatrixContext &&
           appName == other.appName &&
-          environment == other.environment &&
           remoteAddress == other.remoteAddress &&
           userId == other.userId &&
           sessionId == other.sessionId &&
@@ -257,7 +252,6 @@ class GatrixContext {
   @override
   int get hashCode =>
       appName.hashCode ^
-      environment.hashCode ^
       remoteAddress.hashCode ^
       userId.hashCode ^
       sessionId.hashCode ^
@@ -267,7 +261,6 @@ class GatrixContext {
   GatrixContext clone() {
     return GatrixContext(
       appName: appName,
-      environment: environment,
       remoteAddress: remoteAddress,
       userId: userId,
       sessionId: sessionId,

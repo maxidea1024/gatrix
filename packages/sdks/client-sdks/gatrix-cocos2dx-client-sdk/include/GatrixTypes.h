@@ -48,6 +48,8 @@ template <typename T> struct VariationResult {
 struct GatrixContext {
   std::string userId;
   std::string sessionId;
+  std::string appName;
+  std::string remoteAddress;
   std::string currentTime;
   std::map<std::string, std::string> properties;
 };

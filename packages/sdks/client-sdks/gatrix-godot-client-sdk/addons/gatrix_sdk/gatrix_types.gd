@@ -113,18 +113,16 @@ static func _create_missing_flag() -> EvaluatedFlag:
 # Evaluation context (global for client-side)
 # System fields (app_name, environment) cannot be removed via update_context.
 class GatrixContext:
-	var app_name: String = ""
-	var environment: String = ""
-	var remote_address: String = ""
 	var user_id: String = ""
 	var session_id: String = ""
+	var app_name: String = ""
+	var remote_address: String = ""
 	var current_time: String = ""
 	var properties: Dictionary = {}
 
 	func to_dict() -> Dictionary:
 		var d := {}
 		if app_name != "": d["appName"] = app_name
-		if environment != "": d["environment"] = environment
 		if remote_address != "": d["remoteAddress"] = remote_address
 		if user_id != "": d["userId"] = user_id
 		if session_id != "": d["sessionId"] = session_id
@@ -136,7 +134,6 @@ class GatrixContext:
 	func to_query_string() -> String:
 		var parts: PackedStringArray = []
 		if app_name != "": parts.append("appName=%s" % app_name.uri_encode())
-		if environment != "": parts.append("environment=%s" % environment.uri_encode())
 		if remote_address != "": parts.append("remoteAddress=%s" % remote_address.uri_encode())
 		if user_id != "": parts.append("userId=%s" % user_id.uri_encode())
 		if session_id != "": parts.append("sessionId=%s" % session_id.uri_encode())
