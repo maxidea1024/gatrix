@@ -404,8 +404,14 @@ gatrix.OffAny(AnyHandle)
 | `flags.sync` | 플래그 동기화됨 |
 | `flags.pending_sync` | 보류 중인 동기화 가능 |
 | `flags.recovered` | 에러에서 복구됨 |
-| `flags.streaming_connected` / `flags.streaming_disconnected` / `flags.streaming_error` | 스트리밍 상태 |
-| `flags.invalidated` | 스트리밍에 의해 무효화됨 |
+| `flags.removed` | 서버에서 플래그 제거됨 |
+| `flags.streaming_connected` | 스트리밍 연결됨 |
+| `flags.streaming_disconnected` | 스트리밍 연결 해제됨 |
+| `flags.streaming_error` | 스트리밍 오류 |
+| `flags.streaming_reconnecting` | 스트리밍 재연결 중 |
+| `flags.metrics_sent` | 메트릭스 서버 전송 완료 |
+| `flags.metrics_error` | 메트릭스 전송 오류 |
+| `flags.invalidated` | 스트리밍에 의해 플래그 무효화됨 |
 
 ### Watch (`gatrix.Features`)
 

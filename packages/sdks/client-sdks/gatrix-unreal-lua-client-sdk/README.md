@@ -759,6 +759,9 @@ gatrix.OffAny(AnyHandle)
 | `flags.streaming_connected`    | Streaming connected                       |
 | `flags.streaming_disconnected` | Streaming disconnected                    |
 | `flags.streaming_error`        | Streaming error                           |
+| `flags.streaming_reconnecting` | Streaming reconnecting                    |
+| `flags.metrics_sent`           | Metrics sent to server                    |
+| `flags.metrics_error`          | Error sending metrics                     |
 | `flags.invalidated`            | Flags invalidated by streaming            |
 
 ### Watch (`gatrix.Features`)
