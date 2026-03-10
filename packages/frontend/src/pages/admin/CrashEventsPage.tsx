@@ -1448,7 +1448,11 @@ const CrashEventsPage: React.FC = () => {
                                               }}
                                             >
                                               <Chip
-                                                label={(event as any).environmentName || event.environmentId}
+                                                label={
+                                                  (event as any)
+                                                    .environmentName ||
+                                                  event.environmentId
+                                                }
                                                 size="small"
                                                 color="secondary"
                                                 variant="outlined"

@@ -1007,7 +1007,9 @@ const FeatureContextFieldsPage: React.FC = () => {
                                                 field.fieldName,
                                                 () =>
                                                   enqueueSnackbar(
-                                                    t('common.copySuccess', { type: field.fieldName }),
+                                                    t('common.copySuccess', {
+                                                      type: field.fieldName,
+                                                    }),
                                                     {
                                                       variant: 'success',
                                                     }

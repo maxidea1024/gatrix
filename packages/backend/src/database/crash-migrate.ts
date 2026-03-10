@@ -78,8 +78,12 @@ async function main() {
       break;
     default:
       console.log('Usage:');
-      console.log('  yarn migrate:crash up|run     - Run pending crash migrations');
-      console.log('  yarn migrate:crash status     - Show crash migration status');
+      console.log(
+        '  yarn migrate:crash up|run     - Run pending crash migrations'
+      );
+      console.log(
+        '  yarn migrate:crash status     - Show crash migration status'
+      );
       console.log(
         '  yarn migrate:crash rollback <id> - Rollback specific crash migration'
       );

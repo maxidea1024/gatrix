@@ -37,10 +37,7 @@ export const config = {
       process.env.EDGE_REDIS_PASSWORD ||
       process.env.REDIS_PASSWORD ||
       undefined,
-    db: parseInt(
-      process.env.EDGE_REDIS_DB || process.env.REDIS_DB || '0',
-      10
-    ),
+    db: parseInt(process.env.EDGE_REDIS_DB || process.env.REDIS_DB || '0', 10),
   },
 
   // Cache configuration

@@ -182,10 +182,15 @@ export class CrashMigration {
           return;
         }
 
-        logger.info(`Found ${pendingMigrations.length} pending crash migrations:`, {
-          migrations: pendingMigrations.map((m) => m.id),
-        });
-        logger.info(`Running ${pendingMigrations.length} pending crash migrations`);
+        logger.info(
+          `Found ${pendingMigrations.length} pending crash migrations:`,
+          {
+            migrations: pendingMigrations.map((m) => m.id),
+          }
+        );
+        logger.info(
+          `Running ${pendingMigrations.length} pending crash migrations`
+        );
 
         for (const migration of pendingMigrations) {
           await this.runMigration(migration);

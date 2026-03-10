@@ -146,7 +146,9 @@ export class CrashEventController {
         .offset((pageNum - 1) * limitNum);
 
       // Resolve environment names from main DB
-      const envIds = [...new Set(events.map((e: any) => e.environmentId).filter(Boolean))];
+      const envIds = [
+        ...new Set(events.map((e: any) => e.environmentId).filter(Boolean)),
+      ];
       let envNameMap: Record<string, string> = {};
       if (envIds.length > 0) {
         try {
@@ -374,7 +376,9 @@ export class CrashEventController {
         .sort();
 
       // Resolve environment names from main DB
-      let environments: { id: string; name: string }[] = environmentIds.map((id: string) => ({ id, name: id }));
+      let environments: { id: string; name: string }[] = environmentIds.map(
+        (id: string) => ({ id, name: id })
+      );
       if (environmentIds.length > 0) {
         try {
           const envRows = await database.query(
