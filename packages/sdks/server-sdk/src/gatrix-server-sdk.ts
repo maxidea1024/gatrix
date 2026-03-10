@@ -157,8 +157,7 @@ export class GatrixServerSDK {
     // Override simple fields if provided
     if (overrides.apiUrl !== undefined) merged.apiUrl = overrides.apiUrl;
     if (overrides.apiToken !== undefined) merged.apiToken = overrides.apiToken;
-    if (overrides.appName !== undefined)
-      merged.appName = overrides.appName;
+    if (overrides.appName !== undefined) merged.appName = overrides.appName;
     if (overrides.environmentProvider !== undefined)
       merged.environmentProvider = overrides.environmentProvider;
     // Legacy alias
@@ -354,10 +353,7 @@ export class GatrixServerSDK {
     }
 
     if (!config.appName) {
-      throw createError(
-        ErrorCode.INVALID_CONFIG,
-        'appName is required'
-      );
+      throw createError(ErrorCode.INVALID_CONFIG, 'appName is required');
     }
 
     // service and group are optional
@@ -409,7 +405,9 @@ export class GatrixServerSDK {
       }
 
       if (config.cache.refreshMethod !== undefined) {
-        if (!['polling', 'event', 'manual'].includes(config.cache.refreshMethod)) {
+        if (
+          !['polling', 'event', 'manual'].includes(config.cache.refreshMethod)
+        ) {
           throw createError(
             ErrorCode.INVALID_CONFIG,
             'cache.refreshMethod must be "polling", "event", or "manual"'

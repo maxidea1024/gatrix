@@ -75,11 +75,7 @@ export async function performEvaluation(
 
       // Format result using common utility
       // Pass the cached flag definition directly to preserve all fields (especially valueSource)
-      results[key] = EvaluationUtils.formatResult(
-        key,
-        result,
-        flagDef || {}
-      );
+      results[key] = EvaluationUtils.formatResult(key, result, flagDef || {});
     }
 
     const flagsArray = Object.values(results).sort((a, b) =>
