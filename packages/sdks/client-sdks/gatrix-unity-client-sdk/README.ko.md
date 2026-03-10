@@ -13,7 +13,7 @@
 | **상태** (`enabled`) | `bool` | 기능이 켜져 있는가, 꺼져 있는가 — `IsEnabled()`로 확인 |
 | **값** (`variant`) | `bool` `string` `number` `json` | 세부 구성 값 — `BoolVariation()`, `StringVariation()`, `FloatVariation()`으로 읽음 |
 
-플래그는 **활성화 상태와 값을 동시에 가질 수 있습니다** (예: `difficulty = "hard"`). 상태와 값은 독립적이므로, 둘 다 확인해야 합니다.
+피처 플래그는 단순한 ON/OFF 스위치가 아닙니다. 플래그가 켜져 있을 때 어떤 값을 전달할지도 설정할 수 있습니다. 예를 들어 `difficulty` 플래그를 켜면서 값은 `"hard"`로 설정하는 식입니다. 코드에서는 플래그가 켜져 있는지, 그리고 어떤 값인지를 각각 확인해야 합니다.
 
 ### 💡 Quick Examples
 
