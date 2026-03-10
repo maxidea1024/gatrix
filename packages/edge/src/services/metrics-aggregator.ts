@@ -105,11 +105,21 @@ class MetricsAggregator {
       }
     }
 
-    // Aggregate missing (unknown) flags
+    // Aggregate missing (unknown) flags → route to server unknown buffer
+    // Edge uses a server/infra token, so client endpoint (requireTokenType('client')) rejects it.
+    // Route missing flags through server unknown endpoint instead.
     if (bucket.missing) {
       for (const [flagName, count] of Object.entries(bucket.missing as any)) {
         buffer.missing[flagName] =
           (buffer.missing[flagName] || 0) + (count as number);
+        // Also add to server unknown buffer for reliable delivery
+        this.addServerUnknownReport(
+          environmentId,
+          appName,
+          flagName,
+          count as number,
+          sdkVersion
+        );
       }
     }
   }
@@ -217,9 +227,10 @@ class MetricsAggregator {
       const [environmentId, appName] = key.split(':');
       try {
         await axios.post(
-          `${config.gatrixUrl}/api/v1/client/features/${environmentId}/metrics`,
+          `${config.gatrixUrl}/api/v1/client/features/metrics`,
           {
             appName,
+            environmentId,
             sdkVersion: buffer.sdkVersion,
             bucket: {
               start: buffer.start.toISOString(),
@@ -232,6 +243,7 @@ class MetricsAggregator {
             headers: {
               'x-api-token': config.apiToken,
               'x-application-name': config.appName,
+              'x-environment-id': environmentId,
               ...(buffer.sdkVersion && { 'x-sdk-version': buffer.sdkVersion }),
             },
             timeout: 10_000,
@@ -251,7 +263,7 @@ class MetricsAggregator {
       const metrics = Array.from(buffer.metrics.values());
       try {
         await axios.post(
-          `${config.gatrixUrl}/api/v1/server/${environmentId}/features/metrics`,
+          `${config.gatrixUrl}/api/v1/server/features/metrics`,
           {
             metrics,
             bucket: {
@@ -264,6 +276,7 @@ class MetricsAggregator {
             headers: {
               'x-api-token': config.apiToken,
               'x-application-name': appName,
+              'x-environment-id': environmentId,
               ...(buffer.sdkVersion && { 'x-sdk-version': buffer.sdkVersion }),
             },
             timeout: 10000,
@@ -284,12 +297,13 @@ class MetricsAggregator {
         async ([flagName, count]) => {
           try {
             await axios.post(
-              `${config.gatrixUrl}/api/v1/server/${environmentId}/features/unknown`,
+              `${config.gatrixUrl}/api/v1/server/features/unknown`,
               { flagName, count, sdkVersion: buffer.sdkVersion },
               {
                 headers: {
                   'x-api-token': config.apiToken,
                   'x-application-name': appName,
+                  'x-environment-id': environmentId,
                   ...(buffer.sdkVersion && {
                     'x-sdk-version': buffer.sdkVersion,
                   }),

@@ -240,6 +240,20 @@ class ServiceDiscoveryService {
   }
 
   /**
+   * Get streaming statistics from a service instance
+   * Calls the service's /internal/stats/streaming endpoint via backend proxy
+   */
+  async getStreamingStats(
+    serviceType: string,
+    instanceId: string
+  ): Promise<any> {
+    const response = await api.get(
+      `/admin/services/${serviceType}/${instanceId}/stats/streaming`
+    );
+    return response as any;
+  }
+
+  /**
    * Create SSE connection for real-time updates
    * Safari compatibility: Add timestamp to prevent caching
    */

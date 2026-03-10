@@ -85,6 +85,7 @@ async function main(): Promise<void> {
           (request.headers['x-application-name'] as string);
 
         if (!apiToken || !appName) {
+          flagStreamingService.recordWsAuthFailure();
           socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
           socket.destroy();
           return;
@@ -113,6 +114,7 @@ async function main(): Promise<void> {
           // Validate token via tokenMirrorService
           const result = tokenMirrorService.validateToken(apiToken, 'client');
           if (!result.valid) {
+            flagStreamingService.recordWsAuthFailure();
             socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
             socket.destroy();
             return;
@@ -126,6 +128,7 @@ async function main(): Promise<void> {
         }
 
         if (!environmentId) {
+          flagStreamingService.recordWsAuthFailure();
           socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
           socket.destroy();
           return;

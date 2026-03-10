@@ -300,4 +300,29 @@ router.post('/stats/rate-limit', (req: Request, res: Response) => {
   });
 });
 
+// ============================================================================
+// Streaming Statistics Endpoints
+// ============================================================================
+
+/**
+ * Get streaming statistics (SSE + WebSocket connections, traffic, events)
+ * GET /internal/stats/streaming
+ */
+router.get('/stats/streaming', async (_req: Request, res: Response) => {
+  try {
+    const { flagStreamingService } =
+      await import('../services/flag-streaming-service');
+    const stats = flagStreamingService.getDetailedStats();
+    res.json({
+      success: true,
+      data: stats,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to get streaming stats',
+    });
+  }
+});
+
 export default router;

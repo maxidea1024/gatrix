@@ -4,6 +4,9 @@ export interface UnknownFlag {
   id: number;
   flagName: string;
   environmentId: string;
+  environmentName: string | null;
+  projectName: string | null;
+  orgName: string | null;
   appName: string | null;
   sdkVersion: string | null;
   accessCount: number;
@@ -34,7 +37,7 @@ export const unknownFlagService = {
       params.append('includeResolved', 'true');
     }
     if (options?.environmentId) {
-      params.append('environment', options.environmentId);
+      params.append('environmentId', options.environmentId);
     }
     const queryString = params.toString();
     const base = basePath(projectApiPath);

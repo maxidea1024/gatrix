@@ -35,6 +35,7 @@ import {
   Code as CodeIcon,
   ContentCopy as CopyIcon,
   BarChart as BarChartIcon,
+  Stream as StreamIcon,
 } from '@mui/icons-material';
 
 import { useTranslation } from 'react-i18next';
@@ -305,6 +306,20 @@ const GatrixEdgesPage: React.FC = () => {
       openJsonDialog(result, t('gatrixEdges.requestStats'));
     } catch (err: any) {
       console.error('Failed to fetch request stats:', err);
+    }
+  };
+
+  // Fetch streaming stats for an instance and show in dialog
+  const handleViewStreamingStats = async (instance: ServiceInstance) => {
+    try {
+      const serviceType = instance.labels.service;
+      const result = await serviceDiscoveryService.getStreamingStats(
+        serviceType,
+        instance.instanceId
+      );
+      openJsonDialog(result, t('gatrixEdges.streamingStats'));
+    } catch (err: any) {
+      console.error('Failed to fetch streaming stats:', err);
     }
   };
 
@@ -614,6 +629,15 @@ const GatrixEdgesPage: React.FC = () => {
             sx={{ fontSize: '0.75rem', textTransform: 'none' }}
           >
             {t('gatrixEdges.requestStats')}
+          </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<StreamIcon fontSize="small" />}
+            onClick={() => handleViewStreamingStats(instance)}
+            sx={{ fontSize: '0.75rem', textTransform: 'none' }}
+          >
+            {t('gatrixEdges.streamingStats')}
           </Button>
         </Box>
       </Box>

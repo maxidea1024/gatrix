@@ -227,17 +227,38 @@ export class UnknownFlagService {
       limit?: number;
     } = {}
   ): Promise<UnknownFlag[]> {
-    let query = db('g_unknown_flags').select('*');
+    let query = db('g_unknown_flags')
+      .select(
+        'g_unknown_flags.*',
+        'g_environments.displayName as environmentName',
+        'g_projects.displayName as projectName',
+        'g_organisations.displayName as orgName'
+      )
+      .leftJoin(
+        'g_environments',
+        'g_unknown_flags.environmentId',
+        'g_environments.id'
+      )
+      .leftJoin(
+        'g_projects',
+        'g_environments.projectId',
+        'g_projects.id'
+      )
+      .leftJoin(
+        'g_organisations',
+        'g_projects.orgId',
+        'g_organisations.id'
+      );
 
     if (!options.includeResolved) {
-      query = query.where('isResolved', false);
+      query = query.where('g_unknown_flags.isResolved', false);
     }
 
     if (options.environmentId) {
-      query = query.where('environmentId', options.environmentId);
+      query = query.where('g_unknown_flags.environmentId', options.environmentId);
     }
 
-    query = query.orderBy('lastReportedAt', 'desc');
+    query = query.orderBy('g_unknown_flags.lastReportedAt', 'desc');
 
     if (options.limit) {
       query = query.limit(options.limit);

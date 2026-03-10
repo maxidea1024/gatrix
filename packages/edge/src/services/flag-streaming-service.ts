@@ -42,6 +42,28 @@ interface WebSocketClient {
 const SDK_EVENTS_PREFIX = 'gatrix-sdk-events';
 const REVISION_KEY_PREFIX = 'gatrix:streaming:revision:';
 
+interface StreamingStats {
+  startTime: string;
+  sse: {
+    connectionAttempts: number;
+    connectionSuccesses: number;
+    authFailures: number;
+    currentConnections: number;
+    eventsSent: number;
+    bytesSent: number;
+  };
+  ws: {
+    connectionAttempts: number;
+    connectionSuccesses: number;
+    authFailures: number;
+    currentConnections: number;
+    eventsSent: number;
+    bytesSent: number;
+  };
+  totalCurrentConnections: number;
+  clientsByEnvironment: Record<string, { sse: number; ws: number }>;
+}
+
 class FlagStreamingService {
   private static instance: FlagStreamingService;
   private sseClients: Map<string, StreamingClient> = new Map();
@@ -52,6 +74,19 @@ class FlagStreamingService {
   private subscriber: Redis | null = null;
   private redisClient: Redis | null = null;
   private started = false;
+  private startTime: Date = new Date();
+
+  // Stats counters
+  private sseConnectionAttempts = 0;
+  private sseConnectionSuccesses = 0;
+  private sseAuthFailures = 0;
+  private sseEventsSent = 0;
+  private sseBytesSent = 0;
+  private wsConnectionAttempts = 0;
+  private wsConnectionSuccesses = 0;
+  private wsAuthFailures = 0;
+  private wsEventsSent = 0;
+  private wsBytesSent = 0;
 
   private constructor() {
     // Private constructor for singleton
@@ -209,6 +244,22 @@ class FlagStreamingService {
   }
 
   /**
+   * Record an SSE auth failure (called externally when auth rejects)
+   */
+  recordSseAuthFailure(): void {
+    this.sseConnectionAttempts++;
+    this.sseAuthFailures++;
+  }
+
+  /**
+   * Record a WebSocket auth failure (called externally when auth rejects)
+   */
+  recordWsAuthFailure(): void {
+    this.wsConnectionAttempts++;
+    this.wsAuthFailures++;
+  }
+
+  /**
    * Add a new SSE client connection
    */
   async addClient(
@@ -216,6 +267,9 @@ class FlagStreamingService {
     environmentId: string,
     res: Response
   ): Promise<void> {
+    this.sseConnectionAttempts++;
+    this.sseConnectionSuccesses++;
+
     // Set SSE headers
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -274,6 +328,9 @@ class FlagStreamingService {
     environmentId: string,
     ws: WebSocket
   ): Promise<void> {
+    this.wsConnectionAttempts++;
+    this.wsConnectionSuccesses++;
+
     const client: WebSocketClient = {
       id: clientId,
       environmentId,
@@ -410,6 +467,8 @@ class FlagStreamingService {
       const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
       client.response.write(message);
       client.lastEventTime = new Date();
+      this.sseEventsSent++;
+      this.sseBytesSent += Buffer.byteLength(message, 'utf8');
       return true;
     } catch (error) {
       logger.warn(`Failed to send SSE event to client ${clientId}:`, error);
@@ -433,6 +492,8 @@ class FlagStreamingService {
       const message = JSON.stringify({ type: event, data });
       client.ws.send(message);
       client.lastEventTime = new Date();
+      this.wsEventsSent++;
+      this.wsBytesSent += Buffer.byteLength(message, 'utf8');
       return true;
     } catch (error) {
       logger.warn(`Failed to send WS event to client ${clientId}:`, error);
@@ -530,7 +591,7 @@ class FlagStreamingService {
   }
 
   /**
-   * Get service statistics
+   * Get service statistics (legacy)
    */
   getStats(): {
     totalClients: number;
@@ -552,6 +613,48 @@ class FlagStreamingService {
       totalClients: this.sseClients.size + this.wsClients.size,
       sseClients: this.sseClients.size,
       wsClients: this.wsClients.size,
+      clientsByEnvironment,
+    };
+  }
+
+  /**
+   * Get detailed streaming statistics including connection counts, traffic, and environment breakdown
+   */
+  getDetailedStats(): StreamingStats {
+    // Build per-environment breakdown
+    const clientsByEnvironment: Record<string, { sse: number; ws: number }> = {};
+    for (const [, client] of this.sseClients) {
+      if (!clientsByEnvironment[client.environmentId]) {
+        clientsByEnvironment[client.environmentId] = { sse: 0, ws: 0 };
+      }
+      clientsByEnvironment[client.environmentId].sse++;
+    }
+    for (const [, client] of this.wsClients) {
+      if (!clientsByEnvironment[client.environmentId]) {
+        clientsByEnvironment[client.environmentId] = { sse: 0, ws: 0 };
+      }
+      clientsByEnvironment[client.environmentId].ws++;
+    }
+
+    return {
+      startTime: this.startTime.toISOString(),
+      sse: {
+        connectionAttempts: this.sseConnectionAttempts,
+        connectionSuccesses: this.sseConnectionSuccesses,
+        authFailures: this.sseAuthFailures,
+        currentConnections: this.sseClients.size,
+        eventsSent: this.sseEventsSent,
+        bytesSent: this.sseBytesSent,
+      },
+      ws: {
+        connectionAttempts: this.wsConnectionAttempts,
+        connectionSuccesses: this.wsConnectionSuccesses,
+        authFailures: this.wsAuthFailures,
+        currentConnections: this.wsClients.size,
+        eventsSent: this.wsEventsSent,
+        bytesSent: this.wsBytesSent,
+      },
+      totalCurrentConnections: this.sseClients.size + this.wsClients.size,
       clientsByEnvironment,
     };
   }

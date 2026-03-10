@@ -35,11 +35,9 @@ namespace Gatrix.Unity.SDK
             _emitter = new GatrixEventEmitter();
             _httpClient = new HttpClient();
 
-            // Add SDK identification header
+            // Add SDK identification headers (version is set per-request with name/version format)
             _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
                 "X-SDK-Name", SdkName);
-            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
-                "X-SDK-Version", SdkVersion);
 
             _featuresClient = new FeaturesClient(_emitter, _config, _httpClient);
         }

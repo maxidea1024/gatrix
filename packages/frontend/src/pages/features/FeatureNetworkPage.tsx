@@ -212,6 +212,13 @@ const FeatureNetworkPage: React.FC = () => {
     ? allEnvironments
     : [];
 
+  // Lookup map: environmentId -> displayName
+  const envNameMap = useMemo(
+    () =>
+      new Map(envList.map((e) => [e.environmentId, e.displayName || e.environmentId])),
+    [envList]
+  );
+
   // State - initialize from URL params
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -1210,13 +1217,15 @@ const FeatureNetworkPage: React.FC = () => {
                               <TableRow key={index} hover>
                                 <TableCell>{row.displayTime}</TableCell>
                                 <TableCell>
-                                  <Chip
-                                    label={row.environmentId}
-                                    size="small"
-                                    color="primary"
-                                    variant="outlined"
-                                    sx={{ borderRadius: '16px' }}
-                                  />
+                                  <Tooltip title={row.environmentId}>
+                                    <Chip
+                                      label={envNameMap.get(row.environmentId) || row.environmentId}
+                                      size="small"
+                                      color="primary"
+                                      variant="outlined"
+                                      sx={{ borderRadius: '16px' }}
+                                    />
+                                  </Tooltip>
                                 </TableCell>
                                 <TableCell>
                                   {row.appName ? (
@@ -1409,13 +1418,15 @@ const FeatureNetworkPage: React.FC = () => {
                               <TableRow key={index} hover>
                                 <TableCell>{row.displayTime}</TableCell>
                                 <TableCell>
-                                  <Chip
-                                    label={row.environmentId}
-                                    size="small"
-                                    color="primary"
-                                    variant="outlined"
-                                    sx={{ borderRadius: '16px' }}
-                                  />
+                                  <Tooltip title={row.environmentId}>
+                                    <Chip
+                                      label={envNameMap.get(row.environmentId) || row.environmentId}
+                                      size="small"
+                                      color="primary"
+                                      variant="outlined"
+                                      sx={{ borderRadius: '16px' }}
+                                    />
+                                  </Tooltip>
                                 </TableCell>
                                 <TableCell>
                                   {row.appName ? (

@@ -743,6 +743,88 @@ router.post(
 );
 
 /**
+ * Get streaming statistics from a service instance
+ * GET /api/v1/admin/services/:type/:instanceId/stats/streaming
+ * Proxies request to the service's /internal/stats/streaming endpoint
+ */
+router.get(
+  '/:type/:instanceId/stats/streaming',
+  async (req: Request, res: Response) => {
+    try {
+      const { type, instanceId } = req.params;
+
+      if (!type || !instanceId) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'type and instanceId are required' },
+        });
+      }
+
+      const services = await serviceDiscoveryService.getServices(type);
+      const service = services.find((s) => s.instanceId === instanceId);
+
+      if (!service) {
+        return res.status(404).json({
+          success: false,
+          error: { message: 'Service not found' },
+        });
+      }
+
+      const webPort =
+        service.ports?.internalApi ||
+        service.ports?.externalApi ||
+        service.ports?.web ||
+        service.ports?.http ||
+        service.ports?.api;
+      if (!webPort) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'Service does not have an API port' },
+        });
+      }
+
+      const address = service.internalAddress || service.externalAddress;
+      const statsUrl = `http://${address}:${webPort}/internal/stats/streaming`;
+
+      const axios = (await import('axios')).default;
+      const startTime = Date.now();
+
+      try {
+        const response = await axios.get(statsUrl, { timeout: 5000 });
+        const latency = Date.now() - startTime;
+
+        res.json({
+          success: true,
+          ...response.data,
+          latency,
+        });
+      } catch (statsError: any) {
+        const latency = Date.now() - startTime;
+        const message =
+          statsError.code === 'ECONNREFUSED'
+            ? 'Connection refused'
+            : statsError.code === 'ETIMEDOUT' ||
+                statsError.code === 'ECONNABORTED'
+              ? 'Connection timeout'
+              : statsError.message || 'Unknown error';
+
+        res.json({
+          success: false,
+          error: message,
+          latency,
+        });
+      }
+    } catch (error) {
+      logger.error('Error fetching streaming stats:', error);
+      res.status(500).json({
+        success: false,
+        error: { message: 'Failed to fetch streaming stats' },
+      });
+    }
+  }
+);
+
+/**
  * Delete a service instance
  * DELETE /api/v1/admin/services/:type/:instanceId
  */

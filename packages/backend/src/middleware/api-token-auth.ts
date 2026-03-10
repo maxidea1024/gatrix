@@ -368,7 +368,12 @@ export const setSDKEnvironment = async (
 ) => {
   try {
     // Token determines environment — strict, no fallback
-    const environmentId = req.apiToken?.environmentId || req.environmentId; // Already set by unsecured token handler
+    // Edge proxy: x-environment header overrides for infra/edge bypass tokens
+    const headerEnvId = req.headers['x-environment-id'] as string | undefined;
+    const environmentId =
+      ((req.isUnsecuredToken || req.isEdgeBypassToken) && headerEnvId)
+        ? headerEnvId
+        : (req.apiToken?.environmentId || req.environmentId); // Already set by unsecured token handler
 
     if (!environmentId) {
       logger.warn('Auth: Environment not determined from token', {
@@ -468,7 +473,13 @@ export const sdkRateLimit = (
  */
 export const clientSDKAuth = [
   authenticateApiToken,
-  requireTokenType('client'),
+  // Allow infra/edge bypass tokens to proxy client requests
+  (req: SDKRequest, res: Response, next: NextFunction) => {
+    if (req.isUnsecuredToken || req.isEdgeBypassToken) {
+      return next();
+    }
+    return requireTokenType('client')(req, res, next);
+  },
   validateApplicationName,
   setSDKEnvironment,
   sdkRateLimit,

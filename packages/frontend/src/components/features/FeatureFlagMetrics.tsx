@@ -5,6 +5,7 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 import {
   Box,
   Paper,
@@ -121,6 +122,19 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   const projectApiPath = getProjectApiPath();
   const theme = useTheme();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { allEnvironments } = useEnvironment();
+
+  // Lookup map: environmentId -> displayName
+  const envNameMap = useMemo(() => {
+    const envList = Array.isArray(allEnvironments) ? allEnvironments : [];
+    return new Map(envList.map((e) => [e.environmentId, e.displayName || e.environmentId]));
+  }, [allEnvironments]);
+
+  // Resolve environment ID to display name
+  const getEnvDisplayName = useCallback(
+    (envId: string) => envNameMap.get(envId) || envId,
+    [envNameMap]
+  );
 
   // Initialize state from URL params
   const [selectedEnvs, setSelectedEnvs] = useState<string[]>(() => {
@@ -752,7 +766,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         const color = groupColors[idx % groupColors.length];
 
         datasets.push({
-          label: `${env} - ${t('featureFlags.metrics.exposed')}`,
+          label: `${getEnvDisplayName(env)} - ${t('featureFlags.metrics.exposed')}`,
           data: allDisplayTimes.map((time) => exposedMetrics.get(time) || 0),
           borderColor: theme.palette.success.main,
           backgroundColor: 'transparent',
@@ -764,7 +778,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         });
 
         datasets.push({
-          label: `${env} - ${t('featureFlags.metrics.notExposed')}`,
+          label: `${getEnvDisplayName(env)} - ${t('featureFlags.metrics.notExposed')}`,
           data: allDisplayTimes.map((time) => notExposedMetrics.get(time) || 0),
           borderColor: theme.palette.error.main,
           backgroundColor: 'transparent',
@@ -776,7 +790,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         });
 
         datasets.push({
-          label: `${env} - ${t('featureFlags.metrics.totalRequests')}`,
+          label: `${getEnvDisplayName(env)} - ${t('featureFlags.metrics.totalRequests')}`,
           data: allDisplayTimes.map((time) => totalMetrics.get(time) || 0),
           borderColor: color.border,
           backgroundColor: 'transparent',
@@ -961,7 +975,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
               return (
                 <Chip
                   key={env.environmentId}
-                  label={env.environmentId}
+                  label={getEnvDisplayName(env.environmentId)}
                   onClick={() => handleEnvToggle(env.environmentId)}
                   color={isSelected ? 'primary' : 'default'}
                   variant={isSelected ? 'filled' : 'outlined'}

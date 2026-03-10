@@ -89,6 +89,8 @@ const UnknownFlagsPage: React.FC = () => {
   const defaultColumns: ColumnConfig[] = [
     { id: 'flagName', labelKey: 'featureFlags.flagName', visible: true },
     { id: 'environment', labelKey: 'common.environment', visible: true },
+    { id: 'project', labelKey: 'common.project', visible: true },
+    { id: 'organisation', labelKey: 'common.organisation', visible: true },
     { id: 'appName', labelKey: 'featureFlags.appName', visible: true },
     { id: 'sdkVersion', labelKey: 'featureFlags.sdkVersion', visible: true },
     { id: 'accessCount', labelKey: 'featureFlags.accessCount', visible: true },
@@ -530,11 +532,29 @@ const UnknownFlagsPage: React.FC = () => {
                           case 'environment':
                             return (
                               <TableCell key={col.id}>
-                                <Chip
-                                  label={flag.environmentId}
-                                  size="small"
-                                  sx={{ borderRadius: '16px' }}
-                                />
+                                <Tooltip title={flag.environmentId}>
+                                  <Chip
+                                    label={flag.environmentName || flag.environmentId}
+                                    size="small"
+                                    sx={{ borderRadius: '16px' }}
+                                  />
+                                </Tooltip>
+                              </TableCell>
+                            );
+                          case 'project':
+                            return (
+                              <TableCell key={col.id}>
+                                <Typography variant="body2">
+                                  {flag.projectName || '-'}
+                                </Typography>
+                              </TableCell>
+                            );
+                          case 'organisation':
+                            return (
+                              <TableCell key={col.id}>
+                                <Typography variant="body2">
+                                  {flag.orgName || '-'}
+                                </Typography>
                               </TableCell>
                             );
                           case 'appName':
