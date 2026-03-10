@@ -1145,7 +1145,7 @@ const FeatureNetworkPage: React.FC = () => {
                   </ToggleButton>
                 </ToggleButtonGroup>
               </Box>
-              {(loading || isRefreshing) && chartDataByApp.length === 0 ? (
+              {loading && chartDataByApp.length === 0 ? (
                 <Skeleton variant="rectangular" height={300} />
               ) : chartDataByApp.length === 0 ? (
                 <Box
@@ -1311,7 +1311,7 @@ const FeatureNetworkPage: React.FC = () => {
                           {card.label}
                         </Typography>
                       </Box>
-                      {(loading || isRefreshing) && !evaluations ? (
+                      {loading && !evaluations ? (
                         <Skeleton variant="text" width={60} height={32} />
                       ) : (
                         <Typography variant="h5" fontWeight={600}>
@@ -1351,7 +1351,7 @@ const FeatureNetworkPage: React.FC = () => {
                   </ToggleButton>
                 </ToggleButtonGroup>
               </Box>
-              {(loading || isRefreshing) &&
+              {loading &&
               evaluationTimeSeriesByApp.length === 0 ? (
                 <Skeleton variant="rectangular" height={300} />
               ) : evaluationTimeSeriesByApp.length === 0 ? (
