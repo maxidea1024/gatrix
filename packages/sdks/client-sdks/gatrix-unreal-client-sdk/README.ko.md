@@ -419,7 +419,7 @@ UGatrixClient::Get()->Stop();
 | `WatchRealtimeFlag...` | 실시간 변경 콜백 주입 |
 | `WatchSyncedFlag...` | 동기화 후 안전한 콜백 주입 |
 | `UnwatchFlag(handle)` | 핸들을 입력해 리스너 파기 |
-| `CreateWatchGroup(name)` | 여러 개의 Watch를 동시에 관리 제어 |
+| `CreateWatchFlagGroup(name)` | 여러 개의 Watch를 동시에 관리 제어 |
 | `SyncFlags(fetchNow)` | 대기 중인 모든 Pending 싱크 한 번에 반영 |
 | `FetchFlags()` | 명시적 서버 Re-Fetch 지시 |
 
@@ -432,7 +432,7 @@ UGatrixClient::Get()->Stop();
 Features->WatchRealtimeFlagWithInitialState(TEXT("game-speed"), 
     FGatrixFlagWatchDelegate::CreateLambda([](UGatrixFlagProxy* Proxy)
 {
-    UGameplayStatics::SetGlobalTimeDilation(GetWorld(), Proxy->GetFloatValue(1.0f));
+    UGameplayStatics::SetGlobalTimeDilation(GetWorld(), Proxy->FloatVariation(1.0f));
 }));
 ```
 
@@ -451,14 +451,14 @@ void OnLoginComplete(FString UserId, int32 Level)
 
 ### 다중 플래그 간 의존성 그룹 묶기 (Watch Group)
 ```cpp
-UGatrixWatchFlagGroup* Group = Features->CreateWatchGroup(TEXT("shop-system"));
+FGatrixWatchFlagGroup* Group = Features->CreateWatchFlagGroup(TEXT("shop-system"));
 
 FGatrixFlagWatchDelegate ShopCb;
 ShopCb.BindLambda([](UGatrixFlagProxy* P){ SetShopEnabled(P->IsEnabled()); });
 Group->WatchSyncedFlagWithInitialState(TEXT("new-shop-enabled"), ShopCb);
 
 FGatrixFlagWatchDelegate DiscountCb;
-DiscountCb.BindLambda([](UGatrixFlagProxy* P){ SetDiscount(P->GetFloatValue(0)); });
+DiscountCb.BindLambda([](UGatrixFlagProxy* P){ SetDiscount(P->FloatVariation(0)); });
 Group->WatchSyncedFlagWithInitialState(TEXT("shop-discount"), DiscountCb);
 
 // 모두 반영 준비 완료! -> 로딩 지점과 같은 곳에서 Sync

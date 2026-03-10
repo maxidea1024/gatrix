@@ -262,6 +262,8 @@ Features->UnwatchFlag(WatchHandle);
 
 | `UserId` | `FString` | Unique user identifier — most important for targeting |
 | `SessionId` | `FString` | Session identifier for session-scoped experiments |
+| `RemoteAddress` | `FString` | Client IP / remote address |
+| `CurrentTime` | `FString` | Current time override |
 | `Properties` | `TMap<FString, FString>` | Custom key-value pairs |
 
 ### Updating Context
@@ -371,14 +373,27 @@ Client->Once(GatrixEvents::FlagsReady, [](const TArray<FString>& Args)
 
 | Event | Description |
 |---|---|
-| `flags.init` | SDK initialized |
+| `flags.init` | SDK initialized from storage/bootstrap |
 | `flags.ready` | First successful fetch completed |
-| `flags.fetch_start` / `fetch_success` / `fetch_error` / `fetch_end` | Fetch lifecycle |
+| `flags.fetch` | Started fetching flags |
+| `flags.fetch_start` | Started fetching (alias) |
+| `flags.fetch_success` | Fetch succeeded |
+| `flags.fetch_error` | Fetch failed |
+| `flags.fetch_end` | Fetch completed (success or error) |
 | `flags.change` | Flags changed from server |
-| `flags.error` | SDK error |
+| `flags.error` | General SDK error |
+| `flags.impression` | Flag impression tracked |
 | `flags.sync` | Flags synchronized (explicit sync mode) |
+| `flags.pending_sync` | Pending sync flags available |
+| `flags.removed` | Flags removed from server |
 | `flags.recovered` | SDK recovered from error |
-| `flags.streaming_connected` / `disconnected` / `error` | Streaming state |
+| `flags.metrics_sent` | Metrics sent to server |
+| `flags.metrics_error` | Error sending metrics |
+| `flags.invalidated` | Flags invalidated by streaming |
+| `flags.streaming_connected` | Streaming connected |
+| `flags.streaming_disconnected` | Streaming disconnected |
+| `flags.streaming_error` | Streaming error |
+| `flags.streaming_reconnecting` | Streaming reconnecting |
 
 ---
 
@@ -411,20 +426,40 @@ UGatrixClient::Get()->Stop();
 | `StringVariation(flagName, fallback)` | String variant value |
 | `IntVariation(flagName, fallback)` | Integer variant value |
 | `FloatVariation(flagName, fallback)` | Float variant value |
-| `DoubleVariation(flagName, fallback)` | Double variant value |
+| `DoubleVariation(flagName, fallback)` | Double variant value (C++ only) |
+| `JsonVariation(flagName, fallback)` | JSON variant value as string |
+| `Variation(flagName, fallback)` | Variant name (string) |
+| `BoolVariationDetails(flagName, fallback)` | Boolean value + reason/exists/enabled |
+| `StringVariationDetails(flagName, fallback)` | String value + details |
+| `IntVariationDetails(flagName, fallback)` | Integer value + details |
+| `FloatVariationDetails(flagName, fallback)` | Float value + details |
+| `DoubleVariationDetails(flagName, fallback)` | Double value + details (C++ only) |
+| `JsonVariationDetails(flagName, fallback)` | JSON value + details |
+| `BoolVariationOrThrow(flagName)` | Boolean value, asserts if missing/disabled |
+| `StringVariationOrThrow(flagName)` | String value, asserts if missing/disabled |
+| `IntVariationOrThrow(flagName)` | Integer value, asserts if missing/disabled |
+| `FloatVariationOrThrow(flagName)` | Float value, asserts if missing/disabled |
+| `DoubleVariationOrThrow(flagName)` | Double value, asserts if missing/disabled (C++ only) |
+| `JsonVariationOrThrow(flagName)` | JSON value, asserts if missing/disabled |
 | `GetVariant(flagName)` | Full variant object |
-| `GetFlag(flagName)` | Full flag proxy (`UGatrixFlagProxy`) |
+| `GetFlag(flagName)` | Raw flag data (`FGatrixEvaluatedFlag`) |
 | `GetAllFlags()` | All evaluated flags |
 | `HasFlag(flagName)` | Check cache existence |
+| `UpdateContext(ctx)` | Update context and re-fetch |
+| `GetContext()` | Get current context |
 | `WatchRealtimeFlag(name, cb)` | Realtime watch |
 | `WatchRealtimeFlagWithInitialState(name, cb)` | Realtime watch + immediate callback |
 | `WatchSyncedFlag(name, cb)` | Synced watch |
 | `WatchSyncedFlagWithInitialState(name, cb)` | Synced watch + immediate callback |
 | `UnwatchFlag(handle)` | Remove a watcher |
-| `CreateWatchGroup(name)` | Batch watcher management |
+| `CreateWatchFlagGroup(name)` | Batch watcher management |
 | `SyncFlags(fetchNow)` | Apply pending changes (explicit sync mode) |
 | `HasPendingSyncFlags()` | Check if pending changes exist |
+| `SetExplicitSyncMode(bEnabled)` | Enable/disable explicit sync at runtime |
 | `FetchFlags()` | Force server fetch |
+| `GetStats()` | Get feature flag statistics |
+| `GetLightStats()` | Lightweight stats (C++ only) |
+| `IsReady()` | Check if SDK is ready |
 
 ### GatrixClient (`UGatrixClient::Get()`)
 
@@ -432,7 +467,12 @@ UGatrixClient::Get()->Stop();
 |---|---|
 | `Start(config)` | Initialize and start fetching |
 | `Stop()` | Stop and clean up |
-| `UpdateContext(ctx)` | Update full context |
+| `IsInitialized()` | Check if SDK has been started |
+| `IsReady()` | Check if first fetch completed |
+| `GetFeatures()` | Get `UGatrixFeaturesClient` |
+| `GetStats()` | Get overall SDK statistics |
+| `GetLightStats()` | Lightweight stats (C++ only) |
+| `Track(eventName, properties)` | Track custom event (reserved) |
 | `On/Once/Off/OnAny` | Event subscriptions |
 
 ---
@@ -445,7 +485,7 @@ UGatrixClient::Get()->Stop();
 Features->WatchRealtimeFlagWithInitialState(TEXT("game-speed"), 
     FGatrixFlagWatchDelegate::CreateLambda([](UGatrixFlagProxy* Proxy)
 {
-    UGameplayStatics::SetGlobalTimeDilation(GetWorld(), Proxy->GetFloatValue(1.0f));
+    UGameplayStatics::SetGlobalTimeDilation(GetWorld(), Proxy->FloatVariation(1.0f));
 }));
 ```
 
@@ -465,7 +505,7 @@ Features->WatchRealtimeFlagWithInitialState(TEXT("winter-event"),
 Features->WatchRealtimeFlagWithInitialState(TEXT("cta-button-text"), 
     FGatrixFlagWatchDelegate::CreateLambda([](UGatrixFlagProxy* Proxy)
 {
-    if (CtaTextWidget) CtaTextWidget->SetText(FText::FromString(Proxy->GetStringValue(TEXT("Play Now"))));
+    if (CtaTextWidget) CtaTextWidget->SetText(FText::FromString(Proxy->StringVariation(TEXT("Play Now"))));
 }));
 ```
 
@@ -486,13 +526,13 @@ void OnLogin(FString UserId, int32 Level)
 ### Multi-Flag Dependency with Watch Group
 
 ```cpp
-UGatrixWatchFlagGroup* Group = Features->CreateWatchGroup(TEXT("shop-system"));
+FGatrixWatchFlagGroup* Group = Features->CreateWatchFlagGroup(TEXT("shop-system"));
 
 FGatrixFlagWatchDelegate ShopEnabledCb;
 ShopEnabledCb.BindLambda([](UGatrixFlagProxy* P){ SetShopEnabled(P->IsEnabled()); });
 
 FGatrixFlagWatchDelegate DiscountCb;
-DiscountCb.BindLambda([](UGatrixFlagProxy* P){ SetDiscount(P->GetFloatValue(0.0f)); });
+DiscountCb.BindLambda([](UGatrixFlagProxy* P){ SetDiscount(P->FloatVariation(0.0f)); });
 
 Group->WatchSyncedFlagWithInitialState(TEXT("new-shop-enabled"), ShopEnabledCb);
 Group->WatchSyncedFlagWithInitialState(TEXT("discount-rate"), DiscountCb);
