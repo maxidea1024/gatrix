@@ -14,7 +14,7 @@ async function main() {
   const sdk = new GatrixServerSDK({
     apiUrl: process.env.GATRIX_URL || 'http://localhost:45000',
     apiToken: process.env.API_TOKEN || 'unsecured-server-api-token',
-    applicationName: 'maintenance-test',
+    appName: 'maintenance-test',
 
     worldId: 'UWO-GL-01',
 

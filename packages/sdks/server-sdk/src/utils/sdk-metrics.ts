@@ -9,7 +9,7 @@ export type SdkMetricsOptions = {
   service?: string;
   group?: string;
   environment?: string;
-  applicationName?: string;
+  appName?: string;
   registry?: any; // prom-client Registry (typed as any to avoid hard dep on types)
 };
 
@@ -48,7 +48,7 @@ export class SdkMetrics {
         service: opts.service || 'unknown',
         group: opts.group || 'unknown',
         environment: opts.environment || 'unknown',
-        application: opts.applicationName || 'unknown',
+        application: opts.appName || 'unknown',
       });
 
       // Core metrics

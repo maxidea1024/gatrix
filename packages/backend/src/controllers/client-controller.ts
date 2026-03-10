@@ -740,8 +740,7 @@ export class ClientController {
                 envSettings?.overrideDisabledValue
                   ? 'environment'
                   : 'flag',
-            },
-            environmentId
+            }
           );
         }
 

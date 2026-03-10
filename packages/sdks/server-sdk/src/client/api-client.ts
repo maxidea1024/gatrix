@@ -15,11 +15,12 @@ import { ApiResponse } from '../types/api';
 import { RetryConfig } from '../types/config';
 import { SdkMetrics } from '../utils/sdk-metrics';
 import { sleep } from '../utils/time';
+import { SDK_VERSION } from '../version';
 
 export interface ApiClientConfig {
   baseURL: string;
   apiToken: string;
-  applicationName: string;
+  appName: string;
   timeout?: number;
   logger?: Logger;
   retry?: RetryConfig;
@@ -59,7 +60,8 @@ export class ApiClient {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-API-Token': config.apiToken,
-      'X-Application-Name': config.applicationName,
+      'X-Application-Name': config.appName,
+      'X-SDK-Version': `gatrix-node-server-sdk/${SDK_VERSION}`,
     };
 
     // Create axios instance

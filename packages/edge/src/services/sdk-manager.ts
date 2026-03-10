@@ -108,11 +108,11 @@ class SDKManager {
     const sdkConfig: GatrixSDKConfig = {
       apiUrl: config.gatrixUrl,
       apiToken: config.apiToken,
-      applicationName: config.applicationName,
-
-      // SDK required fields
-      service: config.service,
-      group: config.group,
+      appName: config.appName,
+      meta: {
+        service: config.meta.service,
+        group: config.meta.group,
+      },
 
       // Multi-environment provider
       environmentProvider,
@@ -181,7 +181,7 @@ class SDKManager {
       const result = await this.sdk.registerService({
         labels: {
           service: 'edge',
-          group: config.group,
+          group: config.meta.group,
           appVersion: serverVersion,
         },
         ports: {

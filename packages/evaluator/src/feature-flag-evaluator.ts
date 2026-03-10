@@ -337,8 +337,6 @@ export class FeatureFlagEvaluator {
         return context.appVersion;
       case 'remoteAddress':
         return context.remoteAddress;
-      case 'environment':
-        return context.environment;
       case 'currentTime':
         return context.currentTime instanceof Date
           ? context.currentTime.toISOString()

@@ -18,12 +18,14 @@ export const config = {
     process.env.EDGE_BYPASS_TOKEN ||
     process.env.EDGE_API_TOKEN ||
     'gatrix-infra-server-token',
-  applicationName: process.env.EDGE_APPLICATION_NAME || 'edge-server',
+  appName: process.env.EDGE_APPLICATION_NAME || 'edge-server',
 
   // SDK required fields for metrics labels and service discovery
-  service: process.env.EDGE_SERVICE || 'edge',
-  group: process.env.EDGE_GROUP || 'gatrix',
-  environment: process.env.EDGE_ENVIRONMENT || 'gatrix-env',
+  meta: {
+    service: process.env.EDGE_SERVICE || 'edge',
+    group: process.env.EDGE_GROUP || 'gatrix',
+    environment: process.env.EDGE_ENVIRONMENT || 'gatrix-env',
+  },
 
   // Redis configuration (for cache PubSub in event mode)
   // Priority: EDGE_REDIS_* > REDIS_* (global fallback)

@@ -29,7 +29,7 @@ async function startServer() {
 
   const sdk = new GatrixServerSDK({
     apiUrl: GATRIX_URL,
-    applicationName: 'test-server',
+    appName: 'test-server',
     apiToken: API_TOKEN,
   });
 

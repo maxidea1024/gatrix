@@ -7,7 +7,7 @@ describe('GatrixSDK', () => {
       const sdk = new GatrixSDK({
         apiUrl: 'http://localhost:3000',
         apiToken: 'test-token',
-        applicationName: 'test-app',
+        appName: 'test-app',
       });
 
       expect(sdk).toBeInstanceOf(GatrixSDK);
@@ -18,7 +18,7 @@ describe('GatrixSDK', () => {
         new GatrixSDK({
           apiUrl: '',
           apiToken: 'test-token',
-          applicationName: 'test-app',
+          appName: 'test-app',
         });
       }).toThrow('apiUrl is required');
     });
@@ -27,20 +27,20 @@ describe('GatrixSDK', () => {
       const sdk = new GatrixSDK({
         apiUrl: 'http://localhost:3000',
         apiToken: '',
-        applicationName: 'test-app',
+        appName: 'test-app',
       });
 
       expect(sdk).toBeInstanceOf(GatrixSDK);
     });
 
-    it('should throw error when applicationName is missing', () => {
+    it('should throw error when appName is missing', () => {
       expect(() => {
         new GatrixSDK({
           apiUrl: 'http://localhost:3000',
           apiToken: 'test-token',
-          applicationName: '',
+          appName: '',
         });
-      }).toThrow('applicationName is required');
+      }).toThrow('appName is required');
     });
   });
 
@@ -49,7 +49,7 @@ describe('GatrixSDK', () => {
       const sdk = new GatrixSDK({
         apiUrl: 'http://localhost:3000',
         apiToken: 'test-token',
-        applicationName: 'test-app',
+        appName: 'test-app',
         cache: {
           enabled: true,
           ttl: 300,
@@ -63,7 +63,7 @@ describe('GatrixSDK', () => {
       const sdk = new GatrixSDK({
         apiUrl: 'http://localhost:3000',
         apiToken: 'test-token',
-        applicationName: 'test-app',
+        appName: 'test-app',
         redis: {
           host: 'localhost',
           port: 6379,
@@ -77,7 +77,7 @@ describe('GatrixSDK', () => {
       const sdk = new GatrixSDK({
         apiUrl: 'http://localhost:3000',
         apiToken: 'test-token',
-        applicationName: 'test-app',
+        appName: 'test-app',
         retry: {
           enabled: true,
           maxRetries: 3,
@@ -104,7 +104,7 @@ describe('GatrixSDK', () => {
       const sdk = new GatrixSDK({
         apiUrl: 'http://localhost:3000',
         apiToken: 'test-token',
-        applicationName: 'test-app',
+        appName: 'test-app',
         serviceDiscovery: {
           autoRegister: true,
           labels: {

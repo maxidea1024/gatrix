@@ -31,7 +31,7 @@ export class ServiceNoticeService {
   private logger: Logger;
   private defaultEnvironmentId: string;
   private storage?: CacheStorageProvider;
-  // Multi-environment cache: Map<environment (environmentName), ServiceNotice[]>
+  // Multi-environment cache: Map<environmentId, ServiceNotice[]>
   private cachedNoticesByEnv: Map<string, ServiceNotice[]> = new Map();
   // Whether this feature is enabled
   private featureEnabled: boolean = true;

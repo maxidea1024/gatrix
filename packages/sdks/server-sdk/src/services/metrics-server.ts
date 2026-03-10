@@ -23,7 +23,7 @@ export type MetricsServerConfig = {
   /** Environment for default labels (e.g., 'env_prod', 'env_staging') */
   environment?: string;
   /** Application name for default labels */
-  applicationName?: string;
+  appName?: string;
   /** Logger instance */
   logger?: Logger;
   /** Existing prom-client registry to use as the primary registry (optional) */
@@ -86,7 +86,7 @@ export function createMetricsServer(
       group: config.group || 'unknown',
       environment: config.environment || 'unknown',
       application:
-        config.applicationName || process.env.SDK_APPLICATION_NAME || 'unknown',
+        config.appName || process.env.SDK_APPLICATION_NAME || 'unknown',
     });
   }
 

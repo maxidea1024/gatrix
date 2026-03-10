@@ -55,7 +55,6 @@ export async function performEvaluation(
     if (!context.appName) {
       context.appName = applicationName;
     }
-    context.environment = environmentId;
 
     // 2. Evaluate flags
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,8 +78,7 @@ export async function performEvaluation(
       results[key] = EvaluationUtils.formatResult(
         key,
         result,
-        flagDef || {},
-        environmentId
+        flagDef || {}
       );
     }
 

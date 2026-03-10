@@ -17,6 +17,9 @@ import { ServiceMaintenanceService } from './services/service-maintenance-servic
 import { ServiceDiscoveryService } from './services/service-discovery-service';
 import { StoreProductService } from './services/store-product-service';
 import { FeatureFlagService } from './services/feature-flag-service';
+import { BannerService } from './services/banner-service';
+import { ClientVersionService } from './services/client-version-service';
+import { ServiceNoticeService } from './services/service-notice-service';
 import { VarsService } from './services/vars-service';
 import { CacheManager } from './cache/cache-manager';
 import { EventListener } from './cache/event-listener';
@@ -114,17 +117,13 @@ export class GatrixServerSDK {
    * const baseConfig: GatrixSDKConfig = {
    *   apiUrl: 'https://api.gatrix.com',
    *   apiToken: 'my-token',
-   *   applicationName: 'my-game',
-   *   service: 'default-service',
-   *   group: 'default-group',
-   *   environment: 'production',
+   *   appName: 'my-game',
+   *   meta: { service: 'default-service', group: 'default-group' },
    * };
    *
    * // Create instance with overrides for billing worker
    * const sdk = GatrixServerSDK.createInstance(baseConfig, {
-   *   service: 'billing-worker',
-   *   group: 'payment',
-   *   region: 'kr',
+   *   meta: { service: 'billing-worker', group: 'payment' },
    *   logger: { level: 'debug' },
    * });
    * ```
@@ -156,23 +155,20 @@ export class GatrixServerSDK {
     const merged: GatrixSDKConfig = { ...baseConfig };
 
     // Override simple fields if provided
-    if (overrides.service !== undefined) merged.service = overrides.service;
-    if (overrides.group !== undefined) merged.group = overrides.group;
     if (overrides.apiUrl !== undefined) merged.apiUrl = overrides.apiUrl;
     if (overrides.apiToken !== undefined) merged.apiToken = overrides.apiToken;
-    if (overrides.applicationName !== undefined)
-      merged.applicationName = overrides.applicationName;
-    if (overrides.worldId !== undefined) merged.worldId = overrides.worldId;
-    if (overrides.version !== undefined) merged.version = overrides.version;
-    if (overrides.commitHash !== undefined)
-      merged.commitHash = overrides.commitHash;
-    if (overrides.gitBranch !== undefined)
-      merged.gitBranch = overrides.gitBranch;
+    if (overrides.appName !== undefined)
+      merged.appName = overrides.appName;
     if (overrides.environmentProvider !== undefined)
       merged.environmentProvider = overrides.environmentProvider;
     // Legacy alias
     if (overrides.tokenProvider !== undefined)
       merged.environmentProvider = overrides.tokenProvider as any;
+
+    // Deep merge meta
+    if (overrides.meta) {
+      merged.meta = { ...baseConfig.meta, ...overrides.meta };
+    }
 
     // Deep merge nested objects
     if (overrides.redis) {
@@ -245,9 +241,9 @@ export class GatrixServerSDK {
         ...loggerConfig.loki,
         labels: {
           job: 'gatrix',
-          service: configWithDefaults.service || '',
-          group: configWithDefaults.group || '',
-          application: configWithDefaults.applicationName,
+          service: configWithDefaults.meta?.service || '',
+          group: configWithDefaults.meta?.group || '',
+          application: configWithDefaults.appName,
           hostname: require('os').hostname(),
           ...loggerConfig.loki.labels,
         },
@@ -258,9 +254,9 @@ export class GatrixServerSDK {
     // Initialize metrics first
     this.metrics = new SdkMetrics({
       enabled: configWithDefaults.metrics?.enabled !== false,
-      service: configWithDefaults.service || '',
-      group: configWithDefaults.group || '',
-      applicationName: configWithDefaults.applicationName,
+      service: configWithDefaults.meta?.service || '',
+      group: configWithDefaults.meta?.group || '',
+      appName: configWithDefaults.appName,
       registry: configWithDefaults.metrics?.registry,
     });
 
@@ -282,10 +278,10 @@ export class GatrixServerSDK {
         if (!this.metrics?.getRegistry()) {
           this.httpRegistry.setDefaultLabels({
             sdk: 'gatrix-server-sdk',
-            service: configWithDefaults.service || '',
-            group: configWithDefaults.group || '',
+            service: configWithDefaults.meta?.service || '',
+            group: configWithDefaults.meta?.group || '',
 
-            application: configWithDefaults.applicationName,
+            application: configWithDefaults.appName,
           });
         }
 
@@ -305,7 +301,7 @@ export class GatrixServerSDK {
     this.apiClient = new ApiClient({
       baseURL: configWithDefaults.apiUrl,
       apiToken: configWithDefaults.apiToken,
-      applicationName: configWithDefaults.applicationName,
+      appName: configWithDefaults.appName,
       logger: this.logger,
       retry: configWithDefaults.retry,
       metrics: this.metrics,
@@ -324,8 +320,8 @@ export class GatrixServerSDK {
     this.impactMetricRegistry = new InMemoryMetricRegistry();
     this.impactMetricDataSource = this.impactMetricRegistry;
     const impactContext: ImpactMetricsStaticContext = {
-      appName: configWithDefaults.applicationName,
-      service: configWithDefaults.service || '',
+      appName: configWithDefaults.appName,
+      service: configWithDefaults.meta?.service || '',
     };
     this._impactMetrics = new MetricsAPI(
       this.impactMetricRegistry,
@@ -335,7 +331,7 @@ export class GatrixServerSDK {
 
     this.logger.info('GatrixServerSDK created', {
       apiUrl: configWithDefaults.apiUrl,
-      applicationName: configWithDefaults.applicationName,
+      appName: configWithDefaults.appName,
 
       apiToken:
         configWithDefaults.apiToken === 'unsecured-server-api-token'
@@ -357,10 +353,10 @@ export class GatrixServerSDK {
       throw createError(ErrorCode.INVALID_CONFIG, 'apiToken is required');
     }
 
-    if (!config.applicationName) {
+    if (!config.appName) {
       throw createError(
         ErrorCode.INVALID_CONFIG,
-        'applicationName is required'
+        'appName is required'
       );
     }
 
@@ -413,10 +409,10 @@ export class GatrixServerSDK {
       }
 
       if (config.cache.refreshMethod !== undefined) {
-        if (!['polling', 'event'].includes(config.cache.refreshMethod)) {
+        if (!['polling', 'event', 'manual'].includes(config.cache.refreshMethod)) {
           throw createError(
             ErrorCode.INVALID_CONFIG,
-            'cache.refreshMethod must be "polling" or "event"'
+            'cache.refreshMethod must be "polling", "event", or "manual"'
           );
         }
       }
@@ -552,9 +548,9 @@ export class GatrixServerSDK {
           port: this.config.metrics?.port,
           bindAddress: this.config.metrics?.bindAddress,
           collectDefaultMetrics: this.config.metrics?.collectDefaultMetrics,
-          service: this.config.service,
-          group: this.config.group,
-          applicationName: this.config.applicationName,
+          service: this.config.meta?.service,
+          group: this.config.meta?.group,
+          appName: this.config.appName,
           logger: this.logger,
           registry: primaryRegistry as any,
           additionalRegistries,
@@ -824,6 +820,48 @@ export class GatrixServerSDK {
     if (!service) {
       throw new Error(
         'VarsService is not available. SDK may not be initialized or vars feature is disabled.'
+      );
+    }
+    return service;
+  }
+
+  /**
+   * Get BannerService instance
+   * @throws Error if SDK is not initialized or feature is disabled
+   */
+  get banner(): BannerService {
+    const service = this.cacheManager?.getBannerService();
+    if (!service) {
+      throw new Error(
+        'BannerService is not available. SDK may not be initialized or banner feature is disabled.'
+      );
+    }
+    return service;
+  }
+
+  /**
+   * Get ClientVersionService instance
+   * @throws Error if SDK is not initialized or feature is disabled
+   */
+  get clientVersion(): ClientVersionService {
+    const service = this.cacheManager?.getClientVersionService();
+    if (!service) {
+      throw new Error(
+        'ClientVersionService is not available. SDK may not be initialized or clientVersion feature is disabled.'
+      );
+    }
+    return service;
+  }
+
+  /**
+   * Get ServiceNoticeService instance
+   * @throws Error if SDK is not initialized or feature is disabled
+   */
+  get serviceNotice(): ServiceNoticeService {
+    const service = this.cacheManager?.getServiceNoticeService();
+    if (!service) {
+      throw new Error(
+        'ServiceNoticeService is not available. SDK may not be initialized or serviceNotice feature is disabled.'
       );
     }
     return service;
@@ -1921,14 +1959,14 @@ export class GatrixServerSDK {
 
     // Build meta with version info from SDK config (merged with input.meta)
     const enhancedMeta: Record<string, any> = { ...input.meta };
-    if (this.config.version) {
-      enhancedMeta.version = this.config.version;
+    if (this.config.meta?.version) {
+      enhancedMeta.version = this.config.meta.version;
     }
-    if (this.config.commitHash) {
-      enhancedMeta.commitHash = this.config.commitHash;
+    if (this.config.meta?.commitHash) {
+      enhancedMeta.commitHash = this.config.meta.commitHash;
     }
-    if (this.config.gitBranch) {
-      enhancedMeta.gitBranch = this.config.gitBranch;
+    if (this.config.meta?.gitBranch) {
+      enhancedMeta.gitBranch = this.config.meta.gitBranch;
     }
 
     const inputWithEnhancements = {

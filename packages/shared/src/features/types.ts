@@ -56,7 +56,6 @@ export interface EvaluationContext {
   appName?: string;
   appVersion?: string;
   remoteAddress?: string;
-  environment?: string;
   currentTime?: Date;
   // Custom properties (string[] for array-type context fields)
   properties?: Record<string, string | number | boolean | string[]>;

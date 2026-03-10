@@ -99,6 +99,10 @@ To maintain a clean and scalable API, **all service-specific operations MUST be 
 - `featureFlag`
 - `serviceDiscovery`
 - `impactMetrics`
+- `banner`
+- `clientVersion`
+- `serviceNotice`
+- `vars`
 
 ### 3. Unified Lifecycle: Single `initialize()`
 
@@ -134,7 +138,7 @@ When `cache.refreshMethod` is `"event"`, the SDK subscribes to a Redis Pub/Sub c
   "type": "gameworld.updated",
   "data": {
     "id": 42,
-    "environment": "production",
+    "environmentId": "production",
     "isVisible": 1
   }
 }
@@ -165,7 +169,7 @@ When `cache.refreshMethod` is `"event"`, the SDK subscribes to a Redis Pub/Sub c
 #### Processing Rules
 
 1. **Feature gate check:** Before processing, check if the relevant feature is enabled in `FeaturesOptions`. Skip silently if disabled.
-2. **Environment / Project scoping:** Events carry `data.environmentId` (or `data.environment`) to identify the target environment. **Segment events (`segment.*`) do NOT require an environment** — they use `data.projectId` instead, since segments are per-project. For non-segment events, if `environmentId` is missing, log a warning and skip.
+2. **Environment / Project scoping:** Events carry `data.environmentId` to identify the target environment. **Segment events (`segment.*`) do NOT require an environment** — they use `data.projectId` instead, since segments are per-project. For non-segment events, if `environmentId` is missing, log a warning and skip.
 3. **Reconnection:** On Redis reconnection, refresh ALL caches immediately to recover missed events.
 4. **Fallback:** If Redis connection fails during initialization, fall back to polling mode.
 
@@ -221,41 +225,70 @@ interface Constraint {
 
 ### Core Methods
 
-All methods follow this parameter order convention:
-- **Required:** `flagName`, `fallback` (where applicable)
-- **Optional:** `context?`, `environmentId?` (both can be omitted)
+All methods provide **two overloads** to prevent accidental context omission:
+1. **Without context** — for server-internal use where no user targeting is needed
+2. **With context** — for user-targeted evaluations where context MUST be explicit
 
-When `environmentId` is omitted, single-environment mode uses the configured default.
-In multi-environment mode (Edge server), `environmentId` should be specified explicitly.
+When `environmentId` is omitted, the environment mapped 1:1 to the `apiToken` is used implicitly (single-environment mode).
+In multi-environment mode (e.g., Edge server with `environmentProvider`), `environmentId` MUST be specified explicitly.
 
 ```csharp
+// ============================================
 // Core Evaluation
-EvaluationResult Evaluate(string flagName, EvaluationContext? context = null, string? environmentId = null);
-bool IsEnabled(string flagName, bool fallback, EvaluationContext? context = null, string? environmentId = null);
+// ============================================
+// Without context (server-internal)
+EvaluationResult Evaluate(string flagName, string? environmentId = null);
+// With context (user-targeted)
+EvaluationResult Evaluate(string flagName, EvaluationContext context, string? environmentId = null);
 
+// Without context
+bool IsEnabled(string flagName, bool fallback, string? environmentId = null);
+// With context
+bool IsEnabled(string flagName, EvaluationContext context, bool fallback, string? environmentId = null);
+
+// ============================================
 // Variant Name (returns matched variant name, not the value)
-string Variation(string flagName, string fallback = "", EvaluationContext? context = null, string? environmentId = null);
+// ============================================
+string Variation(string flagName, string fallback = "", string? environmentId = null);
+string Variation(string flagName, EvaluationContext context, string fallback = "", string? environmentId = null);
 
+// ============================================
 // Typed Variations (returns the variant VALUE converted to the specified type)
 // IMPORTANT: BoolVariation returns the variant's VALUE parsed as bool, NOT the flag's enabled state.
 //            Use IsEnabled() for the flag's enabled state.
-string StringVariation(string flagName, string fallback, EvaluationContext? context = null, string? environmentId = null);
-int    IntVariation(string flagName, int fallback, EvaluationContext? context = null, string? environmentId = null);
-long   LongVariation(string flagName, long fallback, EvaluationContext? context = null, string? environmentId = null);
-float  FloatVariation(string flagName, float fallback, EvaluationContext? context = null, string? environmentId = null);
-double DoubleVariation(string flagName, double fallback, EvaluationContext? context = null, string? environmentId = null);
-bool   BoolVariation(string flagName, bool fallback, EvaluationContext? context = null, string? environmentId = null);
-T?     JsonVariation<T>(string flagName, T? fallback = default, EvaluationContext? context = null, string? environmentId = null);
+// ============================================
 
+// Without context (server-internal, no user targeting)
+string StringVariation(string flagName, string fallback, string? environmentId = null);
+int    IntVariation(string flagName, int fallback, string? environmentId = null);
+long   LongVariation(string flagName, long fallback, string? environmentId = null);
+float  FloatVariation(string flagName, float fallback, string? environmentId = null);
+double DoubleVariation(string flagName, double fallback, string? environmentId = null);
+bool   BoolVariation(string flagName, bool fallback, string? environmentId = null);
+T?     JsonVariation<T>(string flagName, T? fallback = default, string? environmentId = null);
+
+// With context (user-targeted evaluation — context is REQUIRED)
+string StringVariation(string flagName, EvaluationContext context, string fallback, string? environmentId = null);
+int    IntVariation(string flagName, EvaluationContext context, int fallback, string? environmentId = null);
+long   LongVariation(string flagName, EvaluationContext context, long fallback, string? environmentId = null);
+float  FloatVariation(string flagName, EvaluationContext context, float fallback, string? environmentId = null);
+double DoubleVariation(string flagName, EvaluationContext context, double fallback, string? environmentId = null);
+bool   BoolVariation(string flagName, EvaluationContext context, bool fallback, string? environmentId = null);
+T?     JsonVariation<T>(string flagName, EvaluationContext context, T? fallback = default, string? environmentId = null);
+
+// ============================================
 // *Details — returns value + evaluation metadata (reason, variant name)
-EvaluationDetail<string> StringVariationDetails(string flagName, string fallback, EvaluationContext? context = null, string? environmentId = null);
-EvaluationDetail<int>    IntVariationDetails(string flagName, int fallback, EvaluationContext? context = null, string? environmentId = null);
-// ... (all types follow the same pattern)
+// ============================================
+EvaluationDetail<string> StringVariationDetails(string flagName, string fallback, string? environmentId = null);
+EvaluationDetail<string> StringVariationDetails(string flagName, EvaluationContext context, string fallback, string? environmentId = null);
+// ... (all types follow the same two-overload pattern)
 
+// ============================================
 // *OrThrow — throws FeatureFlagException if flag not found or no value
-string StringVariationOrThrow(string flagName, EvaluationContext? context = null, string? environmentId = null);
-int    IntVariationOrThrow(string flagName, EvaluationContext? context = null, string? environmentId = null);
-// ... (all types follow the same pattern)
+// ============================================
+string StringVariationOrThrow(string flagName, string? environmentId = null);
+string StringVariationOrThrow(string flagName, EvaluationContext context, string? environmentId = null);
+// ... (all types follow the same two-overload pattern)
 ```
 
 > **CRITICAL:** `BoolVariation` parses the variant's string value as a boolean (`"true"`/`"false"`, `"1"`/`"0"`).
@@ -271,13 +304,19 @@ interface GatrixSDKConfig {
   // Required Authentication and Identity
   apiUrl: string;  // Gatrix backend URL (e.g., https://api.gatrix.com)
   apiToken: string;
-  applicationName: string;
-  service: string;
-  group: string;
-  environment: string; // Environment identifier, or "*" for multi-env Edge server
-  
-  // Optional specific identifiers
+  appName: string;
+
+  // Optional - World ID for world-specific maintenance checks
   worldId?: string;
+
+  // Optional - Service metadata (for metrics labels and service discovery)
+  meta?: {
+    service?: string;
+    group?: string;
+    version?: string;
+    commitHash?: string;
+    gitBranch?: string;
+  };
 
   // External event bus for realtime cache invalidation
   redis?: {
@@ -310,6 +349,22 @@ interface GatrixSDKConfig {
     enabled: boolean;
     serverEnabled?: boolean;
     port?: number;
+  };
+
+  // Feature toggles (selective caching)
+  // Services default to enabled, except newer services which require explicit opt-in.
+  uses?: {
+    gameWorld?: boolean;           // default: true
+    popupNotice?: boolean;         // default: true
+    survey?: boolean;              // default: true
+    whitelist?: boolean;           // default: true
+    serviceMaintenance?: boolean;  // default: true
+    clientVersion?: boolean;       // default: false (opt-in)
+    serviceNotice?: boolean;       // default: false (opt-in)
+    banner?: boolean;              // default: false (opt-in)
+    storeProduct?: boolean;        // default: false (opt-in)
+    featureFlag?: boolean;         // default: false (opt-in)
+    vars?: boolean;                // default: false (opt-in)
   };
 }
 ```

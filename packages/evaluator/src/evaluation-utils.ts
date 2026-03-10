@@ -30,7 +30,6 @@ export function buildContextQueryParams(
 ): void {
   const systemAndTopLevel = [
     'appName',
-    'environment',
     'userId',
     'sessionId',
     'remoteAddress',
@@ -82,7 +81,7 @@ export class EvaluationUtils {
         context.remoteAddress = query.remoteAddress as string;
       if (query.appName) context.appName = query.appName as string;
       if (query.appVersion) context.appVersion = query.appVersion as string;
-      if (query.environment) context.environment = query.environment as string;
+
       if (query.currentTime) {
         context.currentTime = new Date(
           truncateToMinute(query.currentTime as string)
@@ -148,8 +147,7 @@ export class EvaluationUtils {
   static formatResult(
     flagName: string,
     evalResult: EvaluationResult,
-    dbFlag: Partial<FeatureFlag>,
-    environment: string
+    dbFlag: Partial<FeatureFlag>
   ): any {
     const { enabled, variant: resultVariant } = evalResult;
 

@@ -752,7 +752,7 @@ router.post(
         headers: {
           'Content-Type': 'application/json',
           'x-api-token': config.apiToken,
-          'x-application-name': config.applicationName,
+          'x-application-name': config.appName,
           'x-environment': environmentId,
           'x-forwarded-for': clientIp,
           'user-agent': userAgent,

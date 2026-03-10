@@ -126,17 +126,31 @@ export interface FeatureFlagConfig {
 }
 
 /**
+ * Metadata Configuration
+ * Service identification and version information for metrics labels and service discovery.
+ */
+export interface MetaConfig {
+  service?: string; // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
+  group?: string; // Service group (e.g., 'kr', 'us', 'production')
+  version?: string; // Version information (for service discovery)
+  commitHash?: string; // Git commit hash
+  gitBranch?: string; // Git branch name
+}
+
+/**
  * Main SDK Configuration
  */
 export interface GatrixSDKConfig {
-  // Required — only url + token + applicationName
+  // Required — only url + token + appName
   apiUrl: string; // Gatrix backend URL (e.g., https://api.gatrix.com)
   apiToken: string; // Server API Token (required; use 'unsecured-server-api-token' for testing)
-  applicationName: string; // Application name
+  appName: string; // Application name
 
-  // Optional - Service identification (for metrics labels and service discovery)
-  service?: string; // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
-  group?: string; // Service group (e.g., 'kr', 'us', 'production')
+  // Optional - Service metadata (for metrics labels and service discovery)
+  meta?: MetaConfig;
+
+  // Optional - World ID for world-specific maintenance checks
+  worldId?: string;
 
   // Optional - Environment provider for multi-environment mode (e.g., Edge server)
   // When not provided, SDK uses SingleEnvironmentProvider with the apiToken.
@@ -148,14 +162,6 @@ export interface GatrixSDKConfig {
 
   // Optional - Cloud configuration for auto-detecting region
   cloud?: CloudConfig;
-
-  // Optional - World ID for world-specific maintenance checks
-  worldId?: string;
-
-  // Optional - Version information (for service discovery)
-  version?: string;
-  commitHash?: string;
-  gitBranch?: string;
 
   // Optional - Redis (for PubSub events)
   redis?: RedisConfig;
@@ -191,26 +197,17 @@ export interface GatrixSDKConfig {
  *
  * // Create instance with overrides for specific program
  * const sdk = GatrixServerSDK.createInstance(baseConfig, {
- *   service: 'billing-worker',
- *   group: 'payment',
- *   worldId: 'world-1',
+ *   meta: { service: 'billing-worker', group: 'payment', worldId: 'world-1' },
  *   logger: { level: 'debug' },
  * });
  * ```
  */
 export interface GatrixSDKInitOptions {
-  // Core identification overrides
-  service?: string;
-  group?: string;
-
-  // Optional overrides
+  // Core overrides
   apiUrl?: string;
   apiToken?: string;
-  applicationName?: string;
-  worldId?: string;
-  version?: string;
-  commitHash?: string;
-  gitBranch?: string;
+  appName?: string;
+  meta?: Partial<MetaConfig>;
 
   // Configuration overrides (deep merged)
   redis?: Partial<RedisConfig>;

@@ -19,7 +19,7 @@ export class ServiceMaintenanceService {
   private logger: Logger;
   private defaultEnvironmentId: string;
   private storage?: CacheStorageProvider;
-  // Multi-environment cache: Map<environment (environmentName), MaintenanceStatus>
+  // Multi-environment cache: Map<environmentId, MaintenanceStatus>
   private cachedStatusByEnv: Map<string, MaintenanceStatus> = new Map();
   // Whether this feature is enabled
   private featureEnabled: boolean = true;

@@ -24,7 +24,7 @@ class TokenUsageTracker {
     this.reportIntervalMs = parseInt(
       process.env.TOKEN_USAGE_REPORT_INTERVAL_MS || '60000'
     );
-    this.edgeInstanceId = `edge-${config.group}-${process.pid}`;
+    this.edgeInstanceId = `edge-${config.meta.group}-${process.pid}`;
   }
 
   /**
@@ -136,7 +136,7 @@ class TokenUsageTracker {
         {
           headers: {
             'x-api-token': config.apiToken,
-            'x-application-name': config.applicationName,
+            'x-application-name': config.appName,
           },
           timeout: 10000,
         }

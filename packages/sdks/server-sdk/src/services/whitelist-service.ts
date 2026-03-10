@@ -41,7 +41,7 @@ export class WhitelistService {
   private logger: Logger;
   private defaultEnvironmentId: string;
   private storage?: CacheStorageProvider;
-  // Multi-environment cache: Map<environment (environmentName), WhitelistData>
+  // Multi-environment cache: Map<environmentId, WhitelistData>
   private cachedWhitelistByEnv: Map<string, WhitelistData> = new Map();
   // Whether this feature is enabled
   private featureEnabled: boolean = true;

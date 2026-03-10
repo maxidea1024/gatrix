@@ -19,9 +19,9 @@ export class SurveyService {
   private logger: Logger;
   private defaultEnvironmentId: string;
   private storage?: CacheStorageProvider;
-  // Multi-environment cache: Map<environment (environmentName), Survey[]>
+  // Multi-environment cache: Map<environmentId, Survey[]>
   private cachedSurveysByEnv: Map<string, Survey[]> = new Map();
-  // Multi-environment settings cache: Map<environment (environmentName), SurveySettings>
+  // Multi-environment settings cache: Map<environmentId, SurveySettings>
   private cachedSettingsByEnv: Map<string, SurveySettings> = new Map();
   // Whether this feature is enabled
   private featureEnabled: boolean = true;

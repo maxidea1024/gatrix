@@ -17,9 +17,11 @@ async function main() {
   const sdk = new GatrixServerSDK({
     apiUrl: process.env.GATRIX_URL || 'http://localhost:45000',
     apiToken: process.env.API_TOKEN || 'unsecured-server-api-token',
-    applicationName: 'feature-flag-test',
-    service: 'test',
-    group: 'development',
+    appName: 'feature-flag-test',
+    meta: {
+      service: 'test',
+      group: 'development',
+    },
 
     cache: {
       enabled: true,

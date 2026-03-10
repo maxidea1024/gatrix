@@ -114,7 +114,7 @@ export class CacheManager {
       defaultEnvironmentId,
       {
         baseURL: apiClient.getAxiosInstance().defaults.baseURL || '',
-        applicationName:
+        appName:
           (apiClient.getAxiosInstance().defaults.headers?.common?.[
             'X-Application-Name'
           ] as string) ||

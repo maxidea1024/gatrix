@@ -95,7 +95,7 @@ class TokenMirrorService {
         {
           headers: {
             'x-api-token': config.apiToken,
-            'x-application-name': config.applicationName,
+            'x-application-name': config.appName,
           },
           timeout: 10000,
         }

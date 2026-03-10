@@ -231,7 +231,7 @@ class MetricsAggregator {
           {
             headers: {
               'x-api-token': config.apiToken,
-              'x-application-name': config.applicationName,
+              'x-application-name': config.appName,
               ...(buffer.sdkVersion && { 'x-sdk-version': buffer.sdkVersion }),
             },
             timeout: 10_000,

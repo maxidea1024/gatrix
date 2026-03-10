@@ -28,9 +28,11 @@ async function main() {
   const sdk = new GatrixServerSDK({
     apiUrl: process.env.GATRIX_URL || 'http://localhost:45000',
     apiToken: process.env.API_TOKEN || 'unsecured-server-api-token',
-    applicationName: 'idle',
-    service: 'idle', // Required: service name for identification
-    group: process.env.SERVICE_GROUP || 'development', // Required: service group
+    appName: 'idle',
+    meta: {
+      service: 'idle', // Service name for identification
+      group: process.env.SERVICE_GROUP || 'development', // Service group
+    },
 
     // Redis for events
     redis: {
@@ -70,7 +72,7 @@ async function main() {
   // Create metrics server (standalone, consistent port)
   const metricsServer = createMetricsServer({
     port: metricsPort,
-    applicationName: 'idle',
+    appName: 'idle',
     service: 'idle',
     group: process.env.SERVICE_GROUP || 'development',
     environment: process.env.ENVIRONMENT || 'env_dev',
