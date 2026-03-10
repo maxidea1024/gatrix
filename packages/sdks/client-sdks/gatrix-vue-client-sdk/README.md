@@ -91,17 +91,20 @@ app.use(GatrixPlugin, {
 
 | Composable             | Description                                 |
 | ---------------------- | ------------------------------------------- |
-| `useFlag(flagName)`    | Returns `Ref<FlagProxy>`                    |
-| `useFlags()`           | Returns `Ref<EvaluatedFlag[]>` - all flags  |
+| `useFlag(flagName, forceRealtime?)`    | Returns `ComputedRef<boolean>` — flag enabled state |
+| `useFlagProxy(flagName, forceRealtime?)` | Returns `Ref<FlagProxy | null>` — full FlagProxy |
+| `useVariant(flagName, forceRealtime?)`   | Returns `ComputedRef<Variant | undefined>`  |
+| `useFlags(forceRealtime?)`               | Returns `Ref<EvaluatedFlag[]>` — all flags  |
+| `useTrack()`                              | Returns track function `(eventName, properties?) => void` |
 
 ### Variation Composables
 
 | Composable                                     | Description               |
 | ---------------------------------------------- | ------------------------- |
-| `useBoolVariation(flagName, defaultValue)`     | Returns `ComputedRef<boolean>`         |
-| `useStringVariation(flagName, defaultValue)`   | Returns `ComputedRef<string>`          |
-| `useNumberVariation(flagName, defaultValue)`   | Returns `ComputedRef<number>`          |
-| `useJsonVariation<T>(flagName, defaultValue)`  | Returns `ComputedRef<T>` (JSON object) |
+| `useBoolVariation(flagName, fallbackValue, forceRealtime?)`     | Returns `ComputedRef<boolean>`         |
+| `useStringVariation(flagName, fallbackValue, forceRealtime?)`   | Returns `ComputedRef<string>`          |
+| `useNumberVariation(flagName, fallbackValue, forceRealtime?)`   | Returns `ComputedRef<number>`          |
+| `useJsonVariation<T>(flagName, fallbackValue, forceRealtime?)`  | Returns `ComputedRef<T>` (JSON object) |
 
 ## Examples
 
@@ -114,7 +117,7 @@ const showNewFeature = useFlag('new-feature');
 </script>
 
 <template>
-  <NewFeature v-if="showNewFeature.enabled" />
+  <NewFeature v-if="showNewFeature" />
 </template>
 ```
 

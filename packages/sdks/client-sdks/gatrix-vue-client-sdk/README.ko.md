@@ -91,17 +91,20 @@ app.use(GatrixPlugin, {
 
 | 컴포저블 | 설명 |
 |----------|------|
-| `useFlag(flagName)` | `Ref<FlagProxy>` 반환 |
-| `useFlags()` | `Ref<EvaluatedFlag[]>` 반환 — 모든 플래그 |
+| `useFlag(flagName, forceRealtime?)` | `ComputedRef<boolean>` 반환 — 플래그 활성 상태 |
+| `useFlagProxy(flagName, forceRealtime?)` | `Ref<FlagProxy | null>` 반환 — 전체 FlagProxy |
+| `useVariant(flagName, forceRealtime?)` | `ComputedRef<Variant | undefined>` 반환 |
+| `useFlags(forceRealtime?)` | `Ref<EvaluatedFlag[]>` 반환 — 모든 플래그 |
+| `useTrack()` | 트래킹 함수 `(eventName, properties?) => void` 반환 |
 
 ### Variation 컴포저블
 
 | 컴포저블 | 설명 |
 |----------|------|
-| `useBoolVariation(flagName, defaultValue)` | `ComputedRef<boolean>` 반환 |
-| `useStringVariation(flagName, defaultValue)` | `ComputedRef<string>` 반환 |
-| `useNumberVariation(flagName, defaultValue)` | `ComputedRef<number>` 반환 |
-| `useJsonVariation<T>(flagName, defaultValue)` | `ComputedRef<T>` (JSON 객체) 반환 |
+| `useBoolVariation(flagName, fallbackValue, forceRealtime?)` | `ComputedRef<boolean>` 반환 |
+| `useStringVariation(flagName, fallbackValue, forceRealtime?)` | `ComputedRef<string>` 반환 |
+| `useNumberVariation(flagName, fallbackValue, forceRealtime?)` | `ComputedRef<number>` 반환 |
+| `useJsonVariation<T>(flagName, fallbackValue, forceRealtime?)` | `ComputedRef<T>` (JSON 객체) 반환 |
 
 ## 예제
 
@@ -114,7 +117,7 @@ const showNewFeature = useFlag('new-feature');
 </script>
 
 <template>
-  <NewFeature v-if="showNewFeature.enabled" />
+  <NewFeature v-if="showNewFeature" />
 </template>
 ```
 
