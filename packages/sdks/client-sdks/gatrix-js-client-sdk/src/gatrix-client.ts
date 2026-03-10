@@ -21,6 +21,7 @@ export class GatrixClient {
   private initialized = false;
   private startPromise: Promise<void> | null = null;
   private logger: Logger;
+  private startupLogPrinted = false;
 
   /**
    * Feature flags client
@@ -52,8 +53,11 @@ export class GatrixClient {
       return Promise.resolve();
     }
 
-    const connId = this.featuresClient.getConnectionId();
-    this.logger.info(`Starting SDK for ${this.config.appName} (v${SDK_VERSION}) [${connId}]`);
+    if (!this.startupLogPrinted) {
+      const connId = this.featuresClient.getConnectionId();
+      this.logger.info(`Starting SDK for ${this.config.appName} (v${SDK_VERSION}) [${connId}]`);
+      this.startupLogPrinted = true;
+    }
 
     this.startPromise = (async () => {
       try {
@@ -187,7 +191,7 @@ export class GatrixClient {
       console.log(
         `[Gatrix] track() called: eventName="${eventName}", properties=`,
         properties ?? {},
-        '— tracking is not yet supported but will be available soon.'
+        '— tracking is not yet supported but will be available soon.',
       );
     }
   }

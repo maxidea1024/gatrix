@@ -18,7 +18,7 @@ export function validateConfig(config: GatrixClientConfig): void {
   // apiUrl format
   if (config.apiUrl && !isValidUrl(config.apiUrl)) {
     throw new GatrixError(
-      `Invalid apiUrl: "${config.apiUrl}". Must be a valid URL (e.g., https://api.example.com/api/v1)`
+      `Invalid apiUrl: "${config.apiUrl}". Must be a valid URL (e.g., https://api.example.com/api/v1)`,
     );
   }
 
@@ -41,7 +41,7 @@ export function validateConfig(config: GatrixClientConfig): void {
         feat.metricsIntervalInitial,
         'features.metricsIntervalInitial',
         0,
-        3600
+        3600,
       );
     }
 
@@ -63,7 +63,7 @@ export function validateConfig(config: GatrixClientConfig): void {
           retry.backoffLimit,
           'features.fetchRetryOptions.backoffLimit',
           0,
-          300000
+          300000,
         );
       }
 
@@ -76,7 +76,7 @@ export function validateConfig(config: GatrixClientConfig): void {
           retry.initialBackoff,
           'features.fetchRetryOptions.initialBackoff',
           0.1,
-          60
+          60,
         );
       }
 
@@ -90,20 +90,20 @@ export function validateConfig(config: GatrixClientConfig): void {
         retry.initialBackoff > retry.maxBackoff
       ) {
         throw new GatrixError(
-          `Invalid config: fetchRetryOptions.initialBackoff (${retry.initialBackoff}) must be <= maxBackoff (${retry.maxBackoff})`
+          `Invalid config: fetchRetryOptions.initialBackoff (${retry.initialBackoff}) must be <= maxBackoff (${retry.maxBackoff})`,
         );
       }
 
       if (retry.nonRetryableStatusCodes) {
         if (!Array.isArray(retry.nonRetryableStatusCodes)) {
           throw new GatrixError(
-            'Invalid config: fetchRetryOptions.nonRetryableStatusCodes must be an array'
+            'Invalid config: fetchRetryOptions.nonRetryableStatusCodes must be an array',
           );
         }
         for (const code of retry.nonRetryableStatusCodes) {
           if (!Number.isInteger(code) || code < 400 || code > 599) {
             throw new GatrixError(
-              `Invalid config: fetchRetryOptions.nonRetryableStatusCodes contains invalid status code: ${code} (must be 400-599)`
+              `Invalid config: fetchRetryOptions.nonRetryableStatusCodes contains invalid status code: ${code} (must be 400-599)`,
             );
           }
         }
@@ -118,7 +118,7 @@ export function validateConfig(config: GatrixClientConfig): void {
     if (streaming.transport !== undefined) {
       if (streaming.transport !== 'sse' && streaming.transport !== 'websocket') {
         throw new GatrixError(
-          `Invalid config: streaming.transport must be 'sse' or 'websocket', got '${streaming.transport}'`
+          `Invalid config: streaming.transport must be 'sse' or 'websocket', got '${streaming.transport}'`,
         );
       }
     }
@@ -143,7 +143,7 @@ export function validateConfig(config: GatrixClientConfig): void {
         streaming.sse.reconnectBase > streaming.sse.reconnectMax
       ) {
         throw new GatrixError(
-          `Invalid config: streaming.sse.reconnectBase (${streaming.sse.reconnectBase}) must be <= reconnectMax (${streaming.sse.reconnectMax})`
+          `Invalid config: streaming.sse.reconnectBase (${streaming.sse.reconnectBase}) must be <= reconnectMax (${streaming.sse.reconnectMax})`,
         );
       }
     }
@@ -158,7 +158,7 @@ export function validateConfig(config: GatrixClientConfig): void {
           streaming.websocket.reconnectBase,
           'streaming.websocket.reconnectBase',
           0.5,
-          60
+          60,
         );
       }
       if (streaming.websocket.reconnectMax !== undefined) {
@@ -166,7 +166,7 @@ export function validateConfig(config: GatrixClientConfig): void {
           streaming.websocket.reconnectMax,
           'streaming.websocket.reconnectMax',
           1,
-          300
+          300,
         );
       }
       if (streaming.websocket.pingInterval !== undefined) {
@@ -174,7 +174,7 @@ export function validateConfig(config: GatrixClientConfig): void {
           streaming.websocket.pingInterval,
           'streaming.websocket.pingInterval',
           5,
-          300
+          300,
         );
       }
       if (
@@ -183,7 +183,7 @@ export function validateConfig(config: GatrixClientConfig): void {
         streaming.websocket.reconnectBase > streaming.websocket.reconnectMax
       ) {
         throw new GatrixError(
-          `Invalid config: streaming.websocket.reconnectBase (${streaming.websocket.reconnectBase}) must be <= reconnectMax (${streaming.websocket.reconnectMax})`
+          `Invalid config: streaming.websocket.reconnectBase (${streaming.websocket.reconnectBase}) must be <= reconnectMax (${streaming.websocket.reconnectMax})`,
         );
       }
     }
@@ -207,7 +207,7 @@ export function validateConfig(config: GatrixClientConfig): void {
     for (const [key, value] of Object.entries(config.customHeaders)) {
       if (typeof value !== 'string') {
         throw new GatrixError(
-          `Invalid config: customHeaders["${key}"] must be a string, got ${typeof value}`
+          `Invalid config: customHeaders["${key}"] must be a string, got ${typeof value}`,
         );
       }
     }
@@ -234,7 +234,7 @@ function validatePositiveNumber(value: unknown, fieldName: string, min: number, 
   }
   if (value < min || value > max) {
     throw new GatrixError(
-      `Invalid config: ${fieldName} must be between ${min} and ${max}, got ${value}`
+      `Invalid config: ${fieldName} must be between ${min} and ${max}, got ${value}`,
     );
   }
 }
@@ -243,7 +243,7 @@ function validatePositiveInteger(
   value: unknown,
   fieldName: string,
   min: number,
-  max: number
+  max: number,
 ): void {
   validatePositiveNumber(value, fieldName, min, max);
   if (!Number.isInteger(value)) {

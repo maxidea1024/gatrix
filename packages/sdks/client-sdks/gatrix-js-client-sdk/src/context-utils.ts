@@ -3,7 +3,7 @@
  * and normalizing context values.
  */
 
-import { GatrixContext } from './types';
+import { type GatrixContext } from './types';
 
 /** System fields that cannot be removed via updateContext(null/undefined) */
 export const SYSTEM_CONTEXT_FIELDS: ReadonlySet<string> = new Set(['appName']);
