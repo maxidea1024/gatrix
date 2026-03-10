@@ -89,6 +89,21 @@ FString difficulty = Client->GetFeatures()->StringVariation(TEXT("difficulty"), 
 
 이로써 **매일 배포**하되 아무것도 릴리즈하지 않다가, 대시보드를 통해 **기능을 독립적으로 릴리즈**할 수 있습니다 — 빌드도, 배포도, 앱 스토어 심사도 필요 없습니다.
 
+### 🌳 트럭기반 개발(Trunk-Based Development)과 피처 플래그
+
+피처 플래그는 모든 개발자가 하나의 메인 브랜치에 커밋하는 브랜칭 전략인 **트럭기반 개발(TBD)**의 자연스러운 동반자입니다.
+
+| 전통적 브랜칭 | 트럭기반 + 피처 플래그 |
+|---|---|
+| 장기 피처 브랜치 유지 | 모든 커밋은 main/trunk으로 |
+| 고통스러운 머지 충돌 | 작고 빈번한 머지 |
+| 브랜치 머지 전까지 기능 차단 | 미완성 기능은 플래그 뒤에 숨김 |
+| 릴리즈 = 브랜치 머지 | 릴리즈 = 대시보드에서 플래그 켜기 |
+
+피처 플래그를 사용하면 개발자들이 미완성된 기능을 플래그로 감싸서 메인 브랜치에 직접 커밋할 수 있습니다. 코드는 배포되지만 비활성 상태로 유지되어, 장기 브랜치와 머지 충돌을 피하면서도 기능 노출 시점을 제어할 수 있습니다.
+
+> 💡 피처 플래그는 **진정한 지속적 통합(CI)**을 가능하게 합니다 — 매일 트럭에 커밋하고, 언제든 배포하고, 준비되면 릴리즈하세요.
+
 ---
 
 ## 📐 평가 모델: 원격 평가 방식
@@ -490,6 +505,11 @@ void AMyActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 - [Progressive Experimentation with Feature Flags](https://learn.microsoft.com/en-us/devops/operate/progressive-experimentation-feature-flags) — Microsoft
 - [Feature Flag Use Cases and Benefits](https://www.optimizely.com/optimization-glossary/feature-flags/) — Optimizely
 - [Feature Flag Best Practices](https://posthog.com/blog/feature-flag-best-practices) — PostHog
+
+**트럭기반 개발:**
+
+- [Feature Flags in Trunk-Based Development](https://trunkbaseddevelopment.com/feature-flags/) — trunkbaseddevelopment.com
+- [Trunk-Based Development Best Practices](https://www.atlassian.com/continuous-delivery/continuous-integration/trunk-based-development) — Atlassian
 
 ## License
 

@@ -89,6 +89,21 @@ Traditionally, **deployment** and **release** were the same thing — shipping c
 
 This means you can **deploy daily** without releasing anything, then **release features** independently through the dashboard — no build, no deploy, no app store review.
 
+### 🌳 Trunk-Based Development & Feature Flags
+
+Feature flags are a natural companion to **Trunk-Based Development (TBD)** — a branching strategy where all developers commit to a single main branch.
+
+| Traditional branching | Trunk-Based + Feature Flags |
+|---|---|
+| Long-lived feature branches | All commits go to main/trunk |
+| Painful merge conflicts | Small, frequent merges |
+| Features blocked until branch merges | Incomplete features hidden behind flags |
+| Release = merge branch | Release = toggle flag on dashboard |
+
+With feature flags, developers can commit incomplete features directly to the main branch wrapped in a flag. The code is deployed but dormant, avoiding long-lived branches and merge conflicts while still controlling when features become visible to users.
+
+> 💡 Feature flags enable **true continuous integration** — commit to trunk every day, deploy anytime, release when ready.
+
 ---
 
 ## 📐 Evaluation Model: Remote Evaluation Only
@@ -548,6 +563,11 @@ void AMyActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 - [Progressive Experimentation with Feature Flags](https://learn.microsoft.com/en-us/devops/operate/progressive-experimentation-feature-flags) — Microsoft
 - [Feature Flag Use Cases and Benefits](https://www.optimizely.com/optimization-glossary/feature-flags/) — Optimizely
 - [Feature Flag Best Practices](https://posthog.com/blog/feature-flag-best-practices) — PostHog
+
+**Trunk-Based Development:**
+
+- [Feature Flags in Trunk-Based Development](https://trunkbaseddevelopment.com/feature-flags/) — trunkbaseddevelopment.com
+- [Trunk-Based Development Best Practices](https://www.atlassian.com/continuous-delivery/continuous-integration/trunk-based-development) — Atlassian
 
 ## License
 

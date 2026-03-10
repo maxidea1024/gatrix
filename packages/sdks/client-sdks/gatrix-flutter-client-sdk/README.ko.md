@@ -107,6 +107,11 @@ MIT
 - [Feature Flag Use Cases and Benefits](https://www.optimizely.com/optimization-glossary/feature-flags/) — Optimizely
 - [Feature Flag Best Practices](https://posthog.com/blog/feature-flag-best-practices) — PostHog
 
+**트럭기반 개발:**
+
+- [Feature Flags in Trunk-Based Development](https://trunkbaseddevelopment.com/feature-flags/) — trunkbaseddevelopment.com
+- [Trunk-Based Development Best Practices](https://www.atlassian.com/continuous-delivery/continuous-integration/trunk-based-development) — Atlassian
+
 ## License
 
 이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.

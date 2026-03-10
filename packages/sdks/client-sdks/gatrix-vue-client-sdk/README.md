@@ -164,6 +164,11 @@ const handleLogin = async (userId) => {
 - [Feature Flag Use Cases and Benefits](https://www.optimizely.com/optimization-glossary/feature-flags/) — Optimizely
 - [Feature Flag Best Practices](https://posthog.com/blog/feature-flag-best-practices) — PostHog
 
+**Trunk-Based Development:**
+
+- [Feature Flags in Trunk-Based Development](https://trunkbaseddevelopment.com/feature-flags/) — trunkbaseddevelopment.com
+- [Trunk-Based Development Best Practices](https://www.atlassian.com/continuous-delivery/continuous-integration/trunk-based-development) — Atlassian
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](../../../../LICENSE) file for details.
