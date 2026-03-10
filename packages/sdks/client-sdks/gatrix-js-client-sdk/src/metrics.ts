@@ -239,7 +239,7 @@ export class Metrics {
   }
 
   private buildMetricsUrl(): string {
-    // Metrics endpoint: {apiUrl}/client/features/{environment}/metrics
+    // Metrics endpoint: {apiUrl}/client/features/metrics
     return `${this.apiUrl}/client/features/metrics`;
   }
 

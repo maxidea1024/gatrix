@@ -350,8 +350,8 @@ interface StreamingConfig {
 
 | Transport | Endpoint                                       |
 | --------- | ---------------------------------------------- |
-| SSE       | `GET /client/features/:environment/stream/sse` |
-| WebSocket | `GET /client/features/:environment/stream/ws`  |
+| SSE       | `GET /client/features/stream/sse`               |
+| WebSocket | `GET /client/features/stream/ws`                |
 
 #### Authentication
 
@@ -1388,13 +1388,13 @@ All SDKs MUST support both **GET** and **POST** HTTP methods for flag evaluation
 
 - Context fields are sent as query parameters
 - Suitable for small context payloads
-- Endpoint: `GET /client/features/{environment}/eval?userId=xxx&sessionId=yyy`
+- Endpoint: `GET /client/features/eval?userId=xxx&sessionId=yyy`
 
 ### POST
 
 - Context fields are sent in the request body as JSON
 - Required when context contains large or complex data (e.g., many properties)
-- Endpoint: `POST /client/features/{environment}/eval`
+- Endpoint: `POST /client/features/eval`
 - Body: `{ "userId": "xxx", "sessionId": "yyy", "properties": { ... } }`
 
 SDKs SHOULD default to GET and provide a configuration option to switch to POST.
@@ -1480,7 +1480,7 @@ This section defines the real-time flag synchronization protocol. All Client SDK
 
 ### Streaming Events
 
-The streaming endpoint (`/client/features/{environment}/stream`) emits the following server-sent events:
+The streaming endpoint (`/client/features/stream`) emits the following server-sent events:
 
 | Event           | Payload                                             | Description                                                         |
 | --------------- | --------------------------------------------------- | ------------------------------------------------------------------- |

@@ -1131,7 +1131,7 @@ export class FeaturesClient implements VariationProvider {
       this.fetchFlagsCount++;
       this.lastFetchTime = new Date();
 
-      // Build endpoint: {apiUrl}/client/features/{environment}/eval
+      // Build endpoint: {apiUrl}/client/features/eval
       const url = new URL(`${this.config.apiUrl}/client/features/eval`);
 
       const headers = this.buildHeaders();
