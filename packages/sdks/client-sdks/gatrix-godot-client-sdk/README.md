@@ -233,6 +233,19 @@ GatrixClient.start(config, storage)
 - Godot Engine 4.x
 - HTTPS support (enabled by default in Godot)
 
+## 📚 References
+
+**Concepts:**
+
+- [Feature Toggles (aka Feature Flags)](https://martinfowler.com/articles/feature-toggles.html) — Martin Fowler
+- [What are Feature Flags?](https://www.atlassian.com/continuous-delivery/principles/feature-flags) — Atlassian
+
+**Use Cases & Case Studies:**
+
+- [Progressive Experimentation with Feature Flags](https://learn.microsoft.com/en-us/devops/operate/progressive-experimentation-feature-flags) — Microsoft
+- [Feature Flag Use Cases and Benefits](https://www.optimizely.com/optimization-glossary/feature-flags/) — Optimizely
+- [Feature Flag Best Practices](https://posthog.com/blog/feature-flag-best-practices) — PostHog
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](../../../../LICENSE) file for details.

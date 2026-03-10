@@ -159,6 +159,19 @@ unwatch();
 - `reason`: evaluation reason string
 - `exists`: `bool` — whether flag was found on server
 
+## 📚 References
+
+**Concepts:**
+
+- [Feature Toggles (aka Feature Flags)](https://martinfowler.com/articles/feature-toggles.html) — Martin Fowler
+- [What are Feature Flags?](https://www.atlassian.com/continuous-delivery/principles/feature-flags) — Atlassian
+
+**Use Cases & Case Studies:**
+
+- [Progressive Experimentation with Feature Flags](https://learn.microsoft.com/en-us/devops/operate/progressive-experimentation-feature-flags) — Microsoft
+- [Feature Flag Use Cases and Benefits](https://www.optimizely.com/optimization-glossary/feature-flags/) — Optimizely
+- [Feature Flag Best Practices](https://posthog.com/blog/feature-flag-best-practices) — PostHog
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](../../../../LICENSE) file for details.

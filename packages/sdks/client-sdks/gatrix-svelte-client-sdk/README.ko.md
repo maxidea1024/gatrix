@@ -210,6 +210,19 @@ SDK 상태를 위한 반응형 스토어를 반환합니다.
 
 MIT
 
+## 📚 참고자료
+
+**개념:**
+
+- [Feature Toggles (aka Feature Flags)](https://martinfowler.com/articles/feature-toggles.html) — Martin Fowler
+- [What are Feature Flags?](https://www.atlassian.com/continuous-delivery/principles/feature-flags) — Atlassian
+
+**사례 모음:**
+
+- [Progressive Experimentation with Feature Flags](https://learn.microsoft.com/en-us/devops/operate/progressive-experimentation-feature-flags) — Microsoft
+- [Feature Flag Use Cases and Benefits](https://www.optimizely.com/optimization-glossary/feature-flags/) — Optimizely
+- [Feature Flag Best Practices](https://posthog.com/blog/feature-flag-best-practices) — PostHog
+
 ## License
 
 이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.

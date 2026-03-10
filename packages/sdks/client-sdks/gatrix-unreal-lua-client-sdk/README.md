@@ -1149,10 +1149,16 @@ Group:Destroy()
 
 ## 📚 References
 
-- [Feature Flags — What Are They?](https://launchdarkly.com/feature-flags/) — LaunchDarkly
-- [Feature Flags Best Practices](https://www.flagship.io/feature-flags-best-practices/) — Flagship
-- [Separating Deploys from Releases](https://devcycle.com/blog/separating-deployments-from-releases-with-feature-flags) — DevCycle
+**Concepts:**
+
 - [Feature Toggles (aka Feature Flags)](https://martinfowler.com/articles/feature-toggles.html) — Martin Fowler
+- [What are Feature Flags?](https://www.atlassian.com/continuous-delivery/principles/feature-flags) — Atlassian
+
+**Use Cases & Case Studies:**
+
+- [Progressive Experimentation with Feature Flags](https://learn.microsoft.com/en-us/devops/operate/progressive-experimentation-feature-flags) — Microsoft
+- [Feature Flag Use Cases and Benefits](https://www.optimizely.com/optimization-glossary/feature-flags/) — Optimizely
+- [Feature Flag Best Practices](https://posthog.com/blog/feature-flag-best-practices) — PostHog
 
 ## License
 
