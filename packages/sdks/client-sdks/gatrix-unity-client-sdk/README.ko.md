@@ -179,13 +179,13 @@ Action unwatch = features.WatchRealtimeFlag("dark-mode", flag =>
 // 초기 상태 포함 (현재 값으로 즉시 + 변경 시 재실행)
 features.WatchRealtimeFlagWithInitialState("game-speed", flag =>
 {
-    SetGameSpeed(flag.FloatValue(1.0f));
+    SetGameSpeed(flag.FloatVariation(1.0f));
 });
 
 // 동기화 Watch — SyncFlagsAsync() 이후에만 실행
 features.WatchSyncedFlagWithInitialState("difficulty", flag =>
 {
-    SetDifficulty(flag.StringValue("normal"));
+    SetDifficulty(flag.StringVariation("normal"));
 });
 
 // Watch 해제 (반환된 Action 호출)
@@ -248,7 +248,7 @@ unwatch();
 await GatrixSDK.Client.UpdateContextAsync(new GatrixContext
 {
     UserId = "player-456",
-    Properties = new Dictionary<string, string>
+    Properties = new Dictionary<string, object>
     {
         { "level", "42" },
         { "country", "KR" }
@@ -271,7 +271,7 @@ config.Features.ExplicitSyncMode = true;
 // 동기화 Watch: SyncFlags() 이후에만 콜백 실행
 features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
 {
-    SetDifficulty(proxy.StringValue("normal")); // SyncFlags() 이후에만 실행
+    SetDifficulty(proxy.StringVariation("normal")); // SyncFlags() 이후에만 실행
 });
 
 // 안전한 시점에 적용 (로딩 화면, 라운드 사이)
@@ -456,28 +456,28 @@ GatrixSDK.Client.Stop();
 
 ```csharp
 features.WatchRealtimeFlagWithInitialState("game-speed", proxy =>
-    Time.timeScale = proxy.FloatValue(1.0f));
+    Time.timeScale = proxy.FloatVariation(1.0f));
 ```
 
 ### 시즌 이벤트 전환
 
 ```csharp
 features.WatchRealtimeFlagWithInitialState("winter-event", proxy =>
-    SetWinterEvent(proxy.IsEnabled));
+    SetWinterEvent(proxy.Enabled));
 ```
 
 ### A/B 테스트 UI 텍스트
 
 ```csharp
 features.WatchRealtimeFlagWithInitialState("cta-button-text", proxy =>
-    ctaButton.text = proxy.StringValue("지금 플레이"));
+    ctaButton.text = proxy.StringVariation("지금 플레이"));
 ```
 
 ### 제어된 게임플레이 업데이트 (Explicit Sync)
 
 ```csharp
 features.WatchSyncedFlagWithInitialState("enemy-hp-multiplier", proxy =>
-    SetEnemyHpMultiplier(proxy.FloatValue(1.0f)));
+    SetEnemyHpMultiplier(proxy.FloatVariation(1.0f)));
 
 // 로딩 화면에서 적용
 IEnumerator LoadingScreen()
@@ -506,7 +506,7 @@ async void OnLogin(string userId, int level)
 var group = features.CreateWatchFlagGroup("shop-system");
 group
     .WatchSyncedFlagWithInitialState("new-shop-enabled", f => SetShopEnabled(f.Enabled))
-    .WatchSyncedFlagWithInitialState("discount-rate", f => SetDiscount(f.FloatValue(0f)));
+    .WatchSyncedFlagWithInitialState("discount-rate", f => SetDiscount(f.FloatVariation(0f)));
 
 await features.SyncFlagsAsync(); // 두 플래그 함께 적용
 

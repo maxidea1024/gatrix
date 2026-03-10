@@ -179,13 +179,13 @@ Action unwatch = features.WatchRealtimeFlag("dark-mode", flag =>
 // With initial state (fires immediately with current value, then on changes)
 features.WatchRealtimeFlagWithInitialState("game-speed", flag =>
 {
-    SetGameSpeed(flag.FloatValue(1.0f));
+    SetGameSpeed(flag.FloatVariation(1.0f));
 });
 
 // Synced watch — fires only after SyncFlagsAsync()
 features.WatchSyncedFlagWithInitialState("difficulty", flag =>
 {
-    SetDifficulty(flag.StringValue("normal"));
+    SetDifficulty(flag.StringVariation("normal"));
 });
 
 // Unwatch (call the returned Action)
@@ -248,7 +248,7 @@ Inspector overlays for `GatrixBehaviour` and Zero-Code components.
 await GatrixSDK.Client.UpdateContextAsync(new GatrixContext
 {
     UserId = "player-456",
-    Properties = new Dictionary<string, string>
+    Properties = new Dictionary<string, object>
     {
         { "level", "42" },
         { "country", "KR" }
@@ -272,7 +272,7 @@ config.Features.ExplicitSyncMode = true;
 // Synced watch: callback fires only after SyncFlags()
 features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
 {
-    SetDifficulty(proxy.StringValue("normal")); // Only fires after sync
+    SetDifficulty(proxy.StringVariation("normal")); // Only fires after sync
 });
 
 // Apply at a safe moment (loading screen, between rounds)
@@ -458,21 +458,21 @@ GatrixSDK.Client.Stop();
 
 ```csharp
 features.WatchRealtimeFlagWithInitialState("game-speed", proxy =>
-    Time.timeScale = proxy.FloatValue(1.0f));
+    Time.timeScale = proxy.FloatVariation(1.0f));
 ```
 
 ### Seasonal Event
 
 ```csharp
 features.WatchRealtimeFlagWithInitialState("winter-event", proxy =>
-    SetWinterEvent(proxy.IsEnabled));
+    SetWinterEvent(proxy.Enabled));
 ```
 
 ### A/B Test UI Copy
 
 ```csharp
 features.WatchRealtimeFlagWithInitialState("cta-button-text", proxy =>
-    ctaButton.text = proxy.StringValue("Play Now"));
+    ctaButton.text = proxy.StringVariation("Play Now"));
 ```
 
 ### Controlled Gameplay Updates (Explicit Sync)
@@ -480,7 +480,7 @@ features.WatchRealtimeFlagWithInitialState("cta-button-text", proxy =>
 ```csharp
 // Register synced watcher for gameplay-critical values
 features.WatchSyncedFlagWithInitialState("enemy-hp-multiplier", proxy =>
-    SetEnemyHpMultiplier(proxy.FloatValue(1.0f)));
+    SetEnemyHpMultiplier(proxy.FloatVariation(1.0f)));
 
 // Apply at loading screen
 IEnumerator LoadingScreen()
@@ -510,7 +510,7 @@ async void OnLogin(string userId, int level)
 var group = features.CreateWatchFlagGroup("shop-system");
 group
     .WatchSyncedFlagWithInitialState("new-shop-enabled", f => SetShopEnabled(f.Enabled))
-    .WatchSyncedFlagWithInitialState("discount-rate", f => SetDiscount(f.FloatValue(0f)));
+    .WatchSyncedFlagWithInitialState("discount-rate", f => SetDiscount(f.FloatVariation(0f)));
 
 // Both applied together at sync time — no partial state
 await features.SyncFlagsAsync();
