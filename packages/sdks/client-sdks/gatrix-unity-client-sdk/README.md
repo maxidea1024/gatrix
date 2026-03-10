@@ -577,3 +577,39 @@ void OnDestroy()
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](../../../../LICENSE) file for details.
+
+## 🎮 Feature Flags in Games
+
+### Industry Case Studies
+
+**Riot Games (League of Legends)** uses feature flags to test experimental gameplay mechanics on specific regional servers before global rollout. New champions or balance changes are deployed behind flags, allowing data-driven decisions before exposing changes to the full player base.
+
+**Supercell (Clash Royale, Brawl Stars)** leverages live ops powered by feature flags for seasonal events, limited-time content, and IP collaborations. Content is pre-deployed and activated at precisely the right moment, enabling rapid iteration based on player metrics without requiring client updates.
+
+**GitHub** [documented their approach](https://github.blog/engineering/infrastructure/ship-code-faster-safer-feature-flags/) to shipping code faster and safer with feature flags — including reducing deployment risk, testing features with internal users first, and using percentage-based rollouts. While not a game company, their patterns directly apply to live service games.
+
+**Slack** [shared their deployment process](https://slack.engineering/deploys-at-slack/) which uses staged rollouts (staging → dogfood → canary → percentage production). This pattern is highly relevant for multiplayer games that need to validate changes against real player traffic before full rollout.
+
+### Practical Game Scenarios
+
+| Scenario | How Feature Flags Help |
+|---|---|
+| **Live balance tuning** | Adjust weapon damage, drop rates, enemy HP remotely without a patch |
+| **Seasonal events** | Pre-deploy holiday content, toggle it on at exactly the right moment |
+| **App store / console review** | Submit with new features hidden, enable after approval — no second review |
+| **Emergency kill switch** | Disable a crashing feature in seconds, not hours of hotfix builds |
+| **A/B testing gameplay** | Test two difficulty curves with different player groups and measure retention |
+| **Gradual rollout** | Release a new game mode to 5% of players first, watch for crashes, then expand |
+| **Tournament / esports** | Lock game parameters during competitive matches to prevent mid-match changes |
+
+### ⚠️ Cautions for Game Development
+
+| Pitfall | Recommendation |
+|---|---|
+| **Flag changes during gameplay** | Use `ExplicitSyncMode` to buffer changes and apply at safe points (loading screens, between rounds) |
+| **Network dependency** | SDK caches last-known values locally — the game works even if the server is unreachable |
+| **Too many flags** | Start with high-impact values (difficulty, economy, features). Don't flag every constant |
+| **Flag cleanup** | Remove flags after permanent rollout. Stale flags become technical debt |
+| **Deterministic multiplayer** | Ensure all clients see the same flag values in the same session. Use `UserId` for consistent assignment |
+| **Performance-sensitive paths** | Avoid flag checks in tight loops (Update/Tick). Cache the value at session start or sync points |
+
