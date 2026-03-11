@@ -1308,7 +1308,10 @@ export class FeatureFlagService {
       );
     }
 
-    if (result.variant?.value == null || typeof result.variant.value !== 'boolean') {
+    if (
+      result.variant?.value == null ||
+      typeof result.variant.value !== 'boolean'
+    ) {
       throw new FeatureFlagError(
         FeatureFlagErrorCode.NO_VALUE,
         `Feature flag '${flagName}' has no boolean variant value`,
