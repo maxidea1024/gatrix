@@ -13,7 +13,8 @@ RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 COPY package.json yarn.lock* ./
 COPY packages/edge/package.json ./packages/edge/
 COPY packages/shared/package.json ./packages/shared/
-COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/sdks/server-sdks/gatrix-node-server-sdk/
+COPY packages/evaluator/package.json ./packages/evaluator/
 
 # Skip Cypress binary download - not needed in production Docker image
 ENV CYPRESS_INSTALL_BINARY=0
@@ -27,14 +28,18 @@ RUN yarn add -W --dev @swc/core-linux-x64-musl --ignore-scripts
 # Copy source code
 COPY packages/edge ./packages/edge
 COPY packages/shared ./packages/shared
-COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk ./packages/sdks/server-sdks/gatrix-node-server-sdk
+COPY packages/evaluator ./packages/evaluator
 COPY tsconfig.json ./
 
 # Build shared
 RUN cd packages/shared && yarn build
 
+# Build evaluator (required by server-sdk)
+RUN cd packages/evaluator && yarn build
+
 # Build server-sdk
-RUN cd packages/sdks/server-sdk && yarn build
+RUN cd packages/sdks/server-sdks/gatrix-node-server-sdk && yarn build
 
 WORKDIR /app/packages/edge
 

@@ -793,6 +793,31 @@ class FeaturesClient implements VariationProvider {
   stringVariation(flagName: string, fallbackValue: string, forceRealtime?: boolean): string;
   numberVariation(flagName: string, fallbackValue: number, forceRealtime?: boolean): number; // JS/TS only
   jsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime?: boolean): T;
+```
+
+> [!CAUTION]
+> **`boolVariation` ≠ `isEnabled`** — These are fundamentally different operations:
+> - `boolVariation`: Returns the **variant's VALUE** as a boolean (only when `flag.valueType === "boolean"`).
+> - `isEnabled`: Returns the **flag's enabled state** (whether the flag is turned on or off).
+>
+> Example: A flag can be `enabled=true` with `enabledValue=false`. `isEnabled()` returns `true`, `boolVariation()` returns `false`.
+> **Never use `boolVariation` as a substitute for `isEnabled`, or vice versa.**
+
+> [!IMPORTANT]
+> **Typed Variation Methods MUST Validate `flag.valueType`**
+>
+> Each typed variation method must check the flag's declared `valueType` before returning a value:
+> `boolVariation` → `"boolean"`, `stringVariation` → `"string"`, `numberVariation` → `"number"`, `jsonVariation` → `"json"`.
+> If `valueType` does not match, return `fallbackValue` (or throw for `*OrThrow`).
+
+> [!WARNING]
+> **All Flag Access Methods MUST Record Metrics**
+>
+> `isEnabled`, `getVariant`, and all `*Variation`/`*Details`/`*OrThrow` methods MUST record evaluation metrics.
+> **Evaluation (metric recording) MUST happen before any `valueType` check or early return.**
+
+
+```typescript
 
   // Variation Details - Returns detailed result with reason (fallbackValue is REQUIRED)
   boolVariationDetails(flagName: string, fallbackValue: boolean, forceRealtime?: boolean): VariationResult<boolean>;

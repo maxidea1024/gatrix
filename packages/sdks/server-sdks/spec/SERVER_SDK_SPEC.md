@@ -297,8 +297,39 @@ string StringVariationOrThrow(string flagName, EvaluationContext context, string
 // ... (all types follow the same two-overload pattern)
 ```
 
-> **CRITICAL:** `BoolVariation` parses the variant's string value as a boolean (`"true"`/`"false"`, `"1"`/`"0"`).
-> It does **NOT** return the flag's enabled state. Use `IsEnabled()` for the flag state.
+> [!CAUTION]
+> **`BoolVariation` ≠ `IsEnabled`** — These are fundamentally different operations:
+> - `BoolVariation`: Returns the **variant's VALUE** as a boolean (only when `flag.valueType === "boolean"`).
+> - `IsEnabled`: Returns the **flag's enabled state** (whether the flag is turned on or off).
+>
+> Example: A flag can be `enabled=true` with `enabledValue=false`. `IsEnabled()` returns `true`, `BoolVariation()` returns `false`.
+> **Never use `BoolVariation` as a substitute for `IsEnabled`, or vice versa.**
+
+> [!IMPORTANT]
+> **Typed Variation Methods MUST Validate `flag.valueType`**
+>
+> All typed variation methods (`BoolVariation`, `StringVariation`, `NumberVariation`, `JsonVariation` and their `*Details`/`*OrThrow` variants) MUST check the flag's declared `valueType` before returning a value:
+>
+> | Method | Required `flag.valueType` |
+> |--------|---------------------------|
+> | `BoolVariation` | `"boolean"` |
+> | `StringVariation` | `"string"` |
+> | `NumberVariation` | `"number"` |
+> | `JsonVariation` | `"json"` |
+>
+> **Rules:**
+> 1. If the flag is not found, return `fallback` (or throw for `*OrThrow`).
+> 2. If `flag.valueType` does not match the expected type, return `fallback` (or throw `INVALID_VALUE_TYPE` for `*OrThrow`).
+> 3. **DO NOT** use `typeof value` or `isNaN()` to infer the type at runtime. The flag's **declared `valueType`** is the single source of truth.
+> 4. **Always evaluate the flag BEFORE the `valueType` check** to ensure metrics are recorded regardless of the outcome.
+
+> [!WARNING]
+> **All Flag Access Methods MUST Record Metrics**
+>
+> The following methods MUST always record evaluation metrics (impression tracking):
+> `IsEnabled`, `GetVariant`, `BoolVariation`, `StringVariation`, `NumberVariation`, `JsonVariation`, and all `*Details`/`*OrThrow` variants.
+>
+> **Evaluation (and therefore metric recording) MUST happen before any `valueType` check or early return.** This ensures that flag usage is accurately tracked even when `valueType` mismatches occur.
 
 
 ## SDK Configuration Definition

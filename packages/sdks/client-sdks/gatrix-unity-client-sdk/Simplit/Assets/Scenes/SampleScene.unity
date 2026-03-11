@@ -873,7 +873,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b7788837a1250c4cacfc884effacb21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Gatrix.Unity.SDK::Gatrix.Unity.SDK.GatrixFlagValue
-  _flagName: demo-text-value
+  _flagName: new-feature-4zqz
   _flagSyncMode: 1
   _format: 
   _fallbackText: '-'
@@ -899,7 +899,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: env-disabled-value
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

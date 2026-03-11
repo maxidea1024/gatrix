@@ -688,31 +688,15 @@ export class FeatureFlagService {
 
   /**
    * Internal evaluation logic — no overloads.
-   * All variation methods call this directly to avoid double-dispatch overhead.
+   * All callers must look up the flag first via getFlagByName and pass it here.
    */
   private evaluateInternal(
-    flagName: string,
+    flag: FeatureFlag,
     context?: EvaluationContext,
     environmentId?: string
   ): EvaluationResult {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
     const mergedContext = this.mergeContext(context || {});
-    const flag = this.getFlagByName(resolvedEnv, flagName);
-
-    if (!flag) {
-      return {
-        id: '',
-        flagName,
-        enabled: false,
-        reason: 'not_found',
-        variant: {
-          name: VALUE_SOURCE.MISSING,
-          weight: 100,
-          enabled: false,
-          value: null,
-        },
-      };
-    }
 
     const projectId = this.envToProjectMap.get(resolvedEnv);
     const segments = projectId
@@ -722,12 +706,30 @@ export class FeatureFlagService {
 
     this.recordMetric(
       resolvedEnv,
-      flagName,
+      flag.name,
       result.enabled,
       result.variant?.name
     );
 
     return result;
+  }
+
+  /**
+   * Build a not-found EvaluationResult for a given flag name.
+   */
+  private notFoundResult(flagName: string): EvaluationResult {
+    return {
+      id: '',
+      flagName,
+      enabled: false,
+      reason: 'not_found',
+      variant: {
+        name: VALUE_SOURCE.MISSING,
+        weight: 100,
+        enabled: false,
+        value: null,
+      },
+    };
   }
 
   /**
@@ -759,15 +761,20 @@ export class FeatureFlagService {
       ? (fallbackOrEnvId as string | undefined)
       : environmentId;
 
-    const result = this.evaluateInternal(flagName, context, envId);
-    return result.reason === 'not_found' ? fallbackValue : result.enabled;
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) return fallbackValue;
+    const result = this.evaluateInternal(flag, context, envId);
+    return result.enabled;
   }
 
   // ==================== Variation Methods ====================
 
   /**
    * Get boolean variation
-   * Returns the flag's enabled state
+   * Returns the variant's boolean value, NOT the flag's enabled state.
+   * Use isEnabled() for the flag's enabled state.
+   * Only returns value when flag.valueType is 'boolean'; otherwise returns fallbackValue.
    */
   boolVariation(
     flagName: string,
@@ -786,41 +793,6 @@ export class FeatureFlagService {
     fallbackOrEnvId?: boolean | string,
     environmentId?: string
   ): boolean {
-    if (typeof contextOrFallback === 'boolean') {
-      return this.isEnabled(
-        flagName,
-        contextOrFallback,
-        fallbackOrEnvId as string | undefined
-      );
-    }
-    return this.isEnabled(
-      flagName,
-      contextOrFallback,
-      fallbackOrEnvId as boolean,
-      environmentId
-    );
-  }
-
-  /**
-   * Get boolean variation with evaluation details
-   */
-  boolVariationDetail(
-    flagName: string,
-    fallbackValue: boolean,
-    environmentId?: string
-  ): { value: boolean; reason: EvaluationResult['reason']; flagName: string };
-  boolVariationDetail(
-    flagName: string,
-    context: EvaluationContext,
-    fallbackValue: boolean,
-    environmentId?: string
-  ): { value: boolean; reason: EvaluationResult['reason']; flagName: string };
-  boolVariationDetail(
-    flagName: string,
-    contextOrFallback: EvaluationContext | boolean,
-    fallbackOrEnvId?: boolean | string,
-    environmentId?: string
-  ): { value: boolean; reason: EvaluationResult['reason']; flagName: string } {
     const isWithoutContext = typeof contextOrFallback === 'boolean';
     const context = isWithoutContext ? undefined : contextOrFallback;
     const fallbackValue = isWithoutContext
@@ -830,11 +802,90 @@ export class FeatureFlagService {
       ? (fallbackOrEnvId as string | undefined)
       : environmentId;
 
-    const result = this.evaluateInternal(flagName, context, envId);
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) return fallbackValue;
+    const result = this.evaluateInternal(flag, context, envId);
+    if (result.variant?.value == null) {
+      return fallbackValue;
+    }
+    if (flag.valueType !== 'boolean') {
+      return fallbackValue;
+    }
+    return typeof result.variant.value === 'boolean'
+      ? result.variant.value
+      : fallbackValue;
+  }
+
+  /**
+   * Get boolean variation with evaluation details
+   * Returns the variant's boolean value, NOT the flag's enabled state.
+   * Only returns value when flag.valueType is 'boolean'; otherwise returns fallbackValue.
+   */
+  boolVariationDetail(
+    flagName: string,
+    fallbackValue: boolean,
+    environmentId?: string
+  ): {
+    value: boolean;
+    reason: EvaluationResult['reason'];
+    flagName: string;
+    variantName?: string;
+  };
+  boolVariationDetail(
+    flagName: string,
+    context: EvaluationContext,
+    fallbackValue: boolean,
+    environmentId?: string
+  ): {
+    value: boolean;
+    reason: EvaluationResult['reason'];
+    flagName: string;
+    variantName?: string;
+  };
+  boolVariationDetail(
+    flagName: string,
+    contextOrFallback: EvaluationContext | boolean,
+    fallbackOrEnvId?: boolean | string,
+    environmentId?: string
+  ): {
+    value: boolean;
+    reason: EvaluationResult['reason'];
+    flagName: string;
+    variantName?: string;
+  } {
+    const isWithoutContext = typeof contextOrFallback === 'boolean';
+    const context = isWithoutContext ? undefined : contextOrFallback;
+    const fallbackValue = isWithoutContext
+      ? contextOrFallback
+      : (fallbackOrEnvId as boolean);
+    const envId = isWithoutContext
+      ? (fallbackOrEnvId as string | undefined)
+      : environmentId;
+
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) {
+      return { value: fallbackValue, reason: 'not_found' as const, flagName };
+    }
+    const result = this.evaluateInternal(flag, context, envId);
+    if (result.variant?.value == null) {
+      return {
+        value: fallbackValue,
+        reason: result.reason,
+        flagName: result.flagName,
+        variantName: result.variant?.name,
+      };
+    }
+    const value =
+      flag.valueType === 'boolean' && typeof result.variant.value === 'boolean'
+        ? result.variant.value
+        : fallbackValue;
     return {
-      value: result.reason === 'not_found' ? fallbackValue : result.enabled,
+      value,
       reason: result.reason,
       flagName: result.flagName,
+      variantName: result.variant?.name,
     };
   }
 
@@ -865,8 +916,14 @@ export class FeatureFlagService {
       : (fallbackOrEnvId as string);
     const envId = isWithoutContext ? fallbackOrEnvId : environmentId;
 
-    const result = this.evaluateInternal(flagName, context, envId);
-    if (result.reason === 'not_found' || result.variant?.value == null) {
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) return fallbackValue;
+    const result = this.evaluateInternal(flag, context, envId);
+    if (result.variant?.value == null) {
+      return fallbackValue;
+    }
+    if (flag.valueType !== 'string') {
       return fallbackValue;
     }
     return String(result.variant.value);
@@ -914,11 +971,24 @@ export class FeatureFlagService {
       : (fallbackOrEnvId as string);
     const envId = isWithoutContext ? fallbackOrEnvId : environmentId;
 
-    const result = this.evaluateInternal(flagName, context, envId);
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) {
+      return { value: fallbackValue, reason: 'not_found' as const, flagName };
+    }
+    const result = this.evaluateInternal(flag, context, envId);
+    if (result.variant?.value == null) {
+      return {
+        value: fallbackValue,
+        reason: result.reason,
+        flagName: result.flagName,
+        variantName: result.variant?.name,
+      };
+    }
     const value =
-      result.reason === 'not_found' || result.variant?.value == null
-        ? fallbackValue
-        : String(result.variant.value);
+      flag.valueType === 'string'
+        ? String(result.variant.value)
+        : fallbackValue;
     return {
       value,
       reason: result.reason,
@@ -956,12 +1026,19 @@ export class FeatureFlagService {
       ? (fallbackOrEnvId as string | undefined)
       : environmentId;
 
-    const result = this.evaluateInternal(flagName, context, envId);
-    if (result.reason === 'not_found' || result.variant?.value == null) {
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) return fallbackValue;
+    const result = this.evaluateInternal(flag, context, envId);
+    if (result.variant?.value == null) {
       return fallbackValue;
     }
-    const num = Number(result.variant.value);
-    return isNaN(num) ? fallbackValue : num;
+    if (flag.valueType !== 'number') {
+      return fallbackValue;
+    }
+    return typeof result.variant.value === 'number'
+      ? result.variant.value
+      : Number(result.variant.value);
   }
 
   /**
@@ -1008,12 +1085,26 @@ export class FeatureFlagService {
       ? (fallbackOrEnvId as string | undefined)
       : environmentId;
 
-    const result = this.evaluateInternal(flagName, context, envId);
-    let value = fallbackValue;
-    if (result.reason !== 'not_found' && result.variant?.value != null) {
-      const num = Number(result.variant.value);
-      value = isNaN(num) ? fallbackValue : num;
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) {
+      return { value: fallbackValue, reason: 'not_found' as const, flagName };
     }
+    const result = this.evaluateInternal(flag, context, envId);
+    if (result.variant?.value == null) {
+      return {
+        value: fallbackValue,
+        reason: result.reason,
+        flagName: result.flagName,
+        variantName: result.variant?.name,
+      };
+    }
+    const value =
+      flag.valueType === 'number'
+        ? typeof result.variant.value === 'number'
+          ? result.variant.value
+          : Number(result.variant.value)
+        : fallbackValue;
     return {
       value,
       reason: result.reason,
@@ -1065,8 +1156,14 @@ export class FeatureFlagService {
       fallbackValue = fallbackOrEnvId as T;
     }
 
-    const result = this.evaluateInternal(flagName, context, envId);
-    if (result.reason === 'not_found' || result.variant?.value == null) {
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) return fallbackValue;
+    const result = this.evaluateInternal(flag, context, envId);
+    if (result.variant?.value == null) {
+      return fallbackValue;
+    }
+    if (flag.valueType !== 'json') {
       return fallbackValue;
     }
     const rawValue = result.variant.value;
@@ -1136,9 +1233,22 @@ export class FeatureFlagService {
       fallbackValue = fallbackOrEnvId as T;
     }
 
-    const result = this.evaluateInternal(flagName, context, envId);
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) {
+      return { value: fallbackValue, reason: 'not_found' as const, flagName };
+    }
+    const result = this.evaluateInternal(flag, context, envId);
+    if (result.variant?.value == null) {
+      return {
+        value: fallbackValue,
+        reason: result.reason,
+        flagName: result.flagName,
+        variantName: result.variant?.name,
+      };
+    }
     let value = fallbackValue;
-    if (result.reason !== 'not_found' && result.variant?.value != null) {
+    if (flag.valueType === 'json') {
       const rawValue = result.variant.value;
       if (typeof rawValue === 'object') {
         value = rawValue as T;
@@ -1156,6 +1266,58 @@ export class FeatureFlagService {
       flagName: result.flagName,
       variantName: result.variant?.name,
     };
+  }
+
+  /**
+   * Get boolean variation or throw if not available
+   * Throws FeatureFlagError if flag not found, valueType is not 'boolean', or has no value
+   */
+  boolVariationOrThrow(flagName: string, environmentId?: string): boolean;
+  boolVariationOrThrow(
+    flagName: string,
+    context: EvaluationContext,
+    environmentId?: string
+  ): boolean;
+  boolVariationOrThrow(
+    flagName: string,
+    contextOrEnvId?: EvaluationContext | string,
+    environmentId?: string
+  ): boolean {
+    const [context, envId] = this.resolveContextArgs(
+      contextOrEnvId,
+      environmentId
+    );
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.FLAG_NOT_FOUND,
+        `Feature flag '${flagName}' not found in environment '${envId}'`,
+        flagName,
+        envId
+      );
+    }
+    const result = this.evaluateInternal(flag, context, envId);
+
+    if (flag.valueType !== 'boolean') {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.INVALID_VALUE_TYPE,
+        `Feature flag '${flagName}' valueType is '${flag?.valueType}', expected 'boolean'`,
+        flagName,
+        envId
+      );
+    }
+
+    if (result.variant?.value == null || typeof result.variant.value !== 'boolean') {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.NO_VALUE,
+        `Feature flag '${flagName}' has no boolean variant value`,
+        flagName,
+        envId
+      );
+    }
+
+    return result.variant.value;
   }
 
   // ==================== Strict Variation Methods (OrThrow) ====================
@@ -1179,12 +1341,22 @@ export class FeatureFlagService {
       contextOrEnvId,
       environmentId
     );
-    const result = this.evaluateInternal(flagName, context, envId);
-
-    if (result.reason === 'not_found') {
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) {
       throw new FeatureFlagError(
         FeatureFlagErrorCode.FLAG_NOT_FOUND,
         `Feature flag '${flagName}' not found in environment '${envId}'`,
+        flagName,
+        envId
+      );
+    }
+    const result = this.evaluateInternal(flag, context, envId);
+
+    if (flag.valueType !== 'string') {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.INVALID_VALUE_TYPE,
+        `Feature flag '${flagName}' valueType is '${flag?.valueType}', expected 'string'`,
         flagName,
         envId
       );
@@ -1221,12 +1393,22 @@ export class FeatureFlagService {
       contextOrEnvId,
       environmentId
     );
-    const result = this.evaluateInternal(flagName, context, envId);
-
-    if (result.reason === 'not_found') {
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) {
       throw new FeatureFlagError(
         FeatureFlagErrorCode.FLAG_NOT_FOUND,
         `Feature flag '${flagName}' not found in environment '${envId}'`,
+        flagName,
+        envId
+      );
+    }
+    const result = this.evaluateInternal(flag, context, envId);
+
+    if (flag.valueType !== 'number') {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.INVALID_VALUE_TYPE,
+        `Feature flag '${flagName}' valueType is '${flag?.valueType}', expected 'number'`,
         flagName,
         envId
       );
@@ -1241,16 +1423,9 @@ export class FeatureFlagService {
       );
     }
 
-    const num = Number(result.variant.value);
-    if (isNaN(num)) {
-      throw new FeatureFlagError(
-        FeatureFlagErrorCode.INVALID_VALUE_TYPE,
-        `Feature flag '${flagName}' variant value is not a valid number`,
-        flagName,
-        envId
-      );
-    }
-    return num;
+    return typeof result.variant.value === 'number'
+      ? result.variant.value
+      : Number(result.variant.value);
   }
 
   /**
@@ -1272,12 +1447,22 @@ export class FeatureFlagService {
       contextOrEnvId,
       environmentId
     );
-    const result = this.evaluateInternal(flagName, context, envId);
-
-    if (result.reason === 'not_found') {
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) {
       throw new FeatureFlagError(
         FeatureFlagErrorCode.FLAG_NOT_FOUND,
         `Feature flag '${flagName}' not found in environment '${envId}'`,
+        flagName,
+        envId
+      );
+    }
+    const result = this.evaluateInternal(flag, context, envId);
+
+    if (flag.valueType !== 'json') {
+      throw new FeatureFlagError(
+        FeatureFlagErrorCode.INVALID_VALUE_TYPE,
+        `Feature flag '${flagName}' valueType is '${flag?.valueType}', expected 'json'`,
         flagName,
         envId
       );
@@ -1343,11 +1528,11 @@ export class FeatureFlagService {
       contextOrEnvId,
       environmentId
     );
-    const result = this.evaluateInternal(flagName, context, envId);
-    if (result.reason === 'not_found' || !result.variant) {
-      return defaultVariant;
-    }
-    return result.variant;
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) return defaultVariant;
+    const result = this.evaluateInternal(flag, context, envId);
+    return result.variant || defaultVariant;
   }
 
   /**
@@ -1369,7 +1554,10 @@ export class FeatureFlagService {
       contextOrEnvId,
       environmentId
     );
-    return this.evaluateInternal(flagName, context, envId);
+    const resolvedEnv = envId || this.defaultEnvironmentId;
+    const flag = this.getFlagByName(resolvedEnv, flagName);
+    if (!flag) return this.notFoundResult(flagName);
+    return this.evaluateInternal(flag, context, envId);
   }
 
   // ==================== Metrics Methods ====================

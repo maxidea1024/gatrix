@@ -22,7 +22,8 @@ COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/shared/package.json ./packages/shared/
-COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/sdks/server-sdks/gatrix-node-server-sdk/
+COPY packages/evaluator/package.json ./packages/evaluator/
 
 # Install all dependencies (including dev dependencies)
 RUN yarn install --frozen-lockfile --network-timeout 600000
@@ -30,13 +31,17 @@ RUN yarn install --frozen-lockfile --network-timeout 600000
 # Copy source code
 COPY packages/event-lens ./packages/event-lens
 COPY packages/shared ./packages/shared
-COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk ./packages/sdks/server-sdks/gatrix-node-server-sdk
+COPY packages/evaluator ./packages/evaluator
 
 # Build shared (required by other packages)
 RUN cd packages/shared && yarn build
 
+# Build evaluator (required by server-sdk)
+RUN cd packages/evaluator && yarn build
+
 # Build server-sdk (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn install --network-timeout 600000 && yarn build
+RUN cd packages/sdks/server-sdks/gatrix-node-server-sdk && yarn install --network-timeout 600000 && yarn build
 
 # Create logs directory
 RUN mkdir -p logs

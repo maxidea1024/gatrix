@@ -167,6 +167,7 @@ describe('Value Source Naming', () => {
             name: 'variant-a',
             weight: 100,
             value: 'value-a',
+            enabled: true,
           },
         ],
       });

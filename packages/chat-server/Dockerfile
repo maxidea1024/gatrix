@@ -17,7 +17,8 @@ COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/shared/package.json ./packages/shared/
-COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/sdks/server-sdks/gatrix-node-server-sdk/
+COPY packages/evaluator/package.json ./packages/evaluator/
 
 # Skip Cypress binary download - not needed in production Docker image
 ENV CYPRESS_INSTALL_BINARY=0
@@ -38,8 +39,11 @@ COPY . .
 # Build shared (required by other packages)
 RUN cd packages/shared && yarn build
 
+# Build evaluator (required by server-sdk)
+RUN cd packages/evaluator && yarn build
+
 # Build server-sdk (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn install --ignore-optional && yarn build
+RUN cd packages/sdks/server-sdks/gatrix-node-server-sdk && yarn install --ignore-optional && yarn build
 
 # Build chat-server
 RUN yarn workspace @gatrix/chat-server build
@@ -68,13 +72,15 @@ COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/shared/package.json ./packages/shared/
-COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/sdks/server-sdks/gatrix-node-server-sdk/
+COPY packages/evaluator/package.json ./packages/evaluator/
 
 # Copy shared source (needed for file: dependency)
 COPY packages/shared ./packages/shared
 
 # Copy server-sdk source (needed for file: dependency)
-COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk ./packages/sdks/server-sdks/gatrix-node-server-sdk
+COPY packages/evaluator ./packages/evaluator
 
 # Install production dependencies only (with increased network timeout for slow connections)
 RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 --ignore-optional && \
@@ -85,8 +91,8 @@ COPY --from=builder /app/packages/shared/dist ./packages/chat-server/node_module
 COPY --from=builder /app/packages/shared/package.json ./packages/chat-server/node_modules/@gatrix/shared/package.json
 
 # Copy built server-sdk from builder to node_modules location
-COPY --from=builder /app/packages/sdks/server-sdk/dist ./packages/chat-server/node_modules/@gatrix/server-sdk/dist
-COPY --from=builder /app/packages/sdks/server-sdk/package.json ./packages/chat-server/node_modules/@gatrix/server-sdk/package.json
+COPY --from=builder /app/packages/sdks/server-sdks/gatrix-node-server-sdk/dist ./packages/chat-server/node_modules/@gatrix/gatrix-node-server-sdk/dist
+COPY --from=builder /app/packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/chat-server/node_modules/@gatrix/gatrix-node-server-sdk/package.json
 
 # Copy built application
 COPY --from=builder /app/packages/chat-server/dist ./packages/chat-server/dist

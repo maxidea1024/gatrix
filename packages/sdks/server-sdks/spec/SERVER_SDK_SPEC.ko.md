@@ -297,8 +297,39 @@ string StringVariationOrThrow(string flagName, EvaluationContext context, string
 // ... (모든 타입이 동일한 두 가지 오버로드 패턴을 따름)
 ```
 
-> **중요:** `BoolVariation`은 배리언트의 문자열 값을 boolean으로 파싱합니다 (`"true"`/`"false"`, `"1"`/`"0"`).
-> 플래그의 활성화 상태를 반환하는 것이 **아닙니다**. 플래그 상태는 `IsEnabled()`를 사용하세요.
+> [!CAUTION]
+> **`BoolVariation` ≠ `IsEnabled`** — 이 둘은 근본적으로 다른 작업입니다:
+> - `BoolVariation`: 배리언트의 **VALUE**를 boolean으로 반환합니다 (`flag.valueType === "boolean"`인 경우에만).
+> - `IsEnabled`: 플래그의 **활성화 상태**를 반환합니다 (플래그가 켜져 있는지 꺼져 있는지).
+>
+> 예시: 플래그가 `enabled=true`이고 `enabledValue=false`인 경우, `IsEnabled()`는 `true`를 반환하지만 `BoolVariation()`은 `false`를 반환합니다.
+> **절대로 `BoolVariation`을 `IsEnabled` 대신 사용하거나, 그 반대로 사용하지 마세요.**
+
+> [!IMPORTANT]
+> **타입별 Variation 메서드는 반드시 `flag.valueType`을 검증해야 합니다**
+>
+> 모든 타입별 variation 메서드(`BoolVariation`, `StringVariation`, `NumberVariation`, `JsonVariation` 및 `*Details`/`*OrThrow` 변형)는 값을 반환하기 전에 플래그의 선언된 `valueType`을 반드시 확인해야 합니다:
+>
+> | 메서드 | 필요한 `flag.valueType` |
+> |--------|------------------------|
+> | `BoolVariation` | `"boolean"` |
+> | `StringVariation` | `"string"` |
+> | `NumberVariation` | `"number"` |
+> | `JsonVariation` | `"json"` |
+>
+> **규칙:**
+> 1. 플래그를 찾을 수 없으면 `fallback`을 반환합니다 (`*OrThrow`는 throw).
+> 2. `flag.valueType`이 기대하는 타입과 일치하지 않으면 `fallback`을 반환합니다 (`*OrThrow`는 `INVALID_VALUE_TYPE` throw).
+> 3. 런타임에 `typeof value`나 `isNaN()`으로 타입을 추론하면 **안 됩니다**. 플래그의 **선언된 `valueType`**이 유일한 판단 기준입니다.
+> 4. **메트릭이 항상 기록되도록 `valueType` 검증 전에 반드시 플래그를 평가해야 합니다.**
+
+> [!WARNING]
+> **모든 플래그 접근 메서드는 반드시 메트릭을 기록해야 합니다**
+>
+> 다음 메서드들은 평가 메트릭(노출 추적)을 항상 기록해야 합니다:
+> `IsEnabled`, `GetVariant`, `BoolVariation`, `StringVariation`, `NumberVariation`, `JsonVariation`, 및 모든 `*Details`/`*OrThrow` 변형.
+>
+> **`valueType` 검증이나 early return 전에 반드시 평가(메트릭 기록)가 먼저 수행되어야 합니다.** 이렇게 해야 `valueType` 불일치가 발생하더라도 플래그 사용이 정확하게 추적됩니다.
 
 
 ## SDK 설정 정의

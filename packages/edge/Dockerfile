@@ -13,7 +13,8 @@ RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 COPY package.json yarn.lock* ./
 COPY packages/edge/package.json ./packages/edge/
 COPY packages/shared/package.json ./packages/shared/
-COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/sdks/server-sdks/gatrix-node-server-sdk/
+COPY packages/evaluator/package.json ./packages/evaluator/
 RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
 
 # Rebuild the source code only when needed
@@ -28,7 +29,8 @@ RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 COPY package.json yarn.lock* ./
 COPY packages/edge/package.json ./packages/edge/
 COPY packages/shared/package.json ./packages/shared/
-COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/sdks/server-sdks/gatrix-node-server-sdk/
+COPY packages/evaluator/package.json ./packages/evaluator/
 
 # Skip Cypress binary download - not needed in production Docker image
 ENV CYPRESS_INSTALL_BINARY=0
@@ -42,14 +44,18 @@ RUN yarn add -W --dev @swc/core-linux-x64-musl --ignore-scripts
 # Copy source code
 COPY packages/edge ./packages/edge
 COPY packages/shared ./packages/shared
-COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk ./packages/sdks/server-sdks/gatrix-node-server-sdk
+COPY packages/evaluator ./packages/evaluator
 COPY tsconfig.json ./
 
 # Build shared first (required by other packages)
 RUN cd packages/shared && yarn build
 
+# Build evaluator (required by server-sdk)
+RUN cd packages/evaluator && yarn build
+
 # Build server-sdk (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn build
+RUN cd packages/sdks/server-sdks/gatrix-node-server-sdk && yarn build
 
 # Build the edge server
 RUN cd packages/edge && yarn build
@@ -78,19 +84,21 @@ COPY --from=builder /app/packages/edge/public ./public
 COPY package.json yarn.lock* ./
 COPY packages/edge/package.json ./packages/edge/
 COPY packages/shared/package.json ./packages/shared/
-COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/sdks/server-sdks/gatrix-node-server-sdk/
+COPY packages/evaluator/package.json ./packages/evaluator/
 
 # Copy shared source (needed for file: dependency)
 COPY packages/shared ./packages/shared
 
 # Copy server-sdk source (needed for file: dependency)
-COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk ./packages/sdks/server-sdks/gatrix-node-server-sdk
+COPY packages/evaluator ./packages/evaluator
 
 RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 --ignore-optional && \
   yarn cache clean
 
 # Copy built server-sdk dist (overwrite source with built version)
-COPY --from=builder /app/packages/sdks/server-sdk/dist ./node_modules/@gatrix/server-sdk/dist
+COPY --from=builder /app/packages/sdks/server-sdks/gatrix-node-server-sdk/dist ./node_modules/@gatrix/gatrix-node-server-sdk/dist
 
 # Copy built shared dist
 COPY --from=builder /app/packages/shared/dist ./node_modules/@gatrix/shared/dist
