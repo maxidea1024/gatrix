@@ -269,6 +269,8 @@ interface FeatureContextField {
   createdByName?: string;
   createdByEmail?: string;
 }
+// Convert camelCase/snake_case/kebab-case to Title Case
+import { toTitleCase } from '../../utils/stringUtils';
 
 const FeatureContextFieldsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -1341,14 +1343,28 @@ const FeatureContextFieldsPage: React.FC = () => {
                 required
                 label={t('featureFlags.fieldName')}
                 value={editingField?.fieldName || ''}
-                onChange={(e) =>
-                  setEditingField((prev) => ({
-                    ...prev,
-                    fieldName: e.target.value.replace(/[^a-zA-Z0-9_]/g, ''),
-                  }))
-                }
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setEditingField((prev) => {
+                    const autoDisplay = !prev?.displayName || prev.displayName === toTitleCase(prev.fieldName || '');
+                    return {
+                      ...prev,
+                      fieldName: newName,
+                      ...(autoDisplay ? { displayName: toTitleCase(newName) } : {}),
+                    };
+                  });
+                }}
                 disabled={!!editingField?.id || !canManage}
-                helperText={t('featureFlags.fieldNameHelp')}
+                error={
+                  !!editingField?.fieldName &&
+                  !/^[a-z][a-zA-Z0-9_]*$/.test(editingField.fieldName)
+                }
+                helperText={
+                  editingField?.fieldName &&
+                  !/^[a-z][a-zA-Z0-9_]*$/.test(editingField.fieldName)
+                    ? t('featureFlags.fieldNameFormatHelp')
+                    : t('featureFlags.fieldNameHelp')
+                }
                 placeholder="userId, deviceType, country..."
               />
               <TextField

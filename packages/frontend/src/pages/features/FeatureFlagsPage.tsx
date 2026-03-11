@@ -173,6 +173,8 @@ const getValueTypeIcon = (type: string) => {
 
 const getTypeIconSmall = (type: string) => getFlagTypeIcon(type, 16);
 
+import { toTitleCase } from '../../utils/stringUtils';
+
 const FeatureFlagsPage: React.FC = () => {
   const { t } = useTranslation();
   const { getProjectApiPath } = useOrgProject();
@@ -1547,9 +1549,10 @@ const FeatureFlagsPage: React.FC = () => {
     // For generic 'featureFlag', default to 'release' as DB type
     const resolvedType =
       createFlagType === 'featureFlag' ? 'release' : createFlagType;
+    const autoName = `${prefix}-${timestamp}`;
     setNewFlag({
-      flagName: `${prefix}-${timestamp}`,
-      displayName: '',
+      flagName: autoName,
+      displayName: toTitleCase(autoName),
       description: '',
       flagType: resolvedType as FlagType,
       tags: [],
@@ -3296,16 +3299,26 @@ const FeatureFlagsPage: React.FC = () => {
                   size="small"
                   autoFocus
                   value={newFlag.flagName}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    const autoDisplay = !newFlag.displayName || newFlag.displayName === toTitleCase(newFlag.flagName);
                     setNewFlag({
                       ...newFlag,
-                      flagName: e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''),
-                    })
+                      flagName: newName,
+                      ...(autoDisplay ? { displayName: toTitleCase(newName) } : {}),
+                    });
+                  }}
+                  error={
+                    !!newFlag.flagName &&
+                    !/^[a-z][a-z0-9_-]*$/.test(newFlag.flagName)
                   }
                   helperText={
-                    newFlag.flagType === 'remoteConfig'
-                      ? t('featureFlags.remoteConfigFlagNameHelp')
-                      : t('featureFlags.flagNameHelp')
+                    newFlag.flagName &&
+                    !/^[a-z][a-z0-9_-]*$/.test(newFlag.flagName)
+                      ? t('featureFlags.flagNameFormatHelp')
+                      : newFlag.flagType === 'remoteConfig'
+                        ? t('featureFlags.remoteConfigFlagNameHelp')
+                        : t('featureFlags.flagNameHelp')
                   }
                   inputProps={{ maxLength: 100 }}
                 />
@@ -3827,6 +3840,7 @@ const FeatureFlagsPage: React.FC = () => {
             disabled={
               creating ||
               !newFlag.flagName.trim() ||
+              !/^[a-z][a-z0-9_-]*$/.test(newFlag.flagName.trim()) ||
               (newFlag.valueType === 'json' && newFlagJsonError !== null)
             }
             startIcon={creating ? <CircularProgress size={20} /> : undefined}
