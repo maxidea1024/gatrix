@@ -24,8 +24,8 @@
     "clean": "rimraf dist"
   },
   "peerDependencies": {
-    "react": ">=17.0.0",
-    "@gatrix/gatrix-js-client-sdk": "link:../gatrix-js-client-sdk"
+    "@gatrix/gatrix-js-client-sdk": "*",
+    "react": ">=17.0.0"
   },
   "devDependencies": {
     "@gatrix/gatrix-js-client-sdk": "link:../gatrix-js-client-sdk",

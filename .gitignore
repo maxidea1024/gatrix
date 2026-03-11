@@ -5,6 +5,12 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Yarn Berry
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+.pnp.*
+
 # Production builds
 dist/
 build/

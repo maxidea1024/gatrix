@@ -114,7 +114,7 @@ export default defineConfig({
       '@/types': path.resolve(__dirname, './src/types'),
       '@/services': path.resolve(__dirname, './src/services'),
       '@/contexts': path.resolve(__dirname, './src/contexts'),
-      // Resolve @gatrix/shared subpath exports for Vite/Rollup (use TS source directly)
+      // Resolve @gatrix/shared for Vite/Rollup (use TS source directly for workspace compatibility)
       '@gatrix/shared/permissions': path.resolve(
         __dirname,
         '../shared/src/permissions/index.ts'
@@ -122,6 +122,10 @@ export default defineConfig({
       '@gatrix/shared/errors': path.resolve(
         __dirname,
         '../shared/src/errors/index.ts'
+      ),
+      '@gatrix/shared': path.resolve(
+        __dirname,
+        '../shared/src/index.ts'
       ),
     },
   },

@@ -24,14 +24,14 @@
         "clean": "rimraf dist"
     },
     "peerDependencies": {
-        "svelte": "^4.0.0 || ^5.0.0",
-        "@gatrix/gatrix-js-client-sdk": "link:../gatrix-js-client-sdk"
+        "@gatrix/gatrix-js-client-sdk": "*",
+        "svelte": "^4.0.0 || ^5.0.0"
     },
     "devDependencies": {
         "@gatrix/gatrix-js-client-sdk": "link:../gatrix-js-client-sdk",
         "@sveltejs/vite-plugin-svelte": "^3.0.0",
-        "svelte": "^4.2.0",
         "rimraf": "^5.0.5",
+        "svelte": "^4.2.0",
         "typescript": "^5.3.3",
         "vite": "^5.0.0",
         "vite-plugin-dts": "^3.7.0",

@@ -134,6 +134,24 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
     return new TextEncoder().encode(editingValue).length;
   }, [editingValue]);
 
+  // Check if dialog editing value differs from the original value
+  const dialogHasChanges = useMemo(() => {
+    if (!dialogOpen) return false;
+    if (valueType === 'json') {
+      try {
+        const originalJson = typeof value === 'object'
+          ? JSON.stringify(value)
+          : JSON.stringify(JSON.parse(String(value || '{}')));
+        const editingJson = JSON.stringify(JSON.parse(editingValue));
+        return editingJson !== originalJson;
+      } catch {
+        // If editingValue is invalid JSON, consider it changed (error shown separately)
+        return true;
+      }
+    }
+    return editingValue !== String(value ?? '');
+  }, [dialogOpen, editingValue, value, valueType]);
+
   // Helper text - only show error, byte length is shown via tooltip
   const helperText = error || undefined;
 
@@ -152,14 +170,25 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
     if (valueType === 'json') {
       try {
         const parsed = JSON.parse(editingValue);
-        onChange(parsed);
+        // Only call onChange if the value actually changed
+        const originalJson = typeof value === 'object'
+          ? JSON.stringify(value)
+          : JSON.stringify(JSON.parse(String(value || '{}')));
+        const newJson = JSON.stringify(parsed);
+        if (newJson !== originalJson) {
+          onChange(parsed);
+        }
         onValidationError?.(null);
         setDialogOpen(false);
       } catch (e: any) {
         setDialogError(e.message || 'Invalid JSON');
       }
     } else {
-      onChange(editingValue);
+      // Only call onChange if the value actually changed
+      const originalStr = String(value ?? '');
+      if (editingValue !== originalStr) {
+        onChange(editingValue);
+      }
       setDialogOpen(false);
     }
   };
@@ -391,7 +420,10 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
             <Button
               onClick={handleApply}
               variant="contained"
-              disabled={valueType === 'json' && !!dialogError}
+              disabled={
+                !dialogHasChanges ||
+                (valueType === 'json' && !!dialogError)
+              }
             >
               {t('featureFlags.applyValue')}
             </Button>

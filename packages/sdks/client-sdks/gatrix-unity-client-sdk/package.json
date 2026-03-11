@@ -22,6 +22,5 @@
             "description": "Simple UGUI dashboard showing feature flag states, SDK stats, and real-time updates.",
             "path": "Samples~/Simplit"
         }
-    ],
-    "dependencies": {}
+    ]
 }

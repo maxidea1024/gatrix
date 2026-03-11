@@ -18,7 +18,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@gatrix/shared": "file:../shared",
+    "@gatrix/shared": "workspace:*",
     "murmurhash": "^2.0.1"
   },
   "devDependencies": {

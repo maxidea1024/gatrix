@@ -90,6 +90,8 @@ interface FeatureSegment {
   createdByEmail?: string;
 }
 
+import { toTitleCase } from '../../utils/stringUtils';
+
 const FeatureSegmentsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -413,6 +415,12 @@ const FeatureSegmentsPage: React.FC = () => {
   // Check if segment is valid for saving
   const isSegmentValid = (): boolean => {
     if (!editingSegment?.segmentName) return false;
+    // Validate segment name format
+    if (!/^[a-z][a-z0-9_-]*$/.test(editingSegment.segmentName)) return false;
+
+    // Segments must have at least one constraint
+    const constraints = editingSegment.constraints || [];
+    if (constraints.length === 0) return false;
 
     // Valueless operators - no value required
     const valuelessOps = ['exists', 'not_exists', 'arr_empty'];
@@ -420,7 +428,6 @@ const FeatureSegmentsPage: React.FC = () => {
     const multiValueOps = ['str_in', 'num_in', 'semver_in'];
 
     // All constraints must have valid contextName and value
-    const constraints = editingSegment.constraints || [];
     for (const constraint of constraints) {
       // Must have a context field selected
       if (!constraint.contextName) return false;
@@ -448,7 +455,7 @@ const FeatureSegmentsPage: React.FC = () => {
           `${projectApiPath}/features/segments/${editingSegment.id}`,
           editingSegment
         );
-        enqueueSnackbar(t('featureFlags.updateSuccess'), {
+        enqueueSnackbar(t('featureFlags.segmentUpdateSuccess'), {
           variant: 'success',
         });
       } else {
@@ -456,7 +463,7 @@ const FeatureSegmentsPage: React.FC = () => {
           ...editingSegment,
           projectId: currentProjectId,
         });
-        enqueueSnackbar(t('featureFlags.createSuccess'), {
+        enqueueSnackbar(t('featureFlags.segmentCreateSuccess'), {
           variant: 'success',
         });
       }
@@ -464,7 +471,7 @@ const FeatureSegmentsPage: React.FC = () => {
       setEditingSegment(null);
       loadSegments();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.saveFailed'), {
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.segmentSaveFailed'), {
         variant: 'error',
       });
     }
@@ -512,7 +519,7 @@ const FeatureSegmentsPage: React.FC = () => {
       await api.delete(
         `${projectApiPath}/features/segments/${deletingSegment.id}`
       );
-      enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('featureFlags.segmentDeleteSuccess'), { variant: 'success' });
       loadSegments();
     } catch (error: any) {
       const errorCode = extractErrorCode(error?.response?.data);
@@ -1092,14 +1099,28 @@ const FeatureSegmentsPage: React.FC = () => {
                 autoFocus={!editingSegment?.id}
                 label={t('featureFlags.segmentName')}
                 value={editingSegment?.segmentName || ''}
-                onChange={(e) =>
-                  setEditingSegment((prev) => ({
-                    ...prev,
-                    segmentName: e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''),
-                  }))
-                }
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setEditingSegment((prev) => {
+                    const autoDisplay = !prev?.displayName || prev.displayName === toTitleCase(prev.segmentName || '');
+                    return {
+                      ...prev,
+                      segmentName: newName,
+                      ...(autoDisplay ? { displayName: toTitleCase(newName) } : {}),
+                    };
+                  });
+                }}
                 disabled={!!editingSegment?.id}
-                helperText={t('featureFlags.segmentNameHelp')}
+                error={
+                  !!editingSegment?.segmentName &&
+                  !/^[a-z][a-z0-9_-]*$/.test(editingSegment.segmentName)
+                }
+                helperText={
+                  editingSegment?.segmentName &&
+                  !/^[a-z][a-z0-9_-]*$/.test(editingSegment.segmentName)
+                    ? t('featureFlags.segmentNameFormatHelp')
+                    : t('featureFlags.segmentNameHelp')
+                }
                 placeholder="beta-users, premium-tier..."
               />
               <TextField
