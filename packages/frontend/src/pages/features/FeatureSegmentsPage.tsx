@@ -471,9 +471,12 @@ const FeatureSegmentsPage: React.FC = () => {
       setEditingSegment(null);
       loadSegments();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.segmentSaveFailed'), {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'featureFlags.segmentSaveFailed'),
+        {
+          variant: 'error',
+        }
+      );
     }
   };
 
@@ -519,7 +522,9 @@ const FeatureSegmentsPage: React.FC = () => {
       await api.delete(
         `${projectApiPath}/features/segments/${deletingSegment.id}`
       );
-      enqueueSnackbar(t('featureFlags.segmentDeleteSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('featureFlags.segmentDeleteSuccess'), {
+        variant: 'success',
+      });
       loadSegments();
     } catch (error: any) {
       const errorCode = extractErrorCode(error?.response?.data);
@@ -1102,11 +1107,15 @@ const FeatureSegmentsPage: React.FC = () => {
                 onChange={(e) => {
                   const newName = e.target.value;
                   setEditingSegment((prev) => {
-                    const autoDisplay = !prev?.displayName || prev.displayName === toTitleCase(prev.segmentName || '');
+                    const autoDisplay =
+                      !prev?.displayName ||
+                      prev.displayName === toTitleCase(prev.segmentName || '');
                     return {
                       ...prev,
                       segmentName: newName,
-                      ...(autoDisplay ? { displayName: toTitleCase(newName) } : {}),
+                      ...(autoDisplay
+                        ? { displayName: toTitleCase(newName) }
+                        : {}),
                     };
                   });
                 }}
