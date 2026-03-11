@@ -1346,11 +1346,15 @@ const FeatureContextFieldsPage: React.FC = () => {
                 onChange={(e) => {
                   const newName = e.target.value;
                   setEditingField((prev) => {
-                    const autoDisplay = !prev?.displayName || prev.displayName === toTitleCase(prev.fieldName || '');
+                    const autoDisplay =
+                      !prev?.displayName ||
+                      prev.displayName === toTitleCase(prev.fieldName || '');
                     return {
                       ...prev,
                       fieldName: newName,
-                      ...(autoDisplay ? { displayName: toTitleCase(newName) } : {}),
+                      ...(autoDisplay
+                        ? { displayName: toTitleCase(newName) }
+                        : {}),
                     };
                   });
                 }}

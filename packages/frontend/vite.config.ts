@@ -123,10 +123,7 @@ export default defineConfig({
         __dirname,
         '../shared/src/errors/index.ts'
       ),
-      '@gatrix/shared': path.resolve(
-        __dirname,
-        '../shared/src/index.ts'
-      ),
+      '@gatrix/shared': path.resolve(__dirname, '../shared/src/index.ts'),
     },
   },
   server: {

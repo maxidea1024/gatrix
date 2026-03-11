@@ -3301,11 +3301,15 @@ const FeatureFlagsPage: React.FC = () => {
                   value={newFlag.flagName}
                   onChange={(e) => {
                     const newName = e.target.value;
-                    const autoDisplay = !newFlag.displayName || newFlag.displayName === toTitleCase(newFlag.flagName);
+                    const autoDisplay =
+                      !newFlag.displayName ||
+                      newFlag.displayName === toTitleCase(newFlag.flagName);
                     setNewFlag({
                       ...newFlag,
                       flagName: newName,
-                      ...(autoDisplay ? { displayName: toTitleCase(newName) } : {}),
+                      ...(autoDisplay
+                        ? { displayName: toTitleCase(newName) }
+                        : {}),
                     });
                   }}
                   error={

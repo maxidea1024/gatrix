@@ -139,9 +139,10 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
     if (!dialogOpen) return false;
     if (valueType === 'json') {
       try {
-        const originalJson = typeof value === 'object'
-          ? JSON.stringify(value)
-          : JSON.stringify(JSON.parse(String(value || '{}')));
+        const originalJson =
+          typeof value === 'object'
+            ? JSON.stringify(value)
+            : JSON.stringify(JSON.parse(String(value || '{}')));
         const editingJson = JSON.stringify(JSON.parse(editingValue));
         return editingJson !== originalJson;
       } catch {
@@ -171,9 +172,10 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
       try {
         const parsed = JSON.parse(editingValue);
         // Only call onChange if the value actually changed
-        const originalJson = typeof value === 'object'
-          ? JSON.stringify(value)
-          : JSON.stringify(JSON.parse(String(value || '{}')));
+        const originalJson =
+          typeof value === 'object'
+            ? JSON.stringify(value)
+            : JSON.stringify(JSON.parse(String(value || '{}')));
         const newJson = JSON.stringify(parsed);
         if (newJson !== originalJson) {
           onChange(parsed);
@@ -421,8 +423,7 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
               onClick={handleApply}
               variant="contained"
               disabled={
-                !dialogHasChanges ||
-                (valueType === 'json' && !!dialogError)
+                !dialogHasChanges || (valueType === 'json' && !!dialogError)
               }
             >
               {t('featureFlags.applyValue')}
