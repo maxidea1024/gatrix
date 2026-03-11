@@ -13,6 +13,7 @@ interface ContextFieldSeed {
   description: string;
   legalValues?: string[];
   stickiness?: boolean;
+  isDefaultStickinessField?: boolean;
   sortOrder: number;
   tags?: string[];
   validationRules?: Record<string, any>;
@@ -28,6 +29,7 @@ async function main() {
       displayName: 'User ID',
       description: 'Unique user identifier',
       stickiness: true,
+      isDefaultStickinessField: true,
       sortOrder: 1,
       tags: ['identity'],
       validationRules: { trimWhitespace: 'trim', allowEmpty: false },
@@ -38,6 +40,7 @@ async function main() {
       displayName: 'Session ID',
       description: 'Session identifier',
       stickiness: true,
+      isDefaultStickinessField: true,
       sortOrder: 2,
       tags: ['identity'],
       validationRules: { trimWhitespace: 'trim' },
@@ -246,6 +249,7 @@ async function main() {
         : null,
       tags: field.tags ? JSON.stringify(field.tags) : null,
       stickiness: field.stickiness || false,
+      isDefaultStickinessField: field.isDefaultStickinessField || false,
       sortOrder: field.sortOrder,
       isEnabled: true,
       createdBy: 1,

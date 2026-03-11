@@ -179,6 +179,7 @@ export interface FeatureContextFieldAttributes {
   validationRules?: ValidationRules;
   tags?: string[];
   stickiness: boolean;
+  isDefaultStickinessField?: boolean;
   isEnabled?: boolean;
   sortOrder: number;
   createdBy?: string;

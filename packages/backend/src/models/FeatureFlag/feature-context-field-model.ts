@@ -77,6 +77,7 @@ export class FeatureContextFieldModel {
       return fields.map((f: any) => ({
         ...f,
         stickiness: Boolean(f.stickiness),
+        isDefaultStickinessField: Boolean(f.isDefaultStickinessField),
         validationRules:
           parseJsonField<ValidationRules>(f.validationRules) || undefined,
         tags: parseJsonField<string[]>(f.tags) || [],
@@ -100,6 +101,7 @@ export class FeatureContextFieldModel {
       return {
         ...field,
         stickiness: Boolean(field.stickiness),
+        isDefaultStickinessField: Boolean(field.isDefaultStickinessField),
         validationRules:
           parseJsonField<ValidationRules>(field.validationRules) || undefined,
         tags: parseJsonField<string[]>(field.tags) || [],

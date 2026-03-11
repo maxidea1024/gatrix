@@ -31,6 +31,7 @@ import {
   Alert,
   Tabs,
   Tab,
+  ListSubheader,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -407,6 +408,31 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                             </Typography>
                           </Box>
                         </MenuItem>
+                        {/* Custom stickiness fields from context fields */}
+                        {contextFields.filter((f) => f.stickiness && !f.isDefaultStickinessField).length > 0 && (
+                          <ListSubheader sx={{ lineHeight: '32px', fontSize: '0.75rem' }}>
+                            {t('featureFlags.customStickinessFields')}
+                          </ListSubheader>
+                        )}
+                        {contextFields
+                          .filter((f) => f.stickiness && !f.isDefaultStickinessField)
+                          .map((field) => (
+                            <MenuItem key={field.fieldName} value={field.fieldName}>
+                              <Box>
+                                <Typography variant="body2">
+                                  {field.displayName || field.fieldName}
+                                </Typography>
+                                {field.description && (
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    {field.description}
+                                  </Typography>
+                                )}
+                              </Box>
+                            </MenuItem>
+                          ))}
                       </Select>
                     </FormControl>
                   </Grid>
@@ -724,6 +750,8 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                 displayName: f.displayName || f.fieldName,
                 description: f.description || '',
                 fieldType: f.fieldType || 'string',
+                stickiness: f.stickiness === true,
+                isDefaultStickinessField: f.isDefaultStickinessField === true,
                 validationRules: rules,
               };
             })

@@ -48,6 +48,7 @@ import {
   DialogActions,
   Collapse,
   Link as MuiLink,
+  ListSubheader,
   useTheme,
   alpha,
 } from '@mui/material';
@@ -701,6 +702,8 @@ const FeatureFlagDetailPage: React.FC = () => {
               displayName: f.displayName || f.fieldName,
               description: f.description || '',
               fieldType: f.fieldType || 'string',
+              stickiness: f.stickiness === true,
+              isDefaultStickinessField: f.isDefaultStickinessField === true,
               validationRules: rules,
             };
           })
@@ -4040,8 +4043,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                       </Box>
 
                       {/* Stickiness & GroupId */}
-                      <Grid container spacing={2} sx={{ mt: 2 }}>
-                        <Grid size={{ xs: 6 }}>
+                      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                        <Box sx={{ flex: 1 }}>
                           <FormControl fullWidth size="small">
                             <Typography
                               variant="subtitle2"
@@ -4128,10 +4131,35 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   </Typography>
                                 </Box>
                               </MenuItem>
+                              {/* Custom stickiness fields from context fields */}
+                              {contextFields.filter((f) => f.stickiness && !f.isDefaultStickinessField).length > 0 && (
+                                <ListSubheader sx={{ lineHeight: '32px', fontSize: '0.75rem' }}>
+                                  {t('featureFlags.customStickinessFields')}
+                                </ListSubheader>
+                              )}
+                              {contextFields
+                                .filter((f) => f.stickiness && !f.isDefaultStickinessField)
+                                .map((field) => (
+                                  <MenuItem key={field.fieldName} value={field.fieldName}>
+                                    <Box>
+                                      <Typography variant="body2">
+                                        {field.displayName || field.fieldName}
+                                      </Typography>
+                                      {field.description && (
+                                        <Typography
+                                          variant="caption"
+                                          color="text.secondary"
+                                        >
+                                          {field.description}
+                                        </Typography>
+                                      )}
+                                    </Box>
+                                  </MenuItem>
+                                ))}
                             </Select>
                           </FormControl>
-                        </Grid>
-                        <Grid size={{ xs: 6 }}>
+                        </Box>
+                        <Box sx={{ flex: 1 }}>
                           <Box>
                             <Typography
                               variant="subtitle2"
@@ -4170,8 +4198,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                               }
                             />
                           </Box>
-                        </Grid>
-                      </Grid>
+                        </Box>
+                      </Box>
                     </Paper>
                   )}
 

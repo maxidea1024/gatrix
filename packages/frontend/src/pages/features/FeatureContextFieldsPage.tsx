@@ -261,6 +261,8 @@ interface FeatureContextField {
     | 'timezone';
   validationRules?: ValidationRules;
   isEnabled: boolean;
+  stickiness?: boolean;
+  isDefaultStickinessField?: boolean;
   tags: string[];
   referenceCount?: number;
   sortOrder: number;
@@ -567,6 +569,7 @@ const FeatureContextFieldsPage: React.FC = () => {
       displayName: '',
       description: '',
       fieldType: 'string' as const,
+      stickiness: false,
       tags: [],
       sortOrder: 0,
     };
@@ -607,6 +610,11 @@ const FeatureContextFieldsPage: React.FC = () => {
       editingTags.length !== originalTags.length ||
       editingTags.some((v, i) => v !== originalTags[i]);
 
+    // Compare stickiness
+    const stickinessChanged =
+      (editingField.stickiness || false) !==
+      (originalField.stickiness || false);
+
     return (
       fieldNameChanged ||
       displayNameChanged ||
@@ -614,7 +622,8 @@ const FeatureContextFieldsPage: React.FC = () => {
       fieldTypeChanged ||
       sortOrderChanged ||
       validationRulesChanged ||
-      tagsChanged
+      tagsChanged ||
+      stickinessChanged
     );
   };
 
@@ -1268,12 +1277,15 @@ const FeatureContextFieldsPage: React.FC = () => {
                                 </IconButton>
                               </Tooltip>
                               <Tooltip title={t('common.delete')}>
+                                <span>
                                 <IconButton
                                   size="small"
                                   onClick={() => handleDelete(field)}
+                                  disabled={field.isDefaultStickinessField === true}
                                 >
                                   <DeleteIcon fontSize="small" />
                                 </IconButton>
+                                </span>
                               </Tooltip>
                             </Box>
                           </TableCell>
@@ -1605,6 +1617,36 @@ const FeatureContextFieldsPage: React.FC = () => {
               </Select>
               <FormHelperText>{t('featureFlags.fieldTypeHelp')}</FormHelperText>
             </FormControl>
+
+            {/* Stickiness field option */}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={editingField?.stickiness === true}
+                  disabled={editingField?.isDefaultStickinessField === true}
+                  onChange={(e) =>
+                    setEditingField((prev) => ({
+                      ...prev,
+                      stickiness: e.target.checked,
+                    }))
+                  }
+                />
+              }
+              label={
+                <Box>
+                  <Typography variant="body2">
+                    {t('featureFlags.stickinessField')}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: 'block', mt: 0.25 }}
+                  >
+                    {t('featureFlags.stickinessFieldHelp')}
+                  </Typography>
+                </Box>
+              }
+            />
 
             {/* Common field settings: Allow Empty + Trim Whitespace */}
             {editingField?.fieldType && (

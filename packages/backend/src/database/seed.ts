@@ -286,6 +286,7 @@ async function createDefaultContextFields(projectId: string) {
       fieldType: 'string',
       description: 'Unique user identifier',
       stickiness: true,
+      isDefaultStickinessField: true,
       sortOrder: 1,
     },
     {
@@ -293,6 +294,7 @@ async function createDefaultContextFields(projectId: string) {
       fieldType: 'string',
       description: 'Session identifier',
       stickiness: true,
+      isDefaultStickinessField: true,
       sortOrder: 2,
     },
     {
@@ -300,6 +302,7 @@ async function createDefaultContextFields(projectId: string) {
       fieldType: 'string',
       description: 'Application name',
       stickiness: false,
+      isDefaultStickinessField: false,
       sortOrder: 3,
     },
     {
@@ -307,6 +310,7 @@ async function createDefaultContextFields(projectId: string) {
       fieldType: 'semver',
       description: 'Application version',
       stickiness: false,
+      isDefaultStickinessField: false,
       sortOrder: 4,
     },
     {
@@ -314,6 +318,7 @@ async function createDefaultContextFields(projectId: string) {
       fieldType: 'string',
       description: 'Remote IP address',
       stickiness: false,
+      isDefaultStickinessField: false,
       sortOrder: 5,
     },
     {
@@ -321,6 +326,7 @@ async function createDefaultContextFields(projectId: string) {
       fieldType: 'string',
       description: 'Country code',
       stickiness: false,
+      isDefaultStickinessField: false,
       sortOrder: 6,
     },
     {
@@ -328,6 +334,7 @@ async function createDefaultContextFields(projectId: string) {
       fieldType: 'string',
       description: 'City name',
       stickiness: false,
+      isDefaultStickinessField: false,
       sortOrder: 7,
     },
     {
@@ -335,6 +342,7 @@ async function createDefaultContextFields(projectId: string) {
       fieldType: 'string',
       description: 'User agent string',
       stickiness: false,
+      isDefaultStickinessField: false,
       sortOrder: 8,
     },
     {
@@ -342,14 +350,15 @@ async function createDefaultContextFields(projectId: string) {
       fieldType: 'date',
       description: 'Current timestamp',
       stickiness: false,
+      isDefaultStickinessField: false,
       sortOrder: 9,
     },
   ];
 
   for (const f of defaultFields) {
     await database.query(
-      `INSERT INTO g_feature_context_fields (id, projectId, fieldName, fieldType, description, stickiness, sortOrder, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())
+      `INSERT INTO g_feature_context_fields (id, projectId, fieldName, fieldType, description, stickiness, isDefaultStickinessField, sortOrder, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())
        ON DUPLICATE KEY UPDATE description = VALUES(description)`,
       [
         ulid(),
@@ -358,6 +367,7 @@ async function createDefaultContextFields(projectId: string) {
         f.fieldType,
         f.description,
         f.stickiness,
+        f.isDefaultStickinessField,
         f.sortOrder,
       ]
     );

@@ -78,6 +78,8 @@ export interface ContextField {
     | 'languageCode'
     | 'localeCode'
     | 'timezone';
+  stickiness?: boolean;
+  isDefaultStickinessField?: boolean;
   validationRules?: any;
 }
 
