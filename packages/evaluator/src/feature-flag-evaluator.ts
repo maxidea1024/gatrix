@@ -21,6 +21,7 @@ import {
   VALUE_SOURCE,
 } from '@gatrix/shared';
 import { getStrategy } from './strategies';
+import { isInCidr } from './strategies/util';
 
 export class FeatureFlagEvaluator {
   /**
@@ -253,6 +254,12 @@ export class FeatureFlagEvaluator {
         } catch {
           result = false;
         }
+        break;
+      // CIDR
+      case 'cidr_match':
+        result = (constraint.values || []).some(
+          (cidr) => stringValue === cidr || isInCidr(stringValue, cidr)
+        );
         break;
       // Number
       case 'num_eq':

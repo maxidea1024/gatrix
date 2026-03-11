@@ -1211,3 +1211,143 @@ describe('Edge Cases', () => {
     });
   });
 });
+
+// ===================== CIDR MATCH OPERATOR =====================
+
+describe('CIDR Match Operator', () => {
+  describe('cidr_match', () => {
+    it('should match exact IP in values list', () => {
+      expect(
+        evalConstraint(
+          c('cidr_match', 'remoteAddress', {
+            values: ['192.168.1.100'],
+          }),
+          { ...defaultContext, remoteAddress: '192.168.1.100' }
+        )
+      ).toBe(true);
+    });
+
+    it('should match IP within CIDR range', () => {
+      expect(
+        evalConstraint(
+          c('cidr_match', 'remoteAddress', {
+            values: ['192.168.1.0/24'],
+          }),
+          { ...defaultContext, remoteAddress: '192.168.1.50' }
+        )
+      ).toBe(true);
+    });
+
+    it('should not match IP outside CIDR range', () => {
+      expect(
+        evalConstraint(
+          c('cidr_match', 'remoteAddress', {
+            values: ['192.168.1.0/24'],
+          }),
+          { ...defaultContext, remoteAddress: '192.168.2.1' }
+        )
+      ).toBe(false);
+    });
+
+    it('should match with multiple CIDR ranges', () => {
+      const constraint = c('cidr_match', 'remoteAddress', {
+        values: ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'],
+      });
+      // Match first range
+      expect(
+        evalConstraint(constraint, {
+          ...defaultContext,
+          remoteAddress: '10.5.3.1',
+        })
+      ).toBe(true);
+      // Match third range
+      expect(
+        evalConstraint(constraint, {
+          ...defaultContext,
+          remoteAddress: '192.168.100.200',
+        })
+      ).toBe(true);
+      // No match
+      expect(
+        evalConstraint(constraint, {
+          ...defaultContext,
+          remoteAddress: '8.8.8.8',
+        })
+      ).toBe(false);
+    });
+
+    it('should support inverted (NOT cidr_match)', () => {
+      expect(
+        evalConstraint(
+          c('cidr_match', 'remoteAddress', {
+            values: ['192.168.1.0/24'],
+            inverted: true,
+          }),
+          { ...defaultContext, remoteAddress: '192.168.1.50' }
+        )
+      ).toBe(false);
+
+      expect(
+        evalConstraint(
+          c('cidr_match', 'remoteAddress', {
+            values: ['192.168.1.0/24'],
+            inverted: true,
+          }),
+          { ...defaultContext, remoteAddress: '10.0.0.1' }
+        )
+      ).toBe(true);
+    });
+
+    it('should work with custom string context fields', () => {
+      expect(
+        evalConstraint(
+          c('cidr_match', 'clientIp', {
+            values: ['10.0.0.0/8'],
+          }),
+          { ...defaultContext, properties: { clientIp: '10.1.2.3' } }
+        )
+      ).toBe(true);
+    });
+
+    it('should handle invalid IP gracefully', () => {
+      expect(
+        evalConstraint(
+          c('cidr_match', 'remoteAddress', {
+            values: ['192.168.1.0/24'],
+          }),
+          { ...defaultContext, remoteAddress: 'not-an-ip' }
+        )
+      ).toBe(false);
+    });
+
+    it('should handle /32 as exact match', () => {
+      expect(
+        evalConstraint(
+          c('cidr_match', 'remoteAddress', {
+            values: ['192.168.1.1/32'],
+          }),
+          { ...defaultContext, remoteAddress: '192.168.1.1' }
+        )
+      ).toBe(true);
+      expect(
+        evalConstraint(
+          c('cidr_match', 'remoteAddress', {
+            values: ['192.168.1.1/32'],
+          }),
+          { ...defaultContext, remoteAddress: '192.168.1.2' }
+        )
+      ).toBe(false);
+    });
+
+    it('should return false when context value is missing', () => {
+      expect(
+        evalConstraint(
+          c('cidr_match', 'remoteAddress', {
+            values: ['192.168.1.0/24'],
+          }),
+          { ...defaultContext }
+        )
+      ).toBe(false);
+    });
+  });
+});

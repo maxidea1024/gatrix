@@ -281,6 +281,12 @@ object FeatureFlagEvaluator {
             "semver_lte" -> compareSemver(stringValue, targetValue) <= 0
             "semver_in" -> targetValues.any { compareSemver(stringValue, it) == 0 }
 
+            // CIDR
+            "cidr_match" -> {
+                val values = constraint.values ?: emptyList()
+                values.any { cidr -> stringValue == cidr || isInCidr(stringValue, cidr) }
+            }
+
             else -> false
         }
 
@@ -422,6 +428,40 @@ object FeatureFlagEvaluator {
     private fun parseSemver(v: String): List<Int> {
         val cleaned = v.removePrefix("v")
         return cleaned.split(".").map { it.toIntOrNull() ?: 0 }
+    }
+
+    /**
+     * Convert IPv4 address to 32-bit unsigned integer.
+     */
+    private fun ipToNumber(ip: String): Long? {
+        val parts = ip.trim().split(".")
+        if (parts.size != 4) return null
+        var result = 0L
+        for (part in parts) {
+            val num = part.toIntOrNull() ?: return null
+            if (num < 0 || num > 255) return null
+            result = (result shl 8) + num
+        }
+        return result and 0xFFFFFFFFL
+    }
+
+    /**
+     * Check if an IP address falls within a CIDR range.
+     */
+    private fun isInCidr(ip: String, cidr: String): Boolean {
+        val parts = cidr.split("/", limit = 2)
+        val ipNum = ipToNumber(ip) ?: return false
+        val rangeNum = ipToNumber(parts[0]) ?: return false
+
+        if (parts.size == 1) {
+            return ipNum == rangeNum
+        }
+
+        val prefix = parts[1].toIntOrNull() ?: return false
+        if (prefix < 0 || prefix > 32) return false
+
+        val mask = if (prefix == 0) 0L else (0xFFFFFFFFL shl (32 - prefix)) and 0xFFFFFFFFL
+        return (ipNum and mask) == (rangeNum and mask)
     }
 
     private fun toDouble(value: Any?): Double {

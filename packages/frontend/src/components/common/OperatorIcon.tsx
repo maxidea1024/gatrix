@@ -30,6 +30,7 @@ const operatorStyles: Record<string, OpStyle> = {
   str_ends_with: { bg: '#dbeafe', fg: '#1e40af', label: '…Z' },
   str_in: { bg: '#dbeafe', fg: '#1e40af', label: '∈' },
   str_regex: { bg: '#dbeafe', fg: '#1e40af', label: '.*' },
+  cidr_match: { bg: '#dbeafe', fg: '#1e40af', label: 'IP' },
 
   // Number operators — green family
   num_eq: { bg: '#d1fae5', fg: '#166534', label: '=' },

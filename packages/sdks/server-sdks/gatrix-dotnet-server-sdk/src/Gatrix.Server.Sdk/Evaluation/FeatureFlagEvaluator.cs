@@ -263,6 +263,10 @@ public class FeatureFlagEvaluator
             "semver_lte" => CompareSemver(GetStringValue(), targetValue) <= 0,
             "semver_in" => targetVals.Any(v => CompareSemver(GetStringValue(), v) == 0),
 
+            // CIDR
+            "cidr_match" => (constraint.Values ?? Array.Empty<string>()).Any(cidr =>
+                GetStringValue() == cidr || IsInCidr(GetStringValue(), cidr)),
+
             _ => false,
         };
 
@@ -444,5 +448,39 @@ public class FeatureFlagEvaluator
             return je.ValueKind == JsonValueKind.String ? je.GetString() ?? "" : je.GetRawText();
         }
         return value.ToString() ?? "";
+    }
+
+    /// <summary>
+    /// Convert IPv4 address to 32-bit unsigned integer.
+    /// </summary>
+    private static uint? IpToNumber(string ip)
+    {
+        var parts = ip.Trim().Split('.');
+        if (parts.Length != 4) return null;
+        uint result = 0;
+        foreach (var part in parts)
+        {
+            if (!int.TryParse(part, out int num) || num < 0 || num > 255) return null;
+            result = (result << 8) + (uint)num;
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Check if an IP address falls within a CIDR range.
+    /// </summary>
+    private static bool IsInCidr(string ip, string cidr)
+    {
+        var parts = cidr.Split('/', 2);
+        var ipNum = IpToNumber(ip);
+        var rangeNum = IpToNumber(parts[0]);
+        if (ipNum is null || rangeNum is null) return false;
+
+        if (parts.Length == 1) return ipNum == rangeNum;
+
+        if (!int.TryParse(parts[1], out int prefix) || prefix < 0 || prefix > 32) return false;
+
+        uint mask = prefix == 0 ? 0 : ~0u << (32 - prefix);
+        return (ipNum.Value & mask) == (rangeNum.Value & mask);
     }
 }

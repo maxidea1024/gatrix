@@ -389,13 +389,13 @@ interface GatrixSDKConfig {
   };
 
   // Feature toggles (selective caching)
-  // Services default to enabled, except newer services which require explicit opt-in.
+  // All services default to disabled. Only enable what you need (opt-in).
   uses?: {
-    gameWorld?: boolean;           // default: true
-    popupNotice?: boolean;         // default: true
-    survey?: boolean;              // default: true
-    whitelist?: boolean;           // default: true
-    serviceMaintenance?: boolean;  // default: true
+    gameWorld?: boolean;           // default: false (opt-in)
+    popupNotice?: boolean;         // default: false (opt-in)
+    survey?: boolean;              // default: false (opt-in)
+    whitelist?: boolean;           // default: false (opt-in)
+    serviceMaintenance?: boolean;  // default: false (opt-in)
     clientVersion?: boolean;       // default: false (opt-in)
     serviceNotice?: boolean;       // default: false (opt-in)
     banner?: boolean;              // default: false (opt-in)
@@ -544,7 +544,7 @@ The evaluator MUST be a faithful port of `@gatrix/shared/FeatureFlagEvaluator`. 
 | Element | Description |
 |---------|-------------|
 | **Strategy evaluation order** | Segments → Constraints → Strategy-specific `isEnabled()` (first match wins) |
-| **Constraint operators** | `str_eq`, `str_contains`, `str_starts_with`, `str_ends_with`, `str_in`, `str_regex`, `num_eq`, `num_gt`, `num_gte`, `num_lt`, `num_lte`, `num_in`, `bool_is`, `date_eq/gt/gte/lt/lte`, `semver_eq/gt/gte/lt/lte/in`, `exists`, `not_exists`, `arr_any`, `arr_all`, `arr_empty` |
+| **Constraint operators** | `str_eq`, `str_contains`, `str_starts_with`, `str_ends_with`, `str_in`, `str_regex`, `cidr_match`, `num_eq`, `num_gt`, `num_gte`, `num_lt`, `num_lte`, `num_in`, `bool_is`, `date_eq/gt/gte/lt/lte`, `semver_eq/gt/gte/lt/lte/in`, `exists`, `not_exists`, `arr_any`, `arr_all`, `arr_empty` |
 | **Modifier flags** | `inverted` (negate result), `caseInsensitive` (string comparison) |
 | **Strategy delegation** | Each strategy handles its own logic: `default` → always true, `flexibleRollout` → MurmurHash3 rollout, `gradualRolloutUserId/SessionId/Random` → percentage-based |
 | **Variant selection** | Weighted distribution via murmurhash percentage |

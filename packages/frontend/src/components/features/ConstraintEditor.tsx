@@ -103,6 +103,7 @@ const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
     { value: 'str_ends_with', label: 'ends with' },
     { value: 'str_in', label: 'in list' },
     { value: 'str_regex', label: 'matches regex' },
+    { value: 'cidr_match', label: 'matches CIDR' },
     ...COMMON_OPERATORS,
   ],
   number: [
@@ -153,6 +154,7 @@ const INVERTED_OPERATOR_LABELS: Record<string, string> = {
   str_ends_with: 'does not end with',
   str_in: 'not in list',
   str_regex: 'does not match regex',
+  cidr_match: 'does not match CIDR',
   num_eq: '≠',
   num_gt: '≤',
   num_gte: '<',
@@ -197,7 +199,8 @@ const isMultiValueOperator = (operator: ConstraintOperator): boolean => {
     operator === 'num_in' ||
     operator === 'semver_in' ||
     operator === 'arr_any' ||
-    operator === 'arr_all'
+    operator === 'arr_all' ||
+    operator === 'cidr_match'
   );
 };
 

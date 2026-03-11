@@ -34,6 +34,8 @@ export type ConstraintOperator =
   | 'str_in'
   /** Matches context value against a regular expression pattern */
   | 'str_regex'
+  /** Checks if context value (IP address) matches any of the CIDR ranges in the values list */
+  | 'cidr_match'
   // Number operators
   /** Numeric equality */
   | 'num_eq'

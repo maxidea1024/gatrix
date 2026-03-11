@@ -22,3 +22,39 @@ export function normalizedStrategyValue(
   const hash = murmurhash.v3(seed, 0);
   return (hash % 10001) / 100.0;
 }
+
+/**
+ * Convert IPv4 address to 32-bit unsigned integer.
+ */
+export function ipToNumber(ip: string): number | null {
+  const parts = ip.trim().split('.');
+  if (parts.length !== 4) return null;
+  let result = 0;
+  for (const part of parts) {
+    const num = parseInt(part, 10);
+    if (isNaN(num) || num < 0 || num > 255) return null;
+    result = (result << 8) + num;
+  }
+  return result >>> 0; // Ensure unsigned 32-bit
+}
+
+/**
+ * Check if an IP address falls within a CIDR range.
+ */
+export function isInCidr(ip: string, cidr: string): boolean {
+  const [rangeIp, prefixStr] = cidr.split('/');
+  const ipNum = ipToNumber(ip);
+  const rangeNum = ipToNumber(rangeIp);
+
+  if (ipNum === null || rangeNum === null) return false;
+
+  if (!prefixStr) {
+    return ipNum === rangeNum;
+  }
+
+  const prefix = parseInt(prefixStr, 10);
+  if (isNaN(prefix) || prefix < 0 || prefix > 32) return false;
+
+  const mask = prefix === 0 ? 0 : (~0 << (32 - prefix)) >>> 0;
+  return (ipNum & mask) === (rangeNum & mask);
+}

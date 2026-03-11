@@ -317,6 +317,14 @@ func evaluateConstraint(constraint types.Constraint, ctx types.EvaluationContext
 				break
 			}
 		}
+	// CIDR
+	case "cidr_match":
+		for _, cidr := range constraint.Values {
+			if stringValue == cidr || isInCIDR(stringValue, cidr) {
+				result = true
+				break
+			}
+		}
 	default:
 		result = false
 	}
@@ -634,3 +642,44 @@ func allInSlice(targets, arr []string) bool {
 
 // Ensure math is used
 var _ = math.MaxFloat64
+
+// ipToNum converts an IPv4 address to a 32-bit unsigned integer.
+func ipToNum(ip string) (uint32, bool) {
+	parts := strings.Split(strings.TrimSpace(ip), ".")
+	if len(parts) != 4 {
+		return 0, false
+	}
+	var result uint32
+	for _, part := range parts {
+		n, err := strconv.Atoi(part)
+		if err != nil || n < 0 || n > 255 {
+			return 0, false
+		}
+		result = (result << 8) + uint32(n)
+	}
+	return result, true
+}
+
+// isInCIDR checks if an IP address falls within a CIDR range.
+func isInCIDR(ip, cidr string) bool {
+	parts := strings.SplitN(cidr, "/", 2)
+	ipNum, ok1 := ipToNum(ip)
+	rangeNum, ok2 := ipToNum(parts[0])
+	if !ok1 || !ok2 {
+		return false
+	}
+	if len(parts) == 1 {
+		return ipNum == rangeNum
+	}
+	prefix, err := strconv.Atoi(parts[1])
+	if err != nil || prefix < 0 || prefix > 32 {
+		return false
+	}
+	var mask uint32
+	if prefix == 0 {
+		mask = 0
+	} else {
+		mask = ^uint32(0) << (32 - prefix)
+	}
+	return (ipNum & mask) == (rangeNum & mask)
+}

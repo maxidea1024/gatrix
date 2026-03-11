@@ -198,6 +198,7 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
       semver_lte: '≤',
       semver_in: '∈',
       semver_not_in: '∉',
+      cidr_match: '⊜',
     };
     return opMap[operator] || operator;
   };
