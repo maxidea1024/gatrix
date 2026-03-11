@@ -21,7 +21,10 @@ export class UserWithIdStrategy extends Strategy {
     parameters: StrategyParameters,
     context: EvaluationContext
   ): boolean {
-    return this.isEnabledWithDetails(parameters, context).enabled;
+    const userIds = parameters.userIds;
+    if (!userIds || !context.userId) return false;
+    const matched = userIds.split(/\s*,\s*/).includes(context.userId);
+    return matched;
   }
 
   isEnabledWithDetails(

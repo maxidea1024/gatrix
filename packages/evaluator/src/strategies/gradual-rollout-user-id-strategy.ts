@@ -22,7 +22,13 @@ export class GradualRolloutUserIdStrategy extends Strategy {
     parameters: StrategyParameters,
     context: EvaluationContext
   ): boolean {
-    return this.isEnabledWithDetails(parameters, context).enabled;
+    const { userId } = context;
+    if (!userId) return false;
+    const percentage = Number(parameters.percentage ?? 0);
+    const groupId = parameters.groupId || '';
+    const enabled =
+      percentage > 0 && normalizedStrategyValue(userId, groupId) <= percentage;
+    return enabled;
   }
 
   isEnabledWithDetails(

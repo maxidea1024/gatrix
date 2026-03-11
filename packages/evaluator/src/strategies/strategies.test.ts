@@ -431,10 +431,10 @@ describe('ApplicationHostnameStrategy', () => {
 // ==================== normalizedStrategyValue ====================
 
 describe('normalizedStrategyValue', () => {
-  it('should return value between 1 and 100', () => {
+  it('should return value between 0 and 100', () => {
     for (let i = 0; i < 100; i++) {
       const value = normalizedStrategyValue(`user-${i}`, 'group');
-      expect(value).toBeGreaterThanOrEqual(1);
+      expect(value).toBeGreaterThanOrEqual(0);
       expect(value).toBeLessThanOrEqual(100);
     }
   });

@@ -57,7 +57,17 @@ export class RemoteAddressStrategy extends Strategy {
     parameters: StrategyParameters,
     context: EvaluationContext
   ): boolean {
-    return this.isEnabledWithDetails(parameters, context).enabled;
+    const ips = parameters.IPs;
+    if (!ips) return false;
+    const remoteAddress = context.remoteAddress;
+    if (!remoteAddress) return false;
+    const matched = ips
+      .split(/\s*,\s*/)
+      .some(
+        (range: string) =>
+          range === remoteAddress || isInCidr(remoteAddress, range)
+      );
+    return matched;
   }
 
   isEnabledWithDetails(

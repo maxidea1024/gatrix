@@ -59,6 +59,8 @@ export class FeatureFlagService {
   private compactFlags: boolean = true;
   // Optional factory for multi-token mode (each token gets its own ApiClient with isolated ETag cache)
   private apiClientFactory?: ApiClientFactory;
+  // Reusable empty segment map to avoid allocation on every evaluation
+  private static readonly EMPTY_SEGMENT_MAP = new Map<string, FeatureSegment>();
 
   constructor(
     apiClient: ApiClient,
@@ -114,7 +116,7 @@ export class FeatureFlagService {
     maxBufferSize?: number;
     maxRetryBufferSize?: number;
   }): void {
-    this.metricsConfig = { ...this.metricsConfig, ...config };
+    Object.assign(this.metricsConfig, config);
     this.logger.debug('Metrics config updated', { config: this.metricsConfig });
   }
 
@@ -700,7 +702,8 @@ export class FeatureFlagService {
 
     const projectId = this.envToProjectMap.get(resolvedEnv);
     const segments = projectId
-      ? this.cachedSegments.get(projectId) || new Map<string, FeatureSegment>()
+      ? this.cachedSegments.get(projectId) ||
+        FeatureFlagService.EMPTY_SEGMENT_MAP
       : this.getAllSegments();
     const result = FeatureFlagEvaluator.evaluate(flag, mergedContext, segments);
 
@@ -1597,7 +1600,7 @@ export class FeatureFlagService {
       return;
     }
 
-    const metricsToSend = [...this.metricsBuffer];
+    const metricsToSend = this.metricsBuffer;
     this.metricsBuffer = [];
 
     try {

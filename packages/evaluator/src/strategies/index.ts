@@ -93,6 +93,8 @@ export function evaluateStrategyWithDetails(
       reason: `Unknown strategy type: ${strategyName}`,
     };
   }
-  const result = strategy.isEnabledWithDetails(parameters, context);
-  return { ...result, strategyFound: true };
+  const result: StrategyEvaluationResult & { strategyFound: boolean } =
+    strategy.isEnabledWithDetails(parameters, context) as any;
+  result.strategyFound = true;
+  return result;
 }

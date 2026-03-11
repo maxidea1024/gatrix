@@ -22,7 +22,14 @@ export class GradualRolloutSessionIdStrategy extends Strategy {
     parameters: StrategyParameters,
     context: EvaluationContext
   ): boolean {
-    return this.isEnabledWithDetails(parameters, context).enabled;
+    const { sessionId } = context;
+    if (!sessionId) return false;
+    const percentage = Number(parameters.percentage ?? 0);
+    const groupId = parameters.groupId || '';
+    const enabled =
+      percentage > 0 &&
+      normalizedStrategyValue(sessionId, groupId) <= percentage;
+    return enabled;
   }
 
   isEnabledWithDetails(

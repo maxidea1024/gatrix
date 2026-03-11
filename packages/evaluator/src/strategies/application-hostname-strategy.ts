@@ -28,7 +28,13 @@ export class ApplicationHostnameStrategy extends Strategy {
     parameters: StrategyParameters,
     _context: EvaluationContext
   ): boolean {
-    return this.isEnabledWithDetails(parameters, _context).enabled;
+    const hostNames = parameters.hostNames;
+    if (!hostNames) return false;
+    const matched = hostNames
+      .toLowerCase()
+      .split(/\s*,\s*/)
+      .includes(this.currentHostname);
+    return matched;
   }
 
   isEnabledWithDetails(

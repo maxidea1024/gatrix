@@ -21,7 +21,9 @@ export class GradualRolloutRandomStrategy extends Strategy {
     parameters: StrategyParameters,
     _context: EvaluationContext
   ): boolean {
-    return this.isEnabledWithDetails(parameters, _context).enabled;
+    const percentage = Number(parameters.percentage ?? 0);
+    const enabled = percentage >= Math.floor(Math.random() * 100) + 1;
+    return enabled;
   }
 
   isEnabledWithDetails(

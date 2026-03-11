@@ -43,7 +43,14 @@ export class FlexibleRolloutStrategy extends Strategy {
     parameters: StrategyParameters,
     context: EvaluationContext
   ): boolean {
-    return this.isEnabledWithDetails(parameters, context).enabled;
+    const stickiness = parameters.stickiness || 'default';
+    const stickinessId = this.resolveStickiness(stickiness, context);
+    if (!stickinessId) return false;
+    const groupId = parameters.groupId || context.appName || '';
+    const rollout = Number(parameters.rollout ?? 100);
+    const enabled =
+      rollout > 0 && normalizedStrategyValue(stickinessId, groupId) <= rollout;
+    return enabled;
   }
 
   isEnabledWithDetails(
