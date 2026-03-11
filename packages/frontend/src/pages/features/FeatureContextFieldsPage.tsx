@@ -1278,13 +1278,15 @@ const FeatureContextFieldsPage: React.FC = () => {
                               </Tooltip>
                               <Tooltip title={t('common.delete')}>
                                 <span>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleDelete(field)}
-                                  disabled={field.isDefaultStickinessField === true}
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleDelete(field)}
+                                    disabled={
+                                      field.isDefaultStickinessField === true
+                                    }
+                                  >
+                                    <DeleteIcon fontSize="small" />
+                                  </IconButton>
                                 </span>
                               </Tooltip>
                             </Box>

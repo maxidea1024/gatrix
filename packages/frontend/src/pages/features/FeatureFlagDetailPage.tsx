@@ -4132,15 +4132,29 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 </Box>
                               </MenuItem>
                               {/* Custom stickiness fields from context fields */}
-                              {contextFields.filter((f) => f.stickiness && !f.isDefaultStickinessField).length > 0 && (
-                                <ListSubheader sx={{ lineHeight: '32px', fontSize: '0.75rem' }}>
+                              {contextFields.filter(
+                                (f) =>
+                                  f.stickiness && !f.isDefaultStickinessField
+                              ).length > 0 && (
+                                <ListSubheader
+                                  sx={{
+                                    lineHeight: '32px',
+                                    fontSize: '0.75rem',
+                                  }}
+                                >
                                   {t('featureFlags.customStickinessFields')}
                                 </ListSubheader>
                               )}
                               {contextFields
-                                .filter((f) => f.stickiness && !f.isDefaultStickinessField)
+                                .filter(
+                                  (f) =>
+                                    f.stickiness && !f.isDefaultStickinessField
+                                )
                                 .map((field) => (
-                                  <MenuItem key={field.fieldName} value={field.fieldName}>
+                                  <MenuItem
+                                    key={field.fieldName}
+                                    value={field.fieldName}
+                                  >
                                     <Box>
                                       <Typography variant="body2">
                                         {field.displayName || field.fieldName}
