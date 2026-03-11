@@ -23,18 +23,18 @@
         "clean": "rimraf dist"
     },
     "peerDependencies": {
-        "vue": "^3.3.0",
-        "@gatrix/gatrix-js-client-sdk": "link:../gatrix-js-client-sdk"
+        "@gatrix/gatrix-js-client-sdk": "*",
+        "vue": "^3.3.0"
     },
     "devDependencies": {
         "@gatrix/gatrix-js-client-sdk": "link:../gatrix-js-client-sdk",
         "@vitejs/plugin-vue": "^5.0.0",
-        "vue": "^3.4.0",
         "rimraf": "^5.0.5",
         "typescript": "^5.3.3",
         "vite": "^5.0.0",
         "vite-plugin-dts": "^3.7.0",
-        "vitest": "^1.0.0"
+        "vitest": "^1.0.0",
+        "vue": "^3.4.0"
     },
     "keywords": [
         "gatrix",

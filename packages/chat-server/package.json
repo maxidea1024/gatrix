@@ -30,7 +30,7 @@
   "author": "Gatrix Team",
   "license": "MIT",
   "dependencies": {
-    "@gatrix/gatrix-node-server-sdk": "file:../sdks/server-sdks/gatrix-node-server-sdk",
+    "@gatrix/gatrix-node-server-sdk": "workspace:*",
     "@keyv/redis": "^5.1.2",
     "@socket.io/redis-adapter": "^8.2.1",
     "@types/cheerio": "^0.22.35",

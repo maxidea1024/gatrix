@@ -40,7 +40,7 @@
     "@fullcalendar/interaction": "^6.1.19",
     "@fullcalendar/react": "^6.1.19",
     "@fullcalendar/timegrid": "^6.1.19",
-    "@gatrix/shared": "file:../shared",
+    "@gatrix/shared": "workspace:*",
     "@hookform/resolvers": "^5.2.1",
     "@monaco-editor/react": "^4.7.0",
     "@mui/icons-material": "^7.3.8",
