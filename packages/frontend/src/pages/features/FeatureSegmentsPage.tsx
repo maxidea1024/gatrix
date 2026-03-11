@@ -448,7 +448,7 @@ const FeatureSegmentsPage: React.FC = () => {
           `${projectApiPath}/features/segments/${editingSegment.id}`,
           editingSegment
         );
-        enqueueSnackbar(t('featureFlags.updateSuccess'), {
+        enqueueSnackbar(t('featureFlags.segmentUpdateSuccess'), {
           variant: 'success',
         });
       } else {
@@ -456,7 +456,7 @@ const FeatureSegmentsPage: React.FC = () => {
           ...editingSegment,
           projectId: currentProjectId,
         });
-        enqueueSnackbar(t('featureFlags.createSuccess'), {
+        enqueueSnackbar(t('featureFlags.segmentCreateSuccess'), {
           variant: 'success',
         });
       }
@@ -464,7 +464,7 @@ const FeatureSegmentsPage: React.FC = () => {
       setEditingSegment(null);
       loadSegments();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.saveFailed'), {
+      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.segmentSaveFailed'), {
         variant: 'error',
       });
     }
@@ -512,7 +512,7 @@ const FeatureSegmentsPage: React.FC = () => {
       await api.delete(
         `${projectApiPath}/features/segments/${deletingSegment.id}`
       );
-      enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('featureFlags.segmentDeleteSuccess'), { variant: 'success' });
       loadSegments();
     } catch (error: any) {
       const errorCode = extractErrorCode(error?.response?.data);
