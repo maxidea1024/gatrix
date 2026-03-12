@@ -55,7 +55,7 @@ export class GameWorldService extends BaseEnvironmentService<
    * @param id Game world ID
    * @param environmentId environment ID (required)
    */
-  async getById(id: string, environmentId: string): Promise<GameWorld> {
+  async getById(id: string, environmentId: string = ''): Promise<GameWorld> {
     this.logger.debug('Fetching game world by ID', { id, environmentId });
 
     const response = await this.apiClient.get<GameWorld>(
@@ -113,7 +113,7 @@ export class GameWorldService extends BaseEnvironmentService<
    */
   async updateSingleWorld(
     id: string,
-    environmentId: string,
+    environmentId: string = '',
     isVisible?: boolean | number
   ): Promise<void> {
     try {
@@ -183,7 +183,7 @@ export class GameWorldService extends BaseEnvironmentService<
    * @param worldId World ID
    * @param environmentId environment ID (required)
    */
-  isWorldMaintenanceActive(worldId: string, environmentId: string): boolean {
+  isWorldMaintenanceActive(worldId: string, environmentId: string = ''): boolean {
     const worlds = this.getCached(environmentId);
     const world = worlds.find((w) => w.worldId === worldId);
     if (!world || !world.isMaintenance) {
@@ -216,7 +216,7 @@ export class GameWorldService extends BaseEnvironmentService<
    * @param worldId World ID
    * @param environmentId environment ID (required)
    */
-  getWorldByWorldId(worldId: string, environmentId: string): GameWorld | null {
+  getWorldByWorldId(worldId: string, environmentId: string = ''): GameWorld | null {
     const worlds = this.getCached(environmentId);
     return worlds.find((w) => w.worldId === worldId) || null;
   }
@@ -230,7 +230,7 @@ export class GameWorldService extends BaseEnvironmentService<
    */
   getWorldMaintenanceMessage(
     worldId: string,
-    environmentId: string,
+    environmentId: string = '',
     lang: 'ko' | 'en' | 'zh' = 'en'
   ): string | null {
     const worlds = this.getCached(environmentId);

@@ -61,7 +61,7 @@ export class WhitelistService {
   /**
    * Initialize service and load data from local storage
    */
-  async initializeAsync(environmentId: string): Promise<void> {
+  async initializeAsync(environmentId: string = ''): Promise<void> {
     if (!this.storage) return;
 
     try {
@@ -99,7 +99,7 @@ export class WhitelistService {
    * Get all whitelists (IP and Account) for a specific environment
    * GET /api/v1/server/whitelists
    */
-  async listByEnvironment(environmentId: string): Promise<WhitelistData> {
+  async listByEnvironment(environmentId: string = ''): Promise<WhitelistData> {
     const endpoint = `/api/v1/server/whitelists`;
 
     this.logger.debug('Fetching whitelists', { environmentId });
@@ -159,7 +159,7 @@ export class WhitelistService {
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
   async refreshByEnvironment(
-    environmentId: string,
+    environmentId: string = '',
     suppressWarnings?: boolean
   ): Promise<WhitelistData> {
     if (!this.featureEnabled && !suppressWarnings) {
@@ -178,7 +178,7 @@ export class WhitelistService {
    * Get cached whitelists
    * @param environmentId environment ID (required)
    */
-  getCached(environmentId: string): WhitelistData {
+  getCached(environmentId: string = ''): WhitelistData {
     return (
       this.cachedWhitelistByEnv.get(environmentId) || {
         ipWhitelist: [],
@@ -205,7 +205,7 @@ export class WhitelistService {
   /**
    * Clear cached data for a specific environment
    */
-  clearCacheForEnvironment(environmentId: string): void {
+  clearCacheForEnvironment(environmentId: string = ''): void {
     this.cachedWhitelistByEnv.delete(environmentId);
     this.logger.debug('Whitelist cache cleared for environment', {
       environmentId,
@@ -216,7 +216,7 @@ export class WhitelistService {
    * Get cached IP whitelist
    * @param environmentId environment ID (required)
    */
-  getCachedIpWhitelist(environmentId: string): IpWhitelistEntry[] {
+  getCachedIpWhitelist(environmentId: string = ''): IpWhitelistEntry[] {
     return this.getCached(environmentId).ipWhitelist;
   }
 
@@ -224,7 +224,7 @@ export class WhitelistService {
    * Get cached Account whitelist
    * @param environmentId environment ID (required)
    */
-  getCachedAccountWhitelist(environmentId: string): AccountWhitelistEntry[] {
+  getCachedAccountWhitelist(environmentId: string = ''): AccountWhitelistEntry[] {
     return this.getCached(environmentId).accountWhitelist;
   }
 
@@ -234,7 +234,7 @@ export class WhitelistService {
    * @param ip IP address to check
    * @param environmentId environment ID (required)
    */
-  isIpWhitelisted(ip: string, environmentId: string): boolean {
+  isIpWhitelisted(ip: string, environmentId: string = ''): boolean {
     const whitelist = this.getCached(environmentId);
     return whitelist.ipWhitelist.some((entry) => {
       // Check exact IP match
@@ -311,7 +311,7 @@ export class WhitelistService {
    * @param accountId Account ID to check
    * @param environmentId environment ID (required)
    */
-  isAccountWhitelisted(accountId: string, environmentId: string): boolean {
+  isAccountWhitelisted(accountId: string, environmentId: string = ''): boolean {
     const whitelist = this.getCached(environmentId);
     return whitelist.accountWhitelist.some((entry) => {
       return entry.accountId === accountId;
@@ -324,7 +324,7 @@ export class WhitelistService {
    * @param whitelist Whitelist data to cache
    * @param environmentId environment ID (required)
    */
-  updateCache(whitelist: WhitelistData, environmentId: string): void {
+  updateCache(whitelist: WhitelistData, environmentId: string = ''): void {
     this.logger.debug('Updating whitelist cache', {
       environmentId,
       ipCount: whitelist.ipWhitelist.length,

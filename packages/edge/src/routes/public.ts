@@ -61,7 +61,7 @@ router.get(
       const fields = req.query.fields as string | undefined;
 
       // Get service notices from cache for this environment
-      const envNotices = sdk.getServiceNotices(environmentId);
+      const envNotices = sdk.serviceNotice.getCached(environmentId);
 
       // Optionally filter by platform
       let filteredNotices = envNotices;
@@ -149,7 +149,7 @@ router.get(
       }
 
       // Get service notices from cache for this environment
-      const envNotices = sdk.getServiceNotices(environmentId);
+      const envNotices = sdk.serviceNotice.getCached(environmentId);
       const notice = envNotices.find((n: { id: string }) => n.id === noticeId);
 
       if (!notice) {

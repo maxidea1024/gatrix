@@ -292,7 +292,7 @@ async function main() {
     const serviceRegion = process.env.SERVICE_REGION || 'default';
 
     const { instanceId, hostname, internalAddress, externalAddress } =
-      await sdk.registerService({
+      await sdk.serviceDiscovery.register({
         labels: {
           service: 'idle',
           group: serviceGroup,
@@ -388,7 +388,7 @@ async function main() {
       logger.info('POPUP UPDATED', event.data);
       printCachedData();
 
-      console.log(JSON.stringify(sdk.getActivePopupNotices(), null, 2));
+      console.log(JSON.stringify(sdk.popupNotice.getActivePopupNotices(), null, 2));
     });
 
     sdk.on('popup.deleted', (event) => {
@@ -548,15 +548,15 @@ async function main() {
     function printCachedData() {
       const featureFlags = sdk.featureFlag.getCached(targetEnvironment);
       const cachedData = {
-        gameWorlds: sdk.getGameWorlds(targetEnvironment),
-        popupNotices: sdk.getPopupNotices(targetEnvironment),
-        surveys: sdk.getSurveys(targetEnvironment),
+        gameWorlds: sdk.gameWorld.getCached(targetEnvironment),
+        popupNotices: sdk.popupNotice.getCached(targetEnvironment),
+        surveys: sdk.survey.getCached(targetEnvironment),
         whitelists: sdk.whitelist.getAllCached(),
-        maintenance: sdk.getServiceMaintenanceStatus(targetEnvironment),
-        banners: sdk.getBanners(targetEnvironment),
-        clientVersions: sdk.getClientVersions(targetEnvironment),
-        serviceNotices: sdk.getServiceNotices(targetEnvironment),
-        storeProducts: sdk.getStoreProducts(targetEnvironment),
+        maintenance: sdk.serviceMaintenance.getCached(targetEnvironment),
+        banners: sdk.banner.getCached(targetEnvironment),
+        clientVersions: sdk.clientVersion.getCached(targetEnvironment),
+        serviceNotices: sdk.serviceNotice.getCached(targetEnvironment),
+        storeProducts: sdk.storeProduct.getCached(targetEnvironment),
         featureFlags: featureFlags.length,
         timestamp: new Date().toISOString(),
       };

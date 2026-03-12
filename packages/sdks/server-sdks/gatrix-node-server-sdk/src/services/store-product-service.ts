@@ -49,7 +49,7 @@ export class StoreProductService extends BaseEnvironmentService<
    * Refresh cached store products for a specific environment
    */
   async refreshByEnvironment(
-    environmentId: string,
+    environmentId: string = '',
     suppressWarnings?: boolean
   ): Promise<StoreProduct[]> {
     if (!this.featureEnabled && !suppressWarnings) {
@@ -72,7 +72,7 @@ export class StoreProductService extends BaseEnvironmentService<
    * @param id Store product ID
    * @param environmentId environment ID (required)
    */
-  async getById(id: string, _environmentId: string): Promise<StoreProduct> {
+  async getById(id: string, _environmentId: string = ''): Promise<StoreProduct> {
     const response = await this.apiClient.get<{ product: StoreProduct }>(
       `/api/v1/server/store-products/${id}`
     );
@@ -104,7 +104,7 @@ export class StoreProductService extends BaseEnvironmentService<
    */
   async updateSingleProduct(
     id: string,
-    environmentId: string,
+    environmentId: string = '',
     isActive?: boolean | number
   ): Promise<void> {
     try {
@@ -148,7 +148,7 @@ export class StoreProductService extends BaseEnvironmentService<
   /**
    * Remove an item from cache by ULID (event uses ULID, not cmsProductId)
    */
-  private removeByUlidFromCache(ulid: string, environmentId: string): void {
+  private removeByUlidFromCache(ulid: string, environmentId: string = ''): void {
     const currentItems = this.cachedByEnv.get(environmentId) || [];
     const newItems = currentItems.filter((item) => item.id !== ulid);
     this.cachedByEnv.set(environmentId, newItems);
@@ -203,7 +203,7 @@ export class StoreProductService extends BaseEnvironmentService<
    * @param store Store type
    * @param environmentId environment ID (required)
    */
-  getByStore(store: string, environmentId: string): StoreProduct[] {
+  getByStore(store: string, environmentId: string = ''): StoreProduct[] {
     const products = this.getCached(environmentId);
     return products.filter((p) => p.store === store);
   }
@@ -214,7 +214,7 @@ export class StoreProductService extends BaseEnvironmentService<
    * This method only filters by sale period
    * @param environmentId environment ID (required)
    */
-  getActive(environmentId: string): StoreProduct[] {
+  getActive(environmentId: string = ''): StoreProduct[] {
     const products = this.getCached(environmentId);
     const now = new Date();
 

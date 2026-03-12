@@ -48,7 +48,7 @@ export class ClientVersionService extends BaseEnvironmentService<
    * @param item Client version to update
    * @param environmentId environment ID (required)
    */
-  updateSingleClientVersion(item: ClientVersion, environmentId: string): void {
+  updateSingleClientVersion(item: ClientVersion, environmentId: string = ''): void {
     this.updateItemInCache(item, environmentId);
   }
 
@@ -82,7 +82,7 @@ export class ClientVersionService extends BaseEnvironmentService<
    */
   getLatestByPlatform(
     platform: string,
-    environmentId: string,
+    environmentId: string = '',
     status?: string
   ): ClientVersion | null {
     const versions = this.getCached(environmentId);
@@ -107,7 +107,7 @@ export class ClientVersionService extends BaseEnvironmentService<
    * @param platform Platform name
    * @param environmentId environment ID (required)
    */
-  getByPlatform(platform: string, environmentId: string): ClientVersion[] {
+  getByPlatform(platform: string, environmentId: string = ''): ClientVersion[] {
     const versions = this.getCached(environmentId);
     return versions.filter((v) => v.platform === platform);
   }

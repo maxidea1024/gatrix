@@ -21,6 +21,9 @@ export {
   MaintenanceStateSnapshot,
 } from './cache/maintenance-watcher';
 
+// Export WorldMaintenanceService (aggregates service + world + whitelist)
+export { WorldMaintenanceService } from './services/world-maintenance-service';
+
 // Export errors
 export {
   GatrixSDKError,

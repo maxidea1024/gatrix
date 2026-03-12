@@ -87,7 +87,7 @@ export class VarsService extends BaseEnvironmentService<
    * @param key Variable key
    * @param environmentId environment ID
    */
-  getByKey(key: string, environmentId: string): VarItem | null {
+  getByKey(key: string, environmentId: string = ''): VarItem | null {
     const items = this.getCached(environmentId);
     return items.find((item) => item.varKey === key) || null;
   }

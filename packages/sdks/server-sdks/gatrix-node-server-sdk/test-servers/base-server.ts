@@ -139,8 +139,8 @@ export class BaseTestServer {
     try {
       // Update service status to 'error' if service discovery is enabled
       if (this.config.enableServiceDiscovery) {
-        await this.sdk
-          .updateServiceStatus({
+        await this.sdk.serviceDiscovery
+          .updateStatus({
             status: 'error',
             stats: {
               errorType,
@@ -233,7 +233,7 @@ export class BaseTestServer {
       ...(this.config.customLabels || {}),
     };
 
-    const instanceId = await this.sdk.registerService({
+    const instanceId = await this.sdk.serviceDiscovery.register({
       labels,
       hostname: os.hostname(),
       internalAddress: internalIp,
@@ -259,30 +259,30 @@ export class BaseTestServer {
     this.log('=== Cache State ===');
 
     // Game worlds
-    const worlds = await this.sdk.fetchGameWorlds();
+    const worlds = await this.sdk.gameWorld.listByEnvironment();
     this.log(`Game Worlds: ${worlds.length} loaded`);
     worlds.forEach((world) => {
-      const maintenance = this.sdk.isWorldInMaintenance(world.worldId);
+      const maintenance = this.sdk.gameWorld.isWorldMaintenanceActive(world.worldId);
       this.log(
         `  - ${world.name} (${world.worldId}) ${maintenance ? '[MAINTENANCE]' : '[ACTIVE]'}`
       );
     });
 
     // Popup notices
-    const popups = await this.sdk.fetchPopupNotices();
+    const popups = await this.sdk.popupNotice.listByEnvironment();
     this.log(`Popup Notices: ${popups.length} loaded`);
     popups.forEach((popup) => {
       const contentPreview =
-        popup.message.substring(0, 50) +
-        (popup.message.length > 50 ? '...' : '');
+        (popup.content || '').substring(0, 50) +
+        ((popup.content || '').length > 50 ? '...' : '');
       this.log(`  - ${popup.id}: ${contentPreview}`);
     });
 
     // Surveys (may fail if admin auth is required)
     try {
-      const surveys = await this.sdk.fetchSurveys();
-      this.log(`Surveys: ${surveys.length} loaded`);
-      surveys.forEach((survey) => {
+      const surveys = await this.sdk.survey.listByEnvironment();
+      this.log(`Surveys: ${surveys.surveys.length} loaded`);
+      surveys.surveys.forEach((survey) => {
         this.log(`  - ${survey.id}: ${survey.surveyTitle || 'No title'}`);
       });
     } catch (error: any) {
@@ -413,22 +413,22 @@ export class BaseTestServer {
   protected async testServiceDiscoveryAPI(): Promise<void> {
     try {
       // Get all services
-      const allServices = await this.sdk.fetchServices();
+      const allServices = await this.sdk.serviceDiscovery.fetchServices();
       this.log(`Service Discovery API: ${allServices.length} total services`);
 
       // Get services by service type
-      const authServices = await this.sdk.fetchServices({ service: 'authd' });
+      const authServices = await this.sdk.serviceDiscovery.fetchServices({ service: 'authd' });
       this.log(`  - authd: ${authServices.length} instances`);
 
-      const lobbydServices = await this.sdk.fetchServices({
+      const lobbydServices = await this.sdk.serviceDiscovery.fetchServices({
         service: 'lobbyd',
       });
       this.log(`  - lobbyd: ${lobbydServices.length} instances`);
 
-      const chatdServices = await this.sdk.fetchServices({ service: 'chatd' });
+      const chatdServices = await this.sdk.serviceDiscovery.fetchServices({ service: 'chatd' });
       this.log(`  - chatd: ${chatdServices.length} instances`);
 
-      const worlddServices = await this.sdk.fetchServices({
+      const worlddServices = await this.sdk.serviceDiscovery.fetchServices({
         service: 'worldd',
       });
       this.log(`  - worldd: ${worlddServices.length} instances`);

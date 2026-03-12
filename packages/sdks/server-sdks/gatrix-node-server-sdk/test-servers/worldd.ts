@@ -38,13 +38,13 @@ class WorldServer extends BaseTestServer {
 
   private async checkPopupsAndSurveys(): Promise<void> {
     // Check popups for this world
-    const popups = await this.sdk.fetchPopupNotices();
+    const popups = await this.sdk.popupNotice.listByEnvironment();
     this.log(`Active popups: ${popups.length}`);
 
     // Check surveys (may fail if not available)
     try {
-      const surveys = await this.sdk.fetchSurveys();
-      this.log(`Active surveys: ${surveys.length}`);
+      const result = await this.sdk.survey.listByEnvironment();
+      this.log(`Active surveys: ${result.surveys.length}`);
     } catch (error: any) {
       this.log(`Surveys not available: ${error.message}`);
     }
@@ -72,8 +72,8 @@ class WorldServer extends BaseTestServer {
 
     // Update service stats (only if service discovery is enabled)
     if (this.config.enableServiceDiscovery) {
-      this.sdk
-        .updateServiceStatus({
+      this.sdk.serviceDiscovery
+        .updateStatus({
           status: 'ready',
           stats: {
             cpuUsage: Math.random() * 100,
@@ -98,7 +98,7 @@ class WorldServer extends BaseTestServer {
 
     try {
       this.log(`Testing coupon redemption: ${couponCode} for ${playerId}`);
-      const result = await this.sdk.redeemCoupon({
+      const result = await this.sdk.coupon.redeem({
         code: couponCode,
         userId: playerId,
         userName: `Player_${playerId}`,

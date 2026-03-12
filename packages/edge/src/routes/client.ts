@@ -182,7 +182,7 @@ router.get(
       }
 
       // Get client versions from cache for this environment
-      const envVersions = sdk.getClientVersions(
+      const envVersions = sdk.clientVersion.getCached(
         cacheKey || environmentId
       ) as ClientVersion[];
 
@@ -259,7 +259,7 @@ router.get(
           record.clientStatus === 'RECOMMENDED_UPDATE')
       ) {
         try {
-          const channels = sdk.getVarParsedValue<any[]>(
+          const channels = sdk.vars.getParsedValue<any[]>(
             '$channels',
             environmentId
           );
@@ -374,7 +374,7 @@ router.get(
       const { environmentId, cacheKey } = req.clientContext!;
 
       // Get game worlds from cache for this environment
-      const envWorlds = sdk.getGameWorlds(
+      const envWorlds = sdk.gameWorld.getCached(
         cacheKey || environmentId
       ) as GameWorld[];
 
@@ -497,7 +497,7 @@ router.get(
       const { environmentId } = req.clientContext!;
 
       // Get banners from cache for this environment
-      const envBanners = sdk.getBanners(environmentId) as Banner[];
+      const envBanners = sdk.banner.getCached(environmentId) as Banner[];
 
       // Record cache hit/miss
       if (envBanners.length > 0) {
@@ -555,7 +555,7 @@ router.get(
       const { environmentId } = req.clientContext!;
 
       // Get banners from cache for this environment
-      const envBanners = sdk.getBanners(environmentId) as Banner[];
+      const envBanners = sdk.banner.getCached(environmentId) as Banner[];
 
       // Find the specific banner
       const banner = envBanners.find((b) => b.bannerId === bannerId);
@@ -622,7 +622,7 @@ router.get(
       const { environmentId, platform } = req.clientContext!;
 
       // Get client versions from cache for this environment
-      const envVersions = sdk.getClientVersions(
+      const envVersions = sdk.clientVersion.getCached(
         environmentId
       ) as ClientVersion[];
 
@@ -678,7 +678,7 @@ router.get(
       const { environmentId, platform } = req.clientContext!;
 
       // Get service notices from cache for this environment
-      const envNotices = sdk.getServiceNotices(environmentId);
+      const envNotices = sdk.serviceNotice.getCached(environmentId);
 
       // Optionally filter by platform
       let filteredNotices = envNotices;

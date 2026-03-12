@@ -79,30 +79,47 @@ For the Feature Flag service, Server SDKs:
 - Buffer usage metrics locally and flush them periodically to the Gatrix Edge API to avoid network spam.
 - **Unlike Client SDKs, Server SDKs DO NOT have `synced` vs `realtime` flag concepts or `explicitSyncMode`.** Every flag evaluation is implicitly realtime, using the absolute latest definitions from the in-memory cache. Mid-session consistency is handled by passing identical contexts across stateless requests.
 
-### 2. Service-Namespaced Access
+### 2. Service-Namespaced Access (Getter Pattern)
 
-To maintain a clean and scalable API, **all service-specific operations MUST be accessed through their dedicated sub-service** — never directly on the main root `GatrixServerSdk` object.
+> [!CAUTION]
+> **All service-specific operations MUST be accessed through their dedicated service getter** — never directly on the main root `GatrixServerSdk` object. The root SDK object MUST NOT expose convenience wrapper methods that simply delegate to a sub-service. This prevents API surface bloat and ensures a single, consistent access pattern.
 
-| ❌ Wrong | ✅ Correct |
-|----------|-----------|
+| ❌ Wrong (convenience method on SDK) | ✅ Correct (service getter) |
+|--------------------------------------|----------------------------|
 | `sdk.isEnabled("flag", context)` | `sdk.featureFlag.isEnabled("flag", context)` |
-| `sdk.getGameWorld("world-1")` | `sdk.gameWorld.fetchById("world-1")` |
+| `sdk.getGameWorlds()` | `sdk.gameWorld.getCached()` |
+| `sdk.fetchGameWorldById("world-1")` | `sdk.gameWorld.getById("world-1")` |
+| `sdk.getVarValue("$key")` | `sdk.vars.getValue("$key")` |
+| `sdk.redeemCoupon(request)` | `sdk.coupon.redeem(request)` |
 
-**Required Services:**
-- `coupon`
-- `gameWorld`
-- `popupNotice`
-- `survey`
-- `whitelist`
-- `serviceMaintenance`
-- `storeProduct`
-- `featureFlag`
-- `serviceDiscovery`
-- `impactMetrics`
-- `banner`
-- `clientVersion`
-- `serviceNotice`
-- `vars`
+**Exceptions** — The following are allowed directly on the root SDK object because they are **cross-cutting concerns** that span multiple services or require orchestration logic beyond a single service:
+
+| Allowed on SDK root | Reason |
+|---------------------|--------|
+| `initialize()`, `close()` | SDK lifecycle management |
+| `on()`, `off()`, `publishCustomEvent()` | Unified event bus (dispatches to EventListener, CacheManager, or local event maps) |
+| `refreshCache()` | Orchestrates refresh across ALL services via CacheManager |
+| `createHttpMetricsMiddleware()` | Express middleware factory (not service-specific) |
+
+**Required Service Getters:**
+
+| Getter | Service |
+|--------|---------|
+| `sdk.coupon` | CouponService |
+| `sdk.gameWorld` | GameWorldService |
+| `sdk.popupNotice` | PopupNoticeService |
+| `sdk.survey` | SurveyService |
+| `sdk.whitelist` | WhitelistService |
+| `sdk.serviceMaintenance` | ServiceMaintenanceService |
+| `sdk.storeProduct` | StoreProductService |
+| `sdk.featureFlag` | FeatureFlagService |
+| `sdk.serviceDiscovery` | ServiceDiscoveryService (includes enrichment on register) |
+| `sdk.impactMetrics` | MetricsAPI |
+| `sdk.worldMaintenance` | WorldMaintenanceService (aggregates service + world + whitelist) |
+| `sdk.banner` | BannerService |
+| `sdk.clientVersion` | ClientVersionService |
+| `sdk.serviceNotice` | ServiceNoticeService |
+| `sdk.vars` | VarsService |
 
 ### 3. Unified Lifecycle: Single `initialize()`
 
@@ -340,7 +357,7 @@ The configuration model MUST strictly mirror this interface:
 interface GatrixSDKConfig {
   // Required Authentication and Identity
   apiUrl: string;  // Gatrix backend URL (e.g., https://api.gatrix.com)
-  apiToken: string;
+  apiToken: string; // REQUIRED — server API token. Must be explicitly provided; no default fallback.
   appName: string;
 
   // Optional - World ID for world-specific maintenance checks
@@ -403,6 +420,12 @@ interface GatrixSDKConfig {
     featureFlag?: boolean;         // default: false (opt-in)
     vars?: boolean;                // default: false (opt-in)
   };
+
+  // Optional - Multi-environment support (designed for Edge and similar special-purpose services)
+  // When provided, the SDK operates in multi-environment mode.
+  // Multi-environment mode is determined solely by the PRESENCE of this provider,
+  // NOT by the number of environments it returns.
+  environmentProvider?: IEnvironmentProvider;
 }
 ```
 

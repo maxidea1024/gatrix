@@ -14,6 +14,8 @@ import {
   ServiceLabels,
 } from '../types/api';
 import { getFirstNicAddress } from '../utils/network';
+import type { EventListener } from '../cache/event-listener';
+import type { CloudMetadata } from '../utils/cloud-metadata';
 
 export class ServiceDiscoveryService {
   private apiClient: ApiClient;
@@ -34,9 +36,40 @@ export class ServiceDiscoveryService {
     status?: string;
   };
 
+  // Enrichment config (set after construction to avoid circular deps)
+  private enrichmentConfig?: {
+    cloudMetadata: CloudMetadata;
+    sdkVersion: string;
+    metricsPort?: number;
+    meta?: {
+      version?: string;
+      commitHash?: string;
+      gitBranch?: string;
+    };
+    eventListener?: EventListener;
+  };
+
   constructor(apiClient: ApiClient, logger: Logger) {
     this.apiClient = apiClient;
     this.logger = logger;
+  }
+
+  /**
+   * Set enrichment configuration for automatic enhancement of registration input.
+   * Called during SDK initialization to inject cloud metadata, SDK version, etc.
+   */
+  setEnrichmentConfig(config: {
+    cloudMetadata: CloudMetadata;
+    sdkVersion: string;
+    metricsPort?: number;
+    meta?: {
+      version?: string;
+      commitHash?: string;
+      gitBranch?: string;
+    };
+    eventListener?: EventListener;
+  }): void {
+    this.enrichmentConfig = config;
   }
 
   /**
@@ -89,11 +122,64 @@ export class ServiceDiscoveryService {
     const internalAddress = input.internalAddress || getFirstNicAddress();
     const hostname = input.hostname || os.hostname();
 
-    const registrationInput = {
-      ...input,
-      hostname,
-      internalAddress,
-    };
+    // Apply enrichment if configured
+    let registrationInput: RegisterServiceInput;
+    if (this.enrichmentConfig) {
+      const enhancedLabels: RegisterServiceInput['labels'] = {
+        ...input.labels,
+      };
+
+      // Add cloud metadata labels
+      const cm = this.enrichmentConfig.cloudMetadata;
+      if (cm.provider !== 'unknown') {
+        enhancedLabels.cloudProvider = cm.provider;
+      }
+      if (cm.region) {
+        enhancedLabels.cloudRegion = cm.region;
+      }
+      if (cm.zone) {
+        enhancedLabels.cloudZone = cm.zone;
+      }
+      if (cm.instanceId) {
+        enhancedLabels.cloudInstanceId = cm.instanceId;
+      }
+
+      // Always add SDK version to labels
+      enhancedLabels.sdkVersion = this.enrichmentConfig.sdkVersion;
+
+      // Build ports with metricsApi fallback
+      const enhancedPorts = { ...input.ports };
+      if (!enhancedPorts.metricsApi && this.enrichmentConfig.metricsPort) {
+        enhancedPorts.metricsApi = this.enrichmentConfig.metricsPort;
+      }
+
+      // Build meta with version info from SDK config
+      const enhancedMeta: Record<string, any> = { ...input.meta };
+      if (this.enrichmentConfig.meta?.version) {
+        enhancedMeta.version = this.enrichmentConfig.meta.version;
+      }
+      if (this.enrichmentConfig.meta?.commitHash) {
+        enhancedMeta.commitHash = this.enrichmentConfig.meta.commitHash;
+      }
+      if (this.enrichmentConfig.meta?.gitBranch) {
+        enhancedMeta.gitBranch = this.enrichmentConfig.meta.gitBranch;
+      }
+
+      registrationInput = {
+        ...input,
+        hostname,
+        internalAddress,
+        labels: enhancedLabels,
+        ports: enhancedPorts,
+        meta: Object.keys(enhancedMeta).length > 0 ? enhancedMeta : input.meta,
+      };
+    } else {
+      registrationInput = {
+        ...input,
+        hostname,
+        internalAddress,
+      };
+    }
 
     this.logger.debug('Registering service via API', registrationInput);
 
@@ -137,7 +223,7 @@ export class ServiceDiscoveryService {
     // Start heartbeat to keep service alive in Redis
     this.startHeartbeat();
 
-    return {
+    const returnValue = {
       instanceId,
       hostname,
       internalAddress,
@@ -146,6 +232,36 @@ export class ServiceDiscoveryService {
       projectId: projectId || null,
       environmentId: environmentId || null,
     };
+
+    // Subscribe to org/project channels after registration
+    await this.subscribeChannelsAfterRegistration(returnValue);
+
+    return returnValue;
+  }
+
+  /**
+   * Subscribe to org/project channels after registration (if eventListener is available)
+   */
+  private async subscribeChannelsAfterRegistration(result: {
+    orgId: string | null;
+    projectId: string | null;
+  }): Promise<void> {
+    const eventListener = this.enrichmentConfig?.eventListener;
+    if (eventListener && (result.orgId || result.projectId)) {
+      try {
+        await eventListener.subscribeChannels({
+          orgId: result.orgId || undefined,
+          projectId: result.projectId || undefined,
+        });
+      } catch (error: any) {
+        this.logger.warn(
+          'Failed to subscribe to org/project channels after registration',
+          {
+            error: error.message,
+          }
+        );
+      }
+    }
   }
 
   /**

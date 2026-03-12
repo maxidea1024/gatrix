@@ -226,15 +226,15 @@ export abstract class BaseEnvironmentService<
     return items;
   }
 
-  protected getCacheKey(environmentId: string): string {
+  protected getCacheKey(environmentId: string = ''): string {
     return `${this.getServiceName()}_${environmentId}_data`;
   }
 
-  protected getEtagKey(environmentId: string): string {
+  protected getEtagKey(environmentId: string = ''): string {
     return `${this.getServiceName()}_${environmentId}_etag`;
   }
 
-  protected getResponseKey(environmentId: string): string {
+  protected getResponseKey(environmentId: string = ''): string {
     return `${this.getServiceName()}_${environmentId}_response`;
   }
 
@@ -313,7 +313,7 @@ export abstract class BaseEnvironmentService<
   /**
    * Clear cached data for a specific environment
    */
-  clearCacheForEnvironment(environmentId: string): void {
+  clearCacheForEnvironment(environmentId: string = ''): void {
     this.cachedByEnv.delete(environmentId);
     this.logger.debug(`${this.getServiceName()} cache cleared for environment`);
   }
@@ -419,7 +419,7 @@ export abstract class BaseEnvironmentService<
   /**
    * Persist current cache for an environment to local storage
    */
-  protected async persistCache(environmentId: string): Promise<void> {
+  protected async persistCache(environmentId: string = ''): Promise<void> {
     if (!this.storage) return;
 
     try {
@@ -440,7 +440,7 @@ export abstract class BaseEnvironmentService<
    * Persist the current ETag and raw response body to local storage.
    */
   protected async persistEtag(
-    environmentId: string,
+    environmentId: string = '',
     endpoint: string,
     responseData?: TResponse
   ): Promise<void> {

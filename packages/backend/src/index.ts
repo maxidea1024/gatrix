@@ -105,7 +105,7 @@ const gracefulShutdown = async (signal: string) => {
     // 5. Unregister backend service from service discovery via SDK
     if (gatrixSdk && backendInstanceId) {
       try {
-        await gatrixSdk.unregisterService();
+        await gatrixSdk.serviceDiscovery.unregister();
         await gatrixSdk.close();
         if (logger)
           logger.info(
@@ -556,7 +556,7 @@ const startServer = async () => {
 
         await gatrixSdk.initialize();
 
-        const result = await gatrixSdk.registerService({
+        const result = await gatrixSdk.serviceDiscovery.register({
           labels: {
             service: 'backend',
             group: process.env.SERVICE_GROUP || 'gatrix',

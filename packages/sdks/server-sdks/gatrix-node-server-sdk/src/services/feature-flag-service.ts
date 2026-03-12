@@ -208,7 +208,7 @@ export class FeatureFlagService {
   /**
    * Initialize the service by loading definitions from local storage
    */
-  async initializeAsync(environmentId: string): Promise<void> {
+  async initializeAsync(environmentId: string = ''): Promise<void> {
     if (!this.storage) return;
 
     const flagsKey = `FeatureFlags_${environmentId}_flags`;
@@ -268,7 +268,7 @@ export class FeatureFlagService {
    * GET /api/v1/server/features
    * Also caches referenced segments returned by the backend
    */
-  async listByEnvironment(environmentId: string): Promise<FeatureFlag[]> {
+  async listByEnvironment(environmentId: string = ''): Promise<FeatureFlag[]> {
     let endpoint = `/api/v1/server/features`;
 
     // Append compact query param when enabled
@@ -354,7 +354,7 @@ export class FeatureFlagService {
    * Refresh cached flags for a specific environment
    * Invalidates ETag cache before fetching to ensure fresh data
    */
-  async refreshByEnvironment(environmentId: string): Promise<FeatureFlag[]> {
+  async refreshByEnvironment(environmentId: string = ''): Promise<FeatureFlag[]> {
     if (!this.featureEnabled) {
       this.logger.warn(
         'FeatureFlagService.refreshByEnvironment() called but feature is disabled',
@@ -444,7 +444,7 @@ export class FeatureFlagService {
    * Get a single flag by name from cache (O(1) lookup)
    */
   getFlagByName(
-    environmentId: string,
+    environmentId: string = '',
     flagName: string
   ): FeatureFlag | undefined {
     const envCache = this.cachedFlagsByEnv.get(environmentId);
@@ -466,7 +466,7 @@ export class FeatureFlagService {
   /**
    * Get cached flag count for environment
    */
-  getCachedCount(environmentId: string): number {
+  getCachedCount(environmentId: string = ''): number {
     return this.cachedFlagsByEnv.get(environmentId)?.size ?? 0;
   }
 
@@ -488,7 +488,7 @@ export class FeatureFlagService {
   /**
    * Clear cached data for a specific environment
    */
-  clearCacheForEnvironment(environmentId: string): void {
+  clearCacheForEnvironment(environmentId: string = ''): void {
     this.cachedFlagsByEnv.delete(environmentId);
     this.logger.debug('Feature flags cache cleared for environment', {
       environmentId,
@@ -514,7 +514,7 @@ export class FeatureFlagService {
   /**
    * Resolve projectId from environmentId/cacheKey
    */
-  getProjectIdForEnvironment(environmentId: string): string | undefined {
+  getProjectIdForEnvironment(environmentId: string = ''): string | undefined {
     return this.envToProjectMap.get(environmentId);
   }
 
@@ -663,7 +663,7 @@ export class FeatureFlagService {
    * @param environmentId environment ID
    * @returns true if the flag is defined, false otherwise
    */
-  hasFlag(flagName: string, environmentId: string): boolean {
+  hasFlag(flagName: string, environmentId: string = ''): boolean {
     const flagMap = this.cachedFlagsByEnv.get(environmentId);
     if (!flagMap) return false;
     return flagMap.has(flagName);
@@ -1572,7 +1572,7 @@ export class FeatureFlagService {
    * Record a flag evaluation metric
    */
   private recordMetric(
-    environmentId: string,
+    environmentId: string = '',
     flagName: string,
     enabled: boolean,
     variantName?: string
@@ -1693,7 +1693,7 @@ export class FeatureFlagService {
    */
   async updateSingleFlag(
     flagName: string,
-    environmentId: string,
+    environmentId: string = '',
     isEnabled?: boolean
   ): Promise<void> {
     try {
@@ -1758,7 +1758,7 @@ export class FeatureFlagService {
   /**
    * Remove a flag from cache (O(1))
    */
-  removeFlag(flagName: string, environmentId: string): void {
+  removeFlag(flagName: string, environmentId: string = ''): void {
     this.logger.debug('Removing flag from cache', { flagName, environmentId });
 
     const envCache = this.cachedFlagsByEnv.get(environmentId);

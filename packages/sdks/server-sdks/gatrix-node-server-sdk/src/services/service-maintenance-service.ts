@@ -39,7 +39,7 @@ export class ServiceMaintenanceService {
   /**
    * Initialize service and load data from local storage
    */
-  async initializeAsync(environmentId: string): Promise<void> {
+  async initializeAsync(environmentId: string = ''): Promise<void> {
     if (!this.storage) return;
 
     try {
@@ -161,7 +161,7 @@ export class ServiceMaintenanceService {
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
   async refreshByEnvironment(
-    environmentId: string,
+    environmentId: string = '',
     suppressWarnings?: boolean
   ): Promise<MaintenanceStatus> {
     if (!this.featureEnabled && !suppressWarnings) {
@@ -177,7 +177,7 @@ export class ServiceMaintenanceService {
    * Get cached service maintenance status
    * @param environmentId environment ID (required)
    */
-  getCached(environmentId: string): MaintenanceStatus | null {
+  getCached(environmentId: string = ''): MaintenanceStatus | null {
     return this.cachedStatusByEnv.get(environmentId) || null;
   }
 
@@ -199,7 +199,7 @@ export class ServiceMaintenanceService {
   /**
    * Clear cached data for a specific environment
    */
-  clearCacheForEnvironment(environmentId: string): void {
+  clearCacheForEnvironment(environmentId: string = ''): void {
     this.cachedStatusByEnv.delete(environmentId);
     this.logger.debug('Service maintenance cache cleared for environment', {
       environmentId,
@@ -212,7 +212,7 @@ export class ServiceMaintenanceService {
    * @param status Maintenance status to cache
    * @param environmentId environment ID (required)
    */
-  updateCache(status: MaintenanceStatus | null, environmentId: string): void {
+  updateCache(status: MaintenanceStatus | null, environmentId: string = ''): void {
     if (status) {
       this.cachedStatusByEnv.set(environmentId, status);
     } else {
@@ -224,7 +224,7 @@ export class ServiceMaintenanceService {
    * Check if service is currently in maintenance based on flag and time window
    * @param environmentId environment ID (required)
    */
-  isMaintenanceActive(environmentId: string): boolean {
+  isMaintenanceActive(environmentId: string = ''): boolean {
     const cachedStatus = this.cachedStatusByEnv.get(environmentId);
     if (!cachedStatus) {
       return false;

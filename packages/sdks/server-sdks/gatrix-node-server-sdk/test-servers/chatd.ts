@@ -66,8 +66,8 @@ class ChatServer extends BaseTestServer {
 
       // Update service stats (only if service discovery is enabled)
       if (this.config.enableServiceDiscovery) {
-        this.sdk
-          .updateServiceStatus({
+        this.sdk.serviceDiscovery
+          .updateStatus({
             status: 'ready',
             stats: {
               totalMessages: this.messageCount,

@@ -55,7 +55,7 @@ async function main() {
       });
       logger.info(
         '📊 Current Maintenance Status:',
-        sdk.getCurrentMaintenanceStatus()
+        sdk.worldMaintenance.getCurrentStatus()
       );
     });
 
@@ -67,7 +67,7 @@ async function main() {
       });
       logger.info(
         '📊 Current Maintenance Status:',
-        sdk.getCurrentMaintenanceStatus()
+        sdk.worldMaintenance.getCurrentStatus()
       );
     });
 
@@ -80,14 +80,14 @@ async function main() {
       });
       logger.info(
         '📊 Current Maintenance Status:',
-        sdk.getCurrentMaintenanceStatus()
+        sdk.worldMaintenance.getCurrentStatus()
       );
     });
 
     // Print current maintenance status (once on startup)
     logger.info(
       '📊 Current Maintenance Status:',
-      sdk.getCurrentMaintenanceStatus()
+      sdk.worldMaintenance.getCurrentStatus()
     );
 
     logger.info('');

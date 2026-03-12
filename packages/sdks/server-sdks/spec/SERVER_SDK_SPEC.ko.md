@@ -79,30 +79,47 @@ Feature Flag 서비스에서 Server SDK는:
 - 사용량 메트릭을 로컬에서 버퍼링하고 네트워크 스팸을 방지하기 위해 주기적으로 Gatrix Edge API로 플러시합니다.
 - **Client SDK와 달리 Server SDK에는 `synced` vs `realtime` 플래그 개념이나 `explicitSyncMode`가 없습니다.** 모든 플래그 평가는 암묵적으로 실시간이며, 인메모리 캐시의 최신 정의를 사용합니다. 세션 중 일관성은 스테이트리스 요청에서 동일한 컨텍스트를 전달하여 처리됩니다.
 
-### 2. 서비스 네임스페이스 접근
+### 2. 서비스 네임스페이스 접근 (Getter 패턴)
 
-깔끔하고 확장 가능한 API를 유지하기 위해, **모든 서비스별 작업은 전용 하위 서비스를 통해 접근해야 합니다** — 메인 루트 `GatrixServerSdk` 객체에서 직접 접근하면 안 됩니다.
+> [!CAUTION]
+> **모든 서비스별 작업은 전용 서비스 getter를 통해 접근해야 합니다** — 메인 루트 `GatrixServerSdk` 객체에서 직접 접근하면 안 됩니다. 루트 SDK 객체는 하위 서비스에 단순 위임하는 편의 래퍼 메서드를 노출해서는 **안 됩니다**. 이를 통해 API 표면의 비대화를 방지하고 일관된 접근 패턴을 보장합니다.
 
-| ❌ 잘못된 방법 | ✅ 올바른 방법 |
-|---------------|---------------|
+| ❌ 잘못된 방법 (SDK의 편의 메서드) | ✅ 올바른 방법 (서비스 getter) |
+|--------------------------------------|-------------------------------|
 | `sdk.isEnabled("flag", context)` | `sdk.featureFlag.isEnabled("flag", context)` |
-| `sdk.getGameWorld("world-1")` | `sdk.gameWorld.fetchById("world-1")` |
+| `sdk.getGameWorlds()` | `sdk.gameWorld.getCached()` |
+| `sdk.fetchGameWorldById("world-1")` | `sdk.gameWorld.getById("world-1")` |
+| `sdk.getVarValue("$key")` | `sdk.vars.getValue("$key")` |
+| `sdk.redeemCoupon(request)` | `sdk.coupon.redeem(request)` |
 
-**필수 서비스:**
-- `coupon`
-- `gameWorld`
-- `popupNotice`
-- `survey`
-- `whitelist`
-- `serviceMaintenance`
-- `storeProduct`
-- `featureFlag`
-- `serviceDiscovery`
-- `impactMetrics`
-- `banner`
-- `clientVersion`
-- `serviceNotice`
-- `vars`
+**예외** — 다음은 **여러 서비스에 걸친 크로스커팅 관심사**이거나 단일 서비스를 넘는 오케스트레이션 로직이 필요하므로 루트 SDK 객체에서 직접 허용됩니다:
+
+| SDK 루트에서 허용 | 이유 |
+|-------------------|------|
+| `initialize()`, `close()` | SDK 수명주기 관리 |
+| `on()`, `off()`, `publishCustomEvent()` | 통합 이벤트 버스 (EventListener, CacheManager, 로컬 이벤트 맵으로 디스패치) |
+| `refreshCache()` | CacheManager를 통한 전체 서비스 캐시 갱신 오케스트레이션 |
+| `createHttpMetricsMiddleware()` | Express 미들웨어 팩토리 (특정 서비스에 속하지 않음) |
+
+**필수 서비스 getter:**
+
+| Getter | 서비스 |
+|--------|--------|
+| `sdk.coupon` | CouponService |
+| `sdk.gameWorld` | GameWorldService |
+| `sdk.popupNotice` | PopupNoticeService |
+| `sdk.survey` | SurveyService |
+| `sdk.whitelist` | WhitelistService |
+| `sdk.serviceMaintenance` | ServiceMaintenanceService |
+| `sdk.storeProduct` | StoreProductService |
+| `sdk.featureFlag` | FeatureFlagService |
+| `sdk.serviceDiscovery` | ServiceDiscoveryService (등록 시 자동 보강 포함) |
+| `sdk.impactMetrics` | MetricsAPI |
+| `sdk.worldMaintenance` | WorldMaintenanceService (서비스 + 월드 + 화이트리스트 통합) |
+| `sdk.banner` | BannerService |
+| `sdk.clientVersion` | ClientVersionService |
+| `sdk.serviceNotice` | ServiceNoticeService |
+| `sdk.vars` | VarsService |
 
 ### 3. 통합 라이프사이클: 단일 `initialize()`
 
@@ -340,7 +357,7 @@ string StringVariationOrThrow(string flagName, EvaluationContext context, string
 interface GatrixSDKConfig {
   // 필수 인증 및 식별
   apiUrl: string;  // Gatrix 백엔드 URL (예: https://api.gatrix.com)
-  apiToken: string;
+  apiToken: string; // 필수 — 서버 API 토큰. 반드시 명시적으로 지정해야 하며, 기본값 없음.
   appName: string;
 
   // 선택 - 월드별 점검 확인을 위한 월드 ID
@@ -391,11 +408,11 @@ interface GatrixSDKConfig {
   // 기능 토글 (선택적 캐싱)
   // 기본 서비스는 활성화되어 있으며, 신규 서비스는 명시적으로 활성화해야 합니다.
   uses?: {
-    gameWorld?: boolean;           // 기본값: true
-    popupNotice?: boolean;         // 기본값: true
-    survey?: boolean;              // 기본값: true
-    whitelist?: boolean;           // 기본값: true
-    serviceMaintenance?: boolean;  // 기본값: true
+    gameWorld?: boolean;           // 기본값: false (명시적 활성화 필요)
+    popupNotice?: boolean;         // 기본값: false (명시적 활성화 필요)
+    survey?: boolean;              // 기본값: false (명시적 활성화 필요)
+    whitelist?: boolean;           // 기본값: false (명시적 활성화 필요)
+    serviceMaintenance?: boolean;  // 기본값: false (명시적 활성화 필요)
     clientVersion?: boolean;       // 기본값: false (명시적 활성화 필요)
     serviceNotice?: boolean;       // 기본값: false (명시적 활성화 필요)
     banner?: boolean;              // 기본값: false (명시적 활성화 필요)
@@ -403,6 +420,12 @@ interface GatrixSDKConfig {
     featureFlag?: boolean;         // 기본값: false (명시적 활성화 필요)
     vars?: boolean;                // 기본값: false (명시적 활성화 필요)
   };
+
+  // 선택 - 멀티환경 지원 (Edge 등 특수 목적 서비스용으로 설계)
+  // 설정 시 SDK는 멀티환경 모드로 동작합니다.
+  // 멀티환경 모드 판정은 이 provider의 "존재 여부"로만 결정되며,
+  // 반환하는 환경 수와는 무관합니다.
+  environmentProvider?: IEnvironmentProvider;
 }
 ```
 

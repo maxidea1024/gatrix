@@ -28,7 +28,7 @@ class LobbyServer extends BaseTestServer {
     this.log('Lobby server specific initialization');
 
     // Check game worlds for lobby creation
-    const worlds = await this.sdk.fetchGameWorlds();
+    const worlds = await this.sdk.gameWorld.listByEnvironment();
     this.log(`Available game worlds for lobbies: ${worlds.length}`);
 
     // Subscribe to maintenance events
@@ -221,7 +221,7 @@ class LobbyServer extends BaseTestServer {
   }
 
   private async manageLobby(): Promise<void> {
-    const worlds = await this.sdk.fetchGameWorlds();
+    const worlds = await this.sdk.gameWorld.listByEnvironment();
 
     if (worlds.length === 0) {
       this.log('No game worlds available for lobby creation');
@@ -232,7 +232,7 @@ class LobbyServer extends BaseTestServer {
     const world = worlds[Math.floor(Math.random() * worlds.length)];
 
     // Check if world is in maintenance
-    if (this.sdk.isWorldInMaintenance(world.worldId)) {
+    if (this.sdk.gameWorld.isWorldMaintenanceActive(world.worldId)) {
       this.log(
         `World ${world.name} is in maintenance, skipping lobby creation`
       );
@@ -262,8 +262,8 @@ class LobbyServer extends BaseTestServer {
 
     // Update service stats (only if service discovery is enabled)
     if (this.config.enableServiceDiscovery) {
-      this.sdk
-        .updateServiceStatus({
+      this.sdk.serviceDiscovery
+        .updateStatus({
           status: 'ready',
           stats: {
             activeLobbies: this.lobbies.size,

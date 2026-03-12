@@ -21,6 +21,7 @@ import { BannerService } from './services/banner-service';
 import { ClientVersionService } from './services/client-version-service';
 import { ServiceNoticeService } from './services/service-notice-service';
 import { VarsService } from './services/vars-service';
+import { WorldMaintenanceService } from './services/world-maintenance-service';
 import { CacheManager } from './cache/cache-manager';
 import { EventListener } from './cache/event-listener';
 import { EventCallback, SdkEvent } from './types/events';
@@ -37,24 +38,6 @@ import {
   MetricsAPI,
   ImpactMetricsStaticContext,
 } from './impact-metrics/metric-api';
-import {
-  RedeemCouponRequest,
-  RedeemCouponResponse,
-  GameWorld,
-  PopupNotice,
-  Survey,
-  SurveySettings,
-  ServiceInstance,
-  RegisterServiceInput,
-  UpdateServiceStatusInput,
-  GetServicesParams,
-  MaintenanceInfo,
-  CurrentMaintenanceStatus,
-  ClientVersion,
-  ServiceNotice,
-  Banner,
-  StoreProduct,
-} from './types/api';
 import {
   detectCloudMetadata,
   CloudMetadata,
@@ -74,6 +57,9 @@ export class GatrixServerSDK {
   // Services (non-cacheable - created directly in constructor)
   public readonly coupon: CouponService;
   public readonly serviceDiscovery: ServiceDiscoveryService;
+
+  // World maintenance (aggregates service + world + whitelist)
+  private _worldMaintenance?: WorldMaintenanceService;
 
   // Cache and Events
   private cacheManager?: CacheManager;
@@ -205,10 +191,9 @@ export class GatrixServerSDK {
   }
 
   constructor(config: GatrixSDKConfig) {
-    // Set default API token if not provided (for testing)
+    // Apply defaults
     const configWithDefaults = {
       ...config,
-      apiToken: config.apiToken || 'unsecured-server-api-token',
     };
 
     // Auto-configure Loki from environment variables if enabled
@@ -358,11 +343,6 @@ export class GatrixServerSDK {
 
     // service and group are optional
 
-    // environment is now optional (token handles it)
-    // if (!config.environment) {
-    //   throw createError(ErrorCode.INVALID_CONFIG, 'environment is required');
-    // }
-
     // Validate URL format
     try {
       new URL(config.apiUrl);
@@ -448,10 +428,10 @@ export class GatrixServerSDK {
       },
       redis: this.config.redis
         ? {
-            host: this.config.redis.host,
-            port: this.config.redis.port,
-            db: this.config.redis.db ?? 0,
-          }
+          host: this.config.redis.host,
+          port: this.config.redis.port,
+          db: this.config.redis.db ?? 0,
+        }
         : 'disabled',
       retry: this.config.retry ?? 'default',
     });
@@ -475,6 +455,17 @@ export class GatrixServerSDK {
           'No cloud metadata detected (not running in a cloud environment)'
         );
       }
+
+      // Set enrichment config on service discovery for auto-enrichment of registration input
+      this.serviceDiscovery.setEnrichmentConfig({
+        cloudMetadata: this.cloudMetadata,
+        sdkVersion: SDK_VERSION,
+        metricsPort:
+          this.config.metrics?.port ??
+          parseInt(process.env.SDK_METRICS_PORT || '9337', 10),
+        meta: this.config.meta,
+        eventListener: this.eventListener,
+      });
 
       // Initialize cache manager
       // CacheManager creates all services internally based on feature flags
@@ -866,6 +857,27 @@ export class GatrixServerSDK {
   }
 
   /**
+   * Get WorldMaintenanceService instance
+   * Aggregates service maintenance + world maintenance + whitelist checking
+   */
+  get worldMaintenance(): WorldMaintenanceService {
+    if (!this._worldMaintenance) {
+      this._worldMaintenance = new WorldMaintenanceService(
+        this.logger,
+        this.serviceMaintenance,
+        this.gameWorld,
+        this.whitelist,
+        this.cacheManager || null,
+        {
+          worldId: this.config.worldId,
+          resolveEnvironment: this.resolveEnvironment.bind(this),
+        }
+      );
+    }
+    return this._worldMaintenance;
+  }
+
+  /**
    * Get Impact Metrics API
    * Use this to define and record application-level metrics
    * that can be used for release flow safeguard evaluation.
@@ -952,14 +964,13 @@ export class GatrixServerSDK {
 
   /**
    * Check if SDK is running in multi-environment mode
-   * Multi-environment mode is enabled when:
-   * - environments is set to '*' (wildcard mode)
-   * - environments is an array with multiple values
+   * Multi-environment mode is enabled when environmentProvider (or tokenProvider) is configured.
+   * The number of environments does not matter — having a provider means multi-env mode.
    */
   isMultiEnvironmentMode(): boolean {
     const provider =
       this.config.environmentProvider || this.config.tokenProvider;
-    return !!provider && provider.getEnvironmentTokens().length > 1;
+    return !!provider;
   }
 
   /**
@@ -997,662 +1008,6 @@ export class GatrixServerSDK {
   }
 
   // ============================================================================
-  // Coupon Methods
-  // ============================================================================
-
-  /**
-   * Redeem a coupon
-   * @param request Coupon redemption request
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async redeemCoupon(
-    request: RedeemCouponRequest,
-    environmentId?: string
-  ): Promise<RedeemCouponResponse> {
-    const env = this.resolveEnvironment(environmentId, 'redeemCoupon');
-    return await this.coupon.redeem(request, env);
-  }
-
-  // ============================================================================
-  // Game World Methods
-  // ============================================================================
-
-  /**
-   * Fetch all game worlds
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async fetchGameWorlds(environmentId?: string): Promise<GameWorld[]> {
-    const env = this.resolveEnvironment(environmentId, 'fetchGameWorlds');
-    return await this.gameWorld.listByEnvironment(env);
-  }
-
-  /**
-   * Fetch game world by ID
-   * @param id Game world ID
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async fetchGameWorldById(
-    id: string,
-    environmentId?: string
-  ): Promise<GameWorld> {
-    const env = this.resolveEnvironment(environmentId, 'fetchGameWorldById');
-    return await this.gameWorld.getById(id, env);
-  }
-
-  /**
-   * Fetch game world by worldId
-   * @param worldId World ID string
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async fetchGameWorldByWorldId(
-    worldId: string,
-    environmentId?: string
-  ): Promise<GameWorld> {
-    const env = this.resolveEnvironment(
-      environmentId,
-      'fetchGameWorldByWorldId'
-    );
-    return await this.gameWorld.getByWorldId(worldId, env);
-  }
-
-  /**
-   * Get cached game worlds
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getGameWorlds(environmentId?: string): GameWorld[] {
-    const env = this.resolveEnvironment(environmentId, 'getGameWorlds');
-    return this.gameWorld.getCached(env);
-  }
-
-  /**
-   * Check if a world is in maintenance (time-based check)
-   * @param worldId World ID
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  isWorldMaintenanceActive(worldId: string, environmentId?: string): boolean {
-    const env = this.resolveEnvironment(
-      environmentId,
-      'isWorldMaintenanceActive'
-    );
-    return this.gameWorld.isWorldMaintenanceActive(worldId, env);
-  }
-
-  /**
-   * Get maintenance message for a world
-   * @param worldId World ID
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   * @param lang Language code (default: 'en')
-   */
-  getWorldMaintenanceMessage(
-    worldId: string,
-    environmentId?: string,
-    lang: 'ko' | 'en' | 'zh' = 'en'
-  ): string | null {
-    const env = this.resolveEnvironment(
-      environmentId,
-      'getWorldMaintenanceMessage'
-    );
-    return this.gameWorld.getWorldMaintenanceMessage(worldId, env, lang);
-  }
-
-  /**
-   * Fetch global service maintenance status
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async fetchServiceMaintenanceStatus(environmentId?: string) {
-    const env = this.resolveEnvironment(
-      environmentId,
-      'fetchServiceMaintenanceStatus'
-    );
-    return await this.serviceMaintenance.getStatusByEnvironment(env);
-  }
-
-  /**
-   * Get cached global service maintenance status
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  getServiceMaintenanceStatus(environmentId?: string) {
-    const env = this.resolveEnvironment(
-      environmentId,
-      'getServiceMaintenanceStatus'
-    );
-    return this.serviceMaintenance.getCached(env);
-  }
-
-  /**
-   * Check if global service is currently in maintenance (time-based check)
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  isServiceMaintenanceActive(environmentId?: string): boolean {
-    const env = this.resolveEnvironment(
-      environmentId,
-      'isServiceMaintenanceActive'
-    );
-    return this.serviceMaintenance.isMaintenanceActive(env);
-  }
-
-  /**
-   * Get localized maintenance message for global service
-   * @param lang Language code
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  getServiceMaintenanceMessage(
-    lang: 'ko' | 'en' | 'zh' = 'en',
-    environmentId?: string
-  ): string | null {
-    const env = this.resolveEnvironment(
-      environmentId,
-      'getServiceMaintenanceMessage'
-    );
-    return this.serviceMaintenance.getMessage(lang, env);
-  }
-
-  /**
-   * Get current maintenance status for client delivery
-   * Returns the ACTUAL maintenance status after checking time ranges
-   *
-   * Behavior:
-   * - Global service maintenance is always checked first
-   * - If worldId is configured in SDK, only that world is checked
-   * - Time-based maintenance (startsAt/endsAt) is calculated to determine actual status
-   *
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   * @returns CurrentMaintenanceStatus with isMaintenanceActive, source, and detail
-   */
-  getCurrentMaintenanceStatus(
-    environmentId?: string
-  ): CurrentMaintenanceStatus {
-    const env = this.resolveEnvironment(
-      environmentId,
-      'getCurrentMaintenanceStatus'
-    );
-
-    // Check global service maintenance first (uses time calculation internally)
-    if (this.serviceMaintenance.isMaintenanceActive(env)) {
-      const status = this.serviceMaintenance.getCached(env);
-      return {
-        isMaintenanceActive: true,
-        source: 'service',
-        detail: {
-          startsAt: status?.detail?.startsAt,
-          endsAt: status?.detail?.endsAt,
-          message: status?.detail?.message,
-          localeMessages: status?.detail?.localeMessages,
-          forceDisconnect: status?.detail?.kickExistingPlayers,
-          gracePeriodMinutes: status?.detail?.kickDelayMinutes,
-        },
-      };
-    }
-
-    // Check world-level maintenance
-    const targetWorldId = this.config.worldId;
-
-    if (
-      targetWorldId &&
-      this.gameWorld.isWorldMaintenanceActive(targetWorldId, env)
-    ) {
-      const world = this.gameWorld.getWorldByWorldId(targetWorldId, env);
-      if (world) {
-        // Convert maintenanceLocales array to localeMessages object
-        const localeMessages: { ko?: string; en?: string; zh?: string } = {};
-        if (world.maintenanceLocales) {
-          for (const locale of world.maintenanceLocales) {
-            if (
-              locale.lang === 'ko' ||
-              locale.lang === 'en' ||
-              locale.lang === 'zh'
-            ) {
-              localeMessages[locale.lang] = locale.message;
-            }
-          }
-        }
-
-        return {
-          isMaintenanceActive: true,
-          source: 'world',
-          worldId: targetWorldId,
-          detail: {
-            startsAt: world.maintenanceStartDate,
-            endsAt: world.maintenanceEndDate,
-            message: world.maintenanceMessage,
-            localeMessages:
-              Object.keys(localeMessages).length > 0
-                ? localeMessages
-                : undefined,
-            forceDisconnect: world.forceDisconnect,
-            gracePeriodMinutes: world.gracePeriodMinutes,
-          },
-        };
-      }
-    }
-
-    // Not in maintenance
-    return {
-      isMaintenanceActive: false,
-    };
-  }
-
-  /**
-   * Get maintenance status for a client, considering whitelist exemptions.
-   * This method checks both IP and account whitelists to determine if the client
-   * should be exempt from maintenance mode.
-   *
-   * Usage:
-   * 1. Before auth (IP check only): getMaintenanceStatusForClient({ clientIp })
-   * 2. After auth (IP + account check): getMaintenanceStatusForClient({ clientIp, accountId })
-   *
-   * When whitelisted:
-   * - isMaintenanceActive = false (client can connect)
-   * - isWhitelisted = true (indicates exemption reason)
-   *
-   * @param options.clientIp Client IP address (for IP whitelist check)
-   * @param options.accountId Account ID (for account whitelist check, typically after auth)
-   * @param options.environment environment ID. Optional in single-env mode, required in multi-env mode.
-   * @returns CurrentMaintenanceStatus with isWhitelisted field
-   */
-  getMaintenanceStatusForClient(options: {
-    clientIp?: string;
-    accountId?: string;
-    environmentId?: string;
-  }): CurrentMaintenanceStatus {
-    const { clientIp, accountId, environmentId } = options;
-    const env = this.resolveEnvironment(
-      environmentId,
-      'getMaintenanceStatusForClient'
-    );
-
-    // First get the raw maintenance status
-    const status = this.getCurrentMaintenanceStatus(env);
-
-    // If not in maintenance, return as-is
-    if (!status.isMaintenanceActive) {
-      return status;
-    }
-
-    // Check IP whitelist
-    if (clientIp) {
-      const isIpWhitelisted = this.whitelist.isIpWhitelisted(clientIp, env);
-      if (isIpWhitelisted) {
-        return {
-          isMaintenanceActive: false,
-          isWhitelisted: true,
-        };
-      }
-    }
-
-    // Check account whitelist
-    if (accountId) {
-      const isAccountWhitelisted = this.whitelist.isAccountWhitelisted(
-        accountId,
-        env
-      );
-      if (isAccountWhitelisted) {
-        return {
-          isMaintenanceActive: false,
-          isWhitelisted: true,
-        };
-      }
-    }
-
-    // Not whitelisted, return original maintenance status
-    return {
-      ...status,
-      isWhitelisted: false,
-    };
-  }
-
-  // ============================================================================
-  // Integrated Maintenance Methods
-  // ============================================================================
-
-  /**
-   * Check if the service is in maintenance (global or world-level)
-   * Checks in order: global service maintenance → world-level maintenance
-   *
-   * Behavior:
-   * - If worldId is provided: checks global service + that specific world
-   * - If config.worldId is set: checks global service + that specific world
-   * - If neither is set: checks global service + ALL worlds (returns true if any world is in maintenance)
-   *
-   * @param worldId Optional world ID to check (uses config.worldId if not provided)
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   * @returns true if either global service or world(s) is in maintenance
-   */
-  isMaintenanceActive(worldId?: string, environmentId?: string): boolean {
-    const env = this.resolveEnvironment(environmentId, 'isMaintenanceActive');
-
-    // First check global service maintenance
-    if (this.serviceMaintenance.isMaintenanceActive(env)) {
-      return true;
-    }
-
-    // Determine target world ID
-    const targetWorldId = worldId ?? this.config.worldId;
-
-    // If specific worldId is specified, check only that world
-    if (targetWorldId) {
-      return this.gameWorld.isWorldMaintenanceActive(targetWorldId, env);
-    }
-
-    // If no worldId specified, check ALL worlds (world-wide service mode)
-    const allWorlds = this.gameWorld.getCached(env);
-    for (const world of allWorlds) {
-      if (
-        world.worldId &&
-        this.gameWorld.isWorldMaintenanceActive(world.worldId, env)
-      ) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Get comprehensive maintenance information
-   * Returns detailed info about maintenance status including source, message, and options
-   *
-   * Behavior:
-   * - If worldId is provided: returns info for global service or that specific world
-   * - If config.worldId is set: returns info for global service or that specific world
-   * - If neither is set: returns info for global service or the first world in maintenance
-   *
-   * @param worldId Optional world ID to check (uses config.worldId if not provided)
-   * @param lang Language for maintenance message
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getMaintenanceInfo(
-    worldId?: string,
-    lang: 'ko' | 'en' | 'zh' = 'en',
-    environmentId?: string
-  ): MaintenanceInfo {
-    const env = this.resolveEnvironment(environmentId, 'getMaintenanceInfo');
-    const targetWorldId = worldId ?? this.config.worldId;
-
-    // Check global service maintenance first
-    if (this.serviceMaintenance.isMaintenanceActive(env)) {
-      const status = this.serviceMaintenance.getCached(env);
-      const actualStartTime =
-        this.cacheManager?.getServiceMaintenanceActualStartTime() ?? null;
-      return {
-        isMaintenanceActive: true,
-        source: 'service',
-        message: this.serviceMaintenance.getMessage(lang, env),
-        forceDisconnect: status?.detail?.kickExistingPlayers ?? false,
-        gracePeriodMinutes: status?.detail?.kickDelayMinutes ?? 0,
-        startsAt: status?.detail?.startsAt ?? null,
-        endsAt: status?.detail?.endsAt ?? null,
-        actualStartTime,
-      };
-    }
-
-    // If specific worldId is specified, check that world
-    if (
-      targetWorldId &&
-      this.gameWorld.isWorldMaintenanceActive(targetWorldId, env)
-    ) {
-      const world = this.gameWorld.getWorldByWorldId(targetWorldId, env);
-      const actualStartTime =
-        this.cacheManager?.getWorldMaintenanceActualStartTime(targetWorldId) ??
-        null;
-      return {
-        isMaintenanceActive: true,
-        source: 'world',
-        worldId: targetWorldId,
-        message: this.gameWorld.getWorldMaintenanceMessage(
-          targetWorldId,
-          env,
-          lang
-        ),
-        forceDisconnect: world?.forceDisconnect ?? false,
-        gracePeriodMinutes: world?.gracePeriodMinutes ?? 0,
-        startsAt: world?.maintenanceStartDate ?? null,
-        endsAt: world?.maintenanceEndDate ?? null,
-        actualStartTime,
-      };
-    }
-
-    // If no worldId specified, check ALL worlds and return first one in maintenance
-    if (!targetWorldId) {
-      const allWorlds = this.gameWorld.getCached(env);
-      for (const world of allWorlds) {
-        if (
-          world.worldId &&
-          this.gameWorld.isWorldMaintenanceActive(world.worldId, env)
-        ) {
-          const actualStartTime =
-            this.cacheManager?.getWorldMaintenanceActualStartTime(
-              world.worldId
-            ) ?? null;
-          return {
-            isMaintenanceActive: true,
-            source: 'world',
-            worldId: world.worldId,
-            message: this.gameWorld.getWorldMaintenanceMessage(
-              world.worldId,
-              env,
-              lang
-            ),
-            forceDisconnect: world.forceDisconnect ?? false,
-            gracePeriodMinutes: world.gracePeriodMinutes ?? 0,
-            startsAt: world.maintenanceStartDate ?? null,
-            endsAt: world.maintenanceEndDate ?? null,
-            actualStartTime,
-          };
-        }
-      }
-    }
-
-    // Not in maintenance
-    return {
-      isMaintenanceActive: false,
-      source: null,
-      message: null,
-      forceDisconnect: false,
-      gracePeriodMinutes: 0,
-      startsAt: null,
-      endsAt: null,
-      actualStartTime: null,
-    };
-  }
-
-  // ============================================================================
-  // Popup Notice Methods
-  // ============================================================================
-
-  /**
-   * Fetch active popup notices
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async fetchPopupNotices(environmentId?: string): Promise<PopupNotice[]> {
-    const env = this.resolveEnvironment(environmentId, 'fetchPopupNotices');
-    return await this.popupNotice.listByEnvironment(env);
-  }
-
-  /**
-   * Get cached popup notices
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getPopupNotices(environmentId?: string): PopupNotice[] {
-    const env = this.resolveEnvironment(environmentId, 'getPopupNotices');
-    return this.popupNotice.getCached(env);
-  }
-
-  /**
-   * Get popup notices for a specific world
-   * @param worldId World ID
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getPopupNoticesForWorld(
-    worldId: string,
-    environmentId?: string
-  ): PopupNotice[] {
-    const env = this.resolveEnvironment(
-      environmentId,
-      'getPopupNoticesForWorld'
-    );
-    return this.popupNotice.getNoticesForWorld(worldId, env);
-  }
-
-  /**
-   * Get active popup notices that are currently visible for the given context
-   * Filters by date range (startDate/endDate) and targeting fields
-   * Sorted by displayPriority (ascending, lower values mean higher priority)
-   * @returns Array of active popup notices, empty array if none match
-   */
-  getActivePopupNotices(options?: {
-    platform?: string;
-    channel?: string;
-    subChannel?: string;
-    worldId?: string;
-    userId?: string;
-    environmentId?: string;
-  }): PopupNotice[] {
-    const env = this.resolveEnvironment(
-      options?.environmentId,
-      'getActivePopupNotices'
-    );
-    return this.popupNotice.getActivePopupNotices({
-      ...options,
-      environmentId: env,
-    });
-  }
-
-  // ============================================================================
-  // Store Product Methods
-  // ============================================================================
-
-  /**
-   * Fetch all store products
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  async fetchStoreProducts(environmentId?: string): Promise<StoreProduct[]> {
-    const env = this.resolveEnvironment(environmentId, 'fetchStoreProducts');
-    return await this.storeProduct.listByEnvironment(env);
-  }
-
-  /**
-   * Get cached store products
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getStoreProducts(environmentId?: string): StoreProduct[] {
-    const env = this.resolveEnvironment(environmentId, 'getStoreProducts');
-    return this.storeProduct.getCached(env);
-  }
-
-  /**
-   * Get active store products (filtered by time and status)
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getActiveStoreProducts(environmentId?: string): StoreProduct[] {
-    const env = this.resolveEnvironment(
-      environmentId,
-      'getActiveStoreProducts'
-    );
-    return this.storeProduct.getActive(env);
-  }
-
-  /**
-   * Get store product by ID
-   * @param id Store product ID
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  async getStoreProductById(
-    id: string,
-    environmentId?: string
-  ): Promise<StoreProduct> {
-    const env = this.resolveEnvironment(environmentId, 'getStoreProductById');
-    return await this.storeProduct.getById(id, env);
-  }
-
-  // ============================================================================
-  // Survey Methods
-  // ============================================================================
-
-  /**
-   * Fetch surveys with settings
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async fetchSurveys(
-    environmentId?: string
-  ): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
-    const env = this.resolveEnvironment(environmentId, 'fetchSurveys');
-    return await this.survey.listByEnvironment(env, { isActive: true });
-  }
-
-  /**
-   * Get cached surveys with settings
-   * @param environmentId environment ID. Only used in multi-environment mode (Edge).
-   *                    For game servers, can be omitted to use default environment.
-   *                    For edge servers, must be provided from client request.
-   */
-  getSurveys(environmentId?: string): {
-    surveys: Survey[];
-    settings: SurveySettings | null;
-  } {
-    const env = this.resolveEnvironment(environmentId, 'getSurveys');
-    return {
-      surveys: this.survey.getCached(env),
-      settings: this.survey.getCachedSettings(env),
-    };
-  }
-
-  /**
-   * Get surveys for a specific world
-   * @param environmentId environment ID. Only used in multi-environment mode.
-   */
-  getSurveysForWorld(worldId: string, environmentId?: string): Survey[] {
-    const env = this.resolveEnvironment(environmentId, 'getSurveysForWorld');
-    return this.survey.getSurveysForWorld(worldId, env);
-  }
-
-  /**
-   * Update survey settings only
-   * Called when survey settings change (e.g., survey configuration updates)
-   * @param environmentId environment ID. Only used in multi-environment mode.
-   */
-  updateSurveySettings(
-    newSettings: SurveySettings,
-    environmentId?: string
-  ): void {
-    const env = this.resolveEnvironment(environmentId, 'updateSurveySettings');
-    this.survey.updateSettings(newSettings, env);
-  }
-
-  /**
-   * Get filtered(active) surveys for a user based on their conditions
-   * Filters surveys based on platform, channel, subchannel, world, and trigger conditions
-   * @param platform User's platform (e.g., 'pc', 'ios', 'android')
-   * @param channel User's channel (e.g., 'steam', 'epic')
-   * @param subChannel User's subchannel (e.g., 'pc', 'ios')
-   * @param worldId User's world ID
-   * @param userLevel User's level
-   * @param joinDays User's join days
-   * @param environmentId environment ID. Only used in multi-environment mode.
-   * @returns Array of appropriate surveys, empty array if none match
-   */
-  getActiveSurveys(
-    platform: string,
-    channel: string,
-    subChannel: string,
-    worldId: string,
-    userLevel: number,
-    joinDays: number,
-    environmentId?: string
-  ): Survey[] {
-    const env = this.resolveEnvironment(environmentId, 'getActiveSurveys');
-    return this.survey.getActiveSurveys(
-      platform,
-      channel,
-      subChannel,
-      worldId,
-      userLevel,
-      joinDays,
-      env
-    );
-  }
-
-  // ============================================================================
   // Cache Methods
   // ============================================================================
 
@@ -1668,75 +1023,6 @@ export class GatrixServerSDK {
     }
 
     await this.cacheManager.refreshAll();
-  }
-
-  /**
-   * Refresh game worlds cache
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async refreshGameWorldsCache(environmentId?: string): Promise<void> {
-    if (!this.cacheManager) {
-      throw createError(
-        ErrorCode.NOT_INITIALIZED,
-        'Cache manager not initialized'
-      );
-    }
-    const env = this.resolveEnvironment(
-      environmentId,
-      'refreshGameWorldsCache'
-    );
-    await this.cacheManager.refreshGameWorlds(env);
-  }
-
-  /**
-   * Refresh popup notices cache
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async refreshPopupNoticesCache(environmentId?: string): Promise<void> {
-    if (!this.cacheManager) {
-      throw createError(
-        ErrorCode.NOT_INITIALIZED,
-        'Cache manager not initialized'
-      );
-    }
-    const env = this.resolveEnvironment(
-      environmentId,
-      'refreshPopupNoticesCache'
-    );
-    await this.cacheManager.refreshPopupNotices(env);
-  }
-
-  /**
-   * Refresh surveys cache
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async refreshSurveysCache(environmentId?: string): Promise<void> {
-    if (!this.cacheManager) {
-      throw createError(
-        ErrorCode.NOT_INITIALIZED,
-        'Cache manager not initialized'
-      );
-    }
-    const env = this.resolveEnvironment(environmentId, 'refreshSurveysCache');
-    await this.cacheManager.refreshSurveys(env);
-  }
-
-  /**
-   * Refresh service maintenance cache
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async refreshServiceMaintenanceCache(environmentId?: string): Promise<void> {
-    if (!this.cacheManager) {
-      throw createError(
-        ErrorCode.NOT_INITIALIZED,
-        'Cache manager not initialized'
-      );
-    }
-    const env = this.resolveEnvironment(
-      environmentId,
-      'refreshServiceMaintenanceCache'
-    );
-    await this.cacheManager.refreshServiceMaintenance(env);
   }
 
   // ============================================================================
@@ -1835,7 +1121,7 @@ export class GatrixServerSDK {
         this.logger.warn(
           'Event listener not initialized. Events will not be received.'
         );
-        return () => {}; // Return no-op function
+        return () => { }; // Return no-op function
       }
       return this.eventListener.on(eventType, callback);
     }
@@ -1843,7 +1129,7 @@ export class GatrixServerSDK {
     else if (refreshMethod === 'polling') {
       if (!this.cacheManager) {
         this.logger.warn('Cache manager not initialized.');
-        return () => {}; // Return no-op function
+        return () => { }; // Return no-op function
       }
       const unsubscribe = this.cacheManager.onRefresh(
         (type: string, data: any) => {
@@ -1866,7 +1152,7 @@ export class GatrixServerSDK {
       return unsubscribe;
     }
 
-    return () => {}; // Return no-op function as fallback
+    return () => { }; // Return no-op function as fallback
   }
 
   /**
@@ -1899,146 +1185,6 @@ export class GatrixServerSDK {
     // For polling refresh, we don't have a way to unregister specific callbacks
     // This is a limitation of the current implementation
     // Consider using a callback registry if this becomes important
-  }
-
-  // ============================================================================
-  // Service Discovery Methods (via Backend API)
-  // ============================================================================
-
-  /**
-   * Register this service instance via Backend API
-   * Note: metricsApi port is automatically added from SDK config (default: 9337) if not provided in input.ports
-   * Note: environment and region labels are automatically added from SDK config if not provided
-   * Note: version, commitHash, gitBranch are automatically added to meta from SDK config if provided
-   */
-  async registerService(input: RegisterServiceInput): Promise<{
-    instanceId: string;
-    hostname: string;
-    internalAddress: string;
-    externalAddress: string;
-    orgId: string | null;
-    projectId: string | null;
-    environmentId: string | null;
-  }> {
-    // Auto-add environment and region labels from SDK config if not already provided
-    const enhancedLabels: RegisterServiceInput['labels'] = {
-      ...input.labels,
-    };
-
-    // Add environment from SDK config if not provided in labels
-    // environment label removed - token handles environment identification
-
-    // Add cloud metadata labels (auto-detected, always override any input)
-    // Use 'cloud' prefix to avoid conflicts with other fields (e.g., instanceId from service registration)
-    if (this.cloudMetadata.provider !== 'unknown') {
-      enhancedLabels.cloudProvider = this.cloudMetadata.provider;
-    }
-    if (this.cloudMetadata.region) {
-      enhancedLabels.cloudRegion = this.cloudMetadata.region;
-    }
-    if (this.cloudMetadata.zone) {
-      enhancedLabels.cloudZone = this.cloudMetadata.zone;
-    }
-    if (this.cloudMetadata.instanceId) {
-      enhancedLabels.cloudInstanceId = this.cloudMetadata.instanceId;
-    }
-
-    // Always add SDK version to labels
-    enhancedLabels.sdkVersion = SDK_VERSION;
-
-    // Build ports with metricsApi fallback (use input.ports.metricsApi if provided, otherwise use SDK config default)
-    const enhancedPorts = { ...input.ports };
-    if (!enhancedPorts.metricsApi) {
-      const metricsPort =
-        this.config.metrics?.port ??
-        parseInt(process.env.SDK_METRICS_PORT || '9337', 10);
-      enhancedPorts.metricsApi = metricsPort;
-    }
-
-    // Build meta with version info from SDK config (merged with input.meta)
-    const enhancedMeta: Record<string, any> = { ...input.meta };
-    if (this.config.meta?.version) {
-      enhancedMeta.version = this.config.meta.version;
-    }
-    if (this.config.meta?.commitHash) {
-      enhancedMeta.commitHash = this.config.meta.commitHash;
-    }
-    if (this.config.meta?.gitBranch) {
-      enhancedMeta.gitBranch = this.config.meta.gitBranch;
-    }
-
-    const inputWithEnhancements = {
-      ...input,
-      labels: enhancedLabels,
-      ports: enhancedPorts,
-      meta: Object.keys(enhancedMeta).length > 0 ? enhancedMeta : input.meta,
-    };
-    const result = await this.serviceDiscovery.register(inputWithEnhancements);
-
-    // After registration, subscribe to org/project channels for 3-level event delivery
-    if (this.eventListener && (result.orgId || result.projectId)) {
-      try {
-        await this.eventListener.subscribeChannels({
-          orgId: result.orgId || undefined,
-          projectId: result.projectId || undefined,
-        });
-      } catch (error: any) {
-        this.logger.warn(
-          'Failed to subscribe to org/project channels after registration',
-          {
-            error: error.message,
-          }
-        );
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Unregister this service instance via Backend API
-   */
-  async unregisterService(): Promise<void> {
-    await this.serviceDiscovery.unregister();
-  }
-
-  /**
-   * Update service status via Backend API
-   */
-  async updateServiceStatus(input: UpdateServiceStatusInput): Promise<void> {
-    await this.serviceDiscovery.updateStatus(input);
-  }
-
-  /**
-   * Fetch services with filtering via Backend API
-   * @param params - Filter parameters (serviceType, group, status, labels, excludeSelf)
-   */
-  async fetchServices(params?: GetServicesParams): Promise<ServiceInstance[]> {
-    return await this.serviceDiscovery.fetchServices(params);
-  }
-
-  /**
-   * Fetch a specific service instance via Backend API
-   */
-  async fetchService(
-    serviceType: string,
-    instanceId: string
-  ): Promise<ServiceInstance | null> {
-    return await this.serviceDiscovery.fetchService(serviceType, instanceId);
-  }
-
-  /**
-   * Get current service instance ID
-   */
-  getServiceInstanceId(): string | undefined {
-    return this.serviceDiscovery.getInstanceId();
-  }
-
-  /**
-   * Get current service type
-   */
-  getServiceType(): string | undefined {
-    return this.serviceDiscovery.getServiceType();
   }
 
   /**
@@ -2088,19 +1234,19 @@ export class GatrixServerSDK {
    */
   getUserMetricsProvider():
     | {
-        createCounter: (
-          name: string,
-          help: string,
-          labelNames?: string[]
-        ) => any;
-        createGauge: (name: string, help: string, labelNames?: string[]) => any;
-        createHistogram: (
-          name: string,
-          help: string,
-          labelNames?: string[],
-          buckets?: number[]
-        ) => any;
-      }
+      createCounter: (
+        name: string,
+        help: string,
+        labelNames?: string[]
+      ) => any;
+      createGauge: (name: string, help: string, labelNames?: string[]) => any;
+      createHistogram: (
+        name: string,
+        help: string,
+        labelNames?: string[],
+        buckets?: number[]
+      ) => any;
+    }
     | undefined {
     if (!this.userRegistry) return undefined;
 
@@ -2144,74 +1290,6 @@ export class GatrixServerSDK {
         });
       },
     };
-  }
-
-  /**
-   * Fetch whitelists (IP and Account)
-   * Performs API call via WhitelistService and updates cache
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async fetchWhitelists(environmentId?: string) {
-    const env = this.resolveEnvironment(environmentId, 'fetchWhitelists');
-    return await this.whitelist.listByEnvironment(env);
-  }
-
-  /**
-   * Check if IP is whitelisted using cached data
-   * Note: Uses WhitelistService cache; call fetchWhitelists or initialize cache beforehand.
-   * @param ip IP address to check
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async isIpWhitelisted(ip: string, environmentId?: string): Promise<boolean> {
-    const env = this.resolveEnvironment(environmentId, 'isIpWhitelisted');
-    return this.whitelist.isIpWhitelisted(ip, env);
-  }
-
-  /**
-   * Check if account is whitelisted using cached data
-   * Note: Uses WhitelistService cache; call fetchWhitelists or initialize cache beforehand.
-   * @param accountId Account ID to check
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async isAccountWhitelisted(
-    accountId: string,
-    environmentId?: string
-  ): Promise<boolean> {
-    const env = this.resolveEnvironment(environmentId, 'isAccountWhitelisted');
-    return this.whitelist.isAccountWhitelisted(accountId, env);
-  }
-
-  // ============================================================================
-  // Whitelist Cache Methods
-  // ============================================================================
-
-  /**
-   * Get cached whitelists (IP and Account)
-   * Returns cached data without making API call
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  getWhitelists(environmentId?: string) {
-    if (!this.cacheManager) {
-      this.logger.warn('Cache manager not initialized');
-      return { ipWhitelist: [], accountWhitelist: [] };
-    }
-    const env = this.resolveEnvironment(environmentId, 'getWhitelists');
-    return this.cacheManager.getWhitelists(env);
-  }
-
-  /**
-   * Refresh whitelist cache
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async refreshWhitelistCache(environmentId?: string): Promise<void> {
-    if (!this.cacheManager) {
-      throw createError(
-        ErrorCode.INVALID_CONFIG,
-        'Cache manager not initialized'
-      );
-    }
-    const env = this.resolveEnvironment(environmentId, 'refreshWhitelistCache');
-    await this.cacheManager.refreshWhitelists(env);
   }
 
   // ============================================================================
@@ -2272,138 +1350,6 @@ export class GatrixServerSDK {
       });
       throw error;
     }
-  }
-
-  // ============================================================================
-  // Client Version Methods (Edge feature)
-  // ============================================================================
-
-  /**
-   * Get cached client versions
-   * Only available when features.clientVersion is enabled
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getClientVersions(environmentId?: string): ClientVersion[] {
-    if (!this.cacheManager) {
-      this.logger.warn('SDK not initialized');
-      return [];
-    }
-    const env = this.resolveEnvironment(environmentId, 'getClientVersions');
-    return this.cacheManager.getClientVersions(env);
-  }
-
-  /**
-   * Get ClientVersionService for advanced operations
-   * Returns undefined if features.clientVersion is not enabled
-   */
-  getClientVersionService() {
-    return this.cacheManager?.getClientVersionService();
-  }
-
-  // ============================================================================
-  // Service Notice Methods (Edge feature)
-  // ============================================================================
-
-  /**
-   * Get cached service notices
-   * Only available when features.serviceNotice is enabled
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getServiceNotices(environmentId?: string): ServiceNotice[] {
-    if (!this.cacheManager) {
-      this.logger.warn('SDK not initialized');
-      return [];
-    }
-    const env = this.resolveEnvironment(environmentId, 'getServiceNotices');
-    return this.cacheManager.getServiceNotices(env);
-  }
-
-  /**
-   * Get ServiceNoticeService for advanced operations
-   * Returns undefined if features.serviceNotice is not enabled
-   */
-  getServiceNoticeService() {
-    return this.cacheManager?.getServiceNoticeService();
-  }
-
-  // ============================================================================
-  // Banner Methods (Edge feature)
-  // ============================================================================
-
-  /**
-   * Get cached banners
-   * Only available when features.banner is enabled
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getBanners(environmentId?: string): Banner[] {
-    if (!this.cacheManager) {
-      this.logger.warn('SDK not initialized');
-      return [];
-    }
-    const env = this.resolveEnvironment(environmentId, 'getBanners');
-    return this.cacheManager.getBanners(env);
-  }
-
-  /**
-   * Get BannerService for advanced operations
-   * Returns undefined if features.banner is not enabled
-   */
-  getBannerService() {
-    return this.cacheManager?.getBannerService();
-  }
-
-  // ============================================================================
-  // Vars (KV) Methods
-  // ============================================================================
-
-  /**
-   * Get all cached vars
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getVars(environmentId?: string): any[] {
-    if (!this.cacheManager) {
-      this.logger.warn('SDK not initialized');
-      return [];
-    }
-    const env = this.resolveEnvironment(environmentId, 'getVars');
-    return this.cacheManager.getVars(env);
-  }
-
-  /**
-   * Get a variable value by key from cache
-   * @param key Variable key (e.g., '$channel', 'kv:some-setting')
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getVarValue(key: string, environmentId?: string): string | null {
-    if (!this.cacheManager) return null;
-    const env = this.resolveEnvironment(environmentId, 'getVarValue');
-    return this.vars.getValue(key, env);
-  }
-
-  /**
-   * Get a variable value parsed as JSON if it's an object or array
-   * @param key Variable key
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
-   */
-  getVarParsedValue<T = any>(key: string, environmentId?: string): T | null {
-    if (!this.cacheManager) return null;
-    const env = this.resolveEnvironment(environmentId, 'getVarParsedValue');
-    return this.vars.getParsedValue<T>(key, env);
-  }
-
-  /**
-   * Refresh vars cache
-   * @param environmentId Optional in single-env mode, required in multi-env mode
-   */
-  async refreshVarsCache(environmentId?: string): Promise<void> {
-    if (!this.cacheManager) {
-      throw createError(
-        ErrorCode.NOT_INITIALIZED,
-        'Cache manager not initialized'
-      );
-    }
-    const env = this.resolveEnvironment(environmentId, 'refreshVarsCache');
-    await this.vars.refreshByEnvironment(env);
   }
 
   /**

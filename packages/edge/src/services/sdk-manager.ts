@@ -178,7 +178,7 @@ class SDKManager {
       });
 
       // Register Edge service to Service Discovery
-      const result = await this.sdk.registerService({
+      const result = await this.sdk.serviceDiscovery.register({
         labels: {
           service: 'edge',
           group: config.meta.group,
@@ -217,7 +217,7 @@ class SDKManager {
   async shutdown(): Promise<void> {
     if (this.sdk) {
       try {
-        await this.sdk.unregisterService();
+        await this.sdk.serviceDiscovery.unregister();
         logger.info('Edge service unregistered from Service Discovery');
       } catch (error) {
         logger.warn('Error unregistering Edge service:', error);

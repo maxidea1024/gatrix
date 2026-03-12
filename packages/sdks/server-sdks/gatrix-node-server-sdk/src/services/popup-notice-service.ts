@@ -54,7 +54,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * @param id Popup notice ID
    * @param environmentId environment ID (required)
    */
-  async getById(id: string, environmentId: string): Promise<PopupNotice> {
+  async getById(id: string, environmentId: string = ''): Promise<PopupNotice> {
     this.logger.debug('Fetching popup notice by ID', { id, environmentId });
 
     const response = await this.apiClient.get<{ notice: PopupNotice }>(
@@ -83,7 +83,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
    */
   async updateSingleNotice(
     id: string,
-    environmentId: string,
+    environmentId: string = '',
     isVisible?: boolean | number
   ): Promise<void> {
     try {
@@ -141,7 +141,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * @param worldId World ID
    * @param environmentId environment ID (required)
    */
-  getNoticesForWorld(worldId: string, environmentId: string): PopupNotice[] {
+  getNoticesForWorld(worldId: string, environmentId: string = ''): PopupNotice[] {
     const notices = this.getCached(environmentId);
     return notices.filter((notice) => {
       if (!notice.targetWorlds || notice.targetWorlds.length === 0) {
@@ -164,10 +164,10 @@ export class PopupNoticeService extends BaseEnvironmentService<
     subChannel?: string;
     worldId?: string;
     userId?: string;
-    environmentId: string;
-  }): PopupNotice[] {
+    environmentId?: string;
+  } = {}): PopupNotice[] {
     const now = new Date();
-    const { platform, channel, subChannel, worldId, userId, environmentId } =
+    const { platform, channel, subChannel, worldId, userId, environmentId = '' } =
       options;
     const notices = this.getCached(environmentId);
     const filtered = notices.filter((notice) => {
