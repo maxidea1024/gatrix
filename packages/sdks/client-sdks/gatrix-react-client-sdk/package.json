@@ -24,11 +24,11 @@
     "clean": "rimraf dist"
   },
   "peerDependencies": {
-    "@gatrix/gatrix-js-client-sdk": "*",
+    "@gatrix/gatrix-js-client-sdk": "workspace:*",
     "react": ">=17.0.0"
   },
   "devDependencies": {
-    "@gatrix/gatrix-js-client-sdk": "link:../gatrix-js-client-sdk",
+    "@gatrix/gatrix-js-client-sdk": "workspace:*",
     "@testing-library/react": "^14.1.2",
     "@types/react": "^18.2.38",
     "@vitejs/plugin-react": "^4.2.1",

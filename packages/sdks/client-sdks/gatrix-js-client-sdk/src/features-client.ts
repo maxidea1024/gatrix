@@ -43,6 +43,7 @@ import { GatrixError, GatrixFeatureError } from './errors';
 import { SDK_NAME, SDK_VERSION } from './version';
 import { VALUE_SOURCE } from './value-source';
 import ky from 'ky';
+import { validateAll } from './validate-params';
 
 const STORAGE_KEY_FLAGS = 'flags';
 const STORAGE_KEY_SESSION = 'sessionId';
@@ -437,10 +438,12 @@ export class FeaturesClient implements VariationProvider {
   }
 
   isEnabled(flagName: string, forceRealtime: boolean = true): boolean {
+    validateAll([{ param: 'flagName', value: flagName, type: 'string' }]);
     return this.isEnabledInternal(flagName, forceRealtime);
   }
 
   getFlag(flagName: string, forceRealtime: boolean = true): EvaluatedFlag | undefined {
+    validateAll([{ param: 'flagName', value: flagName, type: 'string' }]);
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getFlag');
@@ -451,6 +454,7 @@ export class FeaturesClient implements VariationProvider {
   }
 
   getVariant(flagName: string, forceRealtime: boolean = true): Variant {
+    validateAll([{ param: 'flagName', value: flagName, type: 'string' }]);
     return this.getVariantInternal(flagName, forceRealtime);
   }
 
@@ -462,6 +466,7 @@ export class FeaturesClient implements VariationProvider {
   // ==================== Flag Query Methods ====================
 
   hasFlag(flagName: string, forceRealtime: boolean = true): boolean {
+    validateAll([{ param: 'flagName', value: flagName, type: 'string' }]);
     const flags = this.selectFlags(forceRealtime);
     return flags.has(flagName);
   }

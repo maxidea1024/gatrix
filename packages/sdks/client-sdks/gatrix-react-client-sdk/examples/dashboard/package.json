@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@gatrix/gatrix-js-client-sdk": "link:../../../gatrix-js-client-sdk",
+    "@gatrix/gatrix-js-client-sdk": "workspace:*",
     "@gatrix/gatrix-react-client-sdk": "link:../..",
     "nes.css": "^2.3.0",
     "phaser": "^3.80.0",

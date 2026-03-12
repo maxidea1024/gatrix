@@ -30,6 +30,12 @@
       "import": "./dist/features/index.js",
       "require": "./dist/features/index.js",
       "default": "./dist/features/index.js"
+    },
+    "./validation": {
+      "types": "./dist/validation/index.d.ts",
+      "import": "./dist/validation/index.js",
+      "require": "./dist/validation/index.js",
+      "default": "./dist/validation/index.js"
     }
   },
   "files": [

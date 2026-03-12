@@ -927,7 +927,7 @@ export class CacheManager {
         );
       if (this.surveyService)
         promises.push(
-          this.surveyService.listByEnvironment(envId).catch(() => [])
+          this.surveyService.listByEnvironment(undefined, envId).catch(() => [])
         );
       if (this.whitelistService)
         promises.push(

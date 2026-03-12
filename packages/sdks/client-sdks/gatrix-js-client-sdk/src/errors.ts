@@ -22,6 +22,8 @@ export enum GatrixFeatureErrorCode {
   INVALID_CONFIG = 'INVALID_CONFIG',
   /** Parse error (JSON parsing failed) */
   PARSE_ERROR = 'PARSE_ERROR',
+  /** Invalid parameters passed to SDK method */
+  INVALID_PARAMETERS = 'INVALID_PARAMETERS',
 }
 
 /**

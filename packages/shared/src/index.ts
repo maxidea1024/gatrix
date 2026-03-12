@@ -10,3 +10,6 @@ export * from './errors/index';
 
 // Permissions (RBAC)
 export * from './permissions/index';
+
+// Validation utilities
+export * from './validation/index';
