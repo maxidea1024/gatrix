@@ -237,6 +237,8 @@ class FeaturesClient:
         self._last_error: Optional[Exception] = None
         self._consecutive_failures = 0
         self._polling_stopped = False
+        self._is_fetching_flags = False
+        self._pending_invalidation_keys: set = set()
 
         # Timers
         self._poll_timer: Optional[threading.Timer] = None
@@ -1010,6 +1012,11 @@ class FeaturesClient:
         if self._offline_mode:
             return
 
+        if self._is_fetching_flags:
+            return
+        self._is_fetching_flags = True
+        fetch_start_context_hash = self._last_context_hash
+
         self._last_context_hash = self._compute_context_hash(self._context)
         self._polling_stopped = False
         self._cancel_poll_timer()
@@ -1099,7 +1106,33 @@ class FeaturesClient:
         except Exception as e:
             self._handle_fetch_error(None, e)
         finally:
+            self._is_fetching_flags = False
             self._emitter.emit(EVENTS.FLAGS_FETCH_END)
+
+            # Priority 1: Context changed during fetch -> re-fetch with new context
+            if self._last_context_hash != fetch_start_context_hash:
+                self._dev_log("Context changed during fetch, triggering re-fetch")
+                self._etag = None  # Invalidate ETag
+                self._pending_invalidation_keys.clear()
+                self.fetch_flags()
+            # Priority 2: Pending invalidation keys from streaming
+            elif self._pending_invalidation_keys:
+                pending_keys = set(self._pending_invalidation_keys)
+                self._pending_invalidation_keys.clear()
+
+                if "*" in pending_keys:
+                    self._dev_log("Processing pending full invalidation")
+                    self._etag = None
+                    self.fetch_flags()
+                else:
+                    total_flags = len(self._synchronized_flags)
+                    if total_flags == 0 or len(pending_keys) >= total_flags // 2:
+                        self._dev_log(f"Pending keys ({len(pending_keys)}) exceed threshold")
+                        self._etag = None
+                        self.fetch_flags()
+                    else:
+                        self._dev_log(f"Processing {len(pending_keys)} pending partial keys")
+                        self.fetch_partial_flags(list(pending_keys))
 
     def _build_fetch_request(self) -> Request:
         """Build the HTTP request for fetching flags."""
@@ -1584,6 +1617,15 @@ class FeaturesClient:
         self, changed_keys: List[str]
     ) -> None:
         """Handle flag invalidation from streaming."""
+        if self._is_fetching_flags:
+            # Queue keys for processing after current fetch completes
+            for key in changed_keys:
+                self._pending_invalidation_keys.add(key)
+            self._dev_log(
+                f"Fetch in progress, queued {len(changed_keys)} pending keys"
+            )
+            return
+
         total_flags = len(self._synchronized_flags)
         changed_count = len(changed_keys)
 
@@ -1603,6 +1645,11 @@ class FeaturesClient:
         """Fetch only specific flag keys from the server."""
         if not changed_keys:
             return
+
+        if self._is_fetching_flags:
+            return
+        self._is_fetching_flags = True
+        fetch_start_context_hash = self._last_context_hash
 
         keys_str = ",".join(changed_keys)
         self._dev_log(f"fetch_partial_flags: starting partial fetch for keys=[{keys_str}]")
@@ -1654,17 +1701,43 @@ class FeaturesClient:
                         self._emitter.emit(EVENTS.FLAGS_FETCH_SUCCESS)
                     else:
                         self._etag = None
+                        self._is_fetching_flags = False
                         self.fetch_flags()
+                        return
                 else:
                     self._etag = None
+                    self._is_fetching_flags = False
                     self.fetch_flags()
+                    return
 
         except Exception as e:
-            self._dev_log(f"fetch_partial_flags: exception {e}, falling back to full fetch")
-            self._etag = None
-            self.fetch_flags()
+            self._dev_log(f"fetch_partial_flags: exception {e}")
+            # On error, fall back to full fetch on next cycle
         finally:
+            self._is_fetching_flags = False
             self._emitter.emit(EVENTS.FLAGS_FETCH_END)
+
+            # Priority 1: Context changed during fetch -> full re-fetch
+            if self._last_context_hash != fetch_start_context_hash:
+                self._dev_log("Context changed during partial fetch, triggering full re-fetch")
+                self._etag = None
+                self._pending_invalidation_keys.clear()
+                self.fetch_flags()
+            # Priority 2: Pending invalidation keys from streaming
+            elif self._pending_invalidation_keys:
+                pending_keys = set(self._pending_invalidation_keys)
+                self._pending_invalidation_keys.clear()
+
+                if "*" in pending_keys:
+                    self._etag = None
+                    self.fetch_flags()
+                else:
+                    total_flags = len(self._synchronized_flags)
+                    if total_flags == 0 or len(pending_keys) >= total_flags // 2:
+                        self._etag = None
+                        self.fetch_flags()
+                    else:
+                        self.fetch_partial_flags(list(pending_keys))
 
     def _store_partial_flags(
         self, flags: List[EvaluatedFlag], requested_keys: List[str]

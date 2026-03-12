@@ -1111,6 +1111,7 @@ export class FeaturesClient implements VariationProvider {
 
     this.isFetchingFlags = true;
     this.pollingStopped = false;
+    const fetchStartContextHash = this.lastContextHash; // Snapshot for context change detection
     this.logger.info(`fetchFlags [${caller}]: starting fetch. etag=${this.etag}`);
     this.emitter.emit(EVENTS.FLAGS_FETCH_START);
 
@@ -1271,8 +1272,15 @@ export class FeaturesClient implements VariationProvider {
       this.abortController = null;
       this.emitter.emit(EVENTS.FLAGS_FETCH_END);
 
-      // If an invalidation arrived during fetch, re-fetch immediately
-      if (this.pendingInvalidationKeys.size > 0) {
+      // Priority 1: Context changed during fetch → re-fetch with new context
+      if (this.lastContextHash !== fetchStartContextHash) {
+        this.devLog('Context changed during fetch, triggering re-fetch with new context');
+        this.etag = ''; // Invalidate ETag for new context
+        this.pendingInvalidationKeys.clear(); // Old context invalidations are irrelevant
+        void this.fetchFlagsInternal('contextChange');
+      }
+      // Priority 2: Pending invalidation keys from streaming
+      else if (this.pendingInvalidationKeys.size > 0) {
         const pendingKeys = new Set(this.pendingInvalidationKeys);
         this.pendingInvalidationKeys.clear();
 
@@ -2194,6 +2202,7 @@ export class FeaturesClient implements VariationProvider {
 
     if (this.isFetchingFlags) return;
     this.isFetchingFlags = true;
+    const fetchStartContextHash = this.lastContextHash; // Snapshot for context change detection
 
     const keysStr = Array.from(flagKeys).join(',');
     this.devLog(`fetchPartialFlags: starting partial fetch for keys=[${keysStr}]`);
@@ -2293,8 +2302,15 @@ export class FeaturesClient implements VariationProvider {
       this.isFetchingFlags = false;
       this.emitter.emit(EVENTS.FLAGS_FETCH_END);
 
-      // Process accumulated pending invalidation keys
-      if (this.pendingInvalidationKeys.size > 0) {
+      // Priority 1: Context changed during fetch → full re-fetch with new context
+      if (this.lastContextHash !== fetchStartContextHash) {
+        this.devLog('Context changed during partial fetch, triggering full re-fetch');
+        this.etag = ''; // Invalidate ETag for new context
+        this.pendingInvalidationKeys.clear(); // Old context invalidations are irrelevant
+        void this.fetchFlagsInternal('contextChange');
+      }
+      // Priority 2: Process accumulated pending invalidation keys
+      else if (this.pendingInvalidationKeys.size > 0) {
         const pendingKeys = new Set(this.pendingInvalidationKeys);
         this.pendingInvalidationKeys.clear();
 

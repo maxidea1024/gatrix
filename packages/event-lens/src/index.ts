@@ -13,7 +13,7 @@ let gatrixSdk: GatrixServerSDK | null = null;
 
 async function start() {
   try {
-    logger.info('🚀 Starting Event Lens Server...');
+    logger.info('Starting Event Lens Server...');
 
     // ClickHouse 데이터베이스 초기화 (먼저 실행)
     logger.info('Initializing ClickHouse database...');
@@ -96,7 +96,7 @@ async function start() {
       await gatrixSdk.initialize();
 
       // Manually register service
-      const result = await gatrixSdk.registerService({
+      const result = await gatrixSdk.serviceDiscovery.register({
         labels: {
           service: 'event-lens',
           group: process.env.SERVICE_GROUP || 'gatrix',
@@ -133,7 +133,7 @@ async function start() {
         // Unregister from Service Discovery via SDK
         if (gatrixSdk) {
           try {
-            await gatrixSdk.unregisterService();
+            await gatrixSdk.serviceDiscovery.unregister();
             logger.info(
               'Event-Lens service unregistered from Service Discovery'
             );
@@ -143,7 +143,7 @@ async function start() {
         }
 
         await app.close();
-        logger.info('✅ Server closed');
+        logger.info('Server closed');
         process.exit(0);
       } catch (error) {
         logger.error('Error during shutdown', { error });

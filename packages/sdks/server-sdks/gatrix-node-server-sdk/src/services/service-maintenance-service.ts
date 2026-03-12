@@ -39,19 +39,20 @@ export class ServiceMaintenanceService {
   /**
    * Initialize service and load data from local storage
    */
-  async initializeAsync(environmentId: string = ''): Promise<void> {
+  async initializeAsync(environmentId?: string): Promise<void> {
     if (!this.storage) return;
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
 
     try {
       const cachedJson = await this.storage.get(
-        `ServiceMaintenance_${environmentId}`
+        `ServiceMaintenance_${resolvedEnv}`
       );
       if (cachedJson) {
-        this.cachedStatusByEnv.set(environmentId, JSON.parse(cachedJson));
+        this.cachedStatusByEnv.set(resolvedEnv, JSON.parse(cachedJson));
         this.logger.debug(
           'Loaded service maintenance status from local storage',
           {
-            environmentId,
+            environmentId: resolvedEnv,
           }
         );
       }
@@ -59,7 +60,7 @@ export class ServiceMaintenanceService {
       this.logger.warn(
         'Failed to load service maintenance status from local storage',
         {
-          environmentId,
+          environmentId: resolvedEnv,
           error: error.message,
         }
       );
@@ -129,18 +130,18 @@ export class ServiceMaintenanceService {
    * Fetch service maintenance status for multiple environments
    */
   async getStatusByEnvironments(
-    environments: string[]
+    environmentIds: string[]
   ): Promise<MaintenanceStatus[]> {
     this.logger.debug(
       'Fetching service maintenance status for multiple environments',
       {
-        environments,
+        environmentIds,
       }
     );
 
     const results: MaintenanceStatus[] = [];
 
-    for (const env of environments) {
+    for (const env of environmentIds) {
       try {
         const status = await this.getStatusByEnvironment(env);
         results.push(status);
@@ -161,24 +162,26 @@ export class ServiceMaintenanceService {
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
   async refreshByEnvironment(
-    environmentId: string = '',
-    suppressWarnings?: boolean
+    suppressWarnings?: boolean,
+    environmentId?: string
   ): Promise<MaintenanceStatus> {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
     if (!this.featureEnabled && !suppressWarnings) {
       this.logger.warn(
         'ServiceMaintenanceService.refreshByEnvironment() called but feature is disabled',
-        { environmentId }
+        { environmentId: resolvedEnv }
       );
     }
-    return await this.getStatusByEnvironment(environmentId);
+    return await this.getStatusByEnvironment(resolvedEnv);
   }
 
   /**
    * Get cached service maintenance status
-   * @param environmentId environment ID (required)
+   * @param environmentId environment ID (optional)
    */
-  getCached(environmentId: string = ''): MaintenanceStatus | null {
-    return this.cachedStatusByEnv.get(environmentId) || null;
+  getCached(environmentId?: string): MaintenanceStatus | null {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    return this.cachedStatusByEnv.get(resolvedEnv) || null;
   }
 
   /**
@@ -199,10 +202,11 @@ export class ServiceMaintenanceService {
   /**
    * Clear cached data for a specific environment
    */
-  clearCacheForEnvironment(environmentId: string = ''): void {
-    this.cachedStatusByEnv.delete(environmentId);
+  clearCacheForEnvironment(environmentId?: string): void {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    this.cachedStatusByEnv.delete(resolvedEnv);
     this.logger.debug('Service maintenance cache cleared for environment', {
-      environmentId,
+      environmentId: resolvedEnv,
     });
   }
 
@@ -210,25 +214,27 @@ export class ServiceMaintenanceService {
    * Update cached service maintenance status
    * Used by cache manager or event listener when maintenance changes
    * @param status Maintenance status to cache
-   * @param environmentId environment ID (required)
+   * @param environmentId environment ID (optional)
    */
   updateCache(
     status: MaintenanceStatus | null,
-    environmentId: string = ''
+    environmentId?: string
   ): void {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
     if (status) {
-      this.cachedStatusByEnv.set(environmentId, status);
+      this.cachedStatusByEnv.set(resolvedEnv, status);
     } else {
-      this.cachedStatusByEnv.delete(environmentId);
+      this.cachedStatusByEnv.delete(resolvedEnv);
     }
   }
 
   /**
    * Check if service is currently in maintenance based on flag and time window
-   * @param environmentId environment ID (required)
+   * @param environmentId environment ID (optional)
    */
-  isMaintenanceActive(environmentId: string = ''): boolean {
-    const cachedStatus = this.cachedStatusByEnv.get(environmentId);
+  isMaintenanceActive(environmentId?: string): boolean {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    const cachedStatus = this.cachedStatusByEnv.get(resolvedEnv);
     if (!cachedStatus) {
       return false;
     }
@@ -264,14 +270,15 @@ export class ServiceMaintenanceService {
    * Get localized maintenance message for the service
    * Returns null when maintenance is not active
    * @param lang Language code
-   * @param environmentId environment ID (required)
+   * @param environmentId environment ID (optional)
    */
   getMessage(
     lang: 'ko' | 'en' | 'zh' = 'en',
-    environmentId: string
+    environmentId?: string
   ): string | null {
-    const cachedStatus = this.cachedStatusByEnv.get(environmentId);
-    if (!this.isMaintenanceActive(environmentId) || !cachedStatus?.detail) {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    const cachedStatus = this.cachedStatusByEnv.get(resolvedEnv);
+    if (!this.isMaintenanceActive(resolvedEnv) || !cachedStatus?.detail) {
       return null;
     }
 
@@ -292,8 +299,8 @@ export class ServiceMaintenanceService {
    * (Alias for getStatusByEnvironments for consistency with BaseEnvironmentService)
    */
   async listByEnvironments(
-    environments: string[]
+    environmentIds: string[]
   ): Promise<MaintenanceStatus[]> {
-    return this.getStatusByEnvironments(environments);
+    return this.getStatusByEnvironments(environmentIds);
   }
 }

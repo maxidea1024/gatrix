@@ -33,8 +33,8 @@ export class SurveyEventHandler implements IEventHandler {
               : event.data.isActive;
         await this.cacheManager.updateSingleSurvey(
           String(event.data.id),
-          environmentId,
-          isActive
+          isActive,
+          environmentId
         );
         break;
       }

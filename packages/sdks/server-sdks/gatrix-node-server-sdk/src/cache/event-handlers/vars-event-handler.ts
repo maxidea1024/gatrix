@@ -35,7 +35,7 @@ export class VarsEventHandler implements IEventHandler {
           environmentId,
         });
       } else {
-        await varsService?.refreshByEnvironment(environmentId);
+        await varsService?.refreshByEnvironment(undefined, environmentId);
       }
     } catch (error: any) {
       this.logger.error('Failed to handle vars update event', {

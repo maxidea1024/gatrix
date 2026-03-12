@@ -9,6 +9,7 @@
 #include "GatrixVariationProvider.h"
 #include <functional>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -227,6 +228,9 @@ private:
   std::string _lastError;
   int _consecutiveFailures = 0;
   bool _pollingStopped = false;
+  bool _isFetchingFlags = false;
+  std::set<std::string> _pendingInvalidationKeys;
+  std::string _fetchStartContextHash;
   std::string _lastContextHash;
   std::string _flagsContextHash;
 

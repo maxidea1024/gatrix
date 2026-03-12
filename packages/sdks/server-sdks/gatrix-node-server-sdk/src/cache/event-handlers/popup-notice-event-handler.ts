@@ -28,8 +28,8 @@ export class PopupNoticeEventHandler implements IEventHandler {
               : event.data.isVisible;
         await this.cacheManager.updateSinglePopupNotice(
           String(event.data.id),
-          environmentId,
-          isVisible
+          isVisible,
+          environmentId
         );
         break;
       }

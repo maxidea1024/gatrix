@@ -46,7 +46,7 @@ export class CouponService {
    */
   async redeem(
     request: RedeemCouponRequest,
-    environmentId: string = ''
+    environmentId?: string
   ): Promise<RedeemCouponResponse> {
     this.logger.info('Redeeming coupon', {
       code: request.code,

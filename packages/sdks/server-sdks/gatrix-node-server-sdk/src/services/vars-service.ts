@@ -87,7 +87,7 @@ export class VarsService extends BaseEnvironmentService<
    * @param key Variable key
    * @param environmentId environment ID
    */
-  getByKey(key: string, environmentId: string = ''): VarItem | null {
+  getByKey(key: string, environmentId?: string): VarItem | null {
     const items = this.getCached(environmentId);
     return items.find((item) => item.varKey === key) || null;
   }
@@ -138,7 +138,7 @@ export class VarsService extends BaseEnvironmentService<
           environmentId,
         }
       );
-      this.refreshByEnvironment(environmentId).catch((error: any) => {
+      this.refreshByEnvironment(undefined, environmentId).catch((error: any) => {
         this.logger.error(
           'Failed to refresh vars after single var update fallback',
           {

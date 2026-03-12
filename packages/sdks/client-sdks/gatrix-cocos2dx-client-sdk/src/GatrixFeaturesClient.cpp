@@ -574,6 +574,11 @@ void FeaturesClient::fetchFlags(std::function<void(bool, const std::string&)> on
   if (onComplete) {
     _pendingFetchCallbacks.push_back(std::move(onComplete));
   }
+
+  if (_isFetchingFlags) return;
+  _isFetchingFlags = true;
+  _fetchStartContextHash = _lastContextHash;
+
   if (_config.enableDevMode) {
     CCLOG("[GatrixSDK][DEV] fetchFlags: starting fetch. etag=%s", _etag.c_str());
   }
@@ -657,14 +662,68 @@ void FeaturesClient::fetchFlags(std::function<void(bool, const std::string&)> on
 
       // Success: reset failure counter and schedule at normal interval
       _consecutiveFailures = 0;
-      scheduleNextRefresh();
+
+      // Check context change / pending invalidation before scheduling
+      _isFetchingFlags = false;
+      if (_lastContextHash != _fetchStartContextHash) {
+        if (_config.enableDevMode) {
+          CCLOG("[GatrixSDK][DEV] Context changed during fetch, triggering re-fetch");
+        }
+        _etag.clear();
+        _pendingInvalidationKeys.clear();
+        fetchFlags();
+      } else if (!_pendingInvalidationKeys.empty()) {
+        auto pendingKeys = _pendingInvalidationKeys;
+        _pendingInvalidationKeys.clear();
+        if (pendingKeys.count("*") > 0) {
+          _etag.clear();
+          fetchFlags();
+        } else {
+          auto totalFlags = static_cast<int>(_realtimeFlags.size());
+          auto pendingCount = static_cast<int>(pendingKeys.size());
+          if (totalFlags == 0 || pendingCount >= totalFlags / 2) {
+            _etag.clear();
+            fetchFlags();
+          } else {
+            std::vector<std::string> keysVec(pendingKeys.begin(), pendingKeys.end());
+            fetchPartialFlags(keysVec);
+          }
+        }
+      } else {
+        scheduleNextRefresh();
+      }
     } else if (statusCode == 304) {
       _stats.notModifiedCount++;
-      _emitter.emit(EVENTS::FLAGS_FETCH_END);
 
-      // 304 Not Modified: reset failure counter and schedule at normal interval
+      // 304 Not Modified: reset failure counter
       _consecutiveFailures = 0;
-      scheduleNextRefresh();
+
+      _isFetchingFlags = false;
+      if (_lastContextHash != _fetchStartContextHash) {
+        _etag.clear();
+        _pendingInvalidationKeys.clear();
+        fetchFlags();
+      } else if (!_pendingInvalidationKeys.empty()) {
+        auto pendingKeys = _pendingInvalidationKeys;
+        _pendingInvalidationKeys.clear();
+        if (pendingKeys.count("*") > 0) {
+          _etag.clear();
+          fetchFlags();
+        } else {
+          auto totalFlags = static_cast<int>(_realtimeFlags.size());
+          auto pendingCount = static_cast<int>(pendingKeys.size());
+          if (totalFlags == 0 || pendingCount >= totalFlags / 2) {
+            _etag.clear();
+            fetchFlags();
+          } else {
+            std::vector<std::string> keysVec(pendingKeys.begin(), pendingKeys.end());
+            fetchPartialFlags(keysVec);
+          }
+        }
+      } else {
+        scheduleNextRefresh();
+      }
+      _emitter.emit(EVENTS::FLAGS_FETCH_END);
     } else {
       // Check for non-retryable status codes
       const auto& nonRetryable = _config.features.fetchRetryOptions.nonRetryableStatusCodes;
@@ -675,13 +734,21 @@ void FeaturesClient::fetchFlags(std::function<void(bool, const std::string&)> on
       std::string errBody = data ? std::string(data->begin(), data->end()) : "unknown error";
       onFetchError(statusCode, errBody);
 
+      _isFetchingFlags = false;
       if (isNonRetryable) {
         // Non-retryable error: stop polling entirely
         _pollingStopped = true;
       } else {
         // Retryable error: schedule with backoff
         _consecutiveFailures++;
-        scheduleNextRefresh();
+        // Still check context change even on error
+        if (_lastContextHash != _fetchStartContextHash) {
+          _etag.clear();
+          _pendingInvalidationKeys.clear();
+          fetchFlags();
+        } else {
+          scheduleNextRefresh();
+        }
       }
     }
   });
@@ -1301,6 +1368,17 @@ void FeaturesClient::disconnectStreaming() {
 }
 
 void FeaturesClient::handleStreamingInvalidation(const std::vector<std::string>& changedKeys) {
+  if (_isFetchingFlags) {
+    // Queue keys for processing after current fetch completes
+    for (const auto& key : changedKeys) {
+      _pendingInvalidationKeys.insert(key);
+    }
+    if (_config.enableDevMode) {
+      CCLOG("[GatrixSDK][DEV] Fetch in progress, queued %zu pending keys", changedKeys.size());
+    }
+    return;
+  }
+
   // Threshold: if changed keys >= 50% of total flags, do full fetch
   auto totalFlags = static_cast<int>(_realtimeFlags.size());
   auto changedCount = static_cast<int>(changedKeys.size());
@@ -1318,6 +1396,10 @@ void FeaturesClient::handleStreamingInvalidation(const std::vector<std::string>&
 void FeaturesClient::fetchPartialFlags(const std::vector<std::string>& changedKeys) {
   if (changedKeys.empty())
     return;
+
+  if (_isFetchingFlags) return;
+  _isFetchingFlags = true;
+  _fetchStartContextHash = _lastContextHash;
 
   std::string keysStr;
   for (size_t i = 0; i < changedKeys.size(); ++i) {
@@ -1360,6 +1442,7 @@ void FeaturesClient::fetchPartialFlags(const std::vector<std::string>& changedKe
     if (!response || !response->isSucceed()) {
       CCLOG("[GatrixSDK] Partial fetch failed, falling back to full fetch");
       _etag.clear();
+      _isFetchingFlags = false;
       fetchFlags();
       return;
     }
@@ -1405,13 +1488,48 @@ void FeaturesClient::fetchPartialFlags(const std::vector<std::string>& changedKe
         _emitter.emit(EVENTS::FLAGS_FETCH_SUCCESS);
       } else {
         _etag.clear();
+        _isFetchingFlags = false;
         fetchFlags();
+        return;
       }
     } else {
       _etag.clear();
+      _isFetchingFlags = false;
+      fetchFlags();
+      return;
+    }
+
+    _isFetchingFlags = false;
+    _emitter.emit(EVENTS::FLAGS_FETCH_END);
+
+    // Priority 1: Context changed during partial fetch -> full re-fetch
+    if (_lastContextHash != _fetchStartContextHash) {
+      if (_config.enableDevMode) {
+        CCLOG("[GatrixSDK][DEV] Context changed during partial fetch, triggering full re-fetch");
+      }
+      _etag.clear();
+      _pendingInvalidationKeys.clear();
       fetchFlags();
     }
-    _emitter.emit(EVENTS::FLAGS_FETCH_END);
+    // Priority 2: Pending invalidation keys
+    else if (!_pendingInvalidationKeys.empty()) {
+      auto pendingKeys = _pendingInvalidationKeys;
+      _pendingInvalidationKeys.clear();
+      if (pendingKeys.count("*") > 0) {
+        _etag.clear();
+        fetchFlags();
+      } else {
+        auto totalFlags = static_cast<int>(_realtimeFlags.size());
+        auto pendingCount = static_cast<int>(pendingKeys.size());
+        if (totalFlags == 0 || pendingCount >= totalFlags / 2) {
+          _etag.clear();
+          fetchFlags();
+        } else {
+          std::vector<std::string> keysVec(pendingKeys.begin(), pendingKeys.end());
+          fetchPartialFlags(keysVec);
+        }
+      }
+    }
   });
 
   HttpClient::getInstance()->sendImmediate(request);

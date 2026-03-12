@@ -52,9 +52,9 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * Get popup notice by ID
    * GET /api/v1/server/ingame-popup-notices/:id
    * @param id Popup notice ID
-   * @param environmentId environment ID (required)
+   * @param environmentId environment ID (optional)
    */
-  async getById(id: string, environmentId: string = ''): Promise<PopupNotice> {
+  async getById(id: string, environmentId?: string): Promise<PopupNotice> {
     this.logger.debug('Fetching popup notice by ID', { id, environmentId });
 
     const response = await this.apiClient.get<{ notice: PopupNotice }>(
@@ -78,18 +78,19 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * If isVisible is true but not in cache, fetches and adds it to cache
    * If isVisible is true and in cache, fetches and updates it
    * @param id Popup notice ID
-   * @param environmentId environment ID (required)
+   * @param environmentId environment ID (optional)
    * @param isVisible Optional visibility status
    */
   async updateSingleNotice(
     id: string,
-    environmentId: string = '',
-    isVisible?: boolean | number
+    isVisible?: boolean | number,
+    environmentId?: string
   ): Promise<void> {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
     try {
       this.logger.debug('Updating single popup notice in cache', {
         id,
-        environmentId,
+        environmentId: resolvedEnv,
         isVisible,
       });
 
@@ -97,9 +98,9 @@ export class PopupNoticeService extends BaseEnvironmentService<
       if (isVisible === false || isVisible === 0) {
         this.logger.info('Popup notice isVisible=false, removing from cache', {
           id,
-          environmentId,
+          environmentId: resolvedEnv,
         });
-        this.removeFromCache(id, environmentId);
+        this.removeFromCache(id, resolvedEnv);
         return;
       }
 
@@ -110,40 +111,40 @@ export class PopupNoticeService extends BaseEnvironmentService<
       // Fetch the single notice from backend using getById
       let updatedNotice: PopupNotice;
       try {
-        updatedNotice = await this.getById(id, environmentId);
+        updatedNotice = await this.getById(id, resolvedEnv);
       } catch (_error: any) {
         // If notice not found (404), it's no longer active or visible
         this.logger.debug(
           'Popup notice not found or not active, removing from cache',
           {
             id,
-            environmentId,
+            environmentId: resolvedEnv,
           }
         );
-        this.removeFromCache(id, environmentId);
+        this.removeFromCache(id, resolvedEnv);
         return;
       }
 
-      this.updateItemInCache(updatedNotice, environmentId);
+      this.updateItemInCache(updatedNotice, resolvedEnv);
     } catch (error: any) {
       this.logger.error('Failed to update single popup notice in cache', {
         id,
-        environmentId,
+        environmentId: resolvedEnv,
         error: error.message,
       });
       // If update fails, fall back to full refresh
-      await this.refreshByEnvironment(environmentId);
+      await this.refreshByEnvironment(undefined, resolvedEnv);
     }
   }
 
   /**
    * Get active notices for a specific world
    * @param worldId World ID
-   * @param environmentId environment ID (required)
+   * @param environmentId environment ID (optional)
    */
   getNoticesForWorld(
     worldId: string,
-    environmentId: string = ''
+    environmentId?: string
   ): PopupNotice[] {
     const notices = this.getCached(environmentId);
     return notices.filter((notice) => {

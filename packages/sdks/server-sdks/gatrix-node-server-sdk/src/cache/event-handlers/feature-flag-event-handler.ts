@@ -50,7 +50,7 @@ export class FeatureFlagEventHandler implements IEventHandler {
 
     try {
       if (changedKeys.length === 0) {
-        await featureFlagService.refreshByEnvironment(environmentId);
+        await featureFlagService.refreshByEnvironment(undefined, environmentId);
       } else if (changeType === 'deleted') {
         for (const flagName of changedKeys) {
           featureFlagService.removeFlag(flagName, environmentId);
@@ -63,8 +63,8 @@ export class FeatureFlagEventHandler implements IEventHandler {
         await Promise.all(
           changedKeys.map((flagName: string) => {
             const cached = featureFlagService.getFlagByName(
-              environmentId,
-              flagName
+              flagName,
+              environmentId
             );
             if (cached?.compact) {
               this.logger.info(
@@ -76,7 +76,7 @@ export class FeatureFlagEventHandler implements IEventHandler {
               );
             }
             return featureFlagService
-              .updateSingleFlag(flagName, environmentId)
+              .updateSingleFlag(flagName, undefined, environmentId)
               .catch((error: any) => {
                 this.logger.warn('Failed to update flag for enabled change', {
                   flagName,
@@ -90,7 +90,7 @@ export class FeatureFlagEventHandler implements IEventHandler {
         await Promise.all(
           changedKeys.map((flagName: string) =>
             featureFlagService
-              .updateSingleFlag(flagName, environmentId)
+              .updateSingleFlag(flagName, undefined, environmentId)
               .catch((error: any) => {
                 this.logger.warn('Failed to update flag definition', {
                   flagName,

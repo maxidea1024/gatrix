@@ -33,8 +33,8 @@ export class GameWorldEventHandler implements IEventHandler {
               : event.data.isVisible;
         await this.cacheManager.updateSingleGameWorld(
           String(event.data.id),
-          environmentId,
-          isVisible
+          isVisible,
+          environmentId
         );
         break;
       }

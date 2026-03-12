@@ -94,7 +94,6 @@ All flag access composables accept an optional `forceRealtime` parameter (defaul
 | Composable             | Description                                 |
 | ---------------------- | ------------------------------------------- |
 | `useFlag(flagName, forceRealtime?)`    | Returns `ComputedRef<boolean>` — flag enabled state |
-| `useFlagProxy(flagName, forceRealtime?)` | Returns `Ref<FlagProxy | null>` — full FlagProxy |
 | `useVariant(flagName, forceRealtime?)`   | Returns `ComputedRef<Variant | undefined>`  |
 | `useFlags(forceRealtime?)`               | Returns `Ref<EvaluatedFlag[]>` — all flags  |
 | `useTrack()`                              | Returns track function `(eventName, properties?) => void` |

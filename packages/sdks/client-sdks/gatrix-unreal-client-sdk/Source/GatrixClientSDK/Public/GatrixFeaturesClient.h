@@ -1,4 +1,4 @@
-﻿// Copyright Gatrix. All Rights Reserved.
+// Copyright Gatrix. All Rights Reserved.
 
 #pragma once
 
@@ -469,6 +469,7 @@ private:
 
   // Context hash for change detection
   FString LastContextHash;
+  FString FetchStartContextHash;
   FString FlagsContextHash;
   static FString ComputeContextHash(const FGatrixContext& Context);
   static FString ComputeEtag(const TMap<FString, FGatrixEvaluatedFlag>& Flags,

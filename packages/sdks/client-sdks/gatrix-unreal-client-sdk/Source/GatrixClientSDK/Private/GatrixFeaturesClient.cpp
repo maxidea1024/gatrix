@@ -488,6 +488,7 @@ void UGatrixFeaturesClient::FetchFlags(TFunction<void(bool, const FString&)> OnC
 
 void UGatrixFeaturesClient::DoFetchFlags() {
   FetchFlagsCount.Increment();
+  FetchStartContextHash = LastContextHash;
   LastContextHash = ComputeContextHash(ClientConfig.Features.Context);
 
   FString Url = BuildFetchUrl();
@@ -590,6 +591,31 @@ void UGatrixFeaturesClient::DoFetchFlags() {
 
         if (EventEmitter) {
           EventEmitter->Emit(GatrixEvents::FlagsFetchEnd);
+        }
+
+        // Priority 1: Context changed during fetch -> re-fetch with new context
+        if (LastContextHash != FetchStartContextHash) {
+          UE_LOG(LogGatrix, Log, TEXT("Context changed during fetch, triggering re-fetch"));
+          Etag = TEXT("");
+          PendingInvalidationKeys.Empty();
+          FetchFlags();
+        }
+        // Priority 2: Pending invalidation keys from streaming
+        else if (PendingInvalidationKeys.Num() > 0) {
+          TSet<FString> PendingCopy = MoveTemp(PendingInvalidationKeys);
+          PendingInvalidationKeys.Empty();
+          if (PendingCopy.Contains(TEXT("*"))) {
+            Etag = TEXT("");
+            FetchFlags();
+          } else {
+            int32 TotalFlags = RealtimeFlags.Num();
+            if (TotalFlags == 0 || PendingCopy.Num() >= TotalFlags / 2) {
+              Etag = TEXT("");
+              FetchFlags();
+            } else {
+              FetchPartialFlags(PendingCopy.Array());
+            }
+          }
         }
       });
 
@@ -2020,6 +2046,7 @@ void UGatrixFeaturesClient::FetchPartialFlags(const TArray<FString>& FlagKeys) {
   }
 
   bStreamingFetching = true;
+  FString PartialFetchStartHash = LastContextHash;
 
   // Build URL with specific flag keys
   FString BaseUrl = BuildFetchUrl();
@@ -2079,11 +2106,29 @@ void UGatrixFeaturesClient::FetchPartialFlags(const TArray<FString>& FlagKeys) {
           FetchFlags();
         }
 
-        // Process accumulated pending invalidation keys
-        if (PendingInvalidationKeys.Num() > 0) {
-          TArray<FString> PendingKeys = PendingInvalidationKeys.Array();
+        // Priority 1: Context changed during partial fetch -> full re-fetch
+        if (LastContextHash != PartialFetchStartHash) {
+          UE_LOG(LogGatrix, Log, TEXT("Context changed during partial fetch, triggering full re-fetch"));
+          Etag = TEXT("");
           PendingInvalidationKeys.Empty();
-          FetchPartialFlags(PendingKeys);
+          FetchFlags();
+        }
+        // Priority 2: Process accumulated pending invalidation keys
+        else if (PendingInvalidationKeys.Num() > 0) {
+          TSet<FString> PendingCopy = MoveTemp(PendingInvalidationKeys);
+          PendingInvalidationKeys.Empty();
+          if (PendingCopy.Contains(TEXT("*"))) {
+            Etag = TEXT("");
+            FetchFlags();
+          } else {
+            int32 TotalFlags = RealtimeFlags.Num();
+            if (TotalFlags == 0 || PendingCopy.Num() >= TotalFlags / 2) {
+              Etag = TEXT("");
+              FetchFlags();
+            } else {
+              FetchPartialFlags(PendingCopy.Array());
+            }
+          }
         }
       });
 

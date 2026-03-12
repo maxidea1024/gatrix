@@ -94,7 +94,6 @@ app.use(GatrixPlugin, {
 | 컴포저블 | 설명 |
 |----------|------|
 | `useFlag(flagName, forceRealtime?)` | `ComputedRef<boolean>` 반환 — 플래그 활성 상태 |
-| `useFlagProxy(flagName, forceRealtime?)` | `Ref<FlagProxy | null>` 반환 — 전체 FlagProxy |
 | `useVariant(flagName, forceRealtime?)` | `ComputedRef<Variant | undefined>` 반환 |
 | `useFlags(forceRealtime?)` | `Ref<EvaluatedFlag[]>` 반환 — 모든 플래그 |
 | `useTrack()` | 트래킹 함수 `(eventName, properties?) => void` 반환 |

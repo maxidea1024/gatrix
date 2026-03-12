@@ -428,6 +428,81 @@ All client SDKs implement a **schedule-after-completion** pattern for polling:
 5. **Manual fetchFlags()**: Calling `fetchFlags()` manually resets `pollingStopped` and cancels any pending timer, allowing recovery from non-retryable errors.
 6. **start()/stop()**: `start()` resets `consecutiveFailures` and `pollingStopped`. `stop()` sets `pollingStopped = true` and resets `consecutiveFailures`.
 
+### Fetch Concurrency & Context Change
+
+All client SDKs MUST implement the following three mechanisms to ensure correct fetch behavior:
+
+#### 1. Fetch Guard (`isFetchingFlags`)
+
+A boolean flag that prevents concurrent fetch requests. When a fetch is already in progress, subsequent fetch calls MUST return immediately without starting a new request.
+
+```
+fetchFlagsInternal(caller):
+    if isFetchingFlags: return    // Prevent concurrent fetches
+    isFetchingFlags = true
+    // ... perform HTTP request ...
+    finally:
+        isFetchingFlags = false
+        // ... check pending work (see below) ...
+```
+
+> [!IMPORTANT]
+> The fetch guard applies to both `fetchFlagsInternal` (full fetch) and `fetchPartialFlagsInternal` (partial/selective fetch). Only one fetch of any kind may be in progress at a time.
+
+#### 2. Pending Invalidation Keys
+
+When a streaming invalidation event (`flags_changed`) arrives while a fetch is already in progress, the changed keys MUST be queued in a `pendingInvalidationKeys` set. After the current fetch completes, the SDK MUST check this set and trigger a new fetch if non-empty:
+
+```
+// In streaming handler:
+onFlagsChanged(changedKeys):
+    pendingInvalidationKeys.addAll(changedKeys)
+    fetchFlagsInternal('streaming_invalidation')  // Will be ignored if fetching
+
+// In fetchFlagsInternal finally block:
+finally:
+    isFetchingFlags = false
+    if pendingInvalidationKeys is not empty:
+        // Process pending invalidation
+        keys = copy(pendingInvalidationKeys)
+        pendingInvalidationKeys.clear()
+        fetchPartialFlagsInternal(keys, 'pending_invalidation')
+```
+
+#### 3. Context Change During Fetch
+
+When `updateContext()` is called while a fetch is in progress, the fetch guard causes the new fetch to be silently dropped. However, the context and `lastContextHash` are already updated. This creates a mismatch: the SDK holds flags evaluated for the old context while `lastContextHash` reflects the new context.
+
+**Solution:** At fetch start, capture a snapshot of `lastContextHash`. On fetch completion, compare the current `lastContextHash` with the snapshot. If they differ, a context change occurred during the fetch — clear the ETag and trigger an immediate re-fetch:
+
+```
+fetchFlagsInternal(caller):
+    if isFetchingFlags: return
+    isFetchingFlags = true
+    fetchStartContextHash = lastContextHash    // Snapshot at start
+
+    // ... perform HTTP request ...
+
+    finally:
+        isFetchingFlags = false
+
+        // Priority 1: Context changed during fetch → re-fetch with new context
+        if lastContextHash != fetchStartContextHash:
+            etag = ''                                         // Invalidate ETag
+            fetchFlagsInternal('contextChange')               // Re-fetch
+        // Priority 2: Pending invalidation keys from streaming
+        else if pendingInvalidationKeys is not empty:
+            keys = copy(pendingInvalidationKeys)
+            pendingInvalidationKeys.clear()
+            fetchPartialFlagsInternal(keys, 'pending_invalidation')
+```
+
+> [!CAUTION]
+> **Context change MUST take priority over pending invalidation.** If the context changed, the pending invalidation keys are for the old context and are no longer relevant. The re-fetch with the new context will return all flags re-evaluated for the new context.
+
+> [!NOTE]
+> This pattern also applies to `fetchPartialFlagsInternal`. Both full and partial fetch methods MUST capture the context hash at start and check for changes in the finally block.
+
 ### HTTP Headers
 
 All client SDKs MUST include the following standard headers on every HTTP request. This ensures consistent authentication, identification, and traceability across all platforms.

@@ -3,9 +3,9 @@ import {
   EVENTS,
   type GatrixClient,
   type GatrixContext,
-  type FlagProxy,
   type EvaluatedFlag,
   type Variant,
+  FlagProxy,
 } from '@gatrix/gatrix-js-client-sdk';
 import { GatrixService } from './gatrix.service';
 
@@ -102,45 +102,14 @@ export function injectFlag(
 
   const watchFn = forceRealtime
     ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
-        svc.client.features
-      )
+      svc.client.features
+    )
     : svc.client.features.watchSyncedFlagWithInitialState.bind(
-        svc.client.features
-      );
+      svc.client.features
+    );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.enabled);
-  });
-
-  destroyRef.onDestroy(unwatch);
-
-  return value.asReadonly();
-}
-
-/**
- * Returns a signal that tracks the full FlagProxy for a flag.
- *
- * @param flagName - The feature flag name
- * @param forceRealtime - Read from realtime flags (default: true)
- */
-export function injectFlagProxy(
-  flagName: string,
-  forceRealtime = true
-): Signal<FlagProxy | null> {
-  const svc = getService();
-  const destroyRef = inject(DestroyRef);
-  const value = signal<FlagProxy | null>(null);
-
-  const watchFn = forceRealtime
-    ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
-        svc.client.features
-      )
-    : svc.client.features.watchSyncedFlagWithInitialState.bind(
-        svc.client.features
-      );
-
-  const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
-    value.set(proxy);
   });
 
   destroyRef.onDestroy(unwatch);
@@ -164,11 +133,11 @@ export function injectVariant(
 
   const watchFn = forceRealtime
     ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
-        svc.client.features
-      )
+      svc.client.features
+    )
     : svc.client.features.watchSyncedFlagWithInitialState.bind(
-        svc.client.features
-      );
+      svc.client.features
+    );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.variant);
@@ -230,11 +199,11 @@ export function injectBoolVariation(
 
   const watchFn = forceRealtime
     ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
-        svc.client.features
-      )
+      svc.client.features
+    )
     : svc.client.features.watchSyncedFlagWithInitialState.bind(
-        svc.client.features
-      );
+      svc.client.features
+    );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.boolVariation(fallbackValue));
@@ -265,11 +234,11 @@ export function injectStringVariation(
 
   const watchFn = forceRealtime
     ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
-        svc.client.features
-      )
+      svc.client.features
+    )
     : svc.client.features.watchSyncedFlagWithInitialState.bind(
-        svc.client.features
-      );
+      svc.client.features
+    );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.stringVariation(fallbackValue));
@@ -300,11 +269,11 @@ export function injectNumberVariation(
 
   const watchFn = forceRealtime
     ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
-        svc.client.features
-      )
+      svc.client.features
+    )
     : svc.client.features.watchSyncedFlagWithInitialState.bind(
-        svc.client.features
-      );
+      svc.client.features
+    );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.numberVariation(fallbackValue));
@@ -335,11 +304,11 @@ export function injectJsonVariation<T>(
 
   const watchFn = forceRealtime
     ? svc.client.features.watchRealtimeFlagWithInitialState.bind(
-        svc.client.features
-      )
+      svc.client.features
+    )
     : svc.client.features.watchSyncedFlagWithInitialState.bind(
-        svc.client.features
-      );
+      svc.client.features
+    );
 
   const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
     value.set(proxy.jsonVariation<T>(fallbackValue));

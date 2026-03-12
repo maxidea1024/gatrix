@@ -142,8 +142,8 @@ export class WorldMaintenanceService {
         worldId: targetWorldId,
         message: this.gameWorld.getWorldMaintenanceMessage(
           targetWorldId,
-          env,
-          lang
+          lang,
+          env
         ),
         forceDisconnect: world?.forceDisconnect ?? false,
         gracePeriodMinutes: world?.gracePeriodMinutes ?? 0,
@@ -171,8 +171,8 @@ export class WorldMaintenanceService {
             worldId: world.worldId,
             message: this.gameWorld.getWorldMaintenanceMessage(
               world.worldId,
-              env,
-              lang
+              lang,
+              env
             ),
             forceDisconnect: world.forceDisconnect ?? false,
             gracePeriodMinutes: world.gracePeriodMinutes ?? 0,

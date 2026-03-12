@@ -22,6 +22,8 @@ var _sdk_state: GatrixTypes.SdkState = GatrixTypes.SdkState.INITIALIZING
 var _ready_emitted := false
 var _fetched_from_server := false
 var _is_fetching := false
+var _pending_invalidation_keys: Array = []
+var _fetch_start_context_hash: String = ""
 var _has_pending_sync := false
 var _started := false
 var _etag := ""
@@ -787,6 +789,7 @@ func _do_fetch_flags() -> void:
 	if _is_fetching:
 		return
 	_is_fetching = true
+	_fetch_start_context_hash = _last_context_hash
 	
 	_last_context_hash = _compute_context_hash(_config.features.context)
 	_stats.fetch_flags_count += 1
@@ -843,6 +846,7 @@ func _on_fetch_completed(result: int, response_code: int, response_headers: Pack
 
 	if result != HTTPRequest.RESULT_SUCCESS:
 		_handle_fetch_error("HTTP request failed (result=%d)" % result, response_code)
+		_check_context_change_after_fetch()
 		return
 
 	# 304 Not Modified
@@ -860,6 +864,7 @@ func _on_fetch_completed(result: int, response_code: int, response_headers: Pack
 
 		if not _ready_emitted:
 			_set_ready()
+		_check_context_change_after_fetch()
 		return
 
 	# Success
@@ -874,8 +879,10 @@ func _on_fetch_completed(result: int, response_code: int, response_headers: Pack
 				break
 
 		_handle_fetch_response(response_text, response_code, new_etag)
+		_check_context_change_after_fetch()
 	else:
 		_handle_fetch_error("HTTP %d" % response_code, response_code)
+		_check_context_change_after_fetch()
 
 
 func _handle_fetch_response(response_body: String, http_status: int, new_etag: String) -> void:
@@ -950,6 +957,36 @@ func _handle_fetch_error(message: String, status_code: int) -> void:
 	if not _ready_emitted and _realtime_flags.size() > 0:
 		_set_ready()
 	_drain_pending_callbacks(false, message)
+
+
+## Check context change / pending invalidation after fetch completes
+func _check_context_change_after_fetch() -> void:
+	# Priority 1: Context changed during fetch -> re-fetch with new context
+	if _last_context_hash != _fetch_start_context_hash:
+		_dev_log("Context changed during fetch, triggering re-fetch")
+		_etag = ""
+		_pending_invalidation_keys.clear()
+		_do_fetch_flags()
+	# Priority 2: Pending invalidation keys from streaming
+	elif _pending_invalidation_keys.size() > 0:
+		var pending_keys := _pending_invalidation_keys.duplicate()
+		_pending_invalidation_keys.clear()
+		
+		if pending_keys.has("*"):
+			_dev_log("Processing pending full invalidation")
+			_etag = ""
+			_do_fetch_flags()
+		else:
+			_mutex.lock()
+			var total_flags := _realtime_flags.size()
+			_mutex.unlock()
+			if total_flags == 0 or pending_keys.size() >= total_flags / 2:
+				_dev_log("Pending keys (%d) exceed threshold" % pending_keys.size())
+				_etag = ""
+				_do_fetch_flags()
+			else:
+				_dev_log("Processing %d pending partial keys" % pending_keys.size())
+				fetch_partial_flags(pending_keys)
 
 
 func _drain_pending_callbacks(success: bool, error_msg: String) -> void:
@@ -1345,6 +1382,14 @@ func _build_metrics_payload() -> String:
 
 ## Handle streaming invalidation signal
 func handle_streaming_invalidation(changed_keys: Array) -> void:
+	if _is_fetching:
+		# Queue keys for processing after current fetch completes
+		for key in changed_keys:
+			if not _pending_invalidation_keys.has(key):
+				_pending_invalidation_keys.append(key)
+		_dev_log("Fetch in progress, queued %d pending keys" % changed_keys.size())
+		return
+
 	_mutex.lock()
 	var total_flags := _realtime_flags.size()
 	_mutex.unlock()
@@ -1364,6 +1409,11 @@ func handle_streaming_invalidation(changed_keys: Array) -> void:
 func fetch_partial_flags(flag_keys: Array) -> void:
 	if flag_keys.is_empty():
 		return
+
+	if _is_fetching:
+		return
+	_is_fetching = true
+	var partial_fetch_start_hash := _last_context_hash
 	
 	var keys_str := ",".join(flag_keys)
 	_dev_log("fetch_partial_flags: starting partial fetch for keys=[%s]" % keys_str)
@@ -1408,15 +1458,49 @@ func fetch_partial_flags(flag_keys: Array) -> void:
 					_emitter.emit_event(GatrixEvents.FLAGS_FETCH_SUCCESS)
 				else:
 					_etag = ""
+					_is_fetching = false
 					_do_fetch_flags()
+					partial_http.queue_free()
+					return
 			else:
 				_etag = ""
+				_is_fetching = false
 				_do_fetch_flags()
+				partial_http.queue_free()
+				return
 		else:
 			_etag = ""
+			_is_fetching = false
 			_do_fetch_flags()
+			partial_http.queue_free()
+			return
 		
+		_is_fetching = false
 		_emitter.emit_event(GatrixEvents.FLAGS_FETCH_END)
+		
+		# Priority 1: Context changed during partial fetch -> full re-fetch
+		if _last_context_hash != partial_fetch_start_hash:
+			_dev_log("Context changed during partial fetch, triggering full re-fetch")
+			_etag = ""
+			_pending_invalidation_keys.clear()
+			_do_fetch_flags()
+		# Priority 2: Pending invalidation keys
+		elif _pending_invalidation_keys.size() > 0:
+			var pending_keys := _pending_invalidation_keys.duplicate()
+			_pending_invalidation_keys.clear()
+			if pending_keys.has("*"):
+				_etag = ""
+				_do_fetch_flags()
+			else:
+				_mutex.lock()
+				var total_flags := _realtime_flags.size()
+				_mutex.unlock()
+				if total_flags == 0 or pending_keys.size() >= total_flags / 2:
+					_etag = ""
+					_do_fetch_flags()
+				else:
+					fetch_partial_flags(pending_keys)
+		
 		partial_http.queue_free()
 	)
 	

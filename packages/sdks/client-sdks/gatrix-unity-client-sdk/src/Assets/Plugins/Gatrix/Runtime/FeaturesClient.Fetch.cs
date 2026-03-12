@@ -26,6 +26,7 @@ namespace Gatrix.Unity.SDK
 
             if (_isFetchingFlags) return;
             _isFetchingFlags = true;
+            var fetchStartContextHash = _lastContextHash; // Snapshot for context change detection
             _devLog.Log($"FetchFlags: starting fetch. etag={_etag}");
 
             try
@@ -237,8 +238,16 @@ namespace Gatrix.Unity.SDK
                 _isFetchingFlags = false;
                 _emitter.Emit(GatrixEvents.FlagsFetchEnd);
 
-                // Process accumulated pending invalidation keys
-                if (_pendingInvalidationKeys.Count > 0)
+                // Priority 1: Context changed during fetch → re-fetch with new context
+                if (_lastContextHash != fetchStartContextHash)
+                {
+                    _devLog.Log("Context changed during fetch, triggering re-fetch with new context");
+                    _etag = ""; // Invalidate ETag for new context
+                    _pendingInvalidationKeys.Clear(); // Old context invalidations are irrelevant
+                    FetchFlagsAsync().Forget();
+                }
+                // Priority 2: Pending invalidation keys from streaming
+                else if (_pendingInvalidationKeys.Count > 0)
                 {
                     var pendingKeys = new HashSet<string>(_pendingInvalidationKeys);
                     _pendingInvalidationKeys.Clear();
@@ -374,6 +383,7 @@ namespace Gatrix.Unity.SDK
 
             if (_isFetchingFlags) return;
             _isFetchingFlags = true;
+            var fetchStartContextHash = _lastContextHash; // Snapshot for context change detection
 
             var keysStr = string.Join(",", flagKeys);
             _devLog.Log($"fetchPartialFlags: starting partial fetch for keys=[{keysStr}]");
@@ -487,8 +497,16 @@ namespace Gatrix.Unity.SDK
                 _isFetchingFlags = false;
                 _emitter.Emit(GatrixEvents.FlagsFetchEnd);
 
-                // Process accumulated pending invalidation keys
-                if (_pendingInvalidationKeys.Count > 0)
+                // Priority 1: Context changed during fetch → full re-fetch with new context
+                if (_lastContextHash != fetchStartContextHash)
+                {
+                    _devLog.Log("Context changed during partial fetch, triggering full re-fetch");
+                    _etag = ""; // Invalidate ETag for new context
+                    _pendingInvalidationKeys.Clear(); // Old context invalidations are irrelevant
+                    FetchFlagsAsync().Forget();
+                }
+                // Priority 2: Process accumulated pending invalidation keys
+                else if (_pendingInvalidationKeys.Count > 0)
                 {
                     var pendingKeys = new HashSet<string>(_pendingInvalidationKeys);
                     _pendingInvalidationKeys.Clear();

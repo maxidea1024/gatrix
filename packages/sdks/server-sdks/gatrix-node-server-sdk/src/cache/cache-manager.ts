@@ -506,7 +506,7 @@ export class CacheManager {
           const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.surveyService
-              .listByEnvironment(defaultEnv, { isActive: true })
+              .listByEnvironment({ isActive: true }, defaultEnv)
               .catch((error) => {
                 this.logger.warn('Failed to load surveys', {
                   error: error.message,
@@ -884,12 +884,12 @@ export class CacheManager {
   /**
    * Clear cached data for removed environments (ALL services)
    */
-  private clearDataForEnvironments(environments: string[]): void {
+  private clearDataForEnvironments(environmentIds: string[]): void {
     this.logger.info('Clearing data for removed environments', {
-      environments,
+      environmentIds,
     });
 
-    for (const env of environments) {
+    for (const env of environmentIds) {
       // All services use optional chaining since they are controlled by feature flags
       this.gameWorldService?.clearCacheForEnvironment(env);
       this.popupNoticeService?.clearCacheForEnvironment(env);
@@ -1021,7 +1021,7 @@ export class CacheManager {
         } else {
           const defaultEnv = this.defaultEnvironmentId;
           promises.push(
-            this.gameWorldService.refreshByEnvironment(defaultEnv, true)
+            this.gameWorldService.refreshByEnvironment(true, defaultEnv)
           ); // suppressWarnings=true for refreshAll
           refreshedTypes.push('gameWorld');
         }
@@ -1045,7 +1045,7 @@ export class CacheManager {
         } else {
           const defaultEnv = this.defaultEnvironmentId;
           promises.push(
-            this.popupNoticeService.refreshByEnvironment(defaultEnv, true)
+            this.popupNoticeService.refreshByEnvironment(true, defaultEnv)
           ); // suppressWarnings=true for refreshAll
           refreshedTypes.push('popupNotice');
         }
@@ -1070,7 +1070,7 @@ export class CacheManager {
           const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.surveyService
-              .refreshByEnvironment(defaultEnv, { isActive: true }, true)
+              .refreshByEnvironment({ isActive: true }, true, defaultEnv)
               .catch((error) => {
                 // suppressWarnings=true for refreshAll
                 this.logger.warn('Failed to refresh surveys', {
@@ -1101,7 +1101,7 @@ export class CacheManager {
           const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.whitelistService
-              .refreshByEnvironment(defaultEnv, true)
+              .refreshByEnvironment(true, defaultEnv)
               .catch((error) => {
                 // suppressWarnings=true for refreshAll
                 this.logger.warn('Failed to refresh whitelists', {
@@ -1209,7 +1209,7 @@ export class CacheManager {
           const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.storeProductService
-              .refreshByEnvironment(defaultEnv, true)
+              .refreshByEnvironment(true, defaultEnv)
               .catch((error) => {
                 this.logger.warn('Failed to refresh store products', {
                   error: error.message,
@@ -1239,7 +1239,7 @@ export class CacheManager {
           const defaultEnv = this.defaultEnvironmentId;
           promises.push(
             this.featureFlagService
-              .refreshByEnvironment(defaultEnv)
+              .refreshByEnvironment(undefined, defaultEnv)
               .catch((error) => {
                 this.logger.warn('Failed to refresh feature flags', {
                   error: error.message,
@@ -1266,7 +1266,7 @@ export class CacheManager {
         } else {
           const defaultEnv = this.defaultEnvironmentId;
           promises.push(
-            this.varsService.refreshByEnvironment(defaultEnv).catch((error) => {
+            this.varsService.refreshByEnvironment(undefined, defaultEnv).catch((error) => {
               this.logger.warn('Failed to refresh vars', {
                 error: error.message,
               });
@@ -1326,7 +1326,7 @@ export class CacheManager {
   async refreshGameWorlds(environmentId: string): Promise<void> {
     if (!this.gameWorldService) return;
     const start = process.hrtime.bigint();
-    await this.gameWorldService.refreshByEnvironment(environmentId);
+    await this.gameWorldService.refreshByEnvironment(undefined, environmentId);
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('gameworlds');
@@ -1344,7 +1344,7 @@ export class CacheManager {
   async refreshPopupNotices(environmentId: string): Promise<void> {
     if (!this.popupNoticeService) return;
     const start = process.hrtime.bigint();
-    await this.popupNoticeService.refreshByEnvironment(environmentId);
+    await this.popupNoticeService.refreshByEnvironment(undefined, environmentId);
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('popups');
@@ -1360,9 +1360,7 @@ export class CacheManager {
   async refreshSurveys(environmentId: string): Promise<void> {
     if (!this.surveyService) return;
     const start = process.hrtime.bigint();
-    await this.surveyService.refreshByEnvironment(environmentId, {
-      isActive: true,
-    });
+    await this.surveyService.refreshByEnvironment({ isActive: true }, undefined, environmentId);
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('surveys');
@@ -1388,13 +1386,13 @@ export class CacheManager {
    */
   async updateSingleGameWorld(
     id: string,
-    environmentId: string,
-    isVisible?: boolean | number
+    isVisible?: boolean | number,
+    environmentId?: string
   ): Promise<void> {
     await this.gameWorldService?.updateSingleWorld(
       id,
-      environmentId,
-      isVisible
+      isVisible,
+      environmentId
     );
     // Check maintenance state changes after update
     this.checkMaintenanceStateChanges();
@@ -1491,13 +1489,13 @@ export class CacheManager {
    */
   async updateSinglePopupNotice(
     id: string,
-    environmentId: string,
-    isVisible?: boolean | number
+    isVisible?: boolean | number,
+    environmentId?: string
   ): Promise<void> {
     await this.popupNoticeService?.updateSingleNotice(
       id,
-      environmentId,
-      isVisible
+      isVisible,
+      environmentId
     );
   }
 
@@ -1518,10 +1516,10 @@ export class CacheManager {
    */
   async updateSingleSurvey(
     id: string,
-    environmentId: string,
-    isActive?: boolean | number
+    isActive?: boolean | number,
+    environmentId?: string
   ): Promise<void> {
-    await this.surveyService?.updateSingleSurvey(id, environmentId, isActive);
+    await this.surveyService?.updateSingleSurvey(id, isActive, environmentId);
   }
 
   /**
@@ -1541,7 +1539,7 @@ export class CacheManager {
     if (!this.whitelistService) return;
     this.logger.info('Refreshing whitelist cache...');
     const start = process.hrtime.bigint();
-    await this.whitelistService.refreshByEnvironment(environmentId);
+    await this.whitelistService.refreshByEnvironment(undefined, environmentId);
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('whitelists');
@@ -1571,8 +1569,8 @@ export class CacheManager {
     const start = process.hrtime.bigint();
     try {
       const status = await this.serviceMaintenanceService.refreshByEnvironment(
-        environmentId,
-        true
+        true,
+        environmentId
       ); // suppressWarnings=true for refreshAll
       this.emitRefreshEvent('serviceMaintenance', status);
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
@@ -1821,13 +1819,13 @@ export class CacheManager {
    */
   async updateSingleStoreProduct(
     id: string,
-    environmentId: string,
-    isActive?: boolean | number
+    isActive?: boolean | number,
+    environmentId?: string
   ): Promise<void> {
     await this.storeProductService?.updateSingleProduct(
       id,
-      environmentId,
-      isActive
+      isActive,
+      environmentId
     );
   }
 
@@ -1845,7 +1843,7 @@ export class CacheManager {
    * @param environmentId environment ID (required)
    */
   async refreshStoreProducts(environmentId: string): Promise<void> {
-    await this.storeProductService?.refreshByEnvironment(environmentId);
+    await this.storeProductService?.refreshByEnvironment(undefined, environmentId);
   }
 
   /**
@@ -1856,13 +1854,13 @@ export class CacheManager {
    */
   async updateSingleBanner(
     bannerId: string,
-    environmentId: string,
-    status?: string
+    status?: string,
+    environmentId?: string
   ): Promise<void> {
     await this.bannerService?.updateSingleBanner(
       bannerId,
-      environmentId,
-      status
+      status,
+      environmentId
     );
   }
 

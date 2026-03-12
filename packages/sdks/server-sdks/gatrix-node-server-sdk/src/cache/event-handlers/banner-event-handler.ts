@@ -23,8 +23,8 @@ export class BannerEventHandler implements IEventHandler {
         const status = event.data.status as string | undefined;
         await this.cacheManager.updateSingleBanner(
           String(event.data.id),
-          environmentId,
-          status
+          status,
+          environmentId
         );
         break;
       }

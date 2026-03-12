@@ -23,7 +23,6 @@ export type {
 export {
   GatrixClient,
   FeaturesClient,
-  FlagProxy,
   WatchFlagGroup,
   EVENTS,
   LocalStorageProvider,

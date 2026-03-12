@@ -255,6 +255,16 @@ All methods provide **two overloads** to prevent accidental context omission:
 When `environmentId` is omitted, the environment mapped 1:1 to the `apiToken` is used implicitly (single-environment mode).
 In multi-environment mode (e.g., Edge server with `environmentProvider`), `environmentId` MUST be specified explicitly.
 
+> [!CAUTION]
+> **`environmentId` Parameter Convention**
+>
+> All service methods that accept an `environmentId` parameter MUST follow these rules:
+> 1. `environmentId` MUST always be the **last parameter** in the method signature.
+> 2. `environmentId` MUST always be **optional** (nullable / defaulting to `undefined`).
+> 3. When `environmentId` is omitted, the method MUST resolve to the SDK's **default environment** (configured via `apiToken`).
+> 4. Method signatures MUST NOT place `environmentId` before required parameters. A required parameter MUST NOT follow an optional one.
+> 5. Array parameters for multiple environments MUST be named `environmentIds` (not `environments`).
+
 ```csharp
 // ============================================
 // Core Evaluation

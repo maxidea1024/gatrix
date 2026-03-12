@@ -221,20 +221,22 @@ export abstract class BaseEnvironmentService<
 
     // Persist data, raw response body, and ETag to local storage
     await this.persistCache(resolvedEnv);
-    await this.persistEtag(resolvedEnv, endpoint, response.data);
+    await this.persistEtag(endpoint, response.data, resolvedEnv);
 
     return items;
   }
 
-  protected getCacheKey(environmentId: string = ''): string {
-    return `${this.getServiceName()}_${environmentId}_data`;
+  protected getCacheKey(environmentId?: string): string {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    return `${this.getServiceName()}_${resolvedEnv}_data`;
   }
 
-  protected getEtagKey(environmentId: string = ''): string {
-    return `${this.getServiceName()}_${environmentId}_etag`;
+  protected getEtagKey(environmentId?: string): string {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    return `${this.getServiceName()}_${resolvedEnv}_etag`;
   }
 
-  protected getResponseKey(environmentId: string = ''): string {
+  protected getResponseKey(environmentId?: string): string {
     return `${this.getServiceName()}_${environmentId}_response`;
   }
 
@@ -313,8 +315,9 @@ export abstract class BaseEnvironmentService<
   /**
    * Clear cached data for a specific environment
    */
-  clearCacheForEnvironment(environmentId: string = ''): void {
-    this.cachedByEnv.delete(environmentId);
+  clearCacheForEnvironment(environmentId?: string): void {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    this.cachedByEnv.delete(resolvedEnv);
     this.logger.debug(`${this.getServiceName()} cache cleared for environment`);
   }
 
@@ -322,8 +325,8 @@ export abstract class BaseEnvironmentService<
    * Refresh cached items for a specific environment
    */
   async refreshByEnvironment(
-    environmentId?: string,
-    suppressWarnings?: boolean
+    suppressWarnings?: boolean,
+    environmentId?: string
   ): Promise<T[]> {
     if (!this.featureEnabled && !suppressWarnings) {
       this.logger.warn(
@@ -367,7 +370,7 @@ export abstract class BaseEnvironmentService<
   updateCache(items: T[], environmentId?: string): void {
     const resolvedEnv = this.resolveEnvironment(environmentId);
     this.cachedByEnv.set(resolvedEnv, items);
-    this.persistCache(resolvedEnv).catch(() => {});
+    this.persistCache(resolvedEnv).catch(() => { });
     this.logger.debug(`${this.getServiceName()} cache updated`, {
       count: items.length,
     });
@@ -395,7 +398,7 @@ export abstract class BaseEnvironmentService<
     }
 
     this.cachedByEnv.set(resolvedEnv, newItems);
-    this.persistCache(resolvedEnv).catch(() => {});
+    this.persistCache(resolvedEnv).catch(() => { });
 
     this.logger.debug(
       `Single ${this.getServiceName()} ${existsInCache ? 'updated' : 'added'} in cache`,
@@ -411,7 +414,7 @@ export abstract class BaseEnvironmentService<
     const currentItems = this.cachedByEnv.get(resolvedEnv) || [];
     const newItems = currentItems.filter((item) => this.getItemId(item) !== id);
     this.cachedByEnv.set(resolvedEnv, newItems);
-    this.persistCache(resolvedEnv).catch(() => {});
+    this.persistCache(resolvedEnv).catch(() => { });
 
     this.logger.debug(`${this.getServiceName()} removed from cache`, { id });
   }
@@ -419,12 +422,13 @@ export abstract class BaseEnvironmentService<
   /**
    * Persist current cache for an environment to local storage
    */
-  protected async persistCache(environmentId: string = ''): Promise<void> {
+  protected async persistCache(environmentId?: string): Promise<void> {
     if (!this.storage) return;
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
 
     try {
-      const items = this.cachedByEnv.get(environmentId) || [];
-      const cacheKey = this.getCacheKey(environmentId);
+      const items = this.cachedByEnv.get(resolvedEnv) || [];
+      const cacheKey = this.getCacheKey(resolvedEnv);
       await this.storage.save(cacheKey, JSON.stringify(items));
     } catch (error: any) {
       this.logger.error(
@@ -440,9 +444,9 @@ export abstract class BaseEnvironmentService<
    * Persist the current ETag and raw response body to local storage.
    */
   protected async persistEtag(
-    environmentId: string = '',
     endpoint: string,
-    responseData?: TResponse
+    responseData?: TResponse,
+    environmentId?: string
   ): Promise<void> {
     if (!this.storage) return;
 

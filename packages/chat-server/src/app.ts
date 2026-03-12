@@ -377,7 +377,7 @@ class ChatServerApp {
             await gatrixSdk.initialize();
 
             // Manually register service
-            const result = await gatrixSdk.registerService({
+            const result = await gatrixSdk.serviceDiscovery.register({
               labels: {
                 service: 'chat',
                 group: process.env.SERVICE_GROUP || 'gatrix',
@@ -455,7 +455,7 @@ class ChatServerApp {
       // 3. Unregister from Service Discovery via SDK
       if (gatrixSdk) {
         try {
-          await gatrixSdk.unregisterService();
+          await gatrixSdk.serviceDiscovery.unregister();
           await gatrixSdk.close();
           logger.info(
             'Chat Server service unregistered from Service Discovery'

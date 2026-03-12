@@ -44,7 +44,7 @@ export class ClientVersionEventHandler implements IEventHandler {
           try {
             await this.cacheManager
               .getClientVersionService()
-              ?.refreshByEnvironment(environmentId);
+              ?.refreshByEnvironment(undefined, environmentId);
           } catch (error: any) {
             this.logger.error('Failed to refresh client version cache', {
               error: error.message,

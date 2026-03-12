@@ -156,7 +156,6 @@ provideGatrixClient(client: GatrixClient, options?: {
 | 함수 | 반환 타입 | 설명 |
 |---|---|---|
 | `injectFlag(flagName, forceRealtime?)` | `Signal<boolean>` | 플래그 활성화 상태 |
-| `injectFlagProxy(flagName, forceRealtime?)` | `Signal<FlagProxy \| null>` | 전체 FlagProxy |
 | `injectVariant(flagName, forceRealtime?)` | `Signal<Variant \| undefined>` | 플래그 배리언트 |
 | `injectFlags(forceRealtime?)` | `Signal<EvaluatedFlag[]>` | 모든 평가된 플래그 |
 

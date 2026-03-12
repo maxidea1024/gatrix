@@ -33,8 +33,8 @@ export class StoreProductEventHandler implements IEventHandler {
               : event.data.isActive;
         await this.cacheManager.updateSingleStoreProduct(
           String(event.data.id),
-          environmentId,
-          isActive
+          isActive,
+          environmentId
         );
         break;
       }

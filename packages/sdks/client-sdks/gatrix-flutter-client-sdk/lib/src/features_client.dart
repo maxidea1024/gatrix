@@ -52,6 +52,8 @@ class FeaturesClient implements VariationProvider {
   // Retry/backoff state
   int _consecutiveFailures = 0;
   bool _pollingStopped = false;
+  bool _isFetchingFlags = false;
+  final Set<String> _pendingInvalidationKeys = {};
   int _refreshIntervalMs;
 
   // Retry options
@@ -946,6 +948,10 @@ class FeaturesClient implements VariationProvider {
   // ============================================= Fetch Flags
 
   Future<void> fetchFlags() async {
+    if (_isFetchingFlags) return;
+    _isFetchingFlags = true;
+    final fetchStartContextHash = _lastContextHash;
+
     _lastContextHash = _computeContextHash(_context);
     _devLog('fetchFlags: starting fetch. etag=$_etag, hash=$_lastContextHash');
     _events.emit(GatrixEvents.flagsFetchStart);
@@ -1085,7 +1091,37 @@ class FeaturesClient implements VariationProvider {
       // Network error: schedule with backoff
       _scheduleNextRefresh();
     } finally {
+      _isFetchingFlags = false;
       _events.emit(GatrixEvents.flagsFetchEnd);
+
+      // Priority 1: Context changed during fetch -> re-fetch with new context
+      if (_lastContextHash != fetchStartContextHash) {
+        _devLog('Context changed during fetch, triggering re-fetch with new context');
+        _etag = null; // Invalidate ETag for new context
+        _pendingInvalidationKeys.clear(); // Old context invalidations are irrelevant
+        fetchFlags();
+      }
+      // Priority 2: Pending invalidation keys from streaming
+      else if (_pendingInvalidationKeys.isNotEmpty) {
+        final pendingKeys = Set<String>.from(_pendingInvalidationKeys);
+        _pendingInvalidationKeys.clear();
+
+        if (pendingKeys.contains('*')) {
+          _devLog('Processing pending full invalidation after fetch completed');
+          _etag = null;
+          fetchFlags();
+        } else {
+          final totalFlags = _realtimeFlags.length;
+          if (totalFlags == 0 || pendingKeys.length >= totalFlags ~/ 2) {
+            _devLog('Pending keys (${pendingKeys.length}) exceed threshold, doing full fetch');
+            _etag = null;
+            fetchFlags();
+          } else {
+            _devLog('Processing ${pendingKeys.length} pending partial invalidation keys');
+            fetchPartialFlags(pendingKeys);
+          }
+        }
+      }
     }
   }
 
@@ -1314,6 +1350,15 @@ class FeaturesClient implements VariationProvider {
 
   /// Handle streaming invalidation signal
   void _handleStreamingInvalidation(List<String> changedKeys) {
+    if (_isFetchingFlags) {
+      // Queue keys for processing after current fetch completes
+      for (final key in changedKeys) {
+        _pendingInvalidationKeys.add(key);
+      }
+      _devLog('Fetch in progress, queued ${changedKeys.length} pending keys for re-fetch after completion');
+      return;
+    }
+
     final totalFlags = _realtimeFlags.length;
     final changedCount = changedKeys.length;
 
@@ -1332,6 +1377,10 @@ class FeaturesClient implements VariationProvider {
   /// Fetch only specific flag keys from the server
   Future<void> fetchPartialFlags(Set<String> flagKeys) async {
     if (flagKeys.isEmpty) return;
+
+    if (_isFetchingFlags) return;
+    _isFetchingFlags = true;
+    final fetchStartContextHash = _lastContextHash;
 
     final keysStr = flagKeys.join(',');
     _devLog('fetchPartialFlags: starting partial fetch for keys=[$keysStr]');
@@ -1365,14 +1414,42 @@ class FeaturesClient implements VariationProvider {
       } else {
         _devLog('fetchPartialFlags: error ${response.statusCode}, falling back to full fetch');
         _etag = null;
+        _isFetchingFlags = false;
         fetchFlags();
+        return;
       }
     } catch (e) {
       _devLog('fetchPartialFlags: exception $e, falling back to full fetch');
-      _etag = null;
-      fetchFlags();
+      // On error, fall back to full fetch on next cycle
     } finally {
+      _isFetchingFlags = false;
       _events.emit(GatrixEvents.flagsFetchEnd);
+
+      // Priority 1: Context changed during fetch -> full re-fetch
+      if (_lastContextHash != fetchStartContextHash) {
+        _devLog('Context changed during partial fetch, triggering full re-fetch');
+        _etag = null;
+        _pendingInvalidationKeys.clear();
+        fetchFlags();
+      }
+      // Priority 2: Pending invalidation keys from streaming
+      else if (_pendingInvalidationKeys.isNotEmpty) {
+        final pendingKeys = Set<String>.from(_pendingInvalidationKeys);
+        _pendingInvalidationKeys.clear();
+
+        if (pendingKeys.contains('*')) {
+          _etag = null;
+          fetchFlags();
+        } else {
+          final totalFlags = _realtimeFlags.length;
+          if (totalFlags == 0 || pendingKeys.length >= totalFlags ~/ 2) {
+            _etag = null;
+            fetchFlags();
+          } else {
+            fetchPartialFlags(pendingKeys);
+          }
+        }
+      }
     }
   }
 

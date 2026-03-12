@@ -156,7 +156,6 @@ All flag access functions accept an optional `forceRealtime` parameter (default:
 | Function | Return Type | Description |
 |---|---|---|
 | `injectFlag(flagName, forceRealtime?)` | `Signal<boolean>` | Flag enabled state |
-| `injectFlagProxy(flagName, forceRealtime?)` | `Signal<FlagProxy \| null>` | Full FlagProxy |
 | `injectVariant(flagName, forceRealtime?)` | `Signal<Variant \| undefined>` | Flag variant |
 | `injectFlags(forceRealtime?)` | `Signal<EvaluatedFlag[]>` | All evaluated flags |
 

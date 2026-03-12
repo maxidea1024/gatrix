@@ -46,11 +46,11 @@ export class ClientVersionService extends BaseEnvironmentService<
   /**
    * Update a single client version in cache (immutable)
    * @param item Client version to update
-   * @param environmentId environment ID (required)
+   * @param environmentId evironment ID
    */
   updateSingleClientVersion(
     item: ClientVersion,
-    environmentId: string = ''
+    environmentId?: string
   ): void {
     this.updateItemInCache(item, environmentId);
   }
@@ -61,7 +61,7 @@ export class ClientVersionService extends BaseEnvironmentService<
    * Get client version by platform and version string
    * @param platform Platform name
    * @param version Version string
-   * @param environmentId environment ID (required)
+   * @param environmentId evironment ID
    */
   getByPlatformAndVersion(
     platform: string,
@@ -80,13 +80,13 @@ export class ClientVersionService extends BaseEnvironmentService<
    * Get latest client version by platform
    * Returns the first version with ONLINE status for the given platform
    * @param platform Platform name
-   * @param environmentId environment ID (required)
    * @param status Optional status filter
+   * @param environmentId evironment ID
    */
   getLatestByPlatform(
     platform: string,
-    environmentId: string = '',
-    status?: string
+    status?: string,
+    environmentId?: string
   ): ClientVersion | null {
     const versions = this.getCached(environmentId);
     const filtered = versions.filter((v) => {
@@ -108,9 +108,9 @@ export class ClientVersionService extends BaseEnvironmentService<
   /**
    * Get all client versions by platform
    * @param platform Platform name
-   * @param environmentId environment ID (required)
+   * @param environmentId evironment ID
    */
-  getByPlatform(platform: string, environmentId: string = ''): ClientVersion[] {
+  getByPlatform(platform: string, environmentId?: string): ClientVersion[] {
     const versions = this.getCached(environmentId);
     return versions.filter((v) => v.platform === platform);
   }
