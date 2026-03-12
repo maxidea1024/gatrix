@@ -171,13 +171,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
     environmentId?: string
   ): PopupNotice[] {
     const now = new Date();
-    const {
-      platform,
-      channel,
-      subChannel,
-      worldId,
-      userId,
-    } = options;
+    const { platform, channel, subChannel, worldId, userId } = options;
     const notices = this.getCached(environmentId);
     const filtered = notices.filter((notice) => {
       // Check startDate: if set, current time must be after startDate
