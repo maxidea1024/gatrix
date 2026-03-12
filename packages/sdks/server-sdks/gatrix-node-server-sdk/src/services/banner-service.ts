@@ -10,6 +10,7 @@ import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { Banner, BannerListResponse } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
+import { validateAll } from '../utils/validation';
 
 export class BannerService extends BaseEnvironmentService<
   Banner,
@@ -67,9 +68,10 @@ export class BannerService extends BaseEnvironmentService<
    * Get a single banner by ID from API
    * Used for updating cache with fresh data
    * @param bannerId Banner ID
-   * @param environmentId environment ID (required)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async fetchById(bannerId: string, _environmentId?: string): Promise<Banner> {
+    validateAll([{ param: 'bannerId', value: bannerId, type: 'string' }]);
     const response = await this.apiClient.get<{ banner: Banner }>(
       `/api/v1/server/banners/${bannerId}`
     );
@@ -85,7 +87,7 @@ export class BannerService extends BaseEnvironmentService<
    * If status is 'published' but not in cache, fetches and adds it to cache
    * If status is 'published' and in cache, fetches and updates it
    * @param bannerId Banner ID
-   * @param environmentId environment ID (required)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    * @param status Optional status
    */
   async updateSingleBanner(
@@ -93,6 +95,7 @@ export class BannerService extends BaseEnvironmentService<
     status?: string,
     environmentId?: string
   ): Promise<void> {
+    validateAll([{ param: 'bannerId', value: bannerId, type: 'string' }]);
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
     try {
       this.logger.debug('Updating single banner in cache', {
@@ -113,8 +116,6 @@ export class BannerService extends BaseEnvironmentService<
       }
 
       // Otherwise, fetch from API and add/update
-      // Add small delay to ensure backend transaction is committed
-      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Invalidate ETag cache before fetching to ensure fresh data
       this.apiClient.invalidateEtagCache(`/banners/${bannerId}`);
@@ -136,9 +137,10 @@ export class BannerService extends BaseEnvironmentService<
   /**
    * Get banner by ID from cache
    * @param bannerId Banner ID
-   * @param environmentId environment ID (required)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getById(bannerId: string, environmentId?: string): Banner | null {
+    validateAll([{ param: 'bannerId', value: bannerId, type: 'string' }]);
     const banners = this.getCached(environmentId);
     return banners.find((b) => b.bannerId === bannerId) || null;
   }
@@ -146,16 +148,17 @@ export class BannerService extends BaseEnvironmentService<
   /**
    * Get banner by name
    * @param name Banner name
-   * @param environmentId environment ID (required)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getByName(name: string, environmentId?: string): Banner | null {
+    validateAll([{ param: 'name', value: name, type: 'string' }]);
     const banners = this.getCached(environmentId);
     return banners.find((b) => b.name === name) || null;
   }
 
   /**
    * Get published banners only
-   * @param environmentId environment ID (required)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getPublished(environmentId?: string): Banner[] {
     const banners = this.getCached(environmentId);
@@ -165,7 +168,7 @@ export class BannerService extends BaseEnvironmentService<
   /**
    * Get banners by status
    * @param status Banner status
-   * @param environmentId environment ID (required)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getByStatus(
     status: 'draft' | 'published' | 'archived',

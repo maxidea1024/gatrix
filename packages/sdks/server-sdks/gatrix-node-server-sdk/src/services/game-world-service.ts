@@ -10,6 +10,7 @@ import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { GameWorld, GameWorldListResponse } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
+import { validateAll } from '../utils/validation';
 
 export class GameWorldService extends BaseEnvironmentService<
   GameWorld,
@@ -53,9 +54,10 @@ export class GameWorldService extends BaseEnvironmentService<
    * Get game world by ID
    * GET /api/v1/server/game-worlds/:id
    * @param id Game world ID
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async getById(id: string, environmentId?: string): Promise<GameWorld> {
+    validateAll([{ param: 'id', value: id, type: 'string' }]);
     this.logger.debug('Fetching game world by ID', { id, environmentId });
 
     const response = await this.apiClient.get<GameWorld>(
@@ -78,15 +80,17 @@ export class GameWorldService extends BaseEnvironmentService<
    * Get game world by worldId
    * GET /api/v1/server/game-worlds/world/:worldId
    * @param worldId World ID
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async getByWorldId(
     worldId: string,
-    environmentId: string
+    environmentId?: string
   ): Promise<GameWorld> {
+    validateAll([{ param: 'worldId', value: worldId, type: 'string' }]);
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
     this.logger.debug('Fetching game world by worldId', {
       worldId,
-      environmentId,
+      environmentId: resolvedEnv,
     });
 
     const response = await this.apiClient.get<GameWorld>(
@@ -109,13 +113,14 @@ export class GameWorldService extends BaseEnvironmentService<
    * If isVisible is true and in cache, fetches and updates it
    * @param id Game world ID
    * @param isVisible Optional visibility status
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async updateSingleWorld(
     id: string,
     isVisible?: boolean | number,
     environmentId?: string
   ): Promise<void> {
+    validateAll([{ param: 'id', value: id, type: 'string' }]);
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
     try {
       this.logger.debug('Updating single game world in cache', {
@@ -135,8 +140,6 @@ export class GameWorldService extends BaseEnvironmentService<
       }
 
       // Otherwise, fetch from API and add/update
-      // Add small delay to ensure backend transaction is committed
-      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Fetch the updated world from backend
       const updatedWorld = await this.getById(id, resolvedEnv);
@@ -182,9 +185,10 @@ export class GameWorldService extends BaseEnvironmentService<
   /**
    * Check if a world is in maintenance based on flag and time window
    * @param worldId World ID
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   isWorldMaintenanceActive(worldId: string, environmentId?: string): boolean {
+    validateAll([{ param: 'worldId', value: worldId, type: 'string' }]);
     const worlds = this.getCached(environmentId);
     const world = worlds.find((w) => w.worldId === worldId);
     if (!world || !world.isMaintenance) {
@@ -215,9 +219,10 @@ export class GameWorldService extends BaseEnvironmentService<
   /**
    * Get world by worldId from cache
    * @param worldId World ID
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getWorldByWorldId(worldId: string, environmentId?: string): GameWorld | null {
+    validateAll([{ param: 'worldId', value: worldId, type: 'string' }]);
     const worlds = this.getCached(environmentId);
     return worlds.find((w) => w.worldId === worldId) || null;
   }
@@ -227,13 +232,14 @@ export class GameWorldService extends BaseEnvironmentService<
    * Falls back to default message if language not found
    * @param worldId World ID
    * @param lang Language code (default: 'en')
-   * @param environmentId evironment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getWorldMaintenanceMessage(
     worldId: string,
     lang: 'ko' | 'en' | 'zh' = 'en',
     environmentId?: string
   ): string | null {
+    validateAll([{ param: 'worldId', value: worldId, type: 'string' }]);
     const worlds = this.getCached(environmentId);
     const world = worlds.find((w) => w.worldId === worldId);
     if (!world || !this.isWorldMaintenanceActive(worldId, environmentId)) {

@@ -10,6 +10,7 @@ import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { ClientVersion, ClientVersionListResponse } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
+import { validateAll } from '../utils/validation';
 
 export class ClientVersionService extends BaseEnvironmentService<
   ClientVersion,
@@ -46,7 +47,7 @@ export class ClientVersionService extends BaseEnvironmentService<
   /**
    * Update a single client version in cache (immutable)
    * @param item Client version to update
-   * @param environmentId evironment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   updateSingleClientVersion(item: ClientVersion, environmentId?: string): void {
     this.updateItemInCache(item, environmentId);
@@ -58,7 +59,7 @@ export class ClientVersionService extends BaseEnvironmentService<
    * Get client version by platform and version string
    * @param platform Platform name
    * @param version Version string
-   * @param environmentId evironment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getByPlatformAndVersion(
     platform: string,
@@ -78,7 +79,7 @@ export class ClientVersionService extends BaseEnvironmentService<
    * Returns the first version with ONLINE status for the given platform
    * @param platform Platform name
    * @param status Optional status filter
-   * @param environmentId evironment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getLatestByPlatform(
     platform: string,
@@ -105,7 +106,7 @@ export class ClientVersionService extends BaseEnvironmentService<
   /**
    * Get all client versions by platform
    * @param platform Platform name
-   * @param environmentId evironment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getByPlatform(platform: string, environmentId?: string): ClientVersion[] {
     const versions = this.getCached(environmentId);

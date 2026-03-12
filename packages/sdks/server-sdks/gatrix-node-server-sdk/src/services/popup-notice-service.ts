@@ -10,6 +10,7 @@ import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { PopupNotice } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
+import { validateAll } from '../utils/validation';
 
 // Response type is directly PopupNotice[] (not wrapped in object)
 type PopupNoticeListResponse = PopupNotice[];
@@ -52,10 +53,10 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * Get popup notice by ID
    * GET /api/v1/server/ingame-popup-notices/:id
    * @param id Popup notice ID
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async getById(id: string, environmentId?: string): Promise<PopupNotice> {
-    this.logger.debug('Fetching popup notice by ID', { id, environmentId });
+    validateAll([{ param: 'id', value: id, type: 'string' }]);
 
     const response = await this.apiClient.get<{ notice: PopupNotice }>(
       `/api/v1/server/ingame-popup-notices/${id}`
@@ -78,7 +79,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * If isVisible is true but not in cache, fetches and adds it to cache
    * If isVisible is true and in cache, fetches and updates it
    * @param id Popup notice ID
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    * @param isVisible Optional visibility status
    */
   async updateSingleNotice(
@@ -86,6 +87,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
     isVisible?: boolean | number,
     environmentId?: string
   ): Promise<void> {
+    validateAll([{ param: 'id', value: id, type: 'string' }]);
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
     try {
       this.logger.debug('Updating single popup notice in cache', {
@@ -105,8 +107,6 @@ export class PopupNoticeService extends BaseEnvironmentService<
       }
 
       // Otherwise, fetch from API and add/update
-      // Add small delay to ensure backend transaction is committed
-      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Fetch the single notice from backend using getById
       let updatedNotice: PopupNotice;
@@ -140,9 +140,10 @@ export class PopupNoticeService extends BaseEnvironmentService<
   /**
    * Get active notices for a specific world
    * @param worldId World ID
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getNoticesForWorld(worldId: string, environmentId?: string): PopupNotice[] {
+    validateAll([{ param: 'worldId', value: worldId, type: 'string' }]);
     const notices = this.getCached(environmentId);
     return notices.filter((notice) => {
       if (!notice.targetWorlds || notice.targetWorlds.length === 0) {
@@ -166,8 +167,8 @@ export class PopupNoticeService extends BaseEnvironmentService<
       subChannel?: string;
       worldId?: string;
       userId?: string;
-      environmentId?: string;
-    } = {}
+    } = {},
+    environmentId?: string
   ): PopupNotice[] {
     const now = new Date();
     const {
@@ -176,7 +177,6 @@ export class PopupNoticeService extends BaseEnvironmentService<
       subChannel,
       worldId,
       userId,
-      environmentId = '',
     } = options;
     const notices = this.getCached(environmentId);
     const filtered = notices.filter((notice) => {

@@ -56,7 +56,7 @@ export class WorldMaintenanceService {
    * - If neither is set: checks global service + ALL worlds (returns true if any world is in maintenance)
    *
    * @param worldId Optional world ID to check (uses config.worldId if not provided)
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    * @returns true if either global service or world(s) is in maintenance
    */
   isActive(worldId?: string, environmentId?: string): boolean {
@@ -100,7 +100,7 @@ export class WorldMaintenanceService {
    *
    * @param worldId Optional world ID to check (uses config.worldId if not provided)
    * @param lang Language for maintenance message
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getInfo(
     worldId?: string,
@@ -206,7 +206,7 @@ export class WorldMaintenanceService {
    * - If worldId is configured in SDK, only that world is checked
    * - Time-based maintenance (startsAt/endsAt) is calculated to determine actual status
    *
-   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    * @returns CurrentMaintenanceStatus with isMaintenanceActive, source, and detail
    */
   getCurrentStatus(environmentId?: string): CurrentMaintenanceStatus {

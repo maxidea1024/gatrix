@@ -158,7 +158,7 @@ export class ServiceMaintenanceService {
 
   /**
    * Refresh service maintenance cache for a specific environment
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
   async refreshByEnvironment(
@@ -177,7 +177,7 @@ export class ServiceMaintenanceService {
 
   /**
    * Get cached service maintenance status
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getCached(environmentId?: string): MaintenanceStatus | null {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -214,7 +214,7 @@ export class ServiceMaintenanceService {
    * Update cached service maintenance status
    * Used by cache manager or event listener when maintenance changes
    * @param status Maintenance status to cache
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   updateCache(status: MaintenanceStatus | null, environmentId?: string): void {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -227,7 +227,7 @@ export class ServiceMaintenanceService {
 
   /**
    * Check if service is currently in maintenance based on flag and time window
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   isMaintenanceActive(environmentId?: string): boolean {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -267,7 +267,7 @@ export class ServiceMaintenanceService {
    * Get localized maintenance message for the service
    * Returns null when maintenance is not active
    * @param lang Language code
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getMessage(
     lang: 'ko' | 'en' | 'zh' = 'en',

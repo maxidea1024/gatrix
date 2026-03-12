@@ -12,6 +12,7 @@ import {
   CouponRedeemErrorCode,
   isGatrixSDKError,
 } from '../utils/errors';
+import { validateAll } from '../utils/validation';
 
 export class CouponService {
   private apiClient: ApiClient;
@@ -42,12 +43,18 @@ export class CouponService {
    * - COUPON_INVALID_SUBCHANNEL: Coupon not available for this subchannel
    * - COUPON_INVALID_USER: Coupon not available for this user
    * @param request Coupon redemption request
-   * @param environmentId environment ID (required)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async redeem(
     request: RedeemCouponRequest,
     environmentId?: string
   ): Promise<RedeemCouponResponse> {
+    validateAll([
+      { param: 'request', value: request, type: 'required' },
+      { param: 'request.code', value: request?.code, type: 'string' },
+      { param: 'request.userId', value: request?.userId, type: 'string' },
+    ]);
+
     this.logger.info('Redeeming coupon', {
       code: request.code,
       userId: request.userId,

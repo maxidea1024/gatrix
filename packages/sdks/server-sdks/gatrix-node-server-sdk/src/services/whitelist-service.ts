@@ -12,6 +12,7 @@
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
+import { validateAll } from '../utils/validation';
 
 export interface IpWhitelistEntry {
   id: string;
@@ -157,7 +158,7 @@ export class WhitelistService {
 
   /**
    * Refresh whitelist cache for a specific environment
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
   async refreshByEnvironment(
@@ -181,7 +182,7 @@ export class WhitelistService {
 
   /**
    * Get cached whitelists
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getCached(environmentId?: string): WhitelistData {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -221,7 +222,7 @@ export class WhitelistService {
 
   /**
    * Get cached IP whitelist
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getCachedIpWhitelist(environmentId?: string): IpWhitelistEntry[] {
     return this.getCached(environmentId).ipWhitelist;
@@ -229,7 +230,7 @@ export class WhitelistService {
 
   /**
    * Get cached Account whitelist
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getCachedAccountWhitelist(environmentId?: string): AccountWhitelistEntry[] {
     return this.getCached(environmentId).accountWhitelist;
@@ -239,9 +240,10 @@ export class WhitelistService {
    * Check if IP is whitelisted (supports CIDR notation)
    * Note: Backend already filters for enabled and valid entries
    * @param ip IP address to check
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   isIpWhitelisted(ip: string, environmentId?: string): boolean {
+    validateAll([{ param: 'ip', value: ip, type: 'string' }]);
     const whitelist = this.getCached(environmentId);
     return whitelist.ipWhitelist.some((entry) => {
       // Check exact IP match
@@ -316,9 +318,10 @@ export class WhitelistService {
    * Check if account is whitelisted
    * Note: Backend already filters for enabled and valid entries
    * @param accountId Account ID to check
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   isAccountWhitelisted(accountId: string, environmentId?: string): boolean {
+    validateAll([{ param: 'accountId', value: accountId, type: 'string' }]);
     const whitelist = this.getCached(environmentId);
     return whitelist.accountWhitelist.some((entry) => {
       return entry.accountId === accountId;
@@ -329,7 +332,7 @@ export class WhitelistService {
    * Update cached whitelist data
    * Called when whitelist.updated event is received
    * @param whitelist Whitelist data to cache
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   updateCache(whitelist: WhitelistData, environmentId?: string): void {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;

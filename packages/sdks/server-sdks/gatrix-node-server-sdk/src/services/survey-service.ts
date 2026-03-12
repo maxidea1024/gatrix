@@ -13,6 +13,7 @@ import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { Survey, SurveyListParams, SurveySettings } from '../types/api';
+import { validateAll } from '../utils/validation';
 
 export class SurveyService {
   private apiClient: ApiClient;
@@ -169,7 +170,7 @@ export class SurveyService {
 
   /**
    * Get cached surveys
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getCached(environmentId?: string): Survey[] {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -192,7 +193,7 @@ export class SurveyService {
 
   /**
    * Get cached survey settings
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getCachedSettings(environmentId?: string): SurveySettings | null {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -224,7 +225,7 @@ export class SurveyService {
    * Refresh cached surveys for a specific environment
    * @param params Optional list parameters
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async refreshByEnvironment(
     params?: SurveyListParams,
@@ -250,9 +251,10 @@ export class SurveyService {
    * Get survey by ID
    * GET /api/v1/server/surveys/:id
    * @param id Survey ID
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async getById(id: string, environmentId?: string): Promise<Survey> {
+    validateAll([{ param: 'id', value: id, type: 'string' }]);
     this.logger.debug('Fetching survey by ID', { id, environmentId });
 
     const response = await this.apiClient.get<{ survey: Survey }>(
@@ -271,7 +273,7 @@ export class SurveyService {
   /**
    * Refresh survey settings only
    * GET /api/v1/server/surveys/settings
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async refreshSettings(environmentId?: string): Promise<SurveySettings> {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -306,7 +308,7 @@ export class SurveyService {
   /**
    * Update cache with new data
    * @param surveys Surveys to cache
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   updateCache(surveys: Survey[], environmentId?: string): void {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -324,13 +326,14 @@ export class SurveyService {
    * If isActive is true and in cache, fetches and updates it
    * @param id Survey ID
    * @param isActive Optional active status
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async updateSingleSurvey(
     id: string,
     isActive?: boolean | number,
     environmentId?: string
   ): Promise<void> {
+    validateAll([{ param: 'id', value: id, type: 'string' }]);
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
     try {
       this.logger.debug('Updating single survey in cache', {
@@ -350,8 +353,6 @@ export class SurveyService {
       }
 
       // Otherwise, fetch from API and add/update
-      // Add small delay to ensure backend transaction is committed
-      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Fetch the single survey from backend using getById (instead of list)
       let updatedSurvey: Survey;
@@ -413,9 +414,10 @@ export class SurveyService {
   /**
    * Remove a survey from cache (immutable)
    * @param id Survey ID
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   removeSurvey(id: string, environmentId?: string): void {
+    validateAll([{ param: 'id', value: id, type: 'string' }]);
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
     this.logger.debug('Removing survey from cache', {
       id,
@@ -437,9 +439,10 @@ export class SurveyService {
   /**
    * Get surveys for a specific world
    * @param worldId World ID
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getSurveysForWorld(worldId: string, environmentId?: string): Survey[] {
+    validateAll([{ param: 'worldId', value: worldId, type: 'string' }]);
     const surveys = this.getCached(environmentId);
     return surveys.filter((survey) => {
       if (!survey.targetWorlds || survey.targetWorlds.length === 0) {
@@ -455,7 +458,7 @@ export class SurveyService {
    * Update survey settings only
    * Called when settings change (e.g., survey configuration updates)
    * @param newSettings New settings to cache
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   updateSettings(newSettings: SurveySettings, environmentId?: string): void {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -506,7 +509,7 @@ export class SurveyService {
    * @param worldId User's world ID
    * @param userLevel User's level
    * @param joinDays User's join days
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    * @returns Array of appropriate surveys, empty array if none match
    */
   getActiveSurveys(

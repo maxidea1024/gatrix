@@ -17,6 +17,7 @@ import {
   ServiceNoticeListResponse,
   ServiceNoticeCategory,
 } from '../types/api';
+import { validateAll } from '../utils/validation';
 
 export interface ServiceNoticeFilters {
   isActive?: boolean;
@@ -161,7 +162,7 @@ export class ServiceNoticeService {
 
   /**
    * Get cached service notices
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getCached(environmentId?: string): ServiceNotice[] {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -203,7 +204,7 @@ export class ServiceNoticeService {
 
   /**
    * Refresh cached service notices for a specific environment
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
   async refreshByEnvironment(
@@ -223,7 +224,7 @@ export class ServiceNoticeService {
   /**
    * Update cache with new data
    * @param notices Service notices to cache
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   updateCache(notices: ServiceNotice[], environmentId?: string): void {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -237,7 +238,7 @@ export class ServiceNoticeService {
   /**
    * Update a single service notice in cache (immutable)
    * @param notice Service notice to update
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   updateSingleServiceNotice(
     notice: ServiceNotice,
@@ -294,7 +295,7 @@ export class ServiceNoticeService {
   /**
    * Remove a service notice from cache (immutable)
    * @param id Service notice ID
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   removeFromCache(id: string, environmentId?: string): void {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
@@ -311,7 +312,7 @@ export class ServiceNoticeService {
 
   /**
    * Get service notice by ID
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getById(id: string, environmentId?: string): ServiceNotice | null {
     const notices = this.getCached(environmentId);
@@ -320,7 +321,7 @@ export class ServiceNoticeService {
 
   /**
    * Get active service notices with optional filters
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getActive(
     environmentId?: string,
@@ -384,7 +385,7 @@ export class ServiceNoticeService {
   /**
    * Get notices by category
    * @param category Notice category
-   * @param environmentId environment ID (optional)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getByCategory(
     category: ServiceNoticeCategory,

@@ -638,6 +638,19 @@ All client SDKs MUST validate configuration at initialization time and fail fast
 - `streaming.websocket.reconnectBase` must be <= `streaming.websocket.reconnectMax` (if both provided)
 - `streaming.sse.url` and `streaming.websocket.url` must be valid URLs (if provided)
 
+### Runtime Parameter Validation
+
+> [!CAUTION]
+> **All public SDK methods MUST validate their required parameters defensively.**
+>
+> Users call SDK methods directly. Invalid arguments MUST be caught immediately with a clear, typed SDK error — not silently propagated into API calls or internal logic.
+>
+> **Rules:**
+> 1. Every required `string` parameter (e.g., `flagName`, `key`) MUST be validated as non-null, non-undefined, and non-empty.
+> 2. Validation MUST throw a typed SDK error (not a generic `Error`).
+> 3. Use centralized validation helpers to ensure consistency across all methods.
+> 4. **When a method has multiple required parameters, validation errors MUST be aggregated** and thrown as a single error listing all failures — not one at a time.
+
 ### Dev Mode Logging
 
 When `enableDevMode` is set to `true`, the SDK outputs detailed debug logs at key lifecycle points:

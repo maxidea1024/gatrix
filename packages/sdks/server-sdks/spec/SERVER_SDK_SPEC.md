@@ -537,6 +537,22 @@ MUST map precisely to `Microsoft.Extensions.Logging.ILogger<T>`.
 - Invalid configuration during initialization MUST throw an easily identifiable exception (e.g., `GatrixConfigurationException`).
 - Caching/sync failures logic MUST NOT break application runtime loops. All exceptions thrown during background processes (events/polling) MUST be swallowed and logged via the internal Logger.
 
+### Parameter Validation
+
+> [!CAUTION]
+> **All public service methods MUST validate their required parameters defensively.**
+>
+> SDK users call service methods directly (e.g., `sdk.gameWorld.getByWorldId(worldId)`). Invalid arguments MUST be caught immediately with a clear error, not silently propagated into cache lookups or API calls.
+>
+> **Rules:**
+> 1. Every required `string` parameter (e.g., `id`, `worldId`, `flagName`, `key`, `code`) MUST be validated as non-null, non-undefined, and non-empty.
+> 2. Every required `object` parameter (e.g., `request`) MUST be validated as non-null and non-undefined. Required fields within the object MUST also be validated.
+> 3. Every required `array` parameter (e.g., `environmentIds`) MUST be validated as non-null, non-undefined, and non-empty.
+> 4. Validation MUST throw a typed SDK error (e.g., `GatrixSDKError` with `INVALID_PARAMETERS` code) — never a generic `Error`.
+> 5. Use a centralized batch validation helper (e.g., `validateAll`) to ensure consistency and reduce boilerplate. Do NOT provide individual validation functions (e.g., `validateRequiredString`) — a single aggregated function prevents API surface confusion.
+> 6. **When a method has multiple required parameters, validation errors MUST be aggregated** and thrown as a single error listing all failures. Do NOT throw on the first failure — users should be able to fix all issues in one pass.
+> 7. `environmentId` is optional and does NOT require validation — it resolves to the default environment when omitted.
+
 ## Complete Service API Reference
 
 All services below MUST be implemented by every Server SDK. Access is always namespaced:

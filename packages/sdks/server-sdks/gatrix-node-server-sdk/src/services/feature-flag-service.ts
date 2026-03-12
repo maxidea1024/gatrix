@@ -459,7 +459,7 @@ export class FeatureFlagService {
 
   /**
    * Get all cached flags as array
-   * @param environmentId environment ID or cache key. Defaults to defaultToken in single-token mode.
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getCached(environmentId?: string): FeatureFlag[] {
     const key = environmentId || this.defaultEnvironmentId;
@@ -670,7 +670,7 @@ export class FeatureFlagService {
   /**
    * Check if a feature flag exists in the cache
    * @param flagName Name of the flag
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    * @returns true if the flag is defined, false otherwise
    */
   hasFlag(flagName: string, environmentId?: string): boolean {
@@ -1700,7 +1700,7 @@ export class FeatureFlagService {
   /**
    * Update a single flag in cache
    * @param flagName Flag name
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    * @param isEnabled Optional enabled status (if false, removes from cache)
    */
   async updateSingleFlag(

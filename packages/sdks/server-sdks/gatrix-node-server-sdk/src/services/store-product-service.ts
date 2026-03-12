@@ -10,6 +10,7 @@ import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { StoreProduct, StoreProductListResponse } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
+import { validateAll } from '../utils/validation';
 
 export class StoreProductService extends BaseEnvironmentService<
   StoreProduct,
@@ -73,9 +74,10 @@ export class StoreProductService extends BaseEnvironmentService<
    * Get a single store product by ID from API
    * Used for updating cache with fresh data
    * @param id Store product ID
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async getById(id: string, _environmentId?: string): Promise<StoreProduct> {
+    validateAll([{ param: 'id', value: id, type: 'string' }]);
     const response = await this.apiClient.get<{ product: StoreProduct }>(
       `/api/v1/server/store-products/${id}`
     );
@@ -94,13 +96,14 @@ export class StoreProductService extends BaseEnvironmentService<
    * If isActive is true and in cache, fetches and updates it
    * @param id Store product ID (ULID from event)
    * @param isActive Optional active status
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   async updateSingleProduct(
     id: string,
     isActive?: boolean | number,
     environmentId?: string
   ): Promise<void> {
+    validateAll([{ param: 'id', value: id, type: 'string' }]);
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
     try {
       this.logger.debug('Updating single store product in cache', {
@@ -120,8 +123,6 @@ export class StoreProductService extends BaseEnvironmentService<
       }
 
       // Otherwise, fetch from API and add/update
-      // Add small delay to ensure backend transaction is committed
-      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Invalidate ETag cache before fetching to ensure fresh data
       this.apiClient.invalidateEtagCache(`/store-products/${id}`);
@@ -184,12 +185,13 @@ export class StoreProductService extends BaseEnvironmentService<
   /**
    * Get store product by productId from cache
    * @param productId Product ID
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getByProductId(
     productId: string,
     environmentId: string
   ): StoreProduct | null {
+    validateAll([{ param: 'productId', value: productId, type: 'string' }]);
     const products = this.getCached(environmentId);
     return products.find((p) => p.productId === productId) || null;
   }
@@ -197,7 +199,7 @@ export class StoreProductService extends BaseEnvironmentService<
   /**
    * Get store products by store type (google, apple, onestore, etc.)
    * @param store Store type
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getByStore(store: string, environmentId?: string): StoreProduct[] {
     const products = this.getCached(environmentId);
@@ -208,7 +210,7 @@ export class StoreProductService extends BaseEnvironmentService<
    * Get active store products only
    * Note: All cached products are already active (filtered by backend)
    * This method only filters by sale period
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getActive(environmentId?: string): StoreProduct[] {
     const products = this.getCached(environmentId);

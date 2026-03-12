@@ -10,6 +10,7 @@ import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { VarItem } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
+import { validateAll } from '../utils/validation';
 
 export class VarsService extends BaseEnvironmentService<
   VarItem,
@@ -48,9 +49,10 @@ export class VarsService extends BaseEnvironmentService<
   /**
    * Get a variable value by key from cache
    * @param key Variable key (e.g., '$channel', 'kv:some-setting')
-   * @param environmentId environment ID (optional if envResolver can provide default)
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getValue(key: string, environmentId?: string): string | null {
+    validateAll([{ param: 'key', value: key, type: 'string' }]);
     const env = environmentId || this.resolveEnvironment(environmentId);
     const item = this.getByKey(key, env);
     return item ? item.varValue : null;
@@ -59,9 +61,10 @@ export class VarsService extends BaseEnvironmentService<
   /**
    * Get a variable value parsed as JSON if it's an object or array
    * @param key Variable key
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getParsedValue<T = any>(key: string, environmentId?: string): T | null {
+    validateAll([{ param: 'key', value: key, type: 'string' }]);
     const value = this.getValue(key, environmentId);
     if (value === null) return null;
 
@@ -85,9 +88,10 @@ export class VarsService extends BaseEnvironmentService<
   /**
    * Get a single VarItem by key
    * @param key Variable key
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   getByKey(key: string, environmentId?: string): VarItem | null {
+    validateAll([{ param: 'key', value: key, type: 'string' }]);
     const items = this.getCached(environmentId);
     return items.find((item) => item.varKey === key) || null;
   }
@@ -97,13 +101,14 @@ export class VarsService extends BaseEnvironmentService<
    * Used for granular event-driven updates (vars.updated event with value data)
    * @param key Variable key
    * @param value New variable value (null means deleted)
-   * @param environmentId environment ID
+   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
   updateSingleVar(
     key: string,
     value: string | null,
     environmentId: string
   ): void {
+    validateAll([{ param: 'key', value: key, type: 'string' }]);
     const items = this.getCached(environmentId);
     const existingIndex = items.findIndex((item) => item.varKey === key);
 
