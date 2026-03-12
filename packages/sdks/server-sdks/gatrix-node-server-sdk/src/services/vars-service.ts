@@ -138,14 +138,16 @@ export class VarsService extends BaseEnvironmentService<
           environmentId,
         }
       );
-      this.refreshByEnvironment(undefined, environmentId).catch((error: any) => {
-        this.logger.error(
-          'Failed to refresh vars after single var update fallback',
-          {
-            error: error.message,
-          }
-        );
-      });
+      this.refreshByEnvironment(undefined, environmentId).catch(
+        (error: any) => {
+          this.logger.error(
+            'Failed to refresh vars after single var update fallback',
+            {
+              error: error.message,
+            }
+          );
+        }
+      );
     }
 
     this.logger.debug('Single var updated in cache', { key, environmentId });

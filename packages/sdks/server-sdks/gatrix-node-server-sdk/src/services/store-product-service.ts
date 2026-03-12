@@ -59,7 +59,9 @@ export class StoreProductService extends BaseEnvironmentService<
         { environmentId: resolvedEnv }
       );
     }
-    this.logger.info('Refreshing store products cache', { environmentId: resolvedEnv });
+    this.logger.info('Refreshing store products cache', {
+      environmentId: resolvedEnv,
+    });
     // Invalidate ETag cache to force fresh data fetch
     this.apiClient.invalidateEtagCache(this.getEndpoint());
     return await this.listByEnvironment(resolvedEnv);
@@ -73,10 +75,7 @@ export class StoreProductService extends BaseEnvironmentService<
    * @param id Store product ID
    * @param environmentId environment ID
    */
-  async getById(
-    id: string,
-    _environmentId?: string
-  ): Promise<StoreProduct> {
+  async getById(id: string, _environmentId?: string): Promise<StoreProduct> {
     const response = await this.apiClient.get<{ product: StoreProduct }>(
       `/api/v1/server/store-products/${id}`
     );
@@ -144,10 +143,7 @@ export class StoreProductService extends BaseEnvironmentService<
   /**
    * Remove an item from cache by ULID (event uses ULID, not cmsProductId)
    */
-  private removeByUlidFromCache(
-    ulid: string,
-    environmentId?: string
-  ): void {
+  private removeByUlidFromCache(ulid: string, environmentId?: string): void {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
     const currentItems = this.cachedByEnv.get(resolvedEnv) || [];
     const newItems = currentItems.filter((item) => item.id !== ulid);

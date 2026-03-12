@@ -370,7 +370,7 @@ export abstract class BaseEnvironmentService<
   updateCache(items: T[], environmentId?: string): void {
     const resolvedEnv = this.resolveEnvironment(environmentId);
     this.cachedByEnv.set(resolvedEnv, items);
-    this.persistCache(resolvedEnv).catch(() => { });
+    this.persistCache(resolvedEnv).catch(() => {});
     this.logger.debug(`${this.getServiceName()} cache updated`, {
       count: items.length,
     });
@@ -398,7 +398,7 @@ export abstract class BaseEnvironmentService<
     }
 
     this.cachedByEnv.set(resolvedEnv, newItems);
-    this.persistCache(resolvedEnv).catch(() => { });
+    this.persistCache(resolvedEnv).catch(() => {});
 
     this.logger.debug(
       `Single ${this.getServiceName()} ${existsInCache ? 'updated' : 'added'} in cache`,
@@ -414,7 +414,7 @@ export abstract class BaseEnvironmentService<
     const currentItems = this.cachedByEnv.get(resolvedEnv) || [];
     const newItems = currentItems.filter((item) => this.getItemId(item) !== id);
     this.cachedByEnv.set(resolvedEnv, newItems);
-    this.persistCache(resolvedEnv).catch(() => { });
+    this.persistCache(resolvedEnv).catch(() => {});
 
     this.logger.debug(`${this.getServiceName()} removed from cache`, { id });
   }

@@ -1266,11 +1266,13 @@ export class CacheManager {
         } else {
           const defaultEnv = this.defaultEnvironmentId;
           promises.push(
-            this.varsService.refreshByEnvironment(undefined, defaultEnv).catch((error) => {
-              this.logger.warn('Failed to refresh vars', {
-                error: error.message,
-              });
-            })
+            this.varsService
+              .refreshByEnvironment(undefined, defaultEnv)
+              .catch((error) => {
+                this.logger.warn('Failed to refresh vars', {
+                  error: error.message,
+                });
+              })
           );
           refreshedTypes.push('vars');
         }
@@ -1344,7 +1346,10 @@ export class CacheManager {
   async refreshPopupNotices(environmentId: string): Promise<void> {
     if (!this.popupNoticeService) return;
     const start = process.hrtime.bigint();
-    await this.popupNoticeService.refreshByEnvironment(undefined, environmentId);
+    await this.popupNoticeService.refreshByEnvironment(
+      undefined,
+      environmentId
+    );
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('popups');
@@ -1360,7 +1365,11 @@ export class CacheManager {
   async refreshSurveys(environmentId: string): Promise<void> {
     if (!this.surveyService) return;
     const start = process.hrtime.bigint();
-    await this.surveyService.refreshByEnvironment({ isActive: true }, undefined, environmentId);
+    await this.surveyService.refreshByEnvironment(
+      { isActive: true },
+      undefined,
+      environmentId
+    );
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('surveys');
@@ -1843,7 +1852,10 @@ export class CacheManager {
    * @param environmentId environment ID (required)
    */
   async refreshStoreProducts(environmentId: string): Promise<void> {
-    await this.storeProductService?.refreshByEnvironment(undefined, environmentId);
+    await this.storeProductService?.refreshByEnvironment(
+      undefined,
+      environmentId
+    );
   }
 
   /**

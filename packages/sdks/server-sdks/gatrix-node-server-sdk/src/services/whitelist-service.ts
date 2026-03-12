@@ -173,7 +173,9 @@ export class WhitelistService {
         }
       );
     }
-    this.logger.debug('Refreshing whitelist cache', { environmentId: resolvedEnv });
+    this.logger.debug('Refreshing whitelist cache', {
+      environmentId: resolvedEnv,
+    });
     return await this.listByEnvironment(resolvedEnv);
   }
 
@@ -229,9 +231,7 @@ export class WhitelistService {
    * Get cached Account whitelist
    * @param environmentId environment ID (optional)
    */
-  getCachedAccountWhitelist(
-    environmentId?: string
-  ): AccountWhitelistEntry[] {
+  getCachedAccountWhitelist(environmentId?: string): AccountWhitelistEntry[] {
     return this.getCached(environmentId).accountWhitelist;
   }
 

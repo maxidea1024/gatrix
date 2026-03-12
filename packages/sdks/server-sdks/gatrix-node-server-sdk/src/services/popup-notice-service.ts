@@ -142,10 +142,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * @param worldId World ID
    * @param environmentId environment ID (optional)
    */
-  getNoticesForWorld(
-    worldId: string,
-    environmentId?: string
-  ): PopupNotice[] {
+  getNoticesForWorld(worldId: string, environmentId?: string): PopupNotice[] {
     const notices = this.getCached(environmentId);
     return notices.filter((notice) => {
       if (!notice.targetWorlds || notice.targetWorlds.length === 0) {

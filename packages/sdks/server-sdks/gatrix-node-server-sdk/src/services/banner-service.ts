@@ -53,7 +53,9 @@ export class BannerService extends BaseEnvironmentService<
     environmentId?: string
   ): Promise<Banner[]> {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
-    this.logger.info('Refreshing banners cache', { environmentId: resolvedEnv });
+    this.logger.info('Refreshing banners cache', {
+      environmentId: resolvedEnv,
+    });
     // Invalidate ETag cache to force fresh data fetch
     this.apiClient.invalidateEtagCache(this.getEndpoint());
     return await this.listByEnvironment(resolvedEnv);
@@ -67,10 +69,7 @@ export class BannerService extends BaseEnvironmentService<
    * @param bannerId Banner ID
    * @param environmentId environment ID (required)
    */
-  async fetchById(
-    bannerId: string,
-    _environmentId?: string
-  ): Promise<Banner> {
+  async fetchById(bannerId: string, _environmentId?: string): Promise<Banner> {
     const response = await this.apiClient.get<{ banner: Banner }>(
       `/api/v1/server/banners/${bannerId}`
     );

@@ -329,10 +329,7 @@ export class FeatureFlagService {
       ];
       if (projectId) {
         saveOps.push(
-          this.storage.save(
-            `FeatureFlags_${resolvedEnv}_projectId`,
-            projectId
-          ),
+          this.storage.save(`FeatureFlags_${resolvedEnv}_projectId`, projectId),
           this.storage.save(
             `FeatureFlags_${projectId}_segments`,
             JSON.stringify(segments || [])
@@ -528,9 +525,7 @@ export class FeatureFlagService {
    * Resolve projectId from environmentId/cacheKey
    */
   getProjectIdForEnvironment(environmentId?: string): string | undefined {
-    return this.envToProjectMap.get(
-      environmentId || this.defaultEnvironmentId
-    );
+    return this.envToProjectMap.get(environmentId || this.defaultEnvironmentId);
   }
 
   /**
