@@ -388,7 +388,9 @@ async function main() {
       logger.info('POPUP UPDATED', event.data);
       printCachedData();
 
-      console.log(JSON.stringify(sdk.popupNotice.getActivePopupNotices(), null, 2));
+      console.log(
+        JSON.stringify(sdk.popupNotice.getActivePopupNotices(), null, 2)
+      );
     });
 
     sdk.on('popup.deleted', (event) => {

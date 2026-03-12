@@ -212,7 +212,10 @@ export class ServiceMaintenanceService {
    * @param status Maintenance status to cache
    * @param environmentId environment ID (required)
    */
-  updateCache(status: MaintenanceStatus | null, environmentId: string = ''): void {
+  updateCache(
+    status: MaintenanceStatus | null,
+    environmentId: string = ''
+  ): void {
     if (status) {
       this.cachedStatusByEnv.set(environmentId, status);
     } else {

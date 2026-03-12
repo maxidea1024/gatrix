@@ -63,7 +63,10 @@ export class BannerService extends BaseEnvironmentService<
    * @param bannerId Banner ID
    * @param environmentId environment ID (required)
    */
-  async fetchById(bannerId: string, _environmentId: string = ''): Promise<Banner> {
+  async fetchById(
+    bannerId: string,
+    _environmentId: string = ''
+  ): Promise<Banner> {
     const response = await this.apiClient.get<{ banner: Banner }>(
       `/api/v1/server/banners/${bannerId}`
     );

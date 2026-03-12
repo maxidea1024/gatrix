@@ -72,7 +72,10 @@ export class StoreProductService extends BaseEnvironmentService<
    * @param id Store product ID
    * @param environmentId environment ID (required)
    */
-  async getById(id: string, _environmentId: string = ''): Promise<StoreProduct> {
+  async getById(
+    id: string,
+    _environmentId: string = ''
+  ): Promise<StoreProduct> {
     const response = await this.apiClient.get<{ product: StoreProduct }>(
       `/api/v1/server/store-products/${id}`
     );
@@ -148,7 +151,10 @@ export class StoreProductService extends BaseEnvironmentService<
   /**
    * Remove an item from cache by ULID (event uses ULID, not cmsProductId)
    */
-  private removeByUlidFromCache(ulid: string, environmentId: string = ''): void {
+  private removeByUlidFromCache(
+    ulid: string,
+    environmentId: string = ''
+  ): void {
     const currentItems = this.cachedByEnv.get(environmentId) || [];
     const newItems = currentItems.filter((item) => item.id !== ulid);
     this.cachedByEnv.set(environmentId, newItems);

@@ -48,7 +48,10 @@ export class ClientVersionService extends BaseEnvironmentService<
    * @param item Client version to update
    * @param environmentId environment ID (required)
    */
-  updateSingleClientVersion(item: ClientVersion, environmentId: string = ''): void {
+  updateSingleClientVersion(
+    item: ClientVersion,
+    environmentId: string = ''
+  ): void {
     this.updateItemInCache(item, environmentId);
   }
 

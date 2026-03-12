@@ -224,7 +224,9 @@ export class WhitelistService {
    * Get cached Account whitelist
    * @param environmentId environment ID (required)
    */
-  getCachedAccountWhitelist(environmentId: string = ''): AccountWhitelistEntry[] {
+  getCachedAccountWhitelist(
+    environmentId: string = ''
+  ): AccountWhitelistEntry[] {
     return this.getCached(environmentId).accountWhitelist;
   }
 

@@ -141,7 +141,10 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * @param worldId World ID
    * @param environmentId environment ID (required)
    */
-  getNoticesForWorld(worldId: string, environmentId: string = ''): PopupNotice[] {
+  getNoticesForWorld(
+    worldId: string,
+    environmentId: string = ''
+  ): PopupNotice[] {
     const notices = this.getCached(environmentId);
     return notices.filter((notice) => {
       if (!notice.targetWorlds || notice.targetWorlds.length === 0) {
@@ -158,17 +161,25 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * @param options Options including environment (required) and optional targeting filters
    * @returns Array of active popup notices, empty array if none match
    */
-  getActivePopupNotices(options: {
-    platform?: string;
-    channel?: string;
-    subChannel?: string;
-    worldId?: string;
-    userId?: string;
-    environmentId?: string;
-  } = {}): PopupNotice[] {
+  getActivePopupNotices(
+    options: {
+      platform?: string;
+      channel?: string;
+      subChannel?: string;
+      worldId?: string;
+      userId?: string;
+      environmentId?: string;
+    } = {}
+  ): PopupNotice[] {
     const now = new Date();
-    const { platform, channel, subChannel, worldId, userId, environmentId = '' } =
-      options;
+    const {
+      platform,
+      channel,
+      subChannel,
+      worldId,
+      userId,
+      environmentId = '',
+    } = options;
     const notices = this.getCached(environmentId);
     const filtered = notices.filter((notice) => {
       // Check startDate: if set, current time must be after startDate

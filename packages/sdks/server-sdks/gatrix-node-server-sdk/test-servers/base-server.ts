@@ -262,7 +262,9 @@ export class BaseTestServer {
     const worlds = await this.sdk.gameWorld.listByEnvironment();
     this.log(`Game Worlds: ${worlds.length} loaded`);
     worlds.forEach((world) => {
-      const maintenance = this.sdk.gameWorld.isWorldMaintenanceActive(world.worldId);
+      const maintenance = this.sdk.gameWorld.isWorldMaintenanceActive(
+        world.worldId
+      );
       this.log(
         `  - ${world.name} (${world.worldId}) ${maintenance ? '[MAINTENANCE]' : '[ACTIVE]'}`
       );
@@ -417,7 +419,9 @@ export class BaseTestServer {
       this.log(`Service Discovery API: ${allServices.length} total services`);
 
       // Get services by service type
-      const authServices = await this.sdk.serviceDiscovery.fetchServices({ service: 'authd' });
+      const authServices = await this.sdk.serviceDiscovery.fetchServices({
+        service: 'authd',
+      });
       this.log(`  - authd: ${authServices.length} instances`);
 
       const lobbydServices = await this.sdk.serviceDiscovery.fetchServices({
@@ -425,7 +429,9 @@ export class BaseTestServer {
       });
       this.log(`  - lobbyd: ${lobbydServices.length} instances`);
 
-      const chatdServices = await this.sdk.serviceDiscovery.fetchServices({ service: 'chatd' });
+      const chatdServices = await this.sdk.serviceDiscovery.fetchServices({
+        service: 'chatd',
+      });
       this.log(`  - chatd: ${chatdServices.length} instances`);
 
       const worlddServices = await this.sdk.serviceDiscovery.fetchServices({

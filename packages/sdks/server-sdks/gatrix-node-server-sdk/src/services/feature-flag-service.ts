@@ -354,7 +354,9 @@ export class FeatureFlagService {
    * Refresh cached flags for a specific environment
    * Invalidates ETag cache before fetching to ensure fresh data
    */
-  async refreshByEnvironment(environmentId: string = ''): Promise<FeatureFlag[]> {
+  async refreshByEnvironment(
+    environmentId: string = ''
+  ): Promise<FeatureFlag[]> {
     if (!this.featureEnabled) {
       this.logger.warn(
         'FeatureFlagService.refreshByEnvironment() called but feature is disabled',

@@ -183,7 +183,10 @@ export class GameWorldService extends BaseEnvironmentService<
    * @param worldId World ID
    * @param environmentId environment ID (required)
    */
-  isWorldMaintenanceActive(worldId: string, environmentId: string = ''): boolean {
+  isWorldMaintenanceActive(
+    worldId: string,
+    environmentId: string = ''
+  ): boolean {
     const worlds = this.getCached(environmentId);
     const world = worlds.find((w) => w.worldId === worldId);
     if (!world || !world.isMaintenance) {
@@ -216,7 +219,10 @@ export class GameWorldService extends BaseEnvironmentService<
    * @param worldId World ID
    * @param environmentId environment ID (required)
    */
-  getWorldByWorldId(worldId: string, environmentId: string = ''): GameWorld | null {
+  getWorldByWorldId(
+    worldId: string,
+    environmentId: string = ''
+  ): GameWorld | null {
     const worlds = this.getCached(environmentId);
     return worlds.find((w) => w.worldId === worldId) || null;
   }

@@ -432,7 +432,10 @@ export class SurveyService {
    * @param newSettings New settings to cache
    * @param environmentId environment ID (required)
    */
-  updateSettings(newSettings: SurveySettings, environmentId: string = ''): void {
+  updateSettings(
+    newSettings: SurveySettings,
+    environmentId: string = ''
+  ): void {
     const oldSettings = this.cachedSettingsByEnv.get(environmentId);
     this.cachedSettingsByEnv.set(environmentId, newSettings);
 

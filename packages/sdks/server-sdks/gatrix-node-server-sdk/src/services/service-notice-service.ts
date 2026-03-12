@@ -91,7 +91,9 @@ export class ServiceNoticeService {
    * Get service notices for a specific environment
    * GET /api/v1/server/service-notices -> { notices: [...] }
    */
-  async listByEnvironment(environmentId: string = ''): Promise<ServiceNotice[]> {
+  async listByEnvironment(
+    environmentId: string = ''
+  ): Promise<ServiceNotice[]> {
     const endpoint = `/api/v1/server/service-notices`;
 
     this.logger.debug('Fetching service notices', { environmentId });
