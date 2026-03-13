@@ -59,6 +59,11 @@ router.post(
   auditUserSuspend as any,
   AdminController.suspendUser as any
 );
+router.post(
+  '/users/:id/unlock',
+  usersManage,
+  AdminController.unlockUser as any
+);
 
 router.post(
   '/users/:id/verify-email',

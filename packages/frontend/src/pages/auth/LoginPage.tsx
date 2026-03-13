@@ -29,6 +29,8 @@ import {
   Warning,
   Cancel,
   CheckCircle,
+  Lock,
+  Email,
 } from '@mui/icons-material';
 import QQIcon from '../../components/icons/QQIcon';
 import WeChatIcon from '../../components/icons/WeChatIcon';
@@ -64,6 +66,9 @@ const getErrorMessage = (error: any, t: any): string => {
   }
 
   if (status === 403) {
+    if (errorCode === 'ACCOUNT_LOCKED') {
+      return t('auth.errors.accountLocked');
+    }
     if (errorCode === 'ACCOUNT_PENDING') {
       return t('auth.errors.accountPending');
     }
@@ -103,6 +108,10 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [oauthLoading, setOauthLoading] = useState<string | null>(null); // 'google', 'github', 'qq', etc.
+  const [lockedDialogOpen, setLockedDialogOpen] = useState(false);
+  const [lockedEmail, setLockedEmail] = useState<string>('');
+  const [resetEmailSending, setResetEmailSending] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const [passwordFieldType, setPasswordFieldType] = useState<
     'text' | 'password'
   >('text'); // Start as text to prevent autofill
@@ -303,15 +312,16 @@ const LoginPage: React.FC = () => {
         return;
       }
 
-      // Check if the error is about user not found
+      // Check if the error is about account locked
       if (
-        err.status === 404 ||
-        err.message === 'USER_NOT_FOUND' ||
-        err.error?.message === 'USER_NOT_FOUND'
+        err.status === 403 &&
+        (err.message === 'ACCOUNT_LOCKED' ||
+          err.error?.message === 'ACCOUNT_LOCKED')
       ) {
-        // Show error message for user not found
-        const errorMsg = t('auth.errors.userNotFound');
-        setLoginError(errorMsg);
+        // Show locked dialog with password reset option
+        setLockedEmail(data.email);
+        setLockedDialogOpen(true);
+        setResetEmailSent(false);
       } else if (err.status === 403) {
         // Check specific account status
         if (
@@ -1056,6 +1066,115 @@ const LoginPage: React.FC = () => {
             }}
           >
             {t('auth.rememberMeWarning.understand')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Account Locked Dialog */}
+      <Dialog
+        open={lockedDialogOpen}
+        onClose={() => setLockedDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            backgroundColor: 'rgba(30, 30, 50, 0.98)',
+            color: 'white',
+            borderRadius: 3,
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            maxWidth: 440,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            pb: 1,
+          }}
+        >
+          <Lock sx={{ color: '#ff6b6b', fontSize: 28 }} />
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            {t('auth.errors.accountLocked')}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            sx={{
+              color: 'rgba(255, 255, 255, 0.7)',
+              mb: 2,
+            }}
+          >
+            {t('auth.errors.accountLockedDescription')}
+          </DialogContentText>
+
+          {resetEmailSent && (
+            <Alert
+              severity="success"
+              sx={{
+                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                color: '#81c784',
+                border: '1px solid rgba(76, 175, 80, 0.2)',
+                '& .MuiAlert-icon': { color: '#81c784' },
+                mb: 1,
+              }}
+            >
+              {t('auth.errors.resetEmailSent')}
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2, gap: 1, flexDirection: 'column' }}>
+          {!resetEmailSent && (
+            <Button
+              fullWidth
+              variant="contained"
+              startIcon={
+                resetEmailSending ? (
+                  <CircularProgress size={18} color="inherit" />
+                ) : (
+                  <Email />
+                )
+              }
+              disabled={resetEmailSending}
+              onClick={async () => {
+                setResetEmailSending(true);
+                try {
+                  await AuthService.forgotPassword(lockedEmail);
+                  setResetEmailSent(true);
+                } catch {
+                  // Even if email sending fails, show success to prevent email enumeration
+                  setResetEmailSent(true);
+                } finally {
+                  setResetEmailSending(false);
+                }
+              }}
+              sx={{
+                background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+                '&:hover': {
+                  background:
+                    'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
+                },
+                textTransform: 'none',
+                fontWeight: 600,
+              }}
+            >
+              {t('auth.errors.sendResetEmail')}
+            </Button>
+          )}
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => setLockedDialogOpen(false)}
+            sx={{
+              color: 'rgba(255, 255, 255, 0.7)',
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              '&:hover': {
+                borderColor: 'rgba(255, 255, 255, 0.5)',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              },
+              textTransform: 'none',
+            }}
+          >
+            {t('common.close')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -32,7 +32,7 @@ export class PasswordResetService {
     email: string
   ): Promise<{ success: boolean; message: string }> {
     try {
-      // Used자 Confirm
+      // Find user by email
       const user = await db('g_users')
         .select('id', 'email', 'name', 'authType')
         .where('email', email)
@@ -40,14 +40,14 @@ export class PasswordResetService {
         .first();
 
       if (!user) {
-        // Register되지 않은 이메일에 대한 오류 반환
+        // Return error for unregistered email
         return {
           success: false,
           message: 'EMAIL_NOT_REGISTERED',
         };
       }
 
-      // authType이 local이 아닌 경우 비밀번호 리셋 불가
+      // Password reset not available for non-local auth types
       if (user.authType !== 'local') {
         return {
           success: false,
@@ -55,24 +55,24 @@ export class PasswordResetService {
         };
       }
 
-      // Existing 미Used 토큰들을 Expired시킴
+      // Expire existing unused tokens
       await db('g_password_reset_tokens')
         .where('userId', user.id)
         .where('used', false)
         .update({ used: true });
 
-      // 새 리셋 토큰 Create (32바이트 랜덤 문자열)
+      // Create new reset token (32-byte random string)
       const resetToken = crypto.randomBytes(32).toString('hex');
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1시간 후 Expired
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // Expires in 1 hour
 
-      // 토큰을 데이터베이스에 Save
+      // Save token to database
       await db('g_password_reset_tokens').insert({
         userId: user.id,
         token: resetToken,
         expiresAt,
       });
 
-      // 이메일 발송
+      // Send email
       const emailSent = await emailService.sendPasswordResetEmail(
         email,
         resetToken
@@ -118,7 +118,7 @@ export class PasswordResetService {
         };
       }
 
-      // Expired Confirm
+      // Check expiration
       if (new Date() > new Date(resetToken.expiresAt)) {
         return {
           valid: false,
@@ -154,22 +154,24 @@ export class PasswordResetService {
         };
       }
 
-      // 새 비밀번호 해시
+      // Hash new password
       const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-      // 트랜잭션으로 비밀번호 업데이트 및 토큰 Used 처리
+      // Transaction: update password, mark tokens as used, and unlock account
       await db.transaction(async (trx) => {
-        // 비밀번호 업데이트
+        // Update password and reset account lockout
         await trx('g_users').where('id', validation.userId).update({
           passwordHash: hashedPassword,
+          failedLoginAttempts: 0,
+          lockedAt: null,
         });
 
-        // 토큰을 Used됨으로 표시
+        // Mark token as used
         await trx('g_password_reset_tokens').where('token', token).update({
           used: true,
         });
 
-        // 해당 Used자의 다른 Mark all tokens as used
+        // Mark all other tokens for this user as used
         await trx('g_password_reset_tokens')
           .where('userId', validation.userId)
           .where('used', false)

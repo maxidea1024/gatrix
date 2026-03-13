@@ -91,6 +91,7 @@ import {
   Preview as PreviewIcon,
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
+  LockOpen as LockOpenIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -927,6 +928,30 @@ const UsersManagementPage: React.FC = () => {
     });
   };
 
+  const handleUnlockUser = (user: User) => {
+    setConfirmDialog({
+      open: true,
+      title: t('users.unlockAccount'),
+      message: t('users.unlockConfirm'),
+      action: async () => {
+        if (confirmDialogLoading) return;
+        setConfirmDialogLoading(true);
+        try {
+          await apiService.post(`/admin/users/${user.id}/unlock`);
+          enqueueSnackbar(t('users.unlockSuccess'), { variant: 'success' });
+          mutateUsers();
+        } catch (error: any) {
+          enqueueSnackbar(error.message || t('common.error'), {
+            variant: 'error',
+          });
+        } finally {
+          setConfirmDialogLoading(false);
+          setConfirmDialog((prev) => ({ ...prev, open: false }));
+        }
+      },
+    });
+  };
+
   const handlePromoteUser = (user: User) => {
     // Open promote dialog with permission selector
     setPromoteDialog({
@@ -1066,6 +1091,9 @@ const UsersManagementPage: React.FC = () => {
         break;
       case 'delete':
         handleDeleteUser(selectedUser);
+        break;
+      case 'unlock':
+        handleUnlockUser(selectedUser);
         break;
       case 'verifyEmail':
         handleVerifyUserEmail(selectedUser.id);
@@ -2154,6 +2182,18 @@ const UsersManagementPage: React.FC = () => {
               <ListItemText>{t('common.activate')}</ListItemText>
             </MenuItem>
           ))}
+
+        {/* Unlock: shown when account is locked due to failed login attempts */}
+        {canManage &&
+          canModifyUser(selectedUser) &&
+          (selectedUser as any)?.lockedAt && (
+            <MenuItem onClick={() => handleMenuAction('unlock')}>
+              <ListItemIcon>
+                <LockOpenIcon />
+              </ListItemIcon>
+              <ListItemText>{t('users.unlockAccount')}</ListItemText>
+            </MenuItem>
+          )}
 
         {/* Promote: not shown for super admin */}
         {canManage &&

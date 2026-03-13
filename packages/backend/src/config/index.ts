@@ -87,6 +87,11 @@ const config = {
     },
   },
 
+  // Security configuration
+  security: {
+    maxLoginAttempts: parseInt(process.env.MAX_LOGIN_ATTEMPTS || '3', 10),
+  },
+
   // Admin configuration
   admin: {
     email: process.env.ADMIN_EMAIL || 'admin@example.com',

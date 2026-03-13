@@ -26,6 +26,8 @@ export interface User {
   ssoProviderId?: string;
   ssoSubjectId?: string;
   tags?: any;
+  failedLoginAttempts: number;
+  lockedAt?: Date | null;
   createdBy?: string;
   updatedBy?: string;
   createdAt: Date;

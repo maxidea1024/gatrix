@@ -118,6 +118,16 @@ export class UserService {
     throw new Error(response.error?.message || 'Failed to unsuspend user');
   }
 
+  static async unlockUser(id: number): Promise<void> {
+    const response = await apiService.post(
+      `/admin/users/${id}/unlock`
+    );
+
+    if (!response.success) {
+      throw new Error(response.error?.message || 'Failed to unlock user');
+    }
+  }
+
   static async promoteToAdmin(id: number): Promise<User> {
     const response = await apiService.post<{ user: User }>(
       `/admin/users/${id}/promote`

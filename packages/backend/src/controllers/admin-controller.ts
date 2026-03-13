@@ -370,6 +370,75 @@ export class AdminController {
     }
   }
 
+  static async unlockUser(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.params.id;
+
+      if (!req.user?.userId) {
+        throw new GatrixError('User not authenticated', 401);
+      }
+
+      // Check if user exists and is locked
+      const user = await db('g_users')
+        .select('id', 'lockedAt', 'failedLoginAttempts')
+        .where('id', userId)
+        .first();
+
+      if (!user) {
+        throw new GatrixError('User not found', 404);
+      }
+
+      if (!user.lockedAt) {
+        throw new GatrixError('User account is not locked', 400);
+      }
+
+      // Unlock the account
+      await db('g_users').where('id', userId).update({
+        failedLoginAttempts: 0,
+        lockedAt: null,
+      });
+
+      // Record audit log
+      try {
+        await AuditLogModel.create({
+          userId: req.user.userId,
+          action: 'user_account_unlocked',
+          description: `Account unlocked by admin`,
+          resourceType: 'user',
+          resourceId: userId,
+          oldValues: {
+            failedLoginAttempts: user.failedLoginAttempts,
+            lockedAt: user.lockedAt,
+          },
+          newValues: {
+            failedLoginAttempts: 0,
+            lockedAt: null,
+          },
+          ipAddress:
+            (req.headers['x-forwarded-for'] as string) ||
+            req.socket.remoteAddress,
+          userAgent: req.headers['user-agent'],
+        });
+      } catch (auditErr) {
+        logger.error(
+          'Failed to create audit log for account unlock:',
+          auditErr
+        );
+      }
+
+      res.json({
+        success: true,
+        message: 'User account unlocked successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async verifyUserEmail(
     req: AuthenticatedRequest,
     res: Response,

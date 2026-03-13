@@ -3,6 +3,9 @@ import { UserModel } from '../models/user';
 import { JwtUtils } from '../utils/jwt';
 import { GatrixError } from '../middleware/error-handler';
 import { createLogger } from '../config/logger';
+import { config } from '../config';
+import { AuditLogModel } from '../models/audit-log';
+import { ErrorCodes } from '../utils/api-response';
 
 const logger = createLogger('AuthService');
 import { CreateUserData, UserWithoutPassword } from '../types/user';
@@ -33,7 +36,23 @@ export class AuthService {
       // Find user by email
       const user = await UserModel.findByEmail(email);
       if (!user) {
-        throw new GatrixError('USER_NOT_FOUND', 404);
+        // A07: Do not reveal whether user exists - return same error as invalid password
+        throw new GatrixError(
+          'INVALID_CREDENTIALS',
+          401,
+          true,
+          ErrorCodes.INVALID_CREDENTIALS
+        );
+      }
+
+      // Check if account is locked
+      if (user.lockedAt) {
+        throw new GatrixError(
+          'ACCOUNT_LOCKED',
+          403,
+          true,
+          ErrorCodes.ACCOUNT_LOCKED
+        );
       }
 
       // Check if user is active
@@ -53,7 +72,62 @@ export class AuthService {
       // Verify password
       const isValidPassword = await UserModel.verifyPassword(user, password);
       if (!isValidPassword) {
-        throw new GatrixError('Invalid email or password', 401);
+        // Increment failed login attempts
+        const newAttempts = (user.failedLoginAttempts || 0) + 1;
+        const maxAttempts = config.security.maxLoginAttempts;
+
+        if (newAttempts >= maxAttempts) {
+          // Lock the account
+          await db('g_users').where('id', user.id).update({
+            failedLoginAttempts: newAttempts,
+            lockedAt: db.raw('UTC_TIMESTAMP()'),
+          });
+
+          // Record audit log for account lock
+          try {
+            await AuditLogModel.create({
+              userId: user.id,
+              action: 'user_account_locked',
+              description: `Account locked after ${newAttempts} failed login attempts`,
+              resourceType: 'user',
+              resourceId: user.id,
+              newValues: {
+                failedLoginAttempts: newAttempts,
+                reason: 'max_login_attempts_exceeded',
+              },
+            });
+          } catch (auditErr) {
+            logger.error(
+              'Failed to create audit log for account lock:',
+              auditErr
+            );
+          }
+
+          throw new GatrixError(
+            'ACCOUNT_LOCKED',
+            403,
+            true,
+            ErrorCodes.ACCOUNT_LOCKED
+          );
+        } else {
+          await db('g_users').where('id', user.id).update({
+            failedLoginAttempts: newAttempts,
+          });
+        }
+
+        throw new GatrixError(
+          'INVALID_CREDENTIALS',
+          401,
+          true,
+          ErrorCodes.INVALID_CREDENTIALS
+        );
+      }
+
+      // Reset failed login attempts on successful login
+      if (user.failedLoginAttempts > 0) {
+        await db('g_users').where('id', user.id).update({
+          failedLoginAttempts: 0,
+        });
       }
 
       // Update last login

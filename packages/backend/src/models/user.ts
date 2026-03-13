@@ -29,6 +29,8 @@ export class User extends Model {
   preferredLanguage?: string;
   createdBy?: string;
   updatedBy?: string;
+  failedLoginAttempts!: number;
+  lockedAt?: Date | null;
   createdAt!: Date;
   updatedAt!: Date;
 }
