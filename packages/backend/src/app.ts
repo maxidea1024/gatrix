@@ -115,8 +115,9 @@ app.use((req, res, next) => {
 });
 
 // Rate limiting
+// NOTE: generalLimiter applies to ALL requests (including health, static, etc.)
+// apiLimiter is applied separately at /api/v1 routes below (line ~197)
 app.use(generalLimiter as any);
-app.use('/api', apiLimiter as any);
 
 // Session configuration with Redis store
 // const RedisStore = (ConnectRedis as any)(session);
@@ -193,7 +194,7 @@ if (config.nodeEnv !== 'production') {
   });
 }
 
-// API routes with rate limiting and caching
+// API routes with rate limiting and version header
 app.use('/api/v1', apiLimiter as any, (req, res, next) => {
   res.header('X-API-Version', '1.0.0');
   next();

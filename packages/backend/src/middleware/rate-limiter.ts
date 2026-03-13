@@ -6,19 +6,20 @@ const logger = createLogger('rateLimiter');
 // Rate limiter configuration from environment variables
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-// More lenient limits for development
+// More lenient limits for development, reasonable limits for production
+// Production limits should handle SDK/Edge polling + dashboard traffic
 const RATE_LIMIT_WINDOW_MS = parseInt(
   process.env.RATE_LIMIT_WINDOW_MS || (isDevelopment ? '60000' : '900000')
 ); // 1 min dev, 15 min prod
 const RATE_LIMIT_MAX_REQUESTS = parseInt(
-  process.env.RATE_LIMIT_MAX_REQUESTS || (isDevelopment ? '1000' : '100')
-); // 1000 dev, 100 prod
+  process.env.RATE_LIMIT_MAX_REQUESTS || (isDevelopment ? '10000' : '10000')
+); // 10,000 per window (both dev and prod)
 const RATE_LIMIT_AUTH_WINDOW_MS = parseInt(
   process.env.RATE_LIMIT_AUTH_WINDOW_MS || (isDevelopment ? '60000' : '900000')
 ); // 1 min dev, 15 min prod
 const RATE_LIMIT_AUTH_MAX_REQUESTS = parseInt(
-  process.env.RATE_LIMIT_AUTH_MAX_REQUESTS || (isDevelopment ? '100' : '5')
-); // 100 dev, 5 prod
+  process.env.RATE_LIMIT_AUTH_MAX_REQUESTS || (isDevelopment ? '100' : '30')
+); // 100 dev, 30 prod (auth stays strict for brute-force protection)
 
 // Rate limiter configuration from environment variables
 
