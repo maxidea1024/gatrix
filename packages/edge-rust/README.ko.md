@@ -158,3 +158,7 @@ services:
       - backend
       - redis
 ```
+
+## 라이선스
+
+리포지토리 루트의 [LICENSE](../../LICENSE) 파일을 참고하세요.

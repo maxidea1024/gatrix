@@ -158,3 +158,7 @@ services:
       - backend
       - redis
 ```
+
+## License
+
+See [LICENSE](../../LICENSE) in the repository root.
