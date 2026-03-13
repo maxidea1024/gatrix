@@ -54,6 +54,7 @@ import signalEndpointRoutes from './signal-endpoints';
 import actionSetRoutes from './action-sets';
 import queueMonitorRoutes from './queue-monitor';
 import rbacRoutes from './rbac';
+import aiChatRoutes from './ai-chat';
 import ImpactMetricsController from '../../controllers/impact-metrics-controller';
 
 const router = express.Router();
@@ -62,6 +63,7 @@ const router = express.Router();
 // This allows SSE endpoints to use their own authentication (query parameter tokens)
 router.use('/notifications', notificationRoutes);
 router.use('/services', serviceDiscoveryRoutes);
+router.use('/ai', aiChatRoutes);
 
 // Self-service routes for authenticated users (not requiring admin role)
 
