@@ -78,10 +78,12 @@ export class AuthService {
 
         if (newAttempts >= maxAttempts) {
           // Lock the account
-          await db('g_users').where('id', user.id).update({
-            failedLoginAttempts: newAttempts,
-            lockedAt: db.raw('UTC_TIMESTAMP()'),
-          });
+          await db('g_users')
+            .where('id', user.id)
+            .update({
+              failedLoginAttempts: newAttempts,
+              lockedAt: db.raw('UTC_TIMESTAMP()'),
+            });
 
           // Record audit log for account lock
           try {

@@ -119,9 +119,7 @@ export class UserService {
   }
 
   static async unlockUser(id: number): Promise<void> {
-    const response = await apiService.post(
-      `/admin/users/${id}/unlock`
-    );
+    const response = await apiService.post(`/admin/users/${id}/unlock`);
 
     if (!response.success) {
       throw new Error(response.error?.message || 'Failed to unlock user');
