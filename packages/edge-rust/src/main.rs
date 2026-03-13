@@ -216,11 +216,11 @@ async fn main() -> std::io::Result<()> {
   };
 
   let rate_limit_rps = config.security.rate_limit_rps;
+  let cors_origin = config.security.cors_origin.clone();
 
   // Start main HTTP server
   let main_server = HttpServer::new(move || {
-    let cors = Cors::default()
-      .allow_any_origin()
+    let mut cors = Cors::default()
       .allowed_methods(vec!["GET", "POST", "OPTIONS"])
       .allowed_headers(vec![
         "content-type",
@@ -236,6 +236,15 @@ async fn main() -> std::io::Result<()> {
       ])
       .expose_headers(vec!["etag"])
       .max_age(3600);
+
+    // Configure CORS origin from config
+    if cors_origin == "*" {
+      cors = cors.allow_any_origin();
+    } else {
+      for origin in cors_origin.split(',') {
+        cors = cors.allowed_origin(origin.trim());
+      }
+    }
 
     // Note: actix-web .wrap() changes the App generic type on each call,
     // so we always add all middleware. They self-disable when not configured.

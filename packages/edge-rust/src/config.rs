@@ -73,6 +73,10 @@ pub struct CliArgs {
   /// Comma-separated list of denied IPs/CIDRs
   #[arg(long, env = "EDGE_DENY_IPS")]
   pub deny_ip: Option<String>,
+
+  /// CORS allowed origin (default: * for all origins)
+  #[arg(long, env = "EDGE_CORS_ORIGIN")]
+  pub cors_origin: Option<String>,
 }
 
 /// Redis configuration
@@ -105,6 +109,7 @@ pub struct SecurityConfig {
   pub rate_limit_rps: u32,
   pub allow_ips: String,
   pub deny_ips: String,
+  pub cors_origin: String,
 }
 
 /// Main Edge configuration
@@ -247,6 +252,10 @@ impl EdgeConfig {
         deny_ips: args.deny_ip.clone().unwrap_or_else(|| {
           env::var("EDGE_DENY_IPS")
             .unwrap_or_default()
+        }),
+        cors_origin: args.cors_origin.clone().unwrap_or_else(|| {
+          env::var("EDGE_CORS_ORIGIN")
+            .unwrap_or_else(|_| "*".to_string())
         }),
       },
 
