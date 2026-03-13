@@ -167,7 +167,7 @@ impl EdgeConfig {
 
       gatrix_url: args.gatrix_url.clone().unwrap_or_else(|| {
         env::var("GATRIX_URL")
-          .unwrap_or_else(|_| "http://localhost:5000".to_string())
+          .unwrap_or_else(|_| "http://localhost:45000".to_string())
       }),
 
       api_token,

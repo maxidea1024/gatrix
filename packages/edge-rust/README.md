@@ -31,7 +31,7 @@ cargo run
 ### With CLI Arguments
 
 ```bash
-cargo run -- --port 3400 --gatrix-url http://localhost:5000 --api-token my-token
+cargo run -- --port 3400 --gatrix-url http://localhost:45000 --api-token my-token
 ```
 
 ### With Docker
@@ -42,7 +42,7 @@ docker build -f packages/edge-rust/Dockerfile -t gatrix-edge-rust .
 
 # Run
 docker run -p 3400:3400 -p 3410:3410 \
-  -e GATRIX_URL=http://backend:5000 \
+  -e GATRIX_URL=http://backend:45000 \
   -e EDGE_BYPASS_TOKEN=your-bypass-token \
   gatrix-edge-rust
 ```
@@ -52,7 +52,7 @@ docker run -p 3400:3400 -p 3410:3410 \
 Copy the single `gatrix-edge-rust` binary to any Linux server:
 
 ```bash
-./gatrix-edge-rust --gatrix-url http://backend:5000 --api-token your-token
+./gatrix-edge-rust --gatrix-url http://backend:45000 --api-token your-token
 ```
 
 ## Configuration
@@ -62,7 +62,7 @@ Configure via environment variables or CLI arguments. CLI arguments take precede
 | CLI Argument               | Environment Variable               | Default                    | Description                      |
 | -------------------------- | ---------------------------------- | -------------------------- | -------------------------------- |
 | `--port`                   | `EDGE_PORT`                        | `3400`                     | Main API port                    |
-| `--gatrix-url`             | `GATRIX_URL`                       | `http://localhost:5000`    | Gatrix backend URL               |
+| `--gatrix-url`             | `GATRIX_URL`                       | `http://localhost:45000`   | Gatrix backend URL               |
 | `--api-token`              | `EDGE_BYPASS_TOKEN`                | `gatrix-infra-server-token`| Bypass API token                 |
 | `--app-name`               | `EDGE_APPLICATION_NAME`            | `edge-rust-server`         | Application name                 |
 | `--service`                | `EDGE_SERVICE`                     | `edge-rust`                | Service label                    |
@@ -150,7 +150,7 @@ services:
       - "3400:3400"
       - "3410:3410"
     environment:
-      - GATRIX_URL=http://backend:5000
+      - GATRIX_URL=http://backend:45000
       - EDGE_BYPASS_TOKEN=gatrix-edge-internal-bypass-token
       - EDGE_SYNC_METHOD=event
       - REDIS_HOST=redis

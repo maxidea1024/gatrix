@@ -31,7 +31,7 @@ cargo run
 ### CLI 인자 사용
 
 ```bash
-cargo run -- --port 3400 --gatrix-url http://localhost:5000 --api-token my-token
+cargo run -- --port 3400 --gatrix-url http://localhost:45000 --api-token my-token
 ```
 
 ### Docker 사용
@@ -42,7 +42,7 @@ docker build -f packages/edge-rust/Dockerfile -t gatrix-edge-rust .
 
 # 실행
 docker run -p 3400:3400 -p 3410:3410 \
-  -e GATRIX_URL=http://backend:5000 \
+  -e GATRIX_URL=http://backend:45000 \
   -e EDGE_BYPASS_TOKEN=your-bypass-token \
   gatrix-edge-rust
 ```
@@ -52,7 +52,7 @@ docker run -p 3400:3400 -p 3410:3410 \
 단일 `gatrix-edge-rust` 바이너리를 아무 Linux 서버에 복사하여 실행:
 
 ```bash
-./gatrix-edge-rust --gatrix-url http://backend:5000 --api-token your-token
+./gatrix-edge-rust --gatrix-url http://backend:45000 --api-token your-token
 ```
 
 ## 설정
@@ -62,7 +62,7 @@ docker run -p 3400:3400 -p 3410:3410 \
 | CLI 인자                   | 환경변수                            | 기본값                      | 설명                          |
 | -------------------------- | ---------------------------------- | -------------------------- | ----------------------------- |
 | `--port`                   | `EDGE_PORT`                        | `3400`                     | 메인 API 포트                  |
-| `--gatrix-url`             | `GATRIX_URL`                       | `http://localhost:5000`    | Gatrix 백엔드 URL              |
+| `--gatrix-url`             | `GATRIX_URL`                       | `http://localhost:45000`   | Gatrix 백엔드 URL              |
 | `--api-token`              | `EDGE_BYPASS_TOKEN`                | `gatrix-infra-server-token`| 바이패스 API 토큰               |
 | `--app-name`               | `EDGE_APPLICATION_NAME`            | `edge-rust-server`         | 애플리케이션 이름                |
 | `--service`                | `EDGE_SERVICE`                     | `edge-rust`                | 서비스 라벨                     |
