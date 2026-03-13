@@ -1,0 +1,41 @@
+[package]
+name = "gatrix-rust-server-sdk"
+version = "0.1.0"
+edition = "2021"
+description = "Gatrix Server SDK for Rust - Feature flags, game worlds, caching, and service discovery"
+license = "MIT"
+repository = "https://github.com/gatrix/gatrix.git"
+readme = "README.md"
+keywords = ["gatrix", "sdk", "server", "feature-flags", "game"]
+
+[dependencies]
+reqwest = { version = "0.12", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", features = ["serde"] }
+log = "0.4"
+env_logger = "0.11"
+thiserror = "2"
+regex = "1"
+rand = "0.8"
+ipnet = "2"
+murmur3 = "0.5"
+futures-util = "0.3"
+
+[dependencies.redis]
+version = "0.27"
+features = ["tokio-comp", "aio"]
+optional = true
+
+[features]
+default = ["redis-pubsub"]
+redis-pubsub = ["redis"]
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full", "test-util"] }
+mockito = "1"
+
+[[example]]
+name = "basic"
+path = "examples/basic.rs"

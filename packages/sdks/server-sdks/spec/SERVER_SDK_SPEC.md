@@ -41,6 +41,15 @@ Pattern: `gatrix-{platform}-server-sdk`
 | Java | `com.gatrix.server.sdk` |
 | Go | `github.com/gatrix/gatrix-go-server-sdk` |
 
+## Development / Testing Defaults
+
+All server SDK examples and tests SHOULD use the following default values:
+
+| Field | Default Value |
+|-------|---------------|
+| API URL | `http://localhost:45000` |
+| API Token | `unsecured-server-api-token` |
+
 ## Data Scope (Organization → Project → Environment)
 
 > [!CAUTION]

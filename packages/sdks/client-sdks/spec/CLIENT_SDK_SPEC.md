@@ -62,6 +62,15 @@ Pattern: `gatrix-{platform}-client-sdk`
 > The `@gatrix/` npm scope uses `@gatrix/gatrix-{platform}-client-sdk` format (not `@gatrix/{platform}-sdk`). Both `gatrix` and `client` MUST appear in every SDK identifier.
 
 
+## Development / Testing Defaults
+
+All client SDK examples and tests SHOULD use the following default values:
+
+| Field | Default Value |
+|-------|---------------|
+| API URL | `http://localhost:3400` |
+| API Token | `unsecured-client-api-token` |
+
 ## Code Style
 
 ### C/C++ SDKs (Cocos2d-x, Unreal, Unreal Lua)
