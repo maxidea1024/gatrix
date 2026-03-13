@@ -38,7 +38,10 @@ export function createETagMiddleware() {
       res.setHeader('ETag', etag);
 
       // Check If-None-Match
-      if (ifNoneMatch && (ifNoneMatch === etag || ifNoneMatch.replace(/"/g, '') === hash)) {
+      if (
+        ifNoneMatch &&
+        (ifNoneMatch === etag || ifNoneMatch.replace(/"/g, '') === hash)
+      ) {
         res.status(304).end();
         return res;
       }

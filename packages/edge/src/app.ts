@@ -62,11 +62,12 @@ app.use(
 const corsOriginConfig = config.security.corsOrigin;
 app.use(
   cors({
-    origin: corsOriginConfig === '*'
-      ? '*'
-      : corsOriginConfig.includes(',')
-        ? corsOriginConfig.split(',').map(s => s.trim())
-        : corsOriginConfig,
+    origin:
+      corsOriginConfig === '*'
+        ? '*'
+        : corsOriginConfig.includes(',')
+          ? corsOriginConfig.split(',').map((s) => s.trim())
+          : corsOriginConfig,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ALLOWED_HEADERS,
     exposedHeaders: ['ETag'],
