@@ -1060,10 +1060,7 @@ export class GatrixServerSDK {
     newSettings: SurveySettings,
     environmentId?: string
   ): void {
-    const env = this.resolveEnvironment(
-      environmentId,
-      'updateSurveySettings'
-    );
+    const env = this.resolveEnvironment(environmentId, 'updateSurveySettings');
     this.survey.updateSettings(newSettings, env);
   }
 
