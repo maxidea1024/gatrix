@@ -62,7 +62,7 @@ import {
   CloudSync as CloudSyncIcon,
   VpnKey as VpnKeyIcon,
   Chat as ChatIcon,
-  BugReport as BugReportIcon,
+
   Timeline as TimelineIcon,
   Terminal as TerminalIcon,
   MenuOpen as MenuOpenIcon,
@@ -111,6 +111,7 @@ import {
   MenuCategory,
 } from '@/config/navigation';
 import mailService from '@/services/mailService';
+import AIChatPanel, { AIChatFloatingButton } from '@/components/ai/AIChatPanel';
 import { Permission, P } from '@/types/permissions';
 
 // Sidebar width is now dynamic
@@ -233,6 +234,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     currentEnvironment,
   } = useEnvironment();
   const { getProjectApiPath } = useOrgProject();
+
+  // AI Chat panel state
+  const [aiChatOpen, setAIChatOpen] = useState(false);
 
   // Pending CR count for banner
   const [pendingCRCount, setPendingCRCount] = useState(0);
@@ -1263,11 +1267,19 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               navigate('/dashboard');
             }}
           >
+          <Tooltip
+              title={sseConnection.isConnected === false ? t('common.connectionLost') : ''}
+              placement="bottom"
+              arrow
+            >
             <Box
               sx={{
                 width: 32,
                 height: 32,
-                backgroundColor: theme.palette.primary.main,
+                backgroundColor: sseConnection.isConnected === false
+                  ? theme.palette.error.main
+                  : theme.palette.primary.main,
+                transition: 'background-color 0.3s ease',
                 borderRadius: 1,
                 display: 'flex',
                 alignItems: 'center',
@@ -1281,6 +1293,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 G
               </Typography>
             </Box>
+            </Tooltip>
             <Typography
               variant="h6"
               sx={{ fontWeight: 600, color: theme.palette.text.primary }}
@@ -2422,6 +2435,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </Box>
       </Box>
 
+      {/* AI Chat Floating Button & Panel */}
+      <AIChatFloatingButton
+        onClick={() => setAIChatOpen(true)}
+        visible={!aiChatOpen && hasAnyPermissions}
+      />
+      <AIChatPanel open={aiChatOpen} onClose={() => setAIChatOpen(false)} />
+
       {/* Role/Permission Change Floating Button */}
       <Zoom in={roleChangeDialogOpen}>
         <Box
@@ -2471,25 +2491,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </Box>
       </Zoom>
       {/* SSE Notifications */}
-      {sseConnection.isConnected === false && (
-        <Tooltip title={t('common.connectionLost')}>
-          <Box
-            sx={{
-              position: 'fixed',
-              bottom: 16,
-              right: 16,
-              bgcolor: 'error.main',
-              color: 'white',
-              p: 1,
-              borderRadius: '50%',
-              boxShadow: 3,
-              zIndex: 9999,
-            }}
-          >
-            <BugReportIcon />
-          </Box>
-        </Tooltip>
-      )}
+      {/* SSE connection status is shown via G logo color */}
 
       {/* Shared User Menu */}
       <Menu
