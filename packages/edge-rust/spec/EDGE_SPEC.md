@@ -83,6 +83,7 @@ Configuration is loaded with the following precedence (highest first):
 | Rate Limit | `--rate-limit-rps` | `EDGE_RATE_LIMIT_RPS` | `0` (disabled) | Max requests per second per IP |
 | IP Allow List | `--allow-ip` | `EDGE_ALLOW_IPS` | — | Comma-separated CIDR list |
 | IP Deny List | `--deny-ip` | `EDGE_DENY_IPS` | — | Comma-separated CIDR list |
+| CORS Origin | `--cors-origin` | `EDGE_CORS_ORIGIN` | `*` | Allowed CORS origin (comma-separated for multiple) |
 
 ## 5. Security
 
@@ -264,8 +265,11 @@ All error responses MUST follow this structure:
 
 ## 12. CORS
 
-The main HTTP server MUST support CORS with:
-- **Origins:** `*` (all origins allowed)
+The main HTTP server MUST support CORS with configurable origin:
+- **Origins:** Configurable via `EDGE_CORS_ORIGIN` (default: `*`)
+  - Single origin: `https://app.example.com`
+  - Multiple origins: `https://app1.com,https://app2.com`
+  - All origins: `*` (default)
 - **Methods:** `GET`, `POST`, `OPTIONS`
 - **Allowed Headers:** `content-type`, `x-api-token`, `x-application-name`, `x-client-version`, `x-platform`, `x-sdk-version`, `x-environment-id`, `x-connection-id`, `authorization`, `if-none-match`
 - **Exposed Headers:** `etag`

@@ -2,6 +2,7 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
+import { config } from './config/env';
 import { createLogger } from './config/logger';
 
 const logger = createLogger('EdgeApp');
@@ -12,12 +13,14 @@ import publicRoutes from './routes/public';
 import { sdkManager } from './services/sdk-manager';
 import { requestStats } from './services/request-stats';
 import { ALLOWED_HEADERS } from './constants/headers';
+import { createRateLimiter } from './middleware/rate-limiter';
+import { createIpFilter } from './middleware/ip-filter';
+import { createETagMiddleware } from './middleware/etag';
 
 // Create Express application
 const app: Application = express();
 
-// Disable ETag for API responses to prevent browser caching issues
-// SDK cache is the source of truth, so we don't want browsers to use stale cached responses
+// Disable Express built-in ETag (we use our own ETag middleware)
 app.set('etag', false);
 
 // Check if HTTPS is enforced (for HTTP environments, disable HSTS and related headers)
@@ -55,15 +58,29 @@ app.use(
   })
 );
 
-// CORS configuration
+// CORS configuration (origin configurable via EDGE_CORS_ORIGIN)
+const corsOriginConfig = config.security.corsOrigin;
 app.use(
   cors({
-    origin: '*', // Edge server accepts requests from any origin
+    origin: corsOriginConfig === '*'
+      ? '*'
+      : corsOriginConfig.includes(',')
+        ? corsOriginConfig.split(',').map(s => s.trim())
+        : corsOriginConfig,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ALLOWED_HEADERS,
     exposedHeaders: ['ETag'],
   })
 );
+
+// Security middleware: IP filter (deny list checked first)
+app.use(createIpFilter(config.security.allowIps, config.security.denyIps));
+
+// Security middleware: Rate limiter
+app.use(createRateLimiter(config.security.rateLimitRps));
+
+// ETag caching middleware (compute ETag, support If-None-Match for 304)
+app.use(createETagMiddleware());
 
 // Body parsing
 app.use(express.json({ limit: '1mb' }));

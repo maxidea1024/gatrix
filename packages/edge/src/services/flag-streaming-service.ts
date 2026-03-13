@@ -405,7 +405,7 @@ class FlagStreamingService {
       const sdk = sdkManager.getSDK();
       if (sdk) {
         // SDK cache uses environmentId as key directly (no longer token-based)
-        await sdk.featureFlag.refreshByEnvironment(environmentId);
+        await sdk.featureFlag.refreshByEnvironment(undefined, environmentId);
         logger.debug(`Cache refreshed for env=${environmentId} before notify`);
       }
     } catch (err) {

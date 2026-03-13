@@ -5,12 +5,12 @@ dotenv.config();
 
 export const config = {
   // Server configuration
-  port: parseInt(process.env.EDGE_PORT || '3410', 10),
+  port: parseInt(process.env.EDGE_PORT || '3400', 10),
   metricsPort: parseInt(process.env.EDGE_METRICS_PORT || '9400', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
 
   // Backend API configuration
-  gatrixUrl: process.env.GATRIX_URL || 'http://localhost:5000',
+  gatrixUrl: process.env.GATRIX_URL || 'http://localhost:45000',
 
   // Edge bypass token - allows access to all environments and internal APIs
   // Can be configured via EDGE_BYPASS_TOKEN or EDGE_API_TOKEN environment variable
@@ -24,7 +24,7 @@ export const config = {
   meta: {
     service: process.env.EDGE_SERVICE || 'edge',
     group: process.env.EDGE_GROUP || 'gatrix',
-    environment: process.env.EDGE_ENVIRONMENT || 'gatrix-env',
+    environment: process.env.EDGE_ENVIRONMENT || 'gatrix-env', //TODO 실제 환경이랑 매칭이 되는지?
   },
 
   // Redis configuration (for cache PubSub in event mode)
@@ -56,6 +56,18 @@ export const config = {
 
   // Logging
   logLevel: process.env.EDGE_LOG_LEVEL || 'info',
+
+  // Security configuration
+  security: {
+    // Rate limiting: max requests per second per IP (0 = disabled)
+    rateLimitRps: parseInt(process.env.EDGE_RATE_LIMIT_RPS || '0', 10),
+    // Comma-separated list of allowed IPs/CIDRs
+    allowIps: process.env.EDGE_ALLOW_IPS || '',
+    // Comma-separated list of denied IPs/CIDRs
+    denyIps: process.env.EDGE_DENY_IPS || '',
+    // CORS allowed origin (default: '*' for all origins)
+    corsOrigin: process.env.EDGE_CORS_ORIGIN || '*',
+  },
 
   // Unsecured client token for testing purposes (client -> edge)
   // This token bypasses normal token validation and allows access to all environments
