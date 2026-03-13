@@ -1,0 +1,30 @@
+# ============================================================================
+# Development Dockerfile for Gatrix Edge Server (Rust)
+# ============================================================================
+
+FROM rust:1.85-alpine
+
+RUN apk add --no-cache musl-dev pkgconfig openssl-dev
+
+WORKDIR /app
+
+# Copy SDK dependency
+COPY packages/sdks/server-sdks/gatrix-rust-server-sdk ./packages/sdks/server-sdks/gatrix-rust-server-sdk
+
+# Copy edge-rust source
+COPY packages/edge-rust ./packages/edge-rust
+
+WORKDIR /app/packages/edge-rust
+
+# Build debug binary
+RUN cargo build
+
+# Main API port
+EXPOSE 3400
+# Internal API port
+EXPOSE 3410
+
+ENV EDGE_PORT=3400
+ENV RUST_LOG=debug
+
+CMD ["cargo", "run"]
