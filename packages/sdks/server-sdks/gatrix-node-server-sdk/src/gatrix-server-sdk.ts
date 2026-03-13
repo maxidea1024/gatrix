@@ -12,6 +12,7 @@ import { CouponService } from './services/coupon-service';
 import { GameWorldService } from './services/game-world-service';
 import { PopupNoticeService } from './services/popup-notice-service';
 import { SurveyService } from './services/survey-service';
+import { Survey, SurveySettings } from './types/api';
 import { WhitelistService } from './services/whitelist-service';
 import { ServiceMaintenanceService } from './services/service-maintenance-service';
 import { ServiceDiscoveryService } from './services/service-discovery-service';
@@ -1005,6 +1006,113 @@ export class GatrixServerSDK {
     }
 
     return this.config.apiToken;
+  }
+
+  // ============================================================================
+  // Survey Methods
+  // ============================================================================
+
+  /**
+   * Fetch surveys with settings
+   * @param environmentId Optional in single-env mode, required in multi-env mode
+   */
+  async fetchSurveys(
+    environmentId?: string
+  ): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
+    const env = this.resolveEnvironment(environmentId, 'fetchSurveys');
+    return await this.survey.listByEnvironment({ isActive: true }, env);
+  }
+
+  /**
+   * Get cached surveys with settings
+   * @param environmentId Environment ID. Only used in multi-environment mode (Edge).
+   *                      For game servers, can be omitted to use default environment.
+   *                      For edge servers, must be provided from client request.
+   */
+  getSurveys(environmentId?: string): {
+    surveys: Survey[];
+    settings: SurveySettings | null;
+  } {
+    const env = this.resolveEnvironment(environmentId, 'getSurveys');
+    return {
+      surveys: this.survey.getCached(env),
+      settings: this.survey.getCachedSettings(env),
+    };
+  }
+
+  /**
+   * Get surveys for a specific world
+   * @param worldId World ID
+   * @param environmentId Environment ID. Only used in multi-environment mode.
+   */
+  getSurveysForWorld(worldId: string, environmentId?: string): Survey[] {
+    const env = this.resolveEnvironment(environmentId, 'getSurveysForWorld');
+    return this.survey.getSurveysForWorld(worldId, env);
+  }
+
+  /**
+   * Update survey settings only
+   * Called when survey settings change (e.g., survey configuration updates)
+   * @param newSettings New survey settings
+   * @param environmentId Environment ID. Only used in multi-environment mode.
+   */
+  updateSurveySettings(
+    newSettings: SurveySettings,
+    environmentId?: string
+  ): void {
+    const env = this.resolveEnvironment(
+      environmentId,
+      'updateSurveySettings'
+    );
+    this.survey.updateSettings(newSettings, env);
+  }
+
+  /**
+   * Get filtered(active) surveys for a user based on their conditions
+   * Filters surveys based on platform, channel, subchannel, world, and trigger conditions
+   * @param platform User's platform (e.g., 'pc', 'ios', 'android')
+   * @param channel User's channel (e.g., 'steam', 'epic')
+   * @param subChannel User's subchannel (e.g., 'pc', 'ios')
+   * @param worldId User's world ID
+   * @param userLevel User's level
+   * @param joinDays User's join days
+   * @param environmentId Environment ID. Only used in multi-environment mode.
+   * @returns Array of appropriate surveys, empty array if none match
+   */
+  getActiveSurveys(
+    platform: string,
+    channel: string,
+    subChannel: string,
+    worldId: string,
+    userLevel: number,
+    joinDays: number,
+    environmentId?: string
+  ): Survey[] {
+    const env = this.resolveEnvironment(environmentId, 'getActiveSurveys');
+    return this.survey.getActiveSurveys(
+      platform,
+      channel,
+      subChannel,
+      worldId,
+      userLevel,
+      joinDays,
+      env
+    );
+  }
+
+  /**
+   * Refresh surveys cache
+   * @param environmentId Optional in single-env mode, required in multi-env mode
+   */
+  async refreshSurveysCache(environmentId?: string): Promise<void> {
+    if (!this.cacheManager) {
+      throw createError(
+        ErrorCode.NOT_INITIALIZED,
+        'Cache manager not initialized'
+      );
+    }
+    const env = this.resolveEnvironment(environmentId, 'refreshSurveysCache');
+    await this.survey.refreshByEnvironment({ isActive: true }, false, env);
   }
 
   // ============================================================================
