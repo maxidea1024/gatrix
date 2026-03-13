@@ -61,6 +61,18 @@ pub struct CliArgs {
   /// Log level: debug | info | warn | error
   #[arg(long, env = "EDGE_LOG_LEVEL")]
   pub log_level: Option<String>,
+
+  /// Rate limit: max requests per second per IP (0 = disabled)
+  #[arg(long, env = "EDGE_RATE_LIMIT_RPS")]
+  pub rate_limit_rps: Option<u32>,
+
+  /// Comma-separated list of allowed IPs/CIDRs
+  #[arg(long, env = "EDGE_ALLOW_IPS")]
+  pub allow_ip: Option<String>,
+
+  /// Comma-separated list of denied IPs/CIDRs
+  #[arg(long, env = "EDGE_DENY_IPS")]
+  pub deny_ip: Option<String>,
 }
 
 /// Redis configuration
@@ -87,6 +99,14 @@ pub struct MetaConfig {
   pub environment: String,
 }
 
+/// Security configuration
+#[derive(Debug, Clone)]
+pub struct SecurityConfig {
+  pub rate_limit_rps: u32,
+  pub allow_ips: String,
+  pub deny_ips: String,
+}
+
 /// Main Edge configuration
 #[derive(Debug, Clone)]
 pub struct EdgeConfig {
@@ -109,6 +129,9 @@ pub struct EdgeConfig {
 
   // Cache
   pub cache: CacheConfig,
+
+  // Security
+  pub security: SecurityConfig,
 
   // Logging
   pub log_level: String,
@@ -207,6 +230,23 @@ impl EdgeConfig {
         sync_method: args.sync_method.clone().unwrap_or_else(|| {
           env::var("EDGE_SYNC_METHOD")
             .unwrap_or_else(|_| "polling".to_string())
+        }),
+      },
+
+      security: SecurityConfig {
+        rate_limit_rps: args.rate_limit_rps.unwrap_or_else(|| {
+          env::var("EDGE_RATE_LIMIT_RPS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(0)
+        }),
+        allow_ips: args.allow_ip.clone().unwrap_or_else(|| {
+          env::var("EDGE_ALLOW_IPS")
+            .unwrap_or_default()
+        }),
+        deny_ips: args.deny_ip.clone().unwrap_or_else(|| {
+          env::var("EDGE_DENY_IPS")
+            .unwrap_or_default()
         }),
       },
 

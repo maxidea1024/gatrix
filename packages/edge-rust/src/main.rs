@@ -45,6 +45,17 @@ async fn main() -> std::io::Result<()> {
   }
   info!("Configuration validated");
 
+  // Log security configuration
+  if config.security.rate_limit_rps > 0 {
+    info!("Rate limiting enabled: {} req/s per IP", config.security.rate_limit_rps);
+  }
+  if !config.security.allow_ips.is_empty() {
+    info!("IP allow list: {}", config.security.allow_ips);
+  }
+  if !config.security.deny_ips.is_empty() {
+    info!("IP deny list: {}", config.security.deny_ips);
+  }
+
   // Initialize SDK
   let refresh_method = match config.cache.sync_method.as_str() {
     "event" => RefreshMethod::Event,
@@ -192,6 +203,20 @@ async fn main() -> std::io::Result<()> {
 
   info!("Edge internal server listening on port {}", internal_port);
 
+  // Parse IP filter lists
+  let allow_list = if !config.security.allow_ips.is_empty() {
+    middleware::ip_filter::parse_cidr_list(&config.security.allow_ips)
+  } else {
+    Vec::new()
+  };
+  let deny_list = if !config.security.deny_ips.is_empty() {
+    middleware::ip_filter::parse_cidr_list(&config.security.deny_ips)
+  } else {
+    Vec::new()
+  };
+
+  let rate_limit_rps = config.security.rate_limit_rps;
+
   // Start main HTTP server
   let main_server = HttpServer::new(move || {
     let cors = Cors::default()
@@ -212,8 +237,16 @@ async fn main() -> std::io::Result<()> {
       .expose_headers(vec!["etag"])
       .max_age(3600);
 
+    // Note: actix-web .wrap() changes the App generic type on each call,
+    // so we always add all middleware. They self-disable when not configured.
     App::new()
       .wrap(cors)
+      .wrap(middleware::etag::ETag)
+      .wrap(middleware::rate_limit::RateLimiter::new(rate_limit_rps))
+      .wrap(middleware::ip_filter::IpFilter::new(
+        allow_list.clone(),
+        deny_list.clone(),
+      ))
       .wrap(actix_middleware::Logger::default())
       .app_data(app_state.clone())
       .app_data(web::JsonConfig::default().limit(1024 * 1024)) // 1MB limit
