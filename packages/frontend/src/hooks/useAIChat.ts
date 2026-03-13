@@ -157,7 +157,10 @@ export function useAIChat(options?: UseAIChatOptions): UseAIChatReturn {
                 case 'error': {
                   const errorKey = `aiChat.errors.${event.error}`;
                   const translated = t(errorKey);
-                  const errorMsg = translated !== errorKey ? translated : (event.error || t('aiChat.errors.unknown'));
+                  const errorMsg =
+                    translated !== errorKey
+                      ? translated
+                      : event.error || t('aiChat.errors.unknown');
                   // Show error as assistant message
                   assistantContent = `⚠️ ${errorMsg}`;
                   setMessages((prev) => {
@@ -191,7 +194,11 @@ export function useAIChat(options?: UseAIChatOptions): UseAIChatReturn {
           setMessages((prev) => {
             const updated = [...prev];
             const lastIdx = updated.length - 1;
-            if (lastIdx >= 0 && updated[lastIdx].role === 'assistant' && !updated[lastIdx].content) {
+            if (
+              lastIdx >= 0 &&
+              updated[lastIdx].role === 'assistant' &&
+              !updated[lastIdx].content
+            ) {
               updated[lastIdx] = { ...updated[lastIdx], content: errorMsg };
             } else {
               updated.push({ role: 'assistant', content: errorMsg });

@@ -77,7 +77,8 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
     projectId: currentProjectId,
     environmentId: currentEnvironment?.environmentId || null,
     projectName: currentProject?.displayName || null,
-    environmentName: currentEnvironment?.displayName || currentEnvironmentId || null,
+    environmentName:
+      currentEnvironment?.displayName || currentEnvironmentId || null,
   });
 
   const [inputValue, setInputValue] = useState('');
@@ -337,7 +338,8 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
                     ...(msg.role === 'user'
                       ? { borderBottomRightRadius: '4px' }
                       : { borderBottomLeftRadius: '4px' }),
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
+                    boxShadow:
+                      '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
                     bgcolor:
                       msg.role === 'user'
                         ? 'primary.main'
@@ -373,17 +375,28 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
                     '& p': { m: 0, mb: 0.5, '&:last-child': { mb: 0 } },
                     '& ul, & ol': { m: 0, pl: 2, mb: 0.5 },
                     '& li': { mb: 0.25 },
-                    '& h1, & h2, & h3, & h4': { mt: 1, mb: 0.5, fontWeight: 600 },
+                    '& h1, & h2, & h3, & h4': {
+                      mt: 1,
+                      mb: 0.5,
+                      fontWeight: 600,
+                    },
                     '& h1': { fontSize: '1.1em' },
                     '& h2': { fontSize: '1.05em' },
                     '& h3': { fontSize: '1em' },
-                    '& hr': { my: 1, border: 'none', borderTop: '1px solid', borderColor: 'divider' },
+                    '& hr': {
+                      my: 1,
+                      border: 'none',
+                      borderTop: '1px solid',
+                      borderColor: 'divider',
+                    },
                     '& strong': { fontWeight: 600 },
                   }}
                 >
                   {msg.role === 'assistant' ? (
                     // Streaming with no content yet - show typing dots
-                    isStreaming && idx === messages.length - 1 && !msg.content ? (
+                    isStreaming &&
+                    idx === messages.length - 1 &&
+                    !msg.content ? (
                       <Box sx={{ display: 'flex', gap: 0.5, py: 0.5, px: 0.5 }}>
                         {[0, 1, 2].map((i) => (
                           <Box
@@ -396,7 +409,10 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
                               animation: 'dotBounce 1.4s infinite ease-in-out',
                               animationDelay: `${i * 0.2}s`,
                               '@keyframes dotBounce': {
-                                '0%, 80%, 100%': { transform: 'scale(0.6)', opacity: 0.4 },
+                                '0%, 80%, 100%': {
+                                  transform: 'scale(0.6)',
+                                  opacity: 0.4,
+                                },
                                 '40%': { transform: 'scale(1)', opacity: 1 },
                               },
                             }}
@@ -404,7 +420,9 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
                         ))}
                       </Box>
                     ) : (
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {msg.content}
+                      </ReactMarkdown>
                     )
                   ) : (
                     msg.content

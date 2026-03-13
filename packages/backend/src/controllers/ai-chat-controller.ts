@@ -275,9 +275,8 @@ export class AIChatController {
       // Use API key if available (regardless of current saved provider)
       const apiKey = settings?.apiKey || null;
 
-      const { AIModelService } = await import(
-        '../services/ai/ai-model-service'
-      );
+      const { AIModelService } =
+        await import('../services/ai/ai-model-service');
 
       // getModels will try API, fallback on failure
       const models = apiKey

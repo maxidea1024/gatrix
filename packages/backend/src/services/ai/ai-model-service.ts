@@ -27,20 +27,40 @@ const FALLBACK_MODELS: Record<string, AIModel[]> = {
   claude: [
     { id: 'claude-opus-4-6', name: 'Claude Opus 4.6', provider: 'claude' },
     { id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6', provider: 'claude' },
-    { id: 'claude-opus-4-5-20251101', name: 'Claude Opus 4.5', provider: 'claude' },
-    { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', provider: 'claude' },
+    {
+      id: 'claude-opus-4-5-20251101',
+      name: 'Claude Opus 4.5',
+      provider: 'claude',
+    },
+    {
+      id: 'claude-sonnet-4-20250514',
+      name: 'Claude Sonnet 4',
+      provider: 'claude',
+    },
     { id: 'claude-haiku-4-5', name: 'Claude Haiku 4.5', provider: 'claude' },
-    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', provider: 'claude' },
+    {
+      id: 'claude-3-5-sonnet-20241022',
+      name: 'Claude 3.5 Sonnet',
+      provider: 'claude',
+    },
   ],
   gemini: [
     { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', provider: 'gemini' },
-    { id: 'gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash Lite', provider: 'gemini' },
+    {
+      id: 'gemini-2.0-flash-lite',
+      name: 'Gemini 2.0 Flash Lite',
+      provider: 'gemini',
+    },
     { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', provider: 'gemini' },
     { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', provider: 'gemini' },
   ],
   deepseek: [
     { id: 'deepseek-chat', name: 'DeepSeek Chat (V3)', provider: 'deepseek' },
-    { id: 'deepseek-reasoner', name: 'DeepSeek Reasoner (R1)', provider: 'deepseek' },
+    {
+      id: 'deepseek-reasoner',
+      name: 'DeepSeek Reasoner (R1)',
+      provider: 'deepseek',
+    },
   ],
   qwen: [
     { id: 'qwen-turbo', name: 'Qwen Turbo', provider: 'qwen' },
