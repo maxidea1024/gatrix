@@ -303,6 +303,12 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         },
       },
       MuiDialog: {
+        defaultProps: {
+          // Disable exit animation to prevent shrinking flicker on close
+          slotProps: {
+            transition: { exit: false },
+          },
+        },
         styleOverrides: {
           root: {
             '& .MuiBackdrop-root': {
@@ -366,6 +372,10 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
               borderRadius: 0,
             },
           },
+          // Disable exit animation to prevent shrinking flicker on close
+          slotProps: {
+            transition: { exit: false },
+          },
         },
       },
       MuiChip: {
@@ -398,6 +408,10 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
               WebkitBackdropFilter: 'none',
             },
             invisible: true,
+          },
+          // Disable exit animation to prevent shrinking flicker on close
+          slotProps: {
+            transition: { exit: false },
           },
         },
       },

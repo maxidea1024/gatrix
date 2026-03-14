@@ -112,6 +112,9 @@ import {
 import mailService from '@/services/mailService';
 import AIChatPanel, { AIChatFloatingButton } from '@/components/ai/AIChatPanel';
 import { Permission, P } from '@/types/permissions';
+import DraftBanner from '@/components/common/DraftBanner';
+import DraftChangesDialog from '@/components/common/DraftChangesDialog';
+import draftService from '@/services/draftService';
 
 // Sidebar width is now dynamic
 
@@ -243,6 +246,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [myDraftCount, setMyDraftCount] = useState(0);
   // My pending review count (open status - edits are locked)
   const [myPendingReviewCount, setMyPendingReviewCount] = useState(0);
+
+  // Global draft state
+  const [globalDraftCount, setGlobalDraftCount] = useState(0);
+  const [draftChangesOpen, setDraftChangesOpen] = useState(false);
 
   // User has RBAC permissions assigned (regardless of system role)
   const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
@@ -591,6 +598,34 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       loadPendingCRCount();
     }
   }, [hasEnvironmentAccess, currentEnvironmentId, loadPendingCRCount]);
+
+  // Load global draft count (all target types)
+  const loadDraftCount = useCallback(async () => {
+    if (!hasAnyPermissions) return;
+    try {
+      const projectApiPath = getProjectApiPath();
+      const [flagDrafts, segmentDrafts] = await Promise.all([
+        draftService.listDrafts('feature_flag', projectApiPath),
+        draftService.listDrafts('segment', projectApiPath),
+      ]);
+      setGlobalDraftCount(flagDrafts.length + segmentDrafts.length);
+    } catch {
+      // Silently fail
+    }
+  }, [hasAnyPermissions, getProjectApiPath]);
+
+  useEffect(() => {
+    if (hasAnyPermissions) {
+      loadDraftCount();
+    }
+  }, [hasAnyPermissions, loadDraftCount]);
+
+  // Listen for draft changes from pages
+  useEffect(() => {
+    const handleDraftChange = () => loadDraftCount();
+    window.addEventListener('draft-changed', handleDraftChange);
+    return () => window.removeEventListener('draft-changed', handleDraftChange);
+  }, [loadDraftCount]);
 
   // Handle role change dialog confirmation
   const handleRoleChangeConfirm = useCallback(async () => {
@@ -2435,8 +2470,79 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             flexDirection: 'column',
           }}
         >
+          {/* Global Draft Banner */}
+          {globalDraftCount > 0 && (
+            <DraftBanner
+              hasDraft={true}
+              onPublish={async () => {
+                try {
+                  const projectApiPath = getProjectApiPath();
+                  const [flagDrafts, segDrafts] = await Promise.all([
+                    draftService.listDrafts('feature_flag', projectApiPath),
+                    draftService.listDrafts('segment', projectApiPath),
+                  ]);
+                  await Promise.all([
+                    ...flagDrafts.map((d) =>
+                      draftService.publishDraft('feature_flag', d.targetId, projectApiPath)
+                    ),
+                    ...segDrafts.map((d) =>
+                      draftService.publishDraft('segment', d.targetId, projectApiPath)
+                    ),
+                  ]);
+                  setGlobalDraftCount(0);
+                  enqueueSnackbar(t('draft.publishSuccess'), {
+                    variant: 'success',
+                  });
+                  window.dispatchEvent(new Event('draft-changed'));
+                } catch {
+                  enqueueSnackbar(t('draft.publishFailed'), {
+                    variant: 'error',
+                  });
+                }
+              }}
+              onDiscard={async () => {
+                try {
+                  const projectApiPath = getProjectApiPath();
+                  const [flagDrafts, segDrafts] = await Promise.all([
+                    draftService.listDrafts('feature_flag', projectApiPath),
+                    draftService.listDrafts('segment', projectApiPath),
+                  ]);
+                  await Promise.all([
+                    ...flagDrafts.map((d) =>
+                      draftService.discardDraft('feature_flag', d.targetId, projectApiPath)
+                    ),
+                    ...segDrafts.map((d) =>
+                      draftService.discardDraft('segment', d.targetId, projectApiPath)
+                    ),
+                  ]);
+                  setGlobalDraftCount(0);
+                  enqueueSnackbar(t('draft.discardSuccess'), {
+                    variant: 'success',
+                  });
+                  window.dispatchEvent(new Event('draft-changed'));
+                } catch {
+                  enqueueSnackbar(t('draft.discardFailed'), {
+                    variant: 'error',
+                  });
+                }
+              }}
+              onViewChanges={() => setDraftChangesOpen(true)}
+            />
+          )}
           {children}
         </Box>
+
+        {/* Global Draft Changes Dialog */}
+        <DraftChangesDialog
+          open={draftChangesOpen}
+          onClose={() => setDraftChangesOpen(false)}
+          targetTypes={['feature_flag', 'segment']}
+          environments={environments.map((e) => ({
+            environmentId: e.environmentId,
+            displayName: e.displayName,
+          }))}
+          projectApiPath={getProjectApiPath()}
+        />
       </Box>
 
       {/* AI Chat Floating Button & Panel */}

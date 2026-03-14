@@ -69,28 +69,47 @@ export async function performEvaluation(
     // Sort keys to ensure consistent iteration order
     keysToEvaluate = [...keysToEvaluate].sort();
 
+    // Track missing flags when specific flagNames are requested
+    const missingFlags: string[] = [];
+
     for (const key of keysToEvaluate) {
+      // Skip flags that don't exist in cache
+      // getFlagByName signature: getFlagByName(flagName, environmentId?)
+      const flagDef = sdk.featureFlag.getFlagByName(key, cacheKey);
+      if (!flagDef) {
+        // Only track as missing when specific flagNames were requested
+        if (flagNames.length > 0) {
+          missingFlags.push(key);
+        }
+        continue;
+      }
+
       const result = sdk.featureFlag.evaluate(key, context, cacheKey);
-      const flagDef = sdk.featureFlag.getFlagByName(cacheKey, key);
 
       // Format result using common utility
       // Pass the cached flag definition directly to preserve all fields (especially valueSource)
-      results[key] = EvaluationUtils.formatResult(key, result, flagDef || {});
+      results[key] = EvaluationUtils.formatResult(key, result, flagDef);
     }
 
     const flagsArray = Object.values(results).sort((a, b) =>
       a.name.localeCompare(b.name)
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const meta: any = {
+      environmentId,
+      evaluatedAt: new Date().toISOString(),
+    };
+    if (missingFlags.length > 0) {
+      meta.missing = missingFlags;
+    }
+
     const responseData = {
       success: true,
       data: {
         flags: flagsArray,
       },
-      meta: {
-        environmentId,
-        evaluatedAt: new Date().toISOString(),
-      },
+      meta,
     };
 
     // 3. Generate ETag and check If-None-Match

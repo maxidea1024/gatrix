@@ -376,6 +376,34 @@ class FeatureFlagService {
       userAgent: requestContext?.userAgent,
     });
 
+    // Auto-resolve matching unknown flags within the same project
+    try {
+      let resolveQuery = db('g_unknown_flags')
+        .where({ flagName: flagName!, isResolved: false });
+
+      if (input.projectId) {
+        resolveQuery = resolveQuery.whereIn(
+          'environmentId',
+          db('g_environments').select('id').where('projectId', input.projectId)
+        );
+      } else if (input.environmentId) {
+        resolveQuery = resolveQuery.where('environmentId', input.environmentId);
+      }
+
+      const resolved = await resolveQuery.update({
+        isResolved: true,
+        resolvedAt: db.raw('UTC_TIMESTAMP()'),
+        resolvedBy: userId,
+      });
+      if (resolved > 0) {
+        logger.info(
+          `Auto-resolved ${resolved} unknown flag record(s) for '${flagName}'`
+        );
+      }
+    } catch (error) {
+      logger.warn('Failed to auto-resolve unknown flags:', error);
+    }
+
     // Invalidate cache
     await this.invalidateCache(input.environmentId!, [input.flagName!]);
 

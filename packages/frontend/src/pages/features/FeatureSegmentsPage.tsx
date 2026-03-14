@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { ulid } from 'ulid';
 
 import { useAuth } from '../../hooks/useAuth';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
@@ -73,6 +74,7 @@ import { tagService } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import * as draftService from '@/services/draftService';
 
 interface FeatureSegment {
   id: string;
@@ -451,20 +453,44 @@ const FeatureSegmentsPage: React.FC = () => {
     if (!editingSegment) return;
     try {
       if (editingSegment.id) {
-        await api.put(
-          `${projectApiPath}/features/segments/${editingSegment.id}`,
-          editingSegment
+        // Save to draft instead of directly updating
+        const draftData: any = {};
+        if (editingSegment.displayName !== undefined) draftData.displayName = editingSegment.displayName;
+        if (editingSegment.description !== undefined) draftData.description = editingSegment.description;
+        if (editingSegment.constraints !== undefined) draftData.constraints = editingSegment.constraints;
+        if (editingSegment.isActive !== undefined) draftData.isActive = editingSegment.isActive;
+        if (editingSegment.tags !== undefined) draftData.tags = editingSegment.tags;
+        await draftService.saveDraft(
+          'segment',
+          editingSegment.id,
+          draftData,
+          projectApiPath
         );
-        enqueueSnackbar(t('featureFlags.segmentUpdateSuccess'), {
-          variant: 'success',
+        window.dispatchEvent(new Event('draft-changed'));
+        enqueueSnackbar(t('featureFlags.draftSaved'), {
+          variant: 'info',
         });
       } else {
-        await api.post(`${projectApiPath}/features/segments`, {
-          ...editingSegment,
-          projectId: currentProjectId,
-        });
-        enqueueSnackbar(t('featureFlags.segmentCreateSuccess'), {
-          variant: 'success',
+        // Save to draft with _action: create
+        const tempId = ulid();
+        await draftService.saveDraft(
+          'segment',
+          tempId,
+          {
+            _action: 'create',
+            _projectId: currentProjectId,
+            segmentName: editingSegment.segmentName,
+            displayName: editingSegment.displayName || editingSegment.segmentName,
+            description: editingSegment.description || '',
+            constraints: editingSegment.constraints || [],
+            isActive: editingSegment.isActive ?? true,
+            tags: editingSegment.tags || [],
+          },
+          projectApiPath
+        );
+        window.dispatchEvent(new Event('draft-changed'));
+        enqueueSnackbar(t('featureFlags.draftSaved'), {
+          variant: 'info',
         });
       }
       setEditDialogOpen(false);
@@ -519,30 +545,24 @@ const FeatureSegmentsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingSegment) return;
     try {
-      await api.delete(
-        `${projectApiPath}/features/segments/${deletingSegment.id}`
+      // Save deletion as draft
+      await draftService.saveDraft(
+        'segment',
+        deletingSegment.id,
+        { _action: 'delete' },
+        projectApiPath
       );
-      enqueueSnackbar(t('featureFlags.segmentDeleteSuccess'), {
-        variant: 'success',
+      window.dispatchEvent(new Event('draft-changed'));
+      enqueueSnackbar(t('featureFlags.draftSaved'), {
+        variant: 'info',
       });
-      loadSegments();
     } catch (error: any) {
-      const errorCode = extractErrorCode(error?.response?.data);
-      if (errorCode === 'RESOURCE_IN_USE') {
-        const payload =
-          error?.response?.data?.error?.details?.payload ||
-          error?.response?.data?.error?.payload;
-        setReferences(payload?.references || null);
-        setReferenceDialogMode('delete');
-        setReferenceDialogOpen(true);
-      } else {
-        enqueueSnackbar(
-          parseApiErrorMessage(error, 'featureFlags.deleteFailed'),
-          {
-            variant: 'error',
-          }
-        );
-      }
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'featureFlags.deleteFailed'),
+        {
+          variant: 'error',
+        }
+      );
     } finally {
       setDeleteConfirmOpen(false);
     }
@@ -737,12 +757,19 @@ const FeatureSegmentsPage: React.FC = () => {
                                         )
                                       );
                                       try {
-                                        await api.put(
-                                          `${projectApiPath}/features/segments/${segment.id}`,
-                                          {
-                                            isActive: newActive,
-                                          }
+                                        // Save to draft instead of directly updating
+                                        const { draftData } = await draftService.getDraft(
+                                          'segment',
+                                          segment.id,
+                                          projectApiPath
                                         );
+                                        await draftService.saveDraft(
+                                          'segment',
+                                          segment.id,
+                                          { ...draftData, isActive: newActive },
+                                          projectApiPath
+                                        );
+                                        window.dispatchEvent(new Event('draft-changed'));
                                       } catch (error: any) {
                                         setAllSegments((prev) =>
                                           prev.map((s) =>

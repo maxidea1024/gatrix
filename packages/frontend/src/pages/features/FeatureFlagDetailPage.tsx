@@ -156,6 +156,22 @@ import ValidationRulesEditor from '../../components/features/ValidationRulesEdit
 import { ValidationRules } from '../../services/featureFlagService';
 import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
 import PageContentLoader from '../../components/common/PageContentLoader';
+import DraftBanner from '../../components/common/DraftBanner';
+import DraftChangesDialog from '../../components/common/DraftChangesDialog';
+import * as draftService from '../../services/draftService';
+
+// Deep equality check for draft coalescing
+function deepEqualDraft(a: any, b: any): boolean {
+  if (a === b) return true;
+  if (a == null || b == null) return a == b;
+  if (typeof a !== typeof b) return false;
+  if (typeof a !== 'object') return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every((key) => deepEqualDraft(a[key], b[key]));
+}
 
 // Playground panel constants (outside component for stable references)
 const PLAYGROUND_VISIBLE_KEY = 'gatrix.embeddedPlaygroundVisible';
@@ -538,6 +554,13 @@ const FeatureFlagDetailPage: React.FC = () => {
     new Set()
   );
 
+  // Draft status at flag level - single draft per flag
+  const [flagDraftStatus, setFlagDraftStatus] = useState<{
+    hasDraft: boolean;
+    updatedAt?: string;
+  }>({ hasDraft: false });
+  const [draftChangesDialogOpen, setDraftChangesDialogOpen] = useState(false);
+
   // Release flow plan summaries - to detect environments managed by release flow
   const { data: releaseFlowPlans, mutate: mutateReleaseFlowPlans } =
     useReleaseFlowPlansByFlag(flag?.id || null);
@@ -867,17 +890,76 @@ const FeatureFlagDetailPage: React.FC = () => {
     isCreating,
   ]);
 
-  // Load environment-specific strategies after environments and flag are loaded
-  useEffect(() => {
-    if (!isCreating && flag?.flagName && environments.length > 0) {
-      setEnvLoading(true);
-      loadEnvStrategies(environments, flag.flagName).finally(() =>
-        setEnvLoading(false)
-      );
-    }
-  }, [isCreating, flag?.flagName, environments, loadEnvStrategies]);
+  // Check draft status and apply draft data to UI
+  const loadFlagDraftStatus = useCallback(
+    async (flagId: string) => {
+      if (!flagId || !projectApiPath) return;
+      try {
+        const result = await draftService.getDraft(
+          'feature_flag',
+          flagId,
+          projectApiPath
+        );
+        setFlagDraftStatus({
+          hasDraft: result.hasDraft,
+          updatedAt: undefined,
+        });
 
-  // Load environment metrics for summary display in environment cards
+        // If draft exists, overlay draft data onto the UI
+        if (result.hasDraft && result.draftData) {
+          const draftData = result.draftData;
+          for (const [envId, envData] of Object.entries(draftData) as [
+            string,
+            any,
+          ][]) {
+            if (envData.strategies) {
+              const localStrategies = envData.strategies.map((s: any) => ({
+                id: s.id || s.strategyName,
+                name: s.strategyName || s.name,
+                title: s.title || '',
+                parameters: s.parameters || {},
+                constraints: s.constraints || [],
+                segments: s.segments || [],
+                sortOrder: s.sortOrder ?? 0,
+                disabled: s.isEnabled === false,
+              }));
+              setEnvStrategies((prev) => ({
+                ...prev,
+                [envId]: localStrategies,
+              }));
+            }
+            if (envData.variants) {
+              const localVariants = envData.variants.map((v: any) => ({
+                name: v.variantName || v.name,
+                weight: v.weight,
+                value: v.value,
+                valueType: v.valueType,
+                stickiness: v.stickiness || 'default',
+              }));
+              setEnvVariants((prev) => ({
+                ...prev,
+                [envId]: localVariants,
+              }));
+            }
+          }
+        }
+      } catch {
+        // Silently fail - draft status is non-critical
+      }
+    },
+    [projectApiPath]
+  );
+
+  // Load environment-specific strategies after environments and flag are loaded
+  // Then overlay draft data if a draft exists
+  useEffect(() => {
+    if (!isCreating && flag?.flagName && flag?.id && environments.length > 0) {
+      setEnvLoading(true);
+      loadEnvStrategies(environments, flag.flagName)
+        .then(() => loadFlagDraftStatus(flag.id))
+        .finally(() => setEnvLoading(false));
+    }
+  }, [isCreating, flag?.flagName, flag?.id, environments, loadEnvStrategies, loadFlagDraftStatus]);  // Load environment metrics for summary display in environment cards
   useEffect(() => {
     if (!isCreating && flag?.flagName && environments.length > 0) {
       loadEnvMetrics(flag.flagName, environments);
@@ -1018,10 +1100,8 @@ const FeatureFlagDetailPage: React.FC = () => {
     setFlag({ ...flag, environments: updatedEnvironments });
 
     try {
-      await api.post(`${projectApiPath}/features/${flag.flagName}/toggle`, {
-        isEnabled: !currentEnabled,
-        environmentId: envKey,
-      });
+      // Save to draft instead of directly toggling
+      await saveChangesToDraft(envKey, { isEnabled: !currentEnabled });
       const envDisplayName =
         environments.find((e) => e.environmentId === envKey)?.displayName ||
         envKey;
@@ -1320,6 +1400,141 @@ const FeatureFlagDetailPage: React.FC = () => {
     setStrategyDialogOpen(true);
   };
 
+  // Helper: save changes to draft instead of directly applying
+  // Draft data structure: { [environmentId]: { strategies, variants, values } }
+  const saveChangesToDraft = async (
+    envId: string,
+    updates: {
+      strategies?: any[];
+      variants?: any[];
+      isEnabled?: boolean;
+      overrideEnabledValue?: boolean;
+      overrideDisabledValue?: boolean;
+      enabledValue?: any;
+      disabledValue?: any;
+    }
+  ) => {
+    if (!flag) return;
+
+    // Get current draft or create snapshot from published state
+    const { draftData, publishedData } = await draftService.getDraft(
+      'feature_flag',
+      flag.id,
+      projectApiPath
+    );
+
+    // Merge updates into the specific environment's data within the draft
+    const currentEnvData = draftData[envId] || {};
+    const mergedEnvData = { ...currentEnvData, ...updates };
+
+    // Coalescing: remove fields that match the published state
+    const pubEnvData = publishedData?.[envId] || {};
+    const coalescedEnvData: Record<string, any> = {};
+    for (const [key, val] of Object.entries(mergedEnvData)) {
+      // Deep compare with published value
+      if (!deepEqualDraft(val, pubEnvData[key])) {
+        coalescedEnvData[key] = val;
+      }
+    }
+
+    // Build draft without this env if no changes remain
+    const mergedDraft = { ...draftData };
+    if (Object.keys(coalescedEnvData).length > 0) {
+      mergedDraft[envId] = coalescedEnvData;
+    } else {
+      delete mergedDraft[envId];
+    }
+
+    // Check if entire draft is empty (no changes at all)
+    // Remove env keys that have no diff vs published
+    const draftKeys = Object.keys(mergedDraft);
+    let hasAnyChange = false;
+    for (const k of draftKeys) {
+      const pubData = publishedData?.[k] || {};
+      if (!deepEqualDraft(mergedDraft[k], pubData)) {
+        hasAnyChange = true;
+        break;
+      }
+    }
+
+    if (!hasAnyChange) {
+      // No real changes - discard draft entirely
+      await draftService.discardDraft('feature_flag', flag.id, projectApiPath);
+      setFlagDraftStatus({ hasDraft: false });
+    } else {
+      // Save to draft
+      await draftService.saveDraft(
+        'feature_flag',
+        flag.id,
+        mergedDraft,
+        projectApiPath
+      );
+      // Mark draft exists
+      setFlagDraftStatus({ hasDraft: true });
+    }
+    window.dispatchEvent(new Event('draft-changed'));
+
+    // Update parent state to keep props in sync with editing state
+    if (updates.strategies) {
+      const localStrategies = updates.strategies.map((s: any) => ({
+        id: s.id || s.strategyName,
+        name: s.strategyName || s.name,
+        title: s.title || '',
+        parameters: s.parameters || {},
+        constraints: s.constraints || [],
+        segments: s.segments || [],
+        sortOrder: s.sortOrder ?? 0,
+        disabled: s.isEnabled === false,
+      }));
+      setEnvStrategies((prev) => ({
+        ...prev,
+        [envId]: localStrategies,
+      }));
+    }
+
+    if (updates.variants) {
+      const localVariants = updates.variants.map((v: any) => ({
+        name: v.variantName || v.name,
+        weight: v.weight,
+        value: v.value,
+        valueType: v.valueType,
+        stickiness: v.stickiness || 'default',
+      }));
+      setEnvVariants((prev) => ({
+        ...prev,
+        [envId]: localVariants,
+      }));
+    }
+  };
+
+  // Save global (flag-level) settings to draft under the _global key
+  const saveGlobalChangesToDraft = async (
+    updates: Record<string, any>
+  ) => {
+    if (!flag) return;
+
+    const { draftData } = await draftService.getDraft(
+      'feature_flag',
+      flag.id,
+      projectApiPath
+    );
+
+    const currentGlobal = draftData._global || {};
+    const mergedDraft = {
+      ...draftData,
+      _global: { ...currentGlobal, ...updates },
+    };
+
+    await draftService.saveDraft(
+      'feature_flag',
+      flag.id,
+      mergedDraft,
+      projectApiPath
+    );
+
+    setFlagDraftStatus({ hasDraft: true });
+  };
+
   const handleSaveStrategy = async () => {
     if (!flag || !editingStrategy || !editingEnv) return;
 
@@ -1340,7 +1555,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       if (!isCreating) {
         // Convert frontend Strategy format to backend API format
         const apiStrategies = updatedStrategies.map((s) => ({
-          strategyName: s.name, // Backend expects strategyName, frontend uses name
+          strategyName: s.name,
           title: s.title,
           parameters: s.parameters,
           constraints: s.constraints,
@@ -1348,23 +1563,8 @@ const FeatureFlagDetailPage: React.FC = () => {
           sortOrder: s.sortOrder,
           isEnabled: !s.disabled,
         }));
-        // Save strategies to the environment
-        await api.put(
-          `${projectApiPath}/features/${flag.flagName}/strategies`,
-          { strategies: apiStrategies },
-          {
-            headers: { 'x-environment-id': editingEnv },
-          }
-        );
-        // Save global properties (only valueType, NOT enabledValue/disabledValue
-        // which would overwrite environment-specific overrides)
-        await api.put(`${projectApiPath}/features/${flag.flagName}`, {
-          valueType: flag.valueType,
-          isGlobal: true,
-        });
-
-        // Reload strategies from server after save to ensure sync
-        await loadEnvStrategies(environments, flag.flagName);
+        // Save to draft instead of directly to backend
+        await saveChangesToDraft(editingEnv, { strategies: apiStrategies });
       } else {
         // Update environment-specific strategies for create mode
         setEnvStrategies((prev) => ({
@@ -1376,7 +1576,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       setEditingStrategy(null);
       setEditingEnv(null);
       setIsAddingStrategy(false);
-      setExpandedSegmentsDialog(new Set()); // Reset dialog-specific segment expansion
+      setExpandedSegmentsDialog(new Set());
       enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
@@ -1398,7 +1598,6 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       if (!isCreating) {
-        // Convert frontend Strategy format to backend API format
         const apiStrategies = updatedStrategies.map((s) => ({
           strategyName: s.name,
           title: s.title,
@@ -1408,17 +1607,9 @@ const FeatureFlagDetailPage: React.FC = () => {
           sortOrder: s.sortOrder,
           isEnabled: !s.disabled,
         }));
-        await api.put(
-          `${projectApiPath}/features/${flag.flagName}/strategies`,
-          { strategies: apiStrategies },
-          {
-            headers: { 'x-environment-id': envName },
-          }
-        );
-        // Reload strategies from server after delete to ensure sync
-        await loadEnvStrategies(environments, flag.flagName);
+        // Save to draft instead of directly to backend
+        await saveChangesToDraft(envName, { strategies: apiStrategies });
       } else {
-        // Update environment-specific strategies for create mode
         setEnvStrategies((prev) => ({
           ...prev,
           [envName]: updatedStrategies,
@@ -1441,7 +1632,6 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       if (!isCreating) {
-        // Convert frontend Variant format to backend API format
         const apiVariants = variants.map((v) => ({
           variantName: v.name,
           weight: v.weight,
@@ -1449,21 +1639,12 @@ const FeatureFlagDetailPage: React.FC = () => {
           valueType: v.valueType,
           stickiness: v.stickiness || 'default',
         }));
-        await api.put(
-          `${projectApiPath}/features/${flag.flagName}/variants`,
-          { variants: apiVariants },
-          {
-            headers: { 'x-environment-id': envName },
-          }
-        );
-        // Reload everything from server after save
-        await loadFlag(flag.flagName, false);
-        await loadEnvStrategies(environments, flag.flagName);
+        // Save to draft instead of directly to backend
+        await saveChangesToDraft(envName, { variants: apiVariants });
         enqueueSnackbar(t('featureFlags.variantsSaved'), {
           variant: 'success',
         });
       } else {
-        // Update environment-specific variants for create mode
         setEnvVariants((prev) => ({
           ...prev,
           [envName]: variants as Variant[],
@@ -1488,14 +1669,8 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       if (!isCreating) {
-        await api.put(`${projectApiPath}/features/${flag.flagName}`, {
-          useFixedWeightVariants: value,
-          isGlobal: true,
-        });
+        await saveGlobalChangesToDraft({ useFixedWeightVariants: value });
         setFlag((prev) =>
-          prev ? { ...prev, useFixedWeightVariants: value } : prev
-        );
-        setOriginalFlag((prev) =>
           prev ? { ...prev, useFixedWeightVariants: value } : prev
         );
       } else {
@@ -1521,22 +1696,12 @@ const FeatureFlagDetailPage: React.FC = () => {
     if (!flag || isCreating) return;
 
     try {
-      // Update flag with environment-specific enabledValue/disabledValue and override flags
-      await api.put(
-        `${projectApiPath}/features/${flag.flagName}`,
-        {
-          enabledValue,
-          disabledValue,
-          overrideEnabledValue,
-          overrideDisabledValue,
-        },
-        { headers: { 'x-environment-id': envName } }
-      );
-      // Reload everything to ensure sync
-      await loadFlag(flag.flagName, false);
-      await loadEnvStrategies(environments, flag.flagName);
-      enqueueSnackbar(t('featureFlags.fallbackValueSaved'), {
-        variant: 'success',
+      // Save to draft instead of directly to backend
+      await saveChangesToDraft(envName, {
+        enabledValue,
+        disabledValue,
+        overrideEnabledValue,
+        overrideDisabledValue,
       });
     } catch (error: any) {
       enqueueSnackbar(
@@ -1607,22 +1772,17 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       if (!isCreating) {
-        // Convert frontend Strategy format to backend API format
         const apiStrategies = updatedStrategies.map((s) => ({
           strategyName: s.name,
+          title: s.title,
           parameters: s.parameters,
           constraints: s.constraints,
           segments: s.segments,
           sortOrder: s.sortOrder,
           isEnabled: !s.disabled,
         }));
-        await api.put(
-          `${projectApiPath}/features/${flag.flagName}/strategies`,
-          { strategies: apiStrategies },
-          {
-            headers: { 'x-environment-id': envName },
-          }
-        );
+        // Save to draft instead of directly to backend
+        await saveChangesToDraft(envName, { strategies: apiStrategies });
         enqueueSnackbar(t('featureFlags.strategyReordered'), {
           variant: 'success',
         });
@@ -1780,7 +1940,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       if (!isCreating) {
-        await api.put(`${projectApiPath}/features/${flag.flagName}/variants`, {
+        await saveGlobalChangesToDraft({
           variants: updatedVariants.map((v) => ({
             variantName: v.name,
             weight: v.weight,
@@ -1791,12 +1951,9 @@ const FeatureFlagDetailPage: React.FC = () => {
         });
       }
       setFlag({ ...flag, variants: updatedVariants });
-      setOriginalFlag((prev) =>
-        prev ? { ...prev, variants: updatedVariants } : null
-      );
       setVariantDialogOpen(false);
       setEditingVariant(null);
-      enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('draft.saveSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
         variant: 'error',
@@ -1810,15 +1967,17 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       if (!isCreating) {
-        await api.put(`${projectApiPath}/features/${flag.flagName}/variants`, {
-          variants: updatedVariants,
+        await saveGlobalChangesToDraft({
+          variants: updatedVariants.map((v) => ({
+            variantName: v.name,
+            weight: v.weight,
+            value: v.value,
+            valueType: v.valueType,
+          })),
         });
       }
       setFlag({ ...flag, variants: updatedVariants });
-      setOriginalFlag((prev) =>
-        prev ? { ...prev, variants: updatedVariants } : null
-      );
-      enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('draft.saveSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), {
         variant: 'error',
@@ -1874,7 +2033,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         <Box sx={{ flex: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="h5" fontWeight={600}>
-              {flag.displayName || flag.flagName}
+              {flag.flagName}
             </Typography>
             {flag.isArchived && (
               <Chip
@@ -2775,6 +2934,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       nextManual.delete(env.environmentId);
                                       setEnvManualReleaseFlow(nextManual);
                                     }}
+                                    onDraftChange={() =>
+                                      saveGlobalChangesToDraft({
+                                        _releaseFlowChanged: true,
+                                      })
+                                    }
                                   />
 
                                   <Divider sx={{ my: 2 }} />
@@ -2841,10 +3005,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         overrideDisabled
                                       )
                                     }
-                                    onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={
-                                      env.environmentId === selectedEnvironment
+                                    onChangeDetected={() =>
+                                      setFlagDraftStatus({ hasDraft: true })
                                     }
+                                    onGoToPayloadTab={() => setTabValue(1)}
+                                    defaultExpanded={true}
                                   />
                                 </>
                               ) : strategies.length === 0 ? (
@@ -2925,6 +3090,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         nextManual.delete(env.environmentId);
                                         setEnvManualReleaseFlow(nextManual);
                                       }}
+                                      onDraftChange={() =>
+                                        saveGlobalChangesToDraft({
+                                          _releaseFlowChanged: true,
+                                        })
+                                      }
                                     />
                                   )}
 
@@ -2992,10 +3162,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         overrideDisabled
                                       )
                                     }
-                                    onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={
-                                      env.environmentId === selectedEnvironment
+                                    onChangeDetected={() =>
+                                      setFlagDraftStatus({ hasDraft: true })
                                     }
+                                    onGoToPayloadTab={() => setTabValue(1)}
+                                    defaultExpanded={true}
                                   />
                                 </>
                               ) : (
@@ -3140,7 +3311,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                     ) : undefined
                                                   }
                                                   collapsible
-                                                  defaultCollapsed
                                                 />
                                               )}
                                             </SortableStrategyItem>
@@ -3239,10 +3409,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         overrideDisabled
                                       )
                                     }
-                                    onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={
-                                      env.environmentId === selectedEnvironment
+                                    onChangeDetected={() =>
+                                      setFlagDraftStatus({ hasDraft: true })
                                     }
+                                    onGoToPayloadTab={() => setTabValue(1)}
+                                    defaultExpanded={true}
                                   />
                                 </>
                               )}
@@ -3524,26 +3695,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                       if (!flag) return;
                       try {
                         setSaving(true);
-                        await api.put(
-                          `${projectApiPath}/features/${flag.flagName}`,
-                          {
-                            enabledValue: flag.enabledValue,
-                            disabledValue: flag.disabledValue,
-                            validationRules: flag.validationRules ?? null,
-                            isGlobal: true,
-                          }
-                        );
-                        setOriginalFlag((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                enabledValue: flag.enabledValue,
-                                disabledValue: flag.disabledValue,
-                                validationRules: flag.validationRules,
-                              }
-                            : prev
-                        );
-                        enqueueSnackbar(t('common.saveSuccess'), {
+                        await saveGlobalChangesToDraft({
+                          enabledValue: flag.enabledValue,
+                          disabledValue: flag.disabledValue,
+                          validationRules: flag.validationRules ?? null,
+                        });
+                        enqueueSnackbar(t('draft.saveSuccess'), {
                           variant: 'success',
                         });
                       } catch (error: any) {
@@ -3830,16 +3987,25 @@ const FeatureFlagDetailPage: React.FC = () => {
                   if (!flag || !editingFlagData) return;
                   try {
                     setSaving(true);
+                    // Save metadata (displayName, description, tags) directly
                     await api.put(
                       `${projectApiPath}/features/${flag.flagName}`,
                       {
                         displayName: editingFlagData.displayName,
                         description: editingFlagData.description,
-                        impressionDataEnabled:
-                          editingFlagData.impressionDataEnabled,
                         tags: editingFlagData.tags,
                       }
                     );
+                    // impressionDataEnabled affects SDK → save to draft
+                    if (
+                      editingFlagData.impressionDataEnabled !==
+                      flag.impressionDataEnabled
+                    ) {
+                      await saveGlobalChangesToDraft({
+                        impressionDataEnabled:
+                          editingFlagData.impressionDataEnabled,
+                      });
+                    }
                     setFlag({
                       ...flag,
                       displayName: editingFlagData.displayName,
@@ -4946,6 +5112,17 @@ const FeatureFlagDetailPage: React.FC = () => {
         initialFlags={flag?.flagName ? [flag.flagName] : []}
         initialEnvironments={playgroundInitialEnvironments}
       />
+
+      {/* Draft Changes Preview Dialog */}
+      {flag && (
+        <DraftChangesDialog
+          open={draftChangesDialogOpen}
+          onClose={() => setDraftChangesDialogOpen(false)}
+          targetTypes={['feature_flag', 'segment']}
+          environments={environments}
+          projectApiPath={projectApiPath}
+        />
+      )}
     </Box>
   );
 };

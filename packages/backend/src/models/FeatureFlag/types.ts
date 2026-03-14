@@ -118,6 +118,34 @@ export interface FeatureFlagEnvironmentAttributes {
   version?: number;
 }
 
+// Draft data snapshot for staged changes
+export interface FeatureFlagDraftData {
+  // Environment-level value overrides
+  overrideEnabledValue?: boolean;
+  overrideDisabledValue?: boolean;
+  enabledValue?: any;
+  disabledValue?: any;
+  // Strategies snapshot
+  strategies?: Array<{
+    id?: string;
+    strategyName: string;
+    title?: string;
+    parameters?: StrategyParameters;
+    constraints?: Constraint[];
+    segments?: string[];
+    sortOrder: number;
+    isEnabled: boolean;
+  }>;
+  // Variants snapshot
+  variants?: Array<{
+    id?: string;
+    variantName: string;
+    weight: number;
+    value?: any;
+    valueType: ValueType;
+  }>;
+}
+
 // Strategy - now includes environment
 export interface FeatureStrategyAttributes {
   id: string;
