@@ -228,10 +228,17 @@ export const formatRelativeTime = (
       return 'Just now';
     }
 
-    if (options?.showSeconds) {
-      const diffSeconds = now.diff(d, 'second');
+    const diffSeconds = now.diff(d, 'second');
 
-      // Less than 60 seconds: show exact seconds
+    // Within 5 minutes: show "just now"
+    if (diffSeconds >= 0 && diffSeconds < 300) {
+      if (lang === 'ko') return '방금 전';
+      if (lang === 'zh-cn' || lang === 'zh') return '刚刚';
+      return 'Just now';
+    }
+
+    if (options?.showSeconds) {
+      // Less than 60 seconds: show exact seconds (only reached if threshold above is changed)
       if (diffSeconds >= 0 && diffSeconds < 60) {
         if (lang === 'ko') return `${diffSeconds}초 전`;
         if (lang === 'zh-cn' || lang === 'zh') return `${diffSeconds}秒前`;

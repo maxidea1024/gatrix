@@ -1985,7 +1985,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         <Box sx={{ flex: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="h5" fontWeight={600}>
-              {flag.displayName || flag.flagName}
+              {flag.flagName}
             </Typography>
             {flag.isArchived && (
               <Chip
@@ -2021,6 +2021,54 @@ const FeatureFlagDetailPage: React.FC = () => {
             </Typography>
           )}
         </Box>
+        {/* Draft publish/discard buttons (right-aligned in header) */}
+        {!isCreating && flagDraftStatus.hasDraft && canManage && (
+          <DraftBanner
+            hasDraft={flagDraftStatus.hasDraft}
+            updatedAt={flagDraftStatus.updatedAt}
+            canManage={canManage}
+            onPublish={async () => {
+              try {
+                await draftService.publishDraft(
+                  'feature_flag',
+                  flag.id,
+                  projectApiPath
+                );
+                enqueueSnackbar(t('draft.publishSuccess'), {
+                  variant: 'success',
+                });
+                await loadFlag(undefined, false);
+                await loadEnvStrategies(environments, flag.flagName);
+                await loadFlagDraftStatus(flag.id);
+              } catch (error: any) {
+                enqueueSnackbar(
+                  parseApiErrorMessage(error, 'draft.publishFailed'),
+                  { variant: 'error' }
+                );
+              }
+            }}
+            onDiscard={async () => {
+              try {
+                await draftService.discardDraft(
+                  'feature_flag',
+                  flag.id,
+                  projectApiPath
+                );
+                enqueueSnackbar(t('draft.discardSuccess'), {
+                  variant: 'success',
+                });
+                await loadFlag(undefined, false);
+                await loadEnvStrategies(environments, flag.flagName);
+                await loadFlagDraftStatus(flag.id);
+              } catch (error: any) {
+                enqueueSnackbar(
+                  parseApiErrorMessage(error, 'draft.discardFailed'),
+                  { variant: 'error' }
+                );
+              }
+            }}
+          />
+        )}
       </Box>
 
       {/* Tabs */}
@@ -2557,53 +2605,6 @@ const FeatureFlagDetailPage: React.FC = () => {
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <PageContentLoader loading={envLoading}>
               <Stack spacing={2} sx={{ minWidth: 0 }}>
-                {/* Flag-level Draft Banner */}
-                <DraftBanner
-                  hasDraft={flagDraftStatus.hasDraft}
-                  updatedAt={flagDraftStatus.updatedAt}
-                  canManage={canManage}
-                  onPublish={async () => {
-                    try {
-                      await draftService.publishDraft(
-                        'feature_flag',
-                        flag.id,
-                        projectApiPath
-                      );
-                      enqueueSnackbar(t('draft.publishSuccess'), {
-                        variant: 'success',
-                      });
-                      // Reload flag, strategies, and draft status
-                      await loadFlag();
-                      await loadEnvStrategies(environments, flag.flagName);
-                      await loadFlagDraftStatus(flag.id);
-                    } catch (error: any) {
-                      enqueueSnackbar(
-                        parseApiErrorMessage(error, 'draft.publishFailed'),
-                        { variant: 'error' }
-                      );
-                    }
-                  }}
-                  onDiscard={async () => {
-                    try {
-                      await draftService.discardDraft(
-                        'feature_flag',
-                        flag.id,
-                        projectApiPath
-                      );
-                      enqueueSnackbar(t('draft.discardSuccess'), {
-                        variant: 'success',
-                      });
-                      // Reload strategies from published state and update draft status
-                      await loadEnvStrategies(environments, flag.flagName);
-                      await loadFlagDraftStatus(flag.id);
-                    } catch (error: any) {
-                      enqueueSnackbar(
-                        parseApiErrorMessage(error, 'draft.discardFailed'),
-                        { variant: 'error' }
-                      );
-                    }
-                  }}
-                />
                 {environments.map((env, envIndex) => {
                   // Get environment-specific isEnabled from flag.environments
                   const envSettings = flag.environments?.find(
@@ -3008,9 +3009,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       setFlagDraftStatus({ hasDraft: true })
                                     }
                                     onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={
-                                      env.environmentId === selectedEnvironment
-                                    }
+                                    defaultExpanded={true}
                                   />
                                 </>
                               ) : strategies.length === 0 ? (
@@ -3167,9 +3166,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       setFlagDraftStatus({ hasDraft: true })
                                     }
                                     onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={
-                                      env.environmentId === selectedEnvironment
-                                    }
+                                    defaultExpanded={true}
                                   />
                                 </>
                               ) : (
@@ -3417,9 +3414,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       setFlagDraftStatus({ hasDraft: true })
                                     }
                                     onGoToPayloadTab={() => setTabValue(1)}
-                                    defaultExpanded={
-                                      env.environmentId === selectedEnvironment
-                                    }
+                                    defaultExpanded={true}
                                   />
                                 </>
                               )}
