@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -35,6 +36,7 @@ import {
   Undo as UndoIcon,
   ContentCopy as CopyIcon,
   ViewColumn as ViewColumnIcon,
+  AddCircleOutline as CreateFlagIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -65,6 +67,7 @@ const UnknownFlagsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
+  const navigate = useNavigate();
 
   const [flags, setFlags] = useState<UnknownFlag[]>([]);
   const [loading, setLoading] = useState(true);
@@ -650,9 +653,26 @@ const UnknownFlagsPage: React.FC = () => {
         onClose={handleMenuClose}
       >
         {selectedFlag && !selectedFlag.isResolved && (
+          <MenuItem
+            onClick={() => {
+              if (selectedFlag) {
+                navigate(
+                  `/feature-flags?create=${encodeURIComponent(selectedFlag.flagName)}`
+                );
+              }
+              handleMenuClose();
+            }}
+          >
+            <ListItemIcon>
+              <CreateFlagIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('featureFlags.createFlag')}</ListItemText>
+          </MenuItem>
+        )}
+        {selectedFlag && !selectedFlag.isResolved && (
           <MenuItem onClick={() => handleOpenConfirmDialog('resolve')}>
             <ListItemIcon>
-              <ResolveIcon fontSize="small" color="success" />
+              <ResolveIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText>{t('featureFlags.markResolved')}</ListItemText>
           </MenuItem>
@@ -660,14 +680,14 @@ const UnknownFlagsPage: React.FC = () => {
         {selectedFlag && selectedFlag.isResolved && (
           <MenuItem onClick={() => handleOpenConfirmDialog('unresolve')}>
             <ListItemIcon>
-              <UndoIcon fontSize="small" color="warning" />
+              <UndoIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText>{t('featureFlags.markUnresolved')}</ListItemText>
           </MenuItem>
         )}
         <MenuItem onClick={() => handleOpenConfirmDialog('delete')}>
           <ListItemIcon>
-            <DeleteIcon fontSize="small" color="error" />
+            <DeleteIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t('common.delete')}</ListItemText>
         </MenuItem>

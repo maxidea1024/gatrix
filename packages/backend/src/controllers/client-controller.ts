@@ -653,20 +653,14 @@ export class ClientController {
         // 3. Evaluate
         const results: Record<string, any> = {};
 
-        // If specific flags are requested, check for not found ones
+        // Non-existent flags are simply excluded from the evaluation results
+        // Track missing flags when specific flagNames were requested
+        const missingFlags: string[] = [];
         if (flagNames && flagNames.length > 0) {
           const existingFlagNames = flags.map((f: any) => f.flagName);
           for (const requestedName of flagNames) {
             if (!existingFlagNames.includes(requestedName)) {
-              results[requestedName] = {
-                name: requestedName,
-                enabled: false,
-                variant: {
-                  name: 'disabled',
-                  enabled: false,
-                },
-                matchReason: 'not_found',
-              };
+              missingFlags.push(requestedName);
             }
           }
         }
@@ -747,15 +741,22 @@ export class ClientController {
         const flagsArray = Object.values(results).sort((a, b) =>
           (b.id || '').localeCompare(a.id || '')
         );
+
+        // Build meta with optional missing field
+        const meta: any = {
+          environmentId,
+          evaluatedAt: new Date().toISOString(),
+        };
+        if (missingFlags.length > 0) {
+          meta.missing = missingFlags;
+        }
+
         const responseData = {
           success: true,
           data: {
             flags: flagsArray,
           },
-          meta: {
-            environmentId,
-            evaluatedAt: new Date().toISOString(),
-          },
+          meta,
         };
 
         // Generate ETag from flags data using common utility

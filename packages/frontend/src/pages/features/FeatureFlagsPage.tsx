@@ -227,32 +227,59 @@ const FeatureFlagsPage: React.FC = () => {
   );
   const [selectedFlags, setSelectedFlags] = useState<Set<string>>(new Set());
 
-  // Create dialog state
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  // Create dialog state - auto-open when navigated with ?create=flagName
+  const createFlagNameParam = searchParams.get('create');
+  const [createDialogOpen, setCreateDialogOpen] = useState(
+    !!createFlagNameParam
+  );
   const [createMenuAnchor, setCreateMenuAnchor] = useState<null | HTMLElement>(
     null
   );
   const [creating, setCreating] = useState(false);
   const [showCreateDescription, setShowCreateDescription] = useState(false);
   const [showCreateTags, setShowCreateTags] = useState(false);
-  const [createFlagTypeMode, setCreateFlagTypeMode] = useState(false);
-  const [newFlag, setNewFlag] = useState({
-    flagName: '',
-    displayName: '',
-    description: '',
-    flagType: 'release' as
-      | 'release'
-      | 'experiment'
-      | 'operational'
-      | 'killSwitch'
-      | 'permission'
-      | 'remoteConfig',
-    tags: [] as string[],
-    impressionDataEnabled: false,
-    valueType: 'boolean' as 'boolean' | 'string' | 'number' | 'json',
-    enabledValue: '' as any,
-    disabledValue: '' as any,
-    validationRules: undefined as ValidationRules | undefined,
+  const [createFlagTypeMode, setCreateFlagTypeMode] = useState(
+    !!createFlagNameParam
+  );
+  const [newFlag, setNewFlag] = useState(() => {
+    if (createFlagNameParam) {
+      return {
+        flagName: createFlagNameParam,
+        displayName: toTitleCase(createFlagNameParam),
+        description: '',
+        flagType: 'release' as
+          | 'release'
+          | 'experiment'
+          | 'operational'
+          | 'killSwitch'
+          | 'permission'
+          | 'remoteConfig',
+        tags: [] as string[],
+        impressionDataEnabled: false,
+        valueType: 'string' as 'boolean' | 'string' | 'number' | 'json',
+        enabledValue: '' as any,
+        disabledValue: '' as any,
+        validationRules: undefined as ValidationRules | undefined,
+      };
+    }
+    return {
+      flagName: '',
+      displayName: '',
+      description: '',
+      flagType: 'release' as
+        | 'release'
+        | 'experiment'
+        | 'operational'
+        | 'killSwitch'
+        | 'permission'
+        | 'remoteConfig',
+      tags: [] as string[],
+      impressionDataEnabled: false,
+      valueType: 'boolean' as 'boolean' | 'string' | 'number' | 'json',
+      enabledValue: '' as any,
+      disabledValue: '' as any,
+      validationRules: undefined as ValidationRules | undefined,
+    };
   });
 
   // Sorting state
