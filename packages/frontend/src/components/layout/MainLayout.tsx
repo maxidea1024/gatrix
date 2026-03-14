@@ -599,16 +599,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
   }, [hasEnvironmentAccess, currentEnvironmentId, loadPendingCRCount]);
 
-  // Load global draft count
+  // Load global draft count (all target types)
   const loadDraftCount = useCallback(async () => {
     if (!hasAnyPermissions) return;
     try {
       const projectApiPath = getProjectApiPath();
-      const drafts = await draftService.listDrafts(
-        'feature_flag',
-        projectApiPath
-      );
-      setGlobalDraftCount(drafts.length);
+      const [flagDrafts, segmentDrafts] = await Promise.all([
+        draftService.listDrafts('feature_flag', projectApiPath),
+        draftService.listDrafts('segment', projectApiPath),
+      ]);
+      setGlobalDraftCount(flagDrafts.length + segmentDrafts.length);
     } catch {
       // Silently fail
     }
@@ -2477,19 +2477,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               onPublish={async () => {
                 try {
                   const projectApiPath = getProjectApiPath();
-                  const drafts = await draftService.listDrafts(
-                    'feature_flag',
-                    projectApiPath
-                  );
-                  await Promise.all(
-                    drafts.map((d) =>
-                      draftService.publishDraft(
-                        'feature_flag',
-                        d.targetId,
-                        projectApiPath
-                      )
-                    )
-                  );
+                  const [flagDrafts, segDrafts] = await Promise.all([
+                    draftService.listDrafts('feature_flag', projectApiPath),
+                    draftService.listDrafts('segment', projectApiPath),
+                  ]);
+                  await Promise.all([
+                    ...flagDrafts.map((d) =>
+                      draftService.publishDraft('feature_flag', d.targetId, projectApiPath)
+                    ),
+                    ...segDrafts.map((d) =>
+                      draftService.publishDraft('segment', d.targetId, projectApiPath)
+                    ),
+                  ]);
                   setGlobalDraftCount(0);
                   enqueueSnackbar(t('draft.publishSuccess'), {
                     variant: 'success',
@@ -2504,19 +2503,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               onDiscard={async () => {
                 try {
                   const projectApiPath = getProjectApiPath();
-                  const drafts = await draftService.listDrafts(
-                    'feature_flag',
-                    projectApiPath
-                  );
-                  await Promise.all(
-                    drafts.map((d) =>
-                      draftService.discardDraft(
-                        'feature_flag',
-                        d.targetId,
-                        projectApiPath
-                      )
-                    )
-                  );
+                  const [flagDrafts, segDrafts] = await Promise.all([
+                    draftService.listDrafts('feature_flag', projectApiPath),
+                    draftService.listDrafts('segment', projectApiPath),
+                  ]);
+                  await Promise.all([
+                    ...flagDrafts.map((d) =>
+                      draftService.discardDraft('feature_flag', d.targetId, projectApiPath)
+                    ),
+                    ...segDrafts.map((d) =>
+                      draftService.discardDraft('segment', d.targetId, projectApiPath)
+                    ),
+                  ]);
                   setGlobalDraftCount(0);
                   enqueueSnackbar(t('draft.discardSuccess'), {
                     variant: 'success',
@@ -2538,7 +2536,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <DraftChangesDialog
           open={draftChangesOpen}
           onClose={() => setDraftChangesOpen(false)}
-          targetType="feature_flag"
+          targetTypes={['feature_flag', 'segment']}
           environments={environments.map((e) => ({
             environmentId: e.environmentId,
             displayName: e.displayName,

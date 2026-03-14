@@ -5118,7 +5118,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         <DraftChangesDialog
           open={draftChangesDialogOpen}
           onClose={() => setDraftChangesDialogOpen(false)}
-          targetType="feature_flag"
+          targetTypes={['feature_flag', 'segment']}
           environments={environments}
           projectApiPath={projectApiPath}
         />

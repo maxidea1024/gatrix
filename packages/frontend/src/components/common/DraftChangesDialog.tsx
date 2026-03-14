@@ -39,8 +39,8 @@ interface Environment {
 interface DraftChangesDialogProps {
   open: boolean;
   onClose: () => void;
-  // Target type (e.g. 'feature_flag')
-  targetType: string;
+  // Target types to show (e.g. ['feature_flag', 'segment'])
+  targetTypes: string[];
   environments: Environment[];
   projectApiPath: string;
 }
@@ -247,6 +247,7 @@ function buildEnvChanges(
 interface TargetDiff {
   targetId: string;
   targetName: string;
+  targetType: string;
   envDiffs: Array<{ envId: string; envName: string; changes: React.ReactNode[] }>;
 }
 
@@ -258,7 +259,7 @@ function buildTargetDiff(
   publishedData: any,
   environments: Environment[],
   t: (key: string, fallback?: any) => string
-): TargetDiff | null {
+): Omit<TargetDiff, 'targetType'> | null {
   const draft = draftData || {};
   const published = publishedData || {};
   const envDiffs: TargetDiff['envDiffs'] = [];
@@ -290,7 +291,7 @@ function buildTargetDiff(
 const DraftChangesDialog: React.FC<DraftChangesDialogProps> = ({
   open,
   onClose,
-  targetType,
+  targetTypes,
   environments,
   projectApiPath,
 }) => {
@@ -308,18 +309,35 @@ const DraftChangesDialog: React.FC<DraftChangesDialogProps> = ({
       setError(null);
       try {
         const results: TargetDiff[] = [];
-        const drafts = await draftService.listDrafts(targetType, projectApiPath);
-        for (const draft of drafts) {
-          const name = (draft as any).targetDisplayName || draft.targetId;
-          const diff = buildTargetDiff(
-            draft.targetId,
-            name,
-            draft.draftData,
-            (draft as any).publishedData,
-            environments,
-            t
-          );
-          if (diff) results.push(diff);
+        for (const tt of targetTypes) {
+          const drafts = await draftService.listDrafts(tt, projectApiPath);
+          for (const draft of drafts) {
+            const name = (draft as any).targetDisplayName || draft.targetId;
+            // Segments have no env grouping — compare flat fields
+            if (tt === 'segment') {
+              const draftData = draft.draftData || {};
+              const pubData = (draft as any).publishedData || {};
+              const changes = buildEnvChanges(draftData, pubData, t);
+              if (changes.length > 0) {
+                results.push({
+                  targetId: draft.targetId,
+                  targetName: name,
+                  targetType: tt,
+                  envDiffs: [{ envId: '_direct', envName: t('segments.title'), changes }],
+                });
+              }
+            } else {
+              const diff = buildTargetDiff(
+                draft.targetId,
+                name,
+                draft.draftData,
+                (draft as any).publishedData,
+                environments,
+                t
+              );
+              if (diff) results.push({ ...diff, targetType: tt });
+            }
+          }
         }
         setTargetDiffs(results);
       } catch {
@@ -329,7 +347,7 @@ const DraftChangesDialog: React.FC<DraftChangesDialogProps> = ({
       }
     };
     fetchAndDiff();
-  }, [open, targetType, projectApiPath, t, environments]);
+  }, [open, targetTypes, projectApiPath, t, environments]);
 
   // Count total changes
   const totalChanges = targetDiffs.reduce(
@@ -337,10 +355,14 @@ const DraftChangesDialog: React.FC<DraftChangesDialogProps> = ({
     0
   );
 
-  // Navigate to flag detail page
-  const handleFlagClick = (flagName: string) => {
+  // Navigate to target detail page
+  const handleTargetClick = (targetType: string, targetName: string) => {
     onClose();
-    navigate(`/feature-flags/${flagName}`);
+    if (targetType === 'segment') {
+      navigate('/segments');
+    } else {
+      navigate(`/feature-flags/${targetName}`);
+    }
   };
 
   return (
@@ -364,14 +386,14 @@ const DraftChangesDialog: React.FC<DraftChangesDialogProps> = ({
               <Alert severity="info">{t('draft.changes.noChanges')}</Alert>
             ) : (
               <Stack spacing={2}>
-                {targetDiffs.map(({ targetId: tid, targetName: tName, envDiffs }) => (
-                  <Paper key={tid} variant="outlined" sx={{ p: 2 }}>
+                {targetDiffs.map(({ targetId: tid, targetName: tName, targetType: tType, envDiffs }) => (
+                  <Paper key={`${tType}-${tid}`} variant="outlined" sx={{ p: 2 }}>
                     <Link
                       component="button"
                       variant="subtitle1"
                       fontWeight={700}
                       underline="hover"
-                      onClick={() => handleFlagClick(tName)}
+                      onClick={() => handleTargetClick(tType, tName)}
                       sx={{ cursor: 'pointer', mb: 1, display: 'block', textAlign: 'left' }}
                     >
                       {tName}

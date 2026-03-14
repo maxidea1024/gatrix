@@ -15,7 +15,9 @@ import { DraftService } from '../../services/draft-service';
 
 // Register all draft handlers
 import { registerFeatureFlagDraftHandler } from '../../services/draft-handlers/feature-flag-draft-handler';
+import { registerSegmentDraftHandler } from '../../services/draft-handlers/segment-draft-handler';
 registerFeatureFlagDraftHandler();
+registerSegmentDraftHandler();
 
 const router = Router();
 

@@ -73,6 +73,7 @@ import { tagService } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import * as draftService from '@/services/draftService';
 
 interface FeatureSegment {
   id: string;
@@ -451,12 +452,22 @@ const FeatureSegmentsPage: React.FC = () => {
     if (!editingSegment) return;
     try {
       if (editingSegment.id) {
-        await api.put(
-          `${projectApiPath}/features/segments/${editingSegment.id}`,
-          editingSegment
+        // Save to draft instead of directly updating
+        const draftData: any = {};
+        if (editingSegment.displayName !== undefined) draftData.displayName = editingSegment.displayName;
+        if (editingSegment.description !== undefined) draftData.description = editingSegment.description;
+        if (editingSegment.constraints !== undefined) draftData.constraints = editingSegment.constraints;
+        if (editingSegment.isActive !== undefined) draftData.isActive = editingSegment.isActive;
+        if (editingSegment.tags !== undefined) draftData.tags = editingSegment.tags;
+        await draftService.saveDraft(
+          'segment',
+          editingSegment.id,
+          draftData,
+          projectApiPath
         );
-        enqueueSnackbar(t('featureFlags.segmentUpdateSuccess'), {
-          variant: 'success',
+        window.dispatchEvent(new Event('draft-changed'));
+        enqueueSnackbar(t('featureFlags.draftSaved'), {
+          variant: 'info',
         });
       } else {
         await api.post(`${projectApiPath}/features/segments`, {
@@ -737,12 +748,19 @@ const FeatureSegmentsPage: React.FC = () => {
                                         )
                                       );
                                       try {
-                                        await api.put(
-                                          `${projectApiPath}/features/segments/${segment.id}`,
-                                          {
-                                            isActive: newActive,
-                                          }
+                                        // Save to draft instead of directly updating
+                                        const { draftData } = await draftService.getDraft(
+                                          'segment',
+                                          segment.id,
+                                          projectApiPath
                                         );
+                                        await draftService.saveDraft(
+                                          'segment',
+                                          segment.id,
+                                          { ...draftData, isActive: newActive },
+                                          projectApiPath
+                                        );
+                                        window.dispatchEvent(new Event('draft-changed'));
                                       } catch (error: any) {
                                         setAllSegments((prev) =>
                                           prev.map((s) =>
