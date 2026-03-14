@@ -34,9 +34,7 @@ const featureFlagDraftHandler = {
     _environmentId?: string
   ): Promise<Record<string, any>> {
     // Get flag base data
-    const flag = await db('g_feature_flags')
-      .where('id', targetId)
-      .first();
+    const flag = await db('g_feature_flags').where('id', targetId).first();
     if (!flag) {
       throw new Error(`Feature flag '${targetId}' not found`);
     }
@@ -48,17 +46,15 @@ const featureFlagDraftHandler = {
     const snapshot: Record<string, any> = {};
 
     for (const env of envSettings) {
-      const strategies =
-        await FeatureStrategyModel.findByFlagIdAndEnvironment(
-          targetId,
-          env.environmentId
-        );
+      const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
+        targetId,
+        env.environmentId
+      );
 
-      const variants =
-        await FeatureVariantModel.findByFlagIdAndEnvironment(
-          targetId,
-          env.environmentId
-        );
+      const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(
+        targetId,
+        env.environmentId
+      );
 
       snapshot[env.environmentId] = {
         isEnabled: env.isEnabled ?? false,
@@ -66,18 +62,18 @@ const featureFlagDraftHandler = {
         overrideDisabledValue: env.overrideDisabledValue ?? false,
         enabledValue: env.overrideEnabledValue
           ? env.enabledValue
-          : (flag.enabledValue != null
-              ? (typeof flag.enabledValue === 'string'
-                  ? JSON.parse(flag.enabledValue)
-                  : flag.enabledValue)
-              : undefined),
+          : flag.enabledValue != null
+            ? typeof flag.enabledValue === 'string'
+              ? JSON.parse(flag.enabledValue)
+              : flag.enabledValue
+            : undefined,
         disabledValue: env.overrideDisabledValue
           ? env.disabledValue
-          : (flag.disabledValue != null
-              ? (typeof flag.disabledValue === 'string'
-                  ? JSON.parse(flag.disabledValue)
-                  : flag.disabledValue)
-              : undefined),
+          : flag.disabledValue != null
+            ? typeof flag.disabledValue === 'string'
+              ? JSON.parse(flag.disabledValue)
+              : flag.disabledValue
+            : undefined,
         strategies: strategies.map((s) => ({
           id: s.id,
           strategyName: s.strategyName,
@@ -208,8 +204,7 @@ const featureFlagDraftHandler = {
 
           if (draftStrategy.segments && draftStrategy.segments.length > 0) {
             for (const segmentName of draftStrategy.segments) {
-              const segment =
-                await FeatureSegmentModel.findByName(segmentName);
+              const segment = await FeatureSegmentModel.findByName(segmentName);
               if (segment) {
                 await db('g_feature_flag_segments').insert({
                   id: ulid(),
@@ -225,10 +220,7 @@ const featureFlagDraftHandler = {
 
       // Replace variants
       if (envData.variants !== undefined) {
-        await FeatureVariantModel.deleteByFlagIdAndEnvironment(
-          targetId,
-          envId
-        );
+        await FeatureVariantModel.deleteByFlagIdAndEnvironment(targetId, envId);
 
         for (const draftVariant of envData.variants) {
           await FeatureVariantModel.create({
@@ -253,6 +245,17 @@ const featureFlagDraftHandler = {
     );
 
     return { flagId: targetId, environments: Object.keys(draftData) };
+  },
+
+  /**
+   * Get flag name for display
+   */
+  async getDisplayName(targetId: string): Promise<string | null> {
+    const flag = await db('g_feature_flags')
+      .select('flagName')
+      .where('id', targetId)
+      .first();
+    return flag?.flagName || null;
   },
 };
 

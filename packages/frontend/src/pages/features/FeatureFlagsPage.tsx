@@ -133,6 +133,7 @@ import {
 } from '../../services/releaseFlowService';
 import draftService from '../../services/draftService';
 import DraftBanner from '../../components/common/DraftBanner';
+import DraftChangesDialog from '../../components/common/DraftChangesDialog';
 
 interface FlagTypeInfo {
   flagType: string;
@@ -300,7 +301,9 @@ const FeatureFlagsPage: React.FC = () => {
   const [newFlagJsonError, setNewFlagJsonError] = useState<string | null>(null);
 
   // Draft tracking: which flags have pending drafts
-  const [flagDraftMap, setFlagDraftMap] = useState<{ [flagId: string]: boolean }>({});
+  const [flagDraftMap, setFlagDraftMap] = useState<{
+    [flagId: string]: boolean;
+  }>({});
 
   // Column settings state
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
@@ -1020,6 +1023,7 @@ const FeatureFlagsPage: React.FC = () => {
 
       // Track which flags have drafts
       setFlagDraftMap((prev) => ({ ...prev, [flag.id]: true }));
+      window.dispatchEvent(new Event('draft-changed'));
 
       const envDisplayName =
         environments.find((e) => e.environmentId === environmentId)
@@ -1064,6 +1068,7 @@ const FeatureFlagsPage: React.FC = () => {
     .filter(([, has]) => has)
     .map(([id]) => id);
   const draftCount = draftFlagIds.length;
+  const [draftChangesOpen, setDraftChangesOpen] = useState(false);
 
   // Publish all pending drafts at once
   const handlePublishAllDrafts = async () => {
@@ -1466,24 +1471,31 @@ const FeatureFlagsPage: React.FC = () => {
 
     try {
       for (const flag of targetFlags) {
-        await featureFlagService.toggleFeatureFlag(
-          flag.flagName,
-          enable,
-          environmentId,
+        // Save to draft instead of directly toggling
+        const { draftData } = await draftService.getDraft(
+          'feature_flag',
+          flag.id,
           projectApiPath
         );
+        const currentEnvData = draftData[environmentId] || {};
+        const mergedDraft = {
+          ...draftData,
+          [environmentId]: { ...currentEnvData, isEnabled: enable },
+        };
+        await draftService.saveDraft(
+          'feature_flag',
+          flag.id,
+          mergedDraft,
+          projectApiPath
+        );
+        setFlagDraftMap((prev) => ({ ...prev, [flag.id]: true }));
       }
+      window.dispatchEvent(new Event('draft-changed'));
       enqueueSnackbar(
-        enable
-          ? t('featureFlags.bulkEnableSuccess', {
-              count: targetFlags.length,
-              env: environmentId,
-            })
-          : t('featureFlags.bulkDisableSuccess', {
-              count: targetFlags.length,
-              env: environmentId,
-            }),
-        { variant: enable ? 'success' : 'warning' }
+        t('featureFlags.bulkDraftSaved', {
+          count: targetFlags.length,
+        }),
+        { variant: 'info' }
       );
       setSelectedFlags(new Set());
       loadFlags();
@@ -1889,15 +1901,6 @@ const FeatureFlagsPage: React.FC = () => {
           </Box>
         </CardContent>
       </Card>
-
-      {/* Consolidated Draft Banner */}
-      {draftCount > 0 && (
-        <DraftBanner
-          hasDraft={true}
-          onPublish={handlePublishAllDrafts}
-          onDiscard={handleDiscardAllDrafts}
-        />
-      )}
 
       {/* Table / Compact View */}
       <PageContentLoader loading={loading && isInitialLoad}>

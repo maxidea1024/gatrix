@@ -39,6 +39,11 @@ export interface DraftHandler {
     targetId: string,
     draftData: any
   ): Promise<{ valid: boolean; errors?: string[] }>;
+
+  /**
+   * (Optional) Get display name for a target
+   */
+  getDisplayName?(targetId: string): Promise<string | null>;
 }
 
 export interface DraftRecord {
@@ -130,6 +135,32 @@ export class DraftService {
     const handler = getHandler(targetType);
     const snapshot = await handler.createSnapshot(targetId, environmentId);
     return { draftData: snapshot, isExisting: false };
+  }
+
+  /**
+   * Get published (live) snapshot from registered handler
+   */
+  static async getPublishedSnapshot(
+    targetType: string,
+    targetId: string,
+    environmentId?: string
+  ): Promise<any> {
+    const handler = getHandler(targetType);
+    return handler.createSnapshot(targetId, environmentId);
+  }
+
+  /**
+   * Get display name for a target (delegates to handler)
+   */
+  static async getTargetDisplayName(
+    targetType: string,
+    targetId: string
+  ): Promise<string | null> {
+    const handler = getHandler(targetType);
+    if (handler.getDisplayName) {
+      return handler.getDisplayName(targetId);
+    }
+    return null;
   }
 
   /**

@@ -24,6 +24,7 @@ export interface DraftRecord {
 export interface DraftSnapshotResponse {
   draftData: any;
   hasDraft: boolean;
+  publishedData?: any;
 }
 
 // ==================== Service ====================

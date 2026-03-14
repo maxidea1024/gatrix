@@ -323,7 +323,7 @@ async function createDefaultContextFields(projectId: string) {
     },
     {
       fieldName: 'country',
-      fieldType: 'string',
+      fieldType: 'country',
       description: 'Country code',
       stickiness: false,
       isDefaultStickinessField: false,
@@ -450,7 +450,7 @@ async function createSampleReleaseFlows(createdBy: string) {
           constraints: [
             {
               contextName: 'appName',
-              operator: 'IN',
+              operator: 'str_in',
               values: ['Gatrix-Admin'],
             },
           ],

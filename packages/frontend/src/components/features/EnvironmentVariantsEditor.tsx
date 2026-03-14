@@ -7,7 +7,13 @@
  * - Explicit save button for applying changes
  * - Shows guidance to flag values tab when valueType is set
  */
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import { alpha, styled } from '@mui/material/styles';
 import {
   Box,
@@ -842,7 +848,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             updateValue(e.target.value === '' ? 0 : Number(e.target.value))
           }
           disabled={!isActuallyEditable}
-          sx={viewOnlyStyle}
+          sx={{
+            ...viewOnlyStyle,
+            '& input[type=number]': { MozAppearance: 'textfield' },
+            '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
+              { WebkitAppearance: 'none', margin: 0 },
+          }}
         />
       );
     }
@@ -1167,6 +1178,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                             }
                             disabled={!canManage || isArchived}
                             InputProps={{ sx: { height: 36 } }}
+                            sx={{
+                              '& input[type=number]': {
+                                MozAppearance: 'textfield',
+                              },
+                              '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
+                                { WebkitAppearance: 'none', margin: 0 },
+                            }}
                           />
                         )}
                       </Box>
@@ -1186,7 +1204,15 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                           disabled={
                             !canManage || isArchived || !useFixedWeightVariants
                           }
-                          sx={{ width: 90, flexShrink: 0 }}
+                          sx={{
+                            width: 90,
+                            flexShrink: 0,
+                            '& input[type=number]': {
+                              MozAppearance: 'textfield',
+                            },
+                            '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
+                              { WebkitAppearance: 'none', margin: 0 },
+                          }}
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position="end">%</InputAdornment>
@@ -1342,8 +1368,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 />
               </Box>
             </Stack>
-
-
           </Box>
         )}
       </Collapse>

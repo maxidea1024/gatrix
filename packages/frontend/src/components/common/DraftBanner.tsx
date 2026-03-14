@@ -1,8 +1,8 @@
 /**
  * DraftBanner
  *
- * Displays a banner indicating that a draft exists for a resource.
- * Shows Publish and Discard buttons with loading states.
+ * Displays a compact banner indicating that a draft exists for a resource.
+ * Shows Publish, View Changes, and Discard buttons with loading states.
  */
 import React, { useState } from 'react';
 import {
@@ -16,9 +16,9 @@ import {
   Publish as PublishIcon,
   DeleteOutline as DiscardIcon,
   Edit as EditIcon,
+  Visibility as ViewIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { formatRelativeTime } from '../../utils/dateFormat';
 
 interface DraftBannerProps {
   /** Whether this resource has a saved draft */
@@ -33,16 +33,17 @@ interface DraftBannerProps {
   onPublish: () => Promise<void>;
   /** Called when user clicks Discard */
   onDiscard: () => Promise<void>;
+  /** Called when user clicks View Changes */
+  onViewChanges?: () => void;
   /** Whether user has permission to manage */
   canManage?: boolean;
 }
 
 const DraftBanner: React.FC<DraftBannerProps> = ({
   hasDraft,
-  flagName,
-  updatedAt,
   onPublish,
   onDiscard,
+  onViewChanges,
   canManage = true,
 }) => {
   const { t } = useTranslation();
@@ -100,11 +101,32 @@ const DraftBanner: React.FC<DraftBannerProps> = ({
           gap: 1.5,
         }}
       >
-        <Typography variant="body2" sx={{ fontWeight: 500, whiteSpace: 'nowrap' }}>
+        <Typography
+          variant="body2"
+          sx={{ fontWeight: 500, whiteSpace: 'nowrap' }}
+        >
           {t('draft.unpublishedChanges')}
         </Typography>
         {canManage && (
           <Box sx={{ display: 'flex', gap: 0.75 }}>
+            {onViewChanges && (
+              <Button
+                size="small"
+                variant="outlined"
+                color="info"
+                startIcon={<ViewIcon sx={{ fontSize: 16 }} />}
+                onClick={onViewChanges}
+                disabled={busy}
+                sx={{
+                  textTransform: 'none',
+                  fontSize: '0.8rem',
+                  py: 0.25,
+                  px: 1.5,
+                }}
+              >
+                {t('draft.viewChanges')}
+              </Button>
+            )}
             <Button
               size="small"
               variant="contained"
@@ -118,7 +140,12 @@ const DraftBanner: React.FC<DraftBannerProps> = ({
               }
               onClick={handlePublish}
               disabled={busy}
-              sx={{ textTransform: 'none', fontSize: '0.8rem', py: 0.25, px: 1.5 }}
+              sx={{
+                textTransform: 'none',
+                fontSize: '0.8rem',
+                py: 0.25,
+                px: 1.5,
+              }}
             >
               {t('draft.publish')}
             </Button>
@@ -135,7 +162,12 @@ const DraftBanner: React.FC<DraftBannerProps> = ({
               }
               onClick={handleDiscard}
               disabled={busy}
-              sx={{ textTransform: 'none', fontSize: '0.8rem', py: 0.25, px: 1.5 }}
+              sx={{
+                textTransform: 'none',
+                fontSize: '0.8rem',
+                py: 0.25,
+                px: 1.5,
+              }}
             >
               {t('draft.discard')}
             </Button>

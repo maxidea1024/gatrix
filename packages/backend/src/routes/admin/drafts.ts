@@ -19,7 +19,7 @@ registerFeatureFlagDraftHandler();
 
 const router = Router();
 
-// List drafts for a target type
+// List drafts for a target type (with published snapshots for diff)
 router.get(
   '/:targetType',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -27,7 +27,22 @@ router.get(
 
     const drafts = await DraftService.listDrafts(targetType);
 
-    res.json({ success: true, data: { drafts } });
+    // Attach published snapshot and display name for each draft
+    const draftsWithPublished = await Promise.all(
+      drafts.map(async (draft) => {
+        const publishedData = await DraftService.getPublishedSnapshot(
+          targetType,
+          draft.targetId
+        );
+        const targetDisplayName = await DraftService.getTargetDisplayName(
+          targetType,
+          draft.targetId
+        );
+        return { ...draft, publishedData, targetDisplayName };
+      })
+    );
+
+    res.json({ success: true, data: { drafts: draftsWithPublished } });
   })
 );
 
@@ -37,16 +52,23 @@ router.get(
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { targetType, targetId } = req.params;
 
-    const result = await DraftService.getOrCreateSnapshot(
-      targetType,
-      targetId
-    );
+    const result = await DraftService.getOrCreateSnapshot(targetType, targetId);
+
+    // When a draft exists, also return the published snapshot for diff comparison
+    let publishedData: any = null;
+    if (result.isExisting) {
+      publishedData = await DraftService.getPublishedSnapshot(
+        targetType,
+        targetId
+      );
+    }
 
     res.json({
       success: true,
       data: {
         draftData: result.draftData,
         hasDraft: result.isExisting,
+        publishedData,
       },
     });
   })
@@ -96,12 +118,7 @@ router.post(
     const { targetType, targetId } = req.params;
     const userId = req.user?.id;
 
-    await DraftService.discardDraft(
-      targetType,
-      targetId,
-      undefined,
-      userId!
-    );
+    await DraftService.discardDraft(targetType, targetId, undefined, userId!);
 
     res.json({ success: true, message: 'Draft discarded successfully' });
   })

@@ -157,7 +157,21 @@ import { ValidationRules } from '../../services/featureFlagService';
 import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
 import PageContentLoader from '../../components/common/PageContentLoader';
 import DraftBanner from '../../components/common/DraftBanner';
+import DraftChangesDialog from '../../components/common/DraftChangesDialog';
 import * as draftService from '../../services/draftService';
+
+// Deep equality check for draft coalescing
+function deepEqualDraft(a: any, b: any): boolean {
+  if (a === b) return true;
+  if (a == null || b == null) return a == b;
+  if (typeof a !== typeof b) return false;
+  if (typeof a !== 'object') return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every((key) => deepEqualDraft(a[key], b[key]));
+}
 
 // Playground panel constants (outside component for stable references)
 const PLAYGROUND_VISIBLE_KEY = 'gatrix.embeddedPlaygroundVisible';
@@ -545,6 +559,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     hasDraft: boolean;
     updatedAt?: string;
   }>({ hasDraft: false });
+  const [draftChangesDialogOpen, setDraftChangesDialogOpen] = useState(false);
 
   // Release flow plan summaries - to detect environments managed by release flow
   const { data: releaseFlowPlans, mutate: mutateReleaseFlowPlans } =
@@ -1402,7 +1417,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     if (!flag) return;
 
     // Get current draft or create snapshot from published state
-    const { draftData } = await draftService.getDraft(
+    const { draftData, publishedData } = await draftService.getDraft(
       'feature_flag',
       flag.id,
       projectApiPath
@@ -1410,18 +1425,54 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     // Merge updates into the specific environment's data within the draft
     const currentEnvData = draftData[envId] || {};
-    const mergedDraft = {
-      ...draftData,
-      [envId]: { ...currentEnvData, ...updates },
-    };
+    const mergedEnvData = { ...currentEnvData, ...updates };
 
-    // Save to draft
-    await draftService.saveDraft(
-      'feature_flag',
-      flag.id,
-      mergedDraft,
-      projectApiPath
-    );
+    // Coalescing: remove fields that match the published state
+    const pubEnvData = publishedData?.[envId] || {};
+    const coalescedEnvData: Record<string, any> = {};
+    for (const [key, val] of Object.entries(mergedEnvData)) {
+      // Deep compare with published value
+      if (!deepEqualDraft(val, pubEnvData[key])) {
+        coalescedEnvData[key] = val;
+      }
+    }
+
+    // Build draft without this env if no changes remain
+    const mergedDraft = { ...draftData };
+    if (Object.keys(coalescedEnvData).length > 0) {
+      mergedDraft[envId] = coalescedEnvData;
+    } else {
+      delete mergedDraft[envId];
+    }
+
+    // Check if entire draft is empty (no changes at all)
+    // Remove env keys that have no diff vs published
+    const draftKeys = Object.keys(mergedDraft);
+    let hasAnyChange = false;
+    for (const k of draftKeys) {
+      const pubData = publishedData?.[k] || {};
+      if (!deepEqualDraft(mergedDraft[k], pubData)) {
+        hasAnyChange = true;
+        break;
+      }
+    }
+
+    if (!hasAnyChange) {
+      // No real changes - discard draft entirely
+      await draftService.discardDraft('feature_flag', flag.id, projectApiPath);
+      setFlagDraftStatus({ hasDraft: false });
+    } else {
+      // Save to draft
+      await draftService.saveDraft(
+        'feature_flag',
+        flag.id,
+        mergedDraft,
+        projectApiPath
+      );
+      // Mark draft exists
+      setFlagDraftStatus({ hasDraft: true });
+    }
+    window.dispatchEvent(new Event('draft-changed'));
 
     // Update parent state to keep props in sync with editing state
     if (updates.strategies) {
@@ -1454,9 +1505,6 @@ const FeatureFlagDetailPage: React.FC = () => {
         [envId]: localVariants,
       }));
     }
-
-    // Mark draft exists
-    setFlagDraftStatus({ hasDraft: true });
   };
 
   // Save global (flag-level) settings to draft under the _global key
@@ -2021,54 +2069,6 @@ const FeatureFlagDetailPage: React.FC = () => {
             </Typography>
           )}
         </Box>
-        {/* Draft publish/discard buttons (right-aligned in header) */}
-        {!isCreating && flagDraftStatus.hasDraft && canManage && (
-          <DraftBanner
-            hasDraft={flagDraftStatus.hasDraft}
-            updatedAt={flagDraftStatus.updatedAt}
-            canManage={canManage}
-            onPublish={async () => {
-              try {
-                await draftService.publishDraft(
-                  'feature_flag',
-                  flag.id,
-                  projectApiPath
-                );
-                enqueueSnackbar(t('draft.publishSuccess'), {
-                  variant: 'success',
-                });
-                await loadFlag(undefined, false);
-                await loadEnvStrategies(environments, flag.flagName);
-                await loadFlagDraftStatus(flag.id);
-              } catch (error: any) {
-                enqueueSnackbar(
-                  parseApiErrorMessage(error, 'draft.publishFailed'),
-                  { variant: 'error' }
-                );
-              }
-            }}
-            onDiscard={async () => {
-              try {
-                await draftService.discardDraft(
-                  'feature_flag',
-                  flag.id,
-                  projectApiPath
-                );
-                enqueueSnackbar(t('draft.discardSuccess'), {
-                  variant: 'success',
-                });
-                await loadFlag(undefined, false);
-                await loadEnvStrategies(environments, flag.flagName);
-                await loadFlagDraftStatus(flag.id);
-              } catch (error: any) {
-                enqueueSnackbar(
-                  parseApiErrorMessage(error, 'draft.discardFailed'),
-                  { variant: 'error' }
-                );
-              }
-            }}
-          />
-        )}
       </Box>
 
       {/* Tabs */}
@@ -3311,7 +3311,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                     ) : undefined
                                                   }
                                                   collapsible
-                                                  defaultCollapsed
                                                 />
                                               )}
                                             </SortableStrategyItem>
@@ -5113,6 +5112,17 @@ const FeatureFlagDetailPage: React.FC = () => {
         initialFlags={flag?.flagName ? [flag.flagName] : []}
         initialEnvironments={playgroundInitialEnvironments}
       />
+
+      {/* Draft Changes Preview Dialog */}
+      {flag && (
+        <DraftChangesDialog
+          open={draftChangesDialogOpen}
+          onClose={() => setDraftChangesDialogOpen(false)}
+          targetType="feature_flag"
+          environments={environments}
+          projectApiPath={projectApiPath}
+        />
+      )}
     </Box>
   );
 };
