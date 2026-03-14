@@ -92,23 +92,56 @@ const ToggleChange: React.FC<{
 }> = ({ label, fieldKey, oldVal, newVal, t }) => {
   const isToggle = fieldKey === 'isEnabled';
   const onLabel = isToggle ? t('draft.changes.active') : t('common.enabled');
-  const offLabel = isToggle ? t('draft.changes.inactive') : t('common.disabled');
+  const offLabel = isToggle
+    ? t('draft.changes.inactive')
+    : t('common.disabled');
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-      <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ minWidth: 120 }}>
+      <Typography
+        variant="body2"
+        fontWeight={600}
+        color="text.secondary"
+        sx={{ minWidth: 120 }}
+      >
         {label}
       </Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         {oldVal ? (
-          <Chip icon={<EnabledIcon sx={{ fontSize: 14 }} />} label={onLabel} size="small" color="success" variant="outlined" sx={{ height: 22 }} />
+          <Chip
+            icon={<EnabledIcon sx={{ fontSize: 14 }} />}
+            label={onLabel}
+            size="small"
+            color="success"
+            variant="outlined"
+            sx={{ height: 22 }}
+          />
         ) : (
-          <Chip icon={<DisabledIcon sx={{ fontSize: 14 }} />} label={offLabel} size="small" color="error" variant="outlined" sx={{ height: 22 }} />
+          <Chip
+            icon={<DisabledIcon sx={{ fontSize: 14 }} />}
+            label={offLabel}
+            size="small"
+            color="error"
+            variant="outlined"
+            sx={{ height: 22 }}
+          />
         )}
         <ArrowIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
         {newVal ? (
-          <Chip icon={<EnabledIcon sx={{ fontSize: 14 }} />} label={onLabel} size="small" color="success" sx={{ height: 22 }} />
+          <Chip
+            icon={<EnabledIcon sx={{ fontSize: 14 }} />}
+            label={onLabel}
+            size="small"
+            color="success"
+            sx={{ height: 22 }}
+          />
         ) : (
-          <Chip icon={<DisabledIcon sx={{ fontSize: 14 }} />} label={offLabel} size="small" color="error" sx={{ height: 22 }} />
+          <Chip
+            icon={<DisabledIcon sx={{ fontSize: 14 }} />}
+            label={offLabel}
+            size="small"
+            color="error"
+            sx={{ height: 22 }}
+          />
         )}
       </Box>
     </Box>
@@ -122,15 +155,30 @@ const ValueChange: React.FC<{
   newVal: any;
 }> = ({ label, oldVal, newVal }) => (
   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, py: 0.5 }}>
-    <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ minWidth: 120, flexShrink: 0 }}>
+    <Typography
+      variant="body2"
+      fontWeight={600}
+      color="text.secondary"
+      sx={{ minWidth: 120, flexShrink: 0 }}
+    >
       {label}
     </Typography>
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-      <Typography variant="body2" sx={{ textDecoration: 'line-through', color: 'error.main', wordBreak: 'break-all' }}>
+      <Typography
+        variant="body2"
+        sx={{
+          textDecoration: 'line-through',
+          color: 'error.main',
+          wordBreak: 'break-all',
+        }}
+      >
         {formatValue(oldVal)}
       </Typography>
       <ArrowIcon sx={{ fontSize: 14, color: 'text.disabled', flexShrink: 0 }} />
-      <Typography variant="body2" sx={{ color: 'success.main', fontWeight: 500, wordBreak: 'break-all' }}>
+      <Typography
+        variant="body2"
+        sx={{ color: 'success.main', fontWeight: 500, wordBreak: 'break-all' }}
+      >
         {formatValue(newVal)}
       </Typography>
     </Box>
@@ -156,16 +204,25 @@ const StrategySummary: React.FC<{
   t: (key: string, fallback?: any) => string;
 }> = ({ label, oldStrategies, newStrategies, t }) => (
   <Box sx={{ py: 0.5 }}>
-    <Typography variant="body2" fontWeight={600} color="text.secondary" gutterBottom>
+    <Typography
+      variant="body2"
+      fontWeight={600}
+      color="text.secondary"
+      gutterBottom
+    >
       {label}
     </Typography>
     <Box sx={{ display: 'flex', gap: 3 }}>
       <Box sx={{ flex: 1 }}>
-        <Typography variant="caption" color="error.main" fontWeight={600}>{t('common.before')}</Typography>
+        <Typography variant="caption" color="error.main" fontWeight={600}>
+          {t('common.before')}
+        </Typography>
         <StrategyList strategies={oldStrategies} t={t} />
       </Box>
       <Box sx={{ flex: 1 }}>
-        <Typography variant="caption" color="success.main" fontWeight={600}>{t('common.after')}</Typography>
+        <Typography variant="caption" color="success.main" fontWeight={600}>
+          {t('common.after')}
+        </Typography>
         <StrategyList strategies={newStrategies} t={t} />
       </Box>
     </Box>
@@ -177,16 +234,26 @@ const StrategyList: React.FC<{
   t: (key: string, fallback?: any) => string;
 }> = ({ strategies, t }) => {
   if (!strategies || strategies.length === 0) {
-    return <Typography variant="body2" color="text.secondary" fontStyle="italic">{t('draft.changes.noStrategies')}</Typography>;
+    return (
+      <Typography variant="body2" color="text.secondary" fontStyle="italic">
+        {t('draft.changes.noStrategies')}
+      </Typography>
+    );
   }
   return (
     <Stack spacing={0.25}>
       {strategies.map((s: any, idx: number) => {
-        const name = s.title || t(`featureFlags.strategies.${s.strategyName || s.name}.title`, s.strategyName || s.name || '');
+        const name =
+          s.title ||
+          t(
+            `featureFlags.strategies.${s.strategyName || s.name}.title`,
+            s.strategyName || s.name || ''
+          );
         const rollout = s.parameters?.rollout;
         return (
           <Typography key={idx} variant="body2">
-            {idx + 1}. {name}{rollout !== undefined ? ` (${rollout}%)` : ''}
+            {idx + 1}. {name}
+            {rollout !== undefined ? ` (${rollout}%)` : ''}
           </Typography>
         );
       })}
@@ -202,7 +269,7 @@ function buildEnvChanges(
 ): React.ReactNode[] {
   const changes: React.ReactNode[] = [];
   const draftFields = typeof draftEnv === 'object' ? draftEnv : {};
-  const pubFields = typeof pubEnv === 'object' ? (pubEnv || {}) : {};
+  const pubFields = typeof pubEnv === 'object' ? pubEnv || {} : {};
 
   for (const [fieldKey, draftVal] of Object.entries(draftFields)) {
     const pubVal = pubFields[fieldKey];
@@ -214,30 +281,66 @@ function buildEnvChanges(
 
     if (MARKER_FIELDS.has(fieldKey)) {
       changes.push(
-        <Box key={fieldKey} sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-          <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ minWidth: 120 }}>
+        <Box
+          key={fieldKey}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}
+        >
+          <Typography
+            variant="body2"
+            fontWeight={600}
+            color="text.secondary"
+            sx={{ minWidth: 120 }}
+          >
             {fieldLabel}
           </Typography>
-          <Chip label={t('draft.changes.modified')} size="small" color="warning" sx={{ height: 22 }} />
+          <Chip
+            label={t('draft.changes.modified')}
+            size="small"
+            color="warning"
+            sx={{ height: 22 }}
+          />
         </Box>
       );
     } else if (BOOLEAN_FIELDS.has(fieldKey)) {
       changes.push(
-        <ToggleChange key={fieldKey} label={fieldLabel} fieldKey={fieldKey} oldVal={pubVal ?? false} newVal={draftVal as boolean} t={t} />
+        <ToggleChange
+          key={fieldKey}
+          label={fieldLabel}
+          fieldKey={fieldKey}
+          oldVal={pubVal ?? false}
+          newVal={draftVal as boolean}
+          t={t}
+        />
       );
     } else if (fieldKey === 'strategies') {
       changes.push(
-        <StrategySummary key={fieldKey} label={fieldLabel} oldStrategies={pubVal || []} newStrategies={(draftVal as any[]) || []} t={t} />
+        <StrategySummary
+          key={fieldKey}
+          label={fieldLabel}
+          oldStrategies={pubVal || []}
+          newStrategies={(draftVal as any[]) || []}
+          t={t}
+        />
       );
     } else if (fieldKey === 'variants') {
       const oldCount = Array.isArray(pubVal) ? pubVal.length : 0;
       const newCount = Array.isArray(draftVal) ? (draftVal as any[]).length : 0;
       changes.push(
-        <ValueChange key={fieldKey} label={fieldLabel} oldVal={`${oldCount}${t('draft.changes.countUnit')}`} newVal={`${newCount}${t('draft.changes.countUnit')}`} />
+        <ValueChange
+          key={fieldKey}
+          label={fieldLabel}
+          oldVal={`${oldCount}${t('draft.changes.countUnit')}`}
+          newVal={`${newCount}${t('draft.changes.countUnit')}`}
+        />
       );
     } else {
       changes.push(
-        <ValueChange key={fieldKey} label={fieldLabel} oldVal={pubVal} newVal={draftVal} />
+        <ValueChange
+          key={fieldKey}
+          label={fieldLabel}
+          oldVal={pubVal}
+          newVal={draftVal}
+        />
       );
     }
   }
@@ -248,7 +351,11 @@ interface TargetDiff {
   targetId: string;
   targetName: string;
   targetType: string;
-  envDiffs: Array<{ envId: string; envName: string; changes: React.ReactNode[] }>;
+  envDiffs: Array<{
+    envId: string;
+    envName: string;
+    changes: React.ReactNode[];
+  }>;
 }
 
 // Build diffs for one draft target
@@ -271,9 +378,11 @@ function buildTargetDiff(
 
     const changes = buildEnvChanges(draftEnv, pubEnv || {}, t);
     if (changes.length > 0) {
-      const envName = envId === '_global'
-        ? t('draft.changes.globalSettings')
-        : environments.find((e) => e.environmentId === envId)?.displayName || envId;
+      const envName =
+        envId === '_global'
+          ? t('draft.changes.globalSettings')
+          : environments.find((e) => e.environmentId === envId)?.displayName ||
+            envId;
       envDiffs.push({ envId, envName, changes });
     }
   }
@@ -325,13 +434,21 @@ const DraftChangesDialog: React.FC<DraftChangesDialogProps> = ({
                   targetId: draft.targetId,
                   targetName: draftData.segmentName || name,
                   targetType: tt,
-                  envDiffs: [{
-                    envId: '_create',
-                    envName: t('draft.changes.newSegment'),
-                    changes: [
-                      <Chip key="action" label={t('draft.changes.newSegment')} size="small" color="success" sx={{ height: 22 }} />,
-                    ],
-                  }],
+                  envDiffs: [
+                    {
+                      envId: '_create',
+                      envName: t('draft.changes.newSegment'),
+                      changes: [
+                        <Chip
+                          key="action"
+                          label={t('draft.changes.newSegment')}
+                          size="small"
+                          color="success"
+                          sx={{ height: 22 }}
+                        />,
+                      ],
+                    },
+                  ],
                 });
               } else if (action === 'delete') {
                 // Show as deletion pending
@@ -339,13 +456,21 @@ const DraftChangesDialog: React.FC<DraftChangesDialogProps> = ({
                   targetId: draft.targetId,
                   targetName: name,
                   targetType: tt,
-                  envDiffs: [{
-                    envId: '_delete',
-                    envName: t('draft.changes.deleteSegment'),
-                    changes: [
-                      <Chip key="action" label={t('draft.changes.deleteSegment')} size="small" color="error" sx={{ height: 22 }} />,
-                    ],
-                  }],
+                  envDiffs: [
+                    {
+                      envId: '_delete',
+                      envName: t('draft.changes.deleteSegment'),
+                      changes: [
+                        <Chip
+                          key="action"
+                          label={t('draft.changes.deleteSegment')}
+                          size="small"
+                          color="error"
+                          sx={{ height: 22 }}
+                        />,
+                      ],
+                    },
+                  ],
                 });
               } else {
                 // Normal update diff
@@ -355,7 +480,13 @@ const DraftChangesDialog: React.FC<DraftChangesDialogProps> = ({
                     targetId: draft.targetId,
                     targetName: name,
                     targetType: tt,
-                    envDiffs: [{ envId: '_direct', envName: t('segments.title'), changes }],
+                    envDiffs: [
+                      {
+                        envId: '_direct',
+                        envName: t('segments.title'),
+                        changes,
+                      },
+                    ],
                   });
                 }
               }
@@ -403,7 +534,12 @@ const DraftChangesDialog: React.FC<DraftChangesDialogProps> = ({
       <DialogTitle>
         {t('draft.changes.title')}
         {!loading && totalChanges > 0 && (
-          <Chip label={`${totalChanges}`} size="small" color="primary" sx={{ ml: 1, height: 22 }} />
+          <Chip
+            label={`${totalChanges}`}
+            size="small"
+            color="primary"
+            sx={{ ml: 1, height: 22 }}
+          />
         )}
       </DialogTitle>
       <DialogContent>
@@ -419,31 +555,52 @@ const DraftChangesDialog: React.FC<DraftChangesDialogProps> = ({
               <Alert severity="info">{t('draft.changes.noChanges')}</Alert>
             ) : (
               <Stack spacing={2}>
-                {targetDiffs.map(({ targetId: tid, targetName: tName, targetType: tType, envDiffs }) => (
-                  <Paper key={`${tType}-${tid}`} variant="outlined" sx={{ p: 2 }}>
-                    <Link
-                      component="button"
-                      variant="subtitle1"
-                      fontWeight={700}
-                      underline="hover"
-                      onClick={() => handleTargetClick(tType, tName)}
-                      sx={{ cursor: 'pointer', mb: 1, display: 'block', textAlign: 'left' }}
+                {targetDiffs.map(
+                  ({
+                    targetId: tid,
+                    targetName: tName,
+                    targetType: tType,
+                    envDiffs,
+                  }) => (
+                    <Paper
+                      key={`${tType}-${tid}`}
+                      variant="outlined"
+                      sx={{ p: 2 }}
                     >
-                      {tName}
-                    </Link>
-                    <Stack spacing={1.5}>
-                      {envDiffs.map(({ envId, envName, changes }) => (
-                        <Box key={envId}>
-                          <Typography variant="subtitle2" fontWeight={600} color="text.secondary" gutterBottom>
-                            {envName}
-                          </Typography>
-                          <Divider sx={{ mb: 1 }} />
-                          <Stack spacing={0.5}>{changes}</Stack>
-                        </Box>
-                      ))}
-                    </Stack>
-                  </Paper>
-                ))}
+                      <Link
+                        component="button"
+                        variant="subtitle1"
+                        fontWeight={700}
+                        underline="hover"
+                        onClick={() => handleTargetClick(tType, tName)}
+                        sx={{
+                          cursor: 'pointer',
+                          mb: 1,
+                          display: 'block',
+                          textAlign: 'left',
+                        }}
+                      >
+                        {tName}
+                      </Link>
+                      <Stack spacing={1.5}>
+                        {envDiffs.map(({ envId, envName, changes }) => (
+                          <Box key={envId}>
+                            <Typography
+                              variant="subtitle2"
+                              fontWeight={600}
+                              color="text.secondary"
+                              gutterBottom
+                            >
+                              {envName}
+                            </Typography>
+                            <Divider sx={{ mb: 1 }} />
+                            <Stack spacing={0.5}>{changes}</Stack>
+                          </Box>
+                        ))}
+                      </Stack>
+                    </Paper>
+                  )
+                )}
               </Stack>
             )}
           </>

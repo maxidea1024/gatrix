@@ -2483,10 +2483,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   ]);
                   await Promise.all([
                     ...flagDrafts.map((d) =>
-                      draftService.publishDraft('feature_flag', d.targetId, projectApiPath)
+                      draftService.publishDraft(
+                        'feature_flag',
+                        d.targetId,
+                        projectApiPath
+                      )
                     ),
                     ...segDrafts.map((d) =>
-                      draftService.publishDraft('segment', d.targetId, projectApiPath)
+                      draftService.publishDraft(
+                        'segment',
+                        d.targetId,
+                        projectApiPath
+                      )
                     ),
                   ]);
                   setGlobalDraftCount(0);
@@ -2509,10 +2517,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   ]);
                   await Promise.all([
                     ...flagDrafts.map((d) =>
-                      draftService.discardDraft('feature_flag', d.targetId, projectApiPath)
+                      draftService.discardDraft(
+                        'feature_flag',
+                        d.targetId,
+                        projectApiPath
+                      )
                     ),
                     ...segDrafts.map((d) =>
-                      draftService.discardDraft('segment', d.targetId, projectApiPath)
+                      draftService.discardDraft(
+                        'segment',
+                        d.targetId,
+                        projectApiPath
+                      )
                     ),
                   ]);
                   setGlobalDraftCount(0);

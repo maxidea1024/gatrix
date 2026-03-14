@@ -247,8 +247,13 @@ const featureFlagDraftHandler = {
         .select('environmentId')
         .where('flagId', targetId);
       for (const fe of flagEnvs) {
-        await featureFlagService.incrementFlagVersion(targetId, fe.environmentId);
-        await featureFlagService.invalidateCache(fe.environmentId, [flag.flagName]);
+        await featureFlagService.incrementFlagVersion(
+          targetId,
+          fe.environmentId
+        );
+        await featureFlagService.invalidateCache(fe.environmentId, [
+          flag.flagName,
+        ]);
       }
     }
 

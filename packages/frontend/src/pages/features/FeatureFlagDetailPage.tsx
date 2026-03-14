@@ -959,7 +959,14 @@ const FeatureFlagDetailPage: React.FC = () => {
         .then(() => loadFlagDraftStatus(flag.id))
         .finally(() => setEnvLoading(false));
     }
-  }, [isCreating, flag?.flagName, flag?.id, environments, loadEnvStrategies, loadFlagDraftStatus]);  // Load environment metrics for summary display in environment cards
+  }, [
+    isCreating,
+    flag?.flagName,
+    flag?.id,
+    environments,
+    loadEnvStrategies,
+    loadFlagDraftStatus,
+  ]); // Load environment metrics for summary display in environment cards
   useEffect(() => {
     if (!isCreating && flag?.flagName && environments.length > 0) {
       loadEnvMetrics(flag.flagName, environments);
@@ -1508,9 +1515,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   };
 
   // Save global (flag-level) settings to draft under the _global key
-  const saveGlobalChangesToDraft = async (
-    updates: Record<string, any>
-  ) => {
+  const saveGlobalChangesToDraft = async (updates: Record<string, any>) => {
     if (!flag) return;
 
     const { draftData } = await draftService.getDraft(

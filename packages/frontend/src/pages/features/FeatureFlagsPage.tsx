@@ -229,18 +229,16 @@ const FeatureFlagsPage: React.FC = () => {
 
   // Create dialog state - auto-open when navigated with ?create=flagName
   const createFlagNameParam = searchParams.get('create');
-  const [createDialogOpen, setCreateDialogOpen] = useState(
-    !!createFlagNameParam
-  );
+  const [createDialogOpen, setCreateDialogOpen] =
+    useState(!!createFlagNameParam);
   const [createMenuAnchor, setCreateMenuAnchor] = useState<null | HTMLElement>(
     null
   );
   const [creating, setCreating] = useState(false);
   const [showCreateDescription, setShowCreateDescription] = useState(false);
   const [showCreateTags, setShowCreateTags] = useState(false);
-  const [createFlagTypeMode, setCreateFlagTypeMode] = useState(
-    !!createFlagNameParam
-  );
+  const [createFlagTypeMode, setCreateFlagTypeMode] =
+    useState(!!createFlagNameParam);
   const [newFlag, setNewFlag] = useState(() => {
     if (createFlagNameParam) {
       return {
