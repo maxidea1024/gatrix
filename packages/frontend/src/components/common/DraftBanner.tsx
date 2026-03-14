@@ -75,13 +75,19 @@ const DraftBanner: React.FC<DraftBannerProps> = ({
       severity="info"
       icon={<EditIcon fontSize="small" />}
       sx={{
-        borderRadius: 0,
-        py: 0.5,
+        borderRadius: 2,
+        py: 0.25,
+        px: 1.5,
+        '& .MuiAlert-icon': {
+          py: 0.5,
+          mr: 0.5,
+        },
         '& .MuiAlert-message': {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           width: '100%',
+          py: 0.25,
         },
       }}
     >
@@ -91,29 +97,14 @@ const DraftBanner: React.FC<DraftBannerProps> = ({
           alignItems: 'center',
           justifyContent: 'space-between',
           width: '100%',
+          gap: 1.5,
         }}
       >
-        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-          {flagName ? (
-            <>
-              <strong>{flagName}</strong>{' '}
-              {t('draft.unpublishedChanges')}
-            </>
-          ) : (
-            t('draft.unpublishedChanges')
-          )}
-          {updatedAt && (
-            <Typography
-              component="span"
-              variant="body2"
-              sx={{ ml: 1, opacity: 0.7 }}
-            >
-              ({formatRelativeTime(updatedAt)})
-            </Typography>
-          )}
+        <Typography variant="body2" sx={{ fontWeight: 500, whiteSpace: 'nowrap' }}>
+          {t('draft.unpublishedChanges')}
         </Typography>
         {canManage && (
-          <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
+          <Box sx={{ display: 'flex', gap: 0.75 }}>
             <Button
               size="small"
               variant="contained"
@@ -122,11 +113,12 @@ const DraftBanner: React.FC<DraftBannerProps> = ({
                 publishing ? (
                   <CircularProgress size={14} color="inherit" />
                 ) : (
-                  <PublishIcon fontSize="small" />
+                  <PublishIcon sx={{ fontSize: 16 }} />
                 )
               }
               onClick={handlePublish}
               disabled={busy}
+              sx={{ textTransform: 'none', fontSize: '0.8rem', py: 0.25, px: 1.5 }}
             >
               {t('draft.publish')}
             </Button>
@@ -138,11 +130,12 @@ const DraftBanner: React.FC<DraftBannerProps> = ({
                 discarding ? (
                   <CircularProgress size={14} />
                 ) : (
-                  <DiscardIcon fontSize="small" />
+                  <DiscardIcon sx={{ fontSize: 16 }} />
                 )
               }
               onClick={handleDiscard}
               disabled={busy}
+              sx={{ textTransform: 'none', fontSize: '0.8rem', py: 0.25, px: 1.5 }}
             >
               {t('draft.discard')}
             </Button>
