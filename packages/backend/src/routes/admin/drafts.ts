@@ -32,14 +32,26 @@ router.get(
     // Attach published snapshot and display name for each draft
     const draftsWithPublished = await Promise.all(
       drafts.map(async (draft) => {
-        const publishedData = await DraftService.getPublishedSnapshot(
+        let publishedData = null;
+        try {
+          publishedData = await DraftService.getPublishedSnapshot(
+            targetType,
+            draft.targetId
+          );
+        } catch {
+          // New target (create action) — no published state
+        }
+        let targetDisplayName = await DraftService.getTargetDisplayName(
           targetType,
           draft.targetId
         );
-        const targetDisplayName = await DraftService.getTargetDisplayName(
-          targetType,
-          draft.targetId
-        );
+        // Fallback: use name from draft data for create actions
+        if (!targetDisplayName && draft.draftData) {
+          targetDisplayName =
+            draft.draftData.segmentName ||
+            draft.draftData.flagName ||
+            draft.targetId;
+        }
         return { ...draft, publishedData, targetDisplayName };
       })
     );

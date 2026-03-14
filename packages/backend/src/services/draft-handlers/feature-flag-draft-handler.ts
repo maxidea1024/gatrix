@@ -240,6 +240,18 @@ const featureFlagDraftHandler = {
       await featureFlagService.invalidateCache(envId, [flag.flagName]);
     }
 
+    // If global data (enabledValue, disabledValue, etc.) changed but no env-specific entries,
+    // invalidate cache for ALL environments so SDK picks up the new values.
+    if (globalData && envEntries.length === 0) {
+      const flagEnvs = await db('g_feature_flag_environments')
+        .select('environmentId')
+        .where('flagId', targetId);
+      for (const fe of flagEnvs) {
+        await featureFlagService.incrementFlagVersion(targetId, fe.environmentId);
+        await featureFlagService.invalidateCache(fe.environmentId, [flag.flagName]);
+      }
+    }
+
     logger.info(
       `Feature flag draft published: ${targetId} (${Object.keys(draftData).length} environments)`
     );

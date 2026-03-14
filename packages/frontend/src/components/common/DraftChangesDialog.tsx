@@ -317,14 +317,47 @@ const DraftChangesDialog: React.FC<DraftChangesDialogProps> = ({
             if (tt === 'segment') {
               const draftData = draft.draftData || {};
               const pubData = (draft as any).publishedData || {};
-              const changes = buildEnvChanges(draftData, pubData, t);
-              if (changes.length > 0) {
+              const action = draftData._action || 'update';
+
+              if (action === 'create') {
+                // Show as a new segment creation
+                results.push({
+                  targetId: draft.targetId,
+                  targetName: draftData.segmentName || name,
+                  targetType: tt,
+                  envDiffs: [{
+                    envId: '_create',
+                    envName: t('draft.changes.newSegment'),
+                    changes: [
+                      <Chip key="action" label={t('draft.changes.newSegment')} size="small" color="success" sx={{ height: 22 }} />,
+                    ],
+                  }],
+                });
+              } else if (action === 'delete') {
+                // Show as deletion pending
                 results.push({
                   targetId: draft.targetId,
                   targetName: name,
                   targetType: tt,
-                  envDiffs: [{ envId: '_direct', envName: t('segments.title'), changes }],
+                  envDiffs: [{
+                    envId: '_delete',
+                    envName: t('draft.changes.deleteSegment'),
+                    changes: [
+                      <Chip key="action" label={t('draft.changes.deleteSegment')} size="small" color="error" sx={{ height: 22 }} />,
+                    ],
+                  }],
                 });
+              } else {
+                // Normal update diff
+                const changes = buildEnvChanges(draftData, pubData, t);
+                if (changes.length > 0) {
+                  results.push({
+                    targetId: draft.targetId,
+                    targetName: name,
+                    targetType: tt,
+                    envDiffs: [{ envId: '_direct', envName: t('segments.title'), changes }],
+                  });
+                }
               }
             } else {
               const diff = buildTargetDiff(

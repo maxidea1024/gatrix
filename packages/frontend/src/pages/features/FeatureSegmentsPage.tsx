@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { ulid } from 'ulid';
 
 import { useAuth } from '../../hooks/useAuth';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
@@ -470,12 +471,26 @@ const FeatureSegmentsPage: React.FC = () => {
           variant: 'info',
         });
       } else {
-        await api.post(`${projectApiPath}/features/segments`, {
-          ...editingSegment,
-          projectId: currentProjectId,
-        });
-        enqueueSnackbar(t('featureFlags.segmentCreateSuccess'), {
-          variant: 'success',
+        // Save to draft with _action: create
+        const tempId = ulid();
+        await draftService.saveDraft(
+          'segment',
+          tempId,
+          {
+            _action: 'create',
+            _projectId: currentProjectId,
+            segmentName: editingSegment.segmentName,
+            displayName: editingSegment.displayName || editingSegment.segmentName,
+            description: editingSegment.description || '',
+            constraints: editingSegment.constraints || [],
+            isActive: editingSegment.isActive ?? true,
+            tags: editingSegment.tags || [],
+          },
+          projectApiPath
+        );
+        window.dispatchEvent(new Event('draft-changed'));
+        enqueueSnackbar(t('featureFlags.draftSaved'), {
+          variant: 'info',
         });
       }
       setEditDialogOpen(false);
@@ -530,30 +545,24 @@ const FeatureSegmentsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingSegment) return;
     try {
-      await api.delete(
-        `${projectApiPath}/features/segments/${deletingSegment.id}`
+      // Save deletion as draft
+      await draftService.saveDraft(
+        'segment',
+        deletingSegment.id,
+        { _action: 'delete' },
+        projectApiPath
       );
-      enqueueSnackbar(t('featureFlags.segmentDeleteSuccess'), {
-        variant: 'success',
+      window.dispatchEvent(new Event('draft-changed'));
+      enqueueSnackbar(t('featureFlags.draftSaved'), {
+        variant: 'info',
       });
-      loadSegments();
     } catch (error: any) {
-      const errorCode = extractErrorCode(error?.response?.data);
-      if (errorCode === 'RESOURCE_IN_USE') {
-        const payload =
-          error?.response?.data?.error?.details?.payload ||
-          error?.response?.data?.error?.payload;
-        setReferences(payload?.references || null);
-        setReferenceDialogMode('delete');
-        setReferenceDialogOpen(true);
-      } else {
-        enqueueSnackbar(
-          parseApiErrorMessage(error, 'featureFlags.deleteFailed'),
-          {
-            variant: 'error',
-          }
-        );
-      }
+      enqueueSnackbar(
+        parseApiErrorMessage(error, 'featureFlags.deleteFailed'),
+        {
+          variant: 'error',
+        }
+      );
     } finally {
       setDeleteConfirmOpen(false);
     }

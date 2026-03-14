@@ -3,7 +3,11 @@
  *
  * Implements the DraftHandler interface for feature segments.
  * Segments are global (no per-environment data).
- * Draft data structure: { displayName, description, constraints, isActive, tags }
+ *
+ * Supports three actions via `_action` field:
+ *   - 'create': Create a new segment on publish
+ *   - 'update': Modify an existing segment on publish (default)
+ *   - 'delete': Delete a segment on publish
  */
 
 import { FeatureSegmentModel } from '../../models/FeatureFlag';
@@ -15,12 +19,14 @@ const logger = createLogger('SegmentDraftHandler');
 
 const segmentDraftHandler = {
   /**
-   * Create a snapshot from the current published state
+   * Create a snapshot from the current published state.
+   * Returns null for new segments (create action).
    */
-  async createSnapshot(targetId: string): Promise<Record<string, any>> {
+  async createSnapshot(targetId: string): Promise<Record<string, any> | null> {
     const segment = await FeatureSegmentModel.findById(targetId);
     if (!segment) {
-      throw new Error(`Segment '${targetId}' not found`);
+      // New segment — no published state
+      return null;
     }
 
     return {
@@ -33,7 +39,8 @@ const segmentDraftHandler = {
   },
 
   /**
-   * Apply draft data to real tables
+   * Apply draft data to real tables.
+   * Handles create / update / delete based on _action.
    */
   async publish(
     targetId: string,
@@ -41,38 +48,45 @@ const segmentDraftHandler = {
     draftData: Record<string, any>,
     userId: string
   ): Promise<any> {
+    const action = draftData._action || 'update';
+
+    if (action === 'create') {
+      // Create a new segment
+      const { _action, _projectId, ...segmentData } = draftData;
+      const created = await FeatureSegmentModel.create({
+        ...segmentData,
+        projectId: _projectId,
+        createdBy: userId,
+      } as any);
+      logger.info(`Segment draft published (create): ${created.id}`);
+      return { segmentId: created.id, action: 'create' };
+    }
+
+    if (action === 'delete') {
+      await FeatureSegmentModel.delete(targetId);
+      logger.info(`Segment draft published (delete): ${targetId}`);
+      return { segmentId: targetId, action: 'delete' };
+    }
+
+    // Default: update
     const segment = await FeatureSegmentModel.findById(targetId);
     if (!segment) {
       throw new Error(`Segment '${targetId}' not found`);
     }
 
-    const updateData: any = { updatedBy: userId };
+    const { _action, ...updateFields } = draftData;
+    await FeatureSegmentModel.update(targetId, {
+      ...updateFields,
+      updatedBy: userId,
+    });
 
-    if (draftData.displayName !== undefined) {
-      updateData.displayName = draftData.displayName;
-    }
-    if (draftData.description !== undefined) {
-      updateData.description = draftData.description;
-    }
-    if (draftData.constraints !== undefined) {
-      updateData.constraints = draftData.constraints;
-    }
-    if (draftData.isActive !== undefined) {
-      updateData.isActive = draftData.isActive;
-    }
-    if (draftData.tags !== undefined) {
-      updateData.tags = draftData.tags;
-    }
-
-    await FeatureSegmentModel.update(targetId, updateData);
-
-    logger.info(`Segment draft published: ${targetId}`);
-
-    return { segmentId: targetId };
+    logger.info(`Segment draft published (update): ${targetId}`);
+    return { segmentId: targetId, action: 'update' };
   },
 
   /**
-   * Get segment name for display
+   * Get segment name for display.
+   * For create drafts, returns the segmentName from draft data.
    */
   async getDisplayName(targetId: string): Promise<string | null> {
     const segment = await db('g_feature_segments')
