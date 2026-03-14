@@ -186,10 +186,9 @@ const SystemSettingsPage: React.FC = () => {
       setSavedAiSettings(base);
       setMaskedApiKey(updated.apiKey || null);
     } catch (error: any) {
-      enqueueSnackbar(
-        parseApiErrorMessage(error, 'common.saveFailed'),
-        { variant: 'error' }
-      );
+      enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
+        variant: 'error',
+      });
     }
   };
 
@@ -362,7 +361,10 @@ const SystemSettingsPage: React.FC = () => {
                     <Switch
                       checked={aiSettings.enabled}
                       onChange={(e) =>
-                        setAiSettings({ ...aiSettings, enabled: e.target.checked })
+                        setAiSettings({
+                          ...aiSettings,
+                          enabled: e.target.checked,
+                        })
                       }
                     />
                   }

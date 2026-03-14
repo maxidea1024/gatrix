@@ -45,6 +45,7 @@ import cmsCashShopRoutes from './cms-cash-shop';
 import serverLifecycleRoutes from './server-lifecycle';
 import changeRequestRoutes from './change-requests';
 import featureRoutes from './features';
+import draftRoutes from './drafts';
 import platformDefaultsRoutes from './platform-defaults';
 import unknownFlagsRoutes from './unknown-flags';
 import integrationRoutes from './integrations';
@@ -166,6 +167,9 @@ projectRouter.use(
   requireProjectPermission([P.FEATURES_READ, P.FEATURES_UPDATE]) as any,
   featureRoutes
 );
+
+// Drafts (generic draft/publish system)
+projectRouter.use('/drafts', draftRoutes);
 
 // Tags
 projectRouter.use(

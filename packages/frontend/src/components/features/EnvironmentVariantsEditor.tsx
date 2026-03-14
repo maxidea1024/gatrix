@@ -7,7 +7,7 @@
  * - Explicit save button for applying changes
  * - Shows guidance to flag values tab when valueType is set
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { alpha, styled } from '@mui/material/styles';
 import {
   Box,
@@ -141,6 +141,7 @@ interface EnvironmentVariantsEditorProps {
     overrideEnabledValue: boolean,
     overrideDisabledValue: boolean
   ) => Promise<void>;
+  onChangeDetected?: () => void;
   onGoToPayloadTab: () => void;
   defaultExpanded?: boolean;
 }
@@ -175,10 +176,20 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   isArchived,
   onSave,
   onSaveValues,
+  onChangeDetected,
   onGoToPayloadTab,
   defaultExpanded = false,
 }) => {
   const { t } = useTranslation();
+
+  // Stable refs for callback props to avoid infinite useEffect loops
+  // (these are inline functions from parent, recreated every render)
+  const onChangeDetectedRef = useRef(onChangeDetected);
+  onChangeDetectedRef.current = onChangeDetected;
+  const onSaveValuesRef = useRef(onSaveValues);
+  onSaveValuesRef.current = onSaveValues;
+  const onSaveRef = useRef(onSave);
+  onSaveRef.current = onSave;
 
   // --- Variants State & Logic ---
   const initialVariantsJson = useMemo(
@@ -199,8 +210,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   // Ref to preserve expanded state
   const preserveExpandedRef = React.useRef(false);
-  // Ref to track saving status to prevent state reset during data reload
-  const isSavingRef = React.useRef(false);
   // Ref to suppress unsaved changes badge on initial mount
   const [isInitialMount, setIsInitialMount] = useState(true);
   React.useEffect(() => {
@@ -209,13 +218,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     }, 300);
     return () => clearTimeout(timer);
   }, []);
-
-  // Sync state if savingRef is true (meaning we just finished saving)
-  useEffect(() => {
-    if (!saving && !savingValues) {
-      isSavingRef.current = false;
-    }
-  }, [saving, savingValues]);
 
   // --- Sync variations when props change ---
   useEffect(() => {
@@ -328,13 +330,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     disabledValue?: string | null;
   }>({});
 
-  const [prevPropsSnapshot, setPrevPropsSnapshot] = useState(propsSnapshot);
+  // Track the last seen props snapshot to detect when props actually change from outside
+  const lastPropsRef = useRef(propsSnapshot);
 
   // Synchronize state when external fallback values or override status change
   useEffect(() => {
-    // Check if anything fundamentally changed in the props compared to our tracking snapshot
-    if (propsSnapshot !== prevPropsSnapshot) {
-      setPrevPropsSnapshot(propsSnapshot);
+    // Only reset if the PROPS actually changed (not our internal state)
+    if (propsSnapshot !== lastPropsRef.current) {
+      lastPropsRef.current = propsSnapshot;
 
       setOverrideEnabled(originalOverrideEnabled);
       setOverrideDisabled(originalOverrideDisabled);
@@ -352,7 +355,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     }
   }, [
     propsSnapshot,
-    prevPropsSnapshot,
     originalOverrideEnabled,
     originalOverrideDisabled,
     envEnabledValue,
@@ -397,7 +399,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   // Handle save fallback values
   const handleSaveValuesClick = useCallback(async () => {
-    if (!onSaveValues) return;
+    if (!onSaveValuesRef.current) return;
 
     // Validate JSON if needed
     if (valueType === 'json') {
@@ -409,7 +411,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       }
     }
 
-    isSavingRef.current = true;
     setSavingValues(true);
     try {
       // Ensure non-null values when override is enabled.
@@ -434,41 +435,109 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       const sendDisabled = overrideDisabled
         ? ensureNonNull(toApiValue(editingDisabledValue))
         : toApiValue(editingDisabledValue);
-      await onSaveValues(
+      await onSaveValuesRef.current(
         sendEnabled,
         sendDisabled,
         overrideEnabled,
         overrideDisabled
       );
-
-      // After successful save, sync prevPropsSnapshot to current state
-      // so valuesHasChanges becomes false immediately, even if the server
-      // response triggers a slightly different props snapshot.
-      setPrevPropsSnapshot(
-        JSON.stringify({
-          overrideEnabled: overrideEnabled,
-          overrideDisabled: overrideDisabled,
-          enabled: canonicalize(editingEnabledValue),
-          disabled: canonicalize(editingDisabledValue),
-        })
-      );
-    } catch (error) {
-      // Error handled by parent or snackbar
-      isSavingRef.current = false;
+    } catch {
+      // Error handled by parent via enqueueSnackbar
     } finally {
       setSavingValues(false);
-      isSavingRef.current = false;
     }
   }, [
-    onSaveValues,
     overrideEnabled,
     overrideDisabled,
     editingEnabledValue,
     editingDisabledValue,
     toApiValue,
     valueJsonErrors,
-    canonicalize,
+    valueType,
   ]);
+
+  // Handle override toggle with immediate save (no debounce for checkboxes)
+  const handleOverrideToggle = useCallback(
+    async (field: 'enabled' | 'disabled', checked: boolean) => {
+      const newOverrideEnabled =
+        field === 'enabled' ? checked : overrideEnabled;
+      const newOverrideDisabled =
+        field === 'disabled' ? checked : overrideDisabled;
+
+      // Compute corresponding value
+      let newEnabledValue = editingEnabledValue;
+      let newDisabledValue = editingDisabledValue;
+      if (field === 'enabled') {
+        setOverrideEnabled(checked);
+        newEnabledValue = checked
+          ? (envEnabledValue ?? enabledValue)
+          : enabledValue;
+        setEditingEnabledValue(newEnabledValue);
+      } else {
+        setOverrideDisabled(checked);
+        newDisabledValue = checked
+          ? (envDisabledValue ?? disabledValue)
+          : disabledValue;
+        setEditingDisabledValue(newDisabledValue);
+      }
+
+      // Immediately notify parent that changes exist
+      onChangeDetectedRef.current?.();
+
+      // Immediately save (no debounce for checkbox toggle)
+      if (!onSaveValuesRef.current) return;
+      try {
+        setSavingValues(true);
+
+        const ensureNonNull = (val: any) => {
+          if (val === null || val === undefined || val === '') {
+            switch (valueType) {
+              case 'boolean':
+                return false;
+              case 'number':
+                return 0;
+              case 'json':
+                return {};
+              default:
+                return '';
+            }
+          }
+          return val;
+        };
+
+        const sendEnabled = newOverrideEnabled
+          ? ensureNonNull(toApiValue(newEnabledValue))
+          : toApiValue(newEnabledValue);
+        const sendDisabled = newOverrideDisabled
+          ? ensureNonNull(toApiValue(newDisabledValue))
+          : toApiValue(newDisabledValue);
+
+        await onSaveValuesRef.current(
+          sendEnabled,
+          sendDisabled,
+          newOverrideEnabled,
+          newOverrideDisabled
+        );
+      } catch {
+        // Error handled by parent via enqueueSnackbar
+      } finally {
+        setSavingValues(false);
+      }
+    },
+    [
+      overrideEnabled,
+      overrideDisabled,
+      editingEnabledValue,
+      editingDisabledValue,
+      envEnabledValue,
+      enabledValue,
+      envDisabledValue,
+      disabledValue,
+      toApiValue,
+      valueType,
+      canonicalize,
+    ]
+  );
 
   // Handle reset values
   const handleResetValues = useCallback(() => {
@@ -609,33 +678,68 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     }
 
     try {
-      isSavingRef.current = true;
       setSaving(true);
       // Preserve expanded state so it remains open after data reload
       preserveExpandedRef.current = true;
 
-      await onSave(editingVariants);
+      await onSaveRef.current(editingVariants);
 
       // After successful save, sync prevVariantsJson to editingVariants
       // so hasChanges becomes false immediately, even if the server response
       // has subtle serialization differences (e.g. undefined vs null).
       const savedJson = JSON.stringify(editingVariants);
       setPrevVariantsJson(savedJson);
-
-      isSavingRef.current = false;
     } catch (error) {
-      isSavingRef.current = false;
       throw error;
     } finally {
-      isSavingRef.current = false;
       setSaving(false);
     }
-  }, [editingVariants, jsonErrors, onSave]);
+  }, [editingVariants, jsonErrors]);
 
   const handleResetVariants = useCallback(() => {
     setEditingVariants(initialVariants);
     setJsonErrors({});
   }, [initialVariants]);
+
+  // Debounced auto-save for variants (draft system)
+  useEffect(() => {
+    if (!hasChanges || !isInitialMount === false) return;
+
+    const names = editingVariants.map((v) => v.name.trim().toLowerCase());
+    const hasDups = names.some((n, i) => names.indexOf(n) !== i);
+    const hasErrs = Object.values(jsonErrors).some((e) => e !== null);
+    if (hasDups || hasErrs) return;
+
+    // Immediately notify parent that changes exist
+    onChangeDetectedRef.current?.();
+
+    const timer = setTimeout(() => {
+      handleSaveVariants();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [editingVariants, hasChanges, jsonErrors, handleSaveVariants]);
+
+  // Debounced auto-save for values (draft system)
+  useEffect(() => {
+    if (!valuesHasChanges) return;
+    if (valueJsonErrors.enabledValue || valueJsonErrors.disabledValue) return;
+
+    // Immediately notify parent that changes exist
+    onChangeDetectedRef.current?.();
+
+    const timer = setTimeout(() => {
+      handleSaveValuesClick();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [
+    valuesHasChanges,
+    overrideEnabled,
+    overrideDisabled,
+    editingEnabledValue,
+    editingDisabledValue,
+    valueJsonErrors,
+    handleSaveValuesClick,
+  ]);
 
   const variantCount = editingVariants.length;
 
@@ -811,14 +915,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
               ? t('featureFlags.configurationValue')
               : t('featureFlags.envSpecificSettings')}
           </Typography>
-          {!isInitialMount && (hasChanges || valuesHasChanges) && (
-            <Chip
-              label={t('common.unsavedChanges')}
-              size="small"
-              color="warning"
-              sx={{ fontWeight: 600, height: 20, borderRadius: '12px' }}
-            />
-          )}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <IconButton size="small" onClick={() => setExpanded(!expanded)}>
@@ -1141,32 +1237,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 ) : (
                   <Box />
                 )}
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  {hasChanges && (
-                    <Button
-                      variant="text"
-                      size="small"
-                      onClick={handleResetVariants}
-                      disabled={saving}
-                    >
-                      {t('common.reset')}
-                    </Button>
-                  )}
-                  <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<SaveIcon />}
-                    onClick={handleSaveVariants}
-                    disabled={
-                      saving ||
-                      !hasChanges ||
-                      hasDuplicateNames ||
-                      hasJsonErrors
-                    }
-                  >
-                    {saving ? t('common.saving') : t('common.save')}
-                  </Button>
-                </Box>
+                <Box />
               </Box>
             )}
           </Box>
@@ -1211,15 +1282,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                   </Box>
                   <OverrideSwitch
                     checked={overrideEnabled}
-                    onChange={(e) => {
-                      const next = e.target.checked;
-                      setOverrideEnabled(next);
-                      if (next) {
-                        setEditingEnabledValue(envEnabledValue ?? enabledValue);
-                      } else {
-                        setEditingEnabledValue(enabledValue);
-                      }
-                    }}
+                    onChange={(e) =>
+                      handleOverrideToggle('enabled', e.target.checked)
+                    }
                     disabled={!canManage || isArchived}
                     slotProps={{
                       track: {
@@ -1262,17 +1327,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 </Box>
                 <OverrideSwitch
                   checked={overrideDisabled}
-                  onChange={(e) => {
-                    const next = e.target.checked;
-                    setOverrideDisabled(next);
-                    if (next) {
-                      setEditingDisabledValue(
-                        envDisabledValue ?? disabledValue
-                      );
-                    } else {
-                      setEditingDisabledValue(disabledValue);
-                    }
-                  }}
+                  onChange={(e) =>
+                    handleOverrideToggle('disabled', e.target.checked)
+                  }
                   disabled={!canManage || isArchived}
                   slotProps={{
                     track: {
@@ -1286,41 +1343,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
               </Box>
             </Stack>
 
-            {canManage && !isArchived && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  gap: 1,
-                  mt: 2,
-                }}
-              >
-                {valuesHasChanges && (
-                  <Button
-                    variant="text"
-                    size="small"
-                    onClick={handleResetValues}
-                    disabled={savingValues}
-                  >
-                    {t('common.reset')}
-                  </Button>
-                )}
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<SaveIcon />}
-                  onClick={handleSaveValuesClick}
-                  disabled={
-                    savingValues ||
-                    !valuesHasChanges ||
-                    !!valueJsonErrors.enabledValue ||
-                    !!valueJsonErrors.disabledValue
-                  }
-                >
-                  {savingValues ? t('common.saving') : t('common.save')}
-                </Button>
-              </Box>
-            )}
+
           </Box>
         )}
       </Collapse>

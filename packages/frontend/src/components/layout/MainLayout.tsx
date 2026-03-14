@@ -62,7 +62,6 @@ import {
   CloudSync as CloudSyncIcon,
   VpnKey as VpnKeyIcon,
   Chat as ChatIcon,
-
   Timeline as TimelineIcon,
   Terminal as TerminalIcon,
   MenuOpen as MenuOpenIcon,
@@ -1267,32 +1266,37 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               navigate('/dashboard');
             }}
           >
-          <Tooltip
-              title={sseConnection.isConnected === false ? t('common.connectionLost') : ''}
+            <Tooltip
+              title={
+                sseConnection.isConnected === false
+                  ? t('common.connectionLost')
+                  : ''
+              }
               placement="bottom"
               arrow
             >
-            <Box
-              sx={{
-                width: 32,
-                height: 32,
-                backgroundColor: sseConnection.isConnected === false
-                  ? theme.palette.error.main
-                  : theme.palette.primary.main,
-                transition: 'background-color 0.3s ease',
-                borderRadius: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{ color: 'white', fontWeight: 'bold' }}
+              <Box
+                sx={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor:
+                    sseConnection.isConnected === false
+                      ? theme.palette.error.main
+                      : theme.palette.primary.main,
+                  transition: 'background-color 0.3s ease',
+                  borderRadius: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
-                G
-              </Typography>
-            </Box>
+                <Typography
+                  variant="h6"
+                  sx={{ color: 'white', fontWeight: 'bold' }}
+                >
+                  G
+                </Typography>
+              </Box>
             </Tooltip>
             <Typography
               variant="h6"

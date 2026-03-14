@@ -77,6 +77,8 @@ interface ReleaseFlowTabProps {
   contextFields?: ContextFieldInfo[];
   onPlanDeleted?: () => void;
   onPlanChange?: () => void;
+  /** Called when release flow settings change (to mark draft dirty) */
+  onDraftChange?: () => void;
 }
 
 // ==================== Types ====================
@@ -151,6 +153,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   contextFields = [],
   onPlanDeleted,
   onPlanChange,
+  onDraftChange,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -289,7 +292,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const handleApplyTemplate = async (templateId: string) => {
     try {
       setApplying(true);
-      // If a plan already exists, archive it first before applying a new template
       if (plan) {
         await deletePlan(plan.id, projectApiPath);
       }
@@ -298,10 +300,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         projectApiPath
       );
       enqueueSnackbar(t('releaseFlow.applySuccess'), { variant: 'success' });
-
-      // Auto-start the plan if the environment is already enabled
-      // (the useEffect only triggers on envEnabled *changes*, so it won't fire
-      // when a new plan is applied while the environment is already active)
       if (envEnabled && newPlan?.id && canManage) {
         try {
           await startPlan(newPlan.id, projectApiPath);
@@ -309,13 +307,12 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             variant: 'success',
           });
         } catch (startError) {
-          // Plan was applied successfully but auto-start failed — not critical
           console.error('Auto-start after apply failed', startError);
         }
       }
-
       await mutatePlan();
       if (onPlanChange) onPlanChange();
+      if (onDraftChange) onDraftChange();
       setShowApplyDialog(false);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), {
@@ -336,6 +333,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       });
       await mutatePlan();
       if (onPlanChange) onPlanChange();
+      if (onDraftChange) onDraftChange();
       setDeleteConfirmOpen(false);
       onPlanDeleted?.();
     } catch (error: any) {
@@ -440,6 +438,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       );
       await mutatePlan();
       if (onPlanChange) onPlanChange();
+      if (onDraftChange) onDraftChange();
       setEditingTransitionId(null);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), {
@@ -464,6 +463,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         await removeTransitionCondition(milestoneId, projectApiPath);
         await mutatePlan();
         if (onPlanChange) onPlanChange();
+        if (onDraftChange) onDraftChange();
         setEditingTransitionId(null);
       } catch (error: any) {
         enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), {

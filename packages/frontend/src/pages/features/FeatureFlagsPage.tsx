@@ -131,6 +131,8 @@ import {
   pausePlan,
   resumePlan,
 } from '../../services/releaseFlowService';
+import draftService from '../../services/draftService';
+import DraftBanner from '../../components/common/DraftBanner';
 
 interface FlagTypeInfo {
   flagType: string;
@@ -296,6 +298,9 @@ const FeatureFlagsPage: React.FC = () => {
   const [cloneNewName, setCloneNewName] = useState('');
   const [cloning, setCloning] = useState(false);
   const [newFlagJsonError, setNewFlagJsonError] = useState<string | null>(null);
+
+  // Draft tracking: which flags have pending drafts
+  const [flagDraftMap, setFlagDraftMap] = useState<{ [flagId: string]: boolean }>({});
 
   // Column settings state
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
@@ -955,7 +960,7 @@ const FeatureFlagsPage: React.FC = () => {
     setPage(0);
   };
 
-  // Toggle flag for a specific environment
+  // Toggle flag for a specific environment - saves to draft instead of direct toggle
   const handleToggle = async (
     flag: FeatureFlag,
     environmentId: string,
@@ -968,7 +973,6 @@ const FeatureFlagsPage: React.FC = () => {
       prev.map((f) => {
         if (f.flagName !== flag.flagName) return f;
 
-        // If environments array doesn't exist, create it with the toggled environment
         const existingEnvs = f.environments || [];
         const envExists = existingEnvs.some(
           (e) => e.environmentId === environmentId
@@ -982,7 +986,6 @@ const FeatureFlagsPage: React.FC = () => {
               : e
           );
         } else {
-          // Add new environment entry
           updatedEnvs = [
             ...existingEnvs,
             { environmentId, isEnabled: newEnabled },
@@ -997,51 +1000,37 @@ const FeatureFlagsPage: React.FC = () => {
     );
 
     try {
-      await featureFlagService.toggleFeatureFlag(
-        flag.flagName,
-        newEnabled,
-        environmentId,
+      // Save to draft instead of directly toggling
+      const { draftData } = await draftService.getDraft(
+        'feature_flag',
+        flag.id,
         projectApiPath
       );
+      const currentEnvData = draftData[environmentId] || {};
+      const mergedDraft = {
+        ...draftData,
+        [environmentId]: { ...currentEnvData, isEnabled: newEnabled },
+      };
+      await draftService.saveDraft(
+        'feature_flag',
+        flag.id,
+        mergedDraft,
+        projectApiPath
+      );
+
+      // Track which flags have drafts
+      setFlagDraftMap((prev) => ({ ...prev, [flag.id]: true }));
+
       const envDisplayName =
         environments.find((e) => e.environmentId === environmentId)
           ?.displayName || environmentId;
       enqueueSnackbar(
         <span>
           <strong>{flag.flagName}</strong> ({envDisplayName}){' '}
-          {t(currentEnabled ? 'featureFlags.disabled' : 'featureFlags.enabled')}
+          {t('featureFlags.draftSaved')}
         </span>,
-        { variant: currentEnabled ? 'warning' : 'success' }
+        { variant: 'info' }
       );
-
-      // Auto-control release flow if one exists for this flag+environment
-      try {
-        const plan = await getPlan(flag.id, environmentId, projectApiPath);
-        if (plan) {
-          if (!newEnabled && plan.status === 'active') {
-            // Environment disabled -> auto-pause
-            await pausePlan(plan.id, projectApiPath);
-            enqueueSnackbar(t('releaseFlow.pausedSuccess'), {
-              variant: 'info',
-            });
-          } else if (newEnabled && plan.status === 'paused') {
-            // Environment re-enabled -> auto-resume
-            await resumePlan(plan.id, projectApiPath);
-            enqueueSnackbar(t('releaseFlow.resumedSuccess'), {
-              variant: 'info',
-            });
-          } else if (newEnabled && plan.status === 'draft') {
-            // Environment enabled with draft plan -> auto-start
-            await startPlan(plan.id, projectApiPath);
-            enqueueSnackbar(t('releaseFlow.startedSuccess'), {
-              variant: 'success',
-            });
-          }
-        }
-      } catch (flowError) {
-        // Release flow control is best-effort; don't fail the toggle
-        console.error('Release flow auto-control failed', flowError);
-      }
     } catch (error: any) {
       // Rollback on error
       setFlags((prev) =>
@@ -1067,6 +1056,48 @@ const FeatureFlagsPage: React.FC = () => {
           variant: 'error',
         }
       );
+    }
+  };
+
+  // Whether any flags have pending drafts
+  const draftFlagIds = Object.entries(flagDraftMap)
+    .filter(([, has]) => has)
+    .map(([id]) => id);
+  const draftCount = draftFlagIds.length;
+
+  // Publish all pending drafts at once
+  const handlePublishAllDrafts = async () => {
+    try {
+      await Promise.all(
+        draftFlagIds.map((id) =>
+          draftService.publishDraft('feature_flag', id, projectApiPath)
+        )
+      );
+      setFlagDraftMap({});
+      enqueueSnackbar(t('draft.publishSuccess'), { variant: 'success' });
+      loadFlags();
+    } catch (error: any) {
+      enqueueSnackbar(parseApiErrorMessage(error, 'draft.publishFailed'), {
+        variant: 'error',
+      });
+    }
+  };
+
+  // Discard all pending drafts at once
+  const handleDiscardAllDrafts = async () => {
+    try {
+      await Promise.all(
+        draftFlagIds.map((id) =>
+          draftService.discardDraft('feature_flag', id, projectApiPath)
+        )
+      );
+      setFlagDraftMap({});
+      enqueueSnackbar(t('draft.discardSuccess'), { variant: 'success' });
+      loadFlags();
+    } catch (error: any) {
+      enqueueSnackbar(parseApiErrorMessage(error, 'draft.discardFailed'), {
+        variant: 'error',
+      });
     }
   };
 
@@ -1858,6 +1889,15 @@ const FeatureFlagsPage: React.FC = () => {
           </Box>
         </CardContent>
       </Card>
+
+      {/* Consolidated Draft Banner */}
+      {draftCount > 0 && (
+        <DraftBanner
+          hasDraft={true}
+          onPublish={handlePublishAllDrafts}
+          onDiscard={handleDiscardAllDrafts}
+        />
+      )}
 
       {/* Table / Compact View */}
       <PageContentLoader loading={loading && isInitialLoad}>
