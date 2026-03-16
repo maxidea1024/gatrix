@@ -17,6 +17,7 @@ import {
 } from '@gatrix/evaluator';
 import { createLogger } from '../../../config/logger';
 import { getFallbackValue } from './_helpers';
+import { DraftService } from '../../../services/draft-service';
 
 const logger = createLogger('PlaygroundRoutes');
 const router = Router();
@@ -352,6 +353,16 @@ router.post(
       }
     }
 
+    // Load all feature_flag drafts for merging with published data
+    const allDrafts = await DraftService.listDrafts('feature_flag');
+    const draftsByTarget = new Map<string, Map<string, any>>();
+    for (const d of allDrafts) {
+      if (!draftsByTarget.has(d.targetId)) {
+        draftsByTarget.set(d.targetId, new Map());
+      }
+      draftsByTarget.get(d.targetId)!.set(d.environmentId || '__global__', d.draftData);
+    }
+
     // Evaluate flags per environment (flag list is shared, only env-specific state differs)
     for (const env of environments) {
       try {
@@ -365,6 +376,34 @@ router.post(
             req.projectId
           );
           if (!flag) continue;
+
+          // Merge draft data into flag if draft exists for this flag+env
+          const flagDrafts = draftsByTarget.get((flag as any).id);
+          if (flagDrafts) {
+            const envDraft = flagDrafts.get(env);
+            if (envDraft && typeof envDraft === 'object') {
+              // Apply draft environment fields to the flag object
+              const draftFields = ['isEnabled', 'strategies', 'variants',
+                'enabledValue', 'disabledValue', 'overrideEnabledValue',
+                'overrideDisabledValue', 'impressionDataEnabled'];
+              for (const field of draftFields) {
+                if (field in envDraft) {
+                  (flag as any)[field] = envDraft[field];
+                }
+              }
+              // Also update environment-level overrides in environments array
+              const envEntry = (flag as any).environments?.find(
+                (e: any) => e.environmentId === env
+              );
+              if (envEntry) {
+                for (const field of draftFields) {
+                  if (field in envDraft) {
+                    envEntry[field] = envDraft[field];
+                  }
+                }
+              }
+            }
+          }
 
           // Evaluate the flag
           const evalResult = evaluateFlagWithDetails(
