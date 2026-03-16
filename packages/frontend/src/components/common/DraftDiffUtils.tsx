@@ -52,7 +52,6 @@ const FIELD_LABELS: Record<string, string> = {
   overrideEnabledValue: 'draft.changes.overrideEnabled',
   overrideDisabledValue: 'draft.changes.overrideDisabled',
   impressionDataEnabled: 'draft.changes.impressionData',
-  _releaseFlowChanged: 'draft.changes.releaseFlow',
 };
 
 // Boolean fields

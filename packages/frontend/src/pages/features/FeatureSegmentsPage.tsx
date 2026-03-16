@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ulid } from 'ulid';
 
 import { useAuth } from '../../hooks/useAuth';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
@@ -74,7 +73,6 @@ import { tagService } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import * as draftService from '@/services/draftService';
 
 interface FeatureSegment {
   id: string;
@@ -212,7 +210,7 @@ const FeatureSegmentsPage: React.FC = () => {
     }
   };
 
-  // Load segments
+  // Load segments from API
   const loadSegments = async () => {
     setLoading(true);
     try {
@@ -222,7 +220,8 @@ const FeatureSegmentsPage: React.FC = () => {
           projectId: currentProjectId || undefined,
         },
       });
-      const allData = result.data?.segments || [];
+      const allData: FeatureSegment[] = result.data?.segments || [];
+
       setAllSegments(allData);
       setTotal(allData.length);
     } catch (error: any) {
@@ -235,6 +234,8 @@ const FeatureSegmentsPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+
 
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
@@ -453,50 +454,28 @@ const FeatureSegmentsPage: React.FC = () => {
     if (!editingSegment) return;
     try {
       if (editingSegment.id) {
-        // Save to draft instead of directly updating
-        const draftData: any = {};
-        if (editingSegment.displayName !== undefined)
-          draftData.displayName = editingSegment.displayName;
-        if (editingSegment.description !== undefined)
-          draftData.description = editingSegment.description;
-        if (editingSegment.constraints !== undefined)
-          draftData.constraints = editingSegment.constraints;
-        if (editingSegment.isActive !== undefined)
-          draftData.isActive = editingSegment.isActive;
-        if (editingSegment.tags !== undefined)
-          draftData.tags = editingSegment.tags;
-        await draftService.saveDraft(
-          'segment',
-          editingSegment.id,
-          draftData,
-          projectApiPath
-        );
-        window.dispatchEvent(new Event('draft-changed'));
-        enqueueSnackbar(t('featureFlags.draftSaved'), {
-          variant: 'info',
-        });
-      } else {
-        // Save to draft with _action: create
-        const tempId = ulid();
-        await draftService.saveDraft(
-          'segment',
-          tempId,
+        // Update existing segment
+        await api.put(
+          `${projectApiPath}/features/segments/${editingSegment.id}`,
           {
-            _action: 'create',
-            _projectId: currentProjectId,
-            segmentName: editingSegment.segmentName,
-            displayName:
-              editingSegment.displayName || editingSegment.segmentName,
-            description: editingSegment.description || '',
-            constraints: editingSegment.constraints || [],
-            isActive: editingSegment.isActive ?? true,
-            tags: editingSegment.tags || [],
-          },
-          projectApiPath
+            displayName: editingSegment.displayName,
+            description: editingSegment.description,
+            constraints: editingSegment.constraints,
+            isActive: editingSegment.isActive,
+            tags: editingSegment.tags,
+          }
         );
-        window.dispatchEvent(new Event('draft-changed'));
-        enqueueSnackbar(t('featureFlags.draftSaved'), {
-          variant: 'info',
+      } else {
+        // Create new segment
+        await api.post(`${projectApiPath}/features/segments`, {
+          segmentName: editingSegment.segmentName,
+          displayName:
+            editingSegment.displayName || editingSegment.segmentName,
+          description: editingSegment.description || '',
+          constraints: editingSegment.constraints || [],
+          isActive: editingSegment.isActive ?? true,
+          tags: editingSegment.tags || [],
+          projectId: currentProjectId,
         });
       }
       setEditDialogOpen(false);
@@ -551,17 +530,10 @@ const FeatureSegmentsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingSegment) return;
     try {
-      // Save deletion as draft
-      await draftService.saveDraft(
-        'segment',
-        deletingSegment.id,
-        { _action: 'delete' },
-        projectApiPath
+      await api.delete(
+        `${projectApiPath}/features/segments/${deletingSegment.id}`
       );
-      window.dispatchEvent(new Event('draft-changed'));
-      enqueueSnackbar(t('featureFlags.draftSaved'), {
-        variant: 'info',
-      });
+      loadSegments();
     } catch (error: any) {
       enqueueSnackbar(
         parseApiErrorMessage(error, 'featureFlags.deleteFailed'),
@@ -744,7 +716,10 @@ const FeatureSegmentsPage: React.FC = () => {
                   </TableHead>
                   <TableBody>
                     {segments.map((segment) => (
-                      <TableRow key={segment.id} hover>
+                      <TableRow
+                        key={segment.id}
+                        hover
+                      >
                         {visibleColumns.map((col) => {
                           switch (col.id) {
                             case 'visibility':
@@ -763,21 +738,10 @@ const FeatureSegmentsPage: React.FC = () => {
                                         )
                                       );
                                       try {
-                                        // Save to draft instead of directly updating
-                                        const { draftData } =
-                                          await draftService.getDraft(
-                                            'segment',
-                                            segment.id,
-                                            projectApiPath
-                                          );
-                                        await draftService.saveDraft(
-                                          'segment',
-                                          segment.id,
-                                          { ...draftData, isActive: newActive },
-                                          projectApiPath
-                                        );
-                                        window.dispatchEvent(
-                                          new Event('draft-changed')
+                                        // Update visibility directly
+                                        await api.put(
+                                          `${projectApiPath}/features/segments/${segment.id}`,
+                                          { isActive: newActive }
                                         );
                                       } catch (error: any) {
                                         setAllSegments((prev) =>

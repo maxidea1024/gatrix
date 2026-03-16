@@ -25,6 +25,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Menu,
+  ListItemIcon,
   Tooltip,
   Tabs,
   Tab,
@@ -160,6 +162,60 @@ import DraftBanner from '../../components/common/DraftBanner';
 import DraftChangesDialog from '../../components/common/DraftChangesDialog';
 import * as draftService from '../../services/draftService';
 
+// Strategy context menu component for edit/delete actions
+const StrategyContextMenu: React.FC<{
+  onEdit: () => void;
+  onDelete: () => void;
+}> = ({ onEdit, onDelete }) => {
+  const { t } = useTranslation();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  return (
+    <>
+      <IconButton
+        size="small"
+        onClick={(e) => {
+          e.stopPropagation();
+          setAnchorEl(e.currentTarget);
+        }}
+      >
+        <MoreIcon fontSize="small" />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+        onClick={(e) => e.stopPropagation()}
+        slotProps={{
+          paper: { sx: { minWidth: 140 } },
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            onEdit();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            onDelete();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
+  );
+};
+
 // Deep equality check for draft coalescing
 function deepEqualDraft(a: any, b: any): boolean {
   if (a === b) return true;
@@ -260,7 +316,7 @@ interface FeatureFlag {
   flagName: string;
   displayName?: string;
   description?: string;
-  flagType: 'release' | 'experiment' | 'operational' | 'permission';
+  flagType: 'release' | 'experiment' | 'operational' | 'permission' | 'killswitch' | 'remoteConfig';
   isEnabled: boolean;
   isArchived: boolean;
   impressionDataEnabled: boolean;
@@ -456,11 +512,11 @@ const FeatureFlagDetailPage: React.FC = () => {
       setFlag((prev) =>
         prev
           ? {
-              ...prev,
-              valueType: originalFlag.valueType,
-              enabledValue: originalFlag.enabledValue,
-              disabledValue: originalFlag.disabledValue,
-            }
+            ...prev,
+            valueType: originalFlag.valueType,
+            enabledValue: originalFlag.enabledValue,
+            disabledValue: originalFlag.disabledValue,
+          }
           : prev
       );
     }
@@ -483,27 +539,28 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [flag, setFlag] = useState<FeatureFlag | null>(
     isCreating
       ? {
-          id: '',
-          environmentId: '',
-          flagName: generateDefaultFlagName(),
-          displayName: '',
-          description: '',
-          flagType: 'release',
-          isEnabled: false,
-          isArchived: false,
-          impressionDataEnabled: false,
-          tags: [],
-          strategies: [],
-          variants: [],
-          valueType: 'string',
-          enabledValue: '',
-          disabledValue: '',
-          createdAt: new Date().toISOString(),
-        }
+        id: '',
+        environmentId: '',
+        flagName: generateDefaultFlagName(),
+        displayName: '',
+        description: '',
+        flagType: 'release',
+        isEnabled: false,
+        isArchived: false,
+        impressionDataEnabled: false,
+        tags: [],
+        strategies: [],
+        variants: [],
+        valueType: 'string',
+        enabledValue: '',
+        disabledValue: '',
+        createdAt: new Date().toISOString(),
+      }
       : null
   );
   const [loading, setLoading] = useState(!isCreating);
   const [envLoading, setEnvLoading] = useState(!isCreating);
+  const [refreshCounter, setRefreshCounter] = useState(0);
   const [saving, setSaving] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
@@ -614,9 +671,9 @@ const FeatureFlagDetailPage: React.FC = () => {
     const saved = localStorage.getItem(PLAYGROUND_WIDTH_KEY);
     return saved
       ? Math.min(
-          MAX_PLAYGROUND_WIDTH,
-          Math.max(MIN_PLAYGROUND_WIDTH, parseInt(saved, 10))
-        )
+        MAX_PLAYGROUND_WIDTH,
+        Math.max(MIN_PLAYGROUND_WIDTH, parseInt(saved, 10))
+      )
       : DEFAULT_PLAYGROUND_WIDTH;
   });
 
@@ -893,11 +950,19 @@ const FeatureFlagDetailPage: React.FC = () => {
   // Refetch data when draft is published or discarded
   useEffect(() => {
     const handleDraftAction = () => {
-      if (!isCreating) loadFlag();
+      if (!isCreating) {
+        loadFlag();
+        // Force re-trigger of loadEnvStrategies + loadFlagDraftStatus
+        setRefreshCounter((c) => c + 1);
+        // Refresh release flow plans (may have been created/deleted by draft)
+        mutateReleaseFlowPlans();
+        // Clear manual release flow selections to avoid stale template forms
+        setEnvManualReleaseFlow(new Set());
+      }
     };
     window.addEventListener('draft-action-completed', handleDraftAction);
     return () => window.removeEventListener('draft-action-completed', handleDraftAction);
-  }, [loadFlag, isCreating]);
+  }, [loadFlag, isCreating, mutateReleaseFlowPlans]);
 
   // Check draft status and apply draft data to UI
   const loadFlagDraftStatus = useCallback(
@@ -921,6 +986,62 @@ const FeatureFlagDetailPage: React.FC = () => {
             string,
             any,
           ][]) {
+            // Handle global key (flag-level settings like impressionDataEnabled)
+            if (envId === '_global') {
+              if (envData.impressionDataEnabled !== undefined) {
+                setFlag((prev) => {
+                  if (!prev) return prev;
+                  return {
+                    ...prev,
+                    impressionDataEnabled: envData.impressionDataEnabled,
+                  };
+                });
+              }
+              continue;
+            }
+
+            // Apply isEnabled and value overrides to flag.environments
+            if (
+              envData.isEnabled !== undefined ||
+              envData.overrideEnabledValue !== undefined ||
+              envData.overrideDisabledValue !== undefined ||
+              envData.enabledValue !== undefined ||
+              envData.disabledValue !== undefined
+            ) {
+              setFlag((prev) => {
+                if (!prev) return prev;
+                const updatedEnvs = (prev.environments || []).map((e) =>
+                  e.environmentId === envId
+                    ? {
+                      ...e,
+                      ...(envData.isEnabled !== undefined
+                        ? { isEnabled: envData.isEnabled }
+                        : {}),
+                      ...(envData.overrideEnabledValue !== undefined
+                        ? {
+                          overrideEnabledValue:
+                            envData.overrideEnabledValue,
+                        }
+                        : {}),
+                      ...(envData.overrideDisabledValue !== undefined
+                        ? {
+                          overrideDisabledValue:
+                            envData.overrideDisabledValue,
+                        }
+                        : {}),
+                      ...(envData.enabledValue !== undefined
+                        ? { enabledValue: envData.enabledValue }
+                        : {}),
+                      ...(envData.disabledValue !== undefined
+                        ? { disabledValue: envData.disabledValue }
+                        : {}),
+                    }
+                    : e
+                );
+                return { ...prev, environments: updatedEnvs };
+              });
+            }
+
             if (envData.strategies) {
               const localStrategies = envData.strategies.map((s: any) => ({
                 id: s.id || s.strategyName,
@@ -975,6 +1096,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     environments,
     loadEnvStrategies,
     loadFlagDraftStatus,
+    refreshCounter, // Added refreshCounter to dependencies
   ]); // Load environment metrics for summary display in environment cards
   useEffect(() => {
     if (!isCreating && flag?.flagName && environments.length > 0) {
@@ -1537,7 +1659,9 @@ const FeatureFlagDetailPage: React.FC = () => {
     );
 
     setFlagDraftStatus({ hasDraft: true });
+    window.dispatchEvent(new Event('draft-changed'));
   };
+
 
   const handleSaveStrategy = async () => {
     if (!flag || !editingStrategy || !editingEnv) return;
@@ -2917,9 +3041,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     envEnabled={isEnabled}
                                     allSegments={segments}
                                     contextFields={contextFields}
-                                    onPlanChange={() =>
-                                      mutateReleaseFlowPlans()
-                                    }
+                                    onPlanChange={() => {
+                                      mutateReleaseFlowPlans();
+                                      // Refresh strategies (release flow changes them)
+                                      loadFlag();
+                                      setRefreshCounter((c) => c + 1);
+                                    }}
                                     onPlanDeleted={() => {
                                       mutateReleaseFlowPlans();
                                       const nextManual = new Set(
@@ -2928,12 +3055,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       nextManual.delete(env.environmentId);
                                       setEnvManualReleaseFlow(nextManual);
                                     }}
-                                    onDraftChange={() =>
-                                      saveGlobalChangesToDraft({
-                                        _releaseFlowChanged: true,
-                                      })
-                                    }
-                                  />
+                                    />
 
                                   <Divider sx={{ my: 2 }} />
 
@@ -3060,37 +3182,35 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   {envManualReleaseFlow.has(
                                     env.environmentId
                                   ) && (
-                                    <ReleaseFlowTab
-                                      flagId={flag.id}
-                                      flagName={flag.flagName}
-                                      environments={[
-                                        {
-                                          environmentId: env.environmentId,
-                                          displayName: env.displayName,
-                                        },
-                                      ]}
-                                      canManage={canManage}
-                                      initialShowTemplates={true}
-                                      envEnabled={isEnabled}
-                                      allSegments={segments}
-                                      contextFields={contextFields}
-                                      onPlanChange={() =>
-                                        mutateReleaseFlowPlans()
-                                      }
-                                      onPlanDeleted={() => {
-                                        const nextManual = new Set(
-                                          envManualReleaseFlow
-                                        );
-                                        nextManual.delete(env.environmentId);
-                                        setEnvManualReleaseFlow(nextManual);
-                                      }}
-                                      onDraftChange={() =>
-                                        saveGlobalChangesToDraft({
-                                          _releaseFlowChanged: true,
-                                        })
-                                      }
-                                    />
-                                  )}
+                                      <ReleaseFlowTab
+                                        flagId={flag.id}
+                                        flagName={flag.flagName}
+                                        environments={[
+                                          {
+                                            environmentId: env.environmentId,
+                                            displayName: env.displayName,
+                                          },
+                                        ]}
+                                        canManage={canManage}
+                                        initialShowTemplates={true}
+                                        envEnabled={isEnabled}
+                                        allSegments={segments}
+                                        contextFields={contextFields}
+                                        onPlanChange={() => {
+                                          mutateReleaseFlowPlans();
+                                          // Refresh strategies (release flow changes them)
+                                          loadFlag();
+                                          setRefreshCounter((c) => c + 1);
+                                        }}
+                                        onPlanDeleted={() => {
+                                          const nextManual = new Set(
+                                            envManualReleaseFlow
+                                          );
+                                          nextManual.delete(env.environmentId);
+                                          setEnvManualReleaseFlow(nextManual);
+                                        }}
+                                      />
+                                    )}
 
                                   <Divider sx={{ my: 2 }} />
 
@@ -3260,48 +3380,21 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                   }
                                                   headerActions={
                                                     canManage ? (
-                                                      <Box
-                                                        sx={{
-                                                          display: 'flex',
-                                                          gap: 0,
-                                                        }}
-                                                      >
-                                                        <Tooltip
-                                                          title={t(
-                                                            'common.edit'
-                                                          )}
-                                                        >
-                                                          <IconButton
-                                                            size="small"
-                                                            onClick={() =>
-                                                              handleEditStrategy(
-                                                                strategy,
-                                                                env.environmentId
-                                                              )
-                                                            }
-                                                          >
-                                                            <EditIcon fontSize="small" />
-                                                          </IconButton>
-                                                        </Tooltip>
-                                                        <Tooltip
-                                                          title={t(
-                                                            'common.delete'
-                                                          )}
-                                                        >
-                                                          <IconButton
-                                                            size="small"
-                                                            onClick={() =>
-                                                              handleOpenDeleteStrategyConfirm(
-                                                                strategy.id,
-                                                                index,
-                                                                env.environmentId
-                                                              )
-                                                            }
-                                                          >
-                                                            <DeleteIcon fontSize="small" />
-                                                          </IconButton>
-                                                        </Tooltip>
-                                                      </Box>
+                                                      <StrategyContextMenu
+                                                        onEdit={() =>
+                                                          handleEditStrategy(
+                                                            strategy,
+                                                            env.environmentId
+                                                          )
+                                                        }
+                                                        onDelete={() =>
+                                                          handleOpenDeleteStrategyConfirm(
+                                                            strategy.id,
+                                                            index,
+                                                            env.environmentId
+                                                          )
+                                                        }
+                                                      />
                                                     ) : undefined
                                                   }
                                                   collapsible
@@ -3662,11 +3755,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                         setFlag((prev) =>
                           prev
                             ? {
-                                ...prev,
-                                enabledValue: originalFlag.enabledValue,
-                                disabledValue: originalFlag.disabledValue,
-                                validationRules: originalFlag.validationRules,
-                              }
+                              ...prev,
+                              enabledValue: originalFlag.enabledValue,
+                              disabledValue: originalFlag.disabledValue,
+                              validationRules: originalFlag.validationRules,
+                            }
                             : prev
                         );
                       }
@@ -3676,9 +3769,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                       (JSON.stringify(flag.enabledValue) ===
                         JSON.stringify(originalFlag?.enabledValue) &&
                         JSON.stringify(flag.disabledValue) ===
-                          JSON.stringify(originalFlag?.disabledValue) &&
+                        JSON.stringify(originalFlag?.disabledValue) &&
                         JSON.stringify(flag.validationRules) ===
-                          JSON.stringify(originalFlag?.validationRules))
+                        JSON.stringify(originalFlag?.validationRules))
                     }
                   >
                     {t('common.cancel')}
@@ -3713,9 +3806,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                       (JSON.stringify(flag.enabledValue) ===
                         JSON.stringify(originalFlag?.enabledValue) &&
                         JSON.stringify(flag.disabledValue) ===
-                          JSON.stringify(originalFlag?.disabledValue) &&
+                        JSON.stringify(originalFlag?.disabledValue) &&
                         JSON.stringify(flag.validationRules) ===
-                          JSON.stringify(originalFlag?.validationRules))
+                        JSON.stringify(originalFlag?.validationRules))
                     }
                   >
                     {saving ? <CircularProgress size={20} /> : t('common.save')}
@@ -3922,41 +4015,41 @@ const FeatureFlagDetailPage: React.FC = () => {
                 {/* Collapsible Tags */}
                 {(!!editingFlagData.tags?.length ||
                   (editingFlagData as any)._showTags) && (
-                  <Autocomplete
-                    multiple
-                    size="small"
-                    options={allTags.map((tag) => tag.name)}
-                    value={editingFlagData.tags || []}
-                    onChange={(_, newValue) =>
-                      setEditingFlagData({ ...editingFlagData, tags: newValue })
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label={t('featureFlags.tags')}
-                        placeholder={t('featureFlags.selectTags')}
-                        helperText={t('featureFlags.tagsHelp')}
-                      />
-                    )}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => {
-                        const tag = allTags.find((t) => t.name === option);
-                        return (
-                          <Chip
-                            {...getTagProps({ index })}
-                            key={option}
-                            label={option}
-                            size="small"
-                            sx={{
-                              bgcolor: tag?.color || '#888',
-                              color: getContrastColor(tag?.color || '#888'),
-                            }}
-                          />
-                        );
-                      })
-                    }
-                  />
-                )}
+                    <Autocomplete
+                      multiple
+                      size="small"
+                      options={allTags.map((tag) => tag.name)}
+                      value={editingFlagData.tags || []}
+                      onChange={(_, newValue) =>
+                        setEditingFlagData({ ...editingFlagData, tags: newValue })
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={t('featureFlags.tags')}
+                          placeholder={t('featureFlags.selectTags')}
+                          helperText={t('featureFlags.tagsHelp')}
+                        />
+                      )}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => {
+                          const tag = allTags.find((t) => t.name === option);
+                          return (
+                            <Chip
+                              {...getTagProps({ index })}
+                              key={option}
+                              label={option}
+                              size="small"
+                              sx={{
+                                bgcolor: tag?.color || '#888',
+                                color: getContrastColor(tag?.color || '#888'),
+                              }}
+                            />
+                          );
+                        })
+                      }
+                    />
+                  )}
               </Stack>
             </Box>
             <Box
@@ -4001,8 +4094,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                       ...flag,
                       displayName: editingFlagData.displayName,
                       description: editingFlagData.description,
-                      impressionDataEnabled:
-                        editingFlagData.impressionDataEnabled,
+                      impressionDataEnabled: editingFlagData.impressionDataEnabled,
                       tags: editingFlagData.tags,
                     });
                     setEditFlagDialogOpen(false);
@@ -4021,11 +4113,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                   saving ||
                   (editingFlagData?.displayName === (flag?.displayName || '') &&
                     editingFlagData?.description ===
-                      (flag?.description || '') &&
+                    (flag?.description || '') &&
                     editingFlagData?.impressionDataEnabled ===
-                      flag?.impressionDataEnabled &&
+                    flag?.impressionDataEnabled &&
                     JSON.stringify(editingFlagData?.tags || []) ===
-                      JSON.stringify(flag?.tags || []))
+                    JSON.stringify(flag?.tags || []))
                 }
               >
                 {saving ? <CircularProgress size={20} /> : t('common.save')}
@@ -4064,16 +4156,16 @@ const FeatureFlagDetailPage: React.FC = () => {
                       {(editingStrategy.segments?.length || 0) +
                         (editingStrategy.constraints?.length || 0) >
                         0 && (
-                        <Chip
-                          label={
-                            (editingStrategy.segments?.length || 0) +
-                            (editingStrategy.constraints?.length || 0)
-                          }
-                          size="small"
-                          color="primary"
-                          sx={{ height: 20, fontSize: '0.75rem' }}
-                        />
-                      )}
+                          <Chip
+                            label={
+                              (editingStrategy.segments?.length || 0) +
+                              (editingStrategy.constraints?.length || 0)
+                            }
+                            size="small"
+                            color="primary"
+                            sx={{ height: 20, fontSize: '0.75rem' }}
+                          />
+                        )}
                     </Box>
                   }
                 />
@@ -4163,216 +4255,216 @@ const FeatureFlagDetailPage: React.FC = () => {
                   {/* Rollout % for flexible rollout */}
                   {(editingStrategy.name === 'flexibleRollout' ||
                     editingStrategy.name?.includes('Rollout')) && (
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      <Typography
-                        variant="subtitle2"
-                        gutterBottom
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                      >
-                        {t('featureFlags.rollout')}
-                        <Tooltip title={t('featureFlags.rolloutTooltip')}>
-                          <HelpOutlineIcon fontSize="small" color="action" />
-                        </Tooltip>
-                      </Typography>
-                      <Box sx={{ px: 2, pt: 3 }}>
-                        <Slider
-                          value={editingStrategy.parameters?.rollout ?? 100}
-                          onChange={(_, value) =>
-                            setEditingStrategy({
-                              ...editingStrategy,
-                              parameters: {
-                                ...editingStrategy.parameters,
-                                rollout: value as number,
-                              },
-                            })
-                          }
-                          valueLabelDisplay="on"
-                          min={0}
-                          max={100}
-                          marks={[
-                            { value: 0, label: '0%' },
-                            { value: 25, label: '25%' },
-                            { value: 50, label: '50%' },
-                            { value: 75, label: '75%' },
-                            { value: 100, label: '100%' },
-                          ]}
-                        />
-                      </Box>
+                      <Paper variant="outlined" sx={{ p: 2 }}>
+                        <Typography
+                          variant="subtitle2"
+                          gutterBottom
+                          sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                        >
+                          {t('featureFlags.rollout')}
+                          <Tooltip title={t('featureFlags.rolloutTooltip')}>
+                            <HelpOutlineIcon fontSize="small" color="action" />
+                          </Tooltip>
+                        </Typography>
+                        <Box sx={{ px: 2, pt: 3 }}>
+                          <Slider
+                            value={editingStrategy.parameters?.rollout ?? 100}
+                            onChange={(_, value) =>
+                              setEditingStrategy({
+                                ...editingStrategy,
+                                parameters: {
+                                  ...editingStrategy.parameters,
+                                  rollout: value as number,
+                                },
+                              })
+                            }
+                            valueLabelDisplay="on"
+                            min={0}
+                            max={100}
+                            marks={[
+                              { value: 0, label: '0%' },
+                              { value: 25, label: '25%' },
+                              { value: 50, label: '50%' },
+                              { value: 75, label: '75%' },
+                              { value: 100, label: '100%' },
+                            ]}
+                          />
+                        </Box>
 
-                      {/* Stickiness & GroupId */}
-                      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                        <Box sx={{ flex: 1 }}>
-                          <FormControl fullWidth size="small">
-                            <Typography
-                              variant="subtitle2"
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.5,
-                                mb: 0.5,
-                              }}
-                            >
-                              {t('featureFlags.stickiness')}
-                              <Tooltip title={t('featureFlags.stickinessHelp')}>
-                                <HelpOutlineIcon
-                                  fontSize="small"
-                                  color="action"
-                                  sx={{ cursor: 'pointer' }}
-                                />
-                              </Tooltip>
-                            </Typography>
-                            <Select
-                              value={
-                                editingStrategy.parameters?.stickiness ||
-                                'default'
-                              }
-                              onChange={(e) =>
-                                setEditingStrategy({
-                                  ...editingStrategy,
-                                  parameters: {
-                                    ...editingStrategy.parameters,
-                                    stickiness: e.target.value,
-                                  },
-                                })
-                              }
-                            >
-                              <MenuItem value="default">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessDefault')}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t('featureFlags.stickinessDefaultDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="userId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessUserId')}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t('featureFlags.stickinessUserIdDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="sessionId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessSessionId')}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t('featureFlags.stickinessSessionIdDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="random">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessRandom')}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t('featureFlags.stickinessRandomDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              {/* Custom stickiness fields from context fields */}
-                              {contextFields.filter(
-                                (f) =>
-                                  f.stickiness && !f.isDefaultStickinessField
-                              ).length > 0 && (
-                                <ListSubheader
-                                  sx={{
-                                    lineHeight: '32px',
-                                    fontSize: '0.75rem',
-                                  }}
-                                >
-                                  {t('featureFlags.customStickinessFields')}
-                                </ListSubheader>
-                              )}
-                              {contextFields
-                                .filter(
+                        {/* Stickiness & GroupId */}
+                        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                          <Box sx={{ flex: 1 }}>
+                            <FormControl fullWidth size="small">
+                              <Typography
+                                variant="subtitle2"
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  mb: 0.5,
+                                }}
+                              >
+                                {t('featureFlags.stickiness')}
+                                <Tooltip title={t('featureFlags.stickinessHelp')}>
+                                  <HelpOutlineIcon
+                                    fontSize="small"
+                                    color="action"
+                                    sx={{ cursor: 'pointer' }}
+                                  />
+                                </Tooltip>
+                              </Typography>
+                              <Select
+                                value={
+                                  editingStrategy.parameters?.stickiness ||
+                                  'default'
+                                }
+                                onChange={(e) =>
+                                  setEditingStrategy({
+                                    ...editingStrategy,
+                                    parameters: {
+                                      ...editingStrategy.parameters,
+                                      stickiness: e.target.value,
+                                    },
+                                  })
+                                }
+                              >
+                                <MenuItem value="default">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessDefault')}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {t('featureFlags.stickinessDefaultDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="userId">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessUserId')}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {t('featureFlags.stickinessUserIdDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="sessionId">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessSessionId')}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {t('featureFlags.stickinessSessionIdDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="random">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessRandom')}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {t('featureFlags.stickinessRandomDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                {/* Custom stickiness fields from context fields */}
+                                {contextFields.filter(
                                   (f) =>
                                     f.stickiness && !f.isDefaultStickinessField
-                                )
-                                .map((field) => (
-                                  <MenuItem
-                                    key={field.fieldName}
-                                    value={field.fieldName}
-                                  >
-                                    <Box>
-                                      <Typography variant="body2">
-                                        {field.displayName || field.fieldName}
-                                      </Typography>
-                                      {field.description && (
-                                        <Typography
-                                          variant="caption"
-                                          color="text.secondary"
-                                        >
-                                          {field.description}
+                                ).length > 0 && (
+                                    <ListSubheader
+                                      sx={{
+                                        lineHeight: '32px',
+                                        fontSize: '0.75rem',
+                                      }}
+                                    >
+                                      {t('featureFlags.customStickinessFields')}
+                                    </ListSubheader>
+                                  )}
+                                {contextFields
+                                  .filter(
+                                    (f) =>
+                                      f.stickiness && !f.isDefaultStickinessField
+                                  )
+                                  .map((field) => (
+                                    <MenuItem
+                                      key={field.fieldName}
+                                      value={field.fieldName}
+                                    >
+                                      <Box>
+                                        <Typography variant="body2">
+                                          {field.displayName || field.fieldName}
                                         </Typography>
-                                      )}
-                                    </Box>
-                                  </MenuItem>
-                                ))}
-                            </Select>
-                          </FormControl>
-                        </Box>
-                        <Box sx={{ flex: 1 }}>
-                          <Box>
-                            <Typography
-                              variant="subtitle2"
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.5,
-                                mb: 0.5,
-                              }}
-                            >
-                              {t('featureFlags.groupId')}
-                              <Tooltip title={t('featureFlags.groupIdHelp')}>
-                                <HelpOutlineIcon
-                                  fontSize="small"
-                                  color="action"
-                                  sx={{ cursor: 'pointer' }}
-                                />
-                              </Tooltip>
-                            </Typography>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              value={
-                                editingStrategy.parameters?.groupId ||
-                                flag?.flagName ||
-                                ''
-                              }
-                              onChange={(e) =>
-                                setEditingStrategy({
-                                  ...editingStrategy,
-                                  parameters: {
-                                    ...editingStrategy.parameters,
-                                    groupId: e.target.value,
-                                  },
-                                })
-                              }
-                            />
+                                        {field.description && (
+                                          <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                          >
+                                            {field.description}
+                                          </Typography>
+                                        )}
+                                      </Box>
+                                    </MenuItem>
+                                  ))}
+                              </Select>
+                            </FormControl>
+                          </Box>
+                          <Box sx={{ flex: 1 }}>
+                            <Box>
+                              <Typography
+                                variant="subtitle2"
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  mb: 0.5,
+                                }}
+                              >
+                                {t('featureFlags.groupId')}
+                                <Tooltip title={t('featureFlags.groupIdHelp')}>
+                                  <HelpOutlineIcon
+                                    fontSize="small"
+                                    color="action"
+                                    sx={{ cursor: 'pointer' }}
+                                  />
+                                </Tooltip>
+                              </Typography>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                value={
+                                  editingStrategy.parameters?.groupId ||
+                                  flag?.flagName ||
+                                  ''
+                                }
+                                onChange={(e) =>
+                                  setEditingStrategy({
+                                    ...editingStrategy,
+                                    parameters: {
+                                      ...editingStrategy.parameters,
+                                      groupId: e.target.value,
+                                    },
+                                  })
+                                }
+                              />
+                            </Box>
                           </Box>
                         </Box>
-                      </Box>
-                    </Paper>
-                  )}
+                      </Paper>
+                    )}
 
                   {/* User IDs input for userWithId strategy */}
                   {editingStrategy.name === 'userWithId' && (
@@ -5001,8 +5093,8 @@ const FeatureFlagDetailPage: React.FC = () => {
             {flag?.isArchived
               ? t('featureFlags.reviveConfirmMessage', { name: flag?.flagName })
               : t('featureFlags.archiveConfirmMessage', {
-                  name: flag?.flagName,
-                })}
+                name: flag?.flagName,
+              })}
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -5037,11 +5129,11 @@ const FeatureFlagDetailPage: React.FC = () => {
           <Typography>
             {flag?.stale
               ? t('featureFlags.unmarkStaleConfirmMessage', {
-                  name: flag?.flagName,
-                })
+                name: flag?.flagName,
+              })
               : t('featureFlags.markStaleConfirmMessage', {
-                  name: flag?.flagName,
-                })}
+                name: flag?.flagName,
+              })}
           </Typography>
         </DialogContent>
         <DialogActions>

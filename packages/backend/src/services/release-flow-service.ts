@@ -236,6 +236,76 @@ export class ReleaseFlowService {
 
       await trx.commit();
 
+      // Auto-activate first milestone so strategies are immediately available
+      const createdPlan = await ReleaseFlowModel.findById(plan.id);
+      const firstMilestone = (createdPlan?.milestones || []).sort(
+        (a, b) => a.sortOrder - b.sortOrder
+      )[0];
+      if (firstMilestone) {
+        await ReleaseFlowModel.update(plan.id, {
+          activeMilestoneId: firstMilestone.id,
+          status: 'active',
+        });
+        await ReleaseFlowMilestoneModel.update(firstMilestone.id, {
+          startedAt: new Date(),
+        });
+
+        // Copy milestone strategies to feature strategies
+        for (const ms of firstMilestone.strategies || []) {
+          const strategyId = ulid();
+          await db('g_feature_strategies').insert({
+            id: strategyId,
+            flagId,
+            environmentId,
+            strategyName: ms.strategyName,
+            parameters: ms.parameters ? JSON.stringify(ms.parameters) : null,
+            constraints: ms.constraints
+              ? JSON.stringify(ms.constraints)
+              : '[]',
+            sortOrder: ms.sortOrder,
+            isEnabled: true,
+            createdBy: userId || null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+
+          // Copy segments
+          if (ms.segments && ms.segments.length > 0) {
+            const segments = await db('g_feature_segments').whereIn(
+              'segmentName',
+              ms.segments
+            );
+            const segmentIds = segments.map((s: any) => s.id);
+            if (segmentIds.length > 0) {
+              const links = segmentIds.map((segmentId: string) => ({
+                id: ulid(),
+                strategyId,
+                segmentId,
+              }));
+              await db('g_feature_flag_segments').insert(links);
+            }
+          }
+        }
+
+        // Bump flag version so SDKs pick up new strategies
+        const flag = await db('g_feature_flags')
+          .where('id', flagId)
+          .select('flagName')
+          .first();
+        if (flag) {
+          await db('g_feature_flags')
+            .where('id', flagId)
+            .update({
+              version: db.raw('COALESCE(version, 0) + 1'),
+              updatedAt: new Date(),
+            });
+          const { featureFlagService } = await import('./feature-flag-service');
+          await featureFlagService.invalidateCache(environmentId, [
+            flag.flagName,
+          ]);
+        }
+      }
+
       await AuditLogModel.create({
         action: 'release_flow.apply_plan',
         description: `Release flow template '${template.flowName}' applied to flag '${flagId}' in [${environmentId}]`,
@@ -906,6 +976,32 @@ export class ReleaseFlowService {
 
     // Cancel any pending progression delayed job
     await this.cancelProgressionJob(planId);
+
+    // Clean up strategies copied from active milestone
+    if (plan.flagId && plan.environmentId) {
+      await db('g_feature_strategies')
+        .where('flagId', plan.flagId)
+        .where('environmentId', plan.environmentId)
+        .del();
+
+      // Bump flag version and invalidate cache
+      const flag = await db('g_feature_flags')
+        .where('id', plan.flagId)
+        .select('flagName')
+        .first();
+      if (flag) {
+        await db('g_feature_flags')
+          .where('id', plan.flagId)
+          .update({
+            version: db.raw('COALESCE(version, 0) + 1'),
+            updatedAt: new Date(),
+          });
+        const { featureFlagService } = await import('./feature-flag-service');
+        await featureFlagService.invalidateCache(plan.environmentId, [
+          flag.flagName,
+        ]);
+      }
+    }
 
     await ReleaseFlowModel.update(planId, {
       isArchived: true,

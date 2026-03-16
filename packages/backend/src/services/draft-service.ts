@@ -44,6 +44,16 @@ export interface DraftHandler {
    * (Optional) Get display name for a target
    */
   getDisplayName?(targetId: string): Promise<string | null>;
+
+  /**
+   * (Optional) Undo immediately-applied changes when draft is discarded
+   */
+  onDiscard?(
+    targetId: string,
+    environmentId: string | undefined,
+    draftData: any,
+    userId: string
+  ): Promise<void>;
 }
 
 export interface DraftRecord {
@@ -286,6 +296,16 @@ export class DraftService {
     if (!draft) {
       // No draft exists — might have been auto-saved but not yet, or already discarded
       return;
+    }
+
+    // Call handler's onDiscard to undo immediately-applied changes
+    const handler = draftHandlers.get(targetType);
+    if (handler?.onDiscard && userId) {
+      try {
+        await handler.onDiscard(targetId, environmentId, draft.draftData, userId);
+      } catch (error) {
+        logger.warn(`onDiscard failed for ${targetType}/${targetId}:`, error);
+      }
     }
 
     await db('g_drafts').where('id', draft.id).del();

@@ -190,6 +190,11 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+    ports:
+      - target: 5000
+        published: ${BACKEND_PORT:-45000}
+        protocol: tcp
+        mode: ingress
     volumes:
       - backend_logs:/app/logs
       - backend_data:/app/data
@@ -225,6 +230,11 @@ services:
       VITE_API_URL: /api/v1
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
+    ports:
+      - target: 80
+        published: ${FRONTEND_PORT:-43000}
+        protocol: tcp
+        mode: ingress
     networks:
       - gatrix-public
     deploy:
@@ -394,8 +404,8 @@ services:
     environment:
       NODE_ENV: production
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-info}
-      EDGE_PORT: 1337
-      EDGE_METRICS_PORT: 9337
+      EDGE_PORT: 3400
+      EDGE_METRICS_PORT: 9400
       GATRIX_URL: http://backend:5000
       EDGE_API_TOKEN: ${EDGE_API_TOKEN:-gatrix-edge-internal-bypass-token}
       EDGE_BYPASS_TOKEN: ${EDGE_BYPASS_TOKEN:-gatrix-edge-internal-bypass-token}
@@ -411,6 +421,15 @@ services:
       EDGE_REDIS_PASSWORD: ${EDGE_REDIS_PASSWORD:-}
       EDGE_REDIS_DB: ${EDGE_REDIS_DB:-0}
       EDGE_FORCE_HTTPS: ${EDGE_FORCE_HTTPS:-true}
+    ports:
+      - target: 3400
+        published: 3400
+        protocol: tcp
+        mode: ingress
+      - target: 3410
+        published: 3410
+        protocol: tcp
+        mode: ingress
     volumes:
       - edge_logs:/app/logs
     networks:
@@ -431,7 +450,7 @@ services:
           'CMD',
           'node',
           '-e',
-          "require('http').get('http://127.0.0.1:1337/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))",
+          "require('http').get('http://127.0.0.1:3400/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))",
         ]
       interval: 30s
       timeout: 10s

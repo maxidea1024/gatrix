@@ -301,115 +301,106 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
         )}
 
         {/* Context Field Selector */}
-        <Tooltip
-          title={
-            contextFields.find((f) => f.fieldName === constraint.contextName)
-              ?.description || ''
-          }
-          disableFocusListener
-          placement="top"
+        <FormControl
+          size="small"
+          sx={{ minWidth: 150, flex: '1 1 150px' }}
+          error={isFieldEmpty}
         >
-          <FormControl
-            size="small"
-            sx={{ minWidth: 150, flex: '1 1 150px' }}
-            error={isFieldEmpty}
-          >
-            <Select
-              value={constraint.contextName}
-              onChange={(e) =>
-                handleConstraintChange(index, 'contextName', e.target.value)
-              }
-              displayEmpty
-              disabled={disabled}
-              renderValue={(selected) => {
-                if (!selected) {
-                  return (
-                    <em style={{ color: 'gray' }}>
-                      {t('featureFlags.selectContextField')}
-                    </em>
-                  );
-                }
-                const selectedField = contextFields.find(
-                  (f) => f.fieldName === selected
+          <Select
+            value={constraint.contextName}
+            onChange={(e) =>
+              handleConstraintChange(index, 'contextName', e.target.value)
+            }
+            displayEmpty
+            disabled={disabled}
+            renderValue={(selected) => {
+              if (!selected) {
+                return (
+                  <em style={{ color: 'gray' }}>
+                    {t('featureFlags.selectContextField')}
+                  </em>
                 );
-                // Show missing icon for deleted/unknown fields
-                if (!selectedField) {
-                  return (
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Tooltip
-                        title={t('featureFlags.missingContextField')}
-                        disableFocusListener
-                      >
-                        <MissingIcon
-                          sx={{ fontSize: 16, color: 'error.main', mr: 1 }}
-                        />
-                      </Tooltip>
-                      <Typography sx={{ color: 'error.main' }}>
-                        {selected}
-                      </Typography>
-                    </Box>
-                  );
-                }
+              }
+              const selectedField = contextFields.find(
+                (f) => f.fieldName === selected
+              );
+              // Show missing icon for deleted/unknown fields
+              if (!selectedField) {
                 return (
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <FieldTypeIcon
-                      type={selectedField.fieldType}
-                      size={16}
-                      sx={{ mr: 1 }}
-                    />
-                    {selectedField.displayName || selectedField.fieldName}
+                    <Tooltip
+                      title={t('featureFlags.missingContextField')}
+                      disableFocusListener
+                    >
+                      <MissingIcon
+                        sx={{ fontSize: 16, color: 'error.main', mr: 1 }}
+                      />
+                    </Tooltip>
+                    <Typography sx={{ color: 'error.main' }}>
+                      {selected}
+                    </Typography>
                   </Box>
                 );
-              }}
-            >
-              <MenuItem value="" disabled>
-                <em>{t('featureFlags.selectContextField')}</em>
-              </MenuItem>
-              {contextFields.map((field) => {
-                const isUsed = usedFieldNames.includes(field.fieldName);
-                return (
-                  <MenuItem
-                    key={field.fieldName}
-                    value={field.fieldName}
-                    disabled={isUsed}
-                    sx={{
-                      display: 'flex',
-                      gap: 1.5,
-                      alignItems: 'flex-start',
-                      py: 1,
-                    }}
-                  >
-                    <Tooltip title={field.fieldType} disableFocusListener>
-                      <Box
-                        sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}
-                      >
-                        <FieldTypeIcon type={field.fieldType} size={16} />
-                      </Box>
-                    </Tooltip>
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography variant="body2">
-                        {field.displayName || field.fieldName}
-                        {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
-                      </Typography>
-                      {field.description && (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ display: 'block' }}
-                        >
-                          {field.description}
-                        </Typography>
-                      )}
+              }
+              return (
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <FieldTypeIcon
+                    type={selectedField.fieldType}
+                    size={16}
+                    sx={{ mr: 1 }}
+                  />
+                  {selectedField.displayName || selectedField.fieldName}
+                </Box>
+              );
+            }}
+          >
+            <MenuItem value="" disabled>
+              <em>{t('featureFlags.selectContextField')}</em>
+            </MenuItem>
+            {contextFields.map((field) => {
+              const isUsed = usedFieldNames.includes(field.fieldName);
+              return (
+                <MenuItem
+                  key={field.fieldName}
+                  value={field.fieldName}
+                  disabled={isUsed}
+                  sx={{
+                    display: 'flex',
+                    gap: 1.5,
+                    alignItems: 'flex-start',
+                    py: 1,
+                  }}
+                >
+                  <Tooltip title={field.fieldType} disableFocusListener>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}
+                    >
+                      <FieldTypeIcon type={field.fieldType} size={16} />
                     </Box>
-                  </MenuItem>
-                );
-              })}
-            </Select>
-            {isFieldEmpty && (
-              <FormHelperText>{t('featureFlags.fieldRequired')}</FormHelperText>
-            )}
-          </FormControl>
-        </Tooltip>
+                  </Tooltip>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="body2">
+                      {field.displayName || field.fieldName}
+                      {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
+                    </Typography>
+                    {field.description && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: 'block' }}
+                      >
+                        {field.description}
+                      </Typography>
+                    )}
+                  </Box>
+                </MenuItem>
+              );
+            })}
+          </Select>
+          {isFieldEmpty && (
+            <FormHelperText>{t('featureFlags.fieldRequired')}</FormHelperText>
+          )}
+        </FormControl>
 
         {/* Inverted (!) - placed before operator for natural reading order */}
         <Tooltip title={t('featureFlags.invertedHelp')} disableFocusListener>
@@ -438,89 +429,83 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
         </Tooltip>
 
         {/* Operator Selector */}
-        <Tooltip
-          title={t(`constraints.operatorDesc.${constraint.operator}`, '')}
-          disableFocusListener
-          placement="top"
-        >
-          <FormControl size="small" sx={{ minWidth: 130, flex: '1 1 130px' }}>
-            <Select
-              value={validOperator}
-              onChange={(e) =>
-                handleConstraintChange(index, 'operator', e.target.value)
-              }
-              disabled={disabled}
-              renderValue={(selected) => {
-                const label = getOperatorLabel(
-                  selected as string,
-                  constraint.inverted || false,
-                  operators
-                );
-                return (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <OperatorIcon
-                      operator={selected as string}
-                      inverted={constraint.inverted}
-                      size={16}
-                      showTooltip={true}
-                    />
-                    {constraint.inverted && (
-                      <Typography
-                        component="span"
-                        sx={{ color: 'warning.main', fontWeight: 600 }}
-                      >
-                        NOT
-                      </Typography>
-                    )}
-                    <Typography component="span">
-                      {t(
-                        `featureFlags.operators.${selected}${
-                          constraint.inverted ? '_inverted' : ''
-                        }`,
-                        label
-                      )}
-                    </Typography>
-                  </Box>
-                );
-              }}
-            >
-              {operators.map((op) => (
-                <MenuItem
-                  key={op.value}
-                  value={op.value}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 1,
-                    py: 1,
-                  }}
-                >
+        <FormControl size="small" sx={{ minWidth: 130, flex: '1 1 130px' }}>
+          <Select
+            value={validOperator}
+            onChange={(e) =>
+              handleConstraintChange(index, 'operator', e.target.value)
+            }
+            disabled={disabled}
+            renderValue={(selected) => {
+              const label = getOperatorLabel(
+                selected as string,
+                constraint.inverted || false,
+                operators
+              );
+              return (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <OperatorIcon
-                    operator={op.value}
-                    size={18}
+                    operator={selected as string}
+                    inverted={constraint.inverted}
+                    size={16}
                     showTooltip={true}
-                    sx={{ mt: 0.25 }}
                   />
-                  <Box sx={{ minWidth: 0 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      {t(`featureFlags.operators.${op.value}`, op.label)}
-                    </Typography>
+                  {constraint.inverted && (
                     <Typography
-                      variant="caption"
-                      sx={{
-                        color: 'text.secondary',
-                        display: 'block',
-                        lineHeight: 1.3,
-                      }}
+                      component="span"
+                      sx={{ color: 'warning.main', fontWeight: 600 }}
                     >
-                      {t(`constraints.operatorDesc.${op.value}`, '')}
+                      NOT
                     </Typography>
-                  </Box>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Tooltip>
+                  )}
+                  <Typography component="span">
+                    {t(
+                      `featureFlags.operators.${selected}${
+                        constraint.inverted ? '_inverted' : ''
+                      }`,
+                      label
+                    )}
+                  </Typography>
+                </Box>
+              );
+            }}
+          >
+            {operators.map((op) => (
+              <MenuItem
+                key={op.value}
+                value={op.value}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 1,
+                  py: 1,
+                }}
+              >
+                <OperatorIcon
+                  operator={op.value}
+                  size={18}
+                  showTooltip={true}
+                  sx={{ mt: 0.25 }}
+                />
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {t(`featureFlags.operators.${op.value}`, op.label)}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'text.secondary',
+                      display: 'block',
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {t(`constraints.operatorDesc.${op.value}`, '')}
+                  </Typography>
+                </Box>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
         {/* Value Input */}
         <Box sx={{ flex: '2 1 200px', minWidth: 150 }}>

@@ -240,6 +240,36 @@ const StrategyCardReadonly: React.FC<StrategyCardReadonlyProps> = ({
               </Typography>
             )}
           </Box>
+
+          {/* Summary chips: segment count and constraint count */}
+          {hasSegments && (
+            <Typography
+              variant="caption"
+              sx={{
+                px: 1,
+                py: 0.25,
+                bgcolor: 'action.hover',
+                borderRadius: '4px',
+                color: 'text.secondary',
+              }}
+            >
+              {t('featureFlags.segments')} {segments.length}
+            </Typography>
+          )}
+          {hasConstraints && (
+            <Typography
+              variant="caption"
+              sx={{
+                px: 1,
+                py: 0.25,
+                bgcolor: 'action.hover',
+                borderRadius: '4px',
+                color: 'text.secondary',
+              }}
+            >
+              {t('featureFlags.constraints')} {constraints.length}
+            </Typography>
+          )}
         </Box>
 
         <Box
