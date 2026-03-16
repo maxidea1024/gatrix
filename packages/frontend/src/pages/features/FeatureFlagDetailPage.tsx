@@ -890,6 +890,15 @@ const FeatureFlagDetailPage: React.FC = () => {
     isCreating,
   ]);
 
+  // Refetch data when draft is published or discarded
+  useEffect(() => {
+    const handleDraftAction = () => {
+      if (!isCreating) loadFlag();
+    };
+    window.addEventListener('draft-action-completed', handleDraftAction);
+    return () => window.removeEventListener('draft-action-completed', handleDraftAction);
+  }, [loadFlag, isCreating]);
+
   // Check draft status and apply draft data to UI
   const loadFlagDraftStatus = useCallback(
     async (flagId: string) => {
@@ -959,7 +968,14 @@ const FeatureFlagDetailPage: React.FC = () => {
         .then(() => loadFlagDraftStatus(flag.id))
         .finally(() => setEnvLoading(false));
     }
-  }, [isCreating, flag?.flagName, flag?.id, environments, loadEnvStrategies, loadFlagDraftStatus]);  // Load environment metrics for summary display in environment cards
+  }, [
+    isCreating,
+    flag?.flagName,
+    flag?.id,
+    environments,
+    loadEnvStrategies,
+    loadFlagDraftStatus,
+  ]); // Load environment metrics for summary display in environment cards
   useEffect(() => {
     if (!isCreating && flag?.flagName && environments.length > 0) {
       loadEnvMetrics(flag.flagName, environments);
@@ -1102,16 +1118,6 @@ const FeatureFlagDetailPage: React.FC = () => {
     try {
       // Save to draft instead of directly toggling
       await saveChangesToDraft(envKey, { isEnabled: !currentEnabled });
-      const envDisplayName =
-        environments.find((e) => e.environmentId === envKey)?.displayName ||
-        envKey;
-      enqueueSnackbar(
-        <span>
-          <strong>{flag.flagName}</strong> ({envDisplayName}){' '}
-          {t(`featureFlags.${!currentEnabled ? 'enabled' : 'disabled'}`)}
-        </span>,
-        { variant: !currentEnabled ? 'success' : 'warning' }
-      );
     } catch (error: any) {
       // Rollback on error
       setFlag({ ...flag, environments: flag.environments });
@@ -1508,9 +1514,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   };
 
   // Save global (flag-level) settings to draft under the _global key
-  const saveGlobalChangesToDraft = async (
-    updates: Record<string, any>
-  ) => {
+  const saveGlobalChangesToDraft = async (updates: Record<string, any>) => {
     if (!flag) return;
 
     const { draftData } = await draftService.getDraft(
@@ -1577,7 +1581,6 @@ const FeatureFlagDetailPage: React.FC = () => {
       setEditingEnv(null);
       setIsAddingStrategy(false);
       setExpandedSegmentsDialog(new Set());
-      enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
         variant: 'error',
@@ -1615,7 +1618,6 @@ const FeatureFlagDetailPage: React.FC = () => {
           [envName]: updatedStrategies,
         }));
       }
-      enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), {
         variant: 'error',
@@ -1641,9 +1643,6 @@ const FeatureFlagDetailPage: React.FC = () => {
         }));
         // Save to draft instead of directly to backend
         await saveChangesToDraft(envName, { variants: apiVariants });
-        enqueueSnackbar(t('featureFlags.variantsSaved'), {
-          variant: 'success',
-        });
       } else {
         setEnvVariants((prev) => ({
           ...prev,
@@ -1783,9 +1782,6 @@ const FeatureFlagDetailPage: React.FC = () => {
         }));
         // Save to draft instead of directly to backend
         await saveChangesToDraft(envName, { strategies: apiStrategies });
-        enqueueSnackbar(t('featureFlags.strategyReordered'), {
-          variant: 'success',
-        });
       }
     } catch (error: any) {
       // Revert on error
@@ -1953,7 +1949,6 @@ const FeatureFlagDetailPage: React.FC = () => {
       setFlag({ ...flag, variants: updatedVariants });
       setVariantDialogOpen(false);
       setEditingVariant(null);
-      enqueueSnackbar(t('draft.saveSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
         variant: 'error',
@@ -1977,7 +1972,6 @@ const FeatureFlagDetailPage: React.FC = () => {
         });
       }
       setFlag({ ...flag, variants: updatedVariants });
-      enqueueSnackbar(t('draft.saveSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), {
         variant: 'error',
@@ -3699,9 +3693,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                           enabledValue: flag.enabledValue,
                           disabledValue: flag.disabledValue,
                           validationRules: flag.validationRules ?? null,
-                        });
-                        enqueueSnackbar(t('draft.saveSuccess'), {
-                          variant: 'success',
                         });
                       } catch (error: any) {
                         enqueueSnackbar(

@@ -229,18 +229,16 @@ const FeatureFlagsPage: React.FC = () => {
 
   // Create dialog state - auto-open when navigated with ?create=flagName
   const createFlagNameParam = searchParams.get('create');
-  const [createDialogOpen, setCreateDialogOpen] = useState(
-    !!createFlagNameParam
-  );
+  const [createDialogOpen, setCreateDialogOpen] =
+    useState(!!createFlagNameParam);
   const [createMenuAnchor, setCreateMenuAnchor] = useState<null | HTMLElement>(
     null
   );
   const [creating, setCreating] = useState(false);
   const [showCreateDescription, setShowCreateDescription] = useState(false);
   const [showCreateTags, setShowCreateTags] = useState(false);
-  const [createFlagTypeMode, setCreateFlagTypeMode] = useState(
-    !!createFlagNameParam
-  );
+  const [createFlagTypeMode, setCreateFlagTypeMode] =
+    useState(!!createFlagNameParam);
   const [newFlag, setNewFlag] = useState(() => {
     if (createFlagNameParam) {
       return {
@@ -634,6 +632,13 @@ const FeatureFlagsPage: React.FC = () => {
       setIsInitialLoad(false);
     }
   };
+
+  // Refetch data when draft is published or discarded
+  useEffect(() => {
+    const handleDraftAction = () => loadFlags();
+    window.addEventListener('draft-action-completed', handleDraftAction);
+    return () => window.removeEventListener('draft-action-completed', handleDraftAction);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadTags = async () => {
     try {
@@ -1051,17 +1056,6 @@ const FeatureFlagsPage: React.FC = () => {
       // Track which flags have drafts
       setFlagDraftMap((prev) => ({ ...prev, [flag.id]: true }));
       window.dispatchEvent(new Event('draft-changed'));
-
-      const envDisplayName =
-        environments.find((e) => e.environmentId === environmentId)
-          ?.displayName || environmentId;
-      enqueueSnackbar(
-        <span>
-          <strong>{flag.flagName}</strong> ({envDisplayName}){' '}
-          {t('featureFlags.draftSaved')}
-        </span>,
-        { variant: 'info' }
-      );
     } catch (error: any) {
       // Rollback on error
       setFlags((prev) =>
@@ -1106,7 +1100,7 @@ const FeatureFlagsPage: React.FC = () => {
         )
       );
       setFlagDraftMap({});
-      enqueueSnackbar(t('draft.publishSuccess'), { variant: 'success' });
+
       loadFlags();
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'draft.publishFailed'), {
@@ -1124,7 +1118,7 @@ const FeatureFlagsPage: React.FC = () => {
         )
       );
       setFlagDraftMap({});
-      enqueueSnackbar(t('draft.discardSuccess'), { variant: 'success' });
+
       loadFlags();
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'draft.discardFailed'), {

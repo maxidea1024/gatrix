@@ -113,6 +113,7 @@ import mailService from '@/services/mailService';
 import AIChatPanel, { AIChatFloatingButton } from '@/components/ai/AIChatPanel';
 import { Permission, P } from '@/types/permissions';
 import DraftBanner from '@/components/common/DraftBanner';
+import DraftConfirmDialog from '@/components/common/DraftConfirmDialog';
 import DraftChangesDialog from '@/components/common/DraftChangesDialog';
 import draftService from '@/services/draftService';
 
@@ -250,6 +251,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Global draft state
   const [globalDraftCount, setGlobalDraftCount] = useState(0);
   const [draftChangesOpen, setDraftChangesOpen] = useState(false);
+  const [draftConfirmMode, setDraftConfirmMode] = useState<
+    'publish' | 'discard' | null
+  >(null);
 
   // User has RBAC permissions assigned (regardless of system role)
   const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
@@ -2470,65 +2474,76 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             flexDirection: 'column',
           }}
         >
-          {/* Global Draft Banner */}
-          {globalDraftCount > 0 && (
-            <DraftBanner
-              hasDraft={true}
-              onPublish={async () => {
-                try {
-                  const projectApiPath = getProjectApiPath();
-                  const [flagDrafts, segDrafts] = await Promise.all([
-                    draftService.listDrafts('feature_flag', projectApiPath),
-                    draftService.listDrafts('segment', projectApiPath),
-                  ]);
-                  await Promise.all([
-                    ...flagDrafts.map((d) =>
-                      draftService.publishDraft('feature_flag', d.targetId, projectApiPath)
-                    ),
-                    ...segDrafts.map((d) =>
-                      draftService.publishDraft('segment', d.targetId, projectApiPath)
-                    ),
-                  ]);
-                  setGlobalDraftCount(0);
-                  enqueueSnackbar(t('draft.publishSuccess'), {
-                    variant: 'success',
-                  });
-                  window.dispatchEvent(new Event('draft-changed'));
-                } catch {
-                  enqueueSnackbar(t('draft.publishFailed'), {
-                    variant: 'error',
-                  });
-                }
-              }}
-              onDiscard={async () => {
-                try {
-                  const projectApiPath = getProjectApiPath();
-                  const [flagDrafts, segDrafts] = await Promise.all([
-                    draftService.listDrafts('feature_flag', projectApiPath),
-                    draftService.listDrafts('segment', projectApiPath),
-                  ]);
-                  await Promise.all([
-                    ...flagDrafts.map((d) =>
-                      draftService.discardDraft('feature_flag', d.targetId, projectApiPath)
-                    ),
-                    ...segDrafts.map((d) =>
-                      draftService.discardDraft('segment', d.targetId, projectApiPath)
-                    ),
-                  ]);
-                  setGlobalDraftCount(0);
-                  enqueueSnackbar(t('draft.discardSuccess'), {
-                    variant: 'success',
-                  });
-                  window.dispatchEvent(new Event('draft-changed'));
-                } catch {
-                  enqueueSnackbar(t('draft.discardFailed'), {
-                    variant: 'error',
-                  });
-                }
-              }}
-              onViewChanges={() => setDraftChangesOpen(true)}
-            />
-          )}
+          {/* Global Draft Banner - always visible */}
+          <DraftBanner
+            hasDraft={globalDraftCount > 0}
+            sidebarWidth={sidebarCollapsed ? 64 : sidebarWidth}
+            onPublish={async () => {
+              try {
+                const projectApiPath = getProjectApiPath();
+                const [flagDrafts, segDrafts] = await Promise.all([
+                  draftService.listDrafts('feature_flag', projectApiPath),
+                  draftService.listDrafts('segment', projectApiPath),
+                ]);
+                await Promise.all([
+                  ...flagDrafts.map((d) =>
+                    draftService.publishDraft(
+                      'feature_flag',
+                      d.targetId,
+                      projectApiPath
+                    )
+                  ),
+                  ...segDrafts.map((d) =>
+                    draftService.publishDraft(
+                      'segment',
+                      d.targetId,
+                      projectApiPath
+                    )
+                  ),
+                ]);
+                setGlobalDraftCount(0);
+                window.dispatchEvent(new Event('draft-changed'));
+              } catch {
+                enqueueSnackbar(t('draft.publishFailed'), {
+                  variant: 'error',
+                });
+              }
+            }}
+            onDiscard={async () => {
+              try {
+                const projectApiPath = getProjectApiPath();
+                const [flagDrafts, segDrafts] = await Promise.all([
+                  draftService.listDrafts('feature_flag', projectApiPath),
+                  draftService.listDrafts('segment', projectApiPath),
+                ]);
+                await Promise.all([
+                  ...flagDrafts.map((d) =>
+                    draftService.discardDraft(
+                      'feature_flag',
+                      d.targetId,
+                      projectApiPath
+                    )
+                  ),
+                  ...segDrafts.map((d) =>
+                    draftService.discardDraft(
+                      'segment',
+                      d.targetId,
+                      projectApiPath
+                    )
+                  ),
+                ]);
+                setGlobalDraftCount(0);
+                window.dispatchEvent(new Event('draft-changed'));
+              } catch {
+                enqueueSnackbar(t('draft.discardFailed'), {
+                  variant: 'error',
+                });
+              }
+            }}
+            onViewChanges={() => setDraftChangesOpen(true)}
+            onPublishClick={() => setDraftConfirmMode('publish')}
+            onDiscardClick={() => setDraftConfirmMode('discard')}
+          />
           {children}
         </Box>
 
@@ -2543,6 +2558,68 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           }))}
           projectApiPath={getProjectApiPath()}
         />
+
+        {/* Global Draft Confirm Dialog (Publish/Discard with preview) */}
+        {draftConfirmMode && (
+          <DraftConfirmDialog
+            open={true}
+            mode={draftConfirmMode}
+            onClose={() => setDraftConfirmMode(null)}
+            onConfirm={async () => {
+              const projectApiPath = getProjectApiPath();
+              const [flagDrafts, segDrafts] = await Promise.all([
+                draftService.listDrafts('feature_flag', projectApiPath),
+                draftService.listDrafts('segment', projectApiPath),
+              ]);
+              if (draftConfirmMode === 'publish') {
+                await Promise.all([
+                  ...flagDrafts.map((d) =>
+                    draftService.publishDraft(
+                      'feature_flag',
+                      d.targetId,
+                      projectApiPath
+                    )
+                  ),
+                  ...segDrafts.map((d) =>
+                    draftService.publishDraft(
+                      'segment',
+                      d.targetId,
+                      projectApiPath
+                    )
+                  ),
+                ]);
+              } else {
+                await Promise.all([
+                  ...flagDrafts.map((d) =>
+                    draftService.discardDraft(
+                      'feature_flag',
+                      d.targetId,
+                      projectApiPath
+                    )
+                  ),
+                  ...segDrafts.map((d) =>
+                    draftService.discardDraft(
+                      'segment',
+                      d.targetId,
+                      projectApiPath
+                    )
+                  ),
+                ]);
+              }
+              setGlobalDraftCount(0);
+              setDraftConfirmMode(null);
+              window.dispatchEvent(new Event('draft-changed'));
+              // Signal pages to refetch their data without hard reload
+              window.dispatchEvent(new Event('draft-action-completed'));
+            }}
+            targetTypes={['feature_flag', 'segment']}
+            environments={environments.map((e) => ({
+              environmentId: e.environmentId,
+              displayName: e.displayName,
+            }))}
+            projectApiPath={getProjectApiPath()}
+          />
+        )}
       </Box>
 
       {/* AI Chat Floating Button & Panel */}

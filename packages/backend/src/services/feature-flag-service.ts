@@ -378,8 +378,10 @@ class FeatureFlagService {
 
     // Auto-resolve matching unknown flags within the same project
     try {
-      let resolveQuery = db('g_unknown_flags')
-        .where({ flagName: flagName!, isResolved: false });
+      let resolveQuery = db('g_unknown_flags').where({
+        flagName: flagName!,
+        isResolved: false,
+      });
 
       if (input.projectId) {
         resolveQuery = resolveQuery.whereIn(

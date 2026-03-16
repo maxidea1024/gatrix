@@ -455,11 +455,16 @@ const FeatureSegmentsPage: React.FC = () => {
       if (editingSegment.id) {
         // Save to draft instead of directly updating
         const draftData: any = {};
-        if (editingSegment.displayName !== undefined) draftData.displayName = editingSegment.displayName;
-        if (editingSegment.description !== undefined) draftData.description = editingSegment.description;
-        if (editingSegment.constraints !== undefined) draftData.constraints = editingSegment.constraints;
-        if (editingSegment.isActive !== undefined) draftData.isActive = editingSegment.isActive;
-        if (editingSegment.tags !== undefined) draftData.tags = editingSegment.tags;
+        if (editingSegment.displayName !== undefined)
+          draftData.displayName = editingSegment.displayName;
+        if (editingSegment.description !== undefined)
+          draftData.description = editingSegment.description;
+        if (editingSegment.constraints !== undefined)
+          draftData.constraints = editingSegment.constraints;
+        if (editingSegment.isActive !== undefined)
+          draftData.isActive = editingSegment.isActive;
+        if (editingSegment.tags !== undefined)
+          draftData.tags = editingSegment.tags;
         await draftService.saveDraft(
           'segment',
           editingSegment.id,
@@ -480,7 +485,8 @@ const FeatureSegmentsPage: React.FC = () => {
             _action: 'create',
             _projectId: currentProjectId,
             segmentName: editingSegment.segmentName,
-            displayName: editingSegment.displayName || editingSegment.segmentName,
+            displayName:
+              editingSegment.displayName || editingSegment.segmentName,
             description: editingSegment.description || '',
             constraints: editingSegment.constraints || [],
             isActive: editingSegment.isActive ?? true,
@@ -758,18 +764,21 @@ const FeatureSegmentsPage: React.FC = () => {
                                       );
                                       try {
                                         // Save to draft instead of directly updating
-                                        const { draftData } = await draftService.getDraft(
-                                          'segment',
-                                          segment.id,
-                                          projectApiPath
-                                        );
+                                        const { draftData } =
+                                          await draftService.getDraft(
+                                            'segment',
+                                            segment.id,
+                                            projectApiPath
+                                          );
                                         await draftService.saveDraft(
                                           'segment',
                                           segment.id,
                                           { ...draftData, isActive: newActive },
                                           projectApiPath
                                         );
-                                        window.dispatchEvent(new Event('draft-changed'));
+                                        window.dispatchEvent(
+                                          new Event('draft-changed')
+                                        );
                                       } catch (error: any) {
                                         setAllSegments((prev) =>
                                           prev.map((s) =>
