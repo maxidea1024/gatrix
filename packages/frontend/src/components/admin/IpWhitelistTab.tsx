@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import {
@@ -119,6 +119,18 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
 
   const [bulkData, setBulkData] = useState('');
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Check if form data has changed from original (for edit mode)
+  const isDirty = useMemo(() => {
+    if (!editDialog || !selectedIpWhitelist) return true; // Always allow submit for add
+    return (
+      formData.ipAddress !== selectedIpWhitelist.ipAddress ||
+      formData.purpose !== selectedIpWhitelist.purpose ||
+      formData.isEnabled !== selectedIpWhitelist.isEnabled ||
+      (formData.startDate || '') !== (selectedIpWhitelist.startDate || '') ||
+      (formData.endDate || '') !== (selectedIpWhitelist.endDate || '')
+    );
+  }, [formData, editDialog, selectedIpWhitelist]);
 
   // Load IP whitelists
   const loadIpWhitelists = useCallback(async () => {
@@ -776,7 +788,11 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleSave} variant="contained">
+          <Button
+            onClick={handleSave}
+            variant="contained"
+            disabled={editDialog && !isDirty}
+          >
             {editDialog ? t('common.update') : t('common.add')}
           </Button>
         </Box>
