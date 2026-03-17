@@ -409,9 +409,12 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
             alignItems: 'center',
             gap: 0.25,
             border: 1,
-            borderColor: 'divider',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.15)'
+                : 'rgba(0, 0, 0, 0.2)',
             borderRadius: 1,
-            overflow: 'hidden',
+            px: 0.5,
             flexShrink: 0,
             bgcolor: (theme) =>
               theme.palette.mode === 'dark'
