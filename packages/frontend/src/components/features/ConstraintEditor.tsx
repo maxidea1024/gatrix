@@ -434,7 +434,9 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                 sx={{
                   width: 32,
                   height: 32,
-                  borderRadius: 0,
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: constraint.inverted ? 'warning.main' : 'divider',
                   color: constraint.inverted ? 'warning.main' : 'text.disabled',
                   bgcolor: constraint.inverted
                     ? 'action.selected'
@@ -555,7 +557,9 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                 sx={{
                   width: 32,
                   height: 32,
-                  borderRadius: 0,
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: constraint.caseInsensitive ? 'primary.main' : 'divider',
                   color: constraint.caseInsensitive
                     ? 'primary.main'
                     : 'text.disabled',
