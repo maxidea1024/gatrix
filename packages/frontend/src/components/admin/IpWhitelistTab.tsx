@@ -29,7 +29,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import LocalizedDateTimePicker from '../common/LocalizedDateTimePicker';
 import {
   MoreVert as MoreVertIcon,
   Add as AddIcon,
@@ -61,7 +61,7 @@ import FormDialogHeader from '../common/FormDialogHeader';
 import ResizableDrawer from '../common/ResizableDrawer';
 import EmptyPagePlaceholder from '../common/EmptyPagePlaceholder';
 import SearchTextField from '../common/SearchTextField';
-import dayjs from 'dayjs';
+
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../common/ExportImportMenuItems';
 import ImportDialog from '../common/ImportDialog';
@@ -701,44 +701,21 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
               inputRef={ipAddressFieldRef}
             />
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <DateTimePicker
+              <LocalizedDateTimePicker
                 label={t('ipWhitelist.form.startDate')}
-                value={formData.startDate ? dayjs(formData.startDate) : null}
-                onChange={(date) =>
-                  setFormData({
-                    ...formData,
-                    startDate: date?.isValid() ? date.toISOString() : undefined,
-                  })
+                value={formData.startDate || null}
+                onChange={(isoString) =>
+                  setFormData({ ...formData, startDate: isoString || undefined })
                 }
-                timeSteps={{ minutes: 1 }}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    slotProps: { input: { readOnly: true } },
-                    helperText: t('ipWhitelist.form.startDateHelp'),
-                  },
-                }}
+                helperText={t('ipWhitelist.form.startDateHelp')}
               />
-              <DateTimePicker
+              <LocalizedDateTimePicker
                 label={t('ipWhitelist.form.endDate')}
-                value={formData.endDate ? dayjs(formData.endDate) : null}
-                onChange={(date) =>
-                  setFormData({
-                    ...formData,
-                    endDate: date?.isValid() ? date.toISOString() : undefined,
-                  })
+                value={formData.endDate || null}
+                onChange={(isoString) =>
+                  setFormData({ ...formData, endDate: isoString || undefined })
                 }
-                minDateTime={
-                  formData.startDate ? dayjs(formData.startDate) : undefined
-                }
-                timeSteps={{ minutes: 1 }}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    slotProps: { input: { readOnly: true } },
-                    helperText: t('ipWhitelist.form.endDateHelp'),
-                  },
-                }}
+                helperText={t('ipWhitelist.form.endDateHelp')}
               />
             </Box>
             <Box>

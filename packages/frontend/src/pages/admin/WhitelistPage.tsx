@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed, formatRelativeTime } from '@/utils/dateFormat';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import dayjs from 'dayjs';
+import LocalizedDateTimePicker from '../../components/common/LocalizedDateTimePicker';
 import { useTranslation } from 'react-i18next';
 import { usePageState } from '../../hooks/usePageState';
 import { useSearchParams } from 'react-router-dom';
@@ -75,7 +74,7 @@ import ExportImportMenuItems from '../../components/common/ExportImportMenuItems
 import ImportDialog from '../../components/common/ImportDialog';
 
 const WhitelistPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
   const { hasPermission } = useAuth();
@@ -949,55 +948,21 @@ const WhitelistPage: React.FC = () => {
                     helperText={t('whitelist.form.ipHelp')}
                   />
                   <Box sx={{ display: 'flex', gap: 2 }}>
-                    <DateTimePicker
-                      key={`start-date-${i18n.language}`}
+                    <LocalizedDateTimePicker
                       label={t('whitelist.form.startDateOpt')}
-                      value={
-                        formData.startDate ? dayjs(formData.startDate) : null
+                      value={formData.startDate || null}
+                      onChange={(isoString) =>
+                        setFormData({ ...formData, startDate: isoString })
                       }
-                      onChange={(date) => {
-                        setFormData({
-                          ...formData,
-                          startDate:
-                            date && dayjs.isDayjs(date) && date.isValid()
-                              ? date.toISOString()
-                              : '',
-                        });
-                      }}
-                      timeSteps={{ minutes: 1 }}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          error: false,
-                          slotProps: { input: { readOnly: true } },
-                          helperText: t('whitelist.form.startDateHelp'),
-                        },
-                      }}
+                      helperText={t('whitelist.form.startDateHelp')}
                     />
-                    <DateTimePicker
-                      key={`end-date-${i18n.language}`}
+                    <LocalizedDateTimePicker
                       label={t('whitelist.form.endDateOpt')}
-                      value={formData.endDate ? dayjs(formData.endDate) : null}
-                      onChange={(date) =>
-                        setFormData({
-                          ...formData,
-                          endDate:
-                            date && dayjs.isDayjs(date) && date.isValid()
-                              ? date.toISOString()
-                              : '',
-                        })
+                      value={formData.endDate || null}
+                      onChange={(isoString) =>
+                        setFormData({ ...formData, endDate: isoString })
                       }
-                      minDateTime={
-                        formData.startDate ? dayjs(formData.startDate) : undefined
-                      }
-                      timeSteps={{ minutes: 1 }}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          slotProps: { input: { readOnly: true } },
-                          helperText: t('whitelist.form.endDateHelp'),
-                        },
-                      }}
+                      helperText={t('whitelist.form.endDateHelp')}
                     />
                   </Box>
                   <TextField
