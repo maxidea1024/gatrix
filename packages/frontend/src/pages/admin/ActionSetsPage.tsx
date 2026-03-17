@@ -286,6 +286,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
+              helperText={t('actionSets.nameHelp')}
             />
             <TextField
               label={t('actionSets.description')}
@@ -295,6 +296,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
               size="small"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              helperText={t('actionSets.descriptionHelp')}
             />
             <FormControl size="small" fullWidth required>
               <InputLabel>{t('actionSets.signalEndpoint')}</InputLabel>
@@ -336,6 +338,9 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
                 ))}
               </Select>
             </FormControl>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: -1 }}>
+              {t('actionSets.signalEndpointHelp')}
+            </Typography>
           </Box>
         </Paper>
 
@@ -457,7 +462,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
           startIcon={<SaveIcon />}
           disabled={!isValid}
         >
-          {actionSet ? t('common.save') : t('common.create')}
+          {actionSet ? t('common.save') : t('common.add')}
         </Button>
       </Box>
     </ResizableDrawer>
