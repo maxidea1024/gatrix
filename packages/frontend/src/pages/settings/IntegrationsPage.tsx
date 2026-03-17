@@ -33,6 +33,7 @@ import {
 } from '@mui/icons-material';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { CreateIntegrationWizard } from '@/components/integrations/CreateIntegrationWizard';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
@@ -445,34 +446,17 @@ export const IntegrationsPage: React.FC = () => {
               </Box>
             </>
           ) : (
-            <Card
-              sx={{
-                p: 4,
-                mb: 6,
-                textAlign: 'center',
-                bgcolor: 'background.paper',
-                border: '1px dashed',
-                borderColor: 'divider',
-                boxShadow: 'none',
-              }}
-            >
-              <Typography variant="h6" color="text.secondary" gutterBottom>
-                {t('integrations.noIntegrations')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                {t('integrations.noIntegrationsGuide')}
-              </Typography>
-              <Button
-                variant="outlined"
-                startIcon={<AddIcon />}
-                onClick={() => {
+            <Box sx={{ mb: 4 }}>
+              <EmptyPagePlaceholder
+                message={t('integrations.noIntegrations')}
+                subtitle={t('integrations.noIntegrationsGuide')}
+                onAddClick={() => {
                   setWizardProvider(undefined);
                   setWizardOpen(true);
                 }}
-              >
-                {t('integrations.createFirst')}
-              </Button>
-            </Card>
+                addButtonLabel={t('integrations.createFirst')}
+              />
+            </Box>
           )}
 
           {/* Available Integrations - Now at BOTTOM */}

@@ -440,7 +440,7 @@ export const CreateIntegrationWizard: React.FC<
       PaperProps={{
         sx: {
           borderRadius: 3,
-          minHeight: 500,
+          height: 640,
         },
       }}
     >
@@ -467,9 +467,21 @@ export const CreateIntegrationWizard: React.FC<
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 3 }}>
+      <DialogContent sx={{ pt: 3, overflow: 'auto' }}>
         {/* Stepper */}
-        <Stepper activeStep={activeStep} sx={{ mt: 3, mb: 4 }}>
+        <Stepper
+          activeStep={activeStep}
+          sx={{
+            mb: 4,
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+            bgcolor: 'inherit',
+            py: 2,
+            mx: -3,
+            px: 3,
+          }}
+        >
           {STEPS.map((step) => (
             <Step key={step}>
               <StepLabel>{t(`integrations.step.${step}`)}</StepLabel>
@@ -770,10 +782,12 @@ export const CreateIntegrationWizard: React.FC<
         sx={{ px: 3, py: 2, borderTop: 1, borderColor: 'divider' }}
       >
         <Button
-          onClick={activeStep === 0 ? onClose : handleBack}
+          onClick={activeStep === 0 || initialProvider ? onClose : handleBack}
           disabled={saving}
         >
-          {activeStep === 0 ? t('common.cancel') : t('common.back')}
+          {activeStep === 0 || initialProvider
+            ? t('common.cancel')
+            : t('common.back')}
         </Button>
         <Button
           variant="contained"
