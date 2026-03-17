@@ -651,14 +651,12 @@ const JobsPage: React.FC = () => {
       {/* Jobs Table */}
       <PageContentLoader loading={loading}>
         {jobs.length === 0 ? (
-          <Paper sx={{ p: 0 }}>
-            <EmptyPagePlaceholder
-              message={t('jobs.noJobsFound')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-              onAddClick={canManage ? handleAddJob : undefined}
-              addButtonLabel={t('jobs.addJob')}
-            />
-          </Paper>
+          <EmptyPagePlaceholder
+            message={t('jobs.noJobsFound')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+            onAddClick={canManage ? handleAddJob : undefined}
+            addButtonLabel={t('jobs.addJob')}
+          />
         ) : (
           <TableContainer
             component={Paper}
