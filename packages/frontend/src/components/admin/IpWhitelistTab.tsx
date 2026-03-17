@@ -251,7 +251,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         ipAddressFieldRef.current?.focus();
       }, 100);
     }
-    handleMenuClose();
+    setAnchorEl(null);
   };
 
   // Direct edit by clicking on IP address
