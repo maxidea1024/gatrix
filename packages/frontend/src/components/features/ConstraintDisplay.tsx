@@ -188,9 +188,9 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
         sx={{
           display: 'flex',
           alignItems: 'center',
-          minWidth: 80,
-          maxWidth: 200,
+          width: 130,
           flexShrink: 0,
+          overflow: 'hidden',
           py: 0.25,
         }}
       >
@@ -216,6 +216,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
         sx={{
           display: 'flex',
           alignItems: 'center',
+          width: 130,
           flexShrink: 0,
           px: 1,
           py: 0.25,
