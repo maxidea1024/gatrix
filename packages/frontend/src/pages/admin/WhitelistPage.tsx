@@ -34,6 +34,9 @@ import {
   DialogActions,
   LinearProgress,
   Pagination,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -67,6 +70,9 @@ import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
+import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
+import ImportDialog from '../../components/common/ImportDialog';
 
 const WhitelistPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -159,6 +165,8 @@ const WhitelistPage: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [bulkData, setBulkData] = useState('');
   const [fullEditingData, setFullEditingData] = useState<any>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const isDirty = useMemo(() => {
     if (!editDialog || !fullEditingData) return true;
@@ -585,19 +593,43 @@ const WhitelistPage: React.FC = () => {
               {canManage && (
                 <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
                   <Button
-                    variant="outlined"
-                    startIcon={<UploadIcon />}
-                    onClick={() => setBulkDialog(true)}
-                  >
-                    {t('whitelist.bulkImport')}
-                  </Button>
-                  <Button
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={handleAdd}
                   >
                     {t('whitelist.addEntry')}
                   </Button>
+                  <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={pageMenuAnchor}
+                    open={Boolean(pageMenuAnchor)}
+                    onClose={() => setPageMenuAnchor(null)}
+                  >
+                    <ExportImportMenuItems
+                      onExport={(format) => {
+                        setPageMenuAnchor(null);
+                        const exportColumns: ExportColumn[] = [
+                          { key: 'accountId', header: t('whitelist.form.accountId') },
+                          { key: 'ipAddress', header: t('whitelist.form.ipAddress') },
+                          { key: 'purpose', header: t('whitelist.form.purpose') },
+                          { key: 'isEnabled', header: t('common.status') },
+                          { key: 'createdAt', header: t('common.createdAt') },
+                        ];
+                        try {
+                          exportToFile(whitelists, exportColumns, 'account-whitelist', format);
+                          enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                        } catch (err) {
+                          enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                        }
+                      }}
+                      onImportClick={() => {
+                        setPageMenuAnchor(null);
+                        setImportDialogOpen(true);
+                      }}
+                    />
+                  </Menu>
                 </Box>
               )}
             </Box>
@@ -1120,6 +1152,36 @@ const WhitelistPage: React.FC = () => {
           </Box>
         </CardContent>
       </Card>
+
+    {/* Import Dialog */}
+    <ImportDialog
+      open={importDialogOpen}
+      onClose={() => setImportDialogOpen(false)}
+      title={t('common.import')}
+      onImport={async (data) => {
+        let successCount = 0;
+        let failCount = 0;
+        for (const item of data) {
+          try {
+            await WhitelistService.createWhitelist({
+              accountId: item[t('whitelist.form.accountId')] || item.accountId || '',
+              ipAddress: item[t('whitelist.form.ipAddress')] || item.ipAddress || '',
+              purpose: item[t('whitelist.form.purpose')] || item.purpose || '',
+            });
+            successCount++;
+          } catch (err) {
+            failCount++;
+          }
+        }
+        if (successCount > 0) {
+          enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+          loadWhitelists();
+        }
+        if (failCount > 0) {
+          enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+        }
+      }}
+    />
     </Box>
   );
 };

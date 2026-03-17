@@ -21,6 +21,10 @@ import {
   CardContent,
   Divider,
   TableSortLabel,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -32,6 +36,7 @@ import {
   FilterList as FilterListIcon,
   ContentCopy as ContentCopyIcon,
   Refresh as RefreshIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -57,6 +62,9 @@ import DynamicFilterBar, {
 } from '../../components/common/DynamicFilterBar';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
+import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
+import ImportDialog from '../../components/common/ImportDialog';
 
 const RewardTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -87,6 +95,8 @@ const RewardTemplatesPage: React.FC = () => {
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
     useState<null | HTMLElement>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Sorting state with localStorage persistence
   const [orderBy, setOrderBy] = useState<string>(() => {
@@ -619,6 +629,35 @@ const RewardTemplatesPage: React.FC = () => {
             </Button>
           </Box>
         )}
+        <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+          <MoreVertIcon />
+        </IconButton>
+        <Menu
+          anchorEl={pageMenuAnchor}
+          open={Boolean(pageMenuAnchor)}
+          onClose={() => setPageMenuAnchor(null)}
+        >
+          <ExportImportMenuItems
+            onExport={(format) => {
+              setPageMenuAnchor(null);
+              const exportColumns: ExportColumn[] = [
+                { key: 'name', header: t('common.name') },
+                { key: 'description', header: t('common.description') },
+                { key: 'createdAt', header: t('common.createdAt') },
+              ];
+              try {
+                exportToFile(templates, exportColumns, 'reward-templates', format);
+                enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+              } catch (err) {
+                enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+              }
+            }}
+            onImportClick={() => {
+              setPageMenuAnchor(null);
+              setImportDialogOpen(true);
+            }}
+          />
+        </Menu>
       </Box>
 
       {/* Search and Filters */}
@@ -1044,6 +1083,36 @@ const RewardTemplatesPage: React.FC = () => {
           count: selectedIds.length,
         })}
         warning={t('rewardTemplates.bulkDeleteWarning')}
+      />
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        title={t('common.import')}
+        onImport={async (data) => {
+          let successCount = 0;
+          let failCount = 0;
+          for (const item of data) {
+            try {
+              await rewardTemplateService.createRewardTemplate(projectApiPath, {
+                name: item[t('common.name')] || item.name || '',
+                description: item[t('common.description')] || item.description || '',
+                rewardItems: [],
+              });
+              successCount++;
+            } catch (err) {
+              failCount++;
+            }
+          }
+          if (successCount > 0) {
+            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+            loadTemplates();
+          }
+          if (failCount > 0) {
+            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+          }
+        }}
       />
     </Box>
   );

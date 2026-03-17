@@ -157,6 +157,7 @@ import { useNavigate } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useDebounce } from '../../hooks/useDebounce';
+import ImportDialog from '../../components/common/ImportDialog';
 
 // HSV를 RGB로 변환하는 함수
 const hsvToRgb = (
@@ -522,6 +523,7 @@ const ClientVersionsPage: React.FC = () => {
   );
   const [selectedExportMenuAnchor, setSelectedExportMenuAnchor] =
     useState<null | HTMLElement>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // SDK 가이드 Status
   const [openSDKGuide, setOpenSDKGuide] = useState(false);
@@ -1713,6 +1715,23 @@ const ClientVersionsPage: React.FC = () => {
               </ListItemIcon>
               <ListItemText>Excel (XLSX)</ListItemText>
             </MenuItem>
+            <Divider />
+            <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
+              <ListItemIcon>
+                <AddIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('common.import')}
+                </Typography>
+              </ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => { setExportMenuAnchor(null); setImportDialogOpen(true); }} sx={{ pl: 4 }}>
+              <ListItemIcon>
+                <AddIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('common.import')} (CSV/JSON/XLSX)</ListItemText>
+            </MenuItem>
             {canManage && [
               <Divider key="divider-settings" />,
               <MenuItem
@@ -2807,6 +2826,39 @@ const ClientVersionsPage: React.FC = () => {
       <ClientVersionGuideDrawer
         open={openSDKGuide}
         onClose={() => setOpenSDKGuide(false)}
+      />
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        title={t('common.import')}
+        onImport={async (data) => {
+          let successCount = 0;
+          let failCount = 0;
+          for (const item of data) {
+            try {
+              await ClientVersionService.createClientVersion(projectApiPath, {
+                platform: item.platform || '',
+                clientVersion: item.clientVersion || item.version || '',
+                clientStatus: item.clientStatus || 'ONLINE',
+                gameServerAddress: item.gameServerAddress || '',
+                patchAddress: item.patchAddress || '',
+                guestModeAllowed: item.guestModeAllowed !== undefined ? Boolean(item.guestModeAllowed) : false,
+              });
+              successCount++;
+            } catch (err) {
+              failCount++;
+            }
+          }
+          if (successCount > 0) {
+            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+            mutateClientVersions();
+          }
+          if (failCount > 0) {
+            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+          }
+        }}
       />
     </Box>
   );

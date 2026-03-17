@@ -28,6 +28,10 @@ import {
   TableSortLabel,
   Switch,
   Divider,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import {
@@ -41,6 +45,7 @@ import {
   Refresh as RefreshIcon,
   Sync as SyncIcon,
   PlaylistPlay as BatchProcessIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -64,6 +69,9 @@ import ColumnSettingsDialog, {
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
+
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
+import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import StoreProductFormDrawer from '../../components/game/StoreProductFormDrawer';
 import DynamicFilterBar, {
@@ -107,6 +115,7 @@ const StoreProductsPage: React.FC = () => {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<StoreProduct | null>(
     null
@@ -805,6 +814,35 @@ const StoreProductsPage: React.FC = () => {
             </Button>
           </Box>
         )}
+        <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+          <MoreVertIcon />
+        </IconButton>
+        <Menu
+          anchorEl={pageMenuAnchor}
+          open={Boolean(pageMenuAnchor)}
+          onClose={() => setPageMenuAnchor(null)}
+        >
+          <ExportImportMenuItems
+            onExport={(format) => {
+              setPageMenuAnchor(null);
+              const exportColumns: ExportColumn[] = [
+                { key: 'productName', header: t('common.name') },
+                { key: 'productId', header: t('storeProducts.columns.productId') },
+                { key: 'store', header: t('storeProducts.columns.store') },
+                { key: 'price', header: t('storeProducts.columns.price') },
+                { key: 'isActive', header: t('common.status') },
+                { key: 'createdAt', header: t('common.createdAt') },
+              ];
+              try {
+                exportToFile(products, exportColumns, 'store-products', format);
+                enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+              } catch (err) {
+                enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+              }
+            }}
+            exportOnly={true}
+          />
+        </Menu>
       </Box>
 
       {/* Search and Filters */}
