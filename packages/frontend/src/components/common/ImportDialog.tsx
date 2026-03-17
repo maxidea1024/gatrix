@@ -68,20 +68,23 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
     onClose();
   }, [resetState, onClose]);
 
-  const processFile = useCallback(async (selectedFile: File) => {
-    setFile(selectedFile);
-    setError(null);
-    setParsing(true);
-    try {
-      const data = await parseImportFile(selectedFile);
-      setParsedData(data);
-    } catch (err: any) {
-      setError(err.message || t('common.importFailed'));
-      setParsedData([]);
-    } finally {
-      setParsing(false);
-    }
-  }, [t]);
+  const processFile = useCallback(
+    async (selectedFile: File) => {
+      setFile(selectedFile);
+      setError(null);
+      setParsing(true);
+      try {
+        const data = await parseImportFile(selectedFile);
+        setParsedData(data);
+      } catch (err: any) {
+        setError(err.message || t('common.importFailed'));
+        setParsedData([]);
+      } finally {
+        setParsing(false);
+      }
+    },
+    [t]
+  );
 
   const handleFileSelect = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,22 +134,17 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
   }, [parsedData, onImport, handleClose]);
 
   // Get preview columns
-  const previewColumns = parsedData.length > 0
-    ? Object.keys(parsedData[0]).slice(0, MAX_PREVIEW_COLS)
-    : [];
-  const totalColumns = parsedData.length > 0 ? Object.keys(parsedData[0]).length : 0;
+  const previewColumns =
+    parsedData.length > 0
+      ? Object.keys(parsedData[0]).slice(0, MAX_PREVIEW_COLS)
+      : [];
+  const totalColumns =
+    parsedData.length > 0 ? Object.keys(parsedData[0]).length : 0;
   const previewRows = parsedData.slice(0, MAX_PREVIEW_ROWS);
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth="md"
-      fullWidth
-    >
-      <DialogTitle>
-        {title || t('common.import')}
-      </DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+      <DialogTitle>{title || t('common.import')}</DialogTitle>
       <DialogContent>
         {/* Drop zone */}
         <Box
@@ -273,7 +271,9 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                         </TableCell>
                       ))}
                       {totalColumns > MAX_PREVIEW_COLS && (
-                        <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                        <TableCell
+                          sx={{ fontSize: '0.75rem', color: 'text.secondary' }}
+                        >
                           ...
                         </TableCell>
                       )}
@@ -284,7 +284,10 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
             </TableContainer>
             {parsedData.length > MAX_PREVIEW_ROWS && (
               <Typography variant="caption" color="text.secondary">
-                {t('common.rowCount', { count: parsedData.length - MAX_PREVIEW_ROWS })} {t('common.more')}...
+                {t('common.rowCount', {
+                  count: parsedData.length - MAX_PREVIEW_ROWS,
+                })}{' '}
+                {t('common.more')}...
               </Typography>
             )}
 

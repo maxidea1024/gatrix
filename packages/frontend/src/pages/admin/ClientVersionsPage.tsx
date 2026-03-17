@@ -1676,9 +1676,7 @@ const ClientVersionsPage: React.FC = () => {
               </Button>
             </>
           )}
-          <IconButton
-            onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-          >
+          <IconButton onClick={(e) => setExportMenuAnchor(e.currentTarget)}>
             <MoreVertIcon />
           </IconButton>
           <Menu

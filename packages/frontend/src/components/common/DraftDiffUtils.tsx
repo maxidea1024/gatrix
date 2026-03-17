@@ -232,38 +232,40 @@ export const StrategySummary: React.FC<{
   t: (key: string, fallback?: any) => string;
 }> = ({ label, oldStrategies, newStrategies, t }) => {
   return (
-  <Box>
-    <Typography
-      variant="body2"
-      fontWeight={600}
-      color="text.secondary"
-      sx={{ mb: 0.5 }}
-    >
-      {label}
-    </Typography>
-    <Box sx={{ display: 'flex', gap: 3 }}>
-      <Box sx={{ flex: 1 }}>
-        <Typography variant="caption" color="error.main" fontWeight={600}>
-          {t('common.before')}
-        </Typography>
-        <StrategyList strategies={oldStrategies} t={t} />
-      </Box>
-      <Box sx={{ flex: 1 }}>
-        <Typography variant="caption" color="success.main" fontWeight={600}>
-          {t('common.after')}
-        </Typography>
-        <StrategyList strategies={newStrategies} t={t} />
+    <Box>
+      <Typography
+        variant="body2"
+        fontWeight={600}
+        color="text.secondary"
+        sx={{ mb: 0.5 }}
+      >
+        {label}
+      </Typography>
+      <Box sx={{ display: 'flex', gap: 3 }}>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="caption" color="error.main" fontWeight={600}>
+            {t('common.before')}
+          </Typography>
+          <StrategyList strategies={oldStrategies} t={t} />
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="caption" color="success.main" fontWeight={600}>
+            {t('common.after')}
+          </Typography>
+          <StrategyList strategies={newStrategies} t={t} />
+        </Box>
       </Box>
     </Box>
-  </Box>
   );
 };
 
 // Format a single variant for display
 function formatVariant(v: any): string {
   const name = v.name || v.variantName || '—';
-  const val = v.value !== undefined && v.value !== null && v.value !== ''
-    ? formatValue(v.value) : null;
+  const val =
+    v.value !== undefined && v.value !== null && v.value !== ''
+      ? formatValue(v.value)
+      : null;
   const weight = v.weight !== undefined ? v.weight : null;
   let result = name;
   if (val !== null) result += ` = ${val}`;
@@ -294,9 +296,21 @@ const VariantSummary: React.FC<{
     const name = ov.name || ov.variantName || '';
     if (!newMap.has(name)) {
       diffs.push(
-        <Box key={`del-${name}`} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Chip label={t('common.delete')} size="small" color="error" variant="outlined" sx={{ height: 20, fontSize: 11 }} />
-          <Typography variant="body2" sx={{ textDecoration: 'line-through', color: 'error.main' }}>
+        <Box
+          key={`del-${name}`}
+          sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+        >
+          <Chip
+            label={t('common.delete')}
+            size="small"
+            color="error"
+            variant="outlined"
+            sx={{ height: 20, fontSize: 11 }}
+          />
+          <Typography
+            variant="body2"
+            sx={{ textDecoration: 'line-through', color: 'error.main' }}
+          >
             {formatVariant(ov)}
           </Typography>
         </Box>
@@ -309,9 +323,21 @@ const VariantSummary: React.FC<{
     const name = nv.name || nv.variantName || '';
     if (!oldMap.has(name)) {
       diffs.push(
-        <Box key={`add-${name}`} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Chip label={t('common.add')} size="small" color="success" variant="outlined" sx={{ height: 20, fontSize: 11 }} />
-          <Typography variant="body2" sx={{ color: 'success.main', fontWeight: 500 }}>
+        <Box
+          key={`add-${name}`}
+          sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+        >
+          <Chip
+            label={t('common.add')}
+            size="small"
+            color="success"
+            variant="outlined"
+            sx={{ height: 20, fontSize: 11 }}
+          />
+          <Typography
+            variant="body2"
+            sx={{ color: 'success.main', fontWeight: 500 }}
+          >
             {formatVariant(nv)}
           </Typography>
         </Box>
@@ -330,12 +356,23 @@ const VariantSummary: React.FC<{
 
     // Build per-field diffs
     const fieldChanges: React.ReactNode[] = [];
-    const oldVal = ov.value !== undefined && ov.value !== null ? formatValue(ov.value) : '—';
-    const newVal = nv.value !== undefined && nv.value !== null ? formatValue(nv.value) : '—';
+    const oldVal =
+      ov.value !== undefined && ov.value !== null ? formatValue(ov.value) : '—';
+    const newVal =
+      nv.value !== undefined && nv.value !== null ? formatValue(nv.value) : '—';
     if (oldVal !== newVal) {
       fieldChanges.push(
         <Typography key="val" variant="body2" component="span">
-          {t('draft.changes.variants')}: <span style={{ textDecoration: 'line-through', color: 'inherit', opacity: 0.6 }}>{oldVal}</span>
+          {t('draft.changes.variants')}:{' '}
+          <span
+            style={{
+              textDecoration: 'line-through',
+              color: 'inherit',
+              opacity: 0.6,
+            }}
+          >
+            {oldVal}
+          </span>
           {' → '}
           <strong>{newVal}</strong>
         </Typography>
@@ -344,7 +381,10 @@ const VariantSummary: React.FC<{
     if (ov.weight !== nv.weight) {
       fieldChanges.push(
         <Typography key="wt" variant="body2" component="span">
-          {t('common.weight')}: <span style={{ textDecoration: 'line-through', opacity: 0.6 }}>{ov.weight}%</span>
+          {t('common.weight')}:{' '}
+          <span style={{ textDecoration: 'line-through', opacity: 0.6 }}>
+            {ov.weight}%
+          </span>
           {' → '}
           <strong>{nv.weight}%</strong>
         </Typography>
@@ -354,7 +394,9 @@ const VariantSummary: React.FC<{
     if (fieldChanges.length > 0) {
       diffs.push(
         <Box key={`mod-${name}`}>
-          <Typography variant="body2" fontWeight={600}>{name}</Typography>
+          <Typography variant="body2" fontWeight={600}>
+            {name}
+          </Typography>
           <Stack spacing={0.25} sx={{ pl: 2 }}>
             {fieldChanges}
           </Stack>
@@ -390,7 +432,10 @@ function normalizeForComparison(val: any): any {
     const sorted: Record<string, any> = {};
     for (const k of Object.keys(val).sort()) {
       // Skip runtime-only / metadata fields
-      if (['id', 'createdAt', 'updatedAt', 'sortOrder', 'environment'].includes(k)) continue;
+      if (
+        ['id', 'createdAt', 'updatedAt', 'sortOrder', 'environment'].includes(k)
+      )
+        continue;
       sorted[k] = normalizeForComparison(val[k]);
     }
     return sorted;
@@ -417,7 +462,10 @@ export function buildEnvChanges(
   // Define field groups for logical display
   const GROUPS: Array<{ key: string; fields: string[] }> = [
     { key: 'toggle', fields: ['isEnabled'] },
-    { key: 'override', fields: ['overrideEnabledValue', 'overrideDisabledValue'] },
+    {
+      key: 'override',
+      fields: ['overrideEnabledValue', 'overrideDisabledValue'],
+    },
     { key: 'values', fields: ['enabledValue', 'disabledValue'] },
     { key: 'impression', fields: ['impressionDataEnabled'] },
     { key: 'strategies', fields: ['strategies'] },
@@ -427,7 +475,9 @@ export function buildEnvChanges(
 
   // Collect other fields not in any group
   const knownFields = new Set(GROUPS.flatMap((g) => g.fields));
-  const otherFields = Object.keys(draftFields).filter((k) => !knownFields.has(k));
+  const otherFields = Object.keys(draftFields).filter(
+    (k) => !knownFields.has(k)
+  );
   if (otherFields.length > 0) {
     GROUPS.push({ key: 'other', fields: otherFields });
   }
@@ -659,7 +709,9 @@ export async function fetchAllDiffs(
             });
           } else {
             // Auto-discard: no real changes in segment draft
-            draftService.discardDraft(tt, draft.targetId, projectApiPath).catch(() => {});
+            draftService
+              .discardDraft(tt, draft.targetId, projectApiPath)
+              .catch(() => {});
           }
         }
       } else {
@@ -675,7 +727,9 @@ export async function fetchAllDiffs(
           results.push({ ...diff, targetType: tt });
         } else {
           // Auto-discard: no real changes in feature flag draft
-          draftService.discardDraft(tt, draft.targetId, projectApiPath).catch(() => {});
+          draftService
+            .discardDraft(tt, draft.targetId, projectApiPath)
+            .catch(() => {});
         }
       }
     }

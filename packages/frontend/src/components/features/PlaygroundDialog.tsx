@@ -648,8 +648,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
           const flagResponse = await api.get(
             `${projectApiPath}/features/${flagName}`
           );
-          const flagId =
-            flagResponse.data?.flag?.id || flagResponse.data?.id;
+          const flagId = flagResponse.data?.flag?.id || flagResponse.data?.id;
           if (!flagId) continue;
 
           const draftResponse = await api.get(
@@ -2805,9 +2804,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     ? 'transparent'
                                     : 'action.hover',
                                 borderBottom:
-                                  idx < enabledEntries.length - 1
-                                    ? 1
-                                    : 0,
+                                  idx < enabledEntries.length - 1 ? 1 : 0,
                                 borderColor: 'divider',
                               }}
                             >
@@ -2936,9 +2933,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                       ? 'transparent'
                                       : 'action.hover',
                                   borderBottom:
-                                    idx < referencedFields.length - 1
-                                      ? 1
-                                      : 0,
+                                    idx < referencedFields.length - 1 ? 1 : 0,
                                   borderColor: 'divider',
                                 }}
                               >

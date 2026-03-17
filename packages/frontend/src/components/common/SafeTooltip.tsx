@@ -16,7 +16,12 @@ import { Tooltip, TooltipProps } from '@mui/material';
 
 export type SafeTooltipProps = Omit<
   TooltipProps,
-  'open' | 'onOpen' | 'onClose' | 'disableHoverListener' | 'disableFocusListener' | 'disableTouchListener'
+  | 'open'
+  | 'onOpen'
+  | 'onClose'
+  | 'disableHoverListener'
+  | 'disableFocusListener'
+  | 'disableTouchListener'
 >;
 
 const SafeTooltip: React.FC<SafeTooltipProps> = ({

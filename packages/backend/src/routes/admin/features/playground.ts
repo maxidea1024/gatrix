@@ -334,7 +334,11 @@ router.post(
           const flagDraftData = draftsByTarget.get((flag as any).id);
           if (flagDraftData) {
             for (const envDraft of Object.values(flagDraftData)) {
-              if (envDraft && typeof envDraft === 'object' && (envDraft as any).strategies) {
+              if (
+                envDraft &&
+                typeof envDraft === 'object' &&
+                (envDraft as any).strategies
+              ) {
                 for (const draftStrategy of (envDraft as any).strategies) {
                   collectConstraintFields(draftStrategy.constraints || []);
                   const draftSegNames = draftStrategy.segments || [];
@@ -403,9 +407,16 @@ router.post(
             const envDraft = flagDraftData[env];
             if (envDraft && typeof envDraft === 'object') {
               // Apply draft environment fields to the flag object
-              const draftFields = ['isEnabled', 'strategies', 'variants',
-                'enabledValue', 'disabledValue', 'overrideEnabledValue',
-                'overrideDisabledValue', 'impressionDataEnabled'];
+              const draftFields = [
+                'isEnabled',
+                'strategies',
+                'variants',
+                'enabledValue',
+                'disabledValue',
+                'overrideEnabledValue',
+                'overrideDisabledValue',
+                'impressionDataEnabled',
+              ];
               for (const field of draftFields) {
                 if (field in envDraft) {
                   (flag as any)[field] = envDraft[field];

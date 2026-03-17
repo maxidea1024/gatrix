@@ -259,9 +259,7 @@ export class ReleaseFlowService {
             environmentId,
             strategyName: ms.strategyName,
             parameters: ms.parameters ? JSON.stringify(ms.parameters) : null,
-            constraints: ms.constraints
-              ? JSON.stringify(ms.constraints)
-              : '[]',
+            constraints: ms.constraints ? JSON.stringify(ms.constraints) : '[]',
             sortOrder: ms.sortOrder,
             isEnabled: true,
             createdBy: userId || null,

@@ -2,10 +2,7 @@ import * as XLSX from 'xlsx';
 
 // Date-time string for filenames (YYYY-MM-DDTHH-MM-SS)
 export const getDateTimeStr = (): string => {
-  return new Date()
-    .toISOString()
-    .replace(/[:.]/g, '-')
-    .slice(0, 19);
+  return new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
 };
 
 // Download a Blob as a file
@@ -30,7 +27,12 @@ export interface ExportColumn {
 const escapeCSV = (value: any): string => {
   if (value === null || value === undefined) return '';
   const str = String(value);
-  if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+  if (
+    str.includes(',') ||
+    str.includes('"') ||
+    str.includes('\n') ||
+    str.includes('\r')
+  ) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;
@@ -104,10 +106,7 @@ export const exportToFile = (
 };
 
 // Export raw JSON data (for complex structures like banners)
-export const exportRawJson = (
-  data: any,
-  filenamePrefix: string
-): void => {
+export const exportRawJson = (data: any, filenamePrefix: string): void => {
   const dateTimeStr = getDateTimeStr();
   const blob = new Blob([JSON.stringify(data, null, 2)], {
     type: 'application/json',
@@ -167,7 +166,8 @@ export const parseImportFile = (file: File): Promise<Record<string, any>[]> => {
         try {
           const workbook = XLSX.read(e.target?.result, { type: 'array' });
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const data = XLSX.utils.sheet_to_json<Record<string, any>>(firstSheet);
+          const data =
+            XLSX.utils.sheet_to_json<Record<string, any>>(firstSheet);
           resolve(data);
         } catch (err) {
           reject(new Error('Invalid XLSX file'));

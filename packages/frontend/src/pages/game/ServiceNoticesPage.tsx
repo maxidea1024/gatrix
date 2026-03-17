@@ -77,6 +77,9 @@ import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
+import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
+import ImportDialog from '../../components/common/ImportDialog';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -98,6 +101,7 @@ const ServiceNoticesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Sorting state
   const [orderBy, setOrderBy] = useState<string>(() => {
@@ -185,7 +189,9 @@ const ServiceNoticesPage: React.FC = () => {
   // Webview menu state
   const [webviewMenuAnchorEl, setWebviewMenuAnchorEl] =
     useState<null | HTMLElement>(null);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
 
   // Action menu state
   const [actionMenuAnchorEl, setActionMenuAnchorEl] =
@@ -669,50 +675,86 @@ const ServiceNoticesPage: React.FC = () => {
               {t('serviceNotices.createNotice')}
             </Button>
           )}
-          <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={pageMenuAnchor}
+            open={Boolean(pageMenuAnchor)}
+            onClose={() => setPageMenuAnchor(null)}
+          >
+            <ExportImportMenuItems
+              onExport={(format) => {
+                setPageMenuAnchor(null);
+                const exportColumns: ExportColumn[] = [
+                  { key: 'title', header: t('serviceNotices.form.title') },
+                  { key: 'content', header: t('serviceNotices.form.content') },
+                  {
+                    key: 'category',
+                    header: t('serviceNotices.form.category'),
+                  },
+                  { key: 'isActive', header: t('common.status') },
+                  { key: 'isPinned', header: t('serviceNotices.pinned') },
+                  { key: 'startDate', header: t('common.start') },
+                  { key: 'endDate', header: t('common.end') },
+                  { key: 'createdAt', header: t('common.createdAt') },
+                ];
+                try {
+                  exportToFile(
+                    notices,
+                    exportColumns,
+                    'service-notices',
+                    format
+                  );
+                  enqueueSnackbar(t('common.exportSuccess'), {
+                    variant: 'success',
+                  });
+                } catch (err) {
+                  enqueueSnackbar(t('common.exportFailed'), {
+                    variant: 'error',
+                  });
+                }
+              }}
+              onImportClick={() => {
+                setPageMenuAnchor(null);
+                setImportDialogOpen(true);
+              }}
+            />
+            <Divider />
+            <MenuItem
+              onClick={() => {
+                setPageMenuAnchor(null);
+                setPreviewDialogOpen(true);
+              }}
             >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
+              <ListItemIcon>
+                <VisibilityIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('serviceNotices.preview')}</ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setPageMenuAnchor(null);
+                handleOpenWebviewPreview();
+              }}
             >
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  setPreviewDialogOpen(true);
-                }}
-              >
-                <ListItemIcon>
-                  <VisibilityIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('serviceNotices.preview')}</ListItemText>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  handleOpenWebviewPreview();
-                }}
-              >
-                <ListItemIcon>
-                  <SportsEsportsIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('serviceNotices.webviewPreview')}</ListItemText>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  handleCopyNoticeUrl();
-                }}
-              >
-                <ListItemIcon>
-                  <ContentCopyIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('serviceNotices.copyWebviewUrl')}</ListItemText>
-              </MenuItem>
-            </Menu>
+              <ListItemIcon>
+                <SportsEsportsIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('serviceNotices.webviewPreview')}</ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setPageMenuAnchor(null);
+                handleCopyNoticeUrl();
+              }}
+            >
+              <ListItemIcon>
+                <ContentCopyIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('serviceNotices.copyWebviewUrl')}</ListItemText>
+            </MenuItem>
+          </Menu>
         </Box>
       </Box>
 
@@ -1458,7 +1500,43 @@ const ServiceNoticesPage: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        title={t('common.import')}
+        onImport={async (data) => {
+          let successCount = 0;
+          let failCount = 0;
+          for (const item of data) {
+            try {
+              await serviceNoticeService.createServiceNotice(projectApiPath, {
+                title: item[t('serviceNotices.form.title')] || item.title || '',
+                content:
+                  item[t('serviceNotices.form.content')] || item.content || '',
+                category:
+                  item[t('serviceNotices.form.category')] ||
+                  item.category ||
+                  'notice',
+                isActive:
+                  String(item[t('common.status')] ?? item.isActive ?? true) ===
+                  'true',
+                platforms: [],
+              });
+              successCount++;
+            } catch (err) {
+              failCount++;
+            }
+          }
+          if (successCount > 0) {
+            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+            loadNotices();
+          }
+          if (failCount > 0) {
+            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+          }
+        }}
+      />
     </Box>
   );
 };

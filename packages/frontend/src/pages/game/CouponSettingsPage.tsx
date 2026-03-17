@@ -196,7 +196,9 @@ const CouponSettingsPage: React.FC = () => {
 
   // SDK Guide drawer state
   const [openSDKGuide, setOpenSDKGuide] = useState(false);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
 
   // Delete confirmation dialog state
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -1376,28 +1378,28 @@ const CouponSettingsPage: React.FC = () => {
               {t('coupons.couponSettings.createCoupon')}
             </Button>
           )}
-          <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={pageMenuAnchor}
+            open={Boolean(pageMenuAnchor)}
+            onClose={() => setPageMenuAnchor(null)}
+          >
+            <MenuItem
+              onClick={() => {
+                setPageMenuAnchor(null);
+                setOpenSDKGuide(true);
+              }}
             >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
-            >
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  setOpenSDKGuide(true);
-                }}
-              >
-                <ListItemIcon>
-                  <CodeIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('coupons.couponSettings.sdkGuide')}</ListItemText>
-              </MenuItem>
-            </Menu>
+              <ListItemIcon>
+                <CodeIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>
+                {t('coupons.couponSettings.sdkGuide')}
+              </ListItemText>
+            </MenuItem>
+          </Menu>
         </Box>
       </Box>
 

@@ -637,7 +637,8 @@ const FeatureFlagsPage: React.FC = () => {
   useEffect(() => {
     const handleDraftAction = () => loadFlags();
     window.addEventListener('draft-action-completed', handleDraftAction);
-    return () => window.removeEventListener('draft-action-completed', handleDraftAction);
+    return () =>
+      window.removeEventListener('draft-action-completed', handleDraftAction);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadTags = async () => {

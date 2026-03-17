@@ -235,8 +235,6 @@ const FeatureSegmentsPage: React.FC = () => {
     }
   };
 
-
-
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
@@ -469,8 +467,7 @@ const FeatureSegmentsPage: React.FC = () => {
         // Create new segment
         await api.post(`${projectApiPath}/features/segments`, {
           segmentName: editingSegment.segmentName,
-          displayName:
-            editingSegment.displayName || editingSegment.segmentName,
+          displayName: editingSegment.displayName || editingSegment.segmentName,
           description: editingSegment.description || '',
           constraints: editingSegment.constraints || [],
           isActive: editingSegment.isActive ?? true,
@@ -716,10 +713,7 @@ const FeatureSegmentsPage: React.FC = () => {
                   </TableHead>
                   <TableBody>
                     {segments.map((segment) => (
-                      <TableRow
-                        key={segment.id}
-                        hover
-                      >
+                      <TableRow key={segment.id} hover>
                         {visibleColumns.map((col) => {
                           switch (col.id) {
                             case 'visibility':

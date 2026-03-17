@@ -302,7 +302,12 @@ export class DraftService {
     const handler = draftHandlers.get(targetType);
     if (handler?.onDiscard && userId) {
       try {
-        await handler.onDiscard(targetId, environmentId, draft.draftData, userId);
+        await handler.onDiscard(
+          targetId,
+          environmentId,
+          draft.draftData,
+          userId
+        );
       } catch (error) {
         logger.warn(`onDiscard failed for ${targetType}/${targetId}:`, error);
       }
