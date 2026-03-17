@@ -4673,6 +4673,12 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 <Autocomplete
                   multiple
                   options={environments.map((e) => e.environmentId)}
+                  getOptionLabel={(option) => {
+                    const env = environments.find(
+                      (e) => e.environmentId === option
+                    );
+                    return env?.displayName || option;
+                  }}
                   value={selectedEnvironments}
                   onChange={(_, value) => setSelectedEnvironments(value)}
                   renderInput={(params) => (
@@ -4683,17 +4689,22 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     />
                   )}
                   renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip
-                        {...getTagProps({ index })}
-                        key={option}
-                        label={option}
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                        sx={{ borderRadius: '16px' }}
-                      />
-                    ))
+                    value.map((option, index) => {
+                      const env = environments.find(
+                        (e) => e.environmentId === option
+                      );
+                      return (
+                        <Chip
+                          {...getTagProps({ index })}
+                          key={option}
+                          label={env?.displayName || option}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                          sx={{ borderRadius: '16px' }}
+                        />
+                      );
+                    })
                   }
                 />
                 <FormHelperText>
