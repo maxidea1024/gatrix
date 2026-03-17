@@ -105,8 +105,8 @@ const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
     { value: 'str_ends_with', label: 'ends with' },
     { value: 'str_in', label: 'in list' },
     { value: 'str_regex', label: 'matches regex' },
-    { value: 'cidr_match', label: 'matches CIDR' },
     ...COMMON_OPERATORS,
+    { value: 'cidr_match', label: 'matches CIDR' },
   ],
   number: [
     { value: 'num_eq', label: '=' },
