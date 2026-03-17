@@ -38,8 +38,6 @@ import {
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Save as SaveIcon,
-  Cancel as CancelIcon,
   Delete as DeleteIcon,
   Schedule as ScheduleIcon,
   Edit as EditIcon,
@@ -845,7 +843,6 @@ const SchedulerPage: React.FC = () => {
             <Button
               onClick={() => setDialogOpen(false)}
               disabled={saving}
-              startIcon={<CancelIcon />}
             >
               {t('common.cancel')}
             </Button>
@@ -854,7 +851,6 @@ const SchedulerPage: React.FC = () => {
               variant="contained"
               onClick={handleSave}
               disabled={saving}
-              startIcon={saving ? undefined : <SaveIcon />}
             >
               {saving ? t('common.saving') : t('common.save')}
             </Button>

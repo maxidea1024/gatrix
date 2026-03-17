@@ -1382,7 +1382,6 @@ const MaintenancePage: React.FC = () => {
                       variant="contained"
                       color="primary"
                       size="large"
-                      startIcon={<SaveIcon />}
                       onClick={() => {
                         // 시간 Validation 먼저 실행
                         const validation = validateMaintenanceTime();

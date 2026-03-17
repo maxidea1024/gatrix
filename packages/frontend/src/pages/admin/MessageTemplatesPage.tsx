@@ -75,9 +75,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Close as CloseIcon,
-  Cancel as CancelIcon,
-  Save as SaveIcon,
   Refresh as RefreshIcon,
   LocalOffer as LocalOfferIcon,
   ContentCopy as ContentCopyIcon,
@@ -1505,7 +1502,6 @@ const MessageTemplatesPage: React.FC = () => {
           <Button
             onClick={() => setDialogOpen(false)}
             disabled={saving}
-            startIcon={<CancelIcon />}
             variant="outlined"
           >
             {t('common.cancel')}
@@ -1514,7 +1510,6 @@ const MessageTemplatesPage: React.FC = () => {
             variant="contained"
             onClick={handleSave}
             disabled={saving || (!!editing && !isDirty)}
-            startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
           >
             {saving ? t('common.saving') : t('common.save')}
           </Button>

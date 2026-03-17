@@ -65,8 +65,6 @@ import {
   ContentCopy as CopyIcon,
   VpnKey as VpnKeyIcon,
   Refresh as RefreshIcon,
-  Cancel as CancelIcon,
-  Save as SaveIcon,
   Close as CloseIcon,
   CheckCircle as CheckCircleIcon,
   Security as SecurityIcon,
@@ -1626,7 +1624,6 @@ const ApiTokensPage: React.FC = () => {
         >
           <Button
             onClick={() => setCreateDialogOpen(false)}
-            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>
@@ -1893,14 +1890,12 @@ const ApiTokensPage: React.FC = () => {
         >
           <Button
             onClick={() => setEditDialogOpen(false)}
-            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>
           <Button
             onClick={handleEdit}
             variant="contained"
-            startIcon={<SaveIcon />}
             disabled={
               !isValidTokenName(formData.tokenName) ||
               !expiresAtValidation.isValid ||
@@ -2044,7 +2039,6 @@ const ApiTokensPage: React.FC = () => {
           <Button
             onClick={() => setDeleteDialogOpen(false)}
             variant="outlined"
-            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>
@@ -2199,7 +2193,6 @@ const ApiTokensPage: React.FC = () => {
           <Button
             onClick={closeRegenerateDialog}
             variant="outlined"
-            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>
@@ -2364,7 +2357,6 @@ const ApiTokensPage: React.FC = () => {
           <Button
             onClick={closeBulkDeleteDrawer}
             variant="outlined"
-            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>

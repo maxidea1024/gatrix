@@ -39,10 +39,7 @@ import {
   Refresh as RefreshIcon,
   Block as BlockIcon,
   CheckCircle as CheckCircleIcon,
-  Cancel as CancelIcon,
-  Save as SaveIcon,
   ContentCopy as ContentCopyIcon,
-  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -857,7 +854,6 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         <DialogActions>
           <Button
             onClick={() => setBulkDialog(false)}
-            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>
@@ -885,7 +881,6 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
             onClick={() =>
               setConfirmDialog((prev) => ({ ...prev, open: false }))
             }
-            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>

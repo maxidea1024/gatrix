@@ -24,11 +24,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
-import {
-  Cancel as CancelIcon,
-  Save as SaveIcon,
-  ExpandMore as ExpandMoreIcon,
-} from '@mui/icons-material';
+import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -1045,7 +1041,6 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
           <Button
             onClick={handleClose}
             disabled={loading}
-            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>
@@ -1053,7 +1048,6 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             type="submit"
             variant="contained"
             disabled={loading || isSubmitting}
-            startIcon={<SaveIcon />}
           >
             {loading
               ? t('clientVersions.creating')

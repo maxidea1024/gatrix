@@ -49,8 +49,6 @@ import {
   Refresh as RefreshIcon,
   ContentCopy as CopyIcon,
   VpnKey as TokenIcon,
-  Cancel as CancelIcon,
-  Save as SaveIcon,
   Shield as ShieldIcon,
   MoreVert as MoreVertIcon,
   Public as PublicIcon,
@@ -703,13 +701,12 @@ const AccountDialog: React.FC<AccountDialogProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose} startIcon={<CancelIcon />}>
+        <Button onClick={onClose}>
           {t('common.cancel')}
         </Button>
         <Button
           onClick={handleSave}
           variant="contained"
-          startIcon={<SaveIcon />}
           disabled={!name.trim() || !selectedEnvironmentId}
         >
           {account ? t('common.save') : t('common.create')}
@@ -1159,7 +1156,6 @@ const ServiceAccountsPage: React.FC = () => {
           {accounts.length > 0 && canCreate && (
             <Button
               variant="contained"
-              startIcon={<AddIcon />}
               onClick={() => setEditDialog({ open: true, account: null })}
             >
               {t('serviceAccounts.createAccount')}
@@ -1386,7 +1382,6 @@ const ServiceAccountsPage: React.FC = () => {
                 <Button
                   size="small"
                   variant="contained"
-                  startIcon={<AddIcon />}
                   onClick={() =>
                     setTokenDialog({
                       open: true,

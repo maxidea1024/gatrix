@@ -25,7 +25,6 @@ import {
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
-  Close as CloseIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
@@ -679,7 +678,6 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               {triggerConditionsExpanded && (
                 <Button
                   size="small"
-                  startIcon={<AddIcon />}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleAddTriggerCondition();

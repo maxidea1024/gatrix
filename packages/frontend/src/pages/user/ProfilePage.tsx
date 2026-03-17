@@ -27,7 +27,6 @@ import {
 import {
   Edit as EditIcon,
   Save as SaveIcon,
-  Cancel as CancelIcon,
   PhotoCamera as PhotoCameraIcon,
   Security as SecurityIcon,
   Schedule as ScheduleIcon,
@@ -510,7 +509,6 @@ const ProfilePage: React.FC = () => {
                 <>
                   <Button
                     variant="outlined"
-                    startIcon={<CancelIcon />}
                     onClick={handleEditToggle}
                   >
                     {t('common.cancel')}
@@ -632,7 +630,6 @@ const ProfilePage: React.FC = () => {
                 <Divider sx={{ mb: 2 }} />
                 <Button
                   variant="outlined"
-                  startIcon={<LockIcon />}
                   onClick={handlePasswordDialogOpen}
                   fullWidth
                 >

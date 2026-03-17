@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
-  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -203,7 +202,6 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
         <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button
           variant="contained"
-          startIcon={saving ? <CircularProgress size={16} /> : <SaveIcon />}
           onClick={handleSave}
           disabled={saving || loading}
         >

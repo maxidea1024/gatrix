@@ -368,7 +368,6 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
               color="error"
               onClick={() => respondToInvitation(invitation.id, 'decline')}
               disabled={processingInvitations.has(invitation.id)}
-              startIcon={<CloseIcon />}
             >
               {t('chat.decline')}
             </Button>

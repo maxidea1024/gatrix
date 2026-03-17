@@ -21,7 +21,6 @@ import {
 import {
   Upload as UploadIcon,
   InsertDriveFile as FileIcon,
-  Close as CloseIcon,
 } from '@mui/icons-material';
 import {
   parseImportFile,
@@ -215,7 +214,6 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
               />
               <Button
                 size="small"
-                startIcon={<CloseIcon />}
                 onClick={(e) => {
                   e.stopPropagation();
                   resetState();

@@ -88,7 +88,6 @@ import {
   Code as CodeIcon,
   Description as ExcelIcon,
   ContentCopy as CopyIcon,
-  Cancel as CancelIcon,
   Close as CloseIcon,
   Update as UpdateIcon,
   Settings as SettingsIcon,
@@ -2443,7 +2442,6 @@ const ClientVersionsPage: React.FC = () => {
         >
           <Button
             onClick={() => setBulkStatusDialogOpen(false)}
-            startIcon={<CancelIcon />}
             variant="outlined"
           >
             {t('common.cancel')}
@@ -2611,7 +2609,6 @@ const ClientVersionsPage: React.FC = () => {
         >
           <Button
             onClick={() => setBulkDeleteDialogOpen(false)}
-            startIcon={<CancelIcon />}
             variant="outlined"
           >
             {t('common.cancel')}

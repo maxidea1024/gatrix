@@ -764,7 +764,6 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
               <Button
                 variant="outlined"
                 size="small"
-                startIcon={<AddIcon />}
                 onClick={handleAddSequence}
               >
                 {t('banners.addSequence')}

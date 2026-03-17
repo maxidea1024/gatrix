@@ -2142,7 +2142,6 @@ const GameWorldsPage: React.FC = () => {
           <Button
             onClick={() => setDialogOpen(false)}
             disabled={saving}
-            startIcon={<CancelIcon />}
           >
             {t('gameWorlds.cancel')}
           </Button>

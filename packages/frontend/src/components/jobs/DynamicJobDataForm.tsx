@@ -226,7 +226,6 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
               </Typography>
               <Button
                 size="small"
-                startIcon={<AddIcon />}
                 onClick={() => handleArrayAdd(fieldName)}
               >
                 {t('common.add')}

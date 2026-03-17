@@ -45,8 +45,6 @@ import {
   SmartToy as SmartToyIcon,
   PlayArrow as PlayIcon,
   RemoveCircleOutline as RemoveIcon,
-  Cancel as CancelIcon,
-  Save as SaveIcon,
   MoreVert as MoreVertIcon,
   Sensors as SensorsIcon,
 } from '@mui/icons-material';
@@ -453,13 +451,12 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose} startIcon={<CancelIcon />}>
+        <Button onClick={onClose}>
           {t('common.cancel')}
         </Button>
         <Button
           onClick={handleSave}
           variant="contained"
-          startIcon={<SaveIcon />}
           disabled={!isValid}
         >
           {actionSet ? t('common.save') : t('common.add')}

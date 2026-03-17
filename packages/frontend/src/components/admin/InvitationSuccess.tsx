@@ -13,7 +13,6 @@ import {
 import {
   ContentCopy as CopyIcon,
   CheckCircle as CheckIcon,
-  Close as CloseIcon,
   Schedule as ScheduleIcon,
   Email as EmailIcon,
 } from '@mui/icons-material';
@@ -193,7 +192,6 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
           <Button
             onClick={onClose}
             variant="outlined"
-            startIcon={<CloseIcon />}
             sx={{
               flex: 1,
               borderColor: 'grey.300',
