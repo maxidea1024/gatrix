@@ -31,9 +31,12 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemIcon,
   Checkbox,
   ListItemButton,
   ClickAwayListener,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import {
   DndContext,
@@ -71,6 +74,7 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
   DragIndicator as DragIndicatorIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -231,17 +235,27 @@ const CrashEventsPage: React.FC = () => {
     branches: string[];
     marketTypes: string[];
     appVersions: string[];
+    resVersions: string[];
+    gameServerIds: string[];
   }>({
     platforms: [],
     environments: [],
     branches: [],
     marketTypes: [],
     appVersions: [],
+    resVersions: [],
+    gameServerIds: [],
   });
 
   // Dynamic filters state
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
+
+  // Context menu state for row actions
+  const [contextMenuAnchor, setContextMenuAnchor] =
+    useState<null | HTMLElement>(null);
+  const [contextMenuEvent, setContextMenuEvent] =
+    useState<CrashEvent | null>(null);
 
   // Dialog state for viewing crash details
   const [expandedRowId, setExpandedRowId] = useState<string | null>(() => {
@@ -281,6 +295,18 @@ const CrashEventsPage: React.FC = () => {
       id: 'environment',
       labelKey: 'crashes.table.environment',
       sortable: true,
+      visible: true,
+    },
+    {
+      id: 'project',
+      labelKey: 'crashes.table.project',
+      sortable: false,
+      visible: true,
+    },
+    {
+      id: 'organization',
+      labelKey: 'crashes.table.organization',
+      sortable: false,
       visible: true,
     },
     {
@@ -463,6 +489,28 @@ const CrashEventsPage: React.FC = () => {
           { value: 'false', label: t('common.no') },
         ],
       },
+      {
+        key: 'resVersion',
+        label: t('crashes.filters.resVersion'),
+        type: 'multiselect',
+        operator: 'any_of',
+        allowOperatorToggle: false,
+        options: filterOptions.resVersions.map((v) => ({
+          value: v,
+          label: v,
+        })),
+      },
+      {
+        key: 'gameServerId',
+        label: t('crashes.filters.gameServerId'),
+        type: 'multiselect',
+        operator: 'any_of',
+        allowOperatorToggle: false,
+        options: filterOptions.gameServerIds.map((g) => ({
+          value: g,
+          label: g,
+        })),
+      },
     ],
     [t, filterOptions]
   );
@@ -501,6 +549,8 @@ const CrashEventsPage: React.FC = () => {
         branches: options.branches || [],
         marketTypes: options.marketTypes || [],
         appVersions: options.appVersions || [],
+        resVersions: options.resVersions || [],
+        gameServerIds: options.gameServerIds || [],
       });
     } catch (error) {
       console.error('Error loading filter options:', error);
@@ -761,6 +811,8 @@ const CrashEventsPage: React.FC = () => {
         ['Created At', dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss')],
         ['Platform', getPlatformName(event.platform)],
         ['Environment', (event as any).environmentName || event.environmentId],
+        ['Project', (event as any).projectName || '-'],
+        ['Organization', (event as any).organizationName || '-'],
         ['Branch', event.branch],
         ['App Version', event.appVersion || '-'],
         ['Res Version', event.resVersion || '-'],
@@ -900,6 +952,10 @@ const CrashEventsPage: React.FC = () => {
             variant="outlined"
           />
         );
+      case 'project':
+        return (event as any).projectName || '-';
+      case 'organization':
+        return (event as any).organizationName || '-';
       case 'branch':
         return (
           <Chip
@@ -1208,54 +1264,15 @@ const CrashEventsPage: React.FC = () => {
                               </TableCell>
                             ))}
                           <TableCell align="center">
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                gap: 0.5,
-                                justifyContent: 'center',
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                setContextMenuAnchor(e.currentTarget);
+                                setContextMenuEvent(event);
                               }}
                             >
-                              <Tooltip title={t('crashes.viewStackTrace')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={async () => {
-                                    try {
-                                      const stackData =
-                                        await crashService.getStackTrace(
-                                          event.id
-                                        );
-                                      setSelectedEvent(event);
-                                      setStackTraceMap((prev) => ({
-                                        ...prev,
-                                        [event.id]: stackData.stackTrace,
-                                      }));
-                                      setDrawerType('stackTrace');
-                                      setDrawerOpen(true);
-                                    } catch (error) {
-                                      console.error(
-                                        'Failed to load stack trace:',
-                                        error
-                                      );
-                                      enqueueSnackbar(t('crashes.loadError'), {
-                                        variant: 'error',
-                                      });
-                                    }
-                                  }}
-                                >
-                                  <BugReportIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              {event.logFilePath && (
-                                <Tooltip title={t('crashes.viewLog')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleViewLog(event)}
-                                  >
-                                    <LogIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-                            </Box>
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1482,6 +1499,42 @@ const CrashEventsPage: React.FC = () => {
                                                 <CopyIcon fontSize="small" />
                                               </IconButton>
                                             </Box>
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* Project */}
+                                        <TableRow hover>
+                                          <TableCell
+                                            sx={{
+                                              fontWeight: 600,
+                                              bgcolor: 'action.hover',
+                                              whiteSpace: 'nowrap',
+                                            }}
+                                          >
+                                            {t('crashes.table.project')}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Typography variant="body2">
+                                              {(event as any).projectName || '-'}
+                                            </Typography>
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* Organization */}
+                                        <TableRow hover>
+                                          <TableCell
+                                            sx={{
+                                              fontWeight: 600,
+                                              bgcolor: 'action.hover',
+                                              whiteSpace: 'nowrap',
+                                            }}
+                                          >
+                                            {t('crashes.table.organization')}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Typography variant="body2">
+                                              {(event as any).organizationName || '-'}
+                                            </Typography>
                                           </TableCell>
                                         </TableRow>
 
@@ -2378,6 +2431,71 @@ const CrashEventsPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Context Menu for row actions */}
+      <Menu
+        anchorEl={contextMenuAnchor}
+        open={Boolean(contextMenuAnchor)}
+        onClose={() => {
+          setContextMenuAnchor(null);
+          setContextMenuEvent(null);
+        }}
+      >
+        <MenuItem
+          onClick={async () => {
+            const event = contextMenuEvent;
+            setContextMenuAnchor(null);
+            setContextMenuEvent(null);
+            if (!event) return;
+            try {
+              const stackData = await crashService.getStackTrace(event.id);
+              setSelectedEvent(event);
+              setStackTraceMap((prev) => ({
+                ...prev,
+                [event.id]: stackData.stackTrace,
+              }));
+              setDrawerType('stackTrace');
+              setDrawerOpen(true);
+            } catch (error) {
+              console.error('Failed to load stack trace:', error);
+              enqueueSnackbar(t('crashes.loadError'), { variant: 'error' });
+            }
+          }}
+        >
+          <ListItemIcon>
+            <BugReportIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('crashes.viewStackTrace')}</ListItemText>
+        </MenuItem>
+        {contextMenuEvent?.logFilePath && (
+          <MenuItem
+            onClick={() => {
+              const event = contextMenuEvent;
+              setContextMenuAnchor(null);
+              setContextMenuEvent(null);
+              if (event) handleViewLog(event);
+            }}
+          >
+            <ListItemIcon>
+              <LogIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('crashes.viewLog')}</ListItemText>
+          </MenuItem>
+        )}
+        <MenuItem
+          onClick={() => {
+            const event = contextMenuEvent;
+            setContextMenuAnchor(null);
+            setContextMenuEvent(null);
+            if (event) handleCopyTableData(event);
+          }}
+        >
+          <ListItemIcon>
+            <CopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.copyData')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Drawer for Stack Trace and Log */}
       <Drawer

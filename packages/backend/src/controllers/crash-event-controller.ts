@@ -35,6 +35,10 @@ export class CrashEventController {
         isEditor,
         appVersion,
         appVersionOperator,
+        resVersion,
+        resVersionOperator,
+        gameServerId,
+        gameServerIdOperator,
         dateFrom,
         dateTo,
         sortBy,
@@ -110,6 +114,26 @@ export class CrashEventController {
         }
       }
 
+      // Resource version filter - support multiple values
+      if (resVersion) {
+        const resVersions = (resVersion as string)
+          .split(',')
+          .map((v) => v.trim());
+        if (resVersions.length > 0) {
+          query = query.whereIn('resVersion', resVersions);
+        }
+      }
+
+      // Game server ID filter - support multiple values
+      if (gameServerId) {
+        const gameServerIds = (gameServerId as string)
+          .split(',')
+          .map((g) => g.trim());
+        if (gameServerIds.length > 0) {
+          query = query.whereIn('gameServerId', gameServerIds);
+        }
+      }
+
       // Date range filter
       if (dateFrom) {
         query = query.where('createdAt', '>=', new Date(dateFrom as string));
@@ -145,30 +169,49 @@ export class CrashEventController {
         .limit(limitNum)
         .offset((pageNum - 1) * limitNum);
 
-      // Resolve environment names from main DB
+      // Resolve environment names, project names, and organization names from main DB (knex)
       const envIds = [
         ...new Set(events.map((e: any) => e.environmentId).filter(Boolean)),
       ];
-      let envNameMap: Record<string, string> = {};
+      let envInfoMap: Record<string, { envName: string; projectName: string; organizationName: string }> = {};
       if (envIds.length > 0) {
         try {
-          const envRows = await database.query(
-            `SELECT id, name, displayName FROM g_environments WHERE id IN (${envIds.map(() => '?').join(',')})`,
-            envIds
-          );
+          const mainDb = (await import('../config/knex')).default;
+          const envRows = await mainDb('g_environments as e')
+            .leftJoin('g_projects as p', 'e.projectId', 'p.id')
+            .leftJoin('g_organisations as o', 'p.orgId', 'o.id')
+            .whereIn('e.id', envIds)
+            .select(
+              'e.id',
+              'e.name',
+              'e.displayName',
+              'p.displayName as projectDisplayName',
+              'p.projectName',
+              'o.displayName as orgDisplayName',
+              'o.orgName'
+            );
           for (const row of envRows) {
-            envNameMap[row.id] = row.displayName || row.name || row.id;
+            envInfoMap[row.id] = {
+              envName: row.displayName || row.name || row.id,
+              projectName: row.projectDisplayName || row.projectName || '-',
+              organizationName: row.orgDisplayName || row.orgName || '-',
+            };
           }
         } catch (error) {
-          logger.warn('Failed to resolve environment names:', error);
+          logger.error('Failed to resolve environment info from main DB:', error);
         }
       }
 
-      // Attach environmentName to each event
-      const eventsWithEnvName = events.map((e: any) => ({
-        ...e,
-        environmentName: envNameMap[e.environmentId] || e.environmentId,
-      }));
+      // Attach environmentName, projectName, organizationName to each event
+      const eventsWithEnvName = events.map((e: any) => {
+        const info = envInfoMap[e.environmentId];
+        return {
+          ...e,
+          environmentName: info?.envName || e.environmentId,
+          projectName: info?.projectName || '-',
+          organizationName: info?.organizationName || '-',
+        };
+      });
 
       res.json({
         success: true,
@@ -353,6 +396,8 @@ export class CrashEventController {
         branchResults,
         marketTypeResults,
         appVersionResults,
+        resVersionResults,
+        gameServerIdResults,
       ] = await Promise.all([
         CrashEvent.query().distinct('platform').whereNotNull('platform'),
         CrashEvent.query()
@@ -361,6 +406,8 @@ export class CrashEventController {
         CrashEvent.query().distinct('branch').whereNotNull('branch'),
         CrashEvent.query().distinct('marketType').whereNotNull('marketType'),
         CrashEvent.query().distinct('appVersion').whereNotNull('appVersion'),
+        CrashEvent.query().distinct('resVersion').whereNotNull('resVersion'),
+        CrashEvent.query().distinct('gameServerId').whereNotNull('gameServerId'),
       ]);
 
       const platforms = platformResults.map((r: any) => r.platform).sort();
@@ -373,6 +420,12 @@ export class CrashEventController {
         .sort();
       const appVersions = appVersionResults
         .map((r: any) => r.appVersion)
+        .sort();
+      const resVersions = resVersionResults
+        .map((r: any) => r.resVersion)
+        .sort();
+      const gameServerIds = gameServerIdResults
+        .map((r: any) => r.gameServerId)
         .sort();
 
       // Resolve environment names from main DB
@@ -406,6 +459,8 @@ export class CrashEventController {
           branches,
           marketTypes,
           appVersions,
+          resVersions,
+          gameServerIds,
         },
       });
     }
