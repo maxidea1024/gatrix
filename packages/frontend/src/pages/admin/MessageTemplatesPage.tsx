@@ -116,6 +116,9 @@ import DynamicFilterBar, {
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { api } from '@/services/api';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
+import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
+import ImportDialog from '../../components/common/ImportDialog';
 
 // Column definition interface
 interface ColumnConfig {
@@ -206,6 +209,8 @@ const MessageTemplatesPage: React.FC = () => {
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const loadStartTimeRef = useRef<number>(0);
   // Copy helper with type/label for proper i18n interpolation
@@ -991,6 +996,37 @@ const MessageTemplatesPage: React.FC = () => {
               {t('messageTemplates.addTemplate')}
             </Button>
           )}
+          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+            <MoreVertIcon />
+          </IconButton>
+          <MuiMenu
+            anchorEl={pageMenuAnchor}
+            open={Boolean(pageMenuAnchor)}
+            onClose={() => setPageMenuAnchor(null)}
+          >
+            <ExportImportMenuItems
+              onExport={(format) => {
+                setPageMenuAnchor(null);
+                const exportColumns: ExportColumn[] = [
+                  { key: 'name', header: t('common.name') },
+                  { key: 'type', header: t('common.type') },
+                  { key: 'defaultMessage', header: t('messageTemplates.defaultMessage') },
+                  { key: 'isEnabled', header: t('common.status') },
+                  { key: 'createdAt', header: t('common.createdAt') },
+                ];
+                try {
+                  exportToFile(items, exportColumns, 'message-templates', format);
+                  enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                } catch (err) {
+                  enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                }
+              }}
+              onImportClick={() => {
+                setPageMenuAnchor(null);
+                setImportDialogOpen(true);
+              }}
+            />
+          </MuiMenu>
         </Box>
       </Box>
 
@@ -1707,6 +1743,16 @@ const MessageTemplatesPage: React.FC = () => {
           </Box>
         </ClickAwayListener>
       </Popover>
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        title={t('common.import')}
+        onImport={async (data) => {
+          enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+        }}
+      />
     </Box>
   );
 };

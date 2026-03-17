@@ -114,6 +114,9 @@ import TargetSettingsGroup, {
 } from '@/components/game/TargetSettingsGroup';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Dayjs } from 'dayjs';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
+import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
+import ImportDialog from '../../components/common/ImportDialog';
 
 // Coupon Settings page (list and management of coupon definitions)
 const CouponSettingsPage: React.FC = () => {
@@ -199,6 +202,7 @@ const CouponSettingsPage: React.FC = () => {
   const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
     null
   );
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Delete confirmation dialog state
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -1386,6 +1390,32 @@ const CouponSettingsPage: React.FC = () => {
             open={Boolean(pageMenuAnchor)}
             onClose={() => setPageMenuAnchor(null)}
           >
+            <ExportImportMenuItems
+              onExport={(format) => {
+                setPageMenuAnchor(null);
+                const exportColumns: ExportColumn[] = [
+                  { key: 'name', header: t('common.name') },
+                  { key: 'code', header: t('coupons.couponSettings.columns.code') },
+                  { key: 'type', header: t('common.type') },
+                  { key: 'status', header: t('common.status') },
+                  { key: 'description', header: t('common.description') },
+                  { key: 'startsAt', header: t('common.start') },
+                  { key: 'expiresAt', header: t('common.end') },
+                  { key: 'createdAt', header: t('common.createdAt') },
+                ];
+                try {
+                  exportToFile(sortedItems, exportColumns, 'coupon-definitions', format);
+                  enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                } catch (err) {
+                  enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                }
+              }}
+              onImportClick={() => {
+                setPageMenuAnchor(null);
+                setImportDialogOpen(true);
+              }}
+            />
+            <Divider />
             <MenuItem
               onClick={() => {
                 setPageMenuAnchor(null);
@@ -3311,6 +3341,40 @@ const CouponSettingsPage: React.FC = () => {
           ) : null}
         </DialogActions>
       </Dialog>
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        title={t('common.import')}
+        onImport={async (data) => {
+          let successCount = 0;
+          let failCount = 0;
+          for (const item of data) {
+            try {
+              await couponService.createSetting(projectApiPath, {
+                name: item[t('common.name')] || item.name || '',
+                code: item[t('coupons.couponSettings.columns.code')] || item.code || '',
+                type: (item[t('common.type')] || item.type || 'NORMAL') as CouponType,
+                status: (item[t('common.status')] || item.status || 'ACTIVE') as CouponStatus,
+                description: item[t('common.description')] || item.description || '',
+                startsAt: item.startsAt || new Date().toISOString(),
+                expiresAt: item.expiresAt || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+              });
+              successCount++;
+            } catch (err) {
+              failCount++;
+            }
+          }
+          if (successCount > 0) {
+            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+            window.location.reload();
+          }
+          if (failCount > 0) {
+            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+          }
+        }}
+      />
     </Box>
   );
 };
