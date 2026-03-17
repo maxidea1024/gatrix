@@ -452,7 +452,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
           </Tooltip>
 
           {/* Operator Selector */}
-          <FormControl size="small" sx={{ minWidth: 110 }}>
+          <FormControl size="small" sx={{ width: 130 }}>
             <Select
               value={validOperator}
               onChange={(e) =>
