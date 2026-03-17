@@ -1686,6 +1686,21 @@ const ClientVersionsPage: React.FC = () => {
             open={Boolean(exportMenuAnchor)}
             onClose={() => setExportMenuAnchor(null)}
           >
+            {canManage && [
+              <MenuItem
+                key="platform-defaults"
+                onClick={() => {
+                  setExportMenuAnchor(null);
+                  setPlatformDefaultsDialogOpen(true);
+                }}
+              >
+                <ListItemIcon>
+                  <SettingsIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('platformDefaults.title')}</ListItemText>
+              </MenuItem>,
+              <Divider key="divider-after-settings" />,
+            ]}
             {/* Export section */}
             <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
               <ListItemIcon>
@@ -1732,21 +1747,6 @@ const ClientVersionsPage: React.FC = () => {
               </ListItemIcon>
               <ListItemText>{t('common.import')} (CSV/JSON/XLSX)</ListItemText>
             </MenuItem>
-            {canManage && [
-              <Divider key="divider-settings" />,
-              <MenuItem
-                key="platform-defaults"
-                onClick={() => {
-                  setExportMenuAnchor(null);
-                  setPlatformDefaultsDialogOpen(true);
-                }}
-              >
-                <ListItemIcon>
-                  <SettingsIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('platformDefaults.title')}</ListItemText>
-              </MenuItem>,
-            ]}
             <Divider />
             <MenuItem
               onClick={() => {

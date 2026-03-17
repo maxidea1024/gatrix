@@ -683,6 +683,40 @@ const ServiceNoticesPage: React.FC = () => {
             open={Boolean(pageMenuAnchor)}
             onClose={() => setPageMenuAnchor(null)}
           >
+            <MenuItem
+              onClick={() => {
+                setPageMenuAnchor(null);
+                setPreviewDialogOpen(true);
+              }}
+            >
+              <ListItemIcon>
+                <VisibilityIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('serviceNotices.preview')}</ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setPageMenuAnchor(null);
+                handleOpenWebviewPreview();
+              }}
+            >
+              <ListItemIcon>
+                <SportsEsportsIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('serviceNotices.webviewPreview')}</ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setPageMenuAnchor(null);
+                handleCopyNoticeUrl();
+              }}
+            >
+              <ListItemIcon>
+                <ContentCopyIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('serviceNotices.copyWebviewUrl')}</ListItemText>
+            </MenuItem>
+            <Divider />
             <ExportImportMenuItems
               onExport={(format) => {
                 setPageMenuAnchor(null);
@@ -720,40 +754,6 @@ const ServiceNoticesPage: React.FC = () => {
                 setImportDialogOpen(true);
               }}
             />
-            <Divider />
-            <MenuItem
-              onClick={() => {
-                setPageMenuAnchor(null);
-                setPreviewDialogOpen(true);
-              }}
-            >
-              <ListItemIcon>
-                <VisibilityIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t('serviceNotices.preview')}</ListItemText>
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setPageMenuAnchor(null);
-                handleOpenWebviewPreview();
-              }}
-            >
-              <ListItemIcon>
-                <SportsEsportsIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t('serviceNotices.webviewPreview')}</ListItemText>
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setPageMenuAnchor(null);
-                handleCopyNoticeUrl();
-              }}
-            >
-              <ListItemIcon>
-                <ContentCopyIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t('serviceNotices.copyWebviewUrl')}</ListItemText>
-            </MenuItem>
           </Menu>
         </Box>
       </Box>

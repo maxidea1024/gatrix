@@ -32,27 +32,36 @@ const ExportImportMenuItems: React.FC<ExportImportMenuItemsProps> = ({
 
   return (
     <>
-      {/* Export section header */}
-      <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
-        <ListItemIcon>
-          <DownloadIcon fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>
-          <Typography variant="subtitle2" color="text.secondary">
-            {t('common.export')}
-          </Typography>
-        </ListItemText>
-      </MenuItem>
-
       {jsonOnly ? (
-        <MenuItem onClick={() => onExport('json')} sx={{ pl: 4 }}>
-          <ListItemIcon>
-            <JsonIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>JSON</ListItemText>
-        </MenuItem>
+        <>
+          <MenuItem onClick={() => onExport('json')}>
+            <ListItemIcon>
+              <DownloadIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('common.export')}</ListItemText>
+          </MenuItem>
+          {!exportOnly && onImportClick && (
+            <MenuItem onClick={onImportClick}>
+              <ListItemIcon>
+                <UploadIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('common.import')}</ListItemText>
+            </MenuItem>
+          )}
+        </>
       ) : (
         <>
+          {/* Export section header */}
+          <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
+            <ListItemIcon>
+              <DownloadIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              <Typography variant="subtitle2" color="text.secondary">
+                {t('common.export')}
+              </Typography>
+            </ListItemText>
+          </MenuItem>
           <MenuItem onClick={() => onExport('csv')} sx={{ pl: 4 }}>
             <ListItemIcon>
               <TableChartIcon fontSize="small" />
@@ -71,31 +80,31 @@ const ExportImportMenuItems: React.FC<ExportImportMenuItemsProps> = ({
             </ListItemIcon>
             <ListItemText>Excel (XLSX)</ListItemText>
           </MenuItem>
-        </>
-      )}
 
-      {/* Import section */}
-      {!exportOnly && onImportClick && (
-        <>
-          <Divider />
-          <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
-            <ListItemIcon>
-              <UploadIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>
-              <Typography variant="subtitle2" color="text.secondary">
-                {t('common.import')}
-              </Typography>
-            </ListItemText>
-          </MenuItem>
-          <MenuItem onClick={onImportClick} sx={{ pl: 4 }}>
-            <ListItemIcon>
-              <UploadIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>
-              {jsonOnly ? 'JSON' : t('common.importFromFile')}
-            </ListItemText>
-          </MenuItem>
+          {/* Import section */}
+          {!exportOnly && onImportClick && (
+            <>
+              <Divider />
+              <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
+                <ListItemIcon>
+                  <UploadIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {t('common.import')}
+                  </Typography>
+                </ListItemText>
+              </MenuItem>
+              <MenuItem onClick={onImportClick} sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <UploadIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>
+                  {t('common.importFromFile')}
+                </ListItemText>
+              </MenuItem>
+            </>
+          )}
         </>
       )}
     </>
