@@ -401,14 +401,14 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   };
 
   const formatValue = (value: any): string => {
-    if (value === null) return t('common.none', '없음');
+    if (value === null) return t('common.none');
     if (value === undefined) return '';
     if (typeof value === 'boolean')
-      return value ? t('common.yes', '예') : t('common.no', '아니오');
+      return value ? t('common.yes') : t('common.no');
     if (typeof value === 'object') {
       // For arrays, show count or items
       if (Array.isArray(value)) {
-        if (value.length === 0) return t('common.none', '없음');
+        if (value.length === 0) return t('common.none');
         // For simple arrays, join with comma
         if (
           value.every((v) => typeof v === 'string' || typeof v === 'number')
@@ -459,8 +459,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         descriptionZh: t('storeProducts.descriptionZh'),
         tags: t('storeProducts.tags'),
         tagIds: t('storeProducts.tags'),
-        cmsProductId: t('storeProducts.cmsProductId', 'CMS 상품 ID'),
-        metadata: t('storeProducts.metadata', '메타데이터'),
+        cmsProductId: t('storeProducts.cmsProductId'),
+        metadata: t('storeProducts.metadata'),
       },
       // Game Worlds (g_game_worlds)
       g_game_worlds: {
@@ -519,29 +519,17 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         surveyContent: t('surveys.surveyContent'),
         triggerConditions: t('surveys.triggerConditions'),
         participationRewards: t('surveys.participationRewards'),
-        rewardTemplateId: t('surveys.rewardTemplateId', '보상 템플릿'),
+        rewardTemplateId: t('surveys.rewardTemplateId'),
         rewardMailTitle: t('surveys.rewardMailTitle'),
         rewardMailContent: t('surveys.rewardMailContent'),
-        targetPlatforms: t('surveys.targetPlatforms', '대상 플랫폼'),
-        targetPlatformsInverted: t(
-          'surveys.targetPlatformsInverted',
-          '플랫폼 제외 모드'
-        ),
-        targetChannels: t('surveys.targetChannels', '대상 채널'),
-        targetChannelsInverted: t(
-          'surveys.targetChannelsInverted',
-          '채널 제외 모드'
-        ),
-        targetSubchannels: t('surveys.targetSubchannels', '대상 서브채널'),
-        targetSubchannelsInverted: t(
-          'surveys.targetSubchannelsInverted',
-          '서브채널 제외 모드'
-        ),
-        targetWorlds: t('surveys.targetWorlds', '대상 월드'),
-        targetWorldsInverted: t(
-          'surveys.targetWorldsInverted',
-          '월드 제외 모드'
-        ),
+        targetPlatforms: t('surveys.targetPlatforms'),
+        targetPlatformsInverted: t('surveys.targetPlatformsInverted'),
+        targetChannels: t('surveys.targetChannels'),
+        targetChannelsInverted: t('surveys.targetChannelsInverted'),
+        targetSubchannels: t('surveys.targetSubchannels'),
+        targetSubchannelsInverted: t('surveys.targetSubchannelsInverted'),
+        targetWorlds: t('surveys.targetWorlds'),
+        targetWorldsInverted: t('surveys.targetWorldsInverted'),
       },
       // Banners (g_banners)
       g_banners: {
@@ -552,7 +540,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         playbackSpeed: t('banners.playbackSpeed'),
         shuffle: t('banners.shuffleMode'),
         sequences: t('banners.sequencesTab'),
-        bannerId: t('banners.bannerId', '배너 ID'),
+        bannerId: t('banners.bannerId'),
       },
       // Ingame Popup Notices (g_ingame_popup_notices) - extended mappings
       g_ingame_popup_notices: {
@@ -565,34 +553,16 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         useTemplate: t('ingamePopupNotices.useTemplate'),
         messageTemplateId: t('ingamePopupNotices.messageTemplate'),
         description: t('ingamePopupNotices.description'),
-        targetPlatforms: t('ingamePopupNotices.targetPlatforms', '대상 플랫폼'),
-        targetPlatformsInverted: t(
-          'ingamePopupNotices.targetPlatformsInverted',
-          '플랫폼 제외 모드'
-        ),
-        targetChannels: t('ingamePopupNotices.targetChannels', '대상 채널'),
-        targetChannelsInverted: t(
-          'ingamePopupNotices.targetChannelsInverted',
-          '채널 제외 모드'
-        ),
-        targetSubchannels: t(
-          'ingamePopupNotices.targetSubchannels',
-          '대상 서브채널'
-        ),
-        targetSubchannelsInverted: t(
-          'ingamePopupNotices.targetSubchannelsInverted',
-          '서브채널 제외 모드'
-        ),
-        targetWorlds: t('ingamePopupNotices.targetWorlds', '대상 월드'),
-        targetWorldsInverted: t(
-          'ingamePopupNotices.targetWorldsInverted',
-          '월드 제외 모드'
-        ),
-        targetUserIds: t('ingamePopupNotices.targetUserIds', '대상 유저 ID'),
-        targetUserIdsInverted: t(
-          'ingamePopupNotices.targetUserIdsInverted',
-          '유저 ID 제외 모드'
-        ),
+        targetPlatforms: t('ingamePopupNotices.targetPlatforms'),
+        targetPlatformsInverted: t('ingamePopupNotices.targetPlatformsInverted'),
+        targetChannels: t('ingamePopupNotices.targetChannels'),
+        targetChannelsInverted: t('ingamePopupNotices.targetChannelsInverted'),
+        targetSubchannels: t('ingamePopupNotices.targetSubchannels'),
+        targetSubchannelsInverted: t('ingamePopupNotices.targetSubchannelsInverted'),
+        targetWorlds: t('ingamePopupNotices.targetWorlds'),
+        targetWorldsInverted: t('ingamePopupNotices.targetWorldsInverted'),
+        targetUserIds: t('ingamePopupNotices.targetUserIds'),
+        targetUserIdsInverted: t('ingamePopupNotices.targetUserIdsInverted'),
       },
       // Reward Templates (g_reward_templates)
       g_reward_templates: {
