@@ -700,45 +700,47 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
               required
               inputRef={ipAddressFieldRef}
             />
-            <DateTimePicker
-              label={t('ipWhitelist.form.startDate')}
-              value={formData.startDate ? dayjs(formData.startDate) : null}
-              onChange={(date) =>
-                setFormData({
-                  ...formData,
-                  startDate: date?.isValid() ? date.toISOString() : undefined,
-                })
-              }
-              timeSteps={{ minutes: 1 }}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  slotProps: { input: { readOnly: true } },
-                  helperText: t('ipWhitelist.form.startDateHelp'),
-                },
-              }}
-            />
-            <DateTimePicker
-              label={t('ipWhitelist.form.endDate')}
-              value={formData.endDate ? dayjs(formData.endDate) : null}
-              onChange={(date) =>
-                setFormData({
-                  ...formData,
-                  endDate: date?.isValid() ? date.toISOString() : undefined,
-                })
-              }
-              minDateTime={
-                formData.startDate ? dayjs(formData.startDate) : undefined
-              }
-              timeSteps={{ minutes: 1 }}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  slotProps: { input: { readOnly: true } },
-                  helperText: t('ipWhitelist.form.endDateHelp'),
-                },
-              }}
-            />
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <DateTimePicker
+                label={t('ipWhitelist.form.startDate')}
+                value={formData.startDate ? dayjs(formData.startDate) : null}
+                onChange={(date) =>
+                  setFormData({
+                    ...formData,
+                    startDate: date?.isValid() ? date.toISOString() : undefined,
+                  })
+                }
+                timeSteps={{ minutes: 1 }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    slotProps: { input: { readOnly: true } },
+                    helperText: t('ipWhitelist.form.startDateHelp'),
+                  },
+                }}
+              />
+              <DateTimePicker
+                label={t('ipWhitelist.form.endDate')}
+                value={formData.endDate ? dayjs(formData.endDate) : null}
+                onChange={(date) =>
+                  setFormData({
+                    ...formData,
+                    endDate: date?.isValid() ? date.toISOString() : undefined,
+                  })
+                }
+                minDateTime={
+                  formData.startDate ? dayjs(formData.startDate) : undefined
+                }
+                timeSteps={{ minutes: 1 }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    slotProps: { input: { readOnly: true } },
+                    helperText: t('ipWhitelist.form.endDateHelp'),
+                  },
+                }}
+              />
+            </Box>
             <Box>
               <FormControlLabel
                 control={

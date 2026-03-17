@@ -948,56 +948,58 @@ const WhitelistPage: React.FC = () => {
                     placeholder={t('whitelist.form.ipPlaceholder')}
                     helperText={t('whitelist.form.ipHelp')}
                   />
-                  <DateTimePicker
-                    key={`start-date-${i18n.language}`}
-                    label={t('whitelist.form.startDateOpt')}
-                    value={
-                      formData.startDate ? dayjs(formData.startDate) : null
-                    }
-                    onChange={(date) => {
-                      setFormData({
-                        ...formData,
-                        startDate:
-                          date && dayjs.isDayjs(date) && date.isValid()
-                            ? date.toISOString()
-                            : '',
-                      });
-                    }}
-                    timeSteps={{ minutes: 1 }}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        error: false,
-                        slotProps: { input: { readOnly: true } },
-                        helperText: t('whitelist.form.startDateHelp'),
-                      },
-                    }}
-                  />
-                  <DateTimePicker
-                    key={`end-date-${i18n.language}`}
-                    label={t('whitelist.form.endDateOpt')}
-                    value={formData.endDate ? dayjs(formData.endDate) : null}
-                    onChange={(date) =>
-                      setFormData({
-                        ...formData,
-                        endDate:
-                          date && dayjs.isDayjs(date) && date.isValid()
-                            ? date.toISOString()
-                            : '',
-                      })
-                    }
-                    minDateTime={
-                      formData.startDate ? dayjs(formData.startDate) : undefined
-                    }
-                    timeSteps={{ minutes: 1 }}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        slotProps: { input: { readOnly: true } },
-                        helperText: t('whitelist.form.endDateHelp'),
-                      },
-                    }}
-                  />
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <DateTimePicker
+                      key={`start-date-${i18n.language}`}
+                      label={t('whitelist.form.startDateOpt')}
+                      value={
+                        formData.startDate ? dayjs(formData.startDate) : null
+                      }
+                      onChange={(date) => {
+                        setFormData({
+                          ...formData,
+                          startDate:
+                            date && dayjs.isDayjs(date) && date.isValid()
+                              ? date.toISOString()
+                              : '',
+                        });
+                      }}
+                      timeSteps={{ minutes: 1 }}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          error: false,
+                          slotProps: { input: { readOnly: true } },
+                          helperText: t('whitelist.form.startDateHelp'),
+                        },
+                      }}
+                    />
+                    <DateTimePicker
+                      key={`end-date-${i18n.language}`}
+                      label={t('whitelist.form.endDateOpt')}
+                      value={formData.endDate ? dayjs(formData.endDate) : null}
+                      onChange={(date) =>
+                        setFormData({
+                          ...formData,
+                          endDate:
+                            date && dayjs.isDayjs(date) && date.isValid()
+                              ? date.toISOString()
+                              : '',
+                        })
+                      }
+                      minDateTime={
+                        formData.startDate ? dayjs(formData.startDate) : undefined
+                      }
+                      timeSteps={{ minutes: 1 }}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          slotProps: { input: { readOnly: true } },
+                          helperText: t('whitelist.form.endDateHelp'),
+                        },
+                      }}
+                    />
+                  </Box>
                   <TextField
                     fullWidth
                     label={t('whitelist.form.purpose')}
