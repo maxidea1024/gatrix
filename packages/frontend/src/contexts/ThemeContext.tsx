@@ -388,12 +388,8 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       MuiTableBody: {
         styleOverrides: {
           root: {
-            '& .MuiTableRow-root:nth-of-type(odd)': {
-              backgroundColor: mode === 'dark' ? '#1e2125' : '#f8f9fa',
-            },
             '& .MuiTableRow-root.MuiTableRow-hover:hover': {
-              backgroundColor:
-                (mode === 'dark' ? '#282c31' : '#eef1f5') + ' !important',
+              backgroundColor: colors.hoverBg + ' !important',
             },
           },
         },
