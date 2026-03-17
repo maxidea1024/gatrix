@@ -1012,7 +1012,7 @@ const WhitelistPage: React.FC = () => {
                     loading || (editDialog && !!selectedWhitelist && !isDirty)
                   }
                 >
-                  {t('common.save')}
+                  {editDialog ? t('common.update') : t('common.add')}
                 </Button>
               </Box>
             </ResizableDrawer>

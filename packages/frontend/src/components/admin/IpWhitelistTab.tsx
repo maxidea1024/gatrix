@@ -598,23 +598,6 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                         </Tooltip>
                       </TableCell>
                       <TableCell align="center">
-                        <Tooltip
-                          title={
-                            ipWhitelist.isEnabled
-                              ? t('common.disable')
-                              : t('common.enable')
-                          }
-                        >
-                          <IconButton
-                            size="small"
-                            onClick={() => handleToggleStatus(ipWhitelist)}
-                            color={
-                              ipWhitelist.isEnabled ? 'success' : 'default'
-                            }
-                          >
-                            <ToggleIcon />
-                          </IconButton>
-                        </Tooltip>
                         <IconButton
                           size="small"
                           onClick={(e) => handleMenuClick(e, ipWhitelist)}
@@ -647,6 +630,22 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
+        {canManage && selectedIpWhitelist && (
+          <MenuItem
+            onClick={() => {
+              handleToggleStatus(selectedIpWhitelist);
+              handleMenuClose();
+            }}
+          >
+            <ToggleIcon
+              sx={{ mr: 1 }}
+              color={selectedIpWhitelist.isEnabled ? 'success' : 'inherit'}
+            />
+            {selectedIpWhitelist.isEnabled
+              ? t('common.disable')
+              : t('common.enable')}
+          </MenuItem>
+        )}
         {canManage && (
           <MenuItem onClick={handleEdit}>
             <EditIcon sx={{ mr: 1 }} />
@@ -778,7 +777,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
             {t('common.cancel')}
           </Button>
           <Button onClick={handleSave} variant="contained">
-            {t('common.save')}
+            {editDialog ? t('common.update') : t('common.add')}
           </Button>
         </Box>
       </ResizableDrawer>
