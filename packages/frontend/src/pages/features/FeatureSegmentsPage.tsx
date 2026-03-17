@@ -26,6 +26,10 @@ import {
   Autocomplete,
   FormControlLabel,
   Checkbox,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -37,6 +41,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   ViewColumn as ViewColumnIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -134,6 +139,8 @@ const FeatureSegmentsPage: React.FC = () => {
     useState<null | HTMLElement>(null);
   const [showDescription, setShowDescription] = useState(false);
   const [showTags, setShowTags] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<FeatureSegment | null>(null);
 
   // Column settings
   const defaultColumns: ColumnConfig[] = [
@@ -705,9 +712,7 @@ const FeatureSegmentsPage: React.FC = () => {
                         </TableCell>
                       ))}
                       {canManage && (
-                        <TableCell align="center">
-                          {t('common.actions')}
-                        </TableCell>
+                        <TableCell align="center" sx={{ width: 48 }} />
                       )}
                     </TableRow>
                   </TableHead>
@@ -1008,31 +1013,16 @@ const FeatureSegmentsPage: React.FC = () => {
                           }
                         })}
                         {canManage && (
-                          <TableCell align="center">
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                gap: 0.5,
-                                justifyContent: 'center',
+                          <TableCell align="center" sx={{ width: 48 }}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                setMenuAnchorEl(e.currentTarget);
+                                setMenuTarget(segment);
                               }}
                             >
-                              <Tooltip title={t('common.edit')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleEdit(segment)}
-                                >
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('common.delete')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleDelete(segment)}
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         )}
                       </TableRow>
@@ -1054,6 +1044,41 @@ const FeatureSegmentsPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Context Menu */}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={() => {
+          setMenuAnchorEl(null);
+          setMenuTarget(null);
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleEdit(menuTarget);
+            setMenuAnchorEl(null);
+            setMenuTarget(null);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleDelete(menuTarget);
+            setMenuAnchorEl(null);
+            setMenuTarget(null);
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Edit Drawer */}
       <ResizableDrawer

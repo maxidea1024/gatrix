@@ -32,6 +32,9 @@ import {
   Tabs,
   Tab,
   ListSubheader,
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -45,6 +48,7 @@ import {
   ArrowDownward as ArrowDownIcon,
   HelpOutline as HelpOutlineIcon,
   Timer as TimerIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -1236,6 +1240,8 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
     useState<null | HTMLElement>(null);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<ReleaseFlowTemplate | null>(null);
 
   // Sorting state with localStorage persistence
   const [orderBy, setOrderBy] = useState<string>(() => {
@@ -1273,7 +1279,6 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
     },
     { id: 'milestones', labelKey: 'releaseFlow.milestones', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
-    { id: 'actions', labelKey: 'common.actions', visible: true },
   ];
 
   // Column configuration (persisted in localStorage)
@@ -1351,8 +1356,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   // Column handlers
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     const checkboxCol = columns.find((c) => c.id === 'checkbox');
-    const actionsCol = columns.find((c) => c.id === 'actions');
-    const updatedColumns = [checkboxCol!, ...newColumns, actionsCol!];
+    const updatedColumns = [checkboxCol!, ...newColumns];
     setColumns(updatedColumns);
     localStorage.setItem(
       'releaseFlowTemplatesColumns',
@@ -1714,12 +1718,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                           );
                         }
                         if (column.id === 'actions') {
-                          if (!canManage) return null;
-                          return (
-                            <TableCell key={column.id} align="center">
-                              {t(column.labelKey)}
-                            </TableCell>
-                          );
+                          return null;
                         }
                         const isSortable = ['name', 'createdAt'].includes(
                           column.id
@@ -1742,6 +1741,9 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                           </TableCell>
                         );
                       })}
+                      {canManage && (
+                        <TableCell align="center" sx={{ width: 48 }} />
+                      )}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -1822,40 +1824,23 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                             );
                           }
                           if (column.id === 'actions') {
-                            if (!canManage) return null;
-                            return (
-                              <TableCell key={column.id} align="center">
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    gap: 0.5,
-                                    justifyContent: 'center',
-                                  }}
-                                >
-                                  <Tooltip title={t('common.edit')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleEdit(template)}
-                                    >
-                                      <EditIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                  <Tooltip title={t('common.delete')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() =>
-                                        handleDeleteClick(template)
-                                      }
-                                    >
-                                      <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Box>
-                              </TableCell>
-                            );
+                            return null;
                           }
                           return null;
                         })}
+                        {canManage && (
+                          <TableCell align="center" sx={{ width: 48 }}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                setMenuAnchorEl(e.currentTarget);
+                                setMenuTarget(template);
+                              }}
+                            >
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
+                          </TableCell>
+                        )}
                       </TableRow>
                     ))}
                   </TableBody>
@@ -1878,12 +1863,47 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
         )}
       </PageContentLoader>
 
+      {/* Context Menu */}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={() => {
+          setMenuAnchorEl(null);
+          setMenuTarget(null);
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleEdit(menuTarget);
+            setMenuAnchorEl(null);
+            setMenuTarget(null);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleDeleteClick(menuTarget);
+            setMenuAnchorEl(null);
+            setMenuTarget(null);
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
+
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
         columns={columns.filter(
-          (col) => col.id !== 'checkbox' && col.id !== 'actions'
+          (col) => col.id !== 'checkbox'
         )}
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
