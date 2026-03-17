@@ -458,6 +458,9 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                 '& .MuiOutlinedInput-notchedOutline': {
                   border: 'none',
                 },
+                '& .MuiSelect-select': {
+                  py: '4px',
+                },
               }}
               renderValue={(selected) => {
                 const label = getOperatorLabel(
