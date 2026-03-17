@@ -402,135 +402,135 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
           )}
         </FormControl>
 
-        {/* Inverted (!) - placed before operator for natural reading order */}
-        <Tooltip title={t('featureFlags.invertedHelp')} disableFocusListener>
-          <span>
-            <IconButton
-              size="small"
-              onClick={() =>
-                handleConstraintChange(index, 'inverted', !constraint.inverted)
-              }
-              disabled={disabled}
-              sx={{
-                width: 32,
-                height: 32,
-                color: constraint.inverted ? 'warning.main' : 'text.disabled',
-                bgcolor: constraint.inverted
-                  ? 'action.selected'
-                  : 'transparent',
-                '&:hover': {
-                  bgcolor: 'action.hover',
-                },
-              }}
-            >
-              <InvertIcon fontSize="small" />
-            </IconButton>
-          </span>
-        </Tooltip>
-
-        {/* Operator Selector */}
-        <FormControl size="small" sx={{ minWidth: 130, flex: '1 1 130px' }}>
-          <Select
-            value={validOperator}
-            onChange={(e) =>
-              handleConstraintChange(index, 'operator', e.target.value)
-            }
-            disabled={disabled}
-            renderValue={(selected) => {
-              const label = getOperatorLabel(
-                selected as string,
-                constraint.inverted || false,
-                operators
-              );
-              return (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <OperatorIcon
-                    operator={selected as string}
-                    inverted={constraint.inverted}
-                    size={16}
-                    showTooltip={true}
-                  />
-                  {constraint.inverted && (
-                    <Typography
-                      component="span"
-                      sx={{ color: 'warning.main', fontWeight: 600 }}
-                    >
-                      NOT
-                    </Typography>
-                  )}
-                  <Typography component="span">
-                    {t(
-                      `featureFlags.operators.${selected}${
-                        constraint.inverted ? '_inverted' : ''
-                      }`,
-                      label
-                    )}
-                  </Typography>
-                </Box>
-              );
-            }}
-          >
-            {operators.map((op) => (
-              <MenuItem
-                key={op.value}
-                value={op.value}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: 1,
-                  py: 1,
-                }}
-              >
-                <OperatorIcon
-                  operator={op.value}
-                  size={18}
-                  showTooltip={true}
-                  sx={{ mt: 0.25 }}
-                />
-                <Box sx={{ minWidth: 0 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    {t(`featureFlags.operators.${op.value}`, op.label)}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: 'text.secondary',
-                      display: 'block',
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    {t(`constraints.operatorDesc.${op.value}`, '')}
-                  </Typography>
-                </Box>
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* Value Input */}
-        <Box sx={{ flex: '2 1 200px', minWidth: 150 }}>
-          {renderValueInput(constraint, index)}
-          {!isFieldEmpty && isValueEmpty && (
-            <Typography
-              variant="caption"
-              color="error"
-              sx={{ display: 'block', mt: 0.5 }}
-            >
-              {t('featureFlags.valueRequired')}
-            </Typography>
-          )}
-        </Box>
-
-        {/* Constraint Options & Delete */}
+        {/* Operator Group: Inverted + Operator Select + Case Sensitivity */}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 0.5,
+            gap: 0.25,
+            border: 1,
+            borderColor: 'divider',
+            borderRadius: 1,
+            overflow: 'hidden',
             flexShrink: 0,
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.03)'
+                : 'rgba(0, 0, 0, 0.02)',
           }}
         >
-          {/* Case Insensitive - always show but disable for non-string operators */}
+          {/* Inverted (!) */}
+          <Tooltip title={t('featureFlags.invertedHelp')} disableFocusListener>
+            <span>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleConstraintChange(index, 'inverted', !constraint.inverted)
+                }
+                disabled={disabled}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 0,
+                  color: constraint.inverted ? 'warning.main' : 'text.disabled',
+                  bgcolor: constraint.inverted
+                    ? 'action.selected'
+                    : 'transparent',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                <InvertIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+
+          {/* Operator Selector */}
+          <FormControl size="small" sx={{ minWidth: 110 }}>
+            <Select
+              value={validOperator}
+              onChange={(e) =>
+                handleConstraintChange(index, 'operator', e.target.value)
+              }
+              disabled={disabled}
+              sx={{
+                '& .MuiOutlinedInput-notchedOutline': {
+                  border: 'none',
+                },
+              }}
+              renderValue={(selected) => {
+                const label = getOperatorLabel(
+                  selected as string,
+                  constraint.inverted || false,
+                  operators
+                );
+                return (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <OperatorIcon
+                      operator={selected as string}
+                      inverted={constraint.inverted}
+                      size={16}
+                      showTooltip={true}
+                    />
+                    {constraint.inverted && (
+                      <Typography
+                        component="span"
+                        sx={{ color: 'warning.main', fontWeight: 600 }}
+                      >
+                        NOT
+                      </Typography>
+                    )}
+                    <Typography component="span">
+                      {t(
+                        `featureFlags.operators.${selected}${
+                          constraint.inverted ? '_inverted' : ''
+                        }`,
+                        label
+                      )}
+                    </Typography>
+                  </Box>
+                );
+              }}
+            >
+              {operators.map((op) => (
+                <MenuItem
+                  key={op.value}
+                  value={op.value}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 1,
+                    py: 1,
+                  }}
+                >
+                  <OperatorIcon
+                    operator={op.value}
+                    size={18}
+                    showTooltip={true}
+                    sx={{ mt: 0.25 }}
+                  />
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {t(`featureFlags.operators.${op.value}`, op.label)}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'text.secondary',
+                        display: 'block',
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {t(`constraints.operatorDesc.${op.value}`, '')}
+                    </Typography>
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Case Insensitive */}
           <Tooltip
             title={t('featureFlags.caseInsensitiveHelp')}
             disableFocusListener
@@ -549,6 +549,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                 sx={{
                   width: 32,
                   height: 32,
+                  borderRadius: 0,
                   color: constraint.caseInsensitive
                     ? 'primary.main'
                     : 'text.disabled',
@@ -564,29 +565,43 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
               </IconButton>
             </span>
           </Tooltip>
-
-          {/* Delete Button */}
-          <Tooltip title={t('common.delete')} disableFocusListener>
-            <span>
-              <IconButton
-                size="small"
-                onClick={() => handleRemoveConstraint(index)}
-                disabled={disabled}
-                sx={{
-                  width: 32,
-                  height: 32,
-                  color: 'text.secondary',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                    color: 'error.main',
-                  },
-                }}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
         </Box>
+
+        {/* Value Input */}
+        <Box sx={{ flex: '2 1 200px', minWidth: 150 }}>
+          {renderValueInput(constraint, index)}
+          {!isFieldEmpty && isValueEmpty && (
+            <Typography
+              variant="caption"
+              color="error"
+              sx={{ display: 'block', mt: 0.5 }}
+            >
+              {t('featureFlags.valueRequired')}
+            </Typography>
+          )}
+        </Box>
+
+        {/* Delete Button */}
+        <Tooltip title={t('common.delete')} disableFocusListener>
+          <span>
+            <IconButton
+              size="small"
+              onClick={() => handleRemoveConstraint(index)}
+              disabled={disabled}
+              sx={{
+                width: 32,
+                height: 32,
+                color: 'text.secondary',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                  color: 'error.main',
+                },
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </span>
+        </Tooltip>
       </Box>
     </Card>
   );
