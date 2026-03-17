@@ -794,6 +794,11 @@ const AuditLogsPage: React.FC = () => {
                           hover
                           sx={{
                             cursor: 'pointer',
+                            bgcolor: index % 2 === 1
+                              ? (theme) => theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.025)'
+                                : 'rgba(79, 70, 229, 0.02)'
+                              : undefined,
                             '& > *': {
                               borderBottom:
                                 expandedRowId === log.id ? 'none' : undefined,
