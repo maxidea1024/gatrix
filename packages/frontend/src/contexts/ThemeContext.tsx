@@ -313,9 +313,9 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           root: {
             '& .MuiBackdrop-root': {
               backgroundColor:
-                mode === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(15,18,37,0.4)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
+                mode === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(15,18,37,0.3)',
+              backdropFilter: 'blur(3px)',
+              WebkitBackdropFilter: 'blur(3px)',
             },
           },
           paper: {
@@ -328,9 +328,9 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           root: {
             '&:not(.MuiSelect-root) .MuiBackdrop-root': {
               backgroundColor:
-                mode === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(15,18,37,0.4)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
+                mode === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(15,18,37,0.3)',
+              backdropFilter: 'blur(3px)',
+              WebkitBackdropFilter: 'blur(3px)',
             },
             '&.MuiSelect-root .MuiBackdrop-root': {
               backgroundColor: 'transparent',
