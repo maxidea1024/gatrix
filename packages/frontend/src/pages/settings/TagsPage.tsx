@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
 import {
@@ -36,6 +36,7 @@ import { useTranslation } from 'react-i18next';
 import { tagService, Tag } from '@/services/tagService';
 import { useSnackbar } from 'notistack';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 import { formatDateTimeDetailed, formatRelativeTime } from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
@@ -66,7 +67,8 @@ const TagsPage: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<Tag | null>(null);
   const [confirmName, setConfirmName] = useState('');
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const isInitialLoad = useRef(true);
 
   // Create form
   const [newName, setNewName] = useState('');
@@ -89,6 +91,7 @@ const TagsPage: React.FC = () => {
       enqueueSnackbar(t('errors.loadError'), { variant: 'error' });
     } finally {
       setLoading(false);
+      isInitialLoad.current = false;
     }
   };
   useEffect(() => {
@@ -303,13 +306,8 @@ const TagsPage: React.FC = () => {
         </Card>
       )}
 
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-          <Typography color="text.secondary">
-            {t('common.loadingData')}
-          </Typography>
-        </Box>
-      ) : tags.length === 0 ? (
+      <PageContentLoader loading={loading && isInitialLoad.current}>
+        {tags.length === 0 ? (
         <EmptyPagePlaceholder
           message={t('tags.noTagsFound')}
           onAddClick={
@@ -525,7 +523,8 @@ const TagsPage: React.FC = () => {
             </TableContainer>
           </CardContent>
         </Card>
-      )}
+        )}
+      </PageContentLoader>
 
       {/* Delete confirmation dialog */}
       <Dialog open={!!deleteTarget} onClose={closeDeleteDialog}>
