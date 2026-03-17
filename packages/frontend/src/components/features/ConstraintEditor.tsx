@@ -303,7 +303,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
         {/* Context Field Selector */}
         <FormControl
           size="small"
-          sx={{ minWidth: 150, flex: '1 1 150px' }}
+          sx={{ width: 170, flexShrink: 0, '& .MuiSelect-select': { overflow: 'hidden', textOverflow: 'ellipsis' } }}
           error={isFieldEmpty}
         >
           <Select
