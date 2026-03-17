@@ -1742,7 +1742,9 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                         );
                       })}
                       {canManage && (
-                        <TableCell align="center" sx={{ width: 48 }} />
+                        <TableCell align="center" sx={{ width: 48 }}>
+                          {t('common.actions')}
+                        </TableCell>
                       )}
                     </TableRow>
                   </TableHead>
