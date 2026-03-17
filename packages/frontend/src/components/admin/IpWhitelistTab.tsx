@@ -26,6 +26,8 @@ import {
   Tooltip,
   Switch,
   FormControlLabel,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import {
@@ -60,6 +62,9 @@ import ResizableDrawer from '../common/ResizableDrawer';
 import EmptyPagePlaceholder from '../common/EmptyPagePlaceholder';
 import SearchTextField from '../common/SearchTextField';
 import dayjs from 'dayjs';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
+import ExportImportMenuItems from '../common/ExportImportMenuItems';
+import ImportDialog from '../common/ImportDialog';
 
 interface IpWhitelistTabProps {
   canManage?: boolean;
@@ -94,6 +99,8 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
   const [addDialog, setAddDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [bulkDialog, setBulkDialog] = useState(false);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
     title: '',
@@ -410,19 +417,42 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         {canManage && (
           <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
             <Button
-              variant="outlined"
-              startIcon={<UploadIcon />}
-              onClick={() => setBulkDialog(true)}
-            >
-              {t('ipWhitelist.bulkImport')}
-            </Button>
-            <Button
               variant="contained"
               startIcon={<AddIcon />}
               onClick={handleAdd}
             >
               {t('ipWhitelist.addEntry')}
             </Button>
+            <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'ipAddress', header: t('ipWhitelist.ipAddress') },
+                    { key: 'purpose', header: t('ipWhitelist.purpose') },
+                    { key: 'isEnabled', header: t('ipWhitelist.status') },
+                    { key: 'createdAt', header: t('ipWhitelist.createdAt') },
+                  ];
+                  try {
+                    exportToFile(ipWhitelists, exportColumns, 'ip-whitelist', format);
+                    enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+              />
+            </Menu>
           </Box>
         )}
       </Box>
@@ -844,6 +874,36 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        title={t('common.import')}
+        onImport={async (data) => {
+          let successCount = 0;
+          let failCount = 0;
+          for (const item of data) {
+            try {
+              await IpWhitelistService.createIpWhitelist({
+                ipAddress: item[t('ipWhitelist.ipAddress')] || item.ipAddress || '',
+                purpose: item[t('ipWhitelist.purpose')] || item.purpose || '',
+                isEnabled: true,
+              });
+              successCount++;
+            } catch (err) {
+              failCount++;
+            }
+          }
+          if (successCount > 0) {
+            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+            loadIpWhitelists();
+          }
+          if (failCount > 0) {
+            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+          }
+        }}
+      />
     </>
   );
 };
