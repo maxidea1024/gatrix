@@ -1511,7 +1511,11 @@ const MessageTemplatesPage: React.FC = () => {
             onClick={handleSave}
             disabled={saving || (!!editing && !isDirty)}
           >
-            {saving ? t('common.saving') : t('common.save')}
+            {saving
+              ? t('common.saving')
+              : editing
+                ? t('common.update')
+                : t('common.add')}
           </Button>
         </Box>
       </ResizableDrawer>
