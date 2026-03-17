@@ -511,7 +511,7 @@ const IngamePopupNoticesPage: React.FC = () => {
               {t('ingamePopupNotices.createNotice')}
             </Button>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
             <MoreVertIcon />
           </IconButton>
           <Menu

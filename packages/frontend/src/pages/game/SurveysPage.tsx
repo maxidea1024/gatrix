@@ -418,7 +418,7 @@ const SurveysPage: React.FC = () => {
               {t('surveys.createSurvey')}
             </Button>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
             <MoreVertIcon />
           </IconButton>
           <Menu
@@ -426,6 +426,18 @@ const SurveysPage: React.FC = () => {
             open={Boolean(pageMenuAnchor)}
             onClose={() => setPageMenuAnchor(null)}
           >
+            <MenuItem
+              onClick={() => {
+                setPageMenuAnchor(null);
+                handleConfigOpen();
+              }}
+            >
+              <ListItemIcon>
+                <SettingsIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('surveys.config')}</ListItemText>
+            </MenuItem>
+            <Divider />
             <ExportImportMenuItems
               onExport={(format) => {
                 setPageMenuAnchor(null);
@@ -447,18 +459,6 @@ const SurveysPage: React.FC = () => {
                 setImportDialogOpen(true);
               }}
             />
-            <Divider />
-            <MenuItem
-              onClick={() => {
-                setPageMenuAnchor(null);
-                handleConfigOpen();
-              }}
-            >
-              <ListItemIcon>
-                <SettingsIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t('surveys.config')}</ListItemText>
-            </MenuItem>
           </Menu>
         </Box>
       </Box>

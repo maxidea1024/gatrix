@@ -1382,7 +1382,7 @@ const CouponSettingsPage: React.FC = () => {
               {t('coupons.couponSettings.createCoupon')}
             </Button>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
             <MoreVertIcon />
           </IconButton>
           <Menu

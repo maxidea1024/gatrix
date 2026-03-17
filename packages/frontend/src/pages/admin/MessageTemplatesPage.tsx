@@ -997,7 +997,7 @@ const MessageTemplatesPage: React.FC = () => {
                 {t('messageTemplates.addTemplate')}
               </Button>
             )}
-            <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+            <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
               <MoreVertIcon />
             </IconButton>
           </Box>

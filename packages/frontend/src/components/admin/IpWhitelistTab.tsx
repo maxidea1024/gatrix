@@ -423,7 +423,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
             >
               {t('ipWhitelist.addEntry')}
             </Button>
-            <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+            <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
               <MoreVertIcon />
             </IconButton>
             <Menu

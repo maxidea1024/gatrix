@@ -421,7 +421,7 @@ const BannerManagementPage: React.FC = () => {
               {t('banners.createBanner')}
             </Button>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
             <MoreVertIcon />
           </IconButton>
           <Menu
