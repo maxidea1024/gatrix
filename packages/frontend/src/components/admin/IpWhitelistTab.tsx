@@ -37,7 +37,8 @@ import {
   Delete as DeleteIcon,
   Upload as UploadIcon,
   Refresh as RefreshIcon,
-  PowerSettingsNew as ToggleIcon,
+  Block as BlockIcon,
+  CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
   Save as SaveIcon,
   ContentCopy as ContentCopyIcon,
@@ -675,13 +676,17 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
               handleMenuClose();
             }}
           >
-            <ToggleIcon
-              sx={{ mr: 1 }}
-              color={selectedIpWhitelist.isEnabled ? 'success' : 'inherit'}
-            />
-            {selectedIpWhitelist.isEnabled
-              ? t('common.disable')
-              : t('common.enable')}
+            {selectedIpWhitelist.isEnabled ? (
+              <>
+                <BlockIcon sx={{ mr: 1 }} />
+                {t('common.disable')}
+              </>
+            ) : (
+              <>
+                <CheckCircleIcon sx={{ mr: 1 }} />
+                {t('common.enable')}
+              </>
+            )}
           </MenuItem>
         )}
         {canManage && (
