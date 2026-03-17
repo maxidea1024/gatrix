@@ -794,29 +794,31 @@ const StoreProductsPage: React.FC = () => {
             {t('storeProducts.subtitle')}
           </Typography>
         </Box>
-        {canManage && (
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Button
-              variant="outlined"
-              startIcon={<SyncIcon />}
-              onClick={handleSyncPreview}
-              disabled={syncLoading}
-            >
-              {t('storeProducts.syncWithPlanningData')}
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-              disabled
-            >
-              {t('storeProducts.createProduct')}
-            </Button>
-          </Box>
-        )}
-        <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
-          <MoreVertIcon />
-        </IconButton>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+          {canManage && (
+            <>
+              <Button
+                variant="outlined"
+                startIcon={<SyncIcon />}
+                onClick={handleSyncPreview}
+                disabled={syncLoading}
+              >
+                {t('storeProducts.syncWithPlanningData')}
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+                disabled
+              >
+                {t('storeProducts.createProduct')}
+              </Button>
+            </>
+          )}
+          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+            <MoreVertIcon />
+          </IconButton>
+        </Box>
         <Menu
           anchorEl={pageMenuAnchor}
           open={Boolean(pageMenuAnchor)}

@@ -987,18 +987,20 @@ const MessageTemplatesPage: React.FC = () => {
               </Typography>
             </Box>
           </Box>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAdd}
-            >
-              {t('messageTemplates.addTemplate')}
-            </Button>
-          )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
-            <MoreVertIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAdd}
+              >
+                {t('messageTemplates.addTemplate')}
+              </Button>
+            )}
+            <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+              <MoreVertIcon />
+            </IconButton>
+          </Box>
           <MuiMenu
             anchorEl={pageMenuAnchor}
             open={Boolean(pageMenuAnchor)}

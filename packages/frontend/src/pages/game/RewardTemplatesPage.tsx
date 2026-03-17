@@ -618,8 +618,8 @@ const RewardTemplatesPage: React.FC = () => {
             {t('rewardTemplates.subtitle')}
           </Typography>
         </Box>
-        {canManage && (
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+          {canManage && (
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -627,11 +627,11 @@ const RewardTemplatesPage: React.FC = () => {
             >
               {t('rewardTemplates.createTemplate')}
             </Button>
-          </Box>
-        )}
-        <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
-          <MoreVertIcon />
-        </IconButton>
+          )}
+          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)}>
+            <MoreVertIcon />
+          </IconButton>
+        </Box>
         <Menu
           anchorEl={pageMenuAnchor}
           open={Boolean(pageMenuAnchor)}
