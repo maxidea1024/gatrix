@@ -577,17 +577,7 @@ const SignalEndpointsPage: React.FC = () => {
                   <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody
-                sx={{
-                  '& .MuiTableRow-root:nth-of-type(4n+1)': {
-                    backgroundColor: (theme) =>
-                      theme.palette.mode === 'dark' ? '#1e2125' : '#f8f9fa',
-                  },
-                  '& .MuiTableRow-root:nth-of-type(4n+3)': {
-                    backgroundColor: 'transparent',
-                  },
-                }}
-              >
+              <TableBody>
                 {endpoints.map((endpoint) => (
                   <React.Fragment key={endpoint.id}>
                     <TableRow

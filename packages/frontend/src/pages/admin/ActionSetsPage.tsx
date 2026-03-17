@@ -732,17 +732,7 @@ const ActionSetsPage: React.FC = () => {
                   <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody
-                sx={{
-                  '& .MuiTableRow-root:nth-of-type(4n+1)': {
-                    backgroundColor: (theme) =>
-                      theme.palette.mode === 'dark' ? '#1e2125' : '#f8f9fa',
-                  },
-                  '& .MuiTableRow-root:nth-of-type(4n+3)': {
-                    backgroundColor: 'transparent',
-                  },
-                }}
-              >
+              <TableBody>
                 {actionSets.map((actionSet) => (
                   <React.Fragment key={actionSet.id}>
                     <TableRow

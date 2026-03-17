@@ -1751,13 +1751,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                     .map((change, i) => (
                                                       <TableRow
                                                         key={i}
-                                                        sx={{
-                                                          '&:nth-of-type(odd)':
-                                                            {
-                                                              bgcolor:
-                                                                'action.hover',
-                                                            },
-                                                        }}
+                                                        sx={{}}
                                                       >
                                                         <TableCell
                                                           sx={{
