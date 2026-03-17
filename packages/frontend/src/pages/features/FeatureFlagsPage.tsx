@@ -1798,30 +1798,11 @@ const FeatureFlagsPage: React.FC = () => {
               </Menu>
             </>
           )}
-          <Button
-            variant="outlined"
-            startIcon={<ImportExportIcon />}
+          <IconButton
             onClick={(e) => setImportExportMenuAnchor(e.currentTarget)}
-            endIcon={<ExpandMoreIcon sx={{ ml: -0.5 }} />}
           >
-            {t('featureFlags.importExport')}
-          </Button>
-          <Divider orientation="vertical" sx={{ height: 32, mx: 0.5 }} />
-          <Tooltip title={t('playground.title')} disableFocusListener>
-            <IconButton
-              size="small"
-              onClick={() => setPlaygroundOpen(true)}
-              sx={{
-                width: 36,
-                height: 36,
-                bgcolor: 'primary.main',
-                color: 'primary.contrastText',
-                '&:hover': { bgcolor: 'primary.dark' },
-              }}
-            >
-              <JoystickIcon sx={{ fontSize: 20 }} />
-            </IconButton>
-          </Tooltip>
+            <MoreVertIcon />
+          </IconButton>
         </Box>
       </Box>
 
@@ -3929,12 +3910,24 @@ const FeatureFlagsPage: React.FC = () => {
         onClose={() => setColumnSettingsAnchor(null)}
       />
 
-      {/* Import/Export Menu */}
+      {/* Page Context Menu */}
       <Menu
         anchorEl={importExportMenuAnchor}
         open={Boolean(importExportMenuAnchor)}
         onClose={() => setImportExportMenuAnchor(null)}
       >
+        <MenuItem
+          onClick={() => {
+            setImportExportMenuAnchor(null);
+            setPlaygroundOpen(true);
+          }}
+        >
+          <ListItemIcon>
+            <JoystickIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('playground.title')}</ListItemText>
+        </MenuItem>
+        <Divider />
         {/* Export section */}
         <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
           <ListItemIcon>

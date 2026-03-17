@@ -91,6 +91,7 @@ const SurveysPage: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingSurvey, setDeletingSurvey] = useState<Survey | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
 
   // Action menu state
   const [actionMenuAnchorEl, setActionMenuAnchorEl] =
@@ -411,18 +412,28 @@ const SurveysPage: React.FC = () => {
               {t('surveys.createSurvey')}
             </Button>
           )}
-          {canManage && (
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-          )}
-          {canManage && (
-            <Button
-              variant="outlined"
-              startIcon={<SettingsIcon />}
-              onClick={handleConfigOpen}
+          <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
             >
-              {t('surveys.config')}
-            </Button>
-          )}
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  handleConfigOpen();
+                }}
+              >
+                <ListItemIcon>
+                  <SettingsIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('surveys.config')}</ListItemText>
+              </MenuItem>
+            </Menu>
         </Box>
       </Box>
 

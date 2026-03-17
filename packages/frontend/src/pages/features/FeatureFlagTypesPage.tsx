@@ -24,7 +24,6 @@ import {
 } from '@mui/material';
 import {
   Edit as EditIcon,
-  Refresh as RefreshIcon,
   RocketLaunch as ReleaseIcon,
   Science as ExperimentIcon,
   Build as OperationalIcon,
@@ -150,13 +149,6 @@ const FeatureFlagTypesPage: React.FC = () => {
             {t('featureFlags.flagTypesDescription')}
           </Typography>
         </Box>
-        <Tooltip title={t('common.refresh')}>
-          <span>
-            <IconButton onClick={loadTypes} disabled={loading}>
-              <RefreshIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
       </Box>
 
       {/* Types Table */}

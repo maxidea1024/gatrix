@@ -185,6 +185,7 @@ const ServiceNoticesPage: React.FC = () => {
   // Webview menu state
   const [webviewMenuAnchorEl, setWebviewMenuAnchorEl] =
     useState<null | HTMLElement>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
 
   // Action menu state
   const [actionMenuAnchorEl, setActionMenuAnchorEl] =
@@ -659,13 +660,6 @@ const ServiceNoticesPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Button
-            variant="outlined"
-            startIcon={<VisibilityIcon />}
-            onClick={() => setPreviewDialogOpen(true)}
-          >
-            {t('serviceNotices.preview')}
-          </Button>
           {canManage && (
             <Button
               variant="contained"
@@ -675,16 +669,50 @@ const ServiceNoticesPage: React.FC = () => {
               {t('serviceNotices.createNotice')}
             </Button>
           )}
-          <Divider orientation="vertical" sx={{ height: 32, mx: 0.5 }} />
-          <Tooltip title={t('serviceNotices.webviewMenuTooltip')}>
-            <IconButton
-              size="small"
-              onClick={handleWebviewMenuOpen}
-              sx={{ p: 1 }}
+          <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
             >
-              <SportsEsportsIcon />
+              <MoreVertIcon />
             </IconButton>
-          </Tooltip>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  setPreviewDialogOpen(true);
+                }}
+              >
+                <ListItemIcon>
+                  <VisibilityIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('serviceNotices.preview')}</ListItemText>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  handleOpenWebviewPreview();
+                }}
+              >
+                <ListItemIcon>
+                  <SportsEsportsIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('serviceNotices.webviewPreview')}</ListItemText>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  handleCopyNoticeUrl();
+                }}
+              >
+                <ListItemIcon>
+                  <ContentCopyIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('serviceNotices.copyWebviewUrl')}</ListItemText>
+              </MenuItem>
+            </Menu>
         </Box>
       </Box>
 
@@ -1430,33 +1458,7 @@ const ServiceNoticesPage: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Webview Context Menu */}
-      <Menu
-        anchorEl={webviewMenuAnchorEl}
-        open={Boolean(webviewMenuAnchorEl)}
-        onClose={handleWebviewMenuClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-      >
-        <MenuItem onClick={handleOpenWebviewPreview}>
-          <ListItemIcon>
-            <VisibilityIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>{t('serviceNotices.webviewPreview')}</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleCopyNoticeUrl}>
-          <ListItemIcon>
-            <ContentCopyIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>{t('serviceNotices.copyWebviewUrl')}</ListItemText>
-        </MenuItem>
-      </Menu>
+
     </Box>
   );
 };

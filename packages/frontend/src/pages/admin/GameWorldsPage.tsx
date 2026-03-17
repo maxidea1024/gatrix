@@ -643,6 +643,7 @@ const GameWorldsPage: React.FC = () => {
 
   // SDK 가이드 Status
   const [openSDKGuide, setOpenSDKGuide] = useState(false);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
 
   // 점검 메시지 Locale 관리 함수들
   const addMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
@@ -1858,24 +1859,36 @@ const GameWorldsPage: React.FC = () => {
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
-            <>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleAddWorld}
-              >
-                {t('gameWorlds.addGameWorld')}
-              </Button>
-              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-            </>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddWorld}
+            >
+              {t('gameWorlds.addGameWorld')}
+            </Button>
           )}
-          <Button
-            variant="outlined"
-            startIcon={<CodeIcon />}
-            onClick={() => setOpenSDKGuide(true)}
+          <IconButton
+            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
           >
-            {t('coupons.couponSettings.sdkGuide')}
-          </Button>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={pageMenuAnchor}
+            open={Boolean(pageMenuAnchor)}
+            onClose={() => setPageMenuAnchor(null)}
+          >
+            <MenuItem
+              onClick={() => {
+                setPageMenuAnchor(null);
+                setOpenSDKGuide(true);
+              }}
+            >
+              <ListItemIcon>
+                <CodeIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('coupons.couponSettings.sdkGuide')}</ListItemText>
+            </MenuItem>
+          </Menu>
         </Box>
       </Box>
 

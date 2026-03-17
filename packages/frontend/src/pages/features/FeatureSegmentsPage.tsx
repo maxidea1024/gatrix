@@ -137,8 +137,8 @@ const FeatureSegmentsPage: React.FC = () => {
 
   // Column settings
   const defaultColumns: ColumnConfig[] = [
-    { id: 'visibility', labelKey: 'featureFlags.visibility', visible: true },
     { id: 'segmentName', labelKey: 'featureFlags.segmentName', visible: true },
+    { id: 'visibility', labelKey: 'featureFlags.visibility', visible: true },
     { id: 'constraints', labelKey: 'featureFlags.constraints', visible: true },
     { id: 'references', labelKey: 'common.references', visible: true },
     { id: 'tags', labelKey: 'featureFlags.tags', visible: true },

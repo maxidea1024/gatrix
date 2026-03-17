@@ -1650,43 +1650,8 @@ const ClientVersionsPage: React.FC = () => {
           </Box>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            endIcon={<ArrowDropDownIcon />}
-            onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-          >
-            {t('common.export')}
-          </Button>
-          <Menu
-            anchorEl={exportMenuAnchor}
-            open={Boolean(exportMenuAnchor)}
-            onClose={() => setExportMenuAnchor(null)}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-          >
-            <MenuItem onClick={() => handleExport('csv')}>
-              <TableChartIcon sx={{ mr: 1 }} />
-              CSV
-            </MenuItem>
-            <MenuItem onClick={() => handleExport('json')}>
-              <JsonIcon sx={{ mr: 1 }} />
-              JSON
-            </MenuItem>
-            <MenuItem onClick={() => handleExport('xlsx')}>
-              <ExcelIcon sx={{ mr: 1 }} />
-              Excel (XLSX)
-            </MenuItem>
-          </Menu>
           {canManage && (
             <>
-              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
               <Button
                 variant="contained"
                 color="primary"
@@ -1709,28 +1674,75 @@ const ClientVersionsPage: React.FC = () => {
               >
                 {t('clientVersions.addBulk')}
               </Button>
-              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-              <Tooltip title={t('platformDefaults.title')}>
-                <IconButton
-                  aria-label={t('platformDefaults.title')}
-                  onClick={() => {
-                    setPlatformDefaultsDialogOpen(true);
-                  }}
-                  size="medium"
-                >
-                  <SettingsIcon />
-                </IconButton>
-              </Tooltip>
             </>
           )}
-          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-          <Button
-            variant="outlined"
-            startIcon={<CodeIcon />}
-            onClick={() => setOpenSDKGuide(true)}
+          <IconButton
+            onClick={(e) => setExportMenuAnchor(e.currentTarget)}
           >
-            {t('clientVersions.sdkGuide')}
-          </Button>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={exportMenuAnchor}
+            open={Boolean(exportMenuAnchor)}
+            onClose={() => setExportMenuAnchor(null)}
+          >
+            {/* Export section */}
+            <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
+              <ListItemIcon>
+                <DownloadIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('common.export')}
+                </Typography>
+              </ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('csv')} sx={{ pl: 4 }}>
+              <ListItemIcon>
+                <TableChartIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>CSV</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('json')} sx={{ pl: 4 }}>
+              <ListItemIcon>
+                <JsonIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>JSON</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('xlsx')} sx={{ pl: 4 }}>
+              <ListItemIcon>
+                <ExcelIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Excel (XLSX)</ListItemText>
+            </MenuItem>
+            {canManage && [
+              <Divider key="divider-settings" />,
+              <MenuItem
+                key="platform-defaults"
+                onClick={() => {
+                  setExportMenuAnchor(null);
+                  setPlatformDefaultsDialogOpen(true);
+                }}
+              >
+                <ListItemIcon>
+                  <SettingsIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('platformDefaults.title')}</ListItemText>
+              </MenuItem>,
+            ]}
+            <Divider />
+            <MenuItem
+              onClick={() => {
+                setExportMenuAnchor(null);
+                setOpenSDKGuide(true);
+              }}
+            >
+              <ListItemIcon>
+                <CodeIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('clientVersions.sdkGuide')}</ListItemText>
+            </MenuItem>
+          </Menu>
         </Box>
       </Box>
 

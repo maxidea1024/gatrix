@@ -140,6 +140,7 @@ const IngamePopupNoticesPage: React.FC = () => {
     useState<IngamePopupNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [guideDrawerOpen, setGuideDrawerOpen] = useState(false);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
 
   // Action menu state
   const [actionMenuAnchorEl, setActionMenuAnchorEl] =
@@ -504,14 +505,28 @@ const IngamePopupNoticesPage: React.FC = () => {
               {t('ingamePopupNotices.createNotice')}
             </Button>
           )}
-          <Divider orientation="vertical" flexItem sx={{ my: 1 }} />
-          <Button
-            variant="outlined"
-            startIcon={<CodeIcon />}
-            onClick={() => setGuideDrawerOpen(true)}
-          >
-            {t('ingamePopupNotices.sdkGuide')}
-          </Button>
+          <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  setGuideDrawerOpen(true);
+                }}
+              >
+                <ListItemIcon>
+                  <CodeIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('ingamePopupNotices.sdkGuide')}</ListItemText>
+              </MenuItem>
+            </Menu>
         </Box>
       </Box>
 

@@ -40,6 +40,8 @@ import {
   FormHelperText,
   Paper,
   Collapse,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Settings as SettingsIcon,
@@ -60,6 +62,7 @@ import {
   Description as ExcelIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useTranslation } from 'react-i18next';
@@ -193,6 +196,7 @@ const CouponSettingsPage: React.FC = () => {
 
   // SDK Guide drawer state
   const [openSDKGuide, setOpenSDKGuide] = useState(false);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
 
   // Delete confirmation dialog state
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -1372,16 +1376,28 @@ const CouponSettingsPage: React.FC = () => {
               {t('coupons.couponSettings.createCoupon')}
             </Button>
           )}
-          {canManage && (
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-          )}
-          <Button
-            variant="outlined"
-            startIcon={<CodeIcon />}
-            onClick={() => setOpenSDKGuide(true)}
-          >
-            {t('coupons.couponSettings.sdkGuide')}
-          </Button>
+          <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  setOpenSDKGuide(true);
+                }}
+              >
+                <ListItemIcon>
+                  <CodeIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('coupons.couponSettings.sdkGuide')}</ListItemText>
+              </MenuItem>
+            </Menu>
         </Box>
       </Box>
 
