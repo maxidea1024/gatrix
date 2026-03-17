@@ -462,7 +462,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                   border: 'none',
                 },
                 '& .MuiSelect-select': {
-                  py: '4px',
+                  py: '6px',
                 },
               }}
               renderValue={(selected) => {
