@@ -254,6 +254,24 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
     handleMenuClose();
   };
 
+  // Direct edit by clicking on IP address
+  const handleDirectEdit = (ipWhitelist: IpWhitelist) => {
+    setSelectedIpWhitelist(ipWhitelist);
+    setFormData({
+      ipAddress: ipWhitelist.ipAddress,
+      purpose: ipWhitelist.purpose,
+      isEnabled: ipWhitelist.isEnabled,
+      startDate: ipWhitelist.startDate,
+      endDate: ipWhitelist.endDate,
+    });
+    setFormErrors({});
+    setEditDialog(true);
+
+    setTimeout(() => {
+      ipAddressFieldRef.current?.focus();
+    }, 100);
+  };
+
   const handleDelete = () => {
     if (selectedIpWhitelist) {
       setConfirmDialog({
@@ -512,7 +530,15 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                         >
                           <Typography
                             variant="body2"
-                            sx={{ fontFamily: 'monospace' }}
+                            sx={{
+                              fontFamily: 'monospace',
+                              cursor: 'pointer',
+                              '&:hover': {
+                                color: 'primary.main',
+                                textDecoration: 'underline',
+                              },
+                            }}
+                            onClick={() => handleDirectEdit(ipWhitelist)}
                           >
                             {ipWhitelist.ipAddress}
                           </Typography>

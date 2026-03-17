@@ -396,6 +396,29 @@ const WhitelistPage: React.FC = () => {
     handleMenuClose();
   };
 
+  // Direct edit by clicking on account ID
+  const handleDirectEdit = (whitelist: Whitelist) => {
+    setSelectedWhitelist(whitelist);
+    setFormData({
+      accountId: whitelist.accountId,
+      ipAddress: whitelist.ipAddress || '',
+      startDate: whitelist.startDate
+        ? whitelist.startDate.split('T')[0]
+        : '',
+      endDate: whitelist.endDate
+        ? whitelist.endDate.split('T')[0]
+        : '',
+      purpose: whitelist.purpose || '',
+    });
+    setFullEditingData(JSON.parse(JSON.stringify(whitelist)));
+    setFormErrors({});
+    setEditDialog(true);
+
+    setTimeout(() => {
+      accountIdFieldRef.current?.focus();
+    }, 100);
+  };
+
   const handleDelete = () => {
     if (selectedWhitelist) {
       setConfirmDialog({
@@ -704,6 +727,14 @@ const WhitelistPage: React.FC = () => {
                                   <Typography
                                     variant="body2"
                                     fontWeight="medium"
+                                    sx={{
+                                      cursor: 'pointer',
+                                      '&:hover': {
+                                        color: 'primary.main',
+                                        textDecoration: 'underline',
+                                      },
+                                    }}
+                                    onClick={() => handleDirectEdit(whitelist)}
                                   >
                                     {whitelist.accountId}
                                   </Typography>
