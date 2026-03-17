@@ -432,8 +432,8 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                 }
                 disabled={disabled}
                 sx={{
-                  width: 32,
-                  height: 32,
+                  width: 34,
+                  height: 34,
                   borderRadius: 1,
                   border: 1,
                   borderColor: constraint.inverted ? 'warning.main' : 'divider',
@@ -555,8 +555,8 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                 }
                 disabled={disabled || !validOperator.startsWith('str_')}
                 sx={{
-                  width: 32,
-                  height: 32,
+                  width: 34,
+                  height: 34,
                   borderRadius: 1,
                   border: 1,
                   borderColor: constraint.caseInsensitive ? 'primary.main' : 'divider',
