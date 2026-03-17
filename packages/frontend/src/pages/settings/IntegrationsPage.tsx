@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -8,7 +8,6 @@ import {
   Typography,
   Button,
   Switch,
-  CircularProgress,
   Alert,
   Chip,
   IconButton,
@@ -33,6 +32,7 @@ import {
   Stop as StopIcon,
 } from '@mui/icons-material';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import { CreateIntegrationWizard } from '@/components/integrations/CreateIntegrationWizard';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
@@ -118,7 +118,8 @@ export const IntegrationsPage: React.FC = () => {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [providers, setProviders] = useState<ProviderDefinition[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<Integration | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const isInitialLoad = useRef(true);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardProvider, setWizardProvider] = useState<string | undefined>(
     undefined
@@ -152,6 +153,7 @@ export const IntegrationsPage: React.FC = () => {
       enqueueSnackbar(t('integrations.loadFailed'), { variant: 'error' });
     } finally {
       setLoading(false);
+      isInitialLoad.current = false;
     }
   };
 
@@ -208,12 +210,7 @@ export const IntegrationsPage: React.FC = () => {
         </Box>
       </Box>
 
-      {loading && integrations.length === 0 ? (
-        <Box display="flex" justifyContent="center" py={4}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <>
+      <PageContentLoader loading={loading && isInitialLoad.current}>
           {/* Configured Integrations */}
           {integrations.length > 0 ? (
             <>
@@ -583,8 +580,7 @@ export const IntegrationsPage: React.FC = () => {
               </Card>
             ))}
           </Box>
-        </>
-      )}
+      </PageContentLoader>
 
       <ConfirmDeleteDialog
         open={!!deleteTarget}
