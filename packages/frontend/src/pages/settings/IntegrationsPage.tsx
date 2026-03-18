@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -8,7 +8,6 @@ import {
   Typography,
   Button,
   Switch,
-  CircularProgress,
   Alert,
   Chip,
   IconButton,
@@ -33,6 +32,8 @@ import {
   Stop as StopIcon,
 } from '@mui/icons-material';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
+import PageContentLoader from '@/components/common/PageContentLoader';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { CreateIntegrationWizard } from '@/components/integrations/CreateIntegrationWizard';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
@@ -118,7 +119,8 @@ export const IntegrationsPage: React.FC = () => {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [providers, setProviders] = useState<ProviderDefinition[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<Integration | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const isInitialLoad = useRef(true);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardProvider, setWizardProvider] = useState<string | undefined>(
     undefined
@@ -152,6 +154,7 @@ export const IntegrationsPage: React.FC = () => {
       enqueueSnackbar(t('integrations.loadFailed'), { variant: 'error' });
     } finally {
       setLoading(false);
+      isInitialLoad.current = false;
     }
   };
 
@@ -208,12 +211,7 @@ export const IntegrationsPage: React.FC = () => {
         </Box>
       </Box>
 
-      {loading && integrations.length === 0 ? (
-        <Box display="flex" justifyContent="center" py={4}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <>
+      <PageContentLoader loading={loading && isInitialLoad.current}>
           {/* Configured Integrations */}
           {integrations.length > 0 ? (
             <>
@@ -448,34 +446,17 @@ export const IntegrationsPage: React.FC = () => {
               </Box>
             </>
           ) : (
-            <Card
-              sx={{
-                p: 4,
-                mb: 6,
-                textAlign: 'center',
-                bgcolor: 'background.paper',
-                border: '1px dashed',
-                borderColor: 'divider',
-                boxShadow: 'none',
-              }}
-            >
-              <Typography variant="h6" color="text.secondary" gutterBottom>
-                {t('integrations.noIntegrations')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                {t('integrations.noIntegrationsGuide')}
-              </Typography>
-              <Button
-                variant="outlined"
-                startIcon={<AddIcon />}
-                onClick={() => {
+            <Box sx={{ mb: 4 }}>
+              <EmptyPagePlaceholder
+                message={t('integrations.noIntegrations')}
+                subtitle={t('integrations.noIntegrationsGuide')}
+                onAddClick={() => {
                   setWizardProvider(undefined);
                   setWizardOpen(true);
                 }}
-              >
-                {t('integrations.createFirst')}
-              </Button>
-            </Card>
+                addButtonLabel={t('integrations.createFirst')}
+              />
+            </Box>
           )}
 
           {/* Available Integrations - Now at BOTTOM */}
@@ -583,8 +564,7 @@ export const IntegrationsPage: React.FC = () => {
               </Card>
             ))}
           </Box>
-        </>
-      )}
+      </PageContentLoader>
 
       <ConfirmDeleteDialog
         open={!!deleteTarget}

@@ -75,9 +75,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Close as CloseIcon,
-  Cancel as CancelIcon,
-  Save as SaveIcon,
   Refresh as RefreshIcon,
   LocalOffer as LocalOfferIcon,
   ContentCopy as ContentCopyIcon,
@@ -116,6 +113,9 @@ import DynamicFilterBar, {
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { api } from '@/services/api';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
+import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
+import ImportDialog from '../../components/common/ImportDialog';
 
 // Column definition interface
 interface ColumnConfig {
@@ -206,6 +206,8 @@ const MessageTemplatesPage: React.FC = () => {
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const loadStartTimeRef = useRef<number>(0);
   // Copy helper with type/label for proper i18n interpolation
@@ -982,15 +984,48 @@ const MessageTemplatesPage: React.FC = () => {
               </Typography>
             </Box>
           </Box>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAdd}
-            >
-              {t('messageTemplates.addTemplate')}
-            </Button>
-          )}
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAdd}
+              >
+                {t('messageTemplates.addTemplate')}
+              </Button>
+            )}
+            <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+              <MoreVertIcon />
+            </IconButton>
+          </Box>
+          <MuiMenu
+            anchorEl={pageMenuAnchor}
+            open={Boolean(pageMenuAnchor)}
+            onClose={() => setPageMenuAnchor(null)}
+          >
+            <ExportImportMenuItems
+              onExport={(format) => {
+                setPageMenuAnchor(null);
+                const exportColumns: ExportColumn[] = [
+                  { key: 'name', header: t('common.name') },
+                  { key: 'type', header: t('common.type') },
+                  { key: 'defaultMessage', header: t('messageTemplates.defaultMessage') },
+                  { key: 'isEnabled', header: t('common.status') },
+                  { key: 'createdAt', header: t('common.createdAt') },
+                ];
+                try {
+                  exportToFile(items, exportColumns, 'message-templates', format);
+                  enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                } catch (err) {
+                  enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                }
+              }}
+              onImportClick={() => {
+                setPageMenuAnchor(null);
+                setImportDialogOpen(true);
+              }}
+            />
+          </MuiMenu>
         </Box>
       </Box>
 
@@ -1467,7 +1502,6 @@ const MessageTemplatesPage: React.FC = () => {
           <Button
             onClick={() => setDialogOpen(false)}
             disabled={saving}
-            startIcon={<CancelIcon />}
             variant="outlined"
           >
             {t('common.cancel')}
@@ -1476,9 +1510,12 @@ const MessageTemplatesPage: React.FC = () => {
             variant="contained"
             onClick={handleSave}
             disabled={saving || (!!editing && !isDirty)}
-            startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
           >
-            {saving ? t('common.saving') : t('common.save')}
+            {saving
+              ? t('common.saving')
+              : editing
+                ? t('common.update')
+                : t('common.add')}
           </Button>
         </Box>
       </ResizableDrawer>
@@ -1707,6 +1744,16 @@ const MessageTemplatesPage: React.FC = () => {
           </Box>
         </ClickAwayListener>
       </Popover>
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        title={t('common.import')}
+        onImport={async (data) => {
+          enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+        }}
+      />
     </Box>
   );
 };

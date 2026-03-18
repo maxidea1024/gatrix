@@ -46,8 +46,6 @@ import {
   ExpandLess as ExpandLessIcon,
   Sensors as SensorsIcon,
   VpnKey as TokenIcon,
-  Cancel as CancelIcon,
-  Save as SaveIcon,
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -166,13 +164,12 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose} startIcon={<CancelIcon />}>
+        <Button onClick={onClose}>
           {t('common.cancel')}
         </Button>
         <Button
           onClick={handleSave}
           variant="contained"
-          startIcon={<SaveIcon />}
           disabled={!name.trim()}
         >
           {endpoint ? t('common.save') : t('common.create')}
@@ -539,7 +536,6 @@ const SignalEndpointsPage: React.FC = () => {
           {endpoints.length > 0 && canManage && (
             <Button
               variant="contained"
-              startIcon={<AddIcon />}
               onClick={() => setEditDialog({ open: true, endpoint: null })}
             >
               {t('signalEndpoints.createEndpoint')}
@@ -577,17 +573,7 @@ const SignalEndpointsPage: React.FC = () => {
                   <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody
-                sx={{
-                  '& .MuiTableRow-root:nth-of-type(4n+1)': {
-                    backgroundColor: (theme) =>
-                      theme.palette.mode === 'dark' ? '#1e2125' : '#f8f9fa',
-                  },
-                  '& .MuiTableRow-root:nth-of-type(4n+3)': {
-                    backgroundColor: 'transparent',
-                  },
-                }}
-              >
+              <TableBody>
                 {endpoints.map((endpoint) => (
                   <React.Fragment key={endpoint.id}>
                     <TableRow
@@ -697,7 +683,6 @@ const SignalEndpointsPage: React.FC = () => {
                               </Typography>
                               <Button
                                 size="small"
-                                startIcon={<AddIcon />}
                                 onClick={() =>
                                   setTokenDialog({
                                     open: true,

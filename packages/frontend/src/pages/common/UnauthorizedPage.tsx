@@ -1,20 +1,12 @@
 import React from 'react';
-import { Box, Typography, Button, Chip, useTheme } from '@mui/material';
+import { Box, Typography, Button, useTheme } from '@mui/material';
 import {
   Block as BlockIcon,
   Home as HomeIcon,
   ArrowBack as ArrowBackIcon,
-  VpnKey as PermissionIcon,
-  SupportAgent as SupportIcon,
 } from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
-interface LocationState {
-  requiredPermissions?: string[];
-  requiredRole?: string;
-}
 
 /**
  * Unauthorized Page (403 Forbidden)
@@ -23,16 +15,9 @@ interface LocationState {
  */
 const UnauthorizedPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { user } = useAuth();
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-
-  // Get required permissions from location state
-  const state = location.state as LocationState | null;
-  const requiredPermissions = state?.requiredPermissions || [];
-  const requiredRole = state?.requiredRole;
 
   const handleGoHome = () => {
     navigate('/dashboard');
@@ -42,12 +27,6 @@ const UnauthorizedPage: React.FC = () => {
     navigate(-1);
   };
 
-  // Translate permission key to display name
-  const getPermissionDisplayName = (permission: string) => {
-    const key = `permissions.${permission.replace('.', '_')}`;
-    const translated = t(key);
-    return translated === key ? permission : translated;
-  };
 
   return (
     <Box
@@ -132,163 +111,9 @@ const UnauthorizedPage: React.FC = () => {
           {t('errors.noPermissionAdminOnly')}
         </Typography>
 
-        {/* Logged-in user info */}
-        {user && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 1,
-              py: 1.5,
-              px: 2,
-              mb: 3,
-              borderRadius: 2,
-              bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
-              border: '1px solid',
-              borderColor: 'divider',
-            }}
-          >
-            <Typography variant="body2" color="text.secondary">
-              {t('common.loggedInAs')}:
-            </Typography>
-            <Typography variant="body2" fontWeight={600} color="text.primary">
-              {user.name}
-            </Typography>
-          </Box>
-        )}
-
-        {/* Required Permissions Section */}
-        {(requiredPermissions.length > 0 || requiredRole) && (
-          <Box sx={{ textAlign: 'left', mb: 3 }}>
-            {/* Header */}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 1.5,
-                py: 1.5,
-                px: 2,
-                borderRadius: 2,
-                mb: 1,
-                bgcolor: isDark
-                  ? 'rgba(237,108,2,0.08)'
-                  : 'rgba(237,108,2,0.04)',
-                border: '1px solid',
-                borderColor: isDark
-                  ? 'rgba(237,108,2,0.2)'
-                  : 'rgba(237,108,2,0.12)',
-              }}
-            >
-              <Box
-                sx={{
-                  mt: 0.25,
-                  color: 'warning.main',
-                  flexShrink: 0,
-                }}
-              >
-                <PermissionIcon sx={{ fontSize: 22 }} />
-              </Box>
-              <Box>
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={600}
-                  sx={{ mb: 0.25, color: 'text.primary' }}
-                >
-                  {t('errors.requiredPermissions')}
-                </Typography>
-
-                {requiredRole && (
-                  <Box sx={{ mt: 0.5 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: 'text.secondary' }}
-                    >
-                      {t('errors.requiredRole')}:{' '}
-                    </Typography>
-                    <Chip
-                      label={t(`users.roles.${requiredRole}`)}
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                      sx={{ borderRadius: '16px', height: 22 }}
-                    />
-                  </Box>
-                )}
-
-                {requiredPermissions.length > 0 && (
-                  <Box sx={{ mt: 0.5 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: 'block',
-                        mb: 0.5,
-                        color: 'text.secondary',
-                      }}
-                    >
-                      {t('errors.requiredPermissionsList')}:
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {requiredPermissions.map((permission) => (
-                        <Chip
-                          key={permission}
-                          label={getPermissionDisplayName(permission)}
-                          size="small"
-                          color="warning"
-                          variant="outlined"
-                          sx={{
-                            fontSize: '0.7rem',
-                            borderRadius: '16px',
-                            height: 22,
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  </Box>
-                )}
-              </Box>
-            </Box>
-          </Box>
-        )}
-
-        {/* Help step */}
-        <Box sx={{ textAlign: 'left', mb: 3 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 1.5,
-              py: 1.5,
-              px: 2,
-              borderRadius: 2,
-              bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
-              border: '1px solid',
-              borderColor: 'divider',
-            }}
-          >
-            <Box
-              sx={{
-                mt: 0.25,
-                color: 'info.main',
-                flexShrink: 0,
-              }}
-            >
-              <SupportIcon sx={{ fontSize: 22 }} />
-            </Box>
-            <Box>
-              <Typography
-                variant="body2"
-                sx={{ lineHeight: 1.5, color: 'text.secondary' }}
-              >
-                {t('errors.contactSupport')}
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-
         {/* Dashboard Button */}
         <Button
-          variant="contained"
+          variant="outlined"
           size="large"
           startIcon={<HomeIcon />}
           onClick={handleGoHome}
@@ -300,12 +125,6 @@ const UnauthorizedPage: React.FC = () => {
             textTransform: 'none',
             fontSize: '1rem',
             fontWeight: 600,
-            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            boxShadow: `0 4px 14px ${isDark ? 'rgba(0,0,0,0.4)' : 'rgba(102,126,234,0.25)'}`,
-            '&:hover': {
-              background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
-              boxShadow: `0 6px 20px ${isDark ? 'rgba(0,0,0,0.5)' : 'rgba(102,126,234,0.35)'}`,
-            },
           }}
         >
           {t('common.goToDashboard')}

@@ -627,12 +627,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                   <React.Fragment key={log.id}>
                     <TableRow
                       hover
-                      sx={{
-                        bgcolor:
-                          index % 2 === 1
-                            ? alpha(theme.palette.action.hover, 0.05)
-                            : 'transparent',
-                      }}
+                      sx={{}}
                     >
                       <TableCell padding="checkbox">
                         <IconButton
@@ -821,11 +816,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                 ({ key, oldVal, newVal }) => (
                                                   <TableRow
                                                     key={key}
-                                                    sx={{
-                                                      '&:nth-of-type(odd)': {
-                                                        bgcolor: 'action.hover',
-                                                      },
-                                                    }}
+                                                    sx={{}}
                                                   >
                                                     <TableCell
                                                       sx={{

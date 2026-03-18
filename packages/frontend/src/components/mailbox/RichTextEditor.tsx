@@ -1993,19 +1993,25 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             },
           },
           '& .ql-stroke': {
-            stroke: theme.palette.text.primary,
+            stroke: `${theme.palette.text.primary} !important`,
           },
           '& .ql-fill': {
-            fill: theme.palette.text.primary,
+            fill: `${theme.palette.text.primary} !important`,
           },
           '& .ql-picker-label': {
-            color: theme.palette.text.primary,
+            color: `${theme.palette.text.primary} !important`,
+          },
+          '& .ql-picker-label .ql-stroke': {
+            stroke: `${theme.palette.text.primary} !important`,
           },
           '& .ql-picker-options': {
             backgroundColor: theme.palette.background.paper,
             border: `1px solid ${theme.palette.divider}`,
             zIndex: 9999,
             position: 'absolute',
+          },
+          '& .ql-picker-options .ql-picker-item': {
+            color: `${theme.palette.text.primary} !important`,
           },
           // Font picker specific styling
           '& .ql-font.ql-picker': {

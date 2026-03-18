@@ -794,14 +794,11 @@ const AuditLogsPage: React.FC = () => {
                           hover
                           sx={{
                             cursor: 'pointer',
-                            '& > td': {
-                              backgroundColor: (theme) =>
-                                index % 2 === 1
-                                  ? theme.palette.mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(0, 0, 0, 0.04)'
-                                  : undefined,
-                            },
+                            bgcolor: index % 2 === 1
+                              ? (theme) => theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.025)'
+                                : 'rgba(79, 70, 229, 0.02)'
+                              : undefined,
                             '& > *': {
                               borderBottom:
                                 expandedRowId === log.id ? 'none' : undefined,
@@ -1246,13 +1243,7 @@ const AuditLogsPage: React.FC = () => {
                                                         <TableRow
                                                           hover
                                                           key={key}
-                                                          sx={{
-                                                            '&:nth-of-type(odd)':
-                                                              {
-                                                                bgcolor:
-                                                                  'action.hover',
-                                                              },
-                                                          }}
+                                                          sx={{}}
                                                         >
                                                           <TableCell
                                                             sx={{

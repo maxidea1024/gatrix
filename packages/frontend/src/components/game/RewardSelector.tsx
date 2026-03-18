@@ -249,7 +249,6 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
                 <Button
                   fullWidth
                   variant="contained"
-                  startIcon={<AddIcon />}
                   onClick={handleAddReward}
                   disabled={disabled}
                 >
@@ -261,7 +260,6 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
               <Button
                 fullWidth
                 variant="outlined"
-                startIcon={<AddIcon />}
                 onClick={handleAddReward}
                 disabled={disabled}
               >

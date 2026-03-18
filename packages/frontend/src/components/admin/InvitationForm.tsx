@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import {
   PersonAdd as PersonAddIcon,
-  Cancel as CancelIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -141,7 +140,6 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
         >
           <Button
             onClick={onCancel}
-            startIcon={<CancelIcon />}
             variant="outlined"
             disabled={loading}
           >
@@ -217,7 +215,6 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
       <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
         <Button
           onClick={onCancel}
-          startIcon={<CancelIcon />}
           variant="outlined"
           disabled={loading}
         >

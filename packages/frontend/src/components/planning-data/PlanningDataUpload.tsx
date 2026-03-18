@@ -880,9 +880,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
                                   bgcolor: 'action.hover',
                                   fontWeight: 'bold',
                                 },
-                                '& tbody tr:nth-of-type(odd)': {
-                                  bgcolor: 'rgba(255, 255, 255, 0.02)',
-                                },
+
                               }}
                             >
                               <thead>
@@ -987,9 +985,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
                                   bgcolor: 'action.hover',
                                   fontWeight: 'bold',
                                 },
-                                '& tbody tr:nth-of-type(odd)': {
-                                  bgcolor: 'rgba(255, 255, 255, 0.02)',
-                                },
+
                               }}
                             >
                               <thead>
@@ -1076,9 +1072,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
                                   bgcolor: 'action.hover',
                                   fontWeight: 'bold',
                                 },
-                                '& tbody tr:nth-of-type(odd)': {
-                                  bgcolor: 'rgba(255, 255, 255, 0.02)',
-                                },
+
                               }}
                             >
                               <thead>

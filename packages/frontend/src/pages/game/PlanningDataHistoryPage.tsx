@@ -421,28 +421,6 @@ const PlanningDataHistoryPage: React.FC = () => {
                               Object.keys(record.fileDiffs).length > 0
                                 ? 'pointer'
                                 : 'default',
-                            bgcolor:
-                              index % 2 === 1
-                                ? (theme) =>
-                                    theme.palette.mode === 'dark'
-                                      ? 'rgba(255, 255, 255, 0.04)'
-                                      : 'rgba(0, 0, 0, 0.025)'
-                                : 'transparent',
-                            '&:hover': {
-                              bgcolor: (theme) =>
-                                theme.palette.mode === 'dark'
-                                  ? 'rgba(255, 255, 255, 0.08)'
-                                  : 'rgba(0, 0, 0, 0.05)',
-                            },
-                            '&.MuiTableRow-root:nth-of-type(even)': {
-                              bgcolor:
-                                index % 2 === 1
-                                  ? (theme) =>
-                                      theme.palette.mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.04)'
-                                        : 'rgba(0, 0, 0, 0.025)'
-                                  : 'transparent',
-                            },
                             ...(expandedRow === record.id && {
                               bgcolor: 'action.selected',
                               '&:hover': { bgcolor: 'action.selected' },
@@ -631,28 +609,6 @@ const PlanningDataHistoryPage: React.FC = () => {
                         <TableRow
                           hover
                           sx={{
-                            bgcolor:
-                              index % 2 === 1
-                                ? (theme) =>
-                                    theme.palette.mode === 'dark'
-                                      ? 'rgba(255, 255, 255, 0.04)'
-                                      : 'rgba(0, 0, 0, 0.025)'
-                                : 'transparent',
-                            '&:hover': {
-                              bgcolor: (theme) =>
-                                theme.palette.mode === 'dark'
-                                  ? 'rgba(255, 255, 255, 0.08)'
-                                  : 'rgba(0, 0, 0, 0.05)',
-                            },
-                            '&.MuiTableRow-root:nth-of-type(even)': {
-                              bgcolor:
-                                index % 2 === 1
-                                  ? (theme) =>
-                                      theme.palette.mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.04)'
-                                        : 'rgba(0, 0, 0, 0.025)'
-                                  : 'transparent',
-                            },
                             ...(expandedRow === record.id && {
                               bgcolor: 'action.selected',
                             }),
@@ -753,11 +709,7 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                             'action.hover',
                                                           fontWeight: 'bold',
                                                         },
-                                                        '& tbody tr:nth-of-type(odd)':
-                                                          {
-                                                            bgcolor:
-                                                              'rgba(255, 255, 255, 0.02)',
-                                                          },
+
                                                       }}
                                                     >
                                                       <thead>

@@ -4269,7 +4269,6 @@ const ServerListPage: React.FC = () => {
                         borderStyle: 'dashed',
                         borderRadius: 0,
                       }}
-                      startIcon={<AddIcon sx={{ fontSize: 14 }} />}
                     >
                       {t('serverList.grouping.add')}
                     </Button>

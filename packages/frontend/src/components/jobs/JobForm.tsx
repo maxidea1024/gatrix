@@ -20,8 +20,6 @@ import {
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
-  Cancel as CancelIcon,
-  Save as SaveIcon,
   Add as AddIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -411,13 +409,12 @@ const JobForm: React.FC<JobFormProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={onCancel} startIcon={<CancelIcon />}>
+          <Button onClick={onCancel}>
             {t('common.cancel')}
           </Button>
           <Button
             type="submit"
             variant="contained"
-            startIcon={job ? <SaveIcon /> : <AddIcon />}
           >
             {job ? '작업 수정' : '작업 추가'}
           </Button>
@@ -564,13 +561,12 @@ const JobForm: React.FC<JobFormProps> = ({
         <Box
           sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 3 }}
         >
-          <Button onClick={onCancel} startIcon={<CancelIcon />}>
+          <Button onClick={onCancel}>
             {t('common.cancel')}
           </Button>
           <Button
             type="submit"
             variant="contained"
-            startIcon={job ? <SaveIcon /> : <AddIcon />}
           >
             {job ? '작업 수정' : '작업 추가'}
           </Button>

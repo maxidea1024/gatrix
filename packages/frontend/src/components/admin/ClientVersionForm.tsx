@@ -21,8 +21,6 @@ import {
   AccordionDetails,
 } from '@mui/material';
 import {
-  Cancel as CancelIcon,
-  Save as SaveIcon,
   FileCopy as CopyIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
@@ -1243,7 +1241,6 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           <Button
             onClick={handleClose}
             disabled={isSubmitting || loading}
-            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>
@@ -1256,7 +1253,6 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               !!duplicateError ||
               (displayIsEdit && !isDirty)
             }
-            startIcon={displayIsCopy ? <CopyIcon /> : <SaveIcon />}
           >
             {displayIsCopy
               ? t('clientVersions.form.copyTitle')

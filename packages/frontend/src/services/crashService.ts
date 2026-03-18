@@ -51,6 +51,8 @@ class CrashService {
     environments: { id: string; name: string }[];
     marketTypes: string[];
     appVersions: string[];
+    resVersions: string[];
+    gameServerIds: string[];
     states: { value: number; label: string }[];
   }> {
     try {

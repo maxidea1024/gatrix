@@ -73,6 +73,9 @@ import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import dayjs from 'dayjs';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
+import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
+import ImportDialog from '../../components/common/ImportDialog';
 
 const IngamePopupNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -140,6 +143,10 @@ const IngamePopupNoticesPage: React.FC = () => {
     useState<IngamePopupNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [guideDrawerOpen, setGuideDrawerOpen] = useState(false);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Action menu state
   const [actionMenuAnchorEl, setActionMenuAnchorEl] =
@@ -504,14 +511,50 @@ const IngamePopupNoticesPage: React.FC = () => {
               {t('ingamePopupNotices.createNotice')}
             </Button>
           )}
-          <Divider orientation="vertical" flexItem sx={{ my: 1 }} />
-          <Button
-            variant="outlined"
-            startIcon={<CodeIcon />}
-            onClick={() => setGuideDrawerOpen(true)}
+          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={pageMenuAnchor}
+            open={Boolean(pageMenuAnchor)}
+            onClose={() => setPageMenuAnchor(null)}
           >
-            {t('ingamePopupNotices.sdkGuide')}
-          </Button>
+            <ExportImportMenuItems
+              onExport={(format) => {
+                setPageMenuAnchor(null);
+                const exportColumns: ExportColumn[] = [
+                  { key: 'content', header: t('ingamePopupNotices.content') },
+                  { key: 'isActive', header: t('common.status') },
+                  { key: 'displayPriority', header: t('ingamePopupNotices.priority') },
+                  { key: 'startDate', header: t('common.start') },
+                  { key: 'endDate', header: t('common.end') },
+                  { key: 'createdAt', header: t('common.createdAt') },
+                ];
+                try {
+                  exportToFile(notices, exportColumns, 'ingame-popup-notices', format);
+                  enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                } catch (err) {
+                  enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                }
+              }}
+              onImportClick={() => {
+                setPageMenuAnchor(null);
+                setImportDialogOpen(true);
+              }}
+            />
+            <Divider />
+            <MenuItem
+              onClick={() => {
+                setPageMenuAnchor(null);
+                setGuideDrawerOpen(true);
+              }}
+            >
+              <ListItemIcon>
+                <CodeIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('ingamePopupNotices.sdkGuide')}</ListItemText>
+            </MenuItem>
+          </Menu>
         </Box>
       </Box>
 
@@ -1035,6 +1078,35 @@ const IngamePopupNoticesPage: React.FC = () => {
       <IngamePopupNoticeGuideDrawer
         open={guideDrawerOpen}
         onClose={() => setGuideDrawerOpen(false)}
+      />
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        title={t('common.import')}
+        onImport={async (data) => {
+          let successCount = 0;
+          let failCount = 0;
+          for (const item of data) {
+            try {
+              await ingamePopupNoticeService.createIngamePopupNotice(projectApiPath, {
+                content: item[t('ingamePopupNotices.content')] || item.content || '',
+                isActive: String(item[t('common.status')] ?? item.isActive ?? true) === 'true',
+              });
+              successCount++;
+            } catch (err) {
+              failCount++;
+            }
+          }
+          if (successCount > 0) {
+            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+            loadNotices();
+          }
+          if (failCount > 0) {
+            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+          }
+        }}
       />
     </Box>
   );

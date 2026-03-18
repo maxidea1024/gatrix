@@ -88,7 +88,6 @@ import {
   Code as CodeIcon,
   Description as ExcelIcon,
   ContentCopy as CopyIcon,
-  Cancel as CancelIcon,
   Close as CloseIcon,
   Update as UpdateIcon,
   Settings as SettingsIcon,
@@ -157,6 +156,7 @@ import { useNavigate } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useDebounce } from '../../hooks/useDebounce';
+import ImportDialog from '../../components/common/ImportDialog';
 
 // HSV를 RGB로 변환하는 함수
 const hsvToRgb = (
@@ -522,6 +522,7 @@ const ClientVersionsPage: React.FC = () => {
   );
   const [selectedExportMenuAnchor, setSelectedExportMenuAnchor] =
     useState<null | HTMLElement>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // SDK 가이드 Status
   const [openSDKGuide, setOpenSDKGuide] = useState(false);
@@ -1650,43 +1651,8 @@ const ClientVersionsPage: React.FC = () => {
           </Box>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            endIcon={<ArrowDropDownIcon />}
-            onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-          >
-            {t('common.export')}
-          </Button>
-          <Menu
-            anchorEl={exportMenuAnchor}
-            open={Boolean(exportMenuAnchor)}
-            onClose={() => setExportMenuAnchor(null)}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-          >
-            <MenuItem onClick={() => handleExport('csv')}>
-              <TableChartIcon sx={{ mr: 1 }} />
-              CSV
-            </MenuItem>
-            <MenuItem onClick={() => handleExport('json')}>
-              <JsonIcon sx={{ mr: 1 }} />
-              JSON
-            </MenuItem>
-            <MenuItem onClick={() => handleExport('xlsx')}>
-              <ExcelIcon sx={{ mr: 1 }} />
-              Excel (XLSX)
-            </MenuItem>
-          </Menu>
           {canManage && (
             <>
-              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
               <Button
                 variant="contained"
                 color="primary"
@@ -1709,28 +1675,90 @@ const ClientVersionsPage: React.FC = () => {
               >
                 {t('clientVersions.addBulk')}
               </Button>
-              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-              <Tooltip title={t('platformDefaults.title')}>
-                <IconButton
-                  aria-label={t('platformDefaults.title')}
-                  onClick={() => {
-                    setPlatformDefaultsDialogOpen(true);
-                  }}
-                  size="medium"
-                >
-                  <SettingsIcon />
-                </IconButton>
-              </Tooltip>
             </>
           )}
-          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-          <Button
-            variant="outlined"
-            startIcon={<CodeIcon />}
-            onClick={() => setOpenSDKGuide(true)}
+          <IconButton onClick={(e) => setExportMenuAnchor(e.currentTarget)}>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={exportMenuAnchor}
+            open={Boolean(exportMenuAnchor)}
+            onClose={() => setExportMenuAnchor(null)}
           >
-            {t('clientVersions.sdkGuide')}
-          </Button>
+            {canManage && [
+              <MenuItem
+                key="platform-defaults"
+                onClick={() => {
+                  setExportMenuAnchor(null);
+                  setPlatformDefaultsDialogOpen(true);
+                }}
+              >
+                <ListItemIcon>
+                  <SettingsIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('platformDefaults.title')}</ListItemText>
+              </MenuItem>,
+              <Divider key="divider-after-settings" />,
+            ]}
+            {/* Export section */}
+            <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
+              <ListItemIcon>
+                <DownloadIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('common.export')}
+                </Typography>
+              </ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('csv')} sx={{ pl: 4 }}>
+              <ListItemIcon>
+                <TableChartIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>CSV</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('json')} sx={{ pl: 4 }}>
+              <ListItemIcon>
+                <JsonIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>JSON</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('xlsx')} sx={{ pl: 4 }}>
+              <ListItemIcon>
+                <ExcelIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Excel (XLSX)</ListItemText>
+            </MenuItem>
+            <Divider />
+            <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
+              <ListItemIcon>
+                <AddIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('common.import')}
+                </Typography>
+              </ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => { setExportMenuAnchor(null); setImportDialogOpen(true); }} sx={{ pl: 4 }}>
+              <ListItemIcon>
+                <AddIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('common.import')} (CSV/JSON/XLSX)</ListItemText>
+            </MenuItem>
+            <Divider />
+            <MenuItem
+              onClick={() => {
+                setExportMenuAnchor(null);
+                setOpenSDKGuide(true);
+              }}
+            >
+              <ListItemIcon>
+                <CodeIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('clientVersions.sdkGuide')}</ListItemText>
+            </MenuItem>
+          </Menu>
         </Box>
       </Box>
 
@@ -2414,7 +2442,6 @@ const ClientVersionsPage: React.FC = () => {
         >
           <Button
             onClick={() => setBulkStatusDialogOpen(false)}
-            startIcon={<CancelIcon />}
             variant="outlined"
           >
             {t('common.cancel')}
@@ -2582,7 +2609,6 @@ const ClientVersionsPage: React.FC = () => {
         >
           <Button
             onClick={() => setBulkDeleteDialogOpen(false)}
-            startIcon={<CancelIcon />}
             variant="outlined"
           >
             {t('common.cancel')}
@@ -2797,6 +2823,39 @@ const ClientVersionsPage: React.FC = () => {
       <ClientVersionGuideDrawer
         open={openSDKGuide}
         onClose={() => setOpenSDKGuide(false)}
+      />
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        title={t('common.import')}
+        onImport={async (data) => {
+          let successCount = 0;
+          let failCount = 0;
+          for (const item of data) {
+            try {
+              await ClientVersionService.createClientVersion(projectApiPath, {
+                platform: item.platform || '',
+                clientVersion: item.clientVersion || item.version || '',
+                clientStatus: item.clientStatus || 'ONLINE',
+                gameServerAddress: item.gameServerAddress || '',
+                patchAddress: item.patchAddress || '',
+                guestModeAllowed: item.guestModeAllowed !== undefined ? Boolean(item.guestModeAllowed) : false,
+              });
+              successCount++;
+            } catch (err) {
+              failCount++;
+            }
+          }
+          if (successCount > 0) {
+            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+            mutateClientVersions();
+          }
+          if (failCount > 0) {
+            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+          }
+        }}
       />
     </Box>
   );

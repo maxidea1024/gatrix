@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ulid } from 'ulid';
 
 import { useAuth } from '../../hooks/useAuth';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
@@ -27,6 +26,10 @@ import {
   Autocomplete,
   FormControlLabel,
   Checkbox,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -38,6 +41,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   ViewColumn as ViewColumnIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -74,7 +78,6 @@ import { tagService } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import * as draftService from '@/services/draftService';
 
 interface FeatureSegment {
   id: string;
@@ -136,11 +139,13 @@ const FeatureSegmentsPage: React.FC = () => {
     useState<null | HTMLElement>(null);
   const [showDescription, setShowDescription] = useState(false);
   const [showTags, setShowTags] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<FeatureSegment | null>(null);
 
   // Column settings
   const defaultColumns: ColumnConfig[] = [
-    { id: 'visibility', labelKey: 'featureFlags.visibility', visible: true },
     { id: 'segmentName', labelKey: 'featureFlags.segmentName', visible: true },
+    { id: 'visibility', labelKey: 'featureFlags.visibility', visible: true },
     { id: 'constraints', labelKey: 'featureFlags.constraints', visible: true },
     { id: 'references', labelKey: 'common.references', visible: true },
     { id: 'tags', labelKey: 'featureFlags.tags', visible: true },
@@ -212,7 +217,7 @@ const FeatureSegmentsPage: React.FC = () => {
     }
   };
 
-  // Load segments
+  // Load segments from API
   const loadSegments = async () => {
     setLoading(true);
     try {
@@ -222,7 +227,8 @@ const FeatureSegmentsPage: React.FC = () => {
           projectId: currentProjectId || undefined,
         },
       });
-      const allData = result.data?.segments || [];
+      const allData: FeatureSegment[] = result.data?.segments || [];
+
       setAllSegments(allData);
       setTotal(allData.length);
     } catch (error: any) {
@@ -453,50 +459,27 @@ const FeatureSegmentsPage: React.FC = () => {
     if (!editingSegment) return;
     try {
       if (editingSegment.id) {
-        // Save to draft instead of directly updating
-        const draftData: any = {};
-        if (editingSegment.displayName !== undefined)
-          draftData.displayName = editingSegment.displayName;
-        if (editingSegment.description !== undefined)
-          draftData.description = editingSegment.description;
-        if (editingSegment.constraints !== undefined)
-          draftData.constraints = editingSegment.constraints;
-        if (editingSegment.isActive !== undefined)
-          draftData.isActive = editingSegment.isActive;
-        if (editingSegment.tags !== undefined)
-          draftData.tags = editingSegment.tags;
-        await draftService.saveDraft(
-          'segment',
-          editingSegment.id,
-          draftData,
-          projectApiPath
-        );
-        window.dispatchEvent(new Event('draft-changed'));
-        enqueueSnackbar(t('featureFlags.draftSaved'), {
-          variant: 'info',
-        });
-      } else {
-        // Save to draft with _action: create
-        const tempId = ulid();
-        await draftService.saveDraft(
-          'segment',
-          tempId,
+        // Update existing segment
+        await api.put(
+          `${projectApiPath}/features/segments/${editingSegment.id}`,
           {
-            _action: 'create',
-            _projectId: currentProjectId,
-            segmentName: editingSegment.segmentName,
-            displayName:
-              editingSegment.displayName || editingSegment.segmentName,
-            description: editingSegment.description || '',
-            constraints: editingSegment.constraints || [],
-            isActive: editingSegment.isActive ?? true,
-            tags: editingSegment.tags || [],
-          },
-          projectApiPath
+            displayName: editingSegment.displayName,
+            description: editingSegment.description,
+            constraints: editingSegment.constraints,
+            isActive: editingSegment.isActive,
+            tags: editingSegment.tags,
+          }
         );
-        window.dispatchEvent(new Event('draft-changed'));
-        enqueueSnackbar(t('featureFlags.draftSaved'), {
-          variant: 'info',
+      } else {
+        // Create new segment
+        await api.post(`${projectApiPath}/features/segments`, {
+          segmentName: editingSegment.segmentName,
+          displayName: editingSegment.displayName || editingSegment.segmentName,
+          description: editingSegment.description || '',
+          constraints: editingSegment.constraints || [],
+          isActive: editingSegment.isActive ?? true,
+          tags: editingSegment.tags || [],
+          projectId: currentProjectId,
         });
       }
       setEditDialogOpen(false);
@@ -551,17 +534,10 @@ const FeatureSegmentsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingSegment) return;
     try {
-      // Save deletion as draft
-      await draftService.saveDraft(
-        'segment',
-        deletingSegment.id,
-        { _action: 'delete' },
-        projectApiPath
+      await api.delete(
+        `${projectApiPath}/features/segments/${deletingSegment.id}`
       );
-      window.dispatchEvent(new Event('draft-changed'));
-      enqueueSnackbar(t('featureFlags.draftSaved'), {
-        variant: 'info',
-      });
+      loadSegments();
     } catch (error: any) {
       enqueueSnackbar(
         parseApiErrorMessage(error, 'featureFlags.deleteFailed'),
@@ -736,7 +712,7 @@ const FeatureSegmentsPage: React.FC = () => {
                         </TableCell>
                       ))}
                       {canManage && (
-                        <TableCell align="center">
+                        <TableCell align="center" sx={{ width: 48 }}>
                           {t('common.actions')}
                         </TableCell>
                       )}
@@ -763,21 +739,10 @@ const FeatureSegmentsPage: React.FC = () => {
                                         )
                                       );
                                       try {
-                                        // Save to draft instead of directly updating
-                                        const { draftData } =
-                                          await draftService.getDraft(
-                                            'segment',
-                                            segment.id,
-                                            projectApiPath
-                                          );
-                                        await draftService.saveDraft(
-                                          'segment',
-                                          segment.id,
-                                          { ...draftData, isActive: newActive },
-                                          projectApiPath
-                                        );
-                                        window.dispatchEvent(
-                                          new Event('draft-changed')
+                                        // Update visibility directly
+                                        await api.put(
+                                          `${projectApiPath}/features/segments/${segment.id}`,
+                                          { isActive: newActive }
                                         );
                                       } catch (error: any) {
                                         setAllSegments((prev) =>
@@ -1050,31 +1015,16 @@ const FeatureSegmentsPage: React.FC = () => {
                           }
                         })}
                         {canManage && (
-                          <TableCell align="center">
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                gap: 0.5,
-                                justifyContent: 'center',
+                          <TableCell align="center" sx={{ width: 48 }}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                setMenuAnchorEl(e.currentTarget);
+                                setMenuTarget(segment);
                               }}
                             >
-                              <Tooltip title={t('common.edit')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleEdit(segment)}
-                                >
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('common.delete')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleDelete(segment)}
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         )}
                       </TableRow>
@@ -1096,6 +1046,41 @@ const FeatureSegmentsPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Context Menu */}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={() => {
+          setMenuAnchorEl(null);
+          setMenuTarget(null);
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleEdit(menuTarget);
+            setMenuAnchorEl(null);
+            setMenuTarget(null);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleDelete(menuTarget);
+            setMenuAnchorEl(null);
+            setMenuTarget(null);
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Edit Drawer */}
       <ResizableDrawer

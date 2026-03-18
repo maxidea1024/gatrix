@@ -275,7 +275,6 @@ const featureFlagDraftHandler = {
     return flag?.flagName || null;
   },
 };
-
 // ==================== Registration ====================
 
 export function registerFeatureFlagDraftHandler(): void {

@@ -71,7 +71,6 @@ import {
   Security as SecurityIcon,
   Person as PersonIcon,
   People as PeopleIcon,
-  Cancel as CancelIcon,
   Close as CloseIcon,
   Email as EmailIcon,
   VerifiedUser as VerifiedUserIcon,
@@ -1841,7 +1840,6 @@ const UsersManagementPage: React.FC = () => {
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
               variant="contained"
-              startIcon={<PersonAddIcon />}
               onClick={handleAddUser}
             >
               {t('users.addUser')}
@@ -2564,7 +2562,6 @@ const UsersManagementPage: React.FC = () => {
         >
           <Button
             onClick={handleCloseAddUserDialog}
-            startIcon={<CancelIcon />}
             variant="outlined"
           >
             {t('common.cancel')}
@@ -2572,7 +2569,6 @@ const UsersManagementPage: React.FC = () => {
           <Button
             onClick={handleCreateUser}
             variant="contained"
-            startIcon={<AddIcon />}
           >
             {t('users.addUser')}
           </Button>
@@ -2770,7 +2766,6 @@ const UsersManagementPage: React.FC = () => {
               })
             }
             color="inherit"
-            startIcon={<CancelIcon />}
             variant="outlined"
           >
             {t('common.cancel')}
@@ -3445,7 +3440,6 @@ const UsersManagementPage: React.FC = () => {
         >
           <Button
             onClick={() => setEditUserDialog({ open: false, user: null })}
-            startIcon={<CancelIcon />}
             variant="outlined"
           >
             {t('common.cancel')}
@@ -4051,7 +4045,6 @@ const UsersManagementPage: React.FC = () => {
         >
           <Button
             onClick={() => setBulkActionDialogOpen(false)}
-            startIcon={<CancelIcon />}
             variant="outlined"
           >
             {t('common.cancel')}

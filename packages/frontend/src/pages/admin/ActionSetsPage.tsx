@@ -45,8 +45,6 @@ import {
   SmartToy as SmartToyIcon,
   PlayArrow as PlayIcon,
   RemoveCircleOutline as RemoveIcon,
-  Cancel as CancelIcon,
-  Save as SaveIcon,
   MoreVert as MoreVertIcon,
   Sensors as SensorsIcon,
 } from '@mui/icons-material';
@@ -286,6 +284,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
+              helperText={t('actionSets.nameHelp')}
             />
             <TextField
               label={t('actionSets.description')}
@@ -295,6 +294,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
               size="small"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              helperText={t('actionSets.descriptionHelp')}
             />
             <FormControl size="small" fullWidth required>
               <InputLabel>{t('actionSets.signalEndpoint')}</InputLabel>
@@ -336,6 +336,9 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
                 ))}
               </Select>
             </FormControl>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: -1 }}>
+              {t('actionSets.signalEndpointHelp')}
+            </Typography>
           </Box>
         </Paper>
 
@@ -448,16 +451,15 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose} startIcon={<CancelIcon />}>
+        <Button onClick={onClose}>
           {t('common.cancel')}
         </Button>
         <Button
           onClick={handleSave}
           variant="contained"
-          startIcon={<SaveIcon />}
           disabled={!isValid}
         >
-          {actionSet ? t('common.save') : t('common.create')}
+          {actionSet ? t('common.save') : t('common.add')}
         </Button>
       </Box>
     </ResizableDrawer>
@@ -727,17 +729,7 @@ const ActionSetsPage: React.FC = () => {
                   <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody
-                sx={{
-                  '& .MuiTableRow-root:nth-of-type(4n+1)': {
-                    backgroundColor: (theme) =>
-                      theme.palette.mode === 'dark' ? '#1e2125' : '#f8f9fa',
-                  },
-                  '& .MuiTableRow-root:nth-of-type(4n+3)': {
-                    backgroundColor: 'transparent',
-                  },
-                }}
-              >
+              <TableBody>
                 {actionSets.map((actionSet) => (
                   <React.Fragment key={actionSet.id}>
                     <TableRow

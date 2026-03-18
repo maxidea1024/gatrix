@@ -179,7 +179,10 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
         border: noBorder ? 0 : '1px solid',
         borderColor: noBorder ? 'transparent' : 'rgba(128,128,128,0.15)',
         borderRadius: noBorder ? 0 : '6px',
-        bgcolor: noBorder ? 'transparent' : 'action.hover',
+        bgcolor: noBorder ? 'transparent' : (theme) =>
+          theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.03)'
+            : 'action.hover',
         gap: 0,
       }}
     >
@@ -188,9 +191,9 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
         sx={{
           display: 'flex',
           alignItems: 'center',
-          minWidth: 120,
-          maxWidth: 200,
+          width: 130,
           flexShrink: 0,
+          overflow: 'hidden',
           py: 0.25,
         }}
       >
@@ -211,44 +214,38 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
         />
       </Box>
 
-      {/* Column 2: Operator area (NOT + unified operator chip) */}
+      {/* Column 2: Operator chip (NOT + operator + case sensitivity combined) */}
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 0.5,
-          width: 160,
+          width: 130,
           flexShrink: 0,
           px: 1,
           py: 0.25,
         }}
       >
-        {/* NOT chip */}
-        {constraint.inverted && (
-          <Tooltip title={t('constraints.inverted')}>
-            <Chip
-              label="NOT"
-              size="small"
-              sx={{
-                height: 22,
-                fontSize: '0.65rem',
-                fontWeight: 700,
-                bgcolor: 'error.main',
-                color: 'error.contrastText',
-                borderRadius: 1.5,
-                '& .MuiChip-label': {
-                  px: 0.75,
-                },
-              }}
-            />
-          </Tooltip>
-        )}
-
-        {/* Unified operator + case sensitivity chip */}
         <Tooltip title={operatorTooltip} arrow>
           <Chip
             label={
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                {constraint.inverted && (
+                  <Box
+                    component="span"
+                    sx={{
+                      fontSize: '0.6rem',
+                      fontWeight: 700,
+                      bgcolor: 'error.main',
+                      color: 'error.contrastText',
+                      borderRadius: 0.5,
+                      px: 0.5,
+                      py: 0.125,
+                      lineHeight: 1,
+                    }}
+                  >
+                    NOT
+                  </Box>
+                )}
                 <OperatorIcon
                   operator={constraint.operator}
                   inverted={constraint.inverted}
@@ -293,7 +290,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
               borderRadius: 1.5,
               cursor: 'help',
               '& .MuiChip-label': {
-                px: 1,
+                px: 0.75,
               },
             }}
           />
@@ -308,7 +305,7 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
           gap: 0.5,
           alignItems: 'center',
           flex: 1,
-          minWidth: 100,
+          minWidth: 60,
           py: 0.25,
         }}
       >

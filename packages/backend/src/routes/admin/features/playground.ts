@@ -17,6 +17,7 @@ import {
 } from '@gatrix/evaluator';
 import { createLogger } from '../../../config/logger';
 import { getFallbackValue } from './_helpers';
+import { DraftService } from '../../../services/draft-service';
 
 const logger = createLogger('PlaygroundRoutes');
 const router = Router();
@@ -266,19 +267,6 @@ router.post(
         ? new Set(flagNames)
         : null;
 
-    // Pre-load target flags to collect referenced context fields
-    // We'll check if any required fields are missing from the provided context
-    const contextKeys = new Set(Object.keys(context || {}));
-    const referencedFields = new Set<string>();
-
-    // Helper: collect contextNames from constraints
-    const collectConstraintFields = (constraints: any[]) => {
-      if (!Array.isArray(constraints)) return;
-      for (const c of constraints) {
-        if (c.contextName) referencedFields.add(c.contextName);
-      }
-    };
-
     // Flags are project-scoped, so fetch the list once (using first environment for isEnabled join)
     const flagsResult = await featureFlagService.listFlags({
       environmentId: environments[0],
@@ -293,6 +281,28 @@ router.post(
       ? flagsResult.data.filter((f) => flagNamesSet.has(f.flagName))
       : flagsResult.data;
 
+    // Load all feature_flag drafts BEFORE field collection so draft strategies are included
+    // feature_flag drafts have environmentId=NULL (flag-level single draft)
+    // draftData structure: { [envId]: { isEnabled, strategies, ... } }
+    const allDrafts = await DraftService.listDrafts('feature_flag');
+    const draftsByTarget = new Map<string, any>();
+    for (const d of allDrafts) {
+      draftsByTarget.set(d.targetId, d.draftData);
+    }
+
+    // Pre-load target flags to collect referenced context fields
+    // We'll check if any required fields are missing from the provided context
+    const contextKeys = new Set(Object.keys(context || {}));
+    const referencedFields = new Set<string>();
+
+    // Helper: collect contextNames from constraints
+    const collectConstraintFields = (constraints: any[]) => {
+      if (!Array.isArray(constraints)) return;
+      for (const c of constraints) {
+        if (c.contextName) referencedFields.add(c.contextName);
+      }
+    };
+
     // Scan flags to collect referenced context fields (strategies are env-scoped,
     // but we use first env as representative for field discovery)
     if (environments.length > 0) {
@@ -305,7 +315,7 @@ router.post(
           );
           if (!flag) continue;
 
-          // Collect from strategies
+          // Collect from published strategies
           const strategies = (flag as any).strategies || [];
           for (const strategy of strategies) {
             collectConstraintFields(strategy.constraints || []);
@@ -316,6 +326,29 @@ router.post(
               const seg = segmentsMap.get(segName);
               if (seg) {
                 collectConstraintFields((seg as any).constraints || []);
+              }
+            }
+          }
+
+          // Also collect from draft strategies (unpublished changes)
+          const flagDraftData = draftsByTarget.get((flag as any).id);
+          if (flagDraftData) {
+            for (const envDraft of Object.values(flagDraftData)) {
+              if (
+                envDraft &&
+                typeof envDraft === 'object' &&
+                (envDraft as any).strategies
+              ) {
+                for (const draftStrategy of (envDraft as any).strategies) {
+                  collectConstraintFields(draftStrategy.constraints || []);
+                  const draftSegNames = draftStrategy.segments || [];
+                  for (const segName of draftSegNames) {
+                    const seg = segmentsMap.get(segName);
+                    if (seg) {
+                      collectConstraintFields((seg as any).constraints || []);
+                    }
+                  }
+                }
               }
             }
           }
@@ -352,6 +385,8 @@ router.post(
       }
     }
 
+    // draftsByTarget already loaded above (before field collection)
+
     // Evaluate flags per environment (flag list is shared, only env-specific state differs)
     for (const env of environments) {
       try {
@@ -365,6 +400,41 @@ router.post(
             req.projectId
           );
           if (!flag) continue;
+
+          // Merge draft data into flag if draft exists for this flag+env
+          const flagDraftData = draftsByTarget.get((flag as any).id);
+          if (flagDraftData) {
+            const envDraft = flagDraftData[env];
+            if (envDraft && typeof envDraft === 'object') {
+              // Apply draft environment fields to the flag object
+              const draftFields = [
+                'isEnabled',
+                'strategies',
+                'variants',
+                'enabledValue',
+                'disabledValue',
+                'overrideEnabledValue',
+                'overrideDisabledValue',
+                'impressionDataEnabled',
+              ];
+              for (const field of draftFields) {
+                if (field in envDraft) {
+                  (flag as any)[field] = envDraft[field];
+                }
+              }
+              // Also update environment-level overrides in environments array
+              const envEntry = (flag as any).environments?.find(
+                (e: any) => e.environmentId === env
+              );
+              if (envEntry) {
+                for (const field of draftFields) {
+                  if (field in envDraft) {
+                    envEntry[field] = envDraft[field];
+                  }
+                }
+              }
+            }
+          }
 
           // Evaluate the flag
           const evalResult = evaluateFlagWithDetails(

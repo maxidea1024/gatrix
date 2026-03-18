@@ -640,7 +640,6 @@ const EnvironmentsPage: React.FC = () => {
               </Button>
               <Button
                 variant="contained"
-                startIcon={<AddIcon />}
                 onClick={handleOpenAddDialog}
               >
                 {t('environments.add')}
@@ -1189,7 +1188,6 @@ const EnvironmentsPage: React.FC = () => {
               !isValidResourceName(newEnv.name || '') ||
               creating
             }
-            startIcon={creating ? <CircularProgress size={20} /> : <AddIcon />}
           >
             {t('environments.create')}
           </Button>

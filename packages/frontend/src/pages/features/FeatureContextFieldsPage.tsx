@@ -29,6 +29,9 @@ import {
   FormHelperText,
   FormControlLabel,
   Checkbox,
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
@@ -39,6 +42,7 @@ import {
   Delete as DeleteIcon,
   ContentCopy as CopyIcon,
   ViewColumn as ViewColumnIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -314,6 +318,8 @@ const FeatureContextFieldsPage: React.FC = () => {
     useState<null | HTMLElement>(null);
   const [showFieldDescription, setShowFieldDescription] = useState(false);
   const [showFieldTags, setShowFieldTags] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<FeatureContextField | null>(null);
 
   // Column settings
   const defaultColumns: ColumnConfig[] = [
@@ -915,7 +921,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                         </TableCell>
                       ))}
                       {canManage && (
-                        <TableCell align="center">
+                        <TableCell align="center" sx={{ width: 48 }}>
                           {t('common.actions')}
                         </TableCell>
                       )}
@@ -1260,36 +1266,16 @@ const FeatureContextFieldsPage: React.FC = () => {
                           }
                         })}
                         {canManage && (
-                          <TableCell align="center">
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                gap: 0.5,
-                                justifyContent: 'center',
+                          <TableCell align="center" sx={{ width: 48 }}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                setMenuAnchorEl(e.currentTarget);
+                                setMenuTarget(field);
                               }}
                             >
-                              <Tooltip title={t('common.edit')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleEdit(field)}
-                                >
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('common.delete')}>
-                                <span>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleDelete(field)}
-                                    disabled={
-                                      field.isDefaultStickinessField === true
-                                    }
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                            </Box>
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         )}
                       </TableRow>
@@ -1311,6 +1297,42 @@ const FeatureContextFieldsPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Context Menu */}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={() => {
+          setMenuAnchorEl(null);
+          setMenuTarget(null);
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleEdit(menuTarget);
+            setMenuAnchorEl(null);
+            setMenuTarget(null);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleDelete(menuTarget);
+            setMenuAnchorEl(null);
+            setMenuTarget(null);
+          }}
+          disabled={menuTarget?.isDefaultStickinessField === true}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Edit Drawer */}
       <ResizableDrawer

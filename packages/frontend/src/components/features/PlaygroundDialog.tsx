@@ -640,6 +640,49 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
           }
         }
       }
+
+      // Also scan draft strategies for context fields (unpublished changes)
+      for (const flagName of flagNames) {
+        try {
+          // Get flag ID first
+          const flagResponse = await api.get(
+            `${projectApiPath}/features/${flagName}`
+          );
+          const flagId = flagResponse.data?.flag?.id || flagResponse.data?.id;
+          if (!flagId) continue;
+
+          const draftResponse = await api.get(
+            `${projectApiPath}/drafts/feature_flag/${flagId}`
+          );
+          const draftData = draftResponse.data?.draftData;
+          if (draftData && typeof draftData === 'object') {
+            for (const envDraft of Object.values(draftData)) {
+              if (
+                envDraft &&
+                typeof envDraft === 'object' &&
+                (envDraft as any).strategies
+              ) {
+                for (const strategy of (envDraft as any).strategies) {
+                  if (strategy.constraints) {
+                    for (const constraint of strategy.constraints) {
+                      if (constraint.contextName) {
+                        extractedFieldNames.add(constraint.contextName);
+                      }
+                    }
+                  }
+                  if (strategy.segments) {
+                    for (const segName of strategy.segments) {
+                      segmentNames.add(segName);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } catch {
+          // Skip draft fetch errors
+        }
+      }
     } else if (initialFlagDetails) {
       // Fallback: use the strategies from initialFlagDetails
       const allStrategies = initialFlagDetails.strategies || [];
@@ -666,7 +709,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
         const segments =
           response.data?.segments || response.data?.data?.segments || [];
         for (const segment of segments) {
-          if (segmentNames.has(segment.name) && segment.constraints) {
+          if (segmentNames.has(segment.segmentName) && segment.constraints) {
             for (const constraint of segment.constraints) {
               if (constraint.contextName) {
                 extractedFieldNames.add(constraint.contextName);
@@ -2704,102 +2747,110 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           />
                         </Box>
                       ) : (
-                        <TableContainer
-                          component={Paper}
-                          variant="outlined"
-                          sx={{ maxHeight: 150, mb: 2 }}
+                        <Box
+                          sx={{
+                            maxHeight: 150,
+                            overflow: 'auto',
+                            border: 1,
+                            borderColor: 'divider',
+                            borderRadius: 1,
+                            mb: 2,
+                          }}
                         >
-                          <Table
-                            size="small"
-                            stickyHeader
-                            sx={{ tableLayout: 'auto' }}
+                          {/* Header */}
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              bgcolor: 'action.hover',
+                              py: 0.5,
+                              px: 1,
+                              borderBottom: 1,
+                              borderColor: 'divider',
+                            }}
                           >
-                            <TableHead>
-                              <TableRow>
-                                <TableCell
-                                  sx={{
-                                    py: 0.5,
-                                    fontWeight: 600,
-                                    bgcolor: 'action.hover',
-                                    whiteSpace: 'nowrap',
-                                    width: 'auto',
-                                  }}
-                                >
-                                  {t('playground.contextField')}
-                                </TableCell>
-                                <TableCell
-                                  sx={{
-                                    py: 0.5,
-                                    fontWeight: 600,
-                                    bgcolor: 'action.hover',
-                                    width: 60,
-                                    textAlign: 'center',
-                                    whiteSpace: 'nowrap',
-                                  }}
-                                >
-                                  {t('playground.referenced')}
-                                </TableCell>
-                                <TableCell
-                                  sx={{
-                                    py: 0.5,
-                                    fontWeight: 600,
-                                    bgcolor: 'action.hover',
-                                  }}
-                                >
-                                  {t('playground.contextValue')}
-                                </TableCell>
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {enabledEntries.map((entry, idx) => (
-                                <TableRow
-                                  key={idx}
-                                  sx={{
-                                    '&:last-child td': { borderBottom: 0 },
-                                  }}
-                                >
-                                  <TableCell sx={{ py: 0.5 }}>
-                                    <ContextFieldChip
-                                      fieldName={entry.key}
-                                      fieldInfo={getFieldInfo(entry.key)}
-                                      fieldType={entry.type}
-                                    />
-                                  </TableCell>
-                                  <TableCell
-                                    sx={{ py: 0.5, textAlign: 'center' }}
+                            <Typography
+                              variant="caption"
+                              fontWeight={600}
+                              sx={{ flex: 1 }}
+                            >
+                              {t('playground.contextField')}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              fontWeight={600}
+                              sx={{ width: 60, textAlign: 'center' }}
+                            >
+                              {t('playground.referenced')}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              fontWeight={600}
+                              sx={{ width: 100 }}
+                            >
+                              {t('playground.contextValue')}
+                            </Typography>
+                          </Box>
+                          {/* Body */}
+                          {enabledEntries.map((entry, idx) => (
+                            <Box
+                              key={idx}
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                py: 0.5,
+                                px: 1,
+                                bgcolor:
+                                  idx % 2 === 0
+                                    ? 'transparent'
+                                    : 'action.hover',
+                                borderBottom:
+                                  idx < enabledEntries.length - 1 ? 1 : 0,
+                                borderColor: 'divider',
+                              }}
+                            >
+                              <Box sx={{ flex: 1 }}>
+                                <ContextFieldChip
+                                  fieldName={entry.key}
+                                  fieldInfo={getFieldInfo(entry.key)}
+                                  fieldType={entry.type}
+                                />
+                              </Box>
+                              <Box
+                                sx={{
+                                  width: 60,
+                                  textAlign: 'center',
+                                }}
+                              >
+                                {referencedFieldNames.has(entry.key) ? (
+                                  <CheckCircleOutlineIcon
+                                    sx={{
+                                      fontSize: 14,
+                                      color: 'success.main',
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography
+                                    variant="caption"
+                                    color="text.disabled"
                                   >
-                                    {referencedFieldNames.has(entry.key) ? (
-                                      <CheckCircleOutlineIcon
-                                        sx={{
-                                          fontSize: 14,
-                                          color: 'success.main',
-                                        }}
-                                      />
-                                    ) : (
-                                      <Typography
-                                        variant="caption"
-                                        color="text.disabled"
-                                      >
-                                        -
-                                      </Typography>
-                                    )}
-                                  </TableCell>
-                                  <TableCell sx={{ py: 0.5 }}>
-                                    <Typography
-                                      variant="caption"
-                                      sx={{
-                                        fontFamily:
-                                          'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
-                                      }}
-                                    >
-                                      {renderValue(entry.value, entry.type)}
-                                    </Typography>
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
+                                    -
+                                  </Typography>
+                                )}
+                              </Box>
+                              <Box sx={{ width: 100 }}>
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    fontFamily:
+                                      'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
+                                  }}
+                                >
+                                  {renderValue(entry.value, entry.type)}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          ))}
+                        </Box>
                       )}
 
                       {/* 2. Referenced Fields */}
@@ -2816,153 +2867,158 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           message={t('playground.noReferencedFields')}
                         />
                       ) : (
-                        <TableContainer
-                          component={Paper}
-                          variant="outlined"
-                          sx={{ maxHeight: 150 }}
+                        <Box
+                          sx={{
+                            maxHeight: 150,
+                            overflow: 'auto',
+                            border: 1,
+                            borderColor: 'divider',
+                            borderRadius: 1,
+                          }}
                         >
-                          <Table
-                            size="small"
-                            stickyHeader
-                            sx={{ tableLayout: 'auto' }}
+                          {/* Header */}
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              bgcolor: 'action.hover',
+                              py: 0.5,
+                              px: 1,
+                              borderBottom: 1,
+                              borderColor: 'divider',
+                            }}
                           >
-                            <TableHead>
-                              <TableRow>
-                                <TableCell
+                            <Typography
+                              variant="caption"
+                              fontWeight={600}
+                              sx={{ flex: 1 }}
+                            >
+                              {t('playground.contextField')}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              fontWeight={600}
+                              sx={{ width: 60, textAlign: 'center' }}
+                            >
+                              {t('featureFlags.validation.isRequired')}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              fontWeight={600}
+                              sx={{ width: 60, textAlign: 'center' }}
+                            >
+                              {t('common.status')}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              fontWeight={600}
+                              sx={{ width: 100 }}
+                            >
+                              {t('playground.contextValue')}
+                            </Typography>
+                          </Box>
+                          {/* Body */}
+                          {referencedFields.map((ref, idx) => {
+                            const provided = contextMap.has(ref.name);
+                            const value = contextMap.get(ref.name);
+                            return (
+                              <Box
+                                key={idx}
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  py: 0.5,
+                                  px: 1,
+                                  bgcolor:
+                                    idx % 2 === 0
+                                      ? 'transparent'
+                                      : 'action.hover',
+                                  borderBottom:
+                                    idx < referencedFields.length - 1 ? 1 : 0,
+                                  borderColor: 'divider',
+                                }}
+                              >
+                                <Box sx={{ flex: 1 }}>
+                                  <ContextFieldChip
+                                    fieldName={ref.name}
+                                    fieldInfo={getFieldInfo(ref.name)}
+                                    fieldType={ref.fieldType}
+                                  />
+                                </Box>
+                                <Box
                                   sx={{
-                                    py: 0.5,
-                                    fontWeight: 600,
-                                    bgcolor: 'action.hover',
-                                    whiteSpace: 'nowrap',
-                                    width: 'auto',
-                                  }}
-                                >
-                                  {t('playground.contextField')}
-                                </TableCell>
-                                <TableCell
-                                  sx={{
-                                    py: 0.5,
-                                    fontWeight: 600,
-                                    bgcolor: 'action.hover',
                                     width: 60,
                                     textAlign: 'center',
-                                    whiteSpace: 'nowrap',
                                   }}
                                 >
-                                  {t('featureFlags.validation.isRequired')}
-                                </TableCell>
-                                <TableCell
+                                  {ref.isRequired ? (
+                                    <Typography
+                                      variant="caption"
+                                      sx={{
+                                        color: 'error.main',
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      *
+                                    </Typography>
+                                  ) : (
+                                    <Typography
+                                      variant="caption"
+                                      color="text.disabled"
+                                    >
+                                      -
+                                    </Typography>
+                                  )}
+                                </Box>
+                                <Box
                                   sx={{
-                                    py: 0.5,
-                                    fontWeight: 600,
-                                    bgcolor: 'action.hover',
                                     width: 60,
                                     textAlign: 'center',
-                                    whiteSpace: 'nowrap',
                                   }}
                                 >
-                                  {t('common.status')}
-                                </TableCell>
-                                <TableCell
-                                  sx={{
-                                    py: 0.5,
-                                    fontWeight: 600,
-                                    bgcolor: 'action.hover',
-                                  }}
-                                >
-                                  {t('playground.contextValue')}
-                                </TableCell>
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {referencedFields.map((ref, idx) => {
-                                const provided = contextMap.has(ref.name);
-                                const value = contextMap.get(ref.name);
-                                return (
-                                  <TableRow
-                                    key={idx}
+                                  {provided ? (
+                                    <CheckCircleOutlineIcon
+                                      sx={{
+                                        fontSize: 14,
+                                        color: 'success.main',
+                                      }}
+                                    />
+                                  ) : (
+                                    <ErrorOutlineIcon
+                                      sx={{
+                                        fontSize: 14,
+                                        color: 'error.main',
+                                      }}
+                                    />
+                                  )}
+                                </Box>
+                                <Box sx={{ width: 100 }}>
+                                  <Typography
+                                    variant="caption"
                                     sx={{
-                                      '&:last-child td': { borderBottom: 0 },
+                                      fontFamily:
+                                        'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                     }}
                                   >
-                                    <TableCell sx={{ py: 0.5 }}>
-                                      <ContextFieldChip
-                                        fieldName={ref.name}
-                                        fieldInfo={getFieldInfo(ref.name)}
-                                        fieldType={ref.fieldType}
-                                      />
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{ py: 0.5, textAlign: 'center' }}
-                                    >
-                                      {ref.isRequired ? (
-                                        <Typography
-                                          variant="caption"
-                                          sx={{
-                                            color: 'error.main',
-                                            fontWeight: 600,
-                                          }}
-                                        >
-                                          *
-                                        </Typography>
-                                      ) : (
-                                        <Typography
-                                          variant="caption"
-                                          color="text.disabled"
-                                        >
-                                          -
-                                        </Typography>
-                                      )}
-                                    </TableCell>
-                                    <TableCell
-                                      sx={{ py: 0.5, textAlign: 'center' }}
-                                    >
-                                      {provided ? (
-                                        <CheckCircleOutlineIcon
-                                          sx={{
-                                            fontSize: 14,
-                                            color: 'success.main',
-                                          }}
-                                        />
-                                      ) : (
-                                        <ErrorOutlineIcon
-                                          sx={{
-                                            fontSize: 14,
-                                            color: 'error.main',
-                                          }}
-                                        />
-                                      )}
-                                    </TableCell>
-                                    <TableCell sx={{ py: 0.5 }}>
+                                    {!provided ? (
                                       <Typography
+                                        component="span"
                                         variant="caption"
                                         sx={{
-                                          fontFamily:
-                                            'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
+                                          color: 'error.main',
+                                          fontStyle: 'italic',
                                         }}
                                       >
-                                        {!provided ? (
-                                          <Typography
-                                            component="span"
-                                            variant="caption"
-                                            sx={{
-                                              color: 'error.main',
-                                              fontStyle: 'italic',
-                                            }}
-                                          >
-                                            {t('playground.notProvided')}
-                                          </Typography>
-                                        ) : (
-                                          renderValue(value, ref.fieldType)
-                                        )}
+                                        {t('playground.notProvided')}
                                       </Typography>
-                                    </TableCell>
-                                  </TableRow>
-                                );
-                              })}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
+                                    ) : (
+                                      renderValue(value, ref.fieldType)
+                                    )}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            );
+                          })}
+                        </Box>
                       )}
                     </>
                   );
@@ -4617,6 +4673,12 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 <Autocomplete
                   multiple
                   options={environments.map((e) => e.environmentId)}
+                  getOptionLabel={(option) => {
+                    const env = environments.find(
+                      (e) => e.environmentId === option
+                    );
+                    return env?.displayName || option;
+                  }}
                   value={selectedEnvironments}
                   onChange={(_, value) => setSelectedEnvironments(value)}
                   renderInput={(params) => (
@@ -4627,17 +4689,22 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                     />
                   )}
                   renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip
-                        {...getTagProps({ index })}
-                        key={option}
-                        label={option}
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                        sx={{ borderRadius: '16px' }}
-                      />
-                    ))
+                    value.map((option, index) => {
+                      const env = environments.find(
+                        (e) => e.environmentId === option
+                      );
+                      return (
+                        <Chip
+                          {...getTagProps({ index })}
+                          key={option}
+                          label={env?.displayName || option}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                          sx={{ borderRadius: '16px' }}
+                        />
+                      );
+                    })
                   }
                 />
                 <FormHelperText>

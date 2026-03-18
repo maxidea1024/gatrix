@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { P } from '@/types/permissions';
@@ -15,25 +15,14 @@ import {
   Paper,
   Chip,
   IconButton,
-  TextField,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
   Tooltip,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Grid,
   Card,
   CardContent,
-  Tabs,
-  Tab,
-  LinearProgress,
-  Autocomplete,
   Drawer,
-  InputAdornment,
   useTheme,
 } from '@mui/material';
 import {
@@ -43,12 +32,12 @@ import {
   Close as CloseIcon,
   PlayArrow as ExecuteIcon,
   History as HistoryIcon,
-  Search as SearchIcon,
   Work as WorkIcon,
   ViewColumn as ViewColumnIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { useDebounce } from '../../hooks/useDebounce';
 import { jobService } from '../../services/jobService';
 import { tagService, Tag } from '../../services/tagService';
 import {
@@ -67,7 +56,11 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import ColumnSettingsDialog, {
   ColumnConfig,
 } from '../../components/common/ColumnSettingsDialog';
-import { getContrastColor } from '@/utils/colorUtils';
+import DynamicFilterBar, {
+  FilterDefinition,
+  ActiveFilter,
+} from '../../components/common/DynamicFilterBar';
+import SearchTextField from '../../components/common/SearchTextField';
 
 // Default column configuration
 const defaultColumns: ColumnConfig[] = [
@@ -116,12 +109,12 @@ const JobsPage: React.FC = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobTypes, setJobTypes] = useState<JobType[]>([]);
   const [allTags, setAllTags] = useState<Tag[]>([]);
-  const [tagFilter, setTagFilter] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedJobType, setSelectedJobType] = useState<number | ''>('');
-  const [enabledFilter, setEnabledFilter] = useState<boolean | ''>('');
-  const [tabValue, setTabValue] = useState(0);
+  const debouncedSearch = useDebounce(searchTerm, 300);
+
+  // Dynamic filters
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
   // Pagination state
   const [page, setPage] = useState(0);
@@ -148,16 +141,92 @@ const JobsPage: React.FC = () => {
     localStorage.removeItem('jobsColumns');
   };
 
+  // Extract filter values from activeFilters
+  const selectedJobType = useMemo(() => {
+    const f = activeFilters.find((f) => f.key === 'jobType');
+    return f?.value ?? '';
+  }, [activeFilters]);
+
+  const enabledFilter = useMemo(() => {
+    const f = activeFilters.find((f) => f.key === 'isEnabled');
+    return f?.value ?? '';
+  }, [activeFilters]);
+
+  const tagFilterIds = useMemo(() => {
+    const f = activeFilters.find((f) => f.key === 'tags');
+    return Array.isArray(f?.value) ? f.value : [];
+  }, [activeFilters]);
+
+  // Filter definitions for DynamicFilterBar
+  const availableFilterDefinitions: FilterDefinition[] = useMemo(
+    () => [
+      {
+        key: 'jobType',
+        label: t('jobs.jobType'),
+        type: 'select',
+        options: jobTypes.map((jt) => ({
+          value: jt.id,
+          label: jt.displayName || jt.name,
+        })),
+      },
+      {
+        key: 'isEnabled',
+        label: t('common.usable'),
+        type: 'select',
+        options: [
+          { value: 'true', label: t('common.usable') },
+          { value: 'false', label: t('common.unavailable') },
+        ],
+      },
+      {
+        key: 'tags',
+        label: t('common.tags'),
+        type: 'tags',
+        operator: 'any_of',
+        allowOperatorToggle: true,
+        options: allTags.map((tag) => ({
+          value: tag.id,
+          label: tag.name,
+          color: tag.color,
+        })),
+      },
+    ],
+    [t, jobTypes, allTags]
+  );
+
+  // Dynamic filter handlers
+  const handleFilterAdd = (filter: ActiveFilter) => {
+    setActiveFilters((prev) => [...prev, filter]);
+  };
+
+  const handleFilterRemove = (key: string) => {
+    setActiveFilters((prev) => prev.filter((f) => f.key !== key));
+  };
+
+  const handleDynamicFilterChange = (key: string, value: any) => {
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === key ? { ...f, value } : f))
+    );
+  };
+
+  const handleOperatorChange = (
+    key: string,
+    operator: 'any_of' | 'include_all'
+  ) => {
+    setActiveFilters((prev) =>
+      prev.map((f) => (f.key === key ? { ...f, operator } : f))
+    );
+  };
+
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const tagIds = tagFilter.map((tag) => tag.id.toString());
       const [jobsResponse, jobTypesData] = await Promise.all([
         jobService.getJobsWithPagination({
           jobTypeId: selectedJobType || undefined,
-          isEnabled: enabledFilter !== '' ? enabledFilter : undefined,
-          search: searchTerm || undefined,
-          tags: tagIds.length > 0 ? tagIds.map(Number) : undefined,
+          isEnabled: enabledFilter !== '' ? (enabledFilter === 'true') : undefined,
+          search: debouncedSearch || undefined,
+          tags: tagFilterIds.length > 0 ? tagFilterIds.map(Number) : undefined,
           limit: rowsPerPage,
           offset: page * rowsPerPage,
         }),
@@ -166,11 +235,10 @@ const JobsPage: React.FC = () => {
 
       setJobs(jobsResponse.jobs);
       setTotal(jobsResponse.pagination.total);
-      console.log('JobsPage - jobTypesData received:', jobTypesData);
       setJobTypes(jobTypesData);
     } catch (error) {
       console.error('Failed to load data:', error);
-      enqueueSnackbar('작업 목록을 불러오는데 실패했습니다.', {
+      enqueueSnackbar(t('jobs.loadFailed'), {
         variant: 'error',
       });
     } finally {
@@ -179,8 +247,8 @@ const JobsPage: React.FC = () => {
   }, [
     selectedJobType,
     enabledFilter,
-    searchTerm,
-    tagFilter,
+    debouncedSearch,
+    tagFilterIds,
     page,
     rowsPerPage,
   ]);
@@ -198,35 +266,13 @@ const JobsPage: React.FC = () => {
   // Reset page when filters change
   useEffect(() => {
     setPage(0);
-  }, [selectedJobType, enabledFilter, searchTerm, tagFilter]);
+  }, [debouncedSearch, activeFilters]);
 
   // Load data and tags
   useEffect(() => {
-    console.log('JobsPage useEffect - loading data');
     loadData();
     loadTags();
   }, [loadData, loadTags]);
-
-  // Handlers
-  const handleSearch = () => {
-    setPage(0); // Reset to first page
-    // loadData will be called automatically by useEffect
-  };
-
-  const handleReset = () => {
-    setSearchTerm('');
-    setSelectedJobType('');
-    setEnabledFilter('');
-    setTagFilter([]);
-    setPage(0); // Reset to first page
-    // loadData will be called automatically by useEffect
-  };
-
-  // 태그 Filter 변경 핸들러
-  const handleTagFilterChange = useCallback((tags: Tag[]) => {
-    setTagFilter(tags);
-    setPage(0);
-  }, []);
 
   // 페이지 변경 핸들러
   const handlePageChange = useCallback((_: unknown, newPage: number) => {
@@ -442,223 +488,83 @@ const JobsPage: React.FC = () => {
         )}
       </Box>
 
-      {/* Filters */}
+      {/* Search and Filters */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Grid container spacing={2} alignItems="center">
-            <Grid size={{ xs: 12, md: 3 }}>
-              <TextField
-                fullWidth
-                size="small"
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 2,
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                flexGrow: 1,
+              }}
+            >
+              <SearchTextField
                 placeholder={t('common.search')}
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': {
-                      borderColor: 'divider',
-                    },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': {
-                        borderColor: 'primary.light',
-                      },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': {
-                    fontSize: '0.875rem',
-                  },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: 'text.secondary', fontSize: 20 }}
-                      />
-                    </InputAdornment>
-                  ),
-                }}
+                onChange={setSearchTerm}
               />
-            </Grid>
-            <Grid size={{ xs: 12, md: 2 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel shrink={true}>{t('jobs.jobType')}</InputLabel>
-                <Select
-                  value={selectedJobType}
-                  onChange={(e) =>
-                    setSelectedJobType(e.target.value as number | '')
-                  }
-                  label={t('jobs.jobType')}
-                  displayEmpty
-                  size="small"
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        zIndex: 9999,
-                      },
-                    },
-                  }}
-                  sx={{
-                    minWidth: 120,
-                    '& .MuiSelect-select': {
-                      overflow: 'visible',
-                      textOverflow: 'clip',
-                      whiteSpace: 'nowrap',
-                    },
-                  }}
-                >
-                  <MenuItem value="">{t('common.all')}</MenuItem>
-                  {jobTypes.map((jobType) => (
-                    <MenuItem key={jobType.id} value={jobType.id}>
-                      {jobType.displayName}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid size={{ xs: 12, md: 2 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel shrink={true}>{t('common.usable')}</InputLabel>
-                <Select
-                  value={enabledFilter}
-                  onChange={(e) =>
-                    setEnabledFilter(e.target.value as boolean | '')
-                  }
-                  label={t('common.usable')}
-                  displayEmpty
-                  size="small"
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        zIndex: 9999,
-                      },
-                    },
-                  }}
-                  sx={{
-                    minWidth: 120,
-                    '& .MuiSelect-select': {
-                      overflow: 'visible',
-                      textOverflow: 'clip',
-                      whiteSpace: 'nowrap',
-                    },
-                  }}
-                >
-                  <MenuItem value="">{t('common.all')}</MenuItem>
-                  <MenuItem value={'true' as any}>
-                    {t('common.usable')}
-                  </MenuItem>
-                  <MenuItem value={'false' as any}>
-                    {t('common.unavailable')}
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
 
-            <Grid size={{ xs: 12, md: 5 }}>
-              {/* 태그 Filter */}
-              <Autocomplete
-                multiple
-                sx={{ minWidth: 400 }}
-                options={allTags}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                value={tagFilter}
-                onChange={(_, value) => handleTagFilterChange(value)}
-                slotProps={{
-                  popper: {
-                    style: {
-                      zIndex: 9999,
-                    },
-                  },
+              {/* Dynamic Filter Bar */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 1,
+                  alignItems: 'center',
                 }}
-                renderValue={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip
-                        key={option.id}
-                        title={option.description || t('tags.noDescription')}
-                        arrow
-                      >
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{
-                            bgcolor: option.color,
-                            color: getContrastColor(option.color),
-                          }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('common.tags')}
-                    size="small"
-                  />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...otherProps } = props;
-                  return (
-                    <Box component="li" key={key} {...otherProps}>
-                      <Chip
-                        label={option.name}
-                        size="small"
-                        sx={{
-                          bgcolor: option.color,
-                          color: getContrastColor(option.color),
-                          mr: 1,
-                        }}
-                      />
-                      {option.description || t('common.noDescription')}
-                    </Box>
-                  );
-                }}
-              />
-            </Grid>
-          </Grid>
+              >
+                <DynamicFilterBar
+                  availableFilters={availableFilterDefinitions}
+                  activeFilters={activeFilters}
+                  onFilterAdd={handleFilterAdd}
+                  onFilterRemove={handleFilterRemove}
+                  onFilterChange={handleDynamicFilterChange}
+                  onOperatorChange={handleOperatorChange}
+                  onRefresh={loadData}
+                />
+
+                {/* Column Settings Button */}
+                <Tooltip title={t('common.columnSettings')}>
+                  <IconButton
+                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                    sx={{
+                      bgcolor: 'background.paper',
+                      border: 1,
+                      borderColor: 'divider',
+                      '&:hover': {
+                        bgcolor: 'action.hover',
+                      },
+                    }}
+                  >
+                    <ViewColumnIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
+          </Box>
         </CardContent>
       </Card>
-
-      {/* Column Settings Button */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Button
-          startIcon={<ViewColumnIcon />}
-          onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-          size="small"
-        >
-          {t('common.columnSettings')}
-        </Button>
-      </Box>
 
       {/* Jobs Table */}
       <PageContentLoader loading={loading}>
         {jobs.length === 0 ? (
-          <Paper sx={{ p: 0 }}>
-            <EmptyPagePlaceholder
-              message={t('jobs.noJobsFound')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-              onAddClick={canManage ? handleAddJob : undefined}
-              addButtonLabel={t('jobs.addJob')}
-            />
-          </Paper>
+          <EmptyPagePlaceholder
+            message={t('jobs.noJobsFound')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+            onAddClick={canManage ? handleAddJob : undefined}
+            addButtonLabel={t('jobs.addJob')}
+          />
         ) : (
           <TableContainer
             component={Paper}

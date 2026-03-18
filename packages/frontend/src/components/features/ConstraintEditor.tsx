@@ -105,8 +105,8 @@ const OPERATORS_BY_TYPE: Record<string, { value: string; label: string }[]> = {
     { value: 'str_ends_with', label: 'ends with' },
     { value: 'str_in', label: 'in list' },
     { value: 'str_regex', label: 'matches regex' },
-    { value: 'cidr_match', label: 'matches CIDR' },
     ...COMMON_OPERATORS,
+    { value: 'cidr_match', label: 'matches CIDR' },
   ],
   number: [
     { value: 'num_eq', label: '=' },
@@ -301,155 +301,172 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
         )}
 
         {/* Context Field Selector */}
-        <Tooltip
-          title={
-            contextFields.find((f) => f.fieldName === constraint.contextName)
-              ?.description || ''
-          }
-          disableFocusListener
-          placement="top"
+        <FormControl
+          size="small"
+          sx={{ width: 170, flexShrink: 0, '& .MuiSelect-select': { overflow: 'hidden', textOverflow: 'ellipsis' } }}
+          error={isFieldEmpty}
         >
-          <FormControl
-            size="small"
-            sx={{ minWidth: 150, flex: '1 1 150px' }}
-            error={isFieldEmpty}
-          >
-            <Select
-              value={constraint.contextName}
-              onChange={(e) =>
-                handleConstraintChange(index, 'contextName', e.target.value)
-              }
-              displayEmpty
-              disabled={disabled}
-              renderValue={(selected) => {
-                if (!selected) {
-                  return (
-                    <em style={{ color: 'gray' }}>
-                      {t('featureFlags.selectContextField')}
-                    </em>
-                  );
-                }
-                const selectedField = contextFields.find(
-                  (f) => f.fieldName === selected
+          <Select
+            value={constraint.contextName}
+            onChange={(e) =>
+              handleConstraintChange(index, 'contextName', e.target.value)
+            }
+            displayEmpty
+            disabled={disabled}
+            renderValue={(selected) => {
+              if (!selected) {
+                return (
+                  <em style={{ color: 'gray' }}>
+                    {t('featureFlags.selectContextField')}
+                  </em>
                 );
-                // Show missing icon for deleted/unknown fields
-                if (!selectedField) {
-                  return (
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Tooltip
-                        title={t('featureFlags.missingContextField')}
-                        disableFocusListener
-                      >
-                        <MissingIcon
-                          sx={{ fontSize: 16, color: 'error.main', mr: 1 }}
-                        />
-                      </Tooltip>
-                      <Typography sx={{ color: 'error.main' }}>
-                        {selected}
-                      </Typography>
-                    </Box>
-                  );
-                }
+              }
+              const selectedField = contextFields.find(
+                (f) => f.fieldName === selected
+              );
+              // Show missing icon for deleted/unknown fields
+              if (!selectedField) {
                 return (
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <FieldTypeIcon
-                      type={selectedField.fieldType}
-                      size={16}
-                      sx={{ mr: 1 }}
-                    />
-                    {selectedField.displayName || selectedField.fieldName}
+                    <Tooltip
+                      title={t('featureFlags.missingContextField')}
+                      disableFocusListener
+                    >
+                      <MissingIcon
+                        sx={{ fontSize: 16, color: 'error.main', mr: 1 }}
+                      />
+                    </Tooltip>
+                    <Typography sx={{ color: 'error.main' }}>
+                      {selected}
+                    </Typography>
                   </Box>
                 );
-              }}
-            >
-              <MenuItem value="" disabled>
-                <em>{t('featureFlags.selectContextField')}</em>
-              </MenuItem>
-              {contextFields.map((field) => {
-                const isUsed = usedFieldNames.includes(field.fieldName);
-                return (
-                  <MenuItem
-                    key={field.fieldName}
-                    value={field.fieldName}
-                    disabled={isUsed}
-                    sx={{
-                      display: 'flex',
-                      gap: 1.5,
-                      alignItems: 'flex-start',
-                      py: 1,
-                    }}
-                  >
-                    <Tooltip title={field.fieldType} disableFocusListener>
-                      <Box
-                        sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}
-                      >
-                        <FieldTypeIcon type={field.fieldType} size={16} />
-                      </Box>
-                    </Tooltip>
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography variant="body2">
-                        {field.displayName || field.fieldName}
-                        {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
-                      </Typography>
-                      {field.description && (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ display: 'block' }}
-                        >
-                          {field.description}
-                        </Typography>
-                      )}
-                    </Box>
-                  </MenuItem>
-                );
-              })}
-            </Select>
-            {isFieldEmpty && (
-              <FormHelperText>{t('featureFlags.fieldRequired')}</FormHelperText>
-            )}
-          </FormControl>
-        </Tooltip>
-
-        {/* Inverted (!) - placed before operator for natural reading order */}
-        <Tooltip title={t('featureFlags.invertedHelp')} disableFocusListener>
-          <span>
-            <IconButton
-              size="small"
-              onClick={() =>
-                handleConstraintChange(index, 'inverted', !constraint.inverted)
               }
-              disabled={disabled}
-              sx={{
-                width: 32,
-                height: 32,
-                color: constraint.inverted ? 'warning.main' : 'text.disabled',
-                bgcolor: constraint.inverted
-                  ? 'action.selected'
-                  : 'transparent',
-                '&:hover': {
-                  bgcolor: 'action.hover',
-                },
-              }}
-            >
-              <InvertIcon fontSize="small" />
-            </IconButton>
-          </span>
-        </Tooltip>
+              return (
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <FieldTypeIcon
+                    type={selectedField.fieldType}
+                    size={16}
+                    sx={{ mr: 1 }}
+                  />
+                  {selectedField.displayName || selectedField.fieldName}
+                </Box>
+              );
+            }}
+          >
+            <MenuItem value="" disabled>
+              <em>{t('featureFlags.selectContextField')}</em>
+            </MenuItem>
+            {contextFields.map((field) => {
+              const isUsed = usedFieldNames.includes(field.fieldName);
+              return (
+                <MenuItem
+                  key={field.fieldName}
+                  value={field.fieldName}
+                  disabled={isUsed}
+                  sx={{
+                    display: 'flex',
+                    gap: 1.5,
+                    alignItems: 'flex-start',
+                    py: 1,
+                  }}
+                >
+                  <Tooltip title={field.fieldType} disableFocusListener>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}
+                    >
+                      <FieldTypeIcon type={field.fieldType} size={16} />
+                    </Box>
+                  </Tooltip>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="body2">
+                      {field.displayName || field.fieldName}
+                      {isUsed && ` (${t('featureFlags.alreadyUsed')})`}
+                    </Typography>
+                    {field.description && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: 'block' }}
+                      >
+                        {field.description}
+                      </Typography>
+                    )}
+                  </Box>
+                </MenuItem>
+              );
+            })}
+          </Select>
+          {isFieldEmpty && (
+            <FormHelperText>{t('featureFlags.fieldRequired')}</FormHelperText>
+          )}
+        </FormControl>
 
-        {/* Operator Selector */}
-        <Tooltip
-          title={t(`constraints.operatorDesc.${constraint.operator}`, '')}
-          disableFocusListener
-          placement="top"
+        {/* Operator Group: Inverted + Operator Select + Case Sensitivity */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.25,
+            border: 1,
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.15)'
+                : 'rgba(0, 0, 0, 0.2)',
+            borderRadius: 1,
+            px: 0.5,
+            flexShrink: 0,
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.03)'
+                : 'rgba(0, 0, 0, 0.02)',
+          }}
         >
-          <FormControl size="small" sx={{ minWidth: 130, flex: '1 1 130px' }}>
+          {/* Inverted (!) */}
+          <Tooltip title={t('featureFlags.invertedHelp')} disableFocusListener>
+            <span>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleConstraintChange(index, 'inverted', !constraint.inverted)
+                }
+                disabled={disabled}
+                sx={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: constraint.inverted ? 'warning.main' : 'divider',
+                  color: constraint.inverted ? 'warning.main' : 'text.disabled',
+                  bgcolor: constraint.inverted
+                    ? 'action.selected'
+                    : 'transparent',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                <InvertIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+
+          {/* Operator Selector */}
+          <FormControl size="small" sx={{ width: 130 }}>
             <Select
               value={validOperator}
               onChange={(e) =>
                 handleConstraintChange(index, 'operator', e.target.value)
               }
               disabled={disabled}
+              sx={{
+                '& .MuiOutlinedInput-notchedOutline': {
+                  border: 'none',
+                },
+                '& .MuiSelect-select': {
+                  py: '7px',
+                },
+              }}
               renderValue={(selected) => {
                 const label = getOperatorLabel(
                   selected as string,
@@ -520,32 +537,8 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
               ))}
             </Select>
           </FormControl>
-        </Tooltip>
 
-        {/* Value Input */}
-        <Box sx={{ flex: '2 1 200px', minWidth: 150 }}>
-          {renderValueInput(constraint, index)}
-          {!isFieldEmpty && isValueEmpty && (
-            <Typography
-              variant="caption"
-              color="error"
-              sx={{ display: 'block', mt: 0.5 }}
-            >
-              {t('featureFlags.valueRequired')}
-            </Typography>
-          )}
-        </Box>
-
-        {/* Constraint Options & Delete */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            flexShrink: 0,
-          }}
-        >
-          {/* Case Insensitive - always show but disable for non-string operators */}
+          {/* Case Insensitive */}
           <Tooltip
             title={t('featureFlags.caseInsensitiveHelp')}
             disableFocusListener
@@ -562,8 +555,11 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                 }
                 disabled={disabled || !validOperator.startsWith('str_')}
                 sx={{
-                  width: 32,
-                  height: 32,
+                  width: 28,
+                  height: 28,
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: constraint.caseInsensitive ? 'primary.main' : 'divider',
                   color: constraint.caseInsensitive
                     ? 'primary.main'
                     : 'text.disabled',
@@ -579,29 +575,43 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
               </IconButton>
             </span>
           </Tooltip>
-
-          {/* Delete Button */}
-          <Tooltip title={t('common.delete')} disableFocusListener>
-            <span>
-              <IconButton
-                size="small"
-                onClick={() => handleRemoveConstraint(index)}
-                disabled={disabled}
-                sx={{
-                  width: 32,
-                  height: 32,
-                  color: 'text.secondary',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                    color: 'error.main',
-                  },
-                }}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
         </Box>
+
+        {/* Value Input */}
+        <Box sx={{ flex: '2 1 200px', minWidth: 150 }}>
+          {renderValueInput(constraint, index)}
+          {!isFieldEmpty && isValueEmpty && (
+            <Typography
+              variant="caption"
+              color="error"
+              sx={{ display: 'block', mt: 0.5 }}
+            >
+              {t('featureFlags.valueRequired')}
+            </Typography>
+          )}
+        </Box>
+
+        {/* Delete Button */}
+        <Tooltip title={t('common.delete')} disableFocusListener>
+          <span>
+            <IconButton
+              size="small"
+              onClick={() => handleRemoveConstraint(index)}
+              disabled={disabled}
+              sx={{
+                width: 32,
+                height: 32,
+                color: 'text.secondary',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                  color: 'error.main',
+                },
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </span>
+        </Tooltip>
       </Box>
     </Card>
   );

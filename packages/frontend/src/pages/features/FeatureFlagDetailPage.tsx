@@ -25,6 +25,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Menu,
+  ListItemIcon,
   Tooltip,
   Tabs,
   Tab,
@@ -160,6 +162,60 @@ import DraftBanner from '../../components/common/DraftBanner';
 import DraftChangesDialog from '../../components/common/DraftChangesDialog';
 import * as draftService from '../../services/draftService';
 
+// Strategy context menu component for edit/delete actions
+const StrategyContextMenu: React.FC<{
+  onEdit: () => void;
+  onDelete: () => void;
+}> = ({ onEdit, onDelete }) => {
+  const { t } = useTranslation();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  return (
+    <>
+      <IconButton
+        size="small"
+        onClick={(e) => {
+          e.stopPropagation();
+          setAnchorEl(e.currentTarget);
+        }}
+      >
+        <MoreIcon fontSize="small" />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+        onClick={(e) => e.stopPropagation()}
+        slotProps={{
+          paper: { sx: { minWidth: 140 } },
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            onEdit();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            onDelete();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
+  );
+};
+
 // Deep equality check for draft coalescing
 function deepEqualDraft(a: any, b: any): boolean {
   if (a === b) return true;
@@ -260,7 +316,13 @@ interface FeatureFlag {
   flagName: string;
   displayName?: string;
   description?: string;
-  flagType: 'release' | 'experiment' | 'operational' | 'permission';
+  flagType:
+    | 'release'
+    | 'experiment'
+    | 'operational'
+    | 'permission'
+    | 'killswitch'
+    | 'remoteConfig';
   isEnabled: boolean;
   isArchived: boolean;
   impressionDataEnabled: boolean;
@@ -504,6 +566,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   );
   const [loading, setLoading] = useState(!isCreating);
   const [envLoading, setEnvLoading] = useState(!isCreating);
+  const [refreshCounter, setRefreshCounter] = useState(0);
   const [saving, setSaving] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
@@ -890,6 +953,24 @@ const FeatureFlagDetailPage: React.FC = () => {
     isCreating,
   ]);
 
+  // Refetch data when draft is published or discarded
+  useEffect(() => {
+    const handleDraftAction = () => {
+      if (!isCreating) {
+        loadFlag();
+        // Force re-trigger of loadEnvStrategies + loadFlagDraftStatus
+        setRefreshCounter((c) => c + 1);
+        // Refresh release flow plans (may have been created/deleted by draft)
+        mutateReleaseFlowPlans();
+        // Clear manual release flow selections to avoid stale template forms
+        setEnvManualReleaseFlow(new Set());
+      }
+    };
+    window.addEventListener('draft-action-completed', handleDraftAction);
+    return () =>
+      window.removeEventListener('draft-action-completed', handleDraftAction);
+  }, [loadFlag, isCreating, mutateReleaseFlowPlans]);
+
   // Check draft status and apply draft data to UI
   const loadFlagDraftStatus = useCallback(
     async (flagId: string) => {
@@ -912,6 +993,62 @@ const FeatureFlagDetailPage: React.FC = () => {
             string,
             any,
           ][]) {
+            // Handle global key (flag-level settings like impressionDataEnabled)
+            if (envId === '_global') {
+              if (envData.impressionDataEnabled !== undefined) {
+                setFlag((prev) => {
+                  if (!prev) return prev;
+                  return {
+                    ...prev,
+                    impressionDataEnabled: envData.impressionDataEnabled,
+                  };
+                });
+              }
+              continue;
+            }
+
+            // Apply isEnabled and value overrides to flag.environments
+            if (
+              envData.isEnabled !== undefined ||
+              envData.overrideEnabledValue !== undefined ||
+              envData.overrideDisabledValue !== undefined ||
+              envData.enabledValue !== undefined ||
+              envData.disabledValue !== undefined
+            ) {
+              setFlag((prev) => {
+                if (!prev) return prev;
+                const updatedEnvs = (prev.environments || []).map((e) =>
+                  e.environmentId === envId
+                    ? {
+                        ...e,
+                        ...(envData.isEnabled !== undefined
+                          ? { isEnabled: envData.isEnabled }
+                          : {}),
+                        ...(envData.overrideEnabledValue !== undefined
+                          ? {
+                              overrideEnabledValue:
+                                envData.overrideEnabledValue,
+                            }
+                          : {}),
+                        ...(envData.overrideDisabledValue !== undefined
+                          ? {
+                              overrideDisabledValue:
+                                envData.overrideDisabledValue,
+                            }
+                          : {}),
+                        ...(envData.enabledValue !== undefined
+                          ? { enabledValue: envData.enabledValue }
+                          : {}),
+                        ...(envData.disabledValue !== undefined
+                          ? { disabledValue: envData.disabledValue }
+                          : {}),
+                      }
+                    : e
+                );
+                return { ...prev, environments: updatedEnvs };
+              });
+            }
+
             if (envData.strategies) {
               const localStrategies = envData.strategies.map((s: any) => ({
                 id: s.id || s.strategyName,
@@ -966,6 +1103,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     environments,
     loadEnvStrategies,
     loadFlagDraftStatus,
+    refreshCounter, // Added refreshCounter to dependencies
   ]); // Load environment metrics for summary display in environment cards
   useEffect(() => {
     if (!isCreating && flag?.flagName && environments.length > 0) {
@@ -1109,16 +1247,6 @@ const FeatureFlagDetailPage: React.FC = () => {
     try {
       // Save to draft instead of directly toggling
       await saveChangesToDraft(envKey, { isEnabled: !currentEnabled });
-      const envDisplayName =
-        environments.find((e) => e.environmentId === envKey)?.displayName ||
-        envKey;
-      enqueueSnackbar(
-        <span>
-          <strong>{flag.flagName}</strong> ({envDisplayName}){' '}
-          {t(`featureFlags.${!currentEnabled ? 'enabled' : 'disabled'}`)}
-        </span>,
-        { variant: !currentEnabled ? 'success' : 'warning' }
-      );
     } catch (error: any) {
       // Rollback on error
       setFlag({ ...flag, environments: flag.environments });
@@ -1538,6 +1666,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     );
 
     setFlagDraftStatus({ hasDraft: true });
+    window.dispatchEvent(new Event('draft-changed'));
   };
 
   const handleSaveStrategy = async () => {
@@ -1582,7 +1711,6 @@ const FeatureFlagDetailPage: React.FC = () => {
       setEditingEnv(null);
       setIsAddingStrategy(false);
       setExpandedSegmentsDialog(new Set());
-      enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
         variant: 'error',
@@ -1620,7 +1748,6 @@ const FeatureFlagDetailPage: React.FC = () => {
           [envName]: updatedStrategies,
         }));
       }
-      enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), {
         variant: 'error',
@@ -1646,9 +1773,6 @@ const FeatureFlagDetailPage: React.FC = () => {
         }));
         // Save to draft instead of directly to backend
         await saveChangesToDraft(envName, { variants: apiVariants });
-        enqueueSnackbar(t('featureFlags.variantsSaved'), {
-          variant: 'success',
-        });
       } else {
         setEnvVariants((prev) => ({
           ...prev,
@@ -1788,9 +1912,6 @@ const FeatureFlagDetailPage: React.FC = () => {
         }));
         // Save to draft instead of directly to backend
         await saveChangesToDraft(envName, { strategies: apiStrategies });
-        enqueueSnackbar(t('featureFlags.strategyReordered'), {
-          variant: 'success',
-        });
       }
     } catch (error: any) {
       // Revert on error
@@ -1958,7 +2079,6 @@ const FeatureFlagDetailPage: React.FC = () => {
       setFlag({ ...flag, variants: updatedVariants });
       setVariantDialogOpen(false);
       setEditingVariant(null);
-      enqueueSnackbar(t('draft.saveSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
         variant: 'error',
@@ -1982,7 +2102,6 @@ const FeatureFlagDetailPage: React.FC = () => {
         });
       }
       setFlag({ ...flag, variants: updatedVariants });
-      enqueueSnackbar(t('draft.saveSuccess'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), {
         variant: 'error',
@@ -2928,9 +3047,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     envEnabled={isEnabled}
                                     allSegments={segments}
                                     contextFields={contextFields}
-                                    onPlanChange={() =>
-                                      mutateReleaseFlowPlans()
-                                    }
+                                    onPlanChange={() => {
+                                      mutateReleaseFlowPlans();
+                                      // Refresh strategies (release flow changes them)
+                                      loadFlag();
+                                      setRefreshCounter((c) => c + 1);
+                                    }}
                                     onPlanDeleted={() => {
                                       mutateReleaseFlowPlans();
                                       const nextManual = new Set(
@@ -2939,11 +3061,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       nextManual.delete(env.environmentId);
                                       setEnvManualReleaseFlow(nextManual);
                                     }}
-                                    onDraftChange={() =>
-                                      saveGlobalChangesToDraft({
-                                        _releaseFlowChanged: true,
-                                      })
-                                    }
                                   />
 
                                   <Divider sx={{ my: 2 }} />
@@ -3085,9 +3202,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       envEnabled={isEnabled}
                                       allSegments={segments}
                                       contextFields={contextFields}
-                                      onPlanChange={() =>
-                                        mutateReleaseFlowPlans()
-                                      }
+                                      onPlanChange={() => {
+                                        mutateReleaseFlowPlans();
+                                        // Refresh strategies (release flow changes them)
+                                        loadFlag();
+                                        setRefreshCounter((c) => c + 1);
+                                      }}
                                       onPlanDeleted={() => {
                                         const nextManual = new Set(
                                           envManualReleaseFlow
@@ -3095,11 +3215,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         nextManual.delete(env.environmentId);
                                         setEnvManualReleaseFlow(nextManual);
                                       }}
-                                      onDraftChange={() =>
-                                        saveGlobalChangesToDraft({
-                                          _releaseFlowChanged: true,
-                                        })
-                                      }
                                     />
                                   )}
 
@@ -3271,48 +3386,21 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                   }
                                                   headerActions={
                                                     canManage ? (
-                                                      <Box
-                                                        sx={{
-                                                          display: 'flex',
-                                                          gap: 0,
-                                                        }}
-                                                      >
-                                                        <Tooltip
-                                                          title={t(
-                                                            'common.edit'
-                                                          )}
-                                                        >
-                                                          <IconButton
-                                                            size="small"
-                                                            onClick={() =>
-                                                              handleEditStrategy(
-                                                                strategy,
-                                                                env.environmentId
-                                                              )
-                                                            }
-                                                          >
-                                                            <EditIcon fontSize="small" />
-                                                          </IconButton>
-                                                        </Tooltip>
-                                                        <Tooltip
-                                                          title={t(
-                                                            'common.delete'
-                                                          )}
-                                                        >
-                                                          <IconButton
-                                                            size="small"
-                                                            onClick={() =>
-                                                              handleOpenDeleteStrategyConfirm(
-                                                                strategy.id,
-                                                                index,
-                                                                env.environmentId
-                                                              )
-                                                            }
-                                                          >
-                                                            <DeleteIcon fontSize="small" />
-                                                          </IconButton>
-                                                        </Tooltip>
-                                                      </Box>
+                                                      <StrategyContextMenu
+                                                        onEdit={() =>
+                                                          handleEditStrategy(
+                                                            strategy,
+                                                            env.environmentId
+                                                          )
+                                                        }
+                                                        onDelete={() =>
+                                                          handleOpenDeleteStrategyConfirm(
+                                                            strategy.id,
+                                                            index,
+                                                            env.environmentId
+                                                          )
+                                                        }
+                                                      />
                                                     ) : undefined
                                                   }
                                                   collapsible
@@ -3704,9 +3792,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                           enabledValue: flag.enabledValue,
                           disabledValue: flag.disabledValue,
                           validationRules: flag.validationRules ?? null,
-                        });
-                        enqueueSnackbar(t('draft.saveSuccess'), {
-                          variant: 'success',
                         });
                       } catch (error: any) {
                         enqueueSnackbar(

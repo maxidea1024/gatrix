@@ -22,7 +22,6 @@ import {
   AudioFile as AudioIcon,
   InsertDriveFile as FileIcon,
   LocationOn as LocationIcon,
-  Cancel as CancelIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -255,7 +254,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
         <DialogActions>
           <Button
             onClick={() => setLocationDialog(false)}
-            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>

@@ -77,8 +77,6 @@ interface ReleaseFlowTabProps {
   contextFields?: ContextFieldInfo[];
   onPlanDeleted?: () => void;
   onPlanChange?: () => void;
-  /** Called when release flow settings change (to mark draft dirty) */
-  onDraftChange?: () => void;
 }
 
 // ==================== Types ====================
@@ -153,7 +151,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   contextFields = [],
   onPlanDeleted,
   onPlanChange,
-  onDraftChange,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -312,7 +309,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       }
       await mutatePlan();
       if (onPlanChange) onPlanChange();
-      if (onDraftChange) onDraftChange();
       setShowApplyDialog(false);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), {
@@ -333,7 +329,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       });
       await mutatePlan();
       if (onPlanChange) onPlanChange();
-      if (onDraftChange) onDraftChange();
       setDeleteConfirmOpen(false);
       onPlanDeleted?.();
     } catch (error: any) {
@@ -438,7 +433,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       );
       await mutatePlan();
       if (onPlanChange) onPlanChange();
-      if (onDraftChange) onDraftChange();
       setEditingTransitionId(null);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), {
@@ -463,7 +457,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         await removeTransitionCondition(milestoneId, projectApiPath);
         await mutatePlan();
         if (onPlanChange) onPlanChange();
-        if (onDraftChange) onDraftChange();
         setEditingTransitionId(null);
       } catch (error: any) {
         enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), {

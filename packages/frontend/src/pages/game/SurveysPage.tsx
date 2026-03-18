@@ -63,6 +63,9 @@ import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
+import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
+import ImportDialog from '../../components/common/ImportDialog';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
@@ -91,6 +94,10 @@ const SurveysPage: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingSurvey, setDeletingSurvey] = useState<Survey | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Action menu state
   const [actionMenuAnchorEl, setActionMenuAnchorEl] =
@@ -411,18 +418,48 @@ const SurveysPage: React.FC = () => {
               {t('surveys.createSurvey')}
             </Button>
           )}
-          {canManage && (
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-          )}
-          {canManage && (
-            <Button
-              variant="outlined"
-              startIcon={<SettingsIcon />}
-              onClick={handleConfigOpen}
+          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={pageMenuAnchor}
+            open={Boolean(pageMenuAnchor)}
+            onClose={() => setPageMenuAnchor(null)}
+          >
+            <MenuItem
+              onClick={() => {
+                setPageMenuAnchor(null);
+                handleConfigOpen();
+              }}
             >
-              {t('surveys.config')}
-            </Button>
-          )}
+              <ListItemIcon>
+                <SettingsIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('surveys.config')}</ListItemText>
+            </MenuItem>
+            <Divider />
+            <ExportImportMenuItems
+              onExport={(format) => {
+                setPageMenuAnchor(null);
+                const exportColumns: ExportColumn[] = [
+                  { key: 'platformSurveyId', header: t('surveys.platformSurveyId') },
+                  { key: 'surveyTitle', header: t('surveys.surveyTitle') },
+                  { key: 'isActive', header: t('common.status') },
+                  { key: 'createdAt', header: t('common.createdAt') },
+                ];
+                try {
+                  exportToFile(surveys, exportColumns, 'surveys', format);
+                  enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                } catch (err) {
+                  enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                }
+              }}
+              onImportClick={() => {
+                setPageMenuAnchor(null);
+                setImportDialogOpen(true);
+              }}
+            />
+          </Menu>
         </Box>
       </Box>
 
@@ -853,6 +890,38 @@ const SurveysPage: React.FC = () => {
         warning={t('surveys.bulkDeleteWarning')}
       />
       <ErrorDialog />
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        title={t('common.import')}
+        onImport={async (data) => {
+          let successCount = 0;
+          let failCount = 0;
+          for (const item of data) {
+            try {
+              await surveyService.createSurvey(projectApiPath, {
+                platformSurveyId: item[t('surveys.platformSurveyId')] || item.platformSurveyId || '',
+                surveyTitle: item[t('surveys.surveyTitle')] || item.surveyTitle || '',
+                isActive: String(item[t('common.status')] ?? item.isActive ?? true) === 'true',
+                triggerConditions: [],
+                participationRewards: [],
+              });
+              successCount++;
+            } catch (err) {
+              failCount++;
+            }
+          }
+          if (successCount > 0) {
+            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+            loadSurveys();
+          }
+          if (failCount > 0) {
+            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+          }
+        }}
+      />
     </Box>
   );
 };

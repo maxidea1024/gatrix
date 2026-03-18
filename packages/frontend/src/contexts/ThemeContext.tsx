@@ -313,9 +313,9 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           root: {
             '& .MuiBackdrop-root': {
               backgroundColor:
-                mode === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(15,18,37,0.4)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
+                mode === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(15,18,37,0.35)',
+              backdropFilter: 'blur(1px)',
+              WebkitBackdropFilter: 'blur(1px)',
             },
           },
           paper: {
@@ -328,9 +328,9 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           root: {
             '&:not(.MuiSelect-root) .MuiBackdrop-root': {
               backgroundColor:
-                mode === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(15,18,37,0.4)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
+                mode === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(15,18,37,0.35)',
+              backdropFilter: 'blur(1px)',
+              WebkitBackdropFilter: 'blur(1px)',
             },
             '&.MuiSelect-root .MuiBackdrop-root': {
               backgroundColor: 'transparent',
@@ -388,12 +388,8 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       MuiTableBody: {
         styleOverrides: {
           root: {
-            '& .MuiTableRow-root:nth-of-type(odd)': {
-              backgroundColor: mode === 'dark' ? '#1e2125' : '#f8f9fa',
-            },
             '& .MuiTableRow-root.MuiTableRow-hover:hover': {
-              backgroundColor:
-                (mode === 'dark' ? '#282c31' : '#eef1f5') + ' !important',
+              backgroundColor: colors.hoverBg + ' !important',
             },
           },
         },

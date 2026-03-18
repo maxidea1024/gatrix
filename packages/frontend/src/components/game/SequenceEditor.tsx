@@ -1624,7 +1624,6 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                     })}
                     <Button
                       size="small"
-                      startIcon={<AddIcon />}
                       onClick={handleAddFrame}
                       sx={{ mt: 1 }}
                     >

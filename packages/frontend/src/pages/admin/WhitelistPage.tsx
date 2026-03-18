@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed, formatRelativeTime } from '@/utils/dateFormat';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import dayjs from 'dayjs';
+import LocalizedDateTimePicker from '../../components/common/LocalizedDateTimePicker';
 import { useTranslation } from 'react-i18next';
 import { usePageState } from '../../hooks/usePageState';
 import { useSearchParams } from 'react-router-dom';
@@ -34,6 +33,9 @@ import {
   DialogActions,
   LinearProgress,
   Pagination,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -67,9 +69,12 @@ import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
+import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
+import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
+import ImportDialog from '../../components/common/ImportDialog';
 
 const WhitelistPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
   const { hasPermission } = useAuth();
@@ -159,6 +164,8 @@ const WhitelistPage: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [bulkData, setBulkData] = useState('');
   const [fullEditingData, setFullEditingData] = useState<any>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const isDirty = useMemo(() => {
     if (!editDialog || !fullEditingData) return true;
@@ -389,6 +396,29 @@ const WhitelistPage: React.FC = () => {
     handleMenuClose();
   };
 
+  // Direct edit by clicking on account ID
+  const handleDirectEdit = (whitelist: Whitelist) => {
+    setSelectedWhitelist(whitelist);
+    setFormData({
+      accountId: whitelist.accountId,
+      ipAddress: whitelist.ipAddress || '',
+      startDate: whitelist.startDate
+        ? whitelist.startDate.split('T')[0]
+        : '',
+      endDate: whitelist.endDate
+        ? whitelist.endDate.split('T')[0]
+        : '',
+      purpose: whitelist.purpose || '',
+    });
+    setFullEditingData(JSON.parse(JSON.stringify(whitelist)));
+    setFormErrors({});
+    setEditDialog(true);
+
+    setTimeout(() => {
+      accountIdFieldRef.current?.focus();
+    }, 100);
+  };
+
   const handleDelete = () => {
     if (selectedWhitelist) {
       setConfirmDialog({
@@ -585,19 +615,43 @@ const WhitelistPage: React.FC = () => {
               {canManage && (
                 <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
                   <Button
-                    variant="outlined"
-                    startIcon={<UploadIcon />}
-                    onClick={() => setBulkDialog(true)}
-                  >
-                    {t('whitelist.bulkImport')}
-                  </Button>
-                  <Button
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={handleAdd}
                   >
                     {t('whitelist.addEntry')}
                   </Button>
+                  <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={pageMenuAnchor}
+                    open={Boolean(pageMenuAnchor)}
+                    onClose={() => setPageMenuAnchor(null)}
+                  >
+                    <ExportImportMenuItems
+                      onExport={(format) => {
+                        setPageMenuAnchor(null);
+                        const exportColumns: ExportColumn[] = [
+                          { key: 'accountId', header: t('whitelist.form.accountId') },
+                          { key: 'ipAddress', header: t('whitelist.form.ipAddress') },
+                          { key: 'purpose', header: t('whitelist.form.purpose') },
+                          { key: 'isEnabled', header: t('common.status') },
+                          { key: 'createdAt', header: t('common.createdAt') },
+                        ];
+                        try {
+                          exportToFile(whitelists, exportColumns, 'account-whitelist', format);
+                          enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                        } catch (err) {
+                          enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                        }
+                      }}
+                      onImportClick={() => {
+                        setPageMenuAnchor(null);
+                        setImportDialogOpen(true);
+                      }}
+                    />
+                  </Menu>
                 </Box>
               )}
             </Box>
@@ -673,6 +727,14 @@ const WhitelistPage: React.FC = () => {
                                   <Typography
                                     variant="body2"
                                     fontWeight="medium"
+                                    sx={{
+                                      cursor: 'pointer',
+                                      '&:hover': {
+                                        color: 'primary.main',
+                                        textDecoration: 'underline',
+                                      },
+                                    }}
+                                    onClick={() => handleDirectEdit(whitelist)}
                                   >
                                     {whitelist.accountId}
                                   </Typography>
@@ -916,56 +978,24 @@ const WhitelistPage: React.FC = () => {
                     placeholder={t('whitelist.form.ipPlaceholder')}
                     helperText={t('whitelist.form.ipHelp')}
                   />
-                  <DateTimePicker
-                    key={`start-date-${i18n.language}`}
-                    label={t('whitelist.form.startDateOpt')}
-                    value={
-                      formData.startDate ? dayjs(formData.startDate) : null
-                    }
-                    onChange={(date) => {
-                      setFormData({
-                        ...formData,
-                        startDate:
-                          date && dayjs.isDayjs(date) && date.isValid()
-                            ? date.toISOString()
-                            : '',
-                      });
-                    }}
-                    timeSteps={{ minutes: 1 }}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        error: false,
-                        slotProps: { input: { readOnly: true } },
-                        helperText: t('whitelist.form.startDateHelp'),
-                      },
-                    }}
-                  />
-                  <DateTimePicker
-                    key={`end-date-${i18n.language}`}
-                    label={t('whitelist.form.endDateOpt')}
-                    value={formData.endDate ? dayjs(formData.endDate) : null}
-                    onChange={(date) =>
-                      setFormData({
-                        ...formData,
-                        endDate:
-                          date && dayjs.isDayjs(date) && date.isValid()
-                            ? date.toISOString()
-                            : '',
-                      })
-                    }
-                    minDateTime={
-                      formData.startDate ? dayjs(formData.startDate) : undefined
-                    }
-                    timeSteps={{ minutes: 1 }}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        slotProps: { input: { readOnly: true } },
-                        helperText: t('whitelist.form.endDateHelp'),
-                      },
-                    }}
-                  />
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <LocalizedDateTimePicker
+                      label={t('whitelist.form.startDateOpt')}
+                      value={formData.startDate || null}
+                      onChange={(isoString) =>
+                        setFormData({ ...formData, startDate: isoString })
+                      }
+                      helperText={t('whitelist.form.startDateHelp')}
+                    />
+                    <LocalizedDateTimePicker
+                      label={t('whitelist.form.endDateOpt')}
+                      value={formData.endDate || null}
+                      onChange={(isoString) =>
+                        setFormData({ ...formData, endDate: isoString })
+                      }
+                      helperText={t('whitelist.form.endDateHelp')}
+                    />
+                  </Box>
                   <TextField
                     fullWidth
                     label={t('whitelist.form.purpose')}
@@ -1013,7 +1043,7 @@ const WhitelistPage: React.FC = () => {
                     loading || (editDialog && !!selectedWhitelist && !isDirty)
                   }
                 >
-                  {t('common.save')}
+                  {editDialog ? t('common.update') : t('common.add')}
                 </Button>
               </Box>
             </ResizableDrawer>
@@ -1120,6 +1150,36 @@ const WhitelistPage: React.FC = () => {
           </Box>
         </CardContent>
       </Card>
+
+    {/* Import Dialog */}
+    <ImportDialog
+      open={importDialogOpen}
+      onClose={() => setImportDialogOpen(false)}
+      title={t('common.import')}
+      onImport={async (data) => {
+        let successCount = 0;
+        let failCount = 0;
+        for (const item of data) {
+          try {
+            await WhitelistService.createWhitelist({
+              accountId: item[t('whitelist.form.accountId')] || item.accountId || '',
+              ipAddress: item[t('whitelist.form.ipAddress')] || item.ipAddress || '',
+              purpose: item[t('whitelist.form.purpose')] || item.purpose || '',
+            });
+            successCount++;
+          } catch (err) {
+            failCount++;
+          }
+        }
+        if (successCount > 0) {
+          enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+          loadWhitelists();
+        }
+        if (failCount > 0) {
+          enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+        }
+      }}
+    />
     </Box>
   );
 };
