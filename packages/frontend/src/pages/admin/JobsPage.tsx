@@ -224,7 +224,8 @@ const JobsPage: React.FC = () => {
       const [jobsResponse, jobTypesData] = await Promise.all([
         jobService.getJobsWithPagination({
           jobTypeId: selectedJobType || undefined,
-          isEnabled: enabledFilter !== '' ? (enabledFilter === 'true') : undefined,
+          isEnabled:
+            enabledFilter !== '' ? enabledFilter === 'true' : undefined,
           search: debouncedSearch || undefined,
           tags: tagFilterIds.length > 0 ? tagFilterIds.map(Number) : undefined,
           limit: rowsPerPage,

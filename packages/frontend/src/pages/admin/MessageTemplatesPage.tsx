@@ -206,7 +206,9 @@ const MessageTemplatesPage: React.FC = () => {
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const loadStartTimeRef = useRef<number>(0);
@@ -994,7 +996,10 @@ const MessageTemplatesPage: React.FC = () => {
                 {t('messageTemplates.addTemplate')}
               </Button>
             )}
-            <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
+            >
               <MoreVertIcon />
             </IconButton>
           </Box>
@@ -1009,15 +1014,27 @@ const MessageTemplatesPage: React.FC = () => {
                 const exportColumns: ExportColumn[] = [
                   { key: 'name', header: t('common.name') },
                   { key: 'type', header: t('common.type') },
-                  { key: 'defaultMessage', header: t('messageTemplates.defaultMessage') },
+                  {
+                    key: 'defaultMessage',
+                    header: t('messageTemplates.defaultMessage'),
+                  },
                   { key: 'isEnabled', header: t('common.status') },
                   { key: 'createdAt', header: t('common.createdAt') },
                 ];
                 try {
-                  exportToFile(items, exportColumns, 'message-templates', format);
-                  enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                  exportToFile(
+                    items,
+                    exportColumns,
+                    'message-templates',
+                    format
+                  );
+                  enqueueSnackbar(t('common.exportSuccess'), {
+                    variant: 'success',
+                  });
                 } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                  enqueueSnackbar(t('common.exportFailed'), {
+                    variant: 'error',
+                  });
                 }
               }}
               onImportClick={() => {

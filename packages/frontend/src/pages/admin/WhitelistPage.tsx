@@ -164,7 +164,9 @@ const WhitelistPage: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [bulkData, setBulkData] = useState('');
   const [fullEditingData, setFullEditingData] = useState<any>(null);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const isDirty = useMemo(() => {
@@ -402,12 +404,8 @@ const WhitelistPage: React.FC = () => {
     setFormData({
       accountId: whitelist.accountId,
       ipAddress: whitelist.ipAddress || '',
-      startDate: whitelist.startDate
-        ? whitelist.startDate.split('T')[0]
-        : '',
-      endDate: whitelist.endDate
-        ? whitelist.endDate.split('T')[0]
-        : '',
+      startDate: whitelist.startDate ? whitelist.startDate.split('T')[0] : '',
+      endDate: whitelist.endDate ? whitelist.endDate.split('T')[0] : '',
       purpose: whitelist.purpose || '',
     });
     setFullEditingData(JSON.parse(JSON.stringify(whitelist)));
@@ -621,7 +619,10 @@ const WhitelistPage: React.FC = () => {
                   >
                     {t('whitelist.addEntry')}
                   </Button>
-                  <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+                  <IconButton
+                    onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+                    aria-label="more options"
+                  >
                     <MoreVertIcon />
                   </IconButton>
                   <Menu
@@ -633,17 +634,35 @@ const WhitelistPage: React.FC = () => {
                       onExport={(format) => {
                         setPageMenuAnchor(null);
                         const exportColumns: ExportColumn[] = [
-                          { key: 'accountId', header: t('whitelist.form.accountId') },
-                          { key: 'ipAddress', header: t('whitelist.form.ipAddress') },
-                          { key: 'purpose', header: t('whitelist.form.purpose') },
+                          {
+                            key: 'accountId',
+                            header: t('whitelist.form.accountId'),
+                          },
+                          {
+                            key: 'ipAddress',
+                            header: t('whitelist.form.ipAddress'),
+                          },
+                          {
+                            key: 'purpose',
+                            header: t('whitelist.form.purpose'),
+                          },
                           { key: 'isEnabled', header: t('common.status') },
                           { key: 'createdAt', header: t('common.createdAt') },
                         ];
                         try {
-                          exportToFile(whitelists, exportColumns, 'account-whitelist', format);
-                          enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                          exportToFile(
+                            whitelists,
+                            exportColumns,
+                            'account-whitelist',
+                            format
+                          );
+                          enqueueSnackbar(t('common.exportSuccess'), {
+                            variant: 'success',
+                          });
                         } catch (err) {
-                          enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                          enqueueSnackbar(t('common.exportFailed'), {
+                            variant: 'error',
+                          });
                         }
                       }}
                       onImportClick={() => {
@@ -1151,35 +1170,38 @@ const WhitelistPage: React.FC = () => {
         </CardContent>
       </Card>
 
-    {/* Import Dialog */}
-    <ImportDialog
-      open={importDialogOpen}
-      onClose={() => setImportDialogOpen(false)}
-      title={t('common.import')}
-      onImport={async (data) => {
-        let successCount = 0;
-        let failCount = 0;
-        for (const item of data) {
-          try {
-            await WhitelistService.createWhitelist({
-              accountId: item[t('whitelist.form.accountId')] || item.accountId || '',
-              ipAddress: item[t('whitelist.form.ipAddress')] || item.ipAddress || '',
-              purpose: item[t('whitelist.form.purpose')] || item.purpose || '',
-            });
-            successCount++;
-          } catch (err) {
-            failCount++;
+      {/* Import Dialog */}
+      <ImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        title={t('common.import')}
+        onImport={async (data) => {
+          let successCount = 0;
+          let failCount = 0;
+          for (const item of data) {
+            try {
+              await WhitelistService.createWhitelist({
+                accountId:
+                  item[t('whitelist.form.accountId')] || item.accountId || '',
+                ipAddress:
+                  item[t('whitelist.form.ipAddress')] || item.ipAddress || '',
+                purpose:
+                  item[t('whitelist.form.purpose')] || item.purpose || '',
+              });
+              successCount++;
+            } catch (err) {
+              failCount++;
+            }
           }
-        }
-        if (successCount > 0) {
-          enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
-          loadWhitelists();
-        }
-        if (failCount > 0) {
-          enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
-        }
-      }}
-    />
+          if (successCount > 0) {
+            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
+            loadWhitelists();
+          }
+          if (failCount > 0) {
+            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
+          }
+        }}
+      />
     </Box>
   );
 };

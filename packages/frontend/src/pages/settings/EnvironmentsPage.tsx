@@ -638,10 +638,7 @@ const EnvironmentsPage: React.FC = () => {
               >
                 {t('environments.copyEnvironment')}
               </Button>
-              <Button
-                variant="contained"
-                onClick={handleOpenAddDialog}
-              >
+              <Button variant="contained" onClick={handleOpenAddDialog}>
                 {t('environments.add')}
               </Button>
             </>

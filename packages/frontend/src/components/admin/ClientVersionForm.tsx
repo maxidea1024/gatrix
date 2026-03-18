@@ -1238,10 +1238,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={handleClose}
-            disabled={isSubmitting || loading}
-          >
+          <Button onClick={handleClose} disabled={isSubmitting || loading}>
             {t('common.cancel')}
           </Button>
           <Button

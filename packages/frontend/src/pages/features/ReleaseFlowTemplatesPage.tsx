@@ -264,7 +264,9 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                 size="small"
                 fullWidth
                 value={strategy.title || ''}
-                onChange={(e) => onChange({ ...strategy, title: e.target.value })}
+                onChange={(e) =>
+                  onChange({ ...strategy, title: e.target.value })
+                }
                 placeholder={t('releaseFlow.strategyTitlePlaceholder')}
                 disabled={readonly}
               />
@@ -530,7 +532,10 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                     onChange={(_, newValue) =>
                       onChange({
                         ...strategy,
-                        parameters: { ...strategy.parameters, userIds: newValue },
+                        parameters: {
+                          ...strategy.parameters,
+                          userIds: newValue,
+                        },
                       })
                     }
                     disabled={readonly}
@@ -581,7 +586,9 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                       <TextField
                         {...params}
                         size="small"
-                        placeholder={t('featureFlags.remoteAddressesPlaceholder')}
+                        placeholder={t(
+                          'featureFlags.remoteAddressesPlaceholder'
+                        )}
                       />
                     )}
                     renderTags={(value, getTagProps) =>
@@ -1266,8 +1273,6 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                     handleAddStrategy={handleAddStrategy}
                     t={t}
                   />
-
-
                 ))}
               </Stack>
               {!readonly && (
@@ -1344,7 +1349,9 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
     useState<null | HTMLElement>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [menuTarget, setMenuTarget] = useState<ReleaseFlowTemplate | null>(null);
+  const [menuTarget, setMenuTarget] = useState<ReleaseFlowTemplate | null>(
+    null
+  );
 
   // Sorting state with localStorage persistence
   const [orderBy, setOrderBy] = useState<string>(() => {
@@ -2007,9 +2014,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
       <ColumnSettingsDialog
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        columns={columns.filter(
-          (col) => col.id !== 'checkbox'
-        )}
+        columns={columns.filter((col) => col.id !== 'checkbox')}
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
       />

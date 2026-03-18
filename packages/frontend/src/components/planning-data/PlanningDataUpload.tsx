@@ -880,7 +880,6 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
                                   bgcolor: 'action.hover',
                                   fontWeight: 'bold',
                                 },
-
                               }}
                             >
                               <thead>
@@ -985,7 +984,6 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
                                   bgcolor: 'action.hover',
                                   fontWeight: 'bold',
                                 },
-
                               }}
                             >
                               <thead>
@@ -1072,7 +1070,6 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
                                   bgcolor: 'action.hover',
                                   fontWeight: 'bold',
                                 },
-
                               }}
                             >
                               <thead>

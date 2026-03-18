@@ -701,9 +701,7 @@ const AccountDialog: React.FC<AccountDialogProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose}>
-          {t('common.cancel')}
-        </Button>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button
           onClick={handleSave}
           variant="contained"

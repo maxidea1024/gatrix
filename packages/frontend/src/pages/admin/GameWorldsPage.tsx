@@ -1875,7 +1875,10 @@ const GameWorldsPage: React.FC = () => {
               {t('gameWorlds.addGameWorld')}
             </Button>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+          <IconButton
+            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+            aria-label="more options"
+          >
             <MoreVertIcon />
           </IconButton>
           <Menu
@@ -2139,10 +2142,7 @@ const GameWorldsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={() => setDialogOpen(false)}
-            disabled={saving}
-          >
+          <Button onClick={() => setDialogOpen(false)} disabled={saving}>
             {t('gameWorlds.cancel')}
           </Button>
           <Button

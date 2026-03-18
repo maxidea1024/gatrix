@@ -336,7 +336,11 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
                 ))}
               </Select>
             </FormControl>
-            <Typography variant="caption" color="text.secondary" sx={{ mt: -1 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mt: -1 }}
+            >
               {t('actionSets.signalEndpointHelp')}
             </Typography>
           </Box>
@@ -451,14 +455,8 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose}>
-          {t('common.cancel')}
-        </Button>
-        <Button
-          onClick={handleSave}
-          variant="contained"
-          disabled={!isValid}
-        >
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button onClick={handleSave} variant="contained" disabled={!isValid}>
           {actionSet ? t('common.save') : t('common.add')}
         </Button>
       </Box>

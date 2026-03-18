@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import {
@@ -97,7 +103,9 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
   const [addDialog, setAddDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [bulkDialog, setBulkDialog] = useState(false);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
@@ -451,7 +459,10 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
             >
               {t('ipWhitelist.addEntry')}
             </Button>
-            <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
+            >
               <MoreVertIcon />
             </IconButton>
             <Menu
@@ -469,10 +480,19 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                     { key: 'createdAt', header: t('ipWhitelist.createdAt') },
                   ];
                   try {
-                    exportToFile(ipWhitelists, exportColumns, 'ip-whitelist', format);
-                    enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                    exportToFile(
+                      ipWhitelists,
+                      exportColumns,
+                      'ip-whitelist',
+                      format
+                    );
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
                   } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
                   }
                 }}
                 onImportClick={() => {
@@ -744,7 +764,10 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                 label={t('ipWhitelist.form.startDate')}
                 value={formData.startDate || null}
                 onChange={(isoString) =>
-                  setFormData({ ...formData, startDate: isoString || undefined })
+                  setFormData({
+                    ...formData,
+                    startDate: isoString || undefined,
+                  })
                 }
                 helperText={t('ipWhitelist.form.startDateHelp')}
               />
@@ -852,9 +875,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => setBulkDialog(false)}
-          >
+          <Button onClick={() => setBulkDialog(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -906,7 +927,8 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           for (const item of data) {
             try {
               await IpWhitelistService.createIpWhitelist({
-                ipAddress: item[t('ipWhitelist.ipAddress')] || item.ipAddress || '',
+                ipAddress:
+                  item[t('ipWhitelist.ipAddress')] || item.ipAddress || '',
                 purpose: item[t('ipWhitelist.purpose')] || item.purpose || '',
                 isEnabled: true,
               });

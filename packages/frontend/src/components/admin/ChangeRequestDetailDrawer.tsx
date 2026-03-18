@@ -554,11 +554,15 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         messageTemplateId: t('ingamePopupNotices.messageTemplate'),
         description: t('ingamePopupNotices.description'),
         targetPlatforms: t('ingamePopupNotices.targetPlatforms'),
-        targetPlatformsInverted: t('ingamePopupNotices.targetPlatformsInverted'),
+        targetPlatformsInverted: t(
+          'ingamePopupNotices.targetPlatformsInverted'
+        ),
         targetChannels: t('ingamePopupNotices.targetChannels'),
         targetChannelsInverted: t('ingamePopupNotices.targetChannelsInverted'),
         targetSubchannels: t('ingamePopupNotices.targetSubchannels'),
-        targetSubchannelsInverted: t('ingamePopupNotices.targetSubchannelsInverted'),
+        targetSubchannelsInverted: t(
+          'ingamePopupNotices.targetSubchannelsInverted'
+        ),
         targetWorlds: t('ingamePopupNotices.targetWorlds'),
         targetWorldsInverted: t('ingamePopupNotices.targetWorldsInverted'),
         targetUserIds: t('ingamePopupNotices.targetUserIds'),
@@ -1719,10 +1723,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                         ].includes(c.field)
                                                     )
                                                     .map((change, i) => (
-                                                      <TableRow
-                                                        key={i}
-                                                        sx={{}}
-                                                      >
+                                                      <TableRow key={i} sx={{}}>
                                                         <TableCell
                                                           sx={{
                                                             fontWeight: 600,

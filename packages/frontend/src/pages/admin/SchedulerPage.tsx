@@ -840,18 +840,11 @@ const SchedulerPage: React.FC = () => {
 
             <Box sx={{ flexGrow: 1 }} />
 
-            <Button
-              onClick={() => setDialogOpen(false)}
-              disabled={saving}
-            >
+            <Button onClick={() => setDialogOpen(false)} disabled={saving}>
               {t('common.cancel')}
             </Button>
 
-            <Button
-              variant="contained"
-              onClick={handleSave}
-              disabled={saving}
-            >
+            <Button variant="contained" onClick={handleSave} disabled={saving}>
               {saving ? t('common.saving') : t('common.save')}
             </Button>
           </Stack>

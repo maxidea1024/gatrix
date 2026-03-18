@@ -418,7 +418,10 @@ const SurveysPage: React.FC = () => {
               {t('surveys.createSurvey')}
             </Button>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+          <IconButton
+            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+            aria-label="more options"
+          >
             <MoreVertIcon />
           </IconButton>
           <Menu
@@ -442,16 +445,23 @@ const SurveysPage: React.FC = () => {
               onExport={(format) => {
                 setPageMenuAnchor(null);
                 const exportColumns: ExportColumn[] = [
-                  { key: 'platformSurveyId', header: t('surveys.platformSurveyId') },
+                  {
+                    key: 'platformSurveyId',
+                    header: t('surveys.platformSurveyId'),
+                  },
                   { key: 'surveyTitle', header: t('surveys.surveyTitle') },
                   { key: 'isActive', header: t('common.status') },
                   { key: 'createdAt', header: t('common.createdAt') },
                 ];
                 try {
                   exportToFile(surveys, exportColumns, 'surveys', format);
-                  enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                  enqueueSnackbar(t('common.exportSuccess'), {
+                    variant: 'success',
+                  });
                 } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                  enqueueSnackbar(t('common.exportFailed'), {
+                    variant: 'error',
+                  });
                 }
               }}
               onImportClick={() => {
@@ -902,9 +912,15 @@ const SurveysPage: React.FC = () => {
           for (const item of data) {
             try {
               await surveyService.createSurvey(projectApiPath, {
-                platformSurveyId: item[t('surveys.platformSurveyId')] || item.platformSurveyId || '',
-                surveyTitle: item[t('surveys.surveyTitle')] || item.surveyTitle || '',
-                isActive: String(item[t('common.status')] ?? item.isActive ?? true) === 'true',
+                platformSurveyId:
+                  item[t('surveys.platformSurveyId')] ||
+                  item.platformSurveyId ||
+                  '',
+                surveyTitle:
+                  item[t('surveys.surveyTitle')] || item.surveyTitle || '',
+                isActive:
+                  String(item[t('common.status')] ?? item.isActive ?? true) ===
+                  'true',
                 triggerConditions: [],
                 participationRewards: [],
               });

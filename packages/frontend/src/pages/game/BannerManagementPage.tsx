@@ -75,7 +75,9 @@ const BannerManagementPage: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(false);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -421,7 +423,10 @@ const BannerManagementPage: React.FC = () => {
               {t('banners.createBanner')}
             </Button>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+          <IconButton
+            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+            aria-label="more options"
+          >
             <MoreVertIcon />
           </IconButton>
           <Menu
@@ -439,9 +444,13 @@ const BannerManagementPage: React.FC = () => {
                 ];
                 try {
                   exportToFile(banners, exportColumns, 'banners', format);
-                  enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                  enqueueSnackbar(t('common.exportSuccess'), {
+                    variant: 'success',
+                  });
                 } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                  enqueueSnackbar(t('common.exportFailed'), {
+                    variant: 'error',
+                  });
                 }
               }}
               onImportClick={() => {

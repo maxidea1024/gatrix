@@ -173,7 +173,10 @@ export class CrashEventController {
       const envIds = [
         ...new Set(events.map((e: any) => e.environmentId).filter(Boolean)),
       ];
-      let envInfoMap: Record<string, { envName: string; projectName: string; organizationName: string }> = {};
+      let envInfoMap: Record<
+        string,
+        { envName: string; projectName: string; organizationName: string }
+      > = {};
       if (envIds.length > 0) {
         try {
           const mainDb = (await import('../config/knex')).default;
@@ -198,7 +201,10 @@ export class CrashEventController {
             };
           }
         } catch (error) {
-          logger.error('Failed to resolve environment info from main DB:', error);
+          logger.error(
+            'Failed to resolve environment info from main DB:',
+            error
+          );
         }
       }
 
@@ -407,7 +413,9 @@ export class CrashEventController {
         CrashEvent.query().distinct('marketType').whereNotNull('marketType'),
         CrashEvent.query().distinct('appVersion').whereNotNull('appVersion'),
         CrashEvent.query().distinct('resVersion').whereNotNull('resVersion'),
-        CrashEvent.query().distinct('gameServerId').whereNotNull('gameServerId'),
+        CrashEvent.query()
+          .distinct('gameServerId')
+          .whereNotNull('gameServerId'),
       ]);
 
       const platforms = platformResults.map((r: any) => r.platform).sort();

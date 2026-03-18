@@ -95,7 +95,9 @@ const RewardTemplatesPage: React.FC = () => {
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
     useState<null | HTMLElement>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Sorting state with localStorage persistence
@@ -628,7 +630,10 @@ const RewardTemplatesPage: React.FC = () => {
               {t('rewardTemplates.createTemplate')}
             </Button>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+          <IconButton
+            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+            aria-label="more options"
+          >
             <MoreVertIcon />
           </IconButton>
         </Box>
@@ -646,8 +651,15 @@ const RewardTemplatesPage: React.FC = () => {
                 { key: 'createdAt', header: t('common.createdAt') },
               ];
               try {
-                exportToFile(templates, exportColumns, 'reward-templates', format);
-                enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                exportToFile(
+                  templates,
+                  exportColumns,
+                  'reward-templates',
+                  format
+                );
+                enqueueSnackbar(t('common.exportSuccess'), {
+                  variant: 'success',
+                });
               } catch (err) {
                 enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
               }
@@ -1097,7 +1109,8 @@ const RewardTemplatesPage: React.FC = () => {
             try {
               await rewardTemplateService.createRewardTemplate(projectApiPath, {
                 name: item[t('common.name')] || item.name || '',
-                description: item[t('common.description')] || item.description || '',
+                description:
+                  item[t('common.description')] || item.description || '',
                 rewardItems: [],
               });
               successCount++;

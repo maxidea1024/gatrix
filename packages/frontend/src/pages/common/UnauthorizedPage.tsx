@@ -27,7 +27,6 @@ const UnauthorizedPage: React.FC = () => {
     navigate(-1);
   };
 
-
   return (
     <Box
       sx={{

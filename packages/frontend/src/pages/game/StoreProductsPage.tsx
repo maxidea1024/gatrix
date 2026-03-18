@@ -115,7 +115,9 @@ const StoreProductsPage: React.FC = () => {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(null);
+  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<StoreProduct | null>(
     null
@@ -815,7 +817,10 @@ const StoreProductsPage: React.FC = () => {
               </Button>
             </>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+          <IconButton
+            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+            aria-label="more options"
+          >
             <MoreVertIcon />
           </IconButton>
         </Box>
@@ -829,7 +834,10 @@ const StoreProductsPage: React.FC = () => {
               setPageMenuAnchor(null);
               const exportColumns: ExportColumn[] = [
                 { key: 'productName', header: t('common.name') },
-                { key: 'productId', header: t('storeProducts.columns.productId') },
+                {
+                  key: 'productId',
+                  header: t('storeProducts.columns.productId'),
+                },
                 { key: 'store', header: t('storeProducts.columns.store') },
                 { key: 'price', header: t('storeProducts.columns.price') },
                 { key: 'isActive', header: t('common.status') },
@@ -837,7 +845,9 @@ const StoreProductsPage: React.FC = () => {
               ];
               try {
                 exportToFile(products, exportColumns, 'store-products', format);
-                enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                enqueueSnackbar(t('common.exportSuccess'), {
+                  variant: 'success',
+                });
               } catch (err) {
                 enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
               }

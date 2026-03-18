@@ -409,13 +409,8 @@ const JobForm: React.FC<JobFormProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={onCancel}>
-            {t('common.cancel')}
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-          >
+          <Button onClick={onCancel}>{t('common.cancel')}</Button>
+          <Button type="submit" variant="contained">
             {job ? '작업 수정' : '작업 추가'}
           </Button>
         </Box>
@@ -561,13 +556,8 @@ const JobForm: React.FC<JobFormProps> = ({
         <Box
           sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 3 }}
         >
-          <Button onClick={onCancel}>
-            {t('common.cancel')}
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-          >
+          <Button onClick={onCancel}>{t('common.cancel')}</Button>
+          <Button type="submit" variant="contained">
             {job ? '작업 수정' : '작업 추가'}
           </Button>
         </Box>

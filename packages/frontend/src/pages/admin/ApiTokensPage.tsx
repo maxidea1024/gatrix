@@ -1622,9 +1622,7 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={() => setCreateDialogOpen(false)}
-          >
+          <Button onClick={() => setCreateDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -1888,9 +1886,7 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={() => setEditDialogOpen(false)}
-          >
+          <Button onClick={() => setEditDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -2036,10 +2032,7 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={() => setDeleteDialogOpen(false)}
-            variant="outlined"
-          >
+          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
             {t('common.cancel')}
           </Button>
           <Button
@@ -2190,10 +2183,7 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={closeRegenerateDialog}
-            variant="outlined"
-          >
+          <Button onClick={closeRegenerateDialog} variant="outlined">
             {t('common.cancel')}
           </Button>
           <Button
@@ -2354,10 +2344,7 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={closeBulkDeleteDrawer}
-            variant="outlined"
-          >
+          <Button onClick={closeBulkDeleteDrawer} variant="outlined">
             {t('common.cancel')}
           </Button>
           <Button

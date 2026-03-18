@@ -511,7 +511,10 @@ const IngamePopupNoticesPage: React.FC = () => {
               {t('ingamePopupNotices.createNotice')}
             </Button>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+          <IconButton
+            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+            aria-label="more options"
+          >
             <MoreVertIcon />
           </IconButton>
           <Menu
@@ -525,16 +528,28 @@ const IngamePopupNoticesPage: React.FC = () => {
                 const exportColumns: ExportColumn[] = [
                   { key: 'content', header: t('ingamePopupNotices.content') },
                   { key: 'isActive', header: t('common.status') },
-                  { key: 'displayPriority', header: t('ingamePopupNotices.priority') },
+                  {
+                    key: 'displayPriority',
+                    header: t('ingamePopupNotices.priority'),
+                  },
                   { key: 'startDate', header: t('common.start') },
                   { key: 'endDate', header: t('common.end') },
                   { key: 'createdAt', header: t('common.createdAt') },
                 ];
                 try {
-                  exportToFile(notices, exportColumns, 'ingame-popup-notices', format);
-                  enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                  exportToFile(
+                    notices,
+                    exportColumns,
+                    'ingame-popup-notices',
+                    format
+                  );
+                  enqueueSnackbar(t('common.exportSuccess'), {
+                    variant: 'success',
+                  });
                 } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                  enqueueSnackbar(t('common.exportFailed'), {
+                    variant: 'error',
+                  });
                 }
               }}
               onImportClick={() => {
@@ -1090,10 +1105,17 @@ const IngamePopupNoticesPage: React.FC = () => {
           let failCount = 0;
           for (const item of data) {
             try {
-              await ingamePopupNoticeService.createIngamePopupNotice(projectApiPath, {
-                content: item[t('ingamePopupNotices.content')] || item.content || '',
-                isActive: String(item[t('common.status')] ?? item.isActive ?? true) === 'true',
-              });
+              await ingamePopupNoticeService.createIngamePopupNotice(
+                projectApiPath,
+                {
+                  content:
+                    item[t('ingamePopupNotices.content')] || item.content || '',
+                  isActive:
+                    String(
+                      item[t('common.status')] ?? item.isActive ?? true
+                    ) === 'true',
+                }
+              );
               successCount++;
             } catch (err) {
               failCount++;

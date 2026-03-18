@@ -254,8 +254,9 @@ const CrashEventsPage: React.FC = () => {
   // Context menu state for row actions
   const [contextMenuAnchor, setContextMenuAnchor] =
     useState<null | HTMLElement>(null);
-  const [contextMenuEvent, setContextMenuEvent] =
-    useState<CrashEvent | null>(null);
+  const [contextMenuEvent, setContextMenuEvent] = useState<CrashEvent | null>(
+    null
+  );
 
   // Dialog state for viewing crash details
   const [expandedRowId, setExpandedRowId] = useState<string | null>(() => {
@@ -1515,7 +1516,8 @@ const CrashEventsPage: React.FC = () => {
                                           </TableCell>
                                           <TableCell>
                                             <Typography variant="body2">
-                                              {(event as any).projectName || '-'}
+                                              {(event as any).projectName ||
+                                                '-'}
                                             </Typography>
                                           </TableCell>
                                         </TableRow>
@@ -1533,7 +1535,8 @@ const CrashEventsPage: React.FC = () => {
                                           </TableCell>
                                           <TableCell>
                                             <Typography variant="body2">
-                                              {(event as any).organizationName || '-'}
+                                              {(event as any)
+                                                .organizationName || '-'}
                                             </Typography>
                                           </TableCell>
                                         </TableRow>

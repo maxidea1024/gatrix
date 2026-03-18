@@ -11,9 +11,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import {
-  ExpandMore as ExpandMoreIcon,
-} from '@mui/icons-material';
+import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import {

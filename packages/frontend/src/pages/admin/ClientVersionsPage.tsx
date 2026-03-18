@@ -1740,7 +1740,13 @@ const ClientVersionsPage: React.FC = () => {
                 </Typography>
               </ListItemText>
             </MenuItem>
-            <MenuItem onClick={() => { setExportMenuAnchor(null); setImportDialogOpen(true); }} sx={{ pl: 4 }}>
+            <MenuItem
+              onClick={() => {
+                setExportMenuAnchor(null);
+                setImportDialogOpen(true);
+              }}
+              sx={{ pl: 4 }}
+            >
               <ListItemIcon>
                 <AddIcon fontSize="small" />
               </ListItemIcon>
@@ -2841,7 +2847,10 @@ const ClientVersionsPage: React.FC = () => {
                 clientStatus: item.clientStatus || 'ONLINE',
                 gameServerAddress: item.gameServerAddress || '',
                 patchAddress: item.patchAddress || '',
-                guestModeAllowed: item.guestModeAllowed !== undefined ? Boolean(item.guestModeAllowed) : false,
+                guestModeAllowed:
+                  item.guestModeAllowed !== undefined
+                    ? Boolean(item.guestModeAllowed)
+                    : false,
               });
               successCount++;
             } catch (err) {

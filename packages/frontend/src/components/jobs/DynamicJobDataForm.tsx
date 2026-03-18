@@ -224,10 +224,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
                 {field.description}
                 {field.required && <span style={{ color: 'red' }}> *</span>}
               </Typography>
-              <Button
-                size="small"
-                onClick={() => handleArrayAdd(fieldName)}
-              >
+              <Button size="small" onClick={() => handleArrayAdd(fieldName)}>
                 {t('common.add')}
               </Button>
             </Box>

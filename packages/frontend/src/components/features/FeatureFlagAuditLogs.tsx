@@ -625,10 +625,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
               <TableBody>
                 {auditLogs.map((log, index) => (
                   <React.Fragment key={log.id}>
-                    <TableRow
-                      hover
-                      sx={{}}
-                    >
+                    <TableRow hover sx={{}}>
                       <TableCell padding="checkbox">
                         <IconButton
                           size="small"
@@ -814,10 +811,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
 
                                               return changedFields.map(
                                                 ({ key, oldVal, newVal }) => (
-                                                  <TableRow
-                                                    key={key}
-                                                    sx={{}}
-                                                  >
+                                                  <TableRow key={key} sx={{}}>
                                                     <TableCell
                                                       sx={{
                                                         fontWeight: 500,

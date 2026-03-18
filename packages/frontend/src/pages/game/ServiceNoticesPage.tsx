@@ -675,7 +675,10 @@ const ServiceNoticesPage: React.FC = () => {
               {t('serviceNotices.createNotice')}
             </Button>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+          <IconButton
+            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+            aria-label="more options"
+          >
             <MoreVertIcon />
           </IconButton>
           <Menu

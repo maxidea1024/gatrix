@@ -303,7 +303,14 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
         {/* Context Field Selector */}
         <FormControl
           size="small"
-          sx={{ width: 170, flexShrink: 0, '& .MuiSelect-select': { overflow: 'hidden', textOverflow: 'ellipsis' } }}
+          sx={{
+            width: 170,
+            flexShrink: 0,
+            '& .MuiSelect-select': {
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            },
+          }}
           error={isFieldEmpty}
         >
           <Select
@@ -428,7 +435,11 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
               <IconButton
                 size="small"
                 onClick={() =>
-                  handleConstraintChange(index, 'inverted', !constraint.inverted)
+                  handleConstraintChange(
+                    index,
+                    'inverted',
+                    !constraint.inverted
+                  )
                 }
                 disabled={disabled}
                 sx={{
@@ -559,7 +570,9 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                   height: 28,
                   borderRadius: 1,
                   border: 1,
-                  borderColor: constraint.caseInsensitive ? 'primary.main' : 'divider',
+                  borderColor: constraint.caseInsensitive
+                    ? 'primary.main'
+                    : 'divider',
                   color: constraint.caseInsensitive
                     ? 'primary.main'
                     : 'text.disabled',

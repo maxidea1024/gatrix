@@ -507,10 +507,7 @@ const ProfilePage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 1, mt: { xs: 2, sm: 2 } }}>
               {isEditing ? (
                 <>
-                  <Button
-                    variant="outlined"
-                    onClick={handleEditToggle}
-                  >
+                  <Button variant="outlined" onClick={handleEditToggle}>
                     {t('common.cancel')}
                   </Button>
                   <Button

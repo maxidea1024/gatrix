@@ -1382,7 +1382,10 @@ const CouponSettingsPage: React.FC = () => {
               {t('coupons.couponSettings.createCoupon')}
             </Button>
           )}
-          <IconButton onClick={(e) => setPageMenuAnchor(e.currentTarget)} aria-label="more options">
+          <IconButton
+            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+            aria-label="more options"
+          >
             <MoreVertIcon />
           </IconButton>
           <Menu
@@ -1395,7 +1398,10 @@ const CouponSettingsPage: React.FC = () => {
                 setPageMenuAnchor(null);
                 const exportColumns: ExportColumn[] = [
                   { key: 'name', header: t('common.name') },
-                  { key: 'code', header: t('coupons.couponSettings.columns.code') },
+                  {
+                    key: 'code',
+                    header: t('coupons.couponSettings.columns.code'),
+                  },
                   { key: 'type', header: t('common.type') },
                   { key: 'status', header: t('common.status') },
                   { key: 'description', header: t('common.description') },
@@ -1404,10 +1410,19 @@ const CouponSettingsPage: React.FC = () => {
                   { key: 'createdAt', header: t('common.createdAt') },
                 ];
                 try {
-                  exportToFile(sortedItems, exportColumns, 'coupon-definitions', format);
-                  enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
+                  exportToFile(
+                    sortedItems,
+                    exportColumns,
+                    'coupon-definitions',
+                    format
+                  );
+                  enqueueSnackbar(t('common.exportSuccess'), {
+                    variant: 'success',
+                  });
                 } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                  enqueueSnackbar(t('common.exportFailed'), {
+                    variant: 'error',
+                  });
                 }
               }}
               onImportClick={() => {
@@ -3354,12 +3369,24 @@ const CouponSettingsPage: React.FC = () => {
             try {
               await couponService.createSetting(projectApiPath, {
                 name: item[t('common.name')] || item.name || '',
-                code: item[t('coupons.couponSettings.columns.code')] || item.code || '',
-                type: (item[t('common.type')] || item.type || 'NORMAL') as CouponType,
-                status: (item[t('common.status')] || item.status || 'ACTIVE') as CouponStatus,
-                description: item[t('common.description')] || item.description || '',
+                code:
+                  item[t('coupons.couponSettings.columns.code')] ||
+                  item.code ||
+                  '',
+                type: (item[t('common.type')] ||
+                  item.type ||
+                  'NORMAL') as CouponType,
+                status: (item[t('common.status')] ||
+                  item.status ||
+                  'ACTIVE') as CouponStatus,
+                description:
+                  item[t('common.description')] || item.description || '',
                 startsAt: item.startsAt || new Date().toISOString(),
-                expiresAt: item.expiresAt || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+                expiresAt:
+                  item.expiresAt ||
+                  new Date(
+                    Date.now() + 365 * 24 * 60 * 60 * 1000
+                  ).toISOString(),
               });
               successCount++;
             } catch (err) {

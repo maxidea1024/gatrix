@@ -709,7 +709,6 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                             'action.hover',
                                                           fontWeight: 'bold',
                                                         },
-
                                                       }}
                                                     >
                                                       <thead>

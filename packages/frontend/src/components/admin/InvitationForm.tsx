@@ -11,9 +11,7 @@ import {
   Alert,
   Divider,
 } from '@mui/material';
-import {
-  PersonAdd as PersonAddIcon,
-} from '@mui/icons-material';
+import { PersonAdd as PersonAddIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
   CreateInvitationRequest,
@@ -138,11 +136,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={onCancel}
-            variant="outlined"
-            disabled={loading}
-          >
+          <Button onClick={onCancel} variant="outlined" disabled={loading}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -213,11 +207,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
       />
 
       <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-        <Button
-          onClick={onCancel}
-          variant="outlined"
-          disabled={loading}
-        >
+        <Button onClick={onCancel} variant="outlined" disabled={loading}>
           {t('common.cancel')}
         </Button>
         <Button

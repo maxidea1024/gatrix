@@ -319,7 +319,9 @@ const FeatureContextFieldsPage: React.FC = () => {
   const [showFieldDescription, setShowFieldDescription] = useState(false);
   const [showFieldTags, setShowFieldTags] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [menuTarget, setMenuTarget] = useState<FeatureContextField | null>(null);
+  const [menuTarget, setMenuTarget] = useState<FeatureContextField | null>(
+    null
+  );
 
   // Column settings
   const defaultColumns: ColumnConfig[] = [

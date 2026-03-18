@@ -179,10 +179,12 @@ export const ConstraintDisplay: React.FC<ConstraintDisplayProps> = ({
         border: noBorder ? 0 : '1px solid',
         borderColor: noBorder ? 'transparent' : 'rgba(128,128,128,0.15)',
         borderRadius: noBorder ? 0 : '6px',
-        bgcolor: noBorder ? 'transparent' : (theme) =>
-          theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, 0.03)'
-            : 'action.hover',
+        bgcolor: noBorder
+          ? 'transparent'
+          : (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.03)'
+                : 'action.hover',
         gap: 0,
       }}
     >

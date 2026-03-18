@@ -1838,10 +1838,7 @@ const UsersManagementPage: React.FC = () => {
         {/* 버튼 그룹 */}
         {canManage && (
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button
-              variant="contained"
-              onClick={handleAddUser}
-            >
+            <Button variant="contained" onClick={handleAddUser}>
               {t('users.addUser')}
             </Button>
             <Button
@@ -2560,16 +2557,10 @@ const UsersManagementPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={handleCloseAddUserDialog}
-            variant="outlined"
-          >
+          <Button onClick={handleCloseAddUserDialog} variant="outlined">
             {t('common.cancel')}
           </Button>
-          <Button
-            onClick={handleCreateUser}
-            variant="contained"
-          >
+          <Button onClick={handleCreateUser} variant="contained">
             {t('users.addUser')}
           </Button>
         </Box>

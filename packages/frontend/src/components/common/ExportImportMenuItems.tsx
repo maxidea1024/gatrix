@@ -99,9 +99,7 @@ const ExportImportMenuItems: React.FC<ExportImportMenuItemsProps> = ({
                 <ListItemIcon>
                   <UploadIcon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>
-                  {t('common.importFromFile')}
-                </ListItemText>
+                <ListItemText>{t('common.importFromFile')}</ListItemText>
               </MenuItem>
             </>
           )}
