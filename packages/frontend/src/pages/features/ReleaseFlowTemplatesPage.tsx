@@ -35,6 +35,7 @@ import {
   Menu,
   ListItemIcon,
   ListItemText,
+  Collapse,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -49,6 +50,8 @@ import {
   HelpOutline as HelpOutlineIcon,
   Timer as TimerIcon,
   MoreVert as MoreVertIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -157,6 +160,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
 }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
+  const [collapsed, setCollapsed] = useState(false);
 
   const isRollout =
     strategy.strategyName === 'flexibleRollout' ||
@@ -177,11 +181,18 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
           px: 2,
           py: 1,
           bgcolor: 'action.hover',
-          borderBottom: 1,
+          borderBottom: collapsed ? 0 : 1,
           borderColor: 'divider',
+          cursor: 'pointer',
         }}
+        onClick={() => setCollapsed(!collapsed)}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {collapsed ? (
+            <ExpandMoreIcon fontSize="small" color="action" />
+          ) : (
+            <ExpandLessIcon fontSize="small" color="action" />
+          )}
           <Chip label={index + 1} size="small" color="primary" />
           <Typography variant="subtitle2">
             {t(
@@ -199,114 +210,454 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
           )}
         </Box>
         {!readonly && (
-          <IconButton size="small" color="error" onClick={onRemove}>
+          <IconButton
+            size="small"
+            color="error"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+          >
             <DeleteIcon fontSize="small" />
           </IconButton>
         )}
       </Box>
 
-      {/* Tabs: General | Targeting */}
-      <Tabs
-        value={activeTab}
-        onChange={(_, v) => setActiveTab(v)}
-        sx={{
-          borderBottom: 1,
-          borderColor: 'divider',
-          minHeight: 40,
-          '& .MuiTab-root': { minHeight: 40, py: 0 },
-        }}
-      >
-        <Tab label={t('releaseFlow.generalTab')} />
-        <Tab
-          label={
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              {t('releaseFlow.targetingTab')}
-              {targetingCount > 0 && (
-                <Chip
-                  label={targetingCount}
-                  size="small"
-                  color="info"
-                  sx={{ height: 20 }}
-                />
-              )}
-            </Box>
-          }
-        />
-      </Tabs>
+      <Collapse in={!collapsed} timeout="auto" unmountOnExit>
+        {/* Tabs: General | Targeting */}
+        <Tabs
+          value={activeTab}
+          onChange={(_, v) => setActiveTab(v)}
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+            minHeight: 40,
+            '& .MuiTab-root': { minHeight: 40, py: 0 },
+          }}
+        >
+          <Tab label={t('releaseFlow.generalTab')} />
+          <Tab
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                {t('releaseFlow.targetingTab')}
+                {targetingCount > 0 && (
+                  <Chip
+                    label={targetingCount}
+                    size="small"
+                    color="info"
+                    sx={{ height: 20 }}
+                  />
+                )}
+              </Box>
+            }
+          />
+        </Tabs>
 
-      {/* Tab Content */}
-      <Box sx={{ p: 2 }}>
-        {/* General Tab */}
-        {activeTab === 0 && (
-          <Stack spacing={2}>
-            {/* Strategy Title */}
-            <TextField
-              label={t('releaseFlow.strategyTitle')}
-              size="small"
-              fullWidth
-              value={strategy.title || ''}
-              onChange={(e) => onChange({ ...strategy, title: e.target.value })}
-              placeholder={t('releaseFlow.strategyTitlePlaceholder')}
-              disabled={readonly}
-            />
-
-            {/* Strategy Type */}
-            <FormControl fullWidth size="small">
-              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                {t('releaseFlow.strategyType')}
-              </Typography>
-              <Select
-                value={strategy.strategyName || 'flexibleRollout'}
-                onChange={(e) =>
-                  onChange({
-                    ...strategy,
-                    strategyName: e.target.value,
-                    parameters:
-                      e.target.value === 'flexibleRollout'
-                        ? { rollout: 100, stickiness: 'default', groupId: '' }
-                        : {},
-                  })
-                }
+        {/* Tab Content */}
+        <Box sx={{ p: 2 }}>
+          {/* General Tab */}
+          {activeTab === 0 && (
+            <Stack spacing={2}>
+              {/* Strategy Title */}
+              <TextField
+                label={t('releaseFlow.strategyTitle')}
+                size="small"
+                fullWidth
+                value={strategy.title || ''}
+                onChange={(e) => onChange({ ...strategy, title: e.target.value })}
+                placeholder={t('releaseFlow.strategyTitlePlaceholder')}
                 disabled={readonly}
-              >
-                {STRATEGY_TYPES.map((type) => (
-                  <MenuItem key={type.name} value={type.name}>
-                    <Box>
-                      <Typography variant="body2">
-                        {t(type.titleKey)}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {t(type.descKey)}
-                      </Typography>
-                    </Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+              />
 
-            {/* Rollout % for flexible rollout */}
-            {isRollout && (
-              <>
+              {/* Strategy Type */}
+              <FormControl fullWidth size="small">
+                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                  {t('releaseFlow.strategyType')}
+                </Typography>
+                <Select
+                  value={strategy.strategyName || 'flexibleRollout'}
+                  onChange={(e) =>
+                    onChange({
+                      ...strategy,
+                      strategyName: e.target.value,
+                      parameters:
+                        e.target.value === 'flexibleRollout'
+                          ? { rollout: 100, stickiness: 'default', groupId: '' }
+                          : {},
+                    })
+                  }
+                  disabled={readonly}
+                >
+                  {STRATEGY_TYPES.map((type) => (
+                    <MenuItem key={type.name} value={type.name}>
+                      <Box>
+                        <Typography variant="body2">
+                          {t(type.titleKey)}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t(type.descKey)}
+                        </Typography>
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* Rollout % for flexible rollout */}
+              {isRollout && (
+                <>
+                  <Box>
+                    <Typography
+                      variant="subtitle2"
+                      gutterBottom
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      {t('featureFlags.rollout')}
+                      <Tooltip title={t('featureFlags.rolloutTooltip')}>
+                        <HelpOutlineIcon fontSize="small" color="action" />
+                      </Tooltip>
+                    </Typography>
+                    <Box sx={{ px: 2, pt: 3 }}>
+                      <Slider
+                        value={strategy.parameters?.rollout ?? 100}
+                        onChange={(_, value) =>
+                          onChange({
+                            ...strategy,
+                            parameters: {
+                              ...strategy.parameters,
+                              rollout: value as number,
+                            },
+                          })
+                        }
+                        valueLabelDisplay="on"
+                        min={0}
+                        max={100}
+                        disabled={readonly}
+                        marks={[
+                          { value: 0, label: '0%' },
+                          { value: 25, label: '25%' },
+                          { value: 50, label: '50%' },
+                          { value: 75, label: '75%' },
+                          { value: 100, label: '100%' },
+                        ]}
+                      />
+                    </Box>
+                  </Box>
+
+                  {/* Stickiness & GroupId */}
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 6 }}>
+                      <FormControl fullWidth size="small">
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                            mb: 0.5,
+                          }}
+                        >
+                          {t('featureFlags.stickiness')}
+                          <Tooltip title={t('featureFlags.stickinessHelp')}>
+                            <HelpOutlineIcon
+                              fontSize="small"
+                              color="action"
+                              sx={{ cursor: 'pointer' }}
+                            />
+                          </Tooltip>
+                        </Typography>
+                        <Select
+                          value={strategy.parameters?.stickiness || 'default'}
+                          onChange={(e) =>
+                            onChange({
+                              ...strategy,
+                              parameters: {
+                                ...strategy.parameters,
+                                stickiness: e.target.value,
+                              },
+                            })
+                          }
+                          disabled={readonly}
+                        >
+                          <MenuItem value="default">
+                            <Box>
+                              <Typography variant="body2">
+                                {t('featureFlags.stickinessDefault')}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {t('featureFlags.stickinessDefaultDesc')}
+                              </Typography>
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="userId">
+                            <Box>
+                              <Typography variant="body2">
+                                {t('featureFlags.stickinessUserId')}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {t('featureFlags.stickinessUserIdDesc')}
+                              </Typography>
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="sessionId">
+                            <Box>
+                              <Typography variant="body2">
+                                {t('featureFlags.stickinessSessionId')}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {t('featureFlags.stickinessSessionIdDesc')}
+                              </Typography>
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="random">
+                            <Box>
+                              <Typography variant="body2">
+                                {t('featureFlags.stickinessRandom')}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {t('featureFlags.stickinessRandomDesc')}
+                              </Typography>
+                            </Box>
+                          </MenuItem>
+                          {/* Custom stickiness fields from context fields */}
+                          {contextFields.filter(
+                            (f) => f.stickiness && !f.isDefaultStickinessField
+                          ).length > 0 && (
+                            <ListSubheader
+                              sx={{ lineHeight: '32px', fontSize: '0.75rem' }}
+                            >
+                              {t('featureFlags.customStickinessFields')}
+                            </ListSubheader>
+                          )}
+                          {contextFields
+                            .filter(
+                              (f) => f.stickiness && !f.isDefaultStickinessField
+                            )
+                            .map((field) => (
+                              <MenuItem
+                                key={field.fieldName}
+                                value={field.fieldName}
+                              >
+                                <Box>
+                                  <Typography variant="body2">
+                                    {field.displayName || field.fieldName}
+                                  </Typography>
+                                  {field.description && (
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {field.description}
+                                    </Typography>
+                                  )}
+                                </Box>
+                              </MenuItem>
+                            ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6 }}>
+                      <Box>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                            mb: 0.5,
+                          }}
+                        >
+                          {t('featureFlags.groupId')}
+                          <Tooltip title={t('featureFlags.groupIdHelp')}>
+                            <HelpOutlineIcon
+                              fontSize="small"
+                              color="action"
+                              sx={{ cursor: 'pointer' }}
+                            />
+                          </Tooltip>
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          value={strategy.parameters?.groupId || ''}
+                          onChange={(e) =>
+                            onChange({
+                              ...strategy,
+                              parameters: {
+                                ...strategy.parameters,
+                                groupId: e.target.value,
+                              },
+                            })
+                          }
+                          disabled={readonly}
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </>
+              )}
+
+              {/* User IDs input for userWithId strategy */}
+              {strategy.strategyName === 'userWithId' && (
                 <Box>
                   <Typography
                     variant="subtitle2"
                     gutterBottom
                     sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
                   >
+                    {t('featureFlags.userIds')}{' '}
+                    <Typography component="span" color="error.main">
+                      *
+                    </Typography>
+                  </Typography>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={[]}
+                    value={strategy.parameters?.userIds || []}
+                    onChange={(_, newValue) =>
+                      onChange({
+                        ...strategy,
+                        parameters: { ...strategy.parameters, userIds: newValue },
+                      })
+                    }
+                    disabled={readonly}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        size="small"
+                        placeholder={t('featureFlags.userIdsPlaceholder')}
+                        helperText={t('featureFlags.userIdsHelp')}
+                      />
+                    )}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, idx) => (
+                        <Chip
+                          {...getTagProps({ index: idx })}
+                          key={option}
+                          label={option}
+                          size="small"
+                        />
+                      ))
+                    }
+                  />
+                </Box>
+              )}
+
+              {/* Remote addresses input for remoteAddress strategy */}
+              {strategy.strategyName === 'remoteAddress' && (
+                <Box>
+                  <Typography variant="subtitle2" gutterBottom>
+                    {t('featureFlags.remoteAddresses')}{' '}
+                    <Typography component="span" color="error.main">
+                      *
+                    </Typography>
+                  </Typography>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={[]}
+                    value={strategy.parameters?.IPs || []}
+                    onChange={(_, newValue) =>
+                      onChange({
+                        ...strategy,
+                        parameters: { ...strategy.parameters, IPs: newValue },
+                      })
+                    }
+                    disabled={readonly}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        size="small"
+                        placeholder={t('featureFlags.remoteAddressesPlaceholder')}
+                      />
+                    )}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, idx) => (
+                        <Chip
+                          {...getTagProps({ index: idx })}
+                          key={option}
+                          label={option}
+                          size="small"
+                        />
+                      ))
+                    }
+                  />
+                </Box>
+              )}
+
+              {/* Hostnames for applicationHostname strategy */}
+              {strategy.strategyName === 'applicationHostname' && (
+                <Box>
+                  <Typography variant="subtitle2" gutterBottom>
+                    {t('featureFlags.hostnames')}{' '}
+                    <Typography component="span" color="error.main">
+                      *
+                    </Typography>
+                  </Typography>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={[]}
+                    value={strategy.parameters?.hostNames || []}
+                    onChange={(_, newValue) =>
+                      onChange({
+                        ...strategy,
+                        parameters: {
+                          ...strategy.parameters,
+                          hostNames: newValue,
+                        },
+                      })
+                    }
+                    disabled={readonly}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        size="small"
+                        placeholder={t('featureFlags.hostnamesPlaceholder')}
+                      />
+                    )}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, idx) => (
+                        <Chip
+                          {...getTagProps({ index: idx })}
+                          key={option}
+                          label={option}
+                          size="small"
+                        />
+                      ))
+                    }
+                  />
+                </Box>
+              )}
+
+              {/* Rollout % for gradualRolloutRandom */}
+              {strategy.strategyName === 'gradualRolloutRandom' && (
+                <Box>
+                  <Typography variant="subtitle2" gutterBottom>
                     {t('featureFlags.rollout')}
-                    <Tooltip title={t('featureFlags.rolloutTooltip')}>
-                      <HelpOutlineIcon fontSize="small" color="action" />
-                    </Tooltip>
                   </Typography>
                   <Box sx={{ px: 2, pt: 3 }}>
                     <Slider
-                      value={strategy.parameters?.rollout ?? 100}
+                      value={strategy.parameters?.percentage ?? 50}
                       onChange={(_, value) =>
                         onChange({
                           ...strategy,
                           parameters: {
                             ...strategy.parameters,
-                            rollout: value as number,
+                            percentage: value as number,
                           },
                         })
                       }
@@ -316,385 +667,210 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                       disabled={readonly}
                       marks={[
                         { value: 0, label: '0%' },
-                        { value: 25, label: '25%' },
                         { value: 50, label: '50%' },
-                        { value: 75, label: '75%' },
                         { value: 100, label: '100%' },
                       ]}
                     />
                   </Box>
                 </Box>
+              )}
+            </Stack>
+          )}
 
-                {/* Stickiness & GroupId */}
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 6 }}>
-                    <FormControl fullWidth size="small">
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          mb: 0.5,
-                        }}
-                      >
-                        {t('featureFlags.stickiness')}
-                        <Tooltip title={t('featureFlags.stickinessHelp')}>
-                          <HelpOutlineIcon
-                            fontSize="small"
-                            color="action"
-                            sx={{ cursor: 'pointer' }}
-                          />
-                        </Tooltip>
-                      </Typography>
-                      <Select
-                        value={strategy.parameters?.stickiness || 'default'}
-                        onChange={(e) =>
-                          onChange({
-                            ...strategy,
-                            parameters: {
-                              ...strategy.parameters,
-                              stickiness: e.target.value,
-                            },
-                          })
-                        }
-                        disabled={readonly}
-                      >
-                        <MenuItem value="default">
-                          <Box>
-                            <Typography variant="body2">
-                              {t('featureFlags.stickinessDefault')}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t('featureFlags.stickinessDefaultDesc')}
-                            </Typography>
-                          </Box>
-                        </MenuItem>
-                        <MenuItem value="userId">
-                          <Box>
-                            <Typography variant="body2">
-                              {t('featureFlags.stickinessUserId')}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t('featureFlags.stickinessUserIdDesc')}
-                            </Typography>
-                          </Box>
-                        </MenuItem>
-                        <MenuItem value="sessionId">
-                          <Box>
-                            <Typography variant="body2">
-                              {t('featureFlags.stickinessSessionId')}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t('featureFlags.stickinessSessionIdDesc')}
-                            </Typography>
-                          </Box>
-                        </MenuItem>
-                        <MenuItem value="random">
-                          <Box>
-                            <Typography variant="body2">
-                              {t('featureFlags.stickinessRandom')}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t('featureFlags.stickinessRandomDesc')}
-                            </Typography>
-                          </Box>
-                        </MenuItem>
-                        {/* Custom stickiness fields from context fields */}
-                        {contextFields.filter(
-                          (f) => f.stickiness && !f.isDefaultStickinessField
-                        ).length > 0 && (
-                          <ListSubheader
-                            sx={{ lineHeight: '32px', fontSize: '0.75rem' }}
-                          >
-                            {t('featureFlags.customStickinessFields')}
-                          </ListSubheader>
-                        )}
-                        {contextFields
-                          .filter(
-                            (f) => f.stickiness && !f.isDefaultStickinessField
-                          )
-                          .map((field) => (
-                            <MenuItem
-                              key={field.fieldName}
-                              value={field.fieldName}
-                            >
-                              <Box>
-                                <Typography variant="body2">
-                                  {field.displayName || field.fieldName}
-                                </Typography>
-                                {field.description && (
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {field.description}
-                                  </Typography>
-                                )}
-                              </Box>
-                            </MenuItem>
-                          ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid size={{ xs: 6 }}>
-                    <Box>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          mb: 0.5,
-                        }}
-                      >
-                        {t('featureFlags.groupId')}
-                        <Tooltip title={t('featureFlags.groupIdHelp')}>
-                          <HelpOutlineIcon
-                            fontSize="small"
-                            color="action"
-                            sx={{ cursor: 'pointer' }}
-                          />
-                        </Tooltip>
-                      </Typography>
-                      <TextField
-                        fullWidth
-                        size="small"
-                        value={strategy.parameters?.groupId || ''}
-                        onChange={(e) =>
-                          onChange({
-                            ...strategy,
-                            parameters: {
-                              ...strategy.parameters,
-                              groupId: e.target.value,
-                            },
-                          })
-                        }
-                        disabled={readonly}
-                      />
-                    </Box>
-                  </Grid>
-                </Grid>
-              </>
-            )}
-
-            {/* User IDs input for userWithId strategy */}
-            {strategy.strategyName === 'userWithId' && (
-              <Box>
-                <Typography
-                  variant="subtitle2"
-                  gutterBottom
-                  sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                >
-                  {t('featureFlags.userIds')}{' '}
-                  <Typography component="span" color="error.main">
-                    *
-                  </Typography>
-                </Typography>
-                <Autocomplete
-                  multiple
-                  freeSolo
-                  options={[]}
-                  value={strategy.parameters?.userIds || []}
-                  onChange={(_, newValue) =>
-                    onChange({
-                      ...strategy,
-                      parameters: { ...strategy.parameters, userIds: newValue },
-                    })
-                  }
-                  disabled={readonly}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      size="small"
-                      placeholder={t('featureFlags.userIdsPlaceholder')}
-                      helperText={t('featureFlags.userIdsHelp')}
-                    />
-                  )}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, idx) => (
-                      <Chip
-                        {...getTagProps({ index: idx })}
-                        key={option}
-                        label={option}
-                        size="small"
-                      />
-                    ))
-                  }
-                />
-              </Box>
-            )}
-
-            {/* Remote addresses input for remoteAddress strategy */}
-            {strategy.strategyName === 'remoteAddress' && (
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
-                  {t('featureFlags.remoteAddresses')}{' '}
-                  <Typography component="span" color="error.main">
-                    *
-                  </Typography>
-                </Typography>
-                <Autocomplete
-                  multiple
-                  freeSolo
-                  options={[]}
-                  value={strategy.parameters?.IPs || []}
-                  onChange={(_, newValue) =>
-                    onChange({
-                      ...strategy,
-                      parameters: { ...strategy.parameters, IPs: newValue },
-                    })
-                  }
-                  disabled={readonly}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      size="small"
-                      placeholder={t('featureFlags.remoteAddressesPlaceholder')}
-                    />
-                  )}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, idx) => (
-                      <Chip
-                        {...getTagProps({ index: idx })}
-                        key={option}
-                        label={option}
-                        size="small"
-                      />
-                    ))
-                  }
-                />
-              </Box>
-            )}
-
-            {/* Hostnames for applicationHostname strategy */}
-            {strategy.strategyName === 'applicationHostname' && (
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
-                  {t('featureFlags.hostnames')}{' '}
-                  <Typography component="span" color="error.main">
-                    *
-                  </Typography>
-                </Typography>
-                <Autocomplete
-                  multiple
-                  freeSolo
-                  options={[]}
-                  value={strategy.parameters?.hostNames || []}
-                  onChange={(_, newValue) =>
-                    onChange({
-                      ...strategy,
-                      parameters: {
-                        ...strategy.parameters,
-                        hostNames: newValue,
-                      },
-                    })
-                  }
-                  disabled={readonly}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      size="small"
-                      placeholder={t('featureFlags.hostnamesPlaceholder')}
-                    />
-                  )}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, idx) => (
-                      <Chip
-                        {...getTagProps({ index: idx })}
-                        key={option}
-                        label={option}
-                        size="small"
-                      />
-                    ))
-                  }
-                />
-              </Box>
-            )}
-
-            {/* Rollout % for gradualRolloutRandom */}
-            {strategy.strategyName === 'gradualRolloutRandom' && (
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
-                  {t('featureFlags.rollout')}
-                </Typography>
-                <Box sx={{ px: 2, pt: 3 }}>
-                  <Slider
-                    value={strategy.parameters?.percentage ?? 50}
-                    onChange={(_, value) =>
-                      onChange({
-                        ...strategy,
-                        parameters: {
-                          ...strategy.parameters,
-                          percentage: value as number,
-                        },
-                      })
-                    }
-                    valueLabelDisplay="on"
-                    min={0}
-                    max={100}
-                    disabled={readonly}
-                    marks={[
-                      { value: 0, label: '0%' },
-                      { value: 50, label: '50%' },
-                      { value: 100, label: '100%' },
-                    ]}
-                  />
-                </Box>
-              </Box>
-            )}
-          </Stack>
-        )}
-
-        {/* Targeting Tab: Segments + Constraints */}
-        {activeTab === 1 && (
-          <Stack spacing={2}>
-            <SegmentSelector
-              selectedSegments={strategy.segments || []}
-              availableSegments={segments}
-              onSegmentAdd={(segmentName) =>
-                onChange({
-                  ...strategy,
-                  segments: [...(strategy.segments || []), segmentName],
-                })
-              }
-              onSegmentRemove={(segmentName) =>
-                onChange({
-                  ...strategy,
-                  segments: (strategy.segments || []).filter(
-                    (s) => s !== segmentName
-                  ),
-                })
-              }
-              t={t}
-            />
-            <Box>
-              <Typography variant="subtitle2" gutterBottom>
-                {t('featureFlags.constraints')}
-              </Typography>
-              <ConstraintEditor
-                constraints={strategy.constraints || []}
-                onChange={(newConstraints: Constraint[]) =>
-                  onChange({ ...strategy, constraints: newConstraints })
+          {/* Targeting Tab: Segments + Constraints */}
+          {activeTab === 1 && (
+            <Stack spacing={2}>
+              <SegmentSelector
+                selectedSegments={strategy.segments || []}
+                availableSegments={segments}
+                onSegmentAdd={(segmentName) =>
+                  onChange({
+                    ...strategy,
+                    segments: [...(strategy.segments || []), segmentName],
+                  })
                 }
-                contextFields={contextFields}
+                onSegmentRemove={(segmentName) =>
+                  onChange({
+                    ...strategy,
+                    segments: (strategy.segments || []).filter(
+                      (s) => s !== segmentName
+                    ),
+                  })
+                }
+                t={t}
               />
-            </Box>
-          </Stack>
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  {t('featureFlags.constraints')}
+                </Typography>
+                <ConstraintEditor
+                  constraints={strategy.constraints || []}
+                  onChange={(newConstraints: Constraint[]) =>
+                    onChange({ ...strategy, constraints: newConstraints })
+                  }
+                  contextFields={contextFields}
+                />
+              </Box>
+            </Stack>
+          )}
+        </Box>
+      </Collapse>
+    </Paper>
+  );
+};
+
+// ==================== Collapsible Milestone Section ====================
+interface MilestoneSectionProps {
+  milestone: MilestoneEditorData;
+  mIdx: number;
+  milestones: MilestoneEditorData[];
+  readonly: boolean;
+  segments: any[];
+  contextFields: ContextField[];
+  handleMilestoneNameChange: (idx: number, name: string) => void;
+  handleMoveMilestone: (idx: number, direction: 'up' | 'down') => void;
+  handleRemoveMilestone: (idx: number) => void;
+  handleStrategyChange: (
+    mIdx: number,
+    sIdx: number,
+    updated: StrategyEditorData
+  ) => void;
+  handleRemoveStrategy: (mIdx: number, sIdx: number) => void;
+  handleAddStrategy: (mIdx: number) => void;
+  t: (key: string) => string;
+}
+
+const MilestoneSection: React.FC<MilestoneSectionProps> = ({
+  milestone,
+  mIdx,
+  milestones,
+  readonly,
+  segments,
+  contextFields,
+  handleMilestoneNameChange,
+  handleMoveMilestone,
+  handleRemoveMilestone,
+  handleStrategyChange,
+  handleRemoveStrategy,
+  handleAddStrategy,
+  t,
+}) => {
+  const [expanded, setExpanded] = useState(true);
+
+  return (
+    <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+      {/* Milestone Header - clickable to toggle */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          p: 2,
+          cursor: 'pointer',
+          bgcolor: 'action.hover',
+          borderBottom: expanded ? 1 : 0,
+          borderColor: 'divider',
+        }}
+        onClick={() => setExpanded(!expanded)}
+      >
+        {expanded ? (
+          <ExpandLessIcon fontSize="small" color="action" />
+        ) : (
+          <ExpandMoreIcon fontSize="small" color="action" />
+        )}
+        <Chip label={mIdx + 1} size="small" color="primary" />
+        <TextField
+          size="small"
+          placeholder={t('releaseFlow.milestoneNamePlaceholder')}
+          value={milestone.name}
+          onChange={(e) => handleMilestoneNameChange(mIdx, e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+          sx={{ flex: 1 }}
+          disabled={readonly}
+        />
+        <Typography variant="body2" color="text.secondary">
+          {t('releaseFlow.strategies')} ({milestone.strategies.length})
+        </Typography>
+        {!readonly && (
+          <>
+            <Tooltip title={t('common.moveUp')}>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMoveMilestone(mIdx, 'up');
+                  }}
+                  disabled={mIdx === 0}
+                >
+                  <ArrowUpIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title={t('common.moveDown')}>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMoveMilestone(mIdx, 'down');
+                  }}
+                  disabled={mIdx === milestones.length - 1}
+                >
+                  <ArrowDownIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title={t('common.delete')}>
+              <span>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveMilestone(mIdx);
+                  }}
+                  disabled={milestones.length <= 1}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </>
         )}
       </Box>
+
+      {/* Collapsible content */}
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
+        <Box sx={{ p: 2 }}>
+          <Stack spacing={2}>
+            {milestone.strategies.map((strategy, sIdx) => (
+              <StrategyEditor
+                key={strategy.id}
+                strategy={strategy}
+                index={sIdx}
+                segments={segments}
+                contextFields={contextFields}
+                onChange={(updated) =>
+                  handleStrategyChange(mIdx, sIdx, updated)
+                }
+                onRemove={() => handleRemoveStrategy(mIdx, sIdx)}
+                readonly={readonly}
+              />
+            ))}
+          </Stack>
+          {!readonly && (
+            <Button
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={() => handleAddStrategy(mIdx)}
+              sx={{ mt: 1 }}
+            >
+              {t('releaseFlow.addStrategy')}
+            </Button>
+          )}
+        </Box>
+      </Collapse>
     </Paper>
   );
 };
@@ -1004,7 +1180,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
           ? t('releaseFlow.viewTemplate')
           : initialData
             ? t('releaseFlow.editTemplate')
-            : t('releaseFlow.createTemplate')
+            : t('releaseFlow.addTemplate')
       }
       subtitle={t('releaseFlow.templatesSubtitle')}
       storageKey="releaseFlowTemplateDrawerWidth"
@@ -1070,107 +1246,28 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
               <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
                 {t('releaseFlow.milestones')} ({milestones.length})
               </Typography>
+              {/* Each milestone is collapsible */}
 
               <Stack spacing={3}>
                 {milestones.map((milestone, mIdx) => (
-                  <Paper key={milestone.id} variant="outlined" sx={{ p: 2 }}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        mb: 2,
-                      }}
-                    >
-                      <Chip label={mIdx + 1} size="small" color="primary" />
-                      <TextField
-                        size="small"
-                        placeholder={t('releaseFlow.milestoneNamePlaceholder')}
-                        value={milestone.name}
-                        onChange={(e) =>
-                          handleMilestoneNameChange(mIdx, e.target.value)
-                        }
-                        sx={{ flex: 1 }}
-                        disabled={readonly}
-                      />
-                      {!readonly && (
-                        <>
-                          <Tooltip title={t('common.moveUp')}>
-                            <span>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleMoveMilestone(mIdx, 'up')}
-                                disabled={mIdx === 0}
-                              >
-                                <ArrowUpIcon fontSize="small" />
-                              </IconButton>
-                            </span>
-                          </Tooltip>
-                          <Tooltip title={t('common.moveDown')}>
-                            <span>
-                              <IconButton
-                                size="small"
-                                onClick={() =>
-                                  handleMoveMilestone(mIdx, 'down')
-                                }
-                                disabled={mIdx === milestones.length - 1}
-                              >
-                                <ArrowDownIcon fontSize="small" />
-                              </IconButton>
-                            </span>
-                          </Tooltip>
-                          <Tooltip title={t('common.delete')}>
-                            <span>
-                              <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => handleRemoveMilestone(mIdx)}
-                                disabled={milestones.length <= 1}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </span>
-                          </Tooltip>
-                        </>
-                      )}
-                    </Box>
+                  <MilestoneSection
+                    key={milestone.id}
+                    milestone={milestone}
+                    mIdx={mIdx}
+                    milestones={milestones}
+                    readonly={readonly}
+                    segments={segments}
+                    contextFields={contextFields}
+                    handleMilestoneNameChange={handleMilestoneNameChange}
+                    handleMoveMilestone={handleMoveMilestone}
+                    handleRemoveMilestone={handleRemoveMilestone}
+                    handleStrategyChange={handleStrategyChange}
+                    handleRemoveStrategy={handleRemoveStrategy}
+                    handleAddStrategy={handleAddStrategy}
+                    t={t}
+                  />
 
-                    {/* Strategies */}
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 1 }}
-                    >
-                      {t('releaseFlow.strategies')} (
-                      {milestone.strategies.length})
-                    </Typography>
-                    <Stack spacing={2}>
-                      {milestone.strategies.map((strategy, sIdx) => (
-                        <StrategyEditor
-                          key={strategy.id}
-                          strategy={strategy}
-                          index={sIdx}
-                          segments={segments}
-                          contextFields={contextFields}
-                          onChange={(updated) =>
-                            handleStrategyChange(mIdx, sIdx, updated)
-                          }
-                          onRemove={() => handleRemoveStrategy(mIdx, sIdx)}
-                          readonly={readonly}
-                        />
-                      ))}
-                    </Stack>
-                    {!readonly && (
-                      <Button
-                        size="small"
-                        startIcon={<AddIcon />}
-                        onClick={() => handleAddStrategy(mIdx)}
-                        sx={{ mt: 1 }}
-                      >
-                        {t('releaseFlow.addStrategy')}
-                      </Button>
-                    )}
-                  </Paper>
+
                 ))}
               </Stack>
               {!readonly && (
@@ -1204,7 +1301,13 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
           </Button>
           {!readonly && (
             <Button variant="contained" onClick={handleSave} disabled={saving}>
-              {saving ? <CircularProgress size={20} /> : t('common.save')}
+              {saving ? (
+                <CircularProgress size={20} />
+              ) : initialData ? (
+                t('common.update')
+              ) : (
+                t('common.add')
+              )}
             </Button>
           )}
         </Box>
