@@ -3,8 +3,7 @@ import { asyncHandler, GatrixError } from '../middleware/error-handler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { CrashEvent } from '../models/crash-event';
 import { ClientCrash } from '../models/client-crash';
-import fs from 'fs/promises';
-import path from 'path';
+import { getStorageProvider } from '../services/storage';
 import database from '../config/database';
 
 import { createLogger } from '../config/logger';
@@ -30,8 +29,10 @@ export class CrashEventController {
         environmentOperator,
         branch,
         branchOperator,
-        marketType,
-        marketTypeOperator,
+        channel,
+        channelOperator,
+        subchannel,
+        subchannelOperator,
         isEditor,
         appVersion,
         appVersionOperator,
@@ -88,13 +89,23 @@ export class CrashEventController {
         }
       }
 
-      // Market type filter - support multiple values
-      if (marketType) {
-        const marketTypes = (marketType as string)
+      // Channel filter - support multiple values
+      if (channel) {
+        const channels = (channel as string)
           .split(',')
-          .map((m) => m.trim());
-        if (marketTypes.length > 0) {
-          query = query.whereIn('marketType', marketTypes);
+          .map((c) => c.trim());
+        if (channels.length > 0) {
+          query = query.whereIn('channel', channels);
+        }
+      }
+
+      // Subchannel filter - support multiple values
+      if (subchannel) {
+        const subchannels = (subchannel as string)
+          .split(',')
+          .map((s) => s.trim());
+        if (subchannels.length > 0) {
+          query = query.whereIn('subchannel', subchannels);
         }
       }
 
@@ -307,8 +318,8 @@ export class CrashEventController {
       }
 
       try {
-        const fullPath = path.join(process.cwd(), 'public', event.logFilePath);
-        let logContent = await fs.readFile(fullPath, 'utf8');
+        const storage = getStorageProvider();
+        let logContent = await storage.downloadAsString(event.logFilePath);
 
         // Convert timestamps to local timezone
         logContent = this.convertLogTimestamps(logContent, timezone);
@@ -357,12 +368,8 @@ export class CrashEventController {
       }
 
       try {
-        const fullPath = path.join(
-          process.cwd(),
-          'public',
-          crash.stackFilePath
-        );
-        const stackTrace = await fs.readFile(fullPath, 'utf8');
+        const storage = getStorageProvider();
+        const stackTrace = await storage.downloadAsString(crash.stackFilePath);
 
         res.json({
           success: true,
@@ -384,6 +391,101 @@ export class CrashEventController {
   );
 
   /**
+   * Get signed download URL for log file
+   * GET /admin/crash-events/:id/log-download-url
+   */
+  static getLogDownloadUrl = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { id } = req.params;
+
+      const event = await CrashEvent.query().findById(id);
+
+      if (!event) {
+        throw new GatrixError('Crash event not found', 404);
+      }
+
+      if (!event.logFilePath) {
+        throw new GatrixError(
+          'Log file not available for this crash event',
+          404
+        );
+      }
+
+      try {
+        const storage = getStorageProvider();
+        const downloadUrl = await storage.getSignedUrl(
+          event.logFilePath,
+          3600 // 1 hour
+        );
+
+        res.json({
+          success: true,
+          data: {
+            downloadUrl,
+            logFilePath: event.logFilePath,
+          },
+        });
+      } catch (error) {
+        logger.error('Failed to generate log download URL:', {
+          eventId: id,
+          logFilePath: event.logFilePath,
+          error,
+        });
+        throw new GatrixError('Failed to generate log download URL', 500);
+      }
+    }
+  );
+
+  /**
+   * Get signed download URL for stack trace file
+   * GET /admin/crash-events/:id/stack-download-url
+   */
+  static getStackDownloadUrl = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { id } = req.params;
+
+      const event = await CrashEvent.query().findById(id);
+
+      if (!event) {
+        throw new GatrixError('Crash event not found', 404);
+      }
+
+      const crash = await ClientCrash.query().findById(event.crashId);
+
+      if (!crash) {
+        throw new GatrixError('Crash group not found', 404);
+      }
+
+      if (!crash.stackFilePath) {
+        throw new GatrixError('Stack trace not available for this crash', 404);
+      }
+
+      try {
+        const storage = getStorageProvider();
+        const downloadUrl = await storage.getSignedUrl(
+          crash.stackFilePath,
+          3600 // 1 hour
+        );
+
+        res.json({
+          success: true,
+          data: {
+            downloadUrl,
+            stackFilePath: crash.stackFilePath,
+          },
+        });
+      } catch (error) {
+        logger.error('Failed to generate stack download URL:', {
+          crashId: crash.id,
+          stackFilePath: crash.stackFilePath,
+          error,
+        });
+        throw new GatrixError('Failed to generate stack download URL', 500);
+      }
+    }
+  );
+
+  /**
    * Get filter options for crash events
    * GET /admin/crash-events/filter-options
    */
@@ -394,7 +496,8 @@ export class CrashEventController {
         platformResults,
         environmentResults,
         branchResults,
-        marketTypeResults,
+        channelResults,
+        subchannelResults,
         appVersionResults,
         resVersionResults,
         gameServerIdResults,
@@ -404,7 +507,8 @@ export class CrashEventController {
           .distinct('environmentId')
           .whereNotNull('environmentId'),
         CrashEvent.query().distinct('branch').whereNotNull('branch'),
-        CrashEvent.query().distinct('marketType').whereNotNull('marketType'),
+        CrashEvent.query().distinct('channel').whereNotNull('channel'),
+        CrashEvent.query().distinct('subchannel').whereNotNull('subchannel'),
         CrashEvent.query().distinct('appVersion').whereNotNull('appVersion'),
         CrashEvent.query().distinct('resVersion').whereNotNull('resVersion'),
         CrashEvent.query().distinct('gameServerId').whereNotNull('gameServerId'),
@@ -415,8 +519,11 @@ export class CrashEventController {
         .map((r: any) => r.environmentId)
         .sort();
       const branches = branchResults.map((r: any) => r.branch).sort();
-      const marketTypes = marketTypeResults
-        .map((r: any) => r.marketType)
+      const channels = channelResults
+        .map((r: any) => r.channel)
+        .sort();
+      const subchannels = subchannelResults
+        .map((r: any) => r.subchannel)
         .sort();
       const appVersions = appVersionResults
         .map((r: any) => r.appVersion)
@@ -457,7 +564,8 @@ export class CrashEventController {
           platforms,
           environments,
           branches,
-          marketTypes,
+          channels,
+          subchannels,
           appVersions,
           resVersions,
           gameServerIds,

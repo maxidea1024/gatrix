@@ -340,7 +340,7 @@ const TargetSettingsGroup: React.FC<TargetSettingsGroupProps> = ({
         }}
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
           {title || t('common.targetSettings')}
         </Typography>
         <IconButton size="small" sx={{ pointerEvents: 'none' }}>

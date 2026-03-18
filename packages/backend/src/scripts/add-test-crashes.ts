@@ -27,7 +27,7 @@ const testCrashes = [
   at GameEngine.LevelLoader.LoadAssets() in C:\\Game\\LevelLoader.cs:line 45
   at GameEngine.SceneManager.LoadScene(String sceneName) in C:\\Game\\SceneManager.cs:line 123
   at GameEngine.GameController.Start() in C:\\Game\\GameController.cs:line 67`,
-    marketType: 'steam',
+    channel: 'steam',
     isEditor: false,
   },
   {
@@ -45,7 +45,7 @@ const testCrashes = [
   at CombatSystem.DamageCalculator.ApplyDamage(Int32 targetId) in CombatSystem.cs:line 234
   at CombatSystem.AttackHandler.ProcessAttack() in AttackHandler.cs:line 89
   at GameLoop.Update() in GameLoop.cs:line 156`,
-    marketType: 'googleplay',
+    channel: 'google',
     isEditor: false,
   },
   {
@@ -63,7 +63,7 @@ const testCrashes = [
   at InventorySystem.ItemManager.AddItem(Item item) in ItemManager.cs:line 78
   at UI.InventoryPanel.OnItemClicked(Int32 itemId) in InventoryPanel.cs:line 145
   at UnityEngine.EventSystems.ExecuteEvents.Execute() in ExecuteEvents.cs:line 234`,
-    marketType: 'apple',
+    channel: 'apple',
     isEditor: false,
   },
   {
@@ -81,7 +81,7 @@ const testCrashes = [
   at NewFeature.ExperimentalSystem.Initialize() in ExperimentalSystem.cs:line 12
   at GameEngine.FeatureManager.LoadFeatures() in FeatureManager.cs:line 56
   at GameEngine.Startup.OnApplicationStart() in Startup.cs:line 34`,
-    marketType: 'steam',
+    channel: 'steam',
     isEditor: true,
   },
   {
@@ -99,7 +99,7 @@ const testCrashes = [
   at NetworkManager.ConnectionHandler.Connect(String serverUrl) in ConnectionHandler.cs:line 167
   at MultiplayerSystem.JoinGame(String gameId) in MultiplayerSystem.cs:line 89
   at UI.LobbyPanel.OnJoinButtonClicked() in LobbyPanel.cs:line 234`,
-    marketType: 'googleplay',
+    channel: 'google',
     isEditor: false,
   },
 ];
@@ -144,7 +144,7 @@ async function addTestCrashes() {
             branch: crashData.branch,
             environmentId: crashData.environmentId,
             platform: crashData.platform,
-            marketType: crashData.marketType,
+            channel: crashData.channel,
             isEditor: crashData.isEditor || false,
             firstLine,
             stackFilePath: '', // Will be set later if needed

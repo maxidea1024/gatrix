@@ -221,11 +221,9 @@ export const formatRelativeTime = (
     // If showSeconds option is enabled, calculate seconds for recent times
     const now = options?.baseTime ? dayjs(options.baseTime) : dayjs();
 
-    // Handle future dates (prevent "in ... seconds" or "방금 후")
+    // Handle future dates: show "in X minutes" / "X분 후" format
     if (d.isAfter(now)) {
-      if (lang === 'ko') return '방금 전';
-      if (lang === 'zh-cn' || lang === 'zh') return '刚刚';
-      return 'Just now';
+      return d.to(now);
     }
 
     const diffSeconds = now.diff(d, 'second');

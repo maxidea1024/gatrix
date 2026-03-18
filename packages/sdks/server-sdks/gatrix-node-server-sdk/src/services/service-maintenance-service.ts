@@ -10,6 +10,7 @@
  */
 
 import { ApiClient } from '../client/api-client';
+import { ApiClientFactory } from '../client/api-client-factory';
 import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { MaintenanceStatus } from '../types/api';
@@ -23,6 +24,8 @@ export class ServiceMaintenanceService {
   private cachedStatusByEnv: Map<string, MaintenanceStatus> = new Map();
   // Whether this feature is enabled
   private featureEnabled: boolean = true;
+  // Optional factory for multi-environment mode
+  private apiClientFactory?: ApiClientFactory;
 
   constructor(
     apiClient: ApiClient,
@@ -83,6 +86,25 @@ export class ServiceMaintenanceService {
   }
 
   /**
+   * Set ApiClientFactory for multi-environment mode.
+   * When set, API calls use the factory to get a per-environment ApiClient.
+   */
+  setApiClientFactory(factory: ApiClientFactory): void {
+    this.apiClientFactory = factory;
+  }
+
+  /**
+   * Get the appropriate ApiClient for a given environment.
+   * Uses the factory if available, otherwise falls back to the default client.
+   */
+  private getApiClient(environmentId?: string): ApiClient {
+    if (this.apiClientFactory) {
+      return this.apiClientFactory.getClient(environmentId);
+    }
+    return this.apiClient;
+  }
+
+  /**
    * Fetch service maintenance status for a specific environment
    * GET /api/v1/server/maintenance
    */
@@ -93,7 +115,8 @@ export class ServiceMaintenanceService {
 
     this.logger.debug('Fetching service maintenance status', { environmentId });
 
-    const response = await this.apiClient.get<MaintenanceStatus>(endpoint);
+    const client = this.getApiClient(environmentId);
+    const response = await client.get<MaintenanceStatus>(endpoint);
 
     if (!response.success || !response.data) {
       throw new Error(

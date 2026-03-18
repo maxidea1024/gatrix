@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '../utils/clipboard';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import api from '../services/api';
 
 interface LogViewerProps {
   logContent: string;
@@ -245,7 +246,25 @@ export const LogViewer: React.FC<LogViewerProps> = ({
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
+    // Try COS direct download if eventId is available
+    if (eventId) {
+      try {
+        const response = await api.get(
+          `/admin/crash-events/${eventId}/log-download-url`
+        );
+        const downloadUrl = response.data?.downloadUrl;
+        if (downloadUrl) {
+          window.open(downloadUrl, '_blank');
+          enqueueSnackbar(t('crashes.logDownloaded'), { variant: 'success' });
+          return;
+        }
+      } catch {
+        // Fall through to blob download
+      }
+    }
+
+    // Fallback: blob download from memory
     const blob = new Blob([logContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -368,6 +387,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({
           {/* Menu chip (shows on hover or when selected) */}
           <Box
             className="line-menu-chip"
+            onClick={(e) => handleLineClick(e, lineNumber)}
             sx={{
               opacity: isSelected ? 1 : 0,
               transition: 'opacity 0.2s',

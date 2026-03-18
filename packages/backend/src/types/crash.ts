@@ -27,7 +27,8 @@ export interface ClientCrash {
   branch: string; // Branch name (qa_2025, main, etc)
   environmentId: string; // Environment (dev, staging, production, qa)
   platform: string; // Platform (windows, ios, android, mac)
-  marketType?: string; // Market type (googleplay, apple, etc)
+  channel?: string; // Distribution channel (e.g., steam, epic, apple, google)
+  subchannel?: string; // Sub-channel (e.g., specific store variant)
   isEditor: boolean; // Whether crash occurred in editor
 
   firstLine?: string; // First line of stack trace (max 200 chars)
@@ -59,7 +60,8 @@ export interface CrashEvent {
   firstLine?: string; // First line of stack trace (max 200 chars)
 
   platform: string; // Platform (windows, ios, android, mac)
-  marketType?: string; // Market type (googleplay, apple, etc)
+  channel?: string; // Distribution channel
+  subchannel?: string; // Sub-channel
   branch: string; // Branch name
   environmentId: string; // Environment (dev, staging, production, qa)
   isEditor: boolean; // Whether crash occurred in editor
@@ -86,7 +88,8 @@ export interface CrashEvent {
  */
 export interface CrashUploadRequest {
   platform: string; // Platform (windows, ios, android, mac) - required
-  marketType?: string; // Market type (googleplay, apple, etc) - optional
+  channel?: string; // Distribution channel - optional
+  subchannel?: string; // Sub-channel - optional
   branch: string; // Branch name (qa_2025, main, etc) - required
   environmentId: string; // Environment (dev, staging, production, qa) - required
   isEditor?: boolean; // Whether crash occurred in editor - optional
@@ -115,7 +118,8 @@ export interface CrashFilters {
   platform?: string; // Filter by platform
   environmentId?: string; // Filter by environmentId
   branch?: string; // Filter by branch
-  marketType?: string; // Filter by marketType
+  channel?: string; // Filter by channel
+  subchannel?: string; // Filter by subchannel
   isEditor?: boolean; // Filter by isEditor
   state?: CrashState; // Filter by state
   assignee?: string; // Filter by assignee

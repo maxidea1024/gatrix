@@ -165,5 +165,13 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
         });
       }
     },
+
+    'file-storage:cleanup': async (job) => {
+      const { processFileStorageCleanupJob } =
+        await import('./file-storage-cleanup-scheduler');
+      const retentionDays = job.data?.payload?.retentionDays ?? 30;
+      const deleted = await processFileStorageCleanupJob(retentionDays);
+      logger.info('file-storage:cleanup completed', { jobId: job.id, deleted });
+    },
   };
 }

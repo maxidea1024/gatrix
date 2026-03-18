@@ -40,7 +40,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Refresh as RefreshIcon,
   ContentCopy as CopyIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
@@ -138,6 +137,7 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
+              helperText={t('signalEndpoints.nameHelp')}
             />
             <TextField
               label={t('signalEndpoints.description')}
@@ -526,13 +526,6 @@ const SignalEndpointsPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={fetchEndpoints}
-          >
-            {t('common.refresh')}
-          </Button>
           {endpoints.length > 0 && canManage && (
             <Button
               variant="contained"

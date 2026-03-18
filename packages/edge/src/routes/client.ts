@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
-import crypto from 'crypto';
 import { clientAuth, ClientRequest } from '../middleware/client-auth';
 import { sdkManager } from '../services/sdk-manager';
 import { config } from '../config/env';
@@ -320,14 +319,36 @@ router.get(
         }
       }
 
+      // Check if service-level maintenance is active (overrides client version status)
+      let isServiceMaintenanceActive = false;
+      let serviceMaintenanceMsg: string | undefined;
+      try {
+        isServiceMaintenanceActive =
+          sdk.serviceMaintenance.isMaintenanceActive(environmentId);
+        if (isServiceMaintenanceActive) {
+          serviceMaintenanceMsg =
+            sdk.serviceMaintenance.getMessage(
+              (lang as 'ko' | 'en' | 'zh') || 'en',
+              environmentId
+            ) || '';
+        }
+      } catch (e) {
+        logger.warn('Failed to check service maintenance status:', e);
+      }
+
+      // Determine effective status (service maintenance overrides client version status)
+      const effectiveStatus = isServiceMaintenanceActive
+        ? 'MAINTENANCE'
+        : record.clientStatus;
+
       const clientData: Record<string, unknown> = {
         platform: record.platform,
         clientVersion: record.clientVersion,
-        status: record.clientStatus,
+        status: effectiveStatus,
         gameServerAddress: record.gameServerAddress,
         patchAddress: record.patchAddress,
         guestModeAllowed:
-          record.clientStatus === 'MAINTENANCE'
+          effectiveStatus === 'MAINTENANCE'
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,
@@ -335,8 +356,11 @@ router.get(
       };
 
       // Add maintenance message if status is MAINTENANCE
-      if (record.clientStatus === 'MAINTENANCE') {
-        clientData.maintenanceMessage = maintenanceMessage || '';
+      if (effectiveStatus === 'MAINTENANCE') {
+        // Service maintenance message takes priority over client version maintenance message
+        clientData.maintenanceMessage = isServiceMaintenanceActive
+          ? serviceMaintenanceMsg || ''
+          : maintenanceMessage || '';
       }
 
       logger.debug('Client version retrieved', {
@@ -726,10 +750,11 @@ router.get(
 
 // ============================================================================
 // Crash Upload Proxy (Forward to Backend)
+// Backend generates presigned upload URL in response
 // ============================================================================
 
 router.post(
-  '/crashes/upload',
+  '/crashes',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
@@ -750,7 +775,7 @@ router.post(
       });
 
       // Forward the request to backend
-      const backendUrl = `${config.gatrixUrl}/api/v1/client/crashes/upload`;
+      const backendUrl = `${config.gatrixUrl}/api/v1/client/crashes`;
 
       const response = await axios.post(backendUrl, req.body, {
         headers: {
@@ -773,7 +798,7 @@ router.post(
         isNewCrash: response.data?.data?.isNewCrash,
       });
 
-      // Return the backend response to the client
+      // Return the backend response to the client (includes logUploadUrl)
       res.status(response.status).json(response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -811,6 +836,7 @@ router.post(
     }
   }
 );
+
 
 // ============================================================================
 // Feature Flag Routes

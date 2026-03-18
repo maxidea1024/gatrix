@@ -54,6 +54,7 @@
     "@gatrix/evaluator": "workspace:*",
     "@gatrix/gatrix-node-server-sdk": "workspace:*",
     "@gatrix/shared": "workspace:*",
+    "@gatrix/storage": "*",
     "@keyv/redis": "^5.1.3",
     "@sendgrid/mail": "^8.1.5",
     "@types/bcrypt": "^6.0.0",

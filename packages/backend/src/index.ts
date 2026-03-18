@@ -389,6 +389,19 @@ const startServer = async () => {
       );
     }
 
+    // Register file storage cleanup job (BullMQ-based)
+    try {
+      const fileStorageCleanupScheduler =
+        await import('./services/file-storage-cleanup-scheduler');
+      await fileStorageCleanupScheduler.initializeFileStorageCleanupJob();
+      logger.info('File storage cleanup job registered');
+    } catch (error) {
+      logger.warn(
+        'File storage cleanup job registration failed, continuing:',
+        error
+      );
+    }
+
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)
     const server = createServer(app);
     httpServer = server; // Store reference for graceful shutdown

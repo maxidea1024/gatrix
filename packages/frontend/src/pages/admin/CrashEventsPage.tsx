@@ -233,7 +233,8 @@ const CrashEventsPage: React.FC = () => {
     platforms: string[];
     environments: { id: string; name: string }[];
     branches: string[];
-    marketTypes: string[];
+    channels: string[];
+    subchannels: string[];
     appVersions: string[];
     resVersions: string[];
     gameServerIds: string[];
@@ -241,7 +242,8 @@ const CrashEventsPage: React.FC = () => {
     platforms: [],
     environments: [],
     branches: [],
-    marketTypes: [],
+    channels: [],
+    subchannels: [],
     appVersions: [],
     resVersions: [],
     gameServerIds: [],
@@ -301,17 +303,29 @@ const CrashEventsPage: React.FC = () => {
       id: 'project',
       labelKey: 'crashes.table.project',
       sortable: false,
-      visible: true,
+      visible: false,
     },
     {
       id: 'organization',
       labelKey: 'crashes.table.organization',
       sortable: false,
-      visible: true,
+      visible: false,
     },
     {
       id: 'branch',
       labelKey: 'crashes.table.branch',
+      sortable: true,
+      visible: true,
+    },
+    {
+      id: 'channel',
+      labelKey: 'crashes.table.channel',
+      sortable: true,
+      visible: true,
+    },
+    {
+      id: 'subchannel',
+      labelKey: 'crashes.table.subchannel',
       sortable: true,
       visible: true,
     },
@@ -457,14 +471,25 @@ const CrashEventsPage: React.FC = () => {
         })),
       },
       {
-        key: 'marketType',
-        label: t('crashes.filters.marketType'),
+        key: 'channel',
+        label: t('crashes.filters.channel'),
         type: 'multiselect',
         operator: 'any_of',
         allowOperatorToggle: false,
-        options: filterOptions.marketTypes.map((m) => ({
-          value: m,
-          label: m,
+        options: filterOptions.channels.map((c) => ({
+          value: c,
+          label: c,
+        })),
+      },
+      {
+        key: 'subchannel',
+        label: t('crashes.filters.subchannel'),
+        type: 'multiselect',
+        operator: 'any_of',
+        allowOperatorToggle: false,
+        options: filterOptions.subchannels.map((s) => ({
+          value: s,
+          label: s,
         })),
       },
       {
@@ -547,7 +572,8 @@ const CrashEventsPage: React.FC = () => {
         platforms: options.platforms || [],
         environments: options.environments || [],
         branches: options.branches || [],
-        marketTypes: options.marketTypes || [],
+        channels: options.channels || [],
+        subchannels: options.subchannels || [],
         appVersions: options.appVersions || [],
         resVersions: options.resVersions || [],
         gameServerIds: options.gameServerIds || [],
@@ -821,7 +847,8 @@ const CrashEventsPage: React.FC = () => {
         ['Game User ID', event.gameUserId || '-'],
         ['User Name', event.userName || '-'],
         ['Game Server ID', event.gameServerId || '-'],
-        ['Market Type', event.marketType || '-'],
+        ['Channel', event.channel || '-'],
+        ['Sub-channel', event.subchannel || '-'],
         ['Is Editor', event.isEditor ? 'Yes' : 'No'],
         ['First Line', (event as any).firstLine || '-'],
         ['IP Address', event.crashEventIp || '-'],
@@ -965,6 +992,10 @@ const CrashEventsPage: React.FC = () => {
             variant="outlined"
           />
         );
+      case 'channel':
+        return event.channel || '-';
+      case 'subchannel':
+        return event.subchannel || '-';
       case 'appVersion':
         return (
           <Chip
@@ -1994,8 +2025,8 @@ const CrashEventsPage: React.FC = () => {
                                           </TableRow>
                                         )}
 
-                                        {/* Market Type */}
-                                        {!!event.marketType && (
+                                        {/* Channel */}
+                                        {!!event.channel && (
                                           <TableRow hover>
                                             <TableCell
                                               sx={{
@@ -2004,7 +2035,7 @@ const CrashEventsPage: React.FC = () => {
                                                 whiteSpace: 'nowrap',
                                               }}
                                             >
-                                              {t('crashes.table.marketType')}
+                                              {t('crashes.table.channel')}
                                             </TableCell>
                                             <TableCell>
                                               <Box
@@ -2016,13 +2047,70 @@ const CrashEventsPage: React.FC = () => {
                                                 }}
                                               >
                                                 <Typography variant="body2">
-                                                  {event.marketType}
+                                                  {event.channel}
                                                 </Typography>
                                                 <IconButton
                                                   size="small"
                                                   onClick={async () => {
                                                     await copyToClipboardWithNotification(
-                                                      event.marketType!,
+                                                      event.channel!,
+                                                      () =>
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copiedToClipboard'
+                                                          ),
+                                                          {
+                                                            variant: 'success',
+                                                          }
+                                                        ),
+                                                      () =>
+                                                        enqueueSnackbar(
+                                                          t(
+                                                            'common.copyFailed'
+                                                          ),
+                                                          {
+                                                            variant: 'error',
+                                                          }
+                                                        )
+                                                    );
+                                                  }}
+                                                >
+                                                  <CopyIcon fontSize="small" />
+                                                </IconButton>
+                                              </Box>
+                                            </TableCell>
+                                          </TableRow>
+                                        )}
+
+                                        {/* Sub-channel */}
+                                        {!!event.subchannel && (
+                                          <TableRow hover>
+                                            <TableCell
+                                              sx={{
+                                                fontWeight: 600,
+                                                bgcolor: 'action.hover',
+                                                whiteSpace: 'nowrap',
+                                              }}
+                                            >
+                                              {t('crashes.table.subchannel')}
+                                            </TableCell>
+                                            <TableCell>
+                                              <Box
+                                                sx={{
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  justifyContent:
+                                                    'space-between',
+                                                }}
+                                              >
+                                                <Typography variant="body2">
+                                                  {event.subchannel}
+                                                </Typography>
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={async () => {
+                                                    await copyToClipboardWithNotification(
+                                                      event.subchannel!,
                                                       () =>
                                                         enqueueSnackbar(
                                                           t(

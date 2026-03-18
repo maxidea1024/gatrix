@@ -71,13 +71,15 @@ router.get('/test', clientSDKAuth, (req: any, res: any) => {
 });
 
 // Crash upload endpoint (requires client API token)
+// Response always includes logUploadUrl for direct client upload to storage
 router.post(
-  '/crashes/upload',
+  '/crashes',
   clientSDKAuth,
   body('platform').isString().notEmpty(),
   body('branch').isString().notEmpty(),
   body('stack').isString().notEmpty(),
-  body('marketType').optional({ nullable: true }).isString(),
+  body('channel').optional({ nullable: true }).isString(),
+  body('subchannel').optional({ nullable: true }).isString(),
   body('isEditor').optional({ nullable: true }).isBoolean(),
   body('appVersion').optional({ nullable: true }).isString(),
   body('resVersion').optional({ nullable: true }).isString(),

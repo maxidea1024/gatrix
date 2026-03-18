@@ -124,6 +124,9 @@ const ApiTokensPage = React.lazy(() => import('./pages/admin/ApiTokensPage'));
 const CrashEventsPage = React.lazy(
   () => import('./pages/admin/CrashEventsPage')
 );
+const CrashesPage = React.lazy(
+  () => import('./pages/admin/CrashesPage')
+);
 const ChatPage = React.lazy(() => import('./pages/chat/ChatPage'));
 const MailboxPage = React.lazy(() => import('./pages/mailbox/MailboxPage'));
 const SystemConsolePage = React.lazy(
@@ -786,6 +789,10 @@ const AppContent: React.FC = () => {
                                         <Route
                                           path="crash-events"
                                           element={<CrashEventsPage />}
+                                        />
+                                        <Route
+                                          path="crashes"
+                                          element={<CrashesPage />}
                                         />
                                         <Route
                                           path="api-tokens"
