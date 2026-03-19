@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Paper,
   Typography,
   Button,
   IconButton,
@@ -17,7 +16,7 @@ import {
   MenuItem,
   Tooltip,
 } from '@mui/material';
-import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import RewardItemSelector, { RewardSelection } from './RewardItemSelector';
@@ -26,6 +25,7 @@ import rewardTemplateService, {
   ParticipationReward,
 } from '../../services/rewardTemplateService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 
 interface RewardSelectorProps {
   value: ParticipationReward[];
@@ -229,32 +229,12 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
               </Box>
             ))}
             {value.length === 0 && (
-              <Box
-                sx={{
-                  py: 3,
-                  px: 2,
-                  textAlign: 'center',
-                  bgcolor: 'warning.lighter',
-                  border: '2px dashed',
-                  borderColor: 'warning.main',
-                  borderRadius: 1,
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 600, color: 'warning.dark', mb: 2 }}
-                >
-                  ⚠️ {t('rewardSelector.noRewards')}
-                </Typography>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={handleAddReward}
-                  disabled={disabled}
-                >
-                  {t('rewardSelector.addReward')}
-                </Button>
-              </Box>
+              <EmptyPagePlaceholder
+                message={t('rewardSelector.noRewards')}
+                onAddClick={disabled ? undefined : handleAddReward}
+                addButtonLabel={t('rewardSelector.addReward')}
+                minHeight={100}
+              />
             )}
             {value.length > 0 && (
               <Button

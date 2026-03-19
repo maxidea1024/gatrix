@@ -49,7 +49,6 @@ import {
   Refresh as RefreshIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
-  Edit as EditIcon,
   Warning as WarningIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
@@ -1595,9 +1594,8 @@ const EnvironmentsPage: React.FC = () => {
             variant="contained"
             onClick={handleUpdateEnvironment}
             disabled={!editEnv.displayName || updating || !isEditDirty}
-            startIcon={updating ? <CircularProgress size={20} /> : <EditIcon />}
           >
-            {t('common.save')}
+            {t('common.update')}
           </Button>
         </Box>
       </ResizableDrawer>

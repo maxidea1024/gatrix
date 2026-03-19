@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { P } from '@/types/permissions';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
@@ -66,6 +66,7 @@ const FeatureFlagTypesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingType, setEditingType] = useState<FlagType | null>(null);
+  const [originalType, setOriginalType] = useState<FlagType | null>(null);
   const [saving, setSaving] = useState(false);
 
   // Load types
@@ -90,8 +91,15 @@ const FeatureFlagTypesPage: React.FC = () => {
   // Edit handler
   const handleEdit = (type: FlagType) => {
     setEditingType({ ...type });
+    setOriginalType({ ...type });
     setEditDialogOpen(true);
   };
+
+  // Check if edit form is dirty
+  const isEditDirty = useMemo(() => {
+    if (!editingType || !originalType) return false;
+    return editingType.lifetimeDays !== originalType.lifetimeDays;
+  }, [editingType, originalType]);
 
   // Save handler
   const handleSave = async () => {
@@ -316,11 +324,11 @@ const FeatureFlagTypesPage: React.FC = () => {
             gap: 1,
           }}
         >
-          <Button variant="outlined" onClick={() => setEditDialogOpen(false)}>
+          <Button onClick={() => setEditDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button variant="contained" onClick={handleSave} disabled={saving}>
-            {t('featureFlags.saveFlagType')}
+          <Button variant="contained" onClick={handleSave} disabled={saving || !isEditDirty}>
+            {t('common.update')}
           </Button>
         </Box>
       </ResizableDrawer>

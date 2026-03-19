@@ -1519,7 +1519,6 @@ const MessageTemplatesPage: React.FC = () => {
           <Button
             onClick={() => setDialogOpen(false)}
             disabled={saving}
-            variant="outlined"
           >
             {t('common.cancel')}
           </Button>
@@ -1569,7 +1568,7 @@ const MessageTemplatesPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
+          <Button onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -1617,7 +1616,6 @@ const MessageTemplatesPage: React.FC = () => {
         >
           <Button
             onClick={() => setBulkDeleteDialogOpen(false)}
-            variant="outlined"
           >
             {t('common.cancel')}
           </Button>

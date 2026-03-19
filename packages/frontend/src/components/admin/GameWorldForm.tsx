@@ -348,7 +348,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
             </Box>
 
             {/* Visibility and Maintenance Toggles */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, pl: 1 }}>
               <FormControl variant="standard">
                 <FormControlLabel
                   control={
