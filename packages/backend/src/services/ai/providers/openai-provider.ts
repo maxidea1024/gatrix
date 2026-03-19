@@ -48,27 +48,33 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
     const openaiMessages: any[] = messages.flatMap((m): any[] => {
       // Assistant message that called a tool
       if (m.role === 'assistant' && m.toolCall) {
-        return [{
-          role: 'assistant',
-          content: m.content || null,
-          tool_calls: [{
-            id: m.toolCall.id,
-            type: 'function',
-            function: {
-              name: m.toolCall.name,
-              arguments: JSON.stringify(m.toolCall.arguments),
-            },
-          }],
-        }];
+        return [
+          {
+            role: 'assistant',
+            content: m.content || null,
+            tool_calls: [
+              {
+                id: m.toolCall.id,
+                type: 'function',
+                function: {
+                  name: m.toolCall.name,
+                  arguments: JSON.stringify(m.toolCall.arguments),
+                },
+              },
+            ],
+          },
+        ];
       }
 
       // User message containing a tool result -> convert to "tool" role
       if (m.role === 'user' && m.toolResult) {
-        return [{
-          role: 'tool' as const,
-          tool_call_id: m.toolResult.toolCallId,
-          content: m.content,
-        }];
+        return [
+          {
+            role: 'tool' as const,
+            tool_call_id: m.toolResult.toolCallId,
+            content: m.content,
+          },
+        ];
       }
 
       // Regular message

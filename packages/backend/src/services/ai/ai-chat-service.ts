@@ -189,8 +189,7 @@ export class AIChatService {
                 ...fullMessages,
                 {
                   role: 'assistant',
-                  content:
-                    assistantContent || '',
+                  content: assistantContent || '',
                   toolCall: {
                     id: toolCallId,
                     name: chunk.toolCall!.name,
