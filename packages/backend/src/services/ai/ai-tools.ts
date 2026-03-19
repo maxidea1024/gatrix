@@ -18,20 +18,34 @@ import type { AIToolConfig } from './ai-tool-types';
 import { checkPermission } from '@gatrix/shared/permissions';
 
 import { featureFlagTools } from './tools/feature-flag-tools';
+import { segmentTools } from './tools/segment-tools';
 import { gameWorldTools } from './tools/game-world-tools';
 import { maintenanceTools } from './tools/maintenance-tools';
 import { serviceNoticeTools } from './tools/service-notice-tools';
 import { bannerTools } from './tools/banner-tools';
+import { clientVersionTools } from './tools/client-version-tools';
+import { surveyTools } from './tools/survey-tools';
+import { storeProductTools } from './tools/store-product-tools';
+import { ingamePopupTools } from './tools/ingame-popup-tools';
+import { rewardTemplateTools } from './tools/reward-template-tools';
+import { couponTools } from './tools/coupon-tools';
 
 const logger = createLogger('AITools');
 
 // Aggregate all domain tools into a single registry
 const toolRegistry: AIToolConfig[] = [
   ...featureFlagTools,
+  ...segmentTools,
   ...gameWorldTools,
   ...maintenanceTools,
   ...serviceNoticeTools,
   ...bannerTools,
+  ...clientVersionTools,
+  ...surveyTools,
+  ...storeProductTools,
+  ...ingamePopupTools,
+  ...rewardTemplateTools,
+  ...couponTools,
 ];
 
 /**
