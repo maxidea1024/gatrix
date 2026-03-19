@@ -591,7 +591,7 @@ const GameWorldsPage: React.FC = () => {
     open: false,
     title: '',
     message: '',
-    onConfirm: () => { },
+    onConfirm: () => {},
   });
 
   // Delete confirmation state
@@ -619,7 +619,7 @@ const GameWorldsPage: React.FC = () => {
     tagService
       .list()
       .then(setAllRegistryTags)
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   // Load message templates
@@ -917,8 +917,8 @@ const GameWorldsPage: React.FC = () => {
       const tagFilter = activeFilters.find((f) => f.key === 'tags');
       const tagIds =
         tagFilter &&
-          Array.isArray(tagFilter.value) &&
-          tagFilter.value.length > 0
+        Array.isArray(tagFilter.value) &&
+        tagFilter.value.length > 0
           ? tagFilter.value
           : [];
       const tagOperator = tagFilter?.operator;
@@ -1020,7 +1020,7 @@ const GameWorldsPage: React.FC = () => {
     // Use infraSettingsRaw for editing (preserves JSON5 with comments), fallback to JSON.stringify
     setInfraSettingsText(
       world.infraSettingsRaw ||
-      JSON.stringify(world.infraSettings || {}, null, 2)
+        JSON.stringify(world.infraSettings || {}, null, 2)
     );
     setInfraSettingsError('');
     setFormTags(world.tags || []);
@@ -1065,7 +1065,7 @@ const GameWorldsPage: React.FC = () => {
     // Use infraSettingsRaw for editing (preserves JSON5 with comments), fallback to JSON.stringify
     setInfraSettingsText(
       world.infraSettingsRaw ||
-      JSON.stringify(world.infraSettings || {}, null, 2)
+        JSON.stringify(world.infraSettings || {}, null, 2)
     );
     setInfraSettingsError('');
     setFormTags(world.tags || []);
@@ -1730,37 +1730,37 @@ const GameWorldsPage: React.FC = () => {
         const maintenanceTooltip =
           maintenanceStatus === 'scheduled' || maintenanceStatus === 'active'
             ? (() => {
-              const parts: string[] = [];
-              // Start time: show "immediate start" if not set
-              parts.push(
-                `${t('maintenance.tooltipStartTime')}: ${world.maintenanceStartDate ? formatDateTimeDetailed(world.maintenanceStartDate) : t('maintenance.immediateStart')}`
-              );
-              // End time: show "manual stop" if not set
-              parts.push(
-                `${t('maintenance.tooltipEndTime')}: ${world.maintenanceEndDate ? formatDateTimeDetailed(world.maintenanceEndDate) : t('maintenance.manualStop')}`
-              );
-              // Force disconnect info
-              if (world.forceDisconnect) {
-                const delayText =
-                  (world.gracePeriodMinutes ?? 0) === 0
-                    ? t('maintenance.kickDelayImmediate')
-                    : `${world.gracePeriodMinutes}${t('maintenance.minutesUnit')}`;
+                const parts: string[] = [];
+                // Start time: show "immediate start" if not set
                 parts.push(
-                  `${t('maintenance.kickExistingPlayers')}: ${t('common.yes')} (${delayText})`
+                  `${t('maintenance.tooltipStartTime')}: ${world.maintenanceStartDate ? formatDateTimeDetailed(world.maintenanceStartDate) : t('maintenance.immediateStart')}`
                 );
-              } else {
+                // End time: show "manual stop" if not set
                 parts.push(
-                  `${t('maintenance.kickExistingPlayers')}: ${t('common.no')}`
+                  `${t('maintenance.tooltipEndTime')}: ${world.maintenanceEndDate ? formatDateTimeDetailed(world.maintenanceEndDate) : t('maintenance.manualStop')}`
                 );
-              }
-              if (world.maintenanceMessage) {
-                const msg = world.maintenanceMessage;
-                parts.push(
-                  `${t('maintenance.tooltipMessage')}: ${msg.length > 50 ? msg.substring(0, 50) + '...' : msg}`
-                );
-              }
-              return parts.join('\n');
-            })()
+                // Force disconnect info
+                if (world.forceDisconnect) {
+                  const delayText =
+                    (world.gracePeriodMinutes ?? 0) === 0
+                      ? t('maintenance.kickDelayImmediate')
+                      : `${world.gracePeriodMinutes}${t('maintenance.minutesUnit')}`;
+                  parts.push(
+                    `${t('maintenance.kickExistingPlayers')}: ${t('common.yes')} (${delayText})`
+                  );
+                } else {
+                  parts.push(
+                    `${t('maintenance.kickExistingPlayers')}: ${t('common.no')}`
+                  );
+                }
+                if (world.maintenanceMessage) {
+                  const msg = world.maintenanceMessage;
+                  parts.push(
+                    `${t('maintenance.tooltipMessage')}: ${msg.length > 50 ? msg.substring(0, 50) + '...' : msg}`
+                  );
+                }
+                return parts.join('\n');
+              })()
             : '';
 
         const chip = (
@@ -2150,9 +2150,7 @@ const GameWorldsPage: React.FC = () => {
             disabled={
               saving || formActiveTab !== 0 || (!!editingWorld && !isDirty)
             }
-            startIcon={
-              saving ? <CircularProgress size={20} /> : undefined
-            }
+            startIcon={saving ? <CircularProgress size={20} /> : undefined}
             title={
               formActiveTab !== 0
                 ? t('gameWorlds.form.switchToBasicInfoToSave')
@@ -2162,10 +2160,10 @@ const GameWorldsPage: React.FC = () => {
             {saving
               ? t('common.saving')
               : getActionLabel(
-                editingWorld ? 'update' : 'create',
-                requiresApproval,
-                t
-              )}
+                  editingWorld ? 'update' : 'create',
+                  requiresApproval,
+                  t
+                )}
           </Button>
         </Box>
       </ResizableDrawer>
@@ -2505,7 +2503,7 @@ const GameWorldsPage: React.FC = () => {
             variant="contained"
             disabled={
               maintenanceToggleDialog.confirmInput !==
-              maintenanceToggleDialog.world?.worldId ||
+                maintenanceToggleDialog.world?.worldId ||
               (maintenanceToggleDialog.isActivating &&
                 (toggleInputMode === 'direct'
                   ? !maintenanceToggleDialog.maintenanceData.maintenanceMessage?.trim()
@@ -2606,7 +2604,7 @@ const GameWorldsPage: React.FC = () => {
             }
             helperText={
               deleteConfirmDialog.inputValue !== '' &&
-                deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name
+              deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name
                 ? 'Name does not match'
                 : ''
             }

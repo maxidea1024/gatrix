@@ -843,7 +843,15 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
 
       {/* Footer */}
       <Divider />
-      <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', gap: 1, bgcolor: 'background.paper' }}>
+      <Box
+        sx={{
+          p: 2,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: 1,
+          bgcolor: 'background.paper',
+        }}
+      >
         <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button
           variant="contained"

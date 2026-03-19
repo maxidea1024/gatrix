@@ -327,7 +327,11 @@ const FeatureFlagTypesPage: React.FC = () => {
           <Button onClick={() => setEditDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button variant="contained" onClick={handleSave} disabled={saving || !isEditDirty}>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={saving || !isEditDirty}
+          >
             {t('common.update')}
           </Button>
         </Box>

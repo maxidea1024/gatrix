@@ -1516,10 +1516,7 @@ const MessageTemplatesPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={() => setDialogOpen(false)}
-            disabled={saving}
-          >
+          <Button onClick={() => setDialogOpen(false)} disabled={saving}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -1614,9 +1611,7 @@ const MessageTemplatesPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={() => setBulkDeleteDialogOpen(false)}
-          >
+          <Button onClick={() => setBulkDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
