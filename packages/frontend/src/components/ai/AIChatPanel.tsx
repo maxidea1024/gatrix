@@ -174,7 +174,12 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
 
   // Auto-load the most recent chat when panel opens for the first time
   useEffect(() => {
-    if (open && !initialLoadDoneRef.current && !currentChatId && messages.length === 0) {
+    if (
+      open &&
+      !initialLoadDoneRef.current &&
+      !currentChatId &&
+      messages.length === 0
+    ) {
       initialLoadDoneRef.current = true;
       (async () => {
         try {
@@ -451,7 +456,12 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
                 {t('aiChat.history')}
               </Typography>
               {historyTotal > 0 && (
-                <Chip label={historyTotal} size="small" color="primary" variant="outlined" />
+                <Chip
+                  label={historyTotal}
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                />
               )}
             </Box>
           </>
