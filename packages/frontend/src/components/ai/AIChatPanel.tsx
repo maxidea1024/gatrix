@@ -26,6 +26,8 @@ import {
   Tooltip,
   Fab,
   Zoom,
+  Fade,
+  Skeleton,
   keyframes,
 } from '@mui/material';
 import {
@@ -171,6 +173,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
   const isResizingRef = useRef(false);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const initialLoadDoneRef = useRef(false);
+  const [initialLoading, setInitialLoading] = useState(false);
 
   // Auto-load the most recent chat when panel opens for the first time
   useEffect(() => {
@@ -181,6 +184,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
       messages.length === 0
     ) {
       initialLoadDoneRef.current = true;
+      setInitialLoading(true);
       (async () => {
         try {
           const result = await aiChatService.listChats({ limit: 1 });
@@ -190,6 +194,8 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
           }
         } catch (e) {
           console.error('Failed to auto-load last chat:', e);
+        } finally {
+          setInitialLoading(false);
         }
       })();
     }
@@ -414,7 +420,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
       anchor="right"
       open={open}
       onClose={onClose}
-      variant="persistent"
+      variant="temporary"
       PaperProps={{
         sx: {
           width: drawerWidth,
@@ -513,7 +519,28 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
       {panelView === 'chat' && (
         <>
           {/* Messages - Virtualized */}
-          {messages.length === 0 ? (
+          {initialLoading ? (
+            <Box sx={{ flex: 1, p: 2 }}>
+              {[...Array(5)].map((_, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: i % 2 === 0 ? 'flex-start' : 'flex-end',
+                    mb: 2,
+                  }}
+                >
+                  <Skeleton
+                    variant="rounded"
+                    width={`${50 + Math.random() * 30}%`}
+                    height={i % 3 === 0 ? 56 : 36}
+                    sx={{ borderRadius: '16px' }}
+                  />
+                </Box>
+              ))}
+            </Box>
+          ) : messages.length === 0 ? (
+            <Fade in timeout={400}>
             <Box
               sx={{
                 flex: 1,
@@ -529,7 +556,9 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
               <SmartToyIcon sx={{ fontSize: 48 }} />
               <Typography variant="body2">{t('aiChat.placeholder')}</Typography>
             </Box>
+            </Fade>
           ) : (
+            <Fade in timeout={300}>
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               <Virtuoso
                 ref={virtuosoRef}
@@ -547,7 +576,8 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
                   </Typography>
                 </Box>
               )}
-            </Box>
+              </Box>
+            </Fade>
           )}
 
           <Divider />
