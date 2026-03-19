@@ -473,10 +473,6 @@ export const CreateIntegrationWizard: React.FC<
           activeStep={activeStep}
           sx={{
             mb: 4,
-            position: 'sticky',
-            top: 0,
-            zIndex: 1,
-            bgcolor: 'background.paper',
             py: 2,
             mx: -3,
             px: 3,
