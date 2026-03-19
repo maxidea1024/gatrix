@@ -195,6 +195,13 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
     }
   }, [open, currentChatId, messages.length, loadChat]);
 
+  // Reset initial load flag when panel closes so next open loads last chat
+  useEffect(() => {
+    if (!open) {
+      initialLoadDoneRef.current = false;
+    }
+  }, [open]);
+
   // Auto-focus input when panel opens or view switches to chat
   useEffect(() => {
     if (open && panelView === 'chat') {
@@ -657,6 +664,14 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
                     }}
                     secondaryTypographyProps={{ fontSize: '0.75rem' }}
                   />
+                  {chat.messageCount > 0 && (
+                    <Chip
+                      label={chat.messageCount}
+                      size="small"
+                      variant="outlined"
+                      sx={{ mr: 1, minWidth: 28, fontSize: '0.7rem' }}
+                    />
+                  )}
                   <Tooltip title={t('common.delete')}>
                     <IconButton
                       size="small"

@@ -10,6 +10,7 @@ import api from './api';
 export interface AIChatListItem {
   id: string;
   title: string | null;
+  messageCount: number;
   createdAt: string;
   updatedAt: string;
 }

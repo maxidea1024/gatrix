@@ -276,12 +276,12 @@ export class GameWorldModel {
       // Get the next display order if not provided (within the same environment)
       let displayOrder = worldData.displayOrder;
       if (displayOrder === undefined) {
-        // Get the maximum display order to place new world at the top (when sorted DESC)
-        const maxOrderResult = await db('g_game_worlds')
+        // Get the minimum display order to place new world at the top (when sorted ASC)
+        const minOrderResult = await db('g_game_worlds')
           .where('environmentId', environmentId)
-          .max('displayOrder as maxOrder')
+          .min('displayOrder as minOrder')
           .first();
-        displayOrder = (maxOrderResult?.maxOrder || 0) + 10;
+        displayOrder = (minOrderResult?.minOrder ?? 10) - 10;
       }
 
       // Validate createdBy

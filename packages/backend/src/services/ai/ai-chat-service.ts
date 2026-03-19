@@ -181,9 +181,10 @@ export class AIChatService {
 
             yield `data: ${JSON.stringify({ type: 'tool_result', name: chunk.toolCall?.name, result })}\n\n`;
 
-            // Make follow-up LLM call with tool results to get the final response
+            // Chain tool calls: LLM may call multiple tools sequentially
             if (result) {
-              const toolResultMessages: ChatMessage[] = [
+              const MAX_TOOL_CHAIN_DEPTH = 5;
+              let chainMessages: ChatMessage[] = [
                 ...fullMessages,
                 {
                   role: 'assistant',
@@ -196,16 +197,57 @@ export class AIChatService {
                 },
               ];
 
-              // Pass tools to follow-up stream so LLM can chain additional tool calls
-              const followUpStream = provider.createStream(
-                toolResultMessages,
-                tools
-              );
-              for await (const followUpChunk of followUpStream) {
-                if (followUpChunk.type === 'content') {
-                  assistantContent += followUpChunk.content || '';
-                  yield `data: ${JSON.stringify({ type: 'content', content: followUpChunk.content })}\n\n`;
+              for (let depth = 0; depth < MAX_TOOL_CHAIN_DEPTH; depth++) {
+                let followUpToolCall: typeof chunk.toolCall | null = null;
+                const followUpStream = provider.createStream(
+                  chainMessages,
+                  tools
+                );
+
+                for await (const followUpChunk of followUpStream) {
+                  if (followUpChunk.type === 'content') {
+                    assistantContent += followUpChunk.content || '';
+                    yield `data: ${JSON.stringify({ type: 'content', content: followUpChunk.content })}\n\n`;
+                  } else if (followUpChunk.type === 'tool_call') {
+                    followUpToolCall = followUpChunk.toolCall!;
+                  }
                 }
+
+                // If no more tool calls, break out of the chain
+                if (!followUpToolCall) break;
+
+                // Execute the chained tool call
+                logger.info('Chained tool call from LLM', {
+                  depth: depth + 1,
+                  toolName: followUpToolCall.name,
+                  toolArgs: followUpToolCall.arguments,
+                });
+                yield `data: ${JSON.stringify({ type: 'tool_start', name: followUpToolCall.name })}\n\n`;
+
+                const chainResult = await this.executeToolWithRBAC(
+                  followUpToolCall,
+                  userPermissions,
+                  orgId,
+                  userId
+                );
+
+                yield `data: ${JSON.stringify({ type: 'tool_result', name: followUpToolCall.name, result: chainResult })}\n\n`;
+
+                // Append to chain messages for next iteration
+                chainMessages = [
+                  ...chainMessages,
+                  {
+                    role: 'assistant',
+                    content:
+                      assistantContent ||
+                      `Calling tool: ${followUpToolCall.name}`,
+                  },
+                  {
+                    role: 'user',
+                    content: `Tool "${followUpToolCall.name}" returned: ${JSON.stringify(chainResult)}`,
+                  },
+                ];
+                assistantContent = '';
               }
             }
             break;
@@ -390,11 +432,20 @@ export class AIChatService {
       .orderBy('updatedAt', 'desc')
       .limit(limit)
       .offset(offset)
-      .select('id', 'userId', 'orgId', 'title', 'createdAt', 'updatedAt');
+      .select(
+        'id',
+        'userId',
+        'orgId',
+        'title',
+        'createdAt',
+        'updatedAt',
+        db.raw('JSON_LENGTH(messages) as messageCount')
+      );
 
     const chats = rows.map((r: any) => ({
       ...r,
       id: String(r.id),
+      messageCount: Number(r.messageCount || 0),
       messages: [], // Don't include messages in list
     }));
 

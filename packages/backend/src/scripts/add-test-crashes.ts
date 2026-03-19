@@ -164,7 +164,7 @@ async function addTestCrashes() {
           crashId: crash.id,
           firstLine,
           platform: crashData.platform,
-          marketType: crashData.marketType,
+          channel: crashData.channel,
           branch: crashData.branch,
           environmentId: crashData.environmentId,
           isEditor: crashData.isEditor || false,
