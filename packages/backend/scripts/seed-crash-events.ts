@@ -21,7 +21,7 @@ const knex: Knex = require('knex')({
 const platforms = ['android', 'ios', 'windows', 'mac', 'linux'];
 const environments = ['production', 'staging', 'development'];
 const branches = ['main', 'develop', 'feature/new-ui', 'hotfix/crash-fix'];
-const marketTypes = ['google', 'apple', 'steam', 'epic'];
+const channels = ['google', 'apple', 'steam', 'epic'];
 const appVersions = [
   '1.0.0',
   '1.0.1',
@@ -452,7 +452,7 @@ async function generateCrashEvents(
         platform: crash.platform,
         environment: crash.environment,
         branch: crash.branch,
-        marketType: randomElement(marketTypes),
+        channel: randomElement(channels),
         isEditor: Math.random() < 0.1, // 10% chance of being editor
         appVersion: randomElement(appVersions),
         resVersion: randomElement(resVersions),

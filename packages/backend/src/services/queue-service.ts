@@ -160,6 +160,24 @@ export class QueueService {
             'Repeatable job already exists: release-flow:progression-check'
           );
         }
+
+        // Register file storage cleanup job (daily at 4:30 AM)
+        const fileStorageCleanupExists = repeatables.some(
+          (r) => r.name === 'file-storage:cleanup'
+        );
+        if (!fileStorageCleanupExists) {
+          await this.addJob(
+            'scheduler',
+            'file-storage:cleanup',
+            {},
+            { repeat: { pattern: '30 4 * * *' } }
+          );
+          logger.info(
+            'Registered repeatable job: file-storage:cleanup (daily at 4:30 AM)'
+          );
+        } else {
+          logger.info('Repeatable job already exists: file-storage:cleanup');
+        }
       } catch (e) {
         logger.error('Failed to register repeatable scheduler jobs:', e);
       }

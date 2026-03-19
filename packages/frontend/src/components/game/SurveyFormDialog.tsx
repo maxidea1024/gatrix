@@ -602,7 +602,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               }}
               onClick={() => setBasicInfoExpanded(!basicInfoExpanded)}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
                 {t('common.basicInformation')}
               </Typography>
               <IconButton size="small" sx={{ pointerEvents: 'none' }}>
@@ -664,7 +664,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               }
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
                   {t('surveys.triggerConditions')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
@@ -798,7 +798,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                 setParticipationMailExpanded(!participationMailExpanded)
               }
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
                 {t('surveys.participationMail')}
               </Typography>
               <IconButton size="small" sx={{ pointerEvents: 'none' }}>
@@ -852,7 +852,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               }}
               onClick={() => setRewardsExpanded(!rewardsExpanded)}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
                 {t('surveys.section.rewards')}
               </Typography>
               <IconButton size="small" sx={{ pointerEvents: 'none' }}>

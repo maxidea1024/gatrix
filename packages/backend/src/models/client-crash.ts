@@ -8,14 +8,15 @@ import { isGreaterThan } from '../utils/semver';
  * Represents a crash group (deduplicated by hash + branch)
  */
 export class ClientCrash extends Model {
-  static tableName = 'crashes';
+  static tableName = 'g_crashes';
 
   id!: string; // ULID
   chash!: string; // MD5 hash of stack trace
   branch!: string; // Branch name
   environmentId!: string; // Environment
   platform!: string; // Platform
-  marketType?: string; // Market type
+  channel?: string; // Distribution channel
+  subchannel?: string; // Sub-channel
   isEditor!: boolean; // Whether crash occurred in editor
 
   firstLine?: string; // First line of stack trace
@@ -47,7 +48,8 @@ export class ClientCrash extends Model {
         branch: { type: 'string', maxLength: 50 },
         environmentId: { type: 'string', maxLength: 50 },
         platform: { type: 'string', maxLength: 50 },
-        marketType: { type: ['string', 'null'], maxLength: 50 },
+        channel: { type: ['string', 'null'], maxLength: 50 },
+        subchannel: { type: ['string', 'null'], maxLength: 50 },
         isEditor: { type: 'boolean', default: false },
         firstLine: { type: ['string', 'null'], maxLength: 200 },
         stackFilePath: { type: ['string', 'null'], maxLength: 500 },
@@ -73,8 +75,8 @@ export class ClientCrash extends Model {
         relation: Model.HasManyRelation,
         modelClass: 'CrashEvent',
         join: {
-          from: 'crashes.id',
-          to: 'crash_events.crashId',
+          from: 'g_crashes.id',
+          to: 'g_crash_events.crashId',
         },
       },
     };
@@ -136,19 +138,45 @@ export class ClientCrash extends Model {
   }
 
   /**
+   * Apply filters to query (public access for controllers)
+   */
+  static applyFiltersPublic(
+    query: QueryBuilder<ClientCrash>,
+    filters: CrashFilters
+  ) {
+    return this.applyFilters(query, filters);
+  }
+
+  /**
    * Apply filters to query
    */
   private static applyFilters(
     query: QueryBuilder<ClientCrash>,
     filters: CrashFilters
   ) {
-    // Search in firstLine, assignee, jiraTicket
+    // Search in crashes fields AND crash events fields (cross-table search)
     if (filters.search) {
       const searchTerm = `%${filters.search}%`;
       query.where(function () {
+        // Search in crash group fields
         this.where('firstLine', 'like', searchTerm)
           .orWhere('assignee', 'like', searchTerm)
-          .orWhere('jiraTicket', 'like', searchTerm);
+          .orWhere('jiraTicket', 'like', searchTerm)
+          .orWhere('chash', 'like', searchTerm)
+          // Search in crash events fields via subquery
+          .orWhereExists(function () {
+            this.select(1)
+              .from('g_crash_events')
+              .whereRaw('g_crash_events.crashId = g_crashes.id')
+              .where(function () {
+                this.where('accountId', 'like', searchTerm)
+                  .orWhere('userName', 'like', searchTerm)
+                  .orWhere('gameUserId', 'like', searchTerm)
+                  .orWhere('characterId', 'like', searchTerm)
+                  .orWhere('userMessage', 'like', searchTerm)
+                  .orWhere('crashEventIp', 'like', searchTerm);
+              });
+          });
       });
     }
 
@@ -175,9 +203,14 @@ export class ClientCrash extends Model {
       query.where('branch', filters.branch);
     }
 
-    // Market type filter
-    if (filters.marketType) {
-      query.where('marketType', filters.marketType);
+    // Channel filter
+    if (filters.channel) {
+      query.where('channel', filters.channel);
+    }
+
+    // Subchannel filter
+    if (filters.subchannel) {
+      query.where('subchannel', filters.subchannel);
     }
 
     // isEditor filter

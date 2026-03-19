@@ -164,19 +164,23 @@ export class AIChatService {
 
           case 'tool_call':
             hasToolCalls = true;
+            logger.info('Tool call received from LLM', {
+              toolName: chunk.toolCall?.name,
+              toolArgs: chunk.toolCall?.arguments,
+            });
             yield `data: ${JSON.stringify({ type: 'tool_start', name: chunk.toolCall?.name })}\n\n`;
 
             // Execute tool call with RBAC check
             const result = await this.executeToolWithRBAC(
               chunk.toolCall!,
               userPermissions,
-              orgId
+              orgId,
+              userId
             );
 
             yield `data: ${JSON.stringify({ type: 'tool_result', name: chunk.toolCall?.name, result })}\n\n`;
 
-            // If we got tool calls, we need to make another LLM call
-            // with the tool results to get the final response
+            // Make follow-up LLM call with tool results to get the final response
             if (result) {
               const toolResultMessages: ChatMessage[] = [
                 ...fullMessages,
@@ -191,7 +195,8 @@ export class AIChatService {
                 },
               ];
 
-              const followUpStream = provider.createStream(toolResultMessages);
+              // Pass tools to follow-up stream so LLM can chain additional tool calls
+              const followUpStream = provider.createStream(toolResultMessages, tools);
               for await (const followUpChunk of followUpStream) {
                 if (followUpChunk.type === 'content') {
                   assistantContent += followUpChunk.content || '';
@@ -232,10 +237,11 @@ export class AIChatService {
   private static async executeToolWithRBAC(
     toolCall: ToolCall,
     userPermissions: string[],
-    orgId: number
+    orgId: number,
+    userId: string
   ): Promise<any> {
     try {
-      return await executeToolCall(toolCall, userPermissions, orgId);
+      return await executeToolCall(toolCall, userPermissions, orgId, userId);
     } catch (error: any) {
       logger.error('Tool execution error', {
         tool: toolCall.name,

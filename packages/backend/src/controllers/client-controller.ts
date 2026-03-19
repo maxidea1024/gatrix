@@ -16,6 +16,7 @@ import { VarsService } from '../services/vars-service';
 import { sendBadRequest, sendSuccessResponse } from '../utils/api-response';
 import { IpWhitelistService } from '../services/ip-whitelist-service';
 import { SDKRequest } from '../middleware/api-token-auth';
+import VarsModel from '../models/vars';
 import { resolvePassiveData } from '../utils/passive-data-utils';
 import { FeatureFlagModel, FeatureSegmentModel } from '../models/FeatureFlag';
 import {
@@ -113,9 +114,48 @@ export class ClientController {
       const cachedData = await cacheService.get(cacheKey);
       if (cachedData) {
         logger.debug(`Cache hit for client version: ${cacheKey}`);
+
+        // Even for cached responses, check service maintenance override
+        const cachedResponse = { ...cachedData } as any;
+        try {
+          const isMaintenanceFlag = await VarsModel.get(
+            'isMaintenance',
+            environmentId
+          );
+          if (isMaintenanceFlag === 'true') {
+            const detailRaw = await VarsModel.get(
+              'maintenanceDetail',
+              environmentId
+            );
+            const detail = detailRaw ? JSON.parse(detailRaw) : null;
+            const now = new Date();
+            const startsAt = detail?.startsAt
+              ? new Date(detail.startsAt)
+              : null;
+            const endsAt = detail?.endsAt ? new Date(detail.endsAt) : null;
+            const hasStarted = !startsAt || now >= startsAt;
+            const hasNotEnded = !endsAt || now < endsAt;
+            if (hasStarted && hasNotEnded) {
+              cachedResponse.status = ClientStatus.MAINTENANCE;
+              cachedResponse.guestModeAllowed = false;
+              // Resolve localized message
+              let msg = detail?.message || '';
+              if (lang && detail?.localeMessages?.[lang]) {
+                msg = detail.localeMessages[lang];
+              }
+              cachedResponse.maintenanceMessage = msg;
+            }
+          }
+        } catch (error) {
+          logger.warn(
+            'Failed to check service maintenance status for cached response:',
+            error
+          );
+        }
+
         return res.json({
           success: true,
-          data: cachedData,
+          data: cachedResponse,
           cached: true,
         });
       }
@@ -313,15 +353,57 @@ export class ClientController {
         }
       }
 
+      // Check if service-level maintenance is active (overrides client version status)
+      let isServiceMaintenanceActive = false;
+      let serviceMaintenanceMessage: string | undefined;
+      try {
+        const isMaintenanceFlag = await VarsModel.get(
+          'isMaintenance',
+          environmentId
+        );
+        if (isMaintenanceFlag === 'true') {
+          const detailRaw = await VarsModel.get(
+            'maintenanceDetail',
+            environmentId
+          );
+          const detail = detailRaw ? JSON.parse(detailRaw) : null;
+          const now = new Date();
+          const startsAt = detail?.startsAt
+            ? new Date(detail.startsAt)
+            : null;
+          const endsAt = detail?.endsAt ? new Date(detail.endsAt) : null;
+          const hasStarted = !startsAt || now >= startsAt;
+          const hasNotEnded = !endsAt || now < endsAt;
+          isServiceMaintenanceActive = hasStarted && hasNotEnded;
+
+          if (isServiceMaintenanceActive && detail) {
+            // Resolve localized message
+            if (lang && detail.localeMessages?.[lang]) {
+              serviceMaintenanceMessage = detail.localeMessages[lang];
+            }
+            if (!serviceMaintenanceMessage) {
+              serviceMaintenanceMessage = detail.message || '';
+            }
+          }
+        }
+      } catch (error) {
+        logger.warn('Failed to check service maintenance status:', error);
+      }
+
+      // Determine effective status (service maintenance overrides client version status)
+      const effectiveStatus = isServiceMaintenanceActive
+        ? ClientStatus.MAINTENANCE
+        : record.clientStatus;
+
       // Transform data for client consumption (remove sensitive fields)
       const clientData: any = {
         platform: record.platform,
         clientVersion: record.clientVersion,
-        status: record.clientStatus,
+        status: effectiveStatus,
         gameServerAddress,
         patchAddress,
         guestModeAllowed:
-          record.clientStatus === ClientStatus.MAINTENANCE
+          effectiveStatus === ClientStatus.MAINTENANCE
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,
@@ -329,8 +411,11 @@ export class ClientController {
       };
 
       // Add maintenance message if status is MAINTENANCE
-      if (record.clientStatus === ClientStatus.MAINTENANCE) {
-        clientData.maintenanceMessage = maintenanceMessage || '';
+      if (effectiveStatus === ClientStatus.MAINTENANCE) {
+        // Service maintenance message takes priority over client version maintenance message
+        clientData.maintenanceMessage = isServiceMaintenanceActive
+          ? serviceMaintenanceMessage || ''
+          : maintenanceMessage || '';
       }
 
       // Cache the result for 5 minutes

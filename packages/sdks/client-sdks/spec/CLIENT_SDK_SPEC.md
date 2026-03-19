@@ -1918,3 +1918,137 @@ Callbacks are:
 - Called on the **main/game thread** — safe to manipulate UI or game state
 - Drained with `std::move`/`MoveTemp` for re-entrancy safety (no iterator invalidation)
 - Never called while holding any internal lock
+
+## Crash Reporting
+
+> [!IMPORTANT]
+> Crash reporting is available on both **Backend** and **Edge** endpoints at the same path.
+> Edge is a scaling replica of Backend — client SDKs can use either interchangeably.
+
+### Endpoint
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/client/crashes` | Create crash event, optionally include log, always returns presigned upload URL |
+
+### Authentication
+
+Requires the same `X-API-Token` header used for other client API calls.
+
+### Request
+
+```json
+POST /api/v1/client/crashes
+{
+  "platform": "Windows",        // Required
+  "branch": "develop",          // Required
+  "stack": "NullRef...",         // Required - stack trace text
+  "log": "game log content...", // Optional - log file content (saved server-side)
+  "appVersion": "1.0.0",        // Optional
+  "resVersion": "1.0.0",        // Optional
+  "isEditor": false,            // Optional
+  "channel": "steam",            // Optional - distribution channel
+  "subchannel": "default",       // Optional - sub-channel
+  "accountId": "user123",       // Optional
+  "characterId": "char456",     // Optional
+  "gameUserId": "guser789",     // Optional
+  "userName": "PlayerName",     // Optional
+  "gameServerId": "sv01",       // Optional
+  "userMessage": "It crashed"   // Optional
+}
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "crashId": "01JXXXXXX...",
+    "eventId": "evt_XXXXX...",
+    "isNewCrash": true,
+    "logUploadUrl": "https://cos.ap-shanghai.myqcloud.com/...?sign=..."
+  }
+}
+```
+
+### Log Upload Strategies
+
+The client can choose how to upload log files:
+
+1. **Inline** — Include `log` in the request body. Server saves it directly. Simple but limited to request body size.
+2. **Direct upload** — Omit `log` from request body, use the returned `logUploadUrl` to PUT the log file directly to cloud storage. Preferred for large files.
+3. **Both** — Include `log` for a small summary and use `logUploadUrl` for the full log dump.
+
+**Direct upload example:**
+```
+PUT {logUploadUrl}
+Content-Type: text/plain
+
+<log file content>
+```
+
+> [!TIP]
+> The presigned URL is valid for **30 minutes**. The log upload CAN happen asynchronously after the crash event is created.
+
+### Crash Fields Reference
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `platform` | string | ✅ | OS/platform (e.g., "Windows", "Android", "iOS") |
+| `branch` | string | ✅ | Build branch (e.g., "develop", "release/1.0") |
+| `stack` | string | ✅ | Full stack trace text |
+| `log` | string | ❌ | Log file content (saved server-side if provided) |
+| `appVersion` | string | ❌ | Application version (semver) |
+| `resVersion` | string | ❌ | Resource version |
+| `isEditor` | boolean | ❌ | Whether crash occurred in editor mode |
+| `channel` | string | ❌ | Distribution channel (e.g., "steam", "epic", "google") |
+| `subchannel` | string | ❌ | Sub-channel (e.g., specific store variant) |
+| `accountId` | string | ❌ | User account identifier |
+| `characterId` | string | ❌ | In-game character identifier |
+| `gameUserId` | string | ❌ | Game-specific user ID |
+| `userName` | string | ❌ | Player display name |
+| `gameServerId` | string | ❌ | Game server identifier |
+| `userMessage` | string | ❌ | User description of the crash |
+
+### Admin API: Download URLs
+
+The admin API provides signed download URLs for direct COS access to log and stack trace files.
+
+#### Log Download URL
+
+```
+GET /api/v1/admin/crash-events/:id/log-download-url
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "downloadUrl": "https://cos.ap-shanghai.myqcloud.com/crashes/logs/...?sign=...",
+    "logFilePath": "crashes/logs/2026/03/18/01XXXX.txt"
+  }
+}
+```
+
+#### Stack Trace Download URL
+
+```
+GET /api/v1/admin/crash-events/:id/stack-download-url
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "downloadUrl": "https://cos.ap-shanghai.myqcloud.com/crashes/stacks/...?sign=...",
+    "stackFilePath": "crashes/stacks/xx/xx/hash"
+  }
+}
+```
+
+> [!TIP]
+> Signed download URLs are valid for **1 hour**.
+

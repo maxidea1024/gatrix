@@ -32,7 +32,8 @@ router.get(
     query('platform').optional().isString(),
     query('environmentId').optional().isString(),
     query('branch').optional().isString(),
-    query('marketType').optional().isString(),
+    query('channel').optional().isString(),
+    query('subchannel').optional().isString(),
     query('isEditor').optional().isBoolean(),
     query('appVersion').optional().isString(),
     query('dateFrom').optional().isISO8601(),
@@ -80,6 +81,28 @@ router.get(
   '/:id/stack-trace',
   [param('id').isString(), validateRequest],
   CrashEventController.getStackTrace as any
+);
+
+/**
+ * @route   GET /admin/crash-events/:id/log-download-url
+ * @desc    Get signed download URL for log file
+ * @access  Admin
+ */
+router.get(
+  '/:id/log-download-url',
+  [param('id').isString(), validateRequest],
+  CrashEventController.getLogDownloadUrl as any
+);
+
+/**
+ * @route   GET /admin/crash-events/:id/stack-download-url
+ * @desc    Get signed download URL for stack trace file
+ * @access  Admin
+ */
+router.get(
+  '/:id/stack-download-url',
+  [param('id').isString(), validateRequest],
+  CrashEventController.getStackDownloadUrl as any
 );
 
 export default router;

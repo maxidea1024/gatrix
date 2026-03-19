@@ -14,7 +14,8 @@ export class CrashEvent extends Model {
   firstLine?: string; // First line of stack trace
 
   platform!: string; // Platform
-  marketType?: string; // Market type
+  channel?: string; // Distribution channel
+  subchannel?: string; // Sub-channel
   branch!: string; // Branch name
   environmentId!: string; // Environment
   isEditor!: boolean; // Whether crash occurred in editor
@@ -45,7 +46,8 @@ export class CrashEvent extends Model {
         crashId: { type: 'string', maxLength: 26 }, // ULID
         firstLine: { type: ['string', 'null'], maxLength: 200 },
         platform: { type: 'string', maxLength: 50 },
-        marketType: { type: ['string', 'null'], maxLength: 50 },
+        channel: { type: ['string', 'null'], maxLength: 50 },
+        subchannel: { type: ['string', 'null'], maxLength: 50 },
         branch: { type: 'string', maxLength: 50 },
         environmentId: { type: 'string', maxLength: 50 },
         isEditor: { type: 'boolean', default: false },
@@ -71,8 +73,8 @@ export class CrashEvent extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: 'ClientCrash',
         join: {
-          from: 'crash_events.crashId',
-          to: 'crashes.id',
+          from: 'g_crash_events.crashId',
+          to: 'g_crashes.id',
         },
       },
     };
@@ -92,7 +94,8 @@ export class CrashEvent extends Model {
     crashId: string;
     firstLine?: string;
     platform: string;
-    marketType?: string;
+    channel?: string;
+    subchannel?: string;
     branch: string;
     environmentId: string;
     isEditor?: boolean;

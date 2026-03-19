@@ -8,8 +8,7 @@ import {
   CRASH_CONSTANTS,
 } from '../types/crash';
 import crypto from 'crypto';
-import fs from 'fs/promises';
-import path from 'path';
+import { getStorageProvider } from '../services/storage';
 import { cacheService } from '../services/cache-service';
 import { isGreaterThan } from '../utils/semver';
 import { generateULID } from '../utils/ulid';
@@ -92,7 +91,8 @@ export class ClientCrashController {
           branch: body.branch,
           environmentId: environmentId,
           platform: body.platform,
-          marketType: body.marketType,
+          channel: body.channel,
+          subchannel: body.subchannel,
           isEditor: body.isEditor || false,
           firstLine,
           crashesCount: 1,
@@ -143,7 +143,8 @@ export class ClientCrashController {
         crashId: crash.id,
         firstLine: eventFirstLine,
         platform: body.platform,
-        marketType: body.marketType,
+        channel: body.channel,
+        subchannel: body.subchannel,
         branch: body.branch,
         environmentId: environmentId,
         isEditor: body.isEditor,
@@ -182,10 +183,37 @@ export class ClientCrashController {
         });
       }
 
-      // Save log file if provided
+      // Save log file if provided in body
       if (body.log) {
         const logFilePath = await this.saveLogFile(event.id, body.log);
         await event.$query().patch({ logFilePath });
+      }
+
+      // Generate presigned upload URL for log file (client can upload directly)
+      let logUploadUrl: string | undefined;
+      try {
+        const storage = getStorageProvider();
+        const now = new Date();
+        const year = now.getFullYear().toString();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const logKey = `crashes/logs/${year}/${month}/${day}/${event.id}.txt`;
+
+        logUploadUrl = await storage.getSignedUploadUrl(
+          logKey,
+          'text/plain',
+          1800 // 30 minutes
+        );
+
+        // Pre-set logFilePath if not already set by body.log
+        if (!body.log) {
+          await event.$query().patch({ logFilePath: logKey });
+        }
+      } catch (storageErr) {
+        logger.warn('Failed to generate presigned upload URL', {
+          error: storageErr,
+          eventId: event.id,
+        });
       }
 
       logger.info('Crash uploaded successfully', {
@@ -202,6 +230,7 @@ export class ClientCrashController {
           crashId: crash.id,
           eventId: event.id,
           isNewCrash,
+          logUploadUrl,
         },
       });
     } catch (error) {
@@ -214,36 +243,23 @@ export class ClientCrashController {
   });
 
   /**
-   * Save stack trace to file
-   * Returns the relative file path
+   * Save stack trace to storage
+   * Returns the storage key
    */
   private static async saveStackTraceFile(
     chash: string,
     stack: string
   ): Promise<string> {
     try {
-      // Create directory structure: public/crashes/hash[0:2]/hash[2:4]/
       const hashDir1 = chash.substring(0, 2);
       const hashDir2 = chash.substring(2, 4);
-      const dirPath = path.join(
-        process.cwd(),
-        'public',
-        'crashes',
-        hashDir1,
-        hashDir2
-      );
+      const key = `crashes/stacks/${hashDir1}/${hashDir2}/${chash}`;
 
-      // Ensure directory exists
-      await fs.mkdir(dirPath, { recursive: true });
+      const storage = getStorageProvider();
+      await storage.upload(key, stack, 'text/plain');
 
-      // Save stack trace file
-      const filePath = path.join(dirPath, chash);
-      await fs.writeFile(filePath, stack, 'utf8');
-
-      const relativePath = `/crashes/${hashDir1}/${hashDir2}/${chash}`;
-      logger.debug('Stack trace saved', { chash, relativePath });
-
-      return relativePath;
+      logger.debug('Stack trace saved', { chash, key });
+      return key;
     } catch (error) {
       logger.error('Failed to save stack trace file:', error);
       // Don't throw error - file saving failure shouldn't block crash upload
@@ -252,8 +268,8 @@ export class ClientCrashController {
   }
 
   /**
-   * Save log file
-   * Returns the relative file path
+   * Save log file to storage
+   * Returns the storage key
    */
   private static async saveLogFile(
     eventId: string,
@@ -270,32 +286,17 @@ export class ClientCrashController {
         log = log.substring(0, CRASH_CONSTANTS.MaxLogTextLen);
       }
 
-      // Create directory structure: public/crashes/logs/YYYY/MM/DD/
       const now = new Date();
       const year = now.getFullYear().toString();
       const month = (now.getMonth() + 1).toString().padStart(2, '0');
       const day = now.getDate().toString().padStart(2, '0');
-      const dirPath = path.join(
-        process.cwd(),
-        'public',
-        'crashes',
-        'logs',
-        year,
-        month,
-        day
-      );
+      const key = `crashes/logs/${year}/${month}/${day}/${eventId}.txt`;
 
-      // Ensure directory exists
-      await fs.mkdir(dirPath, { recursive: true });
+      const storage = getStorageProvider();
+      await storage.upload(key, log, 'text/plain');
 
-      // Save log file
-      const filePath = path.join(dirPath, `${eventId}.txt`);
-      await fs.writeFile(filePath, log, 'utf8');
-
-      const relativePath = `/crashes/logs/${year}/${month}/${day}/${eventId}.txt`;
-      logger.debug('Log file saved', { eventId, relativePath });
-
-      return relativePath;
+      logger.debug('Log file saved', { eventId, key });
+      return key;
     } catch (error) {
       logger.error('Failed to save log file:', error);
       // Don't throw error - file saving failure shouldn't block crash upload

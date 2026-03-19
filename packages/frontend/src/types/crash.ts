@@ -9,7 +9,8 @@ export interface ClientCrash {
   branch: string; // Branch name
   environmentId: string; // Environment
   platform: string; // Platform
-  marketType?: string; // Market type
+  channel?: string; // Distribution channel
+  subchannel?: string; // Sub-channel
   isEditor: boolean; // Whether crash occurred in editor
 
   firstLine?: string; // First line of stack trace
@@ -40,7 +41,8 @@ export interface CrashEvent {
   crashId: string; // Reference to crashes.id
 
   platform: string; // Platform
-  marketType?: string; // Market type
+  channel?: string; // Distribution channel
+  subchannel?: string; // Sub-channel
   branch: string; // Branch name
   environmentId: string; // Environment
   isEditor: boolean; // Whether crash occurred in editor
@@ -78,7 +80,8 @@ export interface CrashFilters {
   platform?: string;
   environmentId?: string;
   branch?: string;
-  marketType?: string;
+  channel?: string;
+  subchannel?: string;
   isEditor?: boolean;
   state?: CrashState;
   assignee?: string;
@@ -99,8 +102,10 @@ export interface GetCrashEventsRequest {
   environmentOperator?: 'any_of' | 'include_all';
   branch?: string;
   branchOperator?: 'any_of' | 'include_all';
-  marketType?: string;
-  marketTypeOperator?: 'any_of' | 'include_all';
+  channel?: string;
+  channelOperator?: 'any_of' | 'include_all';
+  subchannel?: string;
+  subchannelOperator?: 'any_of' | 'include_all';
   isEditor?: boolean;
   appVersion?: string;
   appVersionOperator?: 'any_of' | 'include_all';

@@ -982,27 +982,103 @@ const DashboardPage: React.FC = () => {
                 ? new Date(detail.startsAt)
                 : null;
               const endsAt = detail.endsAt ? new Date(detail.endsAt) : null;
-              const isActive = startsAt ? now >= startsAt : true;
+              const hasStarted = startsAt ? now >= startsAt : true;
+              const hasEnded = endsAt ? now >= endsAt : false;
+              const isActive = hasStarted && !hasEnded;
 
               return (
-                <Card
-                  sx={{
-                    borderLeft: 4,
-                    borderColor: isActive ? 'error.main' : 'warning.main',
-                  }}
-                >
-                  <CardContent>
+                <Card>
+                  <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
+                    {/* Row 1: Title + Chip + Link */}
                     <Box
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
-                        mb: 2,
+                        gap: 1,
+                        mb: detail.message ? 1 : 0,
                       }}
                     >
-                      <Typography variant="h6" fontWeight={600}>
+                      <Typography variant="subtitle2" fontWeight={600}>
                         {t('dashboard.maintenanceStatus')}
                       </Typography>
+                      <Chip
+                        label={
+                          isActive
+                            ? t('dashboard.maintenanceActive')
+                            : hasEnded
+                              ? t('dashboard.maintenanceEnded')
+                              : t('dashboard.maintenanceScheduled')
+                        }
+                        color={
+                          isActive ? 'error' : hasEnded ? 'default' : 'warning'
+                        }
+                        size="small"
+                      />
+                      <Divider
+                        orientation="vertical"
+                        flexItem
+                        sx={{ mx: 0.5 }}
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        {detail.type === 'emergency'
+                          ? t('maintenance.types.emergency')
+                          : t('maintenance.types.regular')}
+                      </Typography>
+                      {startsAt && (
+                        <>
+                          <Divider
+                            orientation="vertical"
+                            flexItem
+                            sx={{ mx: 0.5 }}
+                          />
+                          <Tooltip title={formatDateTimeDetailed(startsAt)}>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                            >
+                              <Box
+                                component="span"
+                                sx={{ fontWeight: 500, mr: 0.5 }}
+                              >
+                                {t('dashboard.maintenanceStartsAt')}
+                              </Box>
+                              {formatRelativeTime(
+                                startsAt,
+                                undefined,
+                                i18n.language
+                              )}
+                            </Typography>
+                          </Tooltip>
+                        </>
+                      )}
+                      {endsAt && (
+                        <>
+                          <Divider
+                            orientation="vertical"
+                            flexItem
+                            sx={{ mx: 0.5 }}
+                          />
+                          <Tooltip title={formatDateTimeDetailed(endsAt)}>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                            >
+                              <Box
+                                component="span"
+                                sx={{ fontWeight: 500, mr: 0.5 }}
+                              >
+                                {t('dashboard.maintenanceEndsAt')}
+                              </Box>
+                              {formatRelativeTime(
+                                endsAt,
+                                undefined,
+                                i18n.language
+                              )}
+                            </Typography>
+                          </Tooltip>
+                        </>
+                      )}
+                      <Box sx={{ flex: 1 }} />
                       <Tooltip title={t('dashboard.viewDetails')}>
                         <IconButton
                           size="small"
@@ -1012,103 +1088,21 @@ const DashboardPage: React.FC = () => {
                         </IconButton>
                       </Tooltip>
                     </Box>
-                    <Box>
-                      <Chip
-                        label={
-                          isActive
-                            ? t('dashboard.maintenanceActive')
-                            : t('dashboard.maintenanceScheduled')
-                        }
-                        color={isActive ? 'error' : 'warning'}
-                        size="small"
-                        sx={{ mb: 2 }}
-                      />
-                      <Box
+                    {/* Row 2: Message (if present) */}
+                    {detail.message && (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
                         sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 1,
+                          pl: 0.5,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
                         }}
                       >
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <Typography variant="body2" color="text.secondary">
-                            {t('dashboard.maintenanceType')}
-                          </Typography>
-                          <Typography variant="body2" fontWeight={500}>
-                            {detail.type === 'emergency'
-                              ? t('maintenance.types.emergency')
-                              : t('maintenance.types.regular')}
-                          </Typography>
-                        </Box>
-                        {startsAt && (
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                            }}
-                          >
-                            <Typography variant="body2" color="text.secondary">
-                              {t('dashboard.maintenanceStartsAt')}
-                            </Typography>
-                            <Tooltip title={formatDateTimeDetailed(startsAt)}>
-                              <Typography variant="body2" fontWeight={500}>
-                                {formatRelativeTime(
-                                  startsAt,
-                                  undefined,
-                                  i18n.language
-                                )}
-                              </Typography>
-                            </Tooltip>
-                          </Box>
-                        )}
-                        {endsAt && (
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                            }}
-                          >
-                            <Typography variant="body2" color="text.secondary">
-                              {t('dashboard.maintenanceEndsAt')}
-                            </Typography>
-                            <Tooltip title={formatDateTimeDetailed(endsAt)}>
-                              <Typography variant="body2" fontWeight={500}>
-                                {formatRelativeTime(
-                                  endsAt,
-                                  undefined,
-                                  i18n.language
-                                )}
-                              </Typography>
-                            </Tooltip>
-                          </Box>
-                        )}
-                        {detail.message && (
-                          <Box
-                            sx={{
-                              mt: 1,
-                              p: 1.5,
-                              bgcolor: 'action.hover',
-                              borderRadius: 0,
-                            }}
-                          >
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t('dashboard.maintenanceMessage')}
-                            </Typography>
-                            <Typography variant="body2" sx={{ mt: 0.5 }}>
-                              {detail.message}
-                            </Typography>
-                          </Box>
-                        )}
-                      </Box>
-                    </Box>
+                        {detail.message}
+                      </Typography>
+                    )}
                   </CardContent>
                 </Card>
               );

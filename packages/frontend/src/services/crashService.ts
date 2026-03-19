@@ -49,7 +49,8 @@ class CrashService {
     branches: string[];
     platforms: string[];
     environments: { id: string; name: string }[];
-    marketTypes: string[];
+    channels: string[];
+    subchannels: string[];
     appVersions: string[];
     resVersions: string[];
     gameServerIds: string[];
@@ -132,7 +133,141 @@ class CrashService {
       throw error;
     }
   }
+
+  // ==================== Crashes Group API ====================
+
+  /**
+   * Get crash groups with pagination and filters
+   */
+  async getCrashes(params: Record<string, any> = {}): Promise<{
+    data: any[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
+    try {
+      const response = await api.get('/admin/crashes', { params });
+      const result = response.data;
+      return {
+        data: result.data || [],
+        total: result.total || 0,
+        page: result.page || 1,
+        limit: result.limit || 20,
+        totalPages: result.totalPages || 1,
+      };
+    } catch (error) {
+      console.error('Error fetching crashes:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get crash by ID with stack trace
+   */
+  async getCrashById(
+    id: string
+  ): Promise<any> {
+    try {
+      const response = await api.get(`/admin/crashes/${id}`);
+      return response.data.data || response.data;
+    } catch (error) {
+      console.error('Error fetching crash:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get events for a specific crash group
+   */
+  async getCrashGroupEvents(
+    crashId: string,
+    params: { page?: number; limit?: number } = {}
+  ): Promise<{
+    data: any[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
+    try {
+      const response = await api.get(`/admin/crashes/${crashId}/events`, {
+        params,
+      });
+      const result = response.data;
+      return {
+        data: result.data || [],
+        total: result.total || 0,
+        page: result.page || 1,
+        limit: result.limit || 100,
+        totalPages: result.totalPages || 1,
+      };
+    } catch (error) {
+      console.error('Error fetching crash group events:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update crash state
+   */
+  async updateCrashState(
+    crashId: string,
+    state: number
+  ): Promise<any> {
+    const response = await api.patch(`/admin/crashes/${crashId}/state`, {
+      state,
+    });
+    return response.data;
+  }
+
+  /**
+   * Update crash assignee
+   */
+  async updateCrashAssignee(
+    crashId: string,
+    assignee: string | null
+  ): Promise<any> {
+    const response = await api.patch(`/admin/crashes/${crashId}/assignee`, {
+      assignee,
+    });
+    return response.data;
+  }
+
+  /**
+   * Update crash Jira ticket
+   */
+  async updateCrashJiraTicket(
+    crashId: string,
+    jiraTicket: string | null
+  ): Promise<any> {
+    const response = await api.patch(`/admin/crashes/${crashId}/jira`, {
+      jiraTicket,
+    });
+    return response.data;
+  }
+
+  /**
+   * Get filter options for crashes groups
+   */
+  async getCrashesFilterOptions(): Promise<{
+    platforms: string[];
+    environments: { id: string; name: string }[];
+    branches: string[];
+    channels: string[];
+    subchannels: string[];
+    states: number[];
+  }> {
+    try {
+      const response = await api.get('/admin/crashes/filter-options');
+      return response.data.data || response.data;
+    } catch (error) {
+      console.error('Error fetching crashes filter options:', error);
+      throw error;
+    }
+  }
 }
 
 export const crashService = new CrashService();
 export default crashService;
+

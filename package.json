@@ -26,7 +26,7 @@
     "infra:down": "docker compose -f docker-compose-infra.yml down",
     "infra:logs": "docker compose -f docker-compose-infra.yml logs -f",
     "build": "yarn build:shared && yarn build:sdk && yarn build:docs && yarn build:apps",
-    "build:shared": "yarn workspace @gatrix/shared build && yarn workspace @gatrix/evaluator build",
+    "build:shared": "yarn workspace @gatrix/shared build && yarn workspace @gatrix/evaluator build && yarn workspace @gatrix/storage build",
     "build:sdk": "yarn workspace @gatrix/gatrix-node-server-sdk build",
     "build:apps": "concurrently -n backend,frontend,edge,event-lens,chat-server -c blue,green,cyan,yellow,magenta \"yarn build:backend\" \"yarn build:frontend\" \"yarn build:edge\" \"yarn build:event-lens\" \"yarn build:chat-server\"",
     "build:backend": "yarn workspace @gatrix/backend build",

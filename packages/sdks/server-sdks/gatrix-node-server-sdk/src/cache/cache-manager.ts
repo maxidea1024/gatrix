@@ -177,6 +177,7 @@ export class CacheManager {
         this.storage
       );
       this.serviceMaintenanceService.setFeatureEnabled(true);
+      this.serviceMaintenanceService.setApiClientFactory(this.apiClientFactory);
     }
     if (this.uses.clientVersion === true) {
       this.clientVersionService = new ClientVersionService(

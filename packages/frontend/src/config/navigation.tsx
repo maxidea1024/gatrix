@@ -473,6 +473,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.REALTIME_EVENTS_READ,
       },
       {
+        text: 'sidebar.crashes',
+        icon: 'BugReport',
+        path: '/admin/crashes',
+        requiredPermission: P.CRASH_EVENTS_READ,
+      },
+      {
         text: 'sidebar.crashEvents',
         icon: 'BugReport',
         path: '/admin/crash-events',

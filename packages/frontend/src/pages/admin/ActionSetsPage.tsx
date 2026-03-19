@@ -39,7 +39,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Refresh as RefreshIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   SmartToy as SmartToyIcon,
@@ -680,13 +679,6 @@ const ActionSetsPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={fetchActionSets}
-          >
-            {t('common.refresh')}
-          </Button>
           {actionSets.length > 0 && (
             <Button
               variant="contained"
