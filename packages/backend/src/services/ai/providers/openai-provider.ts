@@ -44,9 +44,40 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
     tools?: ToolDefinition[],
     stream = false
   ): any {
+    // Convert messages to OpenAI format, handling tool_calls and tool role
+    const openaiMessages: any[] = messages.flatMap((m): any[] => {
+      // Assistant message that called a tool
+      if (m.role === 'assistant' && m.toolCall) {
+        return [{
+          role: 'assistant',
+          content: m.content || null,
+          tool_calls: [{
+            id: m.toolCall.id,
+            type: 'function',
+            function: {
+              name: m.toolCall.name,
+              arguments: JSON.stringify(m.toolCall.arguments),
+            },
+          }],
+        }];
+      }
+
+      // User message containing a tool result -> convert to "tool" role
+      if (m.role === 'user' && m.toolResult) {
+        return [{
+          role: 'tool' as const,
+          tool_call_id: m.toolResult.toolCallId,
+          content: m.content,
+        }];
+      }
+
+      // Regular message
+      return [{ role: m.role, content: m.content }];
+    });
+
     const body: any = {
       model: this.config.model,
-      messages: messages.map((m) => ({ role: m.role, content: m.content })),
+      messages: openaiMessages,
       stream,
     };
 

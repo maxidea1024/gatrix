@@ -36,13 +36,45 @@ export class ClaudeProvider extends BaseLLMProvider {
     const { systemMessage, conversationMessages } =
       this.separateSystemMessage(messages);
 
+    // Convert messages to Claude format, handling tool_use and tool_result
+    const claudeMessages = conversationMessages.map((m) => {
+      // Assistant message that called a tool
+      if (m.role === 'assistant' && m.toolCall) {
+        const content: any[] = [];
+        if (m.content) {
+          content.push({ type: 'text', text: m.content });
+        }
+        content.push({
+          type: 'tool_use',
+          id: m.toolCall.id,
+          name: m.toolCall.name,
+          input: m.toolCall.arguments,
+        });
+        return { role: 'assistant', content };
+      }
+
+      // User message containing a tool result
+      if (m.role === 'user' && m.toolResult) {
+        return {
+          role: 'user',
+          content: [
+            {
+              type: 'tool_result',
+              tool_use_id: m.toolResult.toolCallId,
+              content: m.content,
+            },
+          ],
+        };
+      }
+
+      // Regular message
+      return { role: m.role, content: m.content };
+    });
+
     const body: any = {
       model: this.config.model,
       max_tokens: 4096,
-      messages: conversationMessages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
+      messages: claudeMessages,
       stream,
     };
 

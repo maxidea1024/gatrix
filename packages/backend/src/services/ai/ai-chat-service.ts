@@ -184,16 +184,26 @@ export class AIChatService {
             // Chain tool calls: LLM may call multiple tools sequentially
             if (result) {
               const MAX_TOOL_CHAIN_DEPTH = 5;
+              const toolCallId = chunk.toolCall!.id;
               let chainMessages: ChatMessage[] = [
                 ...fullMessages,
                 {
                   role: 'assistant',
                   content:
-                    assistantContent || `Calling tool: ${chunk.toolCall?.name}`,
+                    assistantContent || '',
+                  toolCall: {
+                    id: toolCallId,
+                    name: chunk.toolCall!.name,
+                    arguments: chunk.toolCall!.arguments,
+                  },
                 },
                 {
                   role: 'user',
-                  content: `Tool "${chunk.toolCall?.name}" returned: ${JSON.stringify(result)}`,
+                  content: JSON.stringify(result),
+                  toolResult: {
+                    toolCallId: toolCallId,
+                    toolName: chunk.toolCall!.name,
+                  },
                 },
               ];
 
@@ -233,18 +243,25 @@ export class AIChatService {
 
                 yield `data: ${JSON.stringify({ type: 'tool_result', name: followUpToolCall.name, result: chainResult })}\n\n`;
 
-                // Append to chain messages for next iteration
+                // Append to chain messages for next iteration with proper tool metadata
                 chainMessages = [
                   ...chainMessages,
                   {
                     role: 'assistant',
-                    content:
-                      assistantContent ||
-                      `Calling tool: ${followUpToolCall.name}`,
+                    content: assistantContent || '',
+                    toolCall: {
+                      id: followUpToolCall.id,
+                      name: followUpToolCall.name,
+                      arguments: followUpToolCall.arguments,
+                    },
                   },
                   {
                     role: 'user',
-                    content: `Tool "${followUpToolCall.name}" returned: ${JSON.stringify(chainResult)}`,
+                    content: JSON.stringify(chainResult),
+                    toolResult: {
+                      toolCallId: followUpToolCall.id,
+                      toolName: followUpToolCall.name,
+                    },
                   },
                 ];
                 assistantContent = '';

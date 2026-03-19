@@ -9,6 +9,17 @@ export type LLMProvider = 'openai' | 'claude' | 'gemini' | 'deepseek' | 'qwen';
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
+  // Tool call metadata for assistant messages that invoked a tool
+  toolCall?: {
+    id: string;
+    name: string;
+    arguments: Record<string, any>;
+  };
+  // Tool result metadata for user messages that contain a tool result
+  toolResult?: {
+    toolCallId: string;
+    toolName: string;
+  };
 }
 
 export interface ToolDefinition {
