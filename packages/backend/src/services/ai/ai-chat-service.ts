@@ -208,6 +208,14 @@ export class AIChatService {
 
               for (let depth = 0; depth < MAX_TOOL_CHAIN_DEPTH; depth++) {
                 let followUpToolCall: typeof chunk.toolCall | null = null;
+
+                logger.info('Starting follow-up stream for tool chain', {
+                  depth,
+                  messageCount: chainMessages.length,
+                  lastMessage: chainMessages[chainMessages.length - 1]?.role,
+                  hasToolResult: !!chainMessages[chainMessages.length - 1]?.toolResult,
+                });
+
                 const followUpStream = provider.createStream(
                   chainMessages,
                   tools
@@ -218,9 +226,25 @@ export class AIChatService {
                     assistantContent += followUpChunk.content || '';
                     yield `data: ${JSON.stringify({ type: 'content', content: followUpChunk.content })}\n\n`;
                   } else if (followUpChunk.type === 'tool_call') {
+                    logger.info('Follow-up stream returned tool_call', {
+                      depth,
+                      toolName: followUpChunk.toolCall?.name,
+                    });
                     followUpToolCall = followUpChunk.toolCall!;
+                  } else if (followUpChunk.type === 'error') {
+                    logger.error('Follow-up stream error', {
+                      depth,
+                      error: followUpChunk.error,
+                    });
+                    yield `data: ${JSON.stringify({ type: 'error', error: followUpChunk.error })}\n\n`;
                   }
                 }
+
+                logger.info('Follow-up stream completed', {
+                  depth,
+                  hasToolCall: !!followUpToolCall,
+                  contentLength: assistantContent.length,
+                });
 
                 // If no more tool calls, break out of the chain
                 if (!followUpToolCall) break;
