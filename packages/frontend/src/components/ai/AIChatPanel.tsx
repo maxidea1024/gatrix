@@ -12,6 +12,7 @@ import remarkGfm from 'remark-gfm';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import {
   Box,
+  Chip,
   Drawer,
   IconButton,
   Typography,
@@ -164,10 +165,30 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
   const [panelView, setPanelView] = useState<PanelView>('chat');
   const [chatHistory, setChatHistory] = useState<AIChatListItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyTotal, setHistoryTotal] = useState(0);
   const [drawerWidth, setDrawerWidth] = useState(getSavedWidth);
   const inputRef = useRef<HTMLInputElement>(null);
   const isResizingRef = useRef(false);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
+  const initialLoadDoneRef = useRef(false);
+
+  // Auto-load the most recent chat when panel opens for the first time
+  useEffect(() => {
+    if (open && !initialLoadDoneRef.current && !currentChatId && messages.length === 0) {
+      initialLoadDoneRef.current = true;
+      (async () => {
+        try {
+          const result = await aiChatService.listChats({ limit: 1 });
+          if (result.chats.length > 0) {
+            const chat = await aiChatService.getChat(result.chats[0].id);
+            loadChat(result.chats[0].id, chat.messages);
+          }
+        } catch (e) {
+          console.error('Failed to auto-load last chat:', e);
+        }
+      })();
+    }
+  }, [open, currentChatId, messages.length, loadChat]);
 
   // Auto-focus input when panel opens or view switches to chat
   useEffect(() => {
@@ -196,6 +217,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
     try {
       const result = await aiChatService.listChats({ limit: 50 });
       setChatHistory(result.chats);
+      setHistoryTotal(result.total);
     } catch (e) {
       console.error('Failed to load chat history:', e);
     } finally {
@@ -424,9 +446,14 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
             <IconButton size="small" onClick={() => setPanelView('chat')}>
               <ArrowBackIcon />
             </IconButton>
-            <Typography variant="subtitle1" fontWeight={600}>
-              {t('aiChat.history')}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle1" fontWeight={600}>
+                {t('aiChat.history')}
+              </Typography>
+              {historyTotal > 0 && (
+                <Chip label={historyTotal} size="small" color="primary" variant="outlined" />
+              )}
+            </Box>
           </>
         ) : (
           <>
