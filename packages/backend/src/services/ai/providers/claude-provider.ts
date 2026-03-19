@@ -6,6 +6,7 @@ import { createLogger } from '../../../config/logger';
 import {
   BaseLLMProvider,
   type ChatMessage,
+  type LLMConfig,
   type StreamChunk,
   type ToolCall,
   type ToolDefinition,
@@ -14,7 +15,12 @@ import {
 const logger = createLogger('ClaudeProvider');
 
 export class ClaudeProvider extends BaseLLMProvider {
-  private baseUrl = 'https://api.anthropic.com/v1';
+  private baseUrl: string;
+
+  constructor(config: LLMConfig) {
+    super(config);
+    this.baseUrl = config.apiBaseUrl || 'https://api.anthropic.com/v1';
+  }
 
   private separateSystemMessage(messages: ChatMessage[]) {
     const systemMessage = messages.find((m) => m.role === 'system');
@@ -50,6 +56,7 @@ export class ClaudeProvider extends BaseLLMProvider {
         description: t.description,
         input_schema: t.parameters,
       }));
+      body.tool_choice = { type: 'auto' };
     }
 
     return body;
@@ -68,6 +75,14 @@ export class ClaudeProvider extends BaseLLMProvider {
     tools?: ToolDefinition[]
   ): AsyncGenerator<StreamChunk> {
     const body = this.buildBody(messages, tools, true);
+
+    logger.info('Claude stream request', {
+      model: this.config.model,
+      baseUrl: this.baseUrl,
+      toolCount: tools?.length || 0,
+      toolNames: tools?.map((t) => t.name) || [],
+      hasToolChoice: !!body.tool_choice,
+    });
 
     try {
       const response = await fetch(`${this.baseUrl}/messages`, {
