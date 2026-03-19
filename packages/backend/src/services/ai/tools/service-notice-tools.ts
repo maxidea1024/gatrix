@@ -183,4 +183,40 @@ export const serviceNoticeTools: AIToolConfig[] = [
       );
     },
   },
+
+  {
+    tool: {
+      name: 'delete_service_notice',
+      description: descWithRisk(
+        'Delete a service notice permanently. This action cannot be undone.',
+        'high'
+      ),
+      parameters: {
+        type: 'object',
+        properties: {
+          environmentId: {
+            type: 'string',
+            description: 'The environment ID',
+          },
+          id: {
+            type: 'string',
+            description: 'The service notice ID to delete',
+          },
+        },
+        required: ['environmentId', 'id'],
+      },
+    },
+    requiredPermission: P.SERVICE_NOTICES_DELETE,
+    riskLevel: 'high',
+    handler: async (args) => {
+      const serviceNoticeService = (
+        await import('../../service-notice-service')
+      ).default;
+      await serviceNoticeService.deleteServiceNotice(
+        args.id,
+        args.environmentId
+      );
+      return { success: true, deletedId: args.id };
+    },
+  },
 ];
