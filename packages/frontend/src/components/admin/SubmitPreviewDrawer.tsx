@@ -426,7 +426,14 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
         )}
 
         {/* Action Buttons */}
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', bgcolor: 'background.paper' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            justifyContent: 'flex-end',
+            bgcolor: 'background.paper',
+          }}
+        >
           <Button variant="outlined" onClick={onClose}>
             {t('common.cancel')}
           </Button>
