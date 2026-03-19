@@ -541,41 +541,43 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
             </Box>
           ) : messages.length === 0 ? (
             <Fade in timeout={400}>
-            <Box
-              sx={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: 0.5,
-                gap: 1,
-                p: 2,
-              }}
-            >
-              <SmartToyIcon sx={{ fontSize: 48 }} />
-              <Typography variant="body2">{t('aiChat.placeholder')}</Typography>
-            </Box>
+              <Box
+                sx={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: 0.5,
+                  gap: 1,
+                  p: 2,
+                }}
+              >
+                <SmartToyIcon sx={{ fontSize: 48 }} />
+                <Typography variant="body2">
+                  {t('aiChat.placeholder')}
+                </Typography>
+              </Box>
             </Fade>
           ) : (
             <Fade in timeout={300}>
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <Virtuoso
-                ref={virtuosoRef}
-                style={{ flex: 1 }}
-                totalCount={messages.length}
-                itemContent={renderMessage}
-                followOutput="auto"
-                initialTopMostItemIndex={messages.length - 1}
-                overscan={200}
-              />
-              {error && (
-                <Box sx={{ textAlign: 'center', py: 0.5, px: 2 }}>
-                  <Typography variant="caption" color="error">
-                    {error}
-                  </Typography>
-                </Box>
-              )}
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Virtuoso
+                  ref={virtuosoRef}
+                  style={{ flex: 1 }}
+                  totalCount={messages.length}
+                  itemContent={renderMessage}
+                  followOutput="auto"
+                  initialTopMostItemIndex={messages.length - 1}
+                  overscan={200}
+                />
+                {error && (
+                  <Box sx={{ textAlign: 'center', py: 0.5, px: 2 }}>
+                    <Typography variant="caption" color="error">
+                      {error}
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </Fade>
           )}
