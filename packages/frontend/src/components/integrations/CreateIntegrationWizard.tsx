@@ -476,7 +476,7 @@ export const CreateIntegrationWizard: React.FC<
             position: 'sticky',
             top: 0,
             zIndex: 1,
-            bgcolor: 'inherit',
+            bgcolor: 'background.paper',
             py: 2,
             mx: -3,
             px: 3,
