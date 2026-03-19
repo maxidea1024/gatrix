@@ -18,6 +18,10 @@ export const segmentTools: AIToolConfig[] = [
             type: 'string',
             description: 'The project ID to list segments from',
           },
+          search: {
+            type: 'string',
+            description: 'Optional search term to filter segments',
+          },
         },
         required: ['projectId'],
       },
@@ -26,7 +30,10 @@ export const segmentTools: AIToolConfig[] = [
     riskLevel: 'read',
     handler: async (args) => {
       const { featureFlagService } = await import('../../feature-flag-service');
-      return await featureFlagService.listSegments(args.projectId);
+      return await featureFlagService.listSegments(
+        args.search || undefined,
+        args.projectId
+      );
     },
   },
 
