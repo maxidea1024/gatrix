@@ -22,6 +22,7 @@ const logger = createLogger('AIChat');
 
 const MAX_MESSAGES_PER_CHAT = 100;
 const MAX_MESSAGE_LENGTH = 5000;
+const MAX_CHAT_HISTORY = parseInt(process.env.AI_CHAT_MAX_HISTORY || '100', 10);
 
 export interface AIChatRecord {
   id: string;
@@ -267,6 +268,40 @@ export class AIChatService {
       title: null,
       messages: JSON.stringify([]),
     });
+
+    // Auto-cleanup: delete oldest chats if user exceeds max history
+    try {
+      const countResult = await db('g_ai_chats')
+        .where('userId', userId)
+        .where('orgId', orgId)
+        .count('* as total')
+        .first();
+      const total = Number(countResult?.total || 0);
+
+      if (total > MAX_CHAT_HISTORY) {
+        const excessCount = total - MAX_CHAT_HISTORY;
+        const oldestChats = await db('g_ai_chats')
+          .where('userId', userId)
+          .where('orgId', orgId)
+          .orderBy('updatedAt', 'asc')
+          .limit(excessCount)
+          .select('id');
+
+        if (oldestChats.length > 0) {
+          await db('g_ai_chats')
+            .whereIn('id', oldestChats.map((c: any) => c.id))
+            .delete();
+          logger.info('Auto-cleaned old AI chats', {
+            userId,
+            deletedCount: oldestChats.length,
+          });
+        }
+      }
+    } catch (cleanupError: any) {
+      logger.warn('Failed to cleanup old AI chats', {
+        error: cleanupError.message,
+      });
+    }
 
     return {
       id: String(id),

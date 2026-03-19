@@ -3,11 +3,13 @@
  *
  * A resizable floating drawer for AI chat interactions.
  * Renders Markdown responses and shows streaming progress.
+ * Uses react-virtuoso for virtualized message rendering.
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import {
   Box,
   Drawer,
@@ -41,7 +43,8 @@ import aiChatService, { AIChatListItem } from '@/services/aiChatService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 
-const DRAWER_WIDTH = 420;
+const STORAGE_KEY_WIDTH = 'aiChatPanelWidth';
+const DEFAULT_DRAWER_WIDTH = 420;
 const MIN_DRAWER_WIDTH = 320;
 const MAX_DRAWER_WIDTH = 800;
 
@@ -53,12 +56,90 @@ const wiggleAnimation = keyframes`
   75% { transform: rotate(-3deg); }
 `;
 
+// Load saved width from localStorage
+function getSavedWidth(): number {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY_WIDTH);
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      if (!isNaN(parsed) && parsed >= MIN_DRAWER_WIDTH && parsed <= MAX_DRAWER_WIDTH) {
+        return parsed;
+      }
+    }
+  } catch {
+    // Ignore storage errors
+  }
+  return DEFAULT_DRAWER_WIDTH;
+}
+
 type PanelView = 'chat' | 'history';
 
 interface AIChatPanelProps {
   open: boolean;
   onClose: () => void;
 }
+
+// Message bubble styles extracted to reduce repetition
+const getMessageBubbleSx = (role: 'user' | 'assistant' | 'system') => ({
+  maxWidth: '85%',
+  p: 1.5,
+  borderRadius: '16px',
+  ...(role === 'user'
+    ? { borderBottomRightRadius: '4px' }
+    : { borderBottomLeftRadius: '4px' }),
+  boxShadow:
+    '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
+  bgcolor:
+    role === 'user'
+      ? 'primary.main'
+      : (theme: any) =>
+          theme.palette.mode === 'dark'
+            ? 'rgba(255,255,255,0.08)'
+            : 'grey.100',
+  color:
+    role === 'user'
+      ? 'primary.contrastText'
+      : 'text.primary',
+  whiteSpace: role === 'user' ? 'pre-wrap' : 'normal',
+  wordBreak: 'break-word',
+  fontSize: '0.875rem',
+  lineHeight: 1.6,
+  '& code': {
+    bgcolor: 'action.hover',
+    px: 0.5,
+    borderRadius: 0.5,
+    fontFamily: 'monospace',
+    fontSize: '0.8em',
+  },
+  '& pre': {
+    bgcolor: 'action.hover',
+    p: 1.5,
+    borderRadius: 1,
+    overflow: 'auto',
+    '& code': {
+      bgcolor: 'transparent',
+      p: 0,
+    },
+  },
+  '& p': { m: 0, mb: 0.5, '&:last-child': { mb: 0 } },
+  '& ul, & ol': { m: 0, pl: 2, mb: 0.5 },
+  '& li': { mb: 0.25 },
+  '& h1, & h2, & h3, & h4': {
+    mt: 1,
+    mb: 0.5,
+    fontWeight: 600,
+  },
+  '& h1': { fontSize: '1.1em' },
+  '& h2': { fontSize: '1.05em' },
+  '& h3': { fontSize: '1em' },
+  '& hr': {
+    my: 1,
+    border: 'none',
+    borderTop: '1px solid',
+    borderColor: 'divider',
+  },
+  '& strong': { fontWeight: 600 },
+});
 
 const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
   const { t } = useTranslation();
@@ -85,10 +166,10 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
   const [panelView, setPanelView] = useState<PanelView>('chat');
   const [chatHistory, setChatHistory] = useState<AIChatListItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
-  const [drawerWidth, setDrawerWidth] = useState(DRAWER_WIDTH);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [drawerWidth, setDrawerWidth] = useState(getSavedWidth);
   const inputRef = useRef<HTMLInputElement>(null);
   const isResizingRef = useRef(false);
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
 
   // Auto-focus input when panel opens or view switches to chat
   useEffect(() => {
@@ -97,10 +178,19 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
     }
   }, [open, panelView]);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll to bottom on new messages using Virtuoso
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messages.length > 0) {
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        virtuosoRef.current?.scrollToIndex({
+          index: messages.length - 1,
+          align: 'end',
+          behavior: isStreaming ? 'smooth' : 'auto',
+        });
+      });
+    }
+  }, [messages, isStreaming]);
 
   // Load chat history
   const loadHistory = useCallback(async () => {
@@ -171,34 +261,121 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
     []
   );
 
-  // New chat
+  // New chat - focus input after clearing
   const handleNewChat = useCallback(() => {
     clearChat();
     setPanelView('chat');
+    setTimeout(() => inputRef.current?.focus(), 100);
   }, [clearChat]);
 
-  // Resize handling
+  // Resize handling - save width to localStorage on mouseup
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     isResizingRef.current = true;
     e.preventDefault();
 
+    let latestWidth = 0;
+
     const handleMouseMove = (ev: MouseEvent) => {
       if (!isResizingRef.current) return;
       const newWidth = window.innerWidth - ev.clientX;
-      setDrawerWidth(
-        Math.max(MIN_DRAWER_WIDTH, Math.min(MAX_DRAWER_WIDTH, newWidth))
-      );
+      latestWidth = Math.max(MIN_DRAWER_WIDTH, Math.min(MAX_DRAWER_WIDTH, newWidth));
+      setDrawerWidth(latestWidth);
     };
 
     const handleMouseUp = () => {
       isResizingRef.current = false;
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      // Save width to localStorage
+      if (latestWidth > 0) {
+        try {
+          localStorage.setItem(STORAGE_KEY_WIDTH, String(latestWidth));
+        } catch {
+          // Ignore storage errors
+        }
+      }
     };
 
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   }, []);
+
+  // Render individual message item for Virtuoso
+  const renderMessage = useCallback(
+    (index: number) => {
+      const msg = messages[index];
+      return (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent:
+              msg.role === 'user' ? 'flex-end' : 'flex-start',
+            px: 2,
+            py: 0.75,
+          }}
+        >
+          <Box sx={getMessageBubbleSx(msg.role)}>
+            {msg.role === 'assistant' ? (
+              // Streaming with no content yet - show typing dots
+              isStreaming &&
+              index === messages.length - 1 &&
+              !msg.content ? (
+                <Box sx={{ display: 'flex', gap: 0.5, py: 0.5, px: 0.5 }}>
+                  {[0, 1, 2].map((i) => (
+                    <Box
+                      key={i}
+                      sx={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        bgcolor: 'text.secondary',
+                        animation: 'dotBounce 1.4s infinite ease-in-out',
+                        animationDelay: `${i * 0.2}s`,
+                        '@keyframes dotBounce': {
+                          '0%, 80%, 100%': {
+                            transform: 'scale(0.6)',
+                            opacity: 0.4,
+                          },
+                          '40%': { transform: 'scale(1)', opacity: 1 },
+                        },
+                      }}
+                    />
+                  ))}
+                </Box>
+              ) : (
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {msg.content}
+                </ReactMarkdown>
+              )
+            ) : (
+              msg.content
+            )}
+            {isStreaming &&
+              index === messages.length - 1 &&
+              msg.role === 'assistant' &&
+              msg.content && (
+                <Box
+                  component="span"
+                  sx={{
+                    display: 'inline-block',
+                    width: 6,
+                    height: 14,
+                    bgcolor: 'text.primary',
+                    ml: 0.5,
+                    animation: 'blink 1s infinite',
+                    '@keyframes blink': {
+                      '0%, 50%': { opacity: 1 },
+                      '51%, 100%': { opacity: 0 },
+                    },
+                  }}
+                />
+              )}
+          </Box>
+        </Box>
+      );
+    },
+    [messages, isStreaming]
+  );
 
   return (
     <Drawer
@@ -212,6 +389,10 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
+          bgcolor: (theme) =>
+            theme.palette.mode === 'dark'
+              ? '#1a1d23'
+              : 'background.paper',
         },
       }}
     >
@@ -291,176 +472,45 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
       {/* Chat view */}
       {panelView === 'chat' && (
         <>
-          {/* Messages */}
-          <Box
-            sx={{
-              flex: 1,
-              overflow: 'auto',
-              p: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 1.5,
-            }}
-          >
-            {messages.length === 0 && (
-              <Box
-                sx={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: 0.5,
-                  gap: 1,
-                }}
-              >
-                <SmartToyIcon sx={{ fontSize: 48 }} />
-                <Typography variant="body2">
-                  {t('aiChat.placeholder')}
-                </Typography>
-              </Box>
-            )}
-
-            {messages.map((msg, idx) => (
-              <Box
-                key={idx}
-                sx={{
-                  display: 'flex',
-                  justifyContent:
-                    msg.role === 'user' ? 'flex-end' : 'flex-start',
-                }}
-              >
-                <Box
-                  sx={{
-                    maxWidth: '85%',
-                    p: 1.5,
-                    borderRadius: '16px',
-                    ...(msg.role === 'user'
-                      ? { borderBottomRightRadius: '4px' }
-                      : { borderBottomLeftRadius: '4px' }),
-                    boxShadow:
-                      '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
-                    bgcolor:
-                      msg.role === 'user'
-                        ? 'primary.main'
-                        : (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? 'grey.800'
-                              : 'grey.100',
-                    color:
-                      msg.role === 'user'
-                        ? 'primary.contrastText'
-                        : 'text.primary',
-                    whiteSpace: msg.role === 'user' ? 'pre-wrap' : 'normal',
-                    wordBreak: 'break-word',
-                    fontSize: '0.875rem',
-                    lineHeight: 1.6,
-                    '& code': {
-                      bgcolor: 'action.hover',
-                      px: 0.5,
-                      borderRadius: 0.5,
-                      fontFamily: 'monospace',
-                      fontSize: '0.8em',
-                    },
-                    '& pre': {
-                      bgcolor: 'action.hover',
-                      p: 1.5,
-                      borderRadius: 1,
-                      overflow: 'auto',
-                      '& code': {
-                        bgcolor: 'transparent',
-                        p: 0,
-                      },
-                    },
-                    '& p': { m: 0, mb: 0.5, '&:last-child': { mb: 0 } },
-                    '& ul, & ol': { m: 0, pl: 2, mb: 0.5 },
-                    '& li': { mb: 0.25 },
-                    '& h1, & h2, & h3, & h4': {
-                      mt: 1,
-                      mb: 0.5,
-                      fontWeight: 600,
-                    },
-                    '& h1': { fontSize: '1.1em' },
-                    '& h2': { fontSize: '1.05em' },
-                    '& h3': { fontSize: '1em' },
-                    '& hr': {
-                      my: 1,
-                      border: 'none',
-                      borderTop: '1px solid',
-                      borderColor: 'divider',
-                    },
-                    '& strong': { fontWeight: 600 },
-                  }}
-                >
-                  {msg.role === 'assistant' ? (
-                    // Streaming with no content yet - show typing dots
-                    isStreaming &&
-                    idx === messages.length - 1 &&
-                    !msg.content ? (
-                      <Box sx={{ display: 'flex', gap: 0.5, py: 0.5, px: 0.5 }}>
-                        {[0, 1, 2].map((i) => (
-                          <Box
-                            key={i}
-                            sx={{
-                              width: 6,
-                              height: 6,
-                              borderRadius: '50%',
-                              bgcolor: 'text.secondary',
-                              animation: 'dotBounce 1.4s infinite ease-in-out',
-                              animationDelay: `${i * 0.2}s`,
-                              '@keyframes dotBounce': {
-                                '0%, 80%, 100%': {
-                                  transform: 'scale(0.6)',
-                                  opacity: 0.4,
-                                },
-                                '40%': { transform: 'scale(1)', opacity: 1 },
-                              },
-                            }}
-                          />
-                        ))}
-                      </Box>
-                    ) : (
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {msg.content}
-                      </ReactMarkdown>
-                    )
-                  ) : (
-                    msg.content
-                  )}
-                  {isStreaming &&
-                    idx === messages.length - 1 &&
-                    msg.role === 'assistant' &&
-                    msg.content && (
-                      <Box
-                        component="span"
-                        sx={{
-                          display: 'inline-block',
-                          width: 6,
-                          height: 14,
-                          bgcolor: 'text.primary',
-                          ml: 0.5,
-                          animation: 'blink 1s infinite',
-                          '@keyframes blink': {
-                            '0%, 50%': { opacity: 1 },
-                            '51%, 100%': { opacity: 0 },
-                          },
-                        }}
-                      />
-                    )}
+          {/* Messages - Virtualized */}
+          {messages.length === 0 ? (
+            <Box
+              sx={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: 0.5,
+                gap: 1,
+                p: 2,
+              }}
+            >
+              <SmartToyIcon sx={{ fontSize: 48 }} />
+              <Typography variant="body2">
+                {t('aiChat.placeholder')}
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <Virtuoso
+                ref={virtuosoRef}
+                style={{ flex: 1 }}
+                totalCount={messages.length}
+                itemContent={renderMessage}
+                followOutput="auto"
+                initialTopMostItemIndex={messages.length - 1}
+                overscan={200}
+              />
+              {error && (
+                <Box sx={{ textAlign: 'center', py: 0.5, px: 2 }}>
+                  <Typography variant="caption" color="error">
+                    {error}
+                  </Typography>
                 </Box>
-              </Box>
-            ))}
-
-            {error && (
-              <Box sx={{ textAlign: 'center', mt: 1 }}>
-                <Typography variant="caption" color="error">
-                  {error}
-                </Typography>
-              </Box>
-            )}
-
-            <div ref={messagesEndRef} />
-          </Box>
+              )}
+            </Box>
+          )}
 
           <Divider />
 
