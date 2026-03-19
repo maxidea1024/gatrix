@@ -213,7 +213,8 @@ export class AIChatService {
                   depth,
                   messageCount: chainMessages.length,
                   lastMessage: chainMessages[chainMessages.length - 1]?.role,
-                  hasToolResult: !!chainMessages[chainMessages.length - 1]?.toolResult,
+                  hasToolResult:
+                    !!chainMessages[chainMessages.length - 1]?.toolResult,
                 });
 
                 const followUpStream = provider.createStream(
