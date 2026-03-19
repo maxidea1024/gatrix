@@ -2219,7 +2219,10 @@ const CouponSettingsPage: React.FC = () => {
                   setExpandedGroups((s) => ({ ...s, basicInfo: !s.basicInfo }))
                 }
               >
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 600, flex: 1 }}
+                >
                   {t('common.basicInformation')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
@@ -2332,7 +2335,10 @@ const CouponSettingsPage: React.FC = () => {
                   }))
                 }
               >
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 600, flex: 1 }}
+                >
                   {t('coupons.couponSettings.form.codeAndQuantity')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
@@ -2487,7 +2493,10 @@ const CouponSettingsPage: React.FC = () => {
                   }))
                 }
               >
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 600, flex: 1 }}
+                >
                   {t('coupons.couponSettings.form.usageLimit')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
@@ -2643,7 +2652,10 @@ const CouponSettingsPage: React.FC = () => {
                   setExpandedGroups((s) => ({ ...s, dateRange: !s.dateRange }))
                 }
               >
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 600, flex: 1 }}
+                >
                   {t('coupons.couponSettings.form.dateRange')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
@@ -2735,7 +2747,10 @@ const CouponSettingsPage: React.FC = () => {
                   setExpandedGroups((s) => ({ ...s, rewards: !s.rewards }))
                 }
               >
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 600, flex: 1 }}
+                >
                   {t('surveys.participationRewards')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
@@ -2801,7 +2816,10 @@ const CouponSettingsPage: React.FC = () => {
                   }))
                 }
               >
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 600, flex: 1 }}
+                >
                   {t('coupons.couponSettings.form.rewardEmail')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>

@@ -70,7 +70,10 @@ export async function processFileStorageCleanupJob(
           await storage.delete(file.key);
           deletedCount++;
         } catch (err) {
-          logger.warn('Failed to delete expired file', { key: file.key, error: err });
+          logger.warn('Failed to delete expired file', {
+            key: file.key,
+            error: err,
+          });
         }
       }
     }

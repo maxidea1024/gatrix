@@ -9,8 +9,7 @@ export const serviceNoticeTools: AIToolConfig[] = [
   {
     tool: {
       name: 'get_service_notices',
-      description:
-        'Get service notices for an environment with pagination.',
+      description: 'Get service notices for an environment with pagination.',
       parameters: {
         type: 'object',
         properties: {

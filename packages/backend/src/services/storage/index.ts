@@ -17,7 +17,9 @@ let instance: StorageProvider | null = null;
  */
 export function getStorageProvider(): StorageProvider {
   if (!instance) {
-    logger.info(`Initializing file storage provider: ${process.env.FILE_STORAGE_PROVIDER || 'local'}`);
+    logger.info(
+      `Initializing file storage provider: ${process.env.FILE_STORAGE_PROVIDER || 'local'}`
+    );
     instance = createStorageProvider({
       logger: {
         debug: (msg, meta) => logger.debug(msg, meta),

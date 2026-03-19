@@ -25,9 +25,8 @@ export const clientVersionTools: AIToolConfig[] = [
     requiredPermission: P.CLIENT_VERSIONS_READ,
     riskLevel: 'read',
     handler: async (args) => {
-      const { ClientVersionService } = await import(
-        '../../client-version-service'
-      );
+      const { ClientVersionService } =
+        await import('../../client-version-service');
       return await ClientVersionService.getAllClientVersions(
         args.environmentId,
         {},
@@ -79,9 +78,8 @@ export const clientVersionTools: AIToolConfig[] = [
     requiredPermission: P.CLIENT_VERSIONS_CREATE,
     riskLevel: 'low',
     handler: async (args) => {
-      const { ClientVersionService } = await import(
-        '../../client-version-service'
-      );
+      const { ClientVersionService } =
+        await import('../../client-version-service');
       return await ClientVersionService.createClientVersion(
         {
           environmentId: args.environmentId,
@@ -131,9 +129,8 @@ export const clientVersionTools: AIToolConfig[] = [
     requiredPermission: P.CLIENT_VERSIONS_UPDATE,
     riskLevel: 'medium',
     handler: async (args) => {
-      const { ClientVersionService } = await import(
-        '../../client-version-service'
-      );
+      const { ClientVersionService } =
+        await import('../../client-version-service');
       const { environmentId, id, ...updates } = args;
       return await ClientVersionService.updateClientVersion(
         id,

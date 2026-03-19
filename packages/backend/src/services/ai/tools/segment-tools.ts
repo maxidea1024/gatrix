@@ -25,9 +25,7 @@ export const segmentTools: AIToolConfig[] = [
     requiredPermission: P.SEGMENTS_READ,
     riskLevel: 'read',
     handler: async (args) => {
-      const { featureFlagService } = await import(
-        '../../feature-flag-service'
-      );
+      const { featureFlagService } = await import('../../feature-flag-service');
       return await featureFlagService.listSegments(args.projectId);
     },
   },
@@ -65,9 +63,7 @@ export const segmentTools: AIToolConfig[] = [
     requiredPermission: P.SEGMENTS_CREATE,
     riskLevel: 'low',
     handler: async (args, _orgId, userId) => {
-      const { featureFlagService } = await import(
-        '../../feature-flag-service'
-      );
+      const { featureFlagService } = await import('../../feature-flag-service');
       return await featureFlagService.createSegment(
         {
           segmentName: args.segmentName,

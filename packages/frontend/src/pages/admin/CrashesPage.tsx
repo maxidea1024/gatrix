@@ -166,9 +166,9 @@ const CrashesPage: React.FC = () => {
 
   // Expanded rows (crash group events)
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
-  const [expandedEvents, setExpandedEvents] = useState<
-    Record<string, any[]>
-  >({});
+  const [expandedEvents, setExpandedEvents] = useState<Record<string, any[]>>(
+    {}
+  );
   const [expandedEventsLoading, setExpandedEventsLoading] = useState<
     Set<string>
   >(new Set());
@@ -615,10 +615,7 @@ const CrashesPage: React.FC = () => {
   const handleReopen = useCallback(async () => {
     if (!contextMenuCrash) return;
     try {
-      await crashService.updateCrashState(
-        contextMenuCrash.id,
-        CrashState.OPEN
-      );
+      await crashService.updateCrashState(contextMenuCrash.id, CrashState.OPEN);
       enqueueSnackbar(t('common.updateSuccess'), { variant: 'success' });
       loadCrashes();
     } catch {
@@ -880,9 +877,7 @@ const CrashesPage: React.FC = () => {
                             ))}
                         </Box>
                       </TableCell>
-                      <TableCell>
-                        {t('crashes.columns.lastVersion')}
-                      </TableCell>
+                      <TableCell>{t('crashes.columns.lastVersion')}</TableCell>
                       <TableCell align="center" sx={{ width: 100 }}>
                         {t('crashes.columns.actions')}
                       </TableCell>
@@ -1178,9 +1173,8 @@ const CrashesPage: React.FC = () => {
                                           </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                          {(
-                                            expandedEvents[crash.id] || []
-                                          ).length === 0 ? (
+                                          {(expandedEvents[crash.id] || [])
+                                            .length === 0 ? (
                                             <TableRow>
                                               <TableCell
                                                 colSpan={8}
@@ -1198,7 +1192,10 @@ const CrashesPage: React.FC = () => {
                                             (
                                               expandedEvents[crash.id] || []
                                             ).map(
-                                              (event: any, eventIdx: number) => (
+                                              (
+                                                event: any,
+                                                eventIdx: number
+                                              ) => (
                                                 <TableRow
                                                   key={event.id}
                                                   hover
@@ -1262,8 +1259,7 @@ const CrashesPage: React.FC = () => {
                                                   </TableCell>
                                                   <TableCell>
                                                     <Typography variant="body2">
-                                                      {event.characterId ||
-                                                        '-'}
+                                                      {event.characterId || '-'}
                                                     </Typography>
                                                   </TableCell>
                                                   <TableCell>

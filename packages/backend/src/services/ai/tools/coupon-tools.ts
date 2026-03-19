@@ -25,9 +25,8 @@ export const couponTools: AIToolConfig[] = [
     requiredPermission: P.COUPON_SETTINGS_READ,
     riskLevel: 'read',
     handler: async (args) => {
-      const { CouponSettingsService } = await import(
-        '../../coupon-settings-service'
-      );
+      const { CouponSettingsService } =
+        await import('../../coupon-settings-service');
       return await CouponSettingsService.listSettings({
         environmentId: args.environmentId,
         page: 1,
@@ -59,9 +58,8 @@ export const couponTools: AIToolConfig[] = [
     requiredPermission: P.COUPON_SETTINGS_READ,
     riskLevel: 'read',
     handler: async (args) => {
-      const { CouponSettingsService } = await import(
-        '../../coupon-settings-service'
-      );
+      const { CouponSettingsService } =
+        await import('../../coupon-settings-service');
       return await CouponSettingsService.getUsageBySetting(
         args.settingId,
         {},

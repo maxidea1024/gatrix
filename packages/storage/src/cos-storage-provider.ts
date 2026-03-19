@@ -33,7 +33,11 @@ export class COSStorageProvider implements StorageProvider {
     });
   }
 
-  async upload(key: string, data: Buffer | string, contentType?: string): Promise<string> {
+  async upload(
+    key: string,
+    data: Buffer | string,
+    contentType?: string
+  ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const body = typeof data === 'string' ? Buffer.from(data, 'utf8') : data;
 
@@ -63,7 +67,10 @@ export class COSStorageProvider implements StorageProvider {
     return Buffer.from(result.Body as unknown as string, 'utf8');
   }
 
-  async downloadAsString(key: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
+  async downloadAsString(
+    key: string,
+    encoding: BufferEncoding = 'utf8'
+  ): Promise<string> {
     const buffer = await this.download(key);
     return buffer.toString(encoding);
   }
@@ -82,14 +89,17 @@ export class COSStorageProvider implements StorageProvider {
     const files = await this.listByPrefix(prefix);
     if (files.length === 0) return 0;
 
-    const objects = files.map(f => ({ Key: this.getFullKey(f.key) }));
+    const objects = files.map((f) => ({ Key: this.getFullKey(f.key) }));
     await this.client.deleteMultipleObject({
       Bucket: this.bucket,
       Region: this.region,
       Objects: objects,
     });
 
-    this.logger.info('Files deleted by prefix from COS', { prefix, deleted: files.length });
+    this.logger.info('Files deleted by prefix from COS', {
+      prefix,
+      deleted: files.length,
+    });
     return files.length;
   }
 
@@ -110,7 +120,10 @@ export class COSStorageProvider implements StorageProvider {
     }
   }
 
-  async listByPrefix(prefix: string, maxResults: number = 1000): Promise<StorageFileInfo[]> {
+  async listByPrefix(
+    prefix: string,
+    maxResults: number = 1000
+  ): Promise<StorageFileInfo[]> {
     const fullPrefix = this.getFullKey(prefix);
     const results: StorageFileInfo[] = [];
     let marker: string | undefined;
@@ -136,7 +149,8 @@ export class COSStorageProvider implements StorageProvider {
         }
       }
 
-      marker = response.IsTruncated === 'true' ? response.NextMarker : undefined;
+      marker =
+        response.IsTruncated === 'true' ? response.NextMarker : undefined;
     } while (marker && results.length < maxResults);
 
     return results;
@@ -145,37 +159,47 @@ export class COSStorageProvider implements StorageProvider {
   async getSignedUrl(key: string, expiresIn: number = 3600): Promise<string> {
     const fullKey = this.getFullKey(key);
     const url = await new Promise<string>((resolve, reject) => {
-      this.client.getObjectUrl({
-        Bucket: this.bucket,
-        Region: this.region,
-        Key: fullKey,
-        Sign: true,
-        Expires: expiresIn,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      }, (err: any, data: any) => {
-        if (err) reject(err);
-        else resolve(data.Url);
-      });
+      this.client.getObjectUrl(
+        {
+          Bucket: this.bucket,
+          Region: this.region,
+          Key: fullKey,
+          Sign: true,
+          Expires: expiresIn,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        },
+        (err: any, data: any) => {
+          if (err) reject(err);
+          else resolve(data.Url);
+        }
+      );
     });
     return url;
   }
 
-  async getSignedUploadUrl(key: string, contentType?: string, expiresIn: number = 3600): Promise<string> {
+  async getSignedUploadUrl(
+    key: string,
+    contentType?: string,
+    expiresIn: number = 3600
+  ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const url = await new Promise<string>((resolve, reject) => {
-      this.client.getObjectUrl({
-        Bucket: this.bucket,
-        Region: this.region,
-        Key: fullKey,
-        Method: 'PUT',
-        Sign: true,
-        Expires: expiresIn,
-        Headers: contentType ? { 'Content-Type': contentType } : undefined,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      }, (err: any, data: any) => {
-        if (err) reject(err);
-        else resolve(data.Url);
-      });
+      this.client.getObjectUrl(
+        {
+          Bucket: this.bucket,
+          Region: this.region,
+          Key: fullKey,
+          Method: 'PUT',
+          Sign: true,
+          Expires: expiresIn,
+          Headers: contentType ? { 'Content-Type': contentType } : undefined,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        },
+        (err: any, data: any) => {
+          if (err) reject(err);
+          else resolve(data.Url);
+        }
+      );
     });
     return url;
   }

@@ -51,8 +51,7 @@ export class CrashesController {
       if (subchannel) filters.subchannel = subchannel as string;
       if (isEditor !== undefined)
         filters.isEditor = isEditor === 'true' || isEditor === '1';
-      if (state !== undefined)
-        filters.state = parseInt(state as string, 10);
+      if (state !== undefined) filters.state = parseInt(state as string, 10);
       if (assignee) filters.assignee = assignee as string;
       if (appVersion) filters.appVersion = appVersion as string;
       if (dateFrom) filters.dateFrom = dateFrom as string;
@@ -129,8 +128,10 @@ export class CrashesController {
       }
 
       // Resolve environment name
-      const crashesWithEnvName = await CrashesController.resolveEnvironmentNames([crash as any]);
-      const crashData = crashesWithEnvName.length > 0 ? crashesWithEnvName[0] : crash;
+      const crashesWithEnvName =
+        await CrashesController.resolveEnvironmentNames([crash as any]);
+      const crashData =
+        crashesWithEnvName.length > 0 ? crashesWithEnvName[0] : crash;
 
       res.json({
         success: true,
@@ -231,7 +232,9 @@ export class CrashesController {
 
       if (assignee === null || assignee === '') {
         // Unassign
-        await crash.$query().patch({ assignee: null as any, updatedAt: new Date() });
+        await crash
+          .$query()
+          .patch({ assignee: null as any, updatedAt: new Date() });
       } else {
         await crash.updateAssignee(assignee);
       }
@@ -367,7 +370,10 @@ export class CrashesController {
     ];
     if (envIds.length === 0) return crashes;
 
-    let envInfoMap: Record<string, { envName: string; projectName: string; organizationName: string }> = {};
+    let envInfoMap: Record<
+      string,
+      { envName: string; projectName: string; organizationName: string }
+    > = {};
     try {
       const mainDb = (await import('../config/knex')).default;
       const envRows = await mainDb('g_environments as e')

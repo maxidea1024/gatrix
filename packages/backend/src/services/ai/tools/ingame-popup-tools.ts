@@ -9,8 +9,7 @@ export const ingamePopupTools: AIToolConfig[] = [
   {
     tool: {
       name: 'get_ingame_popups',
-      description:
-        'Get list of in-game popup notices for an environment.',
+      description: 'Get list of in-game popup notices for an environment.',
       parameters: {
         type: 'object',
         properties: {

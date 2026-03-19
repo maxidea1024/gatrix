@@ -95,8 +95,7 @@ export async function executeToolCall(
     });
     return result;
   } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : 'Unknown error';
+    const message = error instanceof Error ? error.message : 'Unknown error';
     logger.error('Tool execution failed', {
       tool: toolCall.name,
       error: message,
@@ -104,4 +103,3 @@ export async function executeToolCall(
     return { error: `Tool execution failed: ${message}` };
   }
 }
-

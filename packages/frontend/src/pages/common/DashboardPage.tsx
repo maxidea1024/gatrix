@@ -1032,10 +1032,7 @@ const DashboardPage: React.FC = () => {
                             sx={{ mx: 0.5 }}
                           />
                           <Tooltip title={formatDateTimeDetailed(startsAt)}>
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                            >
+                            <Typography variant="body2" color="text.secondary">
                               <Box
                                 component="span"
                                 sx={{ fontWeight: 500, mr: 0.5 }}
@@ -1059,10 +1056,7 @@ const DashboardPage: React.FC = () => {
                             sx={{ mx: 0.5 }}
                           />
                           <Tooltip title={formatDateTimeDetailed(endsAt)}>
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                            >
+                            <Typography variant="body2" color="text.secondary">
                               <Box
                                 component="span"
                                 sx={{ fontWeight: 500, mr: 0.5 }}

@@ -664,7 +664,10 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               }
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 600, flex: 1 }}
+                >
                   {t('surveys.triggerConditions')}
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>

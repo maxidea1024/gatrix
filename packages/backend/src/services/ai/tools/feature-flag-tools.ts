@@ -100,8 +100,7 @@ export const featureFlagTools: AIToolConfig[] = [
           },
           valueType: {
             type: 'string',
-            description:
-              'Value type: "boolean", "string", "number", or "json"',
+            description: 'Value type: "boolean", "string", "number", or "json"',
           },
           enabledValue: {
             description:
@@ -122,8 +121,7 @@ export const featureFlagTools: AIToolConfig[] = [
           },
           isEnabled: {
             type: 'boolean',
-            description:
-              'Whether the flag starts enabled. Defaults to false.',
+            description: 'Whether the flag starts enabled. Defaults to false.',
           },
           projectId: {
             type: 'string',

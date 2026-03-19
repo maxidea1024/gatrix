@@ -196,7 +196,10 @@ export class AIChatService {
               ];
 
               // Pass tools to follow-up stream so LLM can chain additional tool calls
-              const followUpStream = provider.createStream(toolResultMessages, tools);
+              const followUpStream = provider.createStream(
+                toolResultMessages,
+                tools
+              );
               for await (const followUpChunk of followUpStream) {
                 if (followUpChunk.type === 'content') {
                   assistantContent += followUpChunk.content || '';

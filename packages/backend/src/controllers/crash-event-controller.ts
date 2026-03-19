@@ -91,9 +91,7 @@ export class CrashEventController {
 
       // Channel filter - support multiple values
       if (channel) {
-        const channels = (channel as string)
-          .split(',')
-          .map((c) => c.trim());
+        const channels = (channel as string).split(',').map((c) => c.trim());
         if (channels.length > 0) {
           query = query.whereIn('channel', channels);
         }
@@ -527,9 +525,7 @@ export class CrashEventController {
         .map((r: any) => r.environmentId)
         .sort();
       const branches = branchResults.map((r: any) => r.branch).sort();
-      const channels = channelResults
-        .map((r: any) => r.channel)
-        .sort();
+      const channels = channelResults.map((r: any) => r.channel).sort();
       const subchannels = subchannelResults
         .map((r: any) => r.subchannel)
         .sort();

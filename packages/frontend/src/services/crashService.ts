@@ -165,9 +165,7 @@ class CrashService {
   /**
    * Get crash by ID with stack trace
    */
-  async getCrashById(
-    id: string
-  ): Promise<any> {
+  async getCrashById(id: string): Promise<any> {
     try {
       const response = await api.get(`/admin/crashes/${id}`);
       return response.data.data || response.data;
@@ -211,10 +209,7 @@ class CrashService {
   /**
    * Update crash state
    */
-  async updateCrashState(
-    crashId: string,
-    state: number
-  ): Promise<any> {
+  async updateCrashState(crashId: string, state: number): Promise<any> {
     const response = await api.patch(`/admin/crashes/${crashId}/state`, {
       state,
     });
@@ -270,4 +265,3 @@ class CrashService {
 
 export const crashService = new CrashService();
 export default crashService;
-

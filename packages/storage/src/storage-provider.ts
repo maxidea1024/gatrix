@@ -20,7 +20,11 @@ export interface StorageProvider {
    * @param contentType - Optional MIME type
    * @returns The stored key
    */
-  upload(key: string, data: Buffer | string, contentType?: string): Promise<string>;
+  upload(
+    key: string,
+    data: Buffer | string,
+    contentType?: string
+  ): Promise<string>;
 
   /**
    * Download a file as Buffer
@@ -68,5 +72,9 @@ export interface StorageProvider {
    * @param expiresIn - Expiration in seconds (default: 3600)
    * @returns Presigned URL string
    */
-  getSignedUploadUrl(key: string, contentType?: string, expiresIn?: number): Promise<string>;
+  getSignedUploadUrl(
+    key: string,
+    contentType?: string,
+    expiresIn?: number
+  ): Promise<string>;
 }

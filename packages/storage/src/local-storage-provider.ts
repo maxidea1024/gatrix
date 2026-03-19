@@ -17,7 +17,11 @@ export class LocalStorageProvider implements StorageProvider {
     this.logger = logger || defaultLogger;
   }
 
-  async upload(key: string, data: Buffer | string, _contentType?: string): Promise<string> {
+  async upload(
+    key: string,
+    data: Buffer | string,
+    _contentType?: string
+  ): Promise<string> {
     const filePath = this.getFilePath(key);
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     await fs.writeFile(filePath, data);
@@ -30,7 +34,10 @@ export class LocalStorageProvider implements StorageProvider {
     return await fs.readFile(filePath);
   }
 
-  async downloadAsString(key: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
+  async downloadAsString(
+    key: string,
+    encoding: BufferEncoding = 'utf8'
+  ): Promise<string> {
     const filePath = this.getFilePath(key);
     return await fs.readFile(filePath, encoding);
   }
@@ -55,7 +62,10 @@ export class LocalStorageProvider implements StorageProvider {
         await this.delete(file.key);
         deleted++;
       } catch (err: unknown) {
-        this.logger.warn('Failed to delete file during prefix cleanup', { key: file.key, error: String(err) });
+        this.logger.warn('Failed to delete file during prefix cleanup', {
+          key: file.key,
+          error: String(err),
+        });
       }
     }
     return deleted;
@@ -71,7 +81,10 @@ export class LocalStorageProvider implements StorageProvider {
     }
   }
 
-  async listByPrefix(prefix: string, maxResults: number = 1000): Promise<StorageFileInfo[]> {
+  async listByPrefix(
+    prefix: string,
+    maxResults: number = 1000
+  ): Promise<StorageFileInfo[]> {
     const dirPath = path.join(this.basePath, prefix);
     const results: StorageFileInfo[] = [];
 
@@ -90,7 +103,11 @@ export class LocalStorageProvider implements StorageProvider {
     return `${this.apiBaseUrl}/download?key=${encodeURIComponent(key)}`;
   }
 
-  async getSignedUploadUrl(key: string, _contentType?: string, _expiresIn?: number): Promise<string> {
+  async getSignedUploadUrl(
+    key: string,
+    _contentType?: string,
+    _expiresIn?: number
+  ): Promise<string> {
     return `${this.apiBaseUrl}/upload?key=${encodeURIComponent(key)}`;
   }
 

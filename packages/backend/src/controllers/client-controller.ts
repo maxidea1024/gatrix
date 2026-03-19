@@ -368,9 +368,7 @@ export class ClientController {
           );
           const detail = detailRaw ? JSON.parse(detailRaw) : null;
           const now = new Date();
-          const startsAt = detail?.startsAt
-            ? new Date(detail.startsAt)
-            : null;
+          const startsAt = detail?.startsAt ? new Date(detail.startsAt) : null;
           const endsAt = detail?.endsAt ? new Date(detail.endsAt) : null;
           const hasStarted = !startsAt || now >= startsAt;
           const hasNotEnded = !endsAt || now < endsAt;

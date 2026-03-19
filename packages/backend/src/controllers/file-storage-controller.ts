@@ -66,7 +66,8 @@ export class FileStorageController {
         xml: 'application/xml',
         csv: 'text/csv',
       };
-      const contentType = contentTypeMap[ext || ''] || 'application/octet-stream';
+      const contentType =
+        contentTypeMap[ext || ''] || 'application/octet-stream';
 
       // Extract filename from key
       const filename = key.split('/').pop() || 'file';

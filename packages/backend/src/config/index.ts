@@ -137,7 +137,10 @@ const config = {
   // File Storage configuration
   fileStorage: {
     provider: process.env.FILE_STORAGE_PROVIDER || 'local',
-    retentionDays: parseInt(process.env.FILE_STORAGE_RETENTION_DAYS || '30', 10),
+    retentionDays: parseInt(
+      process.env.FILE_STORAGE_RETENTION_DAYS || '30',
+      10
+    ),
     localPath: process.env.FILE_STORAGE_LOCAL_PATH || '',
   },
 

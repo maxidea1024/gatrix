@@ -38,7 +38,11 @@ export class OSSStorageProvider implements StorageProvider {
     this.client = new OSS(ossConfig);
   }
 
-  async upload(key: string, data: Buffer | string, contentType?: string): Promise<string> {
+  async upload(
+    key: string,
+    data: Buffer | string,
+    contentType?: string
+  ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const body = typeof data === 'string' ? Buffer.from(data, 'utf8') : data;
 
@@ -62,7 +66,10 @@ export class OSSStorageProvider implements StorageProvider {
     return Buffer.from(result.content as string);
   }
 
-  async downloadAsString(key: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
+  async downloadAsString(
+    key: string,
+    encoding: BufferEncoding = 'utf8'
+  ): Promise<string> {
     const buffer = await this.download(key);
     return buffer.toString(encoding);
   }
@@ -77,10 +84,13 @@ export class OSSStorageProvider implements StorageProvider {
     const files = await this.listByPrefix(prefix);
     if (files.length === 0) return 0;
 
-    const keys = files.map(f => this.getFullKey(f.key));
+    const keys = files.map((f) => this.getFullKey(f.key));
     await this.client.deleteMulti(keys);
 
-    this.logger.info('Files deleted by prefix from OSS', { prefix, deleted: files.length });
+    this.logger.info('Files deleted by prefix from OSS', {
+      prefix,
+      deleted: files.length,
+    });
     return files.length;
   }
 
@@ -98,17 +108,23 @@ export class OSSStorageProvider implements StorageProvider {
     }
   }
 
-  async listByPrefix(prefix: string, maxResults: number = 1000): Promise<StorageFileInfo[]> {
+  async listByPrefix(
+    prefix: string,
+    maxResults: number = 1000
+  ): Promise<StorageFileInfo[]> {
     const fullPrefix = this.getFullKey(prefix);
     const results: StorageFileInfo[] = [];
     let marker: string | undefined;
 
     do {
-      const response = await this.client.list({
-        prefix: fullPrefix,
-        'max-keys': Math.min(maxResults - results.length, 1000),
-        marker: marker || '',
-      }, {});
+      const response = await this.client.list(
+        {
+          prefix: fullPrefix,
+          'max-keys': Math.min(maxResults - results.length, 1000),
+          marker: marker || '',
+        },
+        {}
+      );
 
       if (response.objects) {
         for (const obj of response.objects) {
@@ -135,7 +151,11 @@ export class OSSStorageProvider implements StorageProvider {
     });
   }
 
-  async getSignedUploadUrl(key: string, contentType?: string, expiresIn: number = 3600): Promise<string> {
+  async getSignedUploadUrl(
+    key: string,
+    contentType?: string,
+    expiresIn: number = 3600
+  ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const options: Record<string, unknown> = {
       expires: expiresIn,

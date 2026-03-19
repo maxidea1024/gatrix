@@ -32,11 +32,19 @@ export class AzureStorageProvider implements StorageProvider {
     this.prefix = config.prefix || '';
     this.connectionString = config.connectionString;
     this.logger = config.logger || defaultLogger;
-    this.blobServiceClient = BlobServiceClient.fromConnectionString(config.connectionString);
-    this.containerClient = this.blobServiceClient.getContainerClient(config.container);
+    this.blobServiceClient = BlobServiceClient.fromConnectionString(
+      config.connectionString
+    );
+    this.containerClient = this.blobServiceClient.getContainerClient(
+      config.container
+    );
   }
 
-  async upload(key: string, data: Buffer | string, contentType?: string): Promise<string> {
+  async upload(
+    key: string,
+    data: Buffer | string,
+    contentType?: string
+  ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const body = typeof data === 'string' ? Buffer.from(data, 'utf8') : data;
     const blockBlobClient = this.containerClient.getBlockBlobClient(fullKey);
@@ -57,7 +65,10 @@ export class AzureStorageProvider implements StorageProvider {
     return await blobClient.downloadToBuffer();
   }
 
-  async downloadAsString(key: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
+  async downloadAsString(
+    key: string,
+    encoding: BufferEncoding = 'utf8'
+  ): Promise<string> {
     const buffer = await this.download(key);
     return buffer.toString(encoding);
   }
@@ -78,11 +89,17 @@ export class AzureStorageProvider implements StorageProvider {
         await this.delete(file.key);
         deleted++;
       } catch (err: unknown) {
-        this.logger.warn('Failed to delete blob', { key: file.key, error: String(err) });
+        this.logger.warn('Failed to delete blob', {
+          key: file.key,
+          error: String(err),
+        });
       }
     }
 
-    this.logger.info('Files deleted by prefix from Azure Blob', { prefix, deleted });
+    this.logger.info('Files deleted by prefix from Azure Blob', {
+      prefix,
+      deleted,
+    });
     return deleted;
   }
 
@@ -92,7 +109,10 @@ export class AzureStorageProvider implements StorageProvider {
     return await blobClient.exists();
   }
 
-  async listByPrefix(prefix: string, maxResults: number = 1000): Promise<StorageFileInfo[]> {
+  async listByPrefix(
+    prefix: string,
+    maxResults: number = 1000
+  ): Promise<StorageFileInfo[]> {
     const fullPrefix = this.getFullKey(prefix);
     const results: StorageFileInfo[] = [];
 
@@ -117,24 +137,33 @@ export class AzureStorageProvider implements StorageProvider {
       const credential = this.extractCredential();
       if (credential) {
         const expiryDate = new Date(Date.now() + expiresIn * 1000);
-        const sasToken = generateBlobSASQueryParameters({
-          containerName: this.containerName,
-          blobName: fullKey,
-          permissions: BlobSASPermissions.parse('r'),
-          expiresOn: expiryDate,
-          protocol: SASProtocol.HttpsAndHttp,
-        }, credential).toString();
+        const sasToken = generateBlobSASQueryParameters(
+          {
+            containerName: this.containerName,
+            blobName: fullKey,
+            permissions: BlobSASPermissions.parse('r'),
+            expiresOn: expiryDate,
+            protocol: SASProtocol.HttpsAndHttp,
+          },
+          credential
+        ).toString();
 
         return `${blobClient.url}?${sasToken}`;
       }
     } catch (err: unknown) {
-      this.logger.warn('Failed to generate SAS URL, falling back to blob URL', { error: String(err) });
+      this.logger.warn('Failed to generate SAS URL, falling back to blob URL', {
+        error: String(err),
+      });
     }
 
     return blobClient.url;
   }
 
-  async getSignedUploadUrl(key: string, _contentType?: string, expiresIn: number = 3600): Promise<string> {
+  async getSignedUploadUrl(
+    key: string,
+    _contentType?: string,
+    expiresIn: number = 3600
+  ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const blobClient = this.containerClient.getBlobClient(fullKey);
 
@@ -142,18 +171,23 @@ export class AzureStorageProvider implements StorageProvider {
       const credential = this.extractCredential();
       if (credential) {
         const expiryDate = new Date(Date.now() + expiresIn * 1000);
-        const sasToken = generateBlobSASQueryParameters({
-          containerName: this.containerName,
-          blobName: fullKey,
-          permissions: BlobSASPermissions.parse('cw'),
-          expiresOn: expiryDate,
-          protocol: SASProtocol.HttpsAndHttp,
-        }, credential).toString();
+        const sasToken = generateBlobSASQueryParameters(
+          {
+            containerName: this.containerName,
+            blobName: fullKey,
+            permissions: BlobSASPermissions.parse('cw'),
+            expiresOn: expiryDate,
+            protocol: SASProtocol.HttpsAndHttp,
+          },
+          credential
+        ).toString();
 
         return `${blobClient.url}?${sasToken}`;
       }
     } catch (err: unknown) {
-      this.logger.warn('Failed to generate SAS upload URL', { error: String(err) });
+      this.logger.warn('Failed to generate SAS upload URL', {
+        error: String(err),
+      });
     }
 
     return blobClient.url;
@@ -161,7 +195,8 @@ export class AzureStorageProvider implements StorageProvider {
 
   private extractCredential(): StorageSharedKeyCredential | null {
     try {
-      const accountName = this.connectionString.match(/AccountName=([^;]+)/)?.[1];
+      const accountName =
+        this.connectionString.match(/AccountName=([^;]+)/)?.[1];
       const accountKey = this.connectionString.match(/AccountKey=([^;]+)/)?.[1];
       if (accountName && accountKey) {
         return new StorageSharedKeyCredential(accountName, accountKey);

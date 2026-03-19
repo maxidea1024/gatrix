@@ -29,9 +29,8 @@ export const storeProductTools: AIToolConfig[] = [
     requiredPermission: P.STORE_PRODUCTS_READ,
     riskLevel: 'read',
     handler: async (args) => {
-      const StoreProductService = (
-        await import('../../store-product-service')
-      ).default;
+      const StoreProductService = (await import('../../store-product-service'))
+        .default;
       return await StoreProductService.getStoreProducts({
         environmentId: args.environmentId,
         search: args.search,
@@ -59,9 +58,8 @@ export const storeProductTools: AIToolConfig[] = [
     requiredPermission: P.STORE_PRODUCTS_READ,
     riskLevel: 'read',
     handler: async (args) => {
-      const StoreProductService = (
-        await import('../../store-product-service')
-      ).default;
+      const StoreProductService = (await import('../../store-product-service'))
+        .default;
       return await StoreProductService.getStats(args.environmentId);
     },
   },
@@ -95,9 +93,8 @@ export const storeProductTools: AIToolConfig[] = [
     requiredPermission: P.STORE_PRODUCTS_UPDATE,
     riskLevel: 'medium',
     handler: async (args, _orgId, userId) => {
-      const StoreProductService = (
-        await import('../../store-product-service')
-      ).default;
+      const StoreProductService = (await import('../../store-product-service'))
+        .default;
       return await StoreProductService.toggleActive(
         args.id,
         args.isActive,

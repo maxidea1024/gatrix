@@ -124,9 +124,7 @@ const ApiTokensPage = React.lazy(() => import('./pages/admin/ApiTokensPage'));
 const CrashEventsPage = React.lazy(
   () => import('./pages/admin/CrashEventsPage')
 );
-const CrashesPage = React.lazy(
-  () => import('./pages/admin/CrashesPage')
-);
+const CrashesPage = React.lazy(() => import('./pages/admin/CrashesPage'));
 const ChatPage = React.lazy(() => import('./pages/chat/ChatPage'));
 const MailboxPage = React.lazy(() => import('./pages/mailbox/MailboxPage'));
 const SystemConsolePage = React.lazy(

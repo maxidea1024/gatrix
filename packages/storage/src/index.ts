@@ -41,7 +41,13 @@ import type { StorageLogger } from './logger';
 /**
  * Factory: create a StorageProvider from environment variables
  */
-export type StorageProviderType = 'local' | 's3' | 'cos' | 'oss' | 'azure' | 'gcs';
+export type StorageProviderType =
+  | 'local'
+  | 's3'
+  | 'cos'
+  | 'oss'
+  | 'azure'
+  | 'gcs';
 
 export interface CreateStorageOptions {
   provider?: StorageProviderType;
@@ -50,19 +56,28 @@ export interface CreateStorageOptions {
   logger?: StorageLogger;
 }
 
-export function createStorageProvider(options: CreateStorageOptions = {}): StorageProvider {
-  const provider = options.provider || (process.env.FILE_STORAGE_PROVIDER as StorageProviderType) || 'local';
+export function createStorageProvider(
+  options: CreateStorageOptions = {}
+): StorageProvider {
+  const provider =
+    options.provider ||
+    (process.env.FILE_STORAGE_PROVIDER as StorageProviderType) ||
+    'local';
   const logger = options.logger;
 
   switch (provider) {
     case 'local': {
       const dataRoot = process.env.DATA_ROOT || './data/gatrix-storage-root';
-      const basePath = options.localPath || process.env.FILE_STORAGE_LOCAL_PATH || `${dataRoot}/file-storage`;
+      const basePath =
+        options.localPath ||
+        process.env.FILE_STORAGE_LOCAL_PATH ||
+        `${dataRoot}/file-storage`;
       return new LocalStorageProvider(basePath, options.apiBaseUrl, logger);
     }
     case 's3': {
       const bucket = process.env.FILE_STORAGE_S3_BUCKET;
-      if (!bucket) throw new Error('FILE_STORAGE_S3_BUCKET is required for S3 provider');
+      if (!bucket)
+        throw new Error('FILE_STORAGE_S3_BUCKET is required for S3 provider');
       return new S3StorageProvider({
         bucket,
         region: process.env.FILE_STORAGE_S3_REGION || 'us-east-1',
@@ -76,7 +91,8 @@ export function createStorageProvider(options: CreateStorageOptions = {}): Stora
     }
     case 'cos': {
       const bucket = process.env.FILE_STORAGE_COS_BUCKET;
-      if (!bucket) throw new Error('FILE_STORAGE_COS_BUCKET is required for COS provider');
+      if (!bucket)
+        throw new Error('FILE_STORAGE_COS_BUCKET is required for COS provider');
       return new COSStorageProvider({
         secretId: process.env.FILE_STORAGE_COS_SECRET_ID || '',
         secretKey: process.env.FILE_STORAGE_COS_SECRET_KEY || '',
@@ -88,7 +104,8 @@ export function createStorageProvider(options: CreateStorageOptions = {}): Stora
     }
     case 'oss': {
       const bucket = process.env.FILE_STORAGE_OSS_BUCKET;
-      if (!bucket) throw new Error('FILE_STORAGE_OSS_BUCKET is required for OSS provider');
+      if (!bucket)
+        throw new Error('FILE_STORAGE_OSS_BUCKET is required for OSS provider');
       return new OSSStorageProvider({
         bucket,
         region: process.env.FILE_STORAGE_OSS_REGION || '',
@@ -101,7 +118,10 @@ export function createStorageProvider(options: CreateStorageOptions = {}): Stora
     }
     case 'azure': {
       const connectionString = process.env.FILE_STORAGE_AZURE_CONNECTION_STRING;
-      if (!connectionString) throw new Error('FILE_STORAGE_AZURE_CONNECTION_STRING is required for Azure provider');
+      if (!connectionString)
+        throw new Error(
+          'FILE_STORAGE_AZURE_CONNECTION_STRING is required for Azure provider'
+        );
       return new AzureStorageProvider({
         connectionString,
         container: process.env.FILE_STORAGE_AZURE_CONTAINER || 'gatrix-files',
@@ -111,7 +131,8 @@ export function createStorageProvider(options: CreateStorageOptions = {}): Stora
     }
     case 'gcs': {
       const bucket = process.env.FILE_STORAGE_GCS_BUCKET;
-      if (!bucket) throw new Error('FILE_STORAGE_GCS_BUCKET is required for GCS provider');
+      if (!bucket)
+        throw new Error('FILE_STORAGE_GCS_BUCKET is required for GCS provider');
       return new GCSStorageProvider({
         bucket,
         projectId: process.env.FILE_STORAGE_GCS_PROJECT_ID || undefined,

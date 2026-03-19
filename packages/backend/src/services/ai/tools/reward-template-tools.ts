@@ -39,8 +39,7 @@ export const rewardTemplateTools: AIToolConfig[] = [
   {
     tool: {
       name: 'get_reward_template_by_id',
-      description:
-        'Get detailed information about a specific reward template.',
+      description: 'Get detailed information about a specific reward template.',
       parameters: {
         type: 'object',
         properties: {

@@ -59,16 +59,22 @@ export class S3StorageProvider implements StorageProvider {
     this.client = new S3Client(clientConfig);
   }
 
-  async upload(key: string, data: Buffer | string, contentType?: string): Promise<string> {
+  async upload(
+    key: string,
+    data: Buffer | string,
+    contentType?: string
+  ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const body = typeof data === 'string' ? Buffer.from(data, 'utf8') : data;
 
-    await this.client.send(new PutObjectCommand({
-      Bucket: this.bucket,
-      Key: fullKey,
-      Body: body,
-      ContentType: contentType || 'application/octet-stream',
-    }));
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: fullKey,
+        Body: body,
+        ContentType: contentType || 'application/octet-stream',
+      })
+    );
 
     this.logger.debug('File uploaded to S3', { key: fullKey });
     return key;
@@ -76,10 +82,12 @@ export class S3StorageProvider implements StorageProvider {
 
   async download(key: string): Promise<Buffer> {
     const fullKey = this.getFullKey(key);
-    const response = await this.client.send(new GetObjectCommand({
-      Bucket: this.bucket,
-      Key: fullKey,
-    }));
+    const response = await this.client.send(
+      new GetObjectCommand({
+        Bucket: this.bucket,
+        Key: fullKey,
+      })
+    );
 
     const stream = response.Body;
     if (!stream) {
@@ -93,17 +101,22 @@ export class S3StorageProvider implements StorageProvider {
     return Buffer.concat(chunks);
   }
 
-  async downloadAsString(key: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
+  async downloadAsString(
+    key: string,
+    encoding: BufferEncoding = 'utf8'
+  ): Promise<string> {
     const buffer = await this.download(key);
     return buffer.toString(encoding);
   }
 
   async delete(key: string): Promise<void> {
     const fullKey = this.getFullKey(key);
-    await this.client.send(new DeleteObjectCommand({
-      Bucket: this.bucket,
-      Key: fullKey,
-    }));
+    await this.client.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: fullKey,
+      })
+    );
     this.logger.debug('File deleted from S3', { key: fullKey });
   }
 
@@ -116,12 +129,14 @@ export class S3StorageProvider implements StorageProvider {
 
     for (let i = 0; i < files.length; i += batchSize) {
       const batch = files.slice(i, i + batchSize);
-      const objects = batch.map(f => ({ Key: this.getFullKey(f.key) }));
+      const objects = batch.map((f) => ({ Key: this.getFullKey(f.key) }));
 
-      await this.client.send(new DeleteObjectsCommand({
-        Bucket: this.bucket,
-        Delete: { Objects: objects },
-      }));
+      await this.client.send(
+        new DeleteObjectsCommand({
+          Bucket: this.bucket,
+          Delete: { Objects: objects },
+        })
+      );
 
       deleted += batch.length;
     }
@@ -133,32 +148,45 @@ export class S3StorageProvider implements StorageProvider {
   async exists(key: string): Promise<boolean> {
     const fullKey = this.getFullKey(key);
     try {
-      await this.client.send(new HeadObjectCommand({
-        Bucket: this.bucket,
-        Key: fullKey,
-      }));
+      await this.client.send(
+        new HeadObjectCommand({
+          Bucket: this.bucket,
+          Key: fullKey,
+        })
+      );
       return true;
     } catch (err: unknown) {
-      const error = err as { name?: string; $metadata?: { httpStatusCode?: number } };
-      if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+      const error = err as {
+        name?: string;
+        $metadata?: { httpStatusCode?: number };
+      };
+      if (
+        error.name === 'NotFound' ||
+        error.$metadata?.httpStatusCode === 404
+      ) {
         return false;
       }
       throw err;
     }
   }
 
-  async listByPrefix(prefix: string, maxResults: number = 1000): Promise<StorageFileInfo[]> {
+  async listByPrefix(
+    prefix: string,
+    maxResults: number = 1000
+  ): Promise<StorageFileInfo[]> {
     const fullPrefix = this.getFullKey(prefix);
     const results: StorageFileInfo[] = [];
     let continuationToken: string | undefined;
 
     do {
-      const response = await this.client.send(new ListObjectsV2Command({
-        Bucket: this.bucket,
-        Prefix: fullPrefix,
-        MaxKeys: Math.min(maxResults - results.length, 1000),
-        ContinuationToken: continuationToken,
-      }));
+      const response = await this.client.send(
+        new ListObjectsV2Command({
+          Bucket: this.bucket,
+          Prefix: fullPrefix,
+          MaxKeys: Math.min(maxResults - results.length, 1000),
+          ContinuationToken: continuationToken,
+        })
+      );
 
       if (response.Contents) {
         for (const obj of response.Contents) {
@@ -171,7 +199,9 @@ export class S3StorageProvider implements StorageProvider {
         }
       }
 
-      continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined;
+      continuationToken = response.IsTruncated
+        ? response.NextContinuationToken
+        : undefined;
     } while (continuationToken && results.length < maxResults);
 
     return results;
@@ -186,7 +216,11 @@ export class S3StorageProvider implements StorageProvider {
     return await getSignedUrl(this.client, command, { expiresIn });
   }
 
-  async getSignedUploadUrl(key: string, contentType?: string, expiresIn: number = 3600): Promise<string> {
+  async getSignedUploadUrl(
+    key: string,
+    contentType?: string,
+    expiresIn: number = 3600
+  ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const command = new PutObjectCommand({
       Bucket: this.bucket,

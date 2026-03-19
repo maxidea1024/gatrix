@@ -35,7 +35,11 @@ export class GCSStorageProvider implements StorageProvider {
     this.bucket = storage.bucket(config.bucket);
   }
 
-  async upload(key: string, data: Buffer | string, contentType?: string): Promise<string> {
+  async upload(
+    key: string,
+    data: Buffer | string,
+    contentType?: string
+  ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const body = typeof data === 'string' ? Buffer.from(data, 'utf8') : data;
     const file = this.bucket.file(fullKey);
@@ -56,7 +60,10 @@ export class GCSStorageProvider implements StorageProvider {
     return content;
   }
 
-  async downloadAsString(key: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
+  async downloadAsString(
+    key: string,
+    encoding: BufferEncoding = 'utf8'
+  ): Promise<string> {
     const buffer = await this.download(key);
     return buffer.toString(encoding);
   }
@@ -84,7 +91,10 @@ export class GCSStorageProvider implements StorageProvider {
         await file.delete();
         deleted++;
       } catch (err: unknown) {
-        this.logger.warn('Failed to delete file from GCS', { key: file.name, error: String(err) });
+        this.logger.warn('Failed to delete file from GCS', {
+          key: file.name,
+          error: String(err),
+        });
       }
     }
 
@@ -99,14 +109,17 @@ export class GCSStorageProvider implements StorageProvider {
     return exists;
   }
 
-  async listByPrefix(prefix: string, maxResults: number = 1000): Promise<StorageFileInfo[]> {
+  async listByPrefix(
+    prefix: string,
+    maxResults: number = 1000
+  ): Promise<StorageFileInfo[]> {
     const fullPrefix = this.getFullKey(prefix);
     const [files] = await this.bucket.getFiles({
       prefix: fullPrefix,
       maxResults,
     });
 
-    return files.map(file => ({
+    return files.map((file) => ({
       key: this.stripPrefix(file.name),
       size: parseInt(file.metadata.size as string, 10) || 0,
       lastModified: new Date(file.metadata.updated as string),
@@ -125,7 +138,11 @@ export class GCSStorageProvider implements StorageProvider {
     return url;
   }
 
-  async getSignedUploadUrl(key: string, contentType?: string, expiresIn: number = 3600): Promise<string> {
+  async getSignedUploadUrl(
+    key: string,
+    contentType?: string,
+    expiresIn: number = 3600
+  ): Promise<string> {
     const fullKey = this.getFullKey(key);
     const file = this.bucket.file(fullKey);
 
