@@ -322,6 +322,7 @@ const FeatureFlagTypesPage: React.FC = () => {
             display: 'flex',
             justifyContent: 'flex-end',
             gap: 1,
+            bgcolor: 'background.paper',
           }}
         >
           <Button onClick={() => setEditDialogOpen(false)}>

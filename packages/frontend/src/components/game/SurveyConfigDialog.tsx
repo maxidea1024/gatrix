@@ -153,6 +153,7 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({
           display: 'flex',
           justifyContent: 'flex-end',
           gap: 1,
+          bgcolor: 'background.paper',
         }}
       >
         <Button onClick={onClose} disabled={submitting}>

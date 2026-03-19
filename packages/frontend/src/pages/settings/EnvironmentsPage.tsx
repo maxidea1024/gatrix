@@ -48,6 +48,7 @@ import {
   ContentCopy as CopyIcon,
   Refresh as RefreshIcon,
   Add as AddIcon,
+  Edit as EditIcon,
   Delete as DeleteIcon,
   Warning as WarningIcon,
   Visibility as VisibilityIcon,

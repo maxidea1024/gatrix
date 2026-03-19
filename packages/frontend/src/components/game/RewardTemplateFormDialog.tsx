@@ -553,6 +553,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
             display: 'flex',
             gap: 1,
             justifyContent: 'flex-end',
+            bgcolor: 'background.paper',
           }}
         >
           <Button onClick={onClose} disabled={saving}>

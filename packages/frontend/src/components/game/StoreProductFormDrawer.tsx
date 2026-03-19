@@ -724,6 +724,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
               display: 'flex',
               gap: 1,
               justifyContent: 'flex-end',
+              bgcolor: 'background.paper',
             }}
           >
             <Button onClick={onClose} disabled={saving}>

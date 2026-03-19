@@ -4897,6 +4897,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                 display: 'flex',
                 gap: 1,
                 justifyContent: 'flex-end',
+                bgcolor: 'background.paper',
               }}
             >
               <Button
@@ -5021,6 +5022,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             display: 'flex',
             gap: 1,
             justifyContent: 'flex-end',
+            bgcolor: 'background.paper',
           }}
         >
           <Button onClick={() => setVariantDialogOpen(false)}>
