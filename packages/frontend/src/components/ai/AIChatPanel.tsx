@@ -62,7 +62,11 @@ function getSavedWidth(): number {
     const saved = localStorage.getItem(STORAGE_KEY_WIDTH);
     if (saved) {
       const parsed = parseInt(saved, 10);
-      if (!isNaN(parsed) && parsed >= MIN_DRAWER_WIDTH && parsed <= MAX_DRAWER_WIDTH) {
+      if (
+        !isNaN(parsed) &&
+        parsed >= MIN_DRAWER_WIDTH &&
+        parsed <= MAX_DRAWER_WIDTH
+      ) {
         return parsed;
       }
     }
@@ -87,19 +91,13 @@ const getMessageBubbleSx = (role: 'user' | 'assistant' | 'system') => ({
   ...(role === 'user'
     ? { borderBottomRightRadius: '4px' }
     : { borderBottomLeftRadius: '4px' }),
-  boxShadow:
-    '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
   bgcolor:
     role === 'user'
       ? 'primary.main'
       : (theme: any) =>
-          theme.palette.mode === 'dark'
-            ? 'rgba(255,255,255,0.08)'
-            : 'grey.100',
-  color:
-    role === 'user'
-      ? 'primary.contrastText'
-      : 'text.primary',
+          theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'grey.100',
+  color: role === 'user' ? 'primary.contrastText' : 'text.primary',
   whiteSpace: role === 'user' ? 'pre-wrap' : 'normal',
   wordBreak: 'break-word',
   fontSize: '0.875rem',
@@ -278,7 +276,10 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
     const handleMouseMove = (ev: MouseEvent) => {
       if (!isResizingRef.current) return;
       const newWidth = window.innerWidth - ev.clientX;
-      latestWidth = Math.max(MIN_DRAWER_WIDTH, Math.min(MAX_DRAWER_WIDTH, newWidth));
+      latestWidth = Math.max(
+        MIN_DRAWER_WIDTH,
+        Math.min(MAX_DRAWER_WIDTH, newWidth)
+      );
       setDrawerWidth(latestWidth);
     };
 
@@ -308,8 +309,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
         <Box
           sx={{
             display: 'flex',
-            justifyContent:
-              msg.role === 'user' ? 'flex-end' : 'flex-start',
+            justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
             px: 2,
             py: 0.75,
           }}
@@ -317,9 +317,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
           <Box sx={getMessageBubbleSx(msg.role)}>
             {msg.role === 'assistant' ? (
               // Streaming with no content yet - show typing dots
-              isStreaming &&
-              index === messages.length - 1 &&
-              !msg.content ? (
+              isStreaming && index === messages.length - 1 && !msg.content ? (
                 <Box sx={{ display: 'flex', gap: 0.5, py: 0.5, px: 0.5 }}>
                   {[0, 1, 2].map((i) => (
                     <Box
@@ -390,9 +388,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
           flexDirection: 'column',
           overflow: 'hidden',
           bgcolor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? '#1a1d23'
-              : 'background.paper',
+            theme.palette.mode === 'dark' ? '#1a1d23' : 'background.paper',
         },
       }}
     >
@@ -487,9 +483,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = ({ open, onClose }) => {
               }}
             >
               <SmartToyIcon sx={{ fontSize: 48 }} />
-              <Typography variant="body2">
-                {t('aiChat.placeholder')}
-              </Typography>
+              <Typography variant="body2">{t('aiChat.placeholder')}</Typography>
             </Box>
           ) : (
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>

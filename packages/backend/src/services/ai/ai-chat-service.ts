@@ -289,7 +289,10 @@ export class AIChatService {
 
         if (oldestChats.length > 0) {
           await db('g_ai_chats')
-            .whereIn('id', oldestChats.map((c: any) => c.id))
+            .whereIn(
+              'id',
+              oldestChats.map((c: any) => c.id)
+            )
             .delete();
           logger.info('Auto-cleaned old AI chats', {
             userId,
