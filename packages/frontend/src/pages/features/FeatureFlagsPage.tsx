@@ -3438,7 +3438,11 @@ const FeatureFlagsPage: React.FC = () => {
                   type="feature-flag"
                   description={newFlag.description}
                   context={{ flagType: newFlag.flagType }}
-                  prefix={currentProject ? `${currentProject.projectName}-` : undefined}
+                  prefix={
+                    currentProject
+                      ? `${currentProject.projectName}-`
+                      : undefined
+                  }
                   onSelect={(name) => {
                     setNewFlag({
                       ...newFlag,

@@ -54,16 +54,21 @@ const AISuggestNames: React.FC<AISuggestNamesProps> = ({
   // Check AI availability on mount
   useEffect(() => {
     let cancelled = false;
-    aiChatService.getStatus().then((status) => {
-      if (!cancelled) {
-        setAIAvailable(status.available);
-      }
-    }).catch(() => {
-      if (!cancelled) {
-        setAIAvailable(false);
-      }
-    });
-    return () => { cancelled = true; };
+    aiChatService
+      .getStatus()
+      .then((status) => {
+        if (!cancelled) {
+          setAIAvailable(status.available);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAIAvailable(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Clear suggestions when description changes significantly

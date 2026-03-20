@@ -79,7 +79,10 @@ export class AISuggestService {
     params: SuggestNamesParams
   ): Promise<SuggestNamesResult> {
     const { type, description, context } = params;
-    const count = Math.min(params.count || DEFAULT_SUGGESTIONS, MAX_SUGGESTIONS);
+    const count = Math.min(
+      params.count || DEFAULT_SUGGESTIONS,
+      MAX_SUGGESTIONS
+    );
 
     // Get AI settings
     const settings = await AISettingsService.getSettings(orgId);
@@ -145,7 +148,9 @@ export class AISuggestService {
 
       // Remove markdown code block wrapper if present
       let jsonStr = trimmed;
-      const codeBlockMatch = trimmed.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+      const codeBlockMatch = trimmed.match(
+        /```(?:json)?\s*\n?([\s\S]*?)\n?```/
+      );
       if (codeBlockMatch) {
         jsonStr = codeBlockMatch[1].trim();
       }
@@ -166,7 +171,12 @@ export class AISuggestService {
       // Fallback: split by newlines and clean up
       return trimmed
         .split('\n')
-        .map((l) => l.replace(/^[\d.\-*)\s]+/, '').trim().toLowerCase())
+        .map((l) =>
+          l
+            .replace(/^[\d.\-*)\s]+/, '')
+            .trim()
+            .toLowerCase()
+        )
         .filter((n) => /^[a-z][a-z0-9-]*$/.test(n))
         .slice(0, maxCount);
     } catch (error: any) {

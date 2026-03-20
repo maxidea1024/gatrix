@@ -307,16 +307,21 @@ export class AIChatController {
       const { type, description, context, count } = req.body;
 
       if (!type || typeof type !== 'string') {
-        res
-          .status(400)
-          .json({ success: false, message: 'type is required' });
+        res.status(400).json({ success: false, message: 'type is required' });
         return;
       }
 
-      if (!description || typeof description !== 'string' || description.trim().length < 5) {
+      if (
+        !description ||
+        typeof description !== 'string' ||
+        description.trim().length < 5
+      ) {
         res
           .status(400)
-          .json({ success: false, message: 'description is required (min 5 chars)' });
+          .json({
+            success: false,
+            message: 'description is required (min 5 chars)',
+          });
         return;
       }
 
