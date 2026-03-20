@@ -72,6 +72,7 @@ import { P } from '@/types/permissions';
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
+import PageHeader from '@/components/common/PageHeader';
 
 const WhitelistPage: React.FC = () => {
   const { t } = useTranslation();
@@ -565,27 +566,11 @@ const WhitelistPage: React.FC = () => {
       {/* Main Card with Tabs */}
       <Card>
         <CardContent>
-          {/* Header */}
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              mb: 3,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <SecurityIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-              <Box>
-                <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                  {t('whitelist.title')}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {t('whitelist.subtitle')}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
+      <PageHeader
+        icon={<SecurityIcon />}
+        title={t('whitelist.title')}
+        subtitle={t('whitelist.subtitle')}
+      />
 
           <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 3 }}>
             <Tab label={t('whitelist.tabs.account')} />

@@ -66,6 +66,7 @@ import { useEnvironment } from '../../contexts/EnvironmentContext';
 import api from '../../services/api';
 import { Environment } from '../../services/environmentService';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 
 // Register Chart.js components
 ChartJS.register(
@@ -895,40 +896,26 @@ const FeatureNetworkPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Page Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          mb: 3,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <HubIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Box>
-            <Typography variant="h5" fontWeight={600}>
-              {t('network.title')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('network.subtitle')}
-            </Typography>
-          </Box>
-        </Box>
-        <Tooltip title={t('common.refresh')}>
-          <span>
-            <IconButton onClick={fetchData} disabled={loading || isRefreshing}>
-              <RefreshIcon
-                sx={{
-                  animation: isRefreshing
-                    ? `${spin} 1s linear infinite`
-                    : 'none',
-                }}
-              />
-            </IconButton>
-          </span>
-        </Tooltip>
-      </Box>
+      <PageHeader
+        icon={<HubIcon />}
+        title={t('network.title')}
+        subtitle={t('network.subtitle')}
+        actions={
+          <Tooltip title={t('common.refresh')}>
+            <span>
+              <IconButton onClick={fetchData} disabled={loading || isRefreshing}>
+                <RefreshIcon
+                  sx={{
+                    animation: isRefreshing
+                      ? `${spin} 1s linear infinite`
+                      : 'none',
+                  }}
+                />
+              </IconButton>
+            </span>
+          </Tooltip>
+        }
+      />
 
       {/* Filters */}
       <Paper sx={{ p: 2, mb: 3 }}>

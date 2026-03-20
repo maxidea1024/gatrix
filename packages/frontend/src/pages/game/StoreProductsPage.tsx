@@ -81,6 +81,7 @@ import { useNavigate } from 'react-router-dom';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 
 // Store display names
 const STORE_DISPLAY_NAMES: Record<string, string> = {
@@ -781,19 +782,11 @@ const StoreProductsPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <StorefrontIcon />
-            {t('storeProducts.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('storeProducts.subtitle')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<StorefrontIcon />}
+        title={t('storeProducts.title')}
+        subtitle={t('storeProducts.subtitle')}
+      />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <>

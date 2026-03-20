@@ -65,6 +65,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import SearchTextField from '@/components/common/SearchTextField';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import EffectivePermissionsViewer from '@/components/rbac/EffectivePermissionsViewer';
+import PageHeader from '@/components/common/PageHeader';
 
 // ==================== Tab Panel ====================
 
@@ -477,31 +478,20 @@ const GroupsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h5" sx={{ fontWeight: 600 }}>
-            {t('rbac.groups.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('rbac.groups.description')}
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={openCreateDialog}
-        >
-          {t('rbac.groups.create')}
-        </Button>
-      </Box>
+      <PageHeader
+        icon={<GroupIcon />}
+        title={t('rbac.groups.title')}
+        subtitle={t('rbac.groups.description')}
+        actions={
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={openCreateDialog}
+          >
+            {t('rbac.groups.create')}
+          </Button>
+        }
+      />
 
       {/* Search */}
       <Box sx={{ mb: 2 }}>

@@ -76,6 +76,7 @@ import FieldTypeIcon from '../../components/common/FieldTypeIcon';
 import ValidationRulesEditor from '../../components/features/ValidationRulesEditor';
 import { ValidationRules } from '../../services/featureFlagService';
 import SvgIcon from '@mui/material/SvgIcon';
+import PageHeader from '@/components/common/PageHeader';
 
 // Trim option value → localization key mapping
 const TRIM_LABEL_MAP: Record<string, string> = {
@@ -775,19 +776,11 @@ const FeatureContextFieldsPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <ContextIcon />
-            {t('featureFlags.contextFields')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('featureFlags.contextFieldsDescription')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<ContextIcon />}
+        title={t('featureFlags.contextFields')}
+        subtitle={t('featureFlags.contextFieldsDescription')}
+      />
         <Box sx={{ display: 'flex', gap: 1 }}>
           {canManage && (
             <Button
@@ -1361,6 +1354,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                   });
                 }}
                 disabled={!!editingField?.id || !canManage}
+                autoFocus={!editingField?.id}
                 error={
                   !!editingField?.fieldName &&
                   !/^[a-z][a-zA-Z0-9_]*$/.test(editingField.fieldName)

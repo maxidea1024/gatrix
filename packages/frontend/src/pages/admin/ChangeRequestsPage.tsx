@@ -48,6 +48,7 @@ import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDrawer';
 import RevertPreviewDrawer from '@/components/admin/RevertPreviewDrawer';
 import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
+import PageHeader from '@/components/common/PageHeader';
 
 // JSON Diff wrapper component
 interface FieldChange {
@@ -720,30 +721,20 @@ const ChangeRequestsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h4" component="h1" gutterBottom>
-            {t('changeRequest.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('changeRequest.subtitle')}
-          </Typography>
-        </Box>
-        <Button
-          variant="outlined"
-          startIcon={<RefreshIcon />}
-          onClick={handleRefresh}
-        >
-          {t('common.refresh')}
-        </Button>
-      </Box>
+      <PageHeader
+        icon={<CompareArrowsIcon />}
+        title={t('changeRequest.title')}
+        subtitle={t('changeRequest.subtitle')}
+        actions={
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={handleRefresh}
+          >
+            {t('common.refresh')}
+          </Button>
+        }
+      />
 
       <Card variant="outlined">
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>

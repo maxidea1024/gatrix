@@ -131,6 +131,7 @@ import { getContrastColor } from '@/utils/colorUtils';
 
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 import { TableSkeletonRows } from '@/components/common/TableSkeletonRows';
+import PageHeader from '@/components/common/PageHeader';
 // SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
@@ -1814,44 +1815,28 @@ const UsersManagementPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          mb: 3,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <PeopleIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('users.title')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('users.subtitle')}
-            </Typography>
-          </Box>
-        </Box>
-
-        {/* 버튼 그룹 */}
-        {canManage && (
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button variant="contained" onClick={handleAddUser}>
-              {t('users.addUser')}
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<SendIcon />}
-              onClick={() => setInvitationDialogOpen(true)}
-              disabled={!!currentInvitation}
-            >
-              {t('invitations.createInvitation')}
-            </Button>
-          </Box>
-        )}
-      </Box>
+      <PageHeader
+        icon={<PeopleIcon />}
+        title={t('users.title')}
+        subtitle={t('users.subtitle')}
+        actions={
+          canManage ? (
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button variant="contained" onClick={handleAddUser}>
+                {t('users.addUser')}
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<SendIcon />}
+                onClick={() => setInvitationDialogOpen(true)}
+                disabled={!!currentInvitation}
+              >
+                {t('invitations.createInvitation')}
+              </Button>
+            </Box>
+          ) : undefined
+        }
+      />
 
       {/* Filters */}
       <Card sx={{ mb: 3 }}>

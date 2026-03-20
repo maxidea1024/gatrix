@@ -684,6 +684,279 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
 
 const MemoChartPanel = React.memo(ChartPanel);
 
+// ==================== Chart Preview Panel ====================
+
+const ChartPreviewPanel: React.FC<{
+  metricName: string;
+  chartType: ChartType;
+  aggregationMode: string;
+  groupBy: string[];
+}> = ({ metricName, chartType, aggregationMode, groupBy }) => {
+  const { t, i18n } = useTranslation();
+  const theme = useTheme();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [seriesData, setSeriesData] = useState<TimeSeriesResponse | null>(null);
+
+  // Debounced preview fetch
+  useEffect(() => {
+    if (!metricName) {
+      setSeriesData(null);
+      setError(null);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const timer = setTimeout(async () => {
+      try {
+        const params: any = {
+          series: metricName,
+          range: 'hour',
+          aggregationMode: aggregationMode || 'count',
+        };
+        if (groupBy && groupBy.length > 0) {
+          params.groupBy = groupBy;
+        }
+        const response = await api.get<TimeSeriesResponse>(
+          `${projectApiPath}/impact-metrics`,
+          { params }
+        );
+        setSeriesData(response.data);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch preview data');
+      } finally {
+        setLoading(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [metricName, aggregationMode, groupBy, projectApiPath]);
+
+  // Build chart data (same logic as ChartPanel)
+  const chartData = useMemo(() => {
+    if (!seriesData?.series?.length) return { labels: [], datasets: [] };
+
+    const allTimestamps = new Set<number>();
+    seriesData.series.forEach((s) => {
+      s.data.forEach(([ts]) => allTimestamps.add(ts));
+    });
+    const sorted = Array.from(allTimestamps).sort((a, b) => a - b);
+
+    const locale =
+      i18n.language === 'ko'
+        ? 'ko-KR'
+        : i18n.language === 'zh'
+          ? 'zh-CN'
+          : 'en-US';
+    const formatLabel = (ts: number) => {
+      const d = new Date(ts * 1000);
+      return d.toLocaleTimeString(locale, {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+    };
+
+    const labels = sorted.map(formatLabel);
+    const datasets = seriesData.series.map((s, idx) => {
+      const color = SERIES_COLORS[idx % SERIES_COLORS.length];
+      const tsMap = new Map(s.data.map(([ts, val]) => [ts, val]));
+
+      let label = metricName;
+      if (groupBy && groupBy.length > 0) {
+        const groupParts = groupBy
+          .map((key) => s.metric[key] || '')
+          .filter((v) => v);
+        if (groupParts.length > 0) {
+          label = groupParts.join(' / ');
+        }
+      } else {
+        const metricLabels = Object.entries(s.metric || {}).filter(
+          ([k]) => k !== '__name__'
+        );
+        if (metricLabels.length > 0 && metricLabels.length < 3) {
+          label = metricLabels.map(([k, v]) => `${k}=${v}`).join(', ');
+        } else if (metricLabels.length >= 3) {
+          label = `${metricName} (${idx + 1})`;
+        }
+      }
+
+      return {
+        label,
+        data: sorted.map((ts) => tsMap.get(ts) ?? null),
+        borderColor: color.border,
+        backgroundColor:
+          chartType === 'line' ? color.bg.replace('0.4', '0.1') : color.bg,
+        borderWidth: 2,
+        tension: 0.3,
+        pointRadius: 1,
+        pointHoverRadius: 4,
+        fill: chartType === 'area',
+        spanGaps: true,
+      };
+    });
+
+    return { labels, datasets };
+  }, [seriesData, metricName, chartType, groupBy, i18n.language]);
+
+  const chartOptions = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false as const,
+      interaction: { mode: 'index' as const, intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom' as const,
+          labels: {
+            color: theme.palette.text.primary,
+            usePointStyle: true,
+            padding: 12,
+            font: { size: 11 },
+            boxWidth: 10,
+          },
+        },
+        tooltip: {
+          backgroundColor: theme.palette.mode === 'dark' ? '#333' : '#fff',
+          titleColor: theme.palette.text.primary,
+          bodyColor: theme.palette.text.secondary,
+          borderColor: theme.palette.divider,
+          borderWidth: 1,
+          cornerRadius: 6,
+          callbacks: {
+            label: (ctx: any) => {
+              const val = ctx.parsed?.y;
+              if (val === null || val === undefined) return '';
+              return `${ctx.dataset.label}: ${typeof val === 'number' ? val.toLocaleString(undefined, { maximumFractionDigits: 2 }) : val}`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: {
+            color:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.05)'
+                : 'rgba(0,0,0,0.05)',
+          },
+          ticks: {
+            color: theme.palette.text.secondary,
+            font: { size: 10 },
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 8,
+          },
+        },
+        y: {
+          beginAtZero: true,
+          grid: {
+            color:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.05)'
+                : 'rgba(0,0,0,0.05)',
+          },
+          ticks: {
+            color: theme.palette.text.secondary,
+            font: { size: 10 },
+          },
+        },
+      },
+    }),
+    [theme]
+  );
+
+  const hasData = chartData.datasets.length > 0;
+
+  // Empty state: no metric name entered
+  if (!metricName) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+          flexDirection: 'column',
+          color: 'text.secondary',
+          opacity: 0.6,
+        }}
+      >
+        <ChartIcon sx={{ fontSize: 48, mb: 1, opacity: 0.4 }} />
+        <Typography variant="body2">
+          {t('impactMetrics.previewHint')}
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+        }}
+      >
+        <CircularProgress size={28} thickness={4} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          color: 'error.main',
+        }}
+      >
+        <Typography variant="body2">{error}</Typography>
+      </Box>
+    );
+  }
+
+  if (!hasData) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+          flexDirection: 'column',
+          color: 'text.secondary',
+          opacity: 0.7,
+        }}
+      >
+        <Typography variant="body2" fontWeight={500}>
+          {t('impactMetrics.noData')}
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ height: '100%' }}>
+      {chartType === 'bar' ? (
+        <Bar data={chartData} options={chartOptions} redraw={false} />
+      ) : (
+        <Line data={chartData} options={chartOptions} redraw={false} />
+      )}
+    </Box>
+  );
+};
+
 // ==================== Chart Config Dialog ====================
 
 const ChartConfigDialog: React.FC<{
@@ -776,145 +1049,186 @@ const ChartConfigDialog: React.FC<{
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>
         {initialValues
           ? t('impactMetrics.editChart')
           : t('impactMetrics.addChart')}
       </DialogTitle>
       <DialogContent dividers>
-        <Stack spacing={2.5} sx={{ pt: 1 }}>
-          <Autocomplete
-            freeSolo
-            loading={loadingMetrics}
-            options={availableMetrics.map((m) => m.name)}
-            value={metricName}
-            onChange={(_, newValue) => setMetricName(newValue || '')}
-            onInputChange={(_, newInput) => setMetricName(newInput)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t('impactMetrics.metricName')}
-                required
-                helperText={t('impactMetrics.metricNameHelp')}
-                autoFocus
-              />
-            )}
-            renderOption={(props, option) => {
-              const metric = availableMetrics.find((m) => m.name === option);
-              return (
-                <li {...props} key={option}>
-                  <Box>
-                    <Typography variant="body2" fontWeight={500}>
-                      {option}
-                    </Typography>
-                    {metric?.help && (
-                      <Typography variant="caption" color="text.secondary">
-                        {metric.help} ({metric.type})
-                      </Typography>
-                    )}
-                  </Box>
-                </li>
-              );
-            }}
-          />
-
-          <Autocomplete
-            multiple
-            freeSolo
-            loading={loadingLabels}
-            options={availableLabels}
-            value={groupBy}
-            onChange={(_, newValue) => setGroupBy(newValue)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t('impactMetrics.groupBy')}
-                placeholder="label (e.g. pod)"
-                helperText={t('impactMetrics.groupByHelp')}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <React.Fragment>
-                      {loadingLabels ? (
-                        <CircularProgress color="inherit" size={20} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </React.Fragment>
-                  ),
+        <Box sx={{ display: 'flex', minHeight: 400 }}>
+          {/* Left: Form */}
+          <Box sx={{ flex: '0 0 360px', minWidth: 0, pr: 2.5 }}>
+            <Stack spacing={2.5} sx={{ pt: 1 }}>
+              <Autocomplete
+                freeSolo
+                loading={loadingMetrics}
+                options={availableMetrics.map((m) => m.name)}
+                value={metricName}
+                onChange={(_, newValue) => setMetricName(newValue || '')}
+                onInputChange={(_, newInput) => setMetricName(newInput)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t('impactMetrics.metricName')}
+                    required
+                    helperText={t('impactMetrics.metricNameHelp')}
+                    autoFocus
+                  />
+                )}
+                renderOption={(props, option) => {
+                  const metric = availableMetrics.find(
+                    (m) => m.name === option
+                  );
+                  return (
+                    <li {...props} key={option}>
+                      <Box>
+                        <Typography variant="body2" fontWeight={500}>
+                          {option}
+                        </Typography>
+                        {metric?.help && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                          >
+                            {metric.help} ({metric.type})
+                          </Typography>
+                        )}
+                      </Box>
+                    </li>
+                  );
                 }}
               />
-            )}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip
-                  variant="outlined"
-                  label={option}
-                  size="small"
-                  {...getTagProps({ index })}
-                />
-              ))
-            }
-          />
 
-          <TextField
-            label={t('impactMetrics.chartTitle')}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder={metricName || t('impactMetrics.chartTitlePlaceholder')}
-            helperText={t('impactMetrics.chartTitleHelp')}
-          />
-
-          <Stack direction="row" spacing={2}>
-            <FormControl size="small" sx={{ flex: 1 }}>
-              <InputLabel>{t('impactMetrics.chartType')}</InputLabel>
-              <Select
-                value={chartType}
-                label={t('impactMetrics.chartType')}
-                onChange={(e: SelectChangeEvent<'line' | 'area' | 'bar'>) =>
-                  setChartType(e.target.value as any)
+              <Autocomplete
+                multiple
+                freeSolo
+                loading={loadingLabels}
+                options={availableLabels}
+                value={groupBy}
+                onChange={(_, newValue) => setGroupBy(newValue)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t('impactMetrics.groupBy')}
+                    placeholder="label (e.g. pod)"
+                    helperText={t('impactMetrics.groupByHelp')}
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <React.Fragment>
+                          {loadingLabels ? (
+                            <CircularProgress color="inherit" size={20} />
+                          ) : null}
+                          {params.InputProps.endAdornment}
+                        </React.Fragment>
+                      ),
+                    }}
+                  />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      variant="outlined"
+                      label={option}
+                      size="small"
+                      {...getTagProps({ index })}
+                    />
+                  ))
                 }
-              >
-                <MenuItem value="line">
-                  {t('impactMetrics.chartType.line')}
-                </MenuItem>
-                <MenuItem value="area">
-                  {t('impactMetrics.chartType.area')}
-                </MenuItem>
-                <MenuItem value="bar">
-                  {t('impactMetrics.chartType.bar')}
-                </MenuItem>
-              </Select>
-            </FormControl>
+              />
 
-            <FormControl size="small" sx={{ flex: 1 }}>
-              <InputLabel>{t('impactMetrics.aggregation')}</InputLabel>
-              <Select
-                value={aggregationMode}
-                label={t('impactMetrics.aggregation')}
-                onChange={(e: SelectChangeEvent<AggregationMode>) =>
-                  setAggregationMode(e.target.value as AggregationMode)
+              <TextField
+                label={t('impactMetrics.chartTitle')}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={
+                  metricName || t('impactMetrics.chartTitlePlaceholder')
                 }
-              >
-                <MenuItem value="count">
-                  {t('impactMetrics.aggregation.count')}
-                </MenuItem>
-                <MenuItem value="sum">
-                  {t('impactMetrics.aggregation.sum')}
-                </MenuItem>
-                <MenuItem value="avg">
-                  {t('impactMetrics.aggregation.avg')}
-                </MenuItem>
-                <MenuItem value="rps">
-                  {t('impactMetrics.aggregation.rps')}
-                </MenuItem>
-                <MenuItem value="p50">P50</MenuItem>
-                <MenuItem value="p95">P95</MenuItem>
-                <MenuItem value="p99">P99</MenuItem>
-              </Select>
-            </FormControl>
-          </Stack>
-        </Stack>
+                helperText={t('impactMetrics.chartTitleHelp')}
+              />
+
+              <Stack direction="row" spacing={2}>
+                <FormControl size="small" sx={{ flex: 1 }}>
+                  <InputLabel>{t('impactMetrics.chartType')}</InputLabel>
+                  <Select
+                    value={chartType}
+                    label={t('impactMetrics.chartType')}
+                    onChange={(
+                      e: SelectChangeEvent<'line' | 'area' | 'bar'>
+                    ) => setChartType(e.target.value as any)}
+                  >
+                    <MenuItem value="line">
+                      {t('impactMetrics.chartType.line')}
+                    </MenuItem>
+                    <MenuItem value="area">
+                      {t('impactMetrics.chartType.area')}
+                    </MenuItem>
+                    <MenuItem value="bar">
+                      {t('impactMetrics.chartType.bar')}
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+
+                <FormControl size="small" sx={{ flex: 1 }}>
+                  <InputLabel>{t('impactMetrics.aggregation')}</InputLabel>
+                  <Select
+                    value={aggregationMode}
+                    label={t('impactMetrics.aggregation')}
+                    onChange={(e: SelectChangeEvent<AggregationMode>) =>
+                      setAggregationMode(e.target.value as AggregationMode)
+                    }
+                  >
+                    <MenuItem value="count">
+                      {t('impactMetrics.aggregation.count')}
+                    </MenuItem>
+                    <MenuItem value="sum">
+                      {t('impactMetrics.aggregation.sum')}
+                    </MenuItem>
+                    <MenuItem value="avg">
+                      {t('impactMetrics.aggregation.avg')}
+                    </MenuItem>
+                    <MenuItem value="rps">
+                      {t('impactMetrics.aggregation.rps')}
+                    </MenuItem>
+                    <MenuItem value="p50">P50</MenuItem>
+                    <MenuItem value="p95">P95</MenuItem>
+                    <MenuItem value="p99">P99</MenuItem>
+                  </Select>
+                </FormControl>
+              </Stack>
+            </Stack>
+          </Box>
+
+          {/* Vertical Divider */}
+          <Divider orientation="vertical" flexItem />
+
+          {/* Right: Chart Preview */}
+          <Box
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              pl: 2.5,
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+                minHeight: 300,
+                p: 1.5,
+              }}
+            >
+              <ChartPreviewPanel
+                metricName={metricName}
+                chartType={chartType}
+                aggregationMode={aggregationMode}
+                groupBy={groupBy}
+              />
+            </Box>
+          </Box>
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t('common.cancel')}</Button>

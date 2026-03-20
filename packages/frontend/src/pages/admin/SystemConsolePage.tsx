@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { Box, Typography, Menu, MenuItem, alpha } from '@mui/material';
 import { Terminal as TerminalIcon } from '@mui/icons-material';
+import PageHeader from '@/components/common/PageHeader';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
@@ -1318,25 +1319,11 @@ const SystemConsolePage: React.FC = () => {
           e.preventDefault();
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          mb: 3,
-          flexShrink: 0,
-        }}
-      >
-        <TerminalIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-        <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
-            {t('console.title')}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {t('console.subtitle')}
-          </Typography>
-        </Box>
-      </Box>
+      <PageHeader
+        icon={<TerminalIcon />}
+        title={t('console.title')}
+        subtitle={t('console.subtitle')}
+      />
 
       <Box
         sx={(th) => ({

@@ -5,6 +5,7 @@ import {
   Construction as ConstructionIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import PageHeader from '@/components/common/PageHeader';
 
 // Animation keyframes
 const iconBounce = keyframes`
@@ -30,20 +31,11 @@ const EventLensProjectsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <FolderIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('eventLens.projects.title')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('eventLens.projects.subtitle')}
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
+      <PageHeader
+        icon={<FolderIcon />}
+        title={t('eventLens.projects.title')}
+        subtitle={t('eventLens.projects.subtitle')}
+      />
 
       {/* Coming Soon Card */}
       <Card>

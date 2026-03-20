@@ -98,6 +98,7 @@ import DynamicFilterBar, {
 } from '../../components/common/DynamicFilterBar';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import SearchTextField from '@/components/common/SearchTextField';
+import PageHeader from '@/components/common/PageHeader';
 
 // Column definition interface
 interface ColumnConfig {
@@ -664,28 +665,11 @@ const AuditLogsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <HistoryIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                {t('auditLogs.title')}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t('auditLogs.subtitle')}
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
+      <PageHeader
+        icon={<HistoryIcon />}
+        title={t('auditLogs.title')}
+        subtitle={t('auditLogs.subtitle')}
+      />
 
       {/* Filters */}
       <Card sx={{ mb: 3 }}>

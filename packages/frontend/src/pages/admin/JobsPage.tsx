@@ -61,6 +61,7 @@ import DynamicFilterBar, {
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
 import SearchTextField from '../../components/common/SearchTextField';
+import PageHeader from '@/components/common/PageHeader';
 
 // Default column configuration
 const defaultColumns: ColumnConfig[] = [
@@ -458,36 +459,22 @@ const JobsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <WorkIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('jobs.title')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('jobs.description')}
-            </Typography>
-          </Box>
-        </Box>
-        {canManage && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddJob}
-          >
-            {t('jobs.addJob')}
-          </Button>
-        )}
-      </Box>
+      <PageHeader
+        icon={<WorkIcon />}
+        title={t('jobs.title')}
+        subtitle={t('jobs.description')}
+        actions={
+          canManage ? (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddJob}
+            >
+              {t('jobs.addJob')}
+            </Button>
+          ) : undefined
+        }
+      />
 
       {/* Search and Filters */}
       <Card sx={{ mb: 3 }}>

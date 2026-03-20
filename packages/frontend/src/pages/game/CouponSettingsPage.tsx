@@ -116,6 +116,7 @@ import { Dayjs } from 'dayjs';
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
+import PageHeader from '@/components/common/PageHeader';
 
 // Coupon Settings page (list and management of coupon definitions)
 const CouponSettingsPage: React.FC = () => {
@@ -1355,19 +1356,11 @@ const CouponSettingsPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <SettingsIcon />
-            {t('coupons.couponSettings.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('coupons.couponSettings.subtitle')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<SettingsIcon />}
+        title={t('coupons.couponSettings.title')}
+        subtitle={t('coupons.couponSettings.subtitle')}
+      />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <Button

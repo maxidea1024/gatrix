@@ -115,6 +115,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
+import PageHeader from '@/components/common/PageHeader';
 
 // Column definition interface
 interface ColumnConfig {
@@ -965,85 +966,72 @@ const MessageTemplatesPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <TextFieldsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                {t('messageTemplates.title')}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t('messageTemplates.subtitle')}
-              </Typography>
-            </Box>
-          </Box>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            {canManage && (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleAdd}
+      <PageHeader
+        icon={<TextFieldsIcon />}
+        title={t('messageTemplates.title')}
+        subtitle={t('messageTemplates.subtitle')}
+        actions={
+          <>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              {canManage && (
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={handleAdd}
+                >
+                  {t('messageTemplates.addTemplate')}
+                </Button>
+              )}
+              <IconButton
+                onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+                aria-label="more options"
               >
-                {t('messageTemplates.addTemplate')}
-              </Button>
-            )}
-            <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-              aria-label="more options"
+                <MoreVertIcon />
+              </IconButton>
+            </Box>
+            <MuiMenu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
             >
-              <MoreVertIcon />
-            </IconButton>
-          </Box>
-          <MuiMenu
-            anchorEl={pageMenuAnchor}
-            open={Boolean(pageMenuAnchor)}
-            onClose={() => setPageMenuAnchor(null)}
-          >
-            <ExportImportMenuItems
-              onExport={(format) => {
-                setPageMenuAnchor(null);
-                const exportColumns: ExportColumn[] = [
-                  { key: 'name', header: t('common.name') },
-                  { key: 'type', header: t('common.type') },
-                  {
-                    key: 'defaultMessage',
-                    header: t('messageTemplates.defaultMessage'),
-                  },
-                  { key: 'isEnabled', header: t('common.status') },
-                  { key: 'createdAt', header: t('common.createdAt') },
-                ];
-                try {
-                  exportToFile(
-                    items,
-                    exportColumns,
-                    'message-templates',
-                    format
-                  );
-                  enqueueSnackbar(t('common.exportSuccess'), {
-                    variant: 'success',
-                  });
-                } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), {
-                    variant: 'error',
-                  });
-                }
-              }}
-              onImportClick={() => {
-                setPageMenuAnchor(null);
-                setImportDialogOpen(true);
-              }}
-            />
-          </MuiMenu>
-        </Box>
-      </Box>
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'name', header: t('common.name') },
+                    { key: 'type', header: t('common.type') },
+                    {
+                      key: 'defaultMessage',
+                      header: t('messageTemplates.defaultMessage'),
+                    },
+                    { key: 'isEnabled', header: t('common.status') },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(
+                      items,
+                      exportColumns,
+                      'message-templates',
+                      format
+                    );
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+              />
+            </MuiMenu>
+          </>
+        }
+      />
 
       {/* Filter */}
       <Card sx={{ mb: 3 }}>

@@ -129,6 +129,7 @@ import { RelativeTime } from '../../components/common/RelativeTime';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import PageHeader from '@/components/common/PageHeader';
 
 // View mode type
 type ViewMode = 'list' | 'grid' | 'checkerboard' | 'card' | 'cluster';
@@ -4091,20 +4092,11 @@ const ServerListPage: React.FC = () => {
         boxSizing: 'border-box',
       }}
     >
-      {/* Header */}
-      <Box sx={{ mb: 3, flexShrink: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <DnsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('serverList.title')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('serverList.subtitle')}
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
+      <PageHeader
+        icon={<DnsIcon />}
+        title={t('serverList.title')}
+        subtitle={t('serverList.subtitle')}
+      />
 
       {/* Search and Filters */}
       <Card sx={{ mb: 3, flexShrink: 0 }}>

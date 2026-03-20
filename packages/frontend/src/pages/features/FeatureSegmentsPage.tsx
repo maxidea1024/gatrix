@@ -95,6 +95,7 @@ interface FeatureSegment {
 }
 
 import { toTitleCase } from '../../utils/stringUtils';
+import PageHeader from '@/components/common/PageHeader';
 
 const FeatureSegmentsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -564,19 +565,11 @@ const FeatureSegmentsPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <SegmentIcon />
-            {t('featureFlags.segments')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('featureFlags.segmentsDescription')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<SegmentIcon />}
+        title={t('featureFlags.segments')}
+        subtitle={t('featureFlags.segmentsDescription')}
+      />
         <Box sx={{ display: 'flex', gap: 1 }}>
           {canManage && (
             <Button

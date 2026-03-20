@@ -9,6 +9,7 @@ import {
 } from '../../hooks/useSWR';
 import { useAuth } from '../../hooks/useAuth';
 import { P } from '@/types/permissions';
+import PageHeader from '@/components/common/PageHeader';
 import * as XLSX from 'xlsx';
 import {
   Box,
@@ -1630,143 +1631,130 @@ const ClientVersionsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Headers */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <WidgetsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('clientVersions.title')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('clientVersions.description')}
-            </Typography>
-          </Box>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {canManage && (
-            <>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AddIcon />}
-                onClick={() => {
-                  setEditingClientVersion(null);
-                  setIsCopyMode(false);
-                  setFormDialogOpen(true);
-                }}
-              >
-                {t('clientVersions.addIndividual')}
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AddIcon />}
-                onClick={() => {
-                  setBulkFormDialogOpen(true);
-                }}
-              >
-                {t('clientVersions.addBulk')}
-              </Button>
-            </>
-          )}
-          <IconButton onClick={(e) => setExportMenuAnchor(e.currentTarget)}>
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            anchorEl={exportMenuAnchor}
-            open={Boolean(exportMenuAnchor)}
-            onClose={() => setExportMenuAnchor(null)}
-          >
-            {canManage && [
+      <PageHeader
+        icon={<WidgetsIcon />}
+        title={t('clientVersions.title')}
+        subtitle={t('clientVersions.description')}
+        actions={
+          <>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              {canManage && (
+                <>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    onClick={() => {
+                      setEditingClientVersion(null);
+                      setIsCopyMode(false);
+                      setFormDialogOpen(true);
+                    }}
+                  >
+                    {t('clientVersions.addIndividual')}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    onClick={() => {
+                      setBulkFormDialogOpen(true);
+                    }}
+                  >
+                    {t('clientVersions.addBulk')}
+                  </Button>
+                </>
+              )}
+              <IconButton onClick={(e) => setExportMenuAnchor(e.currentTarget)}>
+                <MoreVertIcon />
+              </IconButton>
+            </Box>
+            <Menu
+              anchorEl={exportMenuAnchor}
+              open={Boolean(exportMenuAnchor)}
+              onClose={() => setExportMenuAnchor(null)}
+            >
+              {canManage && [
+                <MenuItem
+                  key="platform-defaults"
+                  onClick={() => {
+                    setExportMenuAnchor(null);
+                    setPlatformDefaultsDialogOpen(true);
+                  }}
+                >
+                  <ListItemIcon>
+                    <SettingsIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>{t('platformDefaults.title')}</ListItemText>
+                </MenuItem>,
+                <Divider key="divider-after-settings" />,
+              ]}
+              <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
+                <ListItemIcon>
+                  <DownloadIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {t('common.export')}
+                  </Typography>
+                </ListItemText>
+              </MenuItem>
+              <MenuItem onClick={() => handleExport('csv')} sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <TableChartIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>CSV</ListItemText>
+              </MenuItem>
+              <MenuItem onClick={() => handleExport('json')} sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <JsonIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>JSON</ListItemText>
+              </MenuItem>
+              <MenuItem onClick={() => handleExport('xlsx')} sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ExcelIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Excel (XLSX)</ListItemText>
+              </MenuItem>
+              <Divider />
+              <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
+                <ListItemIcon>
+                  <AddIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {t('common.import')}
+                  </Typography>
+                </ListItemText>
+              </MenuItem>
               <MenuItem
-                key="platform-defaults"
                 onClick={() => {
                   setExportMenuAnchor(null);
-                  setPlatformDefaultsDialogOpen(true);
+                  setImportDialogOpen(true);
+                }}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon>
+                  <AddIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('common.import')} (CSV/JSON/XLSX)</ListItemText>
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  setExportMenuAnchor(null);
+                  setOpenSDKGuide(true);
                 }}
               >
                 <ListItemIcon>
-                  <SettingsIcon fontSize="small" />
+                  <CodeIcon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>{t('platformDefaults.title')}</ListItemText>
-              </MenuItem>,
-              <Divider key="divider-after-settings" />,
-            ]}
-            {/* Export section */}
-            <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
-              <ListItemIcon>
-                <DownloadIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('common.export')}
-                </Typography>
-              </ListItemText>
-            </MenuItem>
-            <MenuItem onClick={() => handleExport('csv')} sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <TableChartIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>CSV</ListItemText>
-            </MenuItem>
-            <MenuItem onClick={() => handleExport('json')} sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <JsonIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>JSON</ListItemText>
-            </MenuItem>
-            <MenuItem onClick={() => handleExport('xlsx')} sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <ExcelIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Excel (XLSX)</ListItemText>
-            </MenuItem>
-            <Divider />
-            <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
-              <ListItemIcon>
-                <AddIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('common.import')}
-                </Typography>
-              </ListItemText>
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setExportMenuAnchor(null);
-                setImportDialogOpen(true);
-              }}
-              sx={{ pl: 4 }}
-            >
-              <ListItemIcon>
-                <AddIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t('common.import')} (CSV/JSON/XLSX)</ListItemText>
-            </MenuItem>
-            <Divider />
-            <MenuItem
-              onClick={() => {
-                setExportMenuAnchor(null);
-                setOpenSDKGuide(true);
-              }}
-            >
-              <ListItemIcon>
-                <CodeIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t('clientVersions.sdkGuide')}</ListItemText>
-            </MenuItem>
-          </Menu>
-        </Box>
-      </Box>
+                <ListItemText>{t('clientVersions.sdkGuide')}</ListItemText>
+              </MenuItem>
+            </Menu>
+          </>
+        }
+      />
 
       {/* Filter */}
       <Card sx={{ mb: 3 }}>

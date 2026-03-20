@@ -64,6 +64,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
+import PageHeader from '@/components/common/PageHeader';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
@@ -384,92 +385,76 @@ const SurveysPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <PollIcon />
-            {t('surveys.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('surveys.subtitle')}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
+      <PageHeader
+        icon={<PollIcon />}
+        title={t('surveys.title')}
+        subtitle={t('surveys.subtitle')}
+        actions={
+          <>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t('surveys.createSurvey')}
+              </Button>
+            )}
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
             >
-              {t('surveys.createSurvey')}
-            </Button>
-          )}
-          <IconButton
-            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-            aria-label="more options"
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            anchorEl={pageMenuAnchor}
-            open={Boolean(pageMenuAnchor)}
-            onClose={() => setPageMenuAnchor(null)}
-          >
-            <MenuItem
-              onClick={() => {
-                setPageMenuAnchor(null);
-                handleConfigOpen();
-              }}
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
             >
-              <ListItemIcon>
-                <SettingsIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t('surveys.config')}</ListItemText>
-            </MenuItem>
-            <Divider />
-            <ExportImportMenuItems
-              onExport={(format) => {
-                setPageMenuAnchor(null);
-                const exportColumns: ExportColumn[] = [
-                  {
-                    key: 'platformSurveyId',
-                    header: t('surveys.platformSurveyId'),
-                  },
-                  { key: 'surveyTitle', header: t('surveys.surveyTitle') },
-                  { key: 'isActive', header: t('common.status') },
-                  { key: 'createdAt', header: t('common.createdAt') },
-                ];
-                try {
-                  exportToFile(surveys, exportColumns, 'surveys', format);
-                  enqueueSnackbar(t('common.exportSuccess'), {
-                    variant: 'success',
-                  });
-                } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), {
-                    variant: 'error',
-                  });
-                }
-              }}
-              onImportClick={() => {
-                setPageMenuAnchor(null);
-                setImportDialogOpen(true);
-              }}
-            />
-          </Menu>
-        </Box>
-      </Box>
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  handleConfigOpen();
+                }}
+              >
+                <ListItemIcon>
+                  <SettingsIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('surveys.config')}</ListItemText>
+              </MenuItem>
+              <Divider />
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    {
+                      key: 'platformSurveyId',
+                      header: t('surveys.platformSurveyId'),
+                    },
+                    { key: 'surveyTitle', header: t('surveys.surveyTitle') },
+                    { key: 'isActive', header: t('common.status') },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(surveys, exportColumns, 'surveys', format);
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+              />
+            </Menu>
+          </>
+        }
+      />
 
       {/* Filter Panel */}
       <Card sx={{ mb: 2 }}>

@@ -57,6 +57,7 @@ import ColumnSettingsDialog, {
 } from '@/components/common/ColumnSettingsDialog';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 
 // Coupon Usage page (admin view of redemption records)
 const CouponUsagePage: React.FC = () => {
@@ -519,19 +520,11 @@ const CouponUsagePage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <HistoryIcon />
-            {t('coupons.couponUsage.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('coupons.couponUsage.subtitle')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<HistoryIcon />}
+        title={t('coupons.couponUsage.title')}
+        subtitle={t('coupons.couponUsage.subtitle')}
+      />
         <Box>
           <Button
             variant="outlined"

@@ -84,6 +84,7 @@ import SearchTextField from '../../components/common/SearchTextField';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatRelativeTime } from '../../utils/dateFormat';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 
 // ==================== Strategy Types ====================
 const STRATEGY_TYPES = [
@@ -1240,38 +1241,40 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Stack spacing={3}>
             {/* Basic Info */}
-            <Box>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                {t('releaseFlow.templateName')}
-                <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>
-              </Typography>
-              <TextField
-                value={flowName}
-                onChange={(e) => setFlowName(e.target.value)}
-                fullWidth
-                size="small"
-                placeholder={t('releaseFlow.templateNamePlaceholder')}
-                disabled={!!initialData || readonly}
-                helperText={
-                  !readonly ? t('releaseFlow.templateNameHelp') : undefined
-                }
-              />
-            </Box>
-            <Box>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                {t('releaseFlow.displayName')}
-              </Typography>
-              <TextField
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                fullWidth
-                size="small"
-                placeholder={t('releaseFlow.displayNamePlaceholder')}
-                disabled={readonly}
-                helperText={
-                  !readonly ? t('releaseFlow.displayNameHelp') : undefined
-                }
-              />
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  {t('releaseFlow.templateName')}
+                  <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>
+                </Typography>
+                <TextField
+                  value={flowName}
+                  onChange={(e) => setFlowName(e.target.value)}
+                  fullWidth
+                  size="small"
+                  placeholder={t('releaseFlow.templateNamePlaceholder')}
+                  disabled={!!initialData || readonly}
+                  helperText={
+                    !readonly ? t('releaseFlow.templateNameHelp') : undefined
+                  }
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  {t('releaseFlow.displayName')}
+                </Typography>
+                <TextField
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  fullWidth
+                  size="small"
+                  placeholder={t('releaseFlow.displayNamePlaceholder')}
+                  disabled={readonly}
+                  helperText={
+                    !readonly ? t('releaseFlow.displayNameHelp') : undefined
+                  }
+                />
+              </Box>
             </Box>
             <Box>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
@@ -1684,19 +1687,11 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <TemplateIcon />
-            {t('releaseFlow.templatesTitle')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('releaseFlow.templatesSubtitle')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<TemplateIcon />}
+        title={t('releaseFlow.templatesTitle')}
+        subtitle={t('releaseFlow.templatesSubtitle')}
+      />
         {canManage && (
           <Button
             variant="contained"

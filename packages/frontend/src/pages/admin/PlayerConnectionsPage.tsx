@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, Paper, Alert } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { PeopleAlt as PeopleIcon } from '@mui/icons-material';
+import PageHeader from '@/components/common/PageHeader';
 
 /**
  * PlayerConnectionsPage
@@ -17,18 +18,11 @@ const PlayerConnectionsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Page Header */}
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-          <PeopleIcon color="primary" />
-          <Typography variant="h5" fontWeight="bold">
-            {t('playerConnections.title')}
-          </Typography>
-        </Box>
-        <Typography variant="body2" color="text.secondary">
-          {t('playerConnections.subtitle')}
-        </Typography>
-      </Box>
+      <PageHeader
+        icon={<PeopleIcon />}
+        title={t('playerConnections.title')}
+        subtitle={t('playerConnections.subtitle')}
+      />
 
       {/* Coming Soon Notice */}
       <Paper sx={{ p: 4, textAlign: 'center' }}>
