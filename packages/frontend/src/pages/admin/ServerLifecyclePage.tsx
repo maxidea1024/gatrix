@@ -51,6 +51,7 @@ import ColumnSettingsDialog, {
   ColumnConfig,
 } from '../../components/common/ColumnSettingsDialog';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 
 // Event row component
 interface EventRowProps {
@@ -1131,28 +1132,11 @@ const ServerLifecyclePage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <HistoryIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                {t('serverLifecycle.title')}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t('serverLifecycle.subtitle')}
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
+      <PageHeader
+        icon={<HistoryIcon />}
+        title={t('serverLifecycle.title')}
+        subtitle={t('serverLifecycle.subtitle')}
+      />
 
       {/* Filters */}
       <Box

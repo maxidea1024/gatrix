@@ -111,6 +111,7 @@ import {
   formatDateTimeDetailed,
 } from '../../utils/dateFormat';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -857,24 +858,11 @@ const RealtimeEventsPage: React.FC = () => {
           flexShrink: 0,
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <TimelineIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                {t('realtimeEvents.title')}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t('realtimeEvents.subtitle')}
-              </Typography>
-            </Box>
-          </Box>
+      <PageHeader
+        icon={<TimelineIcon />}
+        title={t('realtimeEvents.title')}
+        subtitle={t('realtimeEvents.subtitle')}
+        actions={
 
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             {/* Auto-refresh indicator with circular progress */}
@@ -962,7 +950,8 @@ const RealtimeEventsPage: React.FC = () => {
               </IconButton>
             </Tooltip>
           </Box>
-        </Box>
+        }
+      />
 
         {/* Filters */}
         <Box sx={{ mt: 2 }}>

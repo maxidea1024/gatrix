@@ -177,6 +177,7 @@ const getValueTypeIcon = (type: string) => {
 const getTypeIconSmall = (type: string) => getFlagTypeIcon(type, 16);
 
 import { toTitleCase } from '../../utils/stringUtils';
+import PageHeader from '@/components/common/PageHeader';
 
 const FeatureFlagsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -1698,19 +1699,11 @@ const FeatureFlagsPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <FlagIcon />
-            {t('featureFlags.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('featureFlags.subtitle')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<FlagIcon />}
+        title={t('featureFlags.title')}
+        subtitle={t('featureFlags.subtitle')}
+      />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <>

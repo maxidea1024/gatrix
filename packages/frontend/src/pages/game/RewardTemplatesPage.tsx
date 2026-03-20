@@ -63,6 +63,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
+import PageHeader from '@/components/common/PageHeader';
 
 const RewardTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -605,19 +606,11 @@ const RewardTemplatesPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <GiftIcon />
-            {t('rewardTemplates.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('rewardTemplates.subtitle')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<GiftIcon />}
+        title={t('rewardTemplates.title')}
+        subtitle={t('rewardTemplates.subtitle')}
+      />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <Button

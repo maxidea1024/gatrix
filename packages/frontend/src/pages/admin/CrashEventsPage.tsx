@@ -105,6 +105,7 @@ import { useDebounce } from '../../hooks/useDebounce';
 import LogViewer from '../../components/LogViewer';
 import StackTraceViewer from '../../components/StackTraceViewer';
 import SearchTextField from '../../components/common/SearchTextField';
+import PageHeader from '@/components/common/PageHeader';
 
 // Column definition interface
 interface ColumnConfig {
@@ -1113,20 +1114,11 @@ const CrashEventsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <BugReportIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('crashes.crashEvents')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('crashes.subtitle')}
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
+      <PageHeader
+        icon={<BugReportIcon />}
+        title={t('crashes.crashEvents')}
+        subtitle={t('crashes.subtitle')}
+      />
 
       {/* Search & Filters */}
       <Card sx={{ mb: 3 }}>

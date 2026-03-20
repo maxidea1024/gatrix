@@ -3824,6 +3824,17 @@ const FeatureFlagDetailPage: React.FC = () => {
                             flag.validationRules ?? null;
                         }
                         await saveGlobalChangesToDraft(updates);
+                        // Sync originalFlag so the update button becomes disabled
+                        setOriginalFlag((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                enabledValue: flag.enabledValue,
+                                disabledValue: flag.disabledValue,
+                                validationRules: flag.validationRules,
+                              }
+                            : prev
+                        );
                       } catch (error: any) {
                         enqueueSnackbar(
                           parseApiErrorMessage(error, 'common.saveFailed'),

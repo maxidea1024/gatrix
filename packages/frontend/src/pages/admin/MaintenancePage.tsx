@@ -62,6 +62,7 @@ import {
 } from '@/utils/maintenanceStatusUtils';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 
 const MaintenancePage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -578,19 +579,11 @@ const MaintenancePage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <BuildIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('maintenance.title')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('maintenance.description')}
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
+      <PageHeader
+        icon={<BuildIcon />}
+        title={t('maintenance.title')}
+        subtitle={t('maintenance.description')}
+      />
       <PageContentLoader loading={isLoading}>
         <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
           {/* 좌측 Settings 영역 */}

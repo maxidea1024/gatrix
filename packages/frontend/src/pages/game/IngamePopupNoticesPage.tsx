@@ -74,6 +74,7 @@ import dayjs from 'dayjs';
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
+import PageHeader from '@/components/common/PageHeader';
 
 const IngamePopupNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -486,19 +487,11 @@ const IngamePopupNoticesPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <NotificationsIcon />
-            {t('ingamePopupNotices.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('ingamePopupNotices.subtitle')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<NotificationsIcon />}
+        title={t('ingamePopupNotices.title')}
+        subtitle={t('ingamePopupNotices.subtitle')}
+      />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <Button

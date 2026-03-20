@@ -64,6 +64,7 @@ import PlanningDataGuideDrawer, {
 } from '../../components/planning-data/PlanningDataGuideDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 
 const PlanningDataPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -771,19 +772,11 @@ const PlanningDataPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <StorageIcon />
-            {t('planningData.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('planningData.subtitle')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<StorageIcon />}
+        title={t('planningData.title')}
+        subtitle={t('planningData.subtitle')}
+      />
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
             variant="outlined"

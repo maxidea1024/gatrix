@@ -588,6 +588,53 @@ export class ClientVersionService {
       tagIds,
     });
   }
+  /**
+   * Check if a game server address is reachable by directly calling its /health endpoint
+   */
+  static async checkAddressHealth(
+    _projectApiPath: string,
+    address: string
+  ): Promise<{ healthy: boolean; latency: number; error?: string }> {
+    const startTime = Date.now();
+    try {
+      const normalizedAddress = address.replace(/\/+$/, '');
+      const healthUrl = `${normalizedAddress}/health`;
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      try {
+        const response = await fetch(healthUrl, {
+          method: 'GET',
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        const latency = Date.now() - startTime;
+
+        return {
+          healthy: response.ok,
+          latency,
+          ...(!response.ok && { error: `HTTP ${response.status}` }),
+        };
+      } catch (fetchError: any) {
+        clearTimeout(timeoutId);
+        return {
+          healthy: false,
+          latency: Date.now() - startTime,
+          error:
+            fetchError.name === 'AbortError'
+              ? 'Connection timeout'
+              : fetchError.message || 'Connection failed',
+        };
+      }
+    } catch (err: any) {
+      return {
+        healthy: false,
+        latency: Date.now() - startTime,
+        error: err.message || 'Unknown error',
+      };
+    }
+  }
 }
 
 export default ClientVersionService;

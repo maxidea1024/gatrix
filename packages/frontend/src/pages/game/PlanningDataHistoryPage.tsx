@@ -53,6 +53,7 @@ import { useDebounce } from '../../hooks/useDebounce';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import PageHeader from '@/components/common/PageHeader';
 
 const PlanningDataHistoryPage: React.FC = () => {
   const { t } = useTranslation();
@@ -192,19 +193,11 @@ const PlanningDataHistoryPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <HistoryIcon />
-            {t('planningData.history.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('planningData.history.subtitle')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<HistoryIcon />}
+        title={t('planningData.history.title')}
+        subtitle={t('planningData.history.subtitle')}
+      />
         {canManage && history.length > 0 && (
           <Button
             variant="contained"

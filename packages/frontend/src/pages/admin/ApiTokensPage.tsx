@@ -100,6 +100,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
 import { P } from '@/types/permissions';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageHeader from '@/components/common/PageHeader';
 
 interface CreateTokenData {
   tokenName: string;
@@ -1021,26 +1022,12 @@ const ApiTokensPage: React.FC = () => {
     <>
       <Box sx={{ p: 3 }}>
         {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <VpnKeyIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-              <Box>
-                <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                  {t('apiTokens.title')}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {t('apiTokens.subtitle')}
-                </Typography>
-              </Box>
-            </Box>
-            {canManage && (
+        <PageHeader
+          icon={<VpnKeyIcon />}
+          title={t('apiTokens.title')}
+          subtitle={t('apiTokens.subtitle')}
+          actions={
+            canManage ? (
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -1048,9 +1035,9 @@ const ApiTokensPage: React.FC = () => {
               >
                 {t('apiTokens.createToken')}
               </Button>
-            )}
-          </Box>
-        </Box>
+            ) : undefined
+          }
+        />
 
         {/* Bulk Actions */}
         {canManage && selectedTokenIds.length > 0 && (

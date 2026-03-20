@@ -149,6 +149,7 @@ import SearchTextField from '../../components/common/SearchTextField';
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
+import PageHeader from '@/components/common/PageHeader';
 
 // Column definition interface
 interface ColumnConfig {
@@ -1844,98 +1845,86 @@ const GameWorldsPage: React.FC = () => {
 
   return (
     <Box key={i18n.language} sx={{ p: 3 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          mb: 3,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <WorldIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('gameWorlds.title')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('gameWorlds.subtitle')}
-            </Typography>
-          </Box>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAddWorld}
+      <PageHeader
+        icon={<WorldIcon />}
+        title={t('gameWorlds.title')}
+        subtitle={t('gameWorlds.subtitle')}
+        actions={
+          <>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              {canManage && (
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddWorld}
+                >
+                  {t('gameWorlds.addGameWorld')}
+                </Button>
+              )}
+              <IconButton
+                onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+                aria-label="more options"
+              >
+                <MoreVertIcon />
+              </IconButton>
+            </Box>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
             >
-              {t('gameWorlds.addGameWorld')}
-            </Button>
-          )}
-          <IconButton
-            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-            aria-label="more options"
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            anchorEl={pageMenuAnchor}
-            open={Boolean(pageMenuAnchor)}
-            onClose={() => setPageMenuAnchor(null)}
-          >
-            <ExportImportMenuItems
-              onExport={(format) => {
-                setPageMenuAnchor(null);
-                const exportColumns: ExportColumn[] = [
-                  { key: 'worldId', header: t('gameWorlds.worldId') },
-                  { key: 'name', header: t('gameWorlds.name') },
-                  { key: 'description', header: t('gameWorlds.description') },
-                  {
-                    key: 'worldServerAddress',
-                    header: t('gameWorlds.worldServerAddress'),
-                  },
-                  { key: 'isVisible', header: t('gameWorlds.isVisible') },
-                  {
-                    key: 'isMaintenance',
-                    header: t('gameWorlds.isMaintenance'),
-                  },
-                  { key: 'createdAt', header: t('common.createdAt') },
-                ];
-                try {
-                  exportToFile(worlds, exportColumns, 'game-worlds', format);
-                  enqueueSnackbar(t('common.exportSuccess'), {
-                    variant: 'success',
-                  });
-                } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), {
-                    variant: 'error',
-                  });
-                }
-              }}
-              onImportClick={() => {
-                setPageMenuAnchor(null);
-                setImportDialogOpen(true);
-              }}
-            />
-            <Divider />
-            <MenuItem
-              onClick={() => {
-                setPageMenuAnchor(null);
-                setOpenSDKGuide(true);
-              }}
-            >
-              <ListItemIcon>
-                <CodeIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>
-                {t('coupons.couponSettings.sdkGuide')}
-              </ListItemText>
-            </MenuItem>
-          </Menu>
-        </Box>
-      </Box>
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'worldId', header: t('gameWorlds.worldId') },
+                    { key: 'name', header: t('gameWorlds.name') },
+                    { key: 'description', header: t('gameWorlds.description') },
+                    {
+                      key: 'worldServerAddress',
+                      header: t('gameWorlds.worldServerAddress'),
+                    },
+                    { key: 'isVisible', header: t('gameWorlds.isVisible') },
+                    {
+                      key: 'isMaintenance',
+                      header: t('gameWorlds.isMaintenance'),
+                    },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(worlds, exportColumns, 'game-worlds', format);
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+              />
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  setOpenSDKGuide(true);
+                }}
+              >
+                <ListItemIcon>
+                  <CodeIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>
+                  {t('coupons.couponSettings.sdkGuide')}
+                </ListItemText>
+              </MenuItem>
+            </Menu>
+          </>
+        }
+      />
 
       {/* Search and Filters */}
       <Card sx={{ mb: 3 }}>

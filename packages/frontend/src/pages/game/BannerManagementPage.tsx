@@ -58,6 +58,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
+import PageHeader from '@/components/common/PageHeader';
 
 const BannerManagementPage: React.FC = () => {
   const { t } = useTranslation();
@@ -398,19 +399,11 @@ const BannerManagementPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <ImageIcon />
-            {t('banners.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('banners.subtitle')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<ImageIcon />}
+        title={t('banners.title')}
+        subtitle={t('banners.subtitle')}
+      />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <Button

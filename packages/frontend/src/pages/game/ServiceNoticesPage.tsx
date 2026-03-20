@@ -78,6 +78,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
+import PageHeader from '@/components/common/PageHeader';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -650,19 +651,11 @@ const ServiceNoticesPage: React.FC = () => {
           mb: 3,
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <AnnouncementIcon />
-            {t('serviceNotices.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('serviceNotices.subtitle')}
-          </Typography>
-        </Box>
+      <PageHeader
+        icon={<AnnouncementIcon />}
+        title={t('serviceNotices.title')}
+        subtitle={t('serviceNotices.subtitle')}
+      />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <Button

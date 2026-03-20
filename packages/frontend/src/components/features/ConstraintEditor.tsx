@@ -1033,7 +1033,7 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
             items={constraintIds}
             strategy={verticalListSortingStrategy}
           >
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
               {constraints.map((constraint, index) => {
                 // Get valid operator for current field type
                 const validOperator = getValidOperator(
@@ -1057,7 +1057,7 @@ export const ConstraintEditor: React.FC<ConstraintEditorProps> = ({
                         sx={{
                           display: 'flex',
                           justifyContent: 'center',
-                          py: 0.5,
+                          py: 0,
                         }}
                       >
                         <Chip

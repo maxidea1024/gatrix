@@ -74,6 +74,7 @@ import translationService from '../../services/translationService';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useTheme } from '../../contexts/ThemeContext';
 import ComposeMailDialog from '@/components/mailbox/ComposeMailDialog';
+import PageHeader from '@/components/common/PageHeader';
 
 const MailboxPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -550,9 +551,10 @@ const MailboxPage: React.FC = () => {
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
           <MailIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Typography variant="h4" sx={{ fontWeight: 600, flex: 1 }}>
-            {t('mailbox.title')}
-          </Typography>
+      <PageHeader
+        icon={<CreateIcon />}
+        title={t('mailbox.title')}
+      />
           <Button
             variant="contained"
             startIcon={<CreateIcon />}

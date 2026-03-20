@@ -302,4 +302,23 @@ export const gameWorldService = {
     );
     return response.data?.data?.moved ?? response.data?.moved ?? false;
   },
+
+  // Check world server address (verify lobbyd /info via backend proxy)
+  async checkWorldServerAddress(
+    projectApiPath: string,
+    address: string,
+    expectedWorldId?: string
+  ): Promise<{
+    reachable: boolean;
+    worldId?: string;
+    service?: string;
+    matched?: boolean;
+    error?: string;
+  }> {
+    const response = await api.post(
+      `${projectApiPath}/game-worlds/check-address`,
+      { address, expectedWorldId }
+    );
+    return response.data?.data || response.data;
+  },
 };
