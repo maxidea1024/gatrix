@@ -1363,7 +1363,11 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
             {readonly ? t('common.close') : t('common.cancel')}
           </Button>
           {!readonly && (
-            <Button variant="contained" onClick={handleSave} disabled={saving || (!!initialData && !hasChanges)}>
+            <Button
+              variant="contained"
+              onClick={handleSave}
+              disabled={saving || (!!initialData && !hasChanges)}
+            >
               {saving ? (
                 <CircularProgress size={20} />
               ) : initialData ? (

@@ -311,7 +311,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
               WebkitBackdropFilter: 'blur(1px)',
             },
           },
-
         },
       },
       MuiModal: {
@@ -340,7 +339,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
                 WebkitBackdropFilter: 'none',
               },
             },
-
           },
         },
       },
