@@ -107,8 +107,6 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
     <Paper
       variant="outlined"
       sx={{
-        borderLeftWidth: 4,
-        borderLeftColor: envData.color || '#888',
         overflow: 'hidden',
       }}
     >

@@ -912,6 +912,13 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 
+  // Track initial state for change detection
+  const initialStateRef = React.useRef<{
+    displayName: string;
+    description: string;
+    milestones: string;
+  } | null>(null);
+
   // Load segments and context fields
   useEffect(() => {
     const loadData = async () => {
@@ -1014,6 +1021,56 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
       }
     }
   }, [open, initialData]);
+
+  // Capture initial state after form is populated
+  useEffect(() => {
+    if (open && initialData) {
+      // Use a timeout to capture state after the form initialization effect
+      const timer = setTimeout(() => {
+        initialStateRef.current = {
+          displayName,
+          description,
+          milestones: JSON.stringify(
+            milestones.map((m) => ({
+              name: m.name,
+              strategies: m.strategies.map((s) => ({
+                strategyName: s.strategyName,
+                title: s.title,
+                parameters: s.parameters,
+                constraints: s.constraints,
+                segments: s.segments,
+              })),
+            }))
+          ),
+        };
+      }, 0);
+      return () => clearTimeout(timer);
+    } else {
+      initialStateRef.current = null;
+    }
+  }, [open, initialData]);
+
+  // Check if form has changes compared to initial data
+  const hasChanges = React.useMemo(() => {
+    if (!initialData || !initialStateRef.current) return true;
+    const currentMilestones = JSON.stringify(
+      milestones.map((m) => ({
+        name: m.name,
+        strategies: m.strategies.map((s) => ({
+          strategyName: s.strategyName,
+          title: s.title,
+          parameters: s.parameters,
+          constraints: s.constraints,
+          segments: s.segments,
+        })),
+      }))
+    );
+    return (
+      displayName !== initialStateRef.current.displayName ||
+      description !== initialStateRef.current.description ||
+      currentMilestones !== initialStateRef.current.milestones
+    );
+  }, [initialData, displayName, description, milestones]);
 
   const handleAddMilestone = () => {
     // New milestone: copy strategies from last milestone (Unleash pattern)
@@ -1306,7 +1363,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
             {readonly ? t('common.close') : t('common.cancel')}
           </Button>
           {!readonly && (
-            <Button variant="contained" onClick={handleSave} disabled={saving}>
+            <Button variant="contained" onClick={handleSave} disabled={saving || (!!initialData && !hasChanges)}>
               {saving ? (
                 <CircularProgress size={20} />
               ) : initialData ? (

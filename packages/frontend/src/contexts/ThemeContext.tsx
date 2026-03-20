@@ -163,7 +163,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       h6: { fontSize: '1rem', fontWeight: 600 },
     },
     shape: {
-      borderRadius: 0,
+      borderRadius: 4,
     },
     components: {
       MuiAppBar: {
@@ -186,9 +186,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       },
       MuiPaper: {
         styleOverrides: {
-          root: {
-            borderRadius: 0,
-          },
           outlined: {
             backgroundColor: mode === 'dark' ? 'transparent' : undefined,
           },
@@ -206,7 +203,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       MuiCard: {
         styleOverrides: {
           root: {
-            borderRadius: 0,
             boxShadow:
               mode === 'dark'
                 ? '0 1px 3px rgba(0,0,0,0.4)'
@@ -218,7 +214,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             textTransform: 'none',
-            borderRadius: 0,
             fontWeight: 500,
           },
         },
@@ -227,7 +222,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             '& .MuiPaginationItem-root': {
-              borderRadius: 0,
               fontWeight: 500,
               '&.Mui-selected': {
                 backgroundColor: p.main,
@@ -247,7 +241,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             '& .MuiOutlinedInput-root': {
-              borderRadius: 0,
               backgroundColor: colors.inputBg,
               '& fieldset': {
                 borderColor: colors.border,
@@ -318,9 +311,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
               WebkitBackdropFilter: 'blur(1px)',
             },
           },
-          paper: {
-            borderRadius: 0,
-          },
+
         },
       },
       MuiModal: {
@@ -349,11 +340,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
                 WebkitBackdropFilter: 'none',
               },
             },
-            PaperProps: {
-              style: {
-                borderRadius: 0,
-              },
-            },
+
           },
         },
       },
@@ -367,11 +354,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
               WebkitBackdropFilter: 'none',
             },
           },
-          PaperProps: {
-            style: {
-              borderRadius: 0,
-            },
-          },
+
           // Disable exit animation to prevent shrinking flicker on close
           slotProps: {
             transition: { exit: false },

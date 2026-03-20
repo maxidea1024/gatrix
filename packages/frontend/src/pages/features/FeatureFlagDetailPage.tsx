@@ -2755,14 +2755,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                           boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                         }}
                       >
-                        {/* Color indicator bar */}
-                        <Box
-                          sx={{
-                            width: 4,
-                            bgcolor: env.color || '#888',
-                            flexShrink: 0,
-                          }}
-                        />
                         {/* Content */}
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                           <Accordion

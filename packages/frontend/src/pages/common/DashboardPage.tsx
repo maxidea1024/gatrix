@@ -889,7 +889,6 @@ const DashboardPage: React.FC = () => {
           p: { xs: 3, md: 4 },
           mb: 4,
           background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-          borderRadius: 0,
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -1332,7 +1331,6 @@ const DashboardPage: React.FC = () => {
                                   ml: 1,
                                   px: 0.75,
                                   py: 0.25,
-                                  borderRadius: 0,
                                   bgcolor: `${env.color || theme.palette.primary.main}20`,
                                   color:
                                     env.color || theme.palette.primary.main,
@@ -1472,7 +1470,6 @@ const DashboardPage: React.FC = () => {
                                     display: 'flex',
                                     alignItems: 'stretch',
                                     height: 24,
-                                    borderRadius: 0,
                                     border: 1,
                                     borderColor: 'divider',
                                     overflow: 'hidden',
@@ -2398,7 +2395,6 @@ const DashboardPage: React.FC = () => {
                                             sx={{
                                               bgcolor: 'action.selected',
                                               px: 0.5,
-                                              borderRadius: 0,
                                               fontSize: '0.65rem',
                                             }}
                                           >
