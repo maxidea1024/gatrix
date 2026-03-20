@@ -4049,7 +4049,7 @@ const UsersManagementPage: React.FC = () => {
             }
             disabled={!isBulkActionValid()}
           >
-            {t('common.save')}
+            {t('common.apply')}
           </Button>
         </Box>
       </Drawer>

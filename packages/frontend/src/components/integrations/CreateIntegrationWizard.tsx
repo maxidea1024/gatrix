@@ -794,7 +794,7 @@ export const CreateIntegrationWizard: React.FC<
           {saving ? (
             <CircularProgress size={20} color="inherit" />
           ) : activeStep === STEPS.length - 1 ? (
-            t('common.save')
+            t('common.add')
           ) : (
             t('common.next')
           )}

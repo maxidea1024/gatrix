@@ -16,7 +16,7 @@ import {
   IconButton,
   Chip,
   TextField,
-  InputAdornment,
+
   Tooltip,
   Card,
   CardContent,
@@ -33,7 +33,7 @@ import {
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Search as SearchIcon,
+
   People as SegmentIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
@@ -48,6 +48,7 @@ import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { extractErrorCode } from '@gatrix/shared';
 import SimplePagination from '../../components/common/SimplePagination';
+import SearchTextField from '../../components/common/SearchTextField';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import DynamicFilterBar, {
   FilterDefinition,
@@ -613,48 +614,13 @@ const FeatureSegmentsPage: React.FC = () => {
                 minWidth: 0,
               }}
             >
-              <TextField
+              <SearchTextField
                 placeholder={t('common.search')}
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
+                onChange={(value) => {
+                  setSearchTerm(value);
                   setPage(0);
                 }}
-                sx={{
-                  minWidth: 300,
-                  flexGrow: 1,
-                  maxWidth: 500,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': { borderColor: 'divider' },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': { borderColor: 'primary.light' },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': { fontSize: '0.875rem' },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: 'text.secondary', fontSize: 20 }}
-                      />
-                    </InputAdornment>
-                  ),
-                }}
-                size="small"
               />
 
               {/* Dynamic Filter Bar */}

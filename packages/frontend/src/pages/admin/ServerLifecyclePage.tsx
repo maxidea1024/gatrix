@@ -17,20 +17,9 @@ import {
   Paper,
   Collapse,
   LinearProgress,
-  TextField,
-  InputAdornment,
   Tooltip,
-  Popover,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Checkbox,
-  Button,
-  ClickAwayListener,
 } from '@mui/material';
 import {
-  Refresh as RefreshIcon,
   Info as InfoIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
   KeyboardArrowUp as KeyboardArrowUpIcon,
@@ -38,11 +27,7 @@ import {
   Cloud as CloudIcon,
   Code as CodeIcon,
   ErrorOutline as ErrorOutlineIcon,
-  Search as SearchIcon,
   ViewColumn as ViewColumnIcon,
-  DragIndicator as DragIndicatorIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
   ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
@@ -62,104 +47,12 @@ import DynamicFilterBar, {
 import { useDebounce } from '../../hooks/useDebounce';
 import SearchTextField from '../../components/common/SearchTextField';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import ColumnSettingsDialog, {
+  ColumnConfig,
+} from '../../components/common/ColumnSettingsDialog';
 import PageContentLoader from '@/components/common/PageContentLoader';
 
-// Column definition interface
-interface ColumnConfig {
-  id: string;
-  labelKey: string;
-  visible: boolean;
-  width?: string;
-}
 
-// Sortable column item
-interface SortableColumnItemProps {
-  column: ColumnConfig;
-  onToggleVisibility: (id: string) => void;
-}
-
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
-  column,
-  onToggleVisibility,
-}) => {
-  const { t } = useTranslation();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: column.id,
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <ListItem
-      ref={setNodeRef}
-      style={style}
-      disablePadding
-      secondaryAction={
-        <Box
-          {...attributes}
-          {...listeners}
-          sx={{
-            cursor: 'grab',
-            display: 'flex',
-            alignItems: 'center',
-            '&:active': { cursor: 'grabbing' },
-          }}
-        >
-          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
-        </Box>
-      }
-    >
-      <ListItemButton
-        dense
-        onClick={() => onToggleVisibility(column.id)}
-        sx={{ pr: 6 }}
-      >
-        <Checkbox
-          edge="start"
-          checked={column.visible}
-          tabIndex={-1}
-          disableRipple
-          size="small"
-          icon={<VisibilityOffIcon fontSize="small" />}
-          checkedIcon={<VisibilityIcon fontSize="small" />}
-        />
-        <ListItemText
-          primary={t(column.labelKey)}
-          slotProps={{ primary: { variant: 'body2' } }}
-        />
-      </ListItemButton>
-    </ListItem>
-  );
-};
 
 // Event row component
 interface EventRowProps {
@@ -989,12 +882,24 @@ const ServerLifecyclePage: React.FC = () => {
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
     useState<HTMLButtonElement | null>(null);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+  const handleColumnsChange = useCallback(
+    (newColumns: ColumnConfig[]) => {
+      setColumns(newColumns);
+      localStorage.setItem(
+        'serverLifecycleColumns',
+        JSON.stringify(newColumns)
+      );
+    },
+    []
   );
+
+  const handleResetColumns = useCallback(() => {
+    setColumns(defaultColumns);
+    localStorage.setItem(
+      'serverLifecycleColumns',
+      JSON.stringify(defaultColumns)
+    );
+  }, []);
 
   // Visible columns
   const visibleColumns = useMemo(
@@ -1038,7 +943,7 @@ const ServerLifecyclePage: React.FC = () => {
     }
   );
 
-  // Filter definitions - added hostname, externalAddress, internalAddress filters
+  // Filter definitions
   const filterDefinitions: FilterDefinition[] = useMemo(
     () => [
       {
@@ -1191,45 +1096,6 @@ const ServerLifecyclePage: React.FC = () => {
     [activeFilters]
   );
 
-  const handleToggleColumnVisibility = useCallback(
-    (columnId: string) => {
-      const newColumns = columns.map((col) =>
-        col.id === columnId ? { ...col, visible: !col.visible } : col
-      );
-      setColumns(newColumns);
-      localStorage.setItem(
-        'serverLifecycleColumns',
-        JSON.stringify(newColumns)
-      );
-    },
-    [columns]
-  );
-
-  const handleResetColumns = useCallback(() => {
-    setColumns(defaultColumns);
-    localStorage.setItem(
-      'serverLifecycleColumns',
-      JSON.stringify(defaultColumns)
-    );
-  }, []);
-
-  const handleColumnDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
-      if (over && active.id !== over.id) {
-        const oldIndex = columns.findIndex((col) => col.id === active.id);
-        const newIndex = columns.findIndex((col) => col.id === over.id);
-        const newColumns = arrayMove(columns, oldIndex, newIndex);
-        setColumns(newColumns);
-        localStorage.setItem(
-          'serverLifecycleColumns',
-          JSON.stringify(newColumns)
-        );
-      }
-    },
-    [columns]
-  );
-
   const handlePageChange = useCallback((_: unknown, newPage: number) => {
     setPage(newPage);
   }, []);
@@ -1297,201 +1163,130 @@ const ServerLifecyclePage: React.FC = () => {
       </Box>
 
       {/* Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 2,
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                flex: 1,
-              }}
-            >
-              {/* Search */}
-              <SearchTextField
-                placeholder={t('serverLifecycle.searchPlaceholder')}
-                value={searchQuery}
-                onChange={setSearchQuery}
-              />
-
-              {/* Dynamic Filter Bar */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 1,
-                  alignItems: 'center',
-                }}
-              >
-                <DynamicFilterBar
-                  availableFilters={filterDefinitions}
-                  activeFilters={activeFilters}
-                  onFilterAdd={handleFilterAdd}
-                  onFilterRemove={handleFilterRemove}
-                  onFilterChange={handleFilterChange}
-                  onOperatorChange={handleOperatorChange}
-                />
-
-                {/* Column Settings Button */}
-                <Tooltip title={t('common.columnSettings')}>
-                  <IconButton
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': { bgcolor: 'action.hover' },
-                    }}
-                  >
-                    <ViewColumnIcon />
-                  </IconButton>
-                </Tooltip>
-
-                {/* Refresh Button */}
-                <Tooltip title={t('common.refresh')}>
-                  <IconButton
-                    onClick={handleRefresh}
-                    disabled={isLoading}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': { bgcolor: 'action.hover' },
-                    }}
-                  >
-                    <RefreshIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-
-      {/* Column Settings Popover */}
-      <Popover
-        open={Boolean(columnSettingsAnchor)}
-        anchorEl={columnSettingsAnchor}
-        onClose={() => setColumnSettingsAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        disableScrollLock
-        hideBackdrop
-        slotProps={{ paper: { elevation: 8 } }}
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          alignItems: 'center',
+          flexWrap: 'nowrap',
+          mb: 3,
+        }}
       >
-        <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
-          <Box sx={{ p: 2, minWidth: 250 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                mb: 1,
-              }}
-            >
-              <Typography variant="subtitle2">
-                {t('common.columnSettings')}
-              </Typography>
-              <Button size="small" onClick={handleResetColumns}>
-                {t('common.reset')}
-              </Button>
-            </Box>
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              modifiers={[restrictToVerticalAxis]}
-              onDragEnd={handleColumnDragEnd}
-            >
-              <SortableContext
-                items={columns.map((c) => c.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <List dense disablePadding>
-                  {columns.map((column) => (
-                    <SortableColumnItem
-                      key={column.id}
-                      column={column}
-                      onToggleVisibility={handleToggleColumnVisibility}
-                    />
-                  ))}
-                </List>
-              </SortableContext>
-            </DndContext>
-          </Box>
-        </ClickAwayListener>
-      </Popover>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            alignItems: 'center',
+            flexWrap: 'nowrap',
+            flexGrow: 1,
+            minWidth: 0,
+          }}
+        >
+          {/* Search */}
+          <SearchTextField
+            placeholder={t('serverLifecycle.searchPlaceholder')}
+            value={searchQuery}
+            onChange={setSearchQuery}
+          />
+
+          {/* Dynamic Filter Bar */}
+          <DynamicFilterBar
+            availableFilters={filterDefinitions}
+            activeFilters={activeFilters}
+            onFilterAdd={handleFilterAdd}
+            onFilterRemove={handleFilterRemove}
+            onFilterChange={handleFilterChange}
+            onOperatorChange={handleOperatorChange}
+            onRefresh={handleRefresh}
+            refreshDisabled={isLoading}
+            noWrap={true}
+            afterFilterAddActions={
+              <Tooltip title={t('common.columnSettings')}>
+                <IconButton
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': { bgcolor: 'action.hover' },
+                  }}
+                >
+                  <ViewColumnIcon />
+                </IconButton>
+              </Tooltip>
+            }
+          />
+        </Box>
+      </Box>
+
+      {/* Column Settings Dialog */}
+      <ColumnSettingsDialog
+        anchorEl={columnSettingsAnchor}
+        columns={columns}
+        onColumnsChange={handleColumnsChange}
+        onReset={handleResetColumns}
+        onClose={() => setColumnSettingsAnchor(null)}
+      />
 
       {/* Table */}
       <PageContentLoader loading={isLoading}>
         {!data?.data || data.data.length === 0 ? (
           <EmptyPagePlaceholder message={t('serverLifecycle.noEvents')} />
         ) : (
-          <Paper elevation={2} sx={{ borderRadius: 2, position: 'relative' }}>
-            <TableContainer>
-              <Table aria-label="server lifecycle table" size="small">
-                <TableHead sx={{ bgcolor: 'action.hover' }}>
-                  <TableRow>
-                    <TableCell width="50" />
-                    {visibleColumns.map((colId) => {
-                      const col = columns.find((c) => c.id === colId);
-                      const sortField = columnToSortField[colId];
-                      const isSortable = !!sortField;
-                      const isActive = sortBy === sortField;
-                      return col ? (
-                        <TableCell key={colId} sx={{ fontWeight: 600 }}>
-                          {isSortable ? (
-                            <TableSortLabel
-                              active={isActive}
-                              direction={isActive ? sortOrder : 'desc'}
-                              onClick={() => handleSort(colId)}
-                            >
-                              {t(col.labelKey)}
-                            </TableSortLabel>
-                          ) : (
-                            t(col.labelKey)
-                          )}
-                        </TableCell>
-                      ) : null;
-                    })}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data.data.map(
-                    (event: ServerLifecycleEvent, index: number) => (
-                      <EventRow
-                        key={event.id}
-                        event={event}
-                        visibleColumns={visibleColumns}
-                        index={index}
-                        enqueueSnackbar={enqueueSnackbar}
-                      />
-                    )
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            {data && data.data && data.data.length > 0 && (
-              <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
-                <SimplePagination
-                  count={data.total}
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                />
-              </Box>
-            )}
-          </Paper>
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <TableContainer>
+                <Table aria-label="server lifecycle table" size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell width="50" />
+                      {visibleColumns.map((colId) => {
+                        const col = columns.find((c) => c.id === colId);
+                        const sortField = columnToSortField[colId];
+                        const isSortable = !!sortField;
+                        const isActive = sortBy === sortField;
+                        return col ? (
+                          <TableCell key={colId}>
+                            {isSortable ? (
+                              <TableSortLabel
+                                active={isActive}
+                                direction={isActive ? sortOrder : 'desc'}
+                                onClick={() => handleSort(colId)}
+                              >
+                                {t(col.labelKey)}
+                              </TableSortLabel>
+                            ) : (
+                              t(col.labelKey)
+                            )}
+                          </TableCell>
+                        ) : null;
+                      })}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {data.data.map(
+                      (event: ServerLifecycleEvent, index: number) => (
+                        <EventRow
+                          key={event.id}
+                          event={event}
+                          visibleColumns={visibleColumns}
+                          index={index}
+                          enqueueSnackbar={enqueueSnackbar}
+                        />
+                      )
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <SimplePagination
+                count={data.total}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleRowsPerPageChange}
+              />
+            </CardContent>
+          </Card>
         )}
       </PageContentLoader>
     </Box>

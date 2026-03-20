@@ -262,7 +262,7 @@ const SystemSettingsPage: React.FC = () => {
                         );
                       }}
                     >
-                      {t('common.save')}
+                      {t('common.update')}
                     </Button>
                   </Stack>
                 )}
@@ -340,7 +340,7 @@ const SystemSettingsPage: React.FC = () => {
                       variant="contained"
                       onClick={handleSaveServiceDiscoveryConfig}
                     >
-                      {t('common.save')}
+                      {t('common.update')}
                     </Button>
                   </Stack>
                 )}
@@ -476,7 +476,7 @@ const SystemSettingsPage: React.FC = () => {
                       onClick={handleSaveAiSettings}
                       disabled={!isAiSettingsDirty}
                     >
-                      {t('common.save')}
+                      {t('common.update')}
                     </Button>
                   </Stack>
                 )}

@@ -46,7 +46,7 @@ export class FlexibleRolloutStrategy extends Strategy {
     const stickiness = parameters.stickiness || 'default';
     const stickinessId = this.resolveStickiness(stickiness, context);
     if (!stickinessId) return false;
-    const groupId = parameters.groupId || context.appName || '';
+    const groupId = parameters.groupId || '';
     const rollout = Number(parameters.rollout ?? 100);
     const enabled =
       rollout > 0 && normalizedStrategyValue(stickinessId, groupId) <= rollout;
@@ -57,7 +57,7 @@ export class FlexibleRolloutStrategy extends Strategy {
     parameters: StrategyParameters,
     context: EvaluationContext
   ): StrategyEvaluationResult {
-    const groupId = parameters.groupId || context.appName || '';
+    const groupId = parameters.groupId || '';
     const rollout = Number(parameters.rollout ?? 100);
     const stickiness = parameters.stickiness || 'default';
     const stickinessId = this.resolveStickiness(stickiness, context);

@@ -153,9 +153,8 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
         mt: 2,
         p: 2,
         border: '1px solid',
-        borderColor: 'warning.light',
+        borderColor: 'divider',
         borderRadius: 1,
-        bgcolor: 'background.default',
         ...sx,
       }}
     >

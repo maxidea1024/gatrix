@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Typography,
-  TextField,
   MenuItem,
   Card,
   CardContent,
@@ -12,7 +11,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  InputAdornment,
   IconButton,
   Tooltip,
   TableSortLabel,
@@ -26,7 +24,6 @@ import {
 } from '@mui/material';
 import {
   History as HistoryIcon,
-  Search as SearchIcon,
   ViewColumn as ViewColumnIcon,
   Download as DownloadIcon,
   ContentCopy as ContentCopyIcon,
@@ -34,6 +31,7 @@ import {
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import SimplePagination from '@/components/common/SimplePagination';
+import SearchTextField from '@/components/common/SearchTextField';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
@@ -578,48 +576,13 @@ const CouponUsagePage: React.FC = () => {
                 minWidth: 0,
               }}
             >
-              <TextField
+              <SearchTextField
                 placeholder={t('common.search') || ''}
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
+                onChange={(value) => {
+                  setSearchTerm(value);
                   setPage(0);
                 }}
-                sx={{
-                  minWidth: 300,
-                  flexGrow: 1,
-                  maxWidth: 500,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': { borderColor: 'divider' },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': { borderColor: 'primary.light' },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': { fontSize: '0.875rem' },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: 'text.secondary', fontSize: 20 }}
-                      />
-                    </InputAdornment>
-                  ),
-                }}
-                size="small"
               />
 
               <DynamicFilterBar

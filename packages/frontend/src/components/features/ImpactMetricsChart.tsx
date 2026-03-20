@@ -430,7 +430,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
     <Paper
       elevation={isExpanded ? 0 : 3}
       sx={{
-        borderRadius: isExpanded ? 0 : 3,
+        ...(isExpanded && { borderRadius: 0 }),
         height: '100%',
         width: '100%',
         boxSizing: 'border-box',
@@ -456,7 +456,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
               ? 'rgba(255,255,255,0.04)'
               : 'rgba(0,0,0,0.02)',
           borderBottom: `1px solid ${theme.palette.divider}`,
-          borderRadius: isExpanded ? 0 : '12px 12px 0 0',
+          ...(isExpanded && { borderRadius: 0 }),
           cursor: canManage ? 'grab' : 'default',
           '&:active': canManage ? { cursor: 'grabbing' } : {},
         }}
@@ -919,7 +919,7 @@ const ChartConfigDialog: React.FC<{
       <DialogActions>
         <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button variant="contained" onClick={handleSave} disabled={!metricName}>
-          {initialValues ? t('common.save') : t('common.add')}
+          {initialValues ? t('common.update') : t('common.add')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -1523,7 +1523,6 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
           // Override react-grid-layout styles for themed look
           '& .react-grid-item.react-grid-placeholder': {
             bgcolor: theme.palette.primary.main + '20',
-            borderRadius: 3,
             border: `2px dashed ${theme.palette.primary.main}`,
             opacity: 0.6,
           },

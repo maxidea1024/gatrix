@@ -25,7 +25,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  InputAdornment,
+
   Tooltip,
   TableSortLabel,
   FormControlLabel,
@@ -48,7 +48,7 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   Add as AddIcon,
-  Search as SearchIcon,
+
   ViewColumn as ViewColumnIcon,
   List as ListIcon,
   ContentCopy as ContentCopyIcon,
@@ -64,6 +64,7 @@ import {
   ExpandLess as ExpandLessIcon,
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
+import SearchTextField from '../../components/common/SearchTextField';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -1470,48 +1471,13 @@ const CouponSettingsPage: React.FC = () => {
                 minWidth: 0,
               }}
             >
-              <TextField
+              <SearchTextField
                 placeholder={t('common.search') || ''}
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
+                onChange={(value) => {
+                  setSearchTerm(value);
                   setPage(0);
                 }}
-                sx={{
-                  minWidth: 300,
-                  flexGrow: 1,
-                  maxWidth: 500,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': { borderColor: 'divider' },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': { borderColor: 'primary.light' },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': { fontSize: '0.875rem' },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: 'text.secondary', fontSize: 20 }}
-                      />
-                    </InputAdornment>
-                  ),
-                }}
-                size="small"
               />
 
               <DynamicFilterBar
@@ -2979,49 +2945,14 @@ const CouponSettingsPage: React.FC = () => {
               alignItems="center"
               sx={{ width: '100%' }}
             >
-              <TextField
+              <SearchTextField
                 placeholder={
                   t(
                     'coupons.couponSettings.issuedCodesDrawer.searchPlaceholder'
                   ) as string
                 }
                 value={codesSearch}
-                onChange={(e) => setCodesSearch(e.target.value)}
-                disabled={exportingCodes}
-                sx={{
-                  flex: 1,
-                  minWidth: 200,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': { borderColor: 'divider' },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': { borderColor: 'primary.light' },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': { fontSize: '0.875rem' },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: 'text.secondary', fontSize: 20 }}
-                      />
-                    </InputAdornment>
-                  ),
-                }}
-                size="small"
+                onChange={setCodesSearch}
               />
               <Button
                 variant="outlined"

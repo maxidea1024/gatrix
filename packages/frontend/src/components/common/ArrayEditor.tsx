@@ -887,7 +887,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
             {t('common.cancel')}
           </Button>
           <Button onClick={handleSaveObject} variant="contained">
-            {t('common.save')}
+            {t('common.update')}
           </Button>
         </DialogActions>
       </Dialog>

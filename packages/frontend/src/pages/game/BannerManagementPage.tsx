@@ -13,8 +13,7 @@ import {
   TableRow,
   IconButton,
   Chip,
-  TextField,
-  InputAdornment,
+
   Tooltip,
   Checkbox,
   Card,
@@ -29,7 +28,7 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Search as SearchIcon,
+
   ViewColumn as ViewColumnIcon,
   Image as ImageIcon,
   Refresh as RefreshIcon,
@@ -38,6 +37,7 @@ import {
   Archive as ArchiveIcon,
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
+import SearchTextField from '../../components/common/SearchTextField';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
@@ -484,48 +484,13 @@ const BannerManagementPage: React.FC = () => {
                 flex: 1,
               }}
             >
-              <TextField
+              <SearchTextField
                 placeholder={t('banners.searchPlaceholder')}
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
+                onChange={(value) => {
+                  setSearchTerm(value);
                   setPage(0);
                 }}
-                sx={{
-                  minWidth: 200,
-                  flexGrow: 1,
-                  maxWidth: 320,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': { borderColor: 'divider' },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': { borderColor: 'primary.light' },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': { fontSize: '0.875rem' },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: 'text.secondary', fontSize: 20 }}
-                      />
-                    </InputAdornment>
-                  ),
-                }}
-                size="small"
               />
               <Tooltip title={t('common.columnSettings')}>
                 <IconButton

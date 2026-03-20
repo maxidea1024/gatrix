@@ -164,7 +164,7 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({
           variant="contained"
           disabled={loading || submitting}
         >
-          {submitting ? t('common.saving') : t('common.save')}
+          {submitting ? t('common.saving') : t('common.update')}
         </Button>
       </Box>
     </ResizableDrawer>

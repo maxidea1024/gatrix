@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Button,
   TextField,
@@ -41,6 +41,10 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [defaults, setDefaults] = useState<PlatformDefaultsMap>({});
+  const initialDefaultsRef = useRef<string>('');
+
+  // Check if defaults have changed from the initial loaded state
+  const isDirty = JSON.stringify(defaults) !== initialDefaultsRef.current;
 
   // Load defaults
   const loadDefaults = async () => {
@@ -56,6 +60,7 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
         return acc;
       }, {} as PlatformDefaultsMap);
       setDefaults(merged);
+      initialDefaultsRef.current = JSON.stringify(merged);
     } catch (error) {
       console.error('Failed to load platform defaults:', error);
       enqueueSnackbar(t('platformDefaults.loadError'), { variant: 'error' });
@@ -201,9 +206,9 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={saving || loading}
+          disabled={saving || loading || !isDirty}
         >
-          {t('common.save')}
+          {t('common.update')}
         </Button>
       </Box>
     </ResizableDrawer>

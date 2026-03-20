@@ -32,7 +32,7 @@ import {
   ListItemText,
   ListItemIcon,
   ClickAwayListener,
-  InputAdornment,
+
   Select,
   MenuItem,
   InputLabel,
@@ -70,7 +70,7 @@ import {
   Security as SecurityIcon,
   ViewColumn as ViewColumnIcon,
   DragIndicator as DragIndicatorIcon,
-  Search as SearchIcon,
+
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -83,6 +83,7 @@ import 'dayjs/locale/ko';
 import 'dayjs/locale/en';
 import 'dayjs/locale/zh-cn';
 import { ApiAccessToken, TokenType } from '@/types/apiToken';
+import SearchTextField from '../../components/common/SearchTextField';
 import { apiTokenService } from '@/services/apiTokenService';
 import { Environment } from '@/services/environmentService';
 import { useEnvironments } from '@/contexts/EnvironmentContext';
@@ -1093,51 +1094,10 @@ const ApiTokensPage: React.FC = () => {
               }}
             >
               {/* Search */}
-              <TextField
+              <SearchTextField
                 placeholder={t('apiTokens.searchPlaceholder')}
-                size="small"
-                sx={{
-                  minWidth: 450,
-                  flexGrow: 1,
-                  maxWidth: 450,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': {
-                      borderColor: 'divider',
-                    },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': {
-                        borderColor: 'primary.light',
-                      },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': {
-                    fontSize: '0.875rem',
-                  },
-                }}
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: 'text.secondary', fontSize: 20 }}
-                      />
-                    </InputAdornment>
-                  ),
-                }}
+                onChange={setSearchTerm}
               />
 
               {/* Column Settings Button */}
@@ -1900,7 +1860,7 @@ const ApiTokensPage: React.FC = () => {
               (!!selectedToken && !isDirty)
             }
           >
-            {t('common.save')}
+            {t('common.update')}
           </Button>
         </Box>
       </ResizableDrawer>

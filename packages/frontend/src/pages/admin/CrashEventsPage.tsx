@@ -1164,7 +1164,6 @@ const CrashEventsPage: React.FC = () => {
               placeholder={t('crashes.searchPlaceholder')}
               value={searchTerm}
               onChange={setSearchTerm}
-              sx={{ minWidth: 450, maxWidth: 450 }}
             />
 
             {/* Dynamic Filter Bar */}

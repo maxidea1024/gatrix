@@ -1055,7 +1055,7 @@ export const EditIntegrationPage: React.FC = () => {
             onClick={handleSave}
             disabled={saving || !isFormValid() || !isDirty()}
           >
-            {saving ? <CircularProgress size={24} /> : t('common.save')}
+            {saving ? <CircularProgress size={24} /> : t('common.update')}
           </Button>
         </Box>
       </TabPanel>

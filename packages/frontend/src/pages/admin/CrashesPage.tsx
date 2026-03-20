@@ -734,7 +734,6 @@ const CrashesPage: React.FC = () => {
               placeholder={t('crashes.searchPlaceholder')}
               value={searchTerm}
               onChange={setSearchTerm}
-              sx={{ minWidth: 450, maxWidth: 450 }}
             />
 
             {/* Dynamic Filter Bar */}
@@ -1468,7 +1467,7 @@ const CrashesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button variant="contained" onClick={handleSaveAssignee}>
-            {t('common.save')}
+            {t('common.update')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1496,7 +1495,7 @@ const CrashesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button variant="contained" onClick={handleSaveJira}>
-            {t('common.save')}
+            {t('common.update')}
           </Button>
         </DialogActions>
       </Dialog>

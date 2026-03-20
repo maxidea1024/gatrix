@@ -15,8 +15,7 @@ import {
   TableRow,
   IconButton,
   Chip,
-  TextField,
-  InputAdornment,
+
   Tooltip,
   Checkbox,
   Dialog,
@@ -32,7 +31,7 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Search as SearchIcon,
+
   Announcement as AnnouncementIcon,
   Visibility as VisibilityIcon,
   ViewColumn as ViewColumnIcon,
@@ -56,6 +55,7 @@ import serviceNoticeService, {
 } from '../../services/serviceNoticeService';
 import ServiceNoticeFormDialog from '../../components/game/ServiceNoticeFormDialog';
 import SimplePagination from '../../components/common/SimplePagination';
+import SearchTextField from '../../components/common/SearchTextField';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -456,8 +456,8 @@ const ServiceNoticesPage: React.FC = () => {
   };
 
   // Search handler
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
     setPage(0);
   };
 
@@ -783,51 +783,10 @@ const ServiceNoticesPage: React.FC = () => {
                 minWidth: 0,
               }}
             >
-              <TextField
+              <SearchTextField
                 placeholder={t('serviceNotices.searchPlaceholder')}
                 value={searchTerm}
                 onChange={handleSearchChange}
-                sx={{
-                  minWidth: 300,
-                  flexGrow: 1,
-                  maxWidth: 500,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': {
-                      borderColor: 'divider',
-                    },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': {
-                        borderColor: 'primary.light',
-                      },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': {
-                    fontSize: '0.875rem',
-                  },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: 'text.secondary', fontSize: 20 }}
-                      />
-                    </InputAdornment>
-                  ),
-                }}
-                size="small"
               />
 
               {/* Dynamic Filter Bar with Column Settings and Refresh Button */}

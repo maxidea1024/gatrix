@@ -1510,7 +1510,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       id: `new-${Date.now()}`,
       name: 'flexibleRollout',
       title: '',
-      parameters: { rollout: 0, stickiness: 'default', groupId: '' },
+      parameters: { rollout: 0, stickiness: 'default', groupId: flag?.flagName || '' },
       constraints: [],
       segments: [],
       sortOrder: envStrategyList.length,
@@ -1691,7 +1691,11 @@ const FeatureFlagDetailPage: React.FC = () => {
         const apiStrategies = updatedStrategies.map((s) => ({
           strategyName: s.name,
           title: s.title,
-          parameters: s.parameters,
+          parameters: {
+            ...s.parameters,
+            // Ensure groupId is populated with flag name when empty
+            groupId: s.parameters?.groupId || flag.flagName || '',
+          },
           constraints: s.constraints,
           segments: s.segments,
           sortOrder: s.sortOrder,
@@ -3809,7 +3813,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                           JSON.stringify(originalFlag?.validationRules))
                     }
                   >
-                    {saving ? <CircularProgress size={20} /> : t('common.save')}
+                    {saving ? <CircularProgress size={20} /> : t('common.update')}
                   </Button>
                 </Box>
               )}
@@ -4119,7 +4123,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                       JSON.stringify(flag?.tags || []))
                 }
               >
-                {saving ? <CircularProgress size={20} /> : t('common.save')}
+                {saving ? <CircularProgress size={20} /> : t('common.update')}
               </Button>
             </Box>
           </>
@@ -4446,9 +4450,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                               size="small"
                               value={
                                 editingStrategy.parameters?.groupId ||
-                                flag?.flagName ||
                                 ''
                               }
+                              placeholder={flag?.flagName || ''}
                               onChange={(e) =>
                                 setEditingStrategy({
                                   ...editingStrategy,
@@ -4955,7 +4959,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                   return false;
                 })()}
               >
-                {t('featureFlags.saveStrategy')}
+                {isAddingStrategy
+                  ? t('featureFlags.saveStrategy')
+                  : t('common.update')}
               </Button>
             </Box>
           </>
@@ -5021,7 +5027,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button variant="contained" onClick={handleSaveVariants}>
-            {t('common.save')}
+            {t('common.update')}
           </Button>
         </Box>
       </ResizableDrawer>
@@ -5072,7 +5078,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             onClick={handleSaveLink}
             disabled={!editingLink.url}
           >
-            {t('common.save')}
+            {editingLinkIndex !== null ? t('common.update') : t('common.save')}
           </Button>
         </DialogActions>
       </Dialog>

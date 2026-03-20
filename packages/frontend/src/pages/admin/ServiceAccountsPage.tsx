@@ -707,7 +707,7 @@ const AccountDialog: React.FC<AccountDialogProps> = ({
           variant="contained"
           disabled={!name.trim() || !selectedEnvironmentId}
         >
-          {account ? t('common.save') : t('common.create')}
+          {account ? t('common.update') : t('common.create')}
         </Button>
       </Box>
     </ResizableDrawer>

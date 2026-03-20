@@ -882,7 +882,7 @@ const ProjectsPage: React.FC = () => {
             ) : dialogMode === 'create' ? (
               t('common.add')
             ) : (
-              t('common.save')
+              t('common.update')
             )}
           </Button>
         </Box>

@@ -456,7 +456,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
       >
         <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button onClick={handleSave} variant="contained" disabled={!isValid}>
-          {actionSet ? t('common.save') : t('common.add')}
+          {actionSet ? t('common.update') : t('common.add')}
         </Button>
       </Box>
     </ResizableDrawer>

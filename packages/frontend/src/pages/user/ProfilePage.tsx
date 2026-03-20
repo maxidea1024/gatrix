@@ -522,7 +522,7 @@ const ProfilePage: React.FC = () => {
                     onClick={handleSave}
                     disabled={isLoading}
                   >
-                    {isLoading ? t('common.saving') : t('common.save')}
+                    {isLoading ? t('common.saving') : t('common.update')}
                   </Button>
                 </>
               ) : (

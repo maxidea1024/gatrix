@@ -143,7 +143,7 @@ Flag: "new-checkout-flow" (boolean)
 | ------------ | ------ | --------------------------------------------------------------- |
 | `rollout`    | number | 接收启用值的用户百分比（0–100）                                   |
 | `stickiness` | string | 一致性分桶的上下文字段（`userId`、`sessionId`、`random` 或自定义）  |
-| `groupId`    | string | 发布分桶的组标识符（默认：标志名称）                               |
+| `groupId`    | string | 发布分桶的组标识符（默认：空字符串）                               |
 
 ### 发布分桶
 

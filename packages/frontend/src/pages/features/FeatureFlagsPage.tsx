@@ -1836,7 +1836,6 @@ const FeatureFlagsPage: React.FC = () => {
                   setSearchTerm(val);
                   setPage(0);
                 }}
-                sx={{ minWidth: 300, maxWidth: 500 }}
               />
 
               {/* Dynamic Filter Bar */}

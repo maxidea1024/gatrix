@@ -608,7 +608,6 @@ const WhitelistPage: React.FC = () => {
                 placeholder={t('whitelist.searchPlaceholder')}
                 value={pageState.filters?.search || ''}
                 onChange={(value) => updateFilters({ search: value })}
-                sx={{ minWidth: 300 }}
               />
               {canManage && (
                 <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>

@@ -2411,7 +2411,7 @@ const IconCustomizationDialog: React.FC<IconCustomizationDialogProps> = ({
           variant="contained"
           disabled={!selectedIconName}
         >
-          {t('common.save')}
+          {t('common.update')}
         </Button>
       </DialogActions>
     </Dialog>

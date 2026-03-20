@@ -746,7 +746,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                 {transitionSaving ? (
                   <CircularProgress size={14} />
                 ) : (
-                  t('common.save')
+                  t('common.update')
                 )}
               </Button>
               <IconButton

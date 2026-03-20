@@ -429,11 +429,6 @@ const UnknownFlagsPage: React.FC = () => {
                 placeholder={t('featureFlags.searchUnknownFlags')}
                 value={searchTerm}
                 onChange={(value) => setSearchTerm(value)}
-                sx={{
-                  minWidth: 300,
-                  flexGrow: 1,
-                  maxWidth: 500,
-                }}
               />
               <DynamicFilterBar
                 availableFilters={filterDefinitions}

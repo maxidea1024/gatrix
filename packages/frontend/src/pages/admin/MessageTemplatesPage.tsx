@@ -42,7 +42,7 @@ import {
   Checkbox,
   Alert,
   Autocomplete,
-  InputAdornment,
+
   Popover,
   List,
   ListItem,
@@ -78,7 +78,7 @@ import {
   Refresh as RefreshIcon,
   LocalOffer as LocalOfferIcon,
   ContentCopy as ContentCopyIcon,
-  Search as SearchIcon,
+
   TextFields as TextFieldsIcon,
   ViewColumn as ViewColumnIcon,
   DragIndicator as DragIndicatorIcon,
@@ -98,6 +98,7 @@ import {
   MessageTemplateType,
 } from '@/services/messageTemplateService';
 import { tagService, Tag } from '@/services/tagService';
+import SearchTextField from '@/components/common/SearchTextField';
 import translationService from '@/services/translationService';
 import { getLanguageDisplayName } from '@/contexts/I18nContext';
 import SimplePagination from '@/components/common/SimplePagination';
@@ -1068,53 +1069,10 @@ const MessageTemplatesPage: React.FC = () => {
               }}
             >
               {/* Search 컨트롤을 맨 앞으로 이동하고 개선 */}
-              <TextField
+              <SearchTextField
                 placeholder={t('messageTemplates.searchPlaceholderDetailed')}
-                size="small"
-                sx={{
-                  minWidth: 200,
-                  flexGrow: 1,
-                  maxWidth: 320,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': {
-                      borderColor: 'divider',
-                    },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': {
-                        borderColor: 'primary.light',
-                      },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': {
-                    fontSize: '0.875rem',
-                  },
-                }}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon
-                          sx={{ color: 'text.secondary', fontSize: 20 }}
-                        />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
+                onChange={setSearchQuery}
               />
 
               {/* Dynamic Filter Bar */}
@@ -1698,7 +1656,7 @@ const MessageTemplatesPage: React.FC = () => {
             onClick={() => handleSaveTags(templateTags.map((tag) => tag.id))}
             variant="contained"
           >
-            {t('common.save')}
+            {t('common.update')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -1,4 +1,4 @@
-﻿---
+---
 sidebar_position: 1
 sidebar_label: Feature Flags
 ---
@@ -143,7 +143,7 @@ Flag isEnabled?
 | ------------ | ------ | ----------------------------------------------------------------------------------- |
 | `rollout`    | number | Percentage of users (0–100) who receive the enabled value                           |
 | `stickiness` | string | Context field for consistent bucketing (`userId`, `sessionId`, `random`, or custom) |
-| `groupId`    | string | Group identifier for rollout bucketing (defaults to flag name)                      |
+| `groupId`    | string | Group identifier for rollout bucketing (defaults to empty string)                   |
 
 ### Rollout Bucketing
 
@@ -189,6 +189,7 @@ interface Constraint {
 | `str_ends_with`   | Ends with suffix           | single     | `email str_ends_with ".kr"`         |
 | `str_in`          | In list                    | multiple   | `country str_in ["KR", "JP", "US"]` |
 | `str_regex`       | Matches regular expression | single     | `email str_regex "^admin@.*"`       |
+| `cidr_match`      | Matches IP in CIDR range   | multiple   | `remoteAddress cidr_match ["10.0.0.0/8"]` |
 
 #### Number Operators
 

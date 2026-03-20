@@ -4116,11 +4116,6 @@ const ServerListPage: React.FC = () => {
                 placeholder={t('serverList.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(value) => setSearchTerm(value)}
-                sx={{
-                  flex: 1,
-                  minWidth: 280,
-                  maxWidth: 400,
-                }}
               />
 
               <DynamicFilterBar

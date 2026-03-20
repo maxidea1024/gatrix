@@ -44,9 +44,9 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       onChange={handleChange}
       size="small"
       sx={{
-        minWidth: 200,
+        minWidth: 300,
         flexGrow: 1,
-        maxWidth: 320,
+        maxWidth: 500,
         '& .MuiOutlinedInput-root': {
           height: '40px',
           borderRadius: '20px',

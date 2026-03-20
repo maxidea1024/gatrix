@@ -2693,6 +2693,13 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                         </Typography>
                       );
                     }
+                    // Non-string field types: display without quotes
+                    if (
+                      fieldType === 'number' ||
+                      fieldType === 'boolean'
+                    ) {
+                      return String(value);
+                    }
                     if (typeof value === 'string') {
                       if (value === '') {
                         // Boolean type with empty string likely means not set
@@ -2771,21 +2778,21 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             <Typography
                               variant="caption"
                               fontWeight={600}
-                              sx={{ flex: 1 }}
+                              sx={{ width: 180, flexShrink: 0 }}
                             >
                               {t('playground.contextField')}
                             </Typography>
                             <Typography
                               variant="caption"
                               fontWeight={600}
-                              sx={{ width: 60, textAlign: 'center' }}
+                              sx={{ width: 60, textAlign: 'center', flexShrink: 0 }}
                             >
                               {t('playground.referenced')}
                             </Typography>
                             <Typography
                               variant="caption"
                               fontWeight={600}
-                              sx={{ width: 100 }}
+                              sx={{ flex: 1 }}
                             >
                               {t('playground.contextValue')}
                             </Typography>
@@ -2808,7 +2815,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 borderColor: 'divider',
                               }}
                             >
-                              <Box sx={{ flex: 1 }}>
+                              <Box sx={{ width: 180, flexShrink: 0 }}>
                                 <ContextFieldChip
                                   fieldName={entry.key}
                                   fieldInfo={getFieldInfo(entry.key)}
@@ -2819,6 +2826,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 sx={{
                                   width: 60,
                                   textAlign: 'center',
+                                  flexShrink: 0,
                                 }}
                               >
                                 {referencedFieldNames.has(entry.key) ? (
@@ -2837,7 +2845,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   </Typography>
                                 )}
                               </Box>
-                              <Box sx={{ width: 100 }}>
+                              <Box sx={{ flex: 1 }}>
                                 <Typography
                                   variant="caption"
                                   sx={{
@@ -2890,28 +2898,28 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             <Typography
                               variant="caption"
                               fontWeight={600}
-                              sx={{ flex: 1 }}
+                              sx={{ width: 180, flexShrink: 0 }}
                             >
                               {t('playground.contextField')}
                             </Typography>
                             <Typography
                               variant="caption"
                               fontWeight={600}
-                              sx={{ width: 60, textAlign: 'center' }}
+                              sx={{ width: 60, textAlign: 'center', flexShrink: 0 }}
                             >
                               {t('featureFlags.validation.isRequired')}
                             </Typography>
                             <Typography
                               variant="caption"
                               fontWeight={600}
-                              sx={{ width: 60, textAlign: 'center' }}
+                              sx={{ width: 60, textAlign: 'center', flexShrink: 0 }}
                             >
                               {t('common.status')}
                             </Typography>
                             <Typography
                               variant="caption"
                               fontWeight={600}
-                              sx={{ width: 100 }}
+                              sx={{ flex: 1 }}
                             >
                               {t('playground.contextValue')}
                             </Typography>
@@ -2937,7 +2945,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   borderColor: 'divider',
                                 }}
                               >
-                                <Box sx={{ flex: 1 }}>
+                                <Box sx={{ width: 180, flexShrink: 0 }}>
                                   <ContextFieldChip
                                     fieldName={ref.name}
                                     fieldInfo={getFieldInfo(ref.name)}
@@ -2948,6 +2956,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   sx={{
                                     width: 60,
                                     textAlign: 'center',
+                                    flexShrink: 0,
                                   }}
                                 >
                                   {ref.isRequired ? (
@@ -2973,6 +2982,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   sx={{
                                     width: 60,
                                     textAlign: 'center',
+                                    flexShrink: 0,
                                   }}
                                 >
                                   {provided ? (
@@ -2991,7 +3001,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     />
                                   )}
                                 </Box>
-                                <Box sx={{ width: 100 }}>
+                                <Box sx={{ flex: 1 }}>
                                   <Typography
                                     variant="caption"
                                     sx={{
@@ -3915,18 +3925,24 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                               )}
                                                               {check.details && (
                                                                 <Box
+                                                                  component="table"
                                                                   sx={{
                                                                     mt: 0.5,
-                                                                    p: 0.75,
-                                                                    bgcolor:
-                                                                      'action.hover',
-                                                                    borderRadius: 0.5,
+                                                                    borderCollapse: 'collapse',
+                                                                    width: 'auto',
                                                                     fontSize:
                                                                       '0.7rem',
                                                                     fontFamily:
                                                                       'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
+                                                                    '& td': {
+                                                                      border: '1px solid',
+                                                                      borderColor: 'divider',
+                                                                      px: 1,
+                                                                      py: 0.3,
+                                                                    },
                                                                   }}
                                                                 >
+                                                                  <tbody>
                                                                   {Object.entries(
                                                                     check.details as Record<
                                                                       string,
@@ -3937,35 +3953,26 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                       key,
                                                                       val,
                                                                     ]) => (
-                                                                      <Box
+                                                                      <tr
                                                                         key={
                                                                           key
                                                                         }
-                                                                        sx={{
-                                                                          display:
-                                                                            'flex',
-                                                                          gap: 0.5,
-                                                                          py: 0.15,
-                                                                        }}
                                                                       >
-                                                                        <Typography
-                                                                          variant="caption"
+                                                                        <Box
+                                                                          component="td"
                                                                           sx={{
-                                                                            fontFamily:
-                                                                              'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                                                             color:
                                                                               'text.secondary',
                                                                             fontWeight: 600,
-                                                                            minWidth: 100,
+                                                                            whiteSpace: 'nowrap',
+                                                                            bgcolor: 'action.hover',
                                                                           }}
                                                                         >
-                                                                          {key}:
-                                                                        </Typography>
-                                                                        <Typography
-                                                                          variant="caption"
+                                                                          {key}
+                                                                        </Box>
+                                                                        <Box
+                                                                          component="td"
                                                                           sx={{
-                                                                            fontFamily:
-                                                                              'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                                                             color:
                                                                               'text.primary',
                                                                             wordBreak:
@@ -3981,10 +3988,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                                 val ??
                                                                                   ''
                                                                               )}
-                                                                        </Typography>
-                                                                      </Box>
+                                                                        </Box>
+                                                                      </tr>
                                                                     )
                                                                   )}
+                                                                  </tbody>
                                                                 </Box>
                                                               )}
                                                             </Box>

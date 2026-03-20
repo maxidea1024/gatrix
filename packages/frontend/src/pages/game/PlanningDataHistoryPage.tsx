@@ -25,7 +25,7 @@ import {
   TextField,
   Alert,
   Divider,
-  InputAdornment,
+
   TableSortLabel,
 } from '@mui/material';
 import {
@@ -37,7 +37,7 @@ import {
   Computer as WebIcon,
   Terminal as CliIcon,
   Delete as DeleteIcon,
-  Search as SearchIcon,
+
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -46,6 +46,7 @@ import planningDataService, {
   UploadRecord,
 } from '../../services/planningDataService';
 import SimplePagination from '../../components/common/SimplePagination';
+import SearchTextField from '../../components/common/SearchTextField';
 import {
   formatRelativeTime,
   formatDateTimeDetailed,
@@ -239,58 +240,16 @@ const PlanningDataHistoryPage: React.FC = () => {
                 flex: 1,
               }}
             >
-              <TextField
+              <SearchTextField
                 placeholder={
                   t('planningData.history.searchPlaceholder') ||
                   t('common.search')
                 }
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
+                onChange={(value) => {
+                  setSearchTerm(value);
                   setPage(0);
                 }}
-                sx={{
-                  minWidth: 200,
-                  flexGrow: 1,
-                  maxWidth: 400,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': {
-                      borderColor: 'divider',
-                    },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': {
-                        borderColor: 'primary.light',
-                      },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': {
-                    fontSize: '0.875rem',
-                  },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon
-                        sx={{ color: 'text.secondary', fontSize: 20 }}
-                      />
-                    </InputAdornment>
-                  ),
-                  endAdornment: null,
-                }}
-                size="small"
               />
 
               <Box

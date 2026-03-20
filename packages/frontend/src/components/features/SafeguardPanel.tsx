@@ -976,7 +976,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
             onClick={handleSave}
             disabled={!metricName.trim()}
           >
-            {t('common.save')}
+            {selectedSafeguard ? t('common.update') : t('common.add')}
           </Button>
         </DialogActions>
       </Dialog>

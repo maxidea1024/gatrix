@@ -912,7 +912,7 @@ const WorkspacePage: React.FC = () => {
             onClick={handleSaveEdit}
             disabled={saving || !isEditDirty}
           >
-            {saving ? <CircularProgress size={20} /> : t('common.save')}
+            {saving ? <CircularProgress size={20} /> : t('common.update')}
           </Button>
         </Box>
       </ResizableDrawer>

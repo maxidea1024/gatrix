@@ -2762,7 +2762,7 @@ const ClientVersionsPage: React.FC = () => {
             }
             variant="contained"
           >
-            {t('common.save')}
+            {t('common.update')}
           </Button>
         </Box>
       </Drawer>

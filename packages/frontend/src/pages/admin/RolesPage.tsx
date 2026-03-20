@@ -384,7 +384,6 @@ const RolesPage: React.FC = () => {
           placeholder={t('rbac.roles.searchPlaceholder')}
           value={searchTerm}
           onChange={(value) => setSearchTerm(value)}
-          sx={{ width: 300 }}
         />
       </Box>
 
@@ -818,7 +817,7 @@ const RolesPage: React.FC = () => {
             onClick={handleSave}
             disabled={saving || !formData.roleName.trim() || !isEditDirty}
           >
-            {saving ? <CircularProgress size={20} /> : t('common.save')}
+            {saving ? <CircularProgress size={20} /> : dialogMode === 'edit' ? t('common.update') : t('common.save')}
           </Button>
         </Box>
       </ResizableDrawer>

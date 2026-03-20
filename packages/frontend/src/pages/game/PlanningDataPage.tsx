@@ -19,7 +19,7 @@ import {
   Tabs,
   Tab,
   TextField,
-  InputAdornment,
+
   FormControl,
   InputLabel,
   Select,
@@ -36,8 +36,7 @@ import {
   Storage as StorageIcon,
   Refresh as RefreshIcon,
   CheckCircle as CheckCircleIcon,
-  Search as SearchIcon,
-  Clear as ClearIcon,
+
   CardGiftcard as GiftIcon,
   Category as CategoryIcon,
   Schedule as ScheduleIcon,
@@ -48,6 +47,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import SearchTextField from '../../components/common/SearchTextField';
 import planningDataService, {
   PlanningDataStats,
   HotTimeBuffLookup,
@@ -1067,74 +1067,13 @@ const PlanningDataPage: React.FC = () => {
 
                           {/* Search box - only for types with table */}
                           {currentRewardType.hasTable && (
-                            <TextField
+                            <SearchTextField
                               placeholder={t('planningData.searchPlaceholder')}
                               value={searchTerm}
-                              onChange={(e) => {
-                                setSearchTerm(e.target.value);
+                              onChange={(value) => {
+                                setSearchTerm(value);
                                 setPage(0);
                               }}
-                              sx={{
-                                width: '30%',
-                                '& .MuiOutlinedInput-root': {
-                                  height: '40px',
-                                  borderRadius: '20px',
-                                  bgcolor: 'background.paper',
-                                  transition: 'all 0.2s ease-in-out',
-                                  '& fieldset': {
-                                    borderColor: 'divider',
-                                  },
-                                  '&:hover': {
-                                    bgcolor: 'action.hover',
-                                    '& fieldset': {
-                                      borderColor: 'primary.light',
-                                    },
-                                  },
-                                  '&.Mui-focused': {
-                                    bgcolor: 'background.paper',
-                                    boxShadow:
-                                      '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                                    '& fieldset': {
-                                      borderColor: 'primary.main',
-                                      borderWidth: '1px',
-                                    },
-                                  },
-                                },
-                                '& .MuiInputBase-input': {
-                                  fontSize: '0.875rem',
-                                },
-                              }}
-                              InputProps={{
-                                startAdornment: (
-                                  <InputAdornment position="start">
-                                    <SearchIcon
-                                      sx={{
-                                        color: 'text.secondary',
-                                        fontSize: 20,
-                                      }}
-                                    />
-                                  </InputAdornment>
-                                ),
-                                endAdornment: searchTerm && (
-                                  <InputAdornment position="end">
-                                    <ClearIcon
-                                      sx={{
-                                        color: 'text.secondary',
-                                        fontSize: 20,
-                                        cursor: 'pointer',
-                                        '&:hover': {
-                                          color: 'text.primary',
-                                        },
-                                      }}
-                                      onClick={() => {
-                                        setSearchTerm('');
-                                        setPage(0);
-                                      }}
-                                    />
-                                  </InputAdornment>
-                                ),
-                              }}
-                              size="small"
                             />
                           )}
 
@@ -1440,76 +1379,15 @@ const PlanningDataPage: React.FC = () => {
                                 </Select>
                               </FormControl>
 
-                              <TextField
+                              <SearchTextField
                                 placeholder={t(
                                   'planningData.searchPlaceholder'
                                 )}
                                 value={searchTerm}
-                                onChange={(e) => {
-                                  setSearchTerm(e.target.value);
-                                  setPage(0); // Reset to first page when searching
+                                onChange={(value) => {
+                                  setSearchTerm(value);
+                                  setPage(0);
                                 }}
-                                sx={{
-                                  width: '30%',
-                                  '& .MuiOutlinedInput-root': {
-                                    height: '40px',
-                                    borderRadius: '20px',
-                                    bgcolor: 'background.paper',
-                                    transition: 'all 0.2s ease-in-out',
-                                    '& fieldset': {
-                                      borderColor: 'divider',
-                                    },
-                                    '&:hover': {
-                                      bgcolor: 'action.hover',
-                                      '& fieldset': {
-                                        borderColor: 'primary.light',
-                                      },
-                                    },
-                                    '&.Mui-focused': {
-                                      bgcolor: 'background.paper',
-                                      boxShadow:
-                                        '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                                      '& fieldset': {
-                                        borderColor: 'primary.main',
-                                        borderWidth: '1px',
-                                      },
-                                    },
-                                  },
-                                  '& .MuiInputBase-input': {
-                                    fontSize: '0.875rem',
-                                  },
-                                }}
-                                InputProps={{
-                                  startAdornment: (
-                                    <InputAdornment position="start">
-                                      <SearchIcon
-                                        sx={{
-                                          color: 'text.secondary',
-                                          fontSize: 20,
-                                        }}
-                                      />
-                                    </InputAdornment>
-                                  ),
-                                  endAdornment: searchTerm && (
-                                    <InputAdornment position="end">
-                                      <ClearIcon
-                                        sx={{
-                                          color: 'text.secondary',
-                                          fontSize: 20,
-                                          cursor: 'pointer',
-                                          '&:hover': {
-                                            color: 'text.primary',
-                                          },
-                                        }}
-                                        onClick={() => {
-                                          setSearchTerm('');
-                                          setPage(0);
-                                        }}
-                                      />
-                                    </InputAdornment>
-                                  ),
-                                }}
-                                size="small"
                               />
 
                               {/* View All checkbox */}
@@ -1751,70 +1629,13 @@ const PlanningDataPage: React.FC = () => {
                       }}
                     >
                       {/* Search box */}
-                      <TextField
+                      <SearchTextField
                         placeholder={t('planningData.searchPlaceholder')}
                         value={hotTimeBuffSearchTerm}
-                        onChange={(e) => {
-                          setHotTimeBuffSearchTerm(e.target.value);
+                        onChange={(value) => {
+                          setHotTimeBuffSearchTerm(value);
                           setHotTimeBuffPage(0);
                         }}
-                        sx={{
-                          width: '30%',
-                          '& .MuiOutlinedInput-root': {
-                            height: '40px',
-                            borderRadius: '20px',
-                            bgcolor: 'background.paper',
-                            transition: 'all 0.2s ease-in-out',
-                            '& fieldset': {
-                              borderColor: 'divider',
-                            },
-                            '&:hover': {
-                              bgcolor: 'action.hover',
-                              '& fieldset': {
-                                borderColor: 'primary.light',
-                              },
-                            },
-                            '&.Mui-focused': {
-                              bgcolor: 'background.paper',
-                              boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                              '& fieldset': {
-                                borderColor: 'primary.main',
-                                borderWidth: '1px',
-                              },
-                            },
-                          },
-                          '& .MuiInputBase-input': {
-                            fontSize: '0.875rem',
-                          },
-                        }}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchIcon
-                                sx={{ color: 'text.secondary', fontSize: 20 }}
-                              />
-                            </InputAdornment>
-                          ),
-                          endAdornment: hotTimeBuffSearchTerm && (
-                            <InputAdornment position="end">
-                              <ClearIcon
-                                sx={{
-                                  color: 'text.secondary',
-                                  fontSize: 20,
-                                  cursor: 'pointer',
-                                  '&:hover': {
-                                    color: 'text.primary',
-                                  },
-                                }}
-                                onClick={() => {
-                                  setHotTimeBuffSearchTerm('');
-                                  setHotTimeBuffPage(0);
-                                }}
-                              />
-                            </InputAdornment>
-                          ),
-                        }}
-                        size="small"
                       />
 
                       {/* View All checkbox */}
@@ -2204,72 +2025,13 @@ const PlanningDataPage: React.FC = () => {
                             label={`${t('planningData.count')}: ${eventPageData?.items?.length || 0}`}
                             size="small"
                           />
-                          <TextField
+                          <SearchTextField
                             placeholder={t('planningData.search')}
                             value={eventPageSearchTerm}
-                            onChange={(e) => {
-                              setEventPageSearchTerm(e.target.value);
+                            onChange={(value) => {
+                              setEventPageSearchTerm(value);
                               setEventPagePage(0);
                             }}
-                            sx={{
-                              width: '30%',
-                              '& .MuiOutlinedInput-root': {
-                                height: '40px',
-                                borderRadius: '20px',
-                                bgcolor: 'background.paper',
-                                transition: 'all 0.2s ease-in-out',
-                                '& fieldset': {
-                                  borderColor: 'divider',
-                                },
-                                '&:hover': {
-                                  bgcolor: 'action.hover',
-                                  '& fieldset': {
-                                    borderColor: 'primary.light',
-                                  },
-                                },
-                                '&.Mui-focused': {
-                                  bgcolor: 'background.paper',
-                                  boxShadow:
-                                    '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                                  '& fieldset': {
-                                    borderColor: 'primary.main',
-                                    borderWidth: '1px',
-                                  },
-                                },
-                              },
-                              '& .MuiInputBase-input': {
-                                fontSize: '0.875rem',
-                              },
-                            }}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <SearchIcon
-                                    sx={{
-                                      color: 'text.secondary',
-                                      fontSize: 20,
-                                    }}
-                                  />
-                                </InputAdornment>
-                              ),
-                              endAdornment: eventPageSearchTerm && (
-                                <InputAdornment position="end">
-                                  <ClearIcon
-                                    sx={{
-                                      color: 'text.secondary',
-                                      fontSize: 20,
-                                      cursor: 'pointer',
-                                      '&:hover': { color: 'text.primary' },
-                                    }}
-                                    onClick={() => {
-                                      setEventPageSearchTerm('');
-                                      setEventPagePage(0);
-                                    }}
-                                  />
-                                </InputAdornment>
-                              ),
-                            }}
-                            size="small"
                           />
                           <Box
                             sx={{
@@ -2481,72 +2243,13 @@ const PlanningDataPage: React.FC = () => {
                             label={`${t('planningData.count')}: ${liveEventData?.items?.length || 0}`}
                             size="small"
                           />
-                          <TextField
+                          <SearchTextField
                             placeholder={t('planningData.search')}
                             value={liveEventSearchTerm}
-                            onChange={(e) => {
-                              setLiveEventSearchTerm(e.target.value);
+                            onChange={(value) => {
+                              setLiveEventSearchTerm(value);
                               setLiveEventPage(0);
                             }}
-                            sx={{
-                              width: '30%',
-                              '& .MuiOutlinedInput-root': {
-                                height: '40px',
-                                borderRadius: '20px',
-                                bgcolor: 'background.paper',
-                                transition: 'all 0.2s ease-in-out',
-                                '& fieldset': {
-                                  borderColor: 'divider',
-                                },
-                                '&:hover': {
-                                  bgcolor: 'action.hover',
-                                  '& fieldset': {
-                                    borderColor: 'primary.light',
-                                  },
-                                },
-                                '&.Mui-focused': {
-                                  bgcolor: 'background.paper',
-                                  boxShadow:
-                                    '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                                  '& fieldset': {
-                                    borderColor: 'primary.main',
-                                    borderWidth: '1px',
-                                  },
-                                },
-                              },
-                              '& .MuiInputBase-input': {
-                                fontSize: '0.875rem',
-                              },
-                            }}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <SearchIcon
-                                    sx={{
-                                      color: 'text.secondary',
-                                      fontSize: 20,
-                                    }}
-                                  />
-                                </InputAdornment>
-                              ),
-                              endAdornment: liveEventSearchTerm && (
-                                <InputAdornment position="end">
-                                  <ClearIcon
-                                    sx={{
-                                      color: 'text.secondary',
-                                      fontSize: 20,
-                                      cursor: 'pointer',
-                                      '&:hover': { color: 'text.primary' },
-                                    }}
-                                    onClick={() => {
-                                      setLiveEventSearchTerm('');
-                                      setLiveEventPage(0);
-                                    }}
-                                  />
-                                </InputAdornment>
-                              ),
-                            }}
-                            size="small"
                           />
                           <Box
                             sx={{
@@ -2850,72 +2553,13 @@ const PlanningDataPage: React.FC = () => {
                             label={`${t('planningData.count')}: ${mateRecruitingGroupData?.items?.length || 0}`}
                             size="small"
                           />
-                          <TextField
+                          <SearchTextField
                             placeholder={t('planningData.search')}
                             value={mateRecruitingGroupSearchTerm}
-                            onChange={(e) => {
-                              setMateRecruitingGroupSearchTerm(e.target.value);
+                            onChange={(value) => {
+                              setMateRecruitingGroupSearchTerm(value);
                               setMateRecruitingGroupPage(0);
                             }}
-                            sx={{
-                              width: '30%',
-                              '& .MuiOutlinedInput-root': {
-                                height: '40px',
-                                borderRadius: '20px',
-                                bgcolor: 'background.paper',
-                                transition: 'all 0.2s ease-in-out',
-                                '& fieldset': {
-                                  borderColor: 'divider',
-                                },
-                                '&:hover': {
-                                  bgcolor: 'action.hover',
-                                  '& fieldset': {
-                                    borderColor: 'primary.light',
-                                  },
-                                },
-                                '&.Mui-focused': {
-                                  bgcolor: 'background.paper',
-                                  boxShadow:
-                                    '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                                  '& fieldset': {
-                                    borderColor: 'primary.main',
-                                    borderWidth: '1px',
-                                  },
-                                },
-                              },
-                              '& .MuiInputBase-input': {
-                                fontSize: '0.875rem',
-                              },
-                            }}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <SearchIcon
-                                    sx={{
-                                      color: 'text.secondary',
-                                      fontSize: 20,
-                                    }}
-                                  />
-                                </InputAdornment>
-                              ),
-                              endAdornment: mateRecruitingGroupSearchTerm && (
-                                <InputAdornment position="end">
-                                  <ClearIcon
-                                    sx={{
-                                      color: 'text.secondary',
-                                      fontSize: 20,
-                                      cursor: 'pointer',
-                                      '&:hover': { color: 'text.primary' },
-                                    }}
-                                    onClick={() => {
-                                      setMateRecruitingGroupSearchTerm('');
-                                      setMateRecruitingGroupPage(0);
-                                    }}
-                                  />
-                                </InputAdornment>
-                              ),
-                            }}
-                            size="small"
                           />
                           <Box
                             sx={{
@@ -3195,72 +2839,13 @@ const PlanningDataPage: React.FC = () => {
                             label={`${t('planningData.count')}: ${oceanNpcAreaSpawnerData?.items?.length || 0}`}
                             size="small"
                           />
-                          <TextField
+                          <SearchTextField
                             placeholder={t('planningData.search')}
                             value={oceanNpcAreaSpawnerSearchTerm}
-                            onChange={(e) => {
-                              setOceanNpcAreaSpawnerSearchTerm(e.target.value);
+                            onChange={(value) => {
+                              setOceanNpcAreaSpawnerSearchTerm(value);
                               setOceanNpcAreaSpawnerPage(0);
                             }}
-                            sx={{
-                              width: '30%',
-                              '& .MuiOutlinedInput-root': {
-                                height: '40px',
-                                borderRadius: '20px',
-                                bgcolor: 'background.paper',
-                                transition: 'all 0.2s ease-in-out',
-                                '& fieldset': {
-                                  borderColor: 'divider',
-                                },
-                                '&:hover': {
-                                  bgcolor: 'action.hover',
-                                  '& fieldset': {
-                                    borderColor: 'primary.light',
-                                  },
-                                },
-                                '&.Mui-focused': {
-                                  bgcolor: 'background.paper',
-                                  boxShadow:
-                                    '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                                  '& fieldset': {
-                                    borderColor: 'primary.main',
-                                    borderWidth: '1px',
-                                  },
-                                },
-                              },
-                              '& .MuiInputBase-input': {
-                                fontSize: '0.875rem',
-                              },
-                            }}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <SearchIcon
-                                    sx={{
-                                      color: 'text.secondary',
-                                      fontSize: 20,
-                                    }}
-                                  />
-                                </InputAdornment>
-                              ),
-                              endAdornment: oceanNpcAreaSpawnerSearchTerm && (
-                                <InputAdornment position="end">
-                                  <ClearIcon
-                                    sx={{
-                                      color: 'text.secondary',
-                                      fontSize: 20,
-                                      cursor: 'pointer',
-                                      '&:hover': { color: 'text.primary' },
-                                    }}
-                                    onClick={() => {
-                                      setOceanNpcAreaSpawnerSearchTerm('');
-                                      setOceanNpcAreaSpawnerPage(0);
-                                    }}
-                                  />
-                                </InputAdornment>
-                              ),
-                            }}
-                            size="small"
                           />
                           <Box
                             sx={{

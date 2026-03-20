@@ -1300,7 +1300,6 @@ const GatrixEdgesPage: React.FC = () => {
               value={jsonSearchQuery}
               onChange={setJsonSearchQuery}
               placeholder="Find..."
-              sx={{ minWidth: 240 }}
             />
             {jsonSearchMatches.length > 0 && (
               <Box
@@ -1396,23 +1395,14 @@ const GatrixEdgesPage: React.FC = () => {
           {/* Spacer */}
           <Stack direction="row" spacing={1.5}>
             <Button
-              variant="outlined"
               startIcon={<CopyIcon />}
               onClick={handleCopyJson}
-              sx={{
-                borderRadius: 0,
-                textTransform: 'none',
-              }}
             >
               {t('common.copy')}
             </Button>
             <Button
               variant="contained"
               onClick={() => setJsonDialogOpen(false)}
-              sx={{
-                borderRadius: 0,
-                textTransform: 'none',
-              }}
             >
               {t('common.close')}
             </Button>

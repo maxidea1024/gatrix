@@ -101,7 +101,7 @@ export interface EvaluationContext {
   userId?: string;
   /** Unique identifier for the current session. Used by gradualRolloutSessionId and flexibleRollout (stickiness) strategies. */
   sessionId?: string;
-  /** Application name. Used as a fallback groupId for percentage-based strategies. */
+  /** Application name. */
   appName?: string;
   /** Application version string. Typically used with semver constraint operators. */
   appVersion?: string;

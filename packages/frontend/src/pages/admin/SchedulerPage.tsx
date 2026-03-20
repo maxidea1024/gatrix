@@ -845,7 +845,7 @@ const SchedulerPage: React.FC = () => {
             </Button>
 
             <Button variant="contained" onClick={handleSave} disabled={saving}>
-              {saving ? t('common.saving') : t('common.save')}
+              {saving ? t('common.saving') : editingEvent ? t('common.update') : t('common.save')}
             </Button>
           </Stack>
         </DialogActions>

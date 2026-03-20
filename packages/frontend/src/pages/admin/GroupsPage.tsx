@@ -509,7 +509,6 @@ const GroupsPage: React.FC = () => {
           placeholder={t('rbac.groups.searchPlaceholder')}
           value={searchTerm}
           onChange={(value) => setSearchTerm(value)}
-          sx={{ width: 300 }}
         />
       </Box>
 
@@ -754,7 +753,7 @@ const GroupsPage: React.FC = () => {
             onClick={handleSave}
             disabled={saving || !formData.groupName.trim() || !isEditDirty}
           >
-            {saving ? <CircularProgress size={20} /> : t('common.save')}
+            {saving ? <CircularProgress size={20} /> : dialogMode === 'edit' ? t('common.update') : t('common.save')}
           </Button>
         </Box>
       </ResizableDrawer>
@@ -1056,7 +1055,7 @@ const GroupsPage: React.FC = () => {
             onClick={handleSaveDetail}
             disabled={saving || !hasDetailChanges}
           >
-            {saving ? <CircularProgress size={20} /> : t('common.save')}
+            {saving ? <CircularProgress size={20} /> : t('common.update')}
           </Button>
         </Box>
       </ResizableDrawer>

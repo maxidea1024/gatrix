@@ -170,7 +170,7 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
           variant="contained"
           disabled={!name.trim()}
         >
-          {endpoint ? t('common.save') : t('common.create')}
+          {endpoint ? t('common.update') : t('common.create')}
         </Button>
       </Box>
     </ResizableDrawer>
