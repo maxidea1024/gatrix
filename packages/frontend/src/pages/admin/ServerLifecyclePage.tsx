@@ -52,8 +52,6 @@ import ColumnSettingsDialog, {
 } from '../../components/common/ColumnSettingsDialog';
 import PageContentLoader from '@/components/common/PageContentLoader';
 
-
-
 // Event row component
 interface EventRowProps {
   event: ServerLifecycleEvent;
@@ -882,16 +880,10 @@ const ServerLifecyclePage: React.FC = () => {
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
     useState<HTMLButtonElement | null>(null);
 
-  const handleColumnsChange = useCallback(
-    (newColumns: ColumnConfig[]) => {
-      setColumns(newColumns);
-      localStorage.setItem(
-        'serverLifecycleColumns',
-        JSON.stringify(newColumns)
-      );
-    },
-    []
-  );
+  const handleColumnsChange = useCallback((newColumns: ColumnConfig[]) => {
+    setColumns(newColumns);
+    localStorage.setItem('serverLifecycleColumns', JSON.stringify(newColumns));
+  }, []);
 
   const handleResetColumns = useCallback(() => {
     setColumns(defaultColumns);

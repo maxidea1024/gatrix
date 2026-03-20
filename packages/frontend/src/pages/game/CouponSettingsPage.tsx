@@ -25,7 +25,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-
   Tooltip,
   TableSortLabel,
   FormControlLabel,
@@ -48,7 +47,6 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   Add as AddIcon,
-
   ViewColumn as ViewColumnIcon,
   List as ListIcon,
   ContentCopy as ContentCopyIcon,

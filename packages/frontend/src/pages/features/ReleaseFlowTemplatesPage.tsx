@@ -41,7 +41,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-
   ViewColumn as ViewColumnIcon,
   LibraryAdd as TemplateIcon,
   Refresh as RefreshIcon,

@@ -2694,10 +2694,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                       );
                     }
                     // Non-string field types: display without quotes
-                    if (
-                      fieldType === 'number' ||
-                      fieldType === 'boolean'
-                    ) {
+                    if (fieldType === 'number' || fieldType === 'boolean') {
                       return String(value);
                     }
                     if (typeof value === 'string') {
@@ -2785,7 +2782,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             <Typography
                               variant="caption"
                               fontWeight={600}
-                              sx={{ width: 60, textAlign: 'center', flexShrink: 0 }}
+                              sx={{
+                                width: 60,
+                                textAlign: 'center',
+                                flexShrink: 0,
+                              }}
                             >
                               {t('playground.referenced')}
                             </Typography>
@@ -2905,14 +2906,22 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             <Typography
                               variant="caption"
                               fontWeight={600}
-                              sx={{ width: 60, textAlign: 'center', flexShrink: 0 }}
+                              sx={{
+                                width: 60,
+                                textAlign: 'center',
+                                flexShrink: 0,
+                              }}
                             >
                               {t('featureFlags.validation.isRequired')}
                             </Typography>
                             <Typography
                               variant="caption"
                               fontWeight={600}
-                              sx={{ width: 60, textAlign: 'center', flexShrink: 0 }}
+                              sx={{
+                                width: 60,
+                                textAlign: 'center',
+                                flexShrink: 0,
+                              }}
                             >
                               {t('common.status')}
                             </Typography>
@@ -3928,70 +3937,78 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                   component="table"
                                                                   sx={{
                                                                     mt: 0.5,
-                                                                    borderCollapse: 'collapse',
-                                                                    width: 'auto',
+                                                                    borderCollapse:
+                                                                      'collapse',
+                                                                    width:
+                                                                      'auto',
                                                                     fontSize:
                                                                       '0.7rem',
                                                                     fontFamily:
                                                                       'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
                                                                     '& td': {
-                                                                      border: '1px solid',
-                                                                      borderColor: 'divider',
+                                                                      border:
+                                                                        '1px solid',
+                                                                      borderColor:
+                                                                        'divider',
                                                                       px: 1,
                                                                       py: 0.3,
                                                                     },
                                                                   }}
                                                                 >
                                                                   <tbody>
-                                                                  {Object.entries(
-                                                                    check.details as Record<
-                                                                      string,
-                                                                      unknown
-                                                                    >
-                                                                  ).map(
-                                                                    ([
-                                                                      key,
-                                                                      val,
-                                                                    ]) => (
-                                                                      <tr
-                                                                        key={
-                                                                          key
-                                                                        }
+                                                                    {Object.entries(
+                                                                      check.details as Record<
+                                                                        string,
+                                                                        unknown
                                                                       >
-                                                                        <Box
-                                                                          component="td"
-                                                                          sx={{
-                                                                            color:
-                                                                              'text.secondary',
-                                                                            fontWeight: 600,
-                                                                            whiteSpace: 'nowrap',
-                                                                            bgcolor: 'action.hover',
-                                                                          }}
+                                                                    ).map(
+                                                                      ([
+                                                                        key,
+                                                                        val,
+                                                                      ]) => (
+                                                                        <tr
+                                                                          key={
+                                                                            key
+                                                                          }
                                                                         >
-                                                                          {key}
-                                                                        </Box>
-                                                                        <Box
-                                                                          component="td"
-                                                                          sx={{
-                                                                            color:
-                                                                              'text.primary',
-                                                                            wordBreak:
-                                                                              'break-all',
-                                                                          }}
-                                                                        >
-                                                                          {typeof val ===
-                                                                          'object'
-                                                                            ? JSON.stringify(
-                                                                                val
-                                                                              )
-                                                                            : String(
-                                                                                val ??
-                                                                                  ''
-                                                                              )}
-                                                                        </Box>
-                                                                      </tr>
-                                                                    )
-                                                                  )}
+                                                                          <Box
+                                                                            component="td"
+                                                                            sx={{
+                                                                              color:
+                                                                                'text.secondary',
+                                                                              fontWeight: 600,
+                                                                              whiteSpace:
+                                                                                'nowrap',
+                                                                              bgcolor:
+                                                                                'action.hover',
+                                                                            }}
+                                                                          >
+                                                                            {
+                                                                              key
+                                                                            }
+                                                                          </Box>
+                                                                          <Box
+                                                                            component="td"
+                                                                            sx={{
+                                                                              color:
+                                                                                'text.primary',
+                                                                              wordBreak:
+                                                                                'break-all',
+                                                                            }}
+                                                                          >
+                                                                            {typeof val ===
+                                                                            'object'
+                                                                              ? JSON.stringify(
+                                                                                  val
+                                                                                )
+                                                                              : String(
+                                                                                  val ??
+                                                                                    ''
+                                                                                )}
+                                                                          </Box>
+                                                                        </tr>
+                                                                      )
+                                                                    )}
                                                                   </tbody>
                                                                 </Box>
                                                               )}

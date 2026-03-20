@@ -817,7 +817,13 @@ const RolesPage: React.FC = () => {
             onClick={handleSave}
             disabled={saving || !formData.roleName.trim() || !isEditDirty}
           >
-            {saving ? <CircularProgress size={20} /> : dialogMode === 'edit' ? t('common.update') : t('common.save')}
+            {saving ? (
+              <CircularProgress size={20} />
+            ) : dialogMode === 'edit' ? (
+              t('common.update')
+            ) : (
+              t('common.save')
+            )}
           </Button>
         </Box>
       </ResizableDrawer>

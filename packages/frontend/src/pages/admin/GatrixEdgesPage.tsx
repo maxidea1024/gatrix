@@ -1394,10 +1394,7 @@ const GatrixEdgesPage: React.FC = () => {
           <Box />
           {/* Spacer */}
           <Stack direction="row" spacing={1.5}>
-            <Button
-              startIcon={<CopyIcon />}
-              onClick={handleCopyJson}
-            >
+            <Button startIcon={<CopyIcon />} onClick={handleCopyJson}>
               {t('common.copy')}
             </Button>
             <Button

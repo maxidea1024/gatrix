@@ -25,7 +25,6 @@ import {
   TextField,
   Alert,
   Divider,
-
   TableSortLabel,
 } from '@mui/material';
 import {
@@ -37,7 +36,6 @@ import {
   Computer as WebIcon,
   Terminal as CliIcon,
   Delete as DeleteIcon,
-
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';

@@ -16,7 +16,6 @@ import {
   IconButton,
   Chip,
   TextField,
-
   Tooltip,
   Card,
   CardContent,
@@ -33,7 +32,6 @@ import {
 } from '@mui/material';
 import {
   Add as AddIcon,
-
   People as SegmentIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,

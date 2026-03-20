@@ -42,7 +42,6 @@ import {
   Checkbox,
   Alert,
   Autocomplete,
-
   Popover,
   List,
   ListItem,
@@ -78,7 +77,6 @@ import {
   Refresh as RefreshIcon,
   LocalOffer as LocalOfferIcon,
   ContentCopy as ContentCopyIcon,
-
   TextFields as TextFieldsIcon,
   ViewColumn as ViewColumnIcon,
   DragIndicator as DragIndicatorIcon,

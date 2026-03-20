@@ -537,9 +537,7 @@ export const CreateIntegrationPage: React.FC = () => {
             )
           }
         >
-          {activeStep === STEPS.length - 1
-            ? t('common.add')
-            : t('common.next')}
+          {activeStep === STEPS.length - 1 ? t('common.add') : t('common.next')}
         </Button>
       </Box>
     </Box>

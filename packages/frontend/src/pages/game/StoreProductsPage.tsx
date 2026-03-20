@@ -19,7 +19,6 @@ import {
   TableRow,
   IconButton,
   Chip,
-
   Tooltip,
   Checkbox,
   Card,
@@ -37,7 +36,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-
   ViewColumn as ViewColumnIcon,
   Storefront as StorefrontIcon,
   ContentCopy as ContentCopyIcon,

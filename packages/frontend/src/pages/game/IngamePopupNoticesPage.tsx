@@ -15,7 +15,6 @@ import {
   TableRow,
   IconButton,
   Chip,
-
   Tooltip,
   Checkbox,
   Dialog,
@@ -33,7 +32,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-
   Notifications as NotificationsIcon,
   ViewColumn as ViewColumnIcon,
   Close as CloseIcon,

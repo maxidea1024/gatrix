@@ -1510,7 +1510,11 @@ const FeatureFlagDetailPage: React.FC = () => {
       id: `new-${Date.now()}`,
       name: 'flexibleRollout',
       title: '',
-      parameters: { rollout: 0, stickiness: 'default', groupId: flag?.flagName || '' },
+      parameters: {
+        rollout: 0,
+        stickiness: 'default',
+        groupId: flag?.flagName || '',
+      },
       constraints: [],
       segments: [],
       sortOrder: envStrategyList.length,
@@ -3844,7 +3848,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                           JSON.stringify(originalFlag?.validationRules))
                     }
                   >
-                    {saving ? <CircularProgress size={20} /> : t('common.update')}
+                    {saving ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      t('common.update')
+                    )}
                   </Button>
                 </Box>
               )}
@@ -4479,10 +4487,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                             <TextField
                               fullWidth
                               size="small"
-                              value={
-                                editingStrategy.parameters?.groupId ||
-                                ''
-                              }
+                              value={editingStrategy.parameters?.groupId || ''}
                               placeholder={flag?.flagName || ''}
                               onChange={(e) =>
                                 setEditingStrategy({

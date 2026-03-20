@@ -32,7 +32,6 @@ import {
   ListItemText,
   ListItemIcon,
   ClickAwayListener,
-
   Select,
   MenuItem,
   InputLabel,
@@ -70,7 +69,6 @@ import {
   Security as SecurityIcon,
   ViewColumn as ViewColumnIcon,
   DragIndicator as DragIndicatorIcon,
-
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';

@@ -753,7 +753,13 @@ const GroupsPage: React.FC = () => {
             onClick={handleSave}
             disabled={saving || !formData.groupName.trim() || !isEditDirty}
           >
-            {saving ? <CircularProgress size={20} /> : dialogMode === 'edit' ? t('common.update') : t('common.save')}
+            {saving ? (
+              <CircularProgress size={20} />
+            ) : dialogMode === 'edit' ? (
+              t('common.update')
+            ) : (
+              t('common.save')
+            )}
           </Button>
         </Box>
       </ResizableDrawer>

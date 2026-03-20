@@ -654,7 +654,9 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                         <TableRow hover>
                           <TableCell
                             style={{ paddingBottom: 0, paddingTop: 0 }}
-                            colSpan={columns.filter((c) => c.visible).length + 1}
+                            colSpan={
+                              columns.filter((c) => c.visible).length + 1
+                            }
                           >
                             <Collapse
                               in={expandedRowId === log.id}
@@ -847,7 +849,8 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                                     color: 'text.secondary',
                                                   }}
                                                 >
-                                                  {log.resourceType} #{log.resourceId}
+                                                  {log.resourceType} #
+                                                  {log.resourceId}
                                                 </Typography>
                                               </>
                                             );
@@ -1196,7 +1199,9 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
                                       justifyContent: 'flex-end',
                                     }}
                                   >
-                                    <Tooltip title={t('common.copyToClipboard')}>
+                                    <Tooltip
+                                      title={t('common.copyToClipboard')}
+                                    >
                                       <IconButton
                                         size="small"
                                         onClick={(e) => {
