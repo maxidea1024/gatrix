@@ -116,6 +116,19 @@ class AIChatService {
     });
     return response.data.models;
   }
+
+  /**
+   * Suggest names using AI
+   */
+  async suggestNames(params: {
+    type: string;
+    description: string;
+    context?: Record<string, string>;
+    count?: number;
+  }): Promise<string[]> {
+    const response = await api.post('/admin/ai/suggest-names', params);
+    return response.data.names || [];
+  }
 }
 
 export default new AIChatService();

@@ -8,6 +8,7 @@ import { Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { asyncHandler } from '../middleware/error-handler';
 import { AIChatService } from '../services/ai/ai-chat-service';
+import { AISuggestService } from '../services/ai/ai-suggest-service';
 import { AISettingsService } from '../services/ai/ai-settings-service';
 import { permissionService } from '../services/permission-service';
 import { createLogger } from '../config/logger';
@@ -287,6 +288,64 @@ export class AIChatController {
         success: true,
         data: { models },
       });
+    }
+  );
+
+  /**
+   * Suggest names using AI
+   * POST /api/v1/admin/ai/suggest-names
+   */
+  static suggestNames = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const orgId = req.user?.orgId;
+
+      if (!orgId) {
+        res.status(401).json({ success: false, message: 'Unauthorized' });
+        return;
+      }
+
+      const { type, description, context, count } = req.body;
+
+      if (!type || typeof type !== 'string') {
+        res
+          .status(400)
+          .json({ success: false, message: 'type is required' });
+        return;
+      }
+
+      if (!description || typeof description !== 'string' || description.trim().length < 5) {
+        res
+          .status(400)
+          .json({ success: false, message: 'description is required (min 5 chars)' });
+        return;
+      }
+
+      try {
+        const result = await AISuggestService.suggestNames(String(orgId), {
+          type,
+          description: description.trim(),
+          context,
+          count,
+        });
+
+        res.json({
+          success: true,
+          data: result,
+        });
+      } catch (error: any) {
+        if (error.message === 'AI_NOT_CONFIGURED') {
+          res.status(400).json({
+            success: false,
+            message: 'AI is not configured or disabled',
+          });
+          return;
+        }
+        logger.error('Failed to suggest names', { error: error.message });
+        res.status(500).json({
+          success: false,
+          message: 'Failed to generate name suggestions',
+        });
+      }
     }
   );
 }

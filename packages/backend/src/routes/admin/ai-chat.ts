@@ -25,6 +25,9 @@ router.delete('/chats/:chatId', AIChatController.deleteChat);
 // Status check - accessible to all authenticated users
 router.get('/status', AIChatController.getStatus);
 
+// AI name suggestions - accessible to all authenticated users
+router.post('/suggest-names', AIChatController.suggestNames);
+
 // Settings - requires system settings permission
 router.get(
   '/settings',

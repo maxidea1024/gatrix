@@ -134,6 +134,7 @@ import {
 import draftService from '../../services/draftService';
 import DraftBanner from '../../components/common/DraftBanner';
 import DraftChangesDialog from '../../components/common/DraftChangesDialog';
+import AISuggestNames from '../../components/common/AISuggestNames';
 
 interface FlagTypeInfo {
   flagType: string;
@@ -187,7 +188,7 @@ const FeatureFlagsPage: React.FC = () => {
   const { hasPermission } = useAuth();
   const canManage = hasPermission([P.FEATURES_UPDATE]);
   const navigate = useNavigate();
-  const { currentProjectId } = useOrgProject();
+  const { currentProjectId, currentProject } = useOrgProject();
   const [searchParams] = useSearchParams();
 
   // Compact view state - query param overrides localStorage
@@ -3417,21 +3418,36 @@ const FeatureFlagsPage: React.FC = () => {
 
             {/* Collapsible Description */}
             {(showCreateDescription || !!newFlag.description) && (
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                label={t('featureFlags.description')}
-                value={newFlag.description}
-                onChange={(e) =>
-                  setNewFlag({ ...newFlag, description: e.target.value })
-                }
-                helperText={
-                  newFlag.flagType === 'remoteConfig'
-                    ? t('featureFlags.remoteConfigDescriptionHelp')
-                    : t('featureFlags.descriptionHelp')
-                }
-              />
+              <Box>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={3}
+                  label={t('featureFlags.description')}
+                  value={newFlag.description}
+                  onChange={(e) =>
+                    setNewFlag({ ...newFlag, description: e.target.value })
+                  }
+                  helperText={
+                    newFlag.flagType === 'remoteConfig'
+                      ? t('featureFlags.remoteConfigDescriptionHelp')
+                      : t('featureFlags.descriptionHelp')
+                  }
+                />
+                <AISuggestNames
+                  type="feature-flag"
+                  description={newFlag.description}
+                  context={{ flagType: newFlag.flagType }}
+                  prefix={currentProject ? `${currentProject.projectName}-` : undefined}
+                  onSelect={(name) => {
+                    setNewFlag({
+                      ...newFlag,
+                      flagName: name,
+                      displayName: toTitleCase(name),
+                    });
+                  }}
+                />
+              </Box>
             )}
 
             {/* Collapsible Tags */}
