@@ -68,6 +68,8 @@ router.patch(
   auditGameWorldMoveDown as any,
   GameWorldController.moveDown
 );
+// Verify world server address (admin)
+router.post('/check-address', GameWorldController.checkWorldServerAddress);
 router.post('/invalidate-cache', GameWorldController.invalidateCache);
 
 export default router;

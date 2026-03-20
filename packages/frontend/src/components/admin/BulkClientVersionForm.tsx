@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Button,
   TextField,
@@ -23,8 +23,12 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  CircularProgress,
 } from '@mui/material';
-import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import {
+  ExpandMore as ExpandMoreIcon,
+  Circle as CircleIcon,
+} from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -160,6 +164,112 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const [selectedTags, setSelectedTags] = useState<
     { id: number; name: string; color: string; description?: string }[]
   >([]);
+
+  // Health check state per address field
+  type HealthStatus = 'idle' | 'checking' | 'healthy' | 'unhealthy';
+  interface HealthResult {
+    status: HealthStatus;
+    latency?: number;
+    error?: string;
+  }
+  const [healthResults, setHealthResults] = useState<
+    Record<string, HealthResult>
+  >({});
+
+  const handleHealthCheck = useCallback(
+    async (fieldName: string, address: string) => {
+      if (!address?.trim()) return;
+      setHealthResults((prev) => ({
+        ...prev,
+        [fieldName]: { status: 'checking' },
+      }));
+      try {
+        const result = await ClientVersionService.checkAddressHealth(
+          projectApiPath,
+          address
+        );
+        setHealthResults((prev) => ({
+          ...prev,
+          [fieldName]: {
+            status: result.healthy ? 'healthy' : 'unhealthy',
+            latency: result.latency,
+            error: result.error,
+          },
+        }));
+      } catch {
+        setHealthResults((prev) => ({
+          ...prev,
+          [fieldName]: { status: 'unhealthy', error: 'Request failed' },
+        }));
+      }
+    },
+    [projectApiPath]
+  );
+
+  const renderHealthIcon = (
+    fieldName: string,
+    address: string,
+    enabled: boolean
+  ) => {
+    const result = healthResults[fieldName];
+    const isChecking = result?.status === 'checking';
+    const hasAddress = !!address?.trim();
+
+    let color = 'action.disabled';
+    let tooltip = '';
+    if (!enabled) {
+      tooltip = t('clientVersions.addressCheck.notAvailable');
+    } else if (isChecking) {
+      tooltip = t('clientVersions.addressCheck.checking');
+    } else if (result?.status === 'healthy') {
+      color = 'success.main';
+      tooltip = t('clientVersions.addressCheck.healthy', {
+        latency: result.latency ?? 0,
+      });
+    } else if (result?.status === 'unhealthy') {
+      color = 'error.main';
+      tooltip = t('clientVersions.addressCheck.unhealthy', {
+        error: result.error ?? '',
+      });
+    } else {
+      tooltip = t('clientVersions.addressCheck.tooltip');
+    }
+
+    return (
+      <Tooltip title={tooltip}>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            alignSelf: 'flex-start',
+            marginTop: '16px',
+            marginLeft: '4px',
+          }}
+        >
+          <IconButton
+            size="small"
+            disabled={!hasAddress || !enabled || isChecking}
+            onClick={() => handleHealthCheck(fieldName, address)}
+            sx={{
+              p: 0.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 1,
+              width: 28,
+              height: 28,
+            }}
+          >
+            {isChecking ? (
+              <CircularProgress size={12} />
+            ) : (
+              <CircleIcon sx={{ fontSize: 12, color }} />
+            )}
+          </IconButton>
+        </span>
+      </Tooltip>
+    );
+  };
 
   // Maintenance-related state
   const [maintenanceLocales, setMaintenanceLocales] = useState<
@@ -889,135 +999,163 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       </Typography>
 
                       <Stack spacing={2}>
-                        <Controller
-                          name={`platforms.${index}.gameServerAddress`}
-                          control={control}
-                          render={({ field }) => (
-                            <TextField
-                              {...field}
-                              value={field.value || ''}
-                              fullWidth
-                              label={
-                                <Box component="span">
-                                  {t('clientVersions.gameServerAddress')}{' '}
-                                  <Typography component="span" color="error">
-                                    *
-                                  </Typography>
-                                </Box>
-                              }
-                              error={
-                                !!errors.platforms?.[index]?.gameServerAddress
-                              }
-                              helperText={
-                                errors.platforms?.[index]?.gameServerAddress
-                                  ?.message ||
-                                t('clientVersions.form.gameServerAddressHelp')
-                              }
-                              inputProps={{
-                                autoComplete: 'off',
-                                autoCorrect: 'off',
-                                autoCapitalize: 'off',
-                                spellCheck: false,
-                              }}
-                            />
+                        <Box sx={{ display: 'flex' }}>
+                          <Controller
+                            name={`platforms.${index}.gameServerAddress`}
+                            control={control}
+                            render={({ field }) => (
+                              <TextField
+                                {...field}
+                                value={field.value || ''}
+                                fullWidth
+                                label={
+                                  <Box component="span">
+                                    {t('clientVersions.gameServerAddress')}{' '}
+                                    <Typography component="span" color="error">
+                                      *
+                                    </Typography>
+                                  </Box>
+                                }
+                                error={
+                                  !!errors.platforms?.[index]?.gameServerAddress
+                                }
+                                helperText={
+                                  errors.platforms?.[index]?.gameServerAddress
+                                    ?.message ||
+                                  t('clientVersions.form.gameServerAddressHelp')
+                                }
+                                inputProps={{
+                                  autoComplete: 'off',
+                                  autoCorrect: 'off',
+                                  autoCapitalize: 'off',
+                                  spellCheck: false,
+                                }}
+                              />
+                            )}
+                          />
+                          {renderHealthIcon(
+                            `platforms.${index}.gameServerAddress`,
+                            watch(`platforms.${index}.gameServerAddress`) || '',
+                            true
                           )}
-                        />
+                        </Box>
 
-                        <Controller
-                          name={`platforms.${index}.gameServerAddressForWhiteList`}
-                          control={control}
-                          render={({ field }) => (
-                            <TextField
-                              {...field}
-                              value={field.value || ''}
-                              fullWidth
-                              label={t(
-                                'clientVersions.gameServerAddressForWhiteList'
-                              )}
-                              error={
-                                !!errors.platforms?.[index]
-                                  ?.gameServerAddressForWhiteList
-                              }
-                              helperText={
-                                errors.platforms?.[index]
-                                  ?.gameServerAddressForWhiteList?.message ||
-                                t(
-                                  'clientVersions.form.gameServerAddressForWhiteListHelp'
-                                )
-                              }
-                              inputProps={{
-                                autoComplete: 'off',
-                                autoCorrect: 'off',
-                                autoCapitalize: 'off',
-                                spellCheck: false,
-                              }}
-                            />
+                        <Box sx={{ display: 'flex' }}>
+                          <Controller
+                            name={`platforms.${index}.gameServerAddressForWhiteList`}
+                            control={control}
+                            render={({ field }) => (
+                              <TextField
+                                {...field}
+                                value={field.value || ''}
+                                fullWidth
+                                label={t(
+                                  'clientVersions.gameServerAddressForWhiteList'
+                                )}
+                                error={
+                                  !!errors.platforms?.[index]
+                                    ?.gameServerAddressForWhiteList
+                                }
+                                helperText={
+                                  errors.platforms?.[index]
+                                    ?.gameServerAddressForWhiteList?.message ||
+                                  t(
+                                    'clientVersions.form.gameServerAddressForWhiteListHelp'
+                                  )
+                                }
+                                inputProps={{
+                                  autoComplete: 'off',
+                                  autoCorrect: 'off',
+                                  autoCapitalize: 'off',
+                                  spellCheck: false,
+                                }}
+                              />
+                            )}
+                          />
+                          {renderHealthIcon(
+                            `platforms.${index}.gameServerAddressForWhiteList`,
+                            watch(`platforms.${index}.gameServerAddressForWhiteList`) || '',
+                            true
                           )}
-                        />
+                        </Box>
 
-                        <Controller
-                          name={`platforms.${index}.patchAddress`}
-                          control={control}
-                          render={({ field }) => (
-                            <TextField
-                              {...field}
-                              value={field.value || ''}
-                              fullWidth
-                              label={
-                                <Box component="span">
-                                  {t('clientVersions.patchAddress')}{' '}
-                                  <Typography component="span" color="error">
-                                    *
-                                  </Typography>
-                                </Box>
-                              }
-                              error={!!errors.platforms?.[index]?.patchAddress}
-                              helperText={
-                                errors.platforms?.[index]?.patchAddress
-                                  ?.message ||
-                                t('clientVersions.form.patchAddressHelp')
-                              }
-                              inputProps={{
-                                autoComplete: 'off',
-                                autoCorrect: 'off',
-                                autoCapitalize: 'off',
-                                spellCheck: false,
-                              }}
-                            />
+                        <Box sx={{ display: 'flex' }}>
+                          <Controller
+                            name={`platforms.${index}.patchAddress`}
+                            control={control}
+                            render={({ field }) => (
+                              <TextField
+                                {...field}
+                                value={field.value || ''}
+                                fullWidth
+                                label={
+                                  <Box component="span">
+                                    {t('clientVersions.patchAddress')}{' '}
+                                    <Typography component="span" color="error">
+                                      *
+                                    </Typography>
+                                  </Box>
+                                }
+                                error={!!errors.platforms?.[index]?.patchAddress}
+                                helperText={
+                                  errors.platforms?.[index]?.patchAddress
+                                    ?.message ||
+                                  t('clientVersions.form.patchAddressHelp')
+                                }
+                                inputProps={{
+                                  autoComplete: 'off',
+                                  autoCorrect: 'off',
+                                  autoCapitalize: 'off',
+                                  spellCheck: false,
+                                }}
+                              />
+                            )}
+                          />
+                          {renderHealthIcon(
+                            `platforms.${index}.patchAddress`,
+                            watch(`platforms.${index}.patchAddress`) || '',
+                            false
                           )}
-                        />
+                        </Box>
 
-                        <Controller
-                          name={`platforms.${index}.patchAddressForWhiteList`}
-                          control={control}
-                          render={({ field }) => (
-                            <TextField
-                              {...field}
-                              value={field.value || ''}
-                              fullWidth
-                              label={t(
-                                'clientVersions.patchAddressForWhiteList'
-                              )}
-                              error={
-                                !!errors.platforms?.[index]
-                                  ?.patchAddressForWhiteList
-                              }
-                              helperText={
-                                errors.platforms?.[index]
-                                  ?.patchAddressForWhiteList?.message ||
-                                t(
-                                  'clientVersions.form.patchAddressForWhiteListHelp'
-                                )
-                              }
-                              inputProps={{
-                                autoComplete: 'off',
-                                autoCorrect: 'off',
-                                autoCapitalize: 'off',
-                                spellCheck: false,
-                              }}
-                            />
+                        <Box sx={{ display: 'flex' }}>
+                          <Controller
+                            name={`platforms.${index}.patchAddressForWhiteList`}
+                            control={control}
+                            render={({ field }) => (
+                              <TextField
+                                {...field}
+                                value={field.value || ''}
+                                fullWidth
+                                label={t(
+                                  'clientVersions.patchAddressForWhiteList'
+                                )}
+                                error={
+                                  !!errors.platforms?.[index]
+                                    ?.patchAddressForWhiteList
+                                }
+                                helperText={
+                                  errors.platforms?.[index]
+                                    ?.patchAddressForWhiteList?.message ||
+                                  t(
+                                    'clientVersions.form.patchAddressForWhiteListHelp'
+                                  )
+                                }
+                                inputProps={{
+                                  autoComplete: 'off',
+                                  autoCorrect: 'off',
+                                  autoCapitalize: 'off',
+                                  spellCheck: false,
+                                }}
+                              />
+                            )}
+                          />
+                          {renderHealthIcon(
+                            `platforms.${index}.patchAddressForWhiteList`,
+                            watch(`platforms.${index}.patchAddressForWhiteList`) || '',
+                            false
                           )}
-                        />
+                        </Box>
                       </Stack>
                     </Paper>
                   ))}

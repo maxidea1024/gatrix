@@ -14,11 +14,14 @@ import {
   Tab,
   Button,
   Stack,
+  IconButton,
+  CircularProgress,
 } from '@mui/material';
 import {
   Download as DownloadIcon,
   Upload as UploadIcon,
   ContentCopy as CopyIcon,
+  Circle as CircleIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -34,6 +37,8 @@ import Json5Editor from '@/components/common/Json5Editor';
 import { MessageTemplate } from '@/services/messageTemplateService';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { getContrastColor } from '@/utils/colorUtils';
+import { gameWorldService } from '@/services/gameWorldService';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 export interface GameWorldFormProps {
   editingWorld: GameWorld | null;
@@ -111,6 +116,117 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
   const defaultWorldIdRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const refToUse = worldIdRef || defaultWorldIdRef;
+
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
+
+  // Address check state
+  type AddressCheckStatus = 'idle' | 'checking' | 'success' | 'error';
+  const [addressCheckStatus, setAddressCheckStatus] =
+    useState<AddressCheckStatus>('idle');
+  const [addressCheckResult, setAddressCheckResult] = useState<{
+    worldId?: string;
+    matched?: boolean;
+    error?: string;
+  }>({});
+
+  const handleAddressCheck = async () => {
+    const address = formData.worldServerAddress;
+    if (!address?.trim()) return;
+
+    setAddressCheckStatus('checking');
+    try {
+      const result = await gameWorldService.checkWorldServerAddress(
+        projectApiPath,
+        address,
+        formData.worldId || undefined
+      );
+      if (result.reachable) {
+        setAddressCheckStatus('success');
+        setAddressCheckResult({
+          worldId: result.worldId,
+          matched: result.matched,
+        });
+      } else {
+        setAddressCheckStatus('error');
+        setAddressCheckResult({ error: result.error });
+      }
+    } catch {
+      setAddressCheckStatus('error');
+      setAddressCheckResult({ error: 'Request failed' });
+    }
+  };
+
+  const renderAddressCheckIcon = () => {
+    const isChecking = addressCheckStatus === 'checking';
+    const hasAddress = !!formData.worldServerAddress?.trim();
+
+    let color = 'action.disabled';
+    let tooltip = '';
+    if (isChecking) {
+      tooltip = t('gameWorlds.addressCheck.checking');
+    } else if (addressCheckStatus === 'success') {
+      if (addressCheckResult.matched === true) {
+        color = 'success.main';
+        tooltip = t('gameWorlds.addressCheck.matched', {
+          worldId: addressCheckResult.worldId ?? '',
+        });
+      } else if (addressCheckResult.matched === false) {
+        color = 'warning.main';
+        tooltip = t('gameWorlds.addressCheck.mismatch', {
+          expected: formData.worldId,
+          actual: addressCheckResult.worldId ?? '',
+        });
+      } else {
+        color = 'success.main';
+        tooltip = t('gameWorlds.addressCheck.reachable', {
+          worldId: addressCheckResult.worldId ?? '',
+        });
+      }
+    } else if (addressCheckStatus === 'error') {
+      color = 'error.main';
+      tooltip = t('gameWorlds.addressCheck.unreachable', {
+        error: addressCheckResult.error ?? '',
+      });
+    } else {
+      tooltip = t('gameWorlds.addressCheck.tooltip');
+    }
+
+    return (
+      <Tooltip title={tooltip}>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            alignSelf: 'flex-start',
+            marginTop: '16px',
+            marginLeft: '4px',
+          }}
+        >
+          <IconButton
+            size="small"
+            disabled={!hasAddress || isChecking}
+            onClick={handleAddressCheck}
+            sx={{
+              p: 0.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 1,
+              width: 28,
+              height: 28,
+            }}
+          >
+            {isChecking ? (
+              <CircularProgress size={12} />
+            ) : (
+              <CircleIcon sx={{ fontSize: 12, color }} />
+            )}
+          </IconButton>
+        </span>
+      </Tooltip>
+    );
+  };
 
   // Export settings to file (JSON5 format)
   const handleExportSettings = () => {
@@ -268,7 +384,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
             </Box>
 
             {/* World Server Address */}
-            <Box>
+            <Box sx={{ display: 'flex' }}>
               <TextField
                 fullWidth
                 label={t('gameWorlds.worldServerAddress')}
@@ -286,6 +402,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                   t('gameWorlds.form.worldServerAddressHelp')
                 }
               />
+              {renderAddressCheckIcon()}
             </Box>
 
             {/* Tags */}

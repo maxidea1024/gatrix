@@ -24,7 +24,7 @@ const createGameWorldSchema = Joi.object({
   isMaintenance: Joi.boolean().optional(),
   displayOrder: Joi.number().integer().optional(),
   description: Joi.string().max(1000).optional().allow(''),
-  // 점검 관련 필드
+  // Maintenance-related fields
   maintenanceStartDate: Joi.string()
     .isoDate()
     .optional()
@@ -85,7 +85,7 @@ const updateGameWorldSchema = Joi.object({
   isMaintenance: Joi.boolean().optional(),
   displayOrder: Joi.number().integer().optional(),
   description: Joi.string().max(1000).optional().allow(''),
-  // 점검 관련 필드
+  // Maintenance-related fields
   maintenanceStartDate: Joi.string()
     .isoDate()
     .optional()
@@ -226,13 +226,13 @@ export class GameWorldController {
           const operator = tagsOperator || 'include_all';
 
           if (operator === 'any_of') {
-            // OR 조건: 선택한 태그 중 하나라도 가진 게임월드 반환
+            // OR condition: return game worlds that have at least one of the selected tags
             withTags = withTags.filter((w: any) => {
               const ids = (w.tags || []).map((t: any) => Number(t.id));
               return requiredIds.some((rid) => ids.includes(rid));
             });
           } else {
-            // AND 조건: 선택한 모든 태그를 가진 게임월드만 반환
+            // AND condition: return only game worlds that have all selected tags
             withTags = withTags.filter((w: any) => {
               const ids = (w.tags || []).map((t: any) => Number(t.id));
               return requiredIds.every((rid) => ids.includes(rid));
@@ -931,6 +931,96 @@ export class GameWorldController {
         success: true,
         message: 'Game worlds cache invalidated successfully',
       });
+    }
+  );
+
+  // Verify world server address by calling lobbyd /info endpoint
+  // The worldServerAddress stores the TCP socket port (e.g., 127.0.0.1:10100).
+  // The HTTP API port is TCP port + 100 (e.g., 127.0.0.1:10200).
+  static checkWorldServerAddress = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { address, expectedWorldId } = req.body;
+
+      if (!address) {
+        throw new GatrixError('address is required', 400);
+      }
+
+      // Parse the address to extract host and port
+      let host: string;
+      let tcpPort: number;
+
+      // Remove protocol prefix if present
+      const cleanAddress = address.replace(/^https?:\/\//, '');
+
+      const parts = cleanAddress.split(':');
+      if (parts.length === 2) {
+        host = parts[0];
+        tcpPort = parseInt(parts[1], 10);
+        if (isNaN(tcpPort)) {
+          throw new GatrixError('Invalid port number in address', 400);
+        }
+      } else if (parts.length === 1) {
+        // No port specified - cannot derive HTTP API port
+        throw new GatrixError(
+          'Port is required in the address (e.g., host:port)',
+          400
+        );
+      } else {
+        throw new GatrixError('Invalid address format', 400);
+      }
+
+      // Derive HTTP API port: TCP port + 100
+      const httpApiPort = tcpPort + 100;
+      const infoUrl = `http://${host}:${httpApiPort}/info`;
+
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+
+        const response = await fetch(infoUrl, {
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+
+        if (!response.ok) {
+          res.json({
+            success: true,
+            data: {
+              reachable: false,
+              error: `HTTP ${response.status}`,
+            },
+          });
+          return;
+        }
+
+        const info: any = await response.json();
+
+        const result: any = {
+          reachable: true,
+          worldId: info.worldId,
+          service: info.service,
+          matched:
+            expectedWorldId && info.worldId
+              ? info.worldId === expectedWorldId
+              : undefined,
+        };
+
+        res.json({
+          success: true,
+          data: result,
+        });
+      } catch (err: any) {
+        const errorMessage =
+          err.name === 'AbortError' ? 'Connection timed out' : err.message;
+
+        res.json({
+          success: true,
+          data: {
+            reachable: false,
+            error: errorMessage,
+          },
+        });
+      }
     }
   );
 }

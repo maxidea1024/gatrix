@@ -5,43 +5,44 @@ import { auditLog } from '../../middleware/audit-log';
 
 const router = Router();
 
-// 모든 ?�우?�에 ?�증 미들?�어 ?�용
+// Apply authentication middleware to all routes
 router.use((req, res, next) => {
   authenticate(req as any, res, next);
 });
 
-// 메�??�이???�우??(/:id보다 먼�? ?�의?�야 ??
-// ?�랫??Get list (관리자�?
+// Meta routes (must be defined before /:id)
+// Get platform list (admin)
 router.get(
   '/meta/platforms' as any,
   ClientVersionController.getPlatforms as any
 );
 
-// ?�용 가?�한 버전 Get list (관리자�?
+// Get available version list (admin)
 router.get(
   '/meta/versions' as any,
   ClientVersionController.getAvailableVersions as any
 );
 
-// ?�라?�언??버전 Get list (관리자�?
+// Get client version list (admin)
 router.get('/' as any, ClientVersionController.getClientVersions as any);
 
-// ?�라?�언??버전 ?�보?�기 (관리자�?
+// Export client versions (admin)
 router.get(
   '/export' as any,
   ClientVersionController.exportClientVersions as any
 );
 
-// ?�괄 ?�태 변�?(관리자�?
+
+// Bulk status update (admin)
 router.patch(
   '/bulk-status' as any,
   ClientVersionController.bulkUpdateStatus as any
 );
 
-// ?�라?�언??버전 ?�세 조회 (관리자�?
+// Get client version detail (admin)
 router.get('/:id' as any, ClientVersionController.getClientVersionById as any);
 
-// ?�라?�언??버전 ?�성 (관리자�?
+// Create client version (admin)
 router.post(
   '/' as any,
   auditLog({
@@ -55,7 +56,7 @@ router.post(
   ClientVersionController.createClientVersion as any
 );
 
-// ?�라?�언??버전 간편 ?�성 (관리자�?
+// Bulk create client versions (admin)
 router.post(
   '/bulk' as any,
   auditLog({
@@ -69,7 +70,7 @@ router.post(
   ClientVersionController.bulkCreateClientVersions as any
 );
 
-// ?�라?�언??버전 ?�정 (관리자�?
+// Update client version (admin)
 router.put(
   '/:id' as any,
   auditLog({
@@ -83,7 +84,7 @@ router.put(
   ClientVersionController.updateClientVersion as any
 );
 
-// ?�라?�언??버전 ??�� (관리자�?
+// Delete client version (admin)
 router.delete(
   '/:id' as any,
   auditLog({
@@ -96,7 +97,7 @@ router.delete(
   ClientVersionController.deleteClientVersion as any
 );
 
-// ?�그 관???�우??(관리자�?
+// Tag routes (admin)
 router.get('/:id/tags' as any, ClientVersionController.getTags as any);
 router.put('/:id/tags' as any, ClientVersionController.setTags as any);
 
