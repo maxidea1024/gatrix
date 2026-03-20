@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+import { ulid } from 'ulid';
 import { diff as deepDiff, Diff } from 'deep-diff';
 import { GatrixError } from '../middleware/error-handler';
 import { createLogger } from '../config/logger';
@@ -916,7 +917,9 @@ export class PlanningDataService {
       );
 
       // Save upload record to database
+      const newId = ulid();
       const [uploadRecordId] = await db('g_planning_data_uploads').insert({
+        id: newId,
         environmentId,
         uploadHash,
         filesUploaded: JSON.stringify(uploadedFiles),

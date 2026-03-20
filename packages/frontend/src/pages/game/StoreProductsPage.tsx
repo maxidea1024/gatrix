@@ -129,6 +129,12 @@ const StoreProductsPage: React.FC = () => {
     useState<null | HTMLElement>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
+  // Row action menu state
+  const [rowMenuAnchor, setRowMenuAnchor] = useState<HTMLElement | null>(null);
+  const [rowMenuProduct, setRowMenuProduct] = useState<StoreProduct | null>(
+    null
+  );
+
   // Sync state
   const [syncDialogOpen, setSyncDialogOpen] = useState(false);
   const [syncPreview, setSyncPreview] = useState<SyncPreviewResult | null>(
@@ -1469,43 +1475,15 @@ const StoreProductsPage: React.FC = () => {
                             if (!canManage) return null;
                             return (
                               <TableCell key={column.id} align="center">
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    gap: 0.5,
-                                    justifyContent: 'center',
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => {
+                                    setRowMenuAnchor(e.currentTarget);
+                                    setRowMenuProduct(product);
                                   }}
                                 >
-                                  <Tooltip title={t('common.edit')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleEdit(product)}
-                                    >
-                                      <EditIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                  <Tooltip
-                                    title={t('storeProducts.copyProduct')}
-                                  >
-                                    <span>
-                                      <IconButton
-                                        size="small"
-                                        onClick={() => handleCopy(product)}
-                                        disabled
-                                      >
-                                        <ContentCopyIcon fontSize="small" />
-                                      </IconButton>
-                                    </span>
-                                  </Tooltip>
-                                  <Tooltip title={t('common.delete')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleDelete(product)}
-                                    >
-                                      <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Box>
+                                  <MoreVertIcon fontSize="small" />
+                                </IconButton>
                               </TableCell>
                             );
                           }
@@ -1532,6 +1510,55 @@ const StoreProductsPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Row Action Menu */}
+      <Menu
+        anchorEl={rowMenuAnchor}
+        open={Boolean(rowMenuAnchor)}
+        onClose={() => {
+          setRowMenuAnchor(null);
+          setRowMenuProduct(null);
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (rowMenuProduct) handleEdit(rowMenuProduct);
+            setRowMenuAnchor(null);
+            setRowMenuProduct(null);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled
+          onClick={() => {
+            if (rowMenuProduct) handleCopy(rowMenuProduct);
+            setRowMenuAnchor(null);
+            setRowMenuProduct(null);
+          }}
+        >
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('storeProducts.copyProduct')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (rowMenuProduct) handleDelete(rowMenuProduct);
+            setRowMenuAnchor(null);
+            setRowMenuProduct(null);
+          }}
+          sx={{ color: 'error.main' }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog

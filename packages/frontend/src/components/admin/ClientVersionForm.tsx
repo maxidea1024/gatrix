@@ -1283,7 +1283,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         <FormControlLabel
                           control={
                             <Switch
-                              checked={field.value}
+                              checked={Boolean(field.value)}
                               onChange={field.onChange}
                             />
                           }

@@ -737,7 +737,11 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
             >
               {saving
                 ? t('common.saving')
-                : getActionLabel('save', requiresApproval, t)}
+                : getActionLabel(
+                    isEditMode ? 'update' : 'create',
+                    requiresApproval,
+                    t
+                  )}
             </Button>
           </Box>
         </Box>
