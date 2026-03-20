@@ -845,8 +845,15 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           value={isEditing ? (value ?? '') : (globalValue ?? '')}
           onChange={(e) =>
             isActuallyEditable &&
-            updateValue(e.target.value === '' ? 0 : Number(e.target.value))
+            updateValue(e.target.value === '' ? '' : Number(e.target.value))
           }
+          onBlur={() => {
+            if (!isActuallyEditable) return;
+            const cur = field === 'enabledValue' ? editingEnabledValue : editingDisabledValue;
+            if (cur === '' || cur === undefined || cur === null) {
+              updateValue(0);
+            }
+          }}
           disabled={!isActuallyEditable}
           sx={{
             ...viewOnlyStyle,
@@ -1172,10 +1179,15 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                               updateVariant(index, {
                                 value:
                                   e.target.value === ''
-                                    ? 0
+                                    ? ''
                                     : Number(e.target.value),
                               })
                             }
+                            onBlur={(e) => {
+                              if (e.target.value === '') {
+                                updateVariant(index, { value: 0 });
+                              }
+                            }}
                             disabled={!canManage || isArchived}
                             InputProps={{ sx: { height: 36 } }}
                             sx={{
@@ -1243,7 +1255,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
             {canManage && !isArchived && (
               <Box
-                sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}
+                sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}
               >
                 {flagType !== 'remoteConfig' && variantCount > 0 ? (
                   !(valueType === 'boolean' && variantCount >= 2) ? (
