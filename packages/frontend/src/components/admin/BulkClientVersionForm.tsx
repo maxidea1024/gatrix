@@ -1074,7 +1074,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           />
                           {renderHealthIcon(
                             `platforms.${index}.gameServerAddressForWhiteList`,
-                            watch(`platforms.${index}.gameServerAddressForWhiteList`) || '',
+                            watch(
+                              `platforms.${index}.gameServerAddressForWhiteList`
+                            ) || '',
                             true
                           )}
                         </Box>
@@ -1096,7 +1098,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                                     </Typography>
                                   </Box>
                                 }
-                                error={!!errors.platforms?.[index]?.patchAddress}
+                                error={
+                                  !!errors.platforms?.[index]?.patchAddress
+                                }
                                 helperText={
                                   errors.platforms?.[index]?.patchAddress
                                     ?.message ||
@@ -1152,7 +1156,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           />
                           {renderHealthIcon(
                             `platforms.${index}.patchAddressForWhiteList`,
-                            watch(`platforms.${index}.patchAddressForWhiteList`) || '',
+                            watch(
+                              `platforms.${index}.patchAddressForWhiteList`
+                            ) || '',
                             false
                           )}
                         </Box>

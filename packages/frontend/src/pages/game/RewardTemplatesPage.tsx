@@ -606,11 +606,11 @@ const RewardTemplatesPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<GiftIcon />}
-        title={t('rewardTemplates.title')}
-        subtitle={t('rewardTemplates.subtitle')}
-      />
+        <PageHeader
+          icon={<GiftIcon />}
+          title={t('rewardTemplates.title')}
+          subtitle={t('rewardTemplates.subtitle')}
+        />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <Button

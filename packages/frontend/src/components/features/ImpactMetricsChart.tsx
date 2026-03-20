@@ -1087,10 +1087,7 @@ const ChartConfigDialog: React.FC<{
                           {option}
                         </Typography>
                         {metric?.help && (
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                          >
+                          <Typography variant="caption" color="text.secondary">
                             {metric.help} ({metric.type})
                           </Typography>
                         )}
@@ -1154,9 +1151,9 @@ const ChartConfigDialog: React.FC<{
                   <Select
                     value={chartType}
                     label={t('impactMetrics.chartType')}
-                    onChange={(
-                      e: SelectChangeEvent<'line' | 'area' | 'bar'>
-                    ) => setChartType(e.target.value as any)}
+                    onChange={(e: SelectChangeEvent<'line' | 'area' | 'bar'>) =>
+                      setChartType(e.target.value as any)
+                    }
                   >
                     <MenuItem value="line">
                       {t('impactMetrics.chartType.line')}

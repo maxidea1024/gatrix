@@ -772,11 +772,11 @@ const PlanningDataPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<StorageIcon />}
-        title={t('planningData.title')}
-        subtitle={t('planningData.subtitle')}
-      />
+        <PageHeader
+          icon={<StorageIcon />}
+          title={t('planningData.title')}
+          subtitle={t('planningData.subtitle')}
+        />
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
             variant="outlined"

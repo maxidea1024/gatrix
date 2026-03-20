@@ -399,11 +399,11 @@ const BannerManagementPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<ImageIcon />}
-        title={t('banners.title')}
-        subtitle={t('banners.subtitle')}
-      />
+        <PageHeader
+          icon={<ImageIcon />}
+          title={t('banners.title')}
+          subtitle={t('banners.subtitle')}
+        />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <Button

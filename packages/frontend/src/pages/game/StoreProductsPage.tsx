@@ -782,11 +782,11 @@ const StoreProductsPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<StorefrontIcon />}
-        title={t('storeProducts.title')}
-        subtitle={t('storeProducts.subtitle')}
-      />
+        <PageHeader
+          icon={<StorefrontIcon />}
+          title={t('storeProducts.title')}
+          subtitle={t('storeProducts.subtitle')}
+        />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <>

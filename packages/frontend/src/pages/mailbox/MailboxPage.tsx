@@ -551,10 +551,7 @@ const MailboxPage: React.FC = () => {
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
           <MailIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-      <PageHeader
-        icon={<CreateIcon />}
-        title={t('mailbox.title')}
-      />
+          <PageHeader icon={<CreateIcon />} title={t('mailbox.title')} />
           <Button
             variant="contained"
             startIcon={<CreateIcon />}

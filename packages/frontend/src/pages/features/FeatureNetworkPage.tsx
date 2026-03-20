@@ -903,7 +903,10 @@ const FeatureNetworkPage: React.FC = () => {
         actions={
           <Tooltip title={t('common.refresh')}>
             <span>
-              <IconButton onClick={fetchData} disabled={loading || isRefreshing}>
+              <IconButton
+                onClick={fetchData}
+                disabled={loading || isRefreshing}
+              >
                 <RefreshIcon
                   sx={{
                     animation: isRefreshing

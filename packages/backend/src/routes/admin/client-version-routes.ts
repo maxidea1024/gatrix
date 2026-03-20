@@ -32,7 +32,6 @@ router.get(
   ClientVersionController.exportClientVersions as any
 );
 
-
 // Bulk status update (admin)
 router.patch(
   '/bulk-status' as any,

@@ -566,11 +566,11 @@ const WhitelistPage: React.FC = () => {
       {/* Main Card with Tabs */}
       <Card>
         <CardContent>
-      <PageHeader
-        icon={<SecurityIcon />}
-        title={t('whitelist.title')}
-        subtitle={t('whitelist.subtitle')}
-      />
+          <PageHeader
+            icon={<SecurityIcon />}
+            title={t('whitelist.title')}
+            subtitle={t('whitelist.subtitle')}
+          />
 
           <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 3 }}>
             <Tab label={t('whitelist.tabs.account')} />

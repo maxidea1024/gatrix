@@ -193,11 +193,11 @@ const PlanningDataHistoryPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<HistoryIcon />}
-        title={t('planningData.history.title')}
-        subtitle={t('planningData.history.subtitle')}
-      />
+        <PageHeader
+          icon={<HistoryIcon />}
+          title={t('planningData.history.title')}
+          subtitle={t('planningData.history.subtitle')}
+        />
         {canManage && history.length > 0 && (
           <Button
             variant="contained"

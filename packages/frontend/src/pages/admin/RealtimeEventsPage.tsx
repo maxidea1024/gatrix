@@ -858,100 +858,101 @@ const RealtimeEventsPage: React.FC = () => {
           flexShrink: 0,
         }}
       >
-      <PageHeader
-        icon={<TimelineIcon />}
-        title={t('realtimeEvents.title')}
-        subtitle={t('realtimeEvents.subtitle')}
-        actions={
-
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            {/* Auto-refresh indicator with circular progress */}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                px: 2,
-                py: 0.5,
-                borderRadius: 2,
-                bgcolor: autoRefresh
-                  ? alpha(theme.palette.success.main, 0.1)
-                  : alpha(theme.palette.grey[500], 0.1),
-                border: 1,
-                borderColor: autoRefresh ? 'success.main' : 'divider',
-              }}
-            >
-              {/* Circular progress indicator */}
+        <PageHeader
+          icon={<TimelineIcon />}
+          title={t('realtimeEvents.title')}
+          subtitle={t('realtimeEvents.subtitle')}
+          actions={
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              {/* Auto-refresh indicator with circular progress */}
               <Box
                 sx={{
-                  position: 'relative',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  gap: 1,
+                  px: 2,
+                  py: 0.5,
+                  borderRadius: 2,
+                  bgcolor: autoRefresh
+                    ? alpha(theme.palette.success.main, 0.1)
+                    : alpha(theme.palette.grey[500], 0.1),
+                  border: 1,
+                  borderColor: autoRefresh ? 'success.main' : 'divider',
                 }}
               >
-                {autoRefresh ? (
-                  <>
-                    {/* Background circle */}
-                    <CircularProgress
-                      variant="determinate"
-                      value={100}
-                      size={16}
-                      thickness={6}
+                {/* Circular progress indicator */}
+                <Box
+                  sx={{
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {autoRefresh ? (
+                    <>
+                      {/* Background circle */}
+                      <CircularProgress
+                        variant="determinate"
+                        value={100}
+                        size={16}
+                        thickness={6}
+                        sx={{
+                          color: alpha(theme.palette.success.main, 0.2),
+                          position: 'absolute',
+                        }}
+                      />
+                      {/* Progress circle */}
+                      <CircularProgress
+                        variant="determinate"
+                        value={refreshProgress}
+                        size={16}
+                        thickness={6}
+                        sx={{
+                          color: 'success.main',
+                          '& .MuiCircularProgress-circle': {
+                            strokeLinecap: 'round',
+                            // Disable transition to prevent reverse animation when resetting to 0
+                            transition: 'none',
+                          },
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <DotIcon
                       sx={{
-                        color: alpha(theme.palette.success.main, 0.2),
-                        position: 'absolute',
+                        fontSize: 16,
+                        color: 'grey.500',
                       }}
                     />
-                    {/* Progress circle */}
-                    <CircularProgress
-                      variant="determinate"
-                      value={refreshProgress}
-                      size={16}
-                      thickness={6}
-                      sx={{
-                        color: 'success.main',
-                        '& .MuiCircularProgress-circle': {
-                          strokeLinecap: 'round',
-                          // Disable transition to prevent reverse animation when resetting to 0
-                          transition: 'none',
-                        },
-                      }}
-                    />
-                  </>
-                ) : (
-                  <DotIcon
-                    sx={{
-                      fontSize: 16,
-                      color: 'grey.500',
-                    }}
-                  />
-                )}
+                  )}
+                </Box>
+
+                <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                  {autoRefresh ? 'LIVE' : 'PAUSED'}
+                </Typography>
               </Box>
 
-              <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                {autoRefresh ? 'LIVE' : 'PAUSED'}
-              </Typography>
-            </Box>
-
-            <Tooltip title={autoRefresh ? t('common.pause') : t('common.play')}>
-              <IconButton
-                onClick={() => setAutoRefresh(!autoRefresh)}
-                color={autoRefresh ? 'success' : 'default'}
-                size="small"
+              <Tooltip
+                title={autoRefresh ? t('common.pause') : t('common.play')}
               >
-                {autoRefresh ? <PauseIcon /> : <PlayIcon />}
-              </IconButton>
-            </Tooltip>
+                <IconButton
+                  onClick={() => setAutoRefresh(!autoRefresh)}
+                  color={autoRefresh ? 'success' : 'default'}
+                  size="small"
+                >
+                  {autoRefresh ? <PauseIcon /> : <PlayIcon />}
+                </IconButton>
+              </Tooltip>
 
-            <Tooltip title={t('common.refresh')}>
-              <IconButton onClick={handleManualRefresh} size="small">
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        }
-      />
+              <Tooltip title={t('common.refresh')}>
+                <IconButton onClick={handleManualRefresh} size="small">
+                  <RefreshIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          }
+        />
 
         {/* Filters */}
         <Box sx={{ mt: 2 }}>

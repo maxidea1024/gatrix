@@ -1356,11 +1356,11 @@ const CouponSettingsPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<SettingsIcon />}
-        title={t('coupons.couponSettings.title')}
-        subtitle={t('coupons.couponSettings.subtitle')}
-      />
+        <PageHeader
+          icon={<SettingsIcon />}
+          title={t('coupons.couponSettings.title')}
+          subtitle={t('coupons.couponSettings.subtitle')}
+        />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <Button

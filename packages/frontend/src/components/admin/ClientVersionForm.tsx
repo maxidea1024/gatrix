@@ -1138,7 +1138,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           error={!!errors.patchAddressForWhiteList}
                           helperText={
                             errors.patchAddressForWhiteList?.message ||
-                            t('clientVersions.form.patchAddressForWhiteListHelp')
+                            t(
+                              'clientVersions.form.patchAddressForWhiteListHelp'
+                            )
                           }
                           inputProps={{
                             autoComplete: 'off',

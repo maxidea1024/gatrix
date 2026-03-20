@@ -651,11 +651,11 @@ const ServiceNoticesPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<AnnouncementIcon />}
-        title={t('serviceNotices.title')}
-        subtitle={t('serviceNotices.subtitle')}
-      />
+        <PageHeader
+          icon={<AnnouncementIcon />}
+          title={t('serviceNotices.title')}
+          subtitle={t('serviceNotices.subtitle')}
+        />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <Button

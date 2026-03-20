@@ -1737,7 +1737,9 @@ const ClientVersionsPage: React.FC = () => {
                 <ListItemIcon>
                   <AddIcon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>{t('common.import')} (CSV/JSON/XLSX)</ListItemText>
+                <ListItemText>
+                  {t('common.import')} (CSV/JSON/XLSX)
+                </ListItemText>
               </MenuItem>
               <Divider />
               <MenuItem

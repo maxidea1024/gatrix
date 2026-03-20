@@ -776,11 +776,11 @@ const FeatureContextFieldsPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<ContextIcon />}
-        title={t('featureFlags.contextFields')}
-        subtitle={t('featureFlags.contextFieldsDescription')}
-      />
+        <PageHeader
+          icon={<ContextIcon />}
+          title={t('featureFlags.contextFields')}
+          subtitle={t('featureFlags.contextFieldsDescription')}
+        />
         <Box sx={{ display: 'flex', gap: 1 }}>
           {canManage && (
             <Button

@@ -1687,11 +1687,11 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<TemplateIcon />}
-        title={t('releaseFlow.templatesTitle')}
-        subtitle={t('releaseFlow.templatesSubtitle')}
-      />
+        <PageHeader
+          icon={<TemplateIcon />}
+          title={t('releaseFlow.templatesTitle')}
+          subtitle={t('releaseFlow.templatesSubtitle')}
+        />
         {canManage && (
           <Button
             variant="contained"

@@ -520,11 +520,11 @@ const CouponUsagePage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<HistoryIcon />}
-        title={t('coupons.couponUsage.title')}
-        subtitle={t('coupons.couponUsage.subtitle')}
-      />
+        <PageHeader
+          icon={<HistoryIcon />}
+          title={t('coupons.couponUsage.title')}
+          subtitle={t('coupons.couponUsage.subtitle')}
+        />
         <Box>
           <Button
             variant="outlined"

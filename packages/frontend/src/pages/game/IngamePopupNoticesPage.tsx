@@ -487,11 +487,11 @@ const IngamePopupNoticesPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<NotificationsIcon />}
-        title={t('ingamePopupNotices.title')}
-        subtitle={t('ingamePopupNotices.subtitle')}
-      />
+        <PageHeader
+          icon={<NotificationsIcon />}
+          title={t('ingamePopupNotices.title')}
+          subtitle={t('ingamePopupNotices.subtitle')}
+        />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <Button

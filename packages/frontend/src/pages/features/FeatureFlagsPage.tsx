@@ -1699,11 +1699,11 @@ const FeatureFlagsPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<FlagIcon />}
-        title={t('featureFlags.title')}
-        subtitle={t('featureFlags.subtitle')}
-      />
+        <PageHeader
+          icon={<FlagIcon />}
+          title={t('featureFlags.title')}
+          subtitle={t('featureFlags.subtitle')}
+        />
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {canManage && (
             <>

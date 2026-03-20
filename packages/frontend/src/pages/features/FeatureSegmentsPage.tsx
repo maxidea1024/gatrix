@@ -565,11 +565,11 @@ const FeatureSegmentsPage: React.FC = () => {
           mb: 3,
         }}
       >
-      <PageHeader
-        icon={<SegmentIcon />}
-        title={t('featureFlags.segments')}
-        subtitle={t('featureFlags.segmentsDescription')}
-      />
+        <PageHeader
+          icon={<SegmentIcon />}
+          title={t('featureFlags.segments')}
+          subtitle={t('featureFlags.segmentsDescription')}
+        />
         <Box sx={{ display: 'flex', gap: 1 }}>
           {canManage && (
             <Button
