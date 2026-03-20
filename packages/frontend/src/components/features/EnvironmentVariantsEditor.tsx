@@ -849,7 +849,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           }
           onBlur={() => {
             if (!isActuallyEditable) return;
-            const cur = field === 'enabledValue' ? editingEnabledValue : editingDisabledValue;
+            const cur =
+              field === 'enabledValue'
+                ? editingEnabledValue
+                : editingDisabledValue;
             if (cur === '' || cur === undefined || cur === null) {
               updateValue(0);
             }
@@ -1254,9 +1257,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             </Stack>
 
             {canManage && !isArchived && (
-              <Box
-                sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}
-              >
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                 {flagType !== 'remoteConfig' && variantCount > 0 ? (
                   !(valueType === 'boolean' && variantCount >= 2) ? (
                     <Button
