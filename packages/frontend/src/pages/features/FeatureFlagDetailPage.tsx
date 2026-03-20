@@ -1970,8 +1970,22 @@ const FeatureFlagDetailPage: React.FC = () => {
           type="number"
           value={value ?? ''}
           onChange={(e) => {
-            const val = e.target.value === '' ? 0 : Number(e.target.value);
-            setFlag((prev) => (prev ? { ...prev, [field]: val } : prev));
+            // Allow empty string during typing to avoid stuck-at-0 issue
+            const raw = e.target.value;
+            setFlag((prev) =>
+              prev ? { ...prev, [field]: raw === '' ? '' : Number(raw) } : prev
+            );
+          }}
+          onBlur={() => {
+            // Normalize empty to 0 when leaving the field
+            setFlag((prev) => {
+              if (!prev) return prev;
+              const cur = (prev as any)[field];
+              if (cur === '' || cur === undefined || cur === null) {
+                return { ...prev, [field]: 0 };
+              }
+              return prev;
+            });
           }}
           disabled={!canManage}
         />
@@ -3784,11 +3798,28 @@ const FeatureFlagDetailPage: React.FC = () => {
                       if (!flag) return;
                       try {
                         setSaving(true);
-                        await saveGlobalChangesToDraft({
-                          enabledValue: flag.enabledValue,
-                          disabledValue: flag.disabledValue,
-                          validationRules: flag.validationRules ?? null,
-                        });
+                        // Only include changed values in draft
+                        const updates: Record<string, any> = {};
+                        if (
+                          JSON.stringify(flag.enabledValue) !==
+                          JSON.stringify(originalFlag?.enabledValue)
+                        ) {
+                          updates.enabledValue = flag.enabledValue;
+                        }
+                        if (
+                          JSON.stringify(flag.disabledValue) !==
+                          JSON.stringify(originalFlag?.disabledValue)
+                        ) {
+                          updates.disabledValue = flag.disabledValue;
+                        }
+                        if (
+                          JSON.stringify(flag.validationRules) !==
+                          JSON.stringify(originalFlag?.validationRules)
+                        ) {
+                          updates.validationRules =
+                            flag.validationRules ?? null;
+                        }
+                        await saveGlobalChangesToDraft(updates);
                       } catch (error: any) {
                         enqueueSnackbar(
                           parseApiErrorMessage(error, 'common.saveFailed'),
