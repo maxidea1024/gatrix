@@ -1326,20 +1326,25 @@ const MessageTemplatesPage: React.FC = () => {
               required
               inputRef={nameFieldRef}
             />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={form.isEnabled}
-                  onChange={(e) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      isEnabled: e.target.checked,
-                    }))
-                  }
-                />
-              }
-              label={t('messageTemplates.availability')}
-            />
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={form.isEnabled}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        isEnabled: e.target.checked,
+                      }))
+                    }
+                  />
+                }
+                label={t('messageTemplates.availability')}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 7, mt: -0.5 }}>
+                {t('messageTemplates.availabilityHelp')}
+              </Typography>
+            </Box>
             {/* 다국어 메시지 입력 컴포넌트 */}
             <MultiLanguageMessageInput
               defaultMessage={form.defaultMessage || ''}
@@ -1432,7 +1437,7 @@ const MessageTemplatesPage: React.FC = () => {
                   </Box>
                 ),
               }}
-              helperText="메시지 템플릿에 적용할 태그를 선택하세요"
+              helperText={t('messageTemplates.tagsHelp')}
             >
               {allTags.map((tag) => (
                 <MenuItem key={tag.id} value={tag.id}>
@@ -1441,7 +1446,7 @@ const MessageTemplatesPage: React.FC = () => {
                     size="small"
                     sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
                   />
-                  {tag.description || '설명 없음'}
+                  {tag.description || t('tags.noDescription')}
                 </MenuItem>
               ))}
             </TextField>
