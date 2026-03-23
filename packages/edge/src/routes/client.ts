@@ -713,11 +713,26 @@ router.get(
         count: filteredVersions.length,
       });
 
+      // Transform to client-friendly format (same as /client-version single endpoint)
+      const clientVersions = filteredVersions.map((v: any) => ({
+        platform: v.platform,
+        clientVersion: v.clientVersion,
+        status: v.clientStatus,
+        gameServerAddress: v.gameServerAddress,
+        patchAddress: v.patchAddress,
+        guestModeAllowed: Boolean(v.guestModeAllowed),
+        externalClickLink: v.externalClickLink,
+        tags: Array.isArray(v.tags)
+          ? v.tags.map((t: any) => (typeof t === 'string' ? t : t.name))
+          : [],
+        meta: v.customPayload || {},
+      }));
+
       res.json({
         success: true,
         data: {
-          versions: filteredVersions,
-          total: filteredVersions.length,
+          versions: clientVersions,
+          total: clientVersions.length,
         },
       });
     } catch (error) {
