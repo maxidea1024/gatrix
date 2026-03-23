@@ -6,7 +6,7 @@ import {
   GameWorldListParams,
 } from '../models/game-world';
 import { GatrixError } from '../middleware/error-handler';
-import { ENV_SCOPED, allEnvironmentsPattern } from '../constants/cache-keys';
+import { ENV_SCOPED, allEnvironmentsPattern, withEnvironment, GAME_WORLDS } from '../constants/cache-keys';
 import { createLogger } from '../config/logger';
 import { pubSubService } from './pub-sub-service';
 
@@ -117,6 +117,10 @@ export class GameWorldService {
       await pubSubService.invalidateKey(
         `${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`
       );
+      // Also invalidate client-controller cache (uses withEnvironment format)
+      await pubSubService.invalidateKey(
+        withEnvironment(environmentId, GAME_WORLDS.PUBLIC)
+      );
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent(
@@ -185,6 +189,10 @@ export class GameWorldService {
       await pubSubService.invalidateKey(
         `${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`
       );
+      // Also invalidate client-controller cache (uses withEnvironment format)
+      await pubSubService.invalidateKey(
+        withEnvironment(environmentId, GAME_WORLDS.PUBLIC)
+      );
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent(
@@ -232,6 +240,10 @@ export class GameWorldService {
       );
       await pubSubService.invalidateKey(
         `${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`
+      );
+      // Also invalidate client-controller cache (uses withEnvironment format)
+      await pubSubService.invalidateKey(
+        withEnvironment(environmentId, GAME_WORLDS.PUBLIC)
       );
 
       // Publish event for SDK real-time updates
