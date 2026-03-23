@@ -15,6 +15,7 @@ import { WhitelistService } from './whitelist-service';
 import { IpWhitelistService } from './ip-whitelist-service';
 import { TagService } from './tag-service';
 import { featureFlagService } from './feature-flag-service';
+import { pubSubService } from './pub-sub-service';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('ServiceRegistry');
@@ -224,6 +225,18 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
           id,
           data.tagIds,
           userId
+        );
+        // Re-invalidate SDK cache after tags are set
+        const { ENV_SCOPED } = await import('../constants/cache-keys');
+        await pubSubService.invalidateKey(
+          `${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environmentId}`
+        );
+        await pubSubService.invalidateKey(
+          `${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`
+        );
+        await pubSubService.publishSDKEvent(
+          { type: 'gameworld.updated', data: { id, environmentId } },
+          { environmentId }
         );
       }
       return result;

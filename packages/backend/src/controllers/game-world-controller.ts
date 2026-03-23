@@ -371,6 +371,18 @@ export class GameWorldController {
               tagIds,
               authenticatedUserId
             );
+            // Re-invalidate SDK cache after tags are set (initial invalidation happens before tags)
+            const { ENV_SCOPED } = await import('../constants/cache-keys');
+            await pubSubService.invalidateKey(
+              `${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environmentId}`
+            );
+            await pubSubService.invalidateKey(
+              `${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`
+            );
+            await pubSubService.publishSDKEvent(
+              { type: 'gameworld.updated', data: { id: world.id, environmentId } },
+              { environmentId }
+            );
           }
           const tags = await TagService.listTagsForEntity(
             'game_world',
@@ -486,6 +498,18 @@ export class GameWorldController {
               id,
               processedTagIds,
               authenticatedUserId
+            );
+            // Re-invalidate SDK cache after tags are set (initial invalidation happens before tags)
+            const { ENV_SCOPED } = await import('../constants/cache-keys');
+            await pubSubService.invalidateKey(
+              `${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environmentId}`
+            );
+            await pubSubService.invalidateKey(
+              `${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`
+            );
+            await pubSubService.publishSDKEvent(
+              { type: 'gameworld.updated', data: { id, environmentId } },
+              { environmentId }
             );
           }
           const tags = await TagService.listTagsForEntity('game_world', id);
