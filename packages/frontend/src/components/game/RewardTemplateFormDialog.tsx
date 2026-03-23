@@ -34,6 +34,7 @@ import rewardTemplateService, {
   ParticipationReward,
 } from '../../services/rewardTemplateService';
 import RewardItemSelector, { RewardSelection } from './RewardItemSelector';
+import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '@/utils/colorUtils';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -475,16 +476,21 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
             </Box>
 
             {/* Reward Items */}
-            <Box>
+            <Box
+              sx={{
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1,
+                overflow: 'hidden',
+              }}
+            >
               <Box
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  mb: 1,
                   p: 1,
                   backgroundColor: 'action.hover',
-                  borderRadius: 1,
                   cursor: 'pointer',
                 }}
                 onClick={() => setRewardsExpanded(!rewardsExpanded)}
@@ -498,6 +504,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
                 </IconButton>
               </Box>
               <Collapse in={rewardsExpanded}>
+                <Box sx={{ p: 2 }}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -506,39 +513,50 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
                   {t('rewardTemplates.rewardItemsHelp')}
                 </Typography>
                 <Stack spacing={2}>
-                  {rewardItems.map((reward, index) => (
-                    <Box
-                      key={index}
-                      sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}
-                    >
-                      <Box sx={{ flex: 1 }}>
-                        <RewardItemSelector
-                          value={{
-                            rewardType: reward.rewardType,
-                            itemId: reward.itemId,
-                            quantity: reward.quantity,
-                          }}
-                          onChange={(value) => handleRewardChange(index, value)}
-                        />
-                      </Box>
-                      <IconButton
+                  {rewardItems.length === 0 ? (
+                    <EmptyPlaceholder
+                      message={t('rewardTemplates.noRewardItems')}
+                      onAddClick={handleAddReward}
+                      addButtonLabel={t('rewardTemplates.addReward')}
+                    />
+                  ) : (
+                    <>
+                      {rewardItems.map((reward, index) => (
+                        <Box
+                          key={index}
+                          sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}
+                        >
+                          <Box sx={{ flex: 1 }}>
+                            <RewardItemSelector
+                              value={{
+                                rewardType: reward.rewardType,
+                                itemId: reward.itemId,
+                                quantity: reward.quantity,
+                              }}
+                              onChange={(value) => handleRewardChange(index, value)}
+                            />
+                          </Box>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleRemoveReward(index)}
+                            color="error"
+                            sx={{ mt: 0.5 }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      ))}
+                      <Button
                         size="small"
-                        onClick={() => handleRemoveReward(index)}
-                        color="error"
-                        sx={{ mt: 0.5 }}
+                        onClick={handleAddReward}
+                        variant="outlined"
                       >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  ))}
-                  <Button
-                    size="small"
-                    onClick={handleAddReward}
-                    variant="outlined"
-                  >
-                    {t('rewardTemplates.addReward')}
-                  </Button>
+                        {t('rewardTemplates.addReward')}
+                      </Button>
+                    </>
+                  )}
                 </Stack>
+                </Box>
               </Collapse>
             </Box>
           </Stack>
