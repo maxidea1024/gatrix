@@ -577,6 +577,97 @@ export class ClientController {
   );
 
   /**
+   * Get all client versions (list)
+   * GET /api/v1/client/client-versions
+   *
+   * Query params:
+   * - platform (optional): Filter by platform
+   */
+  static getClientVersions = asyncHandler(
+    async (req: SDKRequest, res: Response) => {
+      const environmentId = req.environmentId!;
+      const { platform } = req.query as { platform?: string };
+
+      // Fetch all client versions for this environment
+      const result = await ClientVersionService.getClientVersions(
+        environmentId,
+        platform ? { platform } : {},
+        { page: 1, limit: 10000, sortBy: 'createdAt', sortOrder: 'DESC' }
+      );
+
+      // Fetch tags for each version and transform to client-friendly format
+      const { TagService } = await import('../services/tag-service');
+      const clientVersions = await Promise.all(
+        result.data.map(async (record) => {
+          // Fetch tags
+          let tagNames: string[] = [];
+          if (record.id) {
+            try {
+              const tags = await TagService.listTagsForEntity(
+                'client_version',
+                record.id
+              );
+              tagNames = tags ? tags.map((tag: any) => tag.name) : [];
+            } catch (error) {
+              logger.warn(
+                `Failed to fetch tags for client version ${record.id}:`,
+                error
+              );
+            }
+          }
+
+          // Parse customPayload
+          let meta: Record<string, any> = {};
+          try {
+            if (record.customPayload) {
+              let parsed =
+                typeof record.customPayload === 'string'
+                  ? JSON.parse(record.customPayload)
+                  : record.customPayload;
+              if (typeof parsed === 'string') {
+                try {
+                  parsed = JSON.parse(parsed);
+                } catch (e) {
+                  // ignore
+                }
+              }
+              if (
+                parsed &&
+                typeof parsed === 'object' &&
+                !Array.isArray(parsed)
+              ) {
+                meta = parsed;
+              }
+            }
+          } catch (error) {
+            logger.warn('Failed to parse customPayload:', error);
+          }
+
+          return {
+            platform: record.platform,
+            clientVersion: record.clientVersion,
+            status: record.clientStatus,
+            gameServerAddress: record.gameServerAddress,
+            patchAddress: record.patchAddress,
+            guestModeAllowed: Boolean(record.guestModeAllowed),
+            externalClickLink: record.externalClickLink,
+            tags: tagNames,
+            meta,
+          };
+        })
+      );
+
+      return res.json({
+        success: true,
+        data: {
+          versions: clientVersions,
+          total: clientVersions.length,
+        },
+      });
+    }
+  );
+
+  /**
    * Get cache statistics (for monitoring)
    * GET /api/v1/client/cache-stats
    */

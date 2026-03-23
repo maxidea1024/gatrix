@@ -33,6 +33,11 @@ const validateRequest = (req: any, res: any, next: any) => {
 router.use(requestLogger);
 
 router.get('/client-version', clientSDKAuth, ClientController.getClientVersion);
+router.get(
+  '/client-versions',
+  clientSDKAuth,
+  ClientController.getClientVersions
+);
 
 router.get('/game-worlds', clientSDKAuth, ClientController.getGameWorlds);
 
