@@ -505,7 +505,9 @@ class ServiceNoticeService {
         id,
         environmentId,
       });
-      throw new Error('Service notice not found or update failed: no rows affected');
+      throw new Error(
+        'Service notice not found or update failed: no rows affected'
+      );
     }
 
     const notice = await this.getServiceNoticeById(id, environmentId);

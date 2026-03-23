@@ -41,7 +41,8 @@ export const serviceNoticeTools: AIToolConfig[] = [
         ...n,
         content:
           n.content && n.content.length > 200
-            ? n.content.substring(0, 200) + '... (truncated, use get_service_notice_by_id for full content)'
+            ? n.content.substring(0, 200) +
+              '... (truncated, use get_service_notice_by_id for full content)'
             : n.content,
       }));
       return { notices, total: result.total };

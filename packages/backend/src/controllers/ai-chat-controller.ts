@@ -316,12 +316,10 @@ export class AIChatController {
         typeof description !== 'string' ||
         description.trim().length < 5
       ) {
-        res
-          .status(400)
-          .json({
-            success: false,
-            message: 'description is required (min 5 chars)',
-          });
+        res.status(400).json({
+          success: false,
+          message: 'description is required (min 5 chars)',
+        });
         return;
       }
 
