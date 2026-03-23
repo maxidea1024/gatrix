@@ -601,6 +601,7 @@ export class ClientVersionModel {
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
           const assignments = tagIds.map((tagId) => ({
+            id: generateULID(),
             entityType: 'client_version',
             entityId: clientVersionId,
             tagId: tagId,

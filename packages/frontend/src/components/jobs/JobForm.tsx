@@ -16,7 +16,6 @@ import {
   Chip,
   FormControlLabel,
   Switch,
-  Autocomplete,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -30,11 +29,12 @@ import {
   UpdateJobData,
   JobSchemaField,
 } from '../../types/job';
-import { Tag, tagService } from '../../services/tagService';
+import { Tag } from '../../services/tagService';
 import { jobService } from '../../services/jobService';
 import DynamicJobDataForm from './DynamicJobDataForm';
 import { getContrastColor } from '@/utils/colorUtils';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import TagSelector from '@/components/common/TagSelector';
 
 interface JobFormProps {
   job?: Job | null;
@@ -71,7 +71,7 @@ const JobForm: React.FC<JobFormProps> = ({
 
   const [selectedJobType, setSelectedJobType] = useState<JobType | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   // Initialize form data
   useEffect(() => {
@@ -107,6 +107,7 @@ const JobForm: React.FC<JobFormProps> = ({
 
       console.log('Setting formData to:', newFormData);
       setFormData(newFormData);
+      setSelectedTags(job.tags || []);
 
       const jobType = jobTypes.find((jt) => jt.id === job.jobTypeId);
       console.log('Found job type:', jobType);
@@ -115,19 +116,6 @@ const JobForm: React.FC<JobFormProps> = ({
       console.log('No job provided, skipping initialization');
     }
   }, [job, jobTypes]);
-
-  // Load available tags
-  useEffect(() => {
-    const loadTags = async () => {
-      try {
-        const tags = await tagService.list(projectApiPath);
-        setAvailableTags(tags);
-      } catch (error) {
-        console.error('Failed to load tags:', error);
-      }
-    };
-    loadTags();
-  }, []);
 
   // Handle job type change
   const handleJobTypeChange = (jobTypeId: string) => {
@@ -330,36 +318,13 @@ const JobForm: React.FC<JobFormProps> = ({
             </Box>
 
             <Box>
-              <Autocomplete
-                multiple
-                options={availableTags}
-                getOptionLabel={(option) => option.name}
-                value={availableTags.filter((tag) =>
-                  formData.tagIds.includes(tag.id)
-                )}
-                onChange={(_, newValue) => {
-                  handleFieldChange(
-                    'tagIds',
-                    newValue.map((tag) => tag.id)
-                  );
+              <TagSelector
+                value={selectedTags}
+                onChange={(tags) => {
+                  setSelectedTags(tags);
+                  handleFieldChange('tagIds', tags.map((tag) => tag.id));
                 }}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => (
-                    <Chip
-                      variant="outlined"
-                      label={option.name}
-                      style={{ backgroundColor: option.color, color: '#fff' }}
-                      {...getTagProps({ index })}
-                    />
-                  ))
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('common.tags')}
-                    placeholder={t('common.selectTags')}
-                  />
-                )}
+                label={t('common.tags')}
               />
             </Box>
 
@@ -492,47 +457,13 @@ const JobForm: React.FC<JobFormProps> = ({
 
         {/* Tags */}
         <Box>
-          <Typography variant="subtitle2" gutterBottom>
-            {t('common.tags')}
-          </Typography>
-          <Autocomplete
-            multiple
-            options={availableTags}
-            getOptionLabel={(option) => option.name}
-            value={availableTags.filter((tag) =>
-              formData.tagIds.includes(tag.id)
-            )}
-            onChange={(_, newValue) => {
-              handleFieldChange(
-                'tagIds',
-                newValue.map((tag) => tag.id)
-              );
+          <TagSelector
+            value={selectedTags}
+            onChange={(tags) => {
+              setSelectedTags(tags);
+              handleFieldChange('tagIds', tags.map((tag) => tag.id));
             }}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => {
-                const { key, ...chipProps } = getTagProps({ index });
-                return (
-                  <Chip
-                    key={option.id}
-                    variant="outlined"
-                    label={option.name}
-                    size="small"
-                    sx={{
-                      bgcolor: option.color,
-                      color: getContrastColor(option.color),
-                    }}
-                    {...chipProps}
-                  />
-                );
-              })
-            }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder={t('common.selectTags')}
-                variant="outlined"
-              />
-            )}
+            label={t('common.tags')}
           />
         </Box>
 

@@ -11,16 +11,15 @@ import {
   Box,
   Typography,
   Alert,
-  Chip,
   Paper,
   Stack,
-  Autocomplete,
-  Tooltip,
+  Chip,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   IconButton,
   CircularProgress,
+  Tooltip,
 } from '@mui/material';
 import {
   FileCopy as CopyIcon,
@@ -46,7 +45,6 @@ import {
   CLIENT_VERSION_VALIDATION,
 } from '../../types/clientVersion';
 import { ClientVersionService } from '../../services/clientVersionService';
-import { tagService } from '../../services/tagService';
 import { PlatformDefaultsService } from '../../services/platformDefaultsService';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import JsonEditor from '../common/JsonEditor';
@@ -55,13 +53,14 @@ import {
   MessageTemplate,
   messageTemplateService,
 } from '../../services/messageTemplateService';
-import { getContrastColor } from '@/utils/colorUtils';
 import { parseApiErrorMessage } from '@/utils/errorUtils';
 import { showChangeRequestCreatedToast } from '@/utils/changeRequestToast';
 import { useNavigate } from 'react-router-dom';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { getActionLabel } from '@/utils/changeRequestToast';
+import TagSelector from '../common/TagSelector';
+import { Tag } from '@/services/tagService';
 
 interface ClientVersionFormProps {
   open: boolean;
@@ -160,12 +159,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const [displayIsCopy, setDisplayIsCopy] = useState<boolean>(!!isCopyMode);
 
   // Tag-related state
-  const [allTags, setAllTags] = useState<
-    { id: number; name: string; color: string; description?: string }[]
-  >([]);
-  const [selectedTags, setSelectedTags] = useState<
-    { id: number; name: string; color: string; description?: string }[]
-  >([]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   // Health check state per address field
   type HealthStatus = 'idle' | 'checking' | 'healthy' | 'unhealthy';
@@ -446,20 +440,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     }
   }, [open, isEdit, isCopyMode, clientVersion, reset]);
 
-  // Load tag list
-  useEffect(() => {
-    if (open) {
-      const loadTags = async () => {
-        try {
-          const tags = await tagService.list(projectApiPath);
-          setAllTags(tags);
-        } catch (error) {
-          console.error('Failed to load tags:', error);
-        }
-      };
-      loadTags();
-    }
-  }, [open]);
+
 
   // Load message templates
   useEffect(() => {
@@ -1263,66 +1244,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 {t('clientVersions.form.tagsHelp')}
               </Typography>
 
-              <Autocomplete
-                multiple
-                options={allTags}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
+              <TagSelector
                 value={selectedTags}
-                onChange={(_, value) => {
+                onChange={(value) => {
                   setSelectedTags(value);
                   setValue('tags', value, { shouldDirty: true });
                 }}
-                slotProps={{
-                  popper: {
-                    placement: 'bottom-start',
-                  },
-                }}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip
-                        key={option.id}
-                        title={option.description || t('tags.noDescription')}
-                        arrow
-                      >
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{
-                            bgcolor: option.color,
-                            color: getContrastColor(option.color),
-                          }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('common.tags')}
-                    helperText={t('clientVersions.form.tagsHelp')}
-                  />
-                )}
-                renderOption={(props, option) => (
-                  <Box component="li" {...props}>
-                    <Chip
-                      label={option.name}
-                      size="small"
-                      sx={{
-                        bgcolor: option.color,
-                        color: getContrastColor(option.color),
-                        mr: 1,
-                      }}
-                    />
-                    {option.description || t('common.noDescription')}
-                  </Box>
-                )}
               />
             </Paper>
 

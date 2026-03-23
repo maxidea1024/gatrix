@@ -13,14 +13,12 @@ import {
   FormControlLabel,
   Checkbox,
   Box,
-  Typography,
-  Chip,
   CircularProgress,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { User, Tag } from '@/types';
-import { tagService } from '@/services/tagService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import TagSelector from '../common/TagSelector';
 
 interface UserFormProps {
   open: boolean;
@@ -49,9 +47,7 @@ const UserForm: React.FC<UserFormProps> = ({
 }) => {
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
-  const [allTags, setAllTags] = useState<Tag[]>([]);
-  const [selectedTags, setSelectedTags] = useState<number[]>([]);
-  const [tagsLoading, setTagsLoading] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   const {
     control,
@@ -70,12 +66,7 @@ const UserForm: React.FC<UserFormProps> = ({
     },
   });
 
-  // Tag load
-  useEffect(() => {
-    if (open) {
-      loadTags();
-    }
-  }, [open]);
+
 
   // User data to form initialization
   useEffect(() => {
@@ -88,7 +79,7 @@ const UserForm: React.FC<UserFormProps> = ({
         emailVerified: user.emailVerified,
         tags: user.tags?.map((tag) => tag.id) || [],
       });
-      setSelectedTags(user.tags?.map((tag) => tag.id) || []);
+      setSelectedTags(user.tags || []);
     } else {
       reset({
         name: '',
@@ -103,30 +94,10 @@ const UserForm: React.FC<UserFormProps> = ({
     }
   }, [user, reset]);
 
-  const loadTags = async () => {
-    try {
-      setTagsLoading(true);
-      const tags = await tagService.list(projectApiPath);
-      setAllTags(tags);
-    } catch (error) {
-      console.error('Failed to load tags:', error);
-    } finally {
-      setTagsLoading(false);
-    }
-  };
-
-  const handleTagToggle = (tagId: number) => {
-    setSelectedTags((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId]
-    );
-  };
-
   const handleFormSubmit = async (data: UserFormData) => {
     const formData = {
       ...data,
-      tags: selectedTags,
+      tags: selectedTags.map((tag) => tag.id),
     };
     await onSubmit(formData);
   };
@@ -252,49 +223,10 @@ const UserForm: React.FC<UserFormProps> = ({
             />
 
             {/* Tags */}
-            <Box>
-              <Typography variant="subtitle2" gutterBottom>
-                Tags
-              </Typography>
-              {tagsLoading ? (
-                <CircularProgress size={20} />
-              ) : (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {allTags.map((tag) => (
-                    <Chip
-                      key={tag.id}
-                      label={tag.name}
-                      onClick={() => handleTagToggle(tag.id)}
-                      color={
-                        selectedTags.includes(tag.id) ? 'primary' : 'default'
-                      }
-                      variant={
-                        selectedTags.includes(tag.id) ? 'filled' : 'outlined'
-                      }
-                      sx={{
-                        backgroundColor: selectedTags.includes(tag.id)
-                          ? tag.color
-                          : 'transparent',
-                        borderColor: tag.color,
-                        color: selectedTags.includes(tag.id)
-                          ? 'white'
-                          : tag.color,
-                        '&:hover': {
-                          backgroundColor: selectedTags.includes(tag.id)
-                            ? tag.color
-                            : `${tag.color}20`,
-                        },
-                      }}
-                    />
-                  ))}
-                  {allTags.length === 0 && (
-                    <Typography variant="body2" color="text.secondary">
-                      No tags available
-                    </Typography>
-                  )}
-                </Box>
-              )}
-            </Box>
+            <TagSelector
+              value={selectedTags}
+              onChange={setSelectedTags}
+            />
           </Box>
         </DialogContent>
         <DialogActions>

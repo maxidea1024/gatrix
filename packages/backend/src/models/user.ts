@@ -452,6 +452,7 @@ export class UserModel {
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
           const assignments = tagIds.map((tagId) => ({
+            id: generateULID(),
             tagId,
             entityType: 'user',
             entityId: userId,
@@ -477,6 +478,7 @@ export class UserModel {
   ): Promise<void> {
     try {
       await db('g_tag_assignments').insert({
+        id: generateULID(),
         tagId,
         entityType: 'user',
         entityId: userId,

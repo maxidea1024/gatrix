@@ -4,16 +4,12 @@ import {
   TextField,
   Box,
   Typography,
-  Chip,
   Stack,
-  Autocomplete,
-  Tooltip,
   FormControlLabel,
   Switch,
   MenuItem,
   Select,
   FormControl,
-  CircularProgress,
   Alert,
   AlertTitle,
 } from '@mui/material';
@@ -25,17 +21,17 @@ import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import storeProductService, {
   StoreProduct,
 } from '../../services/storeProductService';
-import { tagService, Tag } from '../../services/tagService';
+import { Tag } from '../../services/tagService';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
-import { getContrastColor } from '@/utils/colorUtils';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { getActionLabel } from '../../utils/changeRequestToast';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
 import { useEntityLock } from '../../hooks/useEntityLock';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import TagSelector from '../common/TagSelector';
 
 interface StoreProductFormDrawerProps {
   open: boolean;
@@ -91,9 +87,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   const [descriptionEn, setDescriptionEn] = useState('');
   const [descriptionZh, setDescriptionZh] = useState('');
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [saving, setSaving] = useState(false);
-  const [loadingTags, setLoadingTags] = useState(false);
   const [isCopy, setIsCopy] = useState(false);
 
   const { handleApiError, ErrorDialog } = useHandleApiError();
@@ -110,24 +104,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   // Check if this is edit mode (existing product)
   const isEditMode = !!product?.id;
 
-  // Load available tags
-  useEffect(() => {
-    const loadTags = async () => {
-      try {
-        setLoadingTags(true);
-        const tags = await tagService.list(projectApiPath);
-        setAvailableTags(tags);
-      } catch (error) {
-        console.error('Failed to load tags:', error);
-      } finally {
-        setLoadingTags(false);
-      }
-    };
 
-    if (open) {
-      loadTags();
-    }
-  }, [open]);
 
   // Initialize form
   useEffect(() => {
@@ -153,17 +130,13 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
       setDescriptionEn(product.descriptionEn || '');
       setDescriptionZh(product.descriptionZh || '');
 
-      // Convert tags to Tag objects
+      // Set tags from product
       if (product.tags && Array.isArray(product.tags)) {
-        const selectedTagObjects = availableTags.filter((tag) =>
-          product.tags?.some((t) => {
-            if (typeof t === 'object' && t !== null && 'id' in t) {
-              return t.id === tag.id;
-            }
-            return false;
-          })
+        setSelectedTags(
+          product.tags.filter(
+            (t): t is Tag => typeof t === 'object' && t !== null && 'id' in t
+          )
         );
-        setSelectedTags(selectedTagObjects);
       } else {
         setSelectedTags([]);
       }
@@ -194,7 +167,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
         nameInputRef.current?.focus();
       }, 100);
     }
-  }, [product, open, availableTags]);
+  }, [product, open]);
 
   // Check if form is dirty (data changed)
   const isDirty = useMemo(() => {
@@ -670,48 +643,10 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
               </Box>
 
               {/* Tags */}
-              <Box>
-                <Autocomplete
-                  multiple
-                  options={availableTags.filter(
-                    (tag) => typeof tag !== 'string'
-                  )}
-                  getOptionLabel={(option) => option.name}
-                  filterSelectedOptions
-                  isOptionEqualToValue={(option, value) =>
-                    option.id === value.id
-                  }
-                  value={selectedTags}
-                  onChange={(_, value) => setSelectedTags(value)}
-                  loading={loadingTags}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => {
-                      const { key, ...chipProps } = getTagProps({ index });
-                      return (
-                        <Tooltip
-                          key={option.id}
-                          title={option.description || t('tags.noDescription')}
-                          arrow
-                        >
-                          <Chip
-                            variant="outlined"
-                            label={option.name}
-                            size="small"
-                            sx={{
-                              bgcolor: option.color,
-                              color: getContrastColor(option.color),
-                            }}
-                            {...chipProps}
-                          />
-                        </Tooltip>
-                      );
-                    })
-                  }
-                  renderInput={(params) => (
-                    <TextField {...params} label={t('storeProducts.tags')} />
-                  )}
-                />
-              </Box>
+              <TagSelector
+                value={selectedTags}
+                onChange={setSelectedTags}
+              />
             </Stack>
           </Box>
 

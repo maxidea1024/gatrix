@@ -408,6 +408,7 @@ export class MessageTemplateModel {
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
           const assignments = tagIds.map((tagId) => ({
+            id: generateULID(),
             entityType: 'message_template',
             entityId: templateId,
             tagId: tagId,

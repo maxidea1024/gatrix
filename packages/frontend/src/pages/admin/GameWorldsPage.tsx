@@ -2076,7 +2076,6 @@ const GameWorldsPage: React.FC = () => {
             formData={formData}
             onFormDataChange={setFormData}
             formErrors={formErrors}
-            allRegistryTags={allRegistryTags}
             formTags={formTags}
             onFormTagsChange={setFormTags}
             maintenanceLocales={maintenanceLocales}

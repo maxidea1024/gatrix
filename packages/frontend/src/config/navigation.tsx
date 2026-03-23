@@ -572,12 +572,6 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.SYSTEM_SETTINGS_READ,
       },
       {
-        text: 'tags.title',
-        icon: 'Label',
-        path: '/settings/tags',
-        requiredPermission: P.TAGS_READ,
-      },
-      {
         text: 'sidebar.dataManagement',
         icon: 'CloudSync',
         path: '/admin/data-management',

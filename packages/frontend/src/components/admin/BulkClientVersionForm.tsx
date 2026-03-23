@@ -18,7 +18,6 @@ import {
   Paper,
   Stack,
   Divider,
-  Autocomplete,
   IconButton,
   Accordion,
   AccordionSummary,
@@ -43,7 +42,6 @@ import {
 } from '../../types/clientVersion';
 import { ClientVersionService } from '../../services/clientVersionService';
 import FormDialogHeader from '../common/FormDialogHeader';
-import { tagService } from '../../services/tagService';
 import { PlatformDefaultsService } from '../../services/platformDefaultsService';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
@@ -52,10 +50,11 @@ import {
   messageTemplateService,
 } from '../../services/messageTemplateService';
 import ResizableDrawer from '../common/ResizableDrawer';
-import { getContrastColor } from '@/utils/colorUtils';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { getActionLabel } from '../../utils/changeRequestToast';
+import TagSelector from '../common/TagSelector';
+import { Tag } from '@/services/tagService';
 
 // Client status label mapping
 const ClientStatusLabels = {
@@ -158,12 +157,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
 
   // Tag-related state
-  const [allTags, setAllTags] = useState<
-    { id: number; name: string; color: string; description?: string }[]
-  >([]);
-  const [selectedTags, setSelectedTags] = useState<
-    { id: number; name: string; color: string; description?: string }[]
-  >([]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   // Health check state per address field
   type HealthStatus = 'idle' | 'checking' | 'healthy' | 'unhealthy';
@@ -323,18 +317,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     }
   }, [open, reset]);
 
-  // Load tag list and message templates
+  // Load message templates
   useEffect(() => {
     if (open) {
-      const loadTags = async () => {
-        try {
-          const tags = await tagService.list(projectApiPath);
-          setAllTags(tags);
-        } catch (error) {
-          console.error('Failed to load tags:', error);
-        }
-      };
-
       const loadTemplates = async () => {
         try {
           const result = await messageTemplateService.list(projectApiPath, {
@@ -347,7 +332,6 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         }
       };
 
-      loadTags();
       loadTemplates();
     }
   }, [open]);
@@ -779,71 +763,11 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 {t('clientVersions.form.tagsHelp')}
               </Typography>
 
-              <Autocomplete
-                multiple
-                options={allTags}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
+              <TagSelector
                 value={selectedTags}
-                onChange={(_, value) => {
+                onChange={(value) => {
                   setSelectedTags(value);
                   setValue('tags', value);
-                }}
-                slotProps={{
-                  popper: {
-                    style: {
-                      zIndex: 99999,
-                    },
-                    placement: 'bottom-start',
-                  },
-                }}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip
-                        key={option.id}
-                        title={option.description || t('tags.noDescription')}
-                        arrow
-                      >
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{
-                            bgcolor: option.color,
-                            color: getContrastColor(option.color),
-                          }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('common.tags')}
-                    helperText={t('clientVersions.form.bulkTagsHelp')}
-                  />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...restProps } = props;
-                  return (
-                    <Box key={option.id} component="li" {...restProps}>
-                      <Chip
-                        label={option.name}
-                        size="small"
-                        sx={{
-                          bgcolor: option.color,
-                          color: getContrastColor(option.color),
-                          mr: 1,
-                        }}
-                      />
-                      {option.description || t('common.noDescription')}
-                    </Box>
-                  );
                 }}
               />
             </Paper>

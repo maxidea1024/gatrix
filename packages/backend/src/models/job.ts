@@ -294,6 +294,7 @@ export class JobModel {
       // 태그 연결
       if (jobData.tagIds && jobData.tagIds.length > 0) {
         const tagAssignments = jobData.tagIds.map((tagId) => ({
+          id: generateULID(),
           entityType: 'job',
           entityId: id,
           tagId: tagId,
@@ -350,6 +351,7 @@ export class JobModel {
         // 새 태그 연결 추가
         if (jobData.tagIds.length > 0) {
           const tagAssignments = jobData.tagIds.map((tagId) => ({
+            id: generateULID(),
             entityType: 'job',
             entityId: id,
             tagId: tagId,
@@ -408,6 +410,7 @@ export class JobModel {
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
           const assignments = tagIds.map((tagId) => ({
+            id: generateULID(),
             entityType: 'job',
             entityId: jobId,
             tagId: tagId,

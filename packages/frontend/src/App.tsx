@@ -88,7 +88,7 @@ const LandingPage = React.lazy(() => import('./pages/LandingPage'));
 // Pages - User
 const ProfilePage = React.lazy(() => import('./pages/user/ProfilePage'));
 const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
-const TagsPage = React.lazy(() => import('./pages/settings/TagsPage'));
+
 const SystemSettingsPage = React.lazy(
   () => import('./pages/settings/SystemSettingsPage')
 );
@@ -639,16 +639,7 @@ const AppContent: React.FC = () => {
                                   </ProtectedRoute>
                                 }
                               />
-                              <Route
-                                path="/settings/tags"
-                                element={
-                                  <ProtectedRoute>
-                                    <EnvironmentAwareLayout>
-                                      <TagsPage />
-                                    </EnvironmentAwareLayout>
-                                  </ProtectedRoute>
-                                }
-                              />
+
                               <Route
                                 path="/settings/environments"
                                 element={

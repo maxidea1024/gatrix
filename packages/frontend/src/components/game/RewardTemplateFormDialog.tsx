@@ -1,19 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  AppBar,
-  Toolbar,
   Button,
   TextField,
   Box,
   Typography,
   IconButton,
-  Chip,
-  Paper,
   Stack,
   Collapse,
-  OutlinedInput,
-  Autocomplete,
-  Tooltip,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -35,9 +28,9 @@ import rewardTemplateService, {
 } from '../../services/rewardTemplateService';
 import RewardItemSelector, { RewardSelection } from './RewardItemSelector';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
-import { tagService, Tag } from '../../services/tagService';
-import { getContrastColor } from '@/utils/colorUtils';
+import { Tag } from '../../services/tagService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import TagSelector from '../common/TagSelector';
 
 interface RewardTemplateFormDialogProps {
   open: boolean;
@@ -65,34 +58,15 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
   const [description, setDescription] = useState('');
   const [rewardItems, setRewardItems] = useState<ParticipationReward[]>([]);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [rewardsExpanded, setRewardsExpanded] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [loadingTags, setLoadingTags] = useState(false);
   const [isCopy, setIsCopy] = useState(false);
   // Track if description was manually edited by user
   const [isDescriptionManuallyEdited, setIsDescriptionManuallyEdited] =
     useState(false);
   const nameInputRef = React.useRef<HTMLInputElement>(null);
 
-  // Load available tags
-  useEffect(() => {
-    const loadTags = async () => {
-      try {
-        setLoadingTags(true);
-        const tags = await tagService.list(projectApiPath);
-        setAvailableTags(tags);
-      } catch (error) {
-        console.error('Failed to load tags:', error);
-      } finally {
-        setLoadingTags(false);
-      }
-    };
 
-    if (open) {
-      loadTags();
-    }
-  }, [open]);
 
   // Initialize form
   useEffect(() => {
@@ -116,44 +90,16 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
           : [];
       setRewardItems(rewardItemsCopy);
 
-      // Convert tags to Tag objects - deep copy to avoid reference sharing
+      // Set tags from template
       if (template.tags && Array.isArray(template.tags)) {
-        const selectedTagObjects = availableTags
-          .filter((tag) =>
-            template.tags?.some((t) => {
-              // Handle both Tag objects and string tags
-              if (typeof t === 'object' && t !== null && 'id' in t) {
-                return t.id === tag.id;
-              }
-              return false;
-            })
-          )
-          .map((tag) => {
-            // Deep copy each tag to avoid reference sharing
-            if (typeof tag === 'object' && tag !== null) {
-              return { ...tag };
-            }
-            return tag;
-          });
-        console.log(
-          '[RewardTemplateFormDialog] Form initialized with template:',
-          {
-            templateId: template.id,
-            templateName: template.name,
-            templateTagIds: template.tags?.map((t: any) => t.id) || [],
-            selectedTagIds: selectedTagObjects.map((t) => t.id),
-            availableTagCount: availableTags.length,
-          }
+        setSelectedTags(
+          template.tags
+            .filter(
+              (t): t is Tag => typeof t === 'object' && t !== null && 'id' in t
+            )
+            .map((tag) => ({ ...tag }))
         );
-        setSelectedTags(selectedTagObjects);
       } else {
-        console.log(
-          '[RewardTemplateFormDialog] Form initialized with template (no tags):',
-          {
-            templateId: template.id,
-            templateName: template.name,
-          }
-        );
         setSelectedTags([]);
       }
     } else {
@@ -179,7 +125,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
         nameInputRef.current?.focus();
       }, 100);
     }
-  }, [template, open, availableTags]);
+  }, [template, open]);
 
   // Check if form is dirty (data changed)
   const isDirty = useMemo(() => {
@@ -436,44 +382,10 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
             </Box>
 
             {/* Tags */}
-            <Box>
-              <Autocomplete
-                multiple
-                options={availableTags.filter((tag) => typeof tag !== 'string')}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={selectedTags}
-                onChange={(_, value) => setSelectedTags(value)}
-                loading={loadingTags}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip
-                        key={option.id}
-                        title={option.description || t('tags.noDescription')}
-                        arrow
-                      >
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{
-                            bgcolor: option.color,
-                            color: getContrastColor(option.color),
-                          }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label={t('rewardTemplates.tags')} />
-                )}
-              />
-            </Box>
+            <TagSelector
+              value={selectedTags}
+              onChange={setSelectedTags}
+            />
 
             {/* Reward Items */}
             <Box

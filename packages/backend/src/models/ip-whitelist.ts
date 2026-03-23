@@ -256,6 +256,7 @@ export class IpWhitelistModel {
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
           const assignments = tagIds.map((tagId) => ({
+            id: generateULID(),
             entityType: 'whitelist',
             entityId: whitelistId,
             tagId: tagId,

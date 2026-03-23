@@ -7,6 +7,7 @@ import { UserModel } from '../models/user';
 import { GatrixError } from '../middleware/error-handler';
 import { clearAllCache } from '../middleware/response-cache';
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import Joi from 'joi';
 import { pubSubService } from '../services/pub-sub-service';
 import { permissionService } from '../services/permission-service';
@@ -983,6 +984,7 @@ export class AdminController {
         if (tagIds.length > 0) {
           const assignments = userIds.flatMap((userId) =>
             tagIds.map((tagId) => ({
+              id: generateULID(),
               userId,
               tagId,
               createdBy: currentUserId,

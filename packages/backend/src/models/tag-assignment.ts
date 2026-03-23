@@ -1,4 +1,5 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 
 export interface TagAssignment {
   id: string;
@@ -23,10 +24,11 @@ export default class TagAssignmentModel {
 
       if (tagIds.length > 0) {
         const insertData = tagIds.map((tagId) => ({
+          id: generateULID(),
           tagId,
           entityType,
           entityId,
-          createdBy: createdBy || '', // Default values으로 1 Used (시스템 사용자)
+          createdBy: createdBy || '',
         }));
         await trx('g_tag_assignments').insert(insertData);
       }

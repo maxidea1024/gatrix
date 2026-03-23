@@ -7,8 +7,6 @@ import {
   FormControl,
   FormControlLabel,
   FormHelperText,
-  Autocomplete,
-  Chip,
   Tooltip,
   Tabs,
   Tab,
@@ -39,13 +37,14 @@ import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { getContrastColor } from '@/utils/colorUtils';
 import { gameWorldService } from '@/services/gameWorldService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import TagSelector from '@/components/common/TagSelector';
 
 export interface GameWorldFormProps {
   editingWorld: GameWorld | null;
   formData: CreateGameWorldData;
   onFormDataChange: (data: CreateGameWorldData) => void;
   formErrors: Record<string, string>;
-  allRegistryTags: Tag[];
+  allRegistryTags?: Tag[]; // deprecated, kept for backward compat
   formTags: Tag[];
   onFormTagsChange: (tags: Tag[]) => void;
   maintenanceLocales: GameWorldMaintenanceLocale[];
@@ -407,60 +406,10 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
 
             {/* Tags */}
             <Box>
-              <Autocomplete
-                multiple
-                options={allRegistryTags.filter(
-                  (tag) => typeof tag !== 'string'
-                )}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
+              <TagSelector
                 value={formTags}
-                onChange={(_, value) => onFormTagsChange(value)}
-                slotProps={{ popper: {} }}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip
-                        key={option.id}
-                        title={option.description || t('tags.noDescription')}
-                        arrow
-                      >
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{
-                            bgcolor: option.color,
-                            color: getContrastColor(option.color),
-                          }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label={t('gameWorlds.tags')} />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...otherProps } = props;
-                  return (
-                    <Box component="li" key={key} {...otherProps}>
-                      <Chip
-                        label={option.name}
-                        size="small"
-                        sx={{
-                          bgcolor: option.color,
-                          color: getContrastColor(option.color),
-                          mr: 1,
-                        }}
-                      />
-                      {option.description || t('common.noDescription')}
-                    </Box>
-                  );
-                }}
+                onChange={onFormTagsChange}
+                label={t('gameWorlds.tags')}
               />
             </Box>
 
