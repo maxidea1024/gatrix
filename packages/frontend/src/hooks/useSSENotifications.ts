@@ -36,7 +36,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
 
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
-    'disconnected' | 'connecting' | 'connected' | 'error'
+    'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error'
   >('disconnected');
   const [lastEvent, setLastEvent] = useState<SSEEvent | null>(null);
 
@@ -118,8 +118,6 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
 
       eventSource.onerror = (error) => {
         console.error('SSE connection error:', error);
-        setIsConnected(false);
-        setConnectionStatus('error');
         onErrorRef.current?.(error as any);
 
         // EventSource가 자동으로 재연결을 시도하므로 여기서는 연결을 닫고 수동으로 재연결 관리
@@ -130,18 +128,23 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
 
         // 이미 최대 재연결 시도에 도달했다면 더 이상 시도하지 않음
         if (maxReconnectReachedRef.current) {
+          setIsConnected(false);
+          setConnectionStatus('error');
           return;
         }
 
         isConnectingRef.current = false;
 
-        // Attempt to reconnect
+        // Attempt to reconnect - keep isConnected true during reconnection (grace period)
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
+          setConnectionStatus('reconnecting');
           scheduleReconnect();
         } else {
-          // 최대 재연결 시도에 도달했을 때 한 번만 에러 토스트 표시
+          // 최대 재연결 시도에 도달했을 때만 에러 상태로 전환
           console.error('Max reconnection attempts reached');
           maxReconnectReachedRef.current = true;
+          setIsConnected(false);
+          setConnectionStatus('error');
           enqueueSnackbar(t('common.connectionLostRefresh'), {
             variant: 'error',
           });

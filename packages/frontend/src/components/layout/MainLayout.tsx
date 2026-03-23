@@ -1307,7 +1307,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           >
             <Tooltip
               title={
-                sseConnection.isConnected === false
+                sseConnection.connectionStatus === 'error'
                   ? t('common.connectionLost')
                   : ''
               }
@@ -1319,7 +1319,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   width: 32,
                   height: 32,
                   backgroundColor:
-                    sseConnection.isConnected === false
+                    sseConnection.connectionStatus === 'error'
                       ? theme.palette.error.main
                       : theme.palette.primary.main,
                   transition: 'background-color 0.3s ease',
@@ -1371,7 +1371,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               sx={{
                 width: 32,
                 height: 32,
-                backgroundColor: theme.palette.primary.main,
+                backgroundColor:
+                  sseConnection.connectionStatus === 'error'
+                    ? theme.palette.error.main
+                    : theme.palette.primary.main,
+                transition: 'background-color 0.3s ease',
                 borderRadius: 1,
                 display: 'flex',
                 alignItems: 'center',
