@@ -348,7 +348,7 @@ class ServiceNoticeService {
 
     const generatedId = generateULID();
 
-    const [result] = await pool.execute<ResultSetHeader>(
+    await pool.execute<ResultSetHeader>(
       `INSERT INTO g_service_notices
       (id, environmentId, isActive, isPinned, category, platforms, channels, subchannels, startDate, endDate, tabTitle, title, content, description)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -413,6 +413,14 @@ class ServiceNoticeService {
     const updates: string[] = [];
     const values: (string | number | boolean | null)[] = [];
 
+    logger.debug('updateServiceNotice called', {
+      id,
+      environmentId,
+      dataKeys: Object.keys(data),
+      hasTitle: !!data.title,
+      hasContent: !!data.content,
+    });
+
     if (data.isActive !== undefined) {
       updates.push('isActive = ?');
       values.push(data.isActive);
@@ -475,13 +483,30 @@ class ServiceNoticeService {
       values.push(data.description || null);
     }
 
+    // Check if there are meaningful updates (beyond just updatedAt)
+    if (updates.length === 0) {
+      logger.warn('updateServiceNotice: no meaningful fields to update', {
+        id,
+        environmentId,
+        dataKeys: Object.keys(data),
+      });
+    }
+
     updates.push('updatedAt = UTC_TIMESTAMP()');
     values.push(id, environmentId);
 
-    await pool.execute(
+    const [result] = await pool.execute<ResultSetHeader>(
       `UPDATE g_service_notices SET ${updates.join(', ')} WHERE id = ? AND environmentId = ?`,
       values
     );
+
+    if (result.affectedRows === 0) {
+      logger.warn('updateServiceNotice: no rows affected by update', {
+        id,
+        environmentId,
+      });
+      throw new Error('Service notice not found or update failed: no rows affected');
+    }
 
     const notice = await this.getServiceNoticeById(id, environmentId);
     if (!notice) {

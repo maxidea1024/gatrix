@@ -9,7 +9,8 @@ export const serviceNoticeTools: AIToolConfig[] = [
   {
     tool: {
       name: 'get_service_notices',
-      description: 'Get service notices for an environment with pagination.',
+      description:
+        'Get service notices for an environment with pagination. Returns a summary list with truncated content. Use get_service_notice_by_id to get the full content of a specific notice.',
       parameters: {
         type: 'object',
         properties: {
@@ -31,10 +32,56 @@ export const serviceNoticeTools: AIToolConfig[] = [
       const serviceNoticeService = (
         await import('../../service-notice-service')
       ).default;
-      return await serviceNoticeService.getServiceNotices(1, 20, {
+      const result = await serviceNoticeService.getServiceNotices(1, 20, {
         environmentId: args.environmentId,
         search: args.search,
       });
+      // Truncate content to save LLM context window
+      const notices = result.notices.map((n) => ({
+        ...n,
+        content:
+          n.content && n.content.length > 200
+            ? n.content.substring(0, 200) + '... (truncated, use get_service_notice_by_id for full content)'
+            : n.content,
+      }));
+      return { notices, total: result.total };
+    },
+  },
+
+  {
+    tool: {
+      name: 'get_service_notice_by_id',
+      description:
+        'Get a single service notice by ID with full content. Use this to read the complete content before updating it.',
+      parameters: {
+        type: 'object',
+        properties: {
+          environmentId: {
+            type: 'string',
+            description: 'The environment ID',
+          },
+          id: {
+            type: 'string',
+            description: 'The service notice ID',
+          },
+        },
+        required: ['environmentId', 'id'],
+      },
+    },
+    requiredPermission: P.SERVICE_NOTICES_READ,
+    riskLevel: 'read',
+    handler: async (args) => {
+      const serviceNoticeService = (
+        await import('../../service-notice-service')
+      ).default;
+      const notice = await serviceNoticeService.getServiceNoticeById(
+        args.id,
+        args.environmentId
+      );
+      if (!notice) {
+        return { error: 'Service notice not found' };
+      }
+      return notice;
     },
   },
 
@@ -112,7 +159,7 @@ export const serviceNoticeTools: AIToolConfig[] = [
     tool: {
       name: 'update_service_notice',
       description: descWithRisk(
-        'Update an existing service notice. Can change title, content, category, active status, etc.',
+        'Update an existing service notice. Can change title, content, category, active status, etc. When updating the content field, you MUST provide the complete new HTML content. Always include content in the arguments when the user asks to change the notice body/content.',
         'medium'
       ),
       parameters: {
@@ -127,7 +174,11 @@ export const serviceNoticeTools: AIToolConfig[] = [
             description: 'The service notice ID to update',
           },
           title: { type: 'string', description: 'New title' },
-          content: { type: 'string', description: 'New content' },
+          content: {
+            type: 'string',
+            description:
+              'New notice content in HTML format. When updating content, provide the complete HTML body. Example: "<p>Updated notice body</p>". You MUST include this field when the user asks to change the notice body/content/text.',
+          },
           category: { type: 'string', description: 'New category' },
           isActive: { type: 'boolean', description: 'Active status' },
         },
@@ -137,10 +188,28 @@ export const serviceNoticeTools: AIToolConfig[] = [
     requiredPermission: P.SERVICE_NOTICES_UPDATE,
     riskLevel: 'medium',
     handler: async (args) => {
+      const logger = (await import('../../../config/logger')).createLogger(
+        'AITools:ServiceNotice'
+      );
       const serviceNoticeService = (
         await import('../../service-notice-service')
       ).default;
       const { environmentId, id, ...updates } = args;
+      logger.info('update_service_notice tool called', {
+        id,
+        environmentId,
+        updateKeys: Object.keys(updates),
+        hasTitle: 'title' in updates,
+        hasContent: 'content' in updates,
+        contentLength: updates.content?.length,
+        updates,
+      });
+      if (Object.keys(updates).length === 0) {
+        return {
+          error:
+            'No fields to update. Please specify at least one field (title, content, category, or isActive).',
+        };
+      }
       return await serviceNoticeService.updateServiceNotice(
         id,
         updates,

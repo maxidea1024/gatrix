@@ -69,4 +69,43 @@ export abstract class BaseLLMProvider {
     messages: ChatMessage[],
     tools?: ToolDefinition[]
   ): Promise<{ content: string; toolCalls?: ToolCall[] }>;
+
+  /**
+   * Create a streaming chat completion with automatic retry on rate limit.
+   * Retries up to maxRetries times with exponential backoff.
+   */
+  async *createStreamWithRetry(
+    messages: ChatMessage[],
+    tools?: ToolDefinition[],
+    maxRetries = 2
+  ): AsyncGenerator<StreamChunk> {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const chunks: StreamChunk[] = [];
+      let hitRateLimit = false;
+
+      for await (const chunk of this.createStream(messages, tools)) {
+        if (
+          chunk.type === 'error' &&
+          chunk.error === 'AI_RATE_LIMITED' &&
+          attempt < maxRetries
+        ) {
+          hitRateLimit = true;
+          break;
+        }
+        chunks.push(chunk);
+      }
+
+      if (hitRateLimit) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+
+      // Yield all collected chunks
+      for (const chunk of chunks) {
+        yield chunk;
+      }
+      return;
+    }
+  }
 }

@@ -129,7 +129,18 @@ export class ClaudeProvider extends BaseLLMProvider {
           status: response.status,
           body: errorText,
         });
-        yield { type: 'error', error: `Claude API error: ${response.status}` };
+        // Map HTTP status to user-friendly error codes
+        let errorCode = 'AI_PROVIDER_ERROR';
+        if (response.status === 429) {
+          errorCode = 'AI_RATE_LIMITED';
+        } else if (response.status === 402) {
+          errorCode = 'AI_INSUFFICIENT_BALANCE';
+        } else if (response.status === 404) {
+          errorCode = 'AI_INVALID_MODEL';
+        } else if (response.status === 401 || response.status === 403) {
+          errorCode = 'AI_AUTH_ERROR';
+        }
+        yield { type: 'error', error: errorCode };
         return;
       }
 
@@ -175,6 +186,10 @@ export class ClaudeProvider extends BaseLLMProvider {
                   currentToolUseId = parsed.content_block.id;
                   currentToolName = parsed.content_block.name;
                   currentToolInput = '';
+                  logger.info('Claude tool_use block started', {
+                    toolName: currentToolName,
+                    toolUseId: currentToolUseId,
+                  });
                 }
                 break;
 
@@ -201,6 +216,9 @@ export class ClaudeProvider extends BaseLLMProvider {
                 break;
 
               case 'message_stop':
+                logger.info('Claude message_stop received', {
+                  hadToolCall: !!(currentToolUseId || currentToolName),
+                });
                 yield { type: 'done' };
                 return;
             }

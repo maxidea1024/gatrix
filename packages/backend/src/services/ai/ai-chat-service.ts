@@ -67,7 +67,10 @@ CRITICAL RULES:
 - Be concise and helpful in your responses.
 - When performing actions, confirm what you're about to do before executing.
 - Always respond in the same language as the user's message.
-- Format responses with Markdown when appropriate.${contextInfo}`;
+- Format responses with Markdown when appropriate.
+- ABSOLUTELY NEVER claim you have performed an action (create, update, delete) without actually calling the corresponding tool. You CANNOT modify any data without using tools. If a tool call fails or you are unable to call a tool, clearly inform the user that the action was NOT performed.
+- When asked to update/modify something, you MUST call the appropriate update tool. Do NOT just describe what the updated content should look like - you must actually call the tool to make the change.
+- When updating service notices: if the user asks to change the body/content/text, you MUST include the "content" field in the update_service_notice tool arguments. The content should be in HTML format. Do NOT skip the content field - changing only the title when the user asked to change the content is incorrect.${contextInfo}`;
 }
 
 export class AIChatService {
@@ -154,7 +157,7 @@ export class AIChatService {
     let hasToolCalls = false;
 
     try {
-      const stream = provider.createStream(fullMessages, tools);
+      const stream = provider.createStreamWithRetry(fullMessages, tools);
 
       for await (const chunk of stream) {
         switch (chunk.type) {
@@ -217,7 +220,7 @@ export class AIChatService {
                     !!chainMessages[chainMessages.length - 1]?.toolResult,
                 });
 
-                const followUpStream = provider.createStream(
+                const followUpStream = provider.createStreamWithRetry(
                   chainMessages,
                   tools
                 );

@@ -811,9 +811,6 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           onChange={(_, expanded) => setPreviewExpanded(expanded)}
           sx={{
             mb: 1,
-            bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
-            '&:before': { display: 'none' },
           }}
         >
           <AccordionSummary
