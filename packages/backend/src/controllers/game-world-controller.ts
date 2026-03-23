@@ -380,7 +380,10 @@ export class GameWorldController {
               `${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`
             );
             await pubSubService.publishSDKEvent(
-              { type: 'gameworld.updated', data: { id: world.id, environmentId } },
+              {
+                type: 'gameworld.updated',
+                data: { id: world.id, environmentId },
+              },
               { environmentId }
             );
           }
