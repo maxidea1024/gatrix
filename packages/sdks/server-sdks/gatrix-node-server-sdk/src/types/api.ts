@@ -73,6 +73,7 @@ export interface ClientVersion {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: ClientVersionMaintenanceLocale[];
   tags?: { id: number; name: string; color: string }[];
+  minPatchVersion?: string;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -436,6 +436,7 @@ export class ClientVersionService {
       externalClickLink: data.externalClickLink || null,
       memo: data.memo || null,
       customPayload: data.customPayload || null,
+      minPatchVersion: data.minPatchVersion || null,
       createdBy: data.createdBy,
       updatedBy: data.updatedBy,
     }));

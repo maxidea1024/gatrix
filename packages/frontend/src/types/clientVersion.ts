@@ -59,6 +59,7 @@ export interface ClientVersion {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: ClientVersionMaintenanceLocale[];
+  minPatchVersion?: string;
   tags?: { id: number; name: string; color: string }[];
   createdAt: string;
   updatedAt: string;
@@ -88,6 +89,7 @@ export interface ClientVersionFormData {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: ClientVersionMaintenanceLocale[];
+  minPatchVersion?: string;
   tags?: { id: number; name: string; color: string }[];
 }
 

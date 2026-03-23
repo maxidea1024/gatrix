@@ -52,6 +52,7 @@ export interface ClientVersionAttributes {
   maintenanceEndDate?: Date;
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
+  minPatchVersion?: string;
   createdBy?: string;
   updatedBy?: string;
   createdAt?: Date;

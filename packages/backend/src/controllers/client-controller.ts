@@ -49,6 +49,22 @@ export class ClientController {
   }
 
   /**
+   * Compare two version strings by splitting on '.' and comparing segments numerically.
+   * Returns: negative if a < b, 0 if equal, positive if a > b
+   */
+  private static compareVersions(a: string, b: string): number {
+    const aParts = a.split('.').map(Number);
+    const bParts = b.split('.').map(Number);
+    const len = Math.max(aParts.length, bParts.length);
+    for (let i = 0; i < len; i++) {
+      const aVal = aParts[i] || 0;
+      const bVal = bParts[i] || 0;
+      if (aVal !== bVal) return aVal - bVal;
+    }
+    return 0;
+  }
+
+  /**
    * Get client version information
    * GET /api/v1/client/client-version
    *
@@ -60,7 +76,7 @@ export class ClientController {
    */
   static getClientVersion = asyncHandler(
     async (req: SDKRequest, res: Response) => {
-      const { platform, version, status, lang, channel, subChannel } =
+      const { platform, version, status, lang, channel, subChannel, patchVersion } =
         req.query as {
           platform?: string;
           version?: string;
@@ -68,6 +84,7 @@ export class ClientController {
           lang?: string;
           channel?: string;
           subChannel?: string;
+          patchVersion?: string;
         };
 
       // Validate required query params - platform is always required
@@ -393,15 +410,23 @@ export class ClientController {
         ? ClientStatus.MAINTENANCE
         : record.clientStatus;
 
+      // Check minimum patch version requirement
+      let finalStatus = effectiveStatus;
+      if (record.minPatchVersion && effectiveStatus !== ClientStatus.MAINTENANCE) {
+        if (!patchVersion || ClientController.compareVersions(patchVersion, record.minPatchVersion) < 0) {
+          finalStatus = ClientStatus.FORCED_UPDATE;
+        }
+      }
+
       // Transform data for client consumption (remove sensitive fields)
       const clientData: any = {
         platform: record.platform,
         clientVersion: record.clientVersion,
-        status: effectiveStatus,
+        status: finalStatus,
         gameServerAddress,
         patchAddress,
         guestModeAllowed:
-          effectiveStatus === ClientStatus.MAINTENANCE
+          finalStatus === ClientStatus.MAINTENANCE || finalStatus === ClientStatus.FORCED_UPDATE
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,
@@ -409,7 +434,7 @@ export class ClientController {
       };
 
       // Add maintenance message if status is MAINTENANCE
-      if (effectiveStatus === ClientStatus.MAINTENANCE) {
+      if (finalStatus === ClientStatus.MAINTENANCE) {
         // Service maintenance message takes priority over client version maintenance message
         clientData.maintenanceMessage = isServiceMaintenanceActive
           ? serviceMaintenanceMessage || ''

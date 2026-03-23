@@ -81,7 +81,7 @@ const createClientVersionSchema = Joi.object({
     .default(null),
   memo: Joi.string().optional().allow('').empty('').default(null),
   customPayload: Joi.string().optional().allow('').empty('').default(null),
-  // 점검 관련 필드
+  // Maintenance-related fields
   maintenanceStartDate: Joi.string()
     .isoDate()
     .optional()
@@ -100,6 +100,12 @@ const createClientVersionSchema = Joi.object({
     otherwise: Joi.string().optional().allow('').empty('').default(null),
   }),
   supportsMultiLanguage: Joi.boolean().optional().default(false),
+  minPatchVersion: Joi.string()
+    .max(50)
+    .optional()
+    .allow('')
+    .empty('')
+    .default(null),
   maintenanceLocales: Joi.array()
     .items(
       Joi.object({
@@ -157,7 +163,7 @@ const updateClientVersionSchema = Joi.object({
     .default(null),
   memo: Joi.string().optional().allow('').empty('').default(null),
   customPayload: Joi.string().optional().allow('').empty('').default(null),
-  // 점검 관련 필드
+  // Maintenance-related fields
   maintenanceStartDate: Joi.string()
     .isoDate()
     .optional()
@@ -176,6 +182,12 @@ const updateClientVersionSchema = Joi.object({
     otherwise: Joi.string().optional().allow('').empty('').default(null),
   }),
   supportsMultiLanguage: Joi.boolean().optional().default(false),
+  minPatchVersion: Joi.string()
+    .max(50)
+    .optional()
+    .allow('')
+    .empty('')
+    .default(null),
   maintenanceLocales: Joi.array()
     .items(
       Joi.object({
@@ -247,10 +259,10 @@ const getClientVersionsQuerySchema = Joi.object({
     .valid('any_of', 'include_all')
     .optional()
     .default('any_of'),
-  _t: Joi.string().optional(), // Cache 방지용 타임스탬프
+  _t: Joi.string().optional(), // Cache-busting timestamp
 });
 
-// 내보내기 전용 스키마 (limit 제한 None)
+// Export-only schema (no limit restriction)
 const exportClientVersionsQuerySchema = Joi.object({
   version: Joi.string().optional(),
   platform: Joi.string().optional(),
@@ -285,7 +297,7 @@ const bulkUpdateStatusSchema = Joi.object({
   clientStatus: Joi.string()
     .valid(...Object.values(ClientStatus))
     .required(),
-  // 점검 관련 필드들
+  // Maintenance-related fields
   maintenanceStartDate: Joi.string().isoDate().optional(),
   maintenanceEndDate: Joi.string().isoDate().optional(),
   maintenanceMessage: Joi.string().max(1000).optional(),
@@ -323,7 +335,7 @@ const bulkCreateClientVersionSchema = Joi.object({
     .empty('')
     .default(null),
 
-  // 점검 관련 필드
+  // Maintenance-related fields
   maintenanceStartDate: Joi.string()
     .isoDate()
     .optional()
@@ -342,6 +354,12 @@ const bulkCreateClientVersionSchema = Joi.object({
     otherwise: Joi.string().optional().allow('').empty('').default(null),
   }),
   supportsMultiLanguage: Joi.boolean().optional().default(false),
+  minPatchVersion: Joi.string()
+    .max(50)
+    .optional()
+    .allow('')
+    .empty('')
+    .default(null),
   maintenanceLocales: Joi.array()
     .items(
       Joi.object({
@@ -375,7 +393,7 @@ const bulkCreateClientVersionSchema = Joi.object({
     .min(1)
     .required(),
 
-  // 태그 필드 추가 - 필요한 필드만 받음
+  // Tag fields - accept only required fields
   tags: Joi.array()
     .items(
       Joi.object({
@@ -389,7 +407,7 @@ const bulkCreateClientVersionSchema = Joi.object({
 });
 
 export class ClientVersionController {
-  // Used 가능한 버전 Get list (distinct)
+  // Get available versions list (distinct)
   static async getAvailableVersions(req: AuthenticatedRequest, res: Response) {
     try {
       const environmentId = req.environmentId!;
@@ -408,7 +426,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 Get list
+  // Get client version list
   static async getClientVersions(req: AuthenticatedRequest, res: Response) {
     const { error, value } = getClientVersionsQuerySchema.validate(req.query);
     if (error) {
@@ -428,10 +446,10 @@ export class ClientVersionController {
       sortOrder,
     };
 
-    // Filter 조건 Settings
+    // Set filter conditions
     Object.keys(filterParams).forEach((key) => {
       const value = filterParams[key];
-      // guestModeAllowed는 boolean이므로 false도 유효한 값
+      // guestModeAllowed is boolean, so false is also a valid value
       if (
         value !== undefined &&
         (value !== '' ||
@@ -441,10 +459,10 @@ export class ClientVersionController {
       ) {
         const processedValue: any = value;
 
-        // guestModeAllowed는 이미 Joi에서 boolean 또는 boolean[]로 변환됨
-        // 다른 필드는 그대로 Used
+        // guestModeAllowed is already converted to boolean or boolean[] by Joi
+        // Other fields are used as-is
 
-        // Type 안전하게 할당
+        // Type-safe assignment
         if (key === 'guestModeAllowed') {
           (filters as any).guestModeAllowed = processedValue;
         } else if (key === 'tags') {
@@ -470,7 +488,7 @@ export class ClientVersionController {
     });
   }
 
-  // 클라이언트 버전 Get details
+  // Get client version details
   static async getClientVersionById(req: AuthenticatedRequest, res: Response) {
     const id = req.params.id;
     if (!id) {
@@ -498,7 +516,7 @@ export class ClientVersionController {
     });
   }
 
-  // 클라이언트 버전 Create
+  // Create client version
   static async createClientVersion(req: AuthenticatedRequest, res: Response) {
     const { error, value } = createClientVersionSchema.validate(req.body);
     if (error) {
@@ -562,7 +580,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 간편 Create
+  // Bulk create client versions
   static async bulkCreateClientVersions(
     req: AuthenticatedRequest,
     res: Response
@@ -669,7 +687,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 Edit
+  // Update client version
   static async updateClientVersion(req: AuthenticatedRequest, res: Response) {
     const id = req.params.id;
     if (!id) {
@@ -702,7 +720,7 @@ export class ClientVersionController {
         value.maintenanceStartDate
       ),
       maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
-      createdBy: userId, // maintenanceLocales 새로 Create 시 필요
+      createdBy: userId, // Required for creating new maintenanceLocales
       updatedBy: userId,
     };
 
@@ -755,7 +773,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 Delete
+  // Delete client version
   static async deleteClientVersion(req: AuthenticatedRequest, res: Response) {
     const id = req.params.id;
     if (!id) {
@@ -803,7 +821,7 @@ export class ClientVersionController {
     }
   }
 
-  // 일괄 Status 변경
+  // Bulk status update
   static async bulkUpdateStatus(req: AuthenticatedRequest, res: Response) {
     const { error, value } = bulkUpdateStatusSchema.validate(req.body);
     if (error) {
@@ -884,7 +902,7 @@ export class ClientVersionController {
     }
   }
 
-  // 채널 Get list
+  // Get channel list
   static async getPlatforms(req: AuthenticatedRequest, res: Response) {
     const environmentId = req.environmentId!;
     const platforms = await ClientVersionService.getPlatforms(environmentId);
@@ -895,7 +913,7 @@ export class ClientVersionController {
     });
   }
 
-  // 클라이언트 버전 태그 Settings
+  // Set client version tags
   static async setTags(req: AuthenticatedRequest, res: Response) {
     try {
       const { id } = req.params;
@@ -923,7 +941,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 태그 조회
+  // Get client version tags
   static async getTags(req: AuthenticatedRequest, res: Response) {
     try {
       const { id } = req.params;
@@ -942,7 +960,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 내보내기 (CSV)
+  // Export client versions (CSV)
   static async exportClientVersions(req: AuthenticatedRequest, res: Response) {
     const { error, value } = exportClientVersionsQuerySchema.validate(
       req.query
@@ -956,13 +974,13 @@ export class ClientVersionController {
 
     try {
       const environmentId = req.environmentId!;
-      // 모든 데이터를 가져오기 위해 매우 큰 limit Used
+      // Use a very large limit to fetch all data
       const result = await ClientVersionService.getAllClientVersions(
         environmentId,
         value,
         {
           page: 1,
-          limit: 50000, // 충분히 큰 값
+          limit: 50000, // Large enough value
           sortBy: 'createdAt',
           sortOrder: 'DESC',
         }

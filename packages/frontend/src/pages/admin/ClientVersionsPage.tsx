@@ -549,9 +549,14 @@ const ClientVersionsPage: React.FC = () => {
       visible: true,
     },
     {
+      id: 'minPatchVersion',
+      labelKey: 'clientVersions.minPatchVersion',
+      visible: true,
+    },
+    {
       id: 'guestModeAllowed',
       labelKey: 'clientVersions.guestModeAllowed',
-      visible: true,
+      visible: false,
     },
     { id: 'tags', labelKey: 'clientVersions.tags', visible: true },
     { id: 'createdAt', labelKey: 'clientVersions.createdAt', visible: true },
@@ -1571,6 +1576,12 @@ const ClientVersionsPage: React.FC = () => {
                 </IconButton>
               </Tooltip>
             </Box>
+          );
+        case 'minPatchVersion':
+          return (
+            <Typography variant="body2" noWrap>
+              {clientVersion.minPatchVersion || '-'}
+            </Typography>
           );
         case 'guestModeAllowed':
           return (

@@ -1,4 +1,4 @@
-﻿---
+---
 sidebar_position: 4
 sidebar_label: Client Versions
 ---
@@ -13,52 +13,78 @@ Manage game client versions and update requirements.
 
 ## Features
 
-- Define minimum required version
-- Force update prompts
-- Platform-specific versions (iOS, Android, PC)
-- Update URL configuration
+- Platform-specific version management (PC, PC-WeGame, iOS, Android, HarmonyOS)
+- Game server and patch server address configuration
+- Status-based access control (Online, Offline, Maintenance, Forced Update, etc.)
+- Minimum patch version enforcement
+- Whitelist-specific server addresses
+- Guest mode control
 
 ## Version Configuration
 
-| Field               | Description                     |
-| ------------------- | ------------------------------- |
-| **Platform**        | iOS, Android, Windows, Mac      |
-| **Minimum Version** | Oldest allowed version          |
-| **Latest Version**  | Current version                 |
-| **Force Update**    | Require update if below minimum |
-| **Update URL**      | Store or download link          |
+| Field                    | Description                                                      |
+| ------------------------ | ---------------------------------------------------------------- |
+| **Platform**             | Target platform (pc, pc-wegame, ios, android, harmonyos)         |
+| **Version**              | Client version string (e.g., 1.0.0)                             |
+| **Status**               | Client status (Online, Offline, Maintenance, Forced Update, etc.)|
+| **Game Server Address**  | Primary game server address                                      |
+| **Patch Address**        | Primary patch server address                                     |
+| **Min Patch Version**    | Minimum required patch version (optional)                        |
+| **Guest Mode Allowed**   | Whether guest mode is allowed                                    |
+| **External Click Link**  | External URL for click-through                                   |
+| **Custom Payload**       | JSON payload passed to the client                                |
 
-## Adding a Version
+## Minimum Patch Version
 
-1. Navigate to **System Management** > **Client Versions**
-2. Click **Add Version** button
-3. Configure:
+When `minPatchVersion` is set on a client version record:
 
-| Field        | Type   | Required | Description                  |
-| ------------ | ------ | -------- | ---------------------------- |
-| Platform     | Select | Required | Target platform              |
-| Version      | Text   | Required | Version string (e.g., 1.2.3) |
-| Min Version  | Text   | Required | Minimum required version     |
-| Force Update | Switch | -        | Force update prompt          |
-| Update URL   | Text   | -        | Download/store link          |
-
-4. Click **Save**
+- Clients **must** send their current `patchVersion` as a query parameter.
+- If `patchVersion` is **missing** or **lower** than `minPatchVersion`, the API responds with `FORCED_UPDATE` status.
+- Version comparison splits by `.` and compares each segment numerically (supports formats like `1.0041` and semver).
+- If the client version status is `MAINTENANCE`, the maintenance status takes priority and `minPatchVersion` is not checked.
 
 ## API Check
 
 Clients check version on startup:
 
-```bash
-GET /api/v1/client-version?platform=android&version=1.2.0
+```
+GET /api/v1/client/client-version?platform=android&clientVersion=1.0.0&patchVersion=1.0041
 ```
 
-Response:
+### Query Parameters
+
+| Parameter       | Required | Description                                     |
+| --------------- | -------- | ----------------------------------------------- |
+| `platform`      | Yes      | Target platform                                 |
+| `clientVersion` | Yes      | Client version string                            |
+| `patchVersion`  | No       | Current patch version (for minPatchVersion check)|
+
+### Response
 
 ```json
 {
-  "needsUpdate": true,
-  "forceUpdate": false,
-  "latestVersion": "1.3.0",
-  "updateUrl": "https://play.google.com/store/apps/..."
+  "success": true,
+  "data": {
+    "platform": "android",
+    "clientVersion": "1.0.0",
+    "status": "ONLINE",
+    "gameServerAddress": "https://auth.example.com",
+    "patchAddress": "https://patch.example.com/cdn",
+    "guestModeAllowed": true,
+    "externalClickLink": null,
+    "customPayload": null
+  }
 }
 ```
+
+### Status Values
+
+| Status                    | Description                                                |
+| ------------------------- | ---------------------------------------------------------- |
+| `ONLINE`                  | Normal operation                                           |
+| `OFFLINE`                 | Service unavailable                                        |
+| `MAINTENANCE`             | Under maintenance (includes maintenance message)           |
+| `FORCED_UPDATE`           | Client must update (returned when below minPatchVersion)   |
+| `RECOMMENDED_UPDATE`      | Update recommended but not required                        |
+| `UNDER_REVIEW`            | Version under review                                      |
+| `BLOCKED_PATCH_ALLOWED`   | Access blocked but patching allowed                        |

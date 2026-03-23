@@ -15,4 +15,5 @@ public class ClientVersion
     [JsonPropertyName("maintenanceMessage")] public string? MaintenanceMessage { get; set; }
     [JsonPropertyName("maintenanceLocales")] public List<MaintenanceLocale>? MaintenanceLocales { get; set; }
     [JsonPropertyName("customPayload")] public Dictionary<string, object>? CustomPayload { get; set; }
+    [JsonPropertyName("minPatchVersion")] public string? MinPatchVersion { get; set; }
 }

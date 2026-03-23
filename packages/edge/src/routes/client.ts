@@ -24,6 +24,22 @@ const router = Router();
 // ============================================================================
 
 /**
+ * Compare two version strings by splitting on '.' and comparing segments numerically.
+ * Returns: negative if a < b, 0 if equal, positive if a > b
+ */
+function compareVersions(a: string, b: string): number {
+  const aParts = a.split('.').map(Number);
+  const bParts = b.split('.').map(Number);
+  const len = Math.max(aParts.length, bParts.length);
+  for (let i = 0; i < len; i++) {
+    const aVal = aParts[i] || 0;
+    const bVal = bParts[i] || 0;
+    if (aVal !== bVal) return aVal - bVal;
+  }
+  return 0;
+}
+
+/**
  * Record cache hit metric
  */
 function recordCacheHit(cacheType: string): void {
@@ -141,7 +157,7 @@ router.get(
       if (!sdk) return;
 
       const { environmentId, cacheKey } = req.clientContext!;
-      const { platform, version, status, lang, channel, subChannel } =
+      const { platform, version, status, lang, channel, subChannel, patchVersion } =
         req.query as {
           platform?: string;
           version?: string;
@@ -149,6 +165,7 @@ router.get(
           lang?: string;
           channel?: string;
           subChannel?: string;
+          patchVersion?: string;
         };
 
       // Validate required query params
@@ -337,9 +354,16 @@ router.get(
       }
 
       // Determine effective status (service maintenance overrides client version status)
-      const effectiveStatus = isServiceMaintenanceActive
+      let effectiveStatus = isServiceMaintenanceActive
         ? 'MAINTENANCE'
         : record.clientStatus;
+
+      // Check minimum patch version requirement
+      if ((record as any).minPatchVersion && effectiveStatus !== 'MAINTENANCE') {
+        if (!patchVersion || compareVersions(patchVersion, (record as any).minPatchVersion) < 0) {
+          effectiveStatus = 'FORCED_UPDATE';
+        }
+      }
 
       const clientData: Record<string, unknown> = {
         platform: record.platform,
@@ -348,7 +372,7 @@ router.get(
         gameServerAddress: record.gameServerAddress,
         patchAddress: record.patchAddress,
         guestModeAllowed:
-          effectiveStatus === 'MAINTENANCE'
+          effectiveStatus === 'MAINTENANCE' || effectiveStatus === 'FORCED_UPDATE'
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,
