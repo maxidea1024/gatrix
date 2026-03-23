@@ -24,7 +24,7 @@ const TagChips: React.FC<TagChipsProps> = ({
   maxWidth,
   emptyText = '-',
 }) => {
-  const items = maxVisible ? (tags || []).slice(0, maxVisible) : (tags || []);
+  const items = maxVisible ? (tags || []).slice(0, maxVisible) : tags || [];
   const remaining = maxVisible ? (tags || []).length - items.length : 0;
 
   if (items.length === 0) {
@@ -67,11 +67,7 @@ const TagChips: React.FC<TagChipsProps> = ({
         );
       })}
       {remaining > 0 && (
-        <Chip
-          label={`+${remaining}`}
-          size="small"
-          variant="outlined"
-        />
+        <Chip label={`+${remaining}`} size="small" variant="outlined" />
       )}
     </Box>
   );

@@ -4073,7 +4073,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                     value={editTagSelection}
                     onChange={(tags) => {
                       setEditTagSelection(tags);
-                      setEditingFlagData({ ...editingFlagData, tags: tags.map((t) => t.name) });
+                      setEditingFlagData({
+                        ...editingFlagData,
+                        tags: tags.map((t) => t.name),
+                      });
                     }}
                   />
                 )}

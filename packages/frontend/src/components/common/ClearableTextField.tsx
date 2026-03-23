@@ -1,5 +1,10 @@
 import React from 'react';
-import { TextField, TextFieldProps, InputAdornment, IconButton } from '@mui/material';
+import {
+  TextField,
+  TextFieldProps,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
 import { Clear as ClearIcon } from '@mui/icons-material';
 
 type ClearableTextFieldProps = TextFieldProps & {
@@ -21,22 +26,23 @@ const ClearableTextField: React.FC<ClearableTextFieldProps> = ({
 }) => {
   const hasValue = value !== undefined && value !== null && value !== '';
 
-  const clearButton = hasValue && !disabled ? (
-    <InputAdornment position="end">
-      <IconButton
-        size="small"
-        onClick={(e) => {
-          e.stopPropagation();
-          onClear?.();
-        }}
-        edge="end"
-        tabIndex={-1}
-        sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
-      >
-        <ClearIcon fontSize="small" />
-      </IconButton>
-    </InputAdornment>
-  ) : null;
+  const clearButton =
+    hasValue && !disabled ? (
+      <InputAdornment position="end">
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClear?.();
+          }}
+          edge="end"
+          tabIndex={-1}
+          sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+        >
+          <ClearIcon fontSize="small" />
+        </IconButton>
+      </InputAdornment>
+    ) : null;
 
   return (
     <TextField
