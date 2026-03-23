@@ -462,18 +462,10 @@ router.get(
           id: world.id,
           worldId: world.worldId,
           name: world.name,
-          description:
-            (world as unknown as { description?: string }).description || '',
           displayOrder: world.displayOrder,
           tags: (world as unknown as { tags?: string | null }).tags || null,
           meta: world.customPayload || {},
-          createdAt: world.createdAt,
-          updatedAt:
-            (world as unknown as { updatedAt?: string }).updatedAt ||
-            world.createdAt,
         })),
-        total: visibleWorlds.length,
-        timestamp: new Date().toISOString(),
       };
 
       logger.debug('Game worlds retrieved', {

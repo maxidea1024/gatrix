@@ -544,21 +544,36 @@ export class ClientController {
         environmentId: environmentId,
       });
 
-      // Transform data for client consumption (remove sensitive fields)
+      // Fetch tags for each world and transform data for client consumption
+      const { TagService } = await import('../services/tag-service');
       const clientData = {
-        worlds: worlds.map((world) => ({
-          id: world.id,
-          worldId: world.worldId,
-          name: world.name,
-          description: world.description,
-          displayOrder: world.displayOrder,
-          tags: world.tags || null,
-          meta: world.customPayload || {},
-          createdAt: world.createdAt,
-          updatedAt: world.updatedAt,
-        })),
-        total: worlds.length,
-        timestamp: new Date().toISOString(),
+        worlds: await Promise.all(
+          worlds.map(async (world) => {
+            let tagNames: string[] = [];
+            if (world.id) {
+              try {
+                const tags = await TagService.listTagsForEntity(
+                  'game_world',
+                  world.id
+                );
+                tagNames = tags ? tags.map((tag: any) => tag.name) : [];
+              } catch (error) {
+                logger.warn(
+                  `Failed to fetch tags for game world ${world.id}:`,
+                  error
+                );
+              }
+            }
+            return {
+              id: world.id,
+              worldId: world.worldId,
+              name: world.name,
+              displayOrder: world.displayOrder,
+              tags: tagNames,
+              meta: world.customPayload || {},
+            };
+          })
+        ),
       };
 
       // Cache the result for 10 minutes (game worlds change less frequently)
