@@ -177,6 +177,26 @@ export class ClientController {
           );
         }
 
+        // Check minimum patch version requirement for cached response
+        if (
+          cachedResponse.minPatchVersion &&
+          cachedResponse.status !== ClientStatus.MAINTENANCE
+        ) {
+          if (
+            !patchVersion ||
+            ClientController.compareVersions(
+              patchVersion,
+              cachedResponse.minPatchVersion
+            ) < 0
+          ) {
+            cachedResponse.status = ClientStatus.FORCED_UPDATE;
+            cachedResponse.guestModeAllowed = false;
+          }
+        }
+
+        // Remove minPatchVersion from client response
+        delete cachedResponse.minPatchVersion;
+
         return res.json({
           success: true,
           data: cachedResponse,
@@ -417,8 +437,38 @@ export class ClientController {
         ? ClientStatus.MAINTENANCE
         : record.clientStatus;
 
-      // Check minimum patch version requirement
-      let finalStatus = effectiveStatus;
+      // Transform data for client consumption (remove sensitive fields)
+      const clientData: any = {
+        platform: record.platform,
+        clientVersion: record.clientVersion,
+        status: effectiveStatus,
+        gameServerAddress,
+        patchAddress,
+        guestModeAllowed:
+          effectiveStatus === ClientStatus.MAINTENANCE
+            ? false
+            : Boolean(record.guestModeAllowed),
+        externalClickLink: record.externalClickLink,
+        meta,
+      };
+
+      // Add maintenance message if status is MAINTENANCE
+      if (effectiveStatus === ClientStatus.MAINTENANCE) {
+        // Service maintenance message takes priority over client version maintenance message
+        clientData.maintenanceMessage = isServiceMaintenanceActive
+          ? serviceMaintenanceMessage || ''
+          : maintenanceMessage || '';
+      }
+
+      // Include minPatchVersion in cached data for later re-evaluation
+      if (record.minPatchVersion) {
+        clientData.minPatchVersion = record.minPatchVersion;
+      }
+
+      // Cache the result for 5 minutes (before patchVersion check so cache has original status)
+      await cacheService.set(cacheKey, clientData, 5 * 60 * 1000);
+
+      // Apply minimum patch version check after caching
       if (
         record.minPatchVersion &&
         effectiveStatus !== ClientStatus.MAINTENANCE
@@ -430,36 +480,13 @@ export class ClientController {
             record.minPatchVersion
           ) < 0
         ) {
-          finalStatus = ClientStatus.FORCED_UPDATE;
+          clientData.status = ClientStatus.FORCED_UPDATE;
+          clientData.guestModeAllowed = false;
         }
       }
 
-      // Transform data for client consumption (remove sensitive fields)
-      const clientData: any = {
-        platform: record.platform,
-        clientVersion: record.clientVersion,
-        status: finalStatus,
-        gameServerAddress,
-        patchAddress,
-        guestModeAllowed:
-          finalStatus === ClientStatus.MAINTENANCE ||
-          finalStatus === ClientStatus.FORCED_UPDATE
-            ? false
-            : Boolean(record.guestModeAllowed),
-        externalClickLink: record.externalClickLink,
-        meta,
-      };
-
-      // Add maintenance message if status is MAINTENANCE
-      if (finalStatus === ClientStatus.MAINTENANCE) {
-        // Service maintenance message takes priority over client version maintenance message
-        clientData.maintenanceMessage = isServiceMaintenanceActive
-          ? serviceMaintenanceMessage || ''
-          : maintenanceMessage || '';
-      }
-
-      // Cache the result for 5 minutes
-      await cacheService.set(cacheKey, clientData, 5 * 60 * 1000);
+      // Remove minPatchVersion from client response
+      delete clientData.minPatchVersion;
 
       return res.json({
         success: true,
