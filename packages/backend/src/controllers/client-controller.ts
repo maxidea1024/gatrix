@@ -524,8 +524,12 @@ export class ClientController {
         : GAME_WORLDS.PUBLIC;
 
       // Try to get from cache first
-      const cachedData = await cacheService.get(cacheKey);
-      if (cachedData) {
+      const cachedData = await cacheService.get(cacheKey) as any;
+      if (
+        cachedData &&
+        cachedData.worlds?.length > 0 &&
+        cachedData.worlds[0].tags !== undefined
+      ) {
         logger.debug(`Cache hit for game worlds: ${cacheKey}`);
         return res.json({
           success: true,
