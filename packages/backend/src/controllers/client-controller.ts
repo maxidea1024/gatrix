@@ -76,16 +76,23 @@ export class ClientController {
    */
   static getClientVersion = asyncHandler(
     async (req: SDKRequest, res: Response) => {
-      const { platform, version, status, lang, channel, subChannel, patchVersion } =
-        req.query as {
-          platform?: string;
-          version?: string;
-          status?: string;
-          lang?: string;
-          channel?: string;
-          subChannel?: string;
-          patchVersion?: string;
-        };
+      const {
+        platform,
+        version,
+        status,
+        lang,
+        channel,
+        subChannel,
+        patchVersion,
+      } = req.query as {
+        platform?: string;
+        version?: string;
+        status?: string;
+        lang?: string;
+        channel?: string;
+        subChannel?: string;
+        patchVersion?: string;
+      };
 
       // Validate required query params - platform is always required
       if (!platform) {
@@ -412,8 +419,17 @@ export class ClientController {
 
       // Check minimum patch version requirement
       let finalStatus = effectiveStatus;
-      if (record.minPatchVersion && effectiveStatus !== ClientStatus.MAINTENANCE) {
-        if (!patchVersion || ClientController.compareVersions(patchVersion, record.minPatchVersion) < 0) {
+      if (
+        record.minPatchVersion &&
+        effectiveStatus !== ClientStatus.MAINTENANCE
+      ) {
+        if (
+          !patchVersion ||
+          ClientController.compareVersions(
+            patchVersion,
+            record.minPatchVersion
+          ) < 0
+        ) {
           finalStatus = ClientStatus.FORCED_UPDATE;
         }
       }
@@ -426,7 +442,8 @@ export class ClientController {
         gameServerAddress,
         patchAddress,
         guestModeAllowed:
-          finalStatus === ClientStatus.MAINTENANCE || finalStatus === ClientStatus.FORCED_UPDATE
+          finalStatus === ClientStatus.MAINTENANCE ||
+          finalStatus === ClientStatus.FORCED_UPDATE
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,

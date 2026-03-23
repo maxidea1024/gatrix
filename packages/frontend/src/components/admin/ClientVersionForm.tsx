@@ -133,10 +133,7 @@ const createValidationSchema = (t: any) =>
     supportsMultiLanguage: yup.boolean().notRequired(),
     maintenanceLocales: yup.array().notRequired(),
     tags: yup.array().notRequired(),
-    minPatchVersion: yup
-      .string()
-      .max(50)
-      .notRequired(),
+    minPatchVersion: yup.string().max(50).notRequired(),
   });
 
 const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
@@ -1029,7 +1026,15 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     m: 0,
                   }}
                 >
-                  <Box component="legend" sx={{ px: 1, fontSize: '0.875rem', fontWeight: 600, color: 'text.secondary' }}>
+                  <Box
+                    component="legend"
+                    sx={{
+                      px: 1,
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      color: 'text.secondary',
+                    }}
+                  >
                     {t('clientVersions.form.gameServerGroup')}
                   </Box>
                   <Box sx={{ display: 'flex', gap: 2 }}>
@@ -1119,7 +1124,15 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     m: 0,
                   }}
                 >
-                  <Box component="legend" sx={{ px: 1, fontSize: '0.875rem', fontWeight: 600, color: 'text.secondary' }}>
+                  <Box
+                    component="legend"
+                    sx={{
+                      px: 1,
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      color: 'text.secondary',
+                    }}
+                  >
                     {t('clientVersions.form.patchServerGroup')}
                   </Box>
                   <Stack spacing={2}>

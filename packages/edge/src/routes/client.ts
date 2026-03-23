@@ -157,16 +157,23 @@ router.get(
       if (!sdk) return;
 
       const { environmentId, cacheKey } = req.clientContext!;
-      const { platform, version, status, lang, channel, subChannel, patchVersion } =
-        req.query as {
-          platform?: string;
-          version?: string;
-          status?: string;
-          lang?: string;
-          channel?: string;
-          subChannel?: string;
-          patchVersion?: string;
-        };
+      const {
+        platform,
+        version,
+        status,
+        lang,
+        channel,
+        subChannel,
+        patchVersion,
+      } = req.query as {
+        platform?: string;
+        version?: string;
+        status?: string;
+        lang?: string;
+        channel?: string;
+        subChannel?: string;
+        patchVersion?: string;
+      };
 
       // Validate required query params
       if (!platform) {
@@ -359,8 +366,14 @@ router.get(
         : record.clientStatus;
 
       // Check minimum patch version requirement
-      if ((record as any).minPatchVersion && effectiveStatus !== 'MAINTENANCE') {
-        if (!patchVersion || compareVersions(patchVersion, (record as any).minPatchVersion) < 0) {
+      if (
+        (record as any).minPatchVersion &&
+        effectiveStatus !== 'MAINTENANCE'
+      ) {
+        if (
+          !patchVersion ||
+          compareVersions(patchVersion, (record as any).minPatchVersion) < 0
+        ) {
           effectiveStatus = 'FORCED_UPDATE';
         }
       }
@@ -372,7 +385,8 @@ router.get(
         gameServerAddress: record.gameServerAddress,
         patchAddress: record.patchAddress,
         guestModeAllowed:
-          effectiveStatus === 'MAINTENANCE' || effectiveStatus === 'FORCED_UPDATE'
+          effectiveStatus === 'MAINTENANCE' ||
+          effectiveStatus === 'FORCED_UPDATE'
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,
