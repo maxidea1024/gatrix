@@ -555,4 +555,22 @@ export class GameWorldModel {
       throw error;
     }
   }
+  /**
+   * Find a game world by ID without requiring environmentId.
+   * Used when only environmentId lookup is needed (e.g. tag change SDK event publishing).
+   */
+  static async findByIdWithoutEnv(
+    id: string
+  ): Promise<{ id: string; environmentId: string } | null> {
+    try {
+      const row = await db('g_game_worlds')
+        .select('id', 'environmentId')
+        .where('id', id)
+        .first();
+      return row || null;
+    } catch (error) {
+      logger.error('Error finding game world by ID (no env):', error);
+      throw error;
+    }
+  }
 }
