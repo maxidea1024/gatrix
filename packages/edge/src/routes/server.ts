@@ -255,4 +255,339 @@ router.get(
   }
 );
 
+// ============================================================================
+// Game World Routes
+// ============================================================================
+
+/**
+ * GET /api/v1/server/game-worlds
+ * Returns all visible game worlds sorted by displayOrder with tags and maintenance info
+ */
+router.get(
+  '/game-worlds',
+  serverAuth,
+  async (req: ServerRequest, res: Response) => {
+    try {
+      const { getSDKOrError } = await import('../utils/evaluation-helper');
+      const sdk = getSDKOrError(res);
+      if (!sdk) return;
+
+      const cacheKey = req.cacheKey!;
+      const envWorlds = sdk.gameWorld.getCached(cacheKey) as any[];
+
+      // Filter visible worlds only (same as Backend)
+      const visibleWorlds = envWorlds.filter(
+        (w) => w.isVisible !== false && w.isVisible !== 0
+      );
+
+      // Helper function to convert MySQL BOOLEAN (0/1) to boolean
+      const toBoolean = (value: any): boolean => {
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'number') return value === 1;
+        if (typeof value === 'string')
+          return value === '1' || value.toLowerCase() === 'true';
+        return false;
+      };
+
+      // Helper function to parse JSON field
+      const parseJsonField = (payload: any): Record<string, any> | null => {
+        if (!payload) return null;
+        if (typeof payload === 'string') {
+          try {
+            return JSON.parse(payload);
+          } catch {
+            return null;
+          }
+        }
+        if (typeof payload === 'object') return payload;
+        return null;
+      };
+
+      // Transform data (same format as Backend ServerGameWorldController)
+      const worlds = visibleWorlds.map((world: any) => {
+        const worldData: any = {
+          id: world.id,
+          worldId: world.worldId,
+          name: world.name,
+          isMaintenance: toBoolean(world.isMaintenance),
+          displayOrder: world.displayOrder,
+          worldServerAddress: world.worldServerAddress || null,
+          customPayload: parseJsonField(world.customPayload),
+          infraSettings: parseJsonField(world.infraSettings),
+          tags: world.tags || [],
+          createdAt: world.createdAt,
+        };
+
+        // Add maintenance info if in maintenance mode
+        if (toBoolean(world.isMaintenance)) {
+          if (world.maintenanceStartDate) {
+            worldData.maintenanceStartDate = world.maintenanceStartDate;
+          }
+          if (world.maintenanceEndDate) {
+            worldData.maintenanceEndDate = world.maintenanceEndDate;
+          }
+          if (world.maintenanceMessage) {
+            worldData.maintenanceMessage = world.maintenanceMessage;
+          }
+          if (
+            world.maintenanceLocales &&
+            world.maintenanceLocales.length > 0
+          ) {
+            worldData.maintenanceLocales = world.maintenanceLocales.map(
+              (locale: any) => ({
+                lang: locale.lang,
+                message: locale.message,
+              })
+            );
+          }
+        }
+
+        return worldData;
+      });
+
+      logger.info(
+        `Server SDK (Edge): Retrieved ${worlds.length} visible game worlds`
+      );
+
+      res.json({
+        success: true,
+        data: {
+          worlds,
+        },
+      });
+    } catch (error) {
+      sendInternalError(
+        res,
+        'Failed to retrieve game worlds',
+        error,
+        ErrorCodes.RESOURCE_FETCH_FAILED
+      );
+    }
+  }
+);
+
+/**
+ * GET /api/v1/server/game-worlds/world/:worldId
+ * Get specific game world by worldId
+ */
+router.get(
+  '/game-worlds/world/:worldId',
+  serverAuth,
+  async (req: ServerRequest, res: Response) => {
+    try {
+      const { getSDKOrError } = await import('../utils/evaluation-helper');
+      const sdk = getSDKOrError(res);
+      if (!sdk) return;
+
+      const { worldId } = req.params;
+      const cacheKey = req.cacheKey!;
+
+      if (!worldId || typeof worldId !== 'string') {
+        return sendBadRequest(res, 'World ID must be a non-empty string');
+      }
+
+      const envWorlds = sdk.gameWorld.getCached(cacheKey) as any[];
+      const world = envWorlds.find((w: any) => w.worldId === worldId);
+
+      if (!world) {
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: `Game world not found: ${worldId}`,
+          },
+        });
+      }
+
+      // Helper function to convert MySQL BOOLEAN (0/1) to boolean
+      const toBoolean = (value: any): boolean => {
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'number') return value === 1;
+        if (typeof value === 'string')
+          return value === '1' || value.toLowerCase() === 'true';
+        return false;
+      };
+
+      // Helper function to parse JSON field
+      const parseJsonField = (payload: any): Record<string, any> | null => {
+        if (!payload) return null;
+        if (typeof payload === 'string') {
+          try {
+            return JSON.parse(payload);
+          } catch {
+            return null;
+          }
+        }
+        if (typeof payload === 'object') return payload;
+        return null;
+      };
+
+      const worldData: any = {
+        id: world.id,
+        worldId: world.worldId,
+        name: world.name,
+        isMaintenance: toBoolean(world.isMaintenance),
+        displayOrder: world.displayOrder,
+        worldServerAddress: world.worldServerAddress || null,
+        customPayload: parseJsonField(world.customPayload),
+        infraSettings: parseJsonField(world.infraSettings),
+        tags: world.tags || [],
+        createdAt: world.createdAt,
+      };
+
+      // Add maintenance info if in maintenance mode
+      if (toBoolean(world.isMaintenance)) {
+        if (world.maintenanceStartDate) {
+          worldData.maintenanceStartDate = world.maintenanceStartDate;
+        }
+        if (world.maintenanceEndDate) {
+          worldData.maintenanceEndDate = world.maintenanceEndDate;
+        }
+        if (world.maintenanceMessage) {
+          worldData.maintenanceMessage = world.maintenanceMessage;
+        }
+        if (
+          world.maintenanceLocales &&
+          world.maintenanceLocales.length > 0
+        ) {
+          worldData.maintenanceLocales = world.maintenanceLocales.map(
+            (locale: any) => ({
+              lang: locale.lang,
+              message: locale.message,
+            })
+          );
+        }
+      }
+
+      res.json({
+        success: true,
+        data: worldData,
+        meta: {
+          timestamp: new Date().toISOString(),
+          apiVersion: '1.0.0',
+        },
+      });
+    } catch (error) {
+      sendInternalError(
+        res,
+        'Failed to retrieve game world',
+        error,
+        ErrorCodes.RESOURCE_FETCH_FAILED
+      );
+    }
+  }
+);
+
+/**
+ * GET /api/v1/server/game-worlds/:id
+ * Get specific game world by ID
+ */
+router.get(
+  '/game-worlds/:id',
+  serverAuth,
+  async (req: ServerRequest, res: Response) => {
+    try {
+      const { getSDKOrError } = await import('../utils/evaluation-helper');
+      const sdk = getSDKOrError(res);
+      if (!sdk) return;
+
+      const { id } = req.params;
+      const cacheKey = req.cacheKey!;
+
+      if (!id) {
+        return sendBadRequest(res, 'Game world ID is required');
+      }
+
+      const envWorlds = sdk.gameWorld.getCached(cacheKey) as any[];
+      const world = envWorlds.find((w: any) => w.id === id);
+
+      if (!world) {
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: `Game world not found: ${id}`,
+          },
+        });
+      }
+
+      // Helper function to convert MySQL BOOLEAN (0/1) to boolean
+      const toBoolean = (value: any): boolean => {
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'number') return value === 1;
+        if (typeof value === 'string')
+          return value === '1' || value.toLowerCase() === 'true';
+        return false;
+      };
+
+      // Helper function to parse JSON field
+      const parseJsonField = (payload: any): Record<string, any> | null => {
+        if (!payload) return null;
+        if (typeof payload === 'string') {
+          try {
+            return JSON.parse(payload);
+          } catch {
+            return null;
+          }
+        }
+        if (typeof payload === 'object') return payload;
+        return null;
+      };
+
+      const worldData: any = {
+        id: world.id,
+        worldId: world.worldId,
+        name: world.name,
+        isMaintenance: toBoolean(world.isMaintenance),
+        displayOrder: world.displayOrder,
+        worldServerAddress: world.worldServerAddress || null,
+        customPayload: parseJsonField(world.customPayload),
+        infraSettings: parseJsonField(world.infraSettings),
+        tags: world.tags || [],
+        createdAt: world.createdAt,
+      };
+
+      // Add maintenance info if in maintenance mode
+      if (toBoolean(world.isMaintenance)) {
+        if (world.maintenanceStartDate) {
+          worldData.maintenanceStartDate = world.maintenanceStartDate;
+        }
+        if (world.maintenanceEndDate) {
+          worldData.maintenanceEndDate = world.maintenanceEndDate;
+        }
+        if (world.maintenanceMessage) {
+          worldData.maintenanceMessage = world.maintenanceMessage;
+        }
+        if (
+          world.maintenanceLocales &&
+          world.maintenanceLocales.length > 0
+        ) {
+          worldData.maintenanceLocales = world.maintenanceLocales.map(
+            (locale: any) => ({
+              lang: locale.lang,
+              message: locale.message,
+            })
+          );
+        }
+      }
+
+      res.json({
+        success: true,
+        data: worldData,
+        meta: {
+          timestamp: new Date().toISOString(),
+          apiVersion: '1.0.0',
+        },
+      });
+    } catch (error) {
+      sendInternalError(
+        res,
+        'Failed to retrieve game world',
+        error,
+        ErrorCodes.RESOURCE_FETCH_FAILED
+      );
+    }
+  }
+);
+
 export default router;

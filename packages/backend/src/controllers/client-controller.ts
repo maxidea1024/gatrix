@@ -437,6 +437,21 @@ export class ClientController {
         ? ClientStatus.MAINTENANCE
         : record.clientStatus;
 
+      // Fetch tags for the client version
+      let tagNames: string[] = [];
+      if (record.id) {
+        try {
+          const { TagService } = await import('../services/tag-service');
+          const tags = await TagService.listTagsForEntity(
+            'client_version',
+            record.id
+          );
+          tagNames = tags ? tags.map((tag: any) => tag.name) : [];
+        } catch (error) {
+          logger.warn('Failed to fetch tags for client version:', error);
+        }
+      }
+
       // Transform data for client consumption (remove sensitive fields)
       const clientData: any = {
         platform: record.platform,
@@ -449,6 +464,7 @@ export class ClientController {
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,
+        tags: tagNames,
         meta,
       };
 
@@ -536,6 +552,7 @@ export class ClientController {
           name: world.name,
           description: world.description,
           displayOrder: world.displayOrder,
+          tags: world.tags || null,
           meta: world.customPayload || {},
           createdAt: world.createdAt,
           updatedAt: world.updatedAt,

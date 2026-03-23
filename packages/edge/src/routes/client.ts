@@ -390,6 +390,9 @@ router.get(
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,
+        tags: Array.isArray(record.tags)
+          ? record.tags.map((t: any) => (typeof t === 'string' ? t : t.name))
+          : [],
         meta,
       };
 
@@ -462,6 +465,7 @@ router.get(
           description:
             (world as unknown as { description?: string }).description || '',
           displayOrder: world.displayOrder,
+          tags: (world as unknown as { tags?: string | null }).tags || null,
           meta: world.customPayload || {},
           createdAt: world.createdAt,
           updatedAt:
