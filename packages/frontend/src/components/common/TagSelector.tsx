@@ -119,7 +119,11 @@ const TagSelector: React.FC<TagSelectorProps> = ({
     try {
       setCreating(true);
       const tag = await tagService.create(
-        { name, color: newTagColor, description: newTagDescription.trim() || null },
+        {
+          name,
+          color: newTagColor,
+          description: newTagDescription.trim() || null,
+        },
         projectApiPath
       );
       setAvailableTags((prev) => [...prev, tag]);
@@ -247,7 +251,8 @@ const TagSelector: React.FC<TagSelectorProps> = ({
           if (allowManage && params.inputValue.trim()) {
             const exists = availableTags.some(
               (tag) =>
-                tag.name.toLowerCase() === params.inputValue.trim().toLowerCase()
+                tag.name.toLowerCase() ===
+                params.inputValue.trim().toLowerCase()
             );
             if (!exists) {
               filtered.push({
@@ -284,7 +289,14 @@ const TagSelector: React.FC<TagSelectorProps> = ({
           }
           return (
             <li {...props} key={option.id}>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  width: '100%',
+                  gap: 1,
+                }}
+              >
                 <Box
                   sx={{
                     width: 14,

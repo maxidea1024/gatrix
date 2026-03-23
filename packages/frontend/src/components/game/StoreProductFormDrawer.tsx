@@ -104,8 +104,6 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   // Check if this is edit mode (existing product)
   const isEditMode = !!product?.id;
 
-
-
   // Initialize form
   useEffect(() => {
     if (product) {
@@ -643,10 +641,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
               </Box>
 
               {/* Tags */}
-              <TagSelector
-                value={selectedTags}
-                onChange={setSelectedTags}
-              />
+              <TagSelector value={selectedTags} onChange={setSelectedTags} />
             </Stack>
           </Box>
 

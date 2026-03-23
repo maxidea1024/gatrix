@@ -440,8 +440,6 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     }
   }, [open, isEdit, isCopyMode, clientVersion, reset]);
 
-
-
   // Load message templates
   useEffect(() => {
     if (open) {

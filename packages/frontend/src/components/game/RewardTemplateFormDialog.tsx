@@ -66,8 +66,6 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
     useState(false);
   const nameInputRef = React.useRef<HTMLInputElement>(null);
 
-
-
   // Initialize form
   useEffect(() => {
     if (template) {
@@ -382,10 +380,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
             </Box>
 
             {/* Tags */}
-            <TagSelector
-              value={selectedTags}
-              onChange={setSelectedTags}
-            />
+            <TagSelector value={selectedTags} onChange={setSelectedTags} />
 
             {/* Reward Items */}
             <Box

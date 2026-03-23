@@ -322,7 +322,10 @@ const JobForm: React.FC<JobFormProps> = ({
                 value={selectedTags}
                 onChange={(tags) => {
                   setSelectedTags(tags);
-                  handleFieldChange('tagIds', tags.map((tag) => tag.id));
+                  handleFieldChange(
+                    'tagIds',
+                    tags.map((tag) => tag.id)
+                  );
                 }}
                 label={t('common.tags')}
               />
@@ -461,7 +464,10 @@ const JobForm: React.FC<JobFormProps> = ({
             value={selectedTags}
             onChange={(tags) => {
               setSelectedTags(tags);
-              handleFieldChange('tagIds', tags.map((tag) => tag.id));
+              handleFieldChange(
+                'tagIds',
+                tags.map((tag) => tag.id)
+              );
             }}
             label={t('common.tags')}
           />

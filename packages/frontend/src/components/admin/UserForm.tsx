@@ -66,8 +66,6 @@ const UserForm: React.FC<UserFormProps> = ({
     },
   });
 
-
-
   // User data to form initialization
   useEffect(() => {
     if (user) {
@@ -223,10 +221,7 @@ const UserForm: React.FC<UserFormProps> = ({
             />
 
             {/* Tags */}
-            <TagSelector
-              value={selectedTags}
-              onChange={setSelectedTags}
-            />
+            <TagSelector value={selectedTags} onChange={setSelectedTags} />
           </Box>
         </DialogContent>
         <DialogActions>
