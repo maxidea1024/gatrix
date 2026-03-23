@@ -1341,7 +1341,11 @@ const MessageTemplatesPage: React.FC = () => {
                 }
                 label={t('messageTemplates.availability')}
               />
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 7, mt: -0.5 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', ml: 7, mt: -0.5 }}
+              >
                 {t('messageTemplates.availabilityHelp')}
               </Typography>
             </Box>
