@@ -48,7 +48,7 @@ import ingamePopupNoticeService, {
   IngamePopupNoticeFilters,
 } from '../../services/ingamePopupNoticeService';
 import IngamePopupNoticeFormDialog from '../../components/game/IngamePopupNoticeFormDialog';
-import IngamePopupNoticeGuideDrawer from '../../components/game/IngamePopupNoticeGuideDrawer';
+
 
 import SimplePagination from '../../components/common/SimplePagination';
 import SearchTextField from '../../components/common/SearchTextField';
@@ -141,7 +141,7 @@ const IngamePopupNoticesPage: React.FC = () => {
   const [deletingNotice, setDeletingNotice] =
     useState<IngamePopupNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
-  const [guideDrawerOpen, setGuideDrawerOpen] = useState(false);
+
   const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
     null
   );
@@ -548,18 +548,7 @@ const IngamePopupNoticesPage: React.FC = () => {
                 setImportDialogOpen(true);
               }}
             />
-            <Divider />
-            <MenuItem
-              onClick={() => {
-                setPageMenuAnchor(null);
-                setGuideDrawerOpen(true);
-              }}
-            >
-              <ListItemIcon>
-                <CodeIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t('ingamePopupNotices.sdkGuide')}</ListItemText>
-            </MenuItem>
+
           </Menu>
         </Box>
       </Box>
@@ -1039,11 +1028,7 @@ const IngamePopupNoticesPage: React.FC = () => {
         onReset={handleResetColumns}
       />
 
-      {/* SDK Guide Drawer */}
-      <IngamePopupNoticeGuideDrawer
-        open={guideDrawerOpen}
-        onClose={() => setGuideDrawerOpen(false)}
-      />
+
 
       {/* Import Dialog */}
       <ImportDialog

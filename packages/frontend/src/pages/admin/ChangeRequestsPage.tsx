@@ -32,6 +32,7 @@ import {
   Undo as UndoIcon,
   PlayArrow as PlayArrowIcon,
   Delete as DeleteIcon,
+  CompareArrows as CompareArrowsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';

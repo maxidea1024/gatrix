@@ -136,7 +136,7 @@ import {
   messageTemplateService,
   MessageTemplate,
 } from '@/services/messageTemplateService';
-import GameWorldSDKGuideDrawer from '../../components/gameWorlds/GameWorldSDKGuideDrawer';
+
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import { getActionLabel } from '../../utils/changeRequestToast';
@@ -647,8 +647,6 @@ const GameWorldsPage: React.FC = () => {
   // Import dialog state
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
-  // SDK 가이드 Status
-  const [openSDKGuide, setOpenSDKGuide] = useState(false);
   const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
     null
   );
@@ -1907,20 +1905,7 @@ const GameWorldsPage: React.FC = () => {
                   setImportDialogOpen(true);
                 }}
               />
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  setOpenSDKGuide(true);
-                }}
-              >
-                <ListItemIcon>
-                  <CodeIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                  {t('coupons.couponSettings.sdkGuide')}
-                </ListItemText>
-              </MenuItem>
+
             </Menu>
           </>
         }
@@ -2696,11 +2681,7 @@ const GameWorldsPage: React.FC = () => {
         </ClickAwayListener>
       </Popover>
 
-      {/* SDK Guide Drawer */}
-      <GameWorldSDKGuideDrawer
-        open={openSDKGuide}
-        onClose={() => setOpenSDKGuide(false)}
-      />
+
 
       {/* Import Dialog */}
       <ImportDialog

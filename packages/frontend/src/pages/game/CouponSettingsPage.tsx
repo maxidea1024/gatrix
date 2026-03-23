@@ -105,7 +105,7 @@ import ColumnSettingsDialog, {
   ColumnConfig,
 } from '@/components/common/ColumnSettingsDialog';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
-import SDKGuideDrawer from '@/components/coupons/SDKGuideDrawer';
+
 import RewardSelector from '@/components/game/RewardSelector';
 import RewardDisplay from '@/components/game/RewardDisplay';
 import TargetSettingsGroup, {
@@ -197,8 +197,6 @@ const CouponSettingsPage: React.FC = () => {
   const [exportFormat, setExportFormat] = useState<'csv' | 'xlsx' | null>(null);
   const exportAbortControllerRef = useRef<AbortController | null>(null);
 
-  // SDK Guide drawer state
-  const [openSDKGuide, setOpenSDKGuide] = useState(false);
   const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
     null
   );
@@ -1422,20 +1420,7 @@ const CouponSettingsPage: React.FC = () => {
                 setImportDialogOpen(true);
               }}
             />
-            <Divider />
-            <MenuItem
-              onClick={() => {
-                setPageMenuAnchor(null);
-                setOpenSDKGuide(true);
-              }}
-            >
-              <ListItemIcon>
-                <CodeIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>
-                {t('coupons.couponSettings.sdkGuide')}
-              </ListItemText>
-            </MenuItem>
+
           </Menu>
         </Box>
       </Box>
@@ -3110,11 +3095,7 @@ const CouponSettingsPage: React.FC = () => {
         </Box>
       </ResizableDrawer>
 
-      {/* SDK Guide Drawer */}
-      <SDKGuideDrawer
-        open={openSDKGuide}
-        onClose={() => setOpenSDKGuide(false)}
-      />
+
 
       {/* Delete Confirmation Dialog */}
       <Dialog

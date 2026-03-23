@@ -145,7 +145,7 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import ClientVersionGuideDrawer from '../../components/admin/ClientVersionGuideDrawer';
+
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { getContrastColor } from '@/utils/colorUtils';
@@ -525,8 +525,6 @@ const ClientVersionsPage: React.FC = () => {
     useState<null | HTMLElement>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
-  // SDK 가이드 Status
-  const [openSDKGuide, setOpenSDKGuide] = useState(false);
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -1741,18 +1739,7 @@ const ClientVersionsPage: React.FC = () => {
                   {t('common.import')} (CSV/JSON/XLSX)
                 </ListItemText>
               </MenuItem>
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setExportMenuAnchor(null);
-                  setOpenSDKGuide(true);
-                }}
-              >
-                <ListItemIcon>
-                  <CodeIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('clientVersions.sdkGuide')}</ListItemText>
-              </MenuItem>
+
             </Menu>
           </>
         }
@@ -2815,11 +2802,7 @@ const ClientVersionsPage: React.FC = () => {
         </ClickAwayListener>
       </Popover>
 
-      {/* Client Version Guide Drawer */}
-      <ClientVersionGuideDrawer
-        open={openSDKGuide}
-        onClose={() => setOpenSDKGuide(false)}
-      />
+
 
       {/* Import Dialog */}
       <ImportDialog

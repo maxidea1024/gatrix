@@ -165,6 +165,7 @@ const KeyValuePage = React.lazy(() => import('./pages/settings/KeyValuePage'));
 const IntegrationsPage = React.lazy(
   () => import('./pages/settings/IntegrationsPage')
 );
+
 const IntegrationsSdksPage = React.lazy(
   () => import('./pages/settings/IntegrationsSdksPage')
 );
@@ -694,6 +695,7 @@ const AppContent: React.FC = () => {
                                   </ProtectedRoute>
                                 }
                               />
+
                               <Route
                                 path="/settings/integrations/create"
                                 element={
