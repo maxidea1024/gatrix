@@ -51,6 +51,7 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import JobForm from '../../components/jobs/JobForm';
 import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
 import SimplePagination from '../../components/common/SimplePagination';
+import TagChips from '../../components/common/TagChips';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ColumnSettingsDialog, {
@@ -439,19 +440,7 @@ const JobsPage: React.FC = () => {
       case 'isEnabled':
         return getStatusChip(job);
       case 'tags':
-        return (
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {job.tags && job.tags.length > 0 ? (
-              job.tags.map((tag) => (
-                <Chip key={tag.id} label={tag.name} size="small" />
-              ))
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                -
-              </Typography>
-            )}
-          </Box>
-        );
+        return <TagChips tags={job.tags} />;
       default:
         return null;
     }

@@ -114,6 +114,7 @@ import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
+import TagSelector from '../../components/common/TagSelector';
 import { Environment } from '../../services/environmentService';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
@@ -239,6 +240,7 @@ const FeatureFlagsPage: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [showCreateDescription, setShowCreateDescription] = useState(false);
   const [showCreateTags, setShowCreateTags] = useState(false);
+  const [createTagSelection, setCreateTagSelection] = useState<Tag[]>([]);
   const [createFlagTypeMode, setCreateFlagTypeMode] =
     useState(!!createFlagNameParam);
   const [newFlag, setNewFlag] = useState(() => {
@@ -3456,39 +3458,12 @@ const FeatureFlagsPage: React.FC = () => {
 
             {/* Collapsible Tags */}
             {(showCreateTags || !!newFlag.tags?.length) && (
-              <Autocomplete
-                multiple
-                size="small"
-                options={allTags.map((tag) => tag.name)}
-                value={newFlag.tags}
-                onChange={(_, newValue) =>
-                  setNewFlag({ ...newFlag, tags: newValue })
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('featureFlags.tags')}
-                    placeholder={t('featureFlags.selectTags')}
-                    helperText={t('featureFlags.tagsHelp')}
-                  />
-                )}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const tag = allTags.find((t) => t.name === option);
-                    return (
-                      <Chip
-                        {...getTagProps({ index })}
-                        key={option}
-                        label={option}
-                        size="small"
-                        sx={{
-                          bgcolor: tag?.color || '#888',
-                          color: getContrastColor(tag?.color || '#888'),
-                        }}
-                      />
-                    );
-                  })
-                }
+              <TagSelector
+                value={createTagSelection}
+                onChange={(tags) => {
+                  setCreateTagSelection(tags);
+                  setNewFlag({ ...newFlag, tags: tags.map((t) => t.name) });
+                }}
               />
             )}
 

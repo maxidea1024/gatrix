@@ -43,6 +43,7 @@ import rewardTemplateService, {
   RewardTemplate,
 } from '../../services/rewardTemplateService';
 import { tagService } from '../../services/tagService';
+import TagChips from '../../components/common/TagChips';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ColumnSettingsDialog, {
@@ -890,46 +891,7 @@ const RewardTemplatesPage: React.FC = () => {
                           if (column.id === 'tags') {
                             return (
                               <TableCell key={column.id}>
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    gap: 0.5,
-                                    flexWrap: 'wrap',
-                                    maxWidth: 220,
-                                  }}
-                                >
-                                  {template.tags && template.tags.length > 0 ? (
-                                    template.tags
-                                      .slice(0, 6)
-                                      .map((tag, idx) => (
-                                        <Tooltip
-                                          key={`${tag.id}-${idx}`}
-                                          title={
-                                            tag.description ||
-                                            t('tags.noDescription')
-                                          }
-                                          arrow
-                                        >
-                                          <Chip
-                                            label={tag.name}
-                                            size="small"
-                                            sx={{
-                                              bgcolor: tag.color,
-                                              color: '#fff',
-                                              cursor: 'help',
-                                            }}
-                                          />
-                                        </Tooltip>
-                                      ))
-                                  ) : (
-                                    <Typography
-                                      variant="body2"
-                                      color="text.secondary"
-                                    >
-                                      -
-                                    </Typography>
-                                  )}
-                                </Box>
+                                <TagChips tags={template.tags} maxVisible={6} />
                               </TableCell>
                             );
                           }

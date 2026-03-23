@@ -116,6 +116,7 @@ import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
+import TagSelector from '../../components/common/TagSelector';
 import JsonEditor from '../../components/common/JsonEditor';
 import ValueEditorField from '../../components/common/ValueEditorField';
 import BooleanSwitch from '../../components/common/BooleanSwitch';
@@ -708,6 +709,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     impressionDataEnabled: boolean;
     tags: string[];
   } | null>(null);
+  const [editTagSelection, setEditTagSelection] = useState<Tag[]>([]);
 
   // Link dialog states
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
@@ -4067,39 +4069,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                 {/* Collapsible Tags */}
                 {(!!editingFlagData.tags?.length ||
                   (editingFlagData as any)._showTags) && (
-                  <Autocomplete
-                    multiple
-                    size="small"
-                    options={allTags.map((tag) => tag.name)}
-                    value={editingFlagData.tags || []}
-                    onChange={(_, newValue) =>
-                      setEditingFlagData({ ...editingFlagData, tags: newValue })
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label={t('featureFlags.tags')}
-                        placeholder={t('featureFlags.selectTags')}
-                        helperText={t('featureFlags.tagsHelp')}
-                      />
-                    )}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => {
-                        const tag = allTags.find((t) => t.name === option);
-                        return (
-                          <Chip
-                            {...getTagProps({ index })}
-                            key={option}
-                            label={option}
-                            size="small"
-                            sx={{
-                              bgcolor: tag?.color || '#888',
-                              color: getContrastColor(tag?.color || '#888'),
-                            }}
-                          />
-                        );
-                      })
-                    }
+                  <TagSelector
+                    value={editTagSelection}
+                    onChange={(tags) => {
+                      setEditTagSelection(tags);
+                      setEditingFlagData({ ...editingFlagData, tags: tags.map((t) => t.name) });
+                    }}
                   />
                 )}
               </Stack>

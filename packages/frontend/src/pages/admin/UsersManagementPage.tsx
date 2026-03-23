@@ -128,6 +128,8 @@ import {
   UserRole as RbacUserRole,
 } from '@/services/rbacService';
 import { getContrastColor } from '@/utils/colorUtils';
+import TagSelector from '@/components/common/TagSelector';
+import TagChips from '@/components/common/TagChips';
 
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 import { TableSkeletonRows } from '@/components/common/TableSkeletonRows';
@@ -1744,25 +1746,7 @@ const UsersManagementPage: React.FC = () => {
         );
       }
       case 'tags':
-        return (
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {user.tags &&
-              user.tags.length > 0 &&
-              user.tags.map((tag: any) => (
-                <Chip
-                  key={tag.id}
-                  label={tag.name}
-                  size="small"
-                  variant="outlined"
-                  sx={{
-                    bgcolor: tag.color ? `${tag.color}15` : undefined,
-                    borderColor: tag.color || undefined,
-                    color: tag.color || undefined,
-                  }}
-                />
-              ))}
-          </Box>
-        );
+        return <TagChips tags={user.tags} />;
       case 'joinDate':
         return (
           <Typography variant="body2">
@@ -2332,68 +2316,10 @@ const UsersManagementPage: React.FC = () => {
 
             {/* Tags Selection */}
             <Box>
-              <Autocomplete
-                multiple
-                options={availableTags}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
+              <TagSelector
                 value={newUserTags}
-                onChange={(_, value) => setNewUserTags(value)}
-                slotProps={{
-                  popper: {
-                    style: {
-                      zIndex: 9999,
-                    },
-                  },
-                }}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip
-                        key={option.id}
-                        title={option.description || t('tags.noDescription')}
-                        arrow
-                      >
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{
-                            bgcolor: option.color,
-                            color: getContrastColor(option.color),
-                          }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('users.tags')}
-                    helperText={t('users.tagsHelp')}
-                  />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...otherProps } = props;
-                  return (
-                    <Box component="li" key={key} {...otherProps}>
-                      <Chip
-                        label={option.name}
-                        size="small"
-                        sx={{
-                          bgcolor: option.color,
-                          color: getContrastColor(option.color),
-                          mr: 1,
-                        }}
-                      />
-                      {option.description || t('common.noDescription')}
-                    </Box>
-                  );
-                }}
+                onChange={(tags) => setNewUserTags(tags)}
+                label={t('users.tags')}
               />
             </Box>
 
@@ -3163,68 +3089,10 @@ const UsersManagementPage: React.FC = () => {
 
             {/* Tags Selection for Edit */}
             <Box>
-              <Autocomplete
-                multiple
-                options={availableTags}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
+              <TagSelector
                 value={editUserTags}
-                onChange={(_, value) => setEditUserTags(value)}
-                slotProps={{
-                  popper: {
-                    style: {
-                      zIndex: 9999,
-                    },
-                  },
-                }}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip
-                        key={option.id}
-                        title={option.description || t('tags.noDescription')}
-                        arrow
-                      >
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{
-                            bgcolor: option.color,
-                            color: getContrastColor(option.color),
-                          }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('users.tags')}
-                    helperText={t('users.tagsHelp')}
-                  />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...otherProps } = props;
-                  return (
-                    <Box component="li" key={key} {...otherProps}>
-                      <Chip
-                        label={option.name}
-                        size="small"
-                        sx={{
-                          bgcolor: option.color,
-                          color: getContrastColor(option.color),
-                          mr: 1,
-                        }}
-                      />
-                      {option.description || t('common.noDescription')}
-                    </Box>
-                  );
-                }}
+                onChange={(tags) => setEditUserTags(tags)}
+                label={t('users.tags')}
               />
             </Box>
 
@@ -3416,14 +3284,12 @@ const UsersManagementPage: React.FC = () => {
         >
           <Button
             onClick={() => setEditUserDialog({ open: false, user: null })}
-            variant="outlined"
           >
             {t('common.cancel')}
           </Button>
           <Button
             onClick={handleOpenReview}
             variant="contained"
-            startIcon={<PreviewIcon />}
             disabled={getChanges().length === 0}
           >
             {t('common.review')}
@@ -3816,68 +3682,10 @@ const UsersManagementPage: React.FC = () => {
           )}
           {bulkActionType === 'tags' && (
             <Box sx={{ mt: 2 }}>
-              <Autocomplete
-                multiple
-                options={availableTags}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
+              <TagSelector
                 value={bulkActionTags}
-                onChange={(_, value) => setBulkActionTags(value)}
-                slotProps={{
-                  popper: {
-                    style: {
-                      zIndex: 1500, // Drawer보다 높은 zIndex
-                    },
-                  },
-                }}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip
-                        key={option.id}
-                        title={option.description || t('tags.noDescription')}
-                        arrow
-                      >
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{
-                            bgcolor: option.color,
-                            color: getContrastColor(option.color),
-                          }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('users.tags')}
-                    helperText={t('users.bulkTagsHelperText')}
-                  />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...otherProps } = props;
-                  return (
-                    <Box component="li" key={key} {...otherProps}>
-                      <Chip
-                        label={option.name}
-                        size="small"
-                        sx={{
-                          bgcolor: option.color,
-                          color: getContrastColor(option.color),
-                          mr: 1,
-                        }}
-                      />
-                      {option.description || t('common.noDescription')}
-                    </Box>
-                  );
-                }}
+                onChange={(tags) => setBulkActionTags(tags)}
+                label={t('users.tags')}
               />
             </Box>
           )}

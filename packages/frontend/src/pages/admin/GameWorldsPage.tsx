@@ -106,6 +106,7 @@ import 'dayjs/locale/en';
 import 'dayjs/locale/zh-cn';
 import { gameWorldService } from '../../services/gameWorldService';
 import { tagService, Tag } from '@/services/tagService';
+import TagChips from '@/components/common/TagChips';
 import {
   GameWorld,
   CreateGameWorldData,
@@ -293,25 +294,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
   };
 
   const renderTags = (tags?: Tag[] | null) => {
-    const items = (tags || []).slice(0, 6);
-    if (items.length === 0) return '-';
-    return (
-      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>
-        {items.map((tag, idx) => (
-          <Tooltip
-            key={`${tag.id}-${idx}`}
-            title={tag.description || t('tags.noDescription')}
-            arrow
-          >
-            <Chip
-              label={tag.name}
-              size="small"
-              sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }}
-            />
-          </Tooltip>
-        ))}
-      </Box>
-    );
+    return <TagChips tags={tags} maxVisible={6} maxWidth={220} />;
   };
 
   return (
@@ -1803,31 +1786,7 @@ const GameWorldsPage: React.FC = () => {
         );
       }
       case 'tags':
-        return (
-          <Box
-            sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}
-          >
-            {world.tags && world.tags.length > 0 ? (
-              world.tags.slice(0, 6).map((tag, idx) => (
-                <Tooltip
-                  key={`${tag.id}-${idx}`}
-                  title={tag.description || t('tags.noDescription')}
-                  arrow
-                >
-                  <Chip
-                    label={tag.name}
-                    size="small"
-                    sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }}
-                  />
-                </Tooltip>
-              ))
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                -
-              </Typography>
-            )}
-          </Box>
-        );
+        return <TagChips tags={world.tags} maxVisible={6} maxWidth={220} />;
       case 'createdAt':
         return (
           <Tooltip title={formatDateTimeDetailed(world.createdAt)}>

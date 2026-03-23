@@ -27,6 +27,7 @@ import {
   Circle as CircleIcon,
 } from '@mui/icons-material';
 import ResizableDrawer from '../common/ResizableDrawer';
+import ClearableTextField from '../common/ClearableTextField';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
@@ -1061,7 +1062,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         name="gameServerAddressForWhiteList"
                         control={control}
                         render={({ field }) => (
-                          <TextField
+                          <ClearableTextField
                             {...field}
                             fullWidth
                             label={t(
@@ -1080,6 +1081,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                               autoCapitalize: 'off',
                               spellCheck: false,
                             }}
+                            onClear={() => field.onChange('')}
                           />
                         )}
                       />
@@ -1160,7 +1162,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           name="patchAddressForWhiteList"
                           control={control}
                           render={({ field }) => (
-                            <TextField
+                            <ClearableTextField
                               {...field}
                               fullWidth
                               label={t(
@@ -1179,6 +1181,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                                 autoCapitalize: 'off',
                                 spellCheck: false,
                               }}
+                              onClear={() => field.onChange('')}
                             />
                           )}
                         />
@@ -1197,7 +1200,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           name="minPatchVersion"
                           control={control}
                           render={({ field }) => (
-                            <TextField
+                            <ClearableTextField
                               {...field}
                               fullWidth
                               label={t('clientVersions.minPatchVersion')}
@@ -1213,6 +1216,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                                 autoCapitalize: 'off',
                                 spellCheck: false,
                               }}
+                              onClear={() => field.onChange('')}
                             />
                           )}
                         />

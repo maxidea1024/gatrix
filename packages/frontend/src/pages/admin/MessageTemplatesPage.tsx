@@ -96,6 +96,8 @@ import {
   MessageTemplateType,
 } from '@/services/messageTemplateService';
 import { tagService, Tag } from '@/services/tagService';
+import TagSelector from '@/components/common/TagSelector';
+import TagChips from '@/components/common/TagChips';
 import SearchTextField from '@/components/common/SearchTextField';
 import translationService from '@/services/translationService';
 import { getLanguageDisplayName } from '@/contexts/I18nContext';
@@ -935,24 +937,7 @@ const MessageTemplatesPage: React.FC = () => {
           />
         );
       case 'tags':
-        return (
-          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-            {template.tags && template.tags.length > 0 ? (
-              template.tags.map((tag) => (
-                <Chip
-                  key={tag.id}
-                  label={tag.name}
-                  size="small"
-                  sx={{ bgcolor: tag.color, color: '#fff' }}
-                />
-              ))
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                -
-              </Typography>
-            )}
-          </Box>
-        );
+        return <TagChips tags={template.tags} />;
       case 'createdAt':
         return (
           <Typography variant="body2">
@@ -1403,57 +1388,10 @@ const MessageTemplatesPage: React.FC = () => {
             />
 
             {/* 태그 선택 */}
-            <TextField
-              select
-              label={t('common.tags')}
-              value={form.tags?.map((tag) => tag.id) || []}
-              onChange={(e) => {
-                const selectedIds = Array.isArray(e.target.value)
-                  ? e.target.value
-                  : [e.target.value];
-                const selectedTags = allTags.filter((tag) =>
-                  selectedIds.includes(String(tag.id))
-                );
-                setForm((prev) => ({ ...prev, tags: selectedTags }));
-              }}
-              SelectProps={{
-                multiple: true,
-                MenuProps: {
-                  PaperProps: {
-                    style: {
-                      zIndex: 99999,
-                    },
-                  },
-                },
-                renderValue: (selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {(selected as number[]).map((id) => {
-                      const tag = allTags.find((t) => t.id === id);
-                      return tag ? (
-                        <Chip
-                          key={id}
-                          label={tag.name}
-                          size="small"
-                          sx={{ bgcolor: tag.color, color: '#fff' }}
-                        />
-                      ) : null;
-                    })}
-                  </Box>
-                ),
-              }}
-              helperText={t('messageTemplates.tagsHelp')}
-            >
-              {allTags.map((tag) => (
-                <MenuItem key={tag.id} value={tag.id}>
-                  <Chip
-                    label={tag.name}
-                    size="small"
-                    sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
-                  />
-                  {tag.description || t('tags.noDescription')}
-                </MenuItem>
-              ))}
-            </TextField>
+            <TagSelector
+              value={form.tags || []}
+              onChange={(tags) => setForm((prev) => ({ ...prev, tags }))}
+            />
           </Stack>
         </Box>
 
@@ -1590,57 +1528,10 @@ const MessageTemplatesPage: React.FC = () => {
         </DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
-            <TextField
-              select
-              label={t('common.selectTags')}
-              value={templateTags.map((tag) => tag.id)}
-              onChange={(e) => {
-                const selectedIds = Array.isArray(e.target.value)
-                  ? e.target.value
-                  : [e.target.value];
-                const selectedTags = allTags.filter((tag) =>
-                  selectedIds.includes(String(tag.id))
-                );
-                setTemplateTags(selectedTags);
-              }}
-              SelectProps={{
-                multiple: true,
-                MenuProps: {
-                  PaperProps: {
-                    style: {
-                      zIndex: 99999,
-                    },
-                  },
-                },
-                renderValue: (selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {(selected as number[]).map((id) => {
-                      const tag = allTags.find((t) => t.id === id);
-                      return tag ? (
-                        <Chip
-                          key={id}
-                          label={tag.name}
-                          size="small"
-                          sx={{ bgcolor: tag.color, color: '#fff' }}
-                        />
-                      ) : null;
-                    })}
-                  </Box>
-                ),
-              }}
-              fullWidth
-            >
-              {allTags.map((tag) => (
-                <MenuItem key={tag.id} value={tag.id}>
-                  <Chip
-                    label={tag.name}
-                    size="small"
-                    sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
-                  />
-                  {tag.description || t('tags.noDescription')}
-                </MenuItem>
-              ))}
-            </TextField>
+            <TagSelector
+              value={templateTags}
+              onChange={(tags) => setTemplateTags(tags)}
+            />
           </Box>
         </DialogContent>
         <DialogActions>

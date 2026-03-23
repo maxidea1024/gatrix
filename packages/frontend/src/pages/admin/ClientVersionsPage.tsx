@@ -149,6 +149,7 @@ import DynamicFilterBar, {
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { getContrastColor } from '@/utils/colorUtils';
+import TagChips from '@/components/common/TagChips';
 import {
   showChangeRequestCreatedToast,
   getActionLabel,
@@ -1597,27 +1598,7 @@ const ClientVersionsPage: React.FC = () => {
             />
           );
         case 'tags':
-          return (
-            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-              {clientVersion.tags && clientVersion.tags.length > 0 ? (
-                clientVersion.tags.map((tag) => (
-                  <Chip
-                    key={tag.id}
-                    label={tag.name}
-                    size="small"
-                    sx={{
-                      bgcolor: tag.color,
-                      color: theme.palette.getContrastText(tag.color),
-                    }}
-                  />
-                ))
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  -
-                </Typography>
-              )}
-            </Box>
-          );
+          return <TagChips tags={clientVersion.tags} />;
         case 'createdAt':
           return (
             <Tooltip title={formatDateTimeDetailed(clientVersion.createdAt)}>
