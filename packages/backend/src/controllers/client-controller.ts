@@ -528,7 +528,7 @@ export class ClientController {
       if (
         cachedData &&
         cachedData.worlds?.length > 0 &&
-        cachedData.worlds[0].tags !== undefined
+        Array.isArray(cachedData.worlds[0].tags)
       ) {
         logger.debug(`Cache hit for game worlds: ${cacheKey}`);
         return res.json({
