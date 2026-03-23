@@ -263,6 +263,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
   highlight,
   canManage = true,
 }) => {
+  const isDragDisabled = total <= 1;
   const {
     attributes,
     listeners,
@@ -272,6 +273,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
     isDragging,
   } = useSortable({
     id: world.id,
+    disabled: isDragDisabled,
   });
 
   const style = {
@@ -313,7 +315,12 @@ const SortableRow: React.FC<SortableRowProps> = ({
           size="small"
           {...attributes}
           {...listeners}
-          sx={{ cursor: 'grab', '&:active': { cursor: 'grabbing' } }}
+          disabled={isDragDisabled}
+          sx={{
+            cursor: isDragDisabled ? 'default' : 'grab',
+            '&:active': { cursor: isDragDisabled ? 'default' : 'grabbing' },
+            opacity: isDragDisabled ? 0.3 : 1,
+          }}
         >
           <DragIcon />
         </IconButton>
