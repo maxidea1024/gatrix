@@ -329,10 +329,7 @@ router.get(
           if (world.maintenanceMessage) {
             worldData.maintenanceMessage = world.maintenanceMessage;
           }
-          if (
-            world.maintenanceLocales &&
-            world.maintenanceLocales.length > 0
-          ) {
+          if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
             worldData.maintenanceLocales = world.maintenanceLocales.map(
               (locale: any) => ({
                 lang: locale.lang,
@@ -446,10 +443,7 @@ router.get(
         if (world.maintenanceMessage) {
           worldData.maintenanceMessage = world.maintenanceMessage;
         }
-        if (
-          world.maintenanceLocales &&
-          world.maintenanceLocales.length > 0
-        ) {
+        if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
           worldData.maintenanceLocales = world.maintenanceLocales.map(
             (locale: any) => ({
               lang: locale.lang,
@@ -558,10 +552,7 @@ router.get(
         if (world.maintenanceMessage) {
           worldData.maintenanceMessage = world.maintenanceMessage;
         }
-        if (
-          world.maintenanceLocales &&
-          world.maintenanceLocales.length > 0
-        ) {
+        if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
           worldData.maintenanceLocales = world.maintenanceLocales.map(
             (locale: any) => ({
               lang: locale.lang,
