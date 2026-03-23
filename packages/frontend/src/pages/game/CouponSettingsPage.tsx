@@ -1420,7 +1420,6 @@ const CouponSettingsPage: React.FC = () => {
                 setImportDialogOpen(true);
               }}
             />
-
           </Menu>
         </Box>
       </Box>
@@ -3094,8 +3093,6 @@ const CouponSettingsPage: React.FC = () => {
           />
         </Box>
       </ResizableDrawer>
-
-
 
       {/* Delete Confirmation Dialog */}
       <Dialog

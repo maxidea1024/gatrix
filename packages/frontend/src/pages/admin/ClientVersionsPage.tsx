@@ -525,7 +525,6 @@ const ClientVersionsPage: React.FC = () => {
     useState<null | HTMLElement>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
-
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
     {
@@ -1739,7 +1738,6 @@ const ClientVersionsPage: React.FC = () => {
                   {t('common.import')} (CSV/JSON/XLSX)
                 </ListItemText>
               </MenuItem>
-
             </Menu>
           </>
         }
@@ -2801,8 +2799,6 @@ const ClientVersionsPage: React.FC = () => {
           </Box>
         </ClickAwayListener>
       </Popover>
-
-
 
       {/* Import Dialog */}
       <ImportDialog

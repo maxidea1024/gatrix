@@ -49,7 +49,6 @@ import ingamePopupNoticeService, {
 } from '../../services/ingamePopupNoticeService';
 import IngamePopupNoticeFormDialog from '../../components/game/IngamePopupNoticeFormDialog';
 
-
 import SimplePagination from '../../components/common/SimplePagination';
 import SearchTextField from '../../components/common/SearchTextField';
 import DynamicFilterBar, {
@@ -548,7 +547,6 @@ const IngamePopupNoticesPage: React.FC = () => {
                 setImportDialogOpen(true);
               }}
             />
-
           </Menu>
         </Box>
       </Box>
@@ -1027,8 +1025,6 @@ const IngamePopupNoticesPage: React.FC = () => {
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
       />
-
-
 
       {/* Import Dialog */}
       <ImportDialog

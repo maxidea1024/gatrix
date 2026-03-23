@@ -1905,7 +1905,6 @@ const GameWorldsPage: React.FC = () => {
                   setImportDialogOpen(true);
                 }}
               />
-
             </Menu>
           </>
         }
@@ -2680,8 +2679,6 @@ const GameWorldsPage: React.FC = () => {
           </Box>
         </ClickAwayListener>
       </Popover>
-
-
 
       {/* Import Dialog */}
       <ImportDialog
