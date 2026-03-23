@@ -654,8 +654,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
             <Box
               sx={{
                 display: 'flex',
-                justifyContent: 'space-between',
                 alignItems: 'center',
+                gap: 1,
                 mb: triggerConditionsExpanded ? 1 : 0,
                 cursor: 'pointer',
               }}
@@ -663,33 +663,16 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                 setTriggerConditionsExpanded(!triggerConditionsExpanded)
               }
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography
-                  variant="subtitle1"
-                  sx={{ fontWeight: 600, flex: 1 }}
-                >
-                  {t('surveys.triggerConditions')}
-                </Typography>
-                <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                  {triggerConditionsExpanded ? (
-                    <ExpandLessIcon />
-                  ) : (
-                    <ExpandMoreIcon />
-                  )}
-                </IconButton>
-              </Box>
-              {triggerConditionsExpanded && (
-                <Button
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddTriggerCondition();
-                  }}
-                  disabled={!canAddMoreConditions()}
-                >
-                  {t('surveys.addCondition')}
-                </Button>
-              )}
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
+                {t('surveys.triggerConditions')}
+              </Typography>
+              <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                {triggerConditionsExpanded ? (
+                  <ExpandLessIcon />
+                ) : (
+                  <ExpandMoreIcon />
+                )}
+              </IconButton>
             </Box>
             <Collapse in={triggerConditionsExpanded}>
               <Typography
@@ -784,6 +767,15 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                   </Box>
                 );
               })}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                <Button
+                  size="small"
+                  onClick={handleAddTriggerCondition}
+                  disabled={!canAddMoreConditions()}
+                >
+                  {t('surveys.addCondition')}
+                </Button>
+              </Box>
             </Collapse>
           </Paper>
 
