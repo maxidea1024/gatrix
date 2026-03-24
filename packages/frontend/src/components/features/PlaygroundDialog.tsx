@@ -1940,7 +1940,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             </Alert>
           )}
 
-          <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: '0 !important' }}>
+          <TableContainer
+            component={Paper}
+            variant="outlined"
+            sx={{ borderRadius: '0 !important' }}
+          >
             <Table size="small">
               <TableHead>
                 <TableRow>
@@ -2068,11 +2072,12 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           result.evaluationSteps &&
                           result.evaluationSteps.length > 0;
 
-                        const variantValueStr = result.variant?.value != null
-                          ? typeof result.variant.value === 'object'
-                            ? JSON.stringify(result.variant.value)
-                            : String(result.variant.value)
-                          : null;
+                        const variantValueStr =
+                          result.variant?.value != null
+                            ? typeof result.variant.value === 'object'
+                              ? JSON.stringify(result.variant.value)
+                              : String(result.variant.value)
+                            : null;
 
                         return (
                           <TableCell
@@ -2090,10 +2095,23 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               <Tooltip
                                 title={
                                   <Box>
-                                    <Box>{getLocalizedReason(result.reason, result.reasonDetails)}</Box>
+                                    <Box>
+                                      {getLocalizedReason(
+                                        result.reason,
+                                        result.reasonDetails
+                                      )}
+                                    </Box>
                                     {hasDetails && (
-                                      <Box sx={{ mt: 0.5, fontSize: '0.75em', opacity: 0.8 }}>
-                                        {t('playground.clickToViewEvaluationResult')}
+                                      <Box
+                                        sx={{
+                                          mt: 0.5,
+                                          fontSize: '0.75em',
+                                          opacity: 0.8,
+                                        }}
+                                      >
+                                        {t(
+                                          'playground.clickToViewEvaluationResult'
+                                        )}
                                       </Box>
                                     )}
                                   </Box>
@@ -2118,7 +2136,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   }}
                                   onClick={(e) => {
                                     if (hasDetails) {
-                                      setEvaluationPopoverAnchor(e.currentTarget);
+                                      setEvaluationPopoverAnchor(
+                                        e.currentTarget
+                                      );
                                       setSelectedEvaluation({
                                         flagName,
                                         env,
@@ -2145,11 +2165,22 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   title={
                                     <Box>
                                       {variantValueStr != null && (
-                                        <Box>{t('playground.variantValue')}: {variantValueStr}</Box>
+                                        <Box>
+                                          {t('playground.variantValue')}:{' '}
+                                          {variantValueStr}
+                                        </Box>
                                       )}
                                       {hasDetails && (
-                                        <Box sx={{ mt: 0.5, fontSize: '0.75em', opacity: 0.8 }}>
-                                          {t('playground.clickToViewEvaluationResult')}
+                                        <Box
+                                          sx={{
+                                            mt: 0.5,
+                                            fontSize: '0.75em',
+                                            opacity: 0.8,
+                                          }}
+                                        >
+                                          {t(
+                                            'playground.clickToViewEvaluationResult'
+                                          )}
                                         </Box>
                                       )}
                                     </Box>
@@ -2162,7 +2193,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                     variant="outlined"
                                     onClick={(e) => {
                                       if (hasDetails) {
-                                        setEvaluationPopoverAnchor(e.currentTarget);
+                                        setEvaluationPopoverAnchor(
+                                          e.currentTarget
+                                        );
                                         setSelectedEvaluation({
                                           flagName,
                                           env,
@@ -2175,7 +2208,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                       maxWidth: 70,
                                       height: 18,
                                       fontSize: '0.65rem',
-                                      cursor: hasDetails ? 'pointer' : 'default',
+                                      cursor: hasDetails
+                                        ? 'pointer'
+                                        : 'default',
                                       '& .MuiChip-label': {
                                         px: 0.75,
                                         overflow: 'hidden',
@@ -2189,9 +2224,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                               {result.validation &&
                                 !result.validation.valid && (
                                   <Tooltip
-                                    title={result.validation.errors.join(
-                                      ', '
-                                    )}
+                                    title={result.validation.errors.join(', ')}
                                     disableFocusListener
                                   >
                                     <WarningAmberIcon
