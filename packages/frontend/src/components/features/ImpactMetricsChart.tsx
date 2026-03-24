@@ -428,9 +428,9 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
 
   return (
     <Paper
-      elevation={isExpanded ? 0 : 3}
+      variant="outlined"
       sx={{
-        ...(isExpanded && { borderRadius: 0 }),
+        ...(isExpanded && { borderRadius: 0, border: 'none' }),
         height: '100%',
         width: '100%',
         boxSizing: 'border-box',
