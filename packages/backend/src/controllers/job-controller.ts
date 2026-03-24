@@ -260,4 +260,3 @@ export const getJobExecutions = async (
 ) => {
   return sendSuccessResponse(res, []);
 };
-

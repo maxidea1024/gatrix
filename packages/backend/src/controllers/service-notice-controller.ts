@@ -211,8 +211,15 @@ class ServiceNoticeController {
         // Handle tags if provided
         const createdNotice = gatewayResult.data;
         if (data.tags && Array.isArray(data.tags) && createdNotice?.id) {
-          const tagIds = data.tags.map((tag: any) => tag.id).filter((id: any) => id);
-          await TagService.setTagsForEntity('service_notice', createdNotice.id.toString(), tagIds, userId);
+          const tagIds = data.tags
+            .map((tag: any) => tag.id)
+            .filter((id: any) => id);
+          await TagService.setTagsForEntity(
+            'service_notice',
+            createdNotice.id.toString(),
+            tagIds,
+            userId
+          );
         }
 
         return sendSuccessResponse(
@@ -292,7 +299,12 @@ class ServiceNoticeController {
           const tagIds = Array.isArray(data.tags)
             ? data.tags.map((tag: any) => tag.id).filter((tid: any) => tid)
             : [];
-          await TagService.setTagsForEntity('service_notice', id, tagIds, userId);
+          await TagService.setTagsForEntity(
+            'service_notice',
+            id,
+            tagIds,
+            userId
+          );
         }
 
         return sendSuccessResponse(

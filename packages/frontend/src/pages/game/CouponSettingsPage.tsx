@@ -2043,7 +2043,10 @@ const CouponSettingsPage: React.FC = () => {
                             case 'tags':
                               return (
                                 <TableCell key="tags" sx={{ py: 1, px: 2 }}>
-                                  <TagChips tags={(it as any).tags} maxVisible={6} />
+                                  <TagChips
+                                    tags={(it as any).tags}
+                                    maxVisible={6}
+                                  />
                                 </TableCell>
                               );
                             default:

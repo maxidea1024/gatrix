@@ -63,7 +63,10 @@ export class UserModel {
 
       if (user) {
         // Load tag info
-        const tags = await TagAssignmentModel.listTagsForEntity('user', user.id);
+        const tags = await TagAssignmentModel.listTagsForEntity(
+          'user',
+          user.id
+        );
         user.tags = tags;
       }
 
@@ -352,7 +355,10 @@ export class UserModel {
       // Load tags for all users
       const usersWithExtras = await Promise.all(
         users.map(async (user: any) => {
-          const tags = await TagAssignmentModel.listTagsForEntity('user', user.id);
+          const tags = await TagAssignmentModel.listTagsForEntity(
+            'user',
+            user.id
+          );
           return {
             ...user,
             tags,
@@ -412,7 +418,6 @@ export class UserModel {
       // Don't throw error for this non-critical operation
     }
   }
-
 
   /**
    * Update user's preferred language

@@ -98,7 +98,10 @@ class BannerService {
       // Load tags for each banner
       const bannersWithTags = await Promise.all(
         result.banners.map(async (banner) => {
-          const tags = await TagService.listTagsForEntity('banner', banner.bannerId);
+          const tags = await TagService.listTagsForEntity(
+            'banner',
+            banner.bannerId
+          );
           return { ...banner, tags };
         })
       );

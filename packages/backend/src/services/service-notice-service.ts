@@ -283,7 +283,10 @@ class ServiceNoticeService {
     // Load tags for each notice
     const noticesWithTags = await Promise.all(
       notices.map(async (notice) => {
-        const tags = await TagService.listTagsForEntity('service_notice', notice.id);
+        const tags = await TagService.listTagsForEntity(
+          'service_notice',
+          notice.id
+        );
         return { ...notice, tags };
       })
     );

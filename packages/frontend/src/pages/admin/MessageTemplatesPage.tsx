@@ -708,15 +708,12 @@ const MessageTemplatesPage: React.FC = () => {
   };
 
   // Tag handler
-  const handleOpenTagDialog = useCallback(
-    (template: MessageTemplate) => {
-      setSelectedTemplateForTags(template);
-      // Use tags already loaded from list data
-      setTemplateTags(template.tags || []);
-      setTagDialogOpen(true);
-    },
-    []
-  );
+  const handleOpenTagDialog = useCallback((template: MessageTemplate) => {
+    setSelectedTemplateForTags(template);
+    // Use tags already loaded from list data
+    setTemplateTags(template.tags || []);
+    setTagDialogOpen(true);
+  }, []);
 
   const handleSaveTags = useCallback(
     async (tagIds: number[]) => {

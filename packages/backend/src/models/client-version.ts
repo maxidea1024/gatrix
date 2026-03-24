@@ -240,7 +240,10 @@ export class ClientVersionModel {
       // Load tag info for each client version
       const clientVersionsWithTags = await Promise.all(
         dataResults.map(async (cv: any) => {
-          const tags = await TagAssignmentModel.listTagsForEntity('client_version', cv.id);
+          const tags = await TagAssignmentModel.listTagsForEntity(
+            'client_version',
+            cv.id
+          );
           return {
             ...cv,
             tags,
@@ -286,7 +289,11 @@ export class ClientVersionModel {
       }
 
       // Load tag info
-      const tags = await TagAssignmentModel.listTagsForEntity('client_version', id, trx);
+      const tags = await TagAssignmentModel.listTagsForEntity(
+        'client_version',
+        id,
+        trx
+      );
 
       // Load maintenance message locale info
       const localesQuery = trx
@@ -575,7 +582,6 @@ export class ClientVersionModel {
       throw error;
     }
   }
-
 
   static async getMaintenanceLocales(
     clientVersionId: string

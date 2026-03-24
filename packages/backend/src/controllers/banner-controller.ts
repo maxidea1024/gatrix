@@ -107,8 +107,15 @@ export class BannerController {
         // Handle tags if provided
         const createdBanner = gatewayResult.data;
         if (tags && Array.isArray(tags) && createdBanner?.id) {
-          const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
-          await TagService.setTagsForEntity('banner', createdBanner.id.toString(), tagIds, userId);
+          const tagIds = tags
+            .map((tag: any) => tag.id)
+            .filter((tid: any) => tid);
+          await TagService.setTagsForEntity(
+            'banner',
+            createdBanner.id.toString(),
+            tagIds,
+            userId
+          );
         }
 
         res.status(201).json({

@@ -202,7 +202,10 @@ class IngamePopupNoticeService {
     // Load tags for each notice
     const noticesWithTags = await Promise.all(
       notices.map(async (notice) => {
-        const tags = await TagService.listTagsForEntity('ingame_popup_notice', notice.id);
+        const tags = await TagService.listTagsForEntity(
+          'ingame_popup_notice',
+          notice.id
+        );
         return { ...notice, tags };
       })
     );

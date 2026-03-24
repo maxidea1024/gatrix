@@ -695,7 +695,10 @@ const BannerManagementPage: React.FC = () => {
                           if (column.id === 'tags') {
                             return (
                               <TableCell key={column.id}>
-                                <TagChips tags={(banner as any).tags} maxVisible={6} />
+                                <TagChips
+                                  tags={(banner as any).tags}
+                                  maxVisible={6}
+                                />
                               </TableCell>
                             );
                           }

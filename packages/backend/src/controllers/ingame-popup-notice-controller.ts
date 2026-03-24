@@ -43,7 +43,11 @@ const createIngamePopupNoticeSchema = Joi.object({
   useTemplate: Joi.boolean().optional(),
   description: Joi.string().max(1000).optional().allow(null, ''),
   tags: Joi.array()
-    .items(Joi.object({ id: Joi.alternatives().try(Joi.string(), Joi.number()).required() }).unknown(true))
+    .items(
+      Joi.object({
+        id: Joi.alternatives().try(Joi.string(), Joi.number()).required(),
+      }).unknown(true)
+    )
     .optional(),
 });
 
@@ -68,7 +72,11 @@ const updateIngamePopupNoticeSchema = Joi.object({
   useTemplate: Joi.boolean().optional(),
   description: Joi.string().max(1000).optional().allow(null, ''),
   tags: Joi.array()
-    .items(Joi.object({ id: Joi.alternatives().try(Joi.string(), Joi.number()).required() }).unknown(true))
+    .items(
+      Joi.object({
+        id: Joi.alternatives().try(Joi.string(), Joi.number()).required(),
+      }).unknown(true)
+    )
     .optional(),
 });
 
@@ -246,8 +254,15 @@ class IngamePopupNoticeController {
         // Handle tags if provided
         const createdNotice = gatewayResult.data;
         if (tags && Array.isArray(tags) && createdNotice?.id) {
-          const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
-          await TagService.setTagsForEntity('ingame_popup_notice', createdNotice.id.toString(), tagIds, createdBy);
+          const tagIds = tags
+            .map((tag: any) => tag.id)
+            .filter((tid: any) => tid);
+          await TagService.setTagsForEntity(
+            'ingame_popup_notice',
+            createdNotice.id.toString(),
+            tagIds,
+            createdBy
+          );
         }
 
         return sendSuccessResponse(
@@ -341,7 +356,12 @@ class IngamePopupNoticeController {
           const tagIds = Array.isArray(tags)
             ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
             : [];
-          await TagService.setTagsForEntity('ingame_popup_notice', id, tagIds, updatedBy);
+          await TagService.setTagsForEntity(
+            'ingame_popup_notice',
+            id,
+            tagIds,
+            updatedBy
+          );
         }
 
         return sendSuccessResponse(

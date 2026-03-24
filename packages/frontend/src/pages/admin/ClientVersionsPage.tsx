@@ -1387,15 +1387,12 @@ const ClientVersionsPage: React.FC = () => {
   );
 
   // Tag handler
-  const handleOpenTagDialog = useCallback(
-    (clientVersion: ClientVersion) => {
-      setSelectedClientVersionForTags(clientVersion);
-      // Use tags already loaded from list data
-      setClientVersionTags(clientVersion.tags || []);
-      setTagDialogOpen(true);
-    },
-    []
-  );
+  const handleOpenTagDialog = useCallback((clientVersion: ClientVersion) => {
+    setSelectedClientVersionForTags(clientVersion);
+    // Use tags already loaded from list data
+    setClientVersionTags(clientVersion.tags || []);
+    setTagDialogOpen(true);
+  }, []);
 
   const handleSaveTags = useCallback(
     async (tagIds: number[]) => {

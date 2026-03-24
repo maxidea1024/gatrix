@@ -95,9 +95,7 @@ export class TagService {
       if (!environmentId) return;
 
       await pubSubService.invalidateByPattern(`*${entityType}*`);
-      await pubSubService.invalidateKey(
-        `${sdkEtagPrefix}:${environmentId}`
-      );
+      await pubSubService.invalidateKey(`${sdkEtagPrefix}:${environmentId}`);
       await pubSubService.publishSDKEvent(
         {
           type: `${entityType}.updated`,

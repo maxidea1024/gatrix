@@ -723,7 +723,9 @@ export class ClientVersionController {
       maintenanceStartDate: convertISOToMySQLDateTime(
         restValue.maintenanceStartDate
       ),
-      maintenanceEndDate: convertISOToMySQLDateTime(restValue.maintenanceEndDate),
+      maintenanceEndDate: convertISOToMySQLDateTime(
+        restValue.maintenanceEndDate
+      ),
       createdBy: userId, // Required for creating new maintenanceLocales
       updatedBy: userId,
     };
@@ -766,9 +768,10 @@ export class ClientVersionController {
       }
 
       // Re-fetch to include updated tags
-      const updatedClientVersion = tags !== undefined
-        ? await ClientVersionService.getClientVersionById(id, environmentId)
-        : clientVersion;
+      const updatedClientVersion =
+        tags !== undefined
+          ? await ClientVersionService.getClientVersionById(id, environmentId)
+          : clientVersion;
 
       res.json({
         success: true,

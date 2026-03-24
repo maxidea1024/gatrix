@@ -1248,7 +1248,10 @@ const ServiceNoticesPage: React.FC = () => {
                           if (column.id === 'tags') {
                             return (
                               <TableCell key={column.id}>
-                                <TagChips tags={(notice as any).tags} maxVisible={6} />
+                                <TagChips
+                                  tags={(notice as any).tags}
+                                  maxVisible={6}
+                                />
                               </TableCell>
                             );
                           }

@@ -723,7 +723,10 @@ const SurveysPage: React.FC = () => {
                           if (column.id === 'tags') {
                             return (
                               <TableCell key={column.id}>
-                                <TagChips tags={(survey as any).tags} maxVisible={6} />
+                                <TagChips
+                                  tags={(survey as any).tags}
+                                  maxVisible={6}
+                                />
                               </TableCell>
                             );
                           }

@@ -156,9 +156,19 @@ export class CouponSettingsController {
       );
 
       // Handle tags if provided
-      if (result.mode === 'DIRECT' && tags && Array.isArray(tags) && result.data?.id) {
+      if (
+        result.mode === 'DIRECT' &&
+        tags &&
+        Array.isArray(tags) &&
+        result.data?.id
+      ) {
         const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
-        await TagService.setTagsForEntity('coupon_setting', result.data.id.toString(), tagIds, authenticatedUserId);
+        await TagService.setTagsForEntity(
+          'coupon_setting',
+          result.data.id.toString(),
+          tagIds,
+          authenticatedUserId
+        );
       }
 
       res.status(result.mode === 'CHANGE_REQUEST' ? 202 : 201).json({
@@ -213,7 +223,12 @@ export class CouponSettingsController {
           const tagIds = Array.isArray(tags)
             ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
             : [];
-          await TagService.setTagsForEntity('coupon_setting', id, tagIds, authenticatedUserId);
+          await TagService.setTagsForEntity(
+            'coupon_setting',
+            id,
+            tagIds,
+            authenticatedUserId
+          );
         }
 
         res.json({

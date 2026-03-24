@@ -203,7 +203,12 @@ export class AdminController {
 
       // Set tags
       if (tagIds && tagIds.length > 0) {
-        await TagService.setTagsForEntity('user', user.id, tagIds, req.user.userId);
+        await TagService.setTagsForEntity(
+          'user',
+          user.id,
+          tagIds,
+          req.user.userId
+        );
       }
 
       // Reload user to get all updated info
@@ -257,7 +262,12 @@ export class AdminController {
 
       // Set tags (only if tagIds is provided)
       if (tagIds !== undefined) {
-        await TagService.setTagsForEntity('user', userId, tagIds, req.user.userId);
+        await TagService.setTagsForEntity(
+          'user',
+          userId,
+          tagIds,
+          req.user.userId
+        );
 
         // Reload user to get latest tag info
         user = await UserService.getUserById(userId);
@@ -979,7 +989,12 @@ export class AdminController {
       await db.transaction(async (trx) => {
         // Set tags for each user using TagService
         for (const userId of userIds) {
-          await TagService.setTagsForEntity('user', userId, tagIds, currentUserId);
+          await TagService.setTagsForEntity(
+            'user',
+            userId,
+            tagIds,
+            currentUserId
+          );
         }
 
         // Log audit entries
