@@ -2402,15 +2402,10 @@ const ClientVersionsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            onClick={() => setBulkStatusDialogOpen(false)}
-          >
+          <Button onClick={() => setBulkStatusDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button
-            onClick={handleBulkStatusUpdate}
-            variant="contained"
-          >
+          <Button onClick={handleBulkStatusUpdate} variant="contained">
             {t('common.update')}
           </Button>
         </Box>

@@ -923,7 +923,9 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     return {
       displayName: initialData.displayName || '',
       description: initialData.description || '',
-      tags: JSON.stringify((initialData.tags || []).map((t: any) => t.id || t).sort()),
+      tags: JSON.stringify(
+        (initialData.tags || []).map((t: any) => t.id || t).sort()
+      ),
       milestones: JSON.stringify(
         (initialData.milestones || []).map((m) => ({
           name: m.name || '',
@@ -955,7 +957,8 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     return (
       displayName !== initialSnapshot.displayName ||
       description !== initialSnapshot.description ||
-      JSON.stringify(selectedTags.map((t) => t.id).sort()) !== initialSnapshot.tags ||
+      JSON.stringify(selectedTags.map((t) => t.id).sort()) !==
+        initialSnapshot.tags ||
       currentMilestones !== initialSnapshot.milestones
     );
   }, [initialSnapshot, displayName, description, selectedTags, milestones]);
@@ -1302,10 +1305,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
 
             {/* Tags */}
             {!readonly && (
-              <TagSelector
-                value={selectedTags}
-                onChange={setSelectedTags}
-              />
+              <TagSelector value={selectedTags} onChange={setSelectedTags} />
             )}
             {readonly && selectedTags.length > 0 && (
               <Box>

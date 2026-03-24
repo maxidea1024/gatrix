@@ -101,30 +101,35 @@ class ApiTokensController {
         .offset(Number(offset));
 
       // Format tokens (mask token for display, keep original for copying)
-      const formattedTokens = await Promise.all(tokens.map(async (token: any) => {
-        // Mask the token: show first 4 and last 4 characters
-        const maskedToken =
-          token.tokenValue && token.tokenValue.length > 8
-            ? `${token.tokenValue.substring(0, 4)}${'•'.repeat(token.tokenValue.length - 8)}${token.tokenValue.substring(token.tokenValue.length - 4)}`
-            : token.tokenValue;
+      const formattedTokens = await Promise.all(
+        tokens.map(async (token: any) => {
+          // Mask the token: show first 4 and last 4 characters
+          const maskedToken =
+            token.tokenValue && token.tokenValue.length > 8
+              ? `${token.tokenValue.substring(0, 4)}${'•'.repeat(token.tokenValue.length - 8)}${token.tokenValue.substring(token.tokenValue.length - 4)}`
+              : token.tokenValue;
 
-        const tags = await TagService.listTagsForEntity('api_token', token.id);
+          const tags = await TagService.listTagsForEntity(
+            'api_token',
+            token.id
+          );
 
-        const formatted = {
-          ...token,
-          // Keep original tokenValue for copying
-          // Add maskedTokenValue for display
-          maskedTokenValue: maskedToken,
-          environmentId: token.environmentId || null,
-          creator: {
-            name: token.creatorName || 'Unknown',
-            email: token.creatorEmail || '',
-          },
-          tags,
-        };
+          const formatted = {
+            ...token,
+            // Keep original tokenValue for copying
+            // Add maskedTokenValue for display
+            maskedTokenValue: maskedToken,
+            environmentId: token.environmentId || null,
+            creator: {
+              name: token.creatorName || 'Unknown',
+              email: token.creatorEmail || '',
+            },
+            tags,
+          };
 
-        return formatted;
-      }));
+          return formatted;
+        })
+      );
 
       const responseData = {
         success: true,
@@ -162,8 +167,14 @@ class ApiTokensController {
         });
       }
 
-      const { tokenName, description, tokenType, expiresAt, environmentId, tags } =
-        req.body;
+      const {
+        tokenName,
+        description,
+        tokenType,
+        expiresAt,
+        environmentId,
+        tags,
+      } = req.body;
       const projectId = (req as any).projectId;
       const userId = (req as any).user.id;
 
@@ -217,10 +228,18 @@ class ApiTokensController {
       // Handle tags
       if (tags && Array.isArray(tags)) {
         const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
-        await TagService.setTagsForEntity('api_token', result.id, tagIds, userId);
+        await TagService.setTagsForEntity(
+          'api_token',
+          result.id,
+          tagIds,
+          userId
+        );
       }
 
-      const tagsForEntity = await TagService.listTagsForEntity('api_token', result.id);
+      const tagsForEntity = await TagService.listTagsForEntity(
+        'api_token',
+        result.id
+      );
 
       // Return the new token with the actual token value (only shown once)
       res.status(201).json({
@@ -251,7 +270,8 @@ class ApiTokensController {
   async updateToken(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { tokenName, description, expiresAt, environmentId, tags } = req.body;
+      const { tokenName, description, expiresAt, environmentId, tags } =
+        req.body;
       const userId = (req as any).user.id;
 
       // Check if token exists

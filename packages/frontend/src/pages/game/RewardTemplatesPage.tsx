@@ -100,7 +100,9 @@ const RewardTemplatesPage: React.FC = () => {
   );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [rowMenuAnchor, setRowMenuAnchor] = useState<HTMLElement | null>(null);
-  const [rowMenuTemplate, setRowMenuTemplate] = useState<RewardTemplate | null>(null);
+  const [rowMenuTemplate, setRowMenuTemplate] = useState<RewardTemplate | null>(
+    null
+  );
 
   // Sorting state with localStorage persistence
   const [orderBy, setOrderBy] = useState<string>(() => {

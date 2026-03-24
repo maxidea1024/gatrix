@@ -79,7 +79,11 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-  const [initialValues, setInitialValues] = useState<{ name: string; description: string; tagIds: string[] }>({
+  const [initialValues, setInitialValues] = useState<{
+    name: string;
+    description: string;
+    tagIds: string[];
+  }>({
     name: '',
     description: '',
     tagIds: [],
@@ -93,7 +97,10 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
       setInitialValues({
         name: endpoint.name,
         description: endpoint.description || '',
-        tagIds: (endpoint.tags || []).map((t) => t.id).sort().join(','),
+        tagIds: (endpoint.tags || [])
+          .map((t) => t.id)
+          .sort()
+          .join(','),
       } as any);
     } else {
       setName('');
@@ -105,7 +112,10 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
 
   const hasChanges = useMemo(() => {
     if (!endpoint) return true; // Creating new - always allow
-    const currentTagIds = selectedTags.map((t) => t.id).sort().join(',');
+    const currentTagIds = selectedTags
+      .map((t) => t.id)
+      .sort()
+      .join(',');
     return (
       name !== initialValues.name ||
       description !== initialValues.description ||
@@ -115,7 +125,11 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
 
   const handleSave = () => {
     if (!name.trim()) return;
-    onSave({ name: name.trim(), description: description.trim() || undefined, tags: selectedTags });
+    onSave({
+      name: name.trim(),
+      description: description.trim() || undefined,
+      tags: selectedTags,
+    });
   };
 
   return (
@@ -176,10 +190,20 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
                     borderColor: 'divider',
                   }}
                 >
-                  <Chip label="POST" size="small" color="primary" variant="filled" sx={{ fontWeight: 600, fontSize: '0.7rem' }} />
+                  <Chip
+                    label="POST"
+                    size="small"
+                    color="primary"
+                    variant="filled"
+                    sx={{ fontWeight: 600, fontSize: '0.7rem' }}
+                  />
                   <Typography
                     variant="body2"
-                    sx={{ fontFamily: 'monospace', flex: 1, wordBreak: 'break-all' }}
+                    sx={{
+                      fontFamily: 'monospace',
+                      flex: 1,
+                      wordBreak: 'break-all',
+                    }}
                   >
                     {`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`}
                   </Typography>
@@ -189,8 +213,14 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
                       onClick={() =>
                         copyToClipboardWithNotification(
                           `${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`,
-                          () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                          () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                          () =>
+                            enqueueSnackbar(t('common.copiedToClipboard'), {
+                              variant: 'success',
+                            }),
+                          () =>
+                            enqueueSnackbar(t('common.copyFailed'), {
+                              variant: 'error',
+                            })
                         )
                       }
                     >
@@ -198,7 +228,11 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
                     </IconButton>
                   </Tooltip>
                 </Box>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: -0.5 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mt: -0.5 }}
+                >
                   {t('signalEndpoints.endpointUrlHelp')}
                 </Typography>
               </>
@@ -212,10 +246,7 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-            <TagSelector
-              value={selectedTags}
-              onChange={setSelectedTags}
-            />
+            <TagSelector value={selectedTags} onChange={setSelectedTags} />
           </Box>
         </Paper>
       </Box>
@@ -747,7 +778,17 @@ const SignalEndpointsPage: React.FC = () => {
                                 borderRadius: 1,
                               }}
                             >
-                              <Chip label="POST" size="small" color="primary" variant="filled" sx={{ fontWeight: 700, fontSize: '0.7rem', height: 22 }} />
+                              <Chip
+                                label="POST"
+                                size="small"
+                                color="primary"
+                                variant="filled"
+                                sx={{
+                                  fontWeight: 700,
+                                  fontSize: '0.7rem',
+                                  height: 22,
+                                }}
+                              />
                               <Typography
                                 variant="body2"
                                 sx={{
@@ -772,9 +813,12 @@ const SignalEndpointsPage: React.FC = () => {
                                           { variant: 'success' }
                                         ),
                                       () =>
-                                        enqueueSnackbar(t('common.copyFailed'), {
-                                          variant: 'error',
-                                        })
+                                        enqueueSnackbar(
+                                          t('common.copyFailed'),
+                                          {
+                                            variant: 'error',
+                                          }
+                                        )
                                     )
                                   }
                                 >
@@ -820,7 +864,13 @@ const SignalEndpointsPage: React.FC = () => {
                                 {t('signalEndpoints.noTokens')}
                               </Typography>
                             ) : (
-                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: 0.5,
+                                }}
+                              >
                                 {endpointTokens[endpoint.id].map((token) => (
                                   <Box
                                     key={token.id}
@@ -837,13 +887,21 @@ const SignalEndpointsPage: React.FC = () => {
                                     }}
                                   >
                                     <Box>
-                                      <Typography variant="body2" fontWeight={500}>
+                                      <Typography
+                                        variant="body2"
+                                        fontWeight={500}
+                                      >
                                         {token.tokenName}
                                       </Typography>
                                       <Tooltip
-                                        title={formatDateTimeDetailed(token.createdAt)}
+                                        title={formatDateTimeDetailed(
+                                          token.createdAt
+                                        )}
                                       >
-                                        <Typography variant="caption" color="text.secondary">
+                                        <Typography
+                                          variant="caption"
+                                          color="text.secondary"
+                                        >
                                           {formatRelativeTime(token.createdAt)}
                                         </Typography>
                                       </Tooltip>

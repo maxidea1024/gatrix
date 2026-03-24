@@ -30,7 +30,10 @@ router.get('/', async (req: Request, res: Response) => {
     // Load tags for each endpoint
     const endpointsWithTags = await Promise.all(
       endpoints.map(async (endpoint) => {
-        const tags = await TagService.listTagsForEntity('signal_endpoint', endpoint.id);
+        const tags = await TagService.listTagsForEntity(
+          'signal_endpoint',
+          endpoint.id
+        );
         return { ...endpoint, tags };
       })
     );
@@ -96,10 +99,18 @@ router.post('/', async (req: Request, res: Response) => {
     // Handle tags
     if (tags && Array.isArray(tags)) {
       const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
-      await TagService.setTagsForEntity('signal_endpoint', endpoint.id, tagIds, user.id);
+      await TagService.setTagsForEntity(
+        'signal_endpoint',
+        endpoint.id,
+        tagIds,
+        user.id
+      );
     }
 
-    const tagsForEntity = await TagService.listTagsForEntity('signal_endpoint', endpoint.id);
+    const tagsForEntity = await TagService.listTagsForEntity(
+      'signal_endpoint',
+      endpoint.id
+    );
     res.status(201).json({ data: { ...endpoint, tags: tagsForEntity } });
   } catch (error) {
     logger.error('Error creating signal endpoint:', error);
@@ -148,7 +159,10 @@ router.put('/:id', async (req: Request, res: Response) => {
       await TagService.setTagsForEntity('signal_endpoint', id, tagIds, user.id);
     }
 
-    const tagsForEntity = await TagService.listTagsForEntity('signal_endpoint', id);
+    const tagsForEntity = await TagService.listTagsForEntity(
+      'signal_endpoint',
+      id
+    );
     res.json({ data: { ...endpoint, tags: tagsForEntity } });
   } catch (error) {
     logger.error('Error updating signal endpoint:', error);

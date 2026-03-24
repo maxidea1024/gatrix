@@ -34,7 +34,10 @@ export class ReleaseFlowController {
       // Load tags for each template
       const templatesWithTags = await Promise.all(
         filtered.map(async (template) => {
-          const tags = await TagService.listTagsForEntity('release_flow_template', template.id);
+          const tags = await TagService.listTagsForEntity(
+            'release_flow_template',
+            template.id
+          );
           return { ...template, tags };
         })
       );
@@ -69,10 +72,18 @@ export class ReleaseFlowController {
       // Handle tags
       if (tags && Array.isArray(tags)) {
         const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
-        await TagService.setTagsForEntity('release_flow_template', template.id, tagIds, userId);
+        await TagService.setTagsForEntity(
+          'release_flow_template',
+          template.id,
+          tagIds,
+          userId
+        );
       }
 
-      const tagsForEntity = await TagService.listTagsForEntity('release_flow_template', template.id);
+      const tagsForEntity = await TagService.listTagsForEntity(
+        'release_flow_template',
+        template.id
+      );
 
       res.status(201).json({
         success: true,
@@ -94,7 +105,10 @@ export class ReleaseFlowController {
     try {
       const { id } = req.params;
       const template = await releaseFlowService.getTemplateById(id);
-      const tags = await TagService.listTagsForEntity('release_flow_template', id);
+      const tags = await TagService.listTagsForEntity(
+        'release_flow_template',
+        id
+      );
       res.json({
         success: true,
         data: { ...template, tags },
@@ -129,10 +143,18 @@ export class ReleaseFlowController {
         const tagIds = Array.isArray(tags)
           ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
           : [];
-        await TagService.setTagsForEntity('release_flow_template', id, tagIds, userId);
+        await TagService.setTagsForEntity(
+          'release_flow_template',
+          id,
+          tagIds,
+          userId
+        );
       }
 
-      const tagsForEntity = await TagService.listTagsForEntity('release_flow_template', id);
+      const tagsForEntity = await TagService.listTagsForEntity(
+        'release_flow_template',
+        id
+      );
 
       res.json({
         success: true,

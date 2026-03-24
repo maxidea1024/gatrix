@@ -29,7 +29,10 @@ router.get('/', async (req: Request, res: Response) => {
     // Load tags for each action set
     const actionSetsWithTags = await Promise.all(
       actionSets.map(async (actionSet) => {
-        const tags = await TagService.listTagsForEntity('action_set', actionSet.id);
+        const tags = await TagService.listTagsForEntity(
+          'action_set',
+          actionSet.id
+        );
         return { ...actionSet, tags };
       })
     );
@@ -120,10 +123,18 @@ router.post('/', async (req: Request, res: Response) => {
     // Handle tags
     if (tags && Array.isArray(tags)) {
       const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
-      await TagService.setTagsForEntity('action_set', actionSet.id, tagIds, user.id);
+      await TagService.setTagsForEntity(
+        'action_set',
+        actionSet.id,
+        tagIds,
+        user.id
+      );
     }
 
-    const tagsForEntity = await TagService.listTagsForEntity('action_set', actionSet.id);
+    const tagsForEntity = await TagService.listTagsForEntity(
+      'action_set',
+      actionSet.id
+    );
     res.status(201).json({ data: { ...actionSet, tags: tagsForEntity } });
   } catch (error) {
     logger.error('Error creating action set:', error);

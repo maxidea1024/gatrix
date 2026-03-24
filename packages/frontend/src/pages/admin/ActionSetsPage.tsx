@@ -169,13 +169,23 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
           },
         }));
         setActions(mappedActions);
-        setInitialSnapshot(JSON.stringify({
-          name: actionSet.name,
-          description: actionSet.description || '',
-          endpointId: actionSet.sourceId || '',
-          tagIds: (actionSet.tags || []).map((t) => t.id).sort().join(','),
-          actions: mappedActions.map((a) => `${a.actionType}:${a.params.flagName}:${a.params.environmentId}`).join('|'),
-        }));
+        setInitialSnapshot(
+          JSON.stringify({
+            name: actionSet.name,
+            description: actionSet.description || '',
+            endpointId: actionSet.sourceId || '',
+            tagIds: (actionSet.tags || [])
+              .map((t) => t.id)
+              .sort()
+              .join(','),
+            actions: mappedActions
+              .map(
+                (a) =>
+                  `${a.actionType}:${a.params.flagName}:${a.params.environmentId}`
+              )
+              .join('|'),
+          })
+        );
       } else {
         setActions([
           {
@@ -208,11 +218,27 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
       name,
       description,
       endpointId: selectedEndpointId,
-      tagIds: selectedTags.map((t) => t.id).sort().join(','),
-      actions: actions.map((a) => `${a.actionType}:${a.params.flagName}:${a.params.environmentId}`).join('|'),
+      tagIds: selectedTags
+        .map((t) => t.id)
+        .sort()
+        .join(','),
+      actions: actions
+        .map(
+          (a) =>
+            `${a.actionType}:${a.params.flagName}:${a.params.environmentId}`
+        )
+        .join('|'),
     });
     return currentSnapshot !== initialSnapshot;
-  }, [actionSet, name, description, selectedEndpointId, selectedTags, actions, initialSnapshot]);
+  }, [
+    actionSet,
+    name,
+    description,
+    selectedEndpointId,
+    selectedTags,
+    actions,
+    initialSnapshot,
+  ]);
 
   const handleAddAction = () => {
     setActions([
@@ -324,10 +350,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
               onChange={(e) => setDescription(e.target.value)}
               helperText={t('actionSets.descriptionHelp')}
             />
-            <TagSelector
-              value={selectedTags}
-              onChange={setSelectedTags}
-            />
+            <TagSelector value={selectedTags} onChange={setSelectedTags} />
             <FormControl size="small" fullWidth required>
               <InputLabel>{t('actionSets.signalEndpoint')}</InputLabel>
               <Select
@@ -480,7 +503,11 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
         }}
       >
         <Button onClick={onClose}>{t('common.cancel')}</Button>
-        <Button onClick={handleSave} variant="contained" disabled={!isValid || (!!actionSet && !hasChanges)}>
+        <Button
+          onClick={handleSave}
+          variant="contained"
+          disabled={!isValid || (!!actionSet && !hasChanges)}
+        >
           {actionSet ? t('common.update') : t('common.add')}
         </Button>
       </Box>
@@ -836,51 +863,93 @@ const ActionSetsPage: React.FC = () => {
                         <Collapse in={expandedId === actionSet.id}>
                           <Box sx={{ p: 2, my: 1 }}>
                             {/* Registered Actions */}
-                            {actionSet.actions && actionSet.actions.length > 0 && (
-                              <Box sx={{ mb: 2 }}>
-                                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-                                  {t('actionSets.actionList')}
-                                </Typography>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                  {actionSet.actions.map((action, idx) => (
-                                    <Box
-                                      key={idx}
-                                      sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 1,
-                                        px: 1.5,
-                                        py: 0.75,
-                                        bgcolor: 'background.paper',
-                                        border: '1px solid',
-                                        borderColor: 'divider',
-                                        borderRadius: 1,
-                                      }}
-                                    >
-                                      <Chip
-                                        label={t(`actionSets.actionTypes.${action.actionType.charAt(0).toLowerCase() + action.actionType.slice(1).replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())}`)}
-                                        size="small"
-                                        color="primary"
-                                        variant="outlined"
-                                        sx={{ fontWeight: 600, fontSize: '0.7rem', height: 22 }}
-                                      />
-                                      <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                                        {(action.executionParams as Record<string, string>)?.flagName || '-'}
-                                      </Typography>
-                                      <Chip
-                                        label={(action.executionParams as Record<string, string>)?.environmentId || '-'}
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{ fontSize: '0.65rem', height: 20 }}
-                                      />
-                                    </Box>
-                                  ))}
+                            {actionSet.actions &&
+                              actionSet.actions.length > 0 && (
+                                <Box sx={{ mb: 2 }}>
+                                  <Typography
+                                    variant="subtitle2"
+                                    fontWeight={600}
+                                    sx={{ mb: 1 }}
+                                  >
+                                    {t('actionSets.actionList')}
+                                  </Typography>
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    {actionSet.actions.map((action, idx) => (
+                                      <Box
+                                        key={idx}
+                                        sx={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 1,
+                                          px: 1.5,
+                                          py: 0.75,
+                                          bgcolor: 'background.paper',
+                                          border: '1px solid',
+                                          borderColor: 'divider',
+                                          borderRadius: 1,
+                                        }}
+                                      >
+                                        <Chip
+                                          label={t(
+                                            `actionSets.actionTypes.${action.actionType.charAt(0).toLowerCase() + action.actionType.slice(1).replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())}`
+                                          )}
+                                          size="small"
+                                          color="primary"
+                                          variant="outlined"
+                                          sx={{
+                                            fontWeight: 600,
+                                            fontSize: '0.7rem',
+                                            height: 22,
+                                          }}
+                                        />
+                                        <Typography
+                                          variant="body2"
+                                          sx={{
+                                            fontFamily: 'monospace',
+                                            fontSize: '0.8rem',
+                                          }}
+                                        >
+                                          {(
+                                            action.executionParams as Record<
+                                              string,
+                                              string
+                                            >
+                                          )?.flagName || '-'}
+                                        </Typography>
+                                        <Chip
+                                          label={
+                                            (
+                                              action.executionParams as Record<
+                                                string,
+                                                string
+                                              >
+                                            )?.environmentId || '-'
+                                          }
+                                          size="small"
+                                          variant="outlined"
+                                          sx={{
+                                            fontSize: '0.65rem',
+                                            height: 20,
+                                          }}
+                                        />
+                                      </Box>
+                                    ))}
+                                  </Box>
                                 </Box>
-                              </Box>
-                            )}
+                              )}
 
                             {/* Recent Events */}
-                            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+                            <Typography
+                              variant="subtitle2"
+                              fontWeight={600}
+                              sx={{ mb: 1 }}
+                            >
                               {t('actionSets.recentEvents')}
                             </Typography>
                             {!events[actionSet.id] ||
@@ -893,7 +962,13 @@ const ActionSetsPage: React.FC = () => {
                                 {t('actionSets.noEvents')}
                               </Typography>
                             ) : (
-                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: 0.5,
+                                }}
+                              >
                                 {events[actionSet.id].map((event) => (
                                   <Box
                                     key={event.id}
@@ -921,9 +996,17 @@ const ActionSetsPage: React.FC = () => {
                                           | 'info'
                                           | 'default'
                                       }
-                                      sx={{ fontWeight: 600, fontSize: '0.7rem', height: 22 }}
+                                      sx={{
+                                        fontWeight: 600,
+                                        fontSize: '0.7rem',
+                                        height: 22,
+                                      }}
                                     />
-                                    <Typography variant="body2" sx={{ flex: 1 }} color="text.secondary">
+                                    <Typography
+                                      variant="body2"
+                                      sx={{ flex: 1 }}
+                                      color="text.secondary"
+                                    >
                                       Signal: {event.signalId || '-'}
                                     </Typography>
                                     <Tooltip
@@ -931,10 +1014,11 @@ const ActionSetsPage: React.FC = () => {
                                         event.createdAt
                                       )}
                                     >
-                                      <Typography variant="caption" color="text.secondary">
-                                        {formatRelativeTime(
-                                          event.createdAt
-                                        )}
+                                      <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                      >
+                                        {formatRelativeTime(event.createdAt)}
                                       </Typography>
                                     </Tooltip>
                                   </Box>

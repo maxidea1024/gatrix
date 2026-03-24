@@ -733,11 +733,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
           <Stack spacing={3} sx={{ mt: 1 }}>
             {/* Basic information section */}
-            <Accordion
-              defaultExpanded
-              disableGutters
-              variant="outlined"
-            >
+            <Accordion defaultExpanded disableGutters variant="outlined">
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Box>
                   <Typography
@@ -759,58 +755,142 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               </AccordionSummary>
               <AccordionDetails>
                 <Stack spacing={2}>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  {/* Version field */}
-                  <Controller
-                    name="clientVersion"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        inputRef={versionFieldRef}
-                        fullWidth
-                        label={
-                          <Box component="span">
-                            {t('clientVersions.version')}{' '}
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    {/* Version field */}
+                    <Controller
+                      name="clientVersion"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          inputRef={versionFieldRef}
+                          fullWidth
+                          label={
+                            <Box component="span">
+                              {t('clientVersions.version')}{' '}
+                              <Typography component="span" color="error">
+                                *
+                              </Typography>
+                            </Box>
+                          }
+                          placeholder={
+                            CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE
+                          }
+                          error={!!errors.clientVersion}
+                          helperText={
+                            errors.clientVersion?.message ||
+                            t('clientVersions.form.versionHelp')
+                          }
+                          inputProps={{
+                            autoComplete: 'off',
+                            autoCorrect: 'off',
+                            autoCapitalize: 'off',
+                            spellCheck: false,
+                          }}
+                        />
+                      )}
+                    />
+
+                    {/* Platform field */}
+                    <Controller
+                      name="platform"
+                      control={control}
+                      render={({ field }) => (
+                        <FormControl fullWidth error={!!errors.platform}>
+                          <InputLabel id="cvf-platform-label">
+                            {t('clientVersions.platform')}{' '}
                             <Typography component="span" color="error">
                               *
                             </Typography>
-                          </Box>
-                        }
-                        placeholder={
-                          CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE
-                        }
-                        error={!!errors.clientVersion}
-                        helperText={
-                          errors.clientVersion?.message ||
-                          t('clientVersions.form.versionHelp')
-                        }
-                        inputProps={{
-                          autoComplete: 'off',
-                          autoCorrect: 'off',
-                          autoCapitalize: 'off',
-                          spellCheck: false,
-                        }}
-                      />
-                    )}
-                  />
+                          </InputLabel>
+                          <Select
+                            labelId="cvf-platform-label"
+                            {...field}
+                            label={`${t('clientVersions.platform')} *`}
+                            MenuProps={{
+                              anchorOrigin: {
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                              },
+                              transformOrigin: {
+                                vertical: 'top',
+                                horizontal: 'left',
+                              },
+                            }}
+                            onChange={async (e) => {
+                              field.onChange(e);
 
-                  {/* Platform field */}
+                              // Apply defaults only when creating new
+                              if (!isEdit && e.target.value) {
+                                try {
+                                  const defaults =
+                                    await PlatformDefaultsService.getPlatformDefaults(
+                                      projectApiPath,
+                                      e.target.value as string
+                                    );
+
+                                  // Apply platform defaults (overwrite regardless of existing values)
+                                  if (defaults.gameServerAddress) {
+                                    setValue(
+                                      'gameServerAddress',
+                                      defaults.gameServerAddress
+                                    );
+                                  }
+                                  if (defaults.patchAddress) {
+                                    setValue(
+                                      'patchAddress',
+                                      defaults.patchAddress
+                                    );
+                                  }
+                                } catch (error) {
+                                  console.error(
+                                    'Failed to apply platform defaults:',
+                                    error
+                                  );
+                                }
+                              }
+                            }}
+                          >
+                            {platforms.map((p) => (
+                              <MenuItem key={p.value} value={p.value}>
+                                {p.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                          {(errors.platform?.message ||
+                            t('clientVersions.form.platformHelp')) && (
+                            <Typography
+                              variant="caption"
+                              color={
+                                errors.platform ? 'error' : 'text.secondary'
+                              }
+                              sx={{ mt: 0.5, display: 'block' }}
+                            >
+                              {errors.platform?.message ||
+                                t('clientVersions.form.platformHelp')}
+                            </Typography>
+                          )}
+                        </FormControl>
+                      )}
+                    />
+                  </Box>
+
+                  {/* Status field */}
                   <Controller
-                    name="platform"
+                    name="clientStatus"
                     control={control}
                     render={({ field }) => (
-                      <FormControl fullWidth error={!!errors.platform}>
-                        <InputLabel id="cvf-platform-label">
-                          {t('clientVersions.platform')}{' '}
+                      <FormControl fullWidth variant="outlined">
+                        <InputLabel id="cvf-status-label" shrink={true}>
+                          {t('clientVersions.statusLabel')}{' '}
                           <Typography component="span" color="error">
                             *
                           </Typography>
                         </InputLabel>
                         <Select
-                          labelId="cvf-platform-label"
+                          labelId="cvf-status-label"
                           {...field}
-                          label={`${t('clientVersions.platform')} *`}
+                          label={`${t('clientVersions.statusLabel')} *`}
                           MenuProps={{
                             anchorOrigin: {
                               vertical: 'bottom',
@@ -821,172 +901,86 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                               horizontal: 'left',
                             },
                           }}
-                          onChange={async (e) => {
-                            field.onChange(e);
-
-                            // Apply defaults only when creating new
-                            if (!isEdit && e.target.value) {
-                              try {
-                                const defaults =
-                                  await PlatformDefaultsService.getPlatformDefaults(
-                                    projectApiPath,
-                                    e.target.value as string
-                                  );
-
-                                // Apply platform defaults (overwrite regardless of existing values)
-                                if (defaults.gameServerAddress) {
-                                  setValue(
-                                    'gameServerAddress',
-                                    defaults.gameServerAddress
-                                  );
-                                }
-                                if (defaults.patchAddress) {
-                                  setValue(
-                                    'patchAddress',
-                                    defaults.patchAddress
-                                  );
-                                }
-                              } catch (error) {
-                                console.error(
-                                  'Failed to apply platform defaults:',
-                                  error
-                                );
-                              }
-                            }
-                          }}
                         >
-                          {platforms.map((p) => (
-                            <MenuItem key={p.value} value={p.value}>
-                              {p.label}
+                          {Object.values(ClientStatus).map((status) => (
+                            <MenuItem key={status} value={status}>
+                              {t(ClientStatusLabels[status])}
                             </MenuItem>
                           ))}
                         </Select>
-                        {(errors.platform?.message ||
-                          t('clientVersions.form.platformHelp')) && (
-                          <Typography
-                            variant="caption"
-                            color={errors.platform ? 'error' : 'text.secondary'}
-                            sx={{ mt: 0.5, display: 'block' }}
-                          >
-                            {errors.platform?.message ||
-                              t('clientVersions.form.platformHelp')}
-                          </Typography>
-                        )}
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mt: 0.5, display: 'block' }}
+                        >
+                          {t('clientVersions.form.statusHelp')}
+                        </Typography>
                       </FormControl>
                     )}
                   />
-                </Box>
 
-                {/* Status field */}
-                <Controller
-                  name="clientStatus"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel id="cvf-status-label" shrink={true}>
-                        {t('clientVersions.statusLabel')}{' '}
-                        <Typography component="span" color="error">
-                          *
-                        </Typography>
-                      </InputLabel>
-                      <Select
-                        labelId="cvf-status-label"
-                        {...field}
-                        label={`${t('clientVersions.statusLabel')} *`}
-                        MenuProps={{
-                          anchorOrigin: {
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                          },
-                          transformOrigin: {
-                            vertical: 'top',
-                            horizontal: 'left',
-                          },
-                        }}
-                      >
-                        {Object.values(ClientStatus).map((status) => (
-                          <MenuItem key={status} value={status}>
-                            {t(ClientStatusLabels[status])}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ mt: 0.5, display: 'block' }}
-                      >
-                        {t('clientVersions.form.statusHelp')}
-                      </Typography>
-                    </FormControl>
-                  )}
-                />
+                  {/* Tags - right after status */}
+                  <TagSelector
+                    value={selectedTags}
+                    onChange={(value) => {
+                      setSelectedTags(value);
+                      setValue('tags', value, { shouldDirty: true });
+                    }}
+                  />
 
-                {/* Tags - right after status */}
-                <TagSelector
-                  value={selectedTags}
-                  onChange={(value) => {
-                    setSelectedTags(value);
-                    setValue('tags', value, { shouldDirty: true });
-                  }}
-                />
-
-                {isMaintenanceMode && (
-                  <MaintenanceSettingsInput
-                    startDate={watch('maintenanceStartDate') || ''}
-                    endDate={watch('maintenanceEndDate') || ''}
-                    onStartDateChange={(date) =>
-                      setValue('maintenanceStartDate', date)
-                    }
-                    onEndDateChange={(date) =>
-                      setValue('maintenanceEndDate', date)
-                    }
-                    inputMode={inputMode}
-                    onInputModeChange={setInputMode}
-                    maintenanceMessage={watch('maintenanceMessage') || ''}
-                    onMaintenanceMessageChange={(message) =>
-                      setValue('maintenanceMessage', message)
-                    }
-                    supportsMultiLanguage={supportsMultiLanguage}
-                    onSupportsMultiLanguageChange={
-                      handleSupportsMultiLanguageChange
-                    }
-                    maintenanceLocales={maintenanceLocales.map((l) => ({
-                      lang: l.lang as 'ko' | 'en' | 'zh',
-                      message: l.message,
-                    }))}
-                    onMaintenanceLocalesChange={(locales) => {
-                      setMaintenanceLocales(locales);
-                      setValue('maintenanceLocales', locales, {
-                        shouldDirty: true,
-                      });
-                      // Auto-enable multi-language messages when translation results exist
-                      const hasNonEmptyLocales = locales.some(
-                        (l) => l.message && l.message.trim() !== ''
-                      );
-                      if (hasNonEmptyLocales && !supportsMultiLanguage) {
-                        setSupportsMultiLanguage(true);
-                        setValue('supportsMultiLanguage', true, {
+                  {isMaintenanceMode && (
+                    <MaintenanceSettingsInput
+                      startDate={watch('maintenanceStartDate') || ''}
+                      endDate={watch('maintenanceEndDate') || ''}
+                      onStartDateChange={(date) =>
+                        setValue('maintenanceStartDate', date)
+                      }
+                      onEndDateChange={(date) =>
+                        setValue('maintenanceEndDate', date)
+                      }
+                      inputMode={inputMode}
+                      onInputModeChange={setInputMode}
+                      maintenanceMessage={watch('maintenanceMessage') || ''}
+                      onMaintenanceMessageChange={(message) =>
+                        setValue('maintenanceMessage', message)
+                      }
+                      supportsMultiLanguage={supportsMultiLanguage}
+                      onSupportsMultiLanguageChange={
+                        handleSupportsMultiLanguageChange
+                      }
+                      maintenanceLocales={maintenanceLocales.map((l) => ({
+                        lang: l.lang as 'ko' | 'en' | 'zh',
+                        message: l.message,
+                      }))}
+                      onMaintenanceLocalesChange={(locales) => {
+                        setMaintenanceLocales(locales);
+                        setValue('maintenanceLocales', locales, {
                           shouldDirty: true,
                         });
-                      }
-                    }}
-                    templates={templates}
-                    selectedTemplateId={selectedTemplateId}
-                    onSelectedTemplateIdChange={setSelectedTemplateId}
-                    messageError={!!errors.maintenanceMessage}
-                    messageRequired={true}
-                  />
-                )}
-              </Stack>
+                        // Auto-enable multi-language messages when translation results exist
+                        const hasNonEmptyLocales = locales.some(
+                          (l) => l.message && l.message.trim() !== ''
+                        );
+                        if (hasNonEmptyLocales && !supportsMultiLanguage) {
+                          setSupportsMultiLanguage(true);
+                          setValue('supportsMultiLanguage', true, {
+                            shouldDirty: true,
+                          });
+                        }
+                      }}
+                      templates={templates}
+                      selectedTemplateId={selectedTemplateId}
+                      onSelectedTemplateIdChange={setSelectedTemplateId}
+                      messageError={!!errors.maintenanceMessage}
+                      messageRequired={true}
+                    />
+                  )}
+                </Stack>
               </AccordionDetails>
             </Accordion>
 
             {/* Server address section */}
-            <Accordion
-              defaultExpanded
-              disableGutters
-              variant="outlined"
-            >
+            <Accordion defaultExpanded disableGutters variant="outlined">
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Box>
                   <Typography
@@ -1007,134 +1001,34 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 </Box>
               </AccordionSummary>
               <AccordionDetails>
-              <Stack spacing={2}>
-                {/* Game server address group */}
-                <Box
-                  component="fieldset"
-                  sx={{
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: 1,
-                    p: 2,
-                    m: 0,
-                  }}
-                >
+                <Stack spacing={2}>
+                  {/* Game server address group */}
                   <Box
-                    component="legend"
+                    component="fieldset"
                     sx={{
-                      px: 1,
-                      fontSize: '0.875rem',
-                      fontWeight: 600,
-                      color: 'text.secondary',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: 1,
+                      p: 2,
+                      m: 0,
                     }}
                   >
-                    {t('clientVersions.form.gameServerGroup')}
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    {/* Game server address */}
-                    <Box sx={{ display: 'flex', flex: 1 }}>
-                      <Controller
-                        name="gameServerAddress"
-                        control={control}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            fullWidth
-                            label={
-                              <Box component="span">
-                                {t('clientVersions.gameServerAddress')}{' '}
-                                <Typography component="span" color="error">
-                                  *
-                                </Typography>
-                              </Box>
-                            }
-                            error={!!errors.gameServerAddress}
-                            helperText={
-                              errors.gameServerAddress?.message ||
-                              t('clientVersions.form.gameServerAddressHelp')
-                            }
-                            inputProps={{
-                              autoComplete: 'off',
-                              autoCorrect: 'off',
-                              autoCapitalize: 'off',
-                              spellCheck: false,
-                            }}
-                          />
-                        )}
-                      />
-                      {renderHealthIcon(
-                        'gameServerAddress',
-                        watch('gameServerAddress'),
-                        true
-                      )}
+                    <Box
+                      component="legend"
+                      sx={{
+                        px: 1,
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        color: 'text.secondary',
+                      }}
+                    >
+                      {t('clientVersions.form.gameServerGroup')}
                     </Box>
-
-                    {/* Game server address (for whitelist) */}
-                    <Box sx={{ display: 'flex', flex: 1 }}>
-                      <Controller
-                        name="gameServerAddressForWhiteList"
-                        control={control}
-                        render={({ field }) => (
-                          <ClearableTextField
-                            {...field}
-                            fullWidth
-                            label={t(
-                              'clientVersions.gameServerAddressForWhiteList'
-                            )}
-                            error={!!errors.gameServerAddressForWhiteList}
-                            helperText={
-                              errors.gameServerAddressForWhiteList?.message ||
-                              t(
-                                'clientVersions.form.gameServerAddressForWhiteListHelp'
-                              )
-                            }
-                            inputProps={{
-                              autoComplete: 'off',
-                              autoCorrect: 'off',
-                              autoCapitalize: 'off',
-                              spellCheck: false,
-                            }}
-                            onClear={() => field.onChange('')}
-                          />
-                        )}
-                      />
-                      {renderHealthIcon(
-                        'gameServerAddressForWhiteList',
-                        watch('gameServerAddressForWhiteList') || '',
-                        true
-                      )}
-                    </Box>
-                  </Box>
-                </Box>
-
-                {/* Patch address group */}
-                <Box
-                  component="fieldset"
-                  sx={{
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: 1,
-                    p: 2,
-                    m: 0,
-                  }}
-                >
-                  <Box
-                    component="legend"
-                    sx={{
-                      px: 1,
-                      fontSize: '0.875rem',
-                      fontWeight: 600,
-                      color: 'text.secondary',
-                    }}
-                  >
-                    {t('clientVersions.form.patchServerGroup')}
-                  </Box>
-                  <Stack spacing={2}>
                     <Box sx={{ display: 'flex', gap: 2 }}>
-                      {/* Patch address */}
+                      {/* Game server address */}
                       <Box sx={{ display: 'flex', flex: 1 }}>
                         <Controller
-                          name="patchAddress"
+                          name="gameServerAddress"
                           control={control}
                           render={({ field }) => (
                             <TextField
@@ -1142,16 +1036,16 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                               fullWidth
                               label={
                                 <Box component="span">
-                                  {t('clientVersions.patchAddress')}{' '}
+                                  {t('clientVersions.gameServerAddress')}{' '}
                                   <Typography component="span" color="error">
                                     *
                                   </Typography>
                                 </Box>
                               }
-                              error={!!errors.patchAddress}
+                              error={!!errors.gameServerAddress}
                               helperText={
-                                errors.patchAddress?.message ||
-                                t('clientVersions.form.patchAddressHelp')
+                                errors.gameServerAddress?.message ||
+                                t('clientVersions.form.gameServerAddressHelp')
                               }
                               inputProps={{
                                 autoComplete: 'off',
@@ -1163,29 +1057,29 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           )}
                         />
                         {renderHealthIcon(
-                          'patchAddress',
-                          watch('patchAddress'),
-                          false
+                          'gameServerAddress',
+                          watch('gameServerAddress'),
+                          true
                         )}
                       </Box>
 
-                      {/* Patch address (for whitelist) */}
+                      {/* Game server address (for whitelist) */}
                       <Box sx={{ display: 'flex', flex: 1 }}>
                         <Controller
-                          name="patchAddressForWhiteList"
+                          name="gameServerAddressForWhiteList"
                           control={control}
                           render={({ field }) => (
                             <ClearableTextField
                               {...field}
                               fullWidth
                               label={t(
-                                'clientVersions.patchAddressForWhiteList'
+                                'clientVersions.gameServerAddressForWhiteList'
                               )}
-                              error={!!errors.patchAddressForWhiteList}
+                              error={!!errors.gameServerAddressForWhiteList}
                               helperText={
-                                errors.patchAddressForWhiteList?.message ||
+                                errors.gameServerAddressForWhiteList?.message ||
                                 t(
-                                  'clientVersions.form.patchAddressForWhiteListHelp'
+                                  'clientVersions.form.gameServerAddressForWhiteListHelp'
                                 )
                               }
                               inputProps={{
@@ -1199,45 +1093,145 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           )}
                         />
                         {renderHealthIcon(
-                          'patchAddressForWhiteList',
-                          watch('patchAddressForWhiteList') || '',
-                          false
+                          'gameServerAddressForWhiteList',
+                          watch('gameServerAddressForWhiteList') || '',
+                          true
                         )}
                       </Box>
                     </Box>
+                  </Box>
 
-                    {/* Minimum patch version */}
-                    <Box sx={{ display: 'flex', gap: 2 }}>
-                      <Box sx={{ flex: 1, maxWidth: '50%' }}>
-                        <Controller
-                          name="minPatchVersion"
-                          control={control}
-                          render={({ field }) => (
-                            <ClearableTextField
-                              {...field}
-                              fullWidth
-                              label={t('clientVersions.minPatchVersion')}
-                              placeholder="e.g., 1.0041"
-                              error={!!errors.minPatchVersion}
-                              helperText={
-                                errors.minPatchVersion?.message ||
-                                t('clientVersions.form.minPatchVersionHelp')
-                              }
-                              inputProps={{
-                                autoComplete: 'off',
-                                autoCorrect: 'off',
-                                autoCapitalize: 'off',
-                                spellCheck: false,
-                              }}
-                              onClear={() => field.onChange('')}
-                            />
-                          )}
-                        />
-                      </Box>
+                  {/* Patch address group */}
+                  <Box
+                    component="fieldset"
+                    sx={{
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: 1,
+                      p: 2,
+                      m: 0,
+                    }}
+                  >
+                    <Box
+                      component="legend"
+                      sx={{
+                        px: 1,
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        color: 'text.secondary',
+                      }}
+                    >
+                      {t('clientVersions.form.patchServerGroup')}
                     </Box>
-                  </Stack>
-                </Box>
-              </Stack>
+                    <Stack spacing={2}>
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+                        {/* Patch address */}
+                        <Box sx={{ display: 'flex', flex: 1 }}>
+                          <Controller
+                            name="patchAddress"
+                            control={control}
+                            render={({ field }) => (
+                              <TextField
+                                {...field}
+                                fullWidth
+                                label={
+                                  <Box component="span">
+                                    {t('clientVersions.patchAddress')}{' '}
+                                    <Typography component="span" color="error">
+                                      *
+                                    </Typography>
+                                  </Box>
+                                }
+                                error={!!errors.patchAddress}
+                                helperText={
+                                  errors.patchAddress?.message ||
+                                  t('clientVersions.form.patchAddressHelp')
+                                }
+                                inputProps={{
+                                  autoComplete: 'off',
+                                  autoCorrect: 'off',
+                                  autoCapitalize: 'off',
+                                  spellCheck: false,
+                                }}
+                              />
+                            )}
+                          />
+                          {renderHealthIcon(
+                            'patchAddress',
+                            watch('patchAddress'),
+                            false
+                          )}
+                        </Box>
+
+                        {/* Patch address (for whitelist) */}
+                        <Box sx={{ display: 'flex', flex: 1 }}>
+                          <Controller
+                            name="patchAddressForWhiteList"
+                            control={control}
+                            render={({ field }) => (
+                              <ClearableTextField
+                                {...field}
+                                fullWidth
+                                label={t(
+                                  'clientVersions.patchAddressForWhiteList'
+                                )}
+                                error={!!errors.patchAddressForWhiteList}
+                                helperText={
+                                  errors.patchAddressForWhiteList?.message ||
+                                  t(
+                                    'clientVersions.form.patchAddressForWhiteListHelp'
+                                  )
+                                }
+                                inputProps={{
+                                  autoComplete: 'off',
+                                  autoCorrect: 'off',
+                                  autoCapitalize: 'off',
+                                  spellCheck: false,
+                                }}
+                                onClear={() => field.onChange('')}
+                              />
+                            )}
+                          />
+                          {renderHealthIcon(
+                            'patchAddressForWhiteList',
+                            watch('patchAddressForWhiteList') || '',
+                            false
+                          )}
+                        </Box>
+                      </Box>
+
+                      {/* Minimum patch version */}
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Box sx={{ flex: 1, maxWidth: '50%' }}>
+                          <Controller
+                            name="minPatchVersion"
+                            control={control}
+                            render={({ field }) => (
+                              <ClearableTextField
+                                {...field}
+                                fullWidth
+                                label={t('clientVersions.minPatchVersion')}
+                                placeholder="e.g., 1.0041"
+                                error={!!errors.minPatchVersion}
+                                helperText={
+                                  errors.minPatchVersion?.message ||
+                                  t('clientVersions.form.minPatchVersionHelp')
+                                }
+                                inputProps={{
+                                  autoComplete: 'off',
+                                  autoCorrect: 'off',
+                                  autoCapitalize: 'off',
+                                  spellCheck: false,
+                                }}
+                                onClear={() => field.onChange('')}
+                              />
+                            )}
+                          />
+                        </Box>
+                      </Box>
+                    </Stack>
+                  </Box>
+                </Stack>
               </AccordionDetails>
             </Accordion>
 

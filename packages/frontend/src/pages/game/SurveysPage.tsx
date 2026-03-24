@@ -48,7 +48,10 @@ import ColumnSettingsDialog, {
 } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
-import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
+import {
+  formatDateTimeDetailed,
+  formatRelativeTime,
+} from '../../utils/dateFormat';
 import SurveyFormDialog from '../../components/game/SurveyFormDialog';
 import SurveyConfigDialog from '../../components/game/SurveyConfigDialog';
 import DynamicFilterBar, {
@@ -672,18 +675,18 @@ const SurveysPage: React.FC = () => {
                                           <Chip label={label} size="small" />
                                           {idx <
                                             survey.triggerConditions.length -
-                                            1 && (
-                                              <Typography
-                                                variant="caption"
-                                                sx={{
-                                                  fontWeight: 600,
-                                                  color: 'primary.main',
-                                                  px: 0.5,
-                                                }}
-                                              >
-                                                AND
-                                              </Typography>
-                                            )}
+                                              1 && (
+                                            <Typography
+                                              variant="caption"
+                                              sx={{
+                                                fontWeight: 600,
+                                                color: 'primary.main',
+                                                px: 0.5,
+                                              }}
+                                            >
+                                              AND
+                                            </Typography>
+                                          )}
                                         </React.Fragment>
                                       );
                                     }
@@ -733,7 +736,11 @@ const SurveysPage: React.FC = () => {
                           if (column.id === 'createdAt') {
                             return (
                               <TableCell key={column.id}>
-                                <Tooltip title={formatDateTimeDetailed(survey.createdAt)}>
+                                <Tooltip
+                                  title={formatDateTimeDetailed(
+                                    survey.createdAt
+                                  )}
+                                >
                                   <Typography variant="body2">
                                     {formatRelativeTime(survey.createdAt)}
                                   </Typography>

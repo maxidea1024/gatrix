@@ -204,7 +204,9 @@ const CouponSettingsPage: React.FC = () => {
   );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [rowMenuAnchor, setRowMenuAnchor] = useState<HTMLElement | null>(null);
-  const [rowMenuCoupon, setRowMenuCoupon] = useState<CouponSetting | null>(null);
+  const [rowMenuCoupon, setRowMenuCoupon] = useState<CouponSetting | null>(
+    null
+  );
 
   // Delete confirmation dialog state
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
