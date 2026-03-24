@@ -1828,6 +1828,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     return (
       <Paper
         variant="outlined"
+        style={{ borderRadius: 0 }}
         sx={{
           p: embedded ? 1.5 : 2,
           boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
@@ -1939,7 +1940,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             </Alert>
           )}
 
-          <TableContainer component={Paper} variant="outlined">
+          <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: '0 !important' }}>
             <Table size="small">
               <TableHead>
                 <TableRow>
@@ -2067,79 +2068,142 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                           result.evaluationSteps &&
                           result.evaluationSteps.length > 0;
 
+                        const variantValueStr = result.variant?.value != null
+                          ? typeof result.variant.value === 'object'
+                            ? JSON.stringify(result.variant.value)
+                            : String(result.variant.value)
+                          : null;
+
                         return (
                           <TableCell
                             key={env}
                             align="center"
-                            sx={{ minWidth: 40, maxWidth: 56, px: 0.25 }}
+                            sx={{ minWidth: 40, maxWidth: 80, px: 0.25 }}
                           >
-                            <Tooltip
-                              title={
-                                hasDetails
-                                  ? t('playground.clickToViewEvaluationResult')
-                                  : ''
-                              }
-                              disableFocusListener
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                              }}
                             >
-                              <Box
-                                sx={{
-                                  display: 'inline-flex',
-                                  flexDirection: 'column',
-                                  alignItems: 'center',
-                                  cursor: hasDetails ? 'pointer' : 'default',
-                                  p: 1,
-                                  borderRadius: 1,
-                                  transition: 'all 0.2s',
-                                  '&:hover': hasDetails
-                                    ? {
-                                        bgcolor: 'action.hover',
-                                        transform: 'scale(1.1)',
-                                      }
-                                    : {},
-                                }}
-                                onClick={(e) => {
-                                  if (hasDetails) {
-                                    setEvaluationPopoverAnchor(e.currentTarget);
-                                    setSelectedEvaluation({
-                                      flagName,
-                                      env,
-                                      result,
-                                    });
-                                  }
-                                }}
+                              <Tooltip
+                                title={
+                                  <Box>
+                                    <Box>{getLocalizedReason(result.reason, result.reasonDetails)}</Box>
+                                    {hasDetails && (
+                                      <Box sx={{ mt: 0.5, fontSize: '0.75em', opacity: 0.8 }}>
+                                        {t('playground.clickToViewEvaluationResult')}
+                                      </Box>
+                                    )}
+                                  </Box>
+                                }
+                                disableFocusListener
                               >
-                                {result.enabled ? (
-                                  <TrueIcon
-                                    color="success"
-                                    sx={{ fontSize: 24 }}
-                                  />
-                                ) : (
-                                  <FalseIcon
-                                    color="error"
-                                    sx={{ fontSize: 24 }}
-                                  />
-                                )}
-                                {result.validation &&
-                                  !result.validation.valid && (
-                                    <Tooltip
-                                      title={result.validation.errors.join(
-                                        ', '
-                                      )}
-                                      disableFocusListener
-                                    >
-                                      <WarningAmberIcon
-                                        sx={{
-                                          fontSize: 14,
-                                          color: 'warning.main',
-                                          position: 'absolute',
-                                          bottom: 4,
-                                          right: 4,
-                                        }}
-                                      />
-                                    </Tooltip>
+                                <Box
+                                  sx={{
+                                    display: 'inline-flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    cursor: hasDetails ? 'pointer' : 'default',
+                                    p: 1,
+                                    borderRadius: 1,
+                                    transition: 'all 0.2s',
+                                    '&:hover': hasDetails
+                                      ? {
+                                          bgcolor: 'action.hover',
+                                          transform: 'scale(1.1)',
+                                        }
+                                      : {},
+                                  }}
+                                  onClick={(e) => {
+                                    if (hasDetails) {
+                                      setEvaluationPopoverAnchor(e.currentTarget);
+                                      setSelectedEvaluation({
+                                        flagName,
+                                        env,
+                                        result,
+                                      });
+                                    }
+                                  }}
+                                >
+                                  {result.enabled ? (
+                                    <TrueIcon
+                                      color="success"
+                                      sx={{ fontSize: 24 }}
+                                    />
+                                  ) : (
+                                    <FalseIcon
+                                      color="error"
+                                      sx={{ fontSize: 24 }}
+                                    />
                                   )}
-                              </Box>
-                            </Tooltip>
+                                </Box>
+                              </Tooltip>
+                              {result.variant?.name && (
+                                <Tooltip
+                                  title={
+                                    <Box>
+                                      {variantValueStr != null && (
+                                        <Box>{t('playground.variantValue')}: {variantValueStr}</Box>
+                                      )}
+                                      {hasDetails && (
+                                        <Box sx={{ mt: 0.5, fontSize: '0.75em', opacity: 0.8 }}>
+                                          {t('playground.clickToViewEvaluationResult')}
+                                        </Box>
+                                      )}
+                                    </Box>
+                                  }
+                                  disableFocusListener
+                                >
+                                  <Chip
+                                    label={result.variant.name}
+                                    size="small"
+                                    variant="outlined"
+                                    onClick={(e) => {
+                                      if (hasDetails) {
+                                        setEvaluationPopoverAnchor(e.currentTarget);
+                                        setSelectedEvaluation({
+                                          flagName,
+                                          env,
+                                          result,
+                                        });
+                                      }
+                                    }}
+                                    sx={{
+                                      mt: 0.5,
+                                      maxWidth: 70,
+                                      height: 18,
+                                      fontSize: '0.65rem',
+                                      cursor: hasDetails ? 'pointer' : 'default',
+                                      '& .MuiChip-label': {
+                                        px: 0.75,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                      },
+                                    }}
+                                  />
+                                </Tooltip>
+                              )}
+                              {result.validation &&
+                                !result.validation.valid && (
+                                  <Tooltip
+                                    title={result.validation.errors.join(
+                                      ', '
+                                    )}
+                                    disableFocusListener
+                                  >
+                                    <WarningAmberIcon
+                                      sx={{
+                                        fontSize: 14,
+                                        color: 'warning.main',
+                                        mt: 0.25,
+                                      }}
+                                    />
+                                  </Tooltip>
+                                )}
+                            </Box>
                           </TableCell>
                         );
                       })}
@@ -2168,7 +2232,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
           maxHeight: '80vh',
           display: 'flex',
           flexDirection: 'column',
-          borderRadius: 2,
+          borderRadius: 0,
           overflow: 'hidden',
           border: '1px solid',
           borderColor: selectedEvaluation?.result?.enabled
