@@ -94,6 +94,7 @@ import featureFlagService, {
   FeatureFlag,
   FlagType,
 } from '../../services/featureFlagService';
+import changeRequestService from '../../services/changeRequestService';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import SearchTextField from '../../components/common/SearchTextField';
@@ -218,7 +219,7 @@ const FeatureFlagsPage: React.FC = () => {
   const [deletingFlag, setDeletingFlag] = useState<FeatureFlag | null>(null);
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [flagTypes, setFlagTypes] = useState<FlagTypeInfo[]>([]);
-  const { environments: envListRaw, currentEnvironmentId } = useEnvironment();
+  const { environments: envListRaw, allEnvironments, currentEnvironmentId } = useEnvironment();
   const environments: Environment[] = useMemo(
     () =>
       envListRaw
@@ -991,9 +992,53 @@ const FeatureFlagsPage: React.FC = () => {
     environmentId: string,
     currentEnabled: boolean
   ) => {
+    const env = allEnvironments.find((e) => e.environmentId === environmentId);
+    const requiresCR = env?.requiresApproval ?? false;
     const newEnabled = !currentEnabled;
 
-    // Optimistic update - ensure environments array exists
+    if (requiresCR) {
+      try {
+        // Fetch existing draft to merge
+        const pendingDraft = await changeRequestService.getPendingFlagDraft(
+          flag.flagName,
+          projectApiPath
+        );
+        const existingDraftData = pendingDraft?.draftData || {};
+
+        const currentEnvData = flag.environments?.find(
+          (e) => e.environmentId === environmentId
+        ) || { environmentId, isEnabled: currentEnabled };
+
+        const updatedEnvData = {
+          ...currentEnvData,
+          isEnabled: newEnabled,
+        };
+
+        // Merge with existing draft data
+        const mergedDraftData = {
+          ...existingDraftData,
+          [environmentId]: updatedEnvData,
+        };
+
+        await changeRequestService.saveFlagDraft(
+          flag.flagName,
+          mergedDraftData,
+          projectApiPath
+        );
+
+        enqueueSnackbar(t('changeRequest.messages.draftSaved'), { variant: 'info' });
+        window.dispatchEvent(new CustomEvent('cr-draft-changed'));
+      } catch (error: any) {
+        if (error?.response?.data?.errorCode === 'PENDING_REVIEW_EXISTS') {
+          enqueueSnackbar(t('changeRequest.errors.pendingReviewExists'), { variant: 'warning' });
+        } else {
+          enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), { variant: 'error' });
+        }
+      }
+      return; // Do NOT optimistically update the list UI, as it's not applied yet.
+    }
+
+    // Direct toggle (optimistic update)
     setFlags((prev) =>
       prev.map((f) => {
         if (f.flagName !== flag.flagName) return f;
@@ -1423,24 +1468,79 @@ const FeatureFlagsPage: React.FC = () => {
       return;
     }
 
+    const env = allEnvironments.find((e) => e.environmentId === environmentId);
+    const requiresCR = env?.requiresApproval ?? false;
+
     try {
-      for (const flag of targetFlags) {
-        // Directly toggle via API
-        await featureFlagService.toggleFeatureFlag(
-          flag.flagName,
-          enable,
-          environmentId,
-          projectApiPath
+      if (requiresCR) {
+        let hasPendingReview = false;
+
+        for (const flag of targetFlags) {
+          try {
+            const pendingDraft = await changeRequestService.getPendingFlagDraft(
+              flag.flagName,
+              projectApiPath
+            );
+            const existingDraftData = pendingDraft?.draftData || {};
+
+            const currentEnvData = flag.environments?.find(
+              (e) => e.environmentId === environmentId
+            ) || { environmentId, isEnabled: !enable };
+
+            const updatedEnvData = {
+              ...currentEnvData,
+              isEnabled: enable,
+            };
+
+            const mergedDraftData = {
+              ...existingDraftData,
+              [environmentId]: updatedEnvData,
+            };
+
+            await changeRequestService.saveFlagDraft(
+              flag.flagName,
+              mergedDraftData,
+              projectApiPath
+            );
+          } catch (err: any) {
+            if (err?.response?.data?.errorCode === 'PENDING_REVIEW_EXISTS') {
+              hasPendingReview = true;
+            } else {
+              throw err;
+            }
+          }
+        }
+
+        if (hasPendingReview) {
+          enqueueSnackbar(t('changeRequest.errors.pendingReviewExists'), {
+            variant: 'warning',
+          });
+        } else {
+          enqueueSnackbar(t('changeRequest.messages.draftSaved'), {
+            variant: 'info',
+          });
+        }
+        window.dispatchEvent(new CustomEvent('cr-draft-changed'));
+        setSelectedFlags(new Set());
+      } else {
+        for (const flag of targetFlags) {
+          // Directly toggle via API
+          await featureFlagService.toggleFeatureFlag(
+            flag.flagName,
+            enable,
+            environmentId,
+            projectApiPath
+          );
+        }
+        enqueueSnackbar(
+          t('featureFlags.bulkToggleSuccess', {
+            count: targetFlags.length,
+          }),
+          { variant: 'success' }
         );
+        setSelectedFlags(new Set());
+        loadFlags();
       }
-      enqueueSnackbar(
-        t('featureFlags.bulkToggleSuccess', {
-          count: targetFlags.length,
-        }),
-        { variant: 'success' }
-      );
-      setSelectedFlags(new Set());
-      loadFlags();
     } catch (error: any) {
       enqueueSnackbar(
         parseApiErrorMessage(error, 'featureFlags.bulkToggleFailed'),
