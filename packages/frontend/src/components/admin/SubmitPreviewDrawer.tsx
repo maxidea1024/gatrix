@@ -34,6 +34,7 @@ import {
   formatChangeRequestTitle,
   getTableLocalizationKey,
 } from '@/utils/changeRequestFormatter';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface SubmitPreviewDrawerProps {
   open: boolean;
@@ -58,6 +59,8 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { handleApiError } = useHandleApiError();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState('');
   const [reason, setReason] = useState('');
@@ -168,14 +171,14 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
         .map(([id]) => id);
 
       for (const itemId of itemsToDelete) {
-        await changeRequestService.deleteChangeItem(changeRequest.id, itemId);
+        await changeRequestService.deleteChangeItem(changeRequest.id, itemId, projectApiPath);
       }
 
       // Then submit
       await changeRequestService.submit(changeRequest.id, {
         title: title.trim(),
         reason: reason.trim() || undefined,
-      });
+      }, projectApiPath);
 
       enqueueSnackbar(t('changeRequest.messages.submitted'), {
         variant: 'success',
@@ -434,7 +437,7 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          <Button variant="outlined" onClick={onClose}>
+          <Button onClick={onClose}>
             {t('common.cancel')}
           </Button>
           <Button

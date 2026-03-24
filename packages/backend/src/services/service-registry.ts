@@ -52,6 +52,17 @@ export interface ServiceHandler {
     environmentId: string,
     userId?: string
   ) => Promise<void>;
+
+  /**
+   * Apply draft data for complex entities (feature flags, segments).
+   * Used when a ChangeItem has draftData instead of ops.
+   */
+  applyDraft?: (
+    id: string,
+    draftData: Record<string, any>,
+    environmentId: string,
+    userId?: string
+  ) => Promise<unknown>;
 }
 
 /**
@@ -364,6 +375,18 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
           userId || ''
         );
       }
+    },
+    applyDraft: async (id, draftData, environmentId, userId) => {
+      // Delegate to the feature flag draft publish logic
+      // draftData contains per-environment configs (strategies, variants, values, etc.)
+      const { publishFeatureFlagDraft } =
+        await import('./draft-handlers/feature-flag-draft-handler');
+      return await publishFeatureFlagDraft(
+        id,
+        environmentId,
+        draftData,
+        userId || ''
+      );
     },
   },
 };

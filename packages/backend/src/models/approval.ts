@@ -22,7 +22,7 @@ export class Approval extends Model {
       properties: {
         id: { type: 'string' },
         changeRequestId: { type: 'string' },
-        approverId: { type: 'integer' },
+        approverId: { type: 'string' },
         comment: { type: ['string', 'null'] },
         createdAt: { type: 'string', format: 'date-time' },
       },

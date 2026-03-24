@@ -132,9 +132,7 @@ import {
   pausePlan,
   resumePlan,
 } from '../../services/releaseFlowService';
-import draftService from '../../services/draftService';
-import DraftBanner from '../../components/common/DraftBanner';
-import DraftChangesDialog from '../../components/common/DraftChangesDialog';
+
 import AISuggestNames from '../../components/common/AISuggestNames';
 
 interface FlagTypeInfo {
@@ -328,11 +326,6 @@ const FeatureFlagsPage: React.FC = () => {
   const [cloneNewName, setCloneNewName] = useState('');
   const [cloning, setCloning] = useState(false);
   const [newFlagJsonError, setNewFlagJsonError] = useState<string | null>(null);
-
-  // Draft tracking: which flags have pending drafts
-  const [flagDraftMap, setFlagDraftMap] = useState<{
-    [flagId: string]: boolean;
-  }>({});
 
   // Column settings state
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
@@ -636,14 +629,6 @@ const FeatureFlagsPage: React.FC = () => {
       setIsInitialLoad(false);
     }
   };
-
-  // Refetch data when draft is published or discarded
-  useEffect(() => {
-    const handleDraftAction = () => loadFlags();
-    window.addEventListener('draft-action-completed', handleDraftAction);
-    return () =>
-      window.removeEventListener('draft-action-completed', handleDraftAction);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadTags = async () => {
     try {
@@ -1000,7 +985,7 @@ const FeatureFlagsPage: React.FC = () => {
     setPage(0);
   };
 
-  // Toggle flag for a specific environment - saves to draft instead of direct toggle
+  // Toggle flag for a specific environment
   const handleToggle = async (
     flag: FeatureFlag,
     environmentId: string,
@@ -1040,27 +1025,13 @@ const FeatureFlagsPage: React.FC = () => {
     );
 
     try {
-      // Save to draft instead of directly toggling
-      const { draftData } = await draftService.getDraft(
-        'feature_flag',
-        flag.id,
+      // Directly toggle via API
+      await featureFlagService.toggleFeatureFlag(
+        flag.flagName,
+        newEnabled,
+        environmentId,
         projectApiPath
       );
-      const currentEnvData = draftData[environmentId] || {};
-      const mergedDraft = {
-        ...draftData,
-        [environmentId]: { ...currentEnvData, isEnabled: newEnabled },
-      };
-      await draftService.saveDraft(
-        'feature_flag',
-        flag.id,
-        mergedDraft,
-        projectApiPath
-      );
-
-      // Track which flags have drafts
-      setFlagDraftMap((prev) => ({ ...prev, [flag.id]: true }));
-      window.dispatchEvent(new Event('draft-changed'));
     } catch (error: any) {
       // Rollback on error
       setFlags((prev) =>
@@ -1086,49 +1057,6 @@ const FeatureFlagsPage: React.FC = () => {
           variant: 'error',
         }
       );
-    }
-  };
-
-  // Whether any flags have pending drafts
-  const draftFlagIds = Object.entries(flagDraftMap)
-    .filter(([, has]) => has)
-    .map(([id]) => id);
-  const draftCount = draftFlagIds.length;
-  const [draftChangesOpen, setDraftChangesOpen] = useState(false);
-
-  // Publish all pending drafts at once
-  const handlePublishAllDrafts = async () => {
-    try {
-      await Promise.all(
-        draftFlagIds.map((id) =>
-          draftService.publishDraft('feature_flag', id, projectApiPath)
-        )
-      );
-      setFlagDraftMap({});
-
-      loadFlags();
-    } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'draft.publishFailed'), {
-        variant: 'error',
-      });
-    }
-  };
-
-  // Discard all pending drafts at once
-  const handleDiscardAllDrafts = async () => {
-    try {
-      await Promise.all(
-        draftFlagIds.map((id) =>
-          draftService.discardDraft('feature_flag', id, projectApiPath)
-        )
-      );
-      setFlagDraftMap({});
-
-      loadFlags();
-    } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'draft.discardFailed'), {
-        variant: 'error',
-      });
     }
   };
 
@@ -1497,31 +1425,19 @@ const FeatureFlagsPage: React.FC = () => {
 
     try {
       for (const flag of targetFlags) {
-        // Save to draft instead of directly toggling
-        const { draftData } = await draftService.getDraft(
-          'feature_flag',
-          flag.id,
+        // Directly toggle via API
+        await featureFlagService.toggleFeatureFlag(
+          flag.flagName,
+          enable,
+          environmentId,
           projectApiPath
         );
-        const currentEnvData = draftData[environmentId] || {};
-        const mergedDraft = {
-          ...draftData,
-          [environmentId]: { ...currentEnvData, isEnabled: enable },
-        };
-        await draftService.saveDraft(
-          'feature_flag',
-          flag.id,
-          mergedDraft,
-          projectApiPath
-        );
-        setFlagDraftMap((prev) => ({ ...prev, [flag.id]: true }));
       }
-      window.dispatchEvent(new Event('draft-changed'));
       enqueueSnackbar(
-        t('featureFlags.bulkDraftSaved', {
+        t('featureFlags.bulkToggleSuccess', {
           count: targetFlags.length,
         }),
-        { variant: 'info' }
+        { variant: 'success' }
       );
       setSelectedFlags(new Set());
       loadFlags();

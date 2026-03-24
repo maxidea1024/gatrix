@@ -389,6 +389,194 @@ export class ChangeRequestService {
     }
   }
 
+  /**
+   * Upsert a ChangeItem with draftData (for complex entities like feature flags, segments).
+   * Instead of field-level ops, stores a full snapshot in draftData.
+   * The draftData is applied via the service-registry handler on execute.
+   */
+  static async upsertDraftDataItem(
+    userId: string,
+    environmentId: string,
+    targetTable: string,
+    targetId: string,
+    draftData: Record<string, any>,
+    actionTitle?: string
+  ): Promise<{ changeRequestId: string; status: ChangeRequestStatus }> {
+    try {
+      // Check for pending review
+      const pendingReview = await ChangeRequest.query()
+        .where('requesterId', userId)
+        .where('environmentId', environmentId)
+        .where('status', 'open')
+        .first();
+
+      if (pendingReview) {
+        throw new GatrixError(
+          'You have a pending review request. Withdraw it or wait for approval/rejection before making new changes.',
+          409,
+          true,
+          'PENDING_REVIEW_EXISTS'
+        );
+      }
+
+      // Find or create draft CR
+      let cr = await ChangeRequest.query()
+        .where('requesterId', userId)
+        .where('environmentId', environmentId)
+        .where('status', 'draft')
+        .first();
+
+      if (!cr) {
+        const cleanTable = targetTable.startsWith('g_')
+          ? targetTable.slice(2)
+          : targetTable;
+        cr = await ChangeRequest.query().insert({
+          id: ulid(),
+          requesterId: userId,
+          environmentId,
+          status: 'draft',
+          title: actionTitle || `[${cleanTable}] Draft: ${targetId}`,
+          priority: 'medium',
+          category: 'feature_flag',
+        });
+      }
+
+      // Check if item for this target already exists
+      const existingItem = await ChangeItem.query()
+        .where('changeRequestId', cr.id)
+        .where('targetTable', targetTable)
+        .where('targetId', targetId)
+        .first();
+
+      if (existingItem) {
+        // Update existing item's draftData
+        await ChangeItem.query()
+          .findById(existingItem.id)
+          .patch({ draftData, ops: [] });
+      } else {
+        // Find or create ActionGroup
+        let actionGroup = await ActionGroup.query()
+          .where('changeRequestId', cr.id)
+          .where('actionType', ACTION_GROUP_TYPES.UPDATE_ENTITY)
+          .first();
+
+        if (!actionGroup) {
+          const maxOrder = await ActionGroup.query()
+            .where('changeRequestId', cr.id)
+            .max('orderIndex as maxOrder')
+            .first();
+          const nextOrder = ((maxOrder as any)?.maxOrder ?? -1) + 1;
+
+          actionGroup = await ActionGroup.query().insert({
+            id: ulid(),
+            changeRequestId: cr.id,
+            actionType: ACTION_GROUP_TYPES.UPDATE_ENTITY,
+            title: actionTitle || `Update ${targetTable}`,
+            orderIndex: nextOrder,
+          });
+        }
+
+        // Insert ChangeItem with draftData (ops is empty)
+        await ChangeItem.query().insert({
+          id: ulid(),
+          changeRequestId: cr.id,
+          actionGroupId: actionGroup.id,
+          targetTable,
+          targetId,
+          opType: 'UPDATE',
+          ops: [],
+          draftData,
+        });
+      }
+
+      return { changeRequestId: cr.id, status: cr.status };
+    } catch (error) {
+      logger.error('Error upserting draft data item:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get pending CR draftData for a specific target entity.
+   * Returns the draftData from the most recent pending (draft/open) CR ChangeItem.
+   * Used by Playground evaluation and detail pages to show pending changes.
+   */
+  static async getPendingDraftForTarget(
+    targetTable: string,
+    targetId: string,
+    environmentId?: string
+  ): Promise<{
+    changeRequestId: string;
+    status: ChangeRequestStatus;
+    draftData: Record<string, any>;
+    requesterId: string;
+  } | null> {
+    const statuses = ['draft', 'open', 'approved'];
+
+    let query = ChangeItem.query()
+      .joinRelated('changeRequest')
+      .where('g_change_items.targetTable', targetTable)
+      .where('g_change_items.targetId', targetId)
+      .whereIn('changeRequest.status', statuses)
+      .whereNotNull('g_change_items.draftData')
+      .select(
+        'g_change_items.changeRequestId',
+        'changeRequest.status',
+        'g_change_items.draftData',
+        'changeRequest.requesterId'
+      )
+      .orderBy('changeRequest.createdAt', 'desc')
+      .first();
+
+    if (environmentId) {
+      query = query.where('changeRequest.environmentId', environmentId);
+    }
+
+    const result = await query;
+
+    if (!result) return null;
+
+    return {
+      changeRequestId: result.changeRequestId,
+      status: (result as any).status,
+      draftData: result.draftData as Record<string, any>,
+      requesterId: (result as any).requesterId,
+    };
+  }
+
+  /**
+   * Get all pending CR draftData items for a target table in an environment.
+   * Used by Playground to merge all pending changes for evaluation.
+   */
+  static async getAllPendingDraftsForTable(
+    targetTable: string,
+    environmentId: string
+  ): Promise<
+    Array<{
+      targetId: string;
+      changeRequestId: string;
+      draftData: Record<string, any>;
+    }>
+  > {
+    const items = await ChangeItem.query()
+      .joinRelated('changeRequest')
+      .where('g_change_items.targetTable', targetTable)
+      .whereIn('changeRequest.status', ['draft', 'open', 'approved'])
+      .where('changeRequest.environmentId', environmentId)
+      .whereNotNull('g_change_items.draftData')
+      .select(
+        'g_change_items.targetId',
+        'g_change_items.changeRequestId',
+        'g_change_items.draftData'
+      );
+
+    return items.map((item) => ({
+      targetId: item.targetId,
+      changeRequestId: item.changeRequestId,
+      draftData: item.draftData as Record<string, any>,
+    }));
+  }
+
   static async updateChangeRequestMetadata(
     changeRequestId: string,
     metadata: {
@@ -653,11 +841,12 @@ export class ChangeRequestService {
 
     // Create Audit Log with comment
     await knex('g_audit_logs').insert({
+      id: ulid(),
       action: 'CHANGE_REQUEST_REJECTED',
-      userId: rejectedBy || '', // 0 for system
+      userId: rejectedBy || '',
       changeRequestId: cr.id,
       entityType: 'ChangeRequest',
-      entityId: 0,
+      entityId: cr.id,
       newValues: JSON.stringify({ comment }),
     });
 
@@ -783,6 +972,7 @@ export class ChangeRequestService {
         afterData: any;
         beforeData: any;
         isCreate: boolean;
+        isDraftData?: boolean;
       }> = [];
 
       // Transactional Logic - verify data and prepare for service calls
@@ -903,6 +1093,24 @@ export class ChangeRequestService {
             });
           }
           continue; // Move to next item
+        }
+
+        // For CREATE/UPDATE: check if this item uses draftData (complex entities)
+        if (item.draftData && Object.keys(item.draftData).length > 0) {
+          // DraftData items skip direct DB updates.
+          // They are applied via the service-registry handler after transaction.
+          logger.info(
+            `Queuing draftData-based execution for ${item.targetTable}:${item.targetId}`
+          );
+          serviceCallsNeeded.push({
+            targetTable: item.targetTable,
+            targetId: item.targetId,
+            afterData: item.draftData,
+            beforeData: liveData,
+            isCreate: false,
+            isDraftData: true,
+          });
+          continue;
         }
 
         // For CREATE/UPDATE: apply ops to get final data
@@ -1202,11 +1410,12 @@ export class ChangeRequestService {
 
       // Log Execution
       await knex('g_audit_logs').transacting(trx).insert({
+        id: ulid(),
         action: 'CHANGE_REQUEST_EXECUTED',
         userId,
         changeRequestId: cr.id,
         entityType: 'ChangeRequest',
-        entityId: 0,
+        entityId: cr.id,
       });
 
       return { cr: finalInfo, serviceCallsNeeded };
@@ -1218,13 +1427,23 @@ export class ChangeRequestService {
         const handler = getServiceHandler(call.targetTable);
         if (handler) {
           try {
-            // Handler is an object implementing ServiceHandler, not a class
-            await handler.apply(
-              call.targetId,
-              call.afterData,
-              result.cr.environmentId, // Use environmentId from result CR
-              userId // Pass executor ID to service for audit/context
-            );
+            if (call.isDraftData && handler.applyDraft) {
+              // Use applyDraft for complex entities with draftData
+              await handler.applyDraft(
+                call.targetId,
+                call.afterData,
+                result.cr.environmentId,
+                userId
+              );
+            } else {
+              // Standard apply for ops-based changes
+              await handler.apply(
+                call.targetId,
+                call.afterData,
+                result.cr.environmentId,
+                userId
+              );
+            }
           } catch (err) {
             logger.error(
               `Post-execution service hook failed for ${call.targetTable}:${call.targetId}`,

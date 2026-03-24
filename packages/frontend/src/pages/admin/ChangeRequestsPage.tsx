@@ -4,7 +4,7 @@ import {
   Box,
   Typography,
   Card,
-  CardContent,
+  Paper,
   TableContainer,
   Table,
   TableHead,
@@ -12,7 +12,6 @@ import {
   TableCell,
   TableBody,
   Chip,
-  LinearProgress,
   Button,
   Tabs,
   Tab,
@@ -23,7 +22,6 @@ import {
   DialogContentText,
   DialogActions,
   TextField,
-  Paper,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -32,7 +30,7 @@ import {
   Undo as UndoIcon,
   PlayArrow as PlayArrowIcon,
   Delete as DeleteIcon,
-  CompareArrows as CompareArrowsIcon,
+  Campaign as CampaignIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -50,6 +48,8 @@ import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDra
 import RevertPreviewDrawer from '@/components/admin/RevertPreviewDrawer';
 import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
 import PageHeader from '@/components/common/PageHeader';
+import PageContentLoader from '@/components/common/PageContentLoader';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 // JSON Diff wrapper component
 interface FieldChange {
@@ -270,6 +270,7 @@ interface ChangeRequestRowProps {
   index: number;
   onRefresh: () => void;
   onOpenDrawer: (id: string) => void;
+  projectApiPath: string | null;
 }
 
 const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
@@ -277,6 +278,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
   index,
   onRefresh,
   onOpenDrawer,
+  projectApiPath,
 }) => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -294,7 +296,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
   const handleApprove = async () => {
     setActionLoading(true);
     try {
-      await changeRequestService.approve(cr.id);
+      await changeRequestService.approve(cr.id, undefined, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.approved'), {
         variant: 'success',
       });
@@ -315,7 +317,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
     }
     setActionLoading(true);
     try {
-      await changeRequestService.reject(cr.id, rejectComment);
+      await changeRequestService.reject(cr.id, rejectComment, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.rejected'), {
         variant: 'success',
       });
@@ -336,7 +338,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
   const confirmReopen = async () => {
     setActionLoading(true);
     try {
-      await changeRequestService.reopen(cr.id);
+      await changeRequestService.reopen(cr.id, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.reopened'), {
         variant: 'success',
       });
@@ -352,7 +354,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
   const handleExecute = async () => {
     setActionLoading(true);
     try {
-      await changeRequestService.execute(cr.id);
+      await changeRequestService.execute(cr.id, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.executed'), {
         variant: 'success',
       });
@@ -367,10 +369,9 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
   };
 
   const handleDelete = async () => {
-    if (!window.confirm(t('changeRequest.confirmDelete'))) return;
     setActionLoading(true);
     try {
-      await changeRequestService.delete(cr.id);
+      await changeRequestService.delete(cr.id, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.deleted'), {
         variant: 'success',
       });
@@ -400,7 +401,7 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
       await changeRequestService.submit(cr.id, {
         title: submitTitle.trim(),
         reason: submitReason.trim(),
-      });
+      }, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.submitted'), {
         variant: 'success',
       });
@@ -620,6 +621,8 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
 const ChangeRequestsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // Tab state controlled by URL param
   const [searchParams, setSearchParams] = useSearchParams();
@@ -682,7 +685,7 @@ const ChangeRequestsPage: React.FC = () => {
     if (statusFilter) {
       params.status = statusFilter;
     }
-    return await changeRequestService.list(params);
+    return await changeRequestService.list(params, projectApiPath);
   }, [page, rowsPerPage, statusFilter]);
 
   const { data, isLoading, mutate } = useSWR(
@@ -696,7 +699,7 @@ const ChangeRequestsPage: React.FC = () => {
 
   const { data: stats, mutate: mutateStats } = useSWR(
     'change-requests-stats',
-    () => changeRequestService.getStats(),
+    () => changeRequestService.getStats(projectApiPath),
     {
       revalidateOnFocus: false,
     }
@@ -705,6 +708,8 @@ const ChangeRequestsPage: React.FC = () => {
   const handleRefresh = useCallback(() => {
     mutate();
     mutateStats();
+    // Notify MainLayout to refresh floating CR banner
+    window.dispatchEvent(new CustomEvent('cr-draft-changed'));
   }, [mutate, mutateStats]);
 
   const handlePageChange = useCallback((_: unknown, newPage: number) => {
@@ -723,7 +728,7 @@ const ChangeRequestsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <PageHeader
-        icon={<CompareArrowsIcon />}
+        icon={<CampaignIcon />}
         title={t('changeRequest.title')}
         subtitle={t('changeRequest.subtitle')}
         actions={
@@ -737,113 +742,114 @@ const ChangeRequestsPage: React.FC = () => {
         }
       />
 
-      <Card variant="outlined">
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {/* Status Tabs */}
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
-            <Tabs value={tabValue} onChange={handleTabChange}>
-              <Tab
-                label={
-                  t('changeRequest.tabs.all') +
-                  (stats?.all ? ` (${stats.all})` : '')
-                }
-              />
-              <Tab
-                label={
-                  t('changeRequest.tabs.draft') +
-                  (stats?.draft ? ` (${stats.draft})` : '')
-                }
-              />
-              <Tab
-                label={
-                  t('changeRequest.tabs.open') +
-                  (stats?.open ? ` (${stats.open})` : '')
-                }
-              />
-              <Tab
-                label={
-                  t('changeRequest.tabs.approved') +
-                  (stats?.approved ? ` (${stats.approved})` : '')
-                }
-              />
-              <Tab
-                label={
-                  t('changeRequest.tabs.applied') +
-                  (stats?.applied ? ` (${stats.applied})` : '')
-                }
-              />
-              <Tab
-                label={
-                  t('changeRequest.tabs.rejected') +
-                  (stats?.rejected ? ` (${stats.rejected})` : '')
-                }
-              />
-              <Tab
-                label={
-                  t('changeRequest.tabs.conflict') +
-                  (stats?.conflict ? ` (${stats.conflict})` : '')
-                }
-              />
-            </Tabs>
-          </Box>
+      {/* Status Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={tabValue} onChange={handleTabChange}>
+          <Tab
+            label={
+              t('changeRequest.tabs.all') +
+              (stats?.all ? ` (${stats.all})` : '')
+            }
+          />
+          <Tab
+            label={
+              t('changeRequest.tabs.draft') +
+              (stats?.draft ? ` (${stats.draft})` : '')
+            }
+          />
+          <Tab
+            label={
+              t('changeRequest.tabs.open') +
+              (stats?.open ? ` (${stats.open})` : '')
+            }
+          />
+          <Tab
+            label={
+              t('changeRequest.tabs.approved') +
+              (stats?.approved ? ` (${stats.approved})` : '')
+            }
+          />
+          <Tab
+            label={
+              t('changeRequest.tabs.applied') +
+              (stats?.applied ? ` (${stats.applied})` : '')
+            }
+          />
+          <Tab
+            label={
+              t('changeRequest.tabs.rejected') +
+              (stats?.rejected ? ` (${stats.rejected})` : '')
+            }
+          />
+          <Tab
+            label={
+              t('changeRequest.tabs.conflict') +
+              (stats?.conflict ? ` (${stats.conflict})` : '')
+            }
+          />
+        </Tabs>
+      </Box>
 
-          {isLoading && <LinearProgress />}
+      <PageContentLoader loading={isLoading && !data}>
+        {!data?.items || data.items.length === 0 ? (
+          <EmptyPagePlaceholder message={t('changeRequest.noRequests')} />
+        ) : (
+          <Card variant="outlined" sx={{ position: 'relative' }}>
+            <TableContainer
+              sx={{
+                opacity: isLoading ? 0.5 : 1,
+                transition: 'opacity 0.15s ease-in-out',
+                pointerEvents: isLoading ? 'none' : 'auto',
+              }}
+            >
+              <Table sx={{ tableLayout: 'auto' }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t('changeRequest.status')}</TableCell>
+                    <TableCell>{t('changeRequest.titleField')}</TableCell>
+                    <TableCell>{t('changeRequest.requester')}</TableCell>
+                    <TableCell>{t('changeRequest.priorityField')}</TableCell>
+                    <TableCell align="center">
+                      {t('changeRequest.items')}
+                    </TableCell>
+                    <TableCell align="center">
+                      {t('changeRequest.approvalProgress')}
+                    </TableCell>
+                    <TableCell align="center">
+                      {t('changeRequest.lastUpdated')}
+                    </TableCell>
+                    <TableCell align="center">
+                      {t('changeRequest.actions.label')}
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data?.items.map((cr, idx) => (
+                    <ChangeRequestRow
+                      key={cr.id}
+                      cr={cr}
+                      index={idx}
+                      onRefresh={handleRefresh}
+                      onOpenDrawer={handleOpenDrawer}
+                      projectApiPath={projectApiPath}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-          {!isLoading && (!data?.items || data.items.length === 0) ? (
-            <EmptyPagePlaceholder message={t('changeRequest.noRequests')} />
-          ) : (
-            <>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('changeRequest.status')}</TableCell>
-                      <TableCell>{t('changeRequest.titleField')}</TableCell>
-                      <TableCell>{t('changeRequest.requester')}</TableCell>
-                      <TableCell>{t('changeRequest.priorityField')}</TableCell>
-                      <TableCell align="center">
-                        {t('changeRequest.items')}
-                      </TableCell>
-                      <TableCell align="center">
-                        {t('changeRequest.approvalProgress')}
-                      </TableCell>
-                      <TableCell align="center">
-                        {t('changeRequest.lastUpdated')}
-                      </TableCell>
-                      <TableCell align="center">
-                        {t('changeRequest.actions.label')}
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {data?.items.map((cr, idx) => (
-                      <ChangeRequestRow
-                        key={cr.id}
-                        cr={cr}
-                        index={idx}
-                        onRefresh={handleRefresh}
-                        onOpenDrawer={handleOpenDrawer}
-                      />
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-
-              {data && data.pagination && data.pagination.total > 0 && (
-                <Box sx={{ p: 2 }}>
-                  <SimplePagination
-                    count={data.pagination.total}
-                    page={page}
-                    rowsPerPage={rowsPerPage}
-                    onPageChange={handlePageChange}
-                    onRowsPerPageChange={handleRowsPerPageChange}
-                  />
-                </Box>
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
+            {data && data.pagination && data.pagination.total > 0 && (
+              <SimplePagination
+                count={data.pagination.total}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleRowsPerPageChange}
+              />
+            )}
+          </Card>
+        )}
+      </PageContentLoader>
 
       {/* Change Request Detail Drawer */}
       <ChangeRequestDetailDrawer

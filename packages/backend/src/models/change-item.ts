@@ -32,6 +32,7 @@ export class ChangeItem extends Model {
   entityVersion?: number;
   opType!: EntityOpType;
   ops!: FieldOp[];
+  draftData?: Record<string, any>;
 
   // Relations
   changeRequest?: ChangeRequest;
@@ -40,7 +41,7 @@ export class ChangeItem extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['changeRequestId', 'targetTable', 'targetId', 'ops'],
+      required: ['changeRequestId', 'targetTable', 'targetId'],
       properties: {
         id: { type: 'string' },
         changeRequestId: { type: 'string' },
@@ -62,13 +63,16 @@ export class ChangeItem extends Model {
             },
           },
         },
+        draftData: {
+          type: ['object', 'null'],
+        },
       },
     };
   }
 
   // JSON parsing for ops column
   static get jsonAttributes() {
-    return ['ops'];
+    return ['ops', 'draftData'];
   }
 
   static get relationMappings() {

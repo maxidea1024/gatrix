@@ -52,6 +52,7 @@ import {
 } from '@/utils/changeRequestFormatter';
 import RevertPreviewDrawer from './RevertPreviewDrawer';
 import SubmitPreviewDrawer from './SubmitPreviewDrawer';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface ChangeRequestDetailDrawerProps {
   open: boolean;
@@ -141,6 +142,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { user, permissions } = useAuth();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const hasAnyPermissions = permissions.length > 0;
 
   const [actionLoading, setActionLoading] = useState(false);
@@ -163,7 +166,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   // Delete handler for error dialog
   const handleDeleteFromError = async () => {
     try {
-      await changeRequestService.delete(changeRequestId!);
+      await changeRequestService.delete(changeRequestId!, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.deleted'), {
         variant: 'success',
       });
@@ -188,7 +191,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     mutate,
   } = useSWR(
     open && changeRequestId ? `change-request-drawer-${changeRequestId}` : null,
-    () => changeRequestService.getById(changeRequestId!),
+    () => changeRequestService.getById(changeRequestId!, projectApiPath),
     { revalidateOnFocus: false }
   );
 
@@ -291,17 +294,35 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     return cr.changeItems.map((item: any) => {
       // Map backend ops to frontend FieldChange format
       const ops = item.ops || [];
-      const changes: FieldChange[] = ops.map((op: any) => ({
-        field: op.path,
-        oldValue: op.oldValue,
-        newValue: op.newValue,
-        operation:
-          op.opType === 'SET'
-            ? 'added'
-            : op.opType === 'DEL'
-              ? 'removed'
-              : 'modified',
-      }));
+      let changes: FieldChange[];
+
+      if (ops.length > 0) {
+        changes = ops.map((op: any) => ({
+          field: op.path,
+          oldValue: op.oldValue,
+          newValue: op.newValue,
+          operation:
+            op.opType === 'SET'
+              ? 'added'
+              : op.opType === 'DEL'
+                ? 'removed'
+                : 'modified',
+        }));
+      } else if (item.draftData && typeof item.draftData === 'object') {
+        // For draftData-based items (e.g. feature flags), show draftData as changes
+        // Filter out metadata keys (starting with _) and resolve env names
+        const envName = cr?.environmentModel?.displayName || cr?.environmentId;
+        changes = Object.entries(item.draftData)
+          .filter(([key]) => !key.startsWith('_'))
+          .map(([key, value]) => ({
+            field: key === cr?.environmentId && envName ? envName : key,
+            oldValue: undefined,
+            newValue: value,
+            operation: 'modified' as const,
+          }));
+      } else {
+        changes = [];
+      }
 
       // Map backend opType to frontend operation
       const operation =
@@ -317,7 +338,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         operation,
         changes,
         actionGroupId: item.actionGroupId,
-        afterData: item.afterData,
+        afterData: item.afterData || item.draftData,
       };
     });
   }, [cr]);
@@ -607,7 +628,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   };
 
   const hasApproved = useMemo(() => {
-    return cr?.approvals?.some((a) => a.approverId === user?.id);
+    return cr?.approvals?.some((a) => a.approverId === String(user?.id));
   }, [cr, user]);
 
   const requiredApprovals = cr?.environmentModel?.requiredApprovers ?? 1;
@@ -619,7 +640,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     try {
       await changeRequestService.approve(
         changeRequestId!,
-        comment || undefined
+        comment || undefined,
+        projectApiPath
       );
       enqueueSnackbar(t('changeRequest.messages.approved'), {
         variant: 'success',
@@ -643,7 +665,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     }
     setActionLoading(true);
     try {
-      await changeRequestService.reject(changeRequestId!, comment);
+      await changeRequestService.reject(changeRequestId!, comment, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.rejected'), {
         variant: 'success',
       });
@@ -660,7 +682,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const handleExecute = async () => {
     setActionLoading(true);
     try {
-      await changeRequestService.execute(changeRequestId!);
+      await changeRequestService.execute(changeRequestId!, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.executed'), {
         variant: 'success',
       });
@@ -682,7 +704,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const handleConfirmDelete = async () => {
     setActionLoading(true);
     try {
-      await changeRequestService.delete(changeRequestId!);
+      await changeRequestService.delete(changeRequestId!, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.deleted'), {
         variant: 'success',
       });
@@ -699,7 +721,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const handleReopen = async () => {
     setActionLoading(true);
     try {
-      await changeRequestService.reopen(changeRequestId!);
+      await changeRequestService.reopen(changeRequestId!, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.reopened'), {
         variant: 'success',
       });
@@ -1244,7 +1266,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
 
                   {/* Status Banners */}
                   {cr.status === 'rejected' &&
-                    (cr.requesterId === user?.id || hasAnyPermissions) && (
+                    (cr.requesterId === String(user?.id) || hasAnyPermissions) && (
                       <Paper
                         sx={{
                           p: 2,
@@ -1316,7 +1338,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                     )}
 
                   {cr.status === 'conflict' &&
-                    (cr.requesterId === user?.id || hasAnyPermissions) && (
+                    (cr.requesterId === String(user?.id) || hasAnyPermissions) && (
                       <Paper
                         sx={{
                           p: 2,

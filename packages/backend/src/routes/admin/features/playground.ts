@@ -17,7 +17,6 @@ import {
 } from '@gatrix/evaluator';
 import { createLogger } from '../../../config/logger';
 import { getFallbackValue } from './_helpers';
-import { DraftService } from '../../../services/draft-service';
 
 const logger = createLogger('PlaygroundRoutes');
 const router = Router();
@@ -281,13 +280,26 @@ router.post(
       ? flagsResult.data.filter((f) => flagNamesSet.has(f.flagName))
       : flagsResult.data;
 
-    // Load all feature_flag drafts BEFORE field collection so draft strategies are included
-    // feature_flag drafts have environmentId=NULL (flag-level single draft)
+    // Load pending CR draft data for feature flags (replaces old DraftService)
     // draftData structure: { [envId]: { isEnabled, strategies, ... } }
-    const allDrafts = await DraftService.listDrafts('feature_flag');
+    const { ChangeRequestService } =
+      await import('../../../services/change-request-service');
     const draftsByTarget = new Map<string, any>();
-    for (const d of allDrafts) {
-      draftsByTarget.set(d.targetId, d.draftData);
+    for (const env of environments) {
+      const pendingDrafts =
+        await ChangeRequestService.getAllPendingDraftsForTable(
+          'g_feature_flags',
+          env
+        );
+      for (const d of pendingDrafts) {
+        // Merge: if draft already exists for this target from another env, merge the draftData
+        const existing = draftsByTarget.get(d.targetId);
+        if (existing) {
+          Object.assign(existing, d.draftData);
+        } else {
+          draftsByTarget.set(d.targetId, { ...d.draftData });
+        }
+      }
     }
 
     // Pre-load target flags to collect referenced context fields

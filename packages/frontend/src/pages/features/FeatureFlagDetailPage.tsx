@@ -153,16 +153,22 @@ import EnvironmentVariantsEditor, {
 import FeatureFlagAuditLogs from '../../components/features/FeatureFlagAuditLogs';
 import ReleaseFlowTab from '../../components/features/ReleaseFlowTab';
 import StrategyCardReadonly from '../../components/features/StrategyCardReadonly';
+import StrategyEditDrawer, {
+  Strategy,
+  Variant,
+  STRATEGY_TYPES,
+} from '../../components/features/StrategyEditDrawer';
 import { useReleaseFlowPlansByFlag } from '../../hooks/useReleaseFlows';
 import FeatureFlagCodeReferences from '../../components/features/FeatureFlagCodeReferences';
 import PlaygroundDialog from '../../components/features/PlaygroundDialog';
 import ValidationRulesEditor from '../../components/features/ValidationRulesEditor';
-import { ValidationRules } from '../../services/featureFlagService';
+import featureFlagService, {
+  ValidationRules,
+} from '../../services/featureFlagService';
 import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
 import PageContentLoader from '../../components/common/PageContentLoader';
-import DraftBanner from '../../components/common/DraftBanner';
-import DraftChangesDialog from '../../components/common/DraftChangesDialog';
-import * as draftService from '../../services/draftService';
+
+import changeRequestService from '../../services/changeRequestService';
 
 // Strategy context menu component for edit/delete actions
 const StrategyContextMenu: React.FC<{
@@ -269,31 +275,7 @@ const ReleaseFlowActiveIcon = (props: any) => (
   </Box>
 );
 
-// ==================== Types ====================
-
-interface Strategy {
-  id: string;
-  name: string;
-  title: string;
-  parameters: Record<string, any>;
-  constraints: Constraint[];
-  segments?: string[];
-  variants?: Variant[];
-  sortOrder: number;
-  disabled?: boolean;
-}
-
-interface Variant {
-  name: string;
-  weight: number;
-  stickiness?: string;
-  value?: any;
-  valueType: 'boolean' | 'string' | 'json' | 'number';
-  overrides?: {
-    contextName: string;
-    values: string[];
-  }[];
-}
+// Strategy, Variant, STRATEGY_TYPES imported from StrategyEditDrawer
 
 interface FeatureFlagEnvironment {
   id: string;
@@ -348,51 +330,6 @@ interface FeatureFlag {
   createdAt: string;
   updatedAt?: string;
 }
-
-// ==================== Strategy Types ====================
-
-const STRATEGY_TYPES = [
-  {
-    name: 'default',
-    titleKey: 'featureFlags.strategies.default.title',
-    descKey: 'featureFlags.strategies.default.desc',
-  },
-  {
-    name: 'flexibleRollout',
-    titleKey: 'featureFlags.strategies.flexibleRollout.title',
-    descKey: 'featureFlags.strategies.flexibleRollout.desc',
-  },
-  {
-    name: 'userWithId',
-    titleKey: 'featureFlags.strategies.userWithId.title',
-    descKey: 'featureFlags.strategies.userWithId.desc',
-  },
-  {
-    name: 'gradualRolloutRandom',
-    titleKey: 'featureFlags.strategies.gradualRolloutRandom.title',
-    descKey: 'featureFlags.strategies.gradualRolloutRandom.desc',
-  },
-  {
-    name: 'gradualRolloutUserId',
-    titleKey: 'featureFlags.strategies.gradualRolloutUserId.title',
-    descKey: 'featureFlags.strategies.gradualRolloutUserId.desc',
-  },
-  {
-    name: 'gradualRolloutSessionId',
-    titleKey: 'featureFlags.strategies.gradualRolloutSessionId.title',
-    descKey: 'featureFlags.strategies.gradualRolloutSessionId.desc',
-  },
-  {
-    name: 'remoteAddress',
-    titleKey: 'featureFlags.strategies.remoteAddress.title',
-    descKey: 'featureFlags.strategies.remoteAddress.desc',
-  },
-  {
-    name: 'applicationHostname',
-    titleKey: 'featureFlags.strategies.applicationHostname.title',
-    descKey: 'featureFlags.strategies.applicationHostname.desc',
-  },
-];
 
 const FLAG_TYPES = [
   {
@@ -578,7 +515,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     open: boolean;
     strategyId?: string;
     index?: number;
-    envName?: string;
+    envId?: string;
   }>({ open: false });
   const [strategyTabValue, setStrategyTabValue] = useState(0);
   const [editingStrategy, setEditingStrategy] = useState<Strategy | null>(null);
@@ -605,11 +542,11 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [originalFlag, setOriginalFlag] = useState<FeatureFlag | null>(null);
   const [valueJsonError, setValueJsonError] = useState<string | null>(null);
-  // Environment-specific strategies - key is environment name, value is array of strategies
+  // Environment-specific strategies - key is environmentId, value is array of strategies
   const [envStrategies, setEnvStrategies] = useState<
     Record<string, Strategy[]>
   >({});
-  // Environment-specific variants - key is environment name, value is array of variants
+  // Environment-specific variants - key is environmentId, value is array of variants
   const [envVariants, setEnvVariants] = useState<Record<string, Variant[]>>({});
   const [codeReferenceCount, setCodeReferenceCount] = useState<number | null>(
     null
@@ -624,7 +561,6 @@ const FeatureFlagDetailPage: React.FC = () => {
     hasDraft: boolean;
     updatedAt?: string;
   }>({ hasDraft: false });
-  const [draftChangesDialogOpen, setDraftChangesDialogOpen] = useState(false);
 
   // Release flow plan summaries - to detect environments managed by release flow
   const { data: releaseFlowPlans, mutate: mutateReleaseFlowPlans } =
@@ -956,42 +892,24 @@ const FeatureFlagDetailPage: React.FC = () => {
     isCreating,
   ]);
 
-  // Refetch data when draft is published or discarded
-  useEffect(() => {
-    const handleDraftAction = () => {
-      if (!isCreating) {
-        loadFlag();
-        // Force re-trigger of loadEnvStrategies + loadFlagDraftStatus
-        setRefreshCounter((c) => c + 1);
-        // Refresh release flow plans (may have been created/deleted by draft)
-        mutateReleaseFlowPlans();
-        // Clear manual release flow selections to avoid stale template forms
-        setEnvManualReleaseFlow(new Set());
-      }
-    };
-    window.addEventListener('draft-action-completed', handleDraftAction);
-    return () =>
-      window.removeEventListener('draft-action-completed', handleDraftAction);
-  }, [loadFlag, isCreating, mutateReleaseFlowPlans]);
-
   // Check draft status and apply draft data to UI
   const loadFlagDraftStatus = useCallback(
-    async (flagId: string) => {
-      if (!flagId || !projectApiPath) return;
+    async (_flagId: string) => {
+      if (!flag?.flagName || !projectApiPath) return;
       try {
-        const result = await draftService.getDraft(
-          'feature_flag',
-          flagId,
+        const result = await changeRequestService.getPendingFlagDraft(
+          flag.flagName,
           projectApiPath
         );
+        const hasDraft = !!result;
         setFlagDraftStatus({
-          hasDraft: result.hasDraft,
+          hasDraft,
           updatedAt: undefined,
         });
+        const draftData = result?.draftData;
 
         // If draft exists, overlay draft data onto the UI
-        if (result.hasDraft && result.draftData) {
-          const draftData = result.draftData;
+        if (hasDraft && draftData) {
           for (const [envId, envData] of Object.entries(draftData) as [
             string,
             any,
@@ -1087,7 +1005,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         // Silently fail - draft status is non-critical
       }
     },
-    [projectApiPath]
+    [projectApiPath, flag?.flagName]
   );
 
   // Load environment-specific strategies after environments and flag are loaded
@@ -1507,8 +1425,8 @@ const FeatureFlagDetailPage: React.FC = () => {
   };
 
   // Strategy handlers
-  const handleAddStrategy = (envName: string) => {
-    const envStrategyList = envStrategies[envName] || [];
+  const handleAddStrategy = (envId: string) => {
+    const envStrategyList = envStrategies[envId] || [];
     const newStrategy: Strategy = {
       id: `new-${Date.now()}`,
       name: 'flexibleRollout',
@@ -1527,23 +1445,24 @@ const FeatureFlagDetailPage: React.FC = () => {
     setOriginalEditingStrategy(JSON.parse(JSON.stringify(newStrategy)));
     setStrategyJsonErrors({});
     setStrategyTabValue(0);
-    setEditingEnv(envName);
+    setEditingEnv(envId);
     setIsAddingStrategy(true);
     setStrategyDialogOpen(true);
   };
 
-  const handleEditStrategy = (strategy: Strategy, envName: string) => {
+  const handleEditStrategy = (strategy: Strategy, envId: string) => {
     setEditingStrategy({ ...strategy });
     setOriginalEditingStrategy(JSON.parse(JSON.stringify(strategy)));
     setStrategyJsonErrors({});
     setStrategyTabValue(0);
-    setEditingEnv(envName);
+    setEditingEnv(envId);
     setIsAddingStrategy(false);
     setStrategyDialogOpen(true);
   };
 
-  // Helper: save changes to draft instead of directly applying
-  // Draft data structure: { [environmentId]: { strategies, variants, values } }
+  // Helper: save environment-specific changes
+  // If the environment requires CR approval, save to CR draft.
+  // Otherwise, apply changes directly via API.
   const saveChangesToDraft = async (
     envId: string,
     updates: {
@@ -1558,63 +1477,80 @@ const FeatureFlagDetailPage: React.FC = () => {
   ) => {
     if (!flag) return;
 
-    // Get current draft or create snapshot from published state
-    const { draftData, publishedData } = await draftService.getDraft(
-      'feature_flag',
-      flag.id,
-      projectApiPath
-    );
+    const env = environments.find((e) => e.environmentId === envId);
+    const requiresCR = env?.requiresApproval ?? false;
 
-    // Merge updates into the specific environment's data within the draft
-    const currentEnvData = draftData[envId] || {};
-    const mergedEnvData = { ...currentEnvData, ...updates };
+    if (requiresCR) {
+      // CR-enabled environment: save to change request draft
+      const pendingCR = await changeRequestService.getPendingFlagDraft(
+        flag.flagName,
+        projectApiPath
+      );
+      const draftData = pendingCR?.draftData || {};
 
-    // Coalescing: remove fields that match the published state
-    const pubEnvData = publishedData?.[envId] || {};
-    const coalescedEnvData: Record<string, any> = {};
-    for (const [key, val] of Object.entries(mergedEnvData)) {
-      // Deep compare with published value
-      if (!deepEqualDraft(val, pubEnvData[key])) {
-        coalescedEnvData[key] = val;
+      // Merge updates into the specific environment's data within the draft
+      const currentEnvData = draftData[envId] || {};
+      const mergedEnvData = { ...currentEnvData, ...updates };
+
+      // Build draft with merged env data
+      const mergedDraft = { ...draftData };
+      if (Object.keys(mergedEnvData).length > 0) {
+        mergedDraft[envId] = mergedEnvData;
+      } else {
+        delete mergedDraft[envId];
       }
-    }
 
-    // Build draft without this env if no changes remain
-    const mergedDraft = { ...draftData };
-    if (Object.keys(coalescedEnvData).length > 0) {
-      mergedDraft[envId] = coalescedEnvData;
-    } else {
-      delete mergedDraft[envId];
-    }
-
-    // Check if entire draft is empty (no changes at all)
-    // Remove env keys that have no diff vs published
-    const draftKeys = Object.keys(mergedDraft);
-    let hasAnyChange = false;
-    for (const k of draftKeys) {
-      const pubData = publishedData?.[k] || {};
-      if (!deepEqualDraft(mergedDraft[k], pubData)) {
-        hasAnyChange = true;
-        break;
-      }
-    }
-
-    if (!hasAnyChange) {
-      // No real changes - discard draft entirely
-      await draftService.discardDraft('feature_flag', flag.id, projectApiPath);
-      setFlagDraftStatus({ hasDraft: false });
-    } else {
-      // Save to draft
-      await draftService.saveDraft(
-        'feature_flag',
-        flag.id,
+      await changeRequestService.saveFlagDraft(
+        flag.flagName,
         mergedDraft,
         projectApiPath
       );
-      // Mark draft exists
       setFlagDraftStatus({ hasDraft: true });
+      // Notify MainLayout to refresh floating CR banner
+      window.dispatchEvent(new CustomEvent('cr-draft-changed'));
+    } else {
+      // Non-CR environment: apply changes directly via API
+      if (updates.isEnabled !== undefined) {
+        await featureFlagService.toggleFeatureFlag(
+          flag.flagName,
+          updates.isEnabled,
+          envId,
+          projectApiPath
+        );
+      }
+      if (updates.strategies) {
+        await featureFlagService.updateStrategies(
+          flag.flagName,
+          envId,
+          updates.strategies,
+          projectApiPath
+        );
+      }
+      if (updates.variants) {
+        await featureFlagService.updateVariants(
+          flag.flagName,
+          envId,
+          updates.variants,
+          projectApiPath
+        );
+      }
+      if (
+        updates.enabledValue !== undefined ||
+        updates.disabledValue !== undefined
+      ) {
+        await featureFlagService.updateFlagValues(
+          flag.flagName,
+          envId,
+          {
+            enabledValue: updates.enabledValue,
+            disabledValue: updates.disabledValue,
+            overrideEnabledValue: updates.overrideEnabledValue,
+            overrideDisabledValue: updates.overrideDisabledValue,
+          },
+          projectApiPath
+        );
+      }
     }
-    window.dispatchEvent(new Event('draft-changed'));
 
     // Update parent state to keep props in sync with editing state
     if (updates.strategies) {
@@ -1653,11 +1589,12 @@ const FeatureFlagDetailPage: React.FC = () => {
   const saveGlobalChangesToDraft = async (updates: Record<string, any>) => {
     if (!flag) return;
 
-    const { draftData } = await draftService.getDraft(
-      'feature_flag',
-      flag.id,
+    // Get current pending CR draft data or start fresh
+    const pendingCR = await changeRequestService.getPendingFlagDraft(
+      flag.flagName,
       projectApiPath
     );
+    const draftData = pendingCR?.draftData || {};
 
     const currentGlobal = draftData._global || {};
     const mergedDraft = {
@@ -1665,15 +1602,13 @@ const FeatureFlagDetailPage: React.FC = () => {
       _global: { ...currentGlobal, ...updates },
     };
 
-    await draftService.saveDraft(
-      'feature_flag',
-      flag.id,
+    await changeRequestService.saveFlagDraft(
+      flag.flagName,
       mergedDraft,
       projectApiPath
     );
 
     setFlagDraftStatus({ hasDraft: true });
-    window.dispatchEvent(new Event('draft-changed'));
   };
 
   const handleSaveStrategy = async () => {
@@ -1732,10 +1667,10 @@ const FeatureFlagDetailPage: React.FC = () => {
   const handleDeleteStrategy = async (
     strategyId: string | undefined,
     index: number,
-    envName: string
+    envId: string
   ) => {
     if (!flag) return;
-    const currentEnvStrategies = envStrategies[envName] || [];
+    const currentEnvStrategies = envStrategies[envId] || [];
     const updatedStrategies = currentEnvStrategies.filter(
       (_, i) => i !== index
     );
@@ -1752,11 +1687,11 @@ const FeatureFlagDetailPage: React.FC = () => {
           isEnabled: !s.disabled,
         }));
         // Save to draft instead of directly to backend
-        await saveChangesToDraft(envName, { strategies: apiStrategies });
+        await saveChangesToDraft(envId, { strategies: apiStrategies });
       } else {
         setEnvStrategies((prev) => ({
           ...prev,
-          [envName]: updatedStrategies,
+          [envId]: updatedStrategies,
         }));
       }
     } catch (error: any) {
@@ -1768,7 +1703,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   // Handler for saving environment-specific variants from EnvironmentVariantsEditor
   const handleSaveEnvVariants = async (
-    envName: string,
+    envId: string,
     variants: EditorVariant[]
   ) => {
     if (!flag) return;
@@ -1783,11 +1718,11 @@ const FeatureFlagDetailPage: React.FC = () => {
           stickiness: v.stickiness || 'default',
         }));
         // Save to draft instead of directly to backend
-        await saveChangesToDraft(envName, { variants: apiVariants });
+        await saveChangesToDraft(envId, { variants: apiVariants });
       } else {
         setEnvVariants((prev) => ({
           ...prev,
-          [envName]: variants as Variant[],
+          [envId]: variants as Variant[],
         }));
         enqueueSnackbar(t('featureFlags.variantsSaved'), {
           variant: 'success',
@@ -1827,7 +1762,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   // Handler for saving environment-specific fallback value (enabledValue/disabledValue)
   const handleSaveEnvFallbackValue = async (
-    envName: string,
+    envId: string,
     enabledValue: any,
     disabledValue: any,
     overrideEnabledValue: boolean,
@@ -1837,7 +1772,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       // Save to draft instead of directly to backend
-      await saveChangesToDraft(envName, {
+      await saveChangesToDraft(envId, {
         enabledValue,
         disabledValue,
         overrideEnabledValue,
@@ -1856,13 +1791,13 @@ const FeatureFlagDetailPage: React.FC = () => {
   const handleOpenDeleteStrategyConfirm = (
     strategyId: string | undefined,
     index: number,
-    envName: string
+    envId: string
   ) => {
     setStrategyDeleteConfirm({
       open: true,
       strategyId,
       index,
-      envName,
+      envId,
     });
   };
 
@@ -1873,25 +1808,25 @@ const FeatureFlagDetailPage: React.FC = () => {
   const handleConfirmDeleteStrategy = () => {
     if (
       strategyDeleteConfirm.index !== undefined &&
-      strategyDeleteConfirm.envName
+      strategyDeleteConfirm.envId
     ) {
       handleDeleteStrategy(
         strategyDeleteConfirm.strategyId,
         strategyDeleteConfirm.index,
-        strategyDeleteConfirm.envName
+        strategyDeleteConfirm.envId
       );
     }
     handleCloseDeleteStrategyConfirm();
   };
 
   const handleReorderStrategies = async (
-    envName: string,
+    envId: string,
     oldIndex: number,
     newIndex: number
   ) => {
     if (!flag || oldIndex === newIndex) return;
 
-    const currentEnvStrategies = envStrategies[envName] || [];
+    const currentEnvStrategies = envStrategies[envId] || [];
     const reorderedStrategies = arrayMove(
       currentEnvStrategies,
       oldIndex,
@@ -1907,7 +1842,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     // Optimistically update UI
     setEnvStrategies((prev) => ({
       ...prev,
-      [envName]: updatedStrategies,
+      [envId]: updatedStrategies,
     }));
 
     try {
@@ -1922,13 +1857,13 @@ const FeatureFlagDetailPage: React.FC = () => {
           isEnabled: !s.disabled,
         }));
         // Save to draft instead of directly to backend
-        await saveChangesToDraft(envName, { strategies: apiStrategies });
+        await saveChangesToDraft(envId, { strategies: apiStrategies });
       }
     } catch (error: any) {
       // Revert on error
       setEnvStrategies((prev) => ({
         ...prev,
-        [envName]: currentEnvStrategies,
+        [envId]: currentEnvStrategies,
       }));
       enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
         variant: 'error',
@@ -4145,840 +4080,23 @@ const FeatureFlagDetailPage: React.FC = () => {
       </ResizableDrawer>
 
       {/* Strategy Edit Drawer */}
-      <ResizableDrawer
+      <StrategyEditDrawer
         open={strategyDialogOpen}
-        onClose={() => setStrategyDialogOpen(false)}
-        title={
-          editingStrategy?.id?.startsWith('new-')
-            ? t('featureFlags.addStrategy')
-            : t('featureFlags.editStrategy')
-        }
-        storageKey="featureFlagStrategyDrawerWidth"
-        defaultWidth={600}
-      >
-        {editingStrategy && (
-          <>
-            {/* Tabs */}
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
-              <Tabs
-                value={strategyTabValue}
-                onChange={(_, v) => setStrategyTabValue(v)}
-                variant="standard"
-              >
-                <Tab label={t('featureFlags.strategyTabs.general')} />
-                <Tab
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {t('featureFlags.strategyTabs.targeting')}
-                      {(editingStrategy.segments?.length || 0) +
-                        (editingStrategy.constraints?.length || 0) >
-                        0 && (
-                        <Chip
-                          label={
-                            (editingStrategy.segments?.length || 0) +
-                            (editingStrategy.constraints?.length || 0)
-                          }
-                          size="small"
-                          color="primary"
-                          sx={{ height: 20, fontSize: '0.75rem' }}
-                        />
-                      )}
-                    </Box>
-                  }
-                />
-              </Tabs>
-            </Box>
-
-            <Box sx={{ p: 3, flex: 1, overflow: 'auto' }}>
-              {/* General Tab */}
-              {strategyTabValue === 0 && (
-                <Stack spacing={3}>
-                  {/* New strategy default disabled notice */}
-                  {(() => {
-                    // Determine if this is a new strategy in disabled state
-                    const isNewStrategy =
-                      editingStrategy.id?.startsWith('new-');
-                    const isRolloutStrategy =
-                      editingStrategy.name === 'flexibleRollout' ||
-                      editingStrategy.name?.includes('Rollout');
-                    const rolloutValue =
-                      editingStrategy.parameters?.rollout ?? 0;
-                    const isDisabled = editingStrategy.disabled !== false; // disabled by default
-                    const hasTargeting =
-                      (editingStrategy.constraints?.length || 0) > 0 ||
-                      (editingStrategy.segments?.length || 0) > 0;
-
-                    // Show notice if:
-                    // - New strategy AND
-                    // - For rollout strategies: disabled or rollout is 0
-                    // - For non-rollout strategies: disabled and no targeting
-                    const shouldShowNotice =
-                      isNewStrategy &&
-                      ((isRolloutStrategy &&
-                        (isDisabled || rolloutValue === 0)) ||
-                        (!isRolloutStrategy && isDisabled && !hasTargeting));
-
-                    return shouldShowNotice ? (
-                      <Alert severity="info">
-                        {t('featureFlags.newStrategyDefaultDisabledNotice')}
-                      </Alert>
-                    ) : null;
-                  })()}
-
-                  {/* Strategy Type */}
-                  <FormControl fullWidth>
-                    <InputLabel>{t('featureFlags.strategyType')}</InputLabel>
-                    <Select
-                      value={editingStrategy.name || 'flexibleRollout'}
-                      onChange={(e) =>
-                        setEditingStrategy({
-                          ...editingStrategy,
-                          name: e.target.value,
-                        })
-                      }
-                      label={t('featureFlags.strategyType')}
-                    >
-                      {STRATEGY_TYPES.map((type) => (
-                        <MenuItem key={type.name} value={type.name}>
-                          <Box>
-                            <Typography>{t(type.titleKey)}</Typography>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t(type.descKey)}
-                            </Typography>
-                          </Box>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  {/* Strategy Title (optional) */}
-                  <TextField
-                    fullWidth
-                    label={t('featureFlags.strategyTitle')}
-                    placeholder={t('featureFlags.strategyTitlePlaceholder')}
-                    value={editingStrategy.title || ''}
-                    onChange={(e) =>
-                      setEditingStrategy({
-                        ...editingStrategy,
-                        title: e.target.value,
-                      })
-                    }
-                    helperText={t('featureFlags.strategyTitleHelp')}
-                  />
-
-                  {/* Rollout % for flexible rollout */}
-                  {(editingStrategy.name === 'flexibleRollout' ||
-                    editingStrategy.name?.includes('Rollout')) && (
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      <Typography
-                        variant="subtitle2"
-                        gutterBottom
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                      >
-                        {t('featureFlags.rollout')}
-                        <Tooltip title={t('featureFlags.rolloutTooltip')}>
-                          <HelpOutlineIcon fontSize="small" color="action" />
-                        </Tooltip>
-                      </Typography>
-                      <Box sx={{ px: 2, pt: 3 }}>
-                        <Slider
-                          value={editingStrategy.parameters?.rollout ?? 100}
-                          onChange={(_, value) =>
-                            setEditingStrategy({
-                              ...editingStrategy,
-                              parameters: {
-                                ...editingStrategy.parameters,
-                                rollout: value as number,
-                              },
-                            })
-                          }
-                          valueLabelDisplay="on"
-                          min={0}
-                          max={100}
-                          marks={[
-                            { value: 0, label: '0%' },
-                            { value: 25, label: '25%' },
-                            { value: 50, label: '50%' },
-                            { value: 75, label: '75%' },
-                            { value: 100, label: '100%' },
-                          ]}
-                        />
-                      </Box>
-
-                      {/* Stickiness & GroupId */}
-                      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                        <Box sx={{ flex: 1 }}>
-                          <FormControl fullWidth size="small">
-                            <Typography
-                              variant="subtitle2"
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.5,
-                                mb: 0.5,
-                              }}
-                            >
-                              {t('featureFlags.stickiness')}
-                              <Tooltip title={t('featureFlags.stickinessHelp')}>
-                                <HelpOutlineIcon
-                                  fontSize="small"
-                                  color="action"
-                                  sx={{ cursor: 'pointer' }}
-                                />
-                              </Tooltip>
-                            </Typography>
-                            <Select
-                              value={
-                                editingStrategy.parameters?.stickiness ||
-                                'default'
-                              }
-                              onChange={(e) =>
-                                setEditingStrategy({
-                                  ...editingStrategy,
-                                  parameters: {
-                                    ...editingStrategy.parameters,
-                                    stickiness: e.target.value,
-                                  },
-                                })
-                              }
-                            >
-                              <MenuItem value="default">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessDefault')}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t('featureFlags.stickinessDefaultDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="userId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessUserId')}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t('featureFlags.stickinessUserIdDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="sessionId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessSessionId')}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t('featureFlags.stickinessSessionIdDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="random">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessRandom')}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t('featureFlags.stickinessRandomDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              {/* Custom stickiness fields from context fields */}
-                              {contextFields.filter(
-                                (f) =>
-                                  f.stickiness && !f.isDefaultStickinessField
-                              ).length > 0 && (
-                                <ListSubheader
-                                  sx={{
-                                    lineHeight: '32px',
-                                    fontSize: '0.75rem',
-                                  }}
-                                >
-                                  {t('featureFlags.customStickinessFields')}
-                                </ListSubheader>
-                              )}
-                              {contextFields
-                                .filter(
-                                  (f) =>
-                                    f.stickiness && !f.isDefaultStickinessField
-                                )
-                                .map((field) => (
-                                  <MenuItem
-                                    key={field.fieldName}
-                                    value={field.fieldName}
-                                  >
-                                    <Box>
-                                      <Typography variant="body2">
-                                        {field.displayName || field.fieldName}
-                                      </Typography>
-                                      {field.description && (
-                                        <Typography
-                                          variant="caption"
-                                          color="text.secondary"
-                                        >
-                                          {field.description}
-                                        </Typography>
-                                      )}
-                                    </Box>
-                                  </MenuItem>
-                                ))}
-                            </Select>
-                          </FormControl>
-                        </Box>
-                        <Box sx={{ flex: 1 }}>
-                          <Box>
-                            <Typography
-                              variant="subtitle2"
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.5,
-                                mb: 0.5,
-                              }}
-                            >
-                              {t('featureFlags.groupId')}
-                              <Tooltip title={t('featureFlags.groupIdHelp')}>
-                                <HelpOutlineIcon
-                                  fontSize="small"
-                                  color="action"
-                                  sx={{ cursor: 'pointer' }}
-                                />
-                              </Tooltip>
-                            </Typography>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              value={editingStrategy.parameters?.groupId || ''}
-                              placeholder={flag?.flagName || ''}
-                              onChange={(e) =>
-                                setEditingStrategy({
-                                  ...editingStrategy,
-                                  parameters: {
-                                    ...editingStrategy.parameters,
-                                    groupId: e.target.value,
-                                  },
-                                })
-                              }
-                            />
-                          </Box>
-                        </Box>
-                      </Box>
-                    </Paper>
-                  )}
-
-                  {/* User IDs input for userWithId strategy */}
-                  {editingStrategy.name === 'userWithId' && (
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      <Typography
-                        variant="subtitle2"
-                        gutterBottom
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                      >
-                        {t('featureFlags.userIds')}{' '}
-                        <Typography component="span" color="error.main">
-                          *
-                        </Typography>
-                        <Tooltip title={t('featureFlags.userIdsTooltip')}>
-                          <HelpOutlineIcon fontSize="small" color="action" />
-                        </Tooltip>
-                      </Typography>
-                      <Autocomplete
-                        multiple
-                        freeSolo
-                        options={[]}
-                        value={editingStrategy.parameters?.userIds || []}
-                        onChange={(_, newValue) =>
-                          setEditingStrategy({
-                            ...editingStrategy,
-                            parameters: {
-                              ...editingStrategy.parameters,
-                              userIds: newValue,
-                            },
-                          })
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            size="small"
-                            required
-                            error={
-                              !(editingStrategy.parameters?.userIds?.length > 0)
-                            }
-                            placeholder={t('featureFlags.userIdsPlaceholder')}
-                            helperText={t('featureFlags.userIdsHelp')}
-                          />
-                        )}
-                        renderTags={(value, getTagProps) =>
-                          value.map((option, index) => (
-                            <Chip
-                              {...getTagProps({ index })}
-                              key={option}
-                              label={option}
-                              size="small"
-                            />
-                          ))
-                        }
-                      />
-                    </Paper>
-                  )}
-
-                  {/* Remote addresses input for remoteAddress strategy */}
-                  {editingStrategy.name === 'remoteAddress' && (
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      <Typography
-                        variant="subtitle2"
-                        gutterBottom
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                      >
-                        {t('featureFlags.remoteAddresses')}{' '}
-                        <Typography component="span" color="error.main">
-                          *
-                        </Typography>
-                        <Tooltip
-                          title={t('featureFlags.remoteAddressesTooltip')}
-                        >
-                          <HelpOutlineIcon fontSize="small" color="action" />
-                        </Tooltip>
-                      </Typography>
-                      <Autocomplete
-                        multiple
-                        freeSolo
-                        options={[]}
-                        value={editingStrategy.parameters?.IPs || []}
-                        onChange={(_, newValue) =>
-                          setEditingStrategy({
-                            ...editingStrategy,
-                            parameters: {
-                              ...editingStrategy.parameters,
-                              IPs: newValue,
-                            },
-                          })
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            size="small"
-                            required
-                            error={
-                              !(editingStrategy.parameters?.IPs?.length > 0)
-                            }
-                            placeholder={t(
-                              'featureFlags.remoteAddressesPlaceholder'
-                            )}
-                            helperText={t('featureFlags.remoteAddressesHelp')}
-                          />
-                        )}
-                        renderTags={(value, getTagProps) =>
-                          value.map((option, index) => (
-                            <Chip
-                              {...getTagProps({ index })}
-                              key={option}
-                              label={option}
-                              size="small"
-                            />
-                          ))
-                        }
-                      />
-                    </Paper>
-                  )}
-
-                  {/* Hostnames input for applicationHostname strategy */}
-                  {editingStrategy.name === 'applicationHostname' && (
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      <Typography
-                        variant="subtitle2"
-                        gutterBottom
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                      >
-                        {t('featureFlags.hostnames')}{' '}
-                        <Typography component="span" color="error.main">
-                          *
-                        </Typography>
-                        <Tooltip title={t('featureFlags.hostnamesTooltip')}>
-                          <HelpOutlineIcon fontSize="small" color="action" />
-                        </Tooltip>
-                      </Typography>
-                      <Autocomplete
-                        multiple
-                        freeSolo
-                        options={[]}
-                        value={editingStrategy.parameters?.hostNames || []}
-                        onChange={(_, newValue) =>
-                          setEditingStrategy({
-                            ...editingStrategy,
-                            parameters: {
-                              ...editingStrategy.parameters,
-                              hostNames: newValue,
-                            },
-                          })
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            size="small"
-                            required
-                            error={
-                              !(
-                                editingStrategy.parameters?.hostNames?.length >
-                                0
-                              )
-                            }
-                            placeholder={t('featureFlags.hostnamesPlaceholder')}
-                            helperText={t('featureFlags.hostnamesHelp')}
-                          />
-                        )}
-                        renderTags={(value, getTagProps) =>
-                          value.map((option, index) => (
-                            <Chip
-                              {...getTagProps({ index })}
-                              key={option}
-                              label={option}
-                              size="small"
-                            />
-                          ))
-                        }
-                      />
-                    </Paper>
-                  )}
-
-                  {/* Strategy Status */}
-                  <Paper variant="outlined" sx={{ p: 2 }}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {t('featureFlags.strategyStatus')}
-                    </Typography>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={!editingStrategy.disabled}
-                          onChange={(e) =>
-                            setEditingStrategy({
-                              ...editingStrategy,
-                              disabled: !e.target.checked,
-                            })
-                          }
-                        />
-                      }
-                      label={
-                        <Box>
-                          <Typography>
-                            {t('featureFlags.strategyActive')}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {t('featureFlags.strategyActiveHelp')}
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                  </Paper>
-                </Stack>
-              )}
-
-              {/* Targeting Tab */}
-              {strategyTabValue === 1 && (
-                <Stack spacing={3}>
-                  {/* Info Alert */}
-                  <Alert severity="info" sx={{ borderRadius: 2 }}>
-                    {t('featureFlags.targetingInfo')}
-                  </Alert>
-
-                  {/* Segments */}
-                  <Box>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        mb: 1,
-                      }}
-                    >
-                      {t('featureFlags.segments')}
-                      <Tooltip title={t('featureFlags.segmentsTooltip')}>
-                        <HelpOutlineIcon fontSize="small" color="action" />
-                      </Tooltip>
-                    </Typography>
-                    <Autocomplete
-                      multiple
-                      options={Array.isArray(segments) ? segments : []}
-                      getOptionLabel={(option) =>
-                        option.displayName || option.segmentName || ''
-                      }
-                      value={(Array.isArray(segments) ? segments : []).filter(
-                        (s) =>
-                          (editingStrategy.segments || []).includes(
-                            s.segmentName
-                          )
-                      )}
-                      onChange={(_, newValue) =>
-                        setEditingStrategy({
-                          ...editingStrategy,
-                          segments: newValue.map((s) => s.segmentName),
-                        })
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder={t('featureFlags.selectSegments')}
-                          size="small"
-                        />
-                      )}
-                      renderTags={(value, getTagProps) =>
-                        value.map((option, index) => (
-                          <Chip
-                            {...getTagProps({ index })}
-                            key={option.segmentName}
-                            label={option.displayName || option.segmentName}
-                            size="small"
-                            onDelete={getTagProps({ index }).onDelete}
-                          />
-                        ))
-                      }
-                    />
-
-                    {/* Selected Segments Preview */}
-                    {(editingStrategy.segments?.length || 0) > 0 && (
-                      <Stack spacing={1} sx={{ mt: 2 }}>
-                        {editingStrategy.segments?.map((segmentName) => {
-                          const segment = segments.find(
-                            (s) => s.segmentName === segmentName
-                          );
-                          if (!segment) return null;
-                          return (
-                            <Paper
-                              key={segmentName}
-                              variant="outlined"
-                              sx={{
-                                p: 1.5,
-                                bgcolor: 'action.hover',
-                                borderRadius: 1,
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  justifyContent: 'space-between',
-                                  alignItems: 'center',
-                                  mb: 1,
-                                }}
-                              >
-                                <Typography
-                                  variant="subtitle2"
-                                  fontWeight={600}
-                                >
-                                  {segment.displayName || segment.segmentName}
-                                </Typography>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => {
-                                    setExpandedSegmentsDialog((prev) => {
-                                      const next = new Set(prev);
-                                      if (next.has(segmentName)) {
-                                        next.delete(segmentName);
-                                      } else {
-                                        next.add(segmentName);
-                                      }
-                                      return next;
-                                    });
-                                  }}
-                                >
-                                  {expandedSegmentsDialog.has(segmentName) ? (
-                                    <KeyboardArrowUpIcon />
-                                  ) : (
-                                    <KeyboardArrowDownIcon />
-                                  )}
-                                </IconButton>
-                              </Box>
-                              {segment.description && (
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                  sx={{ display: 'block', mb: 1 }}
-                                >
-                                  {segment.description}
-                                </Typography>
-                              )}
-                              {expandedSegmentsDialog.has(segmentName) &&
-                                segment.constraints &&
-                                segment.constraints.length > 0 && (
-                                  <Box
-                                    sx={{
-                                      pl: 1,
-                                      borderLeft: 2,
-                                      borderColor: 'primary.main',
-                                    }}
-                                  >
-                                    <ConstraintList
-                                      constraints={segment.constraints}
-                                      contextFields={contextFields}
-                                    />
-                                  </Box>
-                                )}
-                              {expandedSegmentsDialog.has(segmentName) &&
-                                (!segment.constraints ||
-                                  segment.constraints.length === 0) && (
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {t('featureFlags.noConstraintsInSegment')}
-                                  </Typography>
-                                )}
-                            </Paper>
-                          );
-                        })}
-                      </Stack>
-                    )}
-                  </Box>
-
-                  {/* AND divider */}
-                  {(editingStrategy.segments?.length || 0) > 0 && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Divider sx={{ flex: 1 }} />
-                      <Chip
-                        label="AND"
-                        size="small"
-                        sx={{
-                          height: 18,
-                          fontSize: '0.6rem',
-                          fontWeight: 700,
-                          bgcolor: 'background.paper',
-                          color: 'text.secondary',
-                          border: 1,
-                          borderColor: 'divider',
-                        }}
-                      />
-                      <Divider sx={{ flex: 1 }} />
-                    </Box>
-                  )}
-
-                  {/* Constraints */}
-                  <Box>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        mb: 1,
-                      }}
-                    >
-                      {t('featureFlags.constraints')}
-                      <Tooltip title={t('featureFlags.constraintsTooltip')}>
-                        <HelpOutlineIcon fontSize="small" color="action" />
-                      </Tooltip>
-                    </Typography>
-                    <ConstraintEditor
-                      constraints={editingStrategy.constraints || []}
-                      onChange={(constraints) =>
-                        setEditingStrategy({ ...editingStrategy, constraints })
-                      }
-                      contextFields={
-                        Array.isArray(contextFields) ? contextFields : []
-                      }
-                    />
-                  </Box>
-                </Stack>
-              )}
-            </Box>
-
-            {/* Footer */}
-            <Box
-              sx={{
-                p: 2,
-                borderTop: 1,
-                borderColor: 'divider',
-                display: 'flex',
-                gap: 1,
-                justifyContent: 'flex-end',
-                bgcolor: 'background.paper',
-              }}
-            >
-              <Button
-                onClick={() => {
-                  setStrategyDialogOpen(false);
-                  setExpandedSegmentsDialog(new Set());
-                }}
-              >
-                {t('common.cancel')}
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleSaveStrategy}
-                disabled={(() => {
-                  // When editing, require changes to be made (check strategy only, valueType/enabledValue/disabledValue are in Values tab)
-                  const strategyUnchanged =
-                    JSON.stringify(editingStrategy) ===
-                    JSON.stringify(originalEditingStrategy);
-                  if (!isAddingStrategy && strategyUnchanged) {
-                    return true;
-                  }
-                  // Disable if any JSON errors
-                  if (
-                    Object.values(strategyJsonErrors).some((e) => e !== null)
-                  ) {
-                    return true;
-                  }
-                  // Disable if any variant has reserved name 'disabled'
-                  if (
-                    editingStrategy.variants?.some(
-                      (v) => v.name.toLowerCase() === 'disabled'
-                    )
-                  ) {
-                    return true;
-                  }
-                  // Validate list-based strategies require non-empty lists
-                  if (editingStrategy.name === 'userWithId') {
-                    const userIds = editingStrategy.parameters?.userIds;
-                    if (
-                      !userIds ||
-                      !Array.isArray(userIds) ||
-                      userIds.length === 0
-                    ) {
-                      return true;
-                    }
-                  }
-                  if (editingStrategy.name === 'remoteAddress') {
-                    const ips = editingStrategy.parameters?.IPs;
-                    if (!ips || !Array.isArray(ips) || ips.length === 0) {
-                      return true;
-                    }
-                  }
-                  if (editingStrategy.name === 'applicationHostname') {
-                    const hostNames = editingStrategy.parameters?.hostNames;
-                    if (
-                      !hostNames ||
-                      !Array.isArray(hostNames) ||
-                      hostNames.length === 0
-                    ) {
-                      return true;
-                    }
-                  }
-                  return false;
-                })()}
-              >
-                {isAddingStrategy
-                  ? t('featureFlags.saveStrategy')
-                  : t('common.update')}
-              </Button>
-            </Box>
-          </>
-        )}
-      </ResizableDrawer>
-
+        onClose={() => {
+          setStrategyDialogOpen(false);
+          setExpandedSegmentsDialog(new Set());
+        }}
+        strategy={editingStrategy}
+        originalStrategy={originalEditingStrategy}
+        onStrategyChange={setEditingStrategy}
+        onSave={handleSaveStrategy}
+        isAdding={isAddingStrategy}
+        saving={saving}
+        flagName={flag?.flagName}
+        contextFields={contextFields}
+        segments={segments}
+        strategyJsonErrors={strategyJsonErrors}
+      />
       {/* Variant Edit Drawer */}
       <ResizableDrawer
         open={variantDialogOpen}
@@ -5213,17 +4331,6 @@ const FeatureFlagDetailPage: React.FC = () => {
         initialFlags={flag?.flagName ? [flag.flagName] : []}
         initialEnvironments={playgroundInitialEnvironments}
       />
-
-      {/* Draft Changes Preview Dialog */}
-      {flag && (
-        <DraftChangesDialog
-          open={draftChangesDialogOpen}
-          onClose={() => setDraftChangesDialogOpen(false)}
-          targetTypes={['feature_flag', 'segment']}
-          environments={environments}
-          projectApiPath={projectApiPath}
-        />
-      )}
     </Box>
   );
 };

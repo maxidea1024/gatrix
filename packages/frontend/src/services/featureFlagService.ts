@@ -254,6 +254,62 @@ export async function deleteFeatureFlag(
   await api.delete(`${basePath(projectApiPath)}/${flagName}`);
 }
 
+/**
+ * Update all strategies for a flag (bulk replace) in a specific environment
+ */
+export async function updateStrategies(
+  flagName: string,
+  environmentId: string,
+  strategies: any[],
+  projectApiPath: string | null = null
+): Promise<any[]> {
+  const response = await api.put(
+    `${basePath(projectApiPath)}/${flagName}/strategies`,
+    { strategies },
+    { headers: { 'x-environment-id': environmentId } }
+  );
+  return response.data.strategies;
+}
+
+/**
+ * Update variants for a flag (bulk replace) in a specific environment
+ */
+export async function updateVariants(
+  flagName: string,
+  environmentId: string,
+  variants: any[],
+  projectApiPath: string | null = null
+): Promise<any[]> {
+  const response = await api.put(
+    `${basePath(projectApiPath)}/${flagName}/variants`,
+    { variants },
+    { headers: { 'x-environment-id': environmentId } }
+  );
+  return response.data.variants;
+}
+
+/**
+ * Update flag values (enabledValue/disabledValue) for a specific environment
+ */
+export async function updateFlagValues(
+  flagName: string,
+  environmentId: string,
+  values: {
+    enabledValue?: any;
+    disabledValue?: any;
+    overrideEnabledValue?: boolean;
+    overrideDisabledValue?: boolean;
+  },
+  projectApiPath: string | null = null
+): Promise<FeatureFlag> {
+  const response = await api.put(
+    `${basePath(projectApiPath)}/${flagName}`,
+    values,
+    { headers: { 'x-environment-id': environmentId } }
+  );
+  return response.data.flag;
+}
+
 const featureFlagService = {
   getFeatureFlags,
   getFeatureFlag,
@@ -264,6 +320,9 @@ const featureFlagService = {
   reviveFeatureFlag,
   toggleFavorite,
   deleteFeatureFlag,
+  updateStrategies,
+  updateVariants,
+  updateFlagValues,
 };
 
 export default featureFlagService;

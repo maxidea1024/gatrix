@@ -429,6 +429,80 @@ router.post(
   })
 );
 
+// ==================== Change Request Integration ====================
+
+// Save feature flag draft data to a Change Request
+router.post(
+  '/:flagName/change-request',
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
+
+    const userId = req.user?.id;
+    const { draftData } = req.body;
+
+    if (!draftData || typeof draftData !== 'object') {
+      return res.status(400).json({
+        success: false,
+        error: 'draftData is required',
+      });
+    }
+
+    // Get flagId from flagName
+    const flag = await featureFlagService.getFlag(
+      environmentId,
+      req.params.flagName,
+      req.projectId
+    );
+    if (!flag) {
+      return res.status(404).json({ success: false, error: 'Flag not found' });
+    }
+
+    const { ChangeRequestService } =
+      await import('../../../services/change-request-service');
+
+    const result = await ChangeRequestService.upsertDraftDataItem(
+      userId!,
+      environmentId,
+      'g_feature_flags',
+      flag.id,
+      { ...draftData, _flagName: flag.flagName },
+      `[feature_flags] Update: ${flag.flagName}`
+    );
+
+    res.json({ success: true, data: result });
+  })
+);
+
+// Get pending Change Request for a feature flag
+router.get(
+  '/:flagName/pending-change-request',
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
+
+    // Get flagId from flagName
+    const flag = await featureFlagService.getFlag(
+      environmentId,
+      req.params.flagName,
+      req.projectId
+    );
+    if (!flag) {
+      return res.status(404).json({ success: false, error: 'Flag not found' });
+    }
+
+    const { ChangeRequestService } =
+      await import('../../../services/change-request-service');
+
+    const pendingDraft = await ChangeRequestService.getPendingDraftForTarget(
+      'g_feature_flags',
+      flag.id
+    );
+
+    res.json({ success: true, data: pendingDraft });
+  })
+);
+
 // ==================== Code References (per-flag) ====================
 
 router.use('/:flagName/code-references', flagCodeReferencesRouter);

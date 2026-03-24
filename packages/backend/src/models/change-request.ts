@@ -46,7 +46,7 @@ export class ChangeRequest extends Model {
       required: ['requesterId', 'environmentId', 'title'],
       properties: {
         id: { type: 'string' },
-        requesterId: { type: 'integer' },
+        requesterId: { type: 'string' },
         environmentId: { type: 'string' },
         status: {
           type: 'string',
@@ -69,10 +69,10 @@ export class ChangeRequest extends Model {
         },
         category: { type: 'string', maxLength: 50 },
         type: { type: 'string' },
-        rejectedBy: { type: ['integer', 'null'] },
+        rejectedBy: { type: ['string', 'null'] },
         rejectedAt: { type: ['string', 'null'], format: 'date-time' },
         rejectionReason: { type: ['string', 'null'] },
-        executedBy: { type: ['integer', 'null'] },
+        executedBy: { type: ['string', 'null'] },
         createdAt: { type: 'string', format: 'date-time' },
         updatedAt: { type: 'string', format: 'date-time' },
       },

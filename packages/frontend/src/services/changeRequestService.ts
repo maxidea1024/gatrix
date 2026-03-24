@@ -45,11 +45,11 @@ export interface ActionGroup {
 export interface Approval {
   id: string;
   changeRequestId: string;
-  approverId: number;
+  approverId: string;
   comment?: string;
   createdAt: string;
   approver?: {
-    id: number;
+    id: string;
     name: string;
     email: string;
   };
@@ -57,7 +57,7 @@ export interface Approval {
 
 export interface ChangeRequest {
   id: string;
-  requesterId: number;
+  requesterId: string;
   environmentId: string;
   status: ChangeRequestStatus;
   title: string;
@@ -66,18 +66,18 @@ export interface ChangeRequest {
   impactAnalysis?: string;
   priority: ChangeRequestPriority;
   category: string;
-  rejectedBy?: number;
+  rejectedBy?: string;
   rejectedAt?: string;
   rejectionReason?: string;
   createdAt: string;
   updatedAt: string;
   requester?: {
-    id: number;
+    id: string;
     name: string;
     email: string;
   };
   rejector?: {
-    id: number;
+    id: string;
     name: string;
     email: string;
   };
@@ -89,9 +89,9 @@ export interface ChangeRequest {
   changeItems?: ChangeItem[];
   actionGroups?: ActionGroup[];
   approvals?: Approval[];
-  executedBy?: number;
+  executedBy?: string;
   executor?: {
-    id: number;
+    id: string;
     name: string;
     email: string;
   };
@@ -307,6 +307,49 @@ class ChangeRequestService {
   ): Promise<Record<string, number>> {
     const response = await api.get(`${basePath(projectApiPath)}/stats`);
     return response.data;
+  }
+  /**
+   * Save feature flag draft data to a Change Request
+   */
+  async saveFlagDraft(
+    flagName: string,
+    draftData: Record<string, any>,
+    projectApiPath: string | null = null
+  ): Promise<{ changeRequestId: string; status: ChangeRequestStatus }> {
+    const flagsBase = projectApiPath
+      ? `${projectApiPath}/features`
+      : '/admin/features';
+    const response = await api.post(`${flagsBase}/${flagName}/change-request`, {
+      draftData,
+    });
+    return response.data;
+  }
+
+  /**
+   * Get pending Change Request for a feature flag
+   */
+  async getPendingFlagDraft(
+    flagName: string,
+    projectApiPath: string | null = null
+  ): Promise<{
+    changeRequestId: string;
+    status: ChangeRequestStatus;
+    draftData: Record<string, any>;
+    requesterId: string;
+  } | null> {
+    try {
+      const flagsBase = projectApiPath
+        ? `${projectApiPath}/features`
+        : '/admin/features';
+      const response = await api.get(
+        `${flagsBase}/${flagName}/pending-change-request`
+      );
+      return response.data || null;
+    } catch (error: any) {
+      // No pending CR for this flag
+      if (error?.response?.status === 404) return null;
+      throw error;
+    }
   }
 }
 
