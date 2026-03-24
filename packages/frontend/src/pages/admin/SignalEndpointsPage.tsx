@@ -4,7 +4,7 @@
  * Allows administrators to manage signal endpoints,
  * their tokens, and view received signals.
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -27,11 +27,7 @@ import {
   Tooltip,
   Alert,
   Collapse,
-  Divider,
-  List,
-  ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   Menu,
   MenuItem,
   ListItemIcon,
@@ -61,13 +57,16 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
+import TagSelector from '@/components/common/TagSelector';
+import TagChips from '@/components/common/TagChips';
+import { Tag } from '@/services/tagService';
 
 // ==================== Create/Edit Dialog ====================
 interface EndpointDialogProps {
   open: boolean;
   endpoint: SignalEndpoint | null;
   onClose: () => void;
-  onSave: (data: { name: string; description?: string }) => void;
+  onSave: (data: { name: string; description?: string; tags?: Tag[] }) => void;
 }
 
 const EndpointDialog: React.FC<EndpointDialogProps> = ({
@@ -79,20 +78,44 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [initialValues, setInitialValues] = useState<{ name: string; description: string; tagIds: string[] }>({
+    name: '',
+    description: '',
+    tagIds: [],
+  });
 
   useEffect(() => {
     if (endpoint) {
       setName(endpoint.name);
       setDescription(endpoint.description || '');
+      setSelectedTags(endpoint.tags || []);
+      setInitialValues({
+        name: endpoint.name,
+        description: endpoint.description || '',
+        tagIds: (endpoint.tags || []).map((t) => t.id).sort().join(','),
+      } as any);
     } else {
       setName('');
       setDescription('');
+      setSelectedTags([]);
+      setInitialValues({ name: '', description: '', tagIds: [] });
     }
   }, [endpoint, open]);
 
+  const hasChanges = useMemo(() => {
+    if (!endpoint) return true; // Creating new - always allow
+    const currentTagIds = selectedTags.map((t) => t.id).sort().join(',');
+    return (
+      name !== initialValues.name ||
+      description !== initialValues.description ||
+      currentTagIds !== (initialValues as any).tagIds
+    );
+  }, [endpoint, name, description, selectedTags, initialValues]);
+
   const handleSave = () => {
     if (!name.trim()) return;
-    onSave({ name: name.trim(), description: description.trim() || undefined });
+    onSave({ name: name.trim(), description: description.trim() || undefined, tags: selectedTags });
   };
 
   return (
@@ -139,6 +162,47 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
               onChange={(e) => setName(e.target.value)}
               helperText={t('signalEndpoints.nameHelp')}
             />
+            {name.trim() && (
+              <>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    p: 1.5,
+                    bgcolor: 'action.hover',
+                    borderRadius: 1,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                  }}
+                >
+                  <Chip label="POST" size="small" color="primary" variant="filled" sx={{ fontWeight: 600, fontSize: '0.7rem' }} />
+                  <Typography
+                    variant="body2"
+                    sx={{ fontFamily: 'monospace', flex: 1, wordBreak: 'break-all' }}
+                  >
+                    {`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`}
+                  </Typography>
+                  <Tooltip title={t('common.copy')}>
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        copyToClipboardWithNotification(
+                          `${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`,
+                          () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                          () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                        )
+                      }
+                    >
+                      <CopyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: -0.5 }}>
+                  {t('signalEndpoints.endpointUrlHelp')}
+                </Typography>
+              </>
+            )}
             <TextField
               label={t('signalEndpoints.description')}
               fullWidth
@@ -147,6 +211,10 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
               size="small"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+            />
+            <TagSelector
+              value={selectedTags}
+              onChange={setSelectedTags}
             />
           </Box>
         </Paper>
@@ -168,7 +236,7 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
         <Button
           onClick={handleSave}
           variant="contained"
-          disabled={!name.trim()}
+          disabled={!name.trim() || (!!endpoint && !hasChanges)}
         >
           {endpoint ? t('common.update') : t('common.create')}
         </Button>
@@ -555,6 +623,7 @@ const SignalEndpointsPage: React.FC = () => {
                   <TableCell width={40} />
                   <TableCell>{t('signalEndpoints.name')}</TableCell>
                   <TableCell>{t('signalEndpoints.description')}</TableCell>
+                  <TableCell>{t('common.tags')}</TableCell>
                   <TableCell align="center">
                     {t('signalEndpoints.status')}
                   </TableCell>
@@ -589,7 +658,16 @@ const SignalEndpointsPage: React.FC = () => {
                         </IconButton>
                       </TableCell>
                       <TableCell>
-                        <Typography fontWeight="medium">
+                        <Typography
+                          fontWeight="medium"
+                          sx={{
+                            cursor: 'pointer',
+                            '&:hover': { textDecoration: 'underline' },
+                          }}
+                          onClick={() =>
+                            setEditDialog({ open: true, endpoint })
+                          }
+                        >
                           {endpoint.name}
                         </Typography>
                       </TableCell>
@@ -606,6 +684,9 @@ const SignalEndpointsPage: React.FC = () => {
                         >
                           {endpoint.description || '-'}
                         </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <TagChips tags={endpoint.tags} maxVisible={3} />
                       </TableCell>
                       <TableCell align="center">
                         <Tooltip
@@ -643,7 +724,7 @@ const SignalEndpointsPage: React.FC = () => {
                     {/* Expanded Token List */}
                     <TableRow hover>
                       <TableCell
-                        colSpan={6}
+                        colSpan={7}
                         sx={{
                           py: 0,
                           borderBottom:
@@ -651,29 +732,74 @@ const SignalEndpointsPage: React.FC = () => {
                         }}
                       >
                         <Collapse in={expandedId === endpoint.id}>
-                          <Box
-                            sx={{
-                              p: 2,
-                              bgcolor: 'action.hover',
-                              borderRadius: 1,
-                              my: 1,
-                            }}
-                          >
+                          <Box sx={{ p: 2, my: 1 }}>
+                            {/* Endpoint URL */}
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                p: 1.5,
+                                mb: 2,
+                                bgcolor: 'grey.50',
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                borderRadius: 1,
+                              }}
+                            >
+                              <Chip label="POST" size="small" color="primary" variant="filled" sx={{ fontWeight: 700, fontSize: '0.7rem', height: 22 }} />
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontFamily: 'monospace',
+                                  flex: 1,
+                                  wordBreak: 'break-all',
+                                  color: 'text.primary',
+                                  fontSize: '0.8rem',
+                                }}
+                              >
+                                {`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${endpoint.name}`}
+                              </Typography>
+                              <Tooltip title={t('common.copy')}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() =>
+                                    copyToClipboardWithNotification(
+                                      `${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${endpoint.name}`,
+                                      () =>
+                                        enqueueSnackbar(
+                                          t('common.copiedToClipboard'),
+                                          { variant: 'success' }
+                                        ),
+                                      () =>
+                                        enqueueSnackbar(t('common.copyFailed'), {
+                                          variant: 'error',
+                                        })
+                                    )
+                                  }
+                                >
+                                  <CopyIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
+
+                            {/* Tokens Section */}
                             <Box
                               sx={{
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                mb: 1,
+                                mb: 1.5,
                               }}
                             >
-                              <Typography variant="subtitle2">
+                              <Typography variant="subtitle2" fontWeight={600}>
                                 {t('signalEndpoints.tokensFor', {
                                   name: endpoint.name,
                                 })}
                               </Typography>
                               <Button
                                 size="small"
+                                variant="text"
                                 onClick={() =>
                                   setTokenDialog({
                                     open: true,
@@ -684,7 +810,6 @@ const SignalEndpointsPage: React.FC = () => {
                                 {t('signalEndpoints.addToken')}
                               </Button>
                             </Box>
-                            <Divider sx={{ mb: 1 }} />
                             {!endpointTokens[endpoint.id] ||
                             endpointTokens[endpoint.id].length === 0 ? (
                               <Typography
@@ -695,83 +820,53 @@ const SignalEndpointsPage: React.FC = () => {
                                 {t('signalEndpoints.noTokens')}
                               </Typography>
                             ) : (
-                              <List dense disablePadding>
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                                 {endpointTokens[endpoint.id].map((token) => (
-                                  <ListItem key={token.id} sx={{ px: 0 }}>
-                                    <ListItemText
-                                      primary={token.tokenName}
-                                      secondary={
-                                        <Tooltip
-                                          title={formatDateTimeDetailed(
-                                            token.createdAt
-                                          )}
-                                        >
-                                          <span>
-                                            {formatRelativeTime(
-                                              token.createdAt
-                                            )}
-                                          </span>
-                                        </Tooltip>
-                                      }
-                                    />
-                                    <ListItemSecondaryAction>
-                                      <IconButton
-                                        edge="end"
-                                        size="small"
-                                        color="error"
-                                        onClick={() =>
-                                          setDeleteDialog({
-                                            open: true,
-                                            type: 'token',
-                                            endpointId: endpoint.id,
-                                            tokenId: token.id,
-                                            name: token.tokenName,
-                                          })
-                                        }
+                                  <Box
+                                    key={token.id}
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      px: 1.5,
+                                      py: 0.75,
+                                      bgcolor: 'background.paper',
+                                      border: '1px solid',
+                                      borderColor: 'divider',
+                                      borderRadius: 1,
+                                    }}
+                                  >
+                                    <Box>
+                                      <Typography variant="body2" fontWeight={500}>
+                                        {token.tokenName}
+                                      </Typography>
+                                      <Tooltip
+                                        title={formatDateTimeDetailed(token.createdAt)}
                                       >
-                                        <DeleteIcon fontSize="small" />
-                                      </IconButton>
-                                    </ListItemSecondaryAction>
-                                  </ListItem>
+                                        <Typography variant="caption" color="text.secondary">
+                                          {formatRelativeTime(token.createdAt)}
+                                        </Typography>
+                                      </Tooltip>
+                                    </Box>
+                                    <IconButton
+                                      size="small"
+                                      color="error"
+                                      onClick={() =>
+                                        setDeleteDialog({
+                                          open: true,
+                                          type: 'token',
+                                          endpointId: endpoint.id,
+                                          tokenId: token.id,
+                                          name: token.tokenName,
+                                        })
+                                      }
+                                    >
+                                      <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                  </Box>
                                 ))}
-                              </List>
-                            )}
-                            <Divider sx={{ mt: 1, mb: 1 }} />
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t('signalEndpoints.endpointUrl')}:{' '}
-                              <Box
-                                component="code"
-                                sx={{
-                                  bgcolor: 'background.paper',
-                                  px: 1,
-                                  py: 0.5,
-                                  borderRadius: 0.5,
-                                  fontSize: '0.75rem',
-                                  cursor: 'pointer',
-                                }}
-                                onClick={() =>
-                                  copyToClipboardWithNotification(
-                                    `POST /api/v1/signals/${endpoint.name}`,
-                                    () =>
-                                      enqueueSnackbar(
-                                        t('common.copiedToClipboard'),
-                                        {
-                                          variant: 'success',
-                                        }
-                                      ),
-                                    () =>
-                                      enqueueSnackbar(t('common.copyFailed'), {
-                                        variant: 'error',
-                                      })
-                                  )
-                                }
-                              >
-                                POST /api/v1/signals/{endpoint.name}
                               </Box>
-                            </Typography>
+                            )}
                           </Box>
                         </Collapse>
                       </TableCell>

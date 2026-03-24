@@ -733,25 +733,32 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
           <Stack spacing={3} sx={{ mt: 1 }}>
             {/* Basic information section */}
-            <Paper variant="outlined" elevation={0} sx={{ p: 2 }}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  color: 'primary.main',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                }}
-              >
-                {t('clientVersions.form.basicInfo')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t('clientVersions.form.basicInfoDescription')}
-              </Typography>
-
-              <Stack spacing={2}>
+            <Accordion
+              defaultExpanded
+              disableGutters
+              variant="outlined"
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Box>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      color: 'primary.main',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                    }}
+                  >
+                    {t('clientVersions.form.basicInfo')}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('clientVersions.form.basicInfoDescription')}
+                  </Typography>
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack spacing={2}>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   {/* Version field */}
                   <Controller
@@ -971,27 +978,35 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                   />
                 )}
               </Stack>
-            </Paper>
+              </AccordionDetails>
+            </Accordion>
 
             {/* Server address section */}
-            <Paper variant="outlined" elevation={0} sx={{ p: 2 }}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  color: 'primary.main',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                }}
-              >
-                {t('clientVersions.form.serverAddresses')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t('clientVersions.form.serverAddressesDescription')}
-              </Typography>
-
+            <Accordion
+              defaultExpanded
+              disableGutters
+              variant="outlined"
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Box>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      color: 'primary.main',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                    }}
+                  >
+                    {t('clientVersions.form.serverAddresses')}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('clientVersions.form.serverAddressesDescription')}
+                  </Typography>
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
               <Stack spacing={2}>
                 {/* Game server address group */}
                 <Box
@@ -1223,7 +1238,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                   </Stack>
                 </Box>
               </Stack>
-            </Paper>
+              </AccordionDetails>
+            </Accordion>
 
             {/* Tag section (outside additional settings) */}
             {/* Additional settings section */}

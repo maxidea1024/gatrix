@@ -14,6 +14,7 @@ import {
   sendInternalError,
 } from '../../utils/api-response';
 import { ErrorCodes } from '@gatrix/shared';
+import { TagService } from '../../services/tag-service';
 
 const router = Router();
 const logger = createLogger('ActionSetRoutes');
@@ -25,7 +26,14 @@ const logger = createLogger('ActionSetRoutes');
 router.get('/', async (req: Request, res: Response) => {
   try {
     const actionSets = await ActionSetModel.findAll((req as any).projectId);
-    res.json({ data: actionSets });
+    // Load tags for each action set
+    const actionSetsWithTags = await Promise.all(
+      actionSets.map(async (actionSet) => {
+        const tags = await TagService.listTagsForEntity('action_set', actionSet.id);
+        return { ...actionSet, tags };
+      })
+    );
+    res.json({ data: actionSetsWithTags });
   } catch (error) {
     logger.error('Error getting action sets:', error);
     res.status(500).json({ error: 'Failed to get action sets' });
@@ -45,7 +53,8 @@ router.get('/:id', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Action set not found' });
     }
 
-    res.json({ data: actionSet });
+    const tags = await TagService.listTagsForEntity('action_set', id);
+    res.json({ data: { ...actionSet, tags } });
   } catch (error) {
     logger.error('Error getting action set:', error);
     res.status(500).json({ error: 'Failed to get action set' });
@@ -58,6 +67,7 @@ router.get('/:id', async (req: Request, res: Response) => {
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
+    const { tags, ...rest } = req.body;
     const {
       name,
       description,
@@ -67,7 +77,7 @@ router.post('/', async (req: Request, res: Response) => {
       sourceId,
       filters,
       actions,
-    } = req.body;
+    } = rest;
     const user = req.user as { id: string; name: string };
     const projectId = (req as any).projectId;
 
@@ -107,7 +117,14 @@ router.post('/', async (req: Request, res: Response) => {
       createdBy: user.id,
     });
 
-    res.status(201).json({ data: actionSet });
+    // Handle tags
+    if (tags && Array.isArray(tags)) {
+      const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+      await TagService.setTagsForEntity('action_set', actionSet.id, tagIds, user.id);
+    }
+
+    const tagsForEntity = await TagService.listTagsForEntity('action_set', actionSet.id);
+    res.status(201).json({ data: { ...actionSet, tags: tagsForEntity } });
   } catch (error) {
     logger.error('Error creating action set:', error);
     return sendInternalError(res, 'Failed to create action set', error);
@@ -121,6 +138,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
+    const { tags, ...rest } = req.body;
     const {
       name,
       description,
@@ -130,7 +148,7 @@ router.put('/:id', async (req: Request, res: Response) => {
       sourceId,
       filters,
       actions,
-    } = req.body;
+    } = rest;
     const user = req.user as { id: string; name: string };
     const projectId = (req as any).projectId;
 
@@ -165,7 +183,16 @@ router.put('/:id', async (req: Request, res: Response) => {
       return sendNotFound(res, 'Action set not found');
     }
 
-    res.json({ data: actionSet });
+    // Handle tags
+    if (tags !== undefined) {
+      const tagIds = Array.isArray(tags)
+        ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
+        : [];
+      await TagService.setTagsForEntity('action_set', id, tagIds, user.id);
+    }
+
+    const tagsForEntity = await TagService.listTagsForEntity('action_set', id);
+    res.json({ data: { ...actionSet, tags: tagsForEntity } });
   } catch (error) {
     logger.error('Error updating action set:', error);
     return sendInternalError(res, 'Failed to update action set', error);

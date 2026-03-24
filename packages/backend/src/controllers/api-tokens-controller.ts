@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 import { ulid } from 'ulid';
 import { pubSubService } from '../services/pub-sub-service';
 import { createLogger } from '../config/logger';
+import { TagService } from '../services/tag-service';
 
 const logger = createLogger('ApiTokensController');
 
@@ -100,12 +101,14 @@ class ApiTokensController {
         .offset(Number(offset));
 
       // Format tokens (mask token for display, keep original for copying)
-      const formattedTokens = tokens.map((token: any) => {
+      const formattedTokens = await Promise.all(tokens.map(async (token: any) => {
         // Mask the token: show first 4 and last 4 characters
         const maskedToken =
           token.tokenValue && token.tokenValue.length > 8
             ? `${token.tokenValue.substring(0, 4)}${'•'.repeat(token.tokenValue.length - 8)}${token.tokenValue.substring(token.tokenValue.length - 4)}`
             : token.tokenValue;
+
+        const tags = await TagService.listTagsForEntity('api_token', token.id);
 
         const formatted = {
           ...token,
@@ -117,10 +120,11 @@ class ApiTokensController {
             name: token.creatorName || 'Unknown',
             email: token.creatorEmail || '',
           },
+          tags,
         };
 
         return formatted;
-      });
+      }));
 
       const responseData = {
         success: true,
@@ -158,7 +162,7 @@ class ApiTokensController {
         });
       }
 
-      const { tokenName, description, tokenType, expiresAt, environmentId } =
+      const { tokenName, description, tokenType, expiresAt, environmentId, tags } =
         req.body;
       const projectId = (req as any).projectId;
       const userId = (req as any).user.id;
@@ -210,6 +214,14 @@ class ApiTokensController {
         });
       }
 
+      // Handle tags
+      if (tags && Array.isArray(tags)) {
+        const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+        await TagService.setTagsForEntity('api_token', result.id, tagIds, userId);
+      }
+
+      const tagsForEntity = await TagService.listTagsForEntity('api_token', result.id);
+
       // Return the new token with the actual token value (only shown once)
       res.status(201).json({
         success: true,
@@ -221,6 +233,7 @@ class ApiTokensController {
           environmentId: environmentId || null,
           expiresAt,
           createdAt: new Date().toISOString(),
+          tags: tagsForEntity,
         },
       });
     } catch (error) {
@@ -238,7 +251,7 @@ class ApiTokensController {
   async updateToken(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { tokenName, description, expiresAt, environmentId } = req.body;
+      const { tokenName, description, expiresAt, environmentId, tags } = req.body;
       const userId = (req as any).user.id;
 
       // Check if token exists
@@ -332,10 +345,20 @@ class ApiTokensController {
         });
       }
 
+      // Handle tags
+      if (tags !== undefined) {
+        const tagIds = Array.isArray(tags)
+          ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
+          : [];
+        await TagService.setTagsForEntity('api_token', id, tagIds, userId);
+      }
+
+      const tagsForEntity = await TagService.listTagsForEntity('api_token', id);
+
       res.json({
         success: true,
         data: {
-          token: formattedToken,
+          token: { ...formattedToken, tags: tagsForEntity },
         },
       });
     } catch (error) {

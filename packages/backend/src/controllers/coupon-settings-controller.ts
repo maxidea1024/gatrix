@@ -107,6 +107,20 @@ export class CouponSettingsController {
         environmentId,
       });
 
+      // Attach tags to each setting
+      if (result.settings && result.settings.length > 0) {
+        const settingsWithTags = await Promise.all(
+          result.settings.map(async (setting: any) => {
+            const tags = await TagService.listTagsForEntity(
+              'coupon_setting',
+              setting.id.toString()
+            );
+            return { ...setting, tags };
+          })
+        );
+        result.settings = settingsWithTags;
+      }
+
       res.json({ success: true, data: result });
     }
   );
@@ -122,7 +136,15 @@ export class CouponSettingsController {
         id,
         environmentId
       );
-      res.json({ success: true, data: { setting } });
+
+      // Attach tags
+      const tags = await TagService.listTagsForEntity(
+        'coupon_setting',
+        id.toString()
+      );
+      const settingWithTags = { ...setting, tags };
+
+      res.json({ success: true, data: { setting: settingWithTags } });
     }
   );
 

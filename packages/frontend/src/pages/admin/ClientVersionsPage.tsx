@@ -2404,14 +2404,12 @@ const ClientVersionsPage: React.FC = () => {
         >
           <Button
             onClick={() => setBulkStatusDialogOpen(false)}
-            variant="outlined"
           >
             {t('common.cancel')}
           </Button>
           <Button
             onClick={handleBulkStatusUpdate}
             variant="contained"
-            startIcon={<UpdateIcon />}
           >
             {t('common.update')}
           </Button>

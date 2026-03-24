@@ -4,6 +4,7 @@ import { releaseFlowService } from '../services/release-flow-service';
 import { safeguardService } from '../services/safeguard-service';
 import { GatrixError } from '../middleware/error-handler';
 import { ReleaseFlowModel } from '../models/release-flow';
+import { TagService } from '../services/tag-service';
 
 export class ReleaseFlowController {
   /**
@@ -30,9 +31,17 @@ export class ReleaseFlowController {
         );
       }
 
+      // Load tags for each template
+      const templatesWithTags = await Promise.all(
+        filtered.map(async (template) => {
+          const tags = await TagService.listTagsForEntity('release_flow_template', template.id);
+          return { ...template, tags };
+        })
+      );
+
       res.json({
         success: true,
-        data: filtered,
+        data: templatesWithTags,
       });
     } catch (error) {
       next(error);
@@ -51,13 +60,23 @@ export class ReleaseFlowController {
       const userId = req.user?.userId;
       if (!userId) throw new GatrixError('Unauthorized', 401);
 
+      const { tags, ...templateData } = req.body;
       const template = await releaseFlowService.createTemplate(
-        req.body,
+        templateData,
         userId
       );
+
+      // Handle tags
+      if (tags && Array.isArray(tags)) {
+        const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+        await TagService.setTagsForEntity('release_flow_template', template.id, tagIds, userId);
+      }
+
+      const tagsForEntity = await TagService.listTagsForEntity('release_flow_template', template.id);
+
       res.status(201).json({
         success: true,
-        data: template,
+        data: { ...template, tags: tagsForEntity },
       });
     } catch (error) {
       next(error);
@@ -75,9 +94,10 @@ export class ReleaseFlowController {
     try {
       const { id } = req.params;
       const template = await releaseFlowService.getTemplateById(id);
+      const tags = await TagService.listTagsForEntity('release_flow_template', id);
       res.json({
         success: true,
-        data: template,
+        data: { ...template, tags },
       });
     } catch (error) {
       next(error);
@@ -97,14 +117,26 @@ export class ReleaseFlowController {
       if (!userId) throw new GatrixError('Unauthorized', 401);
 
       const { id } = req.params;
+      const { tags, ...updateData } = req.body;
       const template = await releaseFlowService.updateTemplate(
         id,
-        req.body,
+        updateData,
         userId
       );
+
+      // Handle tags
+      if (tags !== undefined) {
+        const tagIds = Array.isArray(tags)
+          ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
+          : [];
+        await TagService.setTagsForEntity('release_flow_template', id, tagIds, userId);
+      }
+
+      const tagsForEntity = await TagService.listTagsForEntity('release_flow_template', id);
+
       res.json({
         success: true,
-        data: template,
+        data: { ...template, tags: tagsForEntity },
       });
     } catch (error) {
       next(error);

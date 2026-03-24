@@ -15,6 +15,7 @@ import {
 } from '../../utils/api-response';
 import { ErrorCodes } from '@gatrix/shared';
 import crypto from 'crypto';
+import { TagService } from '../../services/tag-service';
 
 const router = Router();
 const logger = createLogger('SignalEndpointRoutes');
@@ -26,7 +27,14 @@ const logger = createLogger('SignalEndpointRoutes');
 router.get('/', async (req: Request, res: Response) => {
   try {
     const endpoints = await SignalEndpointModel.findAll((req as any).projectId);
-    res.json({ data: endpoints });
+    // Load tags for each endpoint
+    const endpointsWithTags = await Promise.all(
+      endpoints.map(async (endpoint) => {
+        const tags = await TagService.listTagsForEntity('signal_endpoint', endpoint.id);
+        return { ...endpoint, tags };
+      })
+    );
+    res.json({ data: endpointsWithTags });
   } catch (error) {
     logger.error('Error getting signal endpoints:', error);
     res.status(500).json({ error: 'Failed to get signal endpoints' });
@@ -46,7 +54,8 @@ router.get('/:id', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Signal endpoint not found' });
     }
 
-    res.json({ data: endpoint });
+    const tags = await TagService.listTagsForEntity('signal_endpoint', id);
+    res.json({ data: { ...endpoint, tags } });
   } catch (error) {
     logger.error('Error getting signal endpoint:', error);
     res.status(500).json({ error: 'Failed to get signal endpoint' });
@@ -59,7 +68,7 @@ router.get('/:id', async (req: Request, res: Response) => {
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, tags } = req.body;
     const user = req.user as { id: string; name: string };
     const projectId = (req as any).projectId;
 
@@ -84,7 +93,14 @@ router.post('/', async (req: Request, res: Response) => {
       createdBy: user.id,
     });
 
-    res.status(201).json({ data: endpoint });
+    // Handle tags
+    if (tags && Array.isArray(tags)) {
+      const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+      await TagService.setTagsForEntity('signal_endpoint', endpoint.id, tagIds, user.id);
+    }
+
+    const tagsForEntity = await TagService.listTagsForEntity('signal_endpoint', endpoint.id);
+    res.status(201).json({ data: { ...endpoint, tags: tagsForEntity } });
   } catch (error) {
     logger.error('Error creating signal endpoint:', error);
     return sendInternalError(res, 'Failed to create signal endpoint', error);
@@ -98,7 +114,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    const { name, description, isEnabled } = req.body;
+    const { name, description, isEnabled, tags } = req.body;
     const user = req.user as { id: string; name: string };
 
     // Check for duplicate name if name is being changed
@@ -124,7 +140,16 @@ router.put('/:id', async (req: Request, res: Response) => {
       return sendNotFound(res, 'Signal endpoint not found');
     }
 
-    res.json({ data: endpoint });
+    // Handle tags
+    if (tags !== undefined) {
+      const tagIds = Array.isArray(tags)
+        ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
+        : [];
+      await TagService.setTagsForEntity('signal_endpoint', id, tagIds, user.id);
+    }
+
+    const tagsForEntity = await TagService.listTagsForEntity('signal_endpoint', id);
+    res.json({ data: { ...endpoint, tags: tagsForEntity } });
   } catch (error) {
     logger.error('Error updating signal endpoint:', error);
     return sendInternalError(res, 'Failed to update signal endpoint', error);

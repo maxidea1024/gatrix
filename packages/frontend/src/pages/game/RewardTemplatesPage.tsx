@@ -99,6 +99,8 @@ const RewardTemplatesPage: React.FC = () => {
     null
   );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [rowMenuAnchor, setRowMenuAnchor] = useState<HTMLElement | null>(null);
+  const [rowMenuTemplate, setRowMenuTemplate] = useState<RewardTemplate | null>(null);
 
   // Sorting state with localStorage persistence
   const [orderBy, setOrderBy] = useState<string>(() => {
@@ -906,40 +908,15 @@ const RewardTemplatesPage: React.FC = () => {
                             if (!canManage) return null;
                             return (
                               <TableCell key={column.id} align="center">
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    gap: 0.5,
-                                    justifyContent: 'center',
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => {
+                                    setRowMenuAnchor(e.currentTarget);
+                                    setRowMenuTemplate(template);
                                   }}
                                 >
-                                  <Tooltip title={t('common.edit')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleEdit(template)}
-                                    >
-                                      <EditIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                  <Tooltip
-                                    title={t('rewardTemplates.copyTemplate')}
-                                  >
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleCopy(template)}
-                                    >
-                                      <ContentCopyIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                  <Tooltip title={t('common.delete')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleDelete(template)}
-                                    >
-                                      <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Box>
+                                  <MoreVertIcon fontSize="small" />
+                                </IconButton>
                               </TableCell>
                             );
                           }
@@ -966,6 +943,55 @@ const RewardTemplatesPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Row Context Menu */}
+      <Menu
+        anchorEl={rowMenuAnchor}
+        open={Boolean(rowMenuAnchor)}
+        onClose={() => {
+          setRowMenuAnchor(null);
+          setRowMenuTemplate(null);
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (rowMenuTemplate) handleEdit(rowMenuTemplate);
+            setRowMenuAnchor(null);
+            setRowMenuTemplate(null);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (rowMenuTemplate) handleCopy(rowMenuTemplate);
+            setRowMenuAnchor(null);
+            setRowMenuTemplate(null);
+          }}
+        >
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('rewardTemplates.copyTemplate')}</ListItemText>
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          onClick={() => {
+            if (rowMenuTemplate) handleDelete(rowMenuTemplate);
+            setRowMenuAnchor(null);
+            setRowMenuTemplate(null);
+          }}
+          sx={{ color: 'error.main' }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog

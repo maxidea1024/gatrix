@@ -163,7 +163,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       h6: { fontSize: '1rem', fontWeight: 600 },
     },
     shape: {
-      borderRadius: 8,
+      borderRadius: 6,
     },
     components: {
       MuiAppBar: {
@@ -182,7 +182,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
             backgroundColor: mode === 'dark' ? 'transparent' : undefined,
             '&:before': { display: 'none' },
             // Ensure each Accordion has its own rounded corners
-            borderRadius: '8px !important',
+            borderRadius: '6px !important',
           },
         },
       },
@@ -364,7 +364,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       MuiChip: {
         styleOverrides: {
           root: {
-            borderRadius: 8,
+            borderRadius: 6,
           },
         },
       },

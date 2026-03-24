@@ -39,6 +39,7 @@ export interface ReleaseFlowTemplate {
   createdBy?: number;
   createdAt: string;
   updatedAt: string;
+  tags?: any[];
 }
 
 export interface ReleaseFlowPlan {
@@ -60,6 +61,7 @@ export interface CreateTemplateInput {
   flowName: string;
   displayName?: string;
   description?: string;
+  tags?: any[];
   milestones: {
     name: string;
     sortOrder: number;

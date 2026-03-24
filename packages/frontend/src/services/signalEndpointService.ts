@@ -10,6 +10,7 @@ export interface SignalEndpoint {
   createdAt: string;
   updatedAt: string;
   tokens?: SignalEndpointToken[];
+  tags?: any[];
 }
 
 export interface SignalEndpointToken {

@@ -14,6 +14,7 @@ export interface ActionSet {
   createdAt: string;
   updatedAt: string;
   actions?: Action[];
+  tags?: any[];
 }
 
 export interface Action {

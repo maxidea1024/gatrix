@@ -85,6 +85,9 @@ import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatRelativeTime } from '../../utils/dateFormat';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
+import TagSelector from '../../components/common/TagSelector';
+import TagChips from '../../components/common/TagChips';
+import { Tag } from '../../services/tagService';
 
 // ==================== Strategy Types ====================
 const STRATEGY_TYPES = [
@@ -910,6 +913,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
   const [saving, setSaving] = useState(false);
   const [segments, setSegments] = useState<any[]>([]);
   const [contextFields, setContextFields] = useState<ContextField[]>([]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 
@@ -919,6 +923,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     return {
       displayName: initialData.displayName || '',
       description: initialData.description || '',
+      tags: JSON.stringify((initialData.tags || []).map((t: any) => t.id || t).sort()),
       milestones: JSON.stringify(
         (initialData.milestones || []).map((m) => ({
           name: m.name || '',
@@ -950,9 +955,10 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     return (
       displayName !== initialSnapshot.displayName ||
       description !== initialSnapshot.description ||
+      JSON.stringify(selectedTags.map((t) => t.id).sort()) !== initialSnapshot.tags ||
       currentMilestones !== initialSnapshot.milestones
     );
-  }, [initialSnapshot, displayName, description, milestones]);
+  }, [initialSnapshot, displayName, description, selectedTags, milestones]);
 
   // Load segments and context fields
   useEffect(() => {
@@ -1008,6 +1014,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
         setFlowName(initialData.flowName || '');
         setDisplayName(initialData.displayName || '');
         setDescription(initialData.description || '');
+        setSelectedTags(initialData.tags || []);
         setMilestones(
           (initialData.milestones || []).map((m) => ({
             id: m.id || generateId(),
@@ -1200,6 +1207,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
         flowName: flowName.trim(),
         displayName: displayName.trim() || undefined,
         description: description.trim() || undefined,
+        tags: selectedTags,
         milestones: milestones.map((m, idx) => ({
           name: m.name || `Milestone ${idx + 1}`,
           sortOrder: idx,
@@ -1291,6 +1299,22 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                 disabled={readonly}
               />
             </Box>
+
+            {/* Tags */}
+            {!readonly && (
+              <TagSelector
+                value={selectedTags}
+                onChange={setSelectedTags}
+              />
+            )}
+            {readonly && selectedTags.length > 0 && (
+              <Box>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  {t('common.tags')}
+                </Typography>
+                <TagChips tags={selectedTags} />
+              </Box>
+            )}
 
             {/* Milestones */}
             <Box>
@@ -1437,6 +1461,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
       visible: true,
     },
     { id: 'milestones', labelKey: 'releaseFlow.milestones', visible: true },
+    { id: 'tags', labelKey: 'common.tags', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
   ];
 
@@ -1927,6 +1952,13 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                                   size="small"
                                   variant="outlined"
                                 />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'tags') {
+                            return (
+                              <TableCell key={column.id}>
+                                <TagChips tags={template.tags} maxVisible={3} />
                               </TableCell>
                             );
                           }

@@ -3,7 +3,7 @@
  *
  * Allows administrators to manage action sets (automated actions triggered by signals).
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Autocomplete,
   Box,
@@ -30,7 +30,6 @@ import {
   FormControl,
   InputLabel,
   Collapse,
-  Divider,
   Menu,
   ListItemIcon,
   ListItemText,
@@ -67,6 +66,9 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
+import TagSelector from '@/components/common/TagSelector';
+import TagChips from '@/components/common/TagChips';
+import { Tag } from '@/services/tagService';
 // Action type options
 const ACTION_TYPES = [
   { value: 'TOGGLE_FLAG', labelKey: 'actionSets.actionTypes.toggleFlag' },
@@ -89,6 +91,7 @@ interface ActionSetDialogProps {
       sortOrder: number;
       params: Record<string, unknown>;
     }>;
+    tags?: Tag[];
   }) => void;
 }
 
@@ -120,6 +123,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
   const [flagOptions, setFlagOptions] = useState<string[]>([]);
   const [environments, setEnvironments] = useState<Environment[]>([]);
   const [signalEndpoints, setSignalEndpoints] = useState<SignalEndpoint[]>([]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   // Load flag options and environments when dialog opens
   useEffect(() => {
@@ -144,25 +148,34 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
     loadData();
   }, [open]);
 
+  const [initialSnapshot, setInitialSnapshot] = useState('');
+
   useEffect(() => {
     if (actionSet) {
       setName(actionSet.name);
       setDescription(actionSet.description || '');
       setSelectedEndpointId(actionSet.sourceId || '');
+      setSelectedTags(actionSet.tags || []);
       if (actionSet.actions && actionSet.actions.length > 0) {
-        setActions(
-          actionSet.actions.map((a) => ({
-            actionType: a.actionType,
-            sortOrder: a.sortOrder,
-            params: {
-              flagName:
-                (a.executionParams as Record<string, string>)?.flagName || '',
-              environmentId:
-                (a.executionParams as Record<string, string>)?.environmentId ||
-                '',
-            },
-          }))
-        );
+        const mappedActions = actionSet.actions.map((a) => ({
+          actionType: a.actionType,
+          sortOrder: a.sortOrder,
+          params: {
+            flagName:
+              (a.executionParams as Record<string, string>)?.flagName || '',
+            environmentId:
+              (a.executionParams as Record<string, string>)?.environmentId ||
+              '',
+          },
+        }));
+        setActions(mappedActions);
+        setInitialSnapshot(JSON.stringify({
+          name: actionSet.name,
+          description: actionSet.description || '',
+          endpointId: actionSet.sourceId || '',
+          tagIds: (actionSet.tags || []).map((t) => t.id).sort().join(','),
+          actions: mappedActions.map((a) => `${a.actionType}:${a.params.flagName}:${a.params.environmentId}`).join('|'),
+        }));
       } else {
         setActions([
           {
@@ -171,11 +184,13 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
             params: { flagName: '', environmentId: '' },
           },
         ]);
+        setInitialSnapshot('');
       }
     } else {
       setName('');
       setDescription('');
       setSelectedEndpointId('');
+      setSelectedTags([]);
       setActions([
         {
           actionType: 'TOGGLE_FLAG',
@@ -183,8 +198,21 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
           params: { flagName: '', environmentId: '' },
         },
       ]);
+      setInitialSnapshot('');
     }
   }, [actionSet, open]);
+
+  const hasChanges = useMemo(() => {
+    if (!actionSet) return true; // Creating new
+    const currentSnapshot = JSON.stringify({
+      name,
+      description,
+      endpointId: selectedEndpointId,
+      tagIds: selectedTags.map((t) => t.id).sort().join(','),
+      actions: actions.map((a) => `${a.actionType}:${a.params.flagName}:${a.params.environmentId}`).join('|'),
+    });
+    return currentSnapshot !== initialSnapshot;
+  }, [actionSet, name, description, selectedEndpointId, selectedTags, actions, initialSnapshot]);
 
   const handleAddAction = () => {
     setActions([
@@ -230,6 +258,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
         sortOrder: i,
         params: a.params,
       })),
+      tags: selectedTags,
     });
   };
 
@@ -295,6 +324,10 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
               onChange={(e) => setDescription(e.target.value)}
               helperText={t('actionSets.descriptionHelp')}
             />
+            <TagSelector
+              value={selectedTags}
+              onChange={setSelectedTags}
+            />
             <FormControl size="small" fullWidth required>
               <InputLabel>{t('actionSets.signalEndpoint')}</InputLabel>
               <Select
@@ -345,30 +378,13 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
           </Box>
         </Paper>
 
-        {/* Actions List */}
         <Paper variant="outlined" sx={{ p: 2 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              mb: 2,
-            }}
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 600, color: 'primary.main', mb: 2 }}
           >
-            <Typography
-              variant="subtitle2"
-              sx={{ fontWeight: 600, color: 'primary.main' }}
-            >
-              {t('actionSets.actionList')}
-            </Typography>
-            <Button
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={handleAddAction}
-            >
-              {t('actionSets.addAction')}
-            </Button>
-          </Box>
+            {t('actionSets.actionList')}
+          </Typography>
 
           {actions.map((action, index) => (
             <Paper
@@ -439,6 +455,15 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
               </IconButton>
             </Paper>
           ))}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+            <Button
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={handleAddAction}
+            >
+              {t('actionSets.addAction')}
+            </Button>
+          </Box>
         </Paper>
       </Box>
 
@@ -455,7 +480,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({
         }}
       >
         <Button onClick={onClose}>{t('common.cancel')}</Button>
-        <Button onClick={handleSave} variant="contained" disabled={!isValid}>
+        <Button onClick={handleSave} variant="contained" disabled={!isValid || (!!actionSet && !hasChanges)}>
           {actionSet ? t('common.update') : t('common.add')}
         </Button>
       </Box>
@@ -711,6 +736,7 @@ const ActionSetsPage: React.FC = () => {
                   <TableCell width={40} />
                   <TableCell>{t('actionSets.name')}</TableCell>
                   <TableCell>{t('common.description')}</TableCell>
+                  <TableCell>{t('common.tags')}</TableCell>
                   <TableCell>{t('actionSets.source')}</TableCell>
                   <TableCell align="center">{t('actionSets.status')}</TableCell>
                   <TableCell align="center">
@@ -744,7 +770,16 @@ const ActionSetsPage: React.FC = () => {
                         </IconButton>
                       </TableCell>
                       <TableCell>
-                        <Typography fontWeight="medium">
+                        <Typography
+                          fontWeight="medium"
+                          sx={{
+                            cursor: 'pointer',
+                            '&:hover': { textDecoration: 'underline' },
+                          }}
+                          onClick={() =>
+                            setEditDialog({ open: true, actionSet })
+                          }
+                        >
                           {actionSet.name}
                         </Typography>
                       </TableCell>
@@ -752,6 +787,9 @@ const ActionSetsPage: React.FC = () => {
                         <Typography variant="body2" color="text.secondary">
                           {actionSet.description || '-'}
                         </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <TagChips tags={actionSet.tags} maxVisible={3} />
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">
@@ -788,7 +826,7 @@ const ActionSetsPage: React.FC = () => {
                     {/* Expanded Events */}
                     <TableRow hover>
                       <TableCell
-                        colSpan={7}
+                        colSpan={8}
                         sx={{
                           py: 0,
                           borderBottom:
@@ -796,18 +834,55 @@ const ActionSetsPage: React.FC = () => {
                         }}
                       >
                         <Collapse in={expandedId === actionSet.id}>
-                          <Box
-                            sx={{
-                              p: 2,
-                              bgcolor: 'action.hover',
-                              borderRadius: 1,
-                              my: 1,
-                            }}
-                          >
-                            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                          <Box sx={{ p: 2, my: 1 }}>
+                            {/* Registered Actions */}
+                            {actionSet.actions && actionSet.actions.length > 0 && (
+                              <Box sx={{ mb: 2 }}>
+                                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+                                  {t('actionSets.actionList')}
+                                </Typography>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                  {actionSet.actions.map((action, idx) => (
+                                    <Box
+                                      key={idx}
+                                      sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                        px: 1.5,
+                                        py: 0.75,
+                                        bgcolor: 'background.paper',
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                        borderRadius: 1,
+                                      }}
+                                    >
+                                      <Chip
+                                        label={t(`actionSets.actionTypes.${action.actionType.charAt(0).toLowerCase() + action.actionType.slice(1).replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())}`)}
+                                        size="small"
+                                        color="primary"
+                                        variant="outlined"
+                                        sx={{ fontWeight: 600, fontSize: '0.7rem', height: 22 }}
+                                      />
+                                      <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                                        {(action.executionParams as Record<string, string>)?.flagName || '-'}
+                                      </Typography>
+                                      <Chip
+                                        label={(action.executionParams as Record<string, string>)?.environmentId || '-'}
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ fontSize: '0.65rem', height: 20 }}
+                                      />
+                                    </Box>
+                                  ))}
+                                </Box>
+                              </Box>
+                            )}
+
+                            {/* Recent Events */}
+                            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
                               {t('actionSets.recentEvents')}
                             </Typography>
-                            <Divider sx={{ mb: 1 }} />
                             {!events[actionSet.id] ||
                             events[actionSet.id].length === 0 ? (
                               <Typography
@@ -818,58 +893,53 @@ const ActionSetsPage: React.FC = () => {
                                 {t('actionSets.noEvents')}
                               </Typography>
                             ) : (
-                              <Table size="small">
-                                <TableHead>
-                                  <TableRow hover>
-                                    <TableCell>
-                                      {t('actionSets.eventState')}
-                                    </TableCell>
-                                    <TableCell>
-                                      {t('actionSets.eventSignalId')}
-                                    </TableCell>
-                                    <TableCell>
-                                      {t('actionSets.eventDate')}
-                                    </TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {events[actionSet.id].map((event) => (
-                                    <TableRow key={event.id} hover>
-                                      <TableCell>
-                                        <Chip
-                                          label={t(
-                                            `actionSets.states.${event.eventState}`
-                                          )}
-                                          size="small"
-                                          color={
-                                            getStateColor(event.eventState) as
-                                              | 'success'
-                                              | 'error'
-                                              | 'info'
-                                              | 'default'
-                                          }
-                                        />
-                                      </TableCell>
-                                      <TableCell>
-                                        {event.signalId || '-'}
-                                      </TableCell>
-                                      <TableCell>
-                                        <Tooltip
-                                          title={formatDateTimeDetailed(
-                                            event.createdAt
-                                          )}
-                                        >
-                                          <Typography variant="body2">
-                                            {formatRelativeTime(
-                                              event.createdAt
-                                            )}
-                                          </Typography>
-                                        </Tooltip>
-                                      </TableCell>
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                {events[actionSet.id].map((event) => (
+                                  <Box
+                                    key={event.id}
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 1.5,
+                                      px: 1.5,
+                                      py: 0.75,
+                                      bgcolor: 'background.paper',
+                                      border: '1px solid',
+                                      borderColor: 'divider',
+                                      borderRadius: 1,
+                                    }}
+                                  >
+                                    <Chip
+                                      label={t(
+                                        `actionSets.states.${event.eventState}`
+                                      )}
+                                      size="small"
+                                      color={
+                                        getStateColor(event.eventState) as
+                                          | 'success'
+                                          | 'error'
+                                          | 'info'
+                                          | 'default'
+                                      }
+                                      sx={{ fontWeight: 600, fontSize: '0.7rem', height: 22 }}
+                                    />
+                                    <Typography variant="body2" sx={{ flex: 1 }} color="text.secondary">
+                                      Signal: {event.signalId || '-'}
+                                    </Typography>
+                                    <Tooltip
+                                      title={formatDateTimeDetailed(
+                                        event.createdAt
+                                      )}
+                                    >
+                                      <Typography variant="caption" color="text.secondary">
+                                        {formatRelativeTime(
+                                          event.createdAt
+                                        )}
+                                      </Typography>
+                                    </Tooltip>
+                                  </Box>
+                                ))}
+                              </Box>
                             )}
                           </Box>
                         </Collapse>

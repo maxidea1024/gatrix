@@ -203,6 +203,8 @@ const CouponSettingsPage: React.FC = () => {
     null
   );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [rowMenuAnchor, setRowMenuAnchor] = useState<HTMLElement | null>(null);
+  const [rowMenuCoupon, setRowMenuCoupon] = useState<CouponSetting | null>(null);
 
   // Delete confirmation dialog state
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -2055,39 +2057,15 @@ const CouponSettingsPage: React.FC = () => {
                         })}
                         {canManage && (
                           <TableCell align="center" sx={{ py: 1, px: 2 }}>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                gap: 0.5,
-                                justifyContent: 'center',
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                setRowMenuAnchor(e.currentTarget);
+                                setRowMenuCoupon(it);
                               }}
                             >
-                              <IconButton
-                                size="small"
-                                onClick={() => handleEdit(it)}
-                                color="primary"
-                              >
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                              <Tooltip
-                                title={
-                                  it.status === 'DELETED'
-                                    ? t('coupons.couponSettings.alreadyDeleted')
-                                    : ''
-                                }
-                              >
-                                <span>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleDeleteClick(it)}
-                                    color="error"
-                                    disabled={it.status === 'DELETED'}
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                            </Box>
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         )}
                       </TableRow>
@@ -2112,6 +2090,44 @@ const CouponSettingsPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Row Context Menu */}
+      <Menu
+        anchorEl={rowMenuAnchor}
+        open={Boolean(rowMenuAnchor)}
+        onClose={() => {
+          setRowMenuAnchor(null);
+          setRowMenuCoupon(null);
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (rowMenuCoupon) handleEdit(rowMenuCoupon);
+            setRowMenuAnchor(null);
+            setRowMenuCoupon(null);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          onClick={() => {
+            if (rowMenuCoupon) handleDeleteClick(rowMenuCoupon);
+            setRowMenuAnchor(null);
+            setRowMenuCoupon(null);
+          }}
+          disabled={rowMenuCoupon?.status === 'DELETED'}
+          sx={{ color: 'error.main' }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog
