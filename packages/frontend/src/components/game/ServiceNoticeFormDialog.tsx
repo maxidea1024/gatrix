@@ -50,6 +50,7 @@ import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useEntityLock } from '../../hooks/useEntityLock';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import TagSelector from '../common/TagSelector';
 
 interface ServiceNoticeFormDialogProps {
   open: boolean;
@@ -104,6 +105,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [description, setDescription] = useState('');
+  const [selectedTags, setSelectedTags] = useState<any[]>([]);
 
   // Ref to track initial content after Quill normalization
   const initialContentRef = useRef<string | null>(null);
@@ -455,6 +457,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       // Reset initialContentRef - will be set on first RichTextEditor onChange
       initialContentRef.current = null;
       setDescription(notice.description || '');
+      setSelectedTags(notice.tags || []);
     } else {
       // Reset form
       setIsActive(true);
@@ -470,6 +473,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       setTitle('');
       setContent('');
       setDescription('');
+      setSelectedTags([]);
     }
   }, [notice, open]);
 
@@ -511,6 +515,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       title: title.trim(),
       content: content.trim(),
       description: description.trim() || null,
+      tags: selectedTags.map((t: any) => t.id).sort(),
     };
 
     const originalData = {
@@ -527,6 +532,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       content:
         initialContentRef.current?.trim() || notice.content?.trim() || '',
       description: notice.description?.trim() || null,
+      tags: (notice.tags || []).map((t: any) => t.id).sort(),
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
@@ -543,6 +549,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     title,
     content,
     description,
+    selectedTags,
   ]);
 
   const handleSubmit = async () => {
@@ -609,6 +616,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
         title: title.trim(),
         content: content.trim(),
         description: trimmedDescription ? trimmedDescription : null,
+        tags: selectedTags,
       };
 
       if (notice) {
@@ -952,6 +960,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
               rows={3}
               helperText={t('serviceNotices.descriptionHelp')}
             />
+
+            {/* Tags */}
+            <TagSelector value={selectedTags} onChange={setSelectedTags} />
           </Stack>
         </Box>
 

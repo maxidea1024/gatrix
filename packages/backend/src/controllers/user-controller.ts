@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { UserService } from '../services/user-service';
-import { UserTagService } from '../services/user-tag-service';
+import { TagService } from '../services/tag-service';
 import { ChatServerService } from '../services/chat-server-service';
 import { asyncHandler, GatrixError } from '../middleware/error-handler';
 import { AuthenticatedRequest } from '../middleware/auth';
@@ -36,16 +36,8 @@ const updateUserSchema = Joi.object({
   tagIds: Joi.array().items(Joi.string()).optional(),
 });
 
-const setUserTagsSchema = Joi.object({
-  tagIds: Joi.array().items(Joi.string()).required(),
-});
-
 const updateLanguageSchema = Joi.object({
   preferredLanguage: Joi.string().valid('en', 'ko', 'zh').required(),
-});
-
-const addUserTagSchema = Joi.object({
-  tagId: Joi.string().required(),
 });
 
 const verifyEmailSchema = Joi.object({
@@ -132,7 +124,7 @@ export class UserController {
           tagIds,
           createdBy,
         });
-        await UserTagService.setUserTags(user.id, tagIds, createdBy!);
+        await TagService.setTagsForEntity('user', user.id, tagIds, createdBy!);
         logger.debug('User tags set successfully for new user');
 
         // Reload user to include latest tag info
@@ -223,13 +215,13 @@ export class UserController {
 
       let user = await UserService.updateUser(userId, userData);
 
-      // 태그 Settings (tagIds가 제공된 경우에만)
+      // Set tags (only if tagIds is provided)
       if (tagIds !== undefined) {
         logger.debug('Setting user tags:', { userId, tagIds, updatedBy });
-        await UserTagService.setUserTags(userId, tagIds, updatedBy!);
+        await TagService.setTagsForEntity('user', userId, tagIds, updatedBy!);
         logger.debug('User tags set successfully');
 
-        // 태그 업데이트 후 User info를 다시 로드하여 최신 태그 정보 포함
+        // Reload user to get latest tag info after tag update
         user = await UserService.getUserById(userId);
       } else {
         logger.debug('No tagIds provided, skipping tag update');
@@ -378,7 +370,7 @@ export class UserController {
     }
   );
 
-  // Used자 Search (채팅 시스템용)
+  // Search users (for chat system)
   static searchUsers = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const { q: query, limit = 20, orgId } = req.query;
@@ -446,7 +438,7 @@ export class UserController {
 
       const user = await UserService.updateUser(req.user.userId, value);
 
-      // Chat Server에 User info 동기화 (백그라운드에서 실행)
+      // Sync user info to chat server (runs in background)
       try {
         const chatServerService = ChatServerService.getInstance();
         await chatServerService.syncUser({
@@ -461,7 +453,7 @@ export class UserController {
           updatedAt: user.updatedAt?.toISOString(),
         });
       } catch (error) {
-        // Chat Server 동기화 Failed는 로그만 남기고 Used자에게는 Success Response
+        // Log chat server sync failure but still return success to user
         logger.error('Failed to sync user to Chat Server:', error);
       }
 
@@ -473,93 +465,7 @@ export class UserController {
     }
   );
 
-  // 태그 관련 엔드포인트들
-  static getUserTags = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const userId = req.params.id;
-
-      if (!userId) {
-        throw new GatrixError('Invalid user ID', 400);
-      }
-
-      const tags = await UserTagService.getUserTags(userId);
-
-      res.json({
-        success: true,
-        data: tags,
-      });
-    }
-  );
-
-  static setUserTags = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const userId = req.params.id;
-
-      if (!userId) {
-        throw new GatrixError('Invalid user ID', 400);
-      }
-
-      const { error, value } = setUserTagsSchema.validate(req.body);
-      if (error) {
-        throw new GatrixError(error.details[0].message, 400);
-      }
-
-      const { tagIds } = value;
-      const updatedBy = req.user?.userId;
-
-      await UserTagService.setUserTags(userId, tagIds, updatedBy!);
-
-      res.json({
-        success: true,
-        message: 'User tags updated successfully',
-      });
-    }
-  );
-
-  static addUserTag = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const userId = req.params.id;
-
-      if (!userId) {
-        throw new GatrixError('Invalid user ID', 400);
-      }
-
-      const { error, value } = addUserTagSchema.validate(req.body);
-      if (error) {
-        throw new GatrixError(error.details[0].message, 400);
-      }
-
-      const { tagId } = value;
-      const createdBy = req.user?.userId;
-
-      await UserTagService.addUserTag(userId, tagId, createdBy!);
-
-      res.json({
-        success: true,
-        message: 'Tag added to user successfully',
-      });
-    }
-  );
-
-  static removeUserTag = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const userId = req.params.id;
-      const tagId = req.params.tagId;
-
-      if (!userId || !tagId) {
-        throw new GatrixError('Invalid user ID or tag ID', 400);
-      }
-
-      await UserTagService.removeUserTag(userId, tagId);
-
-      res.json({
-        success: true,
-        message: 'Tag removed from user successfully',
-      });
-    }
-  );
-
-  // 관리자가 Force verify user email
+  // Admin force verify user email
   static verifyUserEmail = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.params.id;
@@ -577,7 +483,7 @@ export class UserController {
     }
   );
 
-  // Used자에게 이메일 Resend verification email
+  // Resend verification email to user
   static resendVerificationEmail = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.params.id;

@@ -32,7 +32,7 @@ class ServerAuthController {
         });
       }
 
-      // User info 조회
+      // Fetch user info
       const user = await UserService.getUserById(decoded.userId);
 
       if (!user) {
@@ -42,7 +42,7 @@ class ServerAuthController {
         });
       }
 
-      // Used자가 Active Status인지 Confirm
+      // Check if user has active status
       if (user.status !== 'active') {
         return res.status(401).json({
           success: false,
@@ -81,7 +81,7 @@ class ServerAuthController {
     }
   }
 
-  // Used자 ID로 User info 조회
+  // Get user info by user ID
   static async getUserById(req: ServerAuthRequest, res: Response) {
     try {
       const userId = req.params.id;

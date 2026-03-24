@@ -30,11 +30,11 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
     if (isEnabled !== undefined) filters.isEnabled = isEnabled === 'true';
     if (search) filters.search = search as string;
 
-    // Pagination 처리
+    // Pagination handling
     const limitNum = parseInt(limit as string) || 20;
     let offsetNum = parseInt(offset as string) || 0;
 
-    // page Parameters가 있으면 offset 계산
+    // Calculate offset if page parameter exists
     if (page) {
       const pageNum = parseInt(page as string) || 1;
       offsetNum = (pageNum - 1) * limitNum;
@@ -105,7 +105,7 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
-    // Job Type 존재 여부 Confirm
+    // Check if job type exists
     const jobType = await JobTypeModel.findById(jobTypeId);
     if (!jobType) {
       return sendBadRequest(res, 'Invalid job type', { field: 'jobTypeId' });
@@ -113,7 +113,7 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const environmentId = req.environmentId!;
 
-    // Job 이름 중복 Validation
+    // Validate job name uniqueness
     const existingJob = await JobModel.findByName(name, environmentId);
     if (existingJob) {
       return sendConflict(
@@ -123,7 +123,7 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
       );
     }
 
-    // Used자 ID 가져오기 (Authentication된 사용자)
+    // Get user ID (authenticated user)
     const userId = (req as any).user?.userId;
 
     const jobData: CreateJobData = {
@@ -168,7 +168,7 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const environmentId = req.environmentId!;
 
-    // Job 존재 여부 Confirm
+    // Check if job exists
     const existingJob = await JobModel.findById(jobId, environmentId);
     if (!existingJob) {
       return sendNotFound(res, 'Job not found', ErrorCodes.RESOURCE_NOT_FOUND);
@@ -176,10 +176,10 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const { name, jobTypeId, jobDataMap, memo, isEnabled, tagIds } = req.body;
 
-    // Used자 ID 가져오기 (Authentication된 사용자)
+    // Get user ID (authenticated user)
     const userId = (req as any).user?.userId;
 
-    // Job 이름 중복 Validation (이름이 변경되는 경우에만)
+    // Validate job name uniqueness (only if name is being changed)
     const existingJobByName = await JobModel.findByName(name, environmentId);
     if (existingJobByName && existingJobByName.id !== jobId) {
       return sendConflict(
@@ -224,7 +224,7 @@ export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const environmentId = req.environmentId!;
 
-    // Job 존재 여부 Confirm
+    // Check if job exists
     const existingJob = await JobModel.findById(jobId, environmentId);
     if (!existingJob) {
       return sendNotFound(res, 'Job not found', ErrorCodes.RESOURCE_NOT_FOUND);
@@ -243,7 +243,7 @@ export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-// Job 수동 실행 (임시 구현)
+// Execute job manually (temporary implementation)
 export const executeJob = async (_req: AuthenticatedRequest, res: Response) => {
   return sendErrorResponse(
     res,
@@ -253,7 +253,7 @@ export const executeJob = async (_req: AuthenticatedRequest, res: Response) => {
   );
 };
 
-// Job 실행 이력 조회 (임시 구현)
+// Get job execution history (temporary implementation)
 export const getJobExecutions = async (
   _req: AuthenticatedRequest,
   res: Response
@@ -261,44 +261,3 @@ export const getJobExecutions = async (
   return sendSuccessResponse(res, []);
 };
 
-// Job 태그 Settings
-export const setJobTags = async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { tagIds } = req.body;
-
-    if (!Array.isArray(tagIds)) {
-      return sendBadRequest(res, 'tagIds must be an array', {
-        field: 'tagIds',
-      });
-    }
-
-    await JobModel.setTags(id, tagIds);
-
-    return sendSuccessResponse(res, undefined, 'Tags updated successfully');
-  } catch (error) {
-    return sendInternalError(
-      res,
-      'Failed to update tags',
-      error,
-      ErrorCodes.RESOURCE_UPDATE_FAILED
-    );
-  }
-};
-
-// Job 태그 조회
-export const getJobTags = async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const tags = await JobModel.getTags(id);
-
-    return sendSuccessResponse(res, tags);
-  } catch (error) {
-    return sendInternalError(
-      res,
-      'Failed to get tags',
-      error,
-      ErrorCodes.RESOURCE_FETCH_FAILED
-    );
-  }
-};

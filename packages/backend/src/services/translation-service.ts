@@ -23,7 +23,7 @@ export class TranslationService {
     'https://translate.googleapis.com/translate_a/single';
 
   /**
-   * 무료 구글 Translation API를 Used하여 텍스트 번역
+   * Translate text using free Google Translate API
    */
   static async translateText(
     request: TranslationRequest
@@ -35,7 +35,7 @@ export class TranslationService {
         throw new Error('Translation text is required');
       }
 
-      // Cache 조회 (입력 Based on original text hash)
+      // Cache lookup (hash based on input text)
       const baseText = text.trim();
       const hash = crypto.createHash('sha256').update(baseText).digest('hex');
       const cacheKey = TRANSLATION.BY_TEXT_LANG(hash, targetLanguage);
@@ -57,7 +57,7 @@ export class TranslationService {
         logger.debug('Translation cache get failed', e);
       }
 
-      // Language code mapping (구글 Translation API 형식으로)
+      // Language code mapping (to Google Translate API format)
       const languageMap: Record<string, string> = {
         ko: 'ko',
         en: 'en',
@@ -69,7 +69,7 @@ export class TranslationService {
         throw new Error(`Unsupported target language: ${targetLanguage}`);
       }
 
-      // 먼저 Detect language
+      // Detect source language first
       let detectedLang = sourceLanguage;
       if (sourceLanguage === 'auto') {
         detectedLang = await this.detectLanguage(text);
@@ -78,7 +78,7 @@ export class TranslationService {
         );
       }
 
-      // 소스 언어와 타겟 언어가 같은 경우에만 원본 반환 (정확히 일치하는 경우만)
+      // Return original text only if source and target languages match exactly
       if (detectedLang === targetLang && detectedLang !== 'auto') {
         const result: TranslationResponse = {
           translatedText: text.trim(),
@@ -100,7 +100,7 @@ export class TranslationService {
         return result;
       }
 
-      // 구글 Translation API 호출 (무료 버전)
+      // Call Google Translate API (free version)
       const params = new URLSearchParams({
         client: 'gtx',
         sl: detectedLang,
@@ -124,7 +124,7 @@ export class TranslationService {
         }
       );
 
-      // Response 파싱
+      // Parse response
       if (
         !response.data ||
         !Array.isArray(response.data) ||
@@ -169,7 +169,7 @@ export class TranslationService {
         stack: error.stack,
       });
 
-      // Translation Failed 시 원본 텍스트 반환
+      // Return original text on translation failure
       return {
         translatedText: request.text,
         sourceLanguage: request.sourceLanguage || 'auto',
@@ -179,7 +179,7 @@ export class TranslationService {
   }
 
   /**
-   * 여러 언어로 동시 Translation
+   * Translate to multiple languages simultaneously
    */
   static async translateToMultipleLanguages(
     text: string,
@@ -225,7 +225,7 @@ export class TranslationService {
       const hash = crypto.createHash('sha256').update(base).digest('hex');
       const cacheKey = TRANSLATION.DETECT(hash);
 
-      // Cache 조회
+      // Cache lookup
       try {
         const cached = await redisClient.get(cacheKey);
         if (cached) {
@@ -240,7 +240,7 @@ export class TranslationService {
         sl: 'auto',
         tl: 'en',
         dt: 't',
-        q: base, // 처음 100자만 Used
+        q: base, // Use first 100 characters only
       });
 
       const response = await axios.get(

@@ -1,4 +1,4 @@
-﻿import { Router } from 'express';
+import { Router } from 'express';
 import { authenticate } from '../../middleware/auth';
 import { MessageTemplateController } from '../../controllers/message-template-controller';
 import { auditLog } from '../../middleware/audit-log';
@@ -49,19 +49,6 @@ router.delete(
     }),
   }) as any,
   MessageTemplateController.remove as any
-);
-
-// ?쒓렇 愿???쇱슦??(愿由ъ옄留?
-router.get('/:id/tags', MessageTemplateController.getTags as any);
-router.put(
-  '/:id/tags',
-  auditLog({
-    action: 'message_template_set_tags',
-    resourceType: 'message_template',
-    getResourceId: (req: any) => req.params?.id,
-    getNewValues: (req) => req.body,
-  }) as any,
-  MessageTemplateController.setTags as any
 );
 
 export default router;

@@ -25,7 +25,7 @@ export class ChatServerService {
   private serviceToken: string;
 
   private constructor() {
-    // Settings에서 API 토큰 가져오기
+    // Get API token from settings
     this.apiToken = config.chatServer.apiToken;
     this.serviceToken =
       (config.chatServer as any).serviceToken ||
@@ -36,11 +36,11 @@ export class ChatServerService {
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Token': this.serviceToken, // Backend -> Chat Server 특수 토큰 Used
+        'X-API-Token': this.serviceToken, // Backend -> Chat Server special token
       },
     });
 
-    // Response 인터셉터로 Error handling
+    // Response interceptor for error handling
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
@@ -100,23 +100,23 @@ export class ChatServerService {
    */
   async ensureUserSynced(userData: UserData): Promise<void> {
     try {
-      // 먼저 Used자가 존재하는지 Confirm
+      // First check if user already exists
       const checkResponse = await this.axiosInstance.get(
         `/api/v1/users/check/${userData.id}`
       );
 
       if (checkResponse.data.success && checkResponse.data.data?.exists) {
-        // Used자가 이미 존재하면 동기화 스킵
+        // Skip sync if user already exists
         return;
       }
     } catch (error) {
-      // Confirm Failed하면 동기화 시도
+      // Proceed with sync if check fails
       logger.debug(
         `🔍 Could not check user existence, proceeding with sync...`
       );
     }
 
-    // Used자가 없거나 Confirm Failed한 경우 동기화
+    // Sync if user doesn't exist or check failed
     await this.syncUser(userData);
   }
 
@@ -246,8 +246,8 @@ export class ChatServerService {
    */
   async getUserChannels(userId: string): Promise<any> {
     try {
-      // Chat Server의 /api/v1/channels/my 엔드포인트 Used
-      // Used자 ID를 Headers로 전달
+      // Use Chat Server's /api/v1/channels/my endpoint
+      // Pass user ID via headers
       const response = await this.axiosInstance.get('/api/v1/channels/my', {
         headers: {
           'X-User-ID': userId.toString(),
@@ -258,7 +258,7 @@ export class ChatServerService {
         throw new Error('Failed to get user channels');
       }
 
-      // Chat Server의 Return response structure as-is (data: [], pagination: {...})
+      // Return chat server response structure as-is (data: [], pagination: {...})
       return response.data.data || { data: [], pagination: {} };
     } catch (error) {
       logger.error('Error getting user channels:', error);

@@ -226,18 +226,6 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
           data.tagIds,
           userId
         );
-        // Re-invalidate SDK cache after tags are set
-        const { ENV_SCOPED } = await import('../constants/cache-keys');
-        await pubSubService.invalidateKey(
-          `${ENV_SCOPED.GAME_WORLDS.PUBLIC}:${environmentId}`
-        );
-        await pubSubService.invalidateKey(
-          `${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`
-        );
-        await pubSubService.publishSDKEvent(
-          { type: 'gameworld.updated', data: { id, environmentId } },
-          { environmentId }
-        );
       }
       return result;
     },

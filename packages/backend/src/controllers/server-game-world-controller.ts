@@ -14,7 +14,7 @@ const logger = createLogger('ServerGameWorldController');
 export class ServerGameWorldController {
   /**
    * Get game worlds for a specific environment
-   * GET /api/v1/server/:env/game-worlds
+   * GET /api/v1/server/game-worlds
    * Returns all visible game worlds sorted by displayOrder with tags and all maintenance messages
    */
   static async getGameWorlds(req: EnvironmentRequest, res: Response) {
@@ -147,7 +147,7 @@ export class ServerGameWorldController {
 
   /**
    * Get specific game world by ID
-   * GET /api/v1/server/:env/game-worlds/:id
+   * GET /api/v1/server/game-worlds/:id
    */
   static async getGameWorldById(req: EnvironmentRequest, res: Response) {
     try {
@@ -273,7 +273,7 @@ export class ServerGameWorldController {
 
   /**
    * Get specific game world by worldId
-   * GET /api/v1/server/:env/game-worlds/world/:worldId
+   * GET /api/v1/server/game-worlds/world/:worldId
    */
   static async getGameWorldByWorldId(req: EnvironmentRequest, res: Response) {
     try {

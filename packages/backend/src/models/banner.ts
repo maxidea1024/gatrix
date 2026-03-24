@@ -195,6 +195,7 @@ export class BannerModel {
       // Parse JSON fields and convert shuffle to boolean
       const parsedBanners = banners.map((b: any) => ({
         ...b,
+        bannerId: b.id,
         shuffle: Boolean(b.shuffle),
         sequences:
           typeof b.sequences === 'string'
@@ -239,6 +240,7 @@ export class BannerModel {
 
       return {
         ...banner,
+        bannerId: banner.id,
         shuffle: Boolean(banner.shuffle),
         sequences:
           typeof banner.sequences === 'string'
@@ -279,6 +281,7 @@ export class BannerModel {
       }
       return {
         ...banner,
+        bannerId: banner.id,
         shuffle: Boolean(banner.shuffle),
         sequences:
           typeof banner.sequences === 'string'
@@ -463,6 +466,7 @@ export class BannerModel {
 
       return banners.map((b: any) => ({
         ...b,
+        bannerId: b.id,
         sequences:
           typeof b.sequences === 'string'
             ? JSON.parse(b.sequences)

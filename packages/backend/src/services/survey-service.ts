@@ -2,6 +2,7 @@ import db from '../config/knex';
 import { GatrixError } from '../middleware/error-handler';
 import { ulid } from 'ulid';
 import { pubSubService } from './pub-sub-service';
+import { TagService } from './tag-service';
 
 export interface TriggerCondition {
   type: 'userLevel' | 'joinDays';
@@ -188,7 +189,15 @@ export class SurveyService {
         : null,
     })) as Survey[];
 
-    return { surveys, total, page, limit };
+    // Load tags for each survey
+    const surveysWithTags = await Promise.all(
+      surveys.map(async (survey) => {
+        const tags = await TagService.listTagsForEntity('survey', survey.id);
+        return { ...survey, tags };
+      })
+    );
+
+    return { surveys: surveysWithTags, total, page, limit };
   }
 
   /**
@@ -240,7 +249,9 @@ export class SurveyService {
         : null,
     } as Survey;
 
-    return survey;
+    // Load tags
+    const tags = await TagService.listTagsForEntity('survey', id);
+    return { ...survey, tags } as any;
   }
 
   /**

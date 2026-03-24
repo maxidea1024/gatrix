@@ -27,16 +27,16 @@ export class HttpRequestJob extends BaseJob {
         method: method.toUpperCase(),
         headers,
         timeout,
-        validateStatus: validateStatus || ((status) => status < 500), // 5xx 에러만 Failed로 처리
+        validateStatus: validateStatus || ((status) => status < 500), // Only treat 5xx errors as failures
       };
 
-      // Request 본문 Settings
+      // Set request body
       if (body && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
         if (typeof body === 'string') {
           config.data = body;
         } else {
           config.data = body;
-          // JSON Request인 경우 Content-Type Settings
+          // Set Content-Type for JSON requests
           if (!headers[HEADERS.CONTENT_TYPE] && !headers['content-type']) {
             config.headers = {
               ...config.headers,
@@ -67,7 +67,7 @@ export class HttpRequestJob extends BaseJob {
         url: config.url,
       });
 
-      // HTTP Request 실행
+      // Execute HTTP request
       const response: AxiosResponse = await axios(config);
 
       logger.info(`HTTP request completed`, {
@@ -107,7 +107,7 @@ export class HttpRequestJob extends BaseJob {
           : undefined,
       });
 
-      // Axios 에러인 경우 Response 정보도 포함
+      // Include response info for Axios errors
       if ((error as any).response) {
         return {
           success: false,

@@ -117,6 +117,8 @@ import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
+import TagSelector from '@/components/common/TagSelector';
+import TagChips from '@/components/common/TagChips';
 
 // Coupon Settings page (list and management of coupon definitions)
 const CouponSettingsPage: React.FC = () => {
@@ -512,6 +514,7 @@ const CouponSettingsPage: React.FC = () => {
         .sort()
         .join(','),
       targetUserIdsInverted: !!form.targetUserIdsInverted,
+      tags: (form.tags || []).map((t: any) => t.id).sort(),
     };
 
     const originalData = {
@@ -565,6 +568,7 @@ const CouponSettingsPage: React.FC = () => {
         .sort()
         .join(','),
       targetUserIdsInverted: !!fullEditingData.targetUserIdsInverted,
+      tags: ((fullEditingData as any).tags || []).map((t: any) => t.id).sort(),
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
@@ -648,6 +652,7 @@ const CouponSettingsPage: React.FC = () => {
       targetChannelSubchannels: [],
       targetWorlds: [],
       targetUserIds: '',
+      tags: [],
     });
     setRewardMode('direct');
     setIsDescriptionManuallyEdited(false);
@@ -695,6 +700,7 @@ const CouponSettingsPage: React.FC = () => {
     { id: 'end', labelKey: 'common.end', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
     { id: 'description', labelKey: 'common.description', visible: true },
+    { id: 'tags', labelKey: 'common.tags', visible: true },
   ];
 
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
@@ -1297,6 +1303,7 @@ const CouponSettingsPage: React.FC = () => {
         targetUserIds: ((fullSetting as any).targetUsers || []).join(', '),
         targetUserIdsInverted:
           (fullSetting as any).targetUserIdsInverted || false,
+        tags: (fullSetting as any).tags || [],
       };
 
       console.log('[CouponSettings] handleEdit - final form state', newForm);
@@ -2033,6 +2040,12 @@ const CouponSettingsPage: React.FC = () => {
                                   </Typography>
                                 </TableCell>
                               );
+                            case 'tags':
+                              return (
+                                <TableCell key="tags" sx={{ py: 1, px: 2 }}>
+                                  <TagChips tags={(it as any).tags} maxVisible={6} />
+                                </TableCell>
+                              );
                             default:
                               return null;
                           }
@@ -2210,6 +2223,11 @@ const CouponSettingsPage: React.FC = () => {
                       'coupons.couponSettings.form.descriptionHelp'
                     )}
                     fullWidth
+                  />
+                  {/* Tags */}
+                  <TagSelector
+                    value={form.tags || []}
+                    onChange={(tags) => setForm((s: any) => ({ ...s, tags }))}
                   />
                 </Stack>
               </Collapse>

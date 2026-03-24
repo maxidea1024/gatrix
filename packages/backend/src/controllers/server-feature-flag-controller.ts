@@ -63,7 +63,7 @@ interface EvaluationSegment {
 export default class ServerFeatureFlagController {
   /**
    * Get all feature flags for runtime evaluation
-   * GET /api/v1/server/:env/features
+   * GET /api/v1/server/features
    * Returns only fields required for runtime evaluation
    * Also returns referenced segments for efficiency (single API call)
    */
@@ -243,7 +243,7 @@ export default class ServerFeatureFlagController {
 
   /**
    * Get a single feature flag for runtime evaluation
-   * GET /api/v1/server/:env/features/:flagName
+   * GET /api/v1/server/features/:flagName
    */
   static async getFeatureFlag(req: SDKRequest, res: Response): Promise<void> {
     try {
@@ -415,7 +415,7 @@ export default class ServerFeatureFlagController {
 
   /**
    * Receive aggregated metrics from SDK
-   * POST /api/v1/server/:env/features/metrics
+   * POST /api/v1/server/features/metrics
    */
   static async receiveMetrics(req: SDKRequest, res: Response): Promise<void> {
     try {
@@ -460,7 +460,7 @@ export default class ServerFeatureFlagController {
 
   /**
    * Report unknown flag access from SDK
-   * POST /api/v1/server/:env/features/unknown
+   * POST /api/v1/server/features/unknown
    */
   static async reportUnknownFlag(
     req: SDKRequest,

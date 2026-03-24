@@ -10,6 +10,7 @@ import { ClientStatus } from '../models/client-version';
 import { ClientVersionModel } from '../models/client-version';
 import { GatrixError } from '../middleware/error-handler';
 import { UnifiedChangeGateway } from '../services/unified-change-gateway';
+import { TagService } from '../services/tag-service';
 
 import { createLogger } from '../config/logger';
 const logger = createLogger('ClientVersionController');
@@ -118,14 +119,7 @@ const createClientVersionSchema = Joi.object({
   tags: Joi.array()
     .items(
       Joi.object({
-        id: Joi.string().required(),
-        name: Joi.string().optional(),
-        color: Joi.string().optional(),
-        description: Joi.string().optional().allow(null),
-        createdBy: Joi.string().optional(),
-        updatedBy: Joi.string().optional(),
-        createdAt: Joi.date().optional(),
-        updatedAt: Joi.date().optional(),
+        id: Joi.alternatives().try(Joi.string(), Joi.number()).required(),
       }).unknown(true)
     )
     .optional()
@@ -197,6 +191,13 @@ const updateClientVersionSchema = Joi.object({
     )
     .optional()
     .default([]),
+  tags: Joi.array()
+    .items(
+      Joi.object({
+        id: Joi.alternatives().try(Joi.string(), Joi.number()).required(),
+      }).unknown(true)
+    )
+    .optional(),
 });
 
 const getClientVersionsQuerySchema = Joi.object({
@@ -713,13 +714,16 @@ export class ClientVersionController {
       });
     }
 
+    // Extract tags from validated data for separate processing
+    const { tags, ...restValue } = value;
+
     const updateData = {
-      ...value,
+      ...restValue,
       // Convert ISO 8601 datetime to MySQL DATETIME format
       maintenanceStartDate: convertISOToMySQLDateTime(
-        value.maintenanceStartDate
+        restValue.maintenanceStartDate
       ),
-      maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
+      maintenanceEndDate: convertISOToMySQLDateTime(restValue.maintenanceEndDate),
       createdBy: userId, // Required for creating new maintenanceLocales
       updatedBy: userId,
     };
@@ -755,9 +759,20 @@ export class ClientVersionController {
         });
       }
 
+      // Handle tags if provided in the update payload
+      if (tags !== undefined) {
+        const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+        await TagService.setTagsForEntity('client_version', id, tagIds, userId);
+      }
+
+      // Re-fetch to include updated tags
+      const updatedClientVersion = tags !== undefined
+        ? await ClientVersionService.getClientVersionById(id, environmentId)
+        : clientVersion;
+
       res.json({
         success: true,
-        data: clientVersion,
+        data: updatedClientVersion || clientVersion,
         message: 'Client version updated successfully',
       });
     } else {
@@ -911,53 +926,6 @@ export class ClientVersionController {
       success: true,
       data: platforms,
     });
-  }
-
-  // Set client version tags
-  static async setTags(req: AuthenticatedRequest, res: Response) {
-    try {
-      const { id } = req.params;
-      const { tagIds } = req.body;
-
-      if (!Array.isArray(tagIds)) {
-        return res.status(400).json({
-          success: false,
-          message: 'tagIds must be an array',
-        });
-      }
-
-      await ClientVersionModel.setTags(id, tagIds);
-
-      res.json({
-        success: true,
-        message: 'Tags updated successfully',
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Failed to update tags',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
-  }
-
-  // Get client version tags
-  static async getTags(req: AuthenticatedRequest, res: Response) {
-    try {
-      const { id } = req.params;
-      const tags = await ClientVersionModel.getTags(id);
-
-      res.json({
-        success: true,
-        data: tags,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Failed to get tags',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
   }
 
   // Export client versions (CSV)

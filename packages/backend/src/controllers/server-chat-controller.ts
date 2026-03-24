@@ -7,12 +7,12 @@ export interface ServerChatRequest extends Request {
   apiToken?: any;
 }
 
-// 메모리에 채팅 서버 정보 Save (실제로는 DB Used)
+// Store chat server info in memory (use DB in production)
 const chatServers = new Map<string, any>();
 const chatStats = new Map<string, any>();
 
 class ServerChatController {
-  // 채팅 서버 Register
+  // Register chat server
   static async registerServer(req: ServerChatRequest, res: Response) {
     try {
       const { serverId, host, port, maxConnections, capabilities } = req.body;
@@ -25,7 +25,7 @@ class ServerChatController {
         });
       }
 
-      // 서버 정보 Save
+      // Save server info
       const serverInfo = {
         serverId,
         host,
@@ -65,7 +65,7 @@ class ServerChatController {
     }
   }
 
-  // 채팅 서버 Register Unregister
+  // Unregister chat server
   static async unregisterServer(req: ServerChatRequest, res: Response) {
     try {
       const serverId = req.body.serverId || req.params.serverId;

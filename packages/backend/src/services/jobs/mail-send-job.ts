@@ -13,7 +13,7 @@ export class MailSendJob extends BaseJob {
       const { to, cc, bcc, subject, body, attachments } =
         this.context.jobDataMap;
 
-      // 메일 전송 Settings (Get from environment variables)
+      // Mail sending settings (get from environment variables)
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'localhost',
         port: parseInt(process.env.SMTP_PORT || '587'),
@@ -24,7 +24,7 @@ export class MailSendJob extends BaseJob {
         },
       });
 
-      // 메일 옵션 구성
+      // Build mail options
       const mailOptions: any = {
         from: process.env.SMTP_FROM || process.env.SMTP_USER,
         to: Array.isArray(to) ? to.join(', ') : to,
@@ -49,7 +49,7 @@ export class MailSendJob extends BaseJob {
         }));
       }
 
-      // 메일 전송
+      // Send mail
       const info = await transporter.sendMail(mailOptions);
 
       logger.info(`Mail sent successfully`, {

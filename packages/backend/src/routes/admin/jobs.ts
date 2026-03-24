@@ -9,8 +9,6 @@ import {
   deleteJob,
   executeJob,
   getJobExecutions,
-  setJobTags,
-  getJobTags,
 } from '../../controllers/job-controller';
 import { getJobTypes, getJobType } from '../../controllers/job-type-controller';
 import {
@@ -21,7 +19,7 @@ import {
 
 const router = express.Router();
 
-// 모든 Route에 Authentication 및 Admin permission required
+// All routes require authentication and admin privileges
 router.use(authenticate as any);
 
 // Job Types Route
@@ -36,7 +34,7 @@ router.post(
   auditLog({
     action: 'job_create',
     resourceType: 'job',
-    // Job Create 시에는 ID가 아직 없으므로 getResourceId 생략
+    // Job ID is not yet available during creation, so getResourceId is omitted
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
@@ -79,21 +77,7 @@ router.post(
 );
 router.get('/:id/executions', getJobExecutions as any);
 
-// 서버별 Route는 제거됨
-// Job 태그 관리 Route
-router.get('/:id/tags', getJobTags as any);
-router.put(
-  '/:id/tags',
-  auditLog({
-    action: 'job_set_tags',
-    resourceType: 'job',
-    getResourceId: (req: any) => req.params?.id,
-    getNewValues: (req) => req.body,
-  }) as any,
-  setJobTags as any
-);
-
-// Job Executions Route (구체적인 라우트를 먼저 정의)
+// Job Executions Route (define specific routes first)
 router.get('/job-executions/statistics', getJobExecutionStatistics as any);
 router.get('/job-executions', getAllJobExecutions as any);
 router.get('/job-executions/:id', getJobExecution as any);

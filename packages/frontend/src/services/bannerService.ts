@@ -123,6 +123,7 @@ export interface Banner {
   updatedByEmail?: string;
   createdAt: string;
   updatedAt: string;
+  tags?: any[];
 }
 
 export interface CreateBannerInput {
@@ -134,6 +135,7 @@ export interface CreateBannerInput {
   playbackSpeed?: number;
   shuffle?: boolean;
   sequences?: Sequence[];
+  tags?: any[];
 }
 
 export interface UpdateBannerInput {
@@ -145,6 +147,7 @@ export interface UpdateBannerInput {
   playbackSpeed?: number;
   shuffle?: boolean;
   sequences?: Sequence[];
+  tags?: any[];
 }
 
 export interface GetBannersParams {

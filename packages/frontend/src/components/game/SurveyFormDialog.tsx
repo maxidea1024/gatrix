@@ -49,6 +49,7 @@ import {
 } from '../../utils/changeRequestToast';
 import { useEntityLock } from '../../hooks/useEntityLock';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import TagSelector from '../common/TagSelector';
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -98,6 +99,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   const [rewardMailContent, setRewardMailContent] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<any[]>([]);
 
   // Targeting state
   const [targetPlatforms, setTargetPlatforms] = useState<string[]>([]);
@@ -184,6 +186,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         Array.isArray(survey.targetWorlds) ? survey.targetWorlds : []
       );
       setTargetWorldsInverted(survey.targetWorldsInverted || false);
+      setSelectedTags(survey.tags || []);
     } else {
       // Reset form
       setPlatformSurveyId('');
@@ -202,6 +205,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setTargetChannelSubchannelsInverted(false);
       setTargetWorlds([]);
       setTargetWorldsInverted(false);
+      setSelectedTags([]);
     }
   }, [survey, open]);
 
@@ -251,6 +255,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       targetSubchannelsInverted: targetChannelSubchannelsInverted,
       targetWorlds: targetWorlds.length > 0 ? [...targetWorlds].sort() : null,
       targetWorldsInverted: targetWorldsInverted,
+      tags: selectedTags.map((t: any) => t.id).sort(),
     };
 
     const originalData = {
@@ -289,6 +294,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           ? [...survey.targetWorlds].sort()
           : null,
       targetWorldsInverted: survey.targetWorldsInverted || false,
+      tags: (survey.tags || []).map((t: any) => t.id).sort(),
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
@@ -310,6 +316,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
     targetChannelSubchannelsInverted,
     targetWorlds,
     targetWorldsInverted,
+    selectedTags,
   ]);
 
   // Get available condition types (exclude already used types)
@@ -478,6 +485,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         targetSubchannelsInverted: targetChannelSubchannelsInverted,
         targetWorlds: targetWorlds.length > 0 ? targetWorlds : null,
         targetWorldsInverted: targetWorldsInverted,
+        tags: selectedTags,
       };
 
       if (survey) {
@@ -622,6 +630,9 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               </Stack>
             </Collapse>
           </Paper>
+
+          {/* Tags */}
+          <TagSelector value={selectedTags} onChange={setSelectedTags} />
 
           {/* Targeting */}
           <TargetSettingsGroup

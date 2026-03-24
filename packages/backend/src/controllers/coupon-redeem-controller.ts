@@ -18,7 +18,7 @@ const redeemSchema = Joi.object({
 export class CouponRedeemController {
   /**
    * Redeem a coupon code
-   * POST /api/v1/server/:env/coupons/:code/redeem
+   * POST /api/v1/server/coupons/:code/redeem
    * Requires: X-API-Token header (server SDK token)
    */
   static redeem = asyncHandler(

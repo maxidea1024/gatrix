@@ -20,6 +20,7 @@ export interface ServiceNotice {
   description?: string | null;
   createdAt: string;
   updatedAt: string;
+  tags?: any[];
 }
 
 export interface CreateServiceNoticeData {
@@ -35,6 +36,7 @@ export interface CreateServiceNoticeData {
   title: string;
   content: string;
   description?: string | null;
+  tags?: any[];
 }
 
 export interface UpdateServiceNoticeData extends Partial<CreateServiceNoticeData> {}

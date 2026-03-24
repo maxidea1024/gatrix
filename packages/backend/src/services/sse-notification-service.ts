@@ -151,7 +151,7 @@ export class SSENotificationService extends EventEmitter {
     }
 
     try {
-      // SSE 표준 형식: data: {JSON}\n\n
+      // SSE standard format: data: {JSON}\n\n
       const eventData = `data: ${JSON.stringify({
         type: event.type,
         data: event.data,

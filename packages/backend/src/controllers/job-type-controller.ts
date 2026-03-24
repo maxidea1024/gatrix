@@ -23,7 +23,7 @@ export const getJobTypes = async (req: Request, res: Response) => {
   } catch (error) {
     logger.error('Error getting job types:', error);
 
-    // 오류 발생 시 하드코딩된 데이터 반환
+    // Return hardcoded data on error
     const fallbackJobTypes = [
       {
         id: 1,

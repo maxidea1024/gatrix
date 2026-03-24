@@ -289,7 +289,7 @@ export class AuthService {
         throw new GatrixError('User not found', 404);
       }
 
-      // OAuth Used자들은 비밀번호 변경 불가
+      // OAuth users cannot change password
       if (user.authType !== 'local') {
         throw new GatrixError(
           'Password change is not available for OAuth users',
@@ -307,7 +307,7 @@ export class AuthService {
           throw new GatrixError('Current password is incorrect', 400);
         }
       } else {
-        // local Used자인데 passwordHash가 없는 경우 (데이터 불일치)
+        // Local user missing passwordHash (data inconsistency)
         throw new GatrixError('Password not set for this account', 400);
       }
 
@@ -337,12 +337,12 @@ export class AuthService {
         return;
       }
 
-      // 1. 보안 리셋 토큰 Create
+      // 1. Create secure reset token
       const crypto = require('crypto');
       const resetToken = crypto.randomBytes(32).toString('hex');
-      const expiresAt = new Date(Date.now() + 3600000); // 1시간 후 Expired
+      const expiresAt = new Date(Date.now() + 3600000); // Expires in 1 hour
 
-      // 2. 데이터베이스에 Save token
+      // 2. Save token to database
       await db('g_password_reset_tokens').insert({
         userId: user.id,
         token: resetToken,
@@ -350,10 +350,10 @@ export class AuthService {
         createdAt: new Date(),
       });
 
-      // 3. 이메일 발송
+      // 3. Send email
       const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
 
-      // QueueService를 통해 이메일 발송 (비동기)
+      // Send email asynchronously via QueueService
       const QueueService = require('./queue-service').default;
       await QueueService.addEmailJob({
         to: user.email,

@@ -12,7 +12,7 @@ import { createLogger } from '../config/logger';
 const logger = createLogger('PublicInvitationController');
 
 export class PublicInvitationController {
-  // 초대 Verify token (Public API)
+  // Verify invitation token (Public API)
   static validateInvitation = asyncHandler(
     async (req: Request, res: Response) => {
       const { token } = req.params;
@@ -25,7 +25,7 @@ export class PublicInvitationController {
       }
 
       try {
-        // 초대 정보 조회
+        // Fetch invitation info
         const invitation = await db('g_invitations')
           .select([
             'id',
@@ -59,7 +59,7 @@ export class PublicInvitationController {
           });
         }
 
-        // 이미 Used된 초대인지 Confirm
+        // Check if invitation is already used
         if (invitation.usedAt) {
           return res.status(400).json({
             success: false,
@@ -102,10 +102,10 @@ export class PublicInvitationController {
     }
   );
 
-  // 초대 수락 및 Used자 Register (Public API)
+  // Accept invitation and register user (Public API)
   static acceptInvitation = asyncHandler(
     async (req: Request, res: Response) => {
-      // 입력 Validation
+      // Validate input
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -126,7 +126,7 @@ export class PublicInvitationController {
       }
 
       try {
-        // 초대 정보 조회 및 Validation
+        // Fetch and validate invitation info
         const invitation = await db('g_invitations')
           .select([
             'id',
@@ -161,7 +161,7 @@ export class PublicInvitationController {
           });
         }
 
-        // 이미 Used된 초대인지 Confirm
+        // Check if invitation is already used
         if (invitation.usedAt) {
           return res.status(400).json({
             success: false,
@@ -169,7 +169,7 @@ export class PublicInvitationController {
           });
         }
 
-        // 이메일이 초대에 지정된 경우 일치하는지 Confirm
+        // Check if email matches the one specified in the invitation
         if (invitation.email && invitation.email !== email) {
           return res.status(400).json({
             success: false,
@@ -177,7 +177,7 @@ export class PublicInvitationController {
           });
         }
 
-        // 이미 Register된 Used자인지 Confirm
+        // Check if user is already registered
         const existingUser = await UserModel.findByEmailWithoutPassword(email);
         if (existingUser) {
           return res.status(409).json({
@@ -186,7 +186,7 @@ export class PublicInvitationController {
           });
         }
 
-        // Used자명 중복 Confirm
+        // Check for duplicate username
         const existingUsername = await db('g_users')
           .select('id')
           .where('name', username)
@@ -198,7 +198,7 @@ export class PublicInvitationController {
           });
         }
 
-        // 비밀번호 해시화
+        // Hash password
         const hashedPassword = await bcrypt.hash(password, 12);
 
         // Transaction: create user, mark invitation used, apply auto-join
@@ -212,8 +212,8 @@ export class PublicInvitationController {
             password: hashedPassword,
             fullName: fullName || username,
             role: invitation.role || 'user',
-            status: 'active', // 초대를 통한 가입은 바로 Active화
-            emailVerified: true, // 초대를 통한 가입은 이메일 Authentication 완료로 처리
+            status: 'active', // Invitation-based registration is immediately active
+            emailVerified: true, // Invitation-based registration skips email verification
             createdAt: now,
             updatedAt: now,
           });
@@ -254,7 +254,7 @@ export class PublicInvitationController {
   );
 }
 
-// 초대 수락 Validation 규칙
+// Invitation acceptance validation rules
 export const acceptInvitationValidation = [
   body('username')
     .notEmpty()

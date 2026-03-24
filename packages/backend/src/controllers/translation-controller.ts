@@ -8,7 +8,7 @@ import { sleep } from '../utils/async-utils';
 // Ensure a minimum response time for UI update timing
 const MIN_RESPONSE_MS = 2_000;
 
-// 단일 Translation Request 스키마
+// Single translation request schema
 const translateSchema = Joi.object({
   text: Joi.string().required().max(5000).messages({
     'string.empty': 'Translation text is required',
@@ -20,7 +20,7 @@ const translateSchema = Joi.object({
   sourceLanguage: Joi.string().optional().default('auto'),
 });
 
-// 다중 Translation Request 스키마
+// Batch translation request schema
 const translateMultipleSchema = Joi.object({
   text: Joi.string().required().max(5000).messages({
     'string.empty': 'Translation text is required',
@@ -38,7 +38,7 @@ const translateMultipleSchema = Joi.object({
   sourceLanguage: Joi.string().optional().default('auto'),
 });
 
-// Detect language Request 스키마
+// Language detection request schema
 const detectLanguageSchema = Joi.object({
   text: Joi.string().required().max(1000).messages({
     'string.empty': 'Text is required for language detection',

@@ -11,6 +11,7 @@ import { createLogger } from '../config/logger';
 
 const logger = createLogger('ServiceNoticeService');
 import { SERVER_SDK_ETAG } from '../constants/cache-keys';
+import { TagService } from './tag-service';
 
 export interface ServiceNotice {
   id: string;
@@ -279,7 +280,15 @@ class ServiceNoticeService {
       ]);
     });
 
-    return { notices, total };
+    // Load tags for each notice
+    const noticesWithTags = await Promise.all(
+      notices.map(async (notice) => {
+        const tags = await TagService.listTagsForEntity('service_notice', notice.id);
+        return { ...notice, tags };
+      })
+    );
+
+    return { notices: noticesWithTags, total };
   }
 
   /**
@@ -326,6 +335,19 @@ class ServiceNoticeService {
       'createdAt',
       'updatedAt',
     ]);
+  }
+
+  /**
+   * Get service notice by ID with tags
+   */
+  async getServiceNoticeByIdWithTags(
+    id: string,
+    environmentId: string
+  ): Promise<ServiceNotice | null> {
+    const notice = await this.getServiceNoticeById(id, environmentId);
+    if (!notice) return null;
+    const tags = await TagService.listTagsForEntity('service_notice', id);
+    return { ...notice, tags } as any;
   }
 
   /**

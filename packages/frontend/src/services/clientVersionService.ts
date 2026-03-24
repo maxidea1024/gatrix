@@ -567,28 +567,6 @@ export class ClientVersionService {
   }
 
   /**
-   * Get client version tags
-   */
-  static async getTags(projectApiPath: string, id: number): Promise<any[]> {
-    const response = await apiService.get<any>(
-      `${this.basePath(projectApiPath)}/${id}/tags`
-    );
-    return response?.data || [];
-  }
-
-  /**
-   * Set client version tag
-   */
-  static async setTags(
-    projectApiPath: string,
-    id: number,
-    tagIds: number[]
-  ): Promise<void> {
-    await apiService.put(`${this.basePath(projectApiPath)}/${id}/tags`, {
-      tagIds,
-    });
-  }
-  /**
    * Check if a game server address is reachable by directly calling its /health endpoint
    */
   static async checkAddressHealth(

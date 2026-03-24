@@ -14,9 +14,9 @@ const logger = createLogger('IpWhitelistService');
 import { pubSubService } from './pub-sub-service';
 import { SERVER_SDK_ETAG } from '../constants/cache-keys';
 
-// CIDR 매칭 함수
+// CIDR matching function
 function ipMatchesCIDR(ip: string, cidr: string): boolean {
-  // 단순 IP 주소인 경우 (CIDR 표기가 아닌 경우)
+  // Simple IP address (not CIDR notation)
   if (!cidr.includes('/')) {
     return ip === cidr;
   }
@@ -25,7 +25,7 @@ function ipMatchesCIDR(ip: string, cidr: string): boolean {
     const [network, prefixLength] = cidr.split('/');
     const prefix = parseInt(prefixLength, 10);
 
-    // IPv4 주소를 32비트 Convert to integer
+    // Convert IPv4 address to 32-bit integer
     const ipToInt = (ipAddr: string): number => {
       return (
         ipAddr
@@ -448,7 +448,7 @@ export class IpWhitelistService {
           return true;
         }
 
-        // CIDR 매칭 로직 구현
+        // CIDR matching logic
         if (ipMatchesCIDR(ipAddress, entry.ipAddress)) {
           return true;
         }

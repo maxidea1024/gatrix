@@ -136,7 +136,7 @@ export class GameWorldModel {
       return null;
     }
 
-    // 점검 메시지 Locale 정보 로드
+    // Load maintenance message locale info
     const maintenanceLocales = await conn('g_game_world_maintenance_locales')
       .where('gameWorldId', id)
       .select('lang', 'message');
@@ -237,7 +237,7 @@ export class GameWorldModel {
 
       const worlds = await query.orderBy('gw.displayOrder', 'ASC');
 
-      // 각 게임월드에 대해 maintenanceLocales 추가
+      // Add maintenanceLocales to each game world
       const worldsWithLocales = await Promise.all(
         worlds.map(async (world: any) => {
           const maintenanceLocales = await db(
@@ -290,7 +290,7 @@ export class GameWorldModel {
       }
 
       return await db.transaction(async (trx) => {
-        // maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
+        // Remove maintenanceLocales field as it is managed in a separate table
         const { maintenanceLocales, ...gameWorldData } = worldData;
 
         const insertData = {
@@ -313,7 +313,7 @@ export class GameWorldModel {
           createdBy: gameWorldData.createdBy,
         };
 
-        // 날짜 필드들을 MySQL DATETIME 형식으로 변환
+        // Convert date fields to MySQL DATETIME format
         const convertedData = convertDateFieldsForMySQL(insertData, [
           'createdAt',
           'updatedAt',
@@ -325,7 +325,7 @@ export class GameWorldModel {
         convertedData.id = newId;
         await trx('g_game_worlds').insert(convertedData);
 
-        // 점검 메시지 Locale 처리
+        // Process maintenance message locales
         if (maintenanceLocales && maintenanceLocales.length > 0) {
           const localeInserts = maintenanceLocales.map((locale: any) => ({
             gameWorldId: newId,
@@ -361,14 +361,14 @@ export class GameWorldModel {
   ): Promise<GameWorld | null> {
     try {
       return await db.transaction(async (trx) => {
-        // maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
+        // Remove maintenanceLocales field as it is managed in a separate table
         const { maintenanceLocales, ...gameWorldUpdateData } = worldData;
 
         const updateData: any = {};
 
         Object.entries(gameWorldUpdateData).forEach(([key, value]) => {
           if (value !== undefined) {
-            // customPayload, infraSettings는 JSON 문자열로 변환
+            // Convert customPayload, infraSettings to JSON string
             if (key === 'customPayload' || key === 'infraSettings') {
               updateData[key] = value === null ? null : JSON.stringify(value);
             } else {
@@ -377,7 +377,7 @@ export class GameWorldModel {
           }
         });
 
-        // 날짜 필드들을 MySQL DATETIME 형식으로 변환
+        // Convert date fields to MySQL DATETIME format
         const convertedUpdateData = convertDateFieldsForMySQL(updateData, [
           'createdAt',
           'updatedAt',
@@ -394,14 +394,14 @@ export class GameWorldModel {
             .update(convertedUpdateData);
         }
 
-        // 점검 메시지 Locale 처리
+        // Process maintenance message locales
         if (maintenanceLocales !== undefined) {
           // Existing Locale Delete
           await trx('g_game_world_maintenance_locales')
             .where('gameWorldId', id)
             .del();
 
-          // 새 Locale 추가
+          // Add new locales
           if (maintenanceLocales.length > 0) {
             const localeInserts = maintenanceLocales.map((locale: any) => ({
               gameWorldId: id,

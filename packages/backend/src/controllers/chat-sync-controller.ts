@@ -25,7 +25,7 @@ export class ChatSyncController {
         });
       }
 
-      // User info 조회
+      // Fetch user info
       const user = await UserModel.findById(userId);
       if (!user) {
         return res.status(404).json({
@@ -34,11 +34,11 @@ export class ChatSyncController {
         });
       }
 
-      // Chat Server에 User info 동기화
+      // Sync user info to chat server
       const chatServerService = ChatServerService.getInstance();
       await chatServerService.syncUser({
         id: user.id,
-        username: user.email, // Backend User Model에는 username이 None
+        username: user.email, // Backend User Model does not have username field
         name: user.name || user.email,
         email: user.email,
         avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
@@ -82,7 +82,7 @@ export class ChatSyncController {
         });
       }
 
-      // User info 조회
+      // Fetch user info
       const user = await UserModel.findById(targetUserId);
       if (!user) {
         return res.status(404).json({
@@ -91,7 +91,7 @@ export class ChatSyncController {
         });
       }
 
-      // Chat Server에 User info 동기화
+      // Sync user info to chat server
       const chatServerService = ChatServerService.getInstance();
       await chatServerService.syncUser({
         id: user.id,
@@ -99,7 +99,7 @@ export class ChatSyncController {
         name: user.name || user.email,
         email: user.email,
         avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
-        status: 'offline', // 관리자가 동기화하는 경우 Default values
+        status: 'offline', // Default when admin triggers sync
         lastSeenAt: new Date().toISOString(),
         createdAt: user.createdAt?.toISOString(),
         updatedAt: user.updatedAt?.toISOString(),
@@ -135,7 +135,7 @@ export class ChatSyncController {
    */
   static async syncAllUsers(req: AuthenticatedRequest, res: Response) {
     try {
-      // 모든 Active Used자 조회
+      // Fetch all active users
       const result = await UserModel.findAll(1, 1000, { status: 'active' });
       const users = result.users;
 
@@ -149,7 +149,7 @@ export class ChatSyncController {
         });
       }
 
-      // Used자 데이터 변환
+      // Transform user data
       const userData = users.map((user) => ({
         id: user.id,
         username: user.email,
@@ -162,7 +162,7 @@ export class ChatSyncController {
         updatedAt: user.updatedAt?.toISOString(),
       }));
 
-      // 프록시를 통해 bulk sync Request
+      // Send bulk sync request via proxy
       const chatServerService = ChatServerService.getInstance();
       await chatServerService.syncUsers(userData);
 
@@ -226,7 +226,7 @@ export class ChatSyncController {
         });
       }
 
-      // User info 조회
+      // Fetch user info
       const user = await UserModel.findById(userId);
       if (!user) {
         return res.status(404).json({
@@ -235,16 +235,16 @@ export class ChatSyncController {
         });
       }
 
-      // 먼저 Used자를 Chat Server에 동기화
+      // First sync user to chat server
       try {
         const chatServerService = ChatServerService.getInstance();
         await chatServerService.syncUser({
           id: user.id,
-          username: user.email, // email을 username으로 Used
+          username: user.email, // Use email as username
           name: user.name,
           email: user.email,
           avatarUrl: user.avatarUrl || undefined,
-          status: 'online', // Default values으로 online Settings
+          status: 'online', // Default to online
         });
       } catch (syncError) {
         logger.warn(
@@ -253,16 +253,16 @@ export class ChatSyncController {
         );
       }
 
-      // Chat Server용 JWT 토큰 Create
+      // Create JWT token for chat server
       const jwt = require('jsonwebtoken');
       const chatToken = jwt.sign(
         {
           userId: user.id,
-          username: user.email, // email을 username으로 Used
+          username: user.email, // Use email as username
           name: user.name,
           email: user.email,
           iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24시간
+          exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
         },
         process.env.JWT_SECRET || 'your-secret-key'
       );
@@ -273,7 +273,7 @@ export class ChatSyncController {
           token: chatToken,
           user: {
             id: user.id,
-            username: user.email, // email을 username으로 Used
+            username: user.email, // Use email as username
             name: user.name,
             email: user.email,
           },

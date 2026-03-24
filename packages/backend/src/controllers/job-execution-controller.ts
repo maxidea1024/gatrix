@@ -4,7 +4,7 @@ import { JobExecutionModel } from '../models/job-execution';
 import { createLogger } from '../config/logger';
 const logger = createLogger('jobExecutionController');
 
-// Job 실행 이력 Get list
+// Get job execution history list
 export const getJobExecutions = async (req: Request, res: Response) => {
   try {
     const {
@@ -42,7 +42,7 @@ export const getJobExecutions = async (req: Request, res: Response) => {
   }
 };
 
-// Job 실행 이력 Get details
+// Get job execution details
 export const getJobExecution = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -69,7 +69,7 @@ export const getJobExecution = async (req: Request, res: Response) => {
   }
 };
 
-// Job 실행 통계 조회
+// Get job execution statistics
 export const getJobExecutionStatistics = async (
   req: Request,
   res: Response

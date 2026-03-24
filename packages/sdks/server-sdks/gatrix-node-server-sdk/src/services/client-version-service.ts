@@ -10,7 +10,6 @@ import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { ClientVersion, ClientVersionListResponse } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
-import { validateAll } from '../utils/validation';
 
 export class ClientVersionService extends BaseEnvironmentService<
   ClientVersion,
@@ -42,6 +41,26 @@ export class ClientVersionService extends BaseEnvironmentService<
 
   protected getItemId(item: ClientVersion): string {
     return item.id;
+  }
+
+  // ==================== Override for ETag Invalidation ====================
+
+  /**
+   * Refresh cached client versions for a specific environment.
+   * Invalidates ApiClient ETag cache first so the SDK does NOT send
+   * a stale If-None-Match header that would result in a 304 with old data.
+   */
+  async refreshByEnvironment(
+    _suppressWarnings?: boolean,
+    environmentId?: string
+  ): Promise<ClientVersion[]> {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    this.logger.info('Refreshing client versions cache', {
+      environmentId: resolvedEnv,
+    });
+    // Invalidate ETag cache to force fresh data fetch from the correct env API client
+    this.getApiClient(resolvedEnv).invalidateEtagCache(this.getEndpoint());
+    return await this.listByEnvironment(resolvedEnv);
   }
 
   /**

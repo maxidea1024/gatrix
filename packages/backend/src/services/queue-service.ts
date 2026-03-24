@@ -530,10 +530,10 @@ export class QueueService {
     logger.info('Processing email job:', { jobId: job.id, to: payload.to });
 
     try {
-      // 이메일 발송 로직 구현
+      // Implement email sending logic
       const nodemailer = require('nodemailer');
 
-      // 개발 환경에서는 Ethereal Email Used
+      // Use Ethereal Email in development environment
       const transporter = nodemailer.createTransporter({
         host: process.env.SMTP_HOST || 'smtp.ethereal.email',
         port: parseInt(process.env.SMTP_PORT || '587'),

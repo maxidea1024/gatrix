@@ -4,6 +4,7 @@ import {
   MessageTemplateModel,
   MessageTemplate,
 } from '../models/message-template';
+import { TagService } from '../services/tag-service';
 
 export class MessageTemplateController {
   static async list(
@@ -48,7 +49,7 @@ export class MessageTemplateController {
         | 'include_all'
         | undefined;
 
-      // tags Parameters 처리 (배열로 변환)
+      // Process tags parameter (convert to array)
       let tagIds: string[] | undefined;
       if (tags) {
         tagIds = Array.isArray(tags) ? tags : [tags];
@@ -120,14 +121,27 @@ export class MessageTemplateController {
         });
       }
 
+      const { tags, ...templateData } = body as any;
       const created = await MessageTemplateModel.create(
         {
-          ...body,
+          ...templateData,
           created_by: (req as any)?.user?.userId,
           updated_by: (req as any)?.user?.userId,
         },
         environmentId
       );
+
+      // Handle tags if provided
+      if (tags && Array.isArray(tags) && created?.id) {
+        const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+        await TagService.setTagsForEntity(
+          'message_template',
+          created.id.toString(),
+          tagIds,
+          (req as any)?.user?.userId
+        );
+      }
+
       res.status(201).json({ success: true, data: created });
     } catch (e) {
       next(e);
@@ -158,15 +172,30 @@ export class MessageTemplateController {
         });
       }
 
+      const { tags, ...templateData } = body as any;
       const updated = await MessageTemplateModel.update(
         id,
         {
-          ...body,
+          ...templateData,
           created_by: (req as any)?.user?.userId,
           updated_by: (req as any)?.user?.userId,
         },
         environmentId
       );
+
+      // Handle tags if provided
+      if (tags !== undefined) {
+        const tagIds = Array.isArray(tags)
+          ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
+          : [];
+        await TagService.setTagsForEntity(
+          'message_template',
+          id,
+          tagIds,
+          (req as any)?.user?.userId
+        );
+      }
+
       res.json({ success: true, data: updated });
     } catch (e) {
       next(e);
@@ -209,53 +238,6 @@ export class MessageTemplateController {
       });
     } catch (e) {
       next(e);
-    }
-  }
-
-  // 메시지 템플릿 태그 Settings
-  static async setTags(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const { id } = req.params;
-      const { tagIds } = req.body;
-
-      if (!Array.isArray(tagIds)) {
-        return res.status(400).json({
-          success: false,
-          message: 'tagIds must be an array',
-        });
-      }
-
-      await MessageTemplateModel.setTags(id, tagIds);
-
-      res.json({
-        success: true,
-        message: 'Tags updated successfully',
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  // 메시지 템플릿 태그 조회
-  static async getTags(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const { id } = req.params;
-      const tags = await MessageTemplateModel.getTags(id);
-
-      res.json({
-        success: true,
-        data: tags,
-      });
-    } catch (error) {
-      next(error);
     }
   }
 }

@@ -14,7 +14,7 @@ const logger = createLogger('ServerBannerController');
 export class ServerBannerController {
   /**
    * Get banners for a specific environment
-   * GET /api/v1/server/:env/banners
+   * GET /api/v1/server/banners
    * Returns only published banners for the specified environment
    */
   static async getBanners(req: EnvironmentRequest, res: Response) {
@@ -65,7 +65,7 @@ export class ServerBannerController {
 
   /**
    * Get specific banner by ID
-   * GET /api/v1/server/:env/banners/:bannerId
+   * GET /api/v1/server/banners/:bannerId
    */
   static async getBannerById(req: EnvironmentRequest, res: Response) {
     try {

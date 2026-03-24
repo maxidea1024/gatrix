@@ -76,7 +76,7 @@ class ServerFileController {
       const fileId = uuidv4();
       const timestamp = Date.now();
 
-      // Generate upload path (년/월/일 구조)
+      // Generate upload path (year/month/day structure)
       const now = new Date();
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -86,14 +86,14 @@ class ServerFileController {
       const uniqueFileName = `${fileId}_${timestamp}${fileExtension}`;
       const fullPath = `${uploadPath}/${uniqueFileName}`;
 
-      // In production environment AWS S3, Google Cloud Storage 등의 presigned URL을 Create
-      // 여기서는 로컬 업로드 URL을 시뮬레이션
+      // In production, create presigned URL for AWS S3, Google Cloud Storage, etc.
+      // Here we simulate a local upload URL
       const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
       const uploadUrl = `${baseUrl}/api/v1/upload/file/${fileId}`;
       const fileUrl = `${baseUrl}/uploads/${fullPath}`;
 
-      // 업로드 정보를 임시 Save (실제로는 Redis나 DB에 저장)
-      // 여기서는 메모리에 Save하는 것으로 시뮬레이션
+      // Save upload info (in production, save to Redis or DB)
+      // Here we simulate in-memory storage
       const uploadInfo = {
         fileId,
         fileName,
@@ -101,7 +101,7 @@ class ServerFileController {
         mimeType,
         userId,
         uploadPath: fullPath,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1시간 후 Expired
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000), // Expires in 1 hour
         createdAt: new Date(),
       };
 
@@ -132,7 +132,7 @@ class ServerFileController {
     }
   }
 
-  // 업로드된 파일 정보 조회
+  // Get uploaded file info
   static async getFileInfo(req: ServerFileRequest, res: Response) {
     try {
       const { fileId } = req.params;
@@ -144,8 +144,8 @@ class ServerFileController {
         });
       }
 
-      // 실제로는 DB에서 파일 정보 조회
-      // 여기서는 시뮬레이션
+      // In production, fetch file info from DB
+      // Here we simulate
       res.json({
         success: true,
         data: {

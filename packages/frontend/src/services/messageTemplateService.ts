@@ -107,22 +107,4 @@ export const messageTemplateService = {
       ids,
     });
   },
-
-  // Tag related methods
-  async getTags(projectApiPath: string, id: number): Promise<any[]> {
-    const response = await apiService.get(
-      `${projectApiPath}/message-templates/${id}/tags`
-    );
-    return response.data?.data || [];
-  },
-
-  async setTags(
-    projectApiPath: string,
-    id: number,
-    tagIds: number[]
-  ): Promise<void> {
-    await apiService.put(`${projectApiPath}/message-templates/${id}/tags`, {
-      tagIds,
-    });
-  },
 };

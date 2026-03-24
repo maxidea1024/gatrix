@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { generateULID } from '../utils/ulid';
 import db from '../config/knex';
 import { createLogger } from '../config/logger';
+import TagAssignmentModel from './tag-assignment';
 
 const logger = createLogger('UserModel');
 import {
@@ -61,8 +62,8 @@ export class UserModel {
         .first();
 
       if (user) {
-        // 태그 정보 로드
-        const tags = await this.getTags(user.id);
+        // Load tag info
+        const tags = await TagAssignmentModel.listTagsForEntity('user', user.id);
         user.tags = tags;
       }
 
@@ -351,7 +352,7 @@ export class UserModel {
       // Load tags for all users
       const usersWithExtras = await Promise.all(
         users.map(async (user: any) => {
-          const tags = await this.getTags(user.id);
+          const tags = await TagAssignmentModel.listTagsForEntity('user', user.id);
           return {
             ...user,
             tags,
@@ -412,99 +413,6 @@ export class UserModel {
     }
   }
 
-  // 태그 관련 메서드들
-  static async getTags(userId: string): Promise<any[]> {
-    try {
-      const tags = await db('g_tag_assignments')
-        .join('g_tags', 'g_tag_assignments.tagId', 'g_tags.id')
-        .select([
-          'g_tags.id',
-          'g_tags.name',
-          'g_tags.color',
-          'g_tags.description',
-          'g_tags.createdAt',
-          'g_tags.updatedAt',
-        ])
-        .where('g_tag_assignments.entityType', 'user')
-        .where('g_tag_assignments.entityId', userId)
-        .orderBy('g_tags.name');
-
-      return tags;
-    } catch (error) {
-      logger.error('Error getting user tags:', error);
-      throw error;
-    }
-  }
-
-  static async setTags(
-    userId: string,
-    tagIds: (string | number)[],
-    updatedBy: string
-  ): Promise<void> {
-    try {
-      await db.transaction(async (trx) => {
-        // Existing 태그 할당 Delete
-        await trx('g_tag_assignments')
-          .where('entityType', 'user')
-          .where('entityId', userId)
-          .del();
-
-        // 새 태그 할당 추가
-        if (tagIds.length > 0) {
-          const assignments = tagIds.map((tagId) => ({
-            id: generateULID(),
-            tagId,
-            entityType: 'user',
-            entityId: userId,
-            createdBy: updatedBy,
-            updatedBy: updatedBy,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }));
-
-          await trx('g_tag_assignments').insert(assignments);
-        }
-      });
-    } catch (error) {
-      logger.error('Error setting user tags:', error);
-      throw error;
-    }
-  }
-
-  static async addTag(
-    userId: string,
-    tagId: string,
-    createdBy: string
-  ): Promise<void> {
-    try {
-      await db('g_tag_assignments').insert({
-        id: generateULID(),
-        tagId,
-        entityType: 'user',
-        entityId: userId,
-        createdBy,
-        updatedBy: createdBy,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-    } catch (error) {
-      logger.error('Error adding user tag:', error);
-      throw error;
-    }
-  }
-
-  static async removeTag(userId: string, tagId: string): Promise<void> {
-    try {
-      await db('g_tag_assignments')
-        .where('entityType', 'user')
-        .where('entityId', userId)
-        .where('tagId', tagId)
-        .del();
-    } catch (error) {
-      logger.error('Error removing user tag:', error);
-      throw error;
-    }
-  }
 
   /**
    * Update user's preferred language
@@ -590,7 +498,7 @@ export class UserModel {
           'createdAt',
           'updatedAt',
         ])
-        .where('status', 'active') // Active Used자만 동기화
+        .where('status', 'active') // Only sync active users
         .whereNot('authType', 'service-account')
         .andWhere(function () {
           this.where('updatedAt', '>=', since).orWhere(

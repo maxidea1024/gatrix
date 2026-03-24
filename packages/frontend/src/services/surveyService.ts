@@ -46,6 +46,7 @@ export interface Survey {
   createdAt?: string;
   updatedAt?: string;
   rewardTemplateId?: string | null;
+  tags?: any[];
 }
 
 export interface SurveyConfig {
@@ -73,6 +74,7 @@ export interface CreateSurveyInput {
   targetSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
+  tags?: any[];
 }
 
 export interface UpdateSurveyInput {
@@ -93,6 +95,7 @@ export interface UpdateSurveyInput {
   targetSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
+  tags?: any[];
 }
 
 export interface GetSurveysParams {

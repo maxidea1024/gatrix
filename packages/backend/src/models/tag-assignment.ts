@@ -14,9 +14,10 @@ export default class TagAssignmentModel {
     entityType: string,
     entityId: string,
     tagIds: string[],
-    createdBy?: string
+    createdBy?: string,
+    existingTrx?: any
   ): Promise<void> {
-    await db.transaction(async (trx) => {
+    const execute = async (trx: any) => {
       await trx('g_tag_assignments')
         .where('entityType', entityType)
         .where('entityId', entityId)
@@ -32,14 +33,28 @@ export default class TagAssignmentModel {
         }));
         await trx('g_tag_assignments').insert(insertData);
       }
-    });
+    };
+
+    if (existingTrx) {
+      // Use the provided external transaction
+      await execute(existingTrx);
+    } else {
+      // Create a new transaction
+      await db.transaction(async (trx) => {
+        await execute(trx);
+      });
+    }
   }
 
   static async listTagsForEntity(
     entityType: string,
-    entityId: string
+    entityId: string,
+    trx?: any
   ): Promise<any[]> {
-    const rows = await db('g_tag_assignments as a')
+    const queryBuilder = trx
+      ? trx('g_tag_assignments as a')
+      : db('g_tag_assignments as a');
+    const rows = await queryBuilder
       .join('g_tags as t', 't.id', 'a.tagId')
       .select('t.*')
       .where('a.entityType', entityType)

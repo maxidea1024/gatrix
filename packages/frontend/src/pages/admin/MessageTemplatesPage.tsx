@@ -707,23 +707,15 @@ const MessageTemplatesPage: React.FC = () => {
     setDialogOpen(true);
   };
 
-  // 태그 관련 핸들러
+  // Tag handler
   const handleOpenTagDialog = useCallback(
-    async (template: MessageTemplate) => {
-      try {
-        setSelectedTemplateForTags(template);
-        const tags = await messageTemplateService.getTags(
-          projectApiPath,
-          template.id!
-        );
-        setTemplateTags(tags);
-        setTagDialogOpen(true);
-      } catch (error) {
-        console.error('Error loading template tags:', error);
-        enqueueSnackbar(t('common.error'), { variant: 'error' });
-      }
+    (template: MessageTemplate) => {
+      setSelectedTemplateForTags(template);
+      // Use tags already loaded from list data
+      setTemplateTags(template.tags || []);
+      setTagDialogOpen(true);
     },
-    [t, enqueueSnackbar]
+    []
   );
 
   const handleSaveTags = useCallback(
@@ -731,14 +723,17 @@ const MessageTemplatesPage: React.FC = () => {
       if (!selectedTemplateForTags?.id) return;
 
       try {
-        await messageTemplateService.setTags(
+        // Update template with new tags through update API
+        await messageTemplateService.update(
           projectApiPath,
           selectedTemplateForTags.id,
-          tagIds
+          {
+            ...selectedTemplateForTags,
+            tags: tagIds.map((id) => ({ id, name: '', color: '' })),
+          }
         );
         setTagDialogOpen(false);
         enqueueSnackbar(t('common.success'), { variant: 'success' });
-        // 필요시 목록 Refresh
         load();
       } catch (error) {
         console.error('Error saving template tags:', error);
@@ -770,6 +765,7 @@ const MessageTemplatesPage: React.FC = () => {
         supportsMultiLanguage: !!form.supportsMultiLanguage,
         defaultMessage: form.defaultMessage || null,
         locales: form.locales,
+        tags: form.tags || [],
       };
 
       let templateId: number;
@@ -796,18 +792,6 @@ const MessageTemplatesPage: React.FC = () => {
           throw new Error(t('common.cannotGetTemplateId'));
         }
         enqueueSnackbar(t('common.createSuccess'), { variant: 'success' });
-      }
-
-      // 태그 Settings
-      if (form.tags && form.tags.length > 0) {
-        await messageTemplateService.setTags(
-          projectApiPath,
-          templateId,
-          form.tags.map((tag) => tag.id)
-        );
-      } else {
-        // 태그가 없으면 Remove all existing tags
-        await messageTemplateService.setTags(projectApiPath, templateId, []);
       }
 
       setDialogOpen(false);

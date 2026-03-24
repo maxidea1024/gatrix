@@ -59,6 +59,7 @@ import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
+import TagChips from '../../components/common/TagChips';
 
 const BannerManagementPage: React.FC = () => {
   const { t } = useTranslation();
@@ -115,6 +116,7 @@ const BannerManagementPage: React.FC = () => {
     { id: 'status', labelKey: 'banners.status', visible: true },
     { id: 'version', labelKey: 'banners.version', visible: true },
     { id: 'createdAt', labelKey: 'banners.createdAt', visible: true },
+    { id: 'tags', labelKey: 'common.tags', visible: true },
     { id: 'actions', labelKey: 'common.actions', visible: true },
   ];
 
@@ -690,6 +692,13 @@ const BannerManagementPage: React.FC = () => {
                                 {formatDateTimeDetailed(banner.createdAt)}
                               </TableCell>
                             );
+                          if (column.id === 'tags') {
+                            return (
+                              <TableCell key={column.id}>
+                                <TagChips tags={(banner as any).tags} maxVisible={6} />
+                              </TableCell>
+                            );
+                          }
                           if (column.id === 'actions') {
                             if (!canManage) return null;
                             return (

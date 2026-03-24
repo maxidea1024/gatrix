@@ -123,7 +123,7 @@ const getWhitelistsQuerySchema = Joi.object({
   tags: Joi.alternatives()
     .try(Joi.string(), Joi.array().items(Joi.string()))
     .optional(),
-  _t: Joi.string().optional(), // Cache 방지용 타임스탬프
+  _t: Joi.string().optional(), // Cache-busting timestamp
 }).options({ stripUnknown: true });
 
 export class WhitelistController {
@@ -319,38 +319,6 @@ export class WhitelistController {
     }
   );
 
-  // 화이트리스트 태그 Settings
-  static setTags = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const { id } = req.params;
-      const { tagIds } = req.body;
-
-      if (!Array.isArray(tagIds)) {
-        throw new GatrixError('tagIds must be an array', 400);
-      }
-
-      await WhitelistModel.setTags(id, tagIds, req.user?.userId);
-
-      res.json({
-        success: true,
-        message: 'Tags updated successfully',
-      });
-    }
-  );
-
-  // 화이트리스트 태그 조회
-  static getTags = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const { id } = req.params;
-      const tags = await WhitelistModel.getTags(id);
-
-      res.json({
-        success: true,
-        data: tags,
-      });
-    }
-  );
-
   static toggleWhitelistStatus = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const id = req.params.id;
@@ -376,7 +344,7 @@ export class WhitelistController {
     }
   );
 
-  // 화이트리스트 테스트
+  // Test whitelist
   static testWhitelist = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const environmentId = req.environmentId;

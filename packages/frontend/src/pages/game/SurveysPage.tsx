@@ -65,6 +65,7 @@ import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
+import TagChips from '../../components/common/TagChips';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
@@ -135,6 +136,7 @@ const SurveysPage: React.FC = () => {
     },
     { id: 'rewards', labelKey: 'surveys.rewards', visible: true },
     { id: 'status', labelKey: 'surveys.status', visible: true },
+    { id: 'tags', labelKey: 'common.tags', visible: true },
     { id: 'createdAt', labelKey: 'surveys.createdAt', visible: true },
     { id: 'actions', labelKey: 'common.actions', visible: true },
   ];
@@ -715,6 +717,13 @@ const SurveysPage: React.FC = () => {
                                   }
                                   size="small"
                                 />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'tags') {
+                            return (
+                              <TableCell key={column.id}>
+                                <TagChips tags={(survey as any).tags} maxVisible={6} />
                               </TableCell>
                             );
                           }

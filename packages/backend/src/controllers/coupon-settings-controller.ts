@@ -4,6 +4,7 @@ import { asyncHandler, GatrixError } from '../middleware/error-handler';
 import { AuthenticatedRequest } from '../types/auth';
 import { CouponSettingsService } from '../services/coupon-settings-service';
 import { UnifiedChangeGateway } from '../services/unified-change-gateway';
+import { TagService } from '../services/tag-service';
 
 import { createLogger } from '../config/logger';
 const logger = createLogger('CouponSettingsController');
@@ -139,18 +140,26 @@ export class CouponSettingsController {
       if (!authenticatedUserId)
         throw new GatrixError('User authentication required', 401);
 
+      const { tags, ...createData } = value;
+
       const result = await UnifiedChangeGateway.requestCreation(
         authenticatedUserId,
         environmentId,
         'g_coupon_settings',
-        { ...value },
+        { ...createData },
         async () => {
           return CouponSettingsService.createSetting(
-            { ...value, createdBy: authenticatedUserId },
+            { ...createData, createdBy: authenticatedUserId },
             environmentId
           );
         }
       );
+
+      // Handle tags if provided
+      if (result.mode === 'DIRECT' && tags && Array.isArray(tags) && result.data?.id) {
+        const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+        await TagService.setTagsForEntity('coupon_setting', result.data.id.toString(), tagIds, authenticatedUserId);
+      }
 
       res.status(result.mode === 'CHANGE_REQUEST' ? 202 : 201).json({
         success: true,
@@ -180,12 +189,14 @@ export class CouponSettingsController {
       if (!authenticatedUserId)
         throw new GatrixError('User authentication required', 401);
 
+      const { tags, ...updateData } = value;
+
       const result = await UnifiedChangeGateway.processChange(
         authenticatedUserId,
         environmentId,
         'g_coupon_settings',
         id,
-        { ...value },
+        { ...updateData },
         async (processedData: any) => {
           const setting = await CouponSettingsService.updateSetting(
             id,
@@ -197,6 +208,14 @@ export class CouponSettingsController {
       );
 
       if (result.mode === 'DIRECT') {
+        // Handle tags if provided
+        if (tags !== undefined) {
+          const tagIds = Array.isArray(tags)
+            ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
+            : [];
+          await TagService.setTagsForEntity('coupon_setting', id, tagIds, authenticatedUserId);
+        }
+
         res.json({
           success: true,
           data: result.data,

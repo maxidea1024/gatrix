@@ -26,7 +26,7 @@ export class SshCommandJob extends BaseJob {
         let errorOutput = '';
         let isResolved = false;
 
-        // 연결 Settings
+        // Connection settings
         const connectConfig: any = {
           host,
           port,
@@ -34,7 +34,7 @@ export class SshCommandJob extends BaseJob {
           readyTimeout: timeout,
         };
 
-        // Authentication 방법 Settings
+        // Authentication method settings
         if (privateKey) {
           connectConfig.privateKey = privateKey;
         } else if (password) {
@@ -43,7 +43,7 @@ export class SshCommandJob extends BaseJob {
           throw new Error('Either password or privateKey must be provided');
         }
 
-        // 타임아웃 Settings
+        // Timeout settings
         const timeoutId = setTimeout(() => {
           if (!isResolved) {
             isResolved = true;
@@ -125,7 +125,7 @@ export class SshCommandJob extends BaseJob {
           }
         });
 
-        // SSH 연결 시작
+        // Start SSH connection
         conn.connect(connectConfig);
       } catch (error) {
         logger.error(`SSH command job failed`, {

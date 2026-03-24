@@ -9,7 +9,7 @@ export interface ServerNotificationRequest extends Request {
 }
 
 class ServerNotificationController {
-  // Notification 전송
+  // Send notification
   static async sendNotification(req: ServerNotificationRequest, res: Response) {
     try {
       const { userId, type, title, content, channelId, messageId, metadata } =
@@ -23,7 +23,7 @@ class ServerNotificationController {
         });
       }
 
-      // 지원되는 Notification Type Validation
+      // Validate supported notification types
       const supportedTypes = ['message', 'mention', 'channel_invite', 'system'];
       if (!supportedTypes.includes(type)) {
         return res.status(400).json({
@@ -32,7 +32,7 @@ class ServerNotificationController {
         });
       }
 
-      // Notification 데이터 구성
+      // Build notification data
       const notificationData = {
         type: 'chat_notification',
         data: {
@@ -46,12 +46,12 @@ class ServerNotificationController {
           timestamp: new Date().toISOString(),
         },
         timestamp: new Date(),
-        targetUsers: [userId], // 특정 Used자에게만 전송
+        targetUsers: [userId], // Send to specific user only
       };
 
-      // PubSub을 통해 전 인스턴스에 전파 → 각 인스턴스가 자신의 SSE 클라이언트로 팬아웃
+      // Broadcast to all instances via PubSub → each instance fans out to its SSE clients
       await pubSubService.publishNotification(notificationData);
-      const sentCount = 0; // fan-out은 비동기적으로 각 인스턴스에서 처리됨
+      const sentCount = 0; // Fan-out is handled asynchronously by each instance
 
       logger.info(`Notification sent to user ${userId}:`, {
         type,
@@ -78,7 +78,7 @@ class ServerNotificationController {
     }
   }
 
-  // 여러 Used자에게 Notification 전송
+  // Send notification to multiple users
   static async sendBulkNotification(
     req: ServerNotificationRequest,
     res: Response
@@ -101,7 +101,7 @@ class ServerNotificationController {
         });
       }
 
-      // 최대 1000명까지만 허용
+      // Allow up to 1000 users
       if (userIds.length > 1000) {
         return res.status(400).json({
           success: false,
@@ -109,7 +109,7 @@ class ServerNotificationController {
         });
       }
 
-      // 지원되는 Notification Type Validation
+      // Validate supported notification types
       const supportedTypes = ['message', 'mention', 'channel_invite', 'system'];
       if (!supportedTypes.includes(type)) {
         return res.status(400).json({
@@ -118,7 +118,7 @@ class ServerNotificationController {
         });
       }
 
-      // Notification 데이터 구성
+      // Build notification data
       const notificationData = {
         type: 'chat_notification',
         data: {
@@ -134,9 +134,9 @@ class ServerNotificationController {
         targetUsers: userIds,
       };
 
-      // PubSub으로 전 인스턴스에 전파 → 각 인스턴스가 자신의 SSE 클라이언트로 팬아웃
+      // Broadcast to all instances via PubSub → each instance fans out to its SSE clients
       await pubSubService.publishNotification(notificationData);
-      const sentCount = 0; // fan-out은 비동기적으로 각 인스턴스에서 처리됨
+      const sentCount = 0; // Fan-out is handled asynchronously by each instance
 
       logger.info(`Bulk notification sent to ${userIds.length} users:`, {
         type,

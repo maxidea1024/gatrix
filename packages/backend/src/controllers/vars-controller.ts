@@ -129,7 +129,7 @@ export class VarsController {
 
   /**
    * Get all KV items for Server SDK
-   * GET /api/v1/server/:env/vars
+   * GET /api/v1/server/vars
    */
   static async getServerVars(
     req: SDKRequest,

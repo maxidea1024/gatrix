@@ -13,6 +13,7 @@ const logger = createLogger('BannerService');
 import { cacheService } from './cache-service';
 import { pubSubService } from './pub-sub-service';
 import { SERVER_SDK_ETAG } from '../constants/cache-keys';
+import { TagService } from './tag-service';
 
 const CACHE_PREFIX = 'banners';
 const CACHE_TTL = 300; // 5 minutes
@@ -94,8 +95,16 @@ class BannerService {
 
       const result = await BannerModel.findAll(filters);
 
+      // Load tags for each banner
+      const bannersWithTags = await Promise.all(
+        result.banners.map(async (banner) => {
+          const tags = await TagService.listTagsForEntity('banner', banner.bannerId);
+          return { ...banner, tags };
+        })
+      );
+
       return {
-        banners: result.banners,
+        banners: bannersWithTags,
         total: result.total,
         page,
         limit,
@@ -120,7 +129,9 @@ class BannerService {
         throw new GatrixError('Banner not found', 404);
       }
 
-      return banner;
+      // Load tags
+      const tags = await TagService.listTagsForEntity('banner', bannerId);
+      return { ...banner, tags } as any;
     } catch (error) {
       if (error instanceof GatrixError) throw error;
       logger.error('Failed to get banner', { error, bannerId, environmentId });

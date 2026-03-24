@@ -70,8 +70,4 @@ router.post(
 
 // ?�이?�리?�트 ?�스???�우??router.post('/test', WhitelistController.testWhitelist);
 
-// ?�그 관???�우??(관리자�?
-router.get('/:id/tags' as any, WhitelistController.getTags);
-router.put('/:id/tags' as any, WhitelistController.setTags);
-
 export default router;

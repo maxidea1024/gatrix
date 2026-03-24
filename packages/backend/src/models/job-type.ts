@@ -38,16 +38,16 @@ export interface UpdateJobTypeData {
 }
 
 export class JobTypeModel {
-  // 안전한 JSON 파싱 메서드
+  // Safe JSON parsing method
   private static parseJobSchema(value: any): any {
     if (!value) return null;
 
-    // 이미 객체인 경우 그대로 반환
+    // Return as-is if already an object
     if (typeof value === 'object') {
       return value;
     }
 
-    // 문자열인 경우 JSON 파싱 시도
+    // Attempt JSON parsing if string
     if (typeof value === 'string') {
       try {
         return JSON.parse(value);

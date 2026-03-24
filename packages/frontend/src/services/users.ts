@@ -1,5 +1,5 @@
 import { apiService } from './api';
-import { User, UserFilters, UserListResponse, Tag } from '@/types';
+import { User, UserFilters, UserListResponse } from '@/types';
 
 export class UserService {
   static async getUsers(
@@ -182,47 +182,6 @@ export class UserService {
     throw new Error(
       response.error?.message || 'Failed to fetch user statistics'
     );
-  }
-
-  // Tag related methods
-  static async getUserTags(userId: number): Promise<Tag[]> {
-    const response = await apiService.get<Tag[]>(`/admin/users/${userId}/tags`);
-
-    if (response.success && response.data) {
-      return response.data;
-    }
-
-    throw new Error(response.error?.message || 'Failed to fetch user tags');
-  }
-
-  static async setUserTags(userId: number, tagIds: number[]): Promise<void> {
-    const response = await apiService.put(`/admin/users/${userId}/tags`, {
-      tagIds,
-    });
-
-    if (!response.success) {
-      throw new Error(response.error?.message || 'Failed to set user tags');
-    }
-  }
-
-  static async addUserTag(userId: number, tagId: number): Promise<void> {
-    const response = await apiService.post(`/admin/users/${userId}/tags`, {
-      tagId,
-    });
-
-    if (!response.success) {
-      throw new Error(response.error?.message || 'Failed to add user tag');
-    }
-  }
-
-  static async removeUserTag(userId: number, tagId: number): Promise<void> {
-    const response = await apiService.delete(
-      `/admin/users/${userId}/tags/${tagId}`
-    );
-
-    if (!response.success) {
-      throw new Error(response.error?.message || 'Failed to remove user tag');
-    }
   }
 
   // Administrator forcibly verifies user email

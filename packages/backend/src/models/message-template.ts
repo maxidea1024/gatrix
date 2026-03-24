@@ -52,21 +52,21 @@ export class MessageTemplateModel {
 
       logger.debug('🔍 MessageTemplate query filters:', { filters });
 
-      // 테스트: 테이블에 데이터가 있는지 Confirm
+      // Test: check if table has data
       const testCount = await db('g_message_templates')
         .where('environmentId', environmentId)
         .count('* as count')
         .first();
       logger.debug('🔍 Total records in g_message_templates:', { testCount });
 
-      // 기본 Query 빌더 with environment filter
+      // Base query builder with environment filter
       const baseQuery = () =>
         db('g_message_templates as mt')
           .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id')
           .where('mt.environmentId', environmentId);
 
-      // Filter 적용 함수
+      // Apply filters
       const applyFilters = (query: any) => {
         // Handle createdBy filter (single or multiple)
         if (filters?.createdBy !== undefined) {
@@ -108,12 +108,12 @@ export class MessageTemplateModel {
           });
         }
 
-        // 태그 Filter 처리
+        // Tag filter handling
         if (filters?.tags && filters.tags.length > 0) {
           const operator = filters.tags_operator || 'include_all';
 
           if (operator === 'any_of') {
-            // OR 조건: 선택한 태그 중 하나라도 가진 템플릿 반환
+            // OR condition: return templates that have any of the selected tags
             query.whereExists(function (this: any) {
               this.select('*')
                 .from('g_tag_assignments as ta')
@@ -122,7 +122,7 @@ export class MessageTemplateModel {
                 .whereIn('ta.tagId', filters.tags!);
             });
           } else {
-            // AND 조건: 선택한 모든 태그를 가진 템플릿만 반환
+            // AND condition: return only templates that have all selected tags
             filters.tags.forEach((tagId) => {
               query.whereExists(function (this: any) {
                 this.select('*')
@@ -154,7 +154,7 @@ export class MessageTemplateModel {
         .limit(limit)
         .offset(offset);
 
-      // 병렬 실행
+      // Execute in parallel
       const [countResult, dataResults] = await Promise.all([
         countQuery,
         dataQuery,
@@ -162,7 +162,7 @@ export class MessageTemplateModel {
 
       const total = countResult?.total || 0;
 
-      // 각 메시지 템플릿에 태그 정보와 locales 정보 추가
+      // Add tag info and locales info to each message template
       const messageTemplatesWithTags = await Promise.all(
         dataResults.map(async (template: any) => {
           const [tags, locales] = await Promise.all([
@@ -217,7 +217,7 @@ export class MessageTemplateModel {
         return null;
       }
 
-      // locales 정보 추가
+      // Add locales info
       const locales = await db('g_message_template_locales')
         .where('templateId', id)
         .select('lang', 'message');
@@ -237,7 +237,7 @@ export class MessageTemplateModel {
   static async create(data: any, environmentId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
-        // 메시지 템플릿 Create
+        // Create message template
         const id = generateULID();
         await trx('g_message_templates').insert({
           id,
@@ -262,7 +262,7 @@ export class MessageTemplateModel {
           updatedAt: new Date(),
         });
 
-        // 언어별 메시지 처리
+        // Process messages per language
         if (data.locales && data.locales.length > 0) {
           const localeInserts = data.locales.map((locale: any) => ({
             templateId: id,
@@ -280,7 +280,7 @@ export class MessageTemplateModel {
         const created = await this.findById(id, environmentId);
 
         if (!created) {
-          // 직접 ID와 기본 정보를 반환
+          // Return ID and basic info directly
           return {
             id: id,
             name: data.name,
@@ -312,7 +312,7 @@ export class MessageTemplateModel {
   ): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
-        // 메시지 템플릿 업데이트
+        // Update message template
         await trx('g_message_templates')
           .where('id', id)
           .where('environmentId', environmentId)
@@ -330,10 +330,10 @@ export class MessageTemplateModel {
             updatedAt: new Date(),
           });
 
-        // Existing 언어별 메시지 Delete
+        // Delete existing language-specific messages
         await trx('g_message_template_locales').where('templateId', id).del();
 
-        // New 언어별 메시지 추가
+        // Add new language-specific messages
         if (data.locales && data.locales.length > 0) {
           const localeInserts = data.locales.map((locale: any) => ({
             templateId: id,
@@ -372,7 +372,7 @@ export class MessageTemplateModel {
     }
   }
 
-  // 추가 메서드들
+  // Additional methods
   static async findByName(
     name: string,
     excludeId?: string
@@ -387,53 +387,6 @@ export class MessageTemplateModel {
       return await query.first();
     } catch (error) {
       logger.error('Error finding message template by name:', error);
-      throw error;
-    }
-  }
-
-  // 태그 관련 메서드들
-  static async setTags(
-    templateId: string,
-    tagIds: string[],
-    createdBy?: string
-  ): Promise<void> {
-    try {
-      await db.transaction(async (trx) => {
-        // Existing 태그 할당 Delete
-        await trx('g_tag_assignments')
-          .where('entityType', 'message_template')
-          .where('entityId', templateId)
-          .del();
-
-        // 새 태그 할당 추가
-        if (tagIds.length > 0) {
-          const assignments = tagIds.map((tagId) => ({
-            id: generateULID(),
-            entityType: 'message_template',
-            entityId: templateId,
-            tagId: tagId,
-            createdBy: createdBy || '',
-            createdAt: new Date(),
-          }));
-          await trx('g_tag_assignments').insert(assignments);
-        }
-      });
-    } catch (error) {
-      logger.error('Error setting message template tags:', error);
-      throw error;
-    }
-  }
-
-  static async getTags(templateId: string): Promise<any[]> {
-    try {
-      return await db('g_tag_assignments as ta')
-        .join('g_tags as t', 'ta.tagId', 't.id')
-        .select(['t.id', 't.name', 't.color', 't.description'])
-        .where('ta.entityType', 'message_template')
-        .where('ta.entityId', templateId)
-        .orderBy('t.name');
-    } catch (error) {
-      logger.error('Error getting message template tags:', error);
       throw error;
     }
   }

@@ -24,7 +24,7 @@ export class LogMessageJob extends BaseJob {
         throw new Error('Log level is required');
       }
 
-      // 유효한 로그 레벨 Validation
+      // Validate log level
       const validLevels = ['debug', 'info', 'warn', 'error'];
       if (!validLevels.includes(data.level)) {
         throw new Error(
@@ -32,7 +32,7 @@ export class LogMessageJob extends BaseJob {
         );
       }
 
-      // 로그 메타데이터 구성
+      // Build log metadata
       const logMetadata: Record<string, any> = {
         jobId: this.context.jobId,
         jobName: this.context.jobName,
@@ -40,12 +40,12 @@ export class LogMessageJob extends BaseJob {
         category: data.category || 'job',
       };
 
-      // Used자 정의 메타데이터 추가
+      // Add user-defined metadata
       if (data.metadata && typeof data.metadata === 'object') {
         Object.assign(logMetadata, data.metadata);
       }
 
-      // 로그 레벨에 따라 로그 기록
+      // Write log based on log level
       switch (data.level) {
         case 'debug':
           logger.debug(data.message, logMetadata);

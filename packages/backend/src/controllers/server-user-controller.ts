@@ -17,7 +17,7 @@ export interface ServerUserRequest extends Request {
 }
 
 class ServerUserController {
-  // Used자 ID로 User info 조회
+  // Get user info by user ID
   static async getUserById(req: ServerUserRequest, res: Response) {
     try {
       const userId = req.params.id;
@@ -53,7 +53,7 @@ class ServerUserController {
     }
   }
 
-  // 여러 Used자 ID로 User info 조회
+  // Get user info by multiple user IDs
   static async getUsersByIds(req: ServerUserRequest, res: Response) {
     try {
       const { userIds } = req.body;
@@ -68,7 +68,7 @@ class ServerUserController {
         return sendSuccessResponse(res, []);
       }
 
-      // 최대 100개까지만 허용
+      // Allow up to 100 IDs
       if (userIds.length > 100) {
         return sendBadRequest(res, 'Maximum 100 user IDs allowed', {
           maxAllowed: 100,
@@ -76,7 +76,7 @@ class ServerUserController {
         });
       }
 
-      // 모든 ID가 숫자인지 Confirm
+      // Validate all IDs are strings
       const validUserIds = userIds.filter(
         (id) => Number.isInteger(id) && id > 0
       );
@@ -85,7 +85,7 @@ class ServerUserController {
         return sendSuccessResponse(res, []);
       }
 
-      // User info 조회
+      // Fetch user info
       const users = [];
       for (const userId of validUserIds) {
         try {
@@ -105,7 +105,7 @@ class ServerUserController {
           }
         } catch (error) {
           logger.warn(`Failed to get user ${userId}:`, error);
-          // 개별 Used자 조회 Failed는 Ignore하고 계속 진행
+          // Ignore individual user fetch failures and continue
         }
       }
 
@@ -120,22 +120,22 @@ class ServerUserController {
     }
   }
 
-  // Used자 동기화 Query data (채팅 서버용)
+  // Sync user data (for chat server)
   static async syncUsers(req: ServerUserRequest, res: Response) {
     try {
       const { lastSyncAt } = req.query;
 
-      // 기본적으로 최근 24시간 내 업데이트된 Used자 조회
+      // By default, fetch users updated within the last 24 hours
       const since = lastSyncAt
         ? new Date(lastSyncAt as string)
         : new Date(Date.now() - 24 * 60 * 60 * 1000);
 
       logger.info('User sync request:', { lastSyncAt, since });
 
-      // 실제 데이터베이스에서 Used자 조회
+      // Fetch users from database
       const users = await UserModel.getUsersForSync(since);
 
-      // 채팅 서버에서 기대하는 형식으로 변환
+      // Transform to chat server expected format
       const syncUsers = users.map((user) => ({
         id: user.id,
         email: user.email,

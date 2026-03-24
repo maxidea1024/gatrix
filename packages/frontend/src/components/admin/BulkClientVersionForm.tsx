@@ -699,6 +699,15 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                   )}
                 />
 
+                {/* Tags - right after status */}
+                <TagSelector
+                  value={selectedTags}
+                  onChange={(value) => {
+                    setSelectedTags(value);
+                    setValue('tags', value);
+                  }}
+                />
+
                 {isMaintenanceMode && (
                   <MaintenanceSettingsInput
                     startDate={watch('maintenanceStartDate') || ''}
@@ -743,33 +752,6 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                   />
                 )}
               </Stack>
-            </Paper>
-
-            <Paper variant="outlined" elevation={0} sx={{ p: 2 }}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  color: 'primary.main',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                }}
-              >
-                {t('common.tags')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t('clientVersions.form.tagsHelp')}
-              </Typography>
-
-              <TagSelector
-                value={selectedTags}
-                onChange={(value) => {
-                  setSelectedTags(value);
-                  setValue('tags', value);
-                }}
-              />
             </Paper>
 
             <Accordion

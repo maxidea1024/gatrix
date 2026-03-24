@@ -14,7 +14,7 @@ const logger = createLogger('ServerServiceNoticeController');
 export class ServerServiceNoticeController {
   /**
    * Get service notices for a specific environment
-   * GET /api/v1/server/:env/service-notices
+   * GET /api/v1/server/service-notices
    * Returns all active service notices for the specified environment
    */
   static async getServiceNotices(req: EnvironmentRequest, res: Response) {
@@ -89,7 +89,7 @@ export class ServerServiceNoticeController {
 
   /**
    * Get specific service notice by ID
-   * GET /api/v1/server/:env/service-notices/:id
+   * GET /api/v1/server/service-notices/:id
    */
   static async getServiceNoticeById(req: EnvironmentRequest, res: Response) {
     try {

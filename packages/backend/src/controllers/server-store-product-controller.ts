@@ -134,7 +134,7 @@ function parseLanguage(langParam: unknown): SdkLanguage {
 export class ServerStoreProductController {
   /**
    * Get store products for a specific environment
-   * GET /api/v1/server/:env/store-products?language=zh
+   * GET /api/v1/server/store-products?language=zh
    * Returns all active store products with tags for the specified environment
    * @param language - Language code (ko, en, zh). Defaults to zh (Chinese)
    */
@@ -206,7 +206,7 @@ export class ServerStoreProductController {
 
   /**
    * Get specific store product by ID
-   * GET /api/v1/server/:env/store-products/:id?language=zh
+   * GET /api/v1/server/store-products/:id?language=zh
    * @param language - Language code (ko, en, zh). Defaults to zh (Chinese)
    */
   static async getStoreProductById(req: EnvironmentRequest, res: Response) {

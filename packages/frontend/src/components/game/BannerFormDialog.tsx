@@ -56,6 +56,7 @@ import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import BannerPreview from './BannerPreview';
 import { useEntityLock } from '../../hooks/useEntityLock';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import TagSelector from '../common/TagSelector';
 
 interface BannerFormDialogProps {
   open: boolean;
@@ -106,6 +107,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   const [shuffle, setShuffle] = useState(false);
   const [sequences, setSequences] = useState<Sequence[]>([]);
   const [saving, setSaving] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<any[]>([]);
 
   // Entity Lock for edit mode
   const { hasLock, lockedBy, pendingCR, forceTakeover } = useEntityLock({
@@ -168,6 +170,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       setSequences(initialSequences);
       setSequenceHistory([initialSequences]);
       setHistoryIndex(0);
+      setSelectedTags(banner.tags || []);
     } else {
       // Reset form for new banner
       setName('');
@@ -180,6 +183,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       setSequences([]);
       setSequenceHistory([[]]);
       setHistoryIndex(0);
+      setSelectedTags([]);
     }
   }, [banner, open, getSizePresetValue]);
 
@@ -204,6 +208,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           clickUrl: f.clickUrl || '',
         })),
       })),
+      tags: selectedTags.map((t: any) => t.id).sort(),
     };
 
     const originalData = {
@@ -223,6 +228,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           clickUrl: f.clickUrl || '',
         })),
       })),
+      tags: (banner.tags || []).map((t: any) => t.id).sort(),
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
@@ -235,6 +241,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
     playbackSpeed,
     shuffle,
     sequences,
+    selectedTags,
   ]);
 
   // Focus name input when dialog opens
@@ -365,6 +372,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
             playbackSpeed,
             shuffle,
             sequences,
+            tags: selectedTags,
           }
         );
         if (result.isChangeRequest) {
@@ -385,6 +393,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           playbackSpeed,
           shuffle,
           sequences,
+          tags: selectedTags,
         });
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -540,6 +549,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                 rows={2}
                 size="small"
               />
+              <TagSelector value={selectedTags} onChange={setSelectedTags} />
               <Divider />
               {/* Size row: Preset + (Custom fields if selected) */}
               <Stack direction="row" spacing={2}>

@@ -19,6 +19,7 @@ import {
   ErrorCodes,
 } from '../utils/api-response';
 import { UnifiedChangeGateway } from '../services/unified-change-gateway';
+import { TagService } from '../services/tag-service';
 
 // Validation schemas
 const createIngamePopupNoticeSchema = Joi.object({
@@ -41,6 +42,9 @@ const createIngamePopupNoticeSchema = Joi.object({
   messageTemplateId: Joi.string().optional().allow(null),
   useTemplate: Joi.boolean().optional(),
   description: Joi.string().max(1000).optional().allow(null, ''),
+  tags: Joi.array()
+    .items(Joi.object({ id: Joi.alternatives().try(Joi.string(), Joi.number()).required() }).unknown(true))
+    .optional(),
 });
 
 const updateIngamePopupNoticeSchema = Joi.object({
@@ -63,6 +67,9 @@ const updateIngamePopupNoticeSchema = Joi.object({
   messageTemplateId: Joi.string().optional().allow(null),
   useTemplate: Joi.boolean().optional(),
   description: Joi.string().max(1000).optional().allow(null, ''),
+  tags: Joi.array()
+    .items(Joi.object({ id: Joi.alternatives().try(Joi.string(), Joi.number()).required() }).unknown(true))
+    .optional(),
 });
 
 class IngamePopupNoticeController {
@@ -200,6 +207,7 @@ class IngamePopupNoticeController {
       }
 
       const data: CreateIngamePopupNoticeData = value;
+      const { tags } = value;
       const createdBy = req.user?.userId;
 
       if (!createdBy) {
@@ -235,9 +243,16 @@ class IngamePopupNoticeController {
       );
 
       if (gatewayResult.mode === 'DIRECT') {
+        // Handle tags if provided
+        const createdNotice = gatewayResult.data;
+        if (tags && Array.isArray(tags) && createdNotice?.id) {
+          const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+          await TagService.setTagsForEntity('ingame_popup_notice', createdNotice.id.toString(), tagIds, createdBy);
+        }
+
         return sendSuccessResponse(
           res,
-          { notice: gatewayResult.data },
+          { notice: createdNotice },
           'Ingame popup notice created successfully',
           201
         );
@@ -283,6 +298,7 @@ class IngamePopupNoticeController {
       }
 
       const data: UpdateIngamePopupNoticeData = value;
+      const { tags } = value;
       const updatedBy = req.user?.userId;
 
       if (!updatedBy) {
@@ -320,6 +336,14 @@ class IngamePopupNoticeController {
       );
 
       if (gatewayResult.mode === 'DIRECT') {
+        // Handle tags if provided
+        if (tags !== undefined) {
+          const tagIds = Array.isArray(tags)
+            ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
+            : [];
+          await TagService.setTagsForEntity('ingame_popup_notice', id, tagIds, updatedBy);
+        }
+
         return sendSuccessResponse(
           res,
           { notice: gatewayResult.data },
@@ -557,7 +581,7 @@ class IngamePopupNoticeController {
 
   /**
    * Get active ingame popup notices for Server SDK
-   * GET /api/v1/server/:env/ingame-popup-notices
+   * GET /api/v1/server/ingame-popup-notices
    * Returns only active notices that are currently visible and not expired
    */
   async getServerIngamePopupNotices(
@@ -610,7 +634,7 @@ class IngamePopupNoticeController {
 
   /**
    * Get ingame popup notice by ID for Server SDK
-   * GET /api/v1/server/:env/ingame-popup-notices/:id
+   * GET /api/v1/server/ingame-popup-notices/:id
    * Returns notice formatted for Server SDK
    */
   async getServerIngamePopupNoticeById(

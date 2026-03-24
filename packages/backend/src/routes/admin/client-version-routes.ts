@@ -96,10 +96,6 @@ router.delete(
   ClientVersionController.deleteClientVersion as any
 );
 
-// Tag routes (admin)
-router.get('/:id/tags' as any, ClientVersionController.getTags as any);
-router.put('/:id/tags' as any, ClientVersionController.setTags as any);
-
 // Reset all client versions and cache (for testing)
 router.delete(
   '/reset/all' as any,

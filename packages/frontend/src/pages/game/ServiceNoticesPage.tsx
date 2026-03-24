@@ -79,6 +79,7 @@ import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
+import TagChips from '../../components/common/TagChips';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -230,6 +231,7 @@ const ServiceNoticesPage: React.FC = () => {
     { id: 'period', labelKey: 'serviceNotices.period', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
     { id: 'updatedAt', labelKey: 'common.updatedAt', visible: true },
+    { id: 'tags', labelKey: 'common.tags', visible: true },
   ];
 
   // Column settings
@@ -1240,6 +1242,13 @@ const ServiceNoticesPage: React.FC = () => {
                                     )}
                                   </Typography>
                                 </Tooltip>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'tags') {
+                            return (
+                              <TableCell key={column.id}>
+                                <TagChips tags={(notice as any).tags} maxVisible={6} />
                               </TableCell>
                             );
                           }

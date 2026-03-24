@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { asyncHandler } from '../middleware/error-handler';
 import BannerService from '../services/banner-service';
 import { UnifiedChangeGateway } from '../services/unified-change-gateway';
+import { TagService } from '../services/tag-service';
 
 export class BannerController {
   /**
@@ -65,6 +66,7 @@ export class BannerController {
         metadata,
         playbackSpeed,
         sequences,
+        tags,
       } = req.body;
       const environmentId = req.environmentId!;
       const userId = req.user?.userId;
@@ -102,9 +104,16 @@ export class BannerController {
       );
 
       if (gatewayResult.mode === 'DIRECT') {
+        // Handle tags if provided
+        const createdBanner = gatewayResult.data;
+        if (tags && Array.isArray(tags) && createdBanner?.id) {
+          const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+          await TagService.setTagsForEntity('banner', createdBanner.id.toString(), tagIds, userId);
+        }
+
         res.status(201).json({
           success: true,
-          data: { banner: gatewayResult.data },
+          data: { banner: createdBanner },
           message: 'Banner created successfully',
         });
       } else {
@@ -136,6 +145,7 @@ export class BannerController {
         metadata,
         playbackSpeed,
         sequences,
+        tags,
       } = req.body;
       const environmentId = req.environmentId!;
       const userId = req.user?.userId;
@@ -166,6 +176,14 @@ export class BannerController {
       );
 
       if (gatewayResult.mode === 'DIRECT') {
+        // Handle tags if provided
+        if (tags !== undefined) {
+          const tagIds = Array.isArray(tags)
+            ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
+            : [];
+          await TagService.setTagsForEntity('banner', bannerId, tagIds, userId);
+        }
+
         res.json({
           success: true,
           data: gatewayResult.data,

@@ -9,6 +9,7 @@ import { respondWithEtagCache } from '../utils/server-sdk-etag-cache';
 import RewardTemplateService from '../services/reward-template-service';
 import { EnvironmentRequest } from '../middleware/environment-resolver';
 import { UnifiedChangeGateway } from '../services/unified-change-gateway';
+import { TagService } from '../services/tag-service';
 
 import { createLogger } from '../config/logger';
 const logger = createLogger('SurveyController');
@@ -159,8 +160,9 @@ export class SurveyController {
         throw new GatrixError('Environment not specified', 400);
       }
 
+      const { tags, ...bodyWithoutTags } = req.body;
       const surveyData = {
-        ...req.body,
+        ...bodyWithoutTags,
         createdBy: authenticatedUserId,
         environmentId,
       };
@@ -169,7 +171,7 @@ export class SurveyController {
         authenticatedUserId,
         environmentId,
         'g_surveys',
-        { ...req.body },
+        { ...bodyWithoutTags },
         async () => {
           const survey = await SurveyService.createSurvey(surveyData);
 
@@ -186,6 +188,12 @@ export class SurveyController {
           return survey;
         }
       );
+
+      // Handle tags if provided
+      if (result.mode === 'DIRECT' && tags && Array.isArray(tags) && result.data?.id) {
+        const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+        await TagService.setTagsForEntity('survey', result.data.id.toString(), tagIds, authenticatedUserId);
+      }
 
       res.status(result.mode === 'CHANGE_REQUEST' ? 202 : 201).json({
         success: true,
@@ -221,8 +229,9 @@ export class SurveyController {
         throw new GatrixError('Environment not specified', 400);
       }
 
+      const { tags, ...bodyWithoutTags } = req.body;
       const updateData = {
-        ...req.body,
+        ...bodyWithoutTags,
         updatedBy: authenticatedUserId,
       };
 
@@ -231,7 +240,7 @@ export class SurveyController {
         environmentId,
         'g_surveys',
         id,
-        { ...req.body },
+        { ...bodyWithoutTags },
         async (processedData: any) => {
           const survey = await SurveyService.updateSurvey(
             id,
@@ -255,6 +264,14 @@ export class SurveyController {
       );
 
       if (result.mode === 'DIRECT') {
+        // Handle tags if provided
+        if (tags !== undefined) {
+          const tagIds = Array.isArray(tags)
+            ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
+            : [];
+          await TagService.setTagsForEntity('survey', id, tagIds, authenticatedUserId);
+        }
+
         res.json({
           success: true,
           data: result.data,
@@ -436,7 +453,7 @@ export class SurveyController {
 
   /**
    * Get survey settings for Server SDK
-   * GET /api/v1/server/:env/surveys/settings
+   * GET /api/v1/server/surveys/settings
    * Returns only the survey configuration settings
    */
   static getServerSurveySettings = asyncHandler(
@@ -467,7 +484,7 @@ export class SurveyController {
 
   /**
    * Get active surveys for Server SDK
-   * GET /api/v1/server/:env/surveys
+   * GET /api/v1/server/surveys
    * Returns surveys with common settings
    */
   static getServerSurveys = asyncHandler(
@@ -537,7 +554,7 @@ export class SurveyController {
 
   /**
    * Get survey by ID for Server SDK
-   * GET /api/v1/server/:env/surveys/:id
+   * GET /api/v1/server/surveys/:id
    * Returns survey formatted for Server SDK
    */
   static getServerSurveyById = asyncHandler(

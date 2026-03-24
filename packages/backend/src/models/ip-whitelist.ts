@@ -61,16 +61,16 @@ export class IpWhitelistModel {
       const offset = (pageNum - 1) * limitNum;
       const environmentId = filters.environmentId;
 
-      // 기본 Query 빌더 with environment filter
+      // Base query builder with environment filter
       const baseQuery = () =>
         db('g_ip_whitelist as iw')
           .leftJoin('g_users as creator', 'iw.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'iw.updatedBy', 'updater.id')
           .where('iw.environmentId', environmentId);
 
-      // Filter 적용 함수
+      // Apply filters
       const applyFilters = (query: any) => {
-        // 기본 조건: Expired되지 않은 항목만
+        // Default condition: only non-expired entries
         query.where(function (this: any) {
           this.whereNull('iw.endDate').orWhere('iw.endDate', '>', new Date());
         });
@@ -112,7 +112,7 @@ export class IpWhitelistModel {
         .limit(limitNum)
         .offset(offset);
 
-      // 병렬 실행
+      // Execute in parallel
       const [countResult, dataResults] = await Promise.all([
         countQuery,
         dataQuery,
@@ -209,7 +209,7 @@ export class IpWhitelistModel {
     }
   }
 
-  // 행 매핑 함수
+  // Row mapping function
   private static mapRowToIpWhitelist(row: any): any {
     return {
       id: row.id,
@@ -227,7 +227,7 @@ export class IpWhitelistModel {
     };
   }
 
-  // 추가 메서드들
+  // Additional methods
   static async findByIpAddress(
     ip: string,
     environmentId: string
@@ -239,48 +239,6 @@ export class IpWhitelistModel {
         .first();
     } catch (error) {
       logger.error('Error finding IP whitelist by IP address:', error);
-      throw error;
-    }
-  }
-
-  // 태그 관련 메서드들
-  static async setTags(whitelistId: string, tagIds: string[]): Promise<void> {
-    try {
-      await db.transaction(async (trx) => {
-        // Existing 태그 할당 Delete
-        await trx('g_tag_assignments')
-          .where('entityType', 'whitelist')
-          .where('entityId', whitelistId)
-          .del();
-
-        // 새 태그 할당 추가
-        if (tagIds.length > 0) {
-          const assignments = tagIds.map((tagId) => ({
-            id: generateULID(),
-            entityType: 'whitelist',
-            entityId: whitelistId,
-            tagId: tagId,
-            createdAt: new Date(),
-          }));
-          await trx('g_tag_assignments').insert(assignments);
-        }
-      });
-    } catch (error) {
-      logger.error('Error setting IP whitelist tags:', error);
-      throw error;
-    }
-  }
-
-  static async getTags(whitelistId: string): Promise<any[]> {
-    try {
-      return await db('g_tag_assignments as ta')
-        .join('g_tags as t', 'ta.tagId', 't.id')
-        .select(['t.id', 't.name', 't.color', 't.description'])
-        .where('ta.entityType', 'whitelist')
-        .where('ta.entityId', whitelistId)
-        .orderBy('t.name');
-    } catch (error) {
-      logger.error('Error getting IP whitelist tags:', error);
       throw error;
     }
   }

@@ -1,7 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 
-// Type은 프런트엔드의 LinkPreview와 호환되도록 정의
+// Type defined to be compatible with frontend LinkPreview
 interface LinkPreview {
   url: string;
   title?: string;
@@ -45,7 +45,7 @@ function extractTitle(html: string): string | undefined {
 }
 
 function extractFavicon(html: string, urlStr: string): string | undefined {
-  // 우선순위: apple-touch-icon -> icon -> shortcut icon
+  // Priority: apple-touch-icon -> icon -> shortcut icon
   const rels = ['apple-touch-icon', 'icon', 'shortcut icon'];
   for (const rel of rels) {
     const re = new RegExp(
@@ -93,14 +93,14 @@ function buildPreviewFromHtml(html: string, url: string): LinkPreview {
   const siteName = ogSite;
   const favicon = extractFavicon(html, url);
 
-  // 유형 추정
+  // Infer content type
   let type: LinkPreview['type'] = 'website';
   const ogType = extractMeta(html, 'og:type');
   if (ogType?.includes('video')) type = 'video';
   else if (ogType?.includes('article')) type = 'article';
   else if (ogType?.includes('image')) type = 'image';
 
-  // YouTube 특화 처리 (썸네일 보장)
+  // YouTube-specific handling (ensure thumbnail)
   if (
     /youtu\.be\//.test(url) ||
     /youtube\.com\/(watch\?v=|embed\/)/.test(url)
@@ -108,12 +108,12 @@ function buildPreviewFromHtml(html: string, url: string): LinkPreview {
     const idMatch = url.match(/(?:watch\?v=|youtu\.be\/|embed\/)([^&\n?#]+)/);
     const vid = idMatch ? idMatch[1] : undefined;
     if (vid && !image) {
-      // 고화질 -> 표준 순으로 시도
+      // Try high quality -> standard in order
       const candidates = [
         `https://img.youtube.com/vi/${vid}/maxresdefault.jpg`,
         `https://img.youtube.com/vi/${vid}/hqdefault.jpg`,
       ];
-      // 우선 첫 번째를 Used (프런트에서 onError로 자연 처리)
+      // Use the first available (frontend handles onError gracefully)
       return {
         url,
         title: title || 'YouTube 동영상',
@@ -154,7 +154,7 @@ export class LinkPreviewController {
         },
         timeout: 8000,
         maxRedirects: 3,
-        // 일부 사이트가 403을 반환하는 경우가 있으므로, 검토 필요
+        // Some sites may return 403, needs review
         validateStatus: () => true,
       });
 
@@ -188,7 +188,7 @@ export class LinkPreviewController {
           .json({ success: false, error: 'urls 배열이 필요합니다' });
       }
 
-      // 과도한 Request 방지: 최대 10개로 제한
+      // Rate limit: max 10 URLs per request
       const limited = urls.slice(0, 10);
       const results = await Promise.all(
         limited.map(async (u) => {

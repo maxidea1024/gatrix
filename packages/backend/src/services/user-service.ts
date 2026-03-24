@@ -2,6 +2,7 @@ import { UserModel } from '../models/user';
 import { UserWithoutPassword } from '../types/user';
 import { GatrixError } from '../middleware/error-handler';
 import { createLogger } from '../config/logger';
+import { TagService } from './tag-service';
 
 const logger = createLogger('userService');
 import EmailService from './email-service';
@@ -214,7 +215,7 @@ export class UserService {
 
       await UserModel.update(userId, { status: 'active' });
 
-      // 승인 이메일 발송
+      // Send approval email
       try {
         await EmailService.sendAccountApprovalEmail(user.email, user.name);
         logger.info('Account approval email sent:', {
@@ -222,7 +223,7 @@ export class UserService {
           email: user.email,
         });
       } catch (emailError) {
-        // 이메일 발송 Failed는 로그만 남기고 전체 프로세스는 계속 진행
+        // Log email failure but continue the process
         logger.error('Failed to send approval email:', {
           userId,
           email: user.email,
@@ -276,79 +277,8 @@ export class UserService {
       throw new GatrixError('Failed to get pending users', 500);
     }
   }
-  // 태그 관련 메서드들
-  static async getUserTags(userId: string): Promise<any[]> {
-    try {
-      return await UserModel.getTags(userId);
-    } catch (error) {
-      logger.error('Error getting user tags:', error);
-      throw new GatrixError('Failed to get user tags', 500);
-    }
-  }
 
-  static async setUserTags(
-    userId: string,
-    tagIds: string[],
-    updatedBy: string
-  ): Promise<void> {
-    try {
-      // Check if user exists
-      const user = await UserModel.findById(userId);
-      if (!user) {
-        throw new GatrixError('User not found', 404);
-      }
-
-      await UserModel.setTags(userId, tagIds, updatedBy);
-    } catch (error) {
-      logger.error('Error setting user tags:', error);
-      if (error instanceof GatrixError) {
-        throw error;
-      }
-      throw new GatrixError('Failed to set user tags', 500);
-    }
-  }
-
-  static async addUserTag(
-    userId: string,
-    tagId: string,
-    createdBy: string
-  ): Promise<void> {
-    try {
-      // Check if user exists
-      const user = await UserModel.findById(userId);
-      if (!user) {
-        throw new GatrixError('User not found', 404);
-      }
-
-      await UserModel.addTag(userId, tagId, createdBy);
-    } catch (error) {
-      logger.error('Error adding user tag:', error);
-      if (error instanceof GatrixError) {
-        throw error;
-      }
-      throw new GatrixError('Failed to add user tag', 500);
-    }
-  }
-
-  static async removeUserTag(userId: string, tagId: string): Promise<void> {
-    try {
-      // Check if user exists
-      const user = await UserModel.findById(userId);
-      if (!user) {
-        throw new GatrixError('User not found', 404);
-      }
-
-      await UserModel.removeTag(userId, tagId);
-    } catch (error) {
-      logger.error('Error removing user tag:', error);
-      if (error instanceof GatrixError) {
-        throw error;
-      }
-      throw new GatrixError('Failed to remove user tag', 500);
-    }
-  }
-
-  // 관리자가 Force verify user email
+  // Force verify user email by admin
   static async verifyUserEmail(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
@@ -374,7 +304,7 @@ export class UserService {
     }
   }
 
-  // Used자에게 이메일 Resend verification email
+  // Resend verification email to user
   static async resendVerificationEmail(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
@@ -386,7 +316,7 @@ export class UserService {
         throw new GatrixError('User email is already verified', 400);
       }
 
-      // 이메일 Authentication 메일 발송 (현재는 웰컴 이메일로 대체)
+      // Send verification email (currently replaced with welcome email)
       try {
         await EmailService.sendWelcomeEmail(user.email, user.name);
         logger.info('Verification email sent:', {

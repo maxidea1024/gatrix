@@ -117,6 +117,7 @@ import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import TagSelector from '../../components/common/TagSelector';
+import TagChips from '../../components/common/TagChips';
 import JsonEditor from '../../components/common/JsonEditor';
 import ValueEditorField from '../../components/common/ValueEditorField';
 import BooleanSwitch from '../../components/common/BooleanSwitch';
@@ -2434,27 +2435,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                   >
                     {t('featureFlags.tags')}
                   </Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {(flag.tags || []).map((tagName) => {
-                      const tag = allTags.find((t) => t.name === tagName);
-                      return (
-                        <Chip
-                          key={tagName}
-                          label={tagName}
-                          size="small"
-                          sx={{
-                            bgcolor: tag?.color || '#888',
-                            color: getContrastColor(tag?.color || '#888'),
-                          }}
-                        />
-                      );
-                    })}
-                    {(flag.tags || []).length === 0 && (
-                      <Typography variant="caption" color="text.secondary">
-                        {t('featureFlags.noTags')}
-                      </Typography>
-                    )}
-                  </Box>
+                  <TagChips
+                    tags={(flag.tags || [])
+                      .map((tagName) => allTags.find((t) => t.name === tagName))
+                      .filter((t): t is Tag => !!t)}
+                    emptyText={t('featureFlags.noTags')}
+                  />
                 </Box>
 
                 {/* Settings Info - only in view mode */}
@@ -4042,6 +4028,21 @@ const FeatureFlagDetailPage: React.FC = () => {
                   />
                 )}
 
+                {/* Collapsible Tags */}
+                {(!!editingFlagData.tags?.length ||
+                  (editingFlagData as any)._showTags) && (
+                  <TagSelector
+                    value={editTagSelection}
+                    onChange={(tags) => {
+                      setEditTagSelection(tags);
+                      setEditingFlagData({
+                        ...editingFlagData,
+                        tags: tags.map((t) => t.name),
+                      });
+                    }}
+                  />
+                )}
+
                 <Box>
                   <FormControlLabel
                     control={
@@ -4065,21 +4066,6 @@ const FeatureFlagDetailPage: React.FC = () => {
                     {t('featureFlags.impressionDataHelp')}
                   </Typography>
                 </Box>
-
-                {/* Collapsible Tags */}
-                {(!!editingFlagData.tags?.length ||
-                  (editingFlagData as any)._showTags) && (
-                  <TagSelector
-                    value={editTagSelection}
-                    onChange={(tags) => {
-                      setEditTagSelection(tags);
-                      setEditingFlagData({
-                        ...editingFlagData,
-                        tags: tags.map((t) => t.name),
-                      });
-                    }}
-                  />
-                )}
               </Stack>
             </Box>
             <Box

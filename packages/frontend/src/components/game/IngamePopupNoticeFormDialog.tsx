@@ -48,6 +48,7 @@ import TargetSettingsGroup, {
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useEntityLock } from '../../hooks/useEntityLock';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import TagSelector from '../common/TagSelector';
 
 interface IngamePopupNoticeFormDialogProps {
   open: boolean;
@@ -111,6 +112,7 @@ const IngamePopupNoticeFormDialog: React.FC<
     null
   );
   const [description, setDescription] = useState('');
+  const [selectedTags, setSelectedTags] = useState<any[]>([]);
 
   // Template state
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
@@ -186,6 +188,7 @@ const IngamePopupNoticeFormDialog: React.FC<
       setUseTemplate(notice.useTemplate);
       setMessageTemplateId(notice.messageTemplateId);
       setDescription(notice.description || '');
+      setSelectedTags(notice.tags || []);
 
       // Load selected template
       if (notice.useTemplate && notice.messageTemplateId) {
@@ -213,6 +216,7 @@ const IngamePopupNoticeFormDialog: React.FC<
       setUseTemplate(false);
       setMessageTemplateId(null);
       setDescription('');
+      setSelectedTags([]);
       setSelectedTemplate(null);
     }
   }, [notice, open, templates]);
@@ -273,6 +277,7 @@ const IngamePopupNoticeFormDialog: React.FC<
       useTemplate,
       messageTemplateId: useTemplate ? messageTemplateId : null,
       description: description.trim() || null,
+      tags: selectedTags.map((t: any) => t.id).sort(),
     };
 
     const originalData = {
@@ -308,6 +313,7 @@ const IngamePopupNoticeFormDialog: React.FC<
       useTemplate: notice.useTemplate,
       messageTemplateId: notice.useTemplate ? notice.messageTemplateId : null,
       description: notice.description?.trim() || null,
+      tags: (notice.tags || []).map((t: any) => t.id).sort(),
     };
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
@@ -330,6 +336,7 @@ const IngamePopupNoticeFormDialog: React.FC<
     useTemplate,
     messageTemplateId,
     description,
+    selectedTags,
   ]);
 
   const handleSubmit = async () => {
@@ -386,7 +393,8 @@ const IngamePopupNoticeFormDialog: React.FC<
         useTemplate,
         messageTemplateId: useTemplate ? messageTemplateId : null,
         description: description.trim() || null,
-      };
+        tags: selectedTags,
+      } as any;
 
       if (notice) {
         const result = await ingamePopupNoticeService.updateIngamePopupNotice(
@@ -701,6 +709,9 @@ const IngamePopupNoticeFormDialog: React.FC<
             rows={2}
             helperText={t('ingamePopupNotices.descriptionHelp')}
           />
+
+          {/* Tags */}
+          <TagSelector value={selectedTags} onChange={setSelectedTags} />
         </Stack>
       </Box>
 

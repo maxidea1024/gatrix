@@ -6,6 +6,7 @@ import {
   convertToMySQLDateTime,
 } from '../utils/date-utils';
 import { pubSubService } from './pub-sub-service';
+import { TagService } from './tag-service';
 
 export interface IngamePopupNotice {
   id: string;
@@ -198,7 +199,15 @@ class IngamePopupNoticeService {
 
     const notices = rows.map((row) => this.formatNotice(row));
 
-    return { notices, total };
+    // Load tags for each notice
+    const noticesWithTags = await Promise.all(
+      notices.map(async (notice) => {
+        const tags = await TagService.listTagsForEntity('ingame_popup_notice', notice.id);
+        return { ...notice, tags };
+      })
+    );
+
+    return { notices: noticesWithTags, total };
   }
 
   /**
@@ -219,6 +228,19 @@ class IngamePopupNoticeService {
     }
 
     return this.formatNotice(rows[0]);
+  }
+
+  /**
+   * Get ingame popup notice by ID with tags
+   */
+  async getIngamePopupNoticeByIdWithTags(
+    id: string,
+    environmentId: string
+  ): Promise<IngamePopupNotice | null> {
+    const notice = await this.getIngamePopupNoticeById(id, environmentId);
+    if (!notice) return null;
+    const tags = await TagService.listTagsForEntity('ingame_popup_notice', id);
+    return { ...notice, tags } as any;
   }
 
   /**

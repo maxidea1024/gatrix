@@ -1,7 +1,6 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { UserService } from '../services/user-service';
-import { UserTagService } from '../services/user-tag-service';
 import { AuditLogModel } from '../models/audit-log';
 import { UserModel } from '../models/user';
 import { GatrixError } from '../middleware/error-handler';
@@ -11,6 +10,7 @@ import { generateULID } from '../utils/ulid';
 import Joi from 'joi';
 import { pubSubService } from '../services/pub-sub-service';
 import { permissionService } from '../services/permission-service';
+import { TagService } from '../services/tag-service';
 
 import { createLogger } from '../config/logger';
 const logger = createLogger('AdminController');
@@ -201,9 +201,9 @@ export class AdminController {
 
       let user = await UserService.createUser(userData);
 
-      // 태그 Settings
+      // Set tags
       if (tagIds && tagIds.length > 0) {
-        await UserTagService.setUserTags(user.id, tagIds, req.user.userId);
+        await TagService.setTagsForEntity('user', user.id, tagIds, req.user.userId);
       }
 
       // Reload user to get all updated info
@@ -255,11 +255,11 @@ export class AdminController {
       }
       let user = await UserService.updateUser(userId, updates);
 
-      // 태그 Settings (tagIds가 제공된 경우에만)
+      // Set tags (only if tagIds is provided)
       if (tagIds !== undefined) {
-        await UserTagService.setUserTags(userId, tagIds, req.user.userId);
+        await TagService.setTagsForEntity('user', userId, tagIds, req.user.userId);
 
-        // 태그 업데이트 후 User info를 다시 로드하여 최신 태그 정보 포함
+        // Reload user to get latest tag info
         user = await UserService.getUserById(userId);
       }
 
@@ -458,19 +458,19 @@ export class AdminController {
         throw new GatrixError('User not found', 404);
       }
 
-      // 이미 Authentication된 경우 Confirm
+      // Check if already verified
       if (user.emailVerified) {
         throw new GatrixError('Email is already verified', 400);
       }
 
-      // 이메일 Authentication Update state
+      // Update email verification status
       await db('g_users').where('id', userId).update({
         emailVerified: 1,
         emailVerifiedAt: new Date(),
         updatedAt: new Date(),
       });
 
-      // Cache 클리어
+      // Clear cache
       clearAllCache();
 
       res.json({
@@ -977,22 +977,9 @@ export class AdminController {
       const currentUserId = req.user.userId;
 
       await db.transaction(async (trx) => {
-        // Remove existing tags for these users
-        await trx('g_tag_assignments').whereIn('userId', userIds).del();
-
-        // Add new tags
-        if (tagIds.length > 0) {
-          const assignments = userIds.flatMap((userId) =>
-            tagIds.map((tagId) => ({
-              id: generateULID(),
-              userId,
-              tagId,
-              createdBy: currentUserId,
-              createdAt: new Date(),
-            }))
-          );
-
-          await trx('g_tag_assignments').insert(assignments);
+        // Set tags for each user using TagService
+        for (const userId of userIds) {
+          await TagService.setTagsForEntity('user', userId, tagIds, currentUserId);
         }
 
         // Log audit entries

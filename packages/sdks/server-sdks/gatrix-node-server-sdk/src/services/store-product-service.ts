@@ -64,7 +64,7 @@ export class StoreProductService extends BaseEnvironmentService<
       environmentId: resolvedEnv,
     });
     // Invalidate ETag cache to force fresh data fetch
-    this.apiClient.invalidateEtagCache(this.getEndpoint());
+    this.getApiClient(resolvedEnv).invalidateEtagCache(this.getEndpoint());
     return await this.listByEnvironment(resolvedEnv);
   }
 

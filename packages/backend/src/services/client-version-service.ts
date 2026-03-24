@@ -6,6 +6,7 @@ import {
 } from '../models/client-version';
 import { pubSubService } from './pub-sub-service';
 import { createLogger } from '../config/logger';
+import { TagService } from './tag-service';
 
 const logger = createLogger('ClientVersionService');
 import {
@@ -56,7 +57,7 @@ export interface BulkStatusUpdateRequest {
   ids: number[];
   clientStatus: ClientStatus;
   updatedBy: string;
-  // 점검 관련 필드들
+  // Maintenance-related fields
   maintenanceStartDate?: string;
   maintenanceEndDate?: string;
   maintenanceMessage?: string;
@@ -127,7 +128,7 @@ async function prepareClientVersionForSDK(
 }
 
 export class ClientVersionService {
-  // Used 가능한 버전 Get list (distinct)
+  // Get available version list (distinct)
   static async getAvailableVersions(environmentId: string): Promise<string[]> {
     try {
       const versions =
@@ -200,7 +201,7 @@ export class ClientVersionService {
     } = pagination;
     const offset = (page - 1) * limit;
 
-    // Search 조건 구성
+    // Build search conditions
     const whereConditions: any = { environmentId };
 
     if (filters.version) {
@@ -247,7 +248,7 @@ export class ClientVersionService {
       whereConditions.updatedBy = filters.updatedBy;
     }
 
-    // 날짜 Filter 구현
+    // Date filter implementation
     if (filters.createdAtFrom || filters.createdAtTo) {
       const dateFilters: any = { environmentId };
       if (filters.createdAtFrom) {
@@ -281,11 +282,11 @@ export class ClientVersionService {
       };
     }
 
-    // 전체 Search - 간단한 구현
+    // Full text search - simple implementation
     if (filters.search) {
-      // Search어가 있으면 다른 Filter는 Ignore하고 검색만 수행
+      // If search query exists, ignore other filters and perform search only
       const searchConditions: any = { environmentId };
-      // 여러 필드에서 Search하는 로직은 Model에서 처리
+      // Multi-field search logic is handled in the Model
       searchConditions.search = filters.search;
       const result = await ClientVersionModel.findAll({
         ...searchConditions,
@@ -403,7 +404,7 @@ export class ClientVersionService {
     data: any,
     environmentId: string
   ): Promise<ClientVersionAttributes[]> {
-    // 중복 체크
+    // Duplicate check
     const duplicates = [];
     for (const platform of data.platforms) {
       const isDuplicate = await ClientVersionModel.checkDuplicate(
@@ -421,7 +422,7 @@ export class ClientVersionService {
       throw new Error(`DUPLICATE_CLIENT_VERSIONS:${duplicates.join(', ')}`);
     }
 
-    // 받은 데이터를 각 플랫Form별로 클라이언트 버전 배열로 변환
+    // Transform received data into client version arrays per platform
     const clientVersions = data.platforms.map((platform: any) => ({
       environmentId,
       platform: platform.platform,
@@ -446,18 +447,19 @@ export class ClientVersionService {
       environmentId
     );
 
-    // 태그가 있는 경우 각 Create된 Set tags for client versions
+    // Set tags for each created client version if tags are provided
     if (data.tags && Array.isArray(data.tags) && data.tags.length > 0) {
       const tagIds = data.tags
         .map((tag: any) => tag.id)
-        .filter((id: any) => id); // null/undefined 제거
+        .filter((id: any) => id); // Remove null/undefined
 
       if (tagIds.length > 0) {
-        // 각 Create된 Set tags for client versions
+        // Set tags for each created client version
         for (const clientVersion of result) {
           if (clientVersion && clientVersion.id) {
             try {
-              await ClientVersionModel.setTags(
+              await TagService.setTagsForEntity(
+                'client_version',
                 clientVersion.id,
                 tagIds,
                 data.createdBy
@@ -467,7 +469,7 @@ export class ClientVersionService {
                 `Failed to set tags for client version ${clientVersion.id}:`,
                 error
               );
-              // 태그 Settings Failed는 전체 작업을 중단하지 않음
+              // Tag setting failure should not abort the entire operation
             }
           } else {
             logger.warn(

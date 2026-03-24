@@ -1386,23 +1386,15 @@ const ClientVersionsPage: React.FC = () => {
     [t, enqueueSnackbar]
   );
 
-  // 태그 관련 핸들러
+  // Tag handler
   const handleOpenTagDialog = useCallback(
-    async (clientVersion: ClientVersion) => {
-      try {
-        setSelectedClientVersionForTags(clientVersion);
-        const tags = await ClientVersionService.getTags(
-          projectApiPath,
-          clientVersion.id!
-        );
-        setClientVersionTags(tags);
-        setTagDialogOpen(true);
-      } catch (error) {
-        console.error('Error loading client version tags:', error);
-        enqueueSnackbar(t('common.error'), { variant: 'error' });
-      }
+    (clientVersion: ClientVersion) => {
+      setSelectedClientVersionForTags(clientVersion);
+      // Use tags already loaded from list data
+      setClientVersionTags(clientVersion.tags || []);
+      setTagDialogOpen(true);
     },
-    [t, enqueueSnackbar]
+    []
   );
 
   const handleSaveTags = useCallback(
@@ -1410,16 +1402,16 @@ const ClientVersionsPage: React.FC = () => {
       if (!selectedClientVersionForTags?.id) return;
 
       try {
-        await ClientVersionService.setTags(
+        // Update client version with new tags through update API
+        await ClientVersionService.updateClientVersion(
           projectApiPath,
           selectedClientVersionForTags.id,
-          tagIds
+          { tags: tagIds.map((id) => ({ id: id.toString() })) } as any
         );
         setTagDialogOpen(false);
         enqueueSnackbar(t('common.success'), { variant: 'success' });
-        // 필요시 목록 Refresh
-        mutateVersions(); // SWR cache 갱신
-        mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
+        mutateVersions();
+        mutateClientVersions(projectApiPath);
       } catch (error) {
         console.error('Error saving client version tags:', error);
         enqueueSnackbar(t('common.error'), { variant: 'error' });

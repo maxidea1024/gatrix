@@ -606,6 +606,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         supportsMultiLanguage: data.supportsMultiLanguage || false,
         maintenanceLocales: finalMaintenanceLocales,
         minPatchVersion: data.minPatchVersion || undefined,
+        tags: selectedTags || [],
       };
       let clientVersionId: number;
 
@@ -671,18 +672,6 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         );
       }
 
-      // Set tags
-      if (selectedTags && selectedTags.length > 0) {
-        const tagIds = selectedTags.map((tag) => tag.id);
-        await ClientVersionService.setTags(
-          projectApiPath,
-          clientVersionId,
-          tagIds
-        );
-      } else {
-        // Remove all existing tags if none selected
-        await ClientVersionService.setTags(projectApiPath, clientVersionId, []);
-      }
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -923,6 +912,15 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       </Typography>
                     </FormControl>
                   )}
+                />
+
+                {/* Tags - right after status */}
+                <TagSelector
+                  value={selectedTags}
+                  onChange={(value) => {
+                    setSelectedTags(value);
+                    setValue('tags', value, { shouldDirty: true });
+                  }}
                 />
 
                 {isMaintenanceMode && (
@@ -1228,33 +1226,6 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             </Paper>
 
             {/* Tag section (outside additional settings) */}
-            <Paper variant="outlined" elevation={0} sx={{ p: 2 }}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  color: 'primary.main',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                }}
-              >
-                {t('common.tags')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t('clientVersions.form.tagsHelp')}
-              </Typography>
-
-              <TagSelector
-                value={selectedTags}
-                onChange={(value) => {
-                  setSelectedTags(value);
-                  setValue('tags', value, { shouldDirty: true });
-                }}
-              />
-            </Paper>
-
             {/* Additional settings section */}
             <Accordion
               defaultExpanded={false}

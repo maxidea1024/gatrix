@@ -32,6 +32,7 @@ export interface IngamePopupNotice {
   updatedAt: string;
   createdBy: number;
   updatedBy: number | null;
+  tags?: any[];
 }
 
 export interface CreateIngamePopupNoticeData {
@@ -54,6 +55,7 @@ export interface CreateIngamePopupNoticeData {
   messageTemplateId?: number | null;
   useTemplate?: boolean;
   description?: string | null;
+  tags?: any[];
 }
 
 export interface UpdateIngamePopupNoticeData extends Partial<CreateIngamePopupNoticeData> {}

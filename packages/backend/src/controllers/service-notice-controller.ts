@@ -9,6 +9,7 @@ import {
   ErrorCodes,
 } from '../utils/api-response';
 import { UnifiedChangeGateway } from '../services/unified-change-gateway';
+import { TagService } from '../services/tag-service';
 
 import { createLogger } from '../config/logger';
 const logger = createLogger('ServiceNoticeController');
@@ -207,9 +208,16 @@ class ServiceNoticeController {
       );
 
       if (gatewayResult.mode === 'DIRECT') {
+        // Handle tags if provided
+        const createdNotice = gatewayResult.data;
+        if (data.tags && Array.isArray(data.tags) && createdNotice?.id) {
+          const tagIds = data.tags.map((tag: any) => tag.id).filter((id: any) => id);
+          await TagService.setTagsForEntity('service_notice', createdNotice.id.toString(), tagIds, userId);
+        }
+
         return sendSuccessResponse(
           res,
-          { notice: gatewayResult.data },
+          { notice: createdNotice },
           'Service notice created successfully',
           201
         );
@@ -279,6 +287,14 @@ class ServiceNoticeController {
       );
 
       if (gatewayResult.mode === 'DIRECT') {
+        // Handle tags if provided
+        if (data.tags !== undefined) {
+          const tagIds = Array.isArray(data.tags)
+            ? data.tags.map((tag: any) => tag.id).filter((tid: any) => tid)
+            : [];
+          await TagService.setTagsForEntity('service_notice', id, tagIds, userId);
+        }
+
         return sendSuccessResponse(
           res,
           gatewayResult.data,

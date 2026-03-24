@@ -1,7 +1,6 @@
 import db from '../config/knex';
 import { generateULID } from '../utils/ulid';
 import { GatrixError } from '../middleware/error-handler';
-import TagAssignmentModel from './tag-assignment';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('AccountWhitelist');
@@ -320,11 +319,11 @@ export class WhitelistModel {
         try {
           tags = JSON.parse(row.tags);
         } catch (error) {
-          // JSON 파싱 Failed 시 문자열을 배열로 변환
+          // Convert string to array on JSON parse failure
           logger.warn(
             `Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`
           );
-          // 쉼표로 구분된 문자열을 배열로 변환
+          // Split comma-separated string into array
           tags = row.tags
             .split(',')
             .map((tag: string) => tag.trim())
@@ -382,23 +381,5 @@ export class WhitelistModel {
         500
       );
     }
-  }
-
-  // 태그 관련 메서드들
-  static async setTags(
-    whitelistId: string,
-    tagIds: string[],
-    createdBy?: string
-  ): Promise<void> {
-    await TagAssignmentModel.setTagsForEntity(
-      'whitelist',
-      whitelistId,
-      tagIds,
-      createdBy
-    );
-  }
-
-  static async getTags(whitelistId: string): Promise<any[]> {
-    return await TagAssignmentModel.listTagsForEntity('whitelist', whitelistId);
   }
 }

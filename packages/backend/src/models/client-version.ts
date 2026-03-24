@@ -1,6 +1,7 @@
 import db from '../config/knex';
 import { generateULID } from '../utils/ulid';
 import { createLogger } from '../config/logger';
+import TagAssignmentModel from './tag-assignment';
 
 const logger = createLogger('ClientVersion');
 
@@ -85,7 +86,7 @@ export interface BulkCreateClientVersionRequest {
 }
 
 export class ClientVersionModel {
-  // Used 가능한 버전 Get list (distinct)
+  // Get available version list (distinct)
   static async getDistinctVersions(environmentId: string): Promise<string[]> {
     try {
       const result = await db('g_client_versions')
@@ -115,14 +116,14 @@ export class ClientVersionModel {
       const sortOrder = filters?.sortOrder || 'DESC';
       const environmentId = filters.environmentId;
 
-      // 기본 Query 빌더 with environment filter
+      // Base query builder with environment filter
       const baseQuery = () =>
         db('g_client_versions as cv')
           .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
           .where('cv.environmentId', environmentId);
 
-      // Filter 적용 함수
+      // Apply filters
       const applyFilters = (query: any) => {
         // clientVersion filter - support both single value and array (any_of)
         if (filters?.clientVersion) {
@@ -160,18 +161,18 @@ export class ClientVersionModel {
             );
             query.whereIn('cv.guestModeAllowed', guestModeValues);
           } else {
-            // TINYINT Type이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
+            // TINYINT type, convert boolean to number (true -> 1, false -> 0)
             const guestModeValue = filters.guestModeAllowed ? 1 : 0;
             query.where('cv.guestModeAllowed', guestModeValue);
           }
         }
 
-        // 태그 Filter링 - support both any_of and include_all
+        // Tag filtering - support both any_of and include_all
         if (filters?.tags && filters.tags.length > 0) {
           const tagsOperator = filters.tagsOperator || 'any_of';
 
           if (tagsOperator === 'include_all') {
-            // AND 조건: 모든 태그를 포함해야 함
+            // AND condition: must include all tags
             filters.tags.forEach((tagId) => {
               query.whereExists((subquery: any) => {
                 subquery
@@ -183,7 +184,7 @@ export class ClientVersionModel {
               });
             });
           } else {
-            // OR 조건: 태그 중 하나라도 포함하면 됨
+            // OR condition: include any of the tags
             query.whereExists((subquery: any) => {
               subquery
                 .select('*')
@@ -228,7 +229,7 @@ export class ClientVersionModel {
         .limit(limit)
         .offset(offset);
 
-      // 병렬 실행
+      // Execute in parallel
       const [countResult, dataResults] = await Promise.all([
         countQuery,
         dataQuery,
@@ -236,10 +237,10 @@ export class ClientVersionModel {
 
       const total = countResult?.total || 0;
 
-      // 각 클라이언트 버전에 대해 태그 정보 로드
+      // Load tag info for each client version
       const clientVersionsWithTags = await Promise.all(
         dataResults.map(async (cv: any) => {
-          const tags = await this.getTags(cv.id);
+          const tags = await TagAssignmentModel.listTagsForEntity('client_version', cv.id);
           return {
             ...cv,
             tags,
@@ -284,10 +285,10 @@ export class ClientVersionModel {
         return null;
       }
 
-      // 태그 정보 로드
-      const tags = await this.getTags(id, trx);
+      // Load tag info
+      const tags = await TagAssignmentModel.listTagsForEntity('client_version', id, trx);
 
-      // 점검 메시지 Locale 정보 로드
+      // Load maintenance message locale info
       const localesQuery = trx
         ? trx('g_client_version_maintenance_locales')
         : db('g_client_version_maintenance_locales');
@@ -309,7 +310,7 @@ export class ClientVersionModel {
   static async create(data: any, environmentId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
-        // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
+        // Remove tags and maintenanceLocales fields as they are managed in separate tables
         const { tags, maintenanceLocales, ...clientVersionData } = data;
 
         const id = generateULID();
@@ -322,7 +323,7 @@ export class ClientVersionModel {
           updatedAt: new Date(),
         });
 
-        // 점검 메시지 Locale 처리
+        // Process maintenance message locales
         if (maintenanceLocales && maintenanceLocales.length > 0) {
           const localeInserts = maintenanceLocales.map((locale: any) => ({
             clientVersionId: id,
@@ -354,7 +355,7 @@ export class ClientVersionModel {
   ): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
-        // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
+        // Remove tags and maintenanceLocales fields as they are managed in separate tables
         const { tags, maintenanceLocales, ...clientVersionData } = data;
 
         await trx('g_client_versions')
@@ -365,14 +366,14 @@ export class ClientVersionModel {
             updatedAt: new Date(),
           });
 
-        // 점검 메시지 Locale 처리
+        // Process maintenance message locales
         if (maintenanceLocales !== undefined) {
           // Existing Locale Delete
           await trx('g_client_version_maintenance_locales')
             .where('clientVersionId', id)
             .del();
 
-          // 새 Locale 추가
+          // Add new locales
           if (maintenanceLocales.length > 0) {
             const localeInserts = maintenanceLocales.map((locale: any) => ({
               clientVersionId: id,
@@ -410,7 +411,7 @@ export class ClientVersionModel {
     }
   }
 
-  // 추가 메서드들
+  // Additional methods
   static async bulkCreate(
     data: ClientVersionCreationAttributes[],
     environmentId: string
@@ -418,10 +419,10 @@ export class ClientVersionModel {
     try {
       const insertedIds: string[] = [];
 
-      // 먼저 모든 데이터를 삽입
+      // First insert all data
       await db.transaction(async (trx) => {
         for (const item of data) {
-          // tags 필드는 별도 테이블에서 관리하므로 제거
+          // Remove tags field as it is managed in a separate table
           const { maintenanceLocales, ...clientVersionData } = item as any;
 
           const id = generateULID();
@@ -437,7 +438,7 @@ export class ClientVersionModel {
         }
       });
 
-      // 트랜잭션 완료 후 Create된 Query data
+      // Query created data after transaction completes
       const results = [];
       for (const cvId of insertedIds) {
         const clientVersion = await this.findById(cvId, environmentId);
@@ -445,7 +446,7 @@ export class ClientVersionModel {
           results.push(clientVersion);
         } else {
           logger.warn(`Failed to find created client version with id: ${cvId}`);
-          // 기본 객체라도 반환하여 null 방지
+          // Return a basic object to prevent null
           results.push({
             id: cvId,
             platform: 'unknown',
@@ -472,7 +473,7 @@ export class ClientVersionModel {
         updatedAt: new Date(),
       };
 
-      // 점검 관련 필드들 추가
+      // Add maintenance-related fields
       if (data.maintenanceStartDate) {
         updateData.maintenanceStartDate = data.maintenanceStartDate;
       }
@@ -494,14 +495,14 @@ export class ClientVersionModel {
         .where('environmentId', environmentId)
         .update(updateData);
 
-      // 언어별 메시지 처리
+      // Process language-specific messages
       if (data.maintenanceLocales && Array.isArray(data.maintenanceLocales)) {
-        // Existing 언어별 메시지 Delete
+        // Delete existing language-specific messages
         await db('g_client_version_maintenance_locales')
           .whereIn('clientVersionId', data.ids)
           .del();
 
-        // New 언어별 메시지 추가
+        // Add new language-specific messages
         if (data.maintenanceLocales.length > 0) {
           const localeInserts = [];
           for (const id of data.ids) {
@@ -575,74 +576,6 @@ export class ClientVersionModel {
     }
   }
 
-  // 태그 관련 메서드들
-  static async setTags(
-    clientVersionId: string,
-    tagIds: string[],
-    createdBy?: string
-  ): Promise<void> {
-    try {
-      logger.info(
-        `Setting tags for client version ${clientVersionId}:`,
-        tagIds
-      );
-
-      await db.transaction(async (trx) => {
-        // Existing 태그 할당 Delete
-        const deletedCount = await trx('g_tag_assignments')
-          .where('entityType', 'client_version')
-          .where('entityId', clientVersionId)
-          .del();
-
-        logger.info(
-          `Deleted ${deletedCount} existing tag assignments for client version ${clientVersionId}`
-        );
-
-        // 새 태그 할당 추가
-        if (tagIds.length > 0) {
-          const assignments = tagIds.map((tagId) => ({
-            id: generateULID(),
-            entityType: 'client_version',
-            entityId: clientVersionId,
-            tagId: tagId,
-            createdBy: createdBy || '',
-            createdAt: new Date(),
-          }));
-
-          logger.info(
-            `Inserting ${assignments.length} new tag assignments:`,
-            assignments
-          );
-          await trx('g_tag_assignments').insert(assignments);
-          logger.info(
-            `Successfully inserted tag assignments for client version ${clientVersionId}`
-          );
-        }
-      });
-    } catch (error) {
-      logger.error('Error setting client version tags:', error);
-      throw error;
-    }
-  }
-
-  static async getTags(clientVersionId: string, trx?: any): Promise<any[]> {
-    try {
-      const query = trx
-        ? trx('g_tag_assignments as ta')
-        : db('g_tag_assignments as ta');
-      const tags = await query
-        .join('g_tags as t', 'ta.tagId', 't.id')
-        .select(['t.id', 't.name', 't.color', 't.description'])
-        .where('ta.entityType', 'client_version')
-        .where('ta.entityId', clientVersionId)
-        .orderBy('t.name');
-
-      return tags;
-    } catch (error) {
-      logger.error('Error getting client version tags:', error);
-      throw error;
-    }
-  }
 
   static async getMaintenanceLocales(
     clientVersionId: string

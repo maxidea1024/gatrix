@@ -50,6 +50,26 @@ export class GameWorldService extends BaseEnvironmentService<
 
   // ==================== Domain-specific Methods ====================
 
+  // ==================== Override for ETag Invalidation ====================
+
+  /**
+   * Refresh cached game worlds for a specific environment.
+   * Invalidates ApiClient ETag cache first so the SDK does NOT send
+   * a stale If-None-Match header that would result in a 304 with old data.
+   */
+  async refreshByEnvironment(
+    _suppressWarnings?: boolean,
+    environmentId?: string
+  ): Promise<GameWorld[]> {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    this.logger.info('Refreshing game worlds cache', {
+      environmentId: resolvedEnv,
+    });
+    // Invalidate ETag cache to force fresh data fetch from the correct env API client
+    this.getApiClient(resolvedEnv).invalidateEtagCache(this.getEndpoint());
+    return await this.listByEnvironment(resolvedEnv);
+  }
+
   /**
    * Get game world by ID
    * GET /api/v1/server/game-worlds/:id

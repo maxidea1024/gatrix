@@ -40,19 +40,19 @@ export interface UpdateJobData {
   updatedBy: string;
 }
 
-// JSON 파싱 Utility 함수
+// JSON parsing utility function
 const safeJsonParse = (input: any): any => {
-  // 이미 객체인 경우 그대로 반환
+  // Return as-is if already an object
   if (typeof input === 'object' && input !== null) {
     return input;
   }
 
-  // null이나 undefined인 경우 빈 객체 반환
+  // Return empty object for null or undefined
   if (!input) {
     return {};
   }
 
-  // 문자열인 경우 JSON 파싱 시도
+  // Attempt JSON parsing if string
   if (typeof input === 'string') {
     if (input === '{}') {
       return {};
@@ -66,19 +66,19 @@ const safeJsonParse = (input: any): any => {
     }
   }
 
-  // 기타 Type인 경우 그대로 반환
+  // Return as-is for other types
   return input;
 };
 
-// JSON 문자열화 Utility 함수
+// JSON stringify utility function
 const safeJsonStringify = (data: any): string => {
   if (typeof data === 'string') {
-    // 이미 문자열인 경우, JSON인지 Confirm
+    // If already a string, check if valid JSON
     try {
       JSON.parse(data);
-      return data; // 이미 유효한 JSON 문자열
+      return data; // Already a valid JSON string
     } catch {
-      // 유효하지 않은 JSON이면 다시 stringify
+      // Re-stringify if not valid JSON
       return JSON.stringify(data);
     }
   }
@@ -99,7 +99,7 @@ export class JobModel {
         : 0;
       const environmentId = filters.environmentId;
 
-      // 기본 Query 빌더 with environment filter
+      // Base query builder with environment filter
       const baseQuery = () =>
         db('g_jobs as j')
           .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
@@ -107,7 +107,7 @@ export class JobModel {
           .leftJoin('g_users as uu', 'j.updatedBy', 'uu.id')
           .where('j.environmentId', environmentId);
 
-      // Filter 적용 함수
+      // Apply filters
       const applyFilters = (query: any) => {
         if (filters?.jobTypeId) {
           query.where('j.jobTypeId', filters.jobTypeId);
@@ -133,7 +133,7 @@ export class JobModel {
         .count('j.id as total')
         .first();
 
-      // Data Query - 태그 정보 포함
+      // Data query - include tag info
       const dataQuery = applyFilters(baseQuery())
         .select([
           'j.*',
@@ -148,7 +148,7 @@ export class JobModel {
         .limit(limit)
         .offset(offset);
 
-      // 병렬 실행
+      // Execute in parallel
       const [countResult, dataResults] = await Promise.all([
         countQuery,
         dataQuery,
@@ -156,7 +156,7 @@ export class JobModel {
 
       const total = countResult?.total || 0;
 
-      // Job Results 매핑
+      // Map job results
       const jobs = dataResults.map((row: any) => ({
         id: row.id,
         name: row.name,
@@ -176,7 +176,7 @@ export class JobModel {
         updatedByEmail: row.updatedByEmail,
       }));
 
-      // 각 Job에 대한 태그 정보 조회
+      // Fetch tag info for each job
       const jobIds = jobs.map((job: any) => job.id);
       if (jobIds.length > 0) {
         const jobTags = await db('g_tag_assignments as ta')
@@ -191,7 +191,7 @@ export class JobModel {
           .where('ta.entityType', 'job')
           .whereIn('ta.entityId', jobIds);
 
-        // Job별로 태그 그룹화
+        // Group tags by job
         const tagsByJobId = jobTags.reduce((acc: any, tag: any) => {
           if (!acc[tag.jobId]) {
             acc[tag.jobId] = [];
@@ -205,7 +205,7 @@ export class JobModel {
           return acc;
         }, {});
 
-        // Job에 태그 정보 추가
+        // Add tag info to jobs
         jobs.forEach((job: any) => {
           job.tags = tagsByJobId[job.id] || [];
         });
@@ -242,7 +242,7 @@ export class JobModel {
 
       if (!job) return null;
 
-      // 태그 정보 조회
+      // Fetch tag info
       const jobTags = await db('g_tag_assignments as ta')
         .join('g_tags as t', 'ta.tagId', 't.id')
         .select([
@@ -291,7 +291,7 @@ export class JobModel {
         updatedAt: new Date(),
       });
 
-      // 태그 연결
+      // Link tags
       if (jobData.tagIds && jobData.tagIds.length > 0) {
         const tagAssignments = jobData.tagIds.map((tagId) => ({
           id: generateULID(),
@@ -340,15 +340,15 @@ export class JobModel {
         .where('environmentId', environmentId)
         .update(updateData);
 
-      // 태그 업데이트
+      // Update tags
       if (jobData.tagIds !== undefined) {
-        // Existing 태그 연결 Delete
+        // Delete existing tag links
         await trx('g_tag_assignments')
           .where('entityType', 'job')
           .where('entityId', id)
           .del();
 
-        // 새 태그 연결 추가
+        // Add new tag links
         if (jobData.tagIds.length > 0) {
           const tagAssignments = jobData.tagIds.map((tagId) => ({
             id: generateULID(),
@@ -373,13 +373,13 @@ export class JobModel {
   static async delete(id: string, environmentId: string): Promise<void> {
     const trx = await db.transaction();
     try {
-      // 태그 할당 Delete
+      // Delete tag assignments
       await trx('g_tag_assignments')
         .where('entityType', 'job')
         .where('entityId', id)
         .del();
 
-      // Job Delete
+      // Delete job
       await trx('g_jobs')
         .where('id', id)
         .where('environmentId', environmentId)
@@ -389,53 +389,6 @@ export class JobModel {
     } catch (error) {
       await trx.rollback();
       logger.error('Error deleting job:', error);
-      throw error;
-    }
-  }
-
-  // 태그 관련 메서드들
-  static async setTags(
-    jobId: string,
-    tagIds: string[],
-    createdBy?: string
-  ): Promise<void> {
-    try {
-      await db.transaction(async (trx) => {
-        // Existing 태그 할당 Delete
-        await trx('g_tag_assignments')
-          .where('entityType', 'job')
-          .where('entityId', jobId)
-          .del();
-
-        // 새 태그 할당 추가
-        if (tagIds.length > 0) {
-          const assignments = tagIds.map((tagId) => ({
-            id: generateULID(),
-            entityType: 'job',
-            entityId: jobId,
-            tagId: tagId,
-            createdBy: createdBy || '',
-            createdAt: new Date(),
-          }));
-          await trx('g_tag_assignments').insert(assignments);
-        }
-      });
-    } catch (error) {
-      logger.error('Error setting job tags:', error);
-      throw error;
-    }
-  }
-
-  static async getTags(jobId: string): Promise<any[]> {
-    try {
-      return await db('g_tag_assignments as ta')
-        .join('g_tags as t', 'ta.tagId', 't.id')
-        .select(['t.id', 't.name', 't.color', 't.description'])
-        .where('ta.entityType', 'job')
-        .where('ta.entityId', jobId)
-        .orderBy('t.name');
-    } catch (error) {
-      logger.error('Error getting job tags:', error);
       throw error;
     }
   }

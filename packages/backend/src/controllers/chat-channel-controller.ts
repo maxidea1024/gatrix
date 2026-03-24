@@ -26,7 +26,7 @@ export class ChatChannelController {
         return;
       }
 
-      // Chat Server에서 Used자 채널 Get list
+      // Get user channels from chat server
       const response =
         await ChatChannelController.chatServerService.getUserChannels(
           user.userId
@@ -34,7 +34,7 @@ export class ChatChannelController {
 
       res.json({
         success: true,
-        data: response, // Chat Server의 Response을 그대로 전달 (data: [], pagination: {...})
+        data: response, // Pass chat server response as-is (data: [], pagination: {...})
       });
     } catch (error) {
       logger.error('Error getting user channels:', error);
@@ -69,9 +69,9 @@ export class ChatChannelController {
         return;
       }
 
-      // 임시: Chat Server 대신 직접 Response (Chat Server 문제 해결 후 원복)
+      // Temporary: respond directly instead of via chat server (revert after chat server issue is resolved)
       const channel = {
-        id: Date.now(), // 임시 ID
+        id: Date.now(), // Temporary ID
         name,
         description,
         type,
@@ -122,7 +122,7 @@ export class ChatChannelController {
 
       const { channelId } = req.params;
 
-      // Chat Server에서 채널 정보 조회
+      // Get channel info from chat server
       const channel = await ChatChannelController.chatServerService.getChannel(
         parseInt(channelId)
       );
@@ -165,7 +165,7 @@ export class ChatChannelController {
       const { channelId } = req.params;
       const { page = 1, limit = 50 } = req.query;
 
-      // Chat Server에서 채널 메시지 조회
+      // Get channel messages from chat server
       const messages =
         await ChatChannelController.chatServerService.getChannelMessages(
           parseInt(channelId),
@@ -204,7 +204,7 @@ export class ChatChannelController {
 
       const { search } = req.query;
 
-      // Chat Server에서 Used자 Get list
+      // Get user list from chat server
       const users = await ChatChannelController.chatServerService.getUsers(
         user.userId,
         search as string
