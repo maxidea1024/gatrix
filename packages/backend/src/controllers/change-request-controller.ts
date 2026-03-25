@@ -56,7 +56,7 @@ export class ChangeRequestController {
       // Filter by project (via environment join) instead of single environment
       let query = ChangeRequest.query()
         .joinRelated('environmentModel')
-        .where('environmentModel.projectId', projectId)
+        .where('environmentModel.projectId', projectId as string)
         .withGraphFetched(
           '[requester, rejector, environmentModel, changeItems, approvals]'
         )
@@ -73,10 +73,10 @@ export class ChangeRequestController {
       } else {
         // When showing all statuses, exclude others' drafts
         // Show: all non-draft OR (draft AND own)
-        query = query.where((builder) => {
+        query = query.where((builder: any) => {
           builder
             .whereNot('g_change_requests.status', 'draft')
-            .orWhere((subBuilder) => {
+            .orWhere((subBuilder: any) => {
               subBuilder
                 .where('g_change_requests.status', 'draft')
                 .where('g_change_requests.requesterId', userId || '');
@@ -88,8 +88,8 @@ export class ChangeRequestController {
         query,
         ChangeRequest.query()
           .joinRelated('environmentModel')
-          .where('environmentModel.projectId', projectId)
-          .where((builder) => {
+          .where('environmentModel.projectId', projectId as string)
+          .where((builder: any) => {
             if (status) {
               builder.where('g_change_requests.status', status);
               if (status === 'draft' && userId) {
@@ -98,7 +98,7 @@ export class ChangeRequestController {
             } else {
               builder
                 .whereNot('g_change_requests.status', 'draft')
-                .orWhere((subBuilder) => {
+                .orWhere((subBuilder: any) => {
                   subBuilder
                     .where('g_change_requests.status', 'draft')
                     .where('g_change_requests.requesterId', userId || '');
@@ -558,7 +558,7 @@ export class ChangeRequestController {
    */
   static getStats = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const projectId = req.projectId;
+      const projectId = req.projectId as string;
       const userId = req.user?.userId;
 
       if (!userId) {
