@@ -3473,12 +3473,14 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         overrideDisabled
                                       )
                                     }
-                                    onChangeDetected={() =>
-                                      setFlagDraftStatus((prev) => ({
-                                        hasDraft: true,
-                                        draftEnvIds: new Set([...(prev.draftEnvIds || []), env.environmentId]),
-                                      }))
-                                    }
+                                    onChangeDetected={() => {
+                                      if (env.requiresApproval) {
+                                        setFlagDraftStatus((prev) => ({
+                                          hasDraft: true,
+                                          draftEnvIds: new Set([...(prev.draftEnvIds || []), env.environmentId]),
+                                        }));
+                                      }
+                                    }}
                                     onGoToPayloadTab={() => setTabValue(1)}
                                     defaultExpanded={true}
                                   />
