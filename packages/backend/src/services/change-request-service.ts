@@ -1167,6 +1167,19 @@ export class ChangeRequestService {
           const dbData = { ...afterData };
           fieldsToStrip.forEach((f) => delete dbData[f]);
 
+          // Strip fields that don't exist in the actual table to prevent 'Unknown column' errors
+          const [allColumns] = await trx.raw(
+            `SHOW COLUMNS FROM ${item.targetTable}`
+          );
+          const validColumns = new Set(
+            (allColumns as any[]).map((col: any) => col.Field)
+          );
+          for (const key of Object.keys(dbData)) {
+            if (!validColumns.has(key)) {
+              delete dbData[key];
+            }
+          }
+
           // Note: Not all tables have createdBy/updatedBy columns
           // These should be set in the ops/afterData if needed
 
@@ -1360,6 +1373,20 @@ export class ChangeRequestService {
               if (versionCols && versionCols.length > 0 && dbData.version === undefined) {
                 dbData.version = 1;
               }
+
+              // Strip fields that don't exist in the actual table
+              const [allCols2] = await trx.raw(
+                `SHOW COLUMNS FROM ${item.targetTable}`
+              );
+              const validCols2 = new Set(
+                (allCols2 as any[]).map((col: any) => col.Field)
+              );
+              for (const key of Object.keys(dbData)) {
+                if (!validCols2.has(key)) {
+                  delete dbData[key];
+                }
+              }
+
               const [insertResult] = await trx(item.targetTable).insert(dbData);
 
               // Update ChangeItem's targetId to the real ID for future rollback

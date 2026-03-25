@@ -2582,7 +2582,7 @@ const GameWorldsPage: React.FC = () => {
               deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name
             }
           >
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
         </Box>
       </Drawer>
