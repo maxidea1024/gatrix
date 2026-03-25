@@ -138,8 +138,9 @@ export async function publishFeatureFlagDraft(
   }
 
   // Apply changes for each environment in the draft
+  // Filter out internal metadata keys (_global, _flagName, etc.)
   const envEntries = Object.entries(draftData).filter(
-    ([key]) => key !== '_global'
+    ([key]) => !key.startsWith('_')
   );
 
   for (const [envId, envData] of envEntries) {

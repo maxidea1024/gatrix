@@ -1607,7 +1607,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                     </Paper>
                   )}
 
-                  {cr.status === 'draft' && (
+                  {cr.status === 'draft' && !submitMode && (
                     <Paper variant="outlined" sx={{ p: 2 }}>
                       <Box
                         sx={{
@@ -1650,7 +1650,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
 
                   {/* Inline Submit Form (replaces separate drawer) */}
                   {submitMode && cr.status === 'draft' && (
-                    <Paper sx={{ p: 2, mt: 2, bgcolor: (theme) => alpha(theme.palette.primary.main, 0.05), border: 1, borderColor: 'primary.main' }}>
+                    <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                         <Button size="small" startIcon={<ArrowBackIcon />} onClick={() => setSubmitMode(false)}>
                           {t('common.back')}

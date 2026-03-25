@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
 import {
   Box,
   Typography,
@@ -659,7 +660,7 @@ const ChangeRequestsPage: React.FC = () => {
 
   // Pagination
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
 
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false);
