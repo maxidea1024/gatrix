@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -17,6 +17,7 @@ import {
   TableBody,
   TableCell,
   TableRow,
+  Checkbox,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -27,6 +28,7 @@ import {
   Person as PersonIcon,
   MergeType as MergeIcon,
   DifferenceOutlined as DiffIcon,
+  ArrowBack as ArrowBackIcon,
   History as HistoryIcon,
   ExpandMore as ExpandMoreIcon,
   Add as AddIcon,
@@ -49,9 +51,9 @@ import changeRequestService, {
 import {
   formatChangeRequestTitle,
   formatChangeItemTitle,
+  getTableLocalizationKey,
 } from '@/utils/changeRequestFormatter';
 import RevertPreviewDrawer from './RevertPreviewDrawer';
-import SubmitPreviewDrawer from './SubmitPreviewDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface ChangeRequestDetailDrawerProps {
@@ -148,7 +150,6 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
 
   const [actionLoading, setActionLoading] = useState(false);
   const [comment, setComment] = useState('');
-  const [submitPreviewOpen, setSubmitPreviewOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [expandedReasons, setExpandedReasons] = useState<
@@ -162,6 +163,15 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   );
   const [rollbackPreviewOpen, setRollbackPreviewOpen] = useState(false);
   const [rollbackTargetId, setRollbackTargetId] = useState<string | null>(null);
+
+  // Inline submit mode (replaces separate SubmitPreviewDrawer)
+  const [submitMode, setSubmitMode] = useState(false);
+  const [submitTitle, setSubmitTitle] = useState('');
+  const [submitReason, setSubmitReason] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitCheckedGroups, setSubmitCheckedGroups] = useState<Record<string, boolean>>({});
+  const [submitCheckedItems, setSubmitCheckedItems] = useState<Record<string, boolean>>({});
+  const [submitExpandedGroups, setSubmitExpandedGroups] = useState<Record<string, boolean>>({});
 
   // Delete handler for error dialog
   const handleDeleteFromError = async () => {
@@ -194,6 +204,100 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     () => changeRequestService.getById(changeRequestId!, projectApiPath),
     { revalidateOnFocus: false }
   );
+
+  // Reset submit mode when drawer closes or CR changes
+  useEffect(() => {
+    setSubmitMode(false);
+  }, [open, changeRequestId]);
+
+  // Initialize submit form when entering submit mode
+  const enterSubmitMode = () => {
+    if (!cr) return;
+    const groupsState: Record<string, boolean> = {};
+    const itemsState: Record<string, boolean> = {};
+    const expandState: Record<string, boolean> = {};
+
+    cr.actionGroups?.forEach((group) => {
+      groupsState[group.id] = true;
+      expandState[group.id] = true;
+      group.changeItems?.forEach((item) => {
+        itemsState[item.id] = true;
+      });
+    });
+    cr.changeItems?.forEach((item) => {
+      if (!item.actionGroupId) {
+        itemsState[item.id] = true;
+      }
+    });
+
+    setSubmitCheckedGroups(groupsState);
+    setSubmitCheckedItems(itemsState);
+    setSubmitExpandedGroups(expandState);
+    setSubmitTitle(cr.title || '');
+    setSubmitReason('');
+    setSubmitMode(true);
+  };
+
+  const handleSubmitGroupCheck = (groupId: string, checked: boolean) => {
+    setSubmitCheckedGroups((prev) => ({ ...prev, [groupId]: checked }));
+    const group = cr?.actionGroups?.find((g) => g.id === groupId);
+    if (group?.changeItems) {
+      const updates: Record<string, boolean> = {};
+      group.changeItems.forEach((item) => { updates[item.id] = checked; });
+      setSubmitCheckedItems((prev) => ({ ...prev, ...updates }));
+    }
+  };
+
+  const handleSubmitItemCheck = (itemId: string, groupId: string | undefined, checked: boolean) => {
+    setSubmitCheckedItems((prev) => ({ ...prev, [itemId]: checked }));
+    if (groupId) {
+      const group = cr?.actionGroups?.find((g) => g.id === groupId);
+      if (group?.changeItems) {
+        const newState = { ...submitCheckedItems, [itemId]: checked };
+        const allChecked = group.changeItems.every((item) => newState[item.id]);
+        setSubmitCheckedGroups((prev) => ({ ...prev, [groupId]: allChecked }));
+      }
+    }
+  };
+
+  const submitSelectedCount = useMemo(() => {
+    return Object.values(submitCheckedItems).filter(Boolean).length;
+  }, [submitCheckedItems]);
+
+  const submitTotalCount = useMemo(() => {
+    return Object.keys(submitCheckedItems).length;
+  }, [submitCheckedItems]);
+
+  const handleSubmitCR = async () => {
+    if (!cr) return;
+    if (!submitTitle.trim()) {
+      enqueueSnackbar(t('changeRequest.errors.titleRequired'), { variant: 'warning' });
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      // Delete unchecked items first
+      const itemsToDelete = Object.entries(submitCheckedItems)
+        .filter(([_, checked]) => !checked)
+        .map(([id]) => id);
+      for (const itemId of itemsToDelete) {
+        await changeRequestService.deleteChangeItem(cr.id, itemId, projectApiPath);
+      }
+      // Submit
+      await changeRequestService.submit(cr.id, {
+        title: submitTitle.trim(),
+        reason: submitReason.trim() || undefined,
+      }, projectApiPath);
+      enqueueSnackbar(t('changeRequest.messages.submitted'), { variant: 'success' });
+      setSubmitMode(false);
+      mutate();
+      onRefresh?.();
+    } catch (err) {
+      handleApiError(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Build timeline from CR data
   const timeline = useMemo<TimelineEvent[]>(() => {
@@ -1534,12 +1638,126 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                           <Button
                             variant="contained"
                             startIcon={<SendIcon />}
-                            onClick={() => setSubmitPreviewOpen(true)}
+                            onClick={enterSubmitMode}
                             disabled={actionLoading}
                           >
                             {t('changeRequest.actions.readyForReview')}
                           </Button>
                         </Box>
+                      </Box>
+                    </Paper>
+                  )}
+
+                  {/* Inline Submit Form (replaces separate drawer) */}
+                  {submitMode && cr.status === 'draft' && (
+                    <Paper sx={{ p: 2, mt: 2, bgcolor: (theme) => alpha(theme.palette.primary.main, 0.05), border: 1, borderColor: 'primary.main' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                        <Button size="small" startIcon={<ArrowBackIcon />} onClick={() => setSubmitMode(false)}>
+                          {t('common.back')}
+                        </Button>
+                        <Typography variant="subtitle1" fontWeight={600} sx={{ flex: 1 }}>
+                          {t('changeRequest.submitPreviewTitle')}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        {t('changeRequest.submitPreviewDesc')}
+                      </Typography>
+
+                      <TextField
+                        fullWidth
+                        label={t('changeRequest.submitDialog.titleField')}
+                        value={submitTitle}
+                        onChange={(e) => setSubmitTitle(e.target.value)}
+                        required
+                        size="small"
+                        sx={{ mb: 2 }}
+                      />
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={2}
+                        label={t('changeRequest.submitDialog.reason')}
+                        value={submitReason}
+                        onChange={(e) => setSubmitReason(e.target.value)}
+                        helperText={t('changeRequest.submitDialog.reasonOptional')}
+                        size="small"
+                        sx={{ mb: 2 }}
+                      />
+
+                      <Divider sx={{ mb: 2 }} />
+                      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                        {t('changeRequest.selectChanges')} ({submitSelectedCount}/{submitTotalCount})
+                      </Typography>
+
+                      {/* Action Groups */}
+                      {cr.actionGroups?.map((group) => (
+                        <Paper key={group.id} variant="outlined" sx={{ mb: 1.5, overflow: 'hidden' }}>
+                          <Box
+                            sx={{ px: 1.5, py: 1, bgcolor: 'action.hover', display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}
+                            onClick={() => setSubmitExpandedGroups((prev) => ({ ...prev, [group.id]: !prev[group.id] }))}
+                          >
+                            <Checkbox
+                              checked={submitCheckedGroups[group.id] ?? true}
+                              indeterminate={
+                                group.changeItems?.some((item) => submitCheckedItems[item.id]) &&
+                                !group.changeItems?.every((item) => submitCheckedItems[item.id])
+                              }
+                              onChange={(e) => { e.stopPropagation(); handleSubmitGroupCheck(group.id, e.target.checked); }}
+                              onClick={(e) => e.stopPropagation()}
+                              size="small"
+                            />
+                            <ExpandMoreIcon sx={{ transform: submitExpandedGroups[group.id] ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s', fontSize: 18 }} />
+                            <Typography variant="body2" fontWeight={600} sx={{ flex: 1 }}>
+                              {formatChangeRequestTitle(group.title, t)}
+                            </Typography>
+                            <Chip label={`${group.changeItems?.filter((item) => submitCheckedItems[item.id]).length || 0}/${group.changeItems?.length || 0}`} size="small" variant="outlined" sx={{ height: 22, fontSize: 11 }} />
+                          </Box>
+                          <Collapse in={submitExpandedGroups[group.id]}>
+                            <Box sx={{ p: 1 }}>
+                              {group.changeItems?.map((item) => (
+                                <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, p: 0.5, borderRadius: 1, opacity: submitCheckedItems[item.id] ? 1 : 0.5 }}>
+                                  <Checkbox checked={submitCheckedItems[item.id] ?? true} onChange={(e) => handleSubmitItemCheck(item.id, group.id, e.target.checked)} size="small" />
+                                  <EditIcon fontSize="small" sx={{ color: 'warning.main' }} />
+                                  <Typography variant="body2" sx={{ fontSize: 13 }}>
+                                    {t(getTableLocalizationKey(item.targetTable))}: {item.targetId}
+                                  </Typography>
+                                  <Chip label={t('changeRequest.opUpdate')} size="small" sx={{ height: 18, fontSize: 10 }} />
+                                </Box>
+                              ))}
+                            </Box>
+                          </Collapse>
+                        </Paper>
+                      ))}
+
+                      {/* Orphan items */}
+                      {cr.changeItems?.filter((item) => !item.actionGroupId).map((item) => (
+                        <Paper key={item.id} variant="outlined" sx={{ mb: 1, p: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Checkbox checked={submitCheckedItems[item.id] ?? true} onChange={(e) => handleSubmitItemCheck(item.id, undefined, e.target.checked)} size="small" />
+                            <EditIcon fontSize="small" sx={{ color: 'warning.main' }} />
+                            <Typography variant="body2" sx={{ fontSize: 13 }}>
+                              {t(getTableLocalizationKey(item.targetTable))}: {item.targetId}
+                            </Typography>
+                          </Box>
+                        </Paper>
+                      ))}
+
+                      {submitSelectedCount < submitTotalCount && (
+                        <Alert severity="warning" sx={{ mb: 2, mt: 1 }}>
+                          {t('changeRequest.submitExcludeWarning', { count: submitTotalCount - submitSelectedCount })}
+                        </Alert>
+                      )}
+
+                      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
+                        <Button onClick={() => setSubmitMode(false)}>{t('common.cancel')}</Button>
+                        <Button
+                          variant="contained"
+                          startIcon={isSubmitting ? <CircularProgress size={16} /> : <SendIcon />}
+                          onClick={handleSubmitCR}
+                          disabled={isSubmitting || submitSelectedCount === 0}
+                        >
+                          {t('changeRequest.actions.submit')}
+                        </Button>
                       </Box>
                     </Paper>
                   )}
@@ -2149,16 +2367,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         }}
       />
 
-      {/* Submit Preview Drawer - Outside main drawer */}
-      <SubmitPreviewDrawer
-        open={submitPreviewOpen}
-        onClose={() => setSubmitPreviewOpen(false)}
-        changeRequest={cr}
-        onSubmitted={() => {
-          mutate();
-          onRefresh?.();
-        }}
-      />
+
     </>
   );
 };
