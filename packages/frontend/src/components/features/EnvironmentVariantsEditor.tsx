@@ -707,45 +707,36 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     setJsonErrors({});
   }, [initialVariants]);
 
-  // Debounced auto-save for variants (draft system)
-  useEffect(() => {
-    if (!hasChanges || !isInitialMount === false) return;
-
+  // Combined apply handler - saves both variants and values
+  const handleApplyAll = useCallback(async () => {
+    // Validate before saving
     const names = editingVariants.map((v) => v.name.trim().toLowerCase());
     const hasDups = names.some((n, i) => names.indexOf(n) !== i);
     const hasErrs = Object.values(jsonErrors).some((e) => e !== null);
     if (hasDups || hasErrs) return;
-
-    // Immediately notify parent that changes exist
-    onChangeDetectedRef.current?.();
-
-    const timer = setTimeout(() => {
-      handleSaveVariants();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [editingVariants, hasChanges, jsonErrors, handleSaveVariants]);
-
-  // Debounced auto-save for values (draft system)
-  useEffect(() => {
-    if (!valuesHasChanges) return;
     if (valueJsonErrors.enabledValue || valueJsonErrors.disabledValue) return;
 
-    // Immediately notify parent that changes exist
+    // Notify parent that changes exist (for CR draft indicator)
     onChangeDetectedRef.current?.();
 
-    const timer = setTimeout(() => {
-      handleSaveValuesClick();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [
-    valuesHasChanges,
-    overrideEnabled,
-    overrideDisabled,
-    editingEnabledValue,
-    editingDisabledValue,
-    valueJsonErrors,
-    handleSaveValuesClick,
-  ]);
+    // Save variants if changed
+    if (hasChanges) {
+      await handleSaveVariants();
+    }
+    // Save values if changed
+    if (valuesHasChanges) {
+      await handleSaveValuesClick();
+    }
+  }, [hasChanges, valuesHasChanges, editingVariants, jsonErrors, valueJsonErrors, handleSaveVariants, handleSaveValuesClick]);
+
+  const handleResetAll = useCallback(() => {
+    handleResetVariants();
+    // Reset values to initial
+    setEditingEnabledValue(enabledValue);
+    setEditingDisabledValue(disabledValue);
+    setOverrideEnabled(originalOverrideEnabled);
+    setOverrideDisabled(originalOverrideDisabled);
+  }, [handleResetVariants, enabledValue, disabledValue, originalOverrideEnabled, originalOverrideDisabled]);
 
   const variantCount = editingVariants.length;
 
@@ -1384,6 +1375,47 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           </Box>
         )}
       </Collapse>
+
+      {/* Apply / Reset button bar - shown when there are unsaved changes */}
+      {(hasChanges || valuesHasChanges) && canManage && !isArchived && (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 1,
+            mt: 1,
+            pt: 1,
+            borderTop: 1,
+            borderColor: 'warning.light',
+          }}
+        >
+          <Typography variant="caption" color="warning.main" sx={{ mr: 'auto' }}>
+            {t('common.unsavedChanges')}
+          </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={handleResetAll}
+          >
+            {t('common.reset')}
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<SaveIcon />}
+            onClick={handleApplyAll}
+            disabled={
+              saving ||
+              savingValues ||
+              hasDuplicateNames ||
+              hasJsonErrors
+            }
+          >
+            {t('common.apply')}
+          </Button>
+        </Box>
+      )}
     </Paper>
   );
 };
