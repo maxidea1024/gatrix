@@ -1261,7 +1261,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                 {flagType !== 'remoteConfig' && variantCount > 0 ? (
                   !(valueType === 'boolean' && variantCount >= 2) ? (
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       size="small"
                       startIcon={<AddIcon />}
                       onClick={addVariant}

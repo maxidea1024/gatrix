@@ -342,7 +342,7 @@ router.post(
           }
 
           // Also collect from draft strategies (unpublished changes)
-          const flagDraftData = draftsByTarget.get(flag.flagName);
+          const flagDraftData = draftsByTarget.get(flag.id);
           if (flagDraftData) {
             for (const envDraft of Object.values(flagDraftData)) {
               if (
@@ -413,7 +413,7 @@ router.post(
           if (!flag) continue;
 
           // Merge draft data into flag if draft exists for this flag+env
-          const flagDraftData = draftsByTarget.get(flag.flagName);
+          const flagDraftData = draftsByTarget.get(flag.id);
           if (flagDraftData) {
             const envDraft = flagDraftData[env];
             if (envDraft && typeof envDraft === 'object') {

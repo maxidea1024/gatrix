@@ -90,6 +90,7 @@ import {
   Close as CloseIcon,
   LibraryAdd as TemplateIcon,
   Shield as ShieldIcon,
+  Schedule as ScheduleIcon,
 } from '@mui/icons-material';
 import FieldTypeIcon from '../../components/common/FieldTypeIcon';
 import { useAuth } from '../../contexts/AuthContext';
@@ -560,6 +561,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [flagDraftStatus, setFlagDraftStatus] = useState<{
     hasDraft: boolean;
     updatedAt?: string;
+    draftEnvIds?: Set<string>;
   }>({ hasDraft: false });
 
   // Release flow plan summaries - to detect environments managed by release flow
@@ -902,11 +904,18 @@ const FeatureFlagDetailPage: React.FC = () => {
           projectApiPath
         );
         const hasDraft = !!result;
+        const draftData = result?.draftData;
+        const draftEnvIds = new Set<string>();
+        if (hasDraft && draftData) {
+          for (const envId of Object.keys(draftData)) {
+            if (!envId.startsWith('_')) draftEnvIds.add(envId);
+          }
+        }
         setFlagDraftStatus({
           hasDraft,
           updatedAt: undefined,
+          draftEnvIds,
         });
-        const draftData = result?.draftData;
 
         // If draft exists, overlay draft data onto the UI
         if (hasDraft && draftData) {
@@ -1506,7 +1515,10 @@ const FeatureFlagDetailPage: React.FC = () => {
         projectApiPath,
         envId
       );
-      setFlagDraftStatus({ hasDraft: true });
+      setFlagDraftStatus((prev) => ({
+        hasDraft: true,
+        draftEnvIds: new Set([...(prev.draftEnvIds || []), envId]),
+      }));
       // Notify MainLayout to refresh floating CR banner
       window.dispatchEvent(new CustomEvent('cr-draft-changed'));
     } else {
@@ -1609,7 +1621,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       projectApiPath
     );
 
-    setFlagDraftStatus({ hasDraft: true });
+    setFlagDraftStatus((prev) => ({ ...prev, hasDraft: true }));
   };
 
   const handleSaveStrategy = async () => {
@@ -2790,6 +2802,21 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   >
                                     {env.displayName}
                                   </Typography>
+                                  {flagDraftStatus.draftEnvIds?.has(env.environmentId) && (
+                                    <Tooltip title={t('changeRequest.pendingChanges')} arrow>
+                                      <ScheduleIcon
+                                        sx={{
+                                          fontSize: 14,
+                                          color: 'warning.main',
+                                          animation: 'pulse 2s infinite',
+                                          '@keyframes pulse': {
+                                            '0%, 100%': { opacity: 1 },
+                                            '50%': { opacity: 0.4 },
+                                          },
+                                        }}
+                                      />
+                                    </Tooltip>
+                                  )}
                                   {releaseFlowEnvs.has(env.environmentId) ? (
                                     <Typography
                                       variant="caption"
@@ -3447,7 +3474,10 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       )
                                     }
                                     onChangeDetected={() =>
-                                      setFlagDraftStatus({ hasDraft: true })
+                                      setFlagDraftStatus((prev) => ({
+                                        hasDraft: true,
+                                        draftEnvIds: new Set([...(prev.draftEnvIds || []), env.environmentId]),
+                                      }))
                                     }
                                     onGoToPayloadTab={() => setTabValue(1)}
                                     defaultExpanded={true}

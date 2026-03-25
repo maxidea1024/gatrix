@@ -83,6 +83,7 @@ import {
   Tune as RemoteConfigIcon,
   ViewList as ViewListIcon,
   GitHub as GitHubIcon,
+  Schedule as ScheduleIcon,
 } from '@mui/icons-material';
 import FieldTypeIcon from '../../components/common/FieldTypeIcon';
 import ValueEditorField from '../../components/common/ValueEditorField';
@@ -344,6 +345,7 @@ const FeatureFlagsPage: React.FC = () => {
     { id: 'createdAt', labelKey: 'featureFlags.createdAt', visible: true },
     { id: 'lastSeenAt', labelKey: 'featureFlags.lastSeenAt', visible: true },
     { id: 'tags', labelKey: 'featureFlags.tags', visible: true },
+    { id: 'pendingChanges', labelKey: 'changeRequest.title', visible: true },
   ];
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
     const saved = localStorage.getItem('featureFlagsColumns');
@@ -593,14 +595,12 @@ const FeatureFlagsPage: React.FC = () => {
                   }
                 });
 
-                if (hasAnyDraft) {
-                  return {
-                    ...f,
-                    environments: newEnvs,
-                    ...(isCurrentEnvChanged ? { isEnabled: newCurrentEnvEnabled } : {}),
-                    hasPendingChanges: true,
-                  };
-                }
+                return {
+                  ...f,
+                  ...(hasAnyDraft ? { environments: newEnvs } : {}),
+                  ...(isCurrentEnvChanged ? { isEnabled: newCurrentEnvEnabled } : {}),
+                  hasPendingChanges: true,
+                };
               }
               return f;
             });
@@ -2214,6 +2214,7 @@ const FeatureFlagsPage: React.FC = () => {
                                   />
                                 );
                               })}
+
                             </Box>
 
                             {/* Divider */}
@@ -2497,6 +2498,13 @@ const FeatureFlagsPage: React.FC = () => {
                                   </TableCell>
                                 );
 
+                              case 'pendingChanges':
+                                return (
+                                  <TableCell key={col.id} align="center" sx={{ px: 0.5, width: 40 }}>
+                                    {t('changeRequest.title')}
+                                  </TableCell>
+                                );
+
                               default:
                                 return null;
                             }
@@ -2758,6 +2766,8 @@ const FeatureFlagsPage: React.FC = () => {
                                               sx={{
                                                 display: 'flex',
                                                 justifyContent: 'center',
+                                                alignItems: 'center',
+                                                gap: 0.25,
                                               }}
                                             >
                                               <FeatureSwitch
@@ -2780,6 +2790,7 @@ const FeatureFlagsPage: React.FC = () => {
                                                 color={env.color}
                                                 label={env.displayName}
                                               />
+
                                             </Box>
                                           </TableCell>
                                         );
@@ -2917,6 +2928,26 @@ const FeatureFlagsPage: React.FC = () => {
                                           />
                                         )}
                                       </Box>
+                                    </TableCell>
+                                  );
+                                case 'pendingChanges':
+                                  return (
+                                    <TableCell key={col.id} align="center" sx={{ px: 0.5 }}>
+                                      {(flag as any).hasPendingChanges && (
+                                        <Tooltip title={t('changeRequest.pendingChanges')} arrow>
+                                          <ScheduleIcon
+                                            sx={{
+                                              fontSize: 16,
+                                              color: 'warning.main',
+                                              animation: 'pulse 2s infinite',
+                                              '@keyframes pulse': {
+                                                '0%, 100%': { opacity: 1 },
+                                                '50%': { opacity: 0.4 },
+                                              },
+                                            }}
+                                          />
+                                        </Tooltip>
+                                      )}
                                     </TableCell>
                                   );
                                 default:
