@@ -731,12 +731,16 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
   const handleResetAll = useCallback(() => {
     handleResetVariants();
-    // Reset values to initial
-    setEditingEnabledValue(enabledValue);
-    setEditingDisabledValue(disabledValue);
+    // Reset values to match comparison targets in valuesHasChanges
     setOverrideEnabled(originalOverrideEnabled);
     setOverrideDisabled(originalOverrideDisabled);
-  }, [handleResetVariants, enabledValue, disabledValue, originalOverrideEnabled, originalOverrideDisabled]);
+    setEditingEnabledValue(
+      originalOverrideEnabled ? (envEnabledValue ?? enabledValue) : enabledValue
+    );
+    setEditingDisabledValue(
+      originalOverrideDisabled ? (envDisabledValue ?? disabledValue) : disabledValue
+    );
+  }, [handleResetVariants, enabledValue, disabledValue, envEnabledValue, envDisabledValue, originalOverrideEnabled, originalOverrideDisabled]);
 
   const variantCount = editingVariants.length;
 
