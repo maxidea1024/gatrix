@@ -310,17 +310,20 @@ class ChangeRequestService {
   }
   /**
    * Save feature flag draft data to a Change Request
+   * @param targetEnvironmentId - The environment to create CR for (may differ from active env)
    */
   async saveFlagDraft(
     flagName: string,
     draftData: Record<string, any>,
-    projectApiPath: string | null = null
+    projectApiPath: string | null = null,
+    targetEnvironmentId?: string
   ): Promise<{ changeRequestId: string; status: ChangeRequestStatus }> {
     const flagsBase = projectApiPath
       ? `${projectApiPath}/features`
       : '/admin/features';
     const response = await api.post(`${flagsBase}/${flagName}/change-request`, {
       draftData,
+      targetEnvironmentId,
     });
     return response.data;
   }

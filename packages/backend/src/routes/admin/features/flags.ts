@@ -452,11 +452,15 @@ router.post(
 router.post(
   '/:flagName/change-request',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
+    const activeEnvironmentId = requireEnvironment(req, res);
+    if (!activeEnvironmentId) return;
 
     const userId = req.user?.id;
-    const { draftData } = req.body;
+    const { draftData, targetEnvironmentId } = req.body;
+
+    // Use target environment if explicitly provided (e.g., modifying Production
+    // while Development is active), otherwise fall back to active environment
+    const environmentId = targetEnvironmentId || activeEnvironmentId;
 
     if (!draftData || typeof draftData !== 'object') {
       return res.status(400).json({

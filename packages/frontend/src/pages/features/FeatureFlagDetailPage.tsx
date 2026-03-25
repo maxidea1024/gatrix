@@ -1503,7 +1503,8 @@ const FeatureFlagDetailPage: React.FC = () => {
       await changeRequestService.saveFlagDraft(
         flag.flagName,
         mergedDraft,
-        projectApiPath
+        projectApiPath,
+        envId
       );
       setFlagDraftStatus({ hasDraft: true });
       // Notify MainLayout to refresh floating CR banner
