@@ -1065,7 +1065,8 @@ const FeatureFlagsPage: React.FC = () => {
         await changeRequestService.saveFlagDraft(
           flag.flagName,
           mergedDraftData,
-          projectApiPath
+          projectApiPath,
+          environmentId
         );
 
         window.dispatchEvent(new CustomEvent('cr-draft-changed'));
@@ -1539,7 +1540,8 @@ const FeatureFlagsPage: React.FC = () => {
             await changeRequestService.saveFlagDraft(
               flag.flagName,
               mergedDraftData,
-              projectApiPath
+              projectApiPath,
+              environmentId
             );
           } catch (err: any) {
             if (err?.response?.data?.errorCode === 'PENDING_REVIEW_EXISTS') {
