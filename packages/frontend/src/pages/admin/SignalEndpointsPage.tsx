@@ -176,67 +176,67 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
               onChange={(e) => setName(e.target.value)}
               helperText={t('signalEndpoints.nameHelp')}
             />
-            {name.trim() && (
-              <>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    p: 1.5,
-                    bgcolor: 'action.hover',
-                    borderRadius: 1,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                  }}
-                >
-                  <Chip
-                    label="POST"
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                p: 1.5,
+                bgcolor: 'action.hover',
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              <Chip
+                label="POST"
+                size="small"
+                color="primary"
+                variant="filled"
+                sx={{ fontWeight: 600, fontSize: '0.7rem' }}
+              />
+              <Typography
+                variant="body2"
+                sx={{
+                  fontFamily: 'monospace',
+                  flex: 1,
+                  wordBreak: 'break-all',
+                  color: name.trim() ? 'text.primary' : 'text.disabled',
+                }}
+              >
+                {`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim() || '{name}'}`}
+              </Typography>
+              <Tooltip title={t('common.copy')}>
+                <span>
+                  <IconButton
                     size="small"
-                    color="primary"
-                    variant="filled"
-                    sx={{ fontWeight: 600, fontSize: '0.7rem' }}
-                  />
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontFamily: 'monospace',
-                      flex: 1,
-                      wordBreak: 'break-all',
-                    }}
+                    disabled={!name.trim()}
+                    onClick={() =>
+                      copyToClipboardWithNotification(
+                        `${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`,
+                        () =>
+                          enqueueSnackbar(t('common.copiedToClipboard'), {
+                            variant: 'success',
+                          }),
+                        () =>
+                          enqueueSnackbar(t('common.copyFailed'), {
+                            variant: 'error',
+                          })
+                      )
+                    }
                   >
-                    {`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`}
-                  </Typography>
-                  <Tooltip title={t('common.copy')}>
-                    <IconButton
-                      size="small"
-                      onClick={() =>
-                        copyToClipboardWithNotification(
-                          `${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`,
-                          () =>
-                            enqueueSnackbar(t('common.copiedToClipboard'), {
-                              variant: 'success',
-                            }),
-                          () =>
-                            enqueueSnackbar(t('common.copyFailed'), {
-                              variant: 'error',
-                            })
-                        )
-                      }
-                    >
-                      <CopyIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mt: -0.5 }}
-                >
-                  {t('signalEndpoints.endpointUrlHelp')}
-                </Typography>
-              </>
-            )}
+                    <CopyIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mt: -1.5, mb: 1 }}
+            >
+              {t('signalEndpoints.endpointUrlHelp')}
+            </Typography>
             <TextField
               label={t('signalEndpoints.description')}
               fullWidth

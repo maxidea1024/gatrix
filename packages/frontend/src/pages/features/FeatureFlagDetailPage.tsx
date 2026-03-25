@@ -2487,6 +2487,12 @@ const FeatureFlagDetailPage: React.FC = () => {
                           impressionDataEnabled: flag.impressionDataEnabled,
                           tags: flag.tags || [],
                         });
+                        
+                        const matchingTags = (flag.tags || [])
+                          .map((tagName) => allTags.find((t) => t.name === tagName))
+                          .filter((t): t is Tag => !!t);
+                        setEditTagSelection(matchingTags);
+                        
                         setEditFlagDialogOpen(true);
                       }}
                       fullWidth

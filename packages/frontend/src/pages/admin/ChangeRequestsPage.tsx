@@ -792,7 +792,7 @@ const ChangeRequestsPage: React.FC = () => {
 
       <PageContentLoader loading={isLoading && !data}>
         {!data?.items || data.items.length === 0 ? (
-          <EmptyPlaceholder message={t('changeRequest.noRequests')} />
+          <EmptyPlaceholder message={t('changeRequest.noRequests')} minHeight={200} />
         ) : (
           <Card variant="outlined" sx={{ position: 'relative' }}>
             <TableContainer
