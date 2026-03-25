@@ -897,7 +897,7 @@ const ActionSetsPage: React.FC = () => {
                                       >
                                         <Chip
                                           label={t(
-                                            `actionSets.actionTypes.${action.actionType.charAt(0).toLowerCase() + action.actionType.slice(1).replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())}`
+                                            ACTION_TYPES.find((a) => a.value === action.actionType)?.labelKey || action.actionType
                                           )}
                                           size="small"
                                           color="primary"

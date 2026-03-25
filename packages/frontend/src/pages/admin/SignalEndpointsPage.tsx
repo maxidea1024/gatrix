@@ -772,7 +772,7 @@ const SignalEndpointsPage: React.FC = () => {
                                 gap: 1,
                                 p: 1.5,
                                 mb: 2,
-                                bgcolor: 'grey.50',
+                                bgcolor: 'action.hover',
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 borderRadius: 1,
