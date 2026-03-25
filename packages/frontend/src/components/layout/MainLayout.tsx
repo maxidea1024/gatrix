@@ -320,9 +320,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       {
         'sidebar.changeRequests': pendingCRCount,
       },
-      {
-        requiresApproval: currentEnvironment?.requiresApproval,
-      }
+      {}
     );
     return categories
       .map((category) => ({
@@ -2294,8 +2292,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <Slide
           direction="down"
           in={
-            !!(currentEnvironment?.requiresApproval &&
-            !location.pathname.startsWith('/admin/change-requests') &&
+            !!(!location.pathname.startsWith('/admin/change-requests') &&
             (myPendingReviewCount > 0 ||
               pendingCRCount > 0 ||
               myDraftCount > 0))

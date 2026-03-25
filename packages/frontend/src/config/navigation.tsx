@@ -412,13 +412,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
-  // Change Requests (conditional)
+  // Change Requests
   {
     id: 'change-requests',
     text: 'sidebar.changeRequests',
     icon: 'Campaign',
     path: '/admin/change-requests',
-    condition: (options) => options.requiresApproval !== false,
     children: [
       {
         text: 'sidebar.changeRequests',

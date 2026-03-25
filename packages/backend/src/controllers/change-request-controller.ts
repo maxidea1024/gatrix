@@ -459,22 +459,21 @@ export class ChangeRequestController {
    */
   static getMyRequests = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = getEnvironment(req);
       const userId = req.user?.userId;
 
       if (!userId) {
         throw new GatrixError('User not authenticated', 401);
       }
 
+      // Return CRs from ALL environments (not filtered by active env)
+      // so the floating banner works regardless of which env is active
       const asRequester = await ChangeRequest.query()
-        .where('environmentId', environmentId)
         .where('requesterId', userId)
         .whereIn('status', ['draft', 'open', 'rejected'])
         .withGraphFetched('changeItems')
         .orderBy('updatedAt', 'desc');
 
       const pendingApproval = await ChangeRequest.query()
-        .where('environmentId', environmentId)
         .where('status', 'open')
         .whereNotIn('id', (qb) => {
           qb.select('changeRequestId')
