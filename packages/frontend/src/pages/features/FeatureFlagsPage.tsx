@@ -560,16 +560,62 @@ const FeatureFlagsPage: React.FC = () => {
         // Apply client-side filtering for multiselect values that server doesn't support
         let filteredFlags = result.flags;
 
+        // Overlay pending CR drafts for the current user
+        try {
+          const drafts = await changeRequestService.getAllPendingFlagDrafts(projectApiPath);
+          if (drafts && drafts.length > 0) {
+            const draftMap = new Map(drafts.map((d: any) => [d.targetId, d.draftData]));
+            filteredFlags = filteredFlags.map((f: any) => {
+              const draft = draftMap.get(f.flagName);
+              if (draft) {
+                const newEnvs = [...(f.environments || [])];
+                let isCurrentEnvChanged = false;
+                let newCurrentEnvEnabled = f.isEnabled;
+                let hasAnyDraft = false;
+
+                Object.keys(draft).forEach((envId) => {
+                  const envDraft = draft[envId];
+                  if (envDraft && envDraft.isEnabled !== undefined) {
+                    hasAnyDraft = true;
+                    const envRef = newEnvs.find((e: any) => e.environmentId === envId);
+                    if (envRef) {
+                      envRef.isEnabled = envDraft.isEnabled;
+                    } else {
+                      newEnvs.push({ environmentId: envId, isEnabled: envDraft.isEnabled });
+                    }
+                    if (envId === currentEnvironmentId) {
+                      isCurrentEnvChanged = true;
+                      newCurrentEnvEnabled = envDraft.isEnabled;
+                    }
+                  }
+                });
+
+                if (hasAnyDraft) {
+                  return {
+                    ...f,
+                    environments: newEnvs,
+                    ...(isCurrentEnvChanged ? { isEnabled: newCurrentEnvEnabled } : {}),
+                    hasPendingChanges: true, // Mark it so UI could optionally show a draft indicator in the future
+                  };
+                }
+              }
+              return f;
+            });
+          }
+        } catch (err) {
+          console.error('Failed to load pending drafts', err);
+        }
+
         // Filter by flagType (if any selected)
         if (flagTypeFilter && flagTypeFilter.length > 0) {
-          filteredFlags = filteredFlags.filter((f) =>
+          filteredFlags = filteredFlags.filter((f: any) =>
             flagTypeFilter.includes(f.flagType)
           );
         }
 
         // Filter by status (if any selected)
         if (statusFilter && statusFilter.length > 0) {
-          filteredFlags = filteredFlags.filter((f) => {
+          filteredFlags = filteredFlags.filter((f: any) => {
             // Determine the flag's status
             let flagStatus: string;
             if (f.isArchived) {

@@ -351,6 +351,25 @@ class ChangeRequestService {
       throw error;
     }
   }
+
+  /**
+   * Get all pending Change Request drafts for all feature flags in the current environment.
+   */
+  async getAllPendingFlagDrafts(
+    projectApiPath: string | null = null
+  ): Promise<
+    Array<{
+      targetId: string;
+      changeRequestId: string;
+      draftData: Record<string, any>;
+    }>
+  > {
+    const flagsBase = projectApiPath
+      ? `${projectApiPath}/features`
+      : '/admin/features';
+    const response = await api.get(`${flagsBase}/pending-drafts`);
+    return response.data;
+  }
 }
 
 export default new ChangeRequestService();
