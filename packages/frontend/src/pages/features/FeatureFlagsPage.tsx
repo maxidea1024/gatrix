@@ -566,7 +566,8 @@ const FeatureFlagsPage: React.FC = () => {
           if (drafts && drafts.length > 0) {
             const draftMap = new Map(drafts.map((d: any) => [d.targetId, d.draftData]));
             filteredFlags = filteredFlags.map((f: any) => {
-              const draft = draftMap.get(f.flagName);
+              // targetId is flag.id (ULID), not flagName
+              const draft = draftMap.get(f.id);
               if (draft) {
                 const newEnvs = [...(f.environments || [])];
                 let isCurrentEnvChanged = false;
@@ -574,6 +575,8 @@ const FeatureFlagsPage: React.FC = () => {
                 let hasAnyDraft = false;
 
                 Object.keys(draft).forEach((envId) => {
+                  // Skip internal metadata keys
+                  if (envId.startsWith('_')) return;
                   const envDraft = draft[envId];
                   if (envDraft && envDraft.isEnabled !== undefined) {
                     hasAnyDraft = true;
@@ -595,7 +598,7 @@ const FeatureFlagsPage: React.FC = () => {
                     ...f,
                     environments: newEnvs,
                     ...(isCurrentEnvChanged ? { isEnabled: newCurrentEnvEnabled } : {}),
-                    hasPendingChanges: true, // Mark it so UI could optionally show a draft indicator in the future
+                    hasPendingChanges: true,
                   };
                 }
               }
