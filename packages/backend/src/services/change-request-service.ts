@@ -1031,13 +1031,26 @@ export class ChangeRequestService {
             conflictReason = `Version mismatch: expected ${storedEntityVersion}, found ${liveVersion}`;
           }
         } else if (!isCreate) {
-          // Fallback to deep-diff comparison for tables without version column
-          const isMatch = compareData(liveData, item.beforeData);
-          if (!isMatch) {
-            hasConflict = true;
-            conflictReason =
-              'Data has changed since this request was created (deep-diff)';
+          // Fallback: compare using ops' oldValues against live data
+          // ChangeItem model does not have a beforeData field, so we use ops to detect conflicts
+          if (item.ops && item.ops.length > 0 && liveData) {
+            const normalizeValue = (val: any): any => {
+              if (val === true) return 1;
+              if (val === false) return 0;
+              if (val instanceof Date) return val.toISOString();
+              return val;
+            };
+            for (const op of item.ops) {
+              const liveVal = normalizeValue(liveData[op.path]);
+              const expectedVal = normalizeValue(op.oldValue);
+              if (JSON.stringify(liveVal) !== JSON.stringify(expectedVal)) {
+                hasConflict = true;
+                conflictReason = `Field "${op.path}" has changed since this request was created (expected: ${JSON.stringify(expectedVal)}, found: ${JSON.stringify(liveVal)})`;
+                break;
+              }
+            }
           }
+          // If ops is empty or not available, skip conflict check (no baseline to compare)
         }
 
         if (hasConflict) {
