@@ -20,29 +20,9 @@ export function showChangeRequestCreatedToast(
   closeSnackbar: (key?: SnackbarKey) => void,
   navigate: (path: string) => void
 ): void {
-  const message = String(i18n.t('changeRequest.messages.created'));
-
-  enqueueSnackbar(message, {
-    variant: 'info',
-    autoHideDuration: 8000,
-    action: (snackbarId) => (
-      <IconButton
-        size="small"
-        color="inherit"
-        onClick={() => {
-          closeSnackbar(snackbarId);
-          navigate('/admin/change-requests?status=draft');
-        }}
-        sx={{
-          '&:hover': {
-            backgroundColor: 'rgba(255,255,255,0.15)',
-          },
-        }}
-      >
-        <ArrowForwardIcon fontSize="small" />
-      </IconButton>
-    ),
-  });
+  // Instead of showing a snackbar, we dispatch an event so that the MainLayout
+  // can update the top floating banner under the AppBar.
+  window.dispatchEvent(new CustomEvent('cr-draft-changed'));
 }
 
 /**

@@ -1072,8 +1072,9 @@ const FeatureFlagsPage: React.FC = () => {
           projectApiPath
         );
 
-        enqueueSnackbar(t('changeRequest.messages.draftSaved'), { variant: 'info' });
         window.dispatchEvent(new CustomEvent('cr-draft-changed'));
+        // The draft overlay fetches list again. Let's just loadFlags to reflect the draft UI overlay immediately.
+        loadFlags();
       } catch (error: any) {
         if (error?.response?.data?.errorCode === 'PENDING_REVIEW_EXISTS') {
           enqueueSnackbar(t('changeRequest.errors.pendingReviewExists'), { variant: 'warning' });
@@ -1081,7 +1082,7 @@ const FeatureFlagsPage: React.FC = () => {
           enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), { variant: 'error' });
         }
       }
-      return; // Do NOT optimistically update the list UI, as it's not applied yet.
+      return; // UI will update via fetchFlags merging the draft state
     }
 
     // Direct toggle (optimistic update)
@@ -1560,10 +1561,6 @@ const FeatureFlagsPage: React.FC = () => {
         if (hasPendingReview) {
           enqueueSnackbar(t('changeRequest.errors.pendingReviewExists'), {
             variant: 'warning',
-          });
-        } else {
-          enqueueSnackbar(t('changeRequest.messages.draftSaved'), {
-            variant: 'info',
           });
         }
         window.dispatchEvent(new CustomEvent('cr-draft-changed'));
