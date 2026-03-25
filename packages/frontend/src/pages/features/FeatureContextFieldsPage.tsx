@@ -768,34 +768,27 @@ const FeatureContextFieldsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<ContextIcon />}
-          title={t('featureFlags.contextFields')}
-          subtitle={t('featureFlags.contextFieldsDescription')}
-        />
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-            >
-              {t('featureFlags.addContextField')}
-            </Button>
-          )}
-        </Box>
-      </Box>
+      <PageHeader
+        icon={<ContextIcon />}
+        title={t('featureFlags.contextFields')}
+        subtitle={t('featureFlags.contextFieldsDescription')}
+        actions={
+          <>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t('featureFlags.addContextField')}
+              </Button>
+            )}
+          </>
+        }
+      />
 
       {/* Search and Filters */}
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box
             sx={{

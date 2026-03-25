@@ -404,7 +404,7 @@ const UnknownFlagsPage: React.FC = () => {
       </Box>
 
       {/* Search and Filters */}
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box
             sx={{

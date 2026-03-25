@@ -1357,86 +1357,79 @@ const CouponSettingsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<SettingsIcon />}
-          title={t('coupons.couponSettings.title')}
-          subtitle={t('coupons.couponSettings.subtitle')}
-        />
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => {
-                resetForm();
-                setOpenForm(true);
-              }}
+      <PageHeader
+        icon={<SettingsIcon />}
+        title={t('coupons.couponSettings.title')}
+        subtitle={t('coupons.couponSettings.subtitle')}
+        actions={
+          <>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  resetForm();
+                  setOpenForm(true);
+                }}
+              >
+                {t('coupons.couponSettings.createCoupon')}
+              </Button>
+            )}
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
             >
-              {t('coupons.couponSettings.createCoupon')}
-            </Button>
-          )}
-          <IconButton
-            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-            aria-label="more options"
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            anchorEl={pageMenuAnchor}
-            open={Boolean(pageMenuAnchor)}
-            onClose={() => setPageMenuAnchor(null)}
-          >
-            <ExportImportMenuItems
-              onExport={(format) => {
-                setPageMenuAnchor(null);
-                const exportColumns: ExportColumn[] = [
-                  { key: 'name', header: t('common.name') },
-                  {
-                    key: 'code',
-                    header: t('coupons.couponSettings.columns.code'),
-                  },
-                  { key: 'type', header: t('common.type') },
-                  { key: 'status', header: t('common.status') },
-                  { key: 'description', header: t('common.description') },
-                  { key: 'startsAt', header: t('common.start') },
-                  { key: 'expiresAt', header: t('common.end') },
-                  { key: 'createdAt', header: t('common.createdAt') },
-                ];
-                try {
-                  exportToFile(
-                    sortedItems,
-                    exportColumns,
-                    'coupon-definitions',
-                    format
-                  );
-                  enqueueSnackbar(t('common.exportSuccess'), {
-                    variant: 'success',
-                  });
-                } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), {
-                    variant: 'error',
-                  });
-                }
-              }}
-              onImportClick={() => {
-                setPageMenuAnchor(null);
-                setImportDialogOpen(true);
-              }}
-            />
-          </Menu>
-        </Box>
-      </Box>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'name', header: t('common.name') },
+                    {
+                      key: 'code',
+                      header: t('coupons.couponSettings.columns.code'),
+                    },
+                    { key: 'type', header: t('common.type') },
+                    { key: 'status', header: t('common.status') },
+                    { key: 'description', header: t('common.description') },
+                    { key: 'startsAt', header: t('common.start') },
+                    { key: 'expiresAt', header: t('common.end') },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(
+                      sortedItems,
+                      exportColumns,
+                      'coupon-definitions',
+                      format
+                    );
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+              />
+            </Menu>
+          </>
+        }
+      />
 
       {/* Search & Filters */}
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box
             sx={{

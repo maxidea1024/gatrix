@@ -43,7 +43,7 @@ import {
   Delete as DeleteIcon,
   ViewColumn as ViewColumnIcon,
   LibraryAdd as TemplateIcon,
-  Refresh as RefreshIcon,
+
   ArrowUpward as ArrowUpIcon,
   ArrowDownward as ArrowDownIcon,
   HelpOutline as HelpOutlineIcon,
@@ -1704,100 +1704,84 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<TemplateIcon />}
-          title={t('releaseFlow.templatesTitle')}
-          subtitle={t('releaseFlow.templatesSubtitle')}
-        />
-        {canManage && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreate}
-          >
-            {t('releaseFlow.addTemplate')}
-          </Button>
-        )}
-      </Box>
+      <PageHeader
+        icon={<TemplateIcon />}
+        title={t('releaseFlow.templatesTitle')}
+        subtitle={t('releaseFlow.templatesSubtitle')}
+        actions={
+          canManage ? (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
+              {t('releaseFlow.addTemplate')}
+            </Button>
+          ) : undefined
+        }
+      />
 
-      {/* Search and Filters */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          flexWrap: 'wrap',
-          mb: 3,
-        }}
-      >
-        {/* Left: Search + Filters */}
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 2,
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            flex: 1,
-          }}
-        >
-          <SearchTextField
-            placeholder={t('releaseFlow.searchPlaceholder')}
-            value={searchTerm}
-            onChange={(value) => {
-              setSearchTerm(value);
-              setPage(0);
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              flexWrap: 'nowrap',
+              justifyContent: 'space-between',
             }}
-          />
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 2,
+                alignItems: 'center',
+                flexWrap: 'nowrap',
+                flexGrow: 1,
+                minWidth: 0,
+              }}
+            >
+              <SearchTextField
+                placeholder={t('releaseFlow.searchPlaceholder')}
+                value={searchTerm}
+                onChange={(value) => {
+                  setSearchTerm(value);
+                  setPage(0);
+                }}
+              />
 
-          {/* Dynamic Filter Bar */}
-          <DynamicFilterBar
-            availableFilters={availableFilterDefinitions}
-            activeFilters={activeFilters}
-            onFilterAdd={handleFilterAdd}
-            onFilterRemove={handleFilterRemove}
-            onFilterChange={handleDynamicFilterChange}
-            onOperatorChange={handleOperatorChange}
-            afterFilterAddActions={
-              <Tooltip title={t('common.columnSettings')}>
-                <IconButton
-                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                  sx={{
-                    bgcolor: 'background.paper',
-                    border: 1,
-                    borderColor: 'divider',
-                    '&:hover': { bgcolor: 'action.hover' },
-                  }}
-                >
-                  <ViewColumnIcon />
-                </IconButton>
-              </Tooltip>
-            }
-          />
-        </Box>
-
-        {/* Right: Refresh */}
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Tooltip title={t('common.refresh')}>
-            <span>
-              <IconButton
-                size="small"
-                onClick={loadTemplates}
-                disabled={loading}
-              >
-                <RefreshIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Box>
-      </Box>
+              {/* Dynamic Filter Bar */}
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
+                onRefresh={loadTemplates}
+                refreshDisabled={loading}
+                noWrap={true}
+                afterFilterAddActions={
+                  <Tooltip title={t('common.columnSettings')}>
+                    <IconButton
+                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                      sx={{
+                        bgcolor: 'background.paper',
+                        border: 1,
+                        borderColor: 'divider',
+                        '&:hover': { bgcolor: 'action.hover' },
+                      }}
+                    >
+                      <ViewColumnIcon />
+                    </IconButton>
+                  </Tooltip>
+                }
+              />
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
 
       {/* Bulk Actions */}
       {selectedIds.length > 0 && (

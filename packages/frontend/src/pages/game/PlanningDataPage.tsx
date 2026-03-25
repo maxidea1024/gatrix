@@ -764,50 +764,43 @@ const PlanningDataPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<StorageIcon />}
-          title={t('planningData.title')}
-          subtitle={t('planningData.subtitle')}
-        />
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={loadStats}
-            disabled={loading || rebuilding}
-          >
-            {t('common.refresh')}
-          </Button>
-          {canManage && (
+      <PageHeader
+        icon={<StorageIcon />}
+        title={t('planningData.title')}
+        subtitle={t('planningData.subtitle')}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
-              variant="contained"
-              startIcon={<CloudUploadIcon />}
-              onClick={handleRebuild}
-              disabled={loading}
+              variant="outlined"
+              startIcon={<RefreshIcon />}
+              onClick={loadStats}
+              disabled={loading || rebuilding}
             >
-              {t('planningData.uploadData')}
+              {t('common.refresh')}
             </Button>
-          )}
-          <Divider
-            orientation="vertical"
-            flexItem
-            sx={{ height: 32, alignSelf: 'center' }}
-          />
-          <Tooltip title={t('planningData.uploadGuide.title')}>
-            <IconButton onClick={() => setShowGuideDrawer(true)}>
-              <HelpOutlineIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      </Box>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<CloudUploadIcon />}
+                onClick={handleRebuild}
+                disabled={loading}
+              >
+                {t('planningData.uploadData')}
+              </Button>
+            )}
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{ height: 32, alignSelf: 'center' }}
+            />
+            <Tooltip title={t('planningData.uploadGuide.title')}>
+              <IconButton onClick={() => setShowGuideDrawer(true)}>
+                <HelpOutlineIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        }
+      />
 
       {/* Upload Dialog Modal */}
       {showUploadDialog && (

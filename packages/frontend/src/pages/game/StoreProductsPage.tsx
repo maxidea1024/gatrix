@@ -781,79 +781,72 @@ const StoreProductsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<StorefrontIcon />}
-          title={t('storeProducts.title')}
-          subtitle={t('storeProducts.subtitle')}
-        />
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {canManage && (
-            <>
-              <Button
-                variant="outlined"
-                startIcon={<SyncIcon />}
-                onClick={handleSyncPreview}
-                disabled={syncLoading}
-              >
-                {t('storeProducts.syncWithPlanningData')}
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleCreate}
-                disabled
-              >
-                {t('storeProducts.createProduct')}
-              </Button>
-            </>
-          )}
-          <IconButton
-            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-            aria-label="more options"
-          >
-            <MoreVertIcon />
-          </IconButton>
-        </Box>
-        <Menu
-          anchorEl={pageMenuAnchor}
-          open={Boolean(pageMenuAnchor)}
-          onClose={() => setPageMenuAnchor(null)}
-        >
-          <ExportImportMenuItems
-            onExport={(format) => {
-              setPageMenuAnchor(null);
-              const exportColumns: ExportColumn[] = [
-                { key: 'productName', header: t('common.name') },
-                {
-                  key: 'productId',
-                  header: t('storeProducts.columns.productId'),
-                },
-                { key: 'store', header: t('storeProducts.columns.store') },
-                { key: 'price', header: t('storeProducts.columns.price') },
-                { key: 'isActive', header: t('common.status') },
-                { key: 'createdAt', header: t('common.createdAt') },
-              ];
-              try {
-                exportToFile(products, exportColumns, 'store-products', format);
-                enqueueSnackbar(t('common.exportSuccess'), {
-                  variant: 'success',
-                });
-              } catch (err) {
-                enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
-              }
-            }}
-            exportOnly={true}
-          />
-        </Menu>
-      </Box>
+      <PageHeader
+        icon={<StorefrontIcon />}
+        title={t('storeProducts.title')}
+        subtitle={t('storeProducts.subtitle')}
+        actions={
+          <>
+            {canManage && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={<SyncIcon />}
+                  onClick={handleSyncPreview}
+                  disabled={syncLoading}
+                >
+                  {t('storeProducts.syncWithPlanningData')}
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={handleCreate}
+                  disabled
+                >
+                  {t('storeProducts.createProduct')}
+                </Button>
+              </>
+            )}
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'productName', header: t('common.name') },
+                    {
+                      key: 'productId',
+                      header: t('storeProducts.columns.productId'),
+                    },
+                    { key: 'store', header: t('storeProducts.columns.store') },
+                    { key: 'price', header: t('storeProducts.columns.price') },
+                    { key: 'isActive', header: t('common.status') },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(products, exportColumns, 'store-products', format);
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                  }
+                }}
+                exportOnly={true}
+              />
+            </Menu>
+          </>
+        }
+      />
 
       {/* Search and Filters */}
       <Card sx={{ mb: 3 }}>

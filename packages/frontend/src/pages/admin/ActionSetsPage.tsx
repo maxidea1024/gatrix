@@ -53,6 +53,7 @@ import actionSetService, {
   ActionSetEvent,
 } from '@/services/actionSetService';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import PageHeader from '@/components/common/PageHeader';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import featureFlagService from '@/services/featureFlagService';
@@ -714,24 +715,11 @@ const ActionSetsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h5" fontWeight="bold">
-            {t('actionSets.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('actionSets.subtitle')}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {actionSets.length > 0 && (
+      <PageHeader
+        title={t('actionSets.title')}
+        subtitle={t('actionSets.subtitle')}
+        actions={
+          actionSets.length > 0 ? (
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -739,9 +727,9 @@ const ActionSetsPage: React.FC = () => {
             >
               {t('actionSets.createActionSet')}
             </Button>
-          )}
-        </Box>
-      </Box>
+          ) : undefined
+        }
+      />
 
       {/* Content */}
       <PageContentLoader loading={loading}>

@@ -1051,19 +1051,15 @@ const FeatureFlagsPage: React.FC = () => {
         );
         const existingDraftData = pendingDraft?.draftData || {};
 
-        const currentEnvData = flag.environments?.find(
-          (e) => e.environmentId === environmentId
-        ) || { environmentId, isEnabled: currentEnabled };
-
-        const updatedEnvData = {
-          ...currentEnvData,
-          isEnabled: newEnabled,
-        };
-
-        // Merge with existing draft data
+        // Only save isEnabled toggle - avoid spreading entire env data
+        // which can cause serialization issues with enabledValue/disabledValue
+        const currentDraftEnvData = existingDraftData[environmentId] || {};
         const mergedDraftData = {
           ...existingDraftData,
-          [environmentId]: updatedEnvData,
+          [environmentId]: {
+            ...currentDraftEnvData,
+            isEnabled: newEnabled,
+          },
         };
 
         await changeRequestService.saveFlagDraft(
@@ -1530,18 +1526,14 @@ const FeatureFlagsPage: React.FC = () => {
             );
             const existingDraftData = pendingDraft?.draftData || {};
 
-            const currentEnvData = flag.environments?.find(
-              (e) => e.environmentId === environmentId
-            ) || { environmentId, isEnabled: !enable };
-
-            const updatedEnvData = {
-              ...currentEnvData,
-              isEnabled: enable,
-            };
-
+            // Only save isEnabled toggle - avoid spreading entire env data
+            const currentDraftEnvData = existingDraftData[environmentId] || {};
             const mergedDraftData = {
               ...existingDraftData,
-              [environmentId]: updatedEnvData,
+              [environmentId]: {
+                ...currentDraftEnvData,
+                isEnabled: enable,
+              },
             };
 
             await changeRequestService.saveFlagDraft(
@@ -1753,117 +1745,110 @@ const FeatureFlagsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<FlagIcon />}
-          title={t('featureFlags.title')}
-          subtitle={t('featureFlags.subtitle')}
-        />
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {canManage && (
-            <>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={(e) => setCreateMenuAnchor(e.currentTarget)}
-                endIcon={<ExpandMoreIcon sx={{ ml: -0.5 }} />}
-              >
-                {t('featureFlags.createFlagOrRemoteConfig')}
-              </Button>
-              <Menu
-                anchorEl={createMenuAnchor}
-                open={Boolean(createMenuAnchor)}
-                onClose={() => setCreateMenuAnchor(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              >
-                <MenuItem onClick={() => handleOpenCreateDialog('featureFlag')}>
-                  <ListItemIcon>
-                    <FlagIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t('featureFlags.createFlagOption')}
-                    secondary={t('featureFlags.createFeatureFlagSubtitle')}
-                  />
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={() => handleOpenCreateDialog('release')}>
-                  <ListItemIcon>
-                    <ReleaseIcon fontSize="small" color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t('featureFlags.flagTypes.release')}
-                    secondary={t('featureFlags.flagTypes.release.desc')}
-                  />
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenCreateDialog('experiment')}>
-                  <ListItemIcon>
-                    <ExperimentIcon fontSize="small" color="secondary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t('featureFlags.flagTypes.experiment')}
-                    secondary={t('featureFlags.flagTypes.experiment.desc')}
-                  />
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenCreateDialog('operational')}>
-                  <ListItemIcon>
-                    <OperationalIcon fontSize="small" color="warning" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t('featureFlags.flagTypes.operational')}
-                    secondary={t('featureFlags.flagTypes.operational.desc')}
-                  />
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenCreateDialog('killSwitch')}>
-                  <ListItemIcon>
-                    <KillSwitchIcon fontSize="small" color="error" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t('featureFlags.flagTypes.killSwitch')}
-                    secondary={t('featureFlags.flagTypes.killSwitch.desc')}
-                  />
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenCreateDialog('permission')}>
-                  <ListItemIcon>
-                    <PermissionIcon fontSize="small" color="action" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t('featureFlags.flagTypes.permission')}
-                    secondary={t('featureFlags.flagTypes.permission.desc')}
-                  />
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  onClick={() => handleOpenCreateDialog('remoteConfig')}
+      <PageHeader
+        icon={<FlagIcon />}
+        title={t('featureFlags.title')}
+        subtitle={t('featureFlags.subtitle')}
+        actions={
+          <>
+            {canManage && (
+              <>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={(e) => setCreateMenuAnchor(e.currentTarget)}
+                  endIcon={<ExpandMoreIcon sx={{ ml: -0.5 }} />}
                 >
-                  <ListItemIcon>
-                    <RemoteConfigIcon fontSize="small" color="info" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t('featureFlags.flagTypes.remoteConfig')}
-                    secondary={t('featureFlags.flagTypes.remoteConfig.desc')}
-                  />
-                </MenuItem>
-              </Menu>
-            </>
-          )}
-          <IconButton
-            onClick={(e) => setImportExportMenuAnchor(e.currentTarget)}
-          >
-            <MoreVertIcon />
-          </IconButton>
-        </Box>
-      </Box>
+                  {t('featureFlags.createFlagOrRemoteConfig')}
+                </Button>
+                <Menu
+                  anchorEl={createMenuAnchor}
+                  open={Boolean(createMenuAnchor)}
+                  onClose={() => setCreateMenuAnchor(null)}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                >
+                  <MenuItem onClick={() => handleOpenCreateDialog('featureFlag')}>
+                    <ListItemIcon>
+                      <FlagIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={t('featureFlags.createFlagOption')}
+                      secondary={t('featureFlags.createFeatureFlagSubtitle')}
+                    />
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={() => handleOpenCreateDialog('release')}>
+                    <ListItemIcon>
+                      <ReleaseIcon fontSize="small" color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={t('featureFlags.flagTypes.release')}
+                      secondary={t('featureFlags.flagTypes.release.desc')}
+                    />
+                  </MenuItem>
+                  <MenuItem onClick={() => handleOpenCreateDialog('experiment')}>
+                    <ListItemIcon>
+                      <ExperimentIcon fontSize="small" color="secondary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={t('featureFlags.flagTypes.experiment')}
+                      secondary={t('featureFlags.flagTypes.experiment.desc')}
+                    />
+                  </MenuItem>
+                  <MenuItem onClick={() => handleOpenCreateDialog('operational')}>
+                    <ListItemIcon>
+                      <OperationalIcon fontSize="small" color="warning" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={t('featureFlags.flagTypes.operational')}
+                      secondary={t('featureFlags.flagTypes.operational.desc')}
+                    />
+                  </MenuItem>
+                  <MenuItem onClick={() => handleOpenCreateDialog('killSwitch')}>
+                    <ListItemIcon>
+                      <KillSwitchIcon fontSize="small" color="error" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={t('featureFlags.flagTypes.killSwitch')}
+                      secondary={t('featureFlags.flagTypes.killSwitch.desc')}
+                    />
+                  </MenuItem>
+                  <MenuItem onClick={() => handleOpenCreateDialog('permission')}>
+                    <ListItemIcon>
+                      <PermissionIcon fontSize="small" color="action" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={t('featureFlags.flagTypes.permission')}
+                      secondary={t('featureFlags.flagTypes.permission.desc')}
+                    />
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem
+                    onClick={() => handleOpenCreateDialog('remoteConfig')}
+                  >
+                    <ListItemIcon>
+                      <RemoteConfigIcon fontSize="small" color="info" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={t('featureFlags.flagTypes.remoteConfig')}
+                      secondary={t('featureFlags.flagTypes.remoteConfig.desc')}
+                    />
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+            <IconButton
+              onClick={(e) => setImportExportMenuAnchor(e.currentTarget)}
+            >
+              <MoreVertIcon />
+            </IconButton>
+          </>
+        }
+      />
 
       {/* Search and Filters */}
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box
             sx={{

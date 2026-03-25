@@ -58,6 +58,7 @@ import {
   ChevronRight as ChevronRightIcon,
   ArrowDropDown as ArrowDropDownIcon,
   Check as CheckIcon,
+  ManageAccounts as ManageAccountsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { enqueueSnackbar } from 'notistack';
@@ -70,6 +71,7 @@ import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
@@ -1127,40 +1129,30 @@ const ServiceAccountsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h5" fontWeight="bold">
-            {t('serviceAccounts.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('serviceAccounts.subtitle')}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={fetchAccounts}
-          >
-            {t('common.refresh')}
-          </Button>
-          {accounts.length > 0 && canCreate && (
+      <PageHeader
+        icon={<ManageAccountsIcon />}
+        title={t('serviceAccounts.title')}
+        subtitle={t('serviceAccounts.subtitle')}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
-              variant="contained"
-              onClick={() => setEditDialog({ open: true, account: null })}
+              variant="outlined"
+              startIcon={<RefreshIcon />}
+              onClick={fetchAccounts}
             >
-              {t('serviceAccounts.createAccount')}
+              {t('common.refresh')}
             </Button>
-          )}
-        </Box>
-      </Box>
+            {accounts.length > 0 && canCreate && (
+              <Button
+                variant="contained"
+                onClick={() => setEditDialog({ open: true, account: null })}
+              >
+                {t('serviceAccounts.createAccount')}
+              </Button>
+            )}
+          </Box>
+        }
+      />
 
       {/* Content */}
       <PageContentLoader loading={loading}>

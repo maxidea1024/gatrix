@@ -18,6 +18,7 @@ import { useSnackbar } from 'notistack';
 import { usePageState } from '../../hooks/usePageState';
 import SimplePagination from '../../components/common/SimplePagination';
 import api from '@/services/api';
+import PageHeader from '@/components/common/PageHeader';
 
 interface MonitoringAlert {
   id: string;
@@ -135,25 +136,10 @@ const AlertsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('monitoring.alerts.title')}
-            </Typography>
-          </Box>
-        </Box>
-        <Typography variant="caption" color="text.secondary">
-          {t('monitoring.alerts.subtitle')}
-        </Typography>
-      </Box>
+      <PageHeader
+        title={t('monitoring.alerts.title')}
+        subtitle={t('monitoring.alerts.subtitle')}
+      />
 
       <Card>
         <CardContent>

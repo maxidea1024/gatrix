@@ -9,7 +9,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 
 interface PageHeaderProps {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   title: string;
   subtitle?: string;
   actions?: React.ReactNode;
@@ -36,7 +36,17 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           gutterBottom
           sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
         >
-          {icon}
+          {icon && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                color: 'text.primary',
+              }}
+            >
+              {icon}
+            </Box>
+          )}
           {title}
         </Typography>
         {subtitle && (

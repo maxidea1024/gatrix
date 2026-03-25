@@ -48,6 +48,7 @@ import {
   History as HistoryIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import PageHeader from '@/components/common/PageHeader';
 import { useSnackbar } from 'notistack';
 
 import dayjs from 'dayjs';
@@ -387,35 +388,22 @@ const SchedulerPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <ScheduleIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('scheduler.title')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('scheduler.subtitle')}
-            </Typography>
-          </Box>
-        </Box>
-        {canManage && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAdd}
-          >
-            {t('scheduler.addEvent')}
-          </Button>
-        )}
-      </Box>
+      <PageHeader
+        icon={<ScheduleIcon />}
+        title={t('scheduler.title')}
+        subtitle={t('scheduler.subtitle')}
+        actions={
+          canManage ? (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAdd}
+            >
+              {t('scheduler.addEvent')}
+            </Button>
+          ) : undefined
+        }
+      />
 
       {/* Calendar */}
       <PageContentLoader loading={loading}>

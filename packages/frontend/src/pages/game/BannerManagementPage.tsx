@@ -393,68 +393,61 @@ const BannerManagementPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<ImageIcon />}
-          title={t('banners.title')}
-          subtitle={t('banners.subtitle')}
-        />
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
+      <PageHeader
+        icon={<ImageIcon />}
+        title={t('banners.title')}
+        subtitle={t('banners.subtitle')}
+        actions={
+          <>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t('banners.createBanner')}
+              </Button>
+            )}
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
             >
-              {t('banners.createBanner')}
-            </Button>
-          )}
-          <IconButton
-            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-            aria-label="more options"
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            anchorEl={pageMenuAnchor}
-            open={Boolean(pageMenuAnchor)}
-            onClose={() => setPageMenuAnchor(null)}
-          >
-            <ExportImportMenuItems
-              onExport={(format) => {
-                setPageMenuAnchor(null);
-                const exportColumns: ExportColumn[] = [
-                  { key: 'title', header: t('banners.title') },
-                  { key: 'isActive', header: t('common.status') },
-                  { key: 'createdAt', header: t('common.createdAt') },
-                ];
-                try {
-                  exportToFile(banners, exportColumns, 'banners', format);
-                  enqueueSnackbar(t('common.exportSuccess'), {
-                    variant: 'success',
-                  });
-                } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), {
-                    variant: 'error',
-                  });
-                }
-              }}
-              onImportClick={() => {
-                setPageMenuAnchor(null);
-                setImportDialogOpen(true);
-              }}
-              jsonOnly={true}
-            />
-          </Menu>
-        </Box>
-      </Box>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'title', header: t('banners.title') },
+                    { key: 'isActive', header: t('common.status') },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(banners, exportColumns, 'banners', format);
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+                jsonOnly={true}
+              />
+            </Menu>
+          </>
+        }
+      />
 
       {/* Search and Filters */}
       <Card sx={{ mb: 3 }}>

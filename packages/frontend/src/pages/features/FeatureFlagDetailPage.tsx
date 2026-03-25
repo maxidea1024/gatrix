@@ -3554,6 +3554,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
       {/* Flag Values Tab */}
       <TabPanel value={tabValue} index={1}>
+        <PageContentLoader loading={false}>
         <Box>
           <Paper
             variant="outlined"
@@ -3799,10 +3800,12 @@ const FeatureFlagDetailPage: React.FC = () => {
             </Stack>
           </Paper>
         </Box>
+        </PageContentLoader>
       </TabPanel>
 
       {/* Metrics Tab */}
       <TabPanel value={tabValue} index={2}>
+        <PageContentLoader loading={false}>
         <FeatureFlagMetrics
           flagName={flag.flagName}
           environments={(flag.environments || []).map((e) => ({
@@ -3813,15 +3816,20 @@ const FeatureFlagDetailPage: React.FC = () => {
             flag.environments?.[0]?.environmentId || 'production'
           }
         />
+        </PageContentLoader>
       </TabPanel>
       <TabPanel value={tabValue} index={3}>
+        <PageContentLoader loading={false}>
         <FeatureFlagCodeReferences
           flagName={flag.flagName}
           onLoad={(count) => setCodeReferenceCount(count)}
         />
+        </PageContentLoader>
       </TabPanel>
       <TabPanel value={tabValue} index={4}>
+        <PageContentLoader loading={false}>
         <FeatureFlagAuditLogs flagName={flag.flagName} flagId={flag.id} />
+        </PageContentLoader>
       </TabPanel>
 
       {/* Delete Confirmation Dialog */}

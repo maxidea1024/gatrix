@@ -480,81 +480,74 @@ const IngamePopupNoticesPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<NotificationsIcon />}
-          title={t('ingamePopupNotices.title')}
-          subtitle={t('ingamePopupNotices.subtitle')}
-        />
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
+      <PageHeader
+        icon={<NotificationsIcon />}
+        title={t('ingamePopupNotices.title')}
+        subtitle={t('ingamePopupNotices.subtitle')}
+        actions={
+          <>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t('ingamePopupNotices.createNotice')}
+              </Button>
+            )}
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
             >
-              {t('ingamePopupNotices.createNotice')}
-            </Button>
-          )}
-          <IconButton
-            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-            aria-label="more options"
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            anchorEl={pageMenuAnchor}
-            open={Boolean(pageMenuAnchor)}
-            onClose={() => setPageMenuAnchor(null)}
-          >
-            <ExportImportMenuItems
-              onExport={(format) => {
-                setPageMenuAnchor(null);
-                const exportColumns: ExportColumn[] = [
-                  { key: 'content', header: t('ingamePopupNotices.content') },
-                  { key: 'isActive', header: t('common.status') },
-                  {
-                    key: 'displayPriority',
-                    header: t('ingamePopupNotices.priority'),
-                  },
-                  { key: 'startDate', header: t('common.start') },
-                  { key: 'endDate', header: t('common.end') },
-                  { key: 'createdAt', header: t('common.createdAt') },
-                ];
-                try {
-                  exportToFile(
-                    notices,
-                    exportColumns,
-                    'ingame-popup-notices',
-                    format
-                  );
-                  enqueueSnackbar(t('common.exportSuccess'), {
-                    variant: 'success',
-                  });
-                } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), {
-                    variant: 'error',
-                  });
-                }
-              }}
-              onImportClick={() => {
-                setPageMenuAnchor(null);
-                setImportDialogOpen(true);
-              }}
-            />
-          </Menu>
-        </Box>
-      </Box>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'content', header: t('ingamePopupNotices.content') },
+                    { key: 'isActive', header: t('common.status') },
+                    {
+                      key: 'displayPriority',
+                      header: t('ingamePopupNotices.priority'),
+                    },
+                    { key: 'startDate', header: t('common.start') },
+                    { key: 'endDate', header: t('common.end') },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(
+                      notices,
+                      exportColumns,
+                      'ingame-popup-notices',
+                      format
+                    );
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+              />
+            </Menu>
+          </>
+        }
+      />
 
       {/* Search and Filters Card */}
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box
             sx={{

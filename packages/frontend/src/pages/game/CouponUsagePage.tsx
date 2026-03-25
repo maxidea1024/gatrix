@@ -512,43 +512,36 @@ const CouponUsagePage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<HistoryIcon />}
-          title={t('coupons.couponUsage.title')}
-          subtitle={t('coupons.couponUsage.subtitle')}
-        />
-        <Box>
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-            disabled={exporting || records.length === 0}
-          >
-            {exporting ? t('common.exporting') : t('common.export')}
-          </Button>
-          <Menu
-            anchorEl={exportMenuAnchor}
-            open={Boolean(exportMenuAnchor)}
-            onClose={() => setExportMenuAnchor(null)}
-          >
-            <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
-            <MenuItem onClick={() => handleExport('xlsx')}>
-              Excel (XLSX)
-            </MenuItem>
-          </Menu>
-        </Box>
-      </Box>
+      <PageHeader
+        icon={<HistoryIcon />}
+        title={t('coupons.couponUsage.title')}
+        subtitle={t('coupons.couponUsage.subtitle')}
+        actions={
+          <>
+            <Button
+              variant="outlined"
+              startIcon={<DownloadIcon />}
+              onClick={(e) => setExportMenuAnchor(e.currentTarget)}
+              disabled={exporting || records.length === 0}
+            >
+              {exporting ? t('common.exporting') : t('common.export')}
+            </Button>
+            <Menu
+              anchorEl={exportMenuAnchor}
+              open={Boolean(exportMenuAnchor)}
+              onClose={() => setExportMenuAnchor(null)}
+            >
+              <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
+              <MenuItem onClick={() => handleExport('xlsx')}>
+                Excel (XLSX)
+              </MenuItem>
+            </Menu>
+          </>
+        }
+      />
 
       {/* Search & Filters */}
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box
             sx={{

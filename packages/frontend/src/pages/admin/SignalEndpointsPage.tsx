@@ -51,6 +51,7 @@ import signalEndpointService, {
 } from '@/services/signalEndpointService';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import PageHeader from '@/components/common/PageHeader';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -606,33 +607,20 @@ const SignalEndpointsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h5" fontWeight="bold">
-            {t('signalEndpoints.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('signalEndpoints.subtitle')}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {endpoints.length > 0 && canManage && (
+      <PageHeader
+        title={t('signalEndpoints.title')}
+        subtitle={t('signalEndpoints.subtitle')}
+        actions={
+          endpoints.length > 0 && canManage ? (
             <Button
               variant="contained"
               onClick={() => setEditDialog({ open: true, endpoint: null })}
             >
               {t('signalEndpoints.createEndpoint')}
             </Button>
-          )}
-        </Box>
-      </Box>
+          ) : undefined
+        }
+      />
 
       {/* Content */}
       <PageContentLoader loading={loading}>
