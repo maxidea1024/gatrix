@@ -420,11 +420,31 @@ export class ChangeRequestService {
       }
 
       // Find or create draft CR
-      let cr = await ChangeRequest.query()
-        .where('requesterId', userId)
-        .where('environmentId', environmentId)
-        .where('status', 'draft')
+      // First, check if there's already a draft CR that contains a change item for this target
+      // This ensures all changes for a single entity (e.g., feature flag across multiple envs) go into one CR
+      let cr: ChangeRequest | undefined;
+
+      const existingItemForTarget = await ChangeItem.query()
+        .joinRelated('changeRequest')
+        .where('g_change_items.targetTable', targetTable)
+        .where('g_change_items.targetId', targetId)
+        .where('changeRequest.requesterId', userId)
+        .where('changeRequest.status', 'draft')
+        .select('g_change_items.changeRequestId')
         .first();
+
+      if (existingItemForTarget) {
+        cr = await ChangeRequest.query().findById(existingItemForTarget.changeRequestId);
+      }
+
+      // Fallback: look for any draft CR by this user for this environment
+      if (!cr) {
+        cr = await ChangeRequest.query()
+          .where('requesterId', userId)
+          .where('environmentId', environmentId)
+          .where('status', 'draft')
+          .first();
+      }
 
       if (!cr) {
         const cleanTable = targetTable.startsWith('g_')
