@@ -43,7 +43,7 @@ import changeRequestService, {
   ChangeRequestStatus,
 } from '@/services/changeRequestService';
 import SimplePagination from '@/components/common/SimplePagination';
-import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDrawer';
 import RevertPreviewDrawer from '@/components/admin/RevertPreviewDrawer';
 import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
@@ -743,7 +743,7 @@ const ChangeRequestsPage: React.FC = () => {
       />
 
       {/* Status Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Paper variant="outlined" sx={{ mb: 3 }}>
         <Tabs value={tabValue} onChange={handleTabChange}>
           <Tab
             label={
@@ -788,11 +788,11 @@ const ChangeRequestsPage: React.FC = () => {
             }
           />
         </Tabs>
-      </Box>
+      </Paper>
 
       <PageContentLoader loading={isLoading && !data}>
         {!data?.items || data.items.length === 0 ? (
-          <EmptyPagePlaceholder message={t('changeRequest.noRequests')} />
+          <EmptyPlaceholder message={t('changeRequest.noRequests')} />
         ) : (
           <Card variant="outlined" sx={{ position: 'relative' }}>
             <TableContainer

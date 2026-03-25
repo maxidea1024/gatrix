@@ -1224,8 +1224,12 @@ export class ChangeRequestService {
               if (dbData.createdBy === undefined) {
                 dbData.createdBy = userId;
               }
+              // Check if table has a version column
+              const [versionCols] = await trx.raw(
+                `SHOW COLUMNS FROM ${item.targetTable} WHERE Field = 'version'`
+              );
               // Set initial version for new records
-              if (dbData.version === undefined) {
+              if (versionCols && versionCols.length > 0 && dbData.version === undefined) {
                 dbData.version = 1;
               }
               const [result] = await trx(item.targetTable).insert(dbData);
@@ -1315,8 +1319,12 @@ export class ChangeRequestService {
               if (!dbData.updatedAt) {
                 dbData.updatedAt = new Date();
               }
+              // Check if table has a version column
+              const [versionCols] = await trx.raw(
+                `SHOW COLUMNS FROM ${item.targetTable} WHERE Field = 'version'`
+              );
               // Set initial version for new records
-              if (dbData.version === undefined) {
+              if (versionCols && versionCols.length > 0 && dbData.version === undefined) {
                 dbData.version = 1;
               }
               const [insertResult] = await trx(item.targetTable).insert(dbData);
