@@ -77,17 +77,14 @@ router.post(
   })
 );
 
-// Get all pending drafts for feature flags in the current environment
+// Get all pending drafts for feature flags in the current project
 router.get(
   '/pending-drafts',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
     const { ChangeRequestService } = await import('../../../services/change-request-service');
     const drafts = await ChangeRequestService.getAllPendingDraftsForTable(
       'g_feature_flags',
-      environmentId
+      req.projectId!
     );
 
     res.json({ success: true, data: drafts });

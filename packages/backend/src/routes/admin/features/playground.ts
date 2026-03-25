@@ -285,20 +285,19 @@ router.post(
     const { ChangeRequestService } =
       await import('../../../services/change-request-service');
     const draftsByTarget = new Map<string, any>();
-    for (const env of environments) {
-      const pendingDrafts =
-        await ChangeRequestService.getAllPendingDraftsForTable(
-          'g_feature_flags',
-          env
-        );
-      for (const d of pendingDrafts) {
-        // Merge: if draft already exists for this target from another env, merge the draftData
-        const existing = draftsByTarget.get(d.targetId);
-        if (existing) {
-          Object.assign(existing, d.draftData);
-        } else {
-          draftsByTarget.set(d.targetId, { ...d.draftData });
-        }
+    // Fetch all pending drafts for this project at once (no env-loop needed)
+    const pendingDrafts =
+      await ChangeRequestService.getAllPendingDraftsForTable(
+        'g_feature_flags',
+        req.projectId!
+      );
+    for (const d of pendingDrafts) {
+      // Merge: if draft already exists for this target from another CR, merge the draftData
+      const existing = draftsByTarget.get(d.targetId);
+      if (existing) {
+        Object.assign(existing, d.draftData);
+      } else {
+        draftsByTarget.set(d.targetId, { ...d.draftData });
       }
     }
 

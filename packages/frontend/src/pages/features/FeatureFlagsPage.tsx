@@ -1070,8 +1070,31 @@ const FeatureFlagsPage: React.FC = () => {
         );
 
         window.dispatchEvent(new CustomEvent('cr-draft-changed'));
-        // The draft overlay fetches list again. Let's just loadFlags to reflect the draft UI overlay immediately.
-        loadFlags();
+
+        // Optimistic local update: show toggled state immediately
+        setFlags((prev) =>
+          prev.map((f) => {
+            if (f.flagName !== flag.flagName) return f;
+            const existingEnvs = f.environments || [];
+            const envExists = existingEnvs.some(
+              (e) => e.environmentId === environmentId
+            );
+            let updatedEnvs;
+            if (envExists) {
+              updatedEnvs = existingEnvs.map((e) =>
+                e.environmentId === environmentId
+                  ? { ...e, isEnabled: newEnabled }
+                  : e
+              );
+            } else {
+              updatedEnvs = [
+                ...existingEnvs,
+                { environmentId, isEnabled: newEnabled },
+              ];
+            }
+            return { ...f, environments: updatedEnvs };
+          })
+        );
       } catch (error: any) {
         if (error?.response?.data?.errorCode === 'PENDING_REVIEW_EXISTS') {
           enqueueSnackbar(t('changeRequest.errors.pendingReviewExists'), { variant: 'warning' });
@@ -1079,7 +1102,7 @@ const FeatureFlagsPage: React.FC = () => {
           enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), { variant: 'error' });
         }
       }
-      return; // UI will update via fetchFlags merging the draft state
+      return;
     }
 
     // Direct toggle (optimistic update)

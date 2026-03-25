@@ -550,7 +550,7 @@ export class ChangeRequestService {
    */
   static async getAllPendingDraftsForTable(
     targetTable: string,
-    environmentId: string
+    projectId: string
   ): Promise<
     Array<{
       targetId: string;
@@ -559,10 +559,10 @@ export class ChangeRequestService {
     }>
   > {
     const items = await ChangeItem.query()
-      .joinRelated('changeRequest')
+      .joinRelated('changeRequest.[environmentModel]')
       .where('g_change_items.targetTable', targetTable)
       .whereIn('changeRequest.status', ['draft', 'open', 'approved'])
-      .where('changeRequest.environmentId', environmentId)
+      .where('changeRequest:environmentModel.projectId', projectId)
       .whereNotNull('g_change_items.draftData')
       .select(
         'g_change_items.targetId',
