@@ -1700,22 +1700,23 @@ export class ChangeRequestService {
 
   /**
    * Get counts of change requests by status
-   * @param environment Environment name
+   * @param projectId Project ID to filter environments
    * @param userId User ID (for draft visibility)
    */
   static async getChangeRequestCounts(
-    environmentId: string,
+    projectId: string,
     userId: string
   ): Promise<Record<string, number>> {
     const counts = await ChangeRequest.query()
-      .where('environmentId', environmentId)
+      .joinRelated('environmentModel')
+      .where('environmentModel.projectId', projectId)
       .where((builder) => {
-        builder.whereNot('status', 'draft').orWhere((subBuilder) => {
-          subBuilder.where('status', 'draft').where('requesterId', userId);
+        builder.whereNot('g_change_requests.status', 'draft').orWhere((subBuilder) => {
+          subBuilder.where('g_change_requests.status', 'draft').where('g_change_requests.requesterId', userId);
         });
       })
-      .groupBy('status')
-      .select('status')
+      .groupBy('g_change_requests.status')
+      .select('g_change_requests.status')
       .count('* as count');
 
     const result: Record<string, number> = {

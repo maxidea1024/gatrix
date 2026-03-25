@@ -558,7 +558,7 @@ export class ChangeRequestController {
    */
   static getStats = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = getEnvironment(req);
+      const projectId = req.projectId;
       const userId = req.user?.userId;
 
       if (!userId) {
@@ -566,7 +566,7 @@ export class ChangeRequestController {
       }
 
       const stats = await ChangeRequestService.getChangeRequestCounts(
-        environmentId,
+        projectId,
         userId
       );
 
