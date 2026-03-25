@@ -46,56 +46,63 @@ export class ChangeRequestController {
    */
   static list = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = getEnvironment(req);
+      const projectId = req.projectId;
       const status = req.query.status as string | undefined;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       const offset = (page - 1) * limit;
       const userId = req.user?.id;
 
+      // Filter by project (via environment join) instead of single environment
       let query = ChangeRequest.query()
-        .where('environmentId', environmentId)
+        .joinRelated('environmentModel')
+        .where('environmentModel.projectId', projectId)
         .withGraphFetched(
           '[requester, rejector, environmentModel, changeItems, approvals]'
         )
-        .orderBy('updatedAt', 'desc')
+        .orderBy('g_change_requests.updatedAt', 'desc')
         .limit(limit)
         .offset(offset);
 
       if (status) {
-        query = query.where('status', status);
+        query = query.where('g_change_requests.status', status);
         // If filtering by draft, only show own drafts
         if (status === 'draft' && userId) {
-          query = query.where('requesterId', userId);
+          query = query.where('g_change_requests.requesterId', userId);
         }
       } else {
         // When showing all statuses, exclude others' drafts
         // Show: all non-draft OR (draft AND own)
         query = query.where((builder) => {
-          builder.whereNot('status', 'draft').orWhere((subBuilder) => {
-            subBuilder
-              .where('status', 'draft')
-              .where('requesterId', userId || '');
-          });
+          builder
+            .whereNot('g_change_requests.status', 'draft')
+            .orWhere((subBuilder) => {
+              subBuilder
+                .where('g_change_requests.status', 'draft')
+                .where('g_change_requests.requesterId', userId || '');
+            });
         });
       }
 
       const [items, countResult] = await Promise.all([
         query,
         ChangeRequest.query()
-          .where('environmentId', environmentId)
+          .joinRelated('environmentModel')
+          .where('environmentModel.projectId', projectId)
           .where((builder) => {
             if (status) {
-              builder.where('status', status);
+              builder.where('g_change_requests.status', status);
               if (status === 'draft' && userId) {
-                builder.where('requesterId', userId);
+                builder.where('g_change_requests.requesterId', userId);
               }
             } else {
-              builder.whereNot('status', 'draft').orWhere((subBuilder) => {
-                subBuilder
-                  .where('status', 'draft')
-                  .where('requesterId', userId || '');
-              });
+              builder
+                .whereNot('g_change_requests.status', 'draft')
+                .orWhere((subBuilder) => {
+                  subBuilder
+                    .where('g_change_requests.status', 'draft')
+                    .where('g_change_requests.requesterId', userId || '');
+                });
             }
           })
           .count('* as count')
