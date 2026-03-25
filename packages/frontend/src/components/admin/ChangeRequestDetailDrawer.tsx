@@ -55,6 +55,7 @@ import {
 } from '@/utils/changeRequestFormatter';
 import RevertPreviewDrawer from './RevertPreviewDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { useEnvironments } from '@/contexts/EnvironmentContext';
 
 interface ChangeRequestDetailDrawerProps {
   open: boolean;
@@ -147,6 +148,16 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const hasAnyPermissions = permissions.length > 0;
+  const { environments: allEnvironments } = useEnvironments();
+
+  // Build envId -> displayName lookup map
+  const envNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    allEnvironments.forEach((env: any) => {
+      map.set(env.environmentId, env.displayName || env.environmentId);
+    });
+    return map;
+  }, [allEnvironments]);
 
   const [actionLoading, setActionLoading] = useState(false);
   const [comment, setComment] = useState('');
@@ -415,11 +426,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
       } else if (item.draftData && typeof item.draftData === 'object') {
         // For draftData-based items (e.g. feature flags), show draftData as changes
         // Filter out metadata keys (starting with _) and resolve env names
-        const envName = cr?.environmentModel?.displayName || cr?.environmentId;
         changes = Object.entries(item.draftData)
           .filter(([key]) => !key.startsWith('_'))
           .map(([key, value]) => ({
-            field: key === cr?.environmentId && envName ? envName : key,
+            field: envNameMap.get(key) || key,
             oldValue: undefined,
             newValue: value,
             operation: 'modified' as const,
