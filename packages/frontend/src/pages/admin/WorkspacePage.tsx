@@ -54,6 +54,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { useNavigate } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageHeader from '@/components/common/PageHeader';
 
 interface OrgWithMemberCount extends Organisation {
   memberCount: number;
@@ -411,35 +412,24 @@ const WorkspacePage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h5" fontWeight={600} gutterBottom>
-            {t('workspace.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('workspace.subtitle')}
-          </Typography>
-        </Box>
-        {canManageOrgs && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => {
-              setCreateData({ orgName: '', displayName: '', description: '' });
-              setCreateDrawerOpen(true);
-            }}
-          >
-            {t('rbac.orgs.create')}
-          </Button>
-        )}
-      </Box>
+      <PageHeader
+        title={t('workspace.title')}
+        subtitle={t('workspace.subtitle')}
+        actions={
+          canManageOrgs ? (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => {
+                setCreateData({ orgName: '', displayName: '', description: '' });
+                setCreateDrawerOpen(true);
+              }}
+            >
+              {t('rbac.orgs.create')}
+            </Button>
+          ) : undefined
+        }
+      />
 
       <PageContentLoader loading={loading}>
         {error && (

@@ -12,6 +12,7 @@ import {
   useTheme,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import PageHeader from '@/components/common/PageHeader';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 
@@ -53,18 +54,10 @@ export const OpenApiPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ mb: 3 }}>
-        <Typography
-          variant="h5"
-          component="h1"
-          sx={{ mb: 0.5, fontWeight: 700 }}
-        >
-          {t('sidebar.openApi')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {t('openApi.description')}
-        </Typography>
-      </Box>
+      <PageHeader
+        title={t('sidebar.openApi')}
+        subtitle={t('openApi.description')}
+      />
       <Paper sx={{ backgroundColor: 'background.paper', borderRadius: 1 }}>
         <Tabs
           value={tabValue}

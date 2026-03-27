@@ -46,56 +46,49 @@ export class ChangeRequestController {
    */
   static list = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = getEnvironment(req);
+      const projectId = req.projectId;
       const status = req.query.status as string | undefined;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       const offset = (page - 1) * limit;
       const userId = req.user?.id;
 
+      // Filter by project (via environment join) instead of single environment
       let query = ChangeRequest.query()
-        .where('environmentId', environmentId)
+        .joinRelated('environmentModel')
+        .where('environmentModel.projectId', projectId as string)
         .withGraphFetched(
           '[requester, rejector, environmentModel, changeItems, approvals]'
         )
-        .orderBy('updatedAt', 'desc')
+        .orderBy('g_change_requests.updatedAt', 'desc')
         .limit(limit)
         .offset(offset);
 
       if (status) {
-        query = query.where('status', status);
+        query = query.where('g_change_requests.status', status);
         // If filtering by draft, only show own drafts
         if (status === 'draft' && userId) {
-          query = query.where('requesterId', userId);
+          query = query.where('g_change_requests.requesterId', userId);
         }
       } else {
-        // When showing all statuses, exclude others' drafts
-        // Show: all non-draft OR (draft AND own)
-        query = query.where((builder) => {
-          builder.whereNot('status', 'draft').orWhere((subBuilder) => {
-            subBuilder
-              .where('status', 'draft')
-              .where('requesterId', userId || '');
-          });
-        });
+        // When showing all statuses, exclude drafts entirely
+        // Drafts are personal edit buffers and only visible via the draft tab
+        query = query.whereNot('g_change_requests.status', 'draft');
       }
 
       const [items, countResult] = await Promise.all([
         query,
         ChangeRequest.query()
-          .where('environmentId', environmentId)
-          .where((builder) => {
+          .joinRelated('environmentModel')
+          .where('environmentModel.projectId', projectId as string)
+          .where((builder: any) => {
             if (status) {
-              builder.where('status', status);
+              builder.where('g_change_requests.status', status);
               if (status === 'draft' && userId) {
-                builder.where('requesterId', userId);
+                builder.where('g_change_requests.requesterId', userId);
               }
             } else {
-              builder.whereNot('status', 'draft').orWhere((subBuilder) => {
-                subBuilder
-                  .where('status', 'draft')
-                  .where('requesterId', userId || '');
-              });
+              builder.whereNot('g_change_requests.status', 'draft');
             }
           })
           .count('* as count')
@@ -160,7 +153,7 @@ export class ChangeRequestController {
   static updateMetadata = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const { id } = req.params;
-      const { title, description, reason, impactAnalysis, priority, category } =
+      const { title, description, reason, impactAnalysis } =
         req.body;
 
       const updated = await ChangeRequestService.updateChangeRequestMetadata(
@@ -170,8 +163,6 @@ export class ChangeRequestController {
           description,
           reason,
           impactAnalysis,
-          priority,
-          category,
         }
       );
 
@@ -459,22 +450,21 @@ export class ChangeRequestController {
    */
   static getMyRequests = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = getEnvironment(req);
       const userId = req.user?.userId;
 
       if (!userId) {
         throw new GatrixError('User not authenticated', 401);
       }
 
+      // Return CRs from ALL environments (not filtered by active env)
+      // so the floating banner works regardless of which env is active
       const asRequester = await ChangeRequest.query()
-        .where('environmentId', environmentId)
         .where('requesterId', userId)
         .whereIn('status', ['draft', 'open', 'rejected'])
         .withGraphFetched('changeItems')
         .orderBy('updatedAt', 'desc');
 
       const pendingApproval = await ChangeRequest.query()
-        .where('environmentId', environmentId)
         .where('status', 'open')
         .whereNotIn('id', (qb) => {
           qb.select('changeRequestId')
@@ -552,7 +542,7 @@ export class ChangeRequestController {
    */
   static getStats = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environmentId = getEnvironment(req);
+      const projectId = req.projectId as string;
       const userId = req.user?.userId;
 
       if (!userId) {
@@ -560,7 +550,7 @@ export class ChangeRequestController {
       }
 
       const stats = await ChangeRequestService.getChangeRequestCounts(
-        environmentId,
+        projectId,
         userId
       );
 
@@ -661,4 +651,87 @@ export class ChangeRequestController {
       });
     }
   );
+
+  /**
+   * Generate AI summary (title + description) for a CR
+   * POST /api/v1/admin/change-requests/:id/generate-summary
+   */
+  static generateSummary = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { id } = req.params;
+
+      // Load CR with change items
+      const cr = await ChangeRequest.query()
+        .findById(id)
+        .withGraphFetched('[changeItems, actionGroups]');
+
+      if (!cr) {
+        throw new GatrixError('Change Request not found', 404);
+      }
+
+      const orgId = req.orgId;
+      if (!orgId) {
+        throw new GatrixError('Organization not found', 400);
+      }
+
+      const { AICRSummaryService } = await import(
+        '../services/ai/ai-cr-summary-service'
+      );
+
+      try {
+        const language = req.body?.language as string | undefined;
+
+        // Collect environment IDs from draftData keys to resolve display names
+        const envIds = new Set<string>();
+        (cr.changeItems || []).forEach((item) => {
+          if (item.draftData) {
+            Object.keys(item.draftData)
+              .filter(k => !k.startsWith('_') && k.length >= 20) // ULID-like keys
+              .forEach(k => envIds.add(k));
+          }
+        });
+
+        let envNameMap: Record<string, string> = {};
+        if (envIds.size > 0) {
+          const { Environment } = await import('../models/environment');
+          const envs = await Environment.query()
+            .whereIn('id', [...envIds])
+            .select('id', 'displayName');
+          envs.forEach(env => {
+            envNameMap[env.id] = env.displayName;
+          });
+        }
+
+        const result = await AICRSummaryService.generateSummary(orgId, {
+          changeItems: (cr.changeItems || []).map((item) => ({
+            targetTable: item.targetTable,
+            targetId: item.targetId,
+            displayName: item.displayName,
+            opType: item.opType,
+            ops: item.ops,
+            draftData: item.draftData,
+            beforeDraftData: item.beforeDraftData,
+          })),
+          actionGroups: (cr.actionGroups || []).map((g) => ({
+            title: g.title,
+            actionType: g.actionType,
+          })),
+          envNameMap,
+        }, language);
+
+        res.json({ success: true, data: result });
+      } catch (error: any) {
+        if (error.message === 'AI_NOT_CONFIGURED') {
+          throw new GatrixError(
+            'AI is not configured. Please set up AI settings first.',
+            400,
+            true,
+            'AI_NOT_CONFIGURED'
+          );
+        }
+        throw error;
+      }
+    }
+  );
 }
+

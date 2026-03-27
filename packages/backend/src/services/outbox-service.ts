@@ -19,7 +19,7 @@ import { pubSubService } from './pub-sub-service';
 import knex from '../config/knex';
 
 export interface OutboxEventData {
-  changeRequestId: string;
+  changeRequestId?: string;
   entityType: string;
   entityId: string;
   eventType: OutboxEventType;

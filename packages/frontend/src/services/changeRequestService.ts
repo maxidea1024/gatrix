@@ -8,7 +8,7 @@ export type ChangeRequestStatus =
   | 'applied'
   | 'rejected'
   | 'conflict';
-export type ChangeRequestPriority = 'low' | 'medium' | 'high' | 'critical';
+
 
 export interface ChangeItem {
   id: string;
@@ -16,9 +16,19 @@ export interface ChangeItem {
   actionGroupId?: string;
   targetTable: string;
   targetId: string;
+  displayName?: string;
   operation: 'create' | 'update' | 'delete';
   beforeData: any;
   afterData: any;
+  draftData?: Record<string, any>;
+  beforeDraftData?: Record<string, any>;
+  ops?: Array<{
+    path: string;
+    oldValue: any;
+    newValue: any;
+    opType: 'SET' | 'DEL' | 'MOD';
+  }>;
+  opType?: 'CREATE' | 'UPDATE' | 'DELETE';
   entityVersion?: number;
 }
 
@@ -45,11 +55,11 @@ export interface ActionGroup {
 export interface Approval {
   id: string;
   changeRequestId: string;
-  approverId: number;
+  approverId: string;
   comment?: string;
   createdAt: string;
   approver?: {
-    id: number;
+    id: string;
     name: string;
     email: string;
   };
@@ -57,27 +67,25 @@ export interface Approval {
 
 export interface ChangeRequest {
   id: string;
-  requesterId: number;
+  requesterId: string;
   environmentId: string;
   status: ChangeRequestStatus;
   title: string;
   description?: string;
   reason?: string;
   impactAnalysis?: string;
-  priority: ChangeRequestPriority;
-  category: string;
-  rejectedBy?: number;
+  rejectedBy?: string;
   rejectedAt?: string;
   rejectionReason?: string;
   createdAt: string;
   updatedAt: string;
   requester?: {
-    id: number;
+    id: string;
     name: string;
     email: string;
   };
   rejector?: {
-    id: number;
+    id: string;
     name: string;
     email: string;
   };
@@ -89,9 +97,9 @@ export interface ChangeRequest {
   changeItems?: ChangeItem[];
   actionGroups?: ActionGroup[];
   approvals?: Approval[];
-  executedBy?: number;
+  executedBy?: string;
   executor?: {
-    id: number;
+    id: string;
     name: string;
     email: string;
   };
@@ -157,8 +165,6 @@ class ChangeRequestService {
       description?: string;
       reason?: string;
       impactAnalysis?: string;
-      priority?: ChangeRequestPriority;
-      category?: string;
     },
     projectApiPath: string | null = null
   ): Promise<ChangeRequest> {
@@ -306,6 +312,85 @@ class ChangeRequestService {
     projectApiPath: string | null = null
   ): Promise<Record<string, number>> {
     const response = await api.get(`${basePath(projectApiPath)}/stats`);
+    return response.data;
+  }
+  /**
+   * Save feature flag draft data to a Change Request
+   * @param targetEnvironmentId - The environment to create CR for (may differ from active env)
+   */
+  async saveFlagDraft(
+    flagName: string,
+    draftData: Record<string, any>,
+    projectApiPath: string | null = null,
+    targetEnvironmentId?: string
+  ): Promise<{ changeRequestId: string; status: ChangeRequestStatus }> {
+    const flagsBase = projectApiPath
+      ? `${projectApiPath}/features`
+      : '/admin/features';
+    const response = await api.post(`${flagsBase}/${flagName}/change-request`, {
+      draftData,
+      targetEnvironmentId,
+    });
+    return response.data;
+  }
+
+  /**
+   * Get pending Change Request for a feature flag
+   */
+  async getPendingFlagDraft(
+    flagName: string,
+    projectApiPath: string | null = null
+  ): Promise<{
+    changeRequestId: string;
+    status: ChangeRequestStatus;
+    draftData: Record<string, any>;
+    requesterId: string;
+  } | null> {
+    try {
+      const flagsBase = projectApiPath
+        ? `${projectApiPath}/features`
+        : '/admin/features';
+      const response = await api.get(
+        `${flagsBase}/${flagName}/pending-change-request`
+      );
+      return response.data || null;
+    } catch (error: any) {
+      // No pending CR for this flag
+      if (error?.response?.status === 404) return null;
+      throw error;
+    }
+  }
+
+  /**
+   * Get all pending Change Request drafts for all feature flags in the current environment.
+   */
+  async getAllPendingFlagDrafts(
+    projectApiPath: string | null = null
+  ): Promise<
+    Array<{
+      targetId: string;
+      changeRequestId: string;
+      draftData: Record<string, any>;
+    }>
+  > {
+    const flagsBase = projectApiPath
+      ? `${projectApiPath}/features`
+      : '/admin/features';
+    const response = await api.get(`${flagsBase}/pending-drafts`);
+    return response.data;
+  }
+  /**
+   * Generate AI summary (title + description) for a CR
+   */
+  async generateSummary(
+    id: string,
+    projectApiPath: string | null = null,
+    language?: string
+  ): Promise<{ title: string; description: string }> {
+    const response = await api.post(
+      `${basePath(projectApiPath)}/${id}/generate-summary`,
+      language ? { language } : undefined
+    );
     return response.data;
   }
 }

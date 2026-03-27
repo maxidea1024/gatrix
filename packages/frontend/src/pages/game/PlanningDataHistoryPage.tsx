@@ -185,30 +185,23 @@ const PlanningDataHistoryPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<HistoryIcon />}
-          title={t('planningData.history.title')}
-          subtitle={t('planningData.history.subtitle')}
-        />
-        {canManage && history.length > 0 && (
-          <Button
-            variant="contained"
-            color="error"
-            startIcon={<DeleteIcon />}
-            onClick={() => setShowResetDialog(true)}
-          >
-            {t('planningData.history.resetAll')}
-          </Button>
-        )}
-      </Box>
+      <PageHeader
+        icon={<HistoryIcon />}
+        title={t('planningData.history.title')}
+        subtitle={t('planningData.history.subtitle')}
+        actions={
+          canManage && history.length > 0 ? (
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={() => setShowResetDialog(true)}
+            >
+              {t('planningData.history.resetAll')}
+            </Button>
+          ) : undefined
+        }
+      />
 
       {/* Search Bar */}
       <Card sx={{ mb: 3 }}>

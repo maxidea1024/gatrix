@@ -22,6 +22,7 @@ import {
   Fab,
   Zoom,
   keyframes,
+  Slide,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import {
@@ -112,10 +113,6 @@ import {
 import mailService from '@/services/mailService';
 import AIChatPanel, { AIChatFloatingButton } from '@/components/ai/AIChatPanel';
 import { Permission, P } from '@/types/permissions';
-import DraftBanner from '@/components/common/DraftBanner';
-import DraftConfirmDialog from '@/components/common/DraftConfirmDialog';
-import DraftChangesDialog from '@/components/common/DraftChangesDialog';
-import draftService from '@/services/draftService';
 
 // Sidebar width is now dynamic
 
@@ -150,6 +147,20 @@ const maintenancePulseAnimation = keyframes`
   50% {
     box-shadow: 0 0 0 4px rgba(244, 67, 54, 0);
   }
+`;
+
+// Rumble animation for CR floating banner
+const crRumbleAnimation = keyframes`
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-3px) rotate(-1deg); }
+  20% { transform: translateX(3px) rotate(1deg); }
+  30% { transform: translateX(-3px) rotate(-0.5deg); }
+  40% { transform: translateX(3px) rotate(0.5deg); }
+  50% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
+  70% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+  90% { transform: translateX(0); }
 `;
 
 // Maintenance icon pulse animation
@@ -248,13 +259,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // My pending review count (open status - edits are locked)
   const [myPendingReviewCount, setMyPendingReviewCount] = useState(0);
 
-  // Global draft state
-  const [globalDraftCount, setGlobalDraftCount] = useState(0);
-  const [draftChangesOpen, setDraftChangesOpen] = useState(false);
-  const [draftConfirmMode, setDraftConfirmMode] = useState<
-    'publish' | 'discard' | null
-  >(null);
-
   // User has RBAC permissions assigned (regardless of system role)
   const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
 
@@ -316,9 +320,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       {
         'sidebar.changeRequests': pendingCRCount,
       },
-      {
-        requiresApproval: currentEnvironment?.requiresApproval,
-      }
+      {}
     );
     return categories
       .map((category) => ({
@@ -584,7 +586,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       const projectApiPath = getProjectApiPath();
       const response = await changeRequestService.getMyRequests(projectApiPath);
       setPendingCRCount(response?.pendingApproval?.length || 0);
-      setMyDraftCount(response?.myDrafts?.length || 0);
+      // Count total change items across all drafts (not CR count, which is always 1)
+      const totalDraftItems = (response?.myDrafts || []).reduce(
+        (sum: number, cr: any) => sum + (cr.changeItems?.length || 0),
+        0
+      );
+      setMyDraftCount(totalDraftItems);
       // Count my own CRs that are in 'open' status (pending review)
       const myOpenCount = (response?.myRequests || []).filter(
         (cr: any) => cr.status === 'open'
@@ -603,33 +610,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
   }, [hasEnvironmentAccess, currentEnvironmentId, loadPendingCRCount]);
 
-  // Load global draft count (all target types)
-  const loadDraftCount = useCallback(async () => {
-    if (!hasAnyPermissions) return;
-    try {
-      const projectApiPath = getProjectApiPath();
-      const [flagDrafts, segmentDrafts] = await Promise.all([
-        draftService.listDrafts('feature_flag', projectApiPath),
-        draftService.listDrafts('segment', projectApiPath),
-      ]);
-      setGlobalDraftCount(flagDrafts.length + segmentDrafts.length);
-    } catch {
-      // Silently fail
-    }
-  }, [hasAnyPermissions, getProjectApiPath]);
-
+  // Listen for cr-draft-changed events from feature flag pages
   useEffect(() => {
-    if (hasAnyPermissions) {
-      loadDraftCount();
-    }
-  }, [hasAnyPermissions, loadDraftCount]);
-
-  // Listen for draft changes from pages
-  useEffect(() => {
-    const handleDraftChange = () => loadDraftCount();
-    window.addEventListener('draft-changed', handleDraftChange);
-    return () => window.removeEventListener('draft-changed', handleDraftChange);
-  }, [loadDraftCount]);
+    const handleCRDraftChanged = () => {
+      loadPendingCRCount();
+    };
+    window.addEventListener('cr-draft-changed', handleCRDraftChanged);
+    return () => {
+      window.removeEventListener('cr-draft-changed', handleCRDraftChanged);
+    };
+  }, [loadPendingCRCount]);
 
   // Handle role change dialog confirmation
   const handleRoleChangeConfirm = useCallback(async () => {
@@ -2303,168 +2293,226 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Toolbar>
         </AppBar>
 
-        {/* Pending Review Lock Banner - shows when user has open CRs (edits are locked) */}
-        {currentEnvironment?.requiresApproval &&
-          myPendingReviewCount > 0 &&
-          !location.pathname.startsWith('/admin/change-requests') && (
+        {/* Floating CR notification - DraftBanner-style top pill */}
+        <Slide
+          direction="down"
+          in={
+            !!(!location.pathname.startsWith('/admin/change-requests') &&
+            (myPendingReviewCount > 0 ||
+              pendingCRCount > 0 ||
+              myDraftCount > 0))
+          }
+          mountOnEnter
+          unmountOnExit
+        >
+          <Box
+            sx={{
+              position: 'fixed',
+              top: 72,
+              left: { xs: 0, md: sidebarCollapsed ? 64 : sidebarWidth },
+              right: 0,
+              zIndex: (theme) => theme.zIndex.appBar - 1,
+              display: 'flex',
+              justifyContent: 'center',
+              pointerEvents: 'none',
+            }}
+          >
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                gap: 1,
-                px: 2,
+                gap: 2,
                 py: 0.75,
-                bgcolor: 'error.main',
-                color: 'error.contrastText',
+                px: 2,
+                borderRadius: 3,
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 167, 38, 0.25)'
+                    : 'rgba(255, 152, 0, 0.22)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? '0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08)'
+                    : '0 4px 24px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.05)',
+                pointerEvents: 'auto',
+                maxWidth: 640,
+                animation: `${crRumbleAnimation} 0.6s ease-in-out`,
               }}
             >
-              <LockIcon sx={{ fontSize: 16 }} />
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 500, fontSize: '0.8125rem' }}
-              >
-                {t('changeRequest.pendingReviewLockBanner')}
-              </Typography>
-              <Tooltip title={t('changeRequest.pendingReviewLockTooltip')}>
-                <HelpOutlineIcon
-                  sx={{ fontSize: 16, opacity: 0.8, cursor: 'help' }}
-                />
-              </Tooltip>
-              <Box
-                onClick={() => navigate('/admin/change-requests?status=open')}
-                sx={{
-                  ml: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  cursor: 'pointer',
-                  px: 1.5,
-                  py: 0.25,
-                  borderRadius: 1.5,
-                  bgcolor: 'rgba(255,255,255,0.15)',
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.25)',
-                  },
-                  transition: 'background-color 0.2s',
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 500, fontSize: '0.75rem' }}
+              {/* Lock warning */}
+              {myPendingReviewCount > 0 && (
+                <Box
+                  onClick={() =>
+                    navigate('/admin/change-requests?status=open')
+                  }
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                    cursor: 'pointer',
+                    px: 1,
+                    py: 0.25,
+                    borderRadius: 2,
+                    '&:hover': {
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.08)'
+                          : 'rgba(0,0,0,0.04)',
+                    },
+                  }}
                 >
-                  {t('changeRequest.viewMyPendingReviews')}
-                </Typography>
-                <ArrowBackIcon
-                  sx={{ transform: 'rotate(180deg)', fontSize: 12 }}
-                />
-              </Box>
-            </Box>
-          )}
-
-        {/* CR Status Banner - shows pending approvals and/or my drafts */}
-        {currentEnvironment?.requiresApproval &&
-          (pendingCRCount > 0 || myDraftCount > 0) &&
-          !location.pathname.startsWith('/admin/change-requests') && (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                px: 2,
-                py: 0.75,
-                bgcolor: 'warning.main',
-                color: 'warning.contrastText',
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  bgcolor: 'rgba(0,0,0,0.08)',
-                  borderRadius: 2,
-                  px: 0.5,
-                  py: 0.25,
-                }}
-              >
-                {/* My drafts section */}
-                {myDraftCount > 0 && (
-                  <Box
-                    onClick={() =>
-                      navigate('/admin/change-requests?status=draft')
-                    }
+                  <LockIcon
+                    sx={{ fontSize: 14, color: 'error.main' }}
+                  />
+                  <Typography
+                    variant="body2"
                     sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.5,
-                      cursor: 'pointer',
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: 1.5,
-                      '&:hover': {
-                        bgcolor: 'rgba(0,0,0,0.15)',
-                      },
-                      transition: 'background-color 0.2s',
+                      fontWeight: 600,
+                      fontSize: '0.78rem',
+                      color: 'error.main',
+                      whiteSpace: 'nowrap',
                     }}
                   >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 500, fontSize: '0.8125rem' }}
-                    >
-                      {t('changeRequest.myDraftsBanner', {
-                        count: myDraftCount,
-                      })}
-                    </Typography>
-                    <ArrowBackIcon
-                      sx={{ transform: 'rotate(180deg)', fontSize: 14 }}
-                    />
-                  </Box>
-                )}
-
-                {/* Separator */}
-                {myDraftCount > 0 && pendingCRCount > 0 && (
-                  <Typography sx={{ opacity: 0.5, fontSize: '0.875rem' }}>
-                    |
+                    {t('changeRequest.pendingReviewLockBanner')}
                   </Typography>
+                </Box>
+              )}
+
+              {/* Separator */}
+              {myPendingReviewCount > 0 &&
+                (myDraftCount > 0 || pendingCRCount > 0) && (
+                  <Box
+                    sx={{
+                      width: '1px',
+                      height: 16,
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.12)'
+                          : 'rgba(0,0,0,0.12)',
+                    }}
+                  />
                 )}
 
-                {/* Pending approvals section */}
-                {pendingCRCount > 0 && (
+              {/* My drafts */}
+              {myDraftCount > 0 && (
+                <Box
+                  onClick={() =>
+                    navigate('/admin/change-requests?status=draft')
+                  }
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                    cursor: 'pointer',
+                    px: 1,
+                    py: 0.25,
+                    borderRadius: 2,
+                    '&:hover': {
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.08)'
+                          : 'rgba(0,0,0,0.04)',
+                    },
+                  }}
+                >
                   <Box
-                    onClick={() =>
-                      navigate('/admin/change-requests?status=open')
-                    }
                     sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.5,
-                      cursor: 'pointer',
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: 1.5,
-                      '&:hover': {
-                        bgcolor: 'rgba(0,0,0,0.15)',
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      bgcolor: 'warning.main',
+                      animation: 'crPulse 2s infinite',
+                      '@keyframes crPulse': {
+                        '0%': { opacity: 1 },
+                        '50%': { opacity: 0.4 },
+                        '100%': { opacity: 1 },
                       },
-                      transition: 'background-color 0.2s',
+                    }}
+                  />
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: '0.78rem',
+                      color: 'text.primary',
+                      whiteSpace: 'nowrap',
                     }}
                   >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 500, fontSize: '0.8125rem' }}
-                    >
-                      {t('changeRequest.pendingReviewBanner', {
-                        count: pendingCRCount,
-                      })}
-                    </Typography>
-                    <ArrowBackIcon
-                      sx={{ transform: 'rotate(180deg)', fontSize: 14 }}
-                    />
-                  </Box>
-                )}
-              </Box>
+                    {t('changeRequest.myDraftsBanner', {
+                      count: myDraftCount,
+                    })}
+                  </Typography>
+                  <ArrowBackIcon
+                    sx={{
+                      transform: 'rotate(180deg)',
+                      fontSize: 12,
+                      color: 'text.secondary',
+                    }}
+                  />
+                </Box>
+              )}
+
+              {/* Separator */}
+              {myDraftCount > 0 && pendingCRCount > 0 && (
+                <Box
+                  sx={{
+                    width: '1px',
+                    height: 16,
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.12)'
+                        : 'rgba(0,0,0,0.12)',
+                  }}
+                />
+              )}
+
+              {/* Pending approvals */}
+              {pendingCRCount > 0 && (
+                <Box
+                  onClick={() =>
+                    navigate('/admin/change-requests?status=open')
+                  }
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                    cursor: 'pointer',
+                    px: 1,
+                    py: 0.25,
+                    borderRadius: 2,
+                    '&:hover': {
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.08)'
+                          : 'rgba(0,0,0,0.04)',
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: '0.78rem',
+                      color: 'text.primary',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {t('changeRequest.pendingReviewBanner', {
+                      count: pendingCRCount,
+                    })}
+                  </Typography>
+                  <ArrowBackIcon
+                    sx={{
+                      transform: 'rotate(180deg)',
+                      fontSize: 12,
+                      color: 'text.secondary',
+                    }}
+                  />
+                </Box>
+              )}
             </Box>
-          )}
+          </Box>
+        </Slide>
 
         {/* 메인 컨텐츠 */}
         <Box
@@ -2478,152 +2526,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             flexDirection: 'column',
           }}
         >
-          {/* Global Draft Banner - always visible */}
-          <DraftBanner
-            hasDraft={globalDraftCount > 0}
-            sidebarWidth={sidebarCollapsed ? 64 : sidebarWidth}
-            onPublish={async () => {
-              try {
-                const projectApiPath = getProjectApiPath();
-                const [flagDrafts, segDrafts] = await Promise.all([
-                  draftService.listDrafts('feature_flag', projectApiPath),
-                  draftService.listDrafts('segment', projectApiPath),
-                ]);
-                await Promise.all([
-                  ...flagDrafts.map((d) =>
-                    draftService.publishDraft(
-                      'feature_flag',
-                      d.targetId,
-                      projectApiPath
-                    )
-                  ),
-                  ...segDrafts.map((d) =>
-                    draftService.publishDraft(
-                      'segment',
-                      d.targetId,
-                      projectApiPath
-                    )
-                  ),
-                ]);
-                setGlobalDraftCount(0);
-                window.dispatchEvent(new Event('draft-changed'));
-              } catch {
-                enqueueSnackbar(t('draft.publishFailed'), {
-                  variant: 'error',
-                });
-              }
-            }}
-            onDiscard={async () => {
-              try {
-                const projectApiPath = getProjectApiPath();
-                const [flagDrafts, segDrafts] = await Promise.all([
-                  draftService.listDrafts('feature_flag', projectApiPath),
-                  draftService.listDrafts('segment', projectApiPath),
-                ]);
-                await Promise.all([
-                  ...flagDrafts.map((d) =>
-                    draftService.discardDraft(
-                      'feature_flag',
-                      d.targetId,
-                      projectApiPath
-                    )
-                  ),
-                  ...segDrafts.map((d) =>
-                    draftService.discardDraft(
-                      'segment',
-                      d.targetId,
-                      projectApiPath
-                    )
-                  ),
-                ]);
-                setGlobalDraftCount(0);
-                window.dispatchEvent(new Event('draft-changed'));
-              } catch {
-                enqueueSnackbar(t('draft.discardFailed'), {
-                  variant: 'error',
-                });
-              }
-            }}
-            onViewChanges={() => setDraftChangesOpen(true)}
-            onPublishClick={() => setDraftConfirmMode('publish')}
-            onDiscardClick={() => setDraftConfirmMode('discard')}
-          />
           {children}
         </Box>
-
-        {/* Global Draft Changes Dialog */}
-        <DraftChangesDialog
-          open={draftChangesOpen}
-          onClose={() => setDraftChangesOpen(false)}
-          targetTypes={['feature_flag', 'segment']}
-          environments={environments.map((e) => ({
-            environmentId: e.environmentId,
-            displayName: e.displayName,
-          }))}
-          projectApiPath={getProjectApiPath()}
-        />
-
-        {/* Global Draft Confirm Dialog (Publish/Discard with preview) */}
-        {draftConfirmMode && (
-          <DraftConfirmDialog
-            open={true}
-            mode={draftConfirmMode}
-            onClose={() => setDraftConfirmMode(null)}
-            onConfirm={async () => {
-              const projectApiPath = getProjectApiPath();
-              const [flagDrafts, segDrafts] = await Promise.all([
-                draftService.listDrafts('feature_flag', projectApiPath),
-                draftService.listDrafts('segment', projectApiPath),
-              ]);
-              if (draftConfirmMode === 'publish') {
-                await Promise.all([
-                  ...flagDrafts.map((d) =>
-                    draftService.publishDraft(
-                      'feature_flag',
-                      d.targetId,
-                      projectApiPath
-                    )
-                  ),
-                  ...segDrafts.map((d) =>
-                    draftService.publishDraft(
-                      'segment',
-                      d.targetId,
-                      projectApiPath
-                    )
-                  ),
-                ]);
-              } else {
-                await Promise.all([
-                  ...flagDrafts.map((d) =>
-                    draftService.discardDraft(
-                      'feature_flag',
-                      d.targetId,
-                      projectApiPath
-                    )
-                  ),
-                  ...segDrafts.map((d) =>
-                    draftService.discardDraft(
-                      'segment',
-                      d.targetId,
-                      projectApiPath
-                    )
-                  ),
-                ]);
-              }
-              setGlobalDraftCount(0);
-              setDraftConfirmMode(null);
-              window.dispatchEvent(new Event('draft-changed'));
-              // Signal pages to refetch their data without hard reload
-              window.dispatchEvent(new Event('draft-action-completed'));
-            }}
-            targetTypes={['feature_flag', 'segment']}
-            environments={environments.map((e) => ({
-              environmentId: e.environmentId,
-              displayName: e.displayName,
-            }))}
-            projectApiPath={getProjectApiPath()}
-          />
-        )}
       </Box>
 
       {/* AI Chat Floating Button & Panel */}

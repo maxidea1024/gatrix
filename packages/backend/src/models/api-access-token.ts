@@ -62,7 +62,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
         lastUsedAt: { type: ['string', 'object', 'null'], format: 'date-time' },
         usageCount: { type: ['integer', 'null'], minimum: 0 },
         environmentId: { type: ['string', 'null'], maxLength: 50 },
-        createdBy: { type: 'integer' },
+        createdBy: { type: 'string' },
         createdAt: { type: ['string', 'object'], format: 'date-time' },
         updatedAt: { type: ['string', 'object'], format: 'date-time' },
       },

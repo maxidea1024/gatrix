@@ -17,7 +17,6 @@ import {
 } from '@gatrix/evaluator';
 import { createLogger } from '../../../config/logger';
 import { getFallbackValue } from './_helpers';
-import { DraftService } from '../../../services/draft-service';
 
 const logger = createLogger('PlaygroundRoutes');
 const router = Router();
@@ -281,13 +280,25 @@ router.post(
       ? flagsResult.data.filter((f) => flagNamesSet.has(f.flagName))
       : flagsResult.data;
 
-    // Load all feature_flag drafts BEFORE field collection so draft strategies are included
-    // feature_flag drafts have environmentId=NULL (flag-level single draft)
+    // Load pending CR draft data for feature flags (replaces old DraftService)
     // draftData structure: { [envId]: { isEnabled, strategies, ... } }
-    const allDrafts = await DraftService.listDrafts('feature_flag');
+    const { ChangeRequestService } =
+      await import('../../../services/change-request-service');
     const draftsByTarget = new Map<string, any>();
-    for (const d of allDrafts) {
-      draftsByTarget.set(d.targetId, d.draftData);
+    // Fetch all pending drafts for this project at once (no env-loop needed)
+    const pendingDrafts =
+      await ChangeRequestService.getAllPendingDraftsForTable(
+        'g_feature_flags',
+        req.projectId!
+      );
+    for (const d of pendingDrafts) {
+      // Merge: if draft already exists for this target from another CR, merge the draftData
+      const existing = draftsByTarget.get(d.targetId);
+      if (existing) {
+        Object.assign(existing, d.draftData);
+      } else {
+        draftsByTarget.set(d.targetId, { ...d.draftData });
+      }
     }
 
     // Pre-load target flags to collect referenced context fields
@@ -331,7 +342,7 @@ router.post(
           }
 
           // Also collect from draft strategies (unpublished changes)
-          const flagDraftData = draftsByTarget.get((flag as any).id);
+          const flagDraftData = draftsByTarget.get(flag.id);
           if (flagDraftData) {
             for (const envDraft of Object.values(flagDraftData)) {
               if (
@@ -402,7 +413,7 @@ router.post(
           if (!flag) continue;
 
           // Merge draft data into flag if draft exists for this flag+env
-          const flagDraftData = draftsByTarget.get((flag as any).id);
+          const flagDraftData = draftsByTarget.get(flag.id);
           if (flagDraftData) {
             const envDraft = flagDraftData[env];
             if (envDraft && typeof envDraft === 'object') {

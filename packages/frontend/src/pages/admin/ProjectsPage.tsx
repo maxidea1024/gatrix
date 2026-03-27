@@ -58,6 +58,7 @@ import { environmentService, Environment } from '@/services/environmentService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
+import PageHeader from '@/components/common/PageHeader';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { rbacService } from '@/services/rbacService';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -423,30 +424,19 @@ const ProjectsPage: React.FC = () => {
       </Breadcrumbs>
 
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h5" sx={{ fontWeight: 600 }}>
-            {t('rbac.projects.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('rbac.projects.description')}
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleCreate}
-        >
-          {t('rbac.projects.create')}
-        </Button>
-      </Box>
+      <PageHeader
+        title={t('rbac.projects.title')}
+        subtitle={t('rbac.projects.description')}
+        actions={
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreate}
+          >
+            {t('rbac.projects.create')}
+          </Button>
+        }
+      />
 
       <PageContentLoader loading={loading}>
         {projects.length === 0 ? (

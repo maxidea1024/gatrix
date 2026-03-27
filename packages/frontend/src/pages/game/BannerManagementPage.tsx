@@ -60,14 +60,21 @@ import ExportImportMenuItems from '../../components/common/ExportImportMenuItems
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 import TagChips from '../../components/common/TagChips';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from '../../utils/changeRequestToast';
 
 const BannerManagementPage: React.FC = () => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([P.BANNERS_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
 
   // State
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -244,8 +251,12 @@ const BannerManagementPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingBanner) return;
     try {
-      await bannerService.deleteBanner(projectApiPath, deletingBanner.bannerId);
-      enqueueSnackbar(t('banners.deleteSuccess'), { variant: 'success' });
+      const result = await bannerService.deleteBanner(projectApiPath, deletingBanner.bannerId);
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(t('banners.deleteSuccess'), { variant: 'success' });
+      }
       setSelectedIds([]);
       loadBanners();
     } catch (error: any) {
@@ -271,10 +282,16 @@ const BannerManagementPage: React.FC = () => {
   const handleBulkDeleteConfirm = async () => {
     if (selectedIds.length === 0) return;
     try {
-      await Promise.all(
-        selectedIds.map((id) => bannerService.deleteBanner(projectApiPath, id))
-      );
-      enqueueSnackbar(t('banners.bulkDeleteSuccess'), { variant: 'success' });
+      let crCreated = false;
+      for (const id of selectedIds) {
+        const result = await bannerService.deleteBanner(projectApiPath, id);
+        if (result.isChangeRequest) crCreated = true;
+      }
+      if (crCreated) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(t('banners.bulkDeleteSuccess'), { variant: 'success' });
+      }
       setSelectedIds([]);
       loadBanners();
     } catch (error: any) {
@@ -325,11 +342,15 @@ const BannerManagementPage: React.FC = () => {
   const handlePublish = async () => {
     if (!actionMenuBanner) return;
     try {
-      await bannerService.publishBanner(
+      const result = await bannerService.publishBanner(
         projectApiPath,
         actionMenuBanner.bannerId
       );
-      enqueueSnackbar(t('banners.publishSuccess'), { variant: 'success' });
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(t('banners.publishSuccess'), { variant: 'success' });
+      }
       loadBanners();
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'banners.publishFailed'), {
@@ -343,11 +364,15 @@ const BannerManagementPage: React.FC = () => {
   const handleArchive = async () => {
     if (!actionMenuBanner) return;
     try {
-      await bannerService.archiveBanner(
+      const result = await bannerService.archiveBanner(
         projectApiPath,
         actionMenuBanner.bannerId
       );
-      enqueueSnackbar(t('banners.archiveSuccess'), { variant: 'success' });
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(t('banners.archiveSuccess'), { variant: 'success' });
+      }
       loadBanners();
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'banners.archiveFailed'), {
@@ -393,68 +418,61 @@ const BannerManagementPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<ImageIcon />}
-          title={t('banners.title')}
-          subtitle={t('banners.subtitle')}
-        />
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
+      <PageHeader
+        icon={<ImageIcon />}
+        title={t('banners.title')}
+        subtitle={t('banners.subtitle')}
+        actions={
+          <>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t('banners.createBanner')}
+              </Button>
+            )}
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
             >
-              {t('banners.createBanner')}
-            </Button>
-          )}
-          <IconButton
-            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-            aria-label="more options"
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            anchorEl={pageMenuAnchor}
-            open={Boolean(pageMenuAnchor)}
-            onClose={() => setPageMenuAnchor(null)}
-          >
-            <ExportImportMenuItems
-              onExport={(format) => {
-                setPageMenuAnchor(null);
-                const exportColumns: ExportColumn[] = [
-                  { key: 'title', header: t('banners.title') },
-                  { key: 'isActive', header: t('common.status') },
-                  { key: 'createdAt', header: t('common.createdAt') },
-                ];
-                try {
-                  exportToFile(banners, exportColumns, 'banners', format);
-                  enqueueSnackbar(t('common.exportSuccess'), {
-                    variant: 'success',
-                  });
-                } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), {
-                    variant: 'error',
-                  });
-                }
-              }}
-              onImportClick={() => {
-                setPageMenuAnchor(null);
-                setImportDialogOpen(true);
-              }}
-              jsonOnly={true}
-            />
-          </Menu>
-        </Box>
-      </Box>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'title', header: t('banners.title') },
+                    { key: 'isActive', header: t('common.status') },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(banners, exportColumns, 'banners', format);
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+                jsonOnly={true}
+              />
+            </Menu>
+          </>
+        }
+      />
 
       {/* Search and Filters */}
       <Card sx={{ mb: 3 }}>
@@ -787,7 +805,7 @@ const BannerManagementPage: React.FC = () => {
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{t('common.delete')}</ListItemText>
+          <ListItemText>{getActionLabel('delete', requiresApproval, t)}</ListItemText>
         </MenuItem>
       </Menu>
 

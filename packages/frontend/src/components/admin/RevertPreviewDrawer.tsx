@@ -28,6 +28,7 @@ import useSWR from 'swr';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import changeRequestService from '@/services/changeRequestService';
 import { getTableLocalizationKey } from '@/utils/changeRequestFormatter';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface FieldOp {
   path: string;
@@ -39,6 +40,7 @@ interface FieldOp {
 interface RevertItem {
   targetTable: string;
   targetId: string;
+  displayName?: string;
   opType: 'CREATE' | 'UPDATE' | 'DELETE';
   ops: FieldOp[];
   actionType: string;
@@ -61,6 +63,8 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { handleApiError } = useHandleApiError();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [isCreating, setIsCreating] = useState(false);
 
   // Fetch revert preview
@@ -72,7 +76,7 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
     open && changeRequestId
       ? `/admin/change-requests/${changeRequestId}/revert-preview`
       : null,
-    () => changeRequestService.getRevertPreview(changeRequestId!)
+    () => changeRequestService.getRevertPreview(changeRequestId!, projectApiPath)
   );
 
   const handleCreateRevert = async () => {
@@ -80,7 +84,7 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
 
     setIsCreating(true);
     try {
-      const result = await changeRequestService.revert(changeRequestId);
+      const result = await changeRequestService.revert(changeRequestId, projectApiPath);
       enqueueSnackbar(t('changeRequest.messages.revertCreated'), {
         variant: 'success',
       });
@@ -313,7 +317,7 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
                       sx={{ flex: 1 }}
                     >
                       {t(getTableLocalizationKey(item.targetTable))}:{' '}
-                      {item.targetId}
+                      {item.displayName || item.targetId}
                     </Typography>
                     <Chip
                       label={getOpTypeLabel(item.opType)}
@@ -445,7 +449,7 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          <Button variant="outlined" onClick={onClose}>
+          <Button onClick={onClose}>
             {t('common.cancel')}
           </Button>
           <Button

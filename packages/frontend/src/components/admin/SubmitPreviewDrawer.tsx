@@ -34,6 +34,7 @@ import {
   formatChangeRequestTitle,
   getTableLocalizationKey,
 } from '@/utils/changeRequestFormatter';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface SubmitPreviewDrawerProps {
   open: boolean;
@@ -58,6 +59,8 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { handleApiError } = useHandleApiError();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState('');
   const [reason, setReason] = useState('');
@@ -168,14 +171,14 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
         .map(([id]) => id);
 
       for (const itemId of itemsToDelete) {
-        await changeRequestService.deleteChangeItem(changeRequest.id, itemId);
+        await changeRequestService.deleteChangeItem(changeRequest.id, itemId, projectApiPath);
       }
 
       // Then submit
       await changeRequestService.submit(changeRequest.id, {
         title: title.trim(),
         reason: reason.trim() || undefined,
-      });
+      }, projectApiPath);
 
       enqueueSnackbar(t('changeRequest.messages.submitted'), {
         variant: 'success',
@@ -229,212 +232,215 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
       defaultWidth={650}
       minWidth={500}
     >
-      <Box
-        sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}
-      >
-        {/* Header */}
-        <Paper sx={{ p: 2, mb: 3, bgcolor: alpha('#2196f3', 0.1) }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <SendIcon color="primary" />
-            <Typography variant="h6">
-              {t('changeRequest.submitPreviewTitle')}
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        {/* Content Area */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+          {/* Header */}
+          <Paper sx={{ p: 2, mb: 3, bgcolor: alpha('#2196f3', 0.1) }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <SendIcon color="primary" />
+              <Typography variant="h6">
+                {t('changeRequest.submitPreviewTitle')}
+              </Typography>
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              {t('changeRequest.submitPreviewDesc')}
             </Typography>
+          </Paper>
+
+          {/* Title & Reason */}
+          <Box sx={{ mb: 3 }}>
+            <TextField
+              fullWidth
+              label={t('changeRequest.submitDialog.titleField')}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              fullWidth
+              multiline
+              rows={2}
+              label={t('changeRequest.submitDialog.reason')}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              helperText={t('changeRequest.submitDialog.reasonOptional')}
+            />
           </Box>
-          <Typography variant="body2" color="text.secondary">
-            {t('changeRequest.submitPreviewDesc')}
+
+          <Divider sx={{ mb: 2 }} />
+
+          {/* Changes Summary */}
+          <Typography variant="subtitle2" sx={{ mb: 2 }}>
+            {t('changeRequest.selectChanges')} ({selectedCount}/{totalCount})
           </Typography>
-        </Paper>
 
-        {/* Title & Reason */}
-        <Box sx={{ mb: 3 }}>
-          <TextField
-            fullWidth
-            label={t('changeRequest.submitDialog.titleField')}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            multiline
-            rows={2}
-            label={t('changeRequest.submitDialog.reason')}
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            helperText={t('changeRequest.submitDialog.reasonOptional')}
-          />
-        </Box>
-
-        <Divider sx={{ mb: 2 }} />
-
-        {/* Changes Summary */}
-        <Typography variant="subtitle2" sx={{ mb: 2 }}>
-          {t('changeRequest.selectChanges')} ({selectedCount}/{totalCount})
-        </Typography>
-
-        {/* Action Groups */}
-        <Box sx={{ flex: 1, overflow: 'auto', mb: 3 }}>
-          {changeRequest.actionGroups?.map((group) => (
-            <Paper
-              key={group.id}
-              variant="outlined"
-              sx={{ mb: 2, overflow: 'hidden' }}
-            >
-              {/* Group Header */}
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1,
-                  bgcolor: 'action.hover',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  cursor: 'pointer',
-                }}
-                onClick={() => toggleGroupExpand(group.id)}
+          {/* Action Groups */}
+          <Box sx={{ mb: 3 }}>
+            {changeRequest.actionGroups?.map((group) => (
+              <Paper
+                key={group.id}
+                variant="outlined"
+                sx={{ mb: 2, overflow: 'hidden' }}
               >
-                <Checkbox
-                  checked={checkedGroups[group.id] ?? true}
-                  indeterminate={
-                    group.changeItems?.some((item) => checkedItems[item.id]) &&
-                    !group.changeItems?.every((item) => checkedItems[item.id])
-                  }
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    handleGroupCheck(group.id, e.target.checked);
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                  size="small"
-                />
-                <ExpandMoreIcon
+                {/* Group Header */}
+                <Box
                   sx={{
-                    transform: expandedGroups[group.id]
-                      ? 'rotate(0deg)'
-                      : 'rotate(-90deg)',
-                    transition: 'transform 0.2s',
-                    fontSize: 20,
+                    px: 2,
+                    py: 1,
+                    bgcolor: 'action.hover',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    cursor: 'pointer',
                   }}
-                />
-                <Typography variant="body2" fontWeight={600} sx={{ flex: 1 }}>
-                  {formatChangeRequestTitle(group.title, t)}
-                </Typography>
-                <Chip
-                  label={`${group.changeItems?.filter((item) => checkedItems[item.id]).length || 0}/${group.changeItems?.length || 0}`}
-                  size="small"
-                  variant="outlined"
-                />
-              </Box>
-
-              {/* Group Items */}
-              <Collapse in={expandedGroups[group.id]}>
-                <Box sx={{ p: 1 }}>
-                  {group.changeItems?.map((item) => (
-                    <Box
-                      key={item.id}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: 1,
-                        p: 1,
-                        borderRadius: 1,
-                        bgcolor: checkedItems[item.id]
-                          ? 'transparent'
-                          : alpha('#f44336', 0.05),
-                        opacity: checkedItems[item.id] ? 1 : 0.6,
-                        '&:hover': { bgcolor: 'action.hover' },
-                      }}
-                    >
-                      <Checkbox
-                        checked={checkedItems[item.id] ?? true}
-                        onChange={(e) =>
-                          handleItemCheck(item.id, group.id, e.target.checked)
-                        }
-                        size="small"
-                      />
-                      <Box sx={{ flex: 1 }}>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1,
-                            mb: 0.5,
-                          }}
-                        >
-                          {getOpTypeIcon((item as any).opType || 'UPDATE')}
-                          <Typography variant="body2" fontWeight={500}>
-                            {t(getTableLocalizationKey(item.targetTable))}:{' '}
-                            {item.targetId}
-                          </Typography>
-                          <Chip
-                            label={getOpTypeLabel(
-                              (item as any).opType || 'UPDATE'
-                            )}
-                            size="small"
-                            sx={{ height: 20, fontSize: 11 }}
-                          />
-                        </Box>
-                        {/* Show ops count for UPDATE */}
-                        {(item as any).opType === 'UPDATE' &&
-                          (item as any).ops?.length > 0 && (
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {(item as any).ops.length}{' '}
-                              {t('changeRequest.fieldChanges')}
-                            </Typography>
-                          )}
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-              </Collapse>
-            </Paper>
-          ))}
-
-          {/* Items without action groups */}
-          {changeRequest.changeItems
-            ?.filter((item) => !item.actionGroupId)
-            .map((item) => (
-              <Paper key={item.id} variant="outlined" sx={{ mb: 1, p: 1.5 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  onClick={() => toggleGroupExpand(group.id)}
+                >
                   <Checkbox
-                    checked={checkedItems[item.id] ?? true}
-                    onChange={(e) =>
-                      handleItemCheck(item.id, undefined, e.target.checked)
+                    checked={checkedGroups[group.id] ?? true}
+                    indeterminate={
+                      group.changeItems?.some((item) => checkedItems[item.id]) &&
+                      !group.changeItems?.every((item) => checkedItems[item.id])
                     }
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleGroupCheck(group.id, e.target.checked);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
                     size="small"
                   />
-                  {getOpTypeIcon((item as any).opType || 'UPDATE')}
-                  <Typography variant="body2">
-                    {t(getTableLocalizationKey(item.targetTable))}:{' '}
-                    {item.targetId}
+                  <ExpandMoreIcon
+                    sx={{
+                      transform: expandedGroups[group.id]
+                        ? 'rotate(0deg)'
+                        : 'rotate(-90deg)',
+                      transition: 'transform 0.2s',
+                      fontSize: 20,
+                    }}
+                  />
+                  <Typography variant="body2" fontWeight={600} sx={{ flex: 1 }}>
+                    {formatChangeRequestTitle(group.title, t)}
                   </Typography>
+                  <Chip
+                    label={`${group.changeItems?.filter((item) => checkedItems[item.id]).length || 0}/${group.changeItems?.length || 0}`}
+                    size="small"
+                    variant="outlined"
+                  />
                 </Box>
+
+                {/* Group Items */}
+                <Collapse in={expandedGroups[group.id]}>
+                  <Box sx={{ p: 1 }}>
+                    {group.changeItems?.map((item) => (
+                      <Box
+                        key={item.id}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 1,
+                          p: 1,
+                          borderRadius: 1,
+                          bgcolor: checkedItems[item.id]
+                            ? 'transparent'
+                            : alpha('#f44336', 0.05),
+                          opacity: checkedItems[item.id] ? 1 : 0.6,
+                          '&:hover': { bgcolor: 'action.hover' },
+                        }}
+                      >
+                        <Checkbox
+                          checked={checkedItems[item.id] ?? true}
+                          onChange={(e) =>
+                            handleItemCheck(item.id, group.id, e.target.checked)
+                          }
+                          size="small"
+                        />
+                        <Box sx={{ flex: 1 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1,
+                              mb: 0.5,
+                            }}
+                          >
+                            {getOpTypeIcon((item as any).opType || 'UPDATE')}
+                            <Typography variant="body2" fontWeight={500}>
+                              {t(getTableLocalizationKey(item.targetTable))}:{' '}
+                              {item.targetId}
+                            </Typography>
+                            <Chip
+                              label={getOpTypeLabel(
+                                (item as any).opType || 'UPDATE'
+                              )}
+                              size="small"
+                              sx={{ height: 20, fontSize: 11 }}
+                            />
+                          </Box>
+                          {/* Show ops count for UPDATE */}
+                          {(item as any).opType === 'UPDATE' &&
+                            (item as any).ops?.length > 0 && (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {(item as any).ops.length}{' '}
+                                {t('changeRequest.fieldChanges')}
+                              </Typography>
+                            )}
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                </Collapse>
               </Paper>
             ))}
+
+            {/* Items without action groups */}
+            {changeRequest.changeItems
+              ?.filter((item) => !item.actionGroupId)
+              .map((item) => (
+                <Paper key={item.id} variant="outlined" sx={{ mb: 1, p: 1.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Checkbox
+                      checked={checkedItems[item.id] ?? true}
+                      onChange={(e) =>
+                        handleItemCheck(item.id, undefined, e.target.checked)
+                      }
+                      size="small"
+                    />
+                    {getOpTypeIcon((item as any).opType || 'UPDATE')}
+                    <Typography variant="body2">
+                      {t(getTableLocalizationKey(item.targetTable))}:{' '}
+                      {item.targetId}
+                    </Typography>
+                  </Box>
+                </Paper>
+              ))}
+          </Box>
+
+          {/* Warning if some items are unchecked */}
+          {selectedCount < totalCount && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              {t('changeRequest.submitExcludeWarning', {
+                count: totalCount - selectedCount,
+              })}
+            </Alert>
+          )}
         </Box>
 
-        {/* Warning if some items are unchecked */}
-        {selectedCount < totalCount && (
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            {t('changeRequest.submitExcludeWarning', {
-              count: totalCount - selectedCount,
-            })}
-          </Alert>
-        )}
-
         {/* Action Buttons */}
+        <Divider />
         <Box
           sx={{
+            p: 2,
             display: 'flex',
             gap: 2,
             justifyContent: 'flex-end',
             bgcolor: 'background.paper',
           }}
         >
-          <Button variant="outlined" onClick={onClose}>
+          <Button onClick={onClose}>
             {t('common.cancel')}
           </Button>
           <Button

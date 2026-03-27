@@ -38,7 +38,7 @@ export class OutboxEvent extends Model {
   static tableName = 'g_outbox_events';
 
   id!: string;
-  changeRequestId!: string;
+  changeRequestId?: string;
   entityType!: string;
   entityId!: string;
   eventType!: OutboxEventType;
@@ -56,7 +56,6 @@ export class OutboxEvent extends Model {
     return {
       type: 'object',
       required: [
-        'changeRequestId',
         'entityType',
         'entityId',
         'eventType',
@@ -64,7 +63,7 @@ export class OutboxEvent extends Model {
       ],
       properties: {
         id: { type: 'string' },
-        changeRequestId: { type: 'string' },
+        changeRequestId: { type: ['string', 'null'] },
         entityType: { type: 'string', maxLength: 100 },
         entityId: { type: 'string', maxLength: 255 },
         eventType: {
@@ -74,7 +73,7 @@ export class OutboxEvent extends Model {
         payload: { type: 'object' },
         status: {
           type: 'string',
-          enum: ['pending', 'processing', 'completed', 'failed'],
+          enum: ['pending', 'processing', 'completed', 'failed', 'dead_letter'],
         },
         retryCount: { type: 'integer', minimum: 0 },
         errorMessage: { type: ['string', 'null'] },

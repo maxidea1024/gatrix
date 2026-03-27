@@ -557,34 +557,27 @@ const FeatureSegmentsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<SegmentIcon />}
-          title={t('featureFlags.segments')}
-          subtitle={t('featureFlags.segmentsDescription')}
-        />
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-            >
-              {t('featureFlags.addSegment')}
-            </Button>
-          )}
-        </Box>
-      </Box>
+      <PageHeader
+        icon={<SegmentIcon />}
+        title={t('featureFlags.segments')}
+        subtitle={t('featureFlags.segmentsDescription')}
+        actions={
+          <>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t('featureFlags.addSegment')}
+              </Button>
+            )}
+          </>
+        }
+      />
 
       {/* Search and Filters */}
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box
             sx={{

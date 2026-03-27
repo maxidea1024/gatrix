@@ -54,6 +54,7 @@ import type {
   RepeatableJob,
 } from '@/services/queueMonitorService';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 
 // Format duration in ms to human-readable
 function formatDuration(ms: number): string {
@@ -271,53 +272,40 @@ const QueueMonitorPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          mb: 3,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <MonitorIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {t('queueMonitor.title')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('queueMonitor.description')}
-            </Typography>
-          </Box>
-        </Box>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <FormControlLabel
-            control={
-              <Switch
-                size="small"
-                checked={autoRefresh}
-                onChange={(e) => setAutoRefresh(e.target.checked)}
-              />
-            }
-            label={
-              <Typography variant="caption">
-                {t('queueMonitor.autoRefresh')}
-              </Typography>
-            }
-          />
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={() => {
-              loadStats();
-              loadQueueDetails();
-            }}
-          >
-            {t('common.refresh')}
-          </Button>
-        </Stack>
-      </Box>
+      <PageHeader
+        icon={<MonitorIcon />}
+        title={t('queueMonitor.title')}
+        subtitle={t('queueMonitor.description')}
+        actions={
+          <Stack direction="row" spacing={2} alignItems="center">
+            <FormControlLabel
+              control={
+                <Switch
+                  size="small"
+                  checked={autoRefresh}
+                  onChange={(e) => setAutoRefresh(e.target.checked)}
+                />
+              }
+              label={
+                <Typography variant="caption">
+                  {t('queueMonitor.autoRefresh')}
+                </Typography>
+              }
+            />
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<RefreshIcon />}
+              onClick={() => {
+                loadStats();
+                loadQueueDetails();
+              }}
+            >
+              {t('common.refresh')}
+            </Button>
+          </Stack>
+        }
+      />
 
       <PageContentLoader loading={loading}>
         {stats.length === 0 ? (

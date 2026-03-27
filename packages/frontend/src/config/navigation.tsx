@@ -371,6 +371,18 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.FEATURES_READ,
       },
       {
+        text: 'sidebar.actionSets',
+        icon: 'SmartToy',
+        path: '/admin/actions',
+        requiredPermission: P.ACTIONS_READ,
+      },
+      {
+        text: 'sidebar.signalEndpoints',
+        icon: 'Sensors',
+        path: '/admin/signal-endpoints',
+        requiredPermission: P.SIGNAL_ENDPOINTS_READ,
+      },
+      {
         text: 'sidebar.featureNetwork',
         icon: 'Hub',
         path: '/feature-flags/network',
@@ -391,34 +403,13 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
-  // Actions & Signals
-  {
-    id: 'actions-signals',
-    text: 'sidebar.actionsSignals',
-    icon: 'Sensors',
-    children: [
-      {
-        text: 'sidebar.signalEndpoints',
-        icon: 'Sensors',
-        path: '/admin/signal-endpoints',
-        requiredPermission: P.SIGNAL_ENDPOINTS_READ,
-      },
-      {
-        text: 'sidebar.actionSets',
-        icon: 'SmartToy',
-        path: '/admin/actions',
-        requiredPermission: P.ACTIONS_READ,
-      },
-    ],
-  },
 
-  // Change Requests (conditional)
+  // Change Requests
   {
     id: 'change-requests',
     text: 'sidebar.changeRequests',
     icon: 'Campaign',
     path: '/admin/change-requests',
-    condition: (options) => options.requiresApproval !== false,
     children: [
       {
         text: 'sidebar.changeRequests',

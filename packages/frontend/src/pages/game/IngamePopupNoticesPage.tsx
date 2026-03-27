@@ -75,16 +75,23 @@ import ExportImportMenuItems from '../../components/common/ExportImportMenuItems
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 import TagChips from '../../components/common/TagChips';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from '../../utils/changeRequestToast';
 
 const IngamePopupNoticesPage: React.FC = () => {
   const { t } = useTranslation();
   const { language } = useI18n();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { platforms } = usePlatformConfig();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([P.INGAME_POPUPS_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
 
   // State
   const [notices, setNotices] = useState<IngamePopupNotice[]>([]);
@@ -410,13 +417,17 @@ const IngamePopupNoticesPage: React.FC = () => {
     if (!deletingNotice) return;
 
     try {
-      await ingamePopupNoticeService.deleteIngamePopupNotice(
+      const result = await ingamePopupNoticeService.deleteIngamePopupNotice(
         projectApiPath,
         deletingNotice.id
       );
-      enqueueSnackbar(t('ingamePopupNotices.deleteSuccess'), {
-        variant: 'success',
-      });
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(t('ingamePopupNotices.deleteSuccess'), {
+          variant: 'success',
+        });
+      }
       setDeleteDialogOpen(false);
       setDeletingNotice(null);
       loadNotices();
@@ -437,16 +448,20 @@ const IngamePopupNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(
+      const result = await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(
         projectApiPath,
         selectedIds
       );
-      enqueueSnackbar(
-        t('ingamePopupNotices.bulkDeleteSuccess', {
-          count: selectedIds.length,
-        }),
-        { variant: 'success' }
-      );
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(
+          t('ingamePopupNotices.bulkDeleteSuccess', {
+            count: selectedIds.length,
+          }),
+          { variant: 'success' }
+        );
+      }
       setBulkDeleteDialogOpen(false);
       setSelectedIds([]);
       loadNotices();
@@ -480,81 +495,74 @@ const IngamePopupNoticesPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<NotificationsIcon />}
-          title={t('ingamePopupNotices.title')}
-          subtitle={t('ingamePopupNotices.subtitle')}
-        />
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
+      <PageHeader
+        icon={<NotificationsIcon />}
+        title={t('ingamePopupNotices.title')}
+        subtitle={t('ingamePopupNotices.subtitle')}
+        actions={
+          <>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t('ingamePopupNotices.createNotice')}
+              </Button>
+            )}
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
             >
-              {t('ingamePopupNotices.createNotice')}
-            </Button>
-          )}
-          <IconButton
-            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-            aria-label="more options"
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            anchorEl={pageMenuAnchor}
-            open={Boolean(pageMenuAnchor)}
-            onClose={() => setPageMenuAnchor(null)}
-          >
-            <ExportImportMenuItems
-              onExport={(format) => {
-                setPageMenuAnchor(null);
-                const exportColumns: ExportColumn[] = [
-                  { key: 'content', header: t('ingamePopupNotices.content') },
-                  { key: 'isActive', header: t('common.status') },
-                  {
-                    key: 'displayPriority',
-                    header: t('ingamePopupNotices.priority'),
-                  },
-                  { key: 'startDate', header: t('common.start') },
-                  { key: 'endDate', header: t('common.end') },
-                  { key: 'createdAt', header: t('common.createdAt') },
-                ];
-                try {
-                  exportToFile(
-                    notices,
-                    exportColumns,
-                    'ingame-popup-notices',
-                    format
-                  );
-                  enqueueSnackbar(t('common.exportSuccess'), {
-                    variant: 'success',
-                  });
-                } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), {
-                    variant: 'error',
-                  });
-                }
-              }}
-              onImportClick={() => {
-                setPageMenuAnchor(null);
-                setImportDialogOpen(true);
-              }}
-            />
-          </Menu>
-        </Box>
-      </Box>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'content', header: t('ingamePopupNotices.content') },
+                    { key: 'isActive', header: t('common.status') },
+                    {
+                      key: 'displayPriority',
+                      header: t('ingamePopupNotices.priority'),
+                    },
+                    { key: 'startDate', header: t('common.start') },
+                    { key: 'endDate', header: t('common.end') },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(
+                      notices,
+                      exportColumns,
+                      'ingame-popup-notices',
+                      format
+                    );
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+              />
+            </Menu>
+          </>
+        }
+      />
 
       {/* Search and Filters Card */}
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box
             sx={{
@@ -973,7 +981,7 @@ const IngamePopupNoticesPage: React.FC = () => {
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{t('common.delete')}</ListItemText>
+          <ListItemText>{getActionLabel('delete', requiresApproval, t)}</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -993,7 +1001,13 @@ const IngamePopupNoticesPage: React.FC = () => {
         <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t('ingamePopupNotices.confirmDelete')}
+            {t('ingamePopupNotices.confirmDelete', {
+              content: deletingNotice?.content
+                ? deletingNotice.content.length > 50
+                  ? deletingNotice.content.substring(0, 50) + '...'
+                  : deletingNotice.content
+                : '',
+            })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -1001,7 +1015,7 @@ const IngamePopupNoticesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button onClick={confirmDelete} color="error" variant="contained">
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1024,7 +1038,7 @@ const IngamePopupNoticesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button onClick={confirmBulkDelete} color="error" variant="contained">
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
         </DialogActions>
       </Dialog>

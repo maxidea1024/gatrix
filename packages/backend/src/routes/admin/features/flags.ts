@@ -77,6 +77,20 @@ router.post(
   })
 );
 
+// Get all pending drafts for feature flags in the current project
+router.get(
+  '/pending-drafts',
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { ChangeRequestService } = await import('../../../services/change-request-service');
+    const drafts = await ChangeRequestService.getAllPendingDraftsForTable(
+      'g_feature_flags',
+      req.projectId!
+    );
+
+    res.json({ success: true, data: drafts });
+  })
+);
+
 // Get a single feature flag (MUST be after /segments and /context-fields)
 router.get(
   '/:flagName',
@@ -426,6 +440,96 @@ router.post(
     );
 
     res.json({ success: true });
+  })
+);
+
+// ==================== Change Request Integration ====================
+
+// Save feature flag draft data to a Change Request
+router.post(
+  '/:flagName/change-request',
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const activeEnvironmentId = requireEnvironment(req, res);
+    if (!activeEnvironmentId) return;
+
+    const userId = req.user?.id;
+    const { draftData, targetEnvironmentId } = req.body;
+
+    // Use target environment if explicitly provided (e.g., modifying Production
+    // while Development is active), otherwise fall back to active environment
+    const environmentId = targetEnvironmentId || activeEnvironmentId;
+
+    if (!draftData || typeof draftData !== 'object') {
+      return res.status(400).json({
+        success: false,
+        error: 'draftData is required',
+      });
+    }
+
+    // Get flagId from flagName
+    const flag = await featureFlagService.getFlag(
+      environmentId,
+      req.params.flagName,
+      req.projectId
+    );
+    if (!flag) {
+      return res.status(404).json({ success: false, error: 'Flag not found' });
+    }
+
+    const { ChangeRequestService } =
+      await import('../../../services/change-request-service');
+
+    // Build beforeDraftData with matching environment key structure for accurate diff comparison
+    // draftData is structured as { envId: { strategies, variants, isEnabled, ... } }
+    // so beforeDraftData must use the same structure
+    const beforeDraftData: Record<string, any> = {};
+    const envKeys = Object.keys(draftData).filter(k => !k.startsWith('_'));
+    for (const envKey of envKeys) {
+      // The flag object itself represents the current state for this environment
+      const { id, flagName, createdAt, updatedAt, createdBy, updatedBy, environmentId: eid, projectId, ...envFields } = flag as any;
+      beforeDraftData[envKey] = envFields;
+    }
+
+    const result = await ChangeRequestService.upsertDraftDataItem(
+      userId!,
+      environmentId,
+      'g_feature_flags',
+      flag.id,
+      { ...draftData, _flagName: flag.flagName },
+      `[feature_flags] Update: ${flag.flagName}`,
+      beforeDraftData
+    );
+
+    res.json({ success: true, data: result });
+  })
+);
+
+// Get pending Change Request for a feature flag
+router.get(
+  '/:flagName/pending-change-request',
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
+
+    // Get flagId from flagName
+    const flag = await featureFlagService.getFlag(
+      environmentId,
+      req.params.flagName,
+      req.projectId
+    );
+    if (!flag) {
+      return res.status(404).json({ success: false, error: 'Flag not found' });
+    }
+
+    const { ChangeRequestService } =
+      await import('../../../services/change-request-service');
+
+    const pendingDraft = await ChangeRequestService.getPendingDraftForTarget(
+      'g_feature_flags',
+      flag.id
+    );
+
+    res.json({ success: true, data: pendingDraft });
   })
 );
 

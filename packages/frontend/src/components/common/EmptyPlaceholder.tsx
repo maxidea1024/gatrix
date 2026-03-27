@@ -14,7 +14,12 @@ interface EmptyPlaceholderProps {
   /** Button variant (default: 'contained') */
   addButtonVariant?: 'text' | 'contained' | 'outlined';
   /** Custom content to render instead of the default add button */
+  /** Custom content to render instead of the default add button */
   children?: React.ReactNode;
+  /** Minimum height of the placeholder */
+  minHeight?: number | string;
+  /** Additional styles */
+  sx?: any;
 }
 
 /**
@@ -29,17 +34,25 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
   addButtonLabel,
   addButtonVariant = 'contained',
   children,
+  minHeight,
+  sx = {},
 }) => {
   return (
     <Box
       sx={{
         textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: minHeight,
         py: 3,
         px: 3,
         border: '2px dashed',
         borderColor: 'divider',
         borderRadius: '4px',
         bgcolor: 'action.hover',
+        ...sx,
       }}
     >
       <Typography variant="body2" color="text.secondary" fontWeight={500}>

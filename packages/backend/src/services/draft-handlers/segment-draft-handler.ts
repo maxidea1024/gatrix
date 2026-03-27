@@ -11,7 +11,6 @@
  */
 
 import { FeatureSegmentModel } from '../../models/FeatureFlag';
-import { registerDraftHandler } from '../draft-service';
 import db from '../../config/knex';
 import { createLogger } from '../../config/logger';
 
@@ -96,9 +95,3 @@ const segmentDraftHandler = {
     return segment?.segmentName || null;
   },
 };
-
-// ==================== Registration ====================
-
-export function registerSegmentDraftHandler(): void {
-  registerDraftHandler('segment', segmentDraftHandler);
-}

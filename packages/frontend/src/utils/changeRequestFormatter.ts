@@ -18,6 +18,11 @@ export const getTableLocalizationKey = (tableName: string): string => {
     users: 'tables.users',
     client_versions: 'tables.clientVersions',
     game_worlds: 'tables.gameWorlds',
+    feature_flags: 'tables.featureFlags',
+    reward_templates: 'tables.rewardTemplates',
+    remote_configs: 'tables.remoteConfigs',
+    banners: 'tables.banners',
+    surveys: 'tables.surveys',
     // Add more mappings as needed
   };
 
@@ -114,6 +119,10 @@ export const formatChangeItemTitle = (
       else if (afterData.worldId) friendlyName = afterData.worldId;
     } else if (cleanTable === 'client_versions') {
       if (afterData.clientVersion) friendlyName = afterData.clientVersion;
+    } else if (cleanTable === 'feature_flags') {
+      if (afterData._flagName) friendlyName = afterData._flagName;
+      else if (afterData.flagName) friendlyName = afterData.flagName;
+      else if (afterData.name) friendlyName = afterData.name;
     }
 
     // Fallback to general list if still ID or strict ID needed

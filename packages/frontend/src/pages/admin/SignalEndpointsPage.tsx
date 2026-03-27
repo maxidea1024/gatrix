@@ -51,6 +51,7 @@ import signalEndpointService, {
 } from '@/services/signalEndpointService';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import PageHeader from '@/components/common/PageHeader';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -176,67 +177,67 @@ const EndpointDialog: React.FC<EndpointDialogProps> = ({
               onChange={(e) => setName(e.target.value)}
               helperText={t('signalEndpoints.nameHelp')}
             />
-            {name.trim() && (
-              <>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    p: 1.5,
-                    bgcolor: 'action.hover',
-                    borderRadius: 1,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                  }}
-                >
-                  <Chip
-                    label="POST"
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                p: 1.5,
+                bgcolor: 'action.hover',
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              <Chip
+                label="POST"
+                size="small"
+                color="primary"
+                variant="filled"
+                sx={{ fontWeight: 600, fontSize: '0.7rem' }}
+              />
+              <Typography
+                variant="body2"
+                sx={{
+                  fontFamily: 'monospace',
+                  flex: 1,
+                  wordBreak: 'break-all',
+                  color: name.trim() ? 'text.primary' : 'text.disabled',
+                }}
+              >
+                {`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim() || '{name}'}`}
+              </Typography>
+              <Tooltip title={t('common.copy')}>
+                <span>
+                  <IconButton
                     size="small"
-                    color="primary"
-                    variant="filled"
-                    sx={{ fontWeight: 600, fontSize: '0.7rem' }}
-                  />
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontFamily: 'monospace',
-                      flex: 1,
-                      wordBreak: 'break-all',
-                    }}
+                    disabled={!name.trim()}
+                    onClick={() =>
+                      copyToClipboardWithNotification(
+                        `${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`,
+                        () =>
+                          enqueueSnackbar(t('common.copiedToClipboard'), {
+                            variant: 'success',
+                          }),
+                        () =>
+                          enqueueSnackbar(t('common.copyFailed'), {
+                            variant: 'error',
+                          })
+                      )
+                    }
                   >
-                    {`${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`}
-                  </Typography>
-                  <Tooltip title={t('common.copy')}>
-                    <IconButton
-                      size="small"
-                      onClick={() =>
-                        copyToClipboardWithNotification(
-                          `${(import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '')}/api/v1/signals/${name.trim()}`,
-                          () =>
-                            enqueueSnackbar(t('common.copiedToClipboard'), {
-                              variant: 'success',
-                            }),
-                          () =>
-                            enqueueSnackbar(t('common.copyFailed'), {
-                              variant: 'error',
-                            })
-                        )
-                      }
-                    >
-                      <CopyIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mt: -0.5 }}
-                >
-                  {t('signalEndpoints.endpointUrlHelp')}
-                </Typography>
-              </>
-            )}
+                    <CopyIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mt: -1.5, mb: 1 }}
+            >
+              {t('signalEndpoints.endpointUrlHelp')}
+            </Typography>
             <TextField
               label={t('signalEndpoints.description')}
               fullWidth
@@ -606,33 +607,20 @@ const SignalEndpointsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h5" fontWeight="bold">
-            {t('signalEndpoints.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('signalEndpoints.subtitle')}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {endpoints.length > 0 && canManage && (
+      <PageHeader
+        title={t('signalEndpoints.title')}
+        subtitle={t('signalEndpoints.subtitle')}
+        actions={
+          endpoints.length > 0 && canManage ? (
             <Button
               variant="contained"
               onClick={() => setEditDialog({ open: true, endpoint: null })}
             >
               {t('signalEndpoints.createEndpoint')}
             </Button>
-          )}
-        </Box>
-      </Box>
+          ) : undefined
+        }
+      />
 
       {/* Content */}
       <PageContentLoader loading={loading}>
@@ -772,7 +760,7 @@ const SignalEndpointsPage: React.FC = () => {
                                 gap: 1,
                                 p: 1.5,
                                 mb: 2,
-                                bgcolor: 'grey.50',
+                                bgcolor: 'action.hover',
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 borderRadius: 1,

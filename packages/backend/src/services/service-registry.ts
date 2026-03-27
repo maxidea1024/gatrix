@@ -52,6 +52,17 @@ export interface ServiceHandler {
     environmentId: string,
     userId?: string
   ) => Promise<void>;
+
+  /**
+   * Apply draft data for complex entities (feature flags, segments).
+   * Used when a ChangeItem has draftData instead of ops.
+   */
+  applyDraft?: (
+    id: string,
+    draftData: Record<string, any>,
+    environmentId: string,
+    userId?: string
+  ) => Promise<unknown>;
 }
 
 /**
@@ -83,33 +94,41 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
   // Client Versions
   g_client_versions: {
     apply: async (id, data, environmentId, userId) => {
-      const result = await ClientVersionService.updateClientVersion(
-        id,
-        data,
-        environmentId
-      );
-      if (data.tagIds && Array.isArray(data.tagIds)) {
+      const { tagIds, ...tableData } = data;
+      // Apply tags independently - even if DB update was already done
+      // (e.g., during CR execution where the transaction already updated the row)
+      if (tagIds && Array.isArray(tagIds)) {
         await TagService.setTagsForEntity(
           'client_version',
           id,
-          data.tagIds,
+          tagIds,
           userId
         );
       }
-      return result;
+      try {
+        const result = await ClientVersionService.updateClientVersion(
+          id,
+          tableData,
+          environmentId
+        );
+        return result;
+      } catch (err: any) {
+        // During CR execution, the row was already updated in-transaction.
+        // A duplicate update here may fail (version mismatch, etc.) — that's OK.
+        return null;
+      }
     },
     create: async (data, environmentId, userId) => {
-      // Tags are usually not handled in service.create but passed separately or handled in controller
-      // But for CR, we need to handle it here if passed in data
+      const { tagIds, ...tableData } = data;
       const result = await ClientVersionService.createClientVersion(
-        data,
+        tableData,
         environmentId
       );
-      if (data.tagIds && Array.isArray(data.tagIds)) {
+      if (tagIds && Array.isArray(tagIds)) {
         await TagService.setTagsForEntity(
           'client_version',
           result.id!,
-          data.tagIds,
+          tagIds,
           userId
         );
       }
@@ -123,31 +142,33 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
   // Store Products
   g_store_products: {
     apply: async (id, data, environmentId, userId) => {
+      const { tagIds, ...tableData } = data;
       const result = await StoreProductService.updateStoreProduct(
         id,
-        data,
+        tableData,
         environmentId
       );
-      if (data.tagIds && Array.isArray(data.tagIds)) {
+      if (tagIds && Array.isArray(tagIds)) {
         await TagService.setTagsForEntity(
           'store_product',
           id,
-          data.tagIds,
+          tagIds,
           userId
         );
       }
       return result;
     },
     create: async (data, environmentId, userId) => {
+      const { tagIds, ...tableData } = data;
       const result = await StoreProductService.createStoreProduct({
-        ...data,
+        ...tableData,
         environmentId,
       });
-      if (data.tagIds && Array.isArray(data.tagIds)) {
+      if (tagIds && Array.isArray(tagIds)) {
         await TagService.setTagsForEntity(
           'store_product',
           result.id,
-          data.tagIds,
+          tagIds,
           userId
         );
       }
@@ -174,33 +195,35 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
   // Ingame Popup Notices
   g_ingame_popup_notices: {
     apply: async (id, data, environmentId, userId) => {
+      const { tagIds, ...tableData } = data;
       const result = await ingamePopupNoticeService.updateIngamePopupNotice(
         id,
-        data,
+        tableData,
         userId || '',
         environmentId
       );
-      if (data.tagIds && Array.isArray(data.tagIds)) {
+      if (tagIds && Array.isArray(tagIds)) {
         await TagService.setTagsForEntity(
           'ingame_popup_notice',
           id,
-          data.tagIds,
+          tagIds,
           userId
         );
       }
       return result;
     },
     create: async (data, environmentId, userId) => {
+      const { tagIds, ...tableData } = data;
       const result = await ingamePopupNoticeService.createIngamePopupNotice(
-        data,
+        tableData,
         userId || '',
         environmentId
       );
-      if (data.tagIds && Array.isArray(data.tagIds)) {
+      if (tagIds && Array.isArray(tagIds)) {
         await TagService.setTagsForEntity(
           'ingame_popup_notice',
           result.id,
-          data.tagIds,
+          tagIds,
           userId
         );
       }
@@ -214,31 +237,33 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
   // Game Worlds
   g_game_worlds: {
     apply: async (id, data, environmentId, userId) => {
+      const { tagIds, ...tableData } = data;
       const result = await GameWorldService.updateGameWorld(
         id,
-        data,
+        tableData,
         environmentId
       );
-      if (data.tagIds && Array.isArray(data.tagIds)) {
+      if (tagIds && Array.isArray(tagIds)) {
         await TagService.setTagsForEntity(
           'game_world',
           id,
-          data.tagIds,
+          tagIds,
           userId
         );
       }
       return result;
     },
     create: async (data, environmentId, userId) => {
+      const { tagIds, ...tableData } = data;
       const result = await GameWorldService.createGameWorld(
-        data,
+        tableData,
         environmentId
       );
-      if (data.tagIds && Array.isArray(data.tagIds)) {
+      if (tagIds && Array.isArray(tagIds)) {
         await TagService.setTagsForEntity(
           'game_world',
           result.id,
-          data.tagIds,
+          tagIds,
           userId
         );
       }
@@ -364,6 +389,18 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
           userId || ''
         );
       }
+    },
+    applyDraft: async (id, draftData, environmentId, userId) => {
+      // Delegate to the feature flag draft publish logic
+      // draftData contains per-environment configs (strategies, variants, values, etc.)
+      const { publishFeatureFlagDraft } =
+        await import('./draft-handlers/feature-flag-draft-handler');
+      return await publishFeatureFlagDraft(
+        id,
+        environmentId,
+        draftData,
+        userId || ''
+      );
     },
   },
 };

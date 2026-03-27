@@ -41,6 +41,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import PageHeader from '@/components/common/PageHeader';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import rbacService, {
   type RoleWithDetails,
@@ -353,30 +354,20 @@ const RolesPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h5" sx={{ fontWeight: 600 }}>
-            {t('rbac.roles.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('rbac.roles.description')}
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={openCreateDialog}
-        >
-          {t('rbac.roles.create')}
-        </Button>
-      </Box>
+      <PageHeader
+        icon={<ShieldIcon />}
+        title={t('rbac.roles.title')}
+        subtitle={t('rbac.roles.description')}
+        actions={
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={openCreateDialog}
+          >
+            {t('rbac.roles.create')}
+          </Button>
+        }
+      />
 
       {/* Search */}
       <Box sx={{ mb: 2 }}>

@@ -265,7 +265,7 @@ const ChangeRequestDetailPage: React.FC = () => {
   };
 
   const hasApproved = useMemo(() => {
-    return cr?.approvals?.some((a) => a.approverId === user?.id);
+    return cr?.approvals?.some((a) => a.approverId === String(user?.id));
   }, [cr, user]);
 
   const requiredApprovals = cr?.environmentModel?.requiredApprovers ?? 1;
@@ -876,7 +876,7 @@ const ChangeRequestDetailPage: React.FC = () => {
                     </Typography>
                   </Box>
                   <Box sx={{ p: 2 }}>
-                    {!hasApproved && cr.requesterId !== user?.id ? (
+                    {!hasApproved && cr.requesterId !== String(user?.id) ? (
                       <>
                         <TextField
                           autoFocus
@@ -949,7 +949,7 @@ const ChangeRequestDetailPage: React.FC = () => {
 
               {/* Status Banners */}
               {cr.status === 'rejected' &&
-                (cr.requesterId === user?.id || hasAnyPermissions) && (
+                (cr.requesterId === String(user?.id) || hasAnyPermissions) && (
                   <Paper
                     sx={{
                       p: 2,

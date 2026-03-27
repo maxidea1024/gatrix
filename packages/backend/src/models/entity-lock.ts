@@ -47,7 +47,7 @@ export class EntityLock extends Model {
         entityType: { type: 'string', maxLength: 100 },
         entityId: { type: 'string', maxLength: 255 },
         environmentId: { type: 'string', maxLength: 100 },
-        lockedBy: { type: 'integer' },
+        lockedBy: { type: 'string' },
         lockType: {
           type: 'string',
           enum: ['soft', 'hard'],

@@ -80,13 +80,18 @@ import ExportImportMenuItems from '../../components/common/ExportImportMenuItems
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 import TagChips from '../../components/common/TagChips';
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from '../../utils/changeRequestToast';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
   const { language } = useI18n();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const canManage = hasPermission([P.SERVICE_NOTICES_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
@@ -505,12 +510,8 @@ const ServiceNoticesPage: React.FC = () => {
       );
 
       if (result.isChangeRequest) {
-        // CR was created, not immediately deleted
-        enqueueSnackbar(t('serviceNotices.deleteChangeRequestCreated'), {
-          variant: 'info',
-        });
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
       } else {
-        // Directly deleted
         enqueueSnackbar(t('serviceNotices.deleteSuccess'), {
           variant: 'success',
         });
@@ -542,15 +543,8 @@ const ServiceNoticesPage: React.FC = () => {
       );
 
       if (result.isChangeRequest) {
-        // CR was created, not immediately deleted
-        enqueueSnackbar(
-          t('serviceNotices.bulkDeleteChangeRequestCreated', {
-            count: selectedIds.length,
-          }),
-          { variant: 'info' }
-        );
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
       } else {
-        // Directly deleted
         enqueueSnackbar(
           t('serviceNotices.bulkDeleteSuccess', { count: selectedIds.length }),
           {
@@ -645,117 +639,110 @@ const ServiceNoticesPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<AnnouncementIcon />}
-          title={t('serviceNotices.title')}
-          subtitle={t('serviceNotices.subtitle')}
-        />
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
+      <PageHeader
+        icon={<AnnouncementIcon />}
+        title={t('serviceNotices.title')}
+        subtitle={t('serviceNotices.subtitle')}
+        actions={
+          <>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t('serviceNotices.createNotice')}
+              </Button>
+            )}
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
             >
-              {t('serviceNotices.createNotice')}
-            </Button>
-          )}
-          <IconButton
-            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-            aria-label="more options"
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            anchorEl={pageMenuAnchor}
-            open={Boolean(pageMenuAnchor)}
-            onClose={() => setPageMenuAnchor(null)}
-          >
-            <MenuItem
-              onClick={() => {
-                setPageMenuAnchor(null);
-                setPreviewDialogOpen(true);
-              }}
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
             >
-              <ListItemIcon>
-                <VisibilityIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t('serviceNotices.preview')}</ListItemText>
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setPageMenuAnchor(null);
-                handleOpenWebviewPreview();
-              }}
-            >
-              <ListItemIcon>
-                <SportsEsportsIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t('serviceNotices.webviewPreview')}</ListItemText>
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setPageMenuAnchor(null);
-                handleCopyNoticeUrl();
-              }}
-            >
-              <ListItemIcon>
-                <ContentCopyIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t('serviceNotices.copyWebviewUrl')}</ListItemText>
-            </MenuItem>
-            <Divider />
-            <ExportImportMenuItems
-              onExport={(format) => {
-                setPageMenuAnchor(null);
-                const exportColumns: ExportColumn[] = [
-                  { key: 'title', header: t('serviceNotices.form.title') },
-                  { key: 'content', header: t('serviceNotices.form.content') },
-                  {
-                    key: 'category',
-                    header: t('serviceNotices.form.category'),
-                  },
-                  { key: 'isActive', header: t('common.status') },
-                  { key: 'isPinned', header: t('serviceNotices.pinned') },
-                  { key: 'startDate', header: t('common.start') },
-                  { key: 'endDate', header: t('common.end') },
-                  { key: 'createdAt', header: t('common.createdAt') },
-                ];
-                try {
-                  exportToFile(
-                    notices,
-                    exportColumns,
-                    'service-notices',
-                    format
-                  );
-                  enqueueSnackbar(t('common.exportSuccess'), {
-                    variant: 'success',
-                  });
-                } catch (err) {
-                  enqueueSnackbar(t('common.exportFailed'), {
-                    variant: 'error',
-                  });
-                }
-              }}
-              onImportClick={() => {
-                setPageMenuAnchor(null);
-                setImportDialogOpen(true);
-              }}
-            />
-          </Menu>
-        </Box>
-      </Box>
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  setPreviewDialogOpen(true);
+                }}
+              >
+                <ListItemIcon>
+                  <VisibilityIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('serviceNotices.preview')}</ListItemText>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  handleOpenWebviewPreview();
+                }}
+              >
+                <ListItemIcon>
+                  <SportsEsportsIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('serviceNotices.webviewPreview')}</ListItemText>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setPageMenuAnchor(null);
+                  handleCopyNoticeUrl();
+                }}
+              >
+                <ListItemIcon>
+                  <ContentCopyIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t('serviceNotices.copyWebviewUrl')}</ListItemText>
+              </MenuItem>
+              <Divider />
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'title', header: t('serviceNotices.form.title') },
+                    { key: 'content', header: t('serviceNotices.form.content') },
+                    {
+                      key: 'category',
+                      header: t('serviceNotices.form.category'),
+                    },
+                    { key: 'isActive', header: t('common.status') },
+                    { key: 'isPinned', header: t('serviceNotices.pinned') },
+                    { key: 'startDate', header: t('common.start') },
+                    { key: 'endDate', header: t('common.end') },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(
+                      notices,
+                      exportColumns,
+                      'service-notices',
+                      format
+                    );
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+              />
+            </Menu>
+          </>
+        }
+      />
 
       {/* Search and Filters Card */}
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box
             sx={{
@@ -1315,7 +1302,7 @@ const ServiceNoticesPage: React.FC = () => {
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{t('common.delete')}</ListItemText>
+          <ListItemText>{getActionLabel('delete', requiresApproval, t)}</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -1346,7 +1333,7 @@ const ServiceNoticesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button onClick={confirmDelete} color="error" variant="contained">
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1369,7 +1356,7 @@ const ServiceNoticesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button onClick={confirmBulkDelete} color="error" variant="contained">
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
         </DialogActions>
       </Dialog>

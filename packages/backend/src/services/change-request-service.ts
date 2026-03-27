@@ -18,6 +18,7 @@ import { diff } from 'deep-diff';
 import { OutboxService } from './outbox-service';
 
 import { createLogger } from '../config/logger';
+import { resolveEntityLabel } from '../utils/entity-label-resolver';
 const logger = createLogger('ChangeRequest');
 
 /**
@@ -41,8 +42,17 @@ function generateOps(
     'version',
   ];
 
-  // Normalize value for comparison (handle MySQL TINYINT boolean)
+  // Normalize value for comparison
+  // Handles: MySQL TINYINT boolean, nullable field mismatches,
+  // null/undefined/''/[]/false/0 equivalences
+  const isEmptyValue = (val: any): boolean => {
+    if (val === null || val === undefined || val === '') return true;
+    if (Array.isArray(val) && val.length === 0) return true;
+    return false;
+  };
+
   const normalizeValue = (val: any): any => {
+    if (isEmptyValue(val)) return null;
     if (val === true) return 1;
     if (val === false) return 0;
     return val;
@@ -174,7 +184,7 @@ export class ChangeRequestService {
    */
   static async upsertChangeRequestItem(
     userId: string,
-    environmentName: string,
+    environmentId: string,
     targetTable: string,
     targetId: string,
     beforeData: Record<string, any> | null,
@@ -188,7 +198,7 @@ export class ChangeRequestService {
       // Block new edits when review is pending
       const pendingReview = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environmentId', environmentName)
+        .where('environmentId', environmentId)
         .where('status', 'open')
         .first();
 
@@ -224,7 +234,7 @@ export class ChangeRequestService {
         // Phase 2: Check if user already has a draft - enforce single draft rule
         const existingDraft = await ChangeRequest.query()
           .where('requesterId', userId)
-          .where('environmentId', environmentName)
+          .where('environmentId', environmentId)
           .where('status', 'draft')
           .first();
 
@@ -232,32 +242,17 @@ export class ChangeRequestService {
           // Use existing draft instead of creating a new one
           cr = existingDraft;
         } else {
-          // 2. Create new Draft CR
-          const cleanTable = targetTable.startsWith('g_')
-            ? targetTable.slice(2)
-            : targetTable;
-          const isNew = targetId.startsWith('NEW_');
-          const identifier =
-            afterData?.name ||
-            afterData?.title ||
-            afterData?.displayName ||
-            afterData?.worldId ||
-            afterData?.id ||
-            (isNew ? 'New Item' : targetId);
-          const action = isNew
-            ? 'Create'
-            : afterData === null
-              ? 'Delete'
-              : 'Update';
+          // Draft is a personal edit buffer - use simple timestamp title
+          const now = new Date();
+          const hh = String(now.getHours()).padStart(2, '0');
+          const mm = String(now.getMinutes()).padStart(2, '0');
 
           cr = await ChangeRequest.query().insert({
             id: ulid(),
             requesterId: userId,
-            environmentId: environmentName,
+            environmentId: environmentId,
             status: 'draft',
-            title: `[${cleanTable}] ${action}: ${identifier}`,
-            priority: 'medium',
-            category: 'general',
+            title: `Draft-${hh}${mm}`,
           });
         }
       }
@@ -282,9 +277,10 @@ export class ChangeRequestService {
 
       if (existingItem) {
         // Update existing item's ops
+        const displayName = resolveEntityLabel(targetTable, afterData || beforeData);
         await ChangeItem.query()
           .findById(existingItem.id)
-          .patch({ ops, opType });
+          .patch({ ops, opType, ...(displayName && { displayName }) });
       } else {
         // Determine ActionGroup type
         let actionGroupType: ActionGroupType = ACTION_GROUP_TYPES.UPDATE_ENTITY;
@@ -325,6 +321,7 @@ export class ChangeRequestService {
         }
 
         // Insert ChangeItem with ops
+        const displayName = resolveEntityLabel(targetTable, afterData || beforeData);
         await ChangeItem.query().insert({
           id: ulid(),
           changeRequestId: cr.id,
@@ -333,60 +330,232 @@ export class ChangeRequestService {
           targetId,
           opType,
           ops,
+          ...(displayName && { displayName }),
         });
       }
 
-      // 5. Update Title Dynamically if more than one item
-      const items = await ChangeItem.query().where('changeRequestId', cr.id);
-      if (items.length > 1) {
-        const user = await User.query().findById(userId);
-        const lang = user?.preferredLanguage || 'en';
-
-        const tables = [...new Set(items.map((i) => i.targetTable))];
-        const cleanTables = tables.map((t) =>
-          t.startsWith('g_') ? t.slice(2) : t
-        );
-
-        let newTitle = '';
-        if (tables.length === 1) {
-          const table = cleanTables[0];
-          const count = items.length;
-          if (lang === 'ko') {
-            newTitle = `[${table}] ${count}개 항목`;
-          } else if (lang === 'zh') {
-            newTitle = `[${table}] ${count} 个项目`;
-          } else {
-            newTitle = `[${table}] ${count} items`;
-          }
-        } else {
-          const count = items.length;
-          if (lang === 'ko') {
-            newTitle = `복합 변경 (${count}개 항목)`;
-          } else if (lang === 'zh') {
-            newTitle = `混合变更 (${count} 个项目)`;
-          } else {
-            newTitle = `Mixed Changes (${count} items)`;
-          }
-        }
-
-        if (
-          cr.title.startsWith('[') ||
-          cr.title.includes('Change Request for') ||
-          cr.title.startsWith('Mixed Changes') ||
-          cr.title.startsWith('복합 변경') ||
-          cr.title.startsWith('混合变更')
-        ) {
-          await ChangeRequest.query()
-            .findById(cr.id)
-            .patch({ title: newTitle });
-        }
-      }
 
       return { changeRequestId: cr.id, status: cr.status };
     } catch (error) {
       logger.error('Error upserting change request:', error);
       throw error;
     }
+  }
+
+  /**
+   * Upsert a ChangeItem with draftData (for complex entities like feature flags, segments).
+   * Instead of field-level ops, stores a full snapshot in draftData.
+   * The draftData is applied via the service-registry handler on execute.
+   */
+  static async upsertDraftDataItem(
+    userId: string,
+    environmentId: string,
+    targetTable: string,
+    targetId: string,
+    draftData: Record<string, any>,
+    actionTitle?: string,
+    beforeDraftData?: Record<string, any>
+  ): Promise<{ changeRequestId: string; status: ChangeRequestStatus }> {
+    try {
+      // Check for pending review
+      const pendingReview = await ChangeRequest.query()
+        .where('requesterId', userId)
+        .where('environmentId', environmentId)
+        .where('status', 'open')
+        .first();
+
+      if (pendingReview) {
+        throw new GatrixError(
+          'You have a pending review request. Withdraw it or wait for approval/rejection before making new changes.',
+          409,
+          true,
+          'PENDING_REVIEW_EXISTS'
+        );
+      }
+
+      // Find or create draft CR
+      // First, check if there's already a draft CR that contains a change item for this target
+      // This ensures all changes for a single entity (e.g., feature flag across multiple envs) go into one CR
+      let cr: ChangeRequest | undefined;
+
+      const existingItemForTarget = await ChangeItem.query()
+        .joinRelated('changeRequest')
+        .where('g_change_items.targetTable', targetTable)
+        .where('g_change_items.targetId', targetId)
+        .where('changeRequest.requesterId', userId)
+        .where('changeRequest.status', 'draft')
+        .select('g_change_items.changeRequestId')
+        .first();
+
+      if (existingItemForTarget) {
+        cr = await ChangeRequest.query().findById(existingItemForTarget.changeRequestId);
+      }
+
+      // Fallback: look for any draft CR by this user for this environment
+      if (!cr) {
+        cr = await ChangeRequest.query()
+          .where('requesterId', userId)
+          .where('environmentId', environmentId)
+          .where('status', 'draft')
+          .first();
+      }
+
+      if (!cr) {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        cr = await ChangeRequest.query().insert({
+          id: ulid(),
+          requesterId: userId,
+          environmentId,
+          status: 'draft',
+          title: `Draft-${hh}${mm}`,
+        });
+      }
+
+      // Check if item for this target already exists
+      const existingItem = await ChangeItem.query()
+        .where('changeRequestId', cr.id)
+        .where('targetTable', targetTable)
+        .where('targetId', targetId)
+        .first();
+
+      if (existingItem) {
+        // Update existing item's draftData
+        const displayName = resolveEntityLabel(targetTable, draftData);
+        await ChangeItem.query()
+          .findById(existingItem.id)
+          .patch({
+            draftData,
+            ops: [],
+            ...(displayName && { displayName }),
+            ...(beforeDraftData && { beforeDraftData }),
+          });
+      } else {
+        // Find or create ActionGroup
+        let actionGroup = await ActionGroup.query()
+          .where('changeRequestId', cr.id)
+          .where('actionType', ACTION_GROUP_TYPES.UPDATE_ENTITY)
+          .first();
+
+        if (!actionGroup) {
+          const maxOrder = await ActionGroup.query()
+            .where('changeRequestId', cr.id)
+            .max('orderIndex as maxOrder')
+            .first();
+          const nextOrder = ((maxOrder as any)?.maxOrder ?? -1) + 1;
+
+          actionGroup = await ActionGroup.query().insert({
+            id: ulid(),
+            changeRequestId: cr.id,
+            actionType: ACTION_GROUP_TYPES.UPDATE_ENTITY,
+            title: actionTitle || `Update ${targetTable}`,
+            orderIndex: nextOrder,
+          });
+        }
+
+        // Insert ChangeItem with draftData (ops is empty)
+        const displayName = resolveEntityLabel(targetTable, draftData);
+        await ChangeItem.query().insert({
+          id: ulid(),
+          changeRequestId: cr.id,
+          actionGroupId: actionGroup.id,
+          targetTable,
+          targetId,
+          opType: 'UPDATE',
+          ops: [],
+          draftData,
+          ...(displayName && { displayName }),
+          ...(beforeDraftData && { beforeDraftData }),
+        });
+      }
+
+      return { changeRequestId: cr.id, status: cr.status };
+    } catch (error) {
+      logger.error('Error upserting draft data item:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get pending CR draftData for a specific target entity.
+   * Returns the draftData from the most recent pending (draft/open) CR ChangeItem.
+   * Used by Playground evaluation and detail pages to show pending changes.
+   */
+  static async getPendingDraftForTarget(
+    targetTable: string,
+    targetId: string,
+    environmentId?: string
+  ): Promise<{
+    changeRequestId: string;
+    status: ChangeRequestStatus;
+    draftData: Record<string, any>;
+    requesterId: string;
+  } | null> {
+    const statuses = ['draft', 'open', 'approved'];
+
+    let query = ChangeItem.query()
+      .joinRelated('changeRequest')
+      .where('g_change_items.targetTable', targetTable)
+      .where('g_change_items.targetId', targetId)
+      .whereIn('changeRequest.status', statuses)
+      .whereNotNull('g_change_items.draftData')
+      .select(
+        'g_change_items.changeRequestId',
+        'changeRequest.status',
+        'g_change_items.draftData',
+        'changeRequest.requesterId'
+      )
+      .orderBy('changeRequest.createdAt', 'desc')
+      .first();
+
+    if (environmentId) {
+      query = query.where('changeRequest.environmentId', environmentId);
+    }
+
+    const result = await query;
+
+    if (!result) return null;
+
+    return {
+      changeRequestId: result.changeRequestId,
+      status: (result as any).status,
+      draftData: result.draftData as Record<string, any>,
+      requesterId: (result as any).requesterId,
+    };
+  }
+
+  /**
+   * Get all pending CR draftData items for a target table in an environment.
+   * Used by Playground to merge all pending changes for evaluation.
+   */
+  static async getAllPendingDraftsForTable(
+    targetTable: string,
+    projectId: string
+  ): Promise<
+    Array<{
+      targetId: string;
+      changeRequestId: string;
+      draftData: Record<string, any>;
+    }>
+  > {
+    const items = await ChangeItem.query()
+      .joinRelated('changeRequest.[environmentModel]')
+      .where('g_change_items.targetTable', targetTable)
+      .whereIn('changeRequest.status', ['draft', 'open', 'approved'])
+      .where('changeRequest:environmentModel.projectId', projectId)
+      .whereNotNull('g_change_items.draftData')
+      .select(
+        'g_change_items.targetId',
+        'g_change_items.changeRequestId',
+        'g_change_items.draftData'
+      );
+
+    return items.map((item) => ({
+      targetId: item.targetId,
+      changeRequestId: item.changeRequestId,
+      draftData: item.draftData as Record<string, any>,
+    }));
   }
 
   static async updateChangeRequestMetadata(
@@ -396,8 +565,7 @@ export class ChangeRequestService {
       description?: string;
       reason?: string;
       impactAnalysis?: string;
-      priority?: 'low' | 'medium' | 'high' | 'critical';
-      category?: string;
+
     }
   ): Promise<ChangeRequest> {
     const cr = await ChangeRequest.query().findById(changeRequestId);
@@ -653,11 +821,12 @@ export class ChangeRequestService {
 
     // Create Audit Log with comment
     await knex('g_audit_logs').insert({
+      id: ulid(),
       action: 'CHANGE_REQUEST_REJECTED',
-      userId: rejectedBy || '', // 0 for system
+      userId: rejectedBy || '',
       changeRequestId: cr.id,
       entityType: 'ChangeRequest',
-      entityId: 0,
+      entityId: cr.id,
       newValues: JSON.stringify({ comment }),
     });
 
@@ -783,6 +952,7 @@ export class ChangeRequestService {
         afterData: any;
         beforeData: any;
         isCreate: boolean;
+        isDraftData?: boolean;
       }> = [];
 
       // Transactional Logic - verify data and prepare for service calls
@@ -821,13 +991,30 @@ export class ChangeRequestService {
             conflictReason = `Version mismatch: expected ${storedEntityVersion}, found ${liveVersion}`;
           }
         } else if (!isCreate) {
-          // Fallback to deep-diff comparison for tables without version column
-          const isMatch = compareData(liveData, item.beforeData);
-          if (!isMatch) {
-            hasConflict = true;
-            conflictReason =
-              'Data has changed since this request was created (deep-diff)';
+          // Fallback: compare using ops' oldValues against live data
+          // ChangeItem model does not have a beforeData field, so we use ops to detect conflicts
+          if (item.ops && item.ops.length > 0 && liveData) {
+            const normalizeValue = (val: any): any => {
+              if (val === true) return 1;
+              if (val === false) return 0;
+              if (val instanceof Date) return val.toISOString();
+              return val;
+            };
+            for (const op of item.ops) {
+              // Skip virtual fields that don't exist in the actual DB table
+              // (e.g., tagIds stored in a separate tag_assignments table)
+              if (!(op.path in liveData)) continue;
+
+              const liveVal = normalizeValue(liveData[op.path]);
+              const expectedVal = normalizeValue(op.oldValue);
+              if (JSON.stringify(liveVal) !== JSON.stringify(expectedVal)) {
+                hasConflict = true;
+                conflictReason = `Field "${op.path}" has changed since this request was created (expected: ${JSON.stringify(expectedVal)}, found: ${JSON.stringify(liveVal)})`;
+                break;
+              }
+            }
           }
+          // If ops is empty or not available, skip conflict check (no baseline to compare)
         }
 
         if (hasConflict) {
@@ -905,6 +1092,24 @@ export class ChangeRequestService {
           continue; // Move to next item
         }
 
+        // For CREATE/UPDATE: check if this item uses draftData (complex entities)
+        if (item.draftData && Object.keys(item.draftData).length > 0) {
+          // DraftData items skip direct DB updates.
+          // They are applied via the service-registry handler after transaction.
+          logger.info(
+            `Queuing draftData-based execution for ${item.targetTable}:${item.targetId}`
+          );
+          serviceCallsNeeded.push({
+            targetTable: item.targetTable,
+            targetId: item.targetId,
+            afterData: item.draftData,
+            beforeData: liveData,
+            isCreate: false,
+            isDraftData: true,
+          });
+          continue;
+        }
+
         // For CREATE/UPDATE: apply ops to get final data
         const afterData = applyOpsToData(liveData, item.ops, item.opType);
         if (afterData) {
@@ -925,6 +1130,19 @@ export class ChangeRequestService {
 
           const dbData = { ...afterData };
           fieldsToStrip.forEach((f) => delete dbData[f]);
+
+          // Strip fields that don't exist in the actual table to prevent 'Unknown column' errors
+          const [allColumns] = await trx.raw(
+            `SHOW COLUMNS FROM ${item.targetTable}`
+          );
+          const validColumns = new Set(
+            (allColumns as any[]).map((col: any) => col.Field)
+          );
+          for (const key of Object.keys(dbData)) {
+            if (!validColumns.has(key)) {
+              delete dbData[key];
+            }
+          }
 
           // Note: Not all tables have createdBy/updatedBy columns
           // These should be set in the ops/afterData if needed
@@ -1012,12 +1230,16 @@ export class ChangeRequestService {
                   .slice(0, 19)
                   .replace('T', ' ');
               }
-              // Set createdBy for new records (use the executor's userId)
-              if (dbData.createdBy === undefined) {
+              // Set createdBy for new records only if the table has the column
+              if (validColumns.has('createdBy') && dbData.createdBy === undefined) {
                 dbData.createdBy = userId;
               }
+              // Check if table has a version column
+              const [versionCols] = await trx.raw(
+                `SHOW COLUMNS FROM ${item.targetTable} WHERE Field = 'version'`
+              );
               // Set initial version for new records
-              if (dbData.version === undefined) {
+              if (versionCols && versionCols.length > 0 && dbData.version === undefined) {
                 dbData.version = 1;
               }
               const [result] = await trx(item.targetTable).insert(dbData);
@@ -1072,7 +1294,7 @@ export class ChangeRequestService {
             serviceCallsNeeded.push({
               targetTable: item.targetTable,
               targetId: String(realId),
-              afterData: item.afterData,
+              afterData,
               beforeData: liveData,
               isCreate,
             });
@@ -1107,10 +1329,28 @@ export class ChangeRequestService {
               if (!dbData.updatedAt) {
                 dbData.updatedAt = new Date();
               }
+              // Check if table has a version column
+              const [versionCols] = await trx.raw(
+                `SHOW COLUMNS FROM ${item.targetTable} WHERE Field = 'version'`
+              );
               // Set initial version for new records
-              if (dbData.version === undefined) {
+              if (versionCols && versionCols.length > 0 && dbData.version === undefined) {
                 dbData.version = 1;
               }
+
+              // Strip fields that don't exist in the actual table
+              const [allCols2] = await trx.raw(
+                `SHOW COLUMNS FROM ${item.targetTable}`
+              );
+              const validCols2 = new Set(
+                (allCols2 as any[]).map((col: any) => col.Field)
+              );
+              for (const key of Object.keys(dbData)) {
+                if (!validCols2.has(key)) {
+                  delete dbData[key];
+                }
+              }
+
               const [insertResult] = await trx(item.targetTable).insert(dbData);
 
               // Update ChangeItem's targetId to the real ID for future rollback
@@ -1202,11 +1442,12 @@ export class ChangeRequestService {
 
       // Log Execution
       await knex('g_audit_logs').transacting(trx).insert({
+        id: ulid(),
         action: 'CHANGE_REQUEST_EXECUTED',
         userId,
         changeRequestId: cr.id,
         entityType: 'ChangeRequest',
-        entityId: 0,
+        entityId: cr.id,
       });
 
       return { cr: finalInfo, serviceCallsNeeded };
@@ -1218,13 +1459,23 @@ export class ChangeRequestService {
         const handler = getServiceHandler(call.targetTable);
         if (handler) {
           try {
-            // Handler is an object implementing ServiceHandler, not a class
-            await handler.apply(
-              call.targetId,
-              call.afterData,
-              result.cr.environmentId, // Use environmentId from result CR
-              userId // Pass executor ID to service for audit/context
-            );
+            if (call.isDraftData && handler.applyDraft) {
+              // Use applyDraft for complex entities with draftData
+              await handler.applyDraft(
+                call.targetId,
+                call.afterData,
+                result.cr.environmentId,
+                userId
+              );
+            } else {
+              // Standard apply for ops-based changes
+              await handler.apply(
+                call.targetId,
+                call.afterData,
+                result.cr.environmentId,
+                userId
+              );
+            }
           } catch (err) {
             logger.error(
               `Post-execution service hook failed for ${call.targetTable}:${call.targetId}`,
@@ -1249,6 +1500,7 @@ export class ChangeRequestService {
     revertItems: Array<{
       targetTable: string;
       targetId: string;
+      displayName?: string;
       opType: EntityOpType;
       ops: FieldOp[];
       actionType: string;
@@ -1265,6 +1517,7 @@ export class ChangeRequestService {
     const revertItems: Array<{
       targetTable: string;
       targetId: string;
+      displayName?: string;
       opType: EntityOpType;
       ops: FieldOp[];
       actionType: string;
@@ -1281,6 +1534,7 @@ export class ChangeRequestService {
       revertItems.push({
         targetTable: item.targetTable,
         targetId: item.targetId,
+        displayName: item.displayName,
         opType: inverseOpType,
         ops: inverseOps,
         actionType,
@@ -1313,8 +1567,7 @@ export class ChangeRequestService {
         environmentId: originalCr.environmentId,
         status: 'open',
         type: 'revert',
-        priority: originalCr.priority || 'medium',
-        category: originalCr.category || 'general',
+
       });
 
       // Process items - Generate inverse operations
@@ -1473,22 +1726,23 @@ export class ChangeRequestService {
 
   /**
    * Get counts of change requests by status
-   * @param environment Environment name
+   * @param projectId Project ID to filter environments
    * @param userId User ID (for draft visibility)
    */
   static async getChangeRequestCounts(
-    environmentId: string,
+    projectId: string,
     userId: string
   ): Promise<Record<string, number>> {
     const counts = await ChangeRequest.query()
-      .where('environmentId', environmentId)
+      .joinRelated('environmentModel')
+      .where('environmentModel.projectId', projectId)
       .where((builder) => {
-        builder.whereNot('status', 'draft').orWhere((subBuilder) => {
-          subBuilder.where('status', 'draft').where('requesterId', userId);
+        builder.whereNot('g_change_requests.status', 'draft').orWhere((subBuilder) => {
+          subBuilder.where('g_change_requests.status', 'draft').where('g_change_requests.requesterId', userId);
         });
       })
-      .groupBy('status')
-      .select('status')
+      .groupBy('g_change_requests.status')
+      .select('g_change_requests.status')
       .count('* as count');
 
     const result: Record<string, number> = {
@@ -1504,7 +1758,10 @@ export class ChangeRequestService {
     counts.forEach((row: any) => {
       const count = parseInt(row.count as string);
       result[row.status] = count;
-      total += count;
+      // Exclude drafts from the 'all' total since they are personal edit buffers
+      if (row.status !== 'draft') {
+        total += count;
+      }
     });
     result.all = total;
 

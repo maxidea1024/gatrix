@@ -603,70 +603,63 @@ const RewardTemplatesPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 3,
-        }}
-      >
-        <PageHeader
-          icon={<GiftIcon />}
-          title={t('rewardTemplates.title')}
-          subtitle={t('rewardTemplates.subtitle')}
-        />
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {canManage && (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
+      <PageHeader
+        icon={<GiftIcon />}
+        title={t('rewardTemplates.title')}
+        subtitle={t('rewardTemplates.subtitle')}
+        actions={
+          <>
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t('rewardTemplates.createTemplate')}
+              </Button>
+            )}
+            <IconButton
+              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
+              aria-label="more options"
             >
-              {t('rewardTemplates.createTemplate')}
-            </Button>
-          )}
-          <IconButton
-            onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-            aria-label="more options"
-          >
-            <MoreVertIcon />
-          </IconButton>
-        </Box>
-        <Menu
-          anchorEl={pageMenuAnchor}
-          open={Boolean(pageMenuAnchor)}
-          onClose={() => setPageMenuAnchor(null)}
-        >
-          <ExportImportMenuItems
-            onExport={(format) => {
-              setPageMenuAnchor(null);
-              const exportColumns: ExportColumn[] = [
-                { key: 'name', header: t('common.name') },
-                { key: 'description', header: t('common.description') },
-                { key: 'createdAt', header: t('common.createdAt') },
-              ];
-              try {
-                exportToFile(
-                  templates,
-                  exportColumns,
-                  'reward-templates',
-                  format
-                );
-                enqueueSnackbar(t('common.exportSuccess'), {
-                  variant: 'success',
-                });
-              } catch (err) {
-                enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
-              }
-            }}
-            onImportClick={() => {
-              setPageMenuAnchor(null);
-              setImportDialogOpen(true);
-            }}
-          />
-        </Menu>
-      </Box>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={pageMenuAnchor}
+              open={Boolean(pageMenuAnchor)}
+              onClose={() => setPageMenuAnchor(null)}
+            >
+              <ExportImportMenuItems
+                onExport={(format) => {
+                  setPageMenuAnchor(null);
+                  const exportColumns: ExportColumn[] = [
+                    { key: 'name', header: t('common.name') },
+                    { key: 'description', header: t('common.description') },
+                    { key: 'createdAt', header: t('common.createdAt') },
+                  ];
+                  try {
+                    exportToFile(
+                      templates,
+                      exportColumns,
+                      'reward-templates',
+                      format
+                    );
+                    enqueueSnackbar(t('common.exportSuccess'), {
+                      variant: 'success',
+                    });
+                  } catch (err) {
+                    enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                  }
+                }}
+                onImportClick={() => {
+                  setPageMenuAnchor(null);
+                  setImportDialogOpen(true);
+                }}
+              />
+            </Menu>
+          </>
+        }
+      />
 
       {/* Search and Filters */}
       <Card sx={{ mb: 3 }}>
