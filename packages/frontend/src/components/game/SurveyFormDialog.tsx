@@ -627,12 +627,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                   fullWidth
                   helperText={t('surveys.platformSurveyIdHelp')}
                 />
+                <TagSelector value={selectedTags} onChange={setSelectedTags} />
               </Stack>
             </Collapse>
           </Paper>
 
-          {/* Tags */}
-          <TagSelector value={selectedTags} onChange={setSelectedTags} />
 
           {/* Targeting */}
           <TargetSettingsGroup

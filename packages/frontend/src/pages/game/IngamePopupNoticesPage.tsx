@@ -1001,7 +1001,13 @@ const IngamePopupNoticesPage: React.FC = () => {
         <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t('ingamePopupNotices.confirmDelete')}
+            {t('ingamePopupNotices.confirmDelete', {
+              content: deletingNotice?.content
+                ? deletingNotice.content.length > 50
+                  ? deletingNotice.content.substring(0, 50) + '...'
+                  : deletingNotice.content
+                : '',
+            })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
