@@ -727,7 +727,15 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     if (valuesHasChanges) {
       await handleSaveValuesClick();
     }
-  }, [hasChanges, valuesHasChanges, editingVariants, jsonErrors, valueJsonErrors, handleSaveVariants, handleSaveValuesClick]);
+  }, [
+    hasChanges,
+    valuesHasChanges,
+    editingVariants,
+    jsonErrors,
+    valueJsonErrors,
+    handleSaveVariants,
+    handleSaveValuesClick,
+  ]);
 
   const handleResetAll = useCallback(() => {
     handleResetVariants();
@@ -738,9 +746,19 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       originalOverrideEnabled ? (envEnabledValue ?? enabledValue) : enabledValue
     );
     setEditingDisabledValue(
-      originalOverrideDisabled ? (envDisabledValue ?? disabledValue) : disabledValue
+      originalOverrideDisabled
+        ? (envDisabledValue ?? disabledValue)
+        : disabledValue
     );
-  }, [handleResetVariants, enabledValue, disabledValue, envEnabledValue, envDisabledValue, originalOverrideEnabled, originalOverrideDisabled]);
+  }, [
+    handleResetVariants,
+    enabledValue,
+    disabledValue,
+    envEnabledValue,
+    envDisabledValue,
+    originalOverrideEnabled,
+    originalOverrideDisabled,
+  ]);
 
   const variantCount = editingVariants.length;
 
@@ -1090,10 +1108,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                               updateVariant(index, { name: e.target.value })
                             }
                             disabled={!canManage || isArchived}
-                          error={isDuplicateName}
+                            error={isDuplicateName}
                             helperText={
                               isDuplicateName
-                                ? t('featureFlags.duplicateVariantName', { defaultValue: 'Duplicate name' })
+                                ? t('featureFlags.duplicateVariantName', {
+                                    defaultValue: 'Duplicate name',
+                                  })
                                 : undefined
                             }
                             sx={{ flex: 1, minWidth: 120 }}
@@ -1401,20 +1421,26 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
         >
           <Typography
             variant="caption"
-            color={hasDuplicateNames || hasJsonErrors ? 'error.main' : 'warning.main'}
-            sx={{ mr: 'auto', fontWeight: hasDuplicateNames || hasJsonErrors ? 700 : 400 }}
+            color={
+              hasDuplicateNames || hasJsonErrors ? 'error.main' : 'warning.main'
+            }
+            sx={{
+              mr: 'auto',
+              fontWeight: hasDuplicateNames || hasJsonErrors ? 700 : 400,
+            }}
           >
             {hasDuplicateNames
-              ? t('featureFlags.duplicateVariantNameError', { defaultValue: 'Duplicate variant names exist. Please use unique names.' })
+              ? t('featureFlags.duplicateVariantNameError', {
+                  defaultValue:
+                    'Duplicate variant names exist. Please use unique names.',
+                })
               : hasJsonErrors
-                ? t('featureFlags.jsonValidationError', { defaultValue: 'JSON validation errors exist.' })
+                ? t('featureFlags.jsonValidationError', {
+                    defaultValue: 'JSON validation errors exist.',
+                  })
                 : t('common.unsavedChanges')}
           </Typography>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={handleResetAll}
-          >
+          <Button variant="outlined" size="small" onClick={handleResetAll}>
             {t('common.reset')}
           </Button>
           <Button
@@ -1423,10 +1449,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             startIcon={<SaveIcon />}
             onClick={handleApplyAll}
             disabled={
-              saving ||
-              savingValues ||
-              hasDuplicateNames ||
-              hasJsonErrors
+              saving || savingValues || hasDuplicateNames || hasJsonErrors
             }
           >
             {t('common.apply')}

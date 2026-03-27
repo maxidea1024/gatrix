@@ -76,7 +76,8 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
     open && changeRequestId
       ? `/admin/change-requests/${changeRequestId}/revert-preview`
       : null,
-    () => changeRequestService.getRevertPreview(changeRequestId!, projectApiPath)
+    () =>
+      changeRequestService.getRevertPreview(changeRequestId!, projectApiPath)
   );
 
   const handleCreateRevert = async () => {
@@ -84,7 +85,10 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
 
     setIsCreating(true);
     try {
-      const result = await changeRequestService.revert(changeRequestId, projectApiPath);
+      const result = await changeRequestService.revert(
+        changeRequestId,
+        projectApiPath
+      );
       enqueueSnackbar(t('changeRequest.messages.revertCreated'), {
         variant: 'success',
       });
@@ -449,9 +453,7 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          <Button onClick={onClose}>
-            {t('common.cancel')}
-          </Button>
+          <Button onClick={onClose}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             color="warning"

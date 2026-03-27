@@ -153,8 +153,7 @@ export class ChangeRequestController {
   static updateMetadata = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const { id } = req.params;
-      const { title, description, reason, impactAnalysis } =
-        req.body;
+      const { title, description, reason, impactAnalysis } = req.body;
 
       const updated = await ChangeRequestService.updateChangeRequestMetadata(
         id,
@@ -674,9 +673,8 @@ export class ChangeRequestController {
         throw new GatrixError('Organization not found', 400);
       }
 
-      const { AICRSummaryService } = await import(
-        '../services/ai/ai-cr-summary-service'
-      );
+      const { AICRSummaryService } =
+        await import('../services/ai/ai-cr-summary-service');
 
       try {
         const language = req.body?.language as string | undefined;
@@ -686,8 +684,8 @@ export class ChangeRequestController {
         (cr.changeItems || []).forEach((item) => {
           if (item.draftData) {
             Object.keys(item.draftData)
-              .filter(k => !k.startsWith('_') && k.length >= 20) // ULID-like keys
-              .forEach(k => envIds.add(k));
+              .filter((k) => !k.startsWith('_') && k.length >= 20) // ULID-like keys
+              .forEach((k) => envIds.add(k));
           }
         });
 
@@ -697,27 +695,31 @@ export class ChangeRequestController {
           const envs = await Environment.query()
             .whereIn('id', [...envIds])
             .select('id', 'displayName');
-          envs.forEach(env => {
+          envs.forEach((env) => {
             envNameMap[env.id] = env.displayName;
           });
         }
 
-        const result = await AICRSummaryService.generateSummary(orgId, {
-          changeItems: (cr.changeItems || []).map((item) => ({
-            targetTable: item.targetTable,
-            targetId: item.targetId,
-            displayName: item.displayName,
-            opType: item.opType,
-            ops: item.ops,
-            draftData: item.draftData,
-            beforeDraftData: item.beforeDraftData,
-          })),
-          actionGroups: (cr.actionGroups || []).map((g) => ({
-            title: g.title,
-            actionType: g.actionType,
-          })),
-          envNameMap,
-        }, language);
+        const result = await AICRSummaryService.generateSummary(
+          orgId,
+          {
+            changeItems: (cr.changeItems || []).map((item) => ({
+              targetTable: item.targetTable,
+              targetId: item.targetId,
+              displayName: item.displayName,
+              opType: item.opType,
+              ops: item.ops,
+              draftData: item.draftData,
+              beforeDraftData: item.beforeDraftData,
+            })),
+            actionGroups: (cr.actionGroups || []).map((g) => ({
+              title: g.title,
+              actionType: g.actionType,
+            })),
+            envNameMap,
+          },
+          language
+        );
 
         res.json({ success: true, data: result });
       } catch (error: any) {
@@ -734,4 +736,3 @@ export class ChangeRequestController {
     }
   );
 }
-

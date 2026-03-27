@@ -632,7 +632,6 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
             </Collapse>
           </Paper>
 
-
           {/* Targeting */}
           <TargetSettingsGroup
             targetPlatforms={targetPlatforms}

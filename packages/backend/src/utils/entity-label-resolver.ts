@@ -138,9 +138,7 @@ export function getTableNameKey(tableName: string): string {
   if (config) return config.tableNameKey;
 
   // Fallback: derive from table name
-  const cleanName = tableName.startsWith('g_')
-    ? tableName.slice(2)
-    : tableName;
+  const cleanName = tableName.startsWith('g_') ? tableName.slice(2) : tableName;
   return `tables.${cleanName}`;
 }
 

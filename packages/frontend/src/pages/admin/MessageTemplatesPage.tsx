@@ -597,12 +597,17 @@ const MessageTemplatesPage: React.FC = () => {
 
   const confirmBulkDelete = useCallback(async () => {
     try {
-      const result = await messageTemplateService.bulkDelete(projectApiPath, selectedIds);
+      const result = await messageTemplateService.bulkDelete(
+        projectApiPath,
+        selectedIds
+      );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
       } else {
         enqueueSnackbar(
-          t('messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }),
+          t('messageTemplates.bulkDeleteSuccess', {
+            count: selectedIds.length,
+          }),
           {
             variant: 'success',
           }
@@ -674,7 +679,10 @@ const MessageTemplatesPage: React.FC = () => {
     if (!deletingTemplate?.id) return;
 
     try {
-      const result = await messageTemplateService.delete(projectApiPath, deletingTemplate.id);
+      const result = await messageTemplateService.delete(
+        projectApiPath,
+        deletingTemplate.id
+      );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
       } else {
@@ -787,7 +795,11 @@ const MessageTemplatesPage: React.FC = () => {
           payload
         );
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            () => {}
+          );
         } else {
           enqueueSnackbar(t('common.updateSuccess'), { variant: 'success' });
         }
@@ -797,7 +809,11 @@ const MessageTemplatesPage: React.FC = () => {
           payload
         );
         if (result.isChangeRequest) {
-          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            () => {}
+          );
         } else {
           enqueueSnackbar(t('common.createSuccess'), { variant: 'success' });
         }

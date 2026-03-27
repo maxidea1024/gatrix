@@ -448,10 +448,11 @@ const IngamePopupNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      const result = await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(
-        projectApiPath,
-        selectedIds
-      );
+      const result =
+        await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(
+          projectApiPath,
+          selectedIds
+        );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
       } else {
@@ -981,7 +982,9 @@ const IngamePopupNoticesPage: React.FC = () => {
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{getActionLabel('delete', requiresApproval, t)}</ListItemText>
+          <ListItemText>
+            {getActionLabel('delete', requiresApproval, t)}
+          </ListItemText>
         </MenuItem>
       </Menu>
 

@@ -171,14 +171,22 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
         .map(([id]) => id);
 
       for (const itemId of itemsToDelete) {
-        await changeRequestService.deleteChangeItem(changeRequest.id, itemId, projectApiPath);
+        await changeRequestService.deleteChangeItem(
+          changeRequest.id,
+          itemId,
+          projectApiPath
+        );
       }
 
       // Then submit
-      await changeRequestService.submit(changeRequest.id, {
-        title: title.trim(),
-        reason: reason.trim() || undefined,
-      }, projectApiPath);
+      await changeRequestService.submit(
+        changeRequest.id,
+        {
+          title: title.trim(),
+          reason: reason.trim() || undefined,
+        },
+        projectApiPath
+      );
 
       enqueueSnackbar(t('changeRequest.messages.submitted'), {
         variant: 'success',
@@ -300,7 +308,9 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
                   <Checkbox
                     checked={checkedGroups[group.id] ?? true}
                     indeterminate={
-                      group.changeItems?.some((item) => checkedItems[item.id]) &&
+                      group.changeItems?.some(
+                        (item) => checkedItems[item.id]
+                      ) &&
                       !group.changeItems?.every((item) => checkedItems[item.id])
                     }
                     onChange={(e) => {
@@ -440,9 +450,7 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
             bgcolor: 'background.paper',
           }}
         >
-          <Button onClick={onClose}>
-            {t('common.cancel')}
-          </Button>
+          <Button onClick={onClose}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             color="primary"

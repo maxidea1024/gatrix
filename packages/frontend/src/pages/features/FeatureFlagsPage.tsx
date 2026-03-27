@@ -220,7 +220,11 @@ const FeatureFlagsPage: React.FC = () => {
   const [deletingFlag, setDeletingFlag] = useState<FeatureFlag | null>(null);
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [flagTypes, setFlagTypes] = useState<FlagTypeInfo[]>([]);
-  const { environments: envListRaw, allEnvironments, currentEnvironmentId } = useEnvironment();
+  const {
+    environments: envListRaw,
+    allEnvironments,
+    currentEnvironmentId,
+  } = useEnvironment();
   const environments: Environment[] = useMemo(
     () =>
       envListRaw
@@ -564,9 +568,12 @@ const FeatureFlagsPage: React.FC = () => {
 
         // Overlay pending CR drafts for the current user
         try {
-          const drafts = await changeRequestService.getAllPendingFlagDrafts(projectApiPath);
+          const drafts =
+            await changeRequestService.getAllPendingFlagDrafts(projectApiPath);
           if (drafts && drafts.length > 0) {
-            const draftMap = new Map(drafts.map((d: any) => [d.targetId, d.draftData]));
+            const draftMap = new Map(
+              drafts.map((d: any) => [d.targetId, d.draftData])
+            );
             filteredFlags = filteredFlags.map((f: any) => {
               // targetId is flag.id (ULID), not flagName
               const draft = draftMap.get(f.id);
@@ -582,11 +589,16 @@ const FeatureFlagsPage: React.FC = () => {
                   const envDraft = draft[envId];
                   if (envDraft && envDraft.isEnabled !== undefined) {
                     hasAnyDraft = true;
-                    const envRef = newEnvs.find((e: any) => e.environmentId === envId);
+                    const envRef = newEnvs.find(
+                      (e: any) => e.environmentId === envId
+                    );
                     if (envRef) {
                       envRef.isEnabled = envDraft.isEnabled;
                     } else {
-                      newEnvs.push({ environmentId: envId, isEnabled: envDraft.isEnabled });
+                      newEnvs.push({
+                        environmentId: envId,
+                        isEnabled: envDraft.isEnabled,
+                      });
                     }
                     if (envId === currentEnvironmentId) {
                       isCurrentEnvChanged = true;
@@ -598,7 +610,9 @@ const FeatureFlagsPage: React.FC = () => {
                 return {
                   ...f,
                   ...(hasAnyDraft ? { environments: newEnvs } : {}),
-                  ...(isCurrentEnvChanged ? { isEnabled: newCurrentEnvEnabled } : {}),
+                  ...(isCurrentEnvChanged
+                    ? { isEnabled: newCurrentEnvEnabled }
+                    : {}),
                   hasPendingChanges: true,
                 };
               }
@@ -1100,9 +1114,13 @@ const FeatureFlagsPage: React.FC = () => {
         );
       } catch (error: any) {
         if (error?.response?.data?.errorCode === 'PENDING_REVIEW_EXISTS') {
-          enqueueSnackbar(t('changeRequest.errors.pendingReviewExists'), { variant: 'warning' });
+          enqueueSnackbar(t('changeRequest.errors.pendingReviewExists'), {
+            variant: 'warning',
+          });
         } else {
-          enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), { variant: 'error' });
+          enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
+            variant: 'error',
+          });
         }
       }
       return;
@@ -1796,7 +1814,9 @@ const FeatureFlagsPage: React.FC = () => {
                   anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                   transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                 >
-                  <MenuItem onClick={() => handleOpenCreateDialog('featureFlag')}>
+                  <MenuItem
+                    onClick={() => handleOpenCreateDialog('featureFlag')}
+                  >
                     <ListItemIcon>
                       <FlagIcon fontSize="small" />
                     </ListItemIcon>
@@ -1815,7 +1835,9 @@ const FeatureFlagsPage: React.FC = () => {
                       secondary={t('featureFlags.flagTypes.release.desc')}
                     />
                   </MenuItem>
-                  <MenuItem onClick={() => handleOpenCreateDialog('experiment')}>
+                  <MenuItem
+                    onClick={() => handleOpenCreateDialog('experiment')}
+                  >
                     <ListItemIcon>
                       <ExperimentIcon fontSize="small" color="secondary" />
                     </ListItemIcon>
@@ -1824,7 +1846,9 @@ const FeatureFlagsPage: React.FC = () => {
                       secondary={t('featureFlags.flagTypes.experiment.desc')}
                     />
                   </MenuItem>
-                  <MenuItem onClick={() => handleOpenCreateDialog('operational')}>
+                  <MenuItem
+                    onClick={() => handleOpenCreateDialog('operational')}
+                  >
                     <ListItemIcon>
                       <OperationalIcon fontSize="small" color="warning" />
                     </ListItemIcon>
@@ -1833,7 +1857,9 @@ const FeatureFlagsPage: React.FC = () => {
                       secondary={t('featureFlags.flagTypes.operational.desc')}
                     />
                   </MenuItem>
-                  <MenuItem onClick={() => handleOpenCreateDialog('killSwitch')}>
+                  <MenuItem
+                    onClick={() => handleOpenCreateDialog('killSwitch')}
+                  >
                     <ListItemIcon>
                       <KillSwitchIcon fontSize="small" color="error" />
                     </ListItemIcon>
@@ -1842,7 +1868,9 @@ const FeatureFlagsPage: React.FC = () => {
                       secondary={t('featureFlags.flagTypes.killSwitch.desc')}
                     />
                   </MenuItem>
-                  <MenuItem onClick={() => handleOpenCreateDialog('permission')}>
+                  <MenuItem
+                    onClick={() => handleOpenCreateDialog('permission')}
+                  >
                     <ListItemIcon>
                       <PermissionIcon fontSize="small" color="action" />
                     </ListItemIcon>
@@ -2214,7 +2242,6 @@ const FeatureFlagsPage: React.FC = () => {
                                   />
                                 );
                               })}
-
                             </Box>
 
                             {/* Divider */}
@@ -2500,7 +2527,11 @@ const FeatureFlagsPage: React.FC = () => {
 
                               case 'pendingChanges':
                                 return (
-                                  <TableCell key={col.id} align="center" sx={{ px: 0.5, width: 40 }}>
+                                  <TableCell
+                                    key={col.id}
+                                    align="center"
+                                    sx={{ px: 0.5, width: 40 }}
+                                  >
                                     {t('changeRequest.title')}
                                   </TableCell>
                                 );
@@ -2790,7 +2821,6 @@ const FeatureFlagsPage: React.FC = () => {
                                                 color={env.color}
                                                 label={env.displayName}
                                               />
-
                                             </Box>
                                           </TableCell>
                                         );
@@ -2932,9 +2962,18 @@ const FeatureFlagsPage: React.FC = () => {
                                   );
                                 case 'pendingChanges':
                                   return (
-                                    <TableCell key={col.id} align="center" sx={{ px: 0.5 }}>
+                                    <TableCell
+                                      key={col.id}
+                                      align="center"
+                                      sx={{ px: 0.5 }}
+                                    >
                                       {(flag as any).hasPendingChanges && (
-                                        <Tooltip title={t('changeRequest.pendingChanges')} arrow>
+                                        <Tooltip
+                                          title={t(
+                                            'changeRequest.pendingChanges'
+                                          )}
+                                          arrow
+                                        >
                                           <ScheduleIcon
                                             sx={{
                                               fontSize: 16,

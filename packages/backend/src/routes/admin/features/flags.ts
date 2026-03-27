@@ -81,7 +81,8 @@ router.post(
 router.get(
   '/pending-drafts',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { ChangeRequestService } = await import('../../../services/change-request-service');
+    const { ChangeRequestService } =
+      await import('../../../services/change-request-service');
     const drafts = await ChangeRequestService.getAllPendingDraftsForTable(
       'g_feature_flags',
       req.projectId!
@@ -483,10 +484,20 @@ router.post(
     // draftData is structured as { envId: { strategies, variants, isEnabled, ... } }
     // so beforeDraftData must use the same structure
     const beforeDraftData: Record<string, any> = {};
-    const envKeys = Object.keys(draftData).filter(k => !k.startsWith('_'));
+    const envKeys = Object.keys(draftData).filter((k) => !k.startsWith('_'));
     for (const envKey of envKeys) {
       // The flag object itself represents the current state for this environment
-      const { id, flagName, createdAt, updatedAt, createdBy, updatedBy, environmentId: eid, projectId, ...envFields } = flag as any;
+      const {
+        id,
+        flagName,
+        createdAt,
+        updatedAt,
+        createdBy,
+        updatedBy,
+        environmentId: eid,
+        projectId,
+        ...envFields
+      } = flag as any;
       beforeDraftData[envKey] = envFields;
     }
 

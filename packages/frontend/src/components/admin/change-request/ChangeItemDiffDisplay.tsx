@@ -35,7 +35,15 @@ const BORDERED_TABLE_SX = {
 };
 
 // Fields to hide from diff display
-const HIDDEN_FIELDS = ['updatedBy', 'createdBy', 'updatedAt', 'createdAt', 'id', 'version', 'environment'];
+const HIDDEN_FIELDS = [
+  'updatedBy',
+  'createdBy',
+  'updatedAt',
+  'createdAt',
+  'id',
+  'version',
+  'environment',
+];
 
 interface ChangeOp {
   field: string;
@@ -70,7 +78,11 @@ const ChangeItemDiffDisplay: React.FC<ChangeItemDiffDisplayProps> = ({
   const { t } = useTranslation();
 
   // Feature Flag: Use dedicated renderer
-  if (item.table === 'g_feature_flags' && item.afterData && typeof item.afterData === 'object') {
+  if (
+    item.table === 'g_feature_flags' &&
+    item.afterData &&
+    typeof item.afterData === 'object'
+  ) {
     return (
       <FeatureFlagDiffRenderer
         draftData={item.afterData}
@@ -134,7 +146,8 @@ const ChangeItemDiffDisplay: React.FC<ChangeItemDiffDisplayProps> = ({
   // UPDATE operation: SET/MOD/DEL chip list
   if (item.operation === 'update') {
     const filteredChanges = item.changes.filter(
-      (c) => !['updatedBy', 'createdBy', 'updatedAt', 'createdAt'].includes(c.field)
+      (c) =>
+        !['updatedBy', 'createdBy', 'updatedAt', 'createdAt'].includes(c.field)
     );
 
     if (filteredChanges.length === 0) {
@@ -195,7 +208,10 @@ const ChangeItemDiffDisplay: React.FC<ChangeItemDiffDisplayProps> = ({
               {/* Value change */}
               <TableCell sx={{ fontSize: 12, fontFamily: 'monospace' }}>
                 {change.operation === 'added' ? (
-                  <Box component="span" sx={{ color: 'success.main', fontWeight: 500 }}>
+                  <Box
+                    component="span"
+                    sx={{ color: 'success.main', fontWeight: 500 }}
+                  >
                     {formatValue(change.newValue, change.field)}
                   </Box>
                 ) : change.operation === 'removed' ? (
@@ -209,7 +225,10 @@ const ChangeItemDiffDisplay: React.FC<ChangeItemDiffDisplayProps> = ({
                   <>
                     <Box
                       component="span"
-                      sx={{ color: 'error.main', textDecoration: 'line-through' }}
+                      sx={{
+                        color: 'error.main',
+                        textDecoration: 'line-through',
+                      }}
                     >
                       {formatValue(change.oldValue, change.field)}
                     </Box>

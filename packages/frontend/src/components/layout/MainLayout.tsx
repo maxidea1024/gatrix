@@ -2297,10 +2297,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <Slide
           direction="down"
           in={
-            !!(!location.pathname.startsWith('/admin/change-requests') &&
-            (myPendingReviewCount > 0 ||
-              pendingCRCount > 0 ||
-              myDraftCount > 0))
+            !!(
+              !location.pathname.startsWith('/admin/change-requests') &&
+              (myPendingReviewCount > 0 ||
+                pendingCRCount > 0 ||
+                myDraftCount > 0)
+            )
           }
           mountOnEnter
           unmountOnExit
@@ -2342,9 +2344,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {/* Lock warning */}
               {myPendingReviewCount > 0 && (
                 <Box
-                  onClick={() =>
-                    navigate('/admin/change-requests?status=open')
-                  }
+                  onClick={() => navigate('/admin/change-requests?status=open')}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -2361,9 +2361,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     },
                   }}
                 >
-                  <LockIcon
-                    sx={{ fontSize: 14, color: 'error.main' }}
-                  />
+                  <LockIcon sx={{ fontSize: 14, color: 'error.main' }} />
                   <Typography
                     variant="body2"
                     sx={{
@@ -2469,9 +2467,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {/* Pending approvals */}
               {pendingCRCount > 0 && (
                 <Box
-                  onClick={() =>
-                    navigate('/admin/change-requests?status=open')
-                  }
+                  onClick={() => navigate('/admin/change-requests?status=open')}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',

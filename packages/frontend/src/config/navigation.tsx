@@ -403,7 +403,6 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
-
   // Change Requests
   {
     id: 'change-requests',

@@ -144,7 +144,9 @@ export class MessageTemplateController {
 
           // Handle tags if provided
           if (tags && Array.isArray(tags) && created?.id) {
-            const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+            const tagIds = tags
+              .map((tag: any) => tag.id)
+              .filter((tid: any) => tid);
             await TagService.setTagsForEntity(
               'message_template',
               created.id.toString(),

@@ -685,7 +685,9 @@ const ServiceNoticesPage: React.FC = () => {
                 <ListItemIcon>
                   <SportsEsportsIcon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>{t('serviceNotices.webviewPreview')}</ListItemText>
+                <ListItemText>
+                  {t('serviceNotices.webviewPreview')}
+                </ListItemText>
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -696,7 +698,9 @@ const ServiceNoticesPage: React.FC = () => {
                 <ListItemIcon>
                   <ContentCopyIcon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>{t('serviceNotices.copyWebviewUrl')}</ListItemText>
+                <ListItemText>
+                  {t('serviceNotices.copyWebviewUrl')}
+                </ListItemText>
               </MenuItem>
               <Divider />
               <ExportImportMenuItems
@@ -704,7 +708,10 @@ const ServiceNoticesPage: React.FC = () => {
                   setPageMenuAnchor(null);
                   const exportColumns: ExportColumn[] = [
                     { key: 'title', header: t('serviceNotices.form.title') },
-                    { key: 'content', header: t('serviceNotices.form.content') },
+                    {
+                      key: 'content',
+                      header: t('serviceNotices.form.content'),
+                    },
                     {
                       key: 'category',
                       header: t('serviceNotices.form.category'),
@@ -1302,7 +1309,9 @@ const ServiceNoticesPage: React.FC = () => {
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{getActionLabel('delete', requiresApproval, t)}</ListItemText>
+          <ListItemText>
+            {getActionLabel('delete', requiresApproval, t)}
+          </ListItemText>
         </MenuItem>
       </Menu>
 

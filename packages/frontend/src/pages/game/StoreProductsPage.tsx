@@ -833,12 +833,19 @@ const StoreProductsPage: React.FC = () => {
                     { key: 'createdAt', header: t('common.createdAt') },
                   ];
                   try {
-                    exportToFile(products, exportColumns, 'store-products', format);
+                    exportToFile(
+                      products,
+                      exportColumns,
+                      'store-products',
+                      format
+                    );
                     enqueueSnackbar(t('common.exportSuccess'), {
                       variant: 'success',
                     });
                   } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
                   }
                 }}
                 exportOnly={true}

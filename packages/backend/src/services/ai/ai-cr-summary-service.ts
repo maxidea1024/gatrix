@@ -47,21 +47,34 @@ function formatChangesForPrompt(input: CRSummaryInput): string {
   const lines: string[] = [];
 
   for (const item of input.changeItems) {
-    const label = item.displayName || resolveEntityLabel(item.targetTable, item.draftData || null) || item.targetId;
+    const label =
+      item.displayName ||
+      resolveEntityLabel(item.targetTable, item.draftData || null) ||
+      item.targetId;
     const cleanTable = item.targetTable.replace(/^g_/, '');
 
     lines.push(`## ${cleanTable} (${label}) — ${item.opType}`);
 
     if (item.ops && item.ops.length > 0) {
       for (const op of item.ops) {
-        const oldStr = op.oldValue !== null && op.oldValue !== undefined ? JSON.stringify(op.oldValue) : 'null';
-        const newStr = op.newValue !== null && op.newValue !== undefined ? JSON.stringify(op.newValue) : 'null';
+        const oldStr =
+          op.oldValue !== null && op.oldValue !== undefined
+            ? JSON.stringify(op.oldValue)
+            : 'null';
+        const newStr =
+          op.newValue !== null && op.newValue !== undefined
+            ? JSON.stringify(op.newValue)
+            : 'null';
         lines.push(`  ${op.opType} ${op.path}: ${oldStr} → ${newStr}`);
       }
     } else if (item.draftData) {
       // For draftData-based items, summarize what environments are being modified
-      const envKeys = Object.keys(item.draftData).filter(k => !k.startsWith('_'));
-      lines.push(`  Modified environments: ${envKeys.map(k => input.envNameMap?.[k] || k).join(', ')}`);
+      const envKeys = Object.keys(item.draftData).filter(
+        (k) => !k.startsWith('_')
+      );
+      lines.push(
+        `  Modified environments: ${envKeys.map((k) => input.envNameMap?.[k] || k).join(', ')}`
+      );
 
       // Include key changes within each environment
       for (const envKey of envKeys) {
@@ -69,9 +82,20 @@ function formatChangesForPrompt(input: CRSummaryInput): string {
         const envData = item.draftData[envKey];
         const beforeEnvData = item.beforeDraftData?.[envKey];
         if (envData && typeof envData === 'object') {
-          const keys = Object.keys(envData).filter(k => !['id', 'createdAt', 'updatedAt', 'createdBy', 'updatedBy', 'environmentId', 'projectId'].includes(k));
+          const keys = Object.keys(envData).filter(
+            (k) =>
+              ![
+                'id',
+                'createdAt',
+                'updatedAt',
+                'createdBy',
+                'updatedBy',
+                'environmentId',
+                'projectId',
+              ].includes(k)
+          );
           if (keys.length > 0) {
-            const summary = keys.map(k => {
+            const summary = keys.map((k) => {
               const val = envData[k];
               const oldVal = beforeEnvData?.[k];
               if (k === 'isEnabled') {
@@ -83,7 +107,9 @@ function formatChangesForPrompt(input: CRSummaryInput): string {
               if (k === 'strategies' && Array.isArray(val)) {
                 if (val.length === 0) {
                   if (Array.isArray(oldVal) && oldVal.length > 0) {
-                    const names = oldVal.map((s: any) => s.name || s.strategyName || 'unknown');
+                    const names = oldVal.map(
+                      (s: any) => s.name || s.strategyName || 'unknown'
+                    );
                     return `strategies: removed ${oldVal.length} strategies (${names.join(', ')})`;
                   }
                   return 'strategies=removed all';
@@ -93,11 +119,15 @@ function formatChangesForPrompt(input: CRSummaryInput): string {
                   const diffs: string[] = [];
                   for (const newS of val) {
                     const sName = newS.name || newS.strategyName || 'unknown';
-                    const oldS = oldVal.find((o: any) => (o.name || o.strategyName) === sName);
+                    const oldS = oldVal.find(
+                      (o: any) => (o.name || o.strategyName) === sName
+                    );
                     if (oldS && newS.parameters && oldS.parameters) {
                       for (const [pk, pv] of Object.entries(newS.parameters)) {
                         if (String(oldS.parameters[pk]) !== String(pv)) {
-                          diffs.push(`${sName}.${pk}: ${oldS.parameters[pk]} → ${pv}`);
+                          diffs.push(
+                            `${sName}.${pk}: ${oldS.parameters[pk]} → ${pv}`
+                          );
                         }
                       }
                     } else if (!oldS) {
@@ -106,11 +136,16 @@ function formatChangesForPrompt(input: CRSummaryInput): string {
                   }
                   for (const oldS of oldVal) {
                     const sName = oldS.name || oldS.strategyName || 'unknown';
-                    if (!val.find((n: any) => (n.name || n.strategyName) === sName)) {
+                    if (
+                      !val.find(
+                        (n: any) => (n.name || n.strategyName) === sName
+                      )
+                    ) {
                       diffs.push(`removed strategy: ${sName}`);
                     }
                   }
-                  if (diffs.length > 0) return `strategies: ${diffs.join('; ')}`;
+                  if (diffs.length > 0)
+                    return `strategies: ${diffs.join('; ')}`;
                   return `strategies(${val.length} rules, unchanged)`;
                 }
                 return `strategies(${val.length} rules)`;

@@ -327,7 +327,10 @@ const SurveysPage: React.FC = () => {
     if (!deletingSurvey) return;
 
     try {
-      const result = await surveyService.deleteSurvey(projectApiPath, deletingSurvey.id);
+      const result = await surveyService.deleteSurvey(
+        projectApiPath,
+        deletingSurvey.id
+      );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
@@ -829,7 +832,9 @@ const SurveysPage: React.FC = () => {
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{getActionLabel('delete', requiresApproval, t)}</ListItemText>
+          <ListItemText>
+            {getActionLabel('delete', requiresApproval, t)}
+          </ListItemText>
         </MenuItem>
       </Menu>
 

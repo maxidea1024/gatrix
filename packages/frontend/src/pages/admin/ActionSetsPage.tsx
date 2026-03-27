@@ -885,7 +885,10 @@ const ActionSetsPage: React.FC = () => {
                                       >
                                         <Chip
                                           label={t(
-                                            ACTION_TYPES.find((a) => a.value === action.actionType)?.labelKey || action.actionType
+                                            ACTION_TYPES.find(
+                                              (a) =>
+                                                a.value === action.actionType
+                                            )?.labelKey || action.actionType
                                           )}
                                           size="small"
                                           color="primary"

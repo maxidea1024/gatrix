@@ -9,7 +9,6 @@ export type ChangeRequestStatus =
   | 'rejected'
   | 'conflict';
 
-
 export interface ChangeItem {
   id: string;
   changeRequestId: string;
@@ -364,9 +363,7 @@ class ChangeRequestService {
   /**
    * Get all pending Change Request drafts for all feature flags in the current environment.
    */
-  async getAllPendingFlagDrafts(
-    projectApiPath: string | null = null
-  ): Promise<
+  async getAllPendingFlagDrafts(projectApiPath: string | null = null): Promise<
     Array<{
       targetId: string;
       changeRequestId: string;

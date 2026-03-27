@@ -55,12 +55,7 @@ export class OutboxEvent extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: [
-        'entityType',
-        'entityId',
-        'eventType',
-        'payload',
-      ],
+      required: ['entityType', 'entityId', 'eventType', 'payload'],
       properties: {
         id: { type: 'string' },
         changeRequestId: { type: ['string', 'null'] },

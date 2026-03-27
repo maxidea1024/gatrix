@@ -10,7 +10,6 @@ import {
   Avatar,
   CircularProgress,
   Alert,
-
   Collapse,
   Table,
   TableBody,
@@ -27,7 +26,6 @@ import {
   Send as SendIcon,
   Person as PersonIcon,
   MergeType as MergeIcon,
-
   ExpandMore as ExpandMoreIcon,
   Add as AddIcon,
   Edit as EditIcon,
@@ -47,10 +45,11 @@ import changeRequestService, {
   ChangeItem,
   ChangeRequestStatus,
 } from '@/services/changeRequestService';
+import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
 import {
-  formatChangeRequestTitle,
-} from '@/utils/changeRequestFormatter';
-import { formatChangeItemLabel, resolveTableDisplayName } from '@/utils/entityLabelResolver';
+  formatChangeItemLabel,
+  resolveTableDisplayName,
+} from '@/utils/entityLabelResolver';
 import ChangeItemDiffDisplay from './change-request/ChangeItemDiffDisplay';
 import RevertPreviewDrawer from './RevertPreviewDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -196,10 +195,15 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const [submitReason, setSubmitReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
-  const [submitCheckedGroups, setSubmitCheckedGroups] = useState<Record<string, boolean>>({});
-  const [submitCheckedItems, setSubmitCheckedItems] = useState<Record<string, boolean>>({});
-  const [submitExpandedGroups, setSubmitExpandedGroups] = useState<Record<string, boolean>>({});
-
+  const [submitCheckedGroups, setSubmitCheckedGroups] = useState<
+    Record<string, boolean>
+  >({});
+  const [submitCheckedItems, setSubmitCheckedItems] = useState<
+    Record<string, boolean>
+  >({});
+  const [submitExpandedGroups, setSubmitExpandedGroups] = useState<
+    Record<string, boolean>
+  >({});
 
   // Delete handler for error dialog
   const handleDeleteFromError = async () => {
@@ -269,12 +273,18 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     const group = cr?.actionGroups?.find((g) => g.id === groupId);
     if (group?.changeItems) {
       const updates: Record<string, boolean> = {};
-      group.changeItems.forEach((item) => { updates[item.id] = checked; });
+      group.changeItems.forEach((item) => {
+        updates[item.id] = checked;
+      });
       setSubmitCheckedItems((prev) => ({ ...prev, ...updates }));
     }
   };
 
-  const handleSubmitItemCheck = (itemId: string, groupId: string | undefined, checked: boolean) => {
+  const handleSubmitItemCheck = (
+    itemId: string,
+    groupId: string | undefined,
+    checked: boolean
+  ) => {
     setSubmitCheckedItems((prev) => ({ ...prev, [itemId]: checked }));
     if (groupId) {
       const group = cr?.actionGroups?.find((g) => g.id === groupId);
@@ -297,7 +307,9 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const handleSubmitCR = async () => {
     if (!cr) return;
     if (!submitTitle.trim()) {
-      enqueueSnackbar(t('changeRequest.errors.titleRequired'), { variant: 'warning' });
+      enqueueSnackbar(t('changeRequest.errors.titleRequired'), {
+        variant: 'warning',
+      });
       return;
     }
     setIsSubmitting(true);
@@ -307,13 +319,21 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         .filter(([_, checked]) => !checked)
         .map(([id]) => id);
       for (const itemId of itemsToDelete) {
-        await changeRequestService.deleteChangeItem(cr.id, itemId, projectApiPath);
+        await changeRequestService.deleteChangeItem(
+          cr.id,
+          itemId,
+          projectApiPath
+        );
       }
       // Submit
-      await changeRequestService.submit(cr.id, {
-        title: submitTitle.trim(),
-        reason: submitReason.trim() || undefined,
-      }, projectApiPath);
+      await changeRequestService.submit(
+        cr.id,
+        {
+          title: submitTitle.trim(),
+          reason: submitReason.trim() || undefined,
+        },
+        projectApiPath
+      );
       setSubmitMode(false);
       mutate();
       onRefresh?.();
@@ -815,7 +835,11 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     }
     setActionLoading(true);
     try {
-      await changeRequestService.reject(changeRequestId!, comment, projectApiPath);
+      await changeRequestService.reject(
+        changeRequestId!,
+        comment,
+        projectApiPath
+      );
       setComment('');
       mutate();
       onRefresh?.();
@@ -948,787 +972,1289 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                   {t('changeRequest.changes')}
                 </Typography>
               </Box>
-
             </Box>
 
             {/* Content */}
             <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
               <Box>
-                  {/* Initial Comment */}
-                  <Box sx={{ display: 'flex' }}>
-                    {/* Time column with triangle pointer */}
+                {/* Initial Comment */}
+                <Box sx={{ display: 'flex' }}>
+                  {/* Time column with triangle pointer */}
+                  <Box
+                    sx={{
+                      width: 72,
+                      flexShrink: 0,
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'flex-end',
+                      pr: 1,
+                      pt: 1.5,
+                    }}
+                  >
                     <Box
                       sx={{
-                        width: 72,
-                        flexShrink: 0,
                         display: 'flex',
-                        alignItems: 'flex-start',
-                        justifyContent: 'flex-end',
-                        pr: 1,
-                        pt: 1.5,
+                        alignItems: 'center',
+                        gap: 0.5,
                       }}
                     >
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontWeight: 600, fontFamily: 'monospace' }}
+                      >
+                        {new Date(cr.createdAt).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false,
+                        })}
+                      </Typography>
                       <Box
                         sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
+                          width: 0,
+                          height: 0,
+                          borderTop: '6px solid transparent',
+                          borderBottom: '6px solid transparent',
+                          borderLeft: (theme) =>
+                            `6px solid ${alpha(theme.palette.text.secondary, 0.3)}`,
                         }}
-                      >
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ fontWeight: 600, fontFamily: 'monospace' }}
-                        >
-                          {new Date(cr.createdAt).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false,
-                          })}
-                        </Typography>
-                        <Box
-                          sx={{
-                            width: 0,
-                            height: 0,
-                            borderTop: '6px solid transparent',
-                            borderBottom: '6px solid transparent',
-                            borderLeft: (theme) =>
-                              `6px solid ${alpha(theme.palette.text.secondary, 0.3)}`,
-                          }}
-                        />
-                      </Box>
+                      />
                     </Box>
+                  </Box>
 
-                    {/* Timeline connector column */}
-                    <Box
+                  {/* Timeline connector column */}
+                  <Box
+                    sx={{
+                      width: 48,
+                      flexShrink: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      position: 'relative',
+                    }}
+                  >
+                    <Avatar
                       sx={{
-                        width: 48,
-                        flexShrink: 0,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        position: 'relative',
+                        width: 32,
+                        height: 32,
+                        bgcolor: 'grey.500',
+                        mt: 0.5,
+                        zIndex: 1,
                       }}
                     >
-                      <Avatar
+                      <PersonIcon sx={{ fontSize: 18 }} />
+                    </Avatar>
+                    {timeline.length > 1 && (
+                      <Box
                         sx={{
-                          width: 32,
-                          height: 32,
-                          bgcolor: 'grey.500',
-                          mt: 0.5,
-                          zIndex: 1,
+                          position: 'absolute',
+                          top: 20, // mt: 0.5 (4px) + center (16px)
+                          bottom: 0,
+                          left: '50%',
+                          width: 2,
+                          bgcolor: 'divider',
+                          transform: 'translateX(-50%)',
+                        }}
+                      />
+                    )}
+                  </Box>
+
+                  {/* Content column */}
+                  <Box sx={{ flex: 1, pl: 1.5, pb: 2 }}>
+                    <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+                      <Box
+                        sx={{
+                          bgcolor: 'action.hover',
+                          px: 2,
+                          py: 1,
+                          borderBottom: cr.reason || cr.description ? 1 : 0,
+                          borderColor: 'divider',
                         }}
                       >
-                        <PersonIcon sx={{ fontSize: 18 }} />
-                      </Avatar>
-                      {timeline.length > 1 && (
+                        <Typography variant="body2">
+                          <strong>
+                            {cr.requester?.name || cr.requester?.email}
+                          </strong>{' '}
+                          {t('changeRequest.opened')}{' '}
+                          <RelativeTime date={cr.createdAt} />
+                        </Typography>
+                      </Box>
+                      {(cr.reason || cr.description) && (
+                        <Box sx={{ p: 2 }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ whiteSpace: 'pre-wrap' }}
+                          >
+                            {cr.reason || cr.description}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Paper>
+                  </Box>
+                </Box>
+
+                {/* Timeline Events */}
+                {timeline
+                  .filter((e) => e.type !== 'created')
+                  .map((event, idx, arr) => (
+                    <Box key={idx} sx={{ display: 'flex' }}>
+                      {/* Time column with triangle pointer */}
+                      <Box
+                        sx={{
+                          width: 72,
+                          flexShrink: 0,
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          justifyContent: 'flex-end',
+                          pr: 1,
+                          pt: 0.5,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                          }}
+                        >
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ fontWeight: 600, fontFamily: 'monospace' }}
+                          >
+                            {new Date(event.timestamp).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: false,
+                            })}
+                          </Typography>
+                          <Box
+                            sx={{
+                              width: 0,
+                              height: 0,
+                              borderTop: '6px solid transparent',
+                              borderBottom: '6px solid transparent',
+                              borderLeft: (theme) =>
+                                `6px solid ${
+                                  event.type === 'rejected'
+                                    ? theme.palette.error.main
+                                    : event.type === 'approved'
+                                      ? theme.palette.success.main
+                                      : event.type === 'executed'
+                                        ? theme.palette.info.main
+                                        : theme.palette.primary.main
+                                }`,
+                            }}
+                          />
+                        </Box>
+                      </Box>
+
+                      {/* Timeline connector column */}
+                      <Box
+                        sx={{
+                          width: 48,
+                          flexShrink: 0,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          position: 'relative',
+                        }}
+                      >
+                        <Avatar
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            bgcolor:
+                              event.type === 'rejected'
+                                ? 'error.main'
+                                : event.type === 'approved'
+                                  ? 'success.main'
+                                  : event.type === 'executed'
+                                    ? 'info.main'
+                                    : 'primary.main',
+                            zIndex: 1,
+                          }}
+                        >
+                          {event.type === 'submitted' && (
+                            <SendIcon sx={{ fontSize: 16 }} />
+                          )}
+                          {event.type === 'approved' && (
+                            <CheckIcon sx={{ fontSize: 16 }} />
+                          )}
+                          {event.type === 'rejected' && (
+                            <CloseIcon sx={{ fontSize: 16 }} />
+                          )}
+                          {event.type === 'executed' && (
+                            <MergeIcon sx={{ fontSize: 16 }} />
+                          )}
+                        </Avatar>
                         <Box
                           sx={{
                             position: 'absolute',
-                            top: 20, // mt: 0.5 (4px) + center (16px)
-                            bottom: 0,
+                            top: 0,
+                            bottom: idx === arr.length - 1 ? 'auto' : 0,
+                            height: idx === arr.length - 1 ? 16 : 'auto',
                             left: '50%',
                             width: 2,
                             bgcolor: 'divider',
                             transform: 'translateX(-50%)',
                           }}
                         />
-                      )}
-                    </Box>
+                      </Box>
 
-                    {/* Content column */}
-                    <Box sx={{ flex: 1, pl: 1.5, pb: 2 }}>
-                      <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-                        <Box
-                          sx={{
-                            bgcolor: 'action.hover',
-                            px: 2,
-                            py: 1,
-                            borderBottom: cr.reason || cr.description ? 1 : 0,
-                            borderColor: 'divider',
-                          }}
-                        >
-                          <Typography variant="body2">
-                            <strong>
-                              {cr.requester?.name || cr.requester?.email}
-                            </strong>{' '}
-                            {t('changeRequest.opened')}{' '}
-                            <RelativeTime date={cr.createdAt} />
+                      {/* Content column */}
+                      <Box sx={{ flex: 1, pl: 1.5, pb: 2 }}>
+                        <Typography variant="body2">
+                          <strong>
+                            {event.user?.name || event.user?.email || 'System'}
+                          </strong>{' '}
+                          {event.type === 'submitted' &&
+                            t('changeRequest.timeline.submitted')}
+                          {event.type === 'approved' &&
+                            t('changeRequest.timeline.approved')}
+                          {event.type === 'rejected' &&
+                            t('changeRequest.timeline.rejected')}
+                          {event.type === 'executed' &&
+                            t('changeRequest.timeline.executed')}{' '}
+                          <Typography component="span" color="text.secondary">
+                            <RelativeTime date={event.timestamp} />
                           </Typography>
-                        </Box>
-                        {(cr.reason || cr.description) && (
-                          <Box sx={{ p: 2 }}>
-                            <Typography
-                              variant="body2"
-                              sx={{ whiteSpace: 'pre-wrap' }}
-                            >
-                              {cr.reason || cr.description}
-                            </Typography>
-                          </Box>
+                        </Typography>
+
+                        {/* Submitted event: show title with expandable reason */}
+                        {event.type === 'submitted' && (
+                          <Paper variant="outlined" sx={{ mt: 1, p: 1.5 }}>
+                            {event.title && (
+                              <Typography
+                                variant="subtitle2"
+                                sx={{
+                                  mb: event.reason ? 1 : 0,
+                                  fontWeight: 600,
+                                }}
+                              >
+                                {formatChangeRequestTitle(event.title, t)}
+                              </Typography>
+                            )}
+                            {event.reason && (
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  whiteSpace: 'pre-wrap',
+                                  color: 'text.secondary',
+                                }}
+                              >
+                                {event.reason}
+                              </Typography>
+                            )}
+                          </Paper>
                         )}
-                      </Paper>
-                    </Box>
-                  </Box>
 
-                  {/* Timeline Events */}
-                  {timeline
-                    .filter((e) => e.type !== 'created')
-                    .map((event, idx, arr) => (
-                      <Box key={idx} sx={{ display: 'flex' }}>
-                        {/* Time column with triangle pointer */}
-                        <Box
-                          sx={{
-                            width: 72,
-                            flexShrink: 0,
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            justifyContent: 'flex-end',
-                            pr: 1,
-                            pt: 0.5,
-                          }}
-                        >
-                          <Box
+                        {event.comment && (
+                          <Paper
+                            variant="outlined"
                             sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 0.5,
-                            }}
-                          >
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                              sx={{ fontWeight: 600, fontFamily: 'monospace' }}
-                            >
-                              {new Date(event.timestamp).toLocaleTimeString(
-                                [],
-                                {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  hour12: false,
-                                }
-                              )}
-                            </Typography>
-                            <Box
-                              sx={{
-                                width: 0,
-                                height: 0,
-                                borderTop: '6px solid transparent',
-                                borderBottom: '6px solid transparent',
-                                borderLeft: (theme) =>
-                                  `6px solid ${
-                                    event.type === 'rejected'
-                                      ? theme.palette.error.main
-                                      : event.type === 'approved'
-                                        ? theme.palette.success.main
-                                        : event.type === 'executed'
-                                          ? theme.palette.info.main
-                                          : theme.palette.primary.main
-                                  }`,
-                              }}
-                            />
-                          </Box>
-                        </Box>
-
-                        {/* Timeline connector column */}
-                        <Box
-                          sx={{
-                            width: 48,
-                            flexShrink: 0,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            position: 'relative',
-                          }}
-                        >
-                          <Avatar
-                            sx={{
-                              width: 32,
-                              height: 32,
+                              mt: 1,
+                              p: 1.5,
                               bgcolor:
+                                event.type === 'rejected'
+                                  ? (theme) =>
+                                      alpha(theme.palette.error.main, 0.1)
+                                  : event.type === 'approved'
+                                    ? (theme) =>
+                                        alpha(theme.palette.success.main, 0.1)
+                                    : 'action.hover',
+                              borderColor:
                                 event.type === 'rejected'
                                   ? 'error.main'
                                   : event.type === 'approved'
                                     ? 'success.main'
-                                    : event.type === 'executed'
-                                      ? 'info.main'
-                                      : 'primary.main',
-                              zIndex: 1,
+                                    : 'divider',
                             }}
                           >
-                            {event.type === 'submitted' && (
-                              <SendIcon sx={{ fontSize: 16 }} />
-                            )}
-                            {event.type === 'approved' && (
-                              <CheckIcon sx={{ fontSize: 16 }} />
-                            )}
-                            {event.type === 'rejected' && (
-                              <CloseIcon sx={{ fontSize: 16 }} />
-                            )}
-                            {event.type === 'executed' && (
-                              <MergeIcon sx={{ fontSize: 16 }} />
-                            )}
-                          </Avatar>
+                            <Typography
+                              variant="body2"
+                              sx={{ whiteSpace: 'pre-wrap' }}
+                            >
+                              {event.comment}
+                            </Typography>
+                          </Paper>
+                        )}
+                      </Box>
+                    </Box>
+                  ))}
+
+                {/* === Status Action Area (aligned with timeline cards) === */}
+                <Box sx={{ display: 'flex', mt: 0.5 }}>
+                  <Box sx={{ width: 72, flexShrink: 0 }} />
+                  <Box sx={{ width: 48, flexShrink: 0 }} />
+                  <Box sx={{ flex: 1, pl: 1.5 }}>
+                    {/* Review Box - Open status */}
+                    {cr.status === 'open' && (
+                      <Box
+                        sx={{
+                          p: 2,
+                          borderRadius: 1,
+                          border: 1,
+                          borderColor: 'divider',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            mb: 2,
+                          }}
+                        >
+                          <Typography variant="subtitle2">
+                            {t('changeRequest.addReview')}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ fontWeight: 600 }}
+                          >
+                            {t('changeRequest.approvalProgress')}:{' '}
+                            {currentApprovals} / {requiredApprovals}
+                          </Typography>
+                        </Box>
+                        {!hasApproved ? (
+                          <>
+                            <TextField
+                              autoFocus
+                              fullWidth
+                              multiline
+                              rows={3}
+                              placeholder={t('changeRequest.leaveComment')}
+                              value={comment}
+                              onChange={(e) => setComment(e.target.value)}
+                              variant="outlined"
+                              size="small"
+                              sx={{ mb: 2 }}
+                            />
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                gap: 1,
+                                justifyContent: 'flex-end',
+                              }}
+                            >
+                              <Button
+                                variant="outlined"
+                                color="error"
+                                size="small"
+                                startIcon={
+                                  actionLoading ? (
+                                    <CircularProgress
+                                      size={14}
+                                      color="inherit"
+                                    />
+                                  ) : (
+                                    <CloseIcon />
+                                  )
+                                }
+                                onClick={handleReject}
+                                disabled={actionLoading || !comment.trim()}
+                              >
+                                {t('changeRequest.actions.reject')}
+                              </Button>
+                              <Button
+                                variant="contained"
+                                color="success"
+                                size="small"
+                                startIcon={
+                                  actionLoading ? (
+                                    <CircularProgress
+                                      size={14}
+                                      color="inherit"
+                                    />
+                                  ) : (
+                                    <CheckIcon />
+                                  )
+                                }
+                                onClick={handleApprove}
+                                disabled={actionLoading}
+                              >
+                                {t('changeRequest.actions.approve')}
+                              </Button>
+                            </Box>
+                          </>
+                        ) : (
                           <Box
                             sx={{
-                              position: 'absolute',
-                              top: 0,
-                              bottom: idx === arr.length - 1 ? 'auto' : 0,
-                              height: idx === arr.length - 1 ? 16 : 'auto',
-                              left: '50%',
-                              width: 2,
-                              bgcolor: 'divider',
-                              transform: 'translateX(-50%)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              py: 2,
+                              flexDirection: 'column',
+                              gap: 1,
                             }}
-                          />
-                        </Box>
-
-                        {/* Content column */}
-                        <Box sx={{ flex: 1, pl: 1.5, pb: 2 }}>
-                          <Typography variant="body2">
-                            <strong>
-                              {event.user?.name ||
-                                event.user?.email ||
-                                'System'}
-                            </strong>{' '}
-                            {event.type === 'submitted' &&
-                              t('changeRequest.timeline.submitted')}
-                            {event.type === 'approved' &&
-                              t('changeRequest.timeline.approved')}
-                            {event.type === 'rejected' &&
-                              t('changeRequest.timeline.rejected')}
-                            {event.type === 'executed' &&
-                              t('changeRequest.timeline.executed')}{' '}
-                            <Typography component="span" color="text.secondary">
-                              <RelativeTime date={event.timestamp} />
+                          >
+                            <CheckIcon color="success" sx={{ fontSize: 32 }} />
+                            <Typography variant="body2" color="text.secondary">
+                              {t('errors.CR_ALREADY_APPROVED')}
                             </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    )}
+
+                    {/* Rejected status */}
+                    {cr.status === 'rejected' &&
+                      (cr.requesterId === String(user?.id) ||
+                        hasAnyPermissions) && (
+                        <Alert
+                          severity="error"
+                          variant="outlined"
+                          action={
+                            <Button
+                              size="small"
+                              color="warning"
+                              startIcon={
+                                actionLoading ? (
+                                  <CircularProgress size={14} color="inherit" />
+                                ) : (
+                                  <UndoIcon />
+                                )
+                              }
+                              onClick={handleReopen}
+                              disabled={actionLoading}
+                            >
+                              {t('changeRequest.actions.reopen')}
+                            </Button>
+                          }
+                        >
+                          <Typography variant="body2" fontWeight={500}>
+                            {t('changeRequest.status.rejected')}
                           </Typography>
+                        </Alert>
+                      )}
 
-                          {/* Submitted event: show title with expandable reason */}
-                          {event.type === 'submitted' && (
-                            <Paper variant="outlined" sx={{ mt: 1, p: 1.5 }}>
-                              {event.title && (
-                                <Typography
-                                  variant="subtitle2"
-                                  sx={{
-                                    mb: event.reason ? 1 : 0,
-                                    fontWeight: 600,
-                                  }}
-                                >
-                                  {formatChangeRequestTitle(event.title, t)}
-                                </Typography>
-                              )}
-                              {event.reason && (
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    whiteSpace: 'pre-wrap',
-                                    color: 'text.secondary',
-                                  }}
-                                >
-                                  {event.reason}
-                                </Typography>
-                              )}
-                            </Paper>
+                    {/* Conflict status */}
+                    {cr.status === 'conflict' &&
+                      (cr.requesterId === String(user?.id) ||
+                        hasAnyPermissions) && (
+                        <Alert
+                          severity="warning"
+                          variant="outlined"
+                          action={
+                            <Button
+                              size="small"
+                              color="warning"
+                              startIcon={
+                                actionLoading ? (
+                                  <CircularProgress size={14} color="inherit" />
+                                ) : (
+                                  <UndoIcon />
+                                )
+                              }
+                              onClick={handleReopen}
+                              disabled={actionLoading}
+                            >
+                              {t('changeRequest.actions.reopen')}
+                            </Button>
+                          }
+                        >
+                          <Typography variant="body2" fontWeight={500}>
+                            ⚠️ {t('changeRequest.status.conflict')}
+                          </Typography>
+                          {cr.rejectionReason && (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ display: 'block', mt: 0.5 }}
+                            >
+                              {formatI18nText(cr.rejectionReason)}
+                            </Typography>
                           )}
+                        </Alert>
+                      )}
 
-                          {event.comment && (
-                            <Paper
-                              variant="outlined"
+                    {/* Approved status - ready to merge */}
+                    {cr.status === 'approved' && (
+                      <Alert
+                        severity="success"
+                        variant="outlined"
+                        action={
+                          <Button
+                            variant="contained"
+                            color="success"
+                            size="small"
+                            startIcon={
+                              actionLoading ? (
+                                <CircularProgress size={14} color="inherit" />
+                              ) : (
+                                <MergeIcon />
+                              )
+                            }
+                            onClick={handleExecute}
+                            disabled={actionLoading}
+                          >
+                            {t('changeRequest.actions.merge')}
+                          </Button>
+                        }
+                      >
+                        <Typography variant="body2" fontWeight={500}>
+                          ✓ {t('changeRequest.readyToMerge')}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {cr.approvals?.length || 0}{' '}
+                          {t('changeRequest.approvals')}
+                        </Typography>
+                      </Alert>
+                    )}
+
+                    {/* Applied status */}
+                    {cr.status === 'applied' && (
+                      <Alert
+                        severity="info"
+                        variant="outlined"
+                        action={
+                          <Button
+                            variant="outlined"
+                            color="warning"
+                            size="small"
+                            startIcon={<UndoIcon />}
+                            onClick={() => {
+                              setRollbackTargetId(changeRequestId);
+                              setRollbackPreviewOpen(true);
+                              onClose();
+                            }}
+                            disabled={actionLoading}
+                          >
+                            {t('changeRequest.actions.revert')}
+                          </Button>
+                        }
+                      >
+                        <Typography variant="body2" fontWeight={500}>
+                          ✓ {t('changeRequest.status.applied')}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('changeRequest.appliedMessage')}
+                        </Typography>
+                      </Alert>
+                    )}
+
+                    {/* Draft status */}
+                    {cr.status === 'draft' && (
+                      <>
+                        <Collapse in={!submitMode} timeout={300} unmountOnExit>
+                          <Box
+                            sx={{
+                              p: 2,
+                              borderRadius: 1,
+                              border: 1,
+                              borderColor: 'divider',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <Typography variant="body2" color="text.secondary">
+                              {t('changeRequest.draftMessage')}
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 1 }}>
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                color="error"
+                                startIcon={
+                                  actionLoading ? (
+                                    <CircularProgress
+                                      size={14}
+                                      color="inherit"
+                                    />
+                                  ) : (
+                                    <DeleteIcon />
+                                  )
+                                }
+                                onClick={handleDelete}
+                                disabled={actionLoading}
+                              >
+                                {t('common.delete')}
+                              </Button>
+                              <Button
+                                size="small"
+                                variant="contained"
+                                startIcon={<SendIcon />}
+                                onClick={enterSubmitMode}
+                                disabled={actionLoading}
+                              >
+                                {t('changeRequest.actions.readyForReview')}
+                              </Button>
+                            </Box>
+                          </Box>
+                        </Collapse>
+
+                        <Collapse
+                          in={submitMode}
+                          timeout={300}
+                          unmountOnExit
+                          onEntered={() => {
+                            setTimeout(
+                              () => submitTitleRef.current?.focus(),
+                              50
+                            );
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              p: 2,
+                              borderRadius: 1,
+                              border: 1,
+                              borderColor: 'divider',
+                            }}
+                          >
+                            <Box
                               sx={{
-                                mt: 1,
-                                p: 1.5,
-                                bgcolor:
-                                  event.type === 'rejected'
-                                    ? (theme) =>
-                                        alpha(theme.palette.error.main, 0.1)
-                                    : event.type === 'approved'
-                                      ? (theme) =>
-                                          alpha(theme.palette.success.main, 0.1)
-                                      : 'action.hover',
-                                borderColor:
-                                  event.type === 'rejected'
-                                    ? 'error.main'
-                                    : event.type === 'approved'
-                                      ? 'success.main'
-                                      : 'divider',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                mb: 2,
                               }}
                             >
                               <Typography
-                                variant="body2"
-                                sx={{ whiteSpace: 'pre-wrap' }}
+                                variant="subtitle1"
+                                fontWeight={600}
+                                sx={{ flex: 1 }}
                               >
-                                {event.comment}
+                                {t('changeRequest.submitPreviewTitle')}
                               </Typography>
-                            </Paper>
-                          )}
-                        </Box>
-                      </Box>
-                    ))}
-
-
-
-                  {/* === Status Action Area (aligned with timeline cards) === */}
-                  <Box sx={{ display: 'flex', mt: 0.5 }}>
-                    <Box sx={{ width: 72, flexShrink: 0 }} />
-                    <Box sx={{ width: 48, flexShrink: 0 }} />
-                    <Box sx={{ flex: 1, pl: 1.5 }}>
-
-                      {/* Review Box - Open status */}
-                      {cr.status === 'open' && (
-                        <Box sx={{ p: 2, borderRadius: 1, border: 1, borderColor: 'divider' }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                            <Typography variant="subtitle2">
-                              {t('changeRequest.addReview')}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                              {t('changeRequest.approvalProgress')}: {currentApprovals} / {requiredApprovals}
-                            </Typography>
-                          </Box>
-                          {!hasApproved ? (
-                            <>
-                              <TextField
-                                autoFocus
-                                fullWidth
-                                multiline
-                                rows={3}
-                                placeholder={t('changeRequest.leaveComment')}
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                                variant="outlined"
-                                size="small"
-                                sx={{ mb: 2 }}
-                              />
-                              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                                <Button
-                                  variant="outlined"
-                                  color="error"
-                                  size="small"
-                                  startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <CloseIcon />}
-                                  onClick={handleReject}
-                                  disabled={actionLoading || !comment.trim()}
-                                >
-                                  {t('changeRequest.actions.reject')}
-                                </Button>
-                                <Button
-                                  variant="contained"
-                                  color="success"
-                                  size="small"
-                                  startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <CheckIcon />}
-                                  onClick={handleApprove}
-                                  disabled={actionLoading}
-                                >
-                                  {t('changeRequest.actions.approve')}
-                                </Button>
-                              </Box>
-                            </>
-                          ) : (
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 2, flexDirection: 'column', gap: 1 }}>
-                              <CheckIcon color="success" sx={{ fontSize: 32 }} />
-                              <Typography variant="body2" color="text.secondary">
-                                {t('errors.CR_ALREADY_APPROVED')}
-                              </Typography>
-                            </Box>
-                          )}
-                        </Box>
-                      )}
-
-                      {/* Rejected status */}
-                      {cr.status === 'rejected' &&
-                        (cr.requesterId === String(user?.id) || hasAnyPermissions) && (
-                          <Alert
-                            severity="error"
-                            variant="outlined"
-                            action={
-                              <Button size="small" color="warning" startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <UndoIcon />} onClick={handleReopen} disabled={actionLoading}>
-                                {t('changeRequest.actions.reopen')}
-                              </Button>
-                            }
-                          >
-                            <Typography variant="body2" fontWeight={500}>
-                              {t('changeRequest.status.rejected')}
-                            </Typography>
-                          </Alert>
-                        )}
-
-                      {/* Conflict status */}
-                      {cr.status === 'conflict' &&
-                        (cr.requesterId === String(user?.id) || hasAnyPermissions) && (
-                          <Alert
-                            severity="warning"
-                            variant="outlined"
-                            action={
-                              <Button size="small" color="warning" startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <UndoIcon />} onClick={handleReopen} disabled={actionLoading}>
-                                {t('changeRequest.actions.reopen')}
-                              </Button>
-                            }
-                          >
-                            <Typography variant="body2" fontWeight={500}>
-                              ⚠️ {t('changeRequest.status.conflict')}
-                            </Typography>
-                            {cr.rejectionReason && (
-                              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                                {formatI18nText(cr.rejectionReason)}
-                              </Typography>
-                            )}
-                          </Alert>
-                        )}
-
-                      {/* Approved status - ready to merge */}
-                      {cr.status === 'approved' && (
-                        <Alert
-                          severity="success"
-                          variant="outlined"
-                          action={
-                            <Button
-                              variant="contained"
-                              color="success"
-                              size="small"
-                              startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <MergeIcon />}
-                              onClick={handleExecute}
-                              disabled={actionLoading}
-                            >
-                              {t('changeRequest.actions.merge')}
-                            </Button>
-                          }
-                        >
-                          <Typography variant="body2" fontWeight={500}>
-                            ✓ {t('changeRequest.readyToMerge')}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {cr.approvals?.length || 0} {t('changeRequest.approvals')}
-                          </Typography>
-                        </Alert>
-                      )}
-
-                      {/* Applied status */}
-                      {cr.status === 'applied' && (
-                        <Alert
-                          severity="info"
-                          variant="outlined"
-                          action={
-                            <Button
-                              variant="outlined"
-                              color="warning"
-                              size="small"
-                              startIcon={<UndoIcon />}
-                              onClick={() => {
-                                setRollbackTargetId(changeRequestId);
-                                setRollbackPreviewOpen(true);
-                                onClose();
-                              }}
-                              disabled={actionLoading}
-                            >
-                              {t('changeRequest.actions.revert')}
-                            </Button>
-                          }
-                        >
-                          <Typography variant="body2" fontWeight={500}>
-                            ✓ {t('changeRequest.status.applied')}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {t('changeRequest.appliedMessage')}
-                          </Typography>
-                        </Alert>
-                      )}
-
-                      {/* Draft status */}
-                      {cr.status === 'draft' && (
-                        <>
-                          <Collapse in={!submitMode} timeout={300} unmountOnExit>
-                            <Box sx={{ p: 2, borderRadius: 1, border: 1, borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <Typography variant="body2" color="text.secondary">
-                                {t('changeRequest.draftMessage')}
-                              </Typography>
-                              <Box sx={{ display: 'flex', gap: 1 }}>
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  color="error"
-                                  startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <DeleteIcon />}
-                                  onClick={handleDelete}
-                                  disabled={actionLoading}
-                                >
-                                  {t('common.delete')}
-                                </Button>
-                                <Button
-                                  size="small"
-                                  variant="contained"
-                                  startIcon={<SendIcon />}
-                                  onClick={enterSubmitMode}
-                                  disabled={actionLoading}
-                                >
-                                  {t('changeRequest.actions.readyForReview')}
-                                </Button>
-                              </Box>
-                            </Box>
-                          </Collapse>
-
-                          <Collapse in={submitMode} timeout={300} unmountOnExit onEntered={() => { setTimeout(() => submitTitleRef.current?.focus(), 50); }}>
-                            <Box sx={{ p: 2, borderRadius: 1, border: 1, borderColor: 'divider' }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                                <Typography variant="subtitle1" fontWeight={600} sx={{ flex: 1 }}>
-                                  {t('changeRequest.submitPreviewTitle')}
-                                </Typography>
-                                <Tooltip title={t('changeRequest.aiGenerateTooltip')} arrow>
-                                  <span>
-                                    <Button
-                                      size="small"
-                                      variant="outlined"
-                                      disabled={isGeneratingSummary}
-                                      startIcon={isGeneratingSummary ? <CircularProgress size={14} /> : <AutoFixHighIcon />}
-                                      onClick={async () => {
-                                        if (!cr) return;
-                                        setIsGeneratingSummary(true);
-                                        try {
-                                          const result = await changeRequestService.generateSummary(cr.id, projectApiPath, i18n.language);
-                                          if (result.title) setSubmitTitle(result.title);
-                                          if (result.description) setSubmitReason(result.description);
-                                        } catch (error: any) {
-                                          console.error('AI summary generation failed:', error);
-                                        } finally {
-                                          setIsGeneratingSummary(false);
-                                        }
-                                      }}
-                                      sx={{ minWidth: 'auto', whiteSpace: 'nowrap' }}
-                                    >
-                                      {t('changeRequest.aiGenerate', { defaultValue: '✨ AI' })}
-                                    </Button>
-                                  </span>
-                                </Tooltip>
-                              </Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                {t('changeRequest.submitPreviewDesc')}
-                              </Typography>
-
-                              <TextField
-                                fullWidth
-                                inputRef={submitTitleRef}
-                                label={t('changeRequest.submitDialog.titleField')}
-                                value={submitTitle}
-                                onChange={(e) => setSubmitTitle(e.target.value)}
-                                required
-                                size="small"
-                                sx={{ mb: 2 }}
-                              />
-                              <TextField
-                                fullWidth
-                                multiline
-                                minRows={4}
-                                label={t('changeRequest.submitDialog.reason')}
-                                value={submitReason}
-                                onChange={(e) => setSubmitReason(e.target.value)}
-                                required
-                                helperText={t('changeRequest.submitDialog.reasonRequired')}
-                                size="small"
-                                sx={{ mb: 2, '& .MuiInputBase-inputMultiline': { resize: 'vertical' } }}
-                              />
-
-                              <Divider sx={{ mb: 2 }} />
-                              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                                {t('changeRequest.selectChanges')} ({submitSelectedCount}/{submitTotalCount})
-                              </Typography>
-
-                              {allChanges.map((item) => {
-                                const changeItem = cr.changeItems?.find(
-                                  (ci) => ci.targetId === item.targetId && ci.targetTable === item.table
-                                );
-                                const itemId = changeItem?.id || item.targetId;
-                                return (
-                                  <Paper key={itemId} variant="outlined" sx={{ mb: 1.5, overflow: 'hidden', opacity: submitCheckedItems[itemId] === false ? 0.5 : 1 }}>
-                                    <Box sx={{ px: 1.5, py: 0.75, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                      <Checkbox
-                                        checked={submitCheckedItems[itemId] ?? true}
-                                        onChange={(e) => handleSubmitItemCheck(itemId, changeItem?.actionGroupId, e.target.checked)}
-                                        size="small"
-                                      />
-                                      <EditIcon fontSize="small" sx={{ color: 'warning.main' }} />
-                                      <Typography variant="body2" sx={{ fontSize: 13, flex: 1 }}>
-                                        {formatChangeItemLabel(item.table, item.targetId, item.afterData || null, item.displayName, t, item.beforeData)}
-                                      </Typography>
-                                      <Chip
-                                        label={item.operation === 'create' ? t('changeRequest.operationCreate') : item.operation === 'delete' ? t('changeRequest.operationDelete') : t('changeRequest.operationUpdate')}
-                                        size="small"
-                                        color={item.operation === 'delete' ? 'error' : item.operation === 'create' ? 'success' : 'warning'}
-                                        sx={{ height: 18, fontSize: 10 }}
-                                      />
-                                    </Box>
-                                  </Paper>
-                                );
-                              })}
-
-                              {submitSelectedCount < submitTotalCount && (
-                                <Alert severity="warning" sx={{ mb: 2, mt: 1 }}>
-                                  {t('changeRequest.submitExcludeWarning', { count: submitTotalCount - submitSelectedCount })}
-                                </Alert>
-                              )}
-
-                              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
-                                <Button onClick={() => setSubmitMode(false)}>{t('common.cancel')}</Button>
-                                <Button
-                                  variant="contained"
-                                  startIcon={isSubmitting ? <CircularProgress size={16} /> : <SendIcon />}
-                                  onClick={handleSubmitCR}
-                                  disabled={isSubmitting || submitSelectedCount === 0 || !submitTitle.trim() || !submitReason.trim()}
-                                >
-                                  {t('changeRequest.actions.submit')}
-                                </Button>
-                              </Box>
-                            </Box>
-                          </Collapse>
-                        </>
-                      )}
-
-                  </Box>
-                  </Box>
-
-                  <Divider sx={{ mt: 3, mb: 2 }} />
-
-                  {/* === Change Details (full-width below timeline) === */}
-                  <Paper variant="outlined" sx={{ mt: 2, overflow: 'hidden' }}>
-                    <Box
-                      sx={{ px: 2, py: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', bgcolor: 'action.hover' }}
-                      onClick={() => setExpandedGroups((prev) => ({ ...prev, __changeDetails: !prev.__changeDetails }))}
-                    >
-                      <Typography variant="subtitle2" fontWeight={600}>
-                        {t('changeRequest.filesChanged')} ({totalChanges})
-                      </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        {expandedGroups.__changeDetails && (
-                          <>
-                            <Button
-                              size="small"
-                              variant="text"
-                              sx={{ minWidth: 'auto', fontSize: 12, px: 0.5, py: 0 }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const newState: Record<string, boolean> = { __changeDetails: true };
-                                if (groupedChanges) {
-                                  groupedChanges.forEach((g) => {
-                                    newState[g.id] = true;
-                                    g.items.forEach((item) => { newState[`item_${item.targetId}`] = true; });
-                                  });
-                                }
-                                setExpandedGroups((prev) => ({ ...prev, ...newState }));
-                              }}
-                            >
-                              {t('common.expandAll')}
-                            </Button>
-                            <Typography variant="caption" color="text.disabled">/</Typography>
-                            <Button
-                              size="small"
-                              variant="text"
-                              sx={{ minWidth: 'auto', fontSize: 12, px: 0.5, py: 0 }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const newState: Record<string, boolean> = { __changeDetails: true };
-                                if (groupedChanges) {
-                                  groupedChanges.forEach((g) => {
-                                    newState[g.id] = false;
-                                    g.items.forEach((item) => { newState[`item_${item.targetId}`] = false; });
-                                  });
-                                }
-                                setExpandedGroups((prev) => ({ ...prev, ...newState }));
-                              }}
-                            >
-                              {t('common.collapseAll')}
-                            </Button>
-                          </>
-                        )}
-                        <ExpandMoreIcon
-                          sx={{
-                            fontSize: 20,
-                            color: 'text.secondary',
-                            transition: 'transform 0.2s',
-                            transform: expandedGroups.__changeDetails ? 'rotate(180deg)' : 'rotate(0deg)',
-                          }}
-                        />
-                      </Box>
-                    </Box>
-                    <Collapse in={expandedGroups.__changeDetails ?? false} timeout="auto">
-                      <Box sx={{ p: 2 }}>
-                        {groupedChanges
-                          ? groupedChanges.map((group) => {
-                              const config = getActionTypeConfig(group.actionType);
-                              const isExpanded = expandedGroups[group.id] === true;
-                              return (
-                                <Paper key={group.id} variant="outlined" sx={{ mb: 2, overflow: 'hidden' }}>
-                                  <Box
-                                    sx={{ px: 2, py: 1.5, bgcolor: 'action.hover', display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
-                                    onClick={() => setExpandedGroups((prev) => ({ ...prev, [group.id]: !prev[group.id] }))}
-                                  >
-                                    {config.icon}
-                                    <Typography variant="subtitle2" fontWeight={600} sx={{ flex: 1 }}>
-                                      {config.label}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                      {group.items.length} {t('changeRequest.itemCount')}
-                                    </Typography>
-                                    <ExpandMoreIcon sx={{ fontSize: 20, color: 'text.secondary', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-                                  </Box>
-                                  <Collapse in={isExpanded} timeout="auto">
-                                    <Box sx={{ p: 2 }}>
-                                      {group.items.map((item) => {
-                                        const isItemExpanded = expandedGroups[`item_${item.targetId}`] ?? false;
-                                        return (
-                                          <Box key={item.targetId} sx={{ mb: 1.5 }}>
-                                            <Box
-                                              sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.75, cursor: item.operation === 'delete' ? 'default' : 'pointer' }}
-                                              onClick={item.operation === 'delete' ? undefined : () => setExpandedGroups((prev) => ({ ...prev, [`item_${item.targetId}`]: !prev[`item_${item.targetId}`] }))}
-                                            >
-                                              {item.operation !== 'delete' && (
-                                                <ExpandMoreIcon sx={{ fontSize: 16, color: 'text.secondary', transition: 'transform 0.2s', transform: isItemExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-                                              )}
-                                              <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                                                {formatChangeItemLabel(item.table, item.targetId, item?.afterData, item?.displayName, t, item?.beforeData)}
-                                              </Typography>
-                                              <Chip label={item.operation === 'create' ? t('changeRequest.operationCreate') : item.operation === 'delete' ? t('changeRequest.operationDelete') : t('changeRequest.operationUpdate')} size="small" sx={{ height: 18, fontSize: 10, bgcolor: item.operation === 'create' ? 'success.main' : item.operation === 'delete' ? 'error.main' : 'primary.main', color: '#fff' }} />
-                                              <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                {item.table !== 'g_feature_flags' && cr?.environmentModel?.displayName && (
-                                                  <Chip label={cr.environmentModel.displayName} size="small" variant="outlined" sx={{ height: 16, fontSize: 9, fontWeight: 500 }} />
-                                                )}
-                                                {item.table !== 'g_feature_flags' && item.operation === 'update' && `${item.changes.length} ops`}
-                                              </Typography>
-                                            </Box>
-                                            {item.operation !== 'delete' ? (
-                                              <Collapse in={isItemExpanded} timeout="auto">
-                                                <Box sx={{ px: 2, py: 1 }}>
-                                                  <ChangeItemDiffDisplay item={item} envNameMap={envNameMap} formatFieldName={formatFieldName} formatValue={formatValue} />
-                                                </Box>
-                                              </Collapse>
-                                            ) : (
-                                              <Typography variant="caption" color="text.disabled" sx={{ pl: 3 }}>
-                                                ID: {item.targetId}
-                                              </Typography>
-                                            )}
-                                          </Box>
+                              <Tooltip
+                                title={t('changeRequest.aiGenerateTooltip')}
+                                arrow
+                              >
+                                <span>
+                                  <Button
+                                    size="small"
+                                    variant="outlined"
+                                    disabled={isGeneratingSummary}
+                                    startIcon={
+                                      isGeneratingSummary ? (
+                                        <CircularProgress size={14} />
+                                      ) : (
+                                        <AutoFixHighIcon />
+                                      )
+                                    }
+                                    onClick={async () => {
+                                      if (!cr) return;
+                                      setIsGeneratingSummary(true);
+                                      try {
+                                        const result =
+                                          await changeRequestService.generateSummary(
+                                            cr.id,
+                                            projectApiPath,
+                                            i18n.language
+                                          );
+                                        if (result.title)
+                                          setSubmitTitle(result.title);
+                                        if (result.description)
+                                          setSubmitReason(result.description);
+                                      } catch (error: any) {
+                                        console.error(
+                                          'AI summary generation failed:',
+                                          error
                                         );
-                                      })}
-                                    </Box>
-                                  </Collapse>
+                                      } finally {
+                                        setIsGeneratingSummary(false);
+                                      }
+                                    }}
+                                    sx={{
+                                      minWidth: 'auto',
+                                      whiteSpace: 'nowrap',
+                                    }}
+                                  >
+                                    {t('changeRequest.aiGenerate', {
+                                      defaultValue: '✨ AI',
+                                    })}
+                                  </Button>
+                                </span>
+                              </Tooltip>
+                            </Box>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ mb: 2 }}
+                            >
+                              {t('changeRequest.submitPreviewDesc')}
+                            </Typography>
+
+                            <TextField
+                              fullWidth
+                              inputRef={submitTitleRef}
+                              label={t('changeRequest.submitDialog.titleField')}
+                              value={submitTitle}
+                              onChange={(e) => setSubmitTitle(e.target.value)}
+                              required
+                              size="small"
+                              sx={{ mb: 2 }}
+                            />
+                            <TextField
+                              fullWidth
+                              multiline
+                              minRows={4}
+                              label={t('changeRequest.submitDialog.reason')}
+                              value={submitReason}
+                              onChange={(e) => setSubmitReason(e.target.value)}
+                              required
+                              helperText={t(
+                                'changeRequest.submitDialog.reasonRequired'
+                              )}
+                              size="small"
+                              sx={{
+                                mb: 2,
+                                '& .MuiInputBase-inputMultiline': {
+                                  resize: 'vertical',
+                                },
+                              }}
+                            />
+
+                            <Divider sx={{ mb: 2 }} />
+                            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                              {t('changeRequest.selectChanges')} (
+                              {submitSelectedCount}/{submitTotalCount})
+                            </Typography>
+
+                            {allChanges.map((item) => {
+                              const changeItem = cr.changeItems?.find(
+                                (ci) =>
+                                  ci.targetId === item.targetId &&
+                                  ci.targetTable === item.table
+                              );
+                              const itemId = changeItem?.id || item.targetId;
+                              return (
+                                <Paper
+                                  key={itemId}
+                                  variant="outlined"
+                                  sx={{
+                                    mb: 1.5,
+                                    overflow: 'hidden',
+                                    opacity:
+                                      submitCheckedItems[itemId] === false
+                                        ? 0.5
+                                        : 1,
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      px: 1.5,
+                                      py: 0.75,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    <Checkbox
+                                      checked={
+                                        submitCheckedItems[itemId] ?? true
+                                      }
+                                      onChange={(e) =>
+                                        handleSubmitItemCheck(
+                                          itemId,
+                                          changeItem?.actionGroupId,
+                                          e.target.checked
+                                        )
+                                      }
+                                      size="small"
+                                    />
+                                    <EditIcon
+                                      fontSize="small"
+                                      sx={{ color: 'warning.main' }}
+                                    />
+                                    <Typography
+                                      variant="body2"
+                                      sx={{ fontSize: 13, flex: 1 }}
+                                    >
+                                      {formatChangeItemLabel(
+                                        item.table,
+                                        item.targetId,
+                                        item.afterData || null,
+                                        item.displayName,
+                                        t,
+                                        item.beforeData
+                                      )}
+                                    </Typography>
+                                    <Chip
+                                      label={
+                                        item.operation === 'create'
+                                          ? t('changeRequest.operationCreate')
+                                          : item.operation === 'delete'
+                                            ? t('changeRequest.operationDelete')
+                                            : t('changeRequest.operationUpdate')
+                                      }
+                                      size="small"
+                                      color={
+                                        item.operation === 'delete'
+                                          ? 'error'
+                                          : item.operation === 'create'
+                                            ? 'success'
+                                            : 'warning'
+                                      }
+                                      sx={{ height: 18, fontSize: 10 }}
+                                    />
+                                  </Box>
                                 </Paper>
                               );
-                            })
-                          : allChanges.map((item, idx) => (
-                              <Paper key={idx} variant="outlined" sx={{ mb: 1.5, overflow: 'hidden' }}>
-                                <Box sx={{ px: 2, py: 1, bgcolor: 'action.hover', borderBottom: 1, borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600, flex: 1 }}>
-                                    {formatChangeItemLabel(item.table, item.targetId, item?.afterData, item?.displayName, t, item?.beforeData)}
-                                  </Typography>
-                                  <Chip label={item.operation === 'create' ? t('changeRequest.operationCreate') : item.operation === 'delete' ? t('changeRequest.operationDelete') : t('changeRequest.operationUpdate')} size="small" sx={{ height: 20, fontSize: 11, bgcolor: item.operation === 'create' ? 'success.main' : item.operation === 'delete' ? 'error.main' : 'primary.main', color: '#fff' }} />
-                                  {item.table !== 'g_feature_flags' && cr?.environmentModel?.displayName && (
-                                    <Chip label={cr.environmentModel.displayName} size="small" variant="outlined" sx={{ height: 18, fontSize: 10, fontWeight: 500 }} />
-                                  )}
-                                </Box>
-                                <Box sx={{ px: 2, py: 1 }}>
-                                  <ChangeItemDiffDisplay item={item} envNameMap={envNameMap} formatFieldName={formatFieldName} formatValue={formatValue} />
-                                </Box>
-                              </Paper>
-                            ))}
-                      </Box>
-                    </Collapse>
-                  </Paper>
+                            })}
+
+                            {submitSelectedCount < submitTotalCount && (
+                              <Alert severity="warning" sx={{ mb: 2, mt: 1 }}>
+                                {t('changeRequest.submitExcludeWarning', {
+                                  count: submitTotalCount - submitSelectedCount,
+                                })}
+                              </Alert>
+                            )}
+
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                gap: 1,
+                                justifyContent: 'flex-end',
+                                mt: 2,
+                              }}
+                            >
+                              <Button onClick={() => setSubmitMode(false)}>
+                                {t('common.cancel')}
+                              </Button>
+                              <Button
+                                variant="contained"
+                                startIcon={
+                                  isSubmitting ? (
+                                    <CircularProgress size={16} />
+                                  ) : (
+                                    <SendIcon />
+                                  )
+                                }
+                                onClick={handleSubmitCR}
+                                disabled={
+                                  isSubmitting ||
+                                  submitSelectedCount === 0 ||
+                                  !submitTitle.trim() ||
+                                  !submitReason.trim()
+                                }
+                              >
+                                {t('changeRequest.actions.submit')}
+                              </Button>
+                            </Box>
+                          </Box>
+                        </Collapse>
+                      </>
+                    )}
+                  </Box>
                 </Box>
 
+                <Divider sx={{ mt: 3, mb: 2 }} />
+
+                {/* === Change Details (full-width below timeline) === */}
+                <Paper variant="outlined" sx={{ mt: 2, overflow: 'hidden' }}>
+                  <Box
+                    sx={{
+                      px: 2,
+                      py: 1.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: 'pointer',
+                      bgcolor: 'action.hover',
+                    }}
+                    onClick={() =>
+                      setExpandedGroups((prev) => ({
+                        ...prev,
+                        __changeDetails: !prev.__changeDetails,
+                      }))
+                    }
+                  >
+                    <Typography variant="subtitle2" fontWeight={600}>
+                      {t('changeRequest.filesChanged')} ({totalChanges})
+                    </Typography>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      {expandedGroups.__changeDetails && (
+                        <>
+                          <Button
+                            size="small"
+                            variant="text"
+                            sx={{
+                              minWidth: 'auto',
+                              fontSize: 12,
+                              px: 0.5,
+                              py: 0,
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const newState: Record<string, boolean> = {
+                                __changeDetails: true,
+                              };
+                              if (groupedChanges) {
+                                groupedChanges.forEach((g) => {
+                                  newState[g.id] = true;
+                                  g.items.forEach((item) => {
+                                    newState[`item_${item.targetId}`] = true;
+                                  });
+                                });
+                              }
+                              setExpandedGroups((prev) => ({
+                                ...prev,
+                                ...newState,
+                              }));
+                            }}
+                          >
+                            {t('common.expandAll')}
+                          </Button>
+                          <Typography variant="caption" color="text.disabled">
+                            /
+                          </Typography>
+                          <Button
+                            size="small"
+                            variant="text"
+                            sx={{
+                              minWidth: 'auto',
+                              fontSize: 12,
+                              px: 0.5,
+                              py: 0,
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const newState: Record<string, boolean> = {
+                                __changeDetails: true,
+                              };
+                              if (groupedChanges) {
+                                groupedChanges.forEach((g) => {
+                                  newState[g.id] = false;
+                                  g.items.forEach((item) => {
+                                    newState[`item_${item.targetId}`] = false;
+                                  });
+                                });
+                              }
+                              setExpandedGroups((prev) => ({
+                                ...prev,
+                                ...newState,
+                              }));
+                            }}
+                          >
+                            {t('common.collapseAll')}
+                          </Button>
+                        </>
+                      )}
+                      <ExpandMoreIcon
+                        sx={{
+                          fontSize: 20,
+                          color: 'text.secondary',
+                          transition: 'transform 0.2s',
+                          transform: expandedGroups.__changeDetails
+                            ? 'rotate(180deg)'
+                            : 'rotate(0deg)',
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                  <Collapse
+                    in={expandedGroups.__changeDetails ?? false}
+                    timeout="auto"
+                  >
+                    <Box sx={{ p: 2 }}>
+                      {groupedChanges
+                        ? groupedChanges.map((group) => {
+                            const config = getActionTypeConfig(
+                              group.actionType
+                            );
+                            const isExpanded =
+                              expandedGroups[group.id] === true;
+                            return (
+                              <Paper
+                                key={group.id}
+                                variant="outlined"
+                                sx={{ mb: 2, overflow: 'hidden' }}
+                              >
+                                <Box
+                                  sx={{
+                                    px: 2,
+                                    py: 1.5,
+                                    bgcolor: 'action.hover',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                    cursor: 'pointer',
+                                  }}
+                                  onClick={() =>
+                                    setExpandedGroups((prev) => ({
+                                      ...prev,
+                                      [group.id]: !prev[group.id],
+                                    }))
+                                  }
+                                >
+                                  {config.icon}
+                                  <Typography
+                                    variant="subtitle2"
+                                    fontWeight={600}
+                                    sx={{ flex: 1 }}
+                                  >
+                                    {config.label}
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    {group.items.length}{' '}
+                                    {t('changeRequest.itemCount')}
+                                  </Typography>
+                                  <ExpandMoreIcon
+                                    sx={{
+                                      fontSize: 20,
+                                      color: 'text.secondary',
+                                      transition: 'transform 0.2s',
+                                      transform: isExpanded
+                                        ? 'rotate(180deg)'
+                                        : 'rotate(0deg)',
+                                    }}
+                                  />
+                                </Box>
+                                <Collapse in={isExpanded} timeout="auto">
+                                  <Box sx={{ p: 2 }}>
+                                    {group.items.map((item) => {
+                                      const isItemExpanded =
+                                        expandedGroups[
+                                          `item_${item.targetId}`
+                                        ] ?? false;
+                                      return (
+                                        <Box
+                                          key={item.targetId}
+                                          sx={{ mb: 1.5 }}
+                                        >
+                                          <Box
+                                            sx={{
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: 1,
+                                              py: 0.75,
+                                              cursor:
+                                                item.operation === 'delete'
+                                                  ? 'default'
+                                                  : 'pointer',
+                                            }}
+                                            onClick={
+                                              item.operation === 'delete'
+                                                ? undefined
+                                                : () =>
+                                                    setExpandedGroups(
+                                                      (prev) => ({
+                                                        ...prev,
+                                                        [`item_${item.targetId}`]:
+                                                          !prev[
+                                                            `item_${item.targetId}`
+                                                          ],
+                                                      })
+                                                    )
+                                            }
+                                          >
+                                            {item.operation !== 'delete' && (
+                                              <ExpandMoreIcon
+                                                sx={{
+                                                  fontSize: 16,
+                                                  color: 'text.secondary',
+                                                  transition: 'transform 0.2s',
+                                                  transform: isItemExpanded
+                                                    ? 'rotate(180deg)'
+                                                    : 'rotate(0deg)',
+                                                }}
+                                              />
+                                            )}
+                                            <Typography
+                                              variant="caption"
+                                              sx={{
+                                                fontFamily: 'monospace',
+                                                fontWeight: 600,
+                                              }}
+                                            >
+                                              {formatChangeItemLabel(
+                                                item.table,
+                                                item.targetId,
+                                                item?.afterData,
+                                                item?.displayName,
+                                                t,
+                                                item?.beforeData
+                                              )}
+                                            </Typography>
+                                            <Chip
+                                              label={
+                                                item.operation === 'create'
+                                                  ? t(
+                                                      'changeRequest.operationCreate'
+                                                    )
+                                                  : item.operation === 'delete'
+                                                    ? t(
+                                                        'changeRequest.operationDelete'
+                                                      )
+                                                    : t(
+                                                        'changeRequest.operationUpdate'
+                                                      )
+                                              }
+                                              size="small"
+                                              sx={{
+                                                height: 18,
+                                                fontSize: 10,
+                                                bgcolor:
+                                                  item.operation === 'create'
+                                                    ? 'success.main'
+                                                    : item.operation ===
+                                                        'delete'
+                                                      ? 'error.main'
+                                                      : 'primary.main',
+                                                color: '#fff',
+                                              }}
+                                            />
+                                            <Typography
+                                              variant="caption"
+                                              color="text.secondary"
+                                              sx={{
+                                                ml: 'auto',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 0.5,
+                                              }}
+                                            >
+                                              {item.table !==
+                                                'g_feature_flags' &&
+                                                cr?.environmentModel
+                                                  ?.displayName && (
+                                                  <Chip
+                                                    label={
+                                                      cr.environmentModel
+                                                        .displayName
+                                                    }
+                                                    size="small"
+                                                    variant="outlined"
+                                                    sx={{
+                                                      height: 16,
+                                                      fontSize: 9,
+                                                      fontWeight: 500,
+                                                    }}
+                                                  />
+                                                )}
+                                              {item.table !==
+                                                'g_feature_flags' &&
+                                                item.operation === 'update' &&
+                                                `${item.changes.length} ops`}
+                                            </Typography>
+                                          </Box>
+                                          {item.operation !== 'delete' ? (
+                                            <Collapse
+                                              in={isItemExpanded}
+                                              timeout="auto"
+                                            >
+                                              <Box sx={{ px: 2, py: 1 }}>
+                                                <ChangeItemDiffDisplay
+                                                  item={item}
+                                                  envNameMap={envNameMap}
+                                                  formatFieldName={
+                                                    formatFieldName
+                                                  }
+                                                  formatValue={formatValue}
+                                                />
+                                              </Box>
+                                            </Collapse>
+                                          ) : (
+                                            <Typography
+                                              variant="caption"
+                                              color="text.disabled"
+                                              sx={{ pl: 3 }}
+                                            >
+                                              ID: {item.targetId}
+                                            </Typography>
+                                          )}
+                                        </Box>
+                                      );
+                                    })}
+                                  </Box>
+                                </Collapse>
+                              </Paper>
+                            );
+                          })
+                        : allChanges.map((item, idx) => (
+                            <Paper
+                              key={idx}
+                              variant="outlined"
+                              sx={{ mb: 1.5, overflow: 'hidden' }}
+                            >
+                              <Box
+                                sx={{
+                                  px: 2,
+                                  py: 1,
+                                  bgcolor: 'action.hover',
+                                  borderBottom: 1,
+                                  borderColor: 'divider',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1,
+                                }}
+                              >
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontFamily: 'monospace',
+                                    fontWeight: 600,
+                                    flex: 1,
+                                  }}
+                                >
+                                  {formatChangeItemLabel(
+                                    item.table,
+                                    item.targetId,
+                                    item?.afterData,
+                                    item?.displayName,
+                                    t,
+                                    item?.beforeData
+                                  )}
+                                </Typography>
+                                <Chip
+                                  label={
+                                    item.operation === 'create'
+                                      ? t('changeRequest.operationCreate')
+                                      : item.operation === 'delete'
+                                        ? t('changeRequest.operationDelete')
+                                        : t('changeRequest.operationUpdate')
+                                  }
+                                  size="small"
+                                  sx={{
+                                    height: 20,
+                                    fontSize: 11,
+                                    bgcolor:
+                                      item.operation === 'create'
+                                        ? 'success.main'
+                                        : item.operation === 'delete'
+                                          ? 'error.main'
+                                          : 'primary.main',
+                                    color: '#fff',
+                                  }}
+                                />
+                                {item.table !== 'g_feature_flags' &&
+                                  cr?.environmentModel?.displayName && (
+                                    <Chip
+                                      label={cr.environmentModel.displayName}
+                                      size="small"
+                                      variant="outlined"
+                                      sx={{
+                                        height: 18,
+                                        fontSize: 10,
+                                        fontWeight: 500,
+                                      }}
+                                    />
+                                  )}
+                              </Box>
+                              <Box sx={{ px: 2, py: 1 }}>
+                                <ChangeItemDiffDisplay
+                                  item={item}
+                                  envNameMap={envNameMap}
+                                  formatFieldName={formatFieldName}
+                                  formatValue={formatValue}
+                                />
+                              </Box>
+                            </Paper>
+                          ))}
+                    </Box>
+                  </Collapse>
+                </Paper>
+              </Box>
             </Box>
           </Box>
         )}
@@ -1758,8 +2284,6 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
           onRefresh?.();
         }}
       />
-
-
     </>
   );
 };

@@ -904,10 +904,12 @@ export class ClientVersionController {
         // Only include maintenance-related fields when status is MAINTENANCE
         if (value.clientStatus === ClientStatus.MAINTENANCE) {
           if (bulkUpdateData.maintenanceStartDate !== undefined) {
-            updateDataAttrs.maintenanceStartDate = bulkUpdateData.maintenanceStartDate;
+            updateDataAttrs.maintenanceStartDate =
+              bulkUpdateData.maintenanceStartDate;
           }
           if (bulkUpdateData.maintenanceEndDate !== undefined) {
-            updateDataAttrs.maintenanceEndDate = bulkUpdateData.maintenanceEndDate;
+            updateDataAttrs.maintenanceEndDate =
+              bulkUpdateData.maintenanceEndDate;
           }
           if (value.maintenanceMessage !== undefined) {
             updateDataAttrs.maintenanceMessage = value.maintenanceMessage;

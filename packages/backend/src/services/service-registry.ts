@@ -98,12 +98,7 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
       // Apply tags independently - even if DB update was already done
       // (e.g., during CR execution where the transaction already updated the row)
       if (tagIds && Array.isArray(tagIds)) {
-        await TagService.setTagsForEntity(
-          'client_version',
-          id,
-          tagIds,
-          userId
-        );
+        await TagService.setTagsForEntity('client_version', id, tagIds, userId);
       }
       try {
         const result = await ClientVersionService.updateClientVersion(
@@ -149,12 +144,7 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
         environmentId
       );
       if (tagIds && Array.isArray(tagIds)) {
-        await TagService.setTagsForEntity(
-          'store_product',
-          id,
-          tagIds,
-          userId
-        );
+        await TagService.setTagsForEntity('store_product', id, tagIds, userId);
       }
       return result;
     },
@@ -244,12 +234,7 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
         environmentId
       );
       if (tagIds && Array.isArray(tagIds)) {
-        await TagService.setTagsForEntity(
-          'game_world',
-          id,
-          tagIds,
-          userId
-        );
+        await TagService.setTagsForEntity('game_world', id, tagIds, userId);
       }
       return result;
     },

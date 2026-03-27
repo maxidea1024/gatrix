@@ -251,7 +251,10 @@ const BannerManagementPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingBanner) return;
     try {
-      const result = await bannerService.deleteBanner(projectApiPath, deletingBanner.bannerId);
+      const result = await bannerService.deleteBanner(
+        projectApiPath,
+        deletingBanner.bannerId
+      );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
       } else {
@@ -805,7 +808,9 @@ const BannerManagementPage: React.FC = () => {
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{getActionLabel('delete', requiresApproval, t)}</ListItemText>
+          <ListItemText>
+            {getActionLabel('delete', requiresApproval, t)}
+          </ListItemText>
         </MenuItem>
       </Menu>
 

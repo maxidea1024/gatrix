@@ -277,7 +277,10 @@ export class ChangeRequestService {
 
       if (existingItem) {
         // Update existing item's ops
-        const displayName = resolveEntityLabel(targetTable, afterData || beforeData);
+        const displayName = resolveEntityLabel(
+          targetTable,
+          afterData || beforeData
+        );
         await ChangeItem.query()
           .findById(existingItem.id)
           .patch({ ops, opType, ...(displayName && { displayName }) });
@@ -321,7 +324,10 @@ export class ChangeRequestService {
         }
 
         // Insert ChangeItem with ops
-        const displayName = resolveEntityLabel(targetTable, afterData || beforeData);
+        const displayName = resolveEntityLabel(
+          targetTable,
+          afterData || beforeData
+        );
         await ChangeItem.query().insert({
           id: ulid(),
           changeRequestId: cr.id,
@@ -333,7 +339,6 @@ export class ChangeRequestService {
           ...(displayName && { displayName }),
         });
       }
-
 
       return { changeRequestId: cr.id, status: cr.status };
     } catch (error) {
@@ -388,7 +393,9 @@ export class ChangeRequestService {
         .first();
 
       if (existingItemForTarget) {
-        cr = await ChangeRequest.query().findById(existingItemForTarget.changeRequestId);
+        cr = await ChangeRequest.query().findById(
+          existingItemForTarget.changeRequestId
+        );
       }
 
       // Fallback: look for any draft CR by this user for this environment
@@ -565,7 +572,6 @@ export class ChangeRequestService {
       description?: string;
       reason?: string;
       impactAnalysis?: string;
-
     }
   ): Promise<ChangeRequest> {
     const cr = await ChangeRequest.query().findById(changeRequestId);
@@ -1231,7 +1237,10 @@ export class ChangeRequestService {
                   .replace('T', ' ');
               }
               // Set createdBy for new records only if the table has the column
-              if (validColumns.has('createdBy') && dbData.createdBy === undefined) {
+              if (
+                validColumns.has('createdBy') &&
+                dbData.createdBy === undefined
+              ) {
                 dbData.createdBy = userId;
               }
               // Check if table has a version column
@@ -1239,7 +1248,11 @@ export class ChangeRequestService {
                 `SHOW COLUMNS FROM ${item.targetTable} WHERE Field = 'version'`
               );
               // Set initial version for new records
-              if (versionCols && versionCols.length > 0 && dbData.version === undefined) {
+              if (
+                versionCols &&
+                versionCols.length > 0 &&
+                dbData.version === undefined
+              ) {
                 dbData.version = 1;
               }
               const [result] = await trx(item.targetTable).insert(dbData);
@@ -1334,7 +1347,11 @@ export class ChangeRequestService {
                 `SHOW COLUMNS FROM ${item.targetTable} WHERE Field = 'version'`
               );
               // Set initial version for new records
-              if (versionCols && versionCols.length > 0 && dbData.version === undefined) {
+              if (
+                versionCols &&
+                versionCols.length > 0 &&
+                dbData.version === undefined
+              ) {
                 dbData.version = 1;
               }
 
@@ -1567,7 +1584,6 @@ export class ChangeRequestService {
         environmentId: originalCr.environmentId,
         status: 'open',
         type: 'revert',
-
       });
 
       // Process items - Generate inverse operations
@@ -1737,9 +1753,13 @@ export class ChangeRequestService {
       .joinRelated('environmentModel')
       .where('environmentModel.projectId', projectId)
       .where((builder) => {
-        builder.whereNot('g_change_requests.status', 'draft').orWhere((subBuilder) => {
-          subBuilder.where('g_change_requests.status', 'draft').where('g_change_requests.requesterId', userId);
-        });
+        builder
+          .whereNot('g_change_requests.status', 'draft')
+          .orWhere((subBuilder) => {
+            subBuilder
+              .where('g_change_requests.status', 'draft')
+              .where('g_change_requests.requesterId', userId);
+          });
       })
       .groupBy('g_change_requests.status')
       .select('g_change_requests.status')

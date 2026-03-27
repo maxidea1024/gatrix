@@ -421,7 +421,11 @@ const WorkspacePage: React.FC = () => {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => {
-                setCreateData({ orgName: '', displayName: '', description: '' });
+                setCreateData({
+                  orgName: '',
+                  displayName: '',
+                  description: '',
+                });
                 setCreateDrawerOpen(true);
               }}
             >

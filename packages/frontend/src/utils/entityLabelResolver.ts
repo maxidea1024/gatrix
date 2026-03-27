@@ -164,6 +164,9 @@ export function formatChangeItemLabel(
 ): string {
   const tableLabel = resolveTableDisplayName(tableName, t);
   const entityLabel =
-    displayName || resolveEntityLabel(tableName, data) || resolveEntityLabel(tableName, beforeData || null) || targetId;
+    displayName ||
+    resolveEntityLabel(tableName, data) ||
+    resolveEntityLabel(tableName, beforeData || null) ||
+    targetId;
   return `${tableLabel}: ${entityLabel}`;
 }

@@ -648,7 +648,9 @@ const RewardTemplatesPage: React.FC = () => {
                       variant: 'success',
                     });
                   } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+                    enqueueSnackbar(t('common.exportFailed'), {
+                      variant: 'error',
+                    });
                   }
                 }}
                 onImportClick={() => {

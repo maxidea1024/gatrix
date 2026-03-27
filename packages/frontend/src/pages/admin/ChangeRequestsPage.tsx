@@ -378,10 +378,14 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
     }
     setActionLoading(true);
     try {
-      await changeRequestService.submit(cr.id, {
-        title: submitTitle.trim(),
-        reason: submitReason.trim(),
-      }, projectApiPath);
+      await changeRequestService.submit(
+        cr.id,
+        {
+          title: submitTitle.trim(),
+          reason: submitReason.trim(),
+        },
+        projectApiPath
+      );
       enqueueSnackbar(t('changeRequest.messages.submitted'), {
         variant: 'success',
       });
@@ -821,7 +825,10 @@ const ChangeRequestsPage: React.FC = () => {
             projectApiPath={projectApiPath}
           />
         ) : !data?.items || data.items.length === 0 ? (
-          <EmptyPlaceholder message={t('changeRequest.noRequests')} minHeight={200} />
+          <EmptyPlaceholder
+            message={t('changeRequest.noRequests')}
+            minHeight={200}
+          />
         ) : (
           <Card variant="outlined" sx={{ position: 'relative' }}>
             <TableContainer
