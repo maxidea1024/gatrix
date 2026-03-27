@@ -1622,6 +1622,8 @@ const FeatureFlagDetailPage: React.FC = () => {
     );
 
     setFlagDraftStatus((prev) => ({ ...prev, hasDraft: true }));
+    // Notify MainLayout to refresh floating CR banner
+    window.dispatchEvent(new CustomEvent('cr-draft-changed'));
   };
 
   const handleSaveStrategy = async () => {
@@ -1784,13 +1786,38 @@ const FeatureFlagDetailPage: React.FC = () => {
     if (!flag || isCreating) return;
 
     try {
-      // Save to draft instead of directly to backend
-      await saveChangesToDraft(envId, {
-        enabledValue,
-        disabledValue,
-        overrideEnabledValue,
-        overrideDisabledValue,
-      });
+      // Compare with current env state and only include actually changed fields
+      const currentEnv = flag.environments?.find(
+        (e) => e.environmentId === envId
+      );
+      const updates: Record<string, any> = {};
+
+      if (
+        JSON.stringify(enabledValue) !==
+        JSON.stringify(currentEnv?.enabledValue ?? flag.enabledValue)
+      ) {
+        updates.enabledValue = enabledValue;
+      }
+      if (
+        JSON.stringify(disabledValue) !==
+        JSON.stringify(currentEnv?.disabledValue ?? flag.disabledValue)
+      ) {
+        updates.disabledValue = disabledValue;
+      }
+      // eslint-disable-next-line eqeqeq
+      if (overrideEnabledValue != (currentEnv?.overrideEnabledValue ?? false)) {
+        updates.overrideEnabledValue = overrideEnabledValue;
+      }
+      // eslint-disable-next-line eqeqeq
+      if (
+        overrideDisabledValue != (currentEnv?.overrideDisabledValue ?? false)
+      ) {
+        updates.overrideDisabledValue = overrideDisabledValue;
+      }
+
+      if (Object.keys(updates).length === 0) return;
+
+      await saveChangesToDraft(envId, updates);
     } catch (error: any) {
       enqueueSnackbar(
         parseApiErrorMessage(error, 'featureFlags.fallbackValueSaveFailed'),

@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEditor.dll::UnityEditor.ContainerWindow
   m_PixelRect:
     serializedVersion: 2
-    x: 481
-    y: 214
+    x: 2623
+    y: 314
     width: 913
     height: 711
   m_ShowMode: 0
@@ -38,8 +38,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PixelRect:
     serializedVersion: 2
-    x: 548
-    y: 183
+    x: 2464
+    y: 250
     width: 1007
     height: 785
   m_ShowMode: 4
@@ -118,8 +118,8 @@ MonoBehaviour:
     y: 0
     width: 376
     height: 538
-  m_MinSize: {x: 202, y: 226}
-  m_MaxSize: {x: 4002, y: 4026}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 22}
   m_Panes:
   - {fileID: 22}
@@ -170,8 +170,8 @@ MonoBehaviour:
     y: 0
     width: 254
     height: 729
-  m_MinSize: {x: 276, y: 76}
-  m_MaxSize: {x: 4001, y: 4026}
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 19}
   m_Panes:
   - {fileID: 19}
@@ -196,8 +196,8 @@ MonoBehaviour:
     y: 0
     width: 149
     height: 538
-  m_MinSize: {x: 201, y: 226}
-  m_MaxSize: {x: 4001, y: 4026}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 20}
   m_Panes:
   - {fileID: 20}
@@ -401,8 +401,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Gatrix Monitor\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 0
-    y: 26
+    x: 2623
+    y: 314
     width: 913
     height: 685
   m_SerializedDataModeController:
@@ -439,8 +439,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "UnityEditor.MainToolbarWindow\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 0
-    y: 0
+    x: 2464
+    y: 250
     width: 1007
     height: 36
   m_SerializedDataModeController:
@@ -705,8 +705,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Project\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 0
-    y: 562
+    x: 2464
+    y: 824
     width: 752
     height: 165
   m_SerializedDataModeController:
@@ -752,13 +752,15 @@ MonoBehaviour:
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs:
-    - m_Data: 47186
+    - m_Data: 47184
     m_LastClickedID:
-      m_Data: 47186
+      m_Data: 47184
     m_ExpandedIDs:
     - m_Data: 0
     - m_Data: 47184
     - m_Data: 47186
+    - m_Data: 1000000000
+    - m_Data: 2147483647
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -820,8 +822,8 @@ MonoBehaviour:
       m_ResourceFile: 
   m_ListAreaState:
     m_SelectedInstanceIDs:
-    - m_Data: 46482
-    m_LastClickedInstanceID: 46482
+    - m_Data: 46480
+    m_LastClickedInstanceID: 46480
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: []
     m_RenameOverlay:
@@ -849,7 +851,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 27}
+    m_ScrollPosition: {x: 0, y: 42}
     m_GridSize: 16
   m_SkipHiddenPackages: 0
   m_DirectoriesAreaWidth: 199
@@ -874,8 +876,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 754
-    y: 24
+    x: 3217
+    y: 286
     width: 253
     height: 703
   m_SerializedDataModeController:
@@ -925,8 +927,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Hierarchy\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 0
-    y: 24
+    x: 2464
+    y: 286
     width: 148
     height: 512
   m_SerializedDataModeController:
@@ -945,11 +947,12 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: []
+      m_SelectedIDs:
+      - m_Data: 46480
       m_LastClickedID:
         m_Data: 0
       m_ExpandedIDs:
-      - m_Data: -1306
+      - m_Data: -1294
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -996,8 +999,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Scene\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 150
-    y: 24
+    x: 2613
+    y: 286
     width: 226
     height: 512
   m_SerializedDataModeController:
@@ -1693,8 +1696,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Game\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 378
-    y: 24
+    x: 2841
+    y: 286
     width: 374
     height: 512
   m_SerializedDataModeController:

@@ -36,7 +36,27 @@ export async function createFeatureFlagSnapshot(
 
   const envSettings = await FeatureFlagEnvironmentModel.findByFlagId(targetId);
 
-  const snapshot: Record<string, any> = {};
+  const snapshot: Record<string, any> = {
+    _global: {
+      enabledValue: flag.enabledValue != null
+        ? typeof flag.enabledValue === 'string'
+          ? JSON.parse(flag.enabledValue)
+          : flag.enabledValue
+        : undefined,
+      disabledValue: flag.disabledValue != null
+        ? typeof flag.disabledValue === 'string'
+          ? JSON.parse(flag.disabledValue)
+          : flag.disabledValue
+        : undefined,
+      validationRules: flag.validationRules != null
+        ? typeof flag.validationRules === 'string'
+          ? JSON.parse(flag.validationRules)
+          : flag.validationRules
+        : undefined,
+      useFixedWeightVariants: flag.useFixedWeightVariants,
+      impressionDataEnabled: flag.impressionDataEnabled,
+    }
+  };
 
   for (const env of envSettings) {
     const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
@@ -106,6 +126,7 @@ export async function publishFeatureFlagDraft(
   userId: string
 ): Promise<any> {
   const { ulid } = await import('ulid');
+  const { AuditLogModel } = await import('../../models/audit-log');
   const flag = await db('g_feature_flags').where('id', targetId).first();
   if (!flag) {
     throw new Error(`Feature flag '${targetId}' not found`);
@@ -134,6 +155,16 @@ export async function publishFeatureFlagDraft(
     }
     if (Object.keys(flagUpdate).length > 0) {
       await db('g_feature_flags').where('id', targetId).update(flagUpdate);
+
+      // Audit global flag changes
+      await AuditLogModel.create({
+        action: 'feature_flag.update',
+        description: `Feature flag '${flag.flagName}' global settings updated via Change Request`,
+        resourceType: 'FeatureFlag',
+        resourceId: targetId,
+        userId,
+        newValues: flagUpdate,
+      });
     }
   }
 
@@ -144,11 +175,17 @@ export async function publishFeatureFlagDraft(
   );
 
   for (const [envId, envData] of envEntries) {
+    // Collect descriptions for audit log
+    const changeDescriptions: string[] = [];
+
     // Apply isEnabled toggle
     if (envData.isEnabled !== undefined) {
       await FeatureFlagEnvironmentModel.update(targetId, envId, {
         isEnabled: envData.isEnabled,
       });
+      changeDescriptions.push(
+        envData.isEnabled ? 'enabled' : 'disabled'
+      );
     }
 
     // Apply environment-level value overrides
@@ -172,6 +209,7 @@ export async function publishFeatureFlagDraft(
         envUpdate.disabledValue = envData.disabledValue;
       }
       await FeatureFlagEnvironmentModel.update(targetId, envId, envUpdate);
+      changeDescriptions.push('values updated');
     }
 
     // Replace strategies
@@ -212,6 +250,9 @@ export async function publishFeatureFlagDraft(
           }
         }
       }
+      changeDescriptions.push(
+        `strategies replaced (${envData.strategies.length} total)`
+      );
     }
 
     // Replace variants
@@ -229,6 +270,22 @@ export async function publishFeatureFlagDraft(
           createdBy: userId,
         });
       }
+      changeDescriptions.push(
+        `variants replaced (${envData.variants.length} total)`
+      );
+    }
+
+    // Create audit log for this environment's changes
+    if (changeDescriptions.length > 0) {
+      await AuditLogModel.create({
+        action: 'feature_flag.update',
+        description: `Feature flag '${flag.flagName}' updated via Change Request in [${envId}]: ${changeDescriptions.join(', ')}`,
+        resourceType: 'FeatureFlag',
+        resourceId: targetId,
+        userId,
+        environmentId: envId,
+        newValues: envData,
+      });
     }
 
     // Increment version and invalidate cache for this environment

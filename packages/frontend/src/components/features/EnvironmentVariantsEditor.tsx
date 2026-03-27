@@ -323,6 +323,20 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   const [overrideDisabled, setOverrideDisabled] = useState(
     originalOverrideDisabled
   );
+
+  // Saved baseline for CR environments where props don't update after draft save
+  const [savedOverrideEnabled, setSavedOverrideEnabled] = useState(
+    originalOverrideEnabled
+  );
+  const [savedOverrideDisabled, setSavedOverrideDisabled] = useState(
+    originalOverrideDisabled
+  );
+  const [savedEnabledValue, setSavedEnabledValue] = useState<any>(
+    originalOverrideEnabled ? (envEnabledValue ?? enabledValue) : enabledValue
+  );
+  const [savedDisabledValue, setSavedDisabledValue] = useState<any>(
+    originalOverrideDisabled ? (envDisabledValue ?? disabledValue) : disabledValue
+  );
   const [editingEnabledValue, setEditingEnabledValue] = useState(
     originalOverrideEnabled ? (envEnabledValue ?? enabledValue) : enabledValue
   );
@@ -357,6 +371,19 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           ? (envDisabledValue ?? disabledValue)
           : disabledValue
       );
+      // Also reset saved baseline when props change
+      setSavedOverrideEnabled(originalOverrideEnabled);
+      setSavedOverrideDisabled(originalOverrideDisabled);
+      setSavedEnabledValue(
+        originalOverrideEnabled
+          ? (envEnabledValue ?? enabledValue)
+          : enabledValue
+      );
+      setSavedDisabledValue(
+        originalOverrideDisabled
+          ? (envDisabledValue ?? disabledValue)
+          : disabledValue
+      );
       setValueJsonErrors({});
     }
   }, [
@@ -370,23 +397,19 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   ]);
 
   const valuesHasChanges = useMemo(() => {
-    // 1. If override toggle state differs from original
-    if (overrideEnabled !== originalOverrideEnabled) return true;
-    if (overrideDisabled !== originalOverrideDisabled) return true;
+    // 1. If override toggle state differs from saved baseline
+    if (overrideEnabled !== savedOverrideEnabled) return true;
+    if (overrideDisabled !== savedOverrideDisabled) return true;
 
-    // 2. Check enabled value if overridden
-    if (overrideEnabled) {
-      const currentE = canonicalize(editingEnabledValue);
-      const serverE = canonicalize(envEnabledValue ?? enabledValue);
-      if (currentE !== serverE) return true;
-    }
+    // 2. Check enabled value
+    const currentE = canonicalize(editingEnabledValue);
+    const baselineE = canonicalize(savedEnabledValue);
+    if (currentE !== baselineE) return true;
 
-    // 3. Check disabled value if overridden
-    if (overrideDisabled) {
-      const currentD = canonicalize(editingDisabledValue);
-      const serverD = canonicalize(envDisabledValue ?? disabledValue);
-      if (currentD !== serverD) return true;
-    }
+    // 3. Check disabled value
+    const currentD = canonicalize(editingDisabledValue);
+    const baselineD = canonicalize(savedDisabledValue);
+    if (currentD !== baselineD) return true;
 
     return false;
   }, [
@@ -394,12 +417,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     overrideDisabled,
     editingEnabledValue,
     editingDisabledValue,
-    originalOverrideEnabled,
-    originalOverrideDisabled,
-    envEnabledValue,
-    enabledValue,
-    envDisabledValue,
-    disabledValue,
+    savedOverrideEnabled,
+    savedOverrideDisabled,
+    savedEnabledValue,
+    savedDisabledValue,
     canonicalize,
   ]);
 
@@ -447,6 +468,11 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
         overrideEnabled,
         overrideDisabled
       );
+      // Update saved baseline so valuesHasChanges becomes false
+      setSavedOverrideEnabled(overrideEnabled);
+      setSavedOverrideDisabled(overrideDisabled);
+      setSavedEnabledValue(editingEnabledValue);
+      setSavedDisabledValue(editingDisabledValue);
     } catch {
       // Error handled by parent via enqueueSnackbar
     } finally {

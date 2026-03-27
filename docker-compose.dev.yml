@@ -43,11 +43,11 @@ services:
     restart: unless-stopped
     # Enable keyspace notifications for expired events (Ex)
     # Used for detecting TTL expiration of service stat keys
-    command: redis-server --notify-keyspace-events Ex
+    command: redis-server --appendonly yes --notify-keyspace-events Ex
     ports:
       - '0.0.0.0:${REDIS_HOST_PORT:-46379}:6379'
     volumes:
-      - gatrix_redis_dev_data:/data
+      - ${DATA_ROOT:-./data}/redis:/data
     networks:
       - gatrix-dev-network
     healthcheck:
@@ -654,4 +654,3 @@ volumes:
   gatrix_mysql_dev_data:
   gatrix_etcd_dev_data:
   clickhouse-data:
-  gatrix_redis_dev_data:
