@@ -2106,79 +2106,22 @@ const GameWorldsPage: React.FC = () => {
         </Box>
       </ResizableDrawer>
 
-      {/* Confirmation Drawer */}
-      <Drawer
-        anchor="right"
+      {/* Confirmation Dialog */}
+      <Dialog
         open={confirmDialog.open}
         onClose={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: 400,
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
-        ModalProps={{
-          keepMounted: false,
-        }}
+        maxWidth="xs"
+        fullWidth
       >
-        {/* Header */}
-        <Box
-          sx={{
-            p: 3,
-            borderBottom: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            backgroundColor: 'background.paper',
-            position: 'sticky',
-            top: 0,
-            zIndex: 1,
-          }}
-        >
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {confirmDialog.title}
-          </Typography>
-          <IconButton
-            onClick={() =>
-              setConfirmDialog((prev) => ({ ...prev, open: false }))
-            }
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
-            }}
-          >
-            <CancelIcon />
-          </IconButton>
-        </Box>
-
-        {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+        <DialogTitle>{confirmDialog.title}</DialogTitle>
+        <DialogContent>
           <Typography>{confirmDialog.message}</Typography>
-        </Box>
-
-        {/* Actions */}
-        <Box
-          sx={{
-            p: 3,
-            borderTop: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            gap: 2,
-            justifyContent: 'flex-end',
-          }}
-        >
+        </DialogContent>
+        <DialogActions>
           <Button
             onClick={() =>
               setConfirmDialog((prev) => ({ ...prev, open: false }))
             }
-            color="inherit"
-            size="small"
           >
             {t('gameWorlds.cancel')}
           </Button>
@@ -2189,8 +2132,8 @@ const GameWorldsPage: React.FC = () => {
           >
             {t('gameWorlds.confirm')}
           </Button>
-        </Box>
-      </Drawer>
+        </DialogActions>
+      </Dialog>
 
       {/* Maintenance Toggle Drawer */}
       <ResizableDrawer
@@ -2455,65 +2398,17 @@ const GameWorldsPage: React.FC = () => {
         </Box>
       </ResizableDrawer>
 
-      {/* Delete Confirmation Drawer */}
-      <Drawer
-        anchor="right"
+      {/* Delete Confirmation Dialog */}
+      <Dialog
         open={deleteConfirmDialog.open}
         onClose={() =>
           setDeleteConfirmDialog({ open: false, world: null, inputValue: '' })
         }
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: 500,
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
-        ModalProps={{
-          keepMounted: false,
-        }}
+        maxWidth="xs"
+        fullWidth
       >
-        {/* Header */}
-        <Box
-          sx={{
-            p: 3,
-            borderBottom: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            backgroundColor: 'background.paper',
-            position: 'sticky',
-            top: 0,
-            zIndex: 1,
-          }}
-        >
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('gameWorlds.deleteGameWorld')}
-          </Typography>
-          <IconButton
-            onClick={() =>
-              setDeleteConfirmDialog({
-                open: false,
-                world: null,
-                inputValue: '',
-              })
-            }
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
-            }}
-          >
-            <CancelIcon />
-          </IconButton>
-        </Box>
-
-        {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+        <DialogTitle>{t('gameWorlds.deleteGameWorld')}</DialogTitle>
+        <DialogContent>
           <Alert severity="warning" sx={{ mb: 2 }}>
             {t('gameWorlds.confirmDelete', {
               name: deleteConfirmDialog.world?.name,
@@ -2548,19 +2443,8 @@ const GameWorldsPage: React.FC = () => {
             }
             size="small"
           />
-        </Box>
-
-        {/* Actions */}
-        <Box
-          sx={{
-            p: 3,
-            borderTop: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            gap: 2,
-            justifyContent: 'flex-end',
-          }}
-        >
+        </DialogContent>
+        <DialogActions>
           <Button
             onClick={() =>
               setDeleteConfirmDialog({
@@ -2569,8 +2453,6 @@ const GameWorldsPage: React.FC = () => {
                 inputValue: '',
               })
             }
-            color="inherit"
-            size="small"
           >
             {t('gameWorlds.cancel')}
           </Button>
@@ -2584,8 +2466,8 @@ const GameWorldsPage: React.FC = () => {
           >
             {getActionLabel('delete', requiresApproval, t)}
           </Button>
-        </Box>
-      </Drawer>
+        </DialogActions>
+      </Dialog>
 
       {/* Column Settings Popover */}
       <Popover

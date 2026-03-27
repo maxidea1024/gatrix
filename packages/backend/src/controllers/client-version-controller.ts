@@ -717,7 +717,7 @@ export class ClientVersionController {
     // Extract tags from validated data for separate processing
     const { tags, ...restValue } = value;
 
-    const updateData = {
+    const updateData: Record<string, any> = {
       ...restValue,
       // Convert ISO 8601 datetime to MySQL DATETIME format
       maintenanceStartDate: convertISOToMySQLDateTime(
@@ -730,52 +730,71 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
+    // Include tagIds in updateData so CR system can track tag changes
+    if (tags !== undefined) {
+      updateData.tagIds = tags
+        .map((tag: any) => tag.id)
+        .filter((tid: any) => tid);
+    }
+
     const environmentId = req.environmentId!;
 
     // Use UnifiedChangeGateway for CR support
+    // Use function form to inject current tags into beforeData for accurate diff
     const gatewayResult = await UnifiedChangeGateway.processChange(
       userId,
       environmentId,
       'g_client_versions',
       id,
-      updateData,
+      async (currentData: any) => {
+        // Inject current tags into the comparison base
+        if (tags !== undefined) {
+          const currentTags = await TagService.listTagsForEntity(
+            'client_version',
+            id
+          );
+          currentData.tagIds = currentTags.map((t: any) => t.id).sort();
+          // Also sort the new tagIds for consistent comparison
+          updateData.tagIds = [...updateData.tagIds].sort();
+        }
+        return updateData;
+      },
       async (processedData: any) => {
-        return await ClientVersionService.updateClientVersion(
+        // Strip tagIds before updating main table (it's not a column)
+        const { tagIds, ...tableData } = processedData;
+        const result = await ClientVersionService.updateClientVersion(
           id,
-          processedData,
+          tableData,
           environmentId
         );
+        // Apply tags directly in DIRECT mode
+        if (tagIds && Array.isArray(tagIds)) {
+          await TagService.setTagsForEntity(
+            'client_version',
+            id,
+            tagIds,
+            userId
+          );
+        }
+        return result;
       }
     );
 
     if (gatewayResult.mode === 'DIRECT') {
-      const clientVersion = await ClientVersionService.updateClientVersion(
-        id,
-        updateData,
-        environmentId
-      );
-      if (!clientVersion) {
+      // Re-fetch to include updated tags
+      const updatedClientVersion =
+        await ClientVersionService.getClientVersionById(id, environmentId);
+
+      if (!updatedClientVersion) {
         return res.status(404).json({
           success: false,
           message: 'Client version not found',
         });
       }
 
-      // Handle tags if provided in the update payload
-      if (tags !== undefined) {
-        const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
-        await TagService.setTagsForEntity('client_version', id, tagIds, userId);
-      }
-
-      // Re-fetch to include updated tags
-      const updatedClientVersion =
-        tags !== undefined
-          ? await ClientVersionService.getClientVersionById(id, environmentId)
-          : clientVersion;
-
       res.json({
         success: true,
-        data: updatedClientVersion || clientVersion,
+        data: updatedClientVersion,
         message: 'Client version updated successfully',
       });
     } else {

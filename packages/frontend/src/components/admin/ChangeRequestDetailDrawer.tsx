@@ -55,6 +55,7 @@ import ChangeItemDiffDisplay from './change-request/ChangeItemDiffDisplay';
 import RevertPreviewDrawer from './RevertPreviewDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useEnvironments } from '@/contexts/EnvironmentContext';
+import { tagService, Tag } from '@/services/tagService';
 
 interface ChangeRequestDetailDrawerProps {
   open: boolean;
@@ -157,6 +158,20 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     });
     return map;
   }, [allEnvironments]);
+
+  // Build tag ID -> name lookup map
+  const { data: tagList } = useSWR(
+    open ? `tags-for-cr-drawer-${projectApiPath}` : null,
+    () => tagService.list(projectApiPath),
+    { revalidateOnFocus: false }
+  );
+  const tagIdMap = useMemo(() => {
+    const map = new Map<string, string>();
+    tagList?.forEach((tag: Tag) => {
+      map.set(String(tag.id), tag.name);
+    });
+    return map;
+  }, [tagList]);
 
   const [actionLoading, setActionLoading] = useState(false);
   const [comment, setComment] = useState('');
@@ -552,7 +567,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     return text;
   };
 
-  const formatValue = (value: any): string => {
+  const formatValue = (value: any, fieldName?: string): string => {
     if (value === null) return t('common.none');
     if (value === undefined) return '';
     if (typeof value === 'boolean')
@@ -561,6 +576,12 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
       // For arrays, show count or items
       if (Array.isArray(value)) {
         if (value.length === 0) return t('common.none');
+        // For tagIds arrays, resolve to tag names
+        if (fieldName === 'tagIds' && tagIdMap.size > 0) {
+          return value
+            .map((id) => tagIdMap.get(String(id)) || String(id))
+            .join(', ');
+        }
         // For simple arrays, join with comma
         if (
           value.every((v) => typeof v === 'string' || typeof v === 'number')
@@ -656,6 +677,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
           'clientVersions.maintenance.supportsMultiLanguage'
         ),
         tags: t('clientVersions.tags'),
+        tagIds: t('clientVersions.tags'),
         channel: t('clientVersions.channel'),
         minVersion: t('clientVersions.minVersion'),
         recommendedVersion: t('clientVersions.recommendedVersion'),

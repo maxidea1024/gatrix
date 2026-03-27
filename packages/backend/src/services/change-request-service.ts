@@ -1001,6 +1001,10 @@ export class ChangeRequestService {
               return val;
             };
             for (const op of item.ops) {
+              // Skip virtual fields that don't exist in the actual DB table
+              // (e.g., tagIds stored in a separate tag_assignments table)
+              if (!(op.path in liveData)) continue;
+
               const liveVal = normalizeValue(liveData[op.path]);
               const expectedVal = normalizeValue(op.oldValue);
               if (JSON.stringify(liveVal) !== JSON.stringify(expectedVal)) {
@@ -1290,7 +1294,7 @@ export class ChangeRequestService {
             serviceCallsNeeded.push({
               targetTable: item.targetTable,
               targetId: String(realId),
-              afterData: item.afterData,
+              afterData,
               beforeData: liveData,
               isCreate,
             });

@@ -2077,71 +2077,23 @@ const ClientVersionsPage: React.FC = () => {
         </MenuItem>
       </Menu>
 
-      {/* Delete Confirm Drawer */}
-      <Drawer
-        anchor="right"
+      {/* Delete Confirm Dialog */}
+      <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 400 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
+        maxWidth="xs"
+        fullWidth
       >
-        {/* Header */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            p: 2,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-          }}
-        >
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('clientVersions.deleteConfirmTitle')}
-          </Typography>
-          <IconButton
-            onClick={() => setDeleteDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        {/* Content */}
-        <Box sx={{ flex: 1, p: 2 }}>
+        <DialogTitle>{t('clientVersions.deleteConfirmTitle')}</DialogTitle>
+        <DialogContent>
           <Typography>
             {t('clientVersions.deleteConfirmMessage', {
-              version: selectedClientVersion?.clientVersion,
+              version: `${selectedClientVersion?.platform} ${selectedClientVersion?.clientVersion}`,
             })}
           </Typography>
-        </Box>
-
-        {/* Footer */}
-        <Box
-          sx={{
-            p: 2,
-            borderTop: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-            display: 'flex',
-            gap: 2,
-            justifyContent: 'flex-end',
-          }}
-        >
-          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -2152,8 +2104,8 @@ const ClientVersionsPage: React.FC = () => {
           >
             {getActionLabel('delete', requiresApproval, t)}
           </Button>
-        </Box>
-      </Drawer>
+        </DialogActions>
+      </Dialog>
 
       {/* 일괄 Status 변경 Drawer */}
       <Drawer
@@ -2406,7 +2358,7 @@ const ClientVersionsPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button onClick={handleBulkStatusUpdate} variant="contained">
-            {t('common.update')}
+            {getActionLabel('update', requiresApproval, t)}
           </Button>
         </Box>
       </Drawer>
@@ -2449,54 +2401,20 @@ const ClientVersionsPage: React.FC = () => {
         onClose={() => setPlatformDefaultsDialogOpen(false)}
       />
 
-      {/* 일괄 Delete Confirm Drawer */}
-      <Drawer
-        anchor="right"
+      {/* 일괄 Delete Confirm Dialog */}
+      <Dialog
         open={bulkDeleteDialogOpen}
         onClose={() => setBulkDeleteDialogOpen(false)}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 500 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
+        maxWidth="xs"
+        fullWidth
       >
-        {/* Header */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            p: 2,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-          }}
-        >
+        <DialogTitle>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <DeleteIcon color="error" />
-            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {t('clientVersions.bulkDeleteTitle')}
-            </Typography>
+            {t('clientVersions.bulkDeleteTitle')}
           </Box>
-          <IconButton
-            onClick={() => setBulkDeleteDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+        </DialogTitle>
+        <DialogContent>
           <Alert severity="warning" sx={{ mb: 2 }}>
             {t('clientVersions.bulkDeleteWarning')}
           </Alert>
@@ -2548,24 +2466,9 @@ const ClientVersionsPage: React.FC = () => {
                 ))}
             </Box>
           </Box>
-        </Box>
-
-        {/* Footer */}
-        <Box
-          sx={{
-            p: 2,
-            borderTop: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-            display: 'flex',
-            gap: 2,
-            justifyContent: 'flex-end',
-          }}
-        >
-          <Button
-            onClick={() => setBulkDeleteDialogOpen(false)}
-            variant="outlined"
-          >
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -2574,10 +2477,10 @@ const ClientVersionsPage: React.FC = () => {
             variant="contained"
             startIcon={<DeleteIcon />}
           >
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
-        </Box>
-      </Drawer>
+        </DialogActions>
+      </Dialog>
 
       {/* 태그 관리 Drawer */}
       <Drawer

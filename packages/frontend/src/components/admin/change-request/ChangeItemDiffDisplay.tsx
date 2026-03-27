@@ -58,7 +58,7 @@ interface ChangeItemDiffDisplayProps {
   item: ChangeItemData;
   envNameMap?: Map<string, string>;
   formatFieldName: (table: string, field: string) => string;
-  formatValue: (value: any) => string;
+  formatValue: (value: any, fieldName?: string) => string;
 }
 
 const ChangeItemDiffDisplay: React.FC<ChangeItemDiffDisplayProps> = ({
@@ -122,7 +122,7 @@ const ChangeItemDiffDisplay: React.FC<ChangeItemDiffDisplayProps> = ({
                   fontSize: '0.875rem',
                 }}
               >
-                {formatValue(change.newValue)}
+                {formatValue(change.newValue, change.field)}
               </TableCell>
             </TableRow>
           ))}
@@ -196,14 +196,14 @@ const ChangeItemDiffDisplay: React.FC<ChangeItemDiffDisplayProps> = ({
               <TableCell sx={{ fontSize: 12, fontFamily: 'monospace' }}>
                 {change.operation === 'added' ? (
                   <Box component="span" sx={{ color: 'success.main', fontWeight: 500 }}>
-                    {formatValue(change.newValue)}
+                    {formatValue(change.newValue, change.field)}
                   </Box>
                 ) : change.operation === 'removed' ? (
                   <Box
                     component="span"
                     sx={{ color: 'error.main', textDecoration: 'line-through' }}
                   >
-                    {formatValue(change.oldValue)}
+                    {formatValue(change.oldValue, change.field)}
                   </Box>
                 ) : (
                   <>
@@ -211,14 +211,14 @@ const ChangeItemDiffDisplay: React.FC<ChangeItemDiffDisplayProps> = ({
                       component="span"
                       sx={{ color: 'error.main', textDecoration: 'line-through' }}
                     >
-                      {formatValue(change.oldValue)}
+                      {formatValue(change.oldValue, change.field)}
                     </Box>
                     {' → '}
                     <Box
                       component="span"
                       sx={{ color: 'success.main', fontWeight: 500 }}
                     >
-                      {formatValue(change.newValue)}
+                      {formatValue(change.newValue, change.field)}
                     </Box>
                   </>
                 )}
