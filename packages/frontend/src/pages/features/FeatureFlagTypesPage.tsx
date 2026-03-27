@@ -39,6 +39,9 @@ import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { getFlagTypeIconByName } from '../../utils/flagTypeIcons';
 import PageContentLoader from '../../components/common/PageContentLoader';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { ChangeRequestSubmitButtons } from '../../components/common/ChangeRequestSubmitButtons';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 
 interface FlagType {
   flagType: string;
@@ -55,11 +58,15 @@ const getTypeIcon = (iconName: string | null) =>
 
 const FeatureFlagTypesPage: React.FC = () => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const canManage = hasPermission([P.FEATURES_UPDATE]);
+  const { allEnvironments } = useEnvironment();
+  const anyRequiresApproval = allEnvironments.some(
+    (env) => env.requiresApproval
+  );
 
   // State
   const [types, setTypes] = useState<FlagType[]>([]);
@@ -102,18 +109,23 @@ const FeatureFlagTypesPage: React.FC = () => {
   }, [editingType, originalType]);
 
   // Save handler
-  const handleSave = async () => {
+  const handleSave = async (skipCr?: boolean) => {
     if (!editingType || !canManage) return;
 
     setSaving(true);
+    const skipParam = skipCr ? '?skipCr=true' : '';
     try {
-      await api.put(
-        `${projectApiPath}/features/types/${editingType.flagType}`,
+      const result = await api.put(
+        `${projectApiPath}/features/types/${editingType.flagType}${skipParam}`,
         {
           lifetimeDays: editingType.lifetimeDays,
         }
       );
-      enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });
+      if (result.data?.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });
+      }
       setEditDialogOpen(false);
       setEditingType(null);
       loadTypes();
@@ -328,13 +340,13 @@ const FeatureFlagTypesPage: React.FC = () => {
           <Button onClick={() => setEditDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button
-            variant="contained"
-            onClick={handleSave}
-            disabled={saving || !isEditDirty}
-          >
-            {t('common.update')}
-          </Button>
+          <ChangeRequestSubmitButtons
+            action="update"
+            requiresApproval={anyRequiresApproval}
+            saving={saving}
+            onSave={(skipCr) => handleSave(skipCr)}
+            disabled={!isEditDirty}
+          />
         </Box>
       </ResizableDrawer>
     </Box>

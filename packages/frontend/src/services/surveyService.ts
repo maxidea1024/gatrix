@@ -150,9 +150,13 @@ class SurveyService {
    */
   async createSurvey(
     projectApiPath: string,
-    input: CreateSurveyInput
+    input: CreateSurveyInput,
+    skipCr?: boolean
   ): Promise<MutationResult<Survey>> {
-    const response = await api.post(`${projectApiPath}/surveys`, input);
+    const response = await api.post(
+      `${projectApiPath}/surveys${skipCr ? '?skipCr=true' : ''}`,
+      input
+    );
     return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }
 
@@ -162,9 +166,13 @@ class SurveyService {
   async updateSurvey(
     projectApiPath: string,
     id: string,
-    input: UpdateSurveyInput
+    input: UpdateSurveyInput,
+    skipCr?: boolean
   ): Promise<MutationResult<Survey>> {
-    const response = await api.put(`${projectApiPath}/surveys/${id}`, input);
+    const response = await api.put(
+      `${projectApiPath}/surveys/${id}${skipCr ? '?skipCr=true' : ''}`,
+      input
+    );
     return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }
 
@@ -173,9 +181,12 @@ class SurveyService {
    */
   async deleteSurvey(
     projectApiPath: string,
-    id: string
+    id: string,
+    skipCr?: boolean
   ): Promise<MutationResult<void>> {
-    const response = await api.delete(`${projectApiPath}/surveys/${id}`);
+    const response = await api.delete(
+      `${projectApiPath}/surveys/${id}${skipCr ? '?skipCr=true' : ''}`
+    );
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
@@ -184,10 +195,11 @@ class SurveyService {
    */
   async toggleActive(
     projectApiPath: string,
-    id: string
+    id: string,
+    skipCr?: boolean
   ): Promise<MutationResult<Survey>> {
     const response = await api.patch(
-      `${projectApiPath}/surveys/${id}/toggle-active`
+      `${projectApiPath}/surveys/${id}/toggle-active${skipCr ? '?skipCr=true' : ''}`
     );
     return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }

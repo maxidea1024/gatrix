@@ -123,6 +123,7 @@ import {
   showChangeRequestCreatedToast,
   getActionLabel,
 } from '../../utils/changeRequestToast';
+import { ChangeRequestSubmitButtons } from '../../components/common/ChangeRequestSubmitButtons';
 
 // Column definition interface
 interface ColumnConfig {
@@ -595,11 +596,12 @@ const MessageTemplatesPage: React.FC = () => {
     setBulkDeleteDialogOpen(true);
   }, [selectedIds]);
 
-  const confirmBulkDelete = useCallback(async () => {
+  const confirmBulkDelete = useCallback(async (skipCr: boolean = false) => {
     try {
       const result = await messageTemplateService.bulkDelete(
         projectApiPath,
-        selectedIds
+        selectedIds,
+        skipCr
       );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
@@ -675,13 +677,14 @@ const MessageTemplatesPage: React.FC = () => {
     setDeleteDialogOpen(true);
   }, []);
 
-  const confirmDelete = useCallback(async () => {
+  const confirmDelete = useCallback(async (skipCr: boolean = false) => {
     if (!deletingTemplate?.id) return;
 
     try {
       const result = await messageTemplateService.delete(
         projectApiPath,
-        deletingTemplate.id
+        deletingTemplate.id,
+        skipCr
       );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
@@ -763,7 +766,7 @@ const MessageTemplatesPage: React.FC = () => {
     [selectedTemplateForTags, t, enqueueSnackbar, load]
   );
 
-  const handleSave = async () => {
+  const handleSave = async (skipCr: boolean = false) => {
     if (!form.name.trim()) {
       enqueueSnackbar(t('common.nameRequired'), { variant: 'error' });
       nameFieldRef.current?.focus();
@@ -792,7 +795,8 @@ const MessageTemplatesPage: React.FC = () => {
         const result = await messageTemplateService.update(
           projectApiPath,
           editing.id,
-          payload
+          payload,
+          skipCr
         );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -806,7 +810,8 @@ const MessageTemplatesPage: React.FC = () => {
       } else {
         const result = await messageTemplateService.create(
           projectApiPath,
-          payload
+          payload,
+          skipCr
         );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -1419,17 +1424,13 @@ const MessageTemplatesPage: React.FC = () => {
           <Button onClick={() => setDialogOpen(false)} disabled={saving}>
             {t('common.cancel')}
           </Button>
-          <Button
-            variant="contained"
-            onClick={handleSave}
+          <ChangeRequestSubmitButtons
+            action={editing ? 'update' : 'create'}
+            requiresApproval={requiresApproval}
+            saving={saving}
+            onSave={handleSave}
             disabled={saving || (!!editing && !isDirty)}
-          >
-            {saving
-              ? t('common.saving')
-              : editing
-                ? getActionLabel('update', requiresApproval, t)
-                : getActionLabel('create', requiresApproval, t)}
-          </Button>
+          />
         </Box>
       </ResizableDrawer>
 
@@ -1452,14 +1453,12 @@ const MessageTemplatesPage: React.FC = () => {
           <Button onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button
-            onClick={confirmDelete}
-            color="error"
-            variant="contained"
-            startIcon={<DeleteIcon />}
-          >
-            {getActionLabel('delete', requiresApproval, t)}
-          </Button>
+          <ChangeRequestSubmitButtons
+            action="delete"
+            requiresApproval={requiresApproval}
+            saving={false}
+            onSave={confirmDelete}
+          />
         </DialogActions>
       </Dialog>
 
@@ -1482,14 +1481,12 @@ const MessageTemplatesPage: React.FC = () => {
           <Button onClick={() => setBulkDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button
-            onClick={confirmBulkDelete}
-            color="error"
-            variant="contained"
-            startIcon={<DeleteIcon />}
-          >
-            {getActionLabel('delete', requiresApproval, t)}
-          </Button>
+          <ChangeRequestSubmitButtons
+            action="delete"
+            requiresApproval={requiresApproval}
+            saving={false}
+            onSave={confirmBulkDelete}
+          />
         </DialogActions>
       </Dialog>
 

@@ -139,10 +139,11 @@ export class ClientVersionService {
    */
   static async createClientVersion(
     projectApiPath: string,
-    data: ClientVersionFormData
+    data: ClientVersionFormData,
+    skipCr?: boolean
   ): Promise<ClientVersionMutationResult> {
     const response: any = await apiService.post<any>(
-      this.basePath(projectApiPath),
+      `${this.basePath(projectApiPath)}${skipCr ? '?skipCr=true' : ''}`,
       data
     );
 
@@ -215,10 +216,11 @@ export class ClientVersionService {
    */
   static async bulkCreateClientVersions(
     projectApiPath: string,
-    data: BulkCreateFormData
+    data: BulkCreateFormData,
+    skipCr?: boolean
   ): Promise<ClientVersion[]> {
     const response = await apiService.post<any>(
-      `${this.basePath(projectApiPath)}/bulk`,
+      `${this.basePath(projectApiPath)}/bulk${skipCr ? '?skipCr=true' : ''}`,
       data
     );
 
@@ -242,10 +244,11 @@ export class ClientVersionService {
   static async updateClientVersion(
     projectApiPath: string,
     id: number,
-    data: Partial<ClientVersionFormData>
+    data: Partial<ClientVersionFormData>,
+    skipCr?: boolean
   ): Promise<ClientVersionMutationResult> {
     const response: any = await apiService.put<any>(
-      `${this.basePath(projectApiPath)}/${id}`,
+      `${this.basePath(projectApiPath)}/${id}${skipCr ? '?skipCr=true' : ''}`,
       data
     );
 
@@ -277,10 +280,11 @@ export class ClientVersionService {
    */
   static async deleteClientVersion(
     projectApiPath: string,
-    id: number
+    id: number,
+    skipCr?: boolean
   ): Promise<{ isChangeRequest: boolean; changeRequestId?: string }> {
     const response = await apiService.delete<any>(
-      `${this.basePath(projectApiPath)}/${id}`
+      `${this.basePath(projectApiPath)}/${id}${skipCr ? '?skipCr=true' : ''}`
     );
     const data = (response as any).data;
     // 202 response indicates CR creation
@@ -296,10 +300,11 @@ export class ClientVersionService {
    */
   static async bulkUpdateStatus(
     projectApiPath: string,
-    data: BulkStatusUpdateRequest
+    data: BulkStatusUpdateRequest,
+    skipCr?: boolean
   ): Promise<{ updatedCount: number; message: string }> {
     const response = await apiService.patch<any>(
-      `${this.basePath(projectApiPath)}/bulk-status`,
+      `${this.basePath(projectApiPath)}/bulk-status${skipCr ? '?skipCr=true' : ''}`,
       data
     );
 

@@ -42,6 +42,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 color: 'text.primary',
+                '& .MuiSvgIcon-root': { color: 'inherit' },
               }}
             >
               {icon}

@@ -422,7 +422,7 @@ services:
       EDGE_REDIS_PORT: ${EDGE_REDIS_PORT:-6379}
       EDGE_REDIS_PASSWORD: ${EDGE_REDIS_PASSWORD:-}
       EDGE_REDIS_DB: ${EDGE_REDIS_DB:-0}
-      EDGE_FORCE_HTTPS: ${EDGE_FORCE_HTTPS:-true}
+      EDGE_FORCE_HTTPS: ${EDGE_FORCE_HTTPS:-false}
     ports:
       - target: 3400
         published: 3400

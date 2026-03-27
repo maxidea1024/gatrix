@@ -66,8 +66,8 @@ import SearchTextField from '../../components/common/SearchTextField';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
-import { getActionLabel } from '../../utils/changeRequestToast';
+import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
+import { ChangeRequestSubmitButtons } from '../../components/common/ChangeRequestSubmitButtons';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
@@ -1015,7 +1015,7 @@ const CouponSettingsPage: React.FC = () => {
     loadCodes,
   ]);
 
-  const handleSave = async () => {
+  const handleSave = async (skipCr: boolean = false) => {
     // Basic validation
     if (!form.name) {
       enqueueSnackbar(t('coupons.couponSettings.form.nameRequired'), {
@@ -1152,7 +1152,8 @@ const CouponSettingsPage: React.FC = () => {
         const result = await couponService.updateSetting(
           projectApiPath,
           editing.id,
-          payload
+          payload,
+          skipCr
         );
         setOpenForm(false);
         resetForm();
@@ -1172,7 +1173,8 @@ const CouponSettingsPage: React.FC = () => {
         // For create: close form immediately and load in background
         const result = await couponService.createSetting(
           projectApiPath,
-          payload
+          payload,
+          skipCr
         );
         setOpenForm(false);
         resetForm();
@@ -2864,13 +2866,13 @@ const CouponSettingsPage: React.FC = () => {
           <Button onClick={() => setOpenForm(false)}>
             {t('common.cancel')}
           </Button>
-          <Button
-            onClick={handleSave}
-            variant="contained"
+          <ChangeRequestSubmitButtons
+            action={editing ? 'update' : 'create'}
+            requiresApproval={requiresApproval}
+            saving={submitting}
+            onSave={handleSave}
             disabled={submitting || (!!editing && !isDirty)}
-          >
-            {getActionLabel(editing ? 'update' : 'create', requiresApproval, t)}
-          </Button>
+          />
         </Box>
       </ResizableDrawer>
 

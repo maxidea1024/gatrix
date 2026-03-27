@@ -55,6 +55,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { getActionLabel } from '../../utils/changeRequestToast';
 import TagSelector from '../common/TagSelector';
 import { Tag } from '@/services/tagService';
+import { ChangeRequestSubmitButtons } from '../common/ChangeRequestSubmitButtons';
 
 // Client status label mapping
 const ClientStatusLabels = {
@@ -72,6 +73,7 @@ interface BulkClientVersionFormProps {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  requiresApproval?: boolean;
 }
 
 // Form validation schema
@@ -145,14 +147,13 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   open,
   onClose,
   onSuccess,
+  requiresApproval = false,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { platforms } = usePlatformConfig();
-  const { currentEnvironment } = useEnvironment();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
-  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const [loading, setLoading] = useState(false);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
 
@@ -408,7 +409,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   };
 
   // Form submission handler
-  const onSubmit = async (data: BulkCreateFormData) => {
+  const handleValidSubmit = async (data: BulkCreateFormData, skipCr: boolean) => {
     // Platform selection validation
     if (selectedPlatforms.length === 0) {
       setError('platforms', {
@@ -477,7 +478,8 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
 
       const result = await ClientVersionService.bulkCreateClientVersions(
         projectApiPath,
-        cleanedData
+        cleanedData,
+        skipCr
       );
 
       enqueueSnackbar(
@@ -522,6 +524,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     }
   };
 
+  const handleSave = (skipCr: boolean) => {
+    handleSubmit((data) => handleValidSubmit(data, skipCr))();
+  };
+
   return (
     <ResizableDrawer
       open={open}
@@ -534,7 +540,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       zIndex={1300}
     >
       <form
-        onSubmit={handleSubmit(onSubmit as any)}
+        onSubmit={handleSubmit((data) => handleValidSubmit(data, false))}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -1091,15 +1097,13 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
           <Button onClick={handleClose} disabled={loading}>
             {t('common.cancel')}
           </Button>
-          <Button
-            type="submit"
-            variant="contained"
+          <ChangeRequestSubmitButtons
+            action="create"
+            requiresApproval={requiresApproval}
+            saving={loading || isSubmitting}
+            onSave={handleSave}
             disabled={loading || isSubmitting}
-          >
-            {loading
-              ? t('clientVersions.creating')
-              : getActionLabel('create', requiresApproval, t)}
-          </Button>
+          />
         </Box>
       </form>
     </ResizableDrawer>

@@ -145,10 +145,11 @@ class IngamePopupNoticeService {
    */
   async createIngamePopupNotice(
     projectApiPath: string,
-    data: CreateIngamePopupNoticeData
+    data: CreateIngamePopupNoticeData,
+    skipCr?: boolean
   ): Promise<IngamePopupNoticeMutationResult> {
     const response = await api.post(
-      `${projectApiPath}/ingame-popup-notices`,
+      `${projectApiPath}/ingame-popup-notices${skipCr ? '?skipCr=true' : ''}`,
       data
     );
     return parseChangeRequestResponse<IngamePopupNotice>(
@@ -163,10 +164,11 @@ class IngamePopupNoticeService {
   async updateIngamePopupNotice(
     projectApiPath: string,
     id: number,
-    data: UpdateIngamePopupNoticeData
+    data: UpdateIngamePopupNoticeData,
+    skipCr?: boolean
   ): Promise<IngamePopupNoticeMutationResult> {
     const response = await api.put(
-      `${projectApiPath}/ingame-popup-notices/${id}`,
+      `${projectApiPath}/ingame-popup-notices/${id}${skipCr ? '?skipCr=true' : ''}`,
       data
     );
     return parseChangeRequestResponse<IngamePopupNotice>(
@@ -180,10 +182,11 @@ class IngamePopupNoticeService {
    */
   async deleteIngamePopupNotice(
     projectApiPath: string,
-    id: number
+    id: number,
+    skipCr?: boolean
   ): Promise<MutationResult<void>> {
     const response = await api.delete(
-      `${projectApiPath}/ingame-popup-notices/${id}`
+      `${projectApiPath}/ingame-popup-notices/${id}${skipCr ? '?skipCr=true' : ''}`
     );
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
@@ -193,10 +196,11 @@ class IngamePopupNoticeService {
    */
   async deleteMultipleIngamePopupNotices(
     projectApiPath: string,
-    ids: number[]
+    ids: number[],
+    skipCr?: boolean
   ): Promise<MutationResult<void>> {
     const response = await api.post(
-      `${projectApiPath}/ingame-popup-notices/bulk-delete`,
+      `${projectApiPath}/ingame-popup-notices/bulk-delete${skipCr ? '?skipCr=true' : ''}`,
       {
         ids,
       }
@@ -209,10 +213,11 @@ class IngamePopupNoticeService {
    */
   async toggleActive(
     projectApiPath: string,
-    id: number
+    id: number,
+    skipCr?: boolean
   ): Promise<IngamePopupNoticeMutationResult> {
     const response = await api.patch(
-      `${projectApiPath}/ingame-popup-notices/${id}/toggle-active`
+      `${projectApiPath}/ingame-popup-notices/${id}/toggle-active${skipCr ? '?skipCr=true' : ''}`
     );
     return parseChangeRequestResponse<IngamePopupNotice>(
       response,

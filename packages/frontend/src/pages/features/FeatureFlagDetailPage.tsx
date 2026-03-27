@@ -4240,6 +4240,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             <TextField
               fullWidth
               size="small"
+              autoFocus
               label={t('featureFlags.links.url')}
               placeholder="https://example.com"
               value={editingLink.url}

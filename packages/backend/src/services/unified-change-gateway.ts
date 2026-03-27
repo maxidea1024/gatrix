@@ -1,7 +1,10 @@
 import { Environment } from '../models/environment';
 import { ChangeRequest } from '../models/change-request';
 import { ChangeRequestService } from './change-request-service';
+import { permissionService } from './permission-service';
+import { P } from '../types/permissions';
 import { createLogger } from '../config/logger';
+import { requestContext } from '../middleware/request-context';
 
 const logger = createLogger('UnifiedChangeGateway');
 import knex from '../config/knex';
@@ -20,21 +23,68 @@ export interface ChangeGatewayResult {
 
 export class UnifiedChangeGateway {
   /**
+   * Helper to check if skipCr was requested either via options or HTTP request payload
+   */
+  static isSkipCrRequested(options?: { skipCr?: boolean }): boolean {
+    if (options?.skipCr) return true;
+    const req = requestContext.getStore();
+    if (!req) return false;
+    return req.query.skipCr === 'true' || req.body?.skipCr === true;
+  }
+
+  /**
+   * Check if user has a specific permission in the given environment
+   */
+  private static async hasEnvPermission(
+    userId: string,
+    environmentId: string,
+    perm: string
+  ): Promise<boolean> {
+    const chain = await permissionService.resolveEnvironmentChain(environmentId);
+    if (!chain) return false;
+    return permissionService.hasEnvPermission(
+      userId,
+      chain.orgId,
+      chain.projectId,
+      environmentId,
+      perm
+    );
+  }
+
+  /**
+   * For project-scoped resources (segments, flag types, etc.),
+   * find the first environment in the project that has requiresApproval=true.
+   * Returns the environment ID or null if none require approval.
+   */
+  static async getProjectCrEnvironment(
+    projectId: string
+  ): Promise<string | null> {
+    const env = await knex('g_environments')
+      .where({ projectId, requiresApproval: true })
+      .select('id')
+      .first();
+    return env?.id || null;
+  }
+
+  /**
    * Request a modification (update) through the Change Request system
    */
   static async requestModification(
     userId: string,
-    environmentName: string,
+    environmentId: string,
     targetTable: string,
     targetId: string,
-    newData: any
+    newData: any,
+    options?: { skipCr?: boolean; primaryKey?: string }
   ): Promise<ChangeGatewayResult> {
     return this.processChange(
       userId,
-      environmentName,
+      environmentId,
       targetTable,
       targetId,
-      newData
+      newData,
+      undefined,
+      options
     );
   }
 
@@ -43,20 +93,31 @@ export class UnifiedChangeGateway {
    */
   static async requestCreation(
     userId: string,
-    environmentName: string,
+    environmentId: string,
     targetTable: string,
     createData: any,
-    createFunction: () => Promise<any>
+    createFunction: () => Promise<any>,
+    options?: { skipCr?: boolean }
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Environment Policy
-      const env = await Environment.query().findById(environmentName);
+      const env = await Environment.query().findById(environmentId);
       if (!env) {
-        throw new Error(`Environment '${environmentName}' not found.`);
+        throw new Error(`Environment '${environmentId}' not found.`);
+      }
+
+      let requiresApproval = env.requiresApproval;
+      if (requiresApproval && this.isSkipCrRequested(options)) {
+        const hasSkipPermission = await this.hasEnvPermission(userId, environmentId, P.CHANGE_REQUESTS_SKIP);
+        if (hasSkipPermission) {
+          requiresApproval = false;
+        } else {
+          throw new GatrixError('You do not have permission to skip change requests.', 403, true, 'FORBIDDEN');
+        }
       }
 
       // 2. Check if CR is required
-      if (!env.requiresApproval) {
+      if (!requiresApproval) {
         // Direct creation
         const result = await createFunction();
         return {
@@ -69,14 +130,14 @@ export class UnifiedChangeGateway {
       // 3. CR Required - Create a change request for the new item
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environmentId', environmentName)
+        .where('environmentId', environmentId)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
 
       const result = await ChangeRequestService.upsertChangeRequestItem(
         userId,
-        environmentName,
+        environmentId,
         targetTable,
         `NEW_${Date.now()}`, // Temporary ID for new items
         null, // beforeData is null for creation (record doesn't exist yet)
@@ -100,16 +161,27 @@ export class UnifiedChangeGateway {
    */
   static async requestDeletion(
     userId: string,
-    environmentName: string,
+    environmentId: string,
     targetTable: string,
     targetId: string,
-    deleteFunction: () => Promise<void>
+    deleteFunction: () => Promise<void>,
+    options?: { skipCr?: boolean; primaryKey?: string }
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Environment Policy
-      const env = await Environment.query().findById(environmentName);
+      const env = await Environment.query().findById(environmentId);
       if (!env) {
-        throw new Error(`Environment '${environmentName}' not found.`);
+        throw new Error(`Environment '${environmentId}' not found.`);
+      }
+
+      let requiresApproval = env.requiresApproval;
+      if (requiresApproval && this.isSkipCrRequested(options)) {
+        const hasSkipPermission = await this.hasEnvPermission(userId, environmentId, P.CHANGE_REQUESTS_SKIP);
+        if (hasSkipPermission) {
+          requiresApproval = false;
+        } else {
+          throw new GatrixError('You do not have permission to skip change requests.', 403, true, 'FORBIDDEN');
+        }
       }
 
       // 2. Check for pending CR locks
@@ -139,7 +211,7 @@ export class UnifiedChangeGateway {
       }
 
       // 3. Check if CR is required
-      if (!env.requiresApproval) {
+      if (!requiresApproval) {
         // Direct deletion
         await deleteFunction();
         return {
@@ -149,21 +221,22 @@ export class UnifiedChangeGateway {
       }
 
       // 4. CR Required - Get current data and create deletion request
-      const currentData = await knex(targetTable).where('id', targetId).first();
+      const pk = options?.primaryKey || 'id';
+      const currentData = await knex(targetTable).where(pk, targetId).first();
       if (!currentData) {
         throw new Error(`Item ${targetId} not found in ${targetTable}`);
       }
 
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environmentId', environmentName)
+        .where('environmentId', environmentId)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
 
       const result = await ChangeRequestService.upsertChangeRequestItem(
         userId,
-        environmentName,
+        environmentId,
         targetTable,
         targetId,
         currentData, // beforeData
@@ -187,17 +260,28 @@ export class UnifiedChangeGateway {
    */
   public static async processChange(
     userId: string,
-    environmentName: string,
+    environmentId: string,
     targetTable: string,
     targetId: string,
     changeDataOrFunction: any | ((currentData: any) => Promise<any> | any),
-    directChangeFunction?: (processedData: any) => Promise<any>
+    directChangeFunction?: (processedData: any) => Promise<any>,
+    options?: { skipCr?: boolean; primaryKey?: string }
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Env Policy
-      const env = await Environment.query().findById(environmentName);
+      const env = await Environment.query().findById(environmentId);
       if (!env) {
-        throw new Error(`Environment '${environmentName}' not found.`);
+        throw new Error(`Environment '${environmentId}' not found.`);
+      }
+
+      let requiresApproval = env.requiresApproval;
+      if (requiresApproval && this.isSkipCrRequested(options)) {
+        const hasSkipPermission = await this.hasEnvPermission(userId, environmentId, P.CHANGE_REQUESTS_SKIP);
+        if (hasSkipPermission) {
+          requiresApproval = false;
+        } else {
+          throw new GatrixError('You do not have permission to skip change requests.', 403, true, 'FORBIDDEN');
+        }
       }
 
       // 2. Global Lock Check
@@ -227,7 +311,8 @@ export class UnifiedChangeGateway {
       }
 
       // 3. Resolve New Data
-      const currentData = await knex(targetTable).where('id', targetId).first();
+      const pk = options?.primaryKey || 'id';
+      const currentData = await knex(targetTable).where(pk, targetId).first();
       let newData;
       if (typeof changeDataOrFunction === 'function') {
         newData = await changeDataOrFunction(currentData);
@@ -237,7 +322,7 @@ export class UnifiedChangeGateway {
 
       // 4. Branching Logic
       // CASE A: Direct Update
-      if (!env.requiresApproval) {
+      if (!requiresApproval) {
         if (!/^[a-zA-Z0-9_]+$/.test(targetTable))
           throw new Error('Invalid table name');
 
@@ -245,7 +330,7 @@ export class UnifiedChangeGateway {
         if (directChangeFunction) {
           result = await directChangeFunction(newData);
         } else {
-          await knex(targetTable).where('id', targetId).update(newData);
+          await knex(targetTable).where(pk, targetId).update(newData);
           result = { id: targetId, ...newData };
         }
 
@@ -259,14 +344,14 @@ export class UnifiedChangeGateway {
       // CASE B: Change Request Required
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environmentId', environmentName)
+        .where('environmentId', environmentId)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
 
       const result = await ChangeRequestService.upsertChangeRequestItem(
         userId,
-        environmentName,
+        environmentId,
         targetTable,
         targetId,
         currentData || {}, // Before
@@ -288,8 +373,8 @@ export class UnifiedChangeGateway {
   /**
    * Check if an environment requires CR approval
    */
-  static async requiresApproval(environmentName: string): Promise<boolean> {
-    const env = await Environment.query().findById(environmentName);
+  static async requiresApproval(environmentId: string): Promise<boolean> {
+    const env = await Environment.query().findById(environmentId);
     return env?.requiresApproval ?? false;
   }
 
@@ -297,9 +382,9 @@ export class UnifiedChangeGateway {
    * Get environment CR settings
    */
   static async getEnvironmentSettings(
-    environmentName: string
+    environmentId: string
   ): Promise<{ requiresApproval: boolean; requiredApprovers: number } | null> {
-    const env = await Environment.query().findById(environmentName);
+    const env = await Environment.query().findById(environmentId);
     if (!env) return null;
     return {
       requiresApproval: env.requiresApproval,

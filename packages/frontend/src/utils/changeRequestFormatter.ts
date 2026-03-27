@@ -19,6 +19,8 @@ export const getTableLocalizationKey = (tableName: string): string => {
     client_versions: 'tables.clientVersions',
     game_worlds: 'tables.gameWorlds',
     feature_flags: 'tables.featureFlags',
+    feature_segments: 'tables.featureSegments',
+    feature_flag_types: 'tables.featureFlagTypes',
     reward_templates: 'tables.rewardTemplates',
     remote_configs: 'tables.remoteConfigs',
     banners: 'tables.banners',
@@ -132,6 +134,7 @@ export const formatChangeItemTitle = (
       const nameFields = [
         'title',
         'name',
+        'segmentName',
         'displayName',
         'code',
         'clientVersion',

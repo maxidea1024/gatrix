@@ -738,9 +738,12 @@ export const AIChatFloatingButton: React.FC<{
           onClick={onClick}
           sx={{
             position: 'fixed',
-            bottom: 24,
-            right: 24,
+            bottom: 16,
+            right: 16,
             zIndex: 1200,
+            width: 44,
+            height: 44,
+            minHeight: 'unset',
             '&:hover .MuiSvgIcon-root': {
               animation: `${wiggleAnimation} 0.5s ease-in-out`,
             },

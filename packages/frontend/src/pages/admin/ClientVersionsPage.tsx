@@ -154,6 +154,7 @@ import {
   showChangeRequestCreatedToast,
   getActionLabel,
 } from '../../utils/changeRequestToast';
+import { ChangeRequestSubmitButtons } from '@/components/common/ChangeRequestSubmitButtons';
 import { useNavigate } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
@@ -915,7 +916,7 @@ const ClientVersionsPage: React.FC = () => {
   ]);
 
   // 일괄 Status 변경 핸들러
-  const handleBulkStatusUpdate = useCallback(async () => {
+  const handleBulkStatusUpdate = useCallback(async (skipCr: boolean = false) => {
     if (selectedIds.length === 0) return;
 
     // 점검 Status일 때 Validate required fields
@@ -961,7 +962,8 @@ const ClientVersionsPage: React.FC = () => {
 
       const result = await ClientVersionService.bulkUpdateStatus(
         projectApiPath,
-        request
+        request,
+        skipCr
       );
       console.log('🔍 Bulk update result:', result);
 
@@ -2357,15 +2359,19 @@ const ClientVersionsPage: React.FC = () => {
           <Button onClick={() => setBulkStatusDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleBulkStatusUpdate} variant="contained">
-            {getActionLabel('update', requiresApproval, t)}
-          </Button>
+          <ChangeRequestSubmitButtons
+            action="update"
+            requiresApproval={requiresApproval}
+            saving={loading}
+            onSave={handleBulkStatusUpdate}
+          />
         </Box>
       </Drawer>
 
       {/* 클라이언트 버전 추가/편집 Form */}
       <ClientVersionForm
         open={formDialogOpen}
+        requiresApproval={requiresApproval}
         onClose={() => {
           setFormDialogOpen(false);
           setEditingClientVersion(null);
@@ -2385,6 +2391,7 @@ const ClientVersionsPage: React.FC = () => {
       {/* 클라이언트 버전 간편 추가 Form */}
       <BulkClientVersionForm
         open={bulkFormDialogOpen}
+        requiresApproval={requiresApproval}
         onClose={() => {
           setBulkFormDialogOpen(false);
         }}

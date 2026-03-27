@@ -71,7 +71,8 @@ export const gameWorldService = {
   // Create new game world
   async createGameWorld(
     projectApiPath: string,
-    data: CreateGameWorldData
+    data: CreateGameWorldData,
+    skipCr?: boolean
   ): Promise<GameWorldMutationResult> {
     // Ensure boolean fields are actually boolean, not numbers
     const sanitizedData = {
@@ -87,7 +88,7 @@ export const gameWorldService = {
       }),
     };
     const response: any = await api.post(
-      `${projectApiPath}/game-worlds`,
+      `${projectApiPath}/game-worlds${skipCr ? '?skipCr=true' : ''}`,
       sanitizedData
     );
 
@@ -112,7 +113,8 @@ export const gameWorldService = {
   async updateGameWorld(
     projectApiPath: string,
     id: number,
-    data: UpdateGameWorldData
+    data: UpdateGameWorldData,
+    skipCr?: boolean
   ): Promise<GameWorldMutationResult> {
     // Ensure boolean fields are actually boolean, not numbers
     const sanitizedData = {
@@ -128,7 +130,7 @@ export const gameWorldService = {
       }),
     };
     const response: any = await api.put(
-      `${projectApiPath}/game-worlds/${id}`,
+      `${projectApiPath}/game-worlds/${id}${skipCr ? '?skipCr=true' : ''}`,
       sanitizedData
     );
 
@@ -152,10 +154,11 @@ export const gameWorldService = {
   // Delete game world
   async deleteGameWorld(
     projectApiPath: string,
-    id: number
+    id: number,
+    skipCr?: boolean
   ): Promise<GameWorldMutationResult> {
     const response: any = await api.delete(
-      `${projectApiPath}/game-worlds/${id}`
+      `${projectApiPath}/game-worlds/${id}${skipCr ? '?skipCr=true' : ''}`
     );
     const responseData = response.data || response;
 
@@ -177,10 +180,11 @@ export const gameWorldService = {
   // Toggle visibility
   async toggleVisibility(
     projectApiPath: string,
-    id: number
+    id: number,
+    skipCr?: boolean
   ): Promise<GameWorldMutationResult> {
     const response: any = await api.patch(
-      `${projectApiPath}/game-worlds/${id}/toggle-visibility`
+      `${projectApiPath}/game-worlds/${id}/toggle-visibility${skipCr ? '?skipCr=true' : ''}`
     );
     const responseData = response.data || response;
 
@@ -202,10 +206,11 @@ export const gameWorldService = {
   // Toggle maintenance status
   async toggleMaintenance(
     projectApiPath: string,
-    id: number
+    id: number,
+    skipCr?: boolean
   ): Promise<GameWorldMutationResult> {
     const response: any = await api.patch(
-      `${projectApiPath}/game-worlds/${id}/toggle-maintenance`
+      `${projectApiPath}/game-worlds/${id}/toggle-maintenance${skipCr ? '?skipCr=true' : ''}`
     );
     const responseData = response.data || response;
 
@@ -238,7 +243,8 @@ export const gameWorldService = {
       maintenanceLocales?: Array<{ lang: 'ko' | 'en' | 'zh'; message: string }>;
       forceDisconnect?: boolean;
       gracePeriodMinutes?: number;
-    }
+    },
+    skipCr?: boolean
   ): Promise<GameWorldMutationResult> {
     // Ensure boolean fields are actually boolean
     const sanitizedData = {
@@ -252,7 +258,7 @@ export const gameWorldService = {
       }),
     };
     const response: any = await api.patch(
-      `${projectApiPath}/game-worlds/${id}/maintenance`,
+      `${projectApiPath}/game-worlds/${id}/maintenance${skipCr ? '?skipCr=true' : ''}`,
       sanitizedData
     );
     const responseData = response.data || response;

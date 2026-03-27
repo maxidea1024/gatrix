@@ -144,7 +144,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { user, permissions } = useAuth();
-  const { getProjectApiPath } = useOrgProject();
+  const { getProjectApiPath, currentProject } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const hasAnyPermissions = permissions.length > 0;
   const { environments: allEnvironments } = useEnvironments();
@@ -770,6 +770,21 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         tags: t('rewardTemplates.tags'),
         tagIds: t('rewardTemplates.tags'),
       },
+      // Feature Segments (g_feature_segments)
+      g_feature_segments: {
+        segmentName: t('common.name'),
+        displayName: t('common.displayName'),
+        description: t('common.description'),
+        constraints: t('featureFlags.constraints'),
+        isActive: t('common.active'),
+        tags: t('featureFlags.tags'),
+      },
+      // Feature Flag Types (g_feature_flag_types)
+      g_feature_flag_types: {
+        displayName: t('common.displayName'),
+        description: t('common.description'),
+        lifetimeDays: t('featureFlags.lifetime'),
+      },
     };
 
     // Common field mappings (fallback)
@@ -817,6 +832,29 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         projectApiPath
       );
       setComment('');
+      mutate();
+      onRefresh?.();
+    } catch (err: any) {
+      handleApiError(err, 'changeRequest.errors.approveFailed');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Force approve: approve + execute in one action
+  const handleForceApprove = async () => {
+    setActionLoading(true);
+    try {
+      await changeRequestService.approve(
+        changeRequestId!,
+        comment || undefined,
+        projectApiPath
+      );
+      await changeRequestService.execute(changeRequestId!, projectApiPath);
+      setComment('');
+      enqueueSnackbar(t('changeRequest.actions.forceApproveSuccess'), {
+        variant: 'success',
+      });
       mutate();
       onRefresh?.();
     } catch (err: any) {
@@ -1337,6 +1375,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                 display: 'flex',
                                 gap: 1,
                                 justifyContent: 'flex-end',
+                                flexWrap: 'wrap',
                               }}
                             >
                               <Button
@@ -1377,6 +1416,33 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                               >
                                 {t('changeRequest.actions.approve')}
                               </Button>
+                              {hasAnyPermissions && (
+                                <Tooltip
+                                  title={t(
+                                    'changeRequest.actions.forceApproveTooltip'
+                                  )}
+                                >
+                                  <Button
+                                    variant="contained"
+                                    color="warning"
+                                    size="small"
+                                    startIcon={
+                                      actionLoading ? (
+                                        <CircularProgress
+                                          size={14}
+                                          color="inherit"
+                                        />
+                                      ) : (
+                                        <AutoFixHighIcon />
+                                      )
+                                    }
+                                    onClick={handleForceApprove}
+                                    disabled={actionLoading}
+                                  >
+                                    {t('changeRequest.actions.forceApprove')}
+                                  </Button>
+                                </Tooltip>
+                              )}
                             </Box>
                           </>
                         ) : (
@@ -1870,8 +1936,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                     <Box
                       sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
                     >
-                      {expandedGroups.__changeDetails && (
-                        <>
+                      <>
                           <Button
                             size="small"
                             variant="text"
@@ -1936,7 +2001,6 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                             {t('common.collapseAll')}
                           </Button>
                         </>
-                      )}
                       <ExpandMoreIcon
                         sx={{
                           fontSize: 20,
@@ -2115,23 +2179,38 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                               }}
                                             >
                                               {item.table !==
-                                                'g_feature_flags' &&
-                                                cr?.environmentModel
-                                                  ?.displayName && (
+                                                'g_feature_flags' && (
+                                                (['g_feature_segments', 'g_feature_flag_types'].includes(item.table)) ? (
                                                   <Chip
-                                                    label={
-                                                      cr.environmentModel
-                                                        .displayName
-                                                    }
+                                                    label={currentProject?.displayName || t('common.project')}
                                                     size="small"
                                                     variant="outlined"
+                                                    color="info"
                                                     sx={{
                                                       height: 16,
                                                       fontSize: 9,
                                                       fontWeight: 500,
                                                     }}
                                                   />
-                                                )}
+                                                ) : (
+                                                  cr?.environmentModel
+                                                    ?.displayName && (
+                                                    <Chip
+                                                      label={
+                                                        cr.environmentModel
+                                                          .displayName
+                                                      }
+                                                      size="small"
+                                                      variant="outlined"
+                                                      sx={{
+                                                        height: 16,
+                                                        fontSize: 9,
+                                                        fontWeight: 500,
+                                                      }}
+                                                    />
+                                                  )
+                                                )
+                                              )}
                                               {item.table !==
                                                 'g_feature_flags' &&
                                                 item.operation === 'update' &&

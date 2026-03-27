@@ -84,6 +84,7 @@ import {
   showChangeRequestCreatedToast,
   getActionLabel,
 } from '../../utils/changeRequestToast';
+import { ChangeRequestSubmitButtons } from '../../components/common/ChangeRequestSubmitButtons';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -500,13 +501,14 @@ const ServiceNoticesPage: React.FC = () => {
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = async (skipCr?: boolean) => {
     if (!deletingNotice) return;
 
     try {
       const result = await serviceNoticeService.deleteServiceNotice(
         projectApiPath,
-        deletingNotice.id
+        deletingNotice.id,
+        skipCr
       );
 
       if (result.isChangeRequest) {
@@ -535,11 +537,12 @@ const ServiceNoticesPage: React.FC = () => {
     setBulkDeleteDialogOpen(true);
   };
 
-  const confirmBulkDelete = async () => {
+  const confirmBulkDelete = async (skipCr?: boolean) => {
     try {
       const result = await serviceNoticeService.deleteMultipleServiceNotices(
         projectApiPath,
-        selectedIds
+        selectedIds,
+        skipCr
       );
 
       if (result.isChangeRequest) {
@@ -1341,9 +1344,12 @@ const ServiceNoticesPage: React.FC = () => {
           <Button onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">
-            {getActionLabel('delete', requiresApproval, t)}
-          </Button>
+          <ChangeRequestSubmitButtons
+            action="delete"
+            requiresApproval={requiresApproval}
+            saving={false}
+            onSave={(skipCr) => confirmDelete(skipCr)}
+          />
         </DialogActions>
       </Dialog>
 
@@ -1364,9 +1370,12 @@ const ServiceNoticesPage: React.FC = () => {
           <Button onClick={() => setBulkDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={confirmBulkDelete} color="error" variant="contained">
-            {getActionLabel('delete', requiresApproval, t)}
-          </Button>
+          <ChangeRequestSubmitButtons
+            action="delete"
+            requiresApproval={requiresApproval}
+            saving={false}
+            onSave={(skipCr) => confirmBulkDelete(skipCr)}
+          />
         </DialogActions>
       </Dialog>
 

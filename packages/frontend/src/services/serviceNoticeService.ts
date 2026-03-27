@@ -121,9 +121,10 @@ class ServiceNoticeService {
    */
   async createServiceNotice(
     projectApiPath: string,
-    data: CreateServiceNoticeData
+    data: CreateServiceNoticeData,
+    skipCr?: boolean
   ): Promise<ServiceNoticeMutationResult> {
-    const response = await api.post(`${projectApiPath}/service-notices`, data);
+    const response = await api.post(`${projectApiPath}/service-notices${skipCr ? '?skipCr=true' : ''}`, data);
     return parseChangeRequestResponse<ServiceNotice>(
       response,
       (r) => r?.notice
@@ -136,10 +137,11 @@ class ServiceNoticeService {
   async updateServiceNotice(
     projectApiPath: string,
     id: number,
-    data: UpdateServiceNoticeData
+    data: UpdateServiceNoticeData,
+    skipCr?: boolean
   ): Promise<ServiceNoticeMutationResult> {
     const response = await api.put(
-      `${projectApiPath}/service-notices/${id}`,
+      `${projectApiPath}/service-notices/${id}${skipCr ? '?skipCr=true' : ''}`,
       data
     );
     return parseChangeRequestResponse<ServiceNotice>(
@@ -153,10 +155,11 @@ class ServiceNoticeService {
    */
   async deleteServiceNotice(
     projectApiPath: string,
-    id: number
+    id: number,
+    skipCr?: boolean
   ): Promise<MutationResult<void>> {
     const response = await api.delete(
-      `${projectApiPath}/service-notices/${id}`
+      `${projectApiPath}/service-notices/${id}${skipCr ? '?skipCr=true' : ''}`
     );
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
@@ -166,10 +169,11 @@ class ServiceNoticeService {
    */
   async deleteMultipleServiceNotices(
     projectApiPath: string,
-    ids: number[]
+    ids: number[],
+    skipCr?: boolean
   ): Promise<MutationResult<void>> {
     const response = await api.post(
-      `${projectApiPath}/service-notices/bulk-delete`,
+      `${projectApiPath}/service-notices/bulk-delete${skipCr ? '?skipCr=true' : ''}`,
       {
         ids,
       }
@@ -182,10 +186,11 @@ class ServiceNoticeService {
    */
   async toggleActive(
     projectApiPath: string,
-    id: number
+    id: number,
+    skipCr?: boolean
   ): Promise<ServiceNoticeMutationResult> {
     const response = await api.patch(
-      `${projectApiPath}/service-notices/${id}/toggle-active`
+      `${projectApiPath}/service-notices/${id}/toggle-active${skipCr ? '?skipCr=true' : ''}`
     );
     return parseChangeRequestResponse<ServiceNotice>(
       response,

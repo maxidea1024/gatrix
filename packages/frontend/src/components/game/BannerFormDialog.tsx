@@ -43,6 +43,7 @@ import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import { getActionLabel } from '../../utils/changeRequestToast';
+import { ChangeRequestSubmitButtons } from '../common/ChangeRequestSubmitButtons';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import bannerService, {
@@ -346,7 +347,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
 
   const nameError = getNameError();
 
-  const handleSave = async () => {
+  const handleSave = async (skipCr: boolean = false) => {
     if (!name.trim()) {
       enqueueSnackbar(t('banners.nameRequired'), { variant: 'error' });
       return;
@@ -373,7 +374,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
             shuffle,
             sequences,
             tags: selectedTags,
-          }
+          },
+          skipCr
         );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -394,7 +396,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           shuffle,
           sequences,
           tags: selectedTags,
-        });
+        }, skipCr);
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
             enqueueSnackbar,
@@ -860,19 +862,13 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
         }}
       >
         <Button onClick={onClose}>{t('common.cancel')}</Button>
-        <Button
-          variant="contained"
-          onClick={handleSave}
+        <ChangeRequestSubmitButtons
+          action={isEditing ? 'update' : 'create'}
+          requiresApproval={requiresApproval}
+          saving={saving}
+          onSave={handleSave}
           disabled={saving || (!!banner && !isDirty)}
-        >
-          {saving
-            ? t('common.saving')
-            : getActionLabel(
-                isEditing ? 'update' : 'create',
-                requiresApproval,
-                t
-              )}
-        </Button>
+        />
       </Box>
     </ResizableDrawer>
   );

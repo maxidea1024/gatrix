@@ -16,10 +16,25 @@ import { GatrixError } from '../middleware/error-handler';
 import { ErrorCodes } from '@gatrix/shared';
 import { diff } from 'deep-diff';
 import { OutboxService } from './outbox-service';
+import { permissionService } from './permission-service';
+import { P } from '../types/permissions';
 
 import { createLogger } from '../config/logger';
 import { resolveEntityLabel } from '../utils/entity-label-resolver';
 const logger = createLogger('ChangeRequest');
+
+/**
+ * Tables that use a non-standard primary key (not 'id').
+ * Used during CR execution to query the correct column.
+ */
+const TABLE_PRIMARY_KEY_MAP: Record<string, string> = {
+  g_feature_flag_types: 'flagType',
+};
+
+/** Resolve the primary key column name for a given table */
+function getPrimaryKey(table: string): string {
+  return TABLE_PRIMARY_KEY_MAP[table] || 'id';
+}
 
 /**
  * Generate ops from beforeData and afterData
@@ -606,7 +621,7 @@ export class ChangeRequestService {
 
       try {
         const currentData = await knex(item.targetTable)
-          .where('id', item.targetId)
+          .where(getPrimaryKey(item.targetTable), item.targetId)
           .first();
 
         if (currentData && typeof currentData.version === 'number') {
@@ -643,7 +658,8 @@ export class ChangeRequestService {
   static async approveChangeRequest(
     changeRequestId: string,
     approverId: string,
-    comment?: string
+    comment?: string,
+    options?: { forceApprove?: boolean }
   ): Promise<ChangeRequest> {
     return await transaction(ChangeRequest.knex(), async (trx) => {
       const cr = await ChangeRequest.query(trx)
@@ -713,11 +729,34 @@ export class ChangeRequestService {
         }
       }
 
+      let isForced = false;
+      if (options?.forceApprove) {
+        const chain = await permissionService.resolveEnvironmentChain(cr.environmentId);
+        const hasSkipPermission = chain
+          ? await permissionService.hasEnvPermission(
+              approverId,
+              chain.orgId,
+              chain.projectId,
+              cr.environmentId,
+              P.CHANGE_REQUESTS_SKIP
+            )
+          : false;
+        if (!hasSkipPermission) {
+          throw new GatrixError(
+            'You do not have permission to force approve.',
+            403,
+            true,
+            'FORBIDDEN'
+          );
+        }
+        isForced = true;
+      }
+
       logger.info(
-        `Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environmentId})`
+        `Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environmentId}, Forced: ${isForced})`
       );
 
-      if (currentApprovals >= requiredApprovers) {
+      if (currentApprovals >= requiredApprovers || isForced) {
         const updated = await ChangeRequest.query(trx).patchAndFetchById(
           cr.id,
           {
@@ -828,7 +867,7 @@ export class ChangeRequestService {
     // Create Audit Log with comment
     await knex('g_audit_logs').insert({
       id: ulid(),
-      action: 'CHANGE_REQUEST_REJECTED',
+      action: 'change_request_rejected',
       userId: rejectedBy || '',
       changeRequestId: cr.id,
       entityType: 'ChangeRequest',
@@ -968,8 +1007,11 @@ export class ChangeRequestService {
           throw new Error(`Invalid target table: ${item.targetTable}`);
         }
 
+        // Resolve primary key column for this table
+        const pk = getPrimaryKey(item.targetTable);
+
         const targetRow = await trx(item.targetTable)
-          .where('id', item.targetId)
+          .where(pk, item.targetId)
           .first()
           .forUpdate(); // ROW LOCK
 
@@ -1066,7 +1108,7 @@ export class ChangeRequestService {
           // Use optimistic locking if version column exists
           if (hasVersionColumn && storedEntityVersion !== undefined) {
             affectedRows = await trx(item.targetTable)
-              .where('id', item.targetId)
+              .where(pk, item.targetId)
               .where('version', storedEntityVersion)
               .delete();
 
@@ -1080,7 +1122,7 @@ export class ChangeRequestService {
             }
           } else {
             affectedRows = await trx(item.targetTable)
-              .where('id', item.targetId)
+              .where(pk, item.targetId)
               .delete();
           }
 
@@ -1154,17 +1196,8 @@ export class ChangeRequestService {
           // These should be set in the ops/afterData if needed
 
           // Convert ISO 8601 datetime strings to MySQL format
-          const dateFields = [
-            'createdAt',
-            'updatedAt',
-            'startDate',
-            'endDate',
-            'saleStartAt',
-            'saleEndAt',
-            'maintenanceStartDate',
-            'maintenanceEndDate',
-          ];
-          for (const field of dateFields) {
+          // Instead of maintaining a list, scan all string fields
+          for (const field of Object.keys(dbData)) {
             if (dbData[field] && typeof dbData[field] === 'string') {
               // Check if it's ISO 8601 format (ends with Z or has timezone offset)
               if (
@@ -1283,7 +1316,7 @@ export class ChangeRequestService {
               ) {
                 dbData.version = liveData.version + 1;
                 const affectedRows = await trx(item.targetTable)
-                  .where('id', item.targetId)
+                  .where(pk, item.targetId)
                   .where('version', storedEntityVersion)
                   .update(dbData);
 
@@ -1298,7 +1331,7 @@ export class ChangeRequestService {
               } else {
                 // No version column - update without optimistic lock
                 await trx(item.targetTable)
-                  .where('id', item.targetId)
+                  .where(pk, item.targetId)
                   .update(dbData);
               }
             }
@@ -1394,7 +1427,7 @@ export class ChangeRequestService {
               ) {
                 dbData.version = liveData.version + 1;
                 const affectedRows = await trx(item.targetTable)
-                  .where('id', item.targetId)
+                  .where(pk, item.targetId)
                   .where('version', storedEntityVersion)
                   .update(dbData);
 
@@ -1409,7 +1442,7 @@ export class ChangeRequestService {
               } else {
                 // No version column - update without optimistic lock
                 await trx(item.targetTable)
-                  .where('id', item.targetId)
+                  .where(pk, item.targetId)
                   .update(dbData);
               }
             }
@@ -1460,7 +1493,7 @@ export class ChangeRequestService {
       // Log Execution
       await knex('g_audit_logs').transacting(trx).insert({
         id: ulid(),
-        action: 'CHANGE_REQUEST_EXECUTED',
+        action: 'change_request_executed',
         userId,
         changeRequestId: cr.id,
         entityType: 'ChangeRequest',
@@ -1641,7 +1674,7 @@ export class ChangeRequestService {
           // For UPDATE/DELETE revert, need to capture current state
           try {
             currentLiveData = await trx(item.targetTable)
-              .where('id', item.targetId)
+              .where(getPrimaryKey(item.targetTable), item.targetId)
               .first();
             if (currentLiveData?.version !== undefined) {
               currentVersion = currentLiveData.version;

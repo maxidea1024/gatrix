@@ -28,6 +28,7 @@ const forceHttps = process.env.EDGE_FORCE_HTTPS !== 'false';
 
 // Security middleware
 // Configure helmet with relaxed CSP for static HTML pages that use inline scripts
+// NOTE: upgrade-insecure-requests is NOT set here - it's handled per-request below
 const cspDirectives: Record<string, string[] | null | undefined> = {
   defaultSrc: ["'self'"],
   scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for game webview pages
@@ -35,12 +36,10 @@ const cspDirectives: Record<string, string[] | null | undefined> = {
   imgSrc: ["'self'", 'data:', 'https:', 'http:'],
   fontSrc: ["'self'", 'https:', 'http:', 'data:'],
   connectSrc: ["'self'", '*'], // Allow connecting to any API (important for SDKs)
+  // Explicitly disable upgrade-insecure-requests (helmet enables it by default!)
+  // It's conditionally re-added per-request below only for actual HTTPS connections
+  upgradeInsecureRequests: null,
 };
-
-// Only add upgrade-insecure-requests for HTTPS environments
-if (forceHttps) {
-  cspDirectives.upgradeInsecureRequests = [];
-}
 
 app.use(
   helmet({
@@ -57,6 +56,23 @@ app.use(
     originAgentCluster: false, // Disable to avoid origin-keying issues in HTTP
   })
 );
+
+// Per-request CSP: add upgrade-insecure-requests ONLY for actual HTTPS requests
+// This prevents HTTP WebView (e.g. UE4 game client) from being blocked
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const isHttps =
+    req.secure || req.headers['x-forwarded-proto'] === 'https';
+  if (forceHttps && isHttps) {
+    const existingCsp = res.getHeader('content-security-policy');
+    if (typeof existingCsp === 'string') {
+      res.setHeader(
+        'content-security-policy',
+        existingCsp + '; upgrade-insecure-requests'
+      );
+    }
+  }
+  next();
+});
 
 // CORS configuration (origin configurable via EDGE_CORS_ORIGIN)
 const corsOriginConfig = config.security.corsOrigin;

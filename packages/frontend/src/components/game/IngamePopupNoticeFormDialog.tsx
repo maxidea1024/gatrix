@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
-import { getActionLabel } from '../../utils/changeRequestToast';
+import { ChangeRequestSubmitButtons } from '../common/ChangeRequestSubmitButtons';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import { useGameWorld } from '../../contexts/GameWorldContext';
@@ -339,7 +339,7 @@ const IngamePopupNoticeFormDialog: React.FC<
     selectedTags,
   ]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (skipCr?: boolean) => {
     // Validation
     if (!content.trim()) {
       enqueueSnackbar(t('ingamePopupNotices.contentRequired'), {
@@ -400,7 +400,8 @@ const IngamePopupNoticeFormDialog: React.FC<
         const result = await ingamePopupNoticeService.updateIngamePopupNotice(
           projectApiPath,
           notice.id,
-          data
+          data,
+          skipCr
         );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -416,7 +417,8 @@ const IngamePopupNoticeFormDialog: React.FC<
       } else {
         const result = await ingamePopupNoticeService.createIngamePopupNotice(
           projectApiPath,
-          data as CreateIngamePopupNoticeData
+          data as CreateIngamePopupNoticeData,
+          skipCr
         );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -730,13 +732,13 @@ const IngamePopupNoticeFormDialog: React.FC<
         <Button onClick={onClose} disabled={submitting}>
           {t('common.cancel')}
         </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
+        <ChangeRequestSubmitButtons
+          action={notice ? 'update' : 'create'}
+          requiresApproval={requiresApproval}
+          saving={submitting}
+          onSave={handleSubmit}
           disabled={submitting || (!!notice && !isDirty)}
-        >
-          {getActionLabel(notice ? 'update' : 'create', requiresApproval, t)}
-        </Button>
+        />
       </Box>
     </ResizableDrawer>
   );
