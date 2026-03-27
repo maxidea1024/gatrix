@@ -60,7 +60,10 @@ import DynamicFilterBar, {
 } from '../../components/common/DynamicFilterBar';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import RewardDisplay from '../../components/game/RewardDisplay';
-import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from '../../utils/changeRequestToast';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
@@ -69,6 +72,7 @@ import ExportImportMenuItems from '../../components/common/ExportImportMenuItems
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 import TagChips from '../../components/common/TagChips';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
@@ -78,6 +82,8 @@ const SurveysPage: React.FC = () => {
   const canManage = hasPermission([P.SURVEYS_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
 
   // State
   const [surveys, setSurveys] = useState<Survey[]>([]);
@@ -321,8 +327,12 @@ const SurveysPage: React.FC = () => {
     if (!deletingSurvey) return;
 
     try {
-      await surveyService.deleteSurvey(projectApiPath, deletingSurvey.id);
-      enqueueSnackbar(t('surveys.deleteSuccess'), { variant: 'success' });
+      const result = await surveyService.deleteSurvey(projectApiPath, deletingSurvey.id);
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+      } else {
+        enqueueSnackbar(t('surveys.deleteSuccess'), { variant: 'success' });
+      }
       setSelectedIds([]);
       loadSurveys();
     } catch (error: any) {
@@ -347,10 +357,16 @@ const SurveysPage: React.FC = () => {
     if (selectedIds.length === 0) return;
 
     try {
-      await Promise.all(
-        selectedIds.map((id) => surveyService.deleteSurvey(projectApiPath, id))
-      );
-      enqueueSnackbar(t('surveys.bulkDeleteSuccess'), { variant: 'success' });
+      let crCreated = false;
+      for (const id of selectedIds) {
+        const result = await surveyService.deleteSurvey(projectApiPath, id);
+        if (result.isChangeRequest) crCreated = true;
+      }
+      if (crCreated) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+      } else {
+        enqueueSnackbar(t('surveys.bulkDeleteSuccess'), { variant: 'success' });
+      }
       setSelectedIds([]);
       loadSurveys();
     } catch (error: any) {
@@ -813,7 +829,7 @@ const SurveysPage: React.FC = () => {
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{t('common.delete')}</ListItemText>
+          <ListItemText>{getActionLabel('delete', requiresApproval, t)}</ListItemText>
         </MenuItem>
       </Menu>
 

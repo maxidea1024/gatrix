@@ -75,16 +75,23 @@ import ExportImportMenuItems from '../../components/common/ExportImportMenuItems
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 import TagChips from '../../components/common/TagChips';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from '../../utils/changeRequestToast';
 
 const IngamePopupNoticesPage: React.FC = () => {
   const { t } = useTranslation();
   const { language } = useI18n();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { platforms } = usePlatformConfig();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([P.INGAME_POPUPS_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
 
   // State
   const [notices, setNotices] = useState<IngamePopupNotice[]>([]);
@@ -410,13 +417,17 @@ const IngamePopupNoticesPage: React.FC = () => {
     if (!deletingNotice) return;
 
     try {
-      await ingamePopupNoticeService.deleteIngamePopupNotice(
+      const result = await ingamePopupNoticeService.deleteIngamePopupNotice(
         projectApiPath,
         deletingNotice.id
       );
-      enqueueSnackbar(t('ingamePopupNotices.deleteSuccess'), {
-        variant: 'success',
-      });
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(t('ingamePopupNotices.deleteSuccess'), {
+          variant: 'success',
+        });
+      }
       setDeleteDialogOpen(false);
       setDeletingNotice(null);
       loadNotices();
@@ -437,16 +448,20 @@ const IngamePopupNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(
+      const result = await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(
         projectApiPath,
         selectedIds
       );
-      enqueueSnackbar(
-        t('ingamePopupNotices.bulkDeleteSuccess', {
-          count: selectedIds.length,
-        }),
-        { variant: 'success' }
-      );
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(
+          t('ingamePopupNotices.bulkDeleteSuccess', {
+            count: selectedIds.length,
+          }),
+          { variant: 'success' }
+        );
+      }
       setBulkDeleteDialogOpen(false);
       setSelectedIds([]);
       loadNotices();
@@ -966,7 +981,7 @@ const IngamePopupNoticesPage: React.FC = () => {
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{t('common.delete')}</ListItemText>
+          <ListItemText>{getActionLabel('delete', requiresApproval, t)}</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -994,7 +1009,7 @@ const IngamePopupNoticesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button onClick={confirmDelete} color="error" variant="contained">
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1017,7 +1032,7 @@ const IngamePopupNoticesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button onClick={confirmBulkDelete} color="error" variant="contained">
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
         </DialogActions>
       </Dialog>

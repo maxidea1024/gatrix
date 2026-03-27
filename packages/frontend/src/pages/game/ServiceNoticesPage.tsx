@@ -80,13 +80,18 @@ import ExportImportMenuItems from '../../components/common/ExportImportMenuItems
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 import TagChips from '../../components/common/TagChips';
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from '../../utils/changeRequestToast';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
   const { language } = useI18n();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const canManage = hasPermission([P.SERVICE_NOTICES_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
@@ -505,12 +510,8 @@ const ServiceNoticesPage: React.FC = () => {
       );
 
       if (result.isChangeRequest) {
-        // CR was created, not immediately deleted
-        enqueueSnackbar(t('serviceNotices.deleteChangeRequestCreated'), {
-          variant: 'info',
-        });
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
       } else {
-        // Directly deleted
         enqueueSnackbar(t('serviceNotices.deleteSuccess'), {
           variant: 'success',
         });
@@ -542,15 +543,8 @@ const ServiceNoticesPage: React.FC = () => {
       );
 
       if (result.isChangeRequest) {
-        // CR was created, not immediately deleted
-        enqueueSnackbar(
-          t('serviceNotices.bulkDeleteChangeRequestCreated', {
-            count: selectedIds.length,
-          }),
-          { variant: 'info' }
-        );
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
       } else {
-        // Directly deleted
         enqueueSnackbar(
           t('serviceNotices.bulkDeleteSuccess', { count: selectedIds.length }),
           {
@@ -1308,7 +1302,7 @@ const ServiceNoticesPage: React.FC = () => {
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText>{t('common.delete')}</ListItemText>
+          <ListItemText>{getActionLabel('delete', requiresApproval, t)}</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -1339,7 +1333,7 @@ const ServiceNoticesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button onClick={confirmDelete} color="error" variant="contained">
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1362,7 +1356,7 @@ const ServiceNoticesPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button onClick={confirmBulkDelete} color="error" variant="contained">
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
         </DialogActions>
       </Dialog>
