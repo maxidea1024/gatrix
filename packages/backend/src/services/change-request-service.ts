@@ -283,6 +283,11 @@ export class ChangeRequestService {
 
       const ops = generateOps(beforeData, mergedAfterData);
 
+      // Skip items with no actual changes for UPDATE operations
+      if (opType === 'UPDATE' && ops.length === 0) {
+        return { changeRequestId: cr.id, status: cr.status };
+      }
+
       // 4. Check if item for this target already exists
       const existingItem = await ChangeItem.query()
         .where('changeRequestId', cr.id)
@@ -291,10 +296,19 @@ export class ChangeRequestService {
         .first();
 
       if (existingItem) {
+        // If the existing item is a DELETE and we're trying to UPDATE, skip it
+        // (cannot modify an item already marked for deletion in the same CR)
+        if (existingItem.opType === 'DELETE' && opType === 'UPDATE') {
+          logger.info(
+            `Skipping UPDATE for ${targetTable}:${targetId} — item already marked for DELETE in CR ${cr.id}`
+          );
+          return { changeRequestId: cr.id, status: cr.status };
+        }
         // Update existing item's ops
+        // Use mergedAfterData for label resolution so all fields (e.g. platform, clientVersion) are available
         const displayName = resolveEntityLabel(
           targetTable,
-          afterData || beforeData
+          mergedAfterData || beforeData
         );
         await ChangeItem.query()
           .findById(existingItem.id)
@@ -339,9 +353,10 @@ export class ChangeRequestService {
         }
 
         // Insert ChangeItem with ops
+        // Use mergedAfterData for label resolution so all fields (e.g. platform, clientVersion) are available
         const displayName = resolveEntityLabel(
           targetTable,
-          afterData || beforeData
+          mergedAfterData || beforeData
         );
         await ChangeItem.query().insert({
           id: ulid(),
@@ -391,6 +406,42 @@ export class ChangeRequestService {
           true,
           'PENDING_REVIEW_EXISTS'
         );
+      }
+
+      // Skip items with no actual changes (systemic guard for bulk operations)
+      if (beforeDraftData && draftData) {
+        const internalKeys = new Set(['_flagName']);
+        const relevantKeys = Object.keys(draftData).filter(
+          (k) => !internalKeys.has(k)
+        );
+        let hasActualChange = false;
+        for (const key of relevantKeys) {
+          const beforeVal = beforeDraftData[key];
+          const afterVal = draftData[key];
+          if (JSON.stringify(beforeVal) !== JSON.stringify(afterVal)) {
+            hasActualChange = true;
+            break;
+          }
+        }
+        if (!hasActualChange) {
+          logger.debug(
+            `Skipping upsertDraftDataItem for ${targetTable}:${targetId} — no actual changes detected`
+          );
+          // Return existing draft CR id if available, otherwise create a minimal response
+          const existingDraft = await ChangeRequest.query()
+            .where('requesterId', userId)
+            .where('environmentId', environmentId)
+            .where('status', 'draft')
+            .first();
+          if (existingDraft) {
+            return {
+              changeRequestId: existingDraft.id,
+              status: existingDraft.status,
+            };
+          }
+          // No draft exists and no changes — return a no-op indicator
+          return { changeRequestId: '', status: 'draft' };
+        }
       }
 
       // Find or create draft CR

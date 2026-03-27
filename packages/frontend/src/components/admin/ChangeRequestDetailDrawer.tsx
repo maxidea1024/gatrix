@@ -2211,7 +2211,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                             {item.table !==
                                               'g_feature_flags' &&
                                               item.operation === 'update' &&
-                                              `${item.changes.length} ops`}
+                                              ''}
                                           </Typography>
                                         </Box>
                                         {item.operation !== 'delete' ? (

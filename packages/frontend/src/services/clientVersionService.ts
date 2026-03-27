@@ -302,16 +302,28 @@ export class ClientVersionService {
     projectApiPath: string,
     data: BulkStatusUpdateRequest,
     skipCr?: boolean
-  ): Promise<{ updatedCount: number; message: string }> {
+  ): Promise<{
+    updatedCount: number;
+    message: string;
+    isChangeRequest?: boolean;
+    changeRequestId?: string;
+  }> {
     const response = await apiService.patch<any>(
       `${this.basePath(projectApiPath)}/bulk-status${skipCr ? '?skipCr=true' : ''}`,
       data
     );
 
-    console.log('🔍 Bulk update response:', response);
-
     // ApiService.request() already returns response.data
     if (response?.success && response?.data) {
+      // Detect CR response (changeRequestId present in data)
+      if (response.data.changeRequestId) {
+        return {
+          updatedCount: 0,
+          message: response.message || '',
+          isChangeRequest: true,
+          changeRequestId: response.data.changeRequestId,
+        };
+      }
       return response.data;
     }
 

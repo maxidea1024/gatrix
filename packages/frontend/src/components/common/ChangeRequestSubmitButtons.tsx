@@ -2,16 +2,12 @@ import React, { useState, useRef } from 'react';
 import {
   Button,
   ButtonGroup,
+  Box,
   CircularProgress,
   Popper,
   Grow,
   Paper,
   ClickAwayListener,
-  MenuList,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Typography,
 } from '@mui/material';
 import {
   ArrowDropDown as ArrowDropDownIcon,
@@ -22,6 +18,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
 import { getActionLabel } from '@/utils/changeRequestToast';
 
+import { Placement } from '@popperjs/core';
+
 export interface ChangeRequestSubmitButtonsProps {
   action: 'create' | 'update' | 'delete' | 'save';
   requiresApproval: boolean;
@@ -30,6 +28,7 @@ export interface ChangeRequestSubmitButtonsProps {
   title?: string;
   disabled?: boolean;
   startIcon?: React.ReactNode;
+  popperPlacement?: Placement;
 }
 
 export const ChangeRequestSubmitButtons: React.FC<
@@ -42,6 +41,7 @@ export const ChangeRequestSubmitButtons: React.FC<
   title,
   disabled,
   startIcon,
+  popperPlacement = 'bottom-end',
 }) => {
   const { t } = useTranslation();
   const { hasPermission } = useAuth();
@@ -137,7 +137,7 @@ export const ChangeRequestSubmitButtons: React.FC<
         role={undefined}
         transition
         disablePortal={false}
-        placement="bottom-end"
+        placement={popperPlacement}
       >
         {({ TransitionProps }) => (
           <Grow
@@ -150,39 +150,31 @@ export const ChangeRequestSubmitButtons: React.FC<
                 borderRadius: 1,
                 overflow: 'hidden',
                 mt: 0.5,
-                border: 1,
-                borderColor: 'divider',
               }}
             >
               <ClickAwayListener onClickAway={handleClose}>
-                <MenuList
-                  id="cr-split-button-menu"
-                  autoFocusItem
-                  dense
-                  sx={{ py: 0.5 }}
-                >
-                  <MenuItem
+                <Box sx={{ p: 0.5 }}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="warning"
+                    size="small"
+                    startIcon={<FlashOnIcon fontSize="small" />}
                     disabled={saving || disabled}
                     onClick={(event) => {
                       onSave(true);
                       handleClose(event);
                     }}
-                    sx={{ px: 2, py: 0.75 }}
+                    sx={{
+                      justifyContent: 'flex-start',
+                      textTransform: 'none',
+                      fontWeight: 500,
+                      fontSize: '0.8125rem',
+                    }}
                   >
-                    <ListItemIcon sx={{ minWidth: 28 }}>
-                      <FlashOnIcon
-                        fontSize="small"
-                        sx={{ color: 'warning.main', fontSize: 16 }}
-                      />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={skipLabel}
-                      primaryTypographyProps={{
-                        fontSize: '0.8125rem',
-                      }}
-                    />
-                  </MenuItem>
-                </MenuList>
+                    {skipLabel}
+                  </Button>
+                </Box>
               </ClickAwayListener>
             </Paper>
           </Grow>

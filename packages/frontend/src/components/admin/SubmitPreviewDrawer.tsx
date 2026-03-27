@@ -387,17 +387,6 @@ const SubmitPreviewDrawer: React.FC<SubmitPreviewDrawerProps> = ({
                               sx={{ height: 20, fontSize: 11 }}
                             />
                           </Box>
-                          {/* Show ops count for UPDATE */}
-                          {(item as any).opType === 'UPDATE' &&
-                            (item as any).ops?.length > 0 && (
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                              >
-                                {(item as any).ops.length}{' '}
-                                {t('changeRequest.fieldChanges')}
-                              </Typography>
-                            )}
                         </Box>
                       </Box>
                     ))}

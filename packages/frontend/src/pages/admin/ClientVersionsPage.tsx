@@ -100,6 +100,7 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
   MoreVert as MoreVertIcon,
+  FlashOn as FlashOnIcon,
 } from '@mui/icons-material';
 import { InputAdornment } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -965,15 +966,19 @@ const ClientVersionsPage: React.FC = () => {
         request,
         skipCr
       );
-      console.log('🔍 Bulk update result:', result);
 
-      // Localization된 메시지 Create
-      const updatedCount = result?.updatedCount || selectedIds.length;
-      const successMessage = t('clientVersions.bulkStatusUpdated', {
-        count: updatedCount,
-      });
+      // Handle CR response - trigger floating banner
+      if (result?.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+      } else {
+        // Localization된 메시지 Create
+        const updatedCount = result?.updatedCount || selectedIds.length;
+        const successMessage = t('clientVersions.bulkStatusUpdated', {
+          count: updatedCount,
+        });
 
-      enqueueSnackbar(successMessage, { variant: 'success' });
+        enqueueSnackbar(successMessage, { variant: 'success' });
+      }
       setBulkStatusDialogOpen(false);
       setSelectedIds([]);
       setSelectAll(false);
@@ -1007,26 +1012,33 @@ const ClientVersionsPage: React.FC = () => {
     maintenanceLocales,
     selectedTemplateId,
     enqueueSnackbar,
+    closeSnackbar,
+    navigate,
     mutateVersions,
     t,
   ]);
 
   // 일괄 Delete 핸들러
-  const handleBulkDelete = useCallback(async () => {
+  const handleBulkDelete = useCallback(async (skipCr: boolean = false) => {
     if (selectedIds.length === 0) return;
 
     try {
-      await Promise.all(
+      const results = await Promise.all(
         selectedIds.map((id) =>
-          ClientVersionService.deleteClientVersion(projectApiPath, id)
+          ClientVersionService.deleteClientVersion(projectApiPath, id, skipCr)
         )
       );
-      enqueueSnackbar(
-        t('clientVersions.bulkDeleteSuccess', { count: selectedIds.length }),
-        {
-          variant: 'success',
-        }
-      );
+      const hasChangeRequest = results.some((r) => r.isChangeRequest);
+      if (hasChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
+      } else {
+        enqueueSnackbar(
+          t('clientVersions.bulkDeleteSuccess', { count: selectedIds.length }),
+          {
+            variant: 'success',
+          }
+        );
+      }
       setSelectedIds([]);
       setSelectAll(false);
       setBulkDeleteDialogOpen(false);
@@ -1041,7 +1053,7 @@ const ClientVersionsPage: React.FC = () => {
         }
       );
     }
-  }, [selectedIds, t, enqueueSnackbar, mutateVersions]);
+  }, [selectedIds, t, enqueueSnackbar, closeSnackbar, navigate, mutateVersions]);
 
   // 내보내기 함수들
   const handleExport = useCallback(
@@ -2478,8 +2490,18 @@ const ClientVersionsPage: React.FC = () => {
           <Button onClick={() => setBulkDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
+          {requiresApproval && hasPermission([P.CHANGE_REQUESTS_SKIP]) && (
+            <Button
+              variant="outlined"
+              color="warning"
+              onClick={() => handleBulkDelete(true)}
+              startIcon={<FlashOnIcon />}
+            >
+              {t('changeRequest.actions.immediateUpdate')}
+            </Button>
+          )}
           <Button
-            onClick={handleBulkDelete}
+            onClick={() => handleBulkDelete(false)}
             color="error"
             variant="contained"
             startIcon={<DeleteIcon />}

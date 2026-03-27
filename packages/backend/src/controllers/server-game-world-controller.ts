@@ -3,6 +3,7 @@ import { GameWorldService } from '../services/game-world-service';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cache-keys';
 import { respondWithEtagCache } from '../utils/server-sdk-etag-cache';
 import { EnvironmentRequest } from '../middleware/environment-resolver';
+import { GatrixError } from '../middleware/error-handler';
 
 import { createLogger } from '../config/logger';
 const logger = createLogger('ServerGameWorldController');
@@ -257,15 +258,23 @@ export class ServerGameWorldController {
         },
       });
     } catch (error) {
+      const statusCode =
+        error instanceof GatrixError ? error.statusCode : 500;
       logger.error(
         'Error in ServerGameWorldController.getGameWorldById:',
         error
       );
-      res.status(500).json({
+      res.status(statusCode).json({
         success: false,
         error: {
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve game world',
+          code:
+            statusCode === 404
+              ? 'GAME_WORLD_NOT_FOUND'
+              : 'INTERNAL_SERVER_ERROR',
+          message:
+            error instanceof GatrixError
+              ? error.message
+              : 'Failed to retrieve game world',
         },
       });
     }
@@ -376,15 +385,23 @@ export class ServerGameWorldController {
         },
       });
     } catch (error) {
+      const statusCode =
+        error instanceof GatrixError ? error.statusCode : 500;
       logger.error(
         'Error in ServerGameWorldController.getGameWorldByWorldId:',
         error
       );
-      res.status(500).json({
+      res.status(statusCode).json({
         success: false,
         error: {
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve game world',
+          code:
+            statusCode === 404
+              ? 'GAME_WORLD_NOT_FOUND'
+              : 'INTERNAL_SERVER_ERROR',
+          message:
+            error instanceof GatrixError
+              ? error.message
+              : 'Failed to retrieve game world',
         },
       });
     }
