@@ -118,6 +118,11 @@ import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from '../../utils/changeRequestToast';
 
 // Column definition interface
 interface ColumnConfig {
@@ -200,11 +205,13 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
 
 const MessageTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([P.MAINTENANCE_TEMPLATES_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
+  const { currentEnvironment } = useEnvironment();
+  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -590,13 +597,17 @@ const MessageTemplatesPage: React.FC = () => {
 
   const confirmBulkDelete = useCallback(async () => {
     try {
-      await messageTemplateService.bulkDelete(projectApiPath, selectedIds);
-      enqueueSnackbar(
-        t('messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }),
-        {
-          variant: 'success',
-        }
-      );
+      const result = await messageTemplateService.bulkDelete(projectApiPath, selectedIds);
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(
+          t('messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }),
+          {
+            variant: 'success',
+          }
+        );
+      }
       setSelectedIds([]);
       setSelectAll(false);
       setBulkDeleteDialogOpen(false);
@@ -610,7 +621,7 @@ const MessageTemplatesPage: React.FC = () => {
         }
       );
     }
-  }, [selectedIds, t, enqueueSnackbar, load]);
+  }, [selectedIds, t, enqueueSnackbar, closeSnackbar, load]);
 
   // 일괄 Used 가능/불가 변경
   const handleBulkToggleAvailability = useCallback(
@@ -663,8 +674,12 @@ const MessageTemplatesPage: React.FC = () => {
     if (!deletingTemplate?.id) return;
 
     try {
-      await messageTemplateService.delete(projectApiPath, deletingTemplate.id);
-      enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
+      const result = await messageTemplateService.delete(projectApiPath, deletingTemplate.id);
+      if (result.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
+      }
       setDeleteDialogOpen(false);
       setDeletingTemplate(null);
       load();
@@ -674,7 +689,7 @@ const MessageTemplatesPage: React.FC = () => {
         variant: 'error',
       });
     }
-  }, [deletingTemplate, t, enqueueSnackbar, load]);
+  }, [deletingTemplate, t, enqueueSnackbar, closeSnackbar, load]);
 
   const handleAdd = () => {
     setEditing(null);
@@ -765,30 +780,27 @@ const MessageTemplatesPage: React.FC = () => {
         tags: form.tags || [],
       };
 
-      let templateId: number;
-
       if (editing?.id) {
-        await messageTemplateService.update(
+        const result = await messageTemplateService.update(
           projectApiPath,
           editing.id,
           payload
         );
-        templateId = editing.id;
-        enqueueSnackbar(t('common.updateSuccess'), { variant: 'success' });
+        if (result.isChangeRequest) {
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+        } else {
+          enqueueSnackbar(t('common.updateSuccess'), { variant: 'success' });
+        }
       } else {
-        const created = await messageTemplateService.create(
+        const result = await messageTemplateService.create(
           projectApiPath,
           payload
         );
-        templateId =
-          created?.id ||
-          (created as any)?.data?.id ||
-          (created as any)?.insertId;
-
-        if (!templateId) {
-          throw new Error(t('common.cannotGetTemplateId'));
+        if (result.isChangeRequest) {
+          showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+        } else {
+          enqueueSnackbar(t('common.createSuccess'), { variant: 'success' });
         }
-        enqueueSnackbar(t('common.createSuccess'), { variant: 'success' });
       }
 
       setDialogOpen(false);
@@ -1399,44 +1411,28 @@ const MessageTemplatesPage: React.FC = () => {
             {saving
               ? t('common.saving')
               : editing
-                ? t('common.update')
-                : t('common.add')}
+                ? getActionLabel('update', requiresApproval, t)
+                : getActionLabel('create', requiresApproval, t)}
           </Button>
         </Box>
       </ResizableDrawer>
 
-      {/* 개별 Delete Confirm Drawer */}
-      <ResizableDrawer
+      {/* 개별 Delete Confirm Dialog */}
+      <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        title={t('common.confirmDelete')}
-        subtitle=""
-        storageKey="messageTemplateDeleteDrawerWidth"
-        defaultWidth={400}
-        minWidth={350}
-        zIndex={1301}
+        maxWidth="xs"
+        fullWidth
       >
-        {/* Content */}
-        <Box sx={{ flex: 1, p: 2 }}>
+        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
+        <DialogContent>
           <Typography>
             {t('messageTemplates.confirmDelete', {
               name: deletingTemplate?.name,
             })}
           </Typography>
-        </Box>
-
-        {/* Footer */}
-        <Box
-          sx={{
-            p: 2,
-            borderTop: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-            display: 'flex',
-            gap: 2,
-            justifyContent: 'flex-end',
-          }}
-        >
+        </DialogContent>
+        <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
@@ -1446,43 +1442,27 @@ const MessageTemplatesPage: React.FC = () => {
             variant="contained"
             startIcon={<DeleteIcon />}
           >
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
-        </Box>
-      </ResizableDrawer>
+        </DialogActions>
+      </Dialog>
 
-      {/* 일괄 Delete Confirm Drawer */}
-      <ResizableDrawer
+      {/* 일괄 Delete Confirm Dialog */}
+      <Dialog
         open={bulkDeleteDialogOpen}
         onClose={() => setBulkDeleteDialogOpen(false)}
-        title={t('common.confirmDelete')}
-        subtitle=""
-        storageKey="messageTemplateBulkDeleteDrawerWidth"
-        defaultWidth={400}
-        minWidth={350}
-        zIndex={1301}
+        maxWidth="xs"
+        fullWidth
       >
-        {/* Content */}
-        <Box sx={{ flex: 1, p: 2 }}>
+        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
+        <DialogContent>
           <Typography>
             {t('messageTemplates.confirmBulkDelete', {
               count: selectedIds.length,
             })}
           </Typography>
-        </Box>
-
-        {/* Footer */}
-        <Box
-          sx={{
-            p: 2,
-            borderTop: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-            display: 'flex',
-            gap: 2,
-            justifyContent: 'flex-end',
-          }}
-        >
+        </DialogContent>
+        <DialogActions>
           <Button onClick={() => setBulkDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
@@ -1492,10 +1472,10 @@ const MessageTemplatesPage: React.FC = () => {
             variant="contained"
             startIcon={<DeleteIcon />}
           >
-            {t('common.delete')}
+            {getActionLabel('delete', requiresApproval, t)}
           </Button>
-        </Box>
-      </ResizableDrawer>
+        </DialogActions>
+      </Dialog>
 
       {/* 태그 관리 Dialog */}
       <Dialog

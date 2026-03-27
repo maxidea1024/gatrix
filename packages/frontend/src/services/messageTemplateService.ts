@@ -25,6 +25,13 @@ export interface MessageTemplateListResponse {
   total: number;
 }
 
+// Extended response type for CR-aware mutations
+export interface MessageTemplateMutationResult {
+  data?: any;
+  isChangeRequest: boolean;
+  changeRequestId?: string;
+}
+
 export const messageTemplateService = {
   async list(
     projectApiPath: string,
@@ -64,47 +71,102 @@ export const messageTemplateService = {
   async create(
     projectApiPath: string,
     data: MessageTemplate
-  ): Promise<MessageTemplate> {
+  ): Promise<MessageTemplateMutationResult> {
     const res = await apiService.post<any>(
       `${projectApiPath}/message-templates`,
       data
     );
 
-    // Server response structure: { success: true, data: created }
-    if (res?.data?.success && res?.data?.data) {
-      return res.data.data;
+    // Check if this is a change request response
+    const responseData = res?.data?.data || res?.data || res;
+    if (responseData?.changeRequestId) {
+      return {
+        isChangeRequest: true,
+        changeRequestId: responseData.changeRequestId,
+      };
     }
 
-    // Other structures for backward compatibility
-    return res?.data?.data || res?.data || res;
+    return {
+      data: responseData,
+      isChangeRequest: false,
+    };
   },
   async update(
     projectApiPath: string,
     id: number,
     data: MessageTemplate
-  ): Promise<MessageTemplate> {
+  ): Promise<MessageTemplateMutationResult> {
     const res = await apiService.put<any>(
       `${projectApiPath}/message-templates/${id}`,
       data
     );
 
-    // Server response structure: { success: true, data: updated }
-    if (res?.data?.success && res?.data?.data) {
-      return res.data.data;
+    // Check if this is a change request response
+    const responseData = res?.data?.data || res?.data || res;
+    if (responseData?.changeRequestId) {
+      return {
+        isChangeRequest: true,
+        changeRequestId: responseData.changeRequestId,
+      };
     }
 
-    // Other structures for backward compatibility
-    return res?.data?.data || res?.data || res;
+    return {
+      data: responseData,
+      isChangeRequest: false,
+    };
   },
-  async remove(projectApiPath: string, id: number): Promise<void> {
-    await apiService.delete(`${projectApiPath}/message-templates/${id}`);
+  async remove(
+    projectApiPath: string,
+    id: number
+  ): Promise<MessageTemplateMutationResult> {
+    const res: any = await apiService.delete(
+      `${projectApiPath}/message-templates/${id}`
+    );
+
+    const responseData = res?.data?.data || res?.data || res;
+    if (responseData?.changeRequestId) {
+      return {
+        isChangeRequest: true,
+        changeRequestId: responseData.changeRequestId,
+      };
+    }
+
+    return { isChangeRequest: false };
   },
-  async delete(projectApiPath: string, id: number): Promise<void> {
-    await apiService.delete(`${projectApiPath}/message-templates/${id}`);
+  async delete(
+    projectApiPath: string,
+    id: number
+  ): Promise<MessageTemplateMutationResult> {
+    const res: any = await apiService.delete(
+      `${projectApiPath}/message-templates/${id}`
+    );
+
+    const responseData = res?.data?.data || res?.data || res;
+    if (responseData?.changeRequestId) {
+      return {
+        isChangeRequest: true,
+        changeRequestId: responseData.changeRequestId,
+      };
+    }
+
+    return { isChangeRequest: false };
   },
-  async bulkDelete(projectApiPath: string, ids: number[]): Promise<void> {
-    await apiService.post(`${projectApiPath}/message-templates/bulk-delete`, {
-      ids,
-    });
+  async bulkDelete(
+    projectApiPath: string,
+    ids: number[]
+  ): Promise<MessageTemplateMutationResult> {
+    const res: any = await apiService.post(
+      `${projectApiPath}/message-templates/bulk-delete`,
+      { ids }
+    );
+
+    const responseData = res?.data?.data || res?.data || res;
+    if (responseData?.mode === 'CHANGE_REQUEST') {
+      return {
+        isChangeRequest: true,
+      };
+    }
+
+    return { isChangeRequest: false };
   },
 };

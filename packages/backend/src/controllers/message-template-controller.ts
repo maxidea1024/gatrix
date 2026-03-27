@@ -5,6 +5,7 @@ import {
   MessageTemplate,
 } from '../models/message-template';
 import { TagService } from '../services/tag-service';
+import { UnifiedChangeGateway } from '../services/unified-change-gateway';
 
 export class MessageTemplateController {
   static async list(
@@ -106,6 +107,7 @@ export class MessageTemplateController {
     try {
       const body = req.body as MessageTemplate;
       const environmentId = req.environmentId!;
+      const userId = (req as any)?.user?.userId;
 
       // Check for duplicate name
       const existing = await MessageTemplateModel.findByName(body.name);
@@ -121,28 +123,49 @@ export class MessageTemplateController {
         });
       }
 
+      // Use UnifiedChangeGateway for CR support
       const { tags, ...templateData } = body as any;
-      const created = await MessageTemplateModel.create(
-        {
-          ...templateData,
-          created_by: (req as any)?.user?.userId,
-          updated_by: (req as any)?.user?.userId,
-        },
-        environmentId
+      const createData = {
+        ...templateData,
+        created_by: userId,
+        updated_by: userId,
+      };
+
+      const gatewayResult = await UnifiedChangeGateway.requestCreation(
+        userId,
+        environmentId,
+        'g_message_templates',
+        createData,
+        async () => {
+          const created = await MessageTemplateModel.create(
+            createData,
+            environmentId
+          );
+
+          // Handle tags if provided
+          if (tags && Array.isArray(tags) && created?.id) {
+            const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
+            await TagService.setTagsForEntity(
+              'message_template',
+              created.id.toString(),
+              tagIds,
+              userId
+            );
+          }
+
+          return created;
+        }
       );
 
-      // Handle tags if provided
-      if (tags && Array.isArray(tags) && created?.id) {
-        const tagIds = tags.map((tag: any) => tag.id).filter((tid: any) => tid);
-        await TagService.setTagsForEntity(
-          'message_template',
-          created.id.toString(),
-          tagIds,
-          (req as any)?.user?.userId
-        );
+      if (gatewayResult.mode === 'CHANGE_REQUEST') {
+        return res.status(200).json({
+          success: true,
+          changeRequestId: gatewayResult.changeRequestId,
+          mode: gatewayResult.mode,
+        });
       }
 
-      res.status(201).json({ success: true, data: created });
+      res.status(201).json({ success: true, data: gatewayResult.data });
     } catch (e) {
       next(e);
     }
@@ -157,6 +180,7 @@ export class MessageTemplateController {
       const id = req.params.id;
       const body = req.body as MessageTemplate;
       const environmentId = req.environmentId!;
+      const userId = (req as any)?.user?.userId;
 
       // Check for duplicate name (excluding current template)
       const existing = await MessageTemplateModel.findByName(body.name, id);
@@ -172,31 +196,56 @@ export class MessageTemplateController {
         });
       }
 
+      // Use UnifiedChangeGateway for CR support
       const { tags, ...templateData } = body as any;
-      const updated = await MessageTemplateModel.update(
+      const updateData = {
+        ...templateData,
+        updated_by: userId,
+      };
+
+      const gatewayResult = await UnifiedChangeGateway.processChange(
+        userId,
+        environmentId,
+        'g_message_templates',
         id,
-        {
-          ...templateData,
-          created_by: (req as any)?.user?.userId,
-          updated_by: (req as any)?.user?.userId,
-        },
-        environmentId
+        updateData,
+        async (processedData: any) => {
+          const updated = await MessageTemplateModel.update(
+            id,
+            {
+              ...processedData,
+              created_by: userId,
+              updated_by: userId,
+            },
+            environmentId
+          );
+
+          // Handle tags if provided
+          if (tags !== undefined) {
+            const tagIds = Array.isArray(tags)
+              ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
+              : [];
+            await TagService.setTagsForEntity(
+              'message_template',
+              id,
+              tagIds,
+              userId
+            );
+          }
+
+          return updated;
+        }
       );
 
-      // Handle tags if provided
-      if (tags !== undefined) {
-        const tagIds = Array.isArray(tags)
-          ? tags.map((tag: any) => tag.id).filter((tid: any) => tid)
-          : [];
-        await TagService.setTagsForEntity(
-          'message_template',
-          id,
-          tagIds,
-          (req as any)?.user?.userId
-        );
+      if (gatewayResult.mode === 'CHANGE_REQUEST') {
+        return res.status(200).json({
+          success: true,
+          changeRequestId: gatewayResult.changeRequestId,
+          mode: gatewayResult.mode,
+        });
       }
 
-      res.json({ success: true, data: updated });
+      res.json({ success: true, data: gatewayResult.data });
     } catch (e) {
       next(e);
     }
@@ -210,7 +259,27 @@ export class MessageTemplateController {
     try {
       const id = req.params.id;
       const environmentId = req.environmentId!;
-      await MessageTemplateModel.delete(id, environmentId);
+      const userId = (req as any)?.user?.userId;
+
+      // Use UnifiedChangeGateway for CR support
+      const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+        userId,
+        environmentId,
+        'g_message_templates',
+        id,
+        async () => {
+          await MessageTemplateModel.delete(id, environmentId);
+        }
+      );
+
+      if (gatewayResult.mode === 'CHANGE_REQUEST') {
+        return res.status(200).json({
+          success: true,
+          changeRequestId: gatewayResult.changeRequestId,
+          mode: gatewayResult.mode,
+        });
+      }
+
       res.json({ success: true });
     } catch (e) {
       next(e);
@@ -224,17 +293,44 @@ export class MessageTemplateController {
   ) {
     try {
       const { ids } = req.body;
-
       const environmentId = req.environmentId!;
+      const userId = (req as any)?.user?.userId;
 
-      // Delete all templates
-      await Promise.all(
-        ids.map((id: any) => MessageTemplateModel.delete(id, environmentId))
-      );
+      let crCount = 0;
+      let directCount = 0;
+
+      // Process each deletion through UnifiedChangeGateway
+      for (const id of ids) {
+        const gatewayResult = await UnifiedChangeGateway.requestDeletion(
+          userId,
+          environmentId,
+          'g_message_templates',
+          String(id),
+          async () => {
+            await MessageTemplateModel.delete(id, environmentId);
+          }
+        );
+
+        if (gatewayResult.mode === 'CHANGE_REQUEST') {
+          crCount++;
+        } else {
+          directCount++;
+        }
+      }
+
+      if (crCount > 0 && directCount === 0) {
+        // All went to CR
+        return res.json({
+          success: true,
+          mode: 'CHANGE_REQUEST',
+          message: `${crCount} items added to change request`,
+        });
+      }
 
       res.json({
         success: true,
-        message: `Successfully deleted ${ids.length} message templates`,
+        message: `Successfully deleted ${directCount} message templates`,
+        ...(crCount > 0 && { crCount }),
       });
     } catch (e) {
       next(e);
