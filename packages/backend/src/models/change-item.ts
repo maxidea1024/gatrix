@@ -29,10 +29,12 @@ export class ChangeItem extends Model {
   actionGroupId?: string;
   targetTable!: string;
   targetId!: string;
+  displayName?: string;
   entityVersion?: number;
   opType!: EntityOpType;
   ops!: FieldOp[];
   draftData?: Record<string, any>;
+  beforeDraftData?: Record<string, any>;
 
   // Relations
   changeRequest?: ChangeRequest;
@@ -48,6 +50,7 @@ export class ChangeItem extends Model {
         actionGroupId: { type: ['string', 'null'] },
         targetTable: { type: 'string', maxLength: 100 },
         targetId: { type: 'string', maxLength: 255 },
+        displayName: { type: ['string', 'null'], maxLength: 255 },
         entityVersion: { type: ['integer', 'null'] },
         opType: { type: 'string', enum: ['CREATE', 'UPDATE', 'DELETE'] },
         ops: {
@@ -66,13 +69,16 @@ export class ChangeItem extends Model {
         draftData: {
           type: ['object', 'null'],
         },
+        beforeDraftData: {
+          type: ['object', 'null'],
+        },
       },
     };
   }
 
   // JSON parsing for ops column
   static get jsonAttributes() {
-    return ['ops', 'draftData'];
+    return ['ops', 'draftData', 'beforeDraftData'];
   }
 
   static get relationMappings() {

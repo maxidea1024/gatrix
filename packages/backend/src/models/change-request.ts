@@ -9,7 +9,6 @@ export type ChangeRequestStatus =
   | 'applied'
   | 'rejected'
   | 'conflict';
-export type ChangeRequestPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export class ChangeRequest extends Model {
   static tableName = 'g_change_requests';
@@ -22,8 +21,6 @@ export class ChangeRequest extends Model {
   description?: string;
   reason?: string;
   impactAnalysis?: string;
-  priority!: ChangeRequestPriority;
-  category!: string;
   type?: string;
   rejectedBy?: string;
   rejectedAt?: string;
@@ -63,11 +60,6 @@ export class ChangeRequest extends Model {
         description: { type: ['string', 'null'] },
         reason: { type: ['string', 'null'] },
         impactAnalysis: { type: ['string', 'null'] },
-        priority: {
-          type: 'string',
-          enum: ['low', 'medium', 'high', 'critical'],
-        },
-        category: { type: 'string', maxLength: 50 },
         type: { type: 'string' },
         rejectedBy: { type: ['string', 'null'] },
         rejectedAt: { type: ['string', 'null'], format: 'date-time' },

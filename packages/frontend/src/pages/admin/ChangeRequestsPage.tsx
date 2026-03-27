@@ -244,27 +244,6 @@ const STATUS_CONFIG: Record<
   conflict: { color: 'warning', labelKey: 'changeRequest.status.conflict' },
 };
 
-// Priority configuration
-const PRIORITY_CONFIG: Record<
-  string,
-  {
-    color:
-      | 'default'
-      | 'primary'
-      | 'secondary'
-      | 'error'
-      | 'info'
-      | 'success'
-      | 'warning';
-    labelKey: string;
-  }
-> = {
-  low: { color: 'default', labelKey: 'changeRequest.priority.low' },
-  medium: { color: 'info', labelKey: 'changeRequest.priority.medium' },
-  high: { color: 'warning', labelKey: 'changeRequest.priority.high' },
-  critical: { color: 'error', labelKey: 'changeRequest.priority.critical' },
-};
-
 // Row component
 interface ChangeRequestRowProps {
   cr: ChangeRequest;
@@ -418,7 +397,6 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
   };
 
   const statusConfig = STATUS_CONFIG[cr.status];
-  const priorityConfig = PRIORITY_CONFIG[cr.priority] || PRIORITY_CONFIG.medium;
 
   return (
     <>
@@ -444,14 +422,6 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
           <Typography variant="body2">
             {cr.requester?.name || cr.requester?.email || '-'}
           </Typography>
-        </TableCell>
-        <TableCell>
-          <Chip
-            label={t(priorityConfig.labelKey)}
-            color={priorityConfig.color}
-            size="small"
-            variant="outlined"
-          />
         </TableCell>
         <TableCell align="center">
           <Typography variant="body2">{cr.changeItems?.length || 0}</Typography>
@@ -615,6 +585,56 @@ const ChangeRequestRow: React.FC<ChangeRequestRowProps> = ({
 
       <ErrorDialog />
     </>
+  );
+};
+
+/**
+ * Draft auto-open: since there's only one draft per user/environment,
+ * automatically open the drawer instead of showing a pointless single-row list.
+ */
+const DraftAutoOpen: React.FC<{
+  draftCR: ChangeRequest;
+  onOpenDrawer: (id: string) => void;
+  onRefresh: () => void;
+  projectApiPath: string | null;
+}> = ({ draftCR, onOpenDrawer, onRefresh, projectApiPath }) => {
+  const { t } = useTranslation();
+  const openedRef = React.useRef(false);
+
+  // Auto-open drawer on mount (only once)
+  React.useEffect(() => {
+    if (!openedRef.current && draftCR?.id) {
+      openedRef.current = true;
+      onOpenDrawer(draftCR.id);
+    }
+  }, [draftCR?.id, onOpenDrawer]);
+
+  const itemCount = draftCR.changeItems?.length || 0;
+
+  return (
+    <Card variant="outlined" sx={{ p: 3, textAlign: 'center' }}>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+        {t('changeRequest.draftAutoOpened', {
+          defaultValue: '초안이 사이드 패널에서 열렸습니다.',
+        })}
+      </Typography>
+      <Typography variant="body2" color="text.disabled">
+        {t('changeRequest.draftItemCount', {
+          defaultValue: `${itemCount}개의 변경사항`,
+          count: itemCount,
+        })}
+        {' · '}
+        <RelativeTime date={draftCR.updatedAt} />
+      </Typography>
+      <Button
+        variant="text"
+        size="small"
+        sx={{ mt: 1 }}
+        onClick={() => onOpenDrawer(draftCR.id)}
+      >
+        {t('changeRequest.openDraft', { defaultValue: '초안 열기' })}
+      </Button>
+    </Card>
   );
 };
 
@@ -792,7 +812,15 @@ const ChangeRequestsPage: React.FC = () => {
       </Paper>
 
       <PageContentLoader loading={isLoading && !data}>
-        {!data?.items || data.items.length === 0 ? (
+        {/* Draft tab: auto-open the single draft CR in drawer instead of showing a list */}
+        {statusFilter === 'draft' && data?.items && data.items.length > 0 ? (
+          <DraftAutoOpen
+            draftCR={data.items[0]}
+            onOpenDrawer={handleOpenDrawer}
+            onRefresh={handleRefresh}
+            projectApiPath={projectApiPath}
+          />
+        ) : !data?.items || data.items.length === 0 ? (
           <EmptyPlaceholder message={t('changeRequest.noRequests')} minHeight={200} />
         ) : (
           <Card variant="outlined" sx={{ position: 'relative' }}>
@@ -809,7 +837,7 @@ const ChangeRequestsPage: React.FC = () => {
                     <TableCell>{t('changeRequest.status')}</TableCell>
                     <TableCell>{t('changeRequest.titleField')}</TableCell>
                     <TableCell>{t('changeRequest.requester')}</TableCell>
-                    <TableCell>{t('changeRequest.priorityField')}</TableCell>
+
                     <TableCell align="center">
                       {t('changeRequest.items')}
                     </TableCell>

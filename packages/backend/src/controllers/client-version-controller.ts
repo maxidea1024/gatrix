@@ -876,17 +876,33 @@ export class ClientVersionController {
     if (requiresApproval) {
       let lastResult;
       for (const id of value.ids) {
-        // We need only the fields that are actually changing in the bulk update
-        const updateDataAttrs = {
+        // Only include fields that are actually being changed
+        const updateDataAttrs: Record<string, any> = {
           clientStatus: value.clientStatus,
-          maintenanceStartDate: bulkUpdateData.maintenanceStartDate,
-          maintenanceEndDate: bulkUpdateData.maintenanceEndDate,
-          maintenanceMessage: value.maintenanceMessage || null,
-          supportsMultiLanguage: value.supportsMultiLanguage || false,
-          maintenanceLocales: value.maintenanceLocales || [],
-          messageTemplateId: value.messageTemplateId || null,
           updatedBy: userId,
         };
+
+        // Only include maintenance-related fields when status is MAINTENANCE
+        if (value.clientStatus === ClientStatus.MAINTENANCE) {
+          if (bulkUpdateData.maintenanceStartDate !== undefined) {
+            updateDataAttrs.maintenanceStartDate = bulkUpdateData.maintenanceStartDate;
+          }
+          if (bulkUpdateData.maintenanceEndDate !== undefined) {
+            updateDataAttrs.maintenanceEndDate = bulkUpdateData.maintenanceEndDate;
+          }
+          if (value.maintenanceMessage !== undefined) {
+            updateDataAttrs.maintenanceMessage = value.maintenanceMessage;
+          }
+          if (value.supportsMultiLanguage !== undefined) {
+            updateDataAttrs.supportsMultiLanguage = value.supportsMultiLanguage;
+          }
+          if (value.maintenanceLocales !== undefined) {
+            updateDataAttrs.maintenanceLocales = value.maintenanceLocales;
+          }
+          if (value.messageTemplateId !== undefined) {
+            updateDataAttrs.messageTemplateId = value.messageTemplateId;
+          }
+        }
 
         lastResult = await UnifiedChangeGateway.requestModification(
           userId,

@@ -479,13 +479,25 @@ router.post(
     const { ChangeRequestService } =
       await import('../../../services/change-request-service');
 
+    // Build beforeDraftData with matching environment key structure for accurate diff comparison
+    // draftData is structured as { envId: { strategies, variants, isEnabled, ... } }
+    // so beforeDraftData must use the same structure
+    const beforeDraftData: Record<string, any> = {};
+    const envKeys = Object.keys(draftData).filter(k => !k.startsWith('_'));
+    for (const envKey of envKeys) {
+      // The flag object itself represents the current state for this environment
+      const { id, flagName, createdAt, updatedAt, createdBy, updatedBy, environmentId: eid, projectId, ...envFields } = flag as any;
+      beforeDraftData[envKey] = envFields;
+    }
+
     const result = await ChangeRequestService.upsertDraftDataItem(
       userId!,
       environmentId,
       'g_feature_flags',
       flag.id,
       { ...draftData, _flagName: flag.flagName },
-      `[feature_flags] Update: ${flag.flagName}`
+      `[feature_flags] Update: ${flag.flagName}`,
+      beforeDraftData
     );
 
     res.json({ success: true, data: result });

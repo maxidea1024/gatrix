@@ -18,6 +18,7 @@ import { diff } from 'deep-diff';
 import { OutboxService } from './outbox-service';
 
 import { createLogger } from '../config/logger';
+import { resolveEntityLabel } from '../utils/entity-label-resolver';
 const logger = createLogger('ChangeRequest');
 
 /**
@@ -41,8 +42,17 @@ function generateOps(
     'version',
   ];
 
-  // Normalize value for comparison (handle MySQL TINYINT boolean)
+  // Normalize value for comparison
+  // Handles: MySQL TINYINT boolean, nullable field mismatches,
+  // null/undefined/''/[]/false/0 equivalences
+  const isEmptyValue = (val: any): boolean => {
+    if (val === null || val === undefined || val === '') return true;
+    if (Array.isArray(val) && val.length === 0) return true;
+    return false;
+  };
+
   const normalizeValue = (val: any): any => {
+    if (isEmptyValue(val)) return null;
     if (val === true) return 1;
     if (val === false) return 0;
     return val;
@@ -174,7 +184,7 @@ export class ChangeRequestService {
    */
   static async upsertChangeRequestItem(
     userId: string,
-    environmentName: string,
+    environmentId: string,
     targetTable: string,
     targetId: string,
     beforeData: Record<string, any> | null,
@@ -188,7 +198,7 @@ export class ChangeRequestService {
       // Block new edits when review is pending
       const pendingReview = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environmentId', environmentName)
+        .where('environmentId', environmentId)
         .where('status', 'open')
         .first();
 
@@ -224,7 +234,7 @@ export class ChangeRequestService {
         // Phase 2: Check if user already has a draft - enforce single draft rule
         const existingDraft = await ChangeRequest.query()
           .where('requesterId', userId)
-          .where('environmentId', environmentName)
+          .where('environmentId', environmentId)
           .where('status', 'draft')
           .first();
 
@@ -232,32 +242,17 @@ export class ChangeRequestService {
           // Use existing draft instead of creating a new one
           cr = existingDraft;
         } else {
-          // 2. Create new Draft CR
-          const cleanTable = targetTable.startsWith('g_')
-            ? targetTable.slice(2)
-            : targetTable;
-          const isNew = targetId.startsWith('NEW_');
-          const identifier =
-            afterData?.name ||
-            afterData?.title ||
-            afterData?.displayName ||
-            afterData?.worldId ||
-            afterData?.id ||
-            (isNew ? 'New Item' : targetId);
-          const action = isNew
-            ? 'Create'
-            : afterData === null
-              ? 'Delete'
-              : 'Update';
+          // Draft is a personal edit buffer - use simple timestamp title
+          const now = new Date();
+          const hh = String(now.getHours()).padStart(2, '0');
+          const mm = String(now.getMinutes()).padStart(2, '0');
 
           cr = await ChangeRequest.query().insert({
             id: ulid(),
             requesterId: userId,
-            environmentId: environmentName,
+            environmentId: environmentId,
             status: 'draft',
-            title: `[${cleanTable}] ${action}: ${identifier}`,
-            priority: 'medium',
-            category: 'general',
+            title: `Draft-${hh}${mm}`,
           });
         }
       }
@@ -282,9 +277,10 @@ export class ChangeRequestService {
 
       if (existingItem) {
         // Update existing item's ops
+        const displayName = resolveEntityLabel(targetTable, afterData || beforeData);
         await ChangeItem.query()
           .findById(existingItem.id)
-          .patch({ ops, opType });
+          .patch({ ops, opType, ...(displayName && { displayName }) });
       } else {
         // Determine ActionGroup type
         let actionGroupType: ActionGroupType = ACTION_GROUP_TYPES.UPDATE_ENTITY;
@@ -325,6 +321,7 @@ export class ChangeRequestService {
         }
 
         // Insert ChangeItem with ops
+        const displayName = resolveEntityLabel(targetTable, afterData || beforeData);
         await ChangeItem.query().insert({
           id: ulid(),
           changeRequestId: cr.id,
@@ -333,54 +330,10 @@ export class ChangeRequestService {
           targetId,
           opType,
           ops,
+          ...(displayName && { displayName }),
         });
       }
 
-      // 5. Update Title Dynamically if more than one item
-      const items = await ChangeItem.query().where('changeRequestId', cr.id);
-      if (items.length > 1) {
-        const user = await User.query().findById(userId);
-        const lang = user?.preferredLanguage || 'en';
-
-        const tables = [...new Set(items.map((i) => i.targetTable))];
-        const cleanTables = tables.map((t) =>
-          t.startsWith('g_') ? t.slice(2) : t
-        );
-
-        let newTitle = '';
-        if (tables.length === 1) {
-          const table = cleanTables[0];
-          const count = items.length;
-          if (lang === 'ko') {
-            newTitle = `[${table}] ${count}개 항목`;
-          } else if (lang === 'zh') {
-            newTitle = `[${table}] ${count} 个项目`;
-          } else {
-            newTitle = `[${table}] ${count} items`;
-          }
-        } else {
-          const count = items.length;
-          if (lang === 'ko') {
-            newTitle = `복합 변경 (${count}개 항목)`;
-          } else if (lang === 'zh') {
-            newTitle = `混合变更 (${count} 个项目)`;
-          } else {
-            newTitle = `Mixed Changes (${count} items)`;
-          }
-        }
-
-        if (
-          cr.title.startsWith('[') ||
-          cr.title.includes('Change Request for') ||
-          cr.title.startsWith('Mixed Changes') ||
-          cr.title.startsWith('복합 변경') ||
-          cr.title.startsWith('混合变更')
-        ) {
-          await ChangeRequest.query()
-            .findById(cr.id)
-            .patch({ title: newTitle });
-        }
-      }
 
       return { changeRequestId: cr.id, status: cr.status };
     } catch (error) {
@@ -400,7 +353,8 @@ export class ChangeRequestService {
     targetTable: string,
     targetId: string,
     draftData: Record<string, any>,
-    actionTitle?: string
+    actionTitle?: string,
+    beforeDraftData?: Record<string, any>
   ): Promise<{ changeRequestId: string; status: ChangeRequestStatus }> {
     try {
       // Check for pending review
@@ -447,17 +401,15 @@ export class ChangeRequestService {
       }
 
       if (!cr) {
-        const cleanTable = targetTable.startsWith('g_')
-          ? targetTable.slice(2)
-          : targetTable;
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
         cr = await ChangeRequest.query().insert({
           id: ulid(),
           requesterId: userId,
           environmentId,
           status: 'draft',
-          title: actionTitle || `[${cleanTable}] Draft: ${targetId}`,
-          priority: 'medium',
-          category: 'feature_flag',
+          title: `Draft-${hh}${mm}`,
         });
       }
 
@@ -470,9 +422,15 @@ export class ChangeRequestService {
 
       if (existingItem) {
         // Update existing item's draftData
+        const displayName = resolveEntityLabel(targetTable, draftData);
         await ChangeItem.query()
           .findById(existingItem.id)
-          .patch({ draftData, ops: [] });
+          .patch({
+            draftData,
+            ops: [],
+            ...(displayName && { displayName }),
+            ...(beforeDraftData && { beforeDraftData }),
+          });
       } else {
         // Find or create ActionGroup
         let actionGroup = await ActionGroup.query()
@@ -497,6 +455,7 @@ export class ChangeRequestService {
         }
 
         // Insert ChangeItem with draftData (ops is empty)
+        const displayName = resolveEntityLabel(targetTable, draftData);
         await ChangeItem.query().insert({
           id: ulid(),
           changeRequestId: cr.id,
@@ -506,6 +465,8 @@ export class ChangeRequestService {
           opType: 'UPDATE',
           ops: [],
           draftData,
+          ...(displayName && { displayName }),
+          ...(beforeDraftData && { beforeDraftData }),
         });
       }
 
@@ -604,8 +565,7 @@ export class ChangeRequestService {
       description?: string;
       reason?: string;
       impactAnalysis?: string;
-      priority?: 'low' | 'medium' | 'high' | 'critical';
-      category?: string;
+
     }
   ): Promise<ChangeRequest> {
     const cr = await ChangeRequest.query().findById(changeRequestId);
@@ -1266,8 +1226,8 @@ export class ChangeRequestService {
                   .slice(0, 19)
                   .replace('T', ' ');
               }
-              // Set createdBy for new records (use the executor's userId)
-              if (dbData.createdBy === undefined) {
+              // Set createdBy for new records only if the table has the column
+              if (validColumns.has('createdBy') && dbData.createdBy === undefined) {
                 dbData.createdBy = userId;
               }
               // Check if table has a version column
@@ -1536,6 +1496,7 @@ export class ChangeRequestService {
     revertItems: Array<{
       targetTable: string;
       targetId: string;
+      displayName?: string;
       opType: EntityOpType;
       ops: FieldOp[];
       actionType: string;
@@ -1552,6 +1513,7 @@ export class ChangeRequestService {
     const revertItems: Array<{
       targetTable: string;
       targetId: string;
+      displayName?: string;
       opType: EntityOpType;
       ops: FieldOp[];
       actionType: string;
@@ -1568,6 +1530,7 @@ export class ChangeRequestService {
       revertItems.push({
         targetTable: item.targetTable,
         targetId: item.targetId,
+        displayName: item.displayName,
         opType: inverseOpType,
         ops: inverseOps,
         actionType,
@@ -1600,8 +1563,7 @@ export class ChangeRequestService {
         environmentId: originalCr.environmentId,
         status: 'open',
         type: 'revert',
-        priority: originalCr.priority || 'medium',
-        category: originalCr.category || 'general',
+
       });
 
       // Process items - Generate inverse operations
@@ -1792,7 +1754,10 @@ export class ChangeRequestService {
     counts.forEach((row: any) => {
       const count = parseInt(row.count as string);
       result[row.status] = count;
-      total += count;
+      // Exclude drafts from the 'all' total since they are personal edit buffers
+      if (row.status !== 'draft') {
+        total += count;
+      }
     });
     result.all = total;
 

@@ -1090,7 +1090,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                               updateVariant(index, { name: e.target.value })
                             }
                             disabled={!canManage || isArchived}
-                            error={isDuplicateName}
+                          error={isDuplicateName}
+                            helperText={
+                              isDuplicateName
+                                ? t('featureFlags.duplicateVariantName', { defaultValue: 'Duplicate name' })
+                                : undefined
+                            }
                             sx={{ flex: 1, minWidth: 120 }}
                             InputProps={{ sx: { height: 36 } }}
                           />
@@ -1394,8 +1399,16 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             borderColor: 'warning.light',
           }}
         >
-          <Typography variant="caption" color="warning.main" sx={{ mr: 'auto' }}>
-            {t('common.unsavedChanges')}
+          <Typography
+            variant="caption"
+            color={hasDuplicateNames || hasJsonErrors ? 'error.main' : 'warning.main'}
+            sx={{ mr: 'auto', fontWeight: hasDuplicateNames || hasJsonErrors ? 700 : 400 }}
+          >
+            {hasDuplicateNames
+              ? t('featureFlags.duplicateVariantNameError', { defaultValue: 'Duplicate variant names exist. Please use unique names.' })
+              : hasJsonErrors
+                ? t('featureFlags.jsonValidationError', { defaultValue: 'JSON validation errors exist.' })
+                : t('common.unsavedChanges')}
           </Typography>
           <Button
             variant="outlined"

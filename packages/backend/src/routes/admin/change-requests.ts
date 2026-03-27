@@ -105,4 +105,11 @@ router.get('/:id/revert-preview', ChangeRequestController.previewRevert);
  */
 router.post('/:id/revert', ChangeRequestController.revert);
 
+/**
+ * @route POST /api/v1/admin/change-requests/:id/generate-summary
+ * @desc Generate AI summary (title + description) for a CR
+ * @access Admin
+ */
+router.post('/:id/generate-summary', ChangeRequestController.generateSummary);
+
 export default router;

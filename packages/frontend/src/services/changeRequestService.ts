@@ -8,7 +8,7 @@ export type ChangeRequestStatus =
   | 'applied'
   | 'rejected'
   | 'conflict';
-export type ChangeRequestPriority = 'low' | 'medium' | 'high' | 'critical';
+
 
 export interface ChangeItem {
   id: string;
@@ -16,9 +16,19 @@ export interface ChangeItem {
   actionGroupId?: string;
   targetTable: string;
   targetId: string;
+  displayName?: string;
   operation: 'create' | 'update' | 'delete';
   beforeData: any;
   afterData: any;
+  draftData?: Record<string, any>;
+  beforeDraftData?: Record<string, any>;
+  ops?: Array<{
+    path: string;
+    oldValue: any;
+    newValue: any;
+    opType: 'SET' | 'DEL' | 'MOD';
+  }>;
+  opType?: 'CREATE' | 'UPDATE' | 'DELETE';
   entityVersion?: number;
 }
 
@@ -64,8 +74,6 @@ export interface ChangeRequest {
   description?: string;
   reason?: string;
   impactAnalysis?: string;
-  priority: ChangeRequestPriority;
-  category: string;
   rejectedBy?: string;
   rejectedAt?: string;
   rejectionReason?: string;
@@ -157,8 +165,6 @@ class ChangeRequestService {
       description?: string;
       reason?: string;
       impactAnalysis?: string;
-      priority?: ChangeRequestPriority;
-      category?: string;
     },
     projectApiPath: string | null = null
   ): Promise<ChangeRequest> {
@@ -371,6 +377,20 @@ class ChangeRequestService {
       ? `${projectApiPath}/features`
       : '/admin/features';
     const response = await api.get(`${flagsBase}/pending-drafts`);
+    return response.data;
+  }
+  /**
+   * Generate AI summary (title + description) for a CR
+   */
+  async generateSummary(
+    id: string,
+    projectApiPath: string | null = null,
+    language?: string
+  ): Promise<{ title: string; description: string }> {
+    const response = await api.post(
+      `${basePath(projectApiPath)}/${id}/generate-summary`,
+      language ? { language } : undefined
+    );
     return response.data;
   }
 }

@@ -40,6 +40,7 @@ interface FieldOp {
 interface RevertItem {
   targetTable: string;
   targetId: string;
+  displayName?: string;
   opType: 'CREATE' | 'UPDATE' | 'DELETE';
   ops: FieldOp[];
   actionType: string;
@@ -316,7 +317,7 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
                       sx={{ flex: 1 }}
                     >
                       {t(getTableLocalizationKey(item.targetTable))}:{' '}
-                      {item.targetId}
+                      {item.displayName || item.targetId}
                     </Typography>
                     <Chip
                       label={getOpTypeLabel(item.opType)}

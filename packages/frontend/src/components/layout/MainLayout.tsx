@@ -586,7 +586,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       const projectApiPath = getProjectApiPath();
       const response = await changeRequestService.getMyRequests(projectApiPath);
       setPendingCRCount(response?.pendingApproval?.length || 0);
-      setMyDraftCount(response?.myDrafts?.length || 0);
+      // Count total change items across all drafts (not CR count, which is always 1)
+      const totalDraftItems = (response?.myDrafts || []).reduce(
+        (sum: number, cr: any) => sum + (cr.changeItems?.length || 0),
+        0
+      );
+      setMyDraftCount(totalDraftItems);
       // Count my own CRs that are in 'open' status (pending review)
       const myOpenCount = (response?.myRequests || []).filter(
         (cr: any) => cr.status === 'open'
