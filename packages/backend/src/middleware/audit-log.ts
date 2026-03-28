@@ -58,7 +58,7 @@ export const auditLog = (options: AuditLogOptions) => {
           return;
         }
 
-        // Resource ID 결정
+        // Determine Resource ID
         let resourceId = options.getResourceId
           ? options.getResourceId(req)
           : undefined;

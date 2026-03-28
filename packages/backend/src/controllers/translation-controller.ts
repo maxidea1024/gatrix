@@ -49,7 +49,7 @@ const detectLanguageSchema = Joi.object({
 
 export class TranslationController {
   /**
-   * 단일 언어 Translation
+   * Single language translation
    */
   static translateText = asyncHandler(async (req: Request, res: Response) => {
     const startedAt = Date.now();
@@ -73,7 +73,7 @@ export class TranslationController {
   });
 
   /**
-   * 다중 언어 Translation
+   * Multi-language translation
    */
   static translateToMultipleLanguages = asyncHandler(
     async (req: Request, res: Response) => {

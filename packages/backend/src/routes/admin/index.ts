@@ -57,6 +57,7 @@ import actionSetRoutes from './action-sets';
 import queueMonitorRoutes from './queue-monitor';
 import rbacRoutes from './rbac';
 import aiChatRoutes from './ai-chat';
+import globalNetworkTrafficRoutes from './global-network-traffic';
 import ImpactMetricsController from '../../controllers/impact-metrics-controller';
 
 const router = express.Router();
@@ -521,6 +522,13 @@ router.use(
   '/queue-monitor',
   requireOrgPermission([P.SCHEDULER_READ, P.SCHEDULER_UPDATE]) as any,
   queueMonitorRoutes
+);
+
+// Global Network Traffic (cross-project)
+router.use(
+  '/network',
+  requireOrgPermission([P.FEATURES_READ]) as any,
+  globalNetworkTrafficRoutes
 );
 
 export default router;

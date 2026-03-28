@@ -53,7 +53,7 @@ const config = {
   // JWT configuration
   jwt: {
     secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key',
-    expiresIn: process.env.JWT_EXPIRES_IN || '30d', // 임시로 30일로 연장
+    expiresIn: process.env.JWT_EXPIRES_IN || '30d', // Temporarily extended to 30 days
   },
 
   // Session configuration

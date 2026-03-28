@@ -296,7 +296,7 @@ const startServer = async () => {
       );
     }
 
-    // Initialize ApiTokenUsageService (QueueService Initialization 뒤에 실행)
+    // Initialize ApiTokenUsageService (must run after QueueService initialization)
     try {
       await apiTokenUsageService.initialize();
       logger.info('ApiTokenUsageService initialized successfully');
@@ -402,7 +402,7 @@ const startServer = async () => {
       );
     }
 
-    // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)
+    // Start HTTP server (handles WebSocket upgrades directly from chat server)
     const server = createServer(app);
     httpServer = server; // Store reference for graceful shutdown
 

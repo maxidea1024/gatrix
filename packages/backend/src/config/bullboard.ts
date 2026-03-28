@@ -17,7 +17,7 @@ export class BullBoardConfig {
 
       // Bull Board Create
       createBullBoard({
-        queues: [], // 초기에는 빈 배열
+        queues: [], // Initially empty array
         serverAdapter: this.serverAdapter,
       });
 
@@ -34,7 +34,7 @@ export class BullBoardConfig {
       if (!this.queues.find((q) => q.name === queue.name)) {
         this.queues.push(queue);
 
-        // Bull Board에 큐 추가
+        // Add queue to Bull Board
         createBullBoard({
           queues: this.queues.map((q) => new BullMQAdapter(q)),
           serverAdapter: this.serverAdapter,

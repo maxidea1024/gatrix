@@ -22,17 +22,17 @@ const upload = multer({
 });
 router.use(upload.any() as any);
 
-// 채팅서버 Settings
+// Chat server settings
 const CHAT_SERVER_URL = process.env.CHAT_SERVER_URL || 'http://localhost:5100';
 const CHAT_API_BASE = `${CHAT_SERVER_URL}/api/v1`;
-// Backend -> Chat Server 특수 토큰 Used (데이터베이스에서 가져오지 않는 미리 약속된 값)
+// Backend -> Chat Server special token (pre-agreed value not fetched from database)
 const BACKEND_SERVICE_TOKEN =
   process.env.BACKEND_SERVICE_TOKEN ||
   'gatrix-backend-service-token-default-key-change-in-production';
 const DEFAULT_AVATAR_URL =
   'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
-// 모든 채팅 Route에 Authentication 필요 (디버깅 로깅 추가)
+// All chat routes require authentication (with debug logging)
 router.use((req, res, next) => {
   logger.info('🔥 Chat route authentication check:', {
     url: req.url,
@@ -43,7 +43,7 @@ router.use((req, res, next) => {
   next();
 });
 
-// Chat Server 연결 테스트 엔드포인트 (Authentication 없이 접근 가능)
+// Chat Server connection test endpoint (accessible without authentication)
 router.get('/test-connection', async (req, res) => {
   try {
     const chatServerService =
@@ -70,15 +70,15 @@ router.get('/test-connection', async (req, res) => {
 
 router.use(authenticate as any);
 
-// 백엔드 전용 엔드포인트 (프록시 전에 처리)
+// Backend-only endpoints (handled before proxy)
 router.get('/health', ChatSyncController.healthCheck);
 
-// 나머지 모든 채팅 Request은 프록시로 처리
-// - /sync-user, /sync-users, /channels/*, /users, /invitations/* 등
+// All remaining chat requests are handled via proxy
+// - /sync-user, /sync-users, /channels/*, /users, /invitations/*, etc.
 
-// 프록시로 전달할 Request들을 위한 로깅 Middleware
+// Logging middleware for requests to be forwarded to proxy
 router.use((req, _res, next) => {
-  // 이미 처리된 Route들은 스킵
+  // Skip already-handled routes
   const directRoutes = ['/health', '/test-connection'];
   const isDirectRoute = directRoutes.some((route) => req.url.startsWith(route));
 
@@ -101,7 +101,7 @@ router.use((req, _res, next) => {
       params: req.params,
     });
 
-    // 프록시 도달 여부 Confirm을 위한 로그
+    // Log to confirm proxy reach status
     logger.info(
       `🚀 About to reach proxy middleware for: ${req.method} ${req.url}`
     );
@@ -110,33 +110,33 @@ router.use((req, _res, next) => {
   next();
 });
 
-// 프록시 Settings (연결 누수 방지)
+// Proxy settings (prevent connection leak)
 const proxyOptions = {
   target: CHAT_API_BASE, // http://localhost:3001/api/v1
   changeOrigin: true,
-  timeout: 10000, // 타임아웃 단축
+  timeout: 10000, // Shortened timeout
   proxyTimeout: 10000,
 
-  // Path 재작성: /chat/* → /*
+  // Path rewrite: /chat/* → /*
   pathRewrite: {
     '^/chat': '', // /chat/invitations/received → /invitations/received
   },
 
-  // 연결 풀 Settings (연결 누수 방지)
-  agent: false, // 연결 재Used 비Active화
-  keepAlive: false, // Keep-Alive 비Active화
+  // Connection pool settings (prevent connection leak)
+  agent: false, // Disable connection reuse
+  keepAlive: false, // Disable Keep-Alive
 
-  // Headers 전달 Settings
+  // Header forwarding settings
   onProxyReq: (proxyReq: any, req: express.Request) => {
     logger.info(`🚀 PROXY MIDDLEWARE REACHED! ${req.method} ${req.url}`);
 
-    // Backend -> Chat Server 특수 토큰 추가 (가장 중요!)
+    // Add Backend -> Chat Server special token (most important!)
     proxyReq.setHeader(HEADERS.X_API_TOKEN, BACKEND_SERVICE_TOKEN);
     logger.info(
       `✅ Adding Backend Service Token: ${BACKEND_SERVICE_TOKEN.substring(0, 20)}...`
     );
 
-    // User info Headers 추가 (Chat Server에서 Used)
+    // Add user info headers (used by Chat Server)
     logger.info(`🔍 Proxy request user check:`, {
       hasUser: !!(req as any).user,
       userId: (req as any).user?.id,
@@ -147,10 +147,10 @@ const proxyOptions = {
       proxyReq.setHeader(HEADERS.X_USER_ID, (req as any).user.id.toString());
       logger.info(`✅ Adding X-User-ID header: ${(req as any).user.id}`);
 
-      // Used자 동기화는 백그라운드에서 비동기로 처리 (Request을 Non-blocking)
+      // User sync is handled asynchronously in background (non-blocking request)
       const user = (req as any).user;
 
-      // 🔍 User info 디버깅
+      // 🔍 User info debugging
       logger.info('🔍 User data for sync:', {
         id: user.id,
         email: user.email,
@@ -184,11 +184,11 @@ const proxyOptions = {
       logger.warn(`❌ No user ID found in request for proxy`);
     }
 
-    // POST body Edit (중요!)
+    // Fix POST body (important!)
     fixRequestBody(proxyReq, req);
   },
 
-  // 에러 핸들링
+  // Error handling
   onError: (err: Error, req: express.Request, res: express.Response) => {
     logger.error(`🚨 Chat proxy error: ${req.method} ${req.url}`, {
       error: err.message,
@@ -206,7 +206,7 @@ const proxyOptions = {
   },
 };
 
-// 임시 테스트: 간단한 프록시 Middleware
+// Temporary test: Simple proxy middleware
 router.use('/', async (req, res, next) => {
   try {
     logger.info('Simple proxy middleware reached:', {
@@ -215,10 +215,10 @@ router.use('/', async (req, res, next) => {
     });
     logger.debug('Request body:', req.body);
 
-    // 채팅서버로 직접 Request
+    // Direct request to chat server
     const axios = require('axios');
 
-    // URL 매핑: /sync-user -> /users/upsert (Chat Server Controller에 맞춤)
+    // URL mapping: /sync-user -> /users/upsert (aligned with Chat Server Controller)
     let targetPath = req.url;
     if (targetPath === '/sync-user') {
       targetPath = '/users/upsert';
@@ -228,7 +228,7 @@ router.use('/', async (req, res, next) => {
 
     logger.info('Forwarding to:', { targetUrl });
 
-    // Used자 동기화 Request인 경우 User info 추가
+    // Add user info if this is a user sync request
     let requestData = req.body;
     if (
       (targetPath === '/users/upsert' || targetPath === '/users/sync-user') &&
@@ -236,7 +236,7 @@ router.use('/', async (req, res, next) => {
     ) {
       const user = req.user as any;
 
-      // DB에서 최신 User info 조회 (avatarUrl 포함)
+      // Fetch latest user info from DB (including avatarUrl)
       let avatarUrl = user.avatarUrl || DEFAULT_AVATAR_URL;
       try {
         const dbUser = await UserModel.findById(user.id);

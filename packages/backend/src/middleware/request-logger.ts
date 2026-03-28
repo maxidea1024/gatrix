@@ -61,14 +61,14 @@ export const requestLogger = (
       req.get('Authorization')?.substring(0, 20) + '...' || 'none',
   };
 
-  // 개발 ?�경?�서�?추�? ?�보 로깅
+  // Additional logging in development environment
   if (isDevelopment) {
-    // Query parameters 추�?
+    // Add query parameters
     if (req.query && Object.keys(req.query).length > 0) {
       requestLogData.queryParams = req.query;
     }
 
-    // Request body 추�? (Content-Type??application/json??경우�?
+    // Add request body (when Content-Type is application/json)
     const contentType = req.get('Content-Type');
     if (
       contentType?.includes('application/json') &&
@@ -94,7 +94,7 @@ export const requestLogger = (
       contentLength: res.get('Content-Length'),
     };
 
-    // 개발 ?�경?�서�?response body 추�? (Content-Type??application/json??경우�?
+    // Add response body in development (when Content-Type is application/json)
     if (
       isDevelopment &&
       chunk &&
@@ -104,20 +104,20 @@ export const requestLogger = (
         let responseText: string | undefined;
 
         if (Buffer.isBuffer(chunk)) {
-          // Buffer�?문자?�로 변??          responseText = chunk.toString('utf8');
+          // Convert Buffer to string
         } else if (typeof chunk === 'string') {
           responseText = chunk;
         } else {
-          // ?��? 객체??경우 그�?�??�용
+          // Use as-is if already an object
           responseLogData.responseBody = chunk;
         }
 
-        // 문자?�인 경우 JSON ?�싱 ?�도
+        // Attempt JSON parsing if string
         if (responseText) {
           responseLogData.responseBody = JSON.parse(responseText);
         }
       } catch (error) {
-        // JSON ?�싱 ?�패??Ignore
+        // Ignore JSON parse failure
       }
     }
 

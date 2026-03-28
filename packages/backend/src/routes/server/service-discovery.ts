@@ -6,7 +6,7 @@
 
 import express from 'express';
 import knex from '../../config/knex';
-import { serverSDKAuth } from '../../middleware/api-token-auth';
+import { serverSDKAuth, serverAuthBase } from '../../middleware/api-token-auth';
 import serviceDiscoveryService from '../../services/service-discovery-service';
 import { IpWhitelistModel } from '../../models/ip-whitelist';
 import { WhitelistModel } from '../../models/account-whitelist';
@@ -126,7 +126,7 @@ router.get('/whitelists', serverSDKAuth, getWhitelistsHandler);
  *
  * Note: externalAddress is auto-detected from req.ip
  */
-router.post('/register', serverSDKAuth, async (req: any, res: any) => {
+router.post('/register', serverAuthBase, async (req: any, res: any) => {
   try {
     const {
       instanceId: providedInstanceId,
@@ -241,7 +241,7 @@ router.post('/register', serverSDKAuth, async (req: any, res: any) => {
  *   "labels": { "service": "world" }
  * }
  */
-router.post('/unregister', serverSDKAuth, async (req: any, res: any) => {
+router.post('/unregister', serverAuthBase, async (req: any, res: any) => {
   try {
     const { instanceId, labels } = req.body;
 
@@ -295,7 +295,7 @@ router.post('/unregister', serverSDKAuth, async (req: any, res: any) => {
  *
  * Note: meta is not included - it's immutable after registration
  */
-router.post('/status', serverSDKAuth, async (req: any, res: any) => {
+router.post('/status', serverAuthBase, async (req: any, res: any) => {
   try {
     const {
       instanceId,
@@ -385,7 +385,7 @@ router.post('/status', serverSDKAuth, async (req: any, res: any) => {
  * - excludeSelf: Exclude self instance (default: true)
  * - Any label key: Filter by label value (e.g., region=ap-northeast-2)
  */
-router.get('/', serverSDKAuth, async (req: any, res: any) => {
+router.get('/', serverAuthBase, async (req: any, res: any) => {
   try {
     const {
       serviceType,
@@ -448,7 +448,7 @@ router.get('/', serverSDKAuth, async (req: any, res: any) => {
  */
 router.get(
   '/:serviceType/:instanceId',
-  serverSDKAuth,
+  serverAuthBase,
   async (req: any, res: any) => {
     try {
       const { serviceType, instanceId } = req.params;

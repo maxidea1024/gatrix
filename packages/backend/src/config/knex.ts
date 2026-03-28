@@ -77,7 +77,7 @@ const knexConfig = {
     charset: 'utf8mb4',
     timezone: 'Z',
   },
-  debug: config.database.debug, // .env의 DB_DEBUG Settings으로 제어
+  debug: config.database.debug, // Controlled by DB_DEBUG setting in .env
   pool: {
     min: 2,
     max: 10,

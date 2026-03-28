@@ -11,7 +11,7 @@ const DEFAULT_AVATAR_URL =
 
 export class ChatSyncController {
   /**
-   * 현재 Used자를 Chat Server에 동기화
+   * Sync the current user to Chat Server
    * POST /api/v1/chat/sync-user
    */
   static async syncCurrentUser(req: AuthenticatedRequest, res: Response) {
@@ -68,7 +68,7 @@ export class ChatSyncController {
   }
 
   /**
-   * 특정 Used자를 Chat Server에 동기화 (Admin only)
+   * Sync a specific user to Chat Server (Admin only)
    * POST /api/v1/chat/sync-user/:userId
    */
   static async syncUser(req: AuthenticatedRequest, res: Response) {
@@ -127,11 +127,11 @@ export class ChatSyncController {
   }
 
   /**
-   * 모든 Used자를 Chat Server에 동기화 (Admin only)
+   * Sync all users to Chat Server (Admin only)
    * POST /api/v1/chat/sync-all-users
    *
-   * 이제 프록시를 통해 처리됩니다.
-   * 실제 Request: POST /api/v1/users/sync-users
+   * Now handled through proxy.
+   * Actual request: POST /api/v1/users/sync-users
    */
   static async syncAllUsers(req: AuthenticatedRequest, res: Response) {
     try {
@@ -187,7 +187,7 @@ export class ChatSyncController {
   }
 
   /**
-   * Chat Server 연결 Status Confirm
+   * Check Chat Server connection status
    * GET /api/v1/chat/health
    */
   static async healthCheck(req: Request, res: Response) {
@@ -212,7 +212,7 @@ export class ChatSyncController {
   }
 
   /**
-   * Chat WebSocket 연결용 토큰 발급
+   * Issue token for Chat WebSocket connection
    * POST /api/v1/chat/token
    */
   static async getChatToken(req: AuthenticatedRequest, res: Response) {

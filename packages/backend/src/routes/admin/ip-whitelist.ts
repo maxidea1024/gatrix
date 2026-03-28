@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import { authenticate } from '../../middleware/auth';
 import { auditLog } from '../../middleware/audit-log';
 import { IpWhitelistController } from '../../controllers/ip-whitelist-controller';
@@ -72,6 +72,6 @@ router.delete(
   IpWhitelistController.deleteIpWhitelist
 );
 
-// bulk delete 湲곕뒫??援ы쁽?섏? ?딆쓬
+// bulk delete is not implemented
 
 export default router;

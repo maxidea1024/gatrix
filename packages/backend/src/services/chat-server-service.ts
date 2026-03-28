@@ -63,11 +63,11 @@ export class ChatServerService {
   }
 
   /**
-   * API 토큰이 이미 Headers에 Settings되어 있으므로 추가 Authentication 불필요
+   * API token is already set in headers, no additional authentication needed
    */
 
   /**
-   * User info를 Chat Server에 동기화
+   * Sync user info to Chat Server
    */
   async syncUser(userData: UserData): Promise<void> {
     try {
@@ -96,7 +96,7 @@ export class ChatServerService {
   }
 
   /**
-   * Used자가 Chat Server에 동기화되어 있는지 Confirm하고, 없으면 동기화
+   * Ensure user is synced to Chat Server, sync if not exists
    */
   async ensureUserSynced(userData: UserData): Promise<void> {
     try {
@@ -121,7 +121,7 @@ export class ChatServerService {
   }
 
   /**
-   * 여러 Used자를 한 번에 동기화 (개선된 bulk 처리)
+   * Sync multiple users at once (improved bulk processing)
    */
   async syncUsers(users: UserData[]): Promise<void> {
     logger.info(`🔄 Bulk syncing ${users.length} users to Chat Server...`);
@@ -166,7 +166,7 @@ export class ChatServerService {
   }
 
   /**
-   * Used자 Update state
+   * Update user status
    */
   async updateUserStatus(
     userId: string,
@@ -198,7 +198,7 @@ export class ChatServerService {
   }
 
   /**
-   * Used자 Delete
+   * Delete user
    */
   async deleteUser(userId: string): Promise<void> {
     try {
@@ -222,7 +222,7 @@ export class ChatServerService {
   }
 
   /**
-   * Chat WebSocket 토큰 Create
+   * Generate Chat WebSocket token
    */
   async generateChatToken(userId: string): Promise<string> {
     try {
@@ -242,7 +242,7 @@ export class ChatServerService {
   }
 
   /**
-   * Used자 채널 Get list
+   * Get user channel list
    */
   async getUserChannels(userId: string): Promise<any> {
     try {
@@ -267,7 +267,7 @@ export class ChatServerService {
   }
 
   /**
-   * 채널 Create
+   * Create channel
    */
   async createChannel(channelData: {
     name: string;
@@ -293,7 +293,7 @@ export class ChatServerService {
   }
 
   /**
-   * 채널 정보 조회
+   * Get channel info
    */
   async getChannel(channelId: number): Promise<any> {
     try {
@@ -313,7 +313,7 @@ export class ChatServerService {
   }
 
   /**
-   * 채널 메시지 조회
+   * Get channel messages
    */
   async getChannelMessages(
     channelId: number,
@@ -342,7 +342,7 @@ export class ChatServerService {
   }
 
   /**
-   * Chat Server 연결 Status Confirm
+   * Check Chat Server connection status
    */
   async healthCheck(): Promise<boolean> {
     try {
@@ -354,7 +354,7 @@ export class ChatServerService {
   }
 
   /**
-   * Used자 Get list
+   * Get user list
    */
   async getUsers(userId: string, search?: string): Promise<any[]> {
     try {

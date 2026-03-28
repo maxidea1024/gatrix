@@ -6,13 +6,13 @@ import {
 
 const router = Router();
 
-// GET /api/v1/invitations/validate/:token - 초대 Verify token (Public API)
+// GET /api/v1/invitations/validate/:token - Validate invitation token (Public API)
 router.get(
   '/validate/:token',
   PublicInvitationController.validateInvitation as any
 );
 
-// POST /api/v1/invitations/accept/:token - 초대 수락 및 Used자 Register (Public API)
+// POST /api/v1/invitations/accept/:token - Accept invitation and register user (Public API)
 router.post(
   '/accept/:token',
   acceptInvitationValidation,

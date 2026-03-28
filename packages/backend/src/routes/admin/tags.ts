@@ -12,7 +12,7 @@ router.post(
   auditLog({
     action: 'tag_create',
     resourceType: 'tag',
-    // ?쒓렇 ?앹꽦 ?쒖뿉??ID媛 ?꾩쭅 ?놁쑝誘濡?getResourceId ?쒓굅
+    // ID does not exist yet before tag creation, so getResourceId is removed
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.tag?.id,
   }) as any,

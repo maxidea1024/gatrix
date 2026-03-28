@@ -1,10 +1,10 @@
 /**
- * HTTP Headers 이름 Constants
- * 모든 Headers 이름을 중앙에서 관리하여 하드코딩을 방지합니다.
+ * HTTP Header Name Constants
+ * Centrally manage all header names to prevent hardcoding.
  */
 
 /**
- * 표준 HTTP Headers
+ * Standard HTTP Headers
  */
 export const STANDARD_HEADERS = {
   /**
@@ -38,27 +38,27 @@ export const STANDARD_HEADERS = {
   X_REQUESTED_WITH: 'x-requested-with',
 
   /**
-   * If-None-Match Headers (ETag용)
+   * If-None-Match Header (for ETag)
    */
   IF_NONE_MATCH: 'if-none-match',
 } as const;
 
 /**
- * 커스텀 API Headers
+ * Custom API Headers
  */
 export const API_HEADERS = {
   /**
-   * API 토큰 Headers
+   * API Token Header
    */
   X_API_TOKEN: 'x-api-token',
 
   /**
-   * 애플리케이션 이름 Headers
+   * Application Name Header
    */
   X_APPLICATION_NAME: 'x-application-name',
 
   /**
-   * Used자 ID Headers (Chat Server용)
+   * User ID Header (for Chat Server)
    */
   X_USER_ID: 'x-user-id',
 
@@ -73,43 +73,43 @@ export const API_HEADERS = {
   X_REQUEST_ID: 'x-request-id',
 
   /**
-   * 클라이언트 연결 ID Headers (SDK용)
+   * Client Connection ID Header (for SDK)
    */
   X_CONNECTION_ID: 'x-connection-id',
 
   /**
-   * SDK 버전 Headers (SDK 이름/버전)
+   * SDK Version Header (SDK name/version)
    */
   X_SDK_VERSION: 'x-sdk-version',
 
   /**
-   * 세션 ID Headers (SDK용)
+   * Session ID Header (for SDK)
    */
   X_SESSION_ID: 'x-session-id',
 
   /**
-   * 피처 컨텍스트 Headers (JSON stringified context)
+   * Feature Context Header (JSON stringified context)
    */
   X_GATRIX_FEATURE_CONTEXT: 'x-gatrix-feature-context',
 
   /**
-   * 컨텍스트 해시 Headers (Context optimization)
+   * Context Hash Header (Context optimization)
    */
   X_GATRIX_CONTEXT_HASH: 'x-gatrix-context-hash',
 
   /**
-   * 클라이언트 버전 Headers
+   * Client Version Header
    */
   X_CLIENT_VERSION: 'x-client-version',
 
   /**
-   * 플랫Form Headers
+   * Platform Header
    */
   X_PLATFORM: 'x-platform',
 } as const;
 
 /**
- * Cache 관련 Headers
+ * Cache-related Headers
  */
 export const CACHE_HEADERS = {
   /**
@@ -118,13 +118,13 @@ export const CACHE_HEADERS = {
   X_CACHE: 'x-cache',
 
   /**
-   * Cache 키 Headers
+   * Cache Key Header
    */
   X_CACHE_KEY: 'x-cache-key',
 } as const;
 
 /**
- * 보안 Headers
+ * Security Headers
  */
 export const SECURITY_HEADERS = {
   /**
@@ -154,7 +154,7 @@ export const SECURITY_HEADERS = {
 } as const;
 
 /**
- * CORS 관련 Headers
+ * CORS-related Headers
  */
 export const CORS_HEADERS = {
   /**
@@ -179,7 +179,7 @@ export const CORS_HEADERS = {
 } as const;
 
 /**
- * 모든 Headers를 하나로 합친 객체
+ * Combined object of all headers
  */
 export const HEADERS = {
   ...STANDARD_HEADERS,
@@ -190,11 +190,11 @@ export const HEADERS = {
 } as const;
 
 /**
- * Headers 값 Constants
+ * Header Value Constants
  */
 export const HEADER_VALUES = {
   /**
-   * Bearer 토큰 접두사
+   * Bearer token prefix
    */
   BEARER_PREFIX: 'Bearer ',
 
@@ -204,13 +204,13 @@ export const HEADER_VALUES = {
   APPLICATION_JSON: 'application/json',
 
   /**
-   * Cache Status 값
+   * Cache Status values
    */
   CACHE_HIT: 'HIT',
   CACHE_MISS: 'MISS',
 
   /**
-   * 보안 Headers Default values
+   * Security Headers Default values
    */
   FRAME_OPTIONS_SAMEORIGIN: 'SAMEORIGIN',
   XSS_PROTECTION_BLOCK: '1; mode=block',
@@ -219,7 +219,7 @@ export const HEADER_VALUES = {
 } as const;
 
 /**
- * CORS에서 허용할 Headers 목록
+ * List of headers allowed in CORS
  */
 export const ALLOWED_HEADERS: string[] = [
   HEADERS.CONTENT_TYPE,

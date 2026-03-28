@@ -13,7 +13,7 @@ router.post(
   auditLog({
     action: 'message_template_create',
     resourceType: 'message_template',
-    // 硫붿떆吏 ?쒗뵆由??앹꽦 ?쒖뿉??ID媛 ?꾩쭅 ?놁쑝誘濡?getResourceId ?쒓굅
+    // ID does not exist yet before message template creation, so getResourceId is removed
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
