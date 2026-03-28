@@ -782,7 +782,9 @@ export class ChangeRequestService {
 
       let isForced = false;
       if (options?.forceApprove) {
-        const chain = await permissionService.resolveEnvironmentChain(cr.environmentId);
+        const chain = await permissionService.resolveEnvironmentChain(
+          cr.environmentId
+        );
         const hasSkipPermission = chain
           ? await permissionService.hasEnvPermission(
               approverId,

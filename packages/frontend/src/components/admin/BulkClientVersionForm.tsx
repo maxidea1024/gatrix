@@ -409,7 +409,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   };
 
   // Form submission handler
-  const handleValidSubmit = async (data: BulkCreateFormData, skipCr: boolean) => {
+  const handleValidSubmit = async (
+    data: BulkCreateFormData,
+    skipCr: boolean
+  ) => {
     // Platform selection validation
     if (selectedPlatforms.length === 0) {
       setError('platforms', {

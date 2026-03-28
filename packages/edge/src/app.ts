@@ -60,8 +60,7 @@ app.use(
 // Per-request CSP: add upgrade-insecure-requests ONLY for actual HTTPS requests
 // This prevents HTTP WebView (e.g. UE4 game client) from being blocked
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const isHttps =
-    req.secure || req.headers['x-forwarded-proto'] === 'https';
+  const isHttps = req.secure || req.headers['x-forwarded-proto'] === 'https';
   if (forceHttps && isHttps) {
     const existingCsp = res.getHeader('content-security-policy');
     if (typeof existingCsp === 'string') {

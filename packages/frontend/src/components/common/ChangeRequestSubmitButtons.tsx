@@ -140,10 +140,7 @@ export const ChangeRequestSubmitButtons: React.FC<
         placement={popperPlacement}
       >
         {({ TransitionProps }) => (
-          <Grow
-            {...TransitionProps}
-            style={{ transformOrigin: 'right top' }}
-          >
+          <Grow {...TransitionProps} style={{ transformOrigin: 'right top' }}>
             <Paper
               elevation={3}
               sx={{

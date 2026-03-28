@@ -387,16 +387,20 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           enqueueSnackbar(t('banners.updateSuccess'), { variant: 'success' });
         }
       } else {
-        const result = await bannerService.createBanner(projectApiPath, {
-          name,
-          description,
-          width,
-          height,
-          playbackSpeed,
-          shuffle,
-          sequences,
-          tags: selectedTags,
-        }, skipCr);
+        const result = await bannerService.createBanner(
+          projectApiPath,
+          {
+            name,
+            description,
+            width,
+            height,
+            playbackSpeed,
+            shuffle,
+            sequences,
+            tags: selectedTags,
+          },
+          skipCr
+        );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
             enqueueSnackbar,

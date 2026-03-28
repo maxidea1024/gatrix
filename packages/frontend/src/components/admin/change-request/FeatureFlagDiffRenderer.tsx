@@ -945,7 +945,9 @@ const FeatureFlagDiffRenderer: React.FC<FeatureFlagDiffRendererProps> = ({
 
   // Collect environment entries (keys that are not metadata except _global)
   const envEntries = Object.entries(draftData).filter(
-    ([key]) => (!key.startsWith('_') || key === '_global') && !METADATA_FIELDS.includes(key)
+    ([key]) =>
+      (!key.startsWith('_') || key === '_global') &&
+      !METADATA_FIELDS.includes(key)
   );
 
   if (envEntries.length === 0) return null;
@@ -957,7 +959,9 @@ const FeatureFlagDiffRenderer: React.FC<FeatureFlagDiffRendererProps> = ({
 
         // Custom name for _global
         if (envId === '_global') {
-          envName = t('featureFlags.globalSettings', { defaultValue: 'Global Settings' });
+          envName = t('featureFlags.globalSettings', {
+            defaultValue: 'Global Settings',
+          });
         }
 
         // beforeDraftData may be keyed by envId (new) or a flat flag object (legacy)
@@ -970,11 +974,10 @@ const FeatureFlagDiffRenderer: React.FC<FeatureFlagDiffRendererProps> = ({
             // New structure: { envId: { strategies, variants, isEnabled, ... } }
             beforeEnvData = beforeDraftData[envId] as Record<string, any>;
           } else if (
-            envId !== '_global' && (
-              'strategies' in beforeDraftData ||
+            envId !== '_global' &&
+            ('strategies' in beforeDraftData ||
               'variants' in beforeDraftData ||
-              'isEnabled' in beforeDraftData
-            )
+              'isEnabled' in beforeDraftData)
           ) {
             // Legacy structure: flat flag object with strategies/variants directly
             beforeEnvData = beforeDraftData;
@@ -995,4 +998,3 @@ const FeatureFlagDiffRenderer: React.FC<FeatureFlagDiffRendererProps> = ({
 };
 
 export default FeatureFlagDiffRenderer;
-

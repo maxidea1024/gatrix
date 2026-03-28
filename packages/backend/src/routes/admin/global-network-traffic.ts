@@ -197,15 +197,14 @@ router.get(
       ? new Date(startDate as string)
       : new Date(end.getTime() - 24 * 60 * 60 * 1000);
 
-    const timeseries =
-      await networkTrafficService.getFlagEvaluationTimeSeries({
-        environments: environments
-          ? (environments as string).split(',')
-          : undefined,
-        appNames: appNames ? (appNames as string).split(',') : undefined,
-        startDate: start,
-        endDate: end,
-      });
+    const timeseries = await networkTrafficService.getFlagEvaluationTimeSeries({
+      environments: environments
+        ? (environments as string).split(',')
+        : undefined,
+      appNames: appNames ? (appNames as string).split(',') : undefined,
+      startDate: start,
+      endDate: end,
+    });
 
     res.json({ success: true, data: { timeseries } });
   })

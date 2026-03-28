@@ -21,7 +21,11 @@ const TARGET_TABLE = 'g_feature_flag_types';
 /**
  * Helper: build CR response or direct response
  */
-function buildResponse(res: Response, result: ChangeGatewayResult, successData?: any) {
+function buildResponse(
+  res: Response,
+  result: ChangeGatewayResult,
+  successData?: any
+) {
   if (result.mode === 'CHANGE_REQUEST') {
     return res.json({
       success: true,

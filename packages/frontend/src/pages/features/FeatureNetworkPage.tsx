@@ -236,7 +236,9 @@ const FeatureNetworkPage: React.FC = () => {
   const filteredProjects = useMemo(() => {
     const map = new Map<string, string>();
     globalEnvs
-      .filter((e) => selectedOrgIds.length === 0 || selectedOrgIds.includes(e.orgId))
+      .filter(
+        (e) => selectedOrgIds.length === 0 || selectedOrgIds.includes(e.orgId)
+      )
       .forEach((e) => map.set(e.projectId, e.projectName));
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
   }, [globalEnvs, selectedOrgIds]);
@@ -246,8 +248,13 @@ const FeatureNetworkPage: React.FC = () => {
   // Environments filtered by selected orgs + projects
   const filteredEnvs = useMemo(() => {
     return globalEnvs.filter((e) => {
-      if (selectedOrgIds.length > 0 && !selectedOrgIds.includes(e.orgId)) return false;
-      if (selectedProjectIds.length > 0 && !selectedProjectIds.includes(e.projectId)) return false;
+      if (selectedOrgIds.length > 0 && !selectedOrgIds.includes(e.orgId))
+        return false;
+      if (
+        selectedProjectIds.length > 0 &&
+        !selectedProjectIds.includes(e.projectId)
+      )
+        return false;
       return true;
     });
   }, [globalEnvs, selectedOrgIds, selectedProjectIds]);
@@ -256,7 +263,10 @@ const FeatureNetworkPage: React.FC = () => {
   const envNameMap = useMemo(
     () =>
       new Map(
-        globalEnvs.map((e) => [e.environmentId, e.environmentName || e.environmentId])
+        globalEnvs.map((e) => [
+          e.environmentId,
+          e.environmentName || e.environmentId,
+        ])
       ),
     [globalEnvs]
   );
@@ -526,7 +536,12 @@ const FeatureNetworkPage: React.FC = () => {
     } else if (globalEnvsLoaded && initialEnvLoad) {
       setInitialEnvLoad(false);
     }
-  }, [globalEnvsLoaded, filteredEnvs, selectedEnvironments.length, initialEnvLoad]);
+  }, [
+    globalEnvsLoaded,
+    filteredEnvs,
+    selectedEnvironments.length,
+    initialEnvLoad,
+  ]);
 
   // When org/project filter changes, reset environment selection to all matching
   useEffect(() => {
@@ -1011,13 +1026,19 @@ const FeatureNetworkPage: React.FC = () => {
                       size="small"
                       onClick={() => {
                         if (selectedOrgIds.includes(org.id)) {
-                          setSelectedOrgIds(selectedOrgIds.filter((o) => o !== org.id));
+                          setSelectedOrgIds(
+                            selectedOrgIds.filter((o) => o !== org.id)
+                          );
                         } else {
                           setSelectedOrgIds([...selectedOrgIds, org.id]);
                         }
                       }}
-                      color={selectedOrgIds.includes(org.id) ? 'primary' : 'default'}
-                      variant={selectedOrgIds.includes(org.id) ? 'filled' : 'outlined'}
+                      color={
+                        selectedOrgIds.includes(org.id) ? 'primary' : 'default'
+                      }
+                      variant={
+                        selectedOrgIds.includes(org.id) ? 'filled' : 'outlined'
+                      }
                       sx={{ borderRadius: '16px' }}
                     />
                   ))}
@@ -1046,13 +1067,26 @@ const FeatureNetworkPage: React.FC = () => {
                       size="small"
                       onClick={() => {
                         if (selectedProjectIds.includes(proj.id)) {
-                          setSelectedProjectIds(selectedProjectIds.filter((p) => p !== proj.id));
+                          setSelectedProjectIds(
+                            selectedProjectIds.filter((p) => p !== proj.id)
+                          );
                         } else {
-                          setSelectedProjectIds([...selectedProjectIds, proj.id]);
+                          setSelectedProjectIds([
+                            ...selectedProjectIds,
+                            proj.id,
+                          ]);
                         }
                       }}
-                      color={selectedProjectIds.includes(proj.id) ? 'primary' : 'default'}
-                      variant={selectedProjectIds.includes(proj.id) ? 'filled' : 'outlined'}
+                      color={
+                        selectedProjectIds.includes(proj.id)
+                          ? 'primary'
+                          : 'default'
+                      }
+                      variant={
+                        selectedProjectIds.includes(proj.id)
+                          ? 'filled'
+                          : 'outlined'
+                      }
                       sx={{ borderRadius: '16px' }}
                     />
                   ))}

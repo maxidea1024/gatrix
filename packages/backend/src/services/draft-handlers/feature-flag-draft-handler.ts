@@ -38,24 +38,27 @@ export async function createFeatureFlagSnapshot(
 
   const snapshot: Record<string, any> = {
     _global: {
-      enabledValue: flag.enabledValue != null
-        ? typeof flag.enabledValue === 'string'
-          ? JSON.parse(flag.enabledValue)
-          : flag.enabledValue
-        : undefined,
-      disabledValue: flag.disabledValue != null
-        ? typeof flag.disabledValue === 'string'
-          ? JSON.parse(flag.disabledValue)
-          : flag.disabledValue
-        : undefined,
-      validationRules: flag.validationRules != null
-        ? typeof flag.validationRules === 'string'
-          ? JSON.parse(flag.validationRules)
-          : flag.validationRules
-        : undefined,
+      enabledValue:
+        flag.enabledValue != null
+          ? typeof flag.enabledValue === 'string'
+            ? JSON.parse(flag.enabledValue)
+            : flag.enabledValue
+          : undefined,
+      disabledValue:
+        flag.disabledValue != null
+          ? typeof flag.disabledValue === 'string'
+            ? JSON.parse(flag.disabledValue)
+            : flag.disabledValue
+          : undefined,
+      validationRules:
+        flag.validationRules != null
+          ? typeof flag.validationRules === 'string'
+            ? JSON.parse(flag.validationRules)
+            : flag.validationRules
+          : undefined,
       useFixedWeightVariants: flag.useFixedWeightVariants,
       impressionDataEnabled: flag.impressionDataEnabled,
-    }
+    },
   };
 
   for (const env of envSettings) {
@@ -183,9 +186,7 @@ export async function publishFeatureFlagDraft(
       await FeatureFlagEnvironmentModel.update(targetId, envId, {
         isEnabled: envData.isEnabled,
       });
-      changeDescriptions.push(
-        envData.isEnabled ? 'enabled' : 'disabled'
-      );
+      changeDescriptions.push(envData.isEnabled ? 'enabled' : 'disabled');
     }
 
     // Apply environment-level value overrides

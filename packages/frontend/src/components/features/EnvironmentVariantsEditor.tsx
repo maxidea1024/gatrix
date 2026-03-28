@@ -335,7 +335,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     originalOverrideEnabled ? (envEnabledValue ?? enabledValue) : enabledValue
   );
   const [savedDisabledValue, setSavedDisabledValue] = useState<any>(
-    originalOverrideDisabled ? (envDisabledValue ?? disabledValue) : disabledValue
+    originalOverrideDisabled
+      ? (envDisabledValue ?? disabledValue)
+      : disabledValue
   );
   const [editingEnabledValue, setEditingEnabledValue] = useState(
     originalOverrideEnabled ? (envEnabledValue ?? enabledValue) : enabledValue

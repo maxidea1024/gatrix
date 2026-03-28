@@ -917,143 +917,159 @@ const ClientVersionsPage: React.FC = () => {
   ]);
 
   // 일괄 Status 변경 핸들러
-  const handleBulkStatusUpdate = useCallback(async (skipCr: boolean = false) => {
-    if (selectedIds.length === 0) return;
+  const handleBulkStatusUpdate = useCallback(
+    async (skipCr: boolean = false) => {
+      if (selectedIds.length === 0) return;
 
-    // 점검 Status일 때 Validate required fields
-    if (bulkStatus === ClientStatus.MAINTENANCE) {
-      if (inputMode === 'direct' && !maintenanceMessage.trim()) {
-        enqueueSnackbar(t('clientVersions.maintenance.messageRequired'), {
-          variant: 'error',
-        });
-        return;
-      }
-      if (inputMode === 'template' && !selectedTemplateId) {
-        enqueueSnackbar(t('maintenance.selectTemplateRequired'), {
-          variant: 'error',
-        });
-        return;
-      }
-    }
-
-    try {
-      const request: BulkStatusUpdateRequest = {
-        ids: selectedIds,
-        clientStatus: bulkStatus,
-        // 점검 Status일 때만 점검 관련 데이터 포함
-        ...(bulkStatus === ClientStatus.MAINTENANCE && {
-          maintenanceStartDate: maintenanceStartDate || undefined,
-          maintenanceEndDate: maintenanceEndDate || undefined,
-          ...(inputMode === 'direct'
-            ? {
-                maintenanceMessage: maintenanceMessage || undefined,
-                supportsMultiLanguage: supportsMultiLanguage,
-                maintenanceLocales: maintenanceLocales.filter(
-                  (l) => l.message.trim() !== ''
-                ),
-              }
-            : {
-                messageTemplateId:
-                  selectedTemplateId === ''
-                    ? undefined
-                    : Number(selectedTemplateId),
-              }),
-        }),
-      };
-
-      const result = await ClientVersionService.bulkUpdateStatus(
-        projectApiPath,
-        request,
-        skipCr
-      );
-
-      // Handle CR response - trigger floating banner
-      if (result?.isChangeRequest) {
-        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
-      } else {
-        // Localization된 메시지 Create
-        const updatedCount = result?.updatedCount || selectedIds.length;
-        const successMessage = t('clientVersions.bulkStatusUpdated', {
-          count: updatedCount,
-        });
-
-        enqueueSnackbar(successMessage, { variant: 'success' });
-      }
-      setBulkStatusDialogOpen(false);
-      setSelectedIds([]);
-      setSelectAll(false);
-      // 점검 관련 Status Initialization
-      setMaintenanceStartDate('');
-      setMaintenanceEndDate('');
-      setMaintenanceMessage('');
-      setSupportsMultiLanguage(false);
-      setMaintenanceLocales([]);
-      setInputMode('direct');
-      setSelectedTemplateId('');
-      mutateVersions(); // SWR cache 갱신
-      mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
-    } catch (error: any) {
-      console.error('Error updating status:', error);
-      enqueueSnackbar(
-        parseApiErrorMessage(error, 'clientVersions.statusUpdateError'),
-        {
-          variant: 'error',
+      // 점검 Status일 때 Validate required fields
+      if (bulkStatus === ClientStatus.MAINTENANCE) {
+        if (inputMode === 'direct' && !maintenanceMessage.trim()) {
+          enqueueSnackbar(t('clientVersions.maintenance.messageRequired'), {
+            variant: 'error',
+          });
+          return;
         }
-      );
-    }
-  }, [
-    selectedIds,
-    bulkStatus,
-    inputMode,
-    maintenanceStartDate,
-    maintenanceEndDate,
-    maintenanceMessage,
-    supportsMultiLanguage,
-    maintenanceLocales,
-    selectedTemplateId,
-    enqueueSnackbar,
-    closeSnackbar,
-    navigate,
-    mutateVersions,
-    t,
-  ]);
+        if (inputMode === 'template' && !selectedTemplateId) {
+          enqueueSnackbar(t('maintenance.selectTemplateRequired'), {
+            variant: 'error',
+          });
+          return;
+        }
+      }
 
-  // 일괄 Delete 핸들러
-  const handleBulkDelete = useCallback(async (skipCr: boolean = false) => {
-    if (selectedIds.length === 0) return;
+      try {
+        const request: BulkStatusUpdateRequest = {
+          ids: selectedIds,
+          clientStatus: bulkStatus,
+          // 점검 Status일 때만 점검 관련 데이터 포함
+          ...(bulkStatus === ClientStatus.MAINTENANCE && {
+            maintenanceStartDate: maintenanceStartDate || undefined,
+            maintenanceEndDate: maintenanceEndDate || undefined,
+            ...(inputMode === 'direct'
+              ? {
+                  maintenanceMessage: maintenanceMessage || undefined,
+                  supportsMultiLanguage: supportsMultiLanguage,
+                  maintenanceLocales: maintenanceLocales.filter(
+                    (l) => l.message.trim() !== ''
+                  ),
+                }
+              : {
+                  messageTemplateId:
+                    selectedTemplateId === ''
+                      ? undefined
+                      : Number(selectedTemplateId),
+                }),
+          }),
+        };
 
-    try {
-      const results = await Promise.all(
-        selectedIds.map((id) =>
-          ClientVersionService.deleteClientVersion(projectApiPath, id, skipCr)
-        )
-      );
-      const hasChangeRequest = results.some((r) => r.isChangeRequest);
-      if (hasChangeRequest) {
-        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
-      } else {
+        const result = await ClientVersionService.bulkUpdateStatus(
+          projectApiPath,
+          request,
+          skipCr
+        );
+
+        // Handle CR response - trigger floating banner
+        if (result?.isChangeRequest) {
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
+        } else {
+          // Localization된 메시지 Create
+          const updatedCount = result?.updatedCount || selectedIds.length;
+          const successMessage = t('clientVersions.bulkStatusUpdated', {
+            count: updatedCount,
+          });
+
+          enqueueSnackbar(successMessage, { variant: 'success' });
+        }
+        setBulkStatusDialogOpen(false);
+        setSelectedIds([]);
+        setSelectAll(false);
+        // 점검 관련 Status Initialization
+        setMaintenanceStartDate('');
+        setMaintenanceEndDate('');
+        setMaintenanceMessage('');
+        setSupportsMultiLanguage(false);
+        setMaintenanceLocales([]);
+        setInputMode('direct');
+        setSelectedTemplateId('');
+        mutateVersions(); // SWR cache 갱신
+        mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
+      } catch (error: any) {
+        console.error('Error updating status:', error);
         enqueueSnackbar(
-          t('clientVersions.bulkDeleteSuccess', { count: selectedIds.length }),
+          parseApiErrorMessage(error, 'clientVersions.statusUpdateError'),
           {
-            variant: 'success',
+            variant: 'error',
           }
         );
       }
-      setSelectedIds([]);
-      setSelectAll(false);
-      setBulkDeleteDialogOpen(false);
-      mutateVersions(); // SWR cache 갱신
-      mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
-    } catch (error: any) {
-      console.error('Failed to delete client versions:', error);
-      enqueueSnackbar(
-        parseApiErrorMessage(error, 'clientVersions.bulkDeleteError'),
-        {
-          variant: 'error',
+    },
+    [
+      selectedIds,
+      bulkStatus,
+      inputMode,
+      maintenanceStartDate,
+      maintenanceEndDate,
+      maintenanceMessage,
+      supportsMultiLanguage,
+      maintenanceLocales,
+      selectedTemplateId,
+      enqueueSnackbar,
+      closeSnackbar,
+      navigate,
+      mutateVersions,
+      t,
+    ]
+  );
+
+  // 일괄 Delete 핸들러
+  const handleBulkDelete = useCallback(
+    async (skipCr: boolean = false) => {
+      if (selectedIds.length === 0) return;
+
+      try {
+        const results = await Promise.all(
+          selectedIds.map((id) =>
+            ClientVersionService.deleteClientVersion(projectApiPath, id, skipCr)
+          )
+        );
+        const hasChangeRequest = results.some((r) => r.isChangeRequest);
+        if (hasChangeRequest) {
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            navigate
+          );
+        } else {
+          enqueueSnackbar(
+            t('clientVersions.bulkDeleteSuccess', {
+              count: selectedIds.length,
+            }),
+            {
+              variant: 'success',
+            }
+          );
         }
-      );
-    }
-  }, [selectedIds, t, enqueueSnackbar, closeSnackbar, navigate, mutateVersions]);
+        setSelectedIds([]);
+        setSelectAll(false);
+        setBulkDeleteDialogOpen(false);
+        mutateVersions(); // SWR cache 갱신
+        mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
+      } catch (error: any) {
+        console.error('Failed to delete client versions:', error);
+        enqueueSnackbar(
+          parseApiErrorMessage(error, 'clientVersions.bulkDeleteError'),
+          {
+            variant: 'error',
+          }
+        );
+      }
+    },
+    [selectedIds, t, enqueueSnackbar, closeSnackbar, navigate, mutateVersions]
+  );
 
   // 내보내기 함수들
   const handleExport = useCallback(

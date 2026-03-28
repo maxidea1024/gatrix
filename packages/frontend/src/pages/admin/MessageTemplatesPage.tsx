@@ -596,39 +596,46 @@ const MessageTemplatesPage: React.FC = () => {
     setBulkDeleteDialogOpen(true);
   }, [selectedIds]);
 
-  const confirmBulkDelete = useCallback(async (skipCr: boolean = false) => {
-    try {
-      const result = await messageTemplateService.bulkDelete(
-        projectApiPath,
-        selectedIds,
-        skipCr
-      );
-      if (result.isChangeRequest) {
-        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
-      } else {
+  const confirmBulkDelete = useCallback(
+    async (skipCr: boolean = false) => {
+      try {
+        const result = await messageTemplateService.bulkDelete(
+          projectApiPath,
+          selectedIds,
+          skipCr
+        );
+        if (result.isChangeRequest) {
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            () => {}
+          );
+        } else {
+          enqueueSnackbar(
+            t('messageTemplates.bulkDeleteSuccess', {
+              count: selectedIds.length,
+            }),
+            {
+              variant: 'success',
+            }
+          );
+        }
+        setSelectedIds([]);
+        setSelectAll(false);
+        setBulkDeleteDialogOpen(false);
+        load();
+      } catch (error: any) {
+        console.error('Error bulk deleting templates:', error);
         enqueueSnackbar(
-          t('messageTemplates.bulkDeleteSuccess', {
-            count: selectedIds.length,
-          }),
+          parseApiErrorMessage(error, 'messageTemplates.bulkDeleteFailed'),
           {
-            variant: 'success',
+            variant: 'error',
           }
         );
       }
-      setSelectedIds([]);
-      setSelectAll(false);
-      setBulkDeleteDialogOpen(false);
-      load();
-    } catch (error: any) {
-      console.error('Error bulk deleting templates:', error);
-      enqueueSnackbar(
-        parseApiErrorMessage(error, 'messageTemplates.bulkDeleteFailed'),
-        {
-          variant: 'error',
-        }
-      );
-    }
-  }, [selectedIds, t, enqueueSnackbar, closeSnackbar, load]);
+    },
+    [selectedIds, t, enqueueSnackbar, closeSnackbar, load]
+  );
 
   // 일괄 Used 가능/불가 변경
   const handleBulkToggleAvailability = useCallback(
@@ -677,30 +684,37 @@ const MessageTemplatesPage: React.FC = () => {
     setDeleteDialogOpen(true);
   }, []);
 
-  const confirmDelete = useCallback(async (skipCr: boolean = false) => {
-    if (!deletingTemplate?.id) return;
+  const confirmDelete = useCallback(
+    async (skipCr: boolean = false) => {
+      if (!deletingTemplate?.id) return;
 
-    try {
-      const result = await messageTemplateService.delete(
-        projectApiPath,
-        deletingTemplate.id,
-        skipCr
-      );
-      if (result.isChangeRequest) {
-        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
-      } else {
-        enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
+      try {
+        const result = await messageTemplateService.delete(
+          projectApiPath,
+          deletingTemplate.id,
+          skipCr
+        );
+        if (result.isChangeRequest) {
+          showChangeRequestCreatedToast(
+            enqueueSnackbar,
+            closeSnackbar,
+            () => {}
+          );
+        } else {
+          enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
+        }
+        setDeleteDialogOpen(false);
+        setDeletingTemplate(null);
+        load();
+      } catch (error: any) {
+        console.error('Error deleting template:', error);
+        enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), {
+          variant: 'error',
+        });
       }
-      setDeleteDialogOpen(false);
-      setDeletingTemplate(null);
-      load();
-    } catch (error: any) {
-      console.error('Error deleting template:', error);
-      enqueueSnackbar(parseApiErrorMessage(error, 'common.deleteFailed'), {
-        variant: 'error',
-      });
-    }
-  }, [deletingTemplate, t, enqueueSnackbar, closeSnackbar, load]);
+    },
+    [deletingTemplate, t, enqueueSnackbar, closeSnackbar, load]
+  );
 
   const handleAdd = () => {
     setEditing(null);

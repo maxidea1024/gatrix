@@ -363,7 +363,11 @@ const SurveysPage: React.FC = () => {
     try {
       let crCreated = false;
       for (const id of selectedIds) {
-        const result = await surveyService.deleteSurvey(projectApiPath, id, skipCr);
+        const result = await surveyService.deleteSurvey(
+          projectApiPath,
+          id,
+          skipCr
+        );
         if (result.isChangeRequest) crCreated = true;
       }
       if (crCreated) {

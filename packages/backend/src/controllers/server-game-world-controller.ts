@@ -258,8 +258,7 @@ export class ServerGameWorldController {
         },
       });
     } catch (error) {
-      const statusCode =
-        error instanceof GatrixError ? error.statusCode : 500;
+      const statusCode = error instanceof GatrixError ? error.statusCode : 500;
       logger.error(
         'Error in ServerGameWorldController.getGameWorldById:',
         error
@@ -385,8 +384,7 @@ export class ServerGameWorldController {
         },
       });
     } catch (error) {
-      const statusCode =
-        error instanceof GatrixError ? error.statusCode : 500;
+      const statusCode = error instanceof GatrixError ? error.statusCode : 500;
       logger.error(
         'Error in ServerGameWorldController.getGameWorldByWorldId:',
         error

@@ -2093,7 +2093,11 @@ const GameWorldsPage: React.FC = () => {
             saving={saving}
             onSave={handleSaveWorld}
             disabled={formActiveTab !== 0 || (!!editingWorld && !isDirty)}
-            title={formActiveTab !== 0 ? t('gameWorlds.form.switchToBasicInfoToSave') : undefined}
+            title={
+              formActiveTab !== 0
+                ? t('gameWorlds.form.switchToBasicInfoToSave')
+                : undefined
+            }
           />
         </Box>
       </ResizableDrawer>

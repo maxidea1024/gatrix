@@ -288,7 +288,11 @@ const BannerManagementPage: React.FC = () => {
     try {
       let crCreated = false;
       for (const id of selectedIds) {
-        const result = await bannerService.deleteBanner(projectApiPath, id, skipCr);
+        const result = await bannerService.deleteBanner(
+          projectApiPath,
+          id,
+          skipCr
+        );
         if (result.isChangeRequest) crCreated = true;
       }
       if (crCreated) {

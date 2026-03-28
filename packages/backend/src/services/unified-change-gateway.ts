@@ -40,7 +40,8 @@ export class UnifiedChangeGateway {
     environmentId: string,
     perm: string
   ): Promise<boolean> {
-    const chain = await permissionService.resolveEnvironmentChain(environmentId);
+    const chain =
+      await permissionService.resolveEnvironmentChain(environmentId);
     if (!chain) return false;
     return permissionService.hasEnvPermission(
       userId,
@@ -108,11 +109,20 @@ export class UnifiedChangeGateway {
 
       let requiresApproval = env.requiresApproval;
       if (requiresApproval && this.isSkipCrRequested(options)) {
-        const hasSkipPermission = await this.hasEnvPermission(userId, environmentId, P.CHANGE_REQUESTS_SKIP);
+        const hasSkipPermission = await this.hasEnvPermission(
+          userId,
+          environmentId,
+          P.CHANGE_REQUESTS_SKIP
+        );
         if (hasSkipPermission) {
           requiresApproval = false;
         } else {
-          throw new GatrixError('You do not have permission to skip change requests.', 403, true, 'FORBIDDEN');
+          throw new GatrixError(
+            'You do not have permission to skip change requests.',
+            403,
+            true,
+            'FORBIDDEN'
+          );
         }
       }
 
@@ -176,11 +186,20 @@ export class UnifiedChangeGateway {
 
       let requiresApproval = env.requiresApproval;
       if (requiresApproval && this.isSkipCrRequested(options)) {
-        const hasSkipPermission = await this.hasEnvPermission(userId, environmentId, P.CHANGE_REQUESTS_SKIP);
+        const hasSkipPermission = await this.hasEnvPermission(
+          userId,
+          environmentId,
+          P.CHANGE_REQUESTS_SKIP
+        );
         if (hasSkipPermission) {
           requiresApproval = false;
         } else {
-          throw new GatrixError('You do not have permission to skip change requests.', 403, true, 'FORBIDDEN');
+          throw new GatrixError(
+            'You do not have permission to skip change requests.',
+            403,
+            true,
+            'FORBIDDEN'
+          );
         }
       }
 
@@ -276,11 +295,20 @@ export class UnifiedChangeGateway {
 
       let requiresApproval = env.requiresApproval;
       if (requiresApproval && this.isSkipCrRequested(options)) {
-        const hasSkipPermission = await this.hasEnvPermission(userId, environmentId, P.CHANGE_REQUESTS_SKIP);
+        const hasSkipPermission = await this.hasEnvPermission(
+          userId,
+          environmentId,
+          P.CHANGE_REQUESTS_SKIP
+        );
         if (hasSkipPermission) {
           requiresApproval = false;
         } else {
-          throw new GatrixError('You do not have permission to skip change requests.', 403, true, 'FORBIDDEN');
+          throw new GatrixError(
+            'You do not have permission to skip change requests.',
+            403,
+            true,
+            'FORBIDDEN'
+          );
         }
       }
 

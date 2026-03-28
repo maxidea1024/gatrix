@@ -66,7 +66,10 @@ import SearchTextField from '../../components/common/SearchTextField';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from '../../utils/changeRequestToast';
 import { ChangeRequestSubmitButtons } from '../../components/common/ChangeRequestSubmitButtons';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useDebounce } from '@/hooks/useDebounce';

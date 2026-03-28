@@ -98,7 +98,11 @@ const ConstraintsDiff: React.FC<{
   type DiffRow =
     | { type: 'added'; constraint: ConstraintValue }
     | { type: 'removed'; constraint: ConstraintValue }
-    | { type: 'modified'; oldConstraint: ConstraintValue; newConstraint: ConstraintValue };
+    | {
+        type: 'modified';
+        oldConstraint: ConstraintValue;
+        newConstraint: ConstraintValue;
+      };
 
   const rows: DiffRow[] = [];
 
@@ -124,7 +128,11 @@ const ConstraintsDiff: React.FC<{
     for (let oi = 0; oi < oldList.length; oi++) {
       if (usedOldIndices.has(oi)) continue;
       if (oldList[oi].contextName === newList[ni].contextName) {
-        rows.push({ type: 'modified', oldConstraint: oldList[oi], newConstraint: newList[ni] });
+        rows.push({
+          type: 'modified',
+          oldConstraint: oldList[oi],
+          newConstraint: newList[ni],
+        });
         usedOldIndices.add(oi);
         usedNewIndices.add(ni);
         break;
@@ -162,20 +170,22 @@ const ConstraintsDiff: React.FC<{
     display: 'flex',
     alignItems: 'center',
     gap: 0.75,
-    bgcolor: type === 'removed'
-      ? 'rgba(211, 47, 47, 0.06)'
-      : type === 'added'
-        ? 'rgba(46, 125, 50, 0.06)'
-        : 'rgba(255, 152, 0, 0.06)',
+    bgcolor:
+      type === 'removed'
+        ? 'rgba(211, 47, 47, 0.06)'
+        : type === 'added'
+          ? 'rgba(46, 125, 50, 0.06)'
+          : 'rgba(255, 152, 0, 0.06)',
     borderRadius: 1,
     px: 1,
     py: 0.5,
     border: '1px solid',
-    borderColor: type === 'removed'
-      ? 'rgba(211, 47, 47, 0.15)'
-      : type === 'added'
-        ? 'rgba(46, 125, 50, 0.15)'
-        : 'rgba(255, 152, 0, 0.15)',
+    borderColor:
+      type === 'removed'
+        ? 'rgba(211, 47, 47, 0.15)'
+        : type === 'added'
+          ? 'rgba(46, 125, 50, 0.15)'
+          : 'rgba(255, 152, 0, 0.15)',
   });
 
   return (
@@ -204,20 +214,42 @@ const ConstraintsDiff: React.FC<{
         // Modified: show old → new
         return (
           <Box key={`mod-${i}`} sx={rowStyle('modified')}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25, flex: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, opacity: 0.7 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 0.25,
+                flex: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  opacity: 0.7,
+                }}
+              >
                 <RemoveCircleOutlineIcon
                   sx={{ fontSize: 12, color: 'error.main', flexShrink: 0 }}
                 />
                 <Box sx={{ textDecoration: 'line-through' }}>
-                  <ConstraintDisplay constraint={row.oldConstraint} compact noBorder />
+                  <ConstraintDisplay
+                    constraint={row.oldConstraint}
+                    compact
+                    noBorder
+                  />
                 </Box>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <AddCircleOutlineIcon
                   sx={{ fontSize: 12, color: 'success.main', flexShrink: 0 }}
                 />
-                <ConstraintDisplay constraint={row.newConstraint} compact noBorder />
+                <ConstraintDisplay
+                  constraint={row.newConstraint}
+                  compact
+                  noBorder
+                />
               </Box>
             </Box>
           </Box>

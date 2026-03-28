@@ -199,7 +199,10 @@ class BannerService {
     input: CreateBannerInput,
     skipCr?: boolean
   ): Promise<BannerMutationResult> {
-    const response = await api.post(`${projectApiPath}/banners${skipCr ? '?skipCr=true' : ''}`, input);
+    const response = await api.post(
+      `${projectApiPath}/banners${skipCr ? '?skipCr=true' : ''}`,
+      input
+    );
     return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }
 
@@ -227,7 +230,9 @@ class BannerService {
     bannerId: string,
     skipCr?: boolean
   ): Promise<MutationResult<void>> {
-    const response = await api.delete(`${projectApiPath}/banners/${bannerId}${skipCr ? '?skipCr=true' : ''}`);
+    const response = await api.delete(
+      `${projectApiPath}/banners/${bannerId}${skipCr ? '?skipCr=true' : ''}`
+    );
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
 

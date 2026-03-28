@@ -506,7 +506,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           enqueueSnackbar(t('surveys.updateSuccess'), { variant: 'success' });
         }
       } else {
-        const result = await surveyService.createSurvey(projectApiPath, data, skipCr);
+        const result = await surveyService.createSurvey(
+          projectApiPath,
+          data,
+          skipCr
+        );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
             enqueueSnackbar,

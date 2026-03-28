@@ -124,7 +124,10 @@ class ServiceNoticeService {
     data: CreateServiceNoticeData,
     skipCr?: boolean
   ): Promise<ServiceNoticeMutationResult> {
-    const response = await api.post(`${projectApiPath}/service-notices${skipCr ? '?skipCr=true' : ''}`, data);
+    const response = await api.post(
+      `${projectApiPath}/service-notices${skipCr ? '?skipCr=true' : ''}`,
+      data
+    );
     return parseChangeRequestResponse<ServiceNotice>(
       response,
       (r) => r?.notice

@@ -555,7 +555,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   }, [watchedPlatform, isEdit, setValue, getValues]);
 
   // Form submission
-  const handleValidSubmit = async (data: ClientVersionFormData, skipCr: boolean) => {
+  const handleValidSubmit = async (
+    data: ClientVersionFormData,
+    skipCr: boolean
+  ) => {
     if (duplicateError) {
       return;
     }
@@ -1386,12 +1389,21 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             {t('common.cancel')}
           </Button>
           <ChangeRequestSubmitButtons
-            action={displayIsCopy ? 'create' : displayIsEdit ? 'update' : 'create'}
+            action={
+              displayIsCopy ? 'create' : displayIsEdit ? 'update' : 'create'
+            }
             requiresApproval={requiresApproval}
             saving={isSubmitting || loading}
             onSave={handleSave}
-            disabled={isSubmitting || loading || !!duplicateError || (displayIsEdit && !isDirty)}
-            title={displayIsCopy ? t('clientVersions.form.copyTitle') : undefined}
+            disabled={
+              isSubmitting ||
+              loading ||
+              !!duplicateError ||
+              (displayIsEdit && !isDirty)
+            }
+            title={
+              displayIsCopy ? t('clientVersions.form.copyTitle') : undefined
+            }
           />
         </Box>
       </form>

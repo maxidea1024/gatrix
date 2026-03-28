@@ -154,7 +154,10 @@ export const couponService = {
     data: CreateCouponSettingInput,
     skipCr?: boolean
   ): Promise<MutationResult<any>> {
-    const res = await api.post(`${projectApiPath}/coupon-settings${skipCr ? '?skipCr=true' : ''}`, data);
+    const res = await api.post(
+      `${projectApiPath}/coupon-settings${skipCr ? '?skipCr=true' : ''}`,
+      data
+    );
     return parseChangeRequestResponse<any>(res, (r) => r?.setting);
   },
   async updateSetting(
@@ -174,7 +177,9 @@ export const couponService = {
     id: string,
     skipCr?: boolean
   ): Promise<MutationResult<void>> {
-    const res = await api.delete(`${projectApiPath}/coupon-settings/${id}${skipCr ? '?skipCr=true' : ''}`);
+    const res = await api.delete(
+      `${projectApiPath}/coupon-settings/${id}${skipCr ? '?skipCr=true' : ''}`
+    );
     return parseChangeRequestResponse<void>(res, () => undefined);
   },
   async getUsage(

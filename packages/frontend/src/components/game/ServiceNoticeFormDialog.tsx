@@ -33,7 +33,10 @@ import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
-import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
+import {
+  showChangeRequestCreatedToast,
+  getActionLabel,
+} from '../../utils/changeRequestToast';
 import { ChangeRequestSubmitButtons } from '../common/ChangeRequestSubmitButtons';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import {
@@ -621,7 +624,13 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 
       if (notice) {
         const result = await import('../../services/serviceNoticeService').then(
-          (m) => m.default.updateServiceNotice(projectApiPath, notice.id, data, skipCr)
+          (m) =>
+            m.default.updateServiceNotice(
+              projectApiPath,
+              notice.id,
+              data,
+              skipCr
+            )
         );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
