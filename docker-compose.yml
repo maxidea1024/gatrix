@@ -35,11 +35,11 @@ services:
     image: redis:7-alpine
     container_name: gatrix-redis
     restart: unless-stopped
-    command: redis-server /usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf --appendonly yes
     ports:
       - '${REDIS_HOST_PORT:-46379}:6379'
     volumes:
-      - gatrix_redis_data:/data
+      - ${DATA_ROOT:-./data}/redis:/data
       - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
       - gatrix-network
@@ -536,8 +536,8 @@ services:
       # Cache configuration (event mode uses Redis PubSub for real-time sync)
       EDGE_SYNC_METHOD: ${EDGE_SYNC_METHOD:-event}
       EDGE_CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
-      # HTTPS enforcement (set to 'false' for HTTP-only environments)
-      EDGE_FORCE_HTTPS: ${EDGE_FORCE_HTTPS:-true}
+      # HTTPS enforcement (set to 'true' for HTTPS environments, default: false for internal HTTP)
+      EDGE_FORCE_HTTPS: ${EDGE_FORCE_HTTPS:-false}
       GATRIX_LOKI_ENABLED: ${GATRIX_LOKI_ENABLED:-true}
       GATRIX_LOKI_URL: ${GATRIX_LOKI_URL:-http://loki:3100/loki/api/v1/push}
     ports:
@@ -615,4 +615,3 @@ networks:
 volumes:
   clickhouse-data:
   gatrix_etcd_data:
-  gatrix_redis_data:

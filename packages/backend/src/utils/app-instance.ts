@@ -17,8 +17,8 @@ export interface AppInstanceInfo {
 }
 
 /**
- * 앱 인스턴스 정보를 관리하는 싱글톤 클래스
- * 백엔드 시작 시 Create되어 시스템 전역에서 Used됩니다.
+ * Singleton class that manages app instance information
+ * Created at backend startup and used globally across the system.
  */
 class AppInstance {
   private static instance: AppInstance;
@@ -49,7 +49,7 @@ class AppInstance {
   }
 
   /**
-   * 싱글톤 인스턴스 반환
+   * Return singleton instance
    */
   public static getInstance(): AppInstance {
     if (!AppInstance.instance) {
@@ -59,14 +59,14 @@ class AppInstance {
   }
 
   /**
-   * 인스턴스 ID 반환
+   * Return instance ID
    */
   public get instanceId(): string {
     return this._instanceInfo.instanceId;
   }
 
   /**
-   * 전체 인스턴스 정보 반환 (uptime 업데이트)
+   * Return full instance info (with uptime update)
    */
   public get info(): AppInstanceInfo {
     return {
@@ -78,7 +78,7 @@ class AppInstance {
   }
 
   /**
-   * 인스턴스 정보를 로그 형태로 반환
+   * Return instance info in log format
    */
   public getLogInfo(): Record<string, any> {
     const info = this.info;
@@ -93,14 +93,14 @@ class AppInstance {
   }
 
   /**
-   * 인스턴스 요약 정보 반환 (짧은 형태)
+   * Return instance summary info (short form)
    */
   public getSummary(): string {
     return `${this._instanceInfo.instanceId.substring(0, 8)}-${this._instanceInfo.processId}`;
   }
 
   /**
-   * 헬스체크용 정보 반환
+   * Return info for health check
    */
   public getHealthInfo(): Record<string, any> {
     const info = this.info;
@@ -116,10 +116,10 @@ class AppInstance {
   }
 }
 
-// 전역에서 쉽게 접근할 수 있도록 export
+// Export for easy global access
 export const appInstance = AppInstance.getInstance();
 
-// 편의 함수들
+// Convenience functions
 export const getInstanceId = (): string => appInstance.instanceId;
 export const getInstanceInfo = (): AppInstanceInfo => appInstance.info;
 export const getInstanceSummary = (): string => appInstance.getSummary();

@@ -7,13 +7,13 @@ const logger = createLogger('ChatChannelController');
 
 /**
  * Chat Channel Controller
- * Frontend와 Chat Server 사이의 프록시 역할
+ * Acts as a proxy between Frontend and Chat Server
  */
 export class ChatChannelController {
   private static chatServerService = ChatServerService.getInstance();
 
   /**
-   * Used자의 채널 Get list
+   * Get user channel list
    */
   static async getMyChannels(req: Request, res: Response): Promise<void> {
     try {
@@ -46,7 +46,7 @@ export class ChatChannelController {
   }
 
   /**
-   * 채널 Create
+   * Create channel
    */
   static async createChannel(req: Request, res: Response): Promise<void> {
     try {
@@ -107,7 +107,7 @@ export class ChatChannelController {
   }
 
   /**
-   * 채널 정보 조회
+   * Get channel info
    */
   static async getChannel(req: Request, res: Response): Promise<void> {
     try {
@@ -149,7 +149,7 @@ export class ChatChannelController {
   }
 
   /**
-   * 채널 메시지 조회
+   * Get channel messages
    */
   static async getChannelMessages(req: Request, res: Response): Promise<void> {
     try {
@@ -189,7 +189,7 @@ export class ChatChannelController {
   }
 
   /**
-   * Used자 Get list
+   * Get user list
    */
   static async getUsers(req: Request, res: Response): Promise<void> {
     try {

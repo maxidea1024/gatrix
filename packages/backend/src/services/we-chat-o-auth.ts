@@ -43,7 +43,7 @@ export class WeChatOAuthService {
   }
 
   /**
-   * Authorization Code로 Access Token 획득
+   * Obtain Access Token using Authorization Code
    */
   static async getAccessToken(code: string): Promise<WeChatTokenResponse> {
     try {
@@ -70,7 +70,7 @@ export class WeChatOAuthService {
   }
 
   /**
-   * Access Token으로 User info 획득
+   * Obtain user info using Access Token
    */
   static async getUserInfo(
     accessToken: string,
@@ -99,7 +99,7 @@ export class WeChatOAuthService {
   }
 
   /**
-   * 전체 OAuth 플로우 처리
+   * Handle full OAuth flow
    */
   static async handleOAuthCallback(code: string): Promise<WeChatProfile> {
     const tokenData = await this.getAccessToken(code);

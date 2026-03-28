@@ -77,6 +77,9 @@ import { tagService } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { ChangeRequestSubmitButtons } from '../../components/common/ChangeRequestSubmitButtons';
+import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 
 interface FeatureSegment {
   id: string;
@@ -99,12 +102,17 @@ import PageHeader from '@/components/common/PageHeader';
 
 const FeatureSegmentsPage: React.FC = () => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const canManage = hasPermission([P.FEATURES_UPDATE]);
   const { currentProjectId } = useOrgProject();
+  const { allEnvironments } = useEnvironment();
+  // Project-level resources: CR required if ANY environment has requiresApproval
+  const anyRequiresApproval = allEnvironments.some(
+    (env) => env.requiresApproval
+  );
 
   // State
   const [allSegments, setAllSegments] = useState<FeatureSegment[]>([]);
@@ -455,13 +463,15 @@ const FeatureSegmentsPage: React.FC = () => {
     return true;
   };
 
-  const handleSave = async () => {
+  const handleSave = async (skipCr?: boolean) => {
     if (!editingSegment) return;
+    const skipParam = skipCr ? '?skipCr=true' : '';
     try {
+      let result;
       if (editingSegment.id) {
         // Update existing segment
-        await api.put(
-          `${projectApiPath}/features/segments/${editingSegment.id}`,
+        result = await api.put(
+          `${projectApiPath}/features/segments/${editingSegment.id}${skipParam}`,
           {
             displayName: editingSegment.displayName,
             description: editingSegment.description,
@@ -472,16 +482,27 @@ const FeatureSegmentsPage: React.FC = () => {
         );
       } else {
         // Create new segment
-        await api.post(`${projectApiPath}/features/segments`, {
-          segmentName: editingSegment.segmentName,
-          displayName: editingSegment.displayName || editingSegment.segmentName,
-          description: editingSegment.description || '',
-          constraints: editingSegment.constraints || [],
-          isActive: editingSegment.isActive ?? true,
-          tags: editingSegment.tags || [],
-          projectId: currentProjectId,
-        });
+        result = await api.post(
+          `${projectApiPath}/features/segments${skipParam}`,
+          {
+            segmentName: editingSegment.segmentName,
+            displayName:
+              editingSegment.displayName || editingSegment.segmentName,
+            description: editingSegment.description || '',
+            constraints: editingSegment.constraints || [],
+            isActive: editingSegment.isActive ?? true,
+            tags: editingSegment.tags || [],
+            projectId: currentProjectId,
+          }
+        );
       }
+
+      if (result.data?.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      } else {
+        enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });
+      }
+
       setEditDialogOpen(false);
       setEditingSegment(null);
       loadSegments();
@@ -531,12 +552,16 @@ const FeatureSegmentsPage: React.FC = () => {
     }
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = async (skipCr?: boolean) => {
     if (!deletingSegment) return;
+    const skipParam = skipCr ? '?skipCr=true' : '';
     try {
-      await api.delete(
-        `${projectApiPath}/features/segments/${deletingSegment.id}`
+      const result = await api.delete(
+        `${projectApiPath}/features/segments/${deletingSegment.id}${skipParam}`
       );
+      if (result.data?.isChangeRequest) {
+        showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
+      }
       loadSegments();
     } catch (error: any) {
       enqueueSnackbar(
@@ -1289,13 +1314,13 @@ const FeatureSegmentsPage: React.FC = () => {
           <Button onClick={() => setEditDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button
-            variant="contained"
-            onClick={handleSave}
+          <ChangeRequestSubmitButtons
+            action={editingSegment?.id ? 'update' : 'create'}
+            requiresApproval={anyRequiresApproval}
+            saving={false}
+            onSave={(skipCr) => handleSave(skipCr)}
             disabled={!hasChanges() || !isSegmentValid()}
-          >
-            {editingSegment?.id ? t('common.update') : t('common.create')}
-          </Button>
+          />
         </Box>
       </ResizableDrawer>
 
@@ -1308,6 +1333,7 @@ const FeatureSegmentsPage: React.FC = () => {
         message={t('featureFlags.deleteConfirmMessage', {
           name: deletingSegment?.segmentName || '',
         })}
+        requiresApproval={anyRequiresApproval}
       />
 
       {/* Reference Check Dialog */}

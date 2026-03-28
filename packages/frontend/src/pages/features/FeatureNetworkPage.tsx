@@ -12,7 +12,6 @@ import React, {
   useRef,
 } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useOrgProject } from '../../contexts/OrgProjectContext';
 import {
   Box,
   Typography,
@@ -62,9 +61,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import { useTranslation } from 'react-i18next';
 
-import { useEnvironment } from '../../contexts/EnvironmentContext';
 import api from '../../services/api';
-import { Environment } from '../../services/environmentService';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
 
@@ -148,6 +145,17 @@ interface EvaluationTimeSeriesPointByApp {
   noCount: number;
 }
 
+// Global environment info with org/project
+interface GlobalEnvironment {
+  environmentId: string;
+  environmentName: string;
+  environmentType: string;
+  projectId: string;
+  projectName: string;
+  orgId: string;
+  orgName: string;
+}
+
 // Time range options
 const TIME_RANGE_OPTIONS = [
   { value: '1h', label: 'network.timeRange.1h', hours: 1 },
@@ -157,6 +165,9 @@ const TIME_RANGE_OPTIONS = [
   { value: '7d', label: 'network.timeRange.7d', hours: 24 * 7 },
   { value: '30d', label: 'network.timeRange.30d', hours: 24 * 30 },
 ];
+
+// Global API base path (not project-scoped)
+const GLOBAL_API_PATH = '/admin/network';
 
 // Fill missing hours with zero values
 function fillMissingHours<T extends { bucket: string; displayTime: string }>(
@@ -206,23 +217,48 @@ const spin = keyframes`
 
 const FeatureNetworkPage: React.FC = () => {
   const { t } = useTranslation();
-  const { getProjectApiPath } = useOrgProject();
-  const projectApiPath = getProjectApiPath();
-  const { currentEnvironment, allEnvironments } = useEnvironment();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Ensure allEnvironments is an array
-  const envList: Environment[] = Array.isArray(allEnvironments)
-    ? allEnvironments
-    : [];
+  // Global environments (all accessible orgs/projects/envs)
+  const [globalEnvs, setGlobalEnvs] = useState<GlobalEnvironment[]>([]);
+  const [globalEnvsLoaded, setGlobalEnvsLoaded] = useState(false);
+
+  // Derived: unique orgs and projects
+  const allOrgs = useMemo(() => {
+    const map = new Map<string, string>();
+    globalEnvs.forEach((e) => map.set(e.orgId, e.orgName));
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [globalEnvs]);
+
+  const [selectedOrgIds, setSelectedOrgIds] = useState<string[]>([]);
+
+  // Projects filtered by selected orgs
+  const filteredProjects = useMemo(() => {
+    const map = new Map<string, string>();
+    globalEnvs
+      .filter((e) => selectedOrgIds.length === 0 || selectedOrgIds.includes(e.orgId))
+      .forEach((e) => map.set(e.projectId, e.projectName));
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [globalEnvs, selectedOrgIds]);
+
+  const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([]);
+
+  // Environments filtered by selected orgs + projects
+  const filteredEnvs = useMemo(() => {
+    return globalEnvs.filter((e) => {
+      if (selectedOrgIds.length > 0 && !selectedOrgIds.includes(e.orgId)) return false;
+      if (selectedProjectIds.length > 0 && !selectedProjectIds.includes(e.projectId)) return false;
+      return true;
+    });
+  }, [globalEnvs, selectedOrgIds, selectedProjectIds]);
 
   // Lookup map: environmentId -> displayName
   const envNameMap = useMemo(
     () =>
       new Map(
-        envList.map((e) => [e.environmentId, e.displayName || e.environmentId])
+        globalEnvs.map((e) => [e.environmentId, e.environmentName || e.environmentId])
       ),
-    [envList]
+    [globalEnvs]
   );
 
   // State - initialize from URL params
@@ -275,6 +311,24 @@ const FeatureNetworkPage: React.FC = () => {
     }
   );
 
+  // Fetch global environments on mount
+  useEffect(() => {
+    const fetchGlobalEnvs = async () => {
+      try {
+        const res = await api.get<{ environments: GlobalEnvironment[] }>(
+          `${GLOBAL_API_PATH}/environments`
+        );
+        const envs = res.data?.environments || [];
+        setGlobalEnvs(envs);
+        setGlobalEnvsLoaded(true);
+      } catch (error) {
+        console.error('Failed to fetch global environments:', error);
+        setGlobalEnvsLoaded(true);
+      }
+    };
+    fetchGlobalEnvs();
+  }, []);
+
   // Get time range dates
   const getTimeRange = useCallback(() => {
     const option = TIME_RANGE_OPTIONS.find((o) => o.value === timeRange);
@@ -289,7 +343,7 @@ const FeatureNetworkPage: React.FC = () => {
     const params = new URLSearchParams();
     if (
       selectedEnvironments.length > 0 &&
-      selectedEnvironments.length < envList.length
+      selectedEnvironments.length < filteredEnvs.length
     ) {
       params.set('environments', selectedEnvironments.join(','));
     }
@@ -312,7 +366,7 @@ const FeatureNetworkPage: React.FC = () => {
     timeRange,
     activeTab,
     chartGroupBy,
-    envList.length,
+    filteredEnvs.length,
     applications.length,
     setSearchParams,
   ]);
@@ -326,13 +380,13 @@ const FeatureNetworkPage: React.FC = () => {
         endDate: endDate.toISOString(),
       });
 
-      // Get apps for all environments
+      // Get apps for selected environments
       if (selectedEnvironments.length > 0) {
         params.set('environments', selectedEnvironments.join(','));
       }
 
       const appsRes = await api.get<{ applications: string[] }>(
-        `${projectApiPath}/features/network/applications?${params}`
+        `${GLOBAL_API_PATH}/applications?${params}`
       );
       const appsList = appsRes.data?.applications || [];
       setApplications(appsList);
@@ -393,8 +447,6 @@ const FeatureNetworkPage: React.FC = () => {
       }
 
       // Evaluations use environment-only params (no appNames filter)
-      // Traffic and metrics tables have different app names, so sharing the
-      // app filter would incorrectly exclude SDK evaluation data.
       const evalParams = new URLSearchParams({
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
@@ -403,7 +455,7 @@ const FeatureNetworkPage: React.FC = () => {
         evalParams.set('environments', selectedEnvironments.join(','));
       }
 
-      // Fetch traffic (detailed), aggregated (for chart), summary, evaluations, and evaluation timeseries in parallel
+      // Fetch all data from global API in parallel
       const [
         trafficRes,
         aggregatedRes,
@@ -414,25 +466,25 @@ const FeatureNetworkPage: React.FC = () => {
         evalTimeSeriesByAppRes,
       ] = await Promise.all([
         api.get<{ traffic: TrafficDataPoint[] }>(
-          `${projectApiPath}/features/network/traffic?${params}`
+          `${GLOBAL_API_PATH}/traffic?${params}`
         ),
         api.get<{ traffic: ChartDataPoint[] }>(
-          `${projectApiPath}/features/network/traffic/aggregated?${params}`
+          `${GLOBAL_API_PATH}/traffic/aggregated?${params}`
         ),
         api.get<{ traffic: ChartDataPointByApp[] }>(
-          `${projectApiPath}/features/network/traffic/aggregated/by-app?${params}`
+          `${GLOBAL_API_PATH}/traffic/aggregated/by-app?${params}`
         ),
         api.get<{ summary: TrafficSummary }>(
-          `${projectApiPath}/features/network/summary?${params}`
+          `${GLOBAL_API_PATH}/summary?${params}`
         ),
         api.get<{ evaluations: EvaluationSummary }>(
-          `${projectApiPath}/features/network/evaluations?${evalParams}`
+          `${GLOBAL_API_PATH}/evaluations?${evalParams}`
         ),
         api.get<{ timeseries: EvaluationTimeSeriesPoint[] }>(
-          `${projectApiPath}/features/network/evaluations/timeseries?${evalParams}`
+          `${GLOBAL_API_PATH}/evaluations/timeseries?${evalParams}`
         ),
         api.get<{ timeseries: EvaluationTimeSeriesPointByApp[] }>(
-          `${projectApiPath}/features/network/evaluations/timeseries/by-app?${evalParams}`
+          `${GLOBAL_API_PATH}/evaluations/timeseries/by-app?${evalParams}`
         ),
       ]);
 
@@ -460,20 +512,30 @@ const FeatureNetworkPage: React.FC = () => {
     applications.length,
   ]);
 
-  // Set default environments when envList is loaded (only on initial load)
+  // Set default environments when global envs are loaded (only on initial load)
   useEffect(() => {
     if (
-      envList.length > 0 &&
+      globalEnvsLoaded &&
+      filteredEnvs.length > 0 &&
       selectedEnvironments.length === 0 &&
       initialEnvLoad
     ) {
       // Select all environments by default only on first load
-      setSelectedEnvironments(envList.map((e) => e.environmentId));
+      setSelectedEnvironments(filteredEnvs.map((e) => e.environmentId));
       setInitialEnvLoad(false);
-    } else if (envList.length > 0 && initialEnvLoad) {
+    } else if (globalEnvsLoaded && initialEnvLoad) {
       setInitialEnvLoad(false);
     }
-  }, [envList, selectedEnvironments.length, initialEnvLoad]);
+  }, [globalEnvsLoaded, filteredEnvs, selectedEnvironments.length, initialEnvLoad]);
+
+  // When org/project filter changes, reset environment selection to all matching
+  useEffect(() => {
+    if (!globalEnvsLoaded || initialEnvLoad) return;
+    setSelectedEnvironments(filteredEnvs.map((e) => e.environmentId));
+    // Reset app selection when filter changes
+    setAppsLoaded(false);
+    setSelectedApps([]);
+  }, [selectedOrgIds, selectedProjectIds]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch applications when environments or time range changes
   useEffect(() => {
@@ -930,6 +992,76 @@ const FeatureNetworkPage: React.FC = () => {
             alignItems: 'stretch',
           }}
         >
+          {/* Organization Toggle */}
+          {allOrgs.length > 1 && (
+            <>
+              <Box>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: 'block', mb: 0.5 }}
+                >
+                  {t('common.organization')}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                  {allOrgs.map((org) => (
+                    <Chip
+                      key={org.id}
+                      label={org.name}
+                      size="small"
+                      onClick={() => {
+                        if (selectedOrgIds.includes(org.id)) {
+                          setSelectedOrgIds(selectedOrgIds.filter((o) => o !== org.id));
+                        } else {
+                          setSelectedOrgIds([...selectedOrgIds, org.id]);
+                        }
+                      }}
+                      color={selectedOrgIds.includes(org.id) ? 'primary' : 'default'}
+                      variant={selectedOrgIds.includes(org.id) ? 'filled' : 'outlined'}
+                      sx={{ borderRadius: '16px' }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+              <Divider orientation="vertical" flexItem />
+            </>
+          )}
+
+          {/* Project Toggle */}
+          {filteredProjects.length > 1 && (
+            <>
+              <Box>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: 'block', mb: 0.5 }}
+                >
+                  {t('common.project')}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                  {filteredProjects.map((proj) => (
+                    <Chip
+                      key={proj.id}
+                      label={proj.name}
+                      size="small"
+                      onClick={() => {
+                        if (selectedProjectIds.includes(proj.id)) {
+                          setSelectedProjectIds(selectedProjectIds.filter((p) => p !== proj.id));
+                        } else {
+                          setSelectedProjectIds([...selectedProjectIds, proj.id]);
+                        }
+                      }}
+                      color={selectedProjectIds.includes(proj.id) ? 'primary' : 'default'}
+                      variant={selectedProjectIds.includes(proj.id) ? 'filled' : 'outlined'}
+                      sx={{ borderRadius: '16px' }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+              <Divider orientation="vertical" flexItem />
+            </>
+          )}
+
           {/* Environment Toggle */}
           <Box>
             <Typography
@@ -940,10 +1072,10 @@ const FeatureNetworkPage: React.FC = () => {
               {t('network.environment')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-              {envList.map((env) => (
+              {filteredEnvs.map((env) => (
                 <Chip
                   key={env.environmentId}
-                  label={env.displayName || env.environmentId}
+                  label={env.environmentName || env.environmentId}
                   size="small"
                   onClick={() => {
                     if (selectedEnvironments.includes(env.environmentId)) {

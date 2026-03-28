@@ -14,17 +14,19 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { ChangeRequestSubmitButtons } from './ChangeRequestSubmitButtons';
 
 interface ConfirmDeleteDialogProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (skipCr?: boolean) => void;
   title: string;
   message: string;
   warning?: string;
   confirmButtonText?: string;
   cancelButtonText?: string;
   loading?: boolean;
+  requiresApproval?: boolean;
   children?: React.ReactNode;
 }
 
@@ -38,12 +40,13 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
   confirmButtonText,
   cancelButtonText,
   loading = false,
+  requiresApproval = false,
   children,
 }) => {
   const { t } = useTranslation();
 
-  const handleConfirm = () => {
-    onConfirm();
+  const handleConfirm = (skipCr?: boolean) => {
+    onConfirm(skipCr);
   };
 
   return (
@@ -100,21 +103,14 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
           {cancelButtonText || t('common.cancel')}
         </Button>
 
-        <Button
-          onClick={handleConfirm}
-          variant="contained"
-          color="error"
+        <ChangeRequestSubmitButtons
+          action="delete"
+          requiresApproval={requiresApproval}
+          saving={loading}
+          onSave={handleConfirm}
           disabled={loading}
-          startIcon={<DeleteIcon />}
-          sx={{
-            minWidth: 80,
-            '&:hover': {
-              backgroundColor: 'error.dark',
-            },
-          }}
-        >
-          {confirmButtonText || t('common.delete')}
-        </Button>
+          title={confirmButtonText}
+        />
       </DialogActions>
     </Dialog>
   );

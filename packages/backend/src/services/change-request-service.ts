@@ -16,10 +16,25 @@ import { GatrixError } from '../middleware/error-handler';
 import { ErrorCodes } from '@gatrix/shared';
 import { diff } from 'deep-diff';
 import { OutboxService } from './outbox-service';
+import { permissionService } from './permission-service';
+import { P } from '../types/permissions';
 
 import { createLogger } from '../config/logger';
 import { resolveEntityLabel } from '../utils/entity-label-resolver';
 const logger = createLogger('ChangeRequest');
+
+/**
+ * Tables that use a non-standard primary key (not 'id').
+ * Used during CR execution to query the correct column.
+ */
+const TABLE_PRIMARY_KEY_MAP: Record<string, string> = {
+  g_feature_flag_types: 'flagType',
+};
+
+/** Resolve the primary key column name for a given table */
+function getPrimaryKey(table: string): string {
+  return TABLE_PRIMARY_KEY_MAP[table] || 'id';
+}
 
 /**
  * Generate ops from beforeData and afterData
@@ -268,6 +283,11 @@ export class ChangeRequestService {
 
       const ops = generateOps(beforeData, mergedAfterData);
 
+      // Skip items with no actual changes for UPDATE operations
+      if (opType === 'UPDATE' && ops.length === 0) {
+        return { changeRequestId: cr.id, status: cr.status };
+      }
+
       // 4. Check if item for this target already exists
       const existingItem = await ChangeItem.query()
         .where('changeRequestId', cr.id)
@@ -276,10 +296,19 @@ export class ChangeRequestService {
         .first();
 
       if (existingItem) {
+        // If the existing item is a DELETE and we're trying to UPDATE, skip it
+        // (cannot modify an item already marked for deletion in the same CR)
+        if (existingItem.opType === 'DELETE' && opType === 'UPDATE') {
+          logger.info(
+            `Skipping UPDATE for ${targetTable}:${targetId} — item already marked for DELETE in CR ${cr.id}`
+          );
+          return { changeRequestId: cr.id, status: cr.status };
+        }
         // Update existing item's ops
+        // Use mergedAfterData for label resolution so all fields (e.g. platform, clientVersion) are available
         const displayName = resolveEntityLabel(
           targetTable,
-          afterData || beforeData
+          mergedAfterData || beforeData
         );
         await ChangeItem.query()
           .findById(existingItem.id)
@@ -324,9 +353,10 @@ export class ChangeRequestService {
         }
 
         // Insert ChangeItem with ops
+        // Use mergedAfterData for label resolution so all fields (e.g. platform, clientVersion) are available
         const displayName = resolveEntityLabel(
           targetTable,
-          afterData || beforeData
+          mergedAfterData || beforeData
         );
         await ChangeItem.query().insert({
           id: ulid(),
@@ -376,6 +406,42 @@ export class ChangeRequestService {
           true,
           'PENDING_REVIEW_EXISTS'
         );
+      }
+
+      // Skip items with no actual changes (systemic guard for bulk operations)
+      if (beforeDraftData && draftData) {
+        const internalKeys = new Set(['_flagName']);
+        const relevantKeys = Object.keys(draftData).filter(
+          (k) => !internalKeys.has(k)
+        );
+        let hasActualChange = false;
+        for (const key of relevantKeys) {
+          const beforeVal = beforeDraftData[key];
+          const afterVal = draftData[key];
+          if (JSON.stringify(beforeVal) !== JSON.stringify(afterVal)) {
+            hasActualChange = true;
+            break;
+          }
+        }
+        if (!hasActualChange) {
+          logger.debug(
+            `Skipping upsertDraftDataItem for ${targetTable}:${targetId} — no actual changes detected`
+          );
+          // Return existing draft CR id if available, otherwise create a minimal response
+          const existingDraft = await ChangeRequest.query()
+            .where('requesterId', userId)
+            .where('environmentId', environmentId)
+            .where('status', 'draft')
+            .first();
+          if (existingDraft) {
+            return {
+              changeRequestId: existingDraft.id,
+              status: existingDraft.status,
+            };
+          }
+          // No draft exists and no changes — return a no-op indicator
+          return { changeRequestId: '', status: 'draft' };
+        }
       }
 
       // Find or create draft CR
@@ -606,7 +672,7 @@ export class ChangeRequestService {
 
       try {
         const currentData = await knex(item.targetTable)
-          .where('id', item.targetId)
+          .where(getPrimaryKey(item.targetTable), item.targetId)
           .first();
 
         if (currentData && typeof currentData.version === 'number') {
@@ -643,7 +709,8 @@ export class ChangeRequestService {
   static async approveChangeRequest(
     changeRequestId: string,
     approverId: string,
-    comment?: string
+    comment?: string,
+    options?: { forceApprove?: boolean }
   ): Promise<ChangeRequest> {
     return await transaction(ChangeRequest.knex(), async (trx) => {
       const cr = await ChangeRequest.query(trx)
@@ -713,11 +780,34 @@ export class ChangeRequestService {
         }
       }
 
+      let isForced = false;
+      if (options?.forceApprove) {
+        const chain = await permissionService.resolveEnvironmentChain(cr.environmentId);
+        const hasSkipPermission = chain
+          ? await permissionService.hasEnvPermission(
+              approverId,
+              chain.orgId,
+              chain.projectId,
+              cr.environmentId,
+              P.CHANGE_REQUESTS_SKIP
+            )
+          : false;
+        if (!hasSkipPermission) {
+          throw new GatrixError(
+            'You do not have permission to force approve.',
+            403,
+            true,
+            'FORBIDDEN'
+          );
+        }
+        isForced = true;
+      }
+
       logger.info(
-        `Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environmentId})`
+        `Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environmentId}, Forced: ${isForced})`
       );
 
-      if (currentApprovals >= requiredApprovers) {
+      if (currentApprovals >= requiredApprovers || isForced) {
         const updated = await ChangeRequest.query(trx).patchAndFetchById(
           cr.id,
           {
@@ -828,7 +918,7 @@ export class ChangeRequestService {
     // Create Audit Log with comment
     await knex('g_audit_logs').insert({
       id: ulid(),
-      action: 'CHANGE_REQUEST_REJECTED',
+      action: 'change_request_rejected',
       userId: rejectedBy || '',
       changeRequestId: cr.id,
       entityType: 'ChangeRequest',
@@ -968,8 +1058,11 @@ export class ChangeRequestService {
           throw new Error(`Invalid target table: ${item.targetTable}`);
         }
 
+        // Resolve primary key column for this table
+        const pk = getPrimaryKey(item.targetTable);
+
         const targetRow = await trx(item.targetTable)
-          .where('id', item.targetId)
+          .where(pk, item.targetId)
           .first()
           .forUpdate(); // ROW LOCK
 
@@ -1066,7 +1159,7 @@ export class ChangeRequestService {
           // Use optimistic locking if version column exists
           if (hasVersionColumn && storedEntityVersion !== undefined) {
             affectedRows = await trx(item.targetTable)
-              .where('id', item.targetId)
+              .where(pk, item.targetId)
               .where('version', storedEntityVersion)
               .delete();
 
@@ -1080,7 +1173,7 @@ export class ChangeRequestService {
             }
           } else {
             affectedRows = await trx(item.targetTable)
-              .where('id', item.targetId)
+              .where(pk, item.targetId)
               .delete();
           }
 
@@ -1154,17 +1247,8 @@ export class ChangeRequestService {
           // These should be set in the ops/afterData if needed
 
           // Convert ISO 8601 datetime strings to MySQL format
-          const dateFields = [
-            'createdAt',
-            'updatedAt',
-            'startDate',
-            'endDate',
-            'saleStartAt',
-            'saleEndAt',
-            'maintenanceStartDate',
-            'maintenanceEndDate',
-          ];
-          for (const field of dateFields) {
+          // Instead of maintaining a list, scan all string fields
+          for (const field of Object.keys(dbData)) {
             if (dbData[field] && typeof dbData[field] === 'string') {
               // Check if it's ISO 8601 format (ends with Z or has timezone offset)
               if (
@@ -1283,7 +1367,7 @@ export class ChangeRequestService {
               ) {
                 dbData.version = liveData.version + 1;
                 const affectedRows = await trx(item.targetTable)
-                  .where('id', item.targetId)
+                  .where(pk, item.targetId)
                   .where('version', storedEntityVersion)
                   .update(dbData);
 
@@ -1298,7 +1382,7 @@ export class ChangeRequestService {
               } else {
                 // No version column - update without optimistic lock
                 await trx(item.targetTable)
-                  .where('id', item.targetId)
+                  .where(pk, item.targetId)
                   .update(dbData);
               }
             }
@@ -1394,7 +1478,7 @@ export class ChangeRequestService {
               ) {
                 dbData.version = liveData.version + 1;
                 const affectedRows = await trx(item.targetTable)
-                  .where('id', item.targetId)
+                  .where(pk, item.targetId)
                   .where('version', storedEntityVersion)
                   .update(dbData);
 
@@ -1409,7 +1493,7 @@ export class ChangeRequestService {
               } else {
                 // No version column - update without optimistic lock
                 await trx(item.targetTable)
-                  .where('id', item.targetId)
+                  .where(pk, item.targetId)
                   .update(dbData);
               }
             }
@@ -1460,7 +1544,7 @@ export class ChangeRequestService {
       // Log Execution
       await knex('g_audit_logs').transacting(trx).insert({
         id: ulid(),
-        action: 'CHANGE_REQUEST_EXECUTED',
+        action: 'change_request_executed',
         userId,
         changeRequestId: cr.id,
         entityType: 'ChangeRequest',
@@ -1641,7 +1725,7 @@ export class ChangeRequestService {
           // For UPDATE/DELETE revert, need to capture current state
           try {
             currentLiveData = await trx(item.targetTable)
-              .where('id', item.targetId)
+              .where(getPrimaryKey(item.targetTable), item.targetId)
               .first();
             if (currentLiveData?.version !== undefined) {
               currentVersion = currentLiveData.version;

@@ -50,7 +50,7 @@ export class BaiduOAuthService {
   }
 
   /**
-   * Authorization Code로 Access Token 획득
+   * Obtain Access Token using Authorization Code
    */
   static async getAccessToken(
     code: string,
@@ -89,7 +89,7 @@ export class BaiduOAuthService {
   }
 
   /**
-   * Access Token으로 User info 획득
+   * Obtain user info using Access Token
    */
   static async getUserInfo(accessToken: string): Promise<BaiduProfile> {
     try {
@@ -115,7 +115,7 @@ export class BaiduOAuthService {
   }
 
   /**
-   * 전체 OAuth 플로우 처리
+   * Handle full OAuth flow
    */
   static async handleOAuthCallback(
     code: string,

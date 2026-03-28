@@ -28,7 +28,7 @@ export class GatrixError extends Error implements AppError {
     this.code = code;
     this.payload = payload;
 
-    //TODO 개발환경에서만 선택적으로 하는게 좋을듯함.
+    //TODO Should selectively enable only in development environment.
     Error.captureStackTrace(this, this.constructor);
   }
 }

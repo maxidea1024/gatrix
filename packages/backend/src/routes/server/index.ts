@@ -89,7 +89,7 @@ router.get(
 );
 
 // Authentication routes - No environment required
-router.post('/auth/verify-token', ServerAuthController.verifyToken); // JWT Verify token (API Token 불필요)
+router.post('/auth/verify-token', ServerAuthController.verifyToken); // JWT token verification (API Token not required)
 router.get('/auth/user/:id', serverAuthBase, ServerAuthController.getUserById);
 
 // User routes - No environment required (global users)

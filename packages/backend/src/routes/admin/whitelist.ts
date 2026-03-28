@@ -15,7 +15,7 @@ router.post(
   auditLog({
     action: 'whitelist_create',
     resourceType: 'whitelist',
-    // ?�이?�리?�트 ?�성 ?�에??ID가 ?�직 ?�으므�?getResourceId ?�거
+    // ID does not exist yet before whitelist creation, so getResourceId is removed
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
@@ -68,6 +68,6 @@ router.post(
   WhitelistController.bulkCreateWhitelists
 );
 
-// ?�이?�리?�트 ?�스???�우??router.post('/test', WhitelistController.testWhitelist);
+// Whitelist test route: router.post('/test', WhitelistController.testWhitelist);
 
 export default router;

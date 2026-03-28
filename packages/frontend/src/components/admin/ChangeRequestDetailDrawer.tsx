@@ -68,13 +68,13 @@ const STATUS_CONFIG: Record<
   ChangeRequestStatus,
   {
     color:
-      | 'default'
-      | 'primary'
-      | 'secondary'
-      | 'error'
-      | 'info'
-      | 'success'
-      | 'warning';
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'error'
+    | 'info'
+    | 'success'
+    | 'warning';
     labelKey: string;
     bgColor: string;
   }
@@ -114,12 +114,12 @@ const STATUS_CONFIG: Record<
 // Timeline event type
 interface TimelineEvent {
   type:
-    | 'created'
-    | 'submitted'
-    | 'approved'
-    | 'rejected'
-    | 'reopened'
-    | 'executed';
+  | 'created'
+  | 'submitted'
+  | 'approved'
+  | 'rejected'
+  | 'reopened'
+  | 'executed';
   timestamp: string;
   user?: { name?: string; email?: string };
   comment?: string;
@@ -144,7 +144,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { user, permissions } = useAuth();
-  const { getProjectApiPath } = useOrgProject();
+  const { getProjectApiPath, currentProject } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const hasAnyPermissions = permissions.length > 0;
   const { environments: allEnvironments } = useEnvironments();
@@ -770,6 +770,21 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         tags: t('rewardTemplates.tags'),
         tagIds: t('rewardTemplates.tags'),
       },
+      // Feature Segments (g_feature_segments)
+      g_feature_segments: {
+        segmentName: t('common.name'),
+        displayName: t('common.displayName'),
+        description: t('common.description'),
+        constraints: t('featureFlags.constraints'),
+        isActive: t('common.active'),
+        tags: t('featureFlags.tags'),
+      },
+      // Feature Flag Types (g_feature_flag_types)
+      g_feature_flag_types: {
+        displayName: t('common.displayName'),
+        description: t('common.description'),
+        lifetimeDays: t('featureFlags.lifetime'),
+      },
     };
 
     // Common field mappings (fallback)
@@ -817,6 +832,29 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         projectApiPath
       );
       setComment('');
+      mutate();
+      onRefresh?.();
+    } catch (err: any) {
+      handleApiError(err, 'changeRequest.errors.approveFailed');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Force approve: approve + execute in one action
+  const handleForceApprove = async () => {
+    setActionLoading(true);
+    try {
+      await changeRequestService.approve(
+        changeRequestId!,
+        comment || undefined,
+        projectApiPath
+      );
+      await changeRequestService.execute(changeRequestId!, projectApiPath);
+      setComment('');
+      enqueueSnackbar(t('changeRequest.actions.forceApproveSuccess'), {
+        variant: 'success',
+      });
       mutate();
       onRefresh?.();
     } catch (err: any) {
@@ -1135,14 +1173,13 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                               borderTop: '6px solid transparent',
                               borderBottom: '6px solid transparent',
                               borderLeft: (theme) =>
-                                `6px solid ${
-                                  event.type === 'rejected'
-                                    ? theme.palette.error.main
-                                    : event.type === 'approved'
-                                      ? theme.palette.success.main
-                                      : event.type === 'executed'
-                                        ? theme.palette.info.main
-                                        : theme.palette.primary.main
+                                `6px solid ${event.type === 'rejected'
+                                  ? theme.palette.error.main
+                                  : event.type === 'approved'
+                                    ? theme.palette.success.main
+                                    : event.type === 'executed'
+                                      ? theme.palette.info.main
+                                      : theme.palette.primary.main
                                 }`,
                             }}
                           />
@@ -1258,10 +1295,10 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                               bgcolor:
                                 event.type === 'rejected'
                                   ? (theme) =>
-                                      alpha(theme.palette.error.main, 0.1)
+                                    alpha(theme.palette.error.main, 0.1)
                                   : event.type === 'approved'
                                     ? (theme) =>
-                                        alpha(theme.palette.success.main, 0.1)
+                                      alpha(theme.palette.success.main, 0.1)
                                     : 'action.hover',
                               borderColor:
                                 event.type === 'rejected'
@@ -1337,6 +1374,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                 display: 'flex',
                                 gap: 1,
                                 justifyContent: 'flex-end',
+                                flexWrap: 'wrap',
                               }}
                             >
                               <Button
@@ -1377,6 +1415,33 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                               >
                                 {t('changeRequest.actions.approve')}
                               </Button>
+                              {hasAnyPermissions && (
+                                <Tooltip
+                                  title={t(
+                                    'changeRequest.actions.forceApproveTooltip'
+                                  )}
+                                >
+                                  <Button
+                                    variant="contained"
+                                    color="warning"
+                                    size="small"
+                                    startIcon={
+                                      actionLoading ? (
+                                        <CircularProgress
+                                          size={14}
+                                          color="inherit"
+                                        />
+                                      ) : (
+                                        <AutoFixHighIcon />
+                                      )
+                                    }
+                                    onClick={handleForceApprove}
+                                    disabled={actionLoading}
+                                  >
+                                    {t('changeRequest.actions.forceApprove')}
+                                  </Button>
+                                </Tooltip>
+                              )}
                             </Box>
                           </>
                         ) : (
@@ -1627,7 +1692,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                 <span>
                                   <Button
                                     size="small"
-                                    variant="outlined"
+                                    variant="contained"
                                     disabled={isGeneratingSummary}
                                     startIcon={
                                       isGeneratingSummary ? (
@@ -1664,9 +1729,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                       whiteSpace: 'nowrap',
                                     }}
                                   >
-                                    {t('changeRequest.aiGenerate', {
-                                      defaultValue: '✨ AI',
-                                    })}
+                                    {t('changeRequest.aiGenerate')}
                                   </Button>
                                 </span>
                               </Tooltip>
@@ -1870,73 +1933,71 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                     <Box
                       sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
                     >
-                      {expandedGroups.__changeDetails && (
-                        <>
-                          <Button
-                            size="small"
-                            variant="text"
-                            sx={{
-                              minWidth: 'auto',
-                              fontSize: 12,
-                              px: 0.5,
-                              py: 0,
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const newState: Record<string, boolean> = {
-                                __changeDetails: true,
-                              };
-                              if (groupedChanges) {
-                                groupedChanges.forEach((g) => {
-                                  newState[g.id] = true;
-                                  g.items.forEach((item) => {
-                                    newState[`item_${item.targetId}`] = true;
-                                  });
+                      <>
+                        <Button
+                          size="small"
+                          variant="text"
+                          sx={{
+                            minWidth: 'auto',
+                            fontSize: 12,
+                            px: 0.5,
+                            py: 0,
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newState: Record<string, boolean> = {
+                              __changeDetails: true,
+                            };
+                            if (groupedChanges) {
+                              groupedChanges.forEach((g) => {
+                                newState[g.id] = true;
+                                g.items.forEach((item) => {
+                                  newState[`item_${item.targetId}`] = true;
                                 });
-                              }
-                              setExpandedGroups((prev) => ({
-                                ...prev,
-                                ...newState,
-                              }));
-                            }}
-                          >
-                            {t('common.expandAll')}
-                          </Button>
-                          <Typography variant="caption" color="text.disabled">
-                            /
-                          </Typography>
-                          <Button
-                            size="small"
-                            variant="text"
-                            sx={{
-                              minWidth: 'auto',
-                              fontSize: 12,
-                              px: 0.5,
-                              py: 0,
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const newState: Record<string, boolean> = {
-                                __changeDetails: true,
-                              };
-                              if (groupedChanges) {
-                                groupedChanges.forEach((g) => {
-                                  newState[g.id] = false;
-                                  g.items.forEach((item) => {
-                                    newState[`item_${item.targetId}`] = false;
-                                  });
+                              });
+                            }
+                            setExpandedGroups((prev) => ({
+                              ...prev,
+                              ...newState,
+                            }));
+                          }}
+                        >
+                          {t('common.expandAll')}
+                        </Button>
+                        <Typography variant="caption" color="text.disabled">
+                          /
+                        </Typography>
+                        <Button
+                          size="small"
+                          variant="text"
+                          sx={{
+                            minWidth: 'auto',
+                            fontSize: 12,
+                            px: 0.5,
+                            py: 0,
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newState: Record<string, boolean> = {
+                              __changeDetails: true,
+                            };
+                            if (groupedChanges) {
+                              groupedChanges.forEach((g) => {
+                                newState[g.id] = false;
+                                g.items.forEach((item) => {
+                                  newState[`item_${item.targetId}`] = false;
                                 });
-                              }
-                              setExpandedGroups((prev) => ({
-                                ...prev,
-                                ...newState,
-                              }));
-                            }}
-                          >
-                            {t('common.collapseAll')}
-                          </Button>
-                        </>
-                      )}
+                              });
+                            }
+                            setExpandedGroups((prev) => ({
+                              ...prev,
+                              ...newState,
+                            }));
+                          }}
+                        >
+                          {t('common.collapseAll')}
+                        </Button>
+                      </>
                       <ExpandMoreIcon
                         sx={{
                           fontSize: 20,
@@ -1956,301 +2017,316 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                     <Box sx={{ p: 2 }}>
                       {groupedChanges
                         ? groupedChanges.map((group) => {
-                            const config = getActionTypeConfig(
-                              group.actionType
-                            );
-                            const isExpanded =
-                              expandedGroups[group.id] === true;
-                            return (
-                              <Paper
-                                key={group.id}
-                                variant="outlined"
-                                sx={{ mb: 2, overflow: 'hidden' }}
+                          const config = getActionTypeConfig(
+                            group.actionType
+                          );
+                          const isExpanded =
+                            expandedGroups[group.id] === true;
+                          return (
+                            <Paper
+                              key={group.id}
+                              variant="outlined"
+                              sx={{ mb: 2, overflow: 'hidden' }}
+                            >
+                              <Box
+                                sx={{
+                                  px: 2,
+                                  py: 1.5,
+                                  bgcolor: 'action.hover',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1,
+                                  cursor: 'pointer',
+                                }}
+                                onClick={() =>
+                                  setExpandedGroups((prev) => ({
+                                    ...prev,
+                                    [group.id]: !prev[group.id],
+                                  }))
+                                }
                               >
-                                <Box
-                                  sx={{
-                                    px: 2,
-                                    py: 1.5,
-                                    bgcolor: 'action.hover',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 1,
-                                    cursor: 'pointer',
-                                  }}
-                                  onClick={() =>
-                                    setExpandedGroups((prev) => ({
-                                      ...prev,
-                                      [group.id]: !prev[group.id],
-                                    }))
-                                  }
+                                {config.icon}
+                                <Typography
+                                  variant="subtitle2"
+                                  fontWeight={600}
+                                  sx={{ flex: 1 }}
                                 >
-                                  {config.icon}
-                                  <Typography
-                                    variant="subtitle2"
-                                    fontWeight={600}
-                                    sx={{ flex: 1 }}
-                                  >
-                                    {config.label}
-                                  </Typography>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    {group.items.length}{' '}
-                                    {t('changeRequest.itemCount')}
-                                  </Typography>
-                                  <ExpandMoreIcon
-                                    sx={{
-                                      fontSize: 20,
-                                      color: 'text.secondary',
-                                      transition: 'transform 0.2s',
-                                      transform: isExpanded
-                                        ? 'rotate(180deg)'
-                                        : 'rotate(0deg)',
-                                    }}
-                                  />
-                                </Box>
-                                <Collapse in={isExpanded} timeout="auto">
-                                  <Box sx={{ p: 2 }}>
-                                    {group.items.map((item) => {
-                                      const isItemExpanded =
-                                        expandedGroups[
-                                          `item_${item.targetId}`
-                                        ] ?? false;
-                                      return (
+                                  {config.label}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  {group.items.length}{' '}
+                                  {t('changeRequest.itemCount')}
+                                </Typography>
+                                <ExpandMoreIcon
+                                  sx={{
+                                    fontSize: 20,
+                                    color: 'text.secondary',
+                                    transition: 'transform 0.2s',
+                                    transform: isExpanded
+                                      ? 'rotate(180deg)'
+                                      : 'rotate(0deg)',
+                                  }}
+                                />
+                              </Box>
+                              <Collapse in={isExpanded} timeout="auto">
+                                <Box sx={{ p: 2 }}>
+                                  {group.items.map((item) => {
+                                    const isItemExpanded =
+                                      expandedGroups[
+                                      `item_${item.targetId}`
+                                      ] ?? false;
+                                    return (
+                                      <Box
+                                        key={item.targetId}
+                                        sx={{ mb: 1.5 }}
+                                      >
                                         <Box
-                                          key={item.targetId}
-                                          sx={{ mb: 1.5 }}
-                                        >
-                                          <Box
-                                            sx={{
-                                              display: 'flex',
-                                              alignItems: 'center',
-                                              gap: 1,
-                                              py: 0.75,
-                                              cursor:
-                                                item.operation === 'delete'
-                                                  ? 'default'
-                                                  : 'pointer',
-                                            }}
-                                            onClick={
+                                          sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 1,
+                                            py: 0.75,
+                                            cursor:
                                               item.operation === 'delete'
-                                                ? undefined
-                                                : () =>
-                                                    setExpandedGroups(
-                                                      (prev) => ({
-                                                        ...prev,
-                                                        [`item_${item.targetId}`]:
-                                                          !prev[
-                                                            `item_${item.targetId}`
-                                                          ],
-                                                      })
-                                                    )
-                                            }
-                                          >
-                                            {item.operation !== 'delete' && (
-                                              <ExpandMoreIcon
-                                                sx={{
-                                                  fontSize: 16,
-                                                  color: 'text.secondary',
-                                                  transition: 'transform 0.2s',
-                                                  transform: isItemExpanded
-                                                    ? 'rotate(180deg)'
-                                                    : 'rotate(0deg)',
-                                                }}
-                                              />
-                                            )}
-                                            <Typography
-                                              variant="caption"
+                                                ? 'default'
+                                                : 'pointer',
+                                          }}
+                                          onClick={
+                                            item.operation === 'delete'
+                                              ? undefined
+                                              : () =>
+                                                setExpandedGroups(
+                                                  (prev) => ({
+                                                    ...prev,
+                                                    [`item_${item.targetId}`]:
+                                                      !prev[
+                                                      `item_${item.targetId}`
+                                                      ],
+                                                  })
+                                                )
+                                          }
+                                        >
+                                          {item.operation !== 'delete' && (
+                                            <ExpandMoreIcon
                                               sx={{
-                                                fontFamily: 'monospace',
-                                                fontWeight: 600,
-                                              }}
-                                            >
-                                              {formatChangeItemLabel(
-                                                item.table,
-                                                item.targetId,
-                                                item?.afterData,
-                                                item?.displayName,
-                                                t,
-                                                item?.beforeData
-                                              )}
-                                            </Typography>
-                                            <Chip
-                                              label={
-                                                item.operation === 'create'
-                                                  ? t(
-                                                      'changeRequest.operationCreate'
-                                                    )
-                                                  : item.operation === 'delete'
-                                                    ? t(
-                                                        'changeRequest.operationDelete'
-                                                      )
-                                                    : t(
-                                                        'changeRequest.operationUpdate'
-                                                      )
-                                              }
-                                              size="small"
-                                              sx={{
-                                                height: 18,
-                                                fontSize: 10,
-                                                bgcolor:
-                                                  item.operation === 'create'
-                                                    ? 'success.main'
-                                                    : item.operation ===
-                                                        'delete'
-                                                      ? 'error.main'
-                                                      : 'primary.main',
-                                                color: '#fff',
+                                                fontSize: 16,
+                                                color: 'text.secondary',
+                                                transition: 'transform 0.2s',
+                                                transform: isItemExpanded
+                                                  ? 'rotate(180deg)'
+                                                  : 'rotate(0deg)',
                                               }}
                                             />
-                                            <Typography
-                                              variant="caption"
-                                              color="text.secondary"
-                                              sx={{
-                                                ml: 'auto',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 0.5,
-                                              }}
-                                            >
-                                              {item.table !==
-                                                'g_feature_flags' &&
-                                                cr?.environmentModel
-                                                  ?.displayName && (
+                                          )}
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              fontFamily: 'monospace',
+                                              fontWeight: 600,
+                                            }}
+                                          >
+                                            {formatChangeItemLabel(
+                                              item.table,
+                                              item.targetId,
+                                              item?.afterData,
+                                              item?.displayName,
+                                              t,
+                                              item?.beforeData
+                                            )}
+                                          </Typography>
+                                          <Chip
+                                            label={
+                                              item.operation === 'create'
+                                                ? t(
+                                                  'changeRequest.operationCreate'
+                                                )
+                                                : item.operation === 'delete'
+                                                  ? t(
+                                                    'changeRequest.operationDelete'
+                                                  )
+                                                  : t(
+                                                    'changeRequest.operationUpdate'
+                                                  )
+                                            }
+                                            size="small"
+                                            sx={{
+                                              height: 18,
+                                              fontSize: 10,
+                                              bgcolor:
+                                                item.operation === 'create'
+                                                  ? 'success.main'
+                                                  : item.operation ===
+                                                    'delete'
+                                                    ? 'error.main'
+                                                    : 'primary.main',
+                                              color: '#fff',
+                                            }}
+                                          />
+                                          <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            sx={{
+                                              ml: 'auto',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: 0.5,
+                                            }}
+                                          >
+                                            {item.table !==
+                                              'g_feature_flags' && (
+                                                (['g_feature_segments', 'g_feature_flag_types'].includes(item.table)) ? (
                                                   <Chip
-                                                    label={
-                                                      cr.environmentModel
-                                                        .displayName
-                                                    }
+                                                    label={currentProject?.displayName || t('common.project')}
                                                     size="small"
                                                     variant="outlined"
+                                                    color="info"
                                                     sx={{
                                                       height: 16,
                                                       fontSize: 9,
                                                       fontWeight: 500,
                                                     }}
                                                   />
-                                                )}
-                                              {item.table !==
-                                                'g_feature_flags' &&
-                                                item.operation === 'update' &&
-                                                `${item.changes.length} ops`}
-                                            </Typography>
-                                          </Box>
-                                          {item.operation !== 'delete' ? (
-                                            <Collapse
-                                              in={isItemExpanded}
-                                              timeout="auto"
-                                            >
-                                              <Box sx={{ px: 2, py: 1 }}>
-                                                <ChangeItemDiffDisplay
-                                                  item={item}
-                                                  envNameMap={envNameMap}
-                                                  formatFieldName={
-                                                    formatFieldName
-                                                  }
-                                                  formatValue={formatValue}
-                                                />
-                                              </Box>
-                                            </Collapse>
-                                          ) : (
-                                            <Typography
-                                              variant="caption"
-                                              color="text.disabled"
-                                              sx={{ pl: 3 }}
-                                            >
-                                              ID: {item.targetId}
-                                            </Typography>
-                                          )}
+                                                ) : (
+                                                  cr?.environmentModel
+                                                    ?.displayName && (
+                                                    <Chip
+                                                      label={
+                                                        cr.environmentModel
+                                                          .displayName
+                                                      }
+                                                      size="small"
+                                                      variant="outlined"
+                                                      sx={{
+                                                        height: 16,
+                                                        fontSize: 9,
+                                                        fontWeight: 500,
+                                                      }}
+                                                    />
+                                                  )
+                                                )
+                                              )}
+                                            {item.table !==
+                                              'g_feature_flags' &&
+                                              item.operation === 'update' &&
+                                              ''}
+                                          </Typography>
                                         </Box>
-                                      );
-                                    })}
-                                  </Box>
-                                </Collapse>
-                              </Paper>
-                            );
-                          })
+                                        {item.operation !== 'delete' ? (
+                                          <Collapse
+                                            in={isItemExpanded}
+                                            timeout="auto"
+                                          >
+                                            <Box sx={{ px: 2, py: 1 }}>
+                                              <ChangeItemDiffDisplay
+                                                item={item}
+                                                envNameMap={envNameMap}
+                                                formatFieldName={
+                                                  formatFieldName
+                                                }
+                                                formatValue={formatValue}
+                                              />
+                                            </Box>
+                                          </Collapse>
+                                        ) : (
+                                          <Typography
+                                            variant="caption"
+                                            color="text.disabled"
+                                            sx={{ pl: 3 }}
+                                          >
+                                            ID: {item.targetId}
+                                          </Typography>
+                                        )}
+                                      </Box>
+                                    );
+                                  })}
+                                </Box>
+                              </Collapse>
+                            </Paper>
+                          );
+                        })
                         : allChanges.map((item, idx) => (
-                            <Paper
-                              key={idx}
-                              variant="outlined"
-                              sx={{ mb: 1.5, overflow: 'hidden' }}
+                          <Paper
+                            key={idx}
+                            variant="outlined"
+                            sx={{ mb: 1.5, overflow: 'hidden' }}
+                          >
+                            <Box
+                              sx={{
+                                px: 2,
+                                py: 1,
+                                bgcolor: 'action.hover',
+                                borderBottom: 1,
+                                borderColor: 'divider',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                              }}
                             >
-                              <Box
+                              <Typography
+                                variant="body2"
                                 sx={{
-                                  px: 2,
-                                  py: 1,
-                                  bgcolor: 'action.hover',
-                                  borderBottom: 1,
-                                  borderColor: 'divider',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: 1,
+                                  fontFamily: 'monospace',
+                                  fontWeight: 600,
+                                  flex: 1,
                                 }}
                               >
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    fontFamily: 'monospace',
-                                    fontWeight: 600,
-                                    flex: 1,
-                                  }}
-                                >
-                                  {formatChangeItemLabel(
-                                    item.table,
-                                    item.targetId,
-                                    item?.afterData,
-                                    item?.displayName,
-                                    t,
-                                    item?.beforeData
-                                  )}
-                                </Typography>
-                                <Chip
-                                  label={
+                                {formatChangeItemLabel(
+                                  item.table,
+                                  item.targetId,
+                                  item?.afterData,
+                                  item?.displayName,
+                                  t,
+                                  item?.beforeData
+                                )}
+                              </Typography>
+                              <Chip
+                                label={
+                                  item.operation === 'create'
+                                    ? t('changeRequest.operationCreate')
+                                    : item.operation === 'delete'
+                                      ? t('changeRequest.operationDelete')
+                                      : t('changeRequest.operationUpdate')
+                                }
+                                size="small"
+                                sx={{
+                                  height: 20,
+                                  fontSize: 11,
+                                  bgcolor:
                                     item.operation === 'create'
-                                      ? t('changeRequest.operationCreate')
+                                      ? 'success.main'
                                       : item.operation === 'delete'
-                                        ? t('changeRequest.operationDelete')
-                                        : t('changeRequest.operationUpdate')
-                                  }
-                                  size="small"
-                                  sx={{
-                                    height: 20,
-                                    fontSize: 11,
-                                    bgcolor:
-                                      item.operation === 'create'
-                                        ? 'success.main'
-                                        : item.operation === 'delete'
-                                          ? 'error.main'
-                                          : 'primary.main',
-                                    color: '#fff',
-                                  }}
-                                />
-                                {item.table !== 'g_feature_flags' &&
-                                  cr?.environmentModel?.displayName && (
-                                    <Chip
-                                      label={cr.environmentModel.displayName}
-                                      size="small"
-                                      variant="outlined"
-                                      sx={{
-                                        height: 18,
-                                        fontSize: 10,
-                                        fontWeight: 500,
-                                      }}
-                                    />
-                                  )}
-                              </Box>
-                              <Box sx={{ px: 2, py: 1 }}>
-                                <ChangeItemDiffDisplay
-                                  item={item}
-                                  envNameMap={envNameMap}
-                                  formatFieldName={formatFieldName}
-                                  formatValue={formatValue}
-                                />
-                              </Box>
-                            </Paper>
-                          ))}
+                                        ? 'error.main'
+                                        : 'primary.main',
+                                  color: '#fff',
+                                }}
+                              />
+                              {item.table !== 'g_feature_flags' &&
+                                cr?.environmentModel?.displayName && (
+                                  <Chip
+                                    label={cr.environmentModel.displayName}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{
+                                      height: 18,
+                                      fontSize: 10,
+                                      fontWeight: 500,
+                                    }}
+                                  />
+                                )}
+                            </Box>
+                            <Box sx={{ px: 2, py: 1 }}>
+                              <ChangeItemDiffDisplay
+                                item={item}
+                                envNameMap={envNameMap}
+                                formatFieldName={formatFieldName}
+                                formatValue={formatValue}
+                              />
+                            </Box>
+                          </Paper>
+                        ))}
                     </Box>
                   </Collapse>
                 </Paper>

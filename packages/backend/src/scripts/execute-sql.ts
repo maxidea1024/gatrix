@@ -25,7 +25,7 @@ class SqlExecutor {
         user: config.database.user,
         password: config.database.password,
         database: database || config.database.name,
-        multipleStatements: true, // SQL 파일에서 여러 문장 실행 허용
+        multipleStatements: true, // Allow multiple statements in SQL file
       });
 
       logger.info(
@@ -71,7 +71,7 @@ class SqlExecutor {
       throw new Error('Database connection not established');
     }
 
-    // SQL 내용을 세미콜론으로 분리하여 개별 문장으로 실행
+    // Split SQL content by semicolons and execute as individual statements
     const statements = this.splitSqlStatements(sqlContent);
 
     if (options.verbose) {
@@ -95,7 +95,7 @@ class SqlExecutor {
       const statement = statements[i].trim();
 
       if (!statement) {
-        continue; // 빈 문장 건너뛰기
+        continue; // Skip empty statements
       }
 
       try {
@@ -115,7 +115,7 @@ class SqlExecutor {
               logger.info(
                 `✅ Executed successfully. Rows returned: ${results.length}`
               );
-              // SELECT Query Results 출력
+              // Print SELECT query results
               if (statement.trim().toUpperCase().startsWith('SELECT')) {
                 console.table(results);
               }
@@ -137,7 +137,7 @@ class SqlExecutor {
         logger.error(`❌ Error executing statement ${i + 1}:`, error);
         logger.error(`Statement: ${statement}`);
 
-        // 에러가 발생해도 계속 진행 (옵션으로 중단할 수도 있음)
+        // Continue even if an error occurs (can be stopped with --stop-on-error)
         if (process.argv.includes('--stop-on-error')) {
           throw error;
         }
@@ -151,7 +151,7 @@ class SqlExecutor {
   }
 
   private splitSqlStatements(sqlContent: string): string[] {
-    // SQL 문장을 세미콜론으로 분리하되, Remove comments and empty lines
+    // Split SQL statements by semicolons, removing comments and empty lines
     const statements: string[] = [];
     const lines = sqlContent.split('\n');
     let currentStatement = '';
@@ -159,7 +159,7 @@ class SqlExecutor {
     for (const line of lines) {
       const trimmedLine = line.trim();
 
-      // 빈 줄이나 주석 줄 건너뛰기
+      // Skip empty lines and comment lines
       if (
         !trimmedLine ||
         trimmedLine.startsWith('--') ||
@@ -168,13 +168,13 @@ class SqlExecutor {
         continue;
       }
 
-      // 줄 끝 주석 제거
+      // Remove end-of-line comments
       const lineWithoutComment = trimmedLine.split('--')[0].trim();
       if (!lineWithoutComment) continue;
 
       currentStatement += lineWithoutComment + ' ';
 
-      // 세미콜론으로 끝나면 문장 완료
+      // Statement is complete if it ends with semicolon
       if (lineWithoutComment.endsWith(';')) {
         const statement = currentStatement.trim();
         if (statement && statement !== ';') {
@@ -184,7 +184,7 @@ class SqlExecutor {
       }
     }
 
-    // 마지막 문장이 세미콜론 없이 끝난 경우
+    // Handle last statement without trailing semicolon
     if (currentStatement.trim()) {
       statements.push(currentStatement.trim());
     }
@@ -197,7 +197,7 @@ async function main() {
   const args = process.argv.slice(2);
   const options: SqlExecutionOptions = {};
 
-  // 명령행 인수 파싱
+  // Parse command-line arguments
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
 
@@ -290,7 +290,7 @@ Examples:
 `);
 }
 
-// 스크립트가 직접 실행될 때만 main 함수 호출
+// Call main function only when script is directly executed
 if (require.main === module) {
   main().catch(console.error);
 }

@@ -248,12 +248,13 @@ const BannerManagementPage: React.FC = () => {
     setDeleteConfirmOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = async (skipCr?: boolean) => {
     if (!deletingBanner) return;
     try {
       const result = await bannerService.deleteBanner(
         projectApiPath,
-        deletingBanner.bannerId
+        deletingBanner.bannerId,
+        skipCr
       );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, () => {});
@@ -282,12 +283,12 @@ const BannerManagementPage: React.FC = () => {
     setBulkDeleteConfirmOpen(true);
   };
 
-  const handleBulkDeleteConfirm = async () => {
+  const handleBulkDeleteConfirm = async (skipCr?: boolean) => {
     if (selectedIds.length === 0) return;
     try {
       let crCreated = false;
       for (const id of selectedIds) {
-        const result = await bannerService.deleteBanner(projectApiPath, id);
+        const result = await bannerService.deleteBanner(projectApiPath, id, skipCr);
         if (result.isChangeRequest) crCreated = true;
       }
       if (crCreated) {
@@ -842,6 +843,7 @@ const BannerManagementPage: React.FC = () => {
         message={t('banners.deleteConfirmMessage', {
           name: deletingBanner?.name || '',
         })}
+        requiresApproval={requiresApproval}
       />
 
       {/* Bulk Delete Confirmation Dialog */}
@@ -853,6 +855,7 @@ const BannerManagementPage: React.FC = () => {
         message={t('banners.bulkDeleteConfirmMessage', {
           count: selectedIds.length,
         })}
+        requiresApproval={requiresApproval}
       />
 
       {/* Import Dialog */}

@@ -18,8 +18,8 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from '../../hooks/useDebounce';
-import { getActionLabel } from '../../utils/changeRequestToast';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { ChangeRequestSubmitButtons } from '../common/ChangeRequestSubmitButtons';
 
 interface BatchProcessDialogProps {
   open: boolean;
@@ -232,23 +232,19 @@ const BatchProcessDialog: React.FC<BatchProcessDialogProps> = ({
         <Button onClick={onClose} disabled={loading}>
           {t('common.cancel')}
         </Button>
-        <Button
-          variant="contained"
-          onClick={handleExecute}
+        <ChangeRequestSubmitButtons
+          action="update"
+          requiresApproval={requiresApproval}
+          saving={loading}
+          onSave={handleExecute}
           disabled={
             loading ||
             countLoading ||
             matchingCount === null ||
             matchingCount === 0
           }
-          color={action === 'activate' ? 'success' : 'warning'}
-        >
-          {loading ? (
-            <CircularProgress size={20} color="inherit" />
-          ) : (
-            `${getActionLabel('update', requiresApproval, t)} (${getDialogActionLabel()})`
-          )}
-        </Button>
+          title={getDialogActionLabel()}
+        />
       </DialogActions>
     </Dialog>
   );

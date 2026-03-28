@@ -75,6 +75,14 @@ const ENTITY_LABEL_REGISTRY: Record<string, EntityLabelConfig> = {
     labelFields: ['title', 'name'],
     tableNameKey: 'tables.serverLifecycleEvents',
   },
+  g_feature_segments: {
+    labelFields: ['segmentName', 'displayName', 'name'],
+    tableNameKey: 'tables.featureSegments',
+  },
+  g_feature_flag_types: {
+    labelFields: ['displayName', 'name'],
+    tableNameKey: 'tables.featureFlagTypes',
+  },
 };
 
 /**

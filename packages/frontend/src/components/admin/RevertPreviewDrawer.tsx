@@ -8,11 +8,6 @@ import {
   CircularProgress,
   Alert,
   Divider,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -29,6 +24,7 @@ import ResizableDrawer from '@/components/common/ResizableDrawer';
 import changeRequestService from '@/services/changeRequestService';
 import { getTableLocalizationKey } from '@/utils/changeRequestFormatter';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import ChangeItemDiffDisplay from './change-request/ChangeItemDiffDisplay';
 
 interface FieldOp {
   path: string;
@@ -294,150 +290,71 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
                 {preview.revertItems?.length || 0})
               </Typography>
 
-              {preview.revertItems?.map((item: RevertItem, index: number) => (
-                <Paper
-                  key={index}
-                  variant="outlined"
-                  sx={{ mb: 2, overflow: 'hidden' }}
-                >
-                  {/* Item Header */}
-                  <Box
-                    sx={{
-                      px: 2,
-                      py: 1.5,
-                      bgcolor: 'action.hover',
-                      borderBottom:
-                        item.opType !== 'DELETE' ? '1px solid' : 'none',
-                      borderColor: 'divider',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1.5,
-                    }}
+              {preview.revertItems?.map((item: RevertItem, index: number) => {
+                // Convert RevertItem to ChangeItemData format for ChangeItemDiffDisplay
+                const diffItem = {
+                  table: item.targetTable,
+                  targetId: item.targetId,
+                  operation: item.opType.toLowerCase(),
+                  changes: item.ops.map((op) => ({
+                    field: op.path,
+                    oldValue: op.oldValue,
+                    newValue: op.newValue,
+                    operation: op.opType,
+                  })),
+                  displayName: item.displayName,
+                };
+
+                return (
+                  <Paper
+                    key={index}
+                    variant="outlined"
+                    sx={{ mb: 2, overflow: 'hidden' }}
                   >
-                    {getOpIcon(item.opType)}
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      sx={{ flex: 1 }}
+                    {/* Item Header */}
+                    <Box
+                      sx={{
+                        px: 2,
+                        py: 1.5,
+                        bgcolor: 'action.hover',
+                        borderBottom:
+                          item.opType !== 'DELETE' ? '1px solid' : 'none',
+                        borderColor: 'divider',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                      }}
                     >
-                      {t(getTableLocalizationKey(item.targetTable))}:{' '}
-                      {item.displayName || item.targetId}
-                    </Typography>
-                    <Chip
-                      label={getOpTypeLabel(item.opType)}
-                      color={getOpTypeColor(item.opType)}
-                      size="small"
-                      sx={{ fontWeight: 500 }}
-                    />
-                  </Box>
-
-                  {/* Ops Detail - Only show for UPDATE/CREATE, hide for DELETE */}
-                  {item.opType === 'CREATE' && item.ops.length > 0 && (
-                    <Box sx={{ p: 2 }}>
-                      <Table size="small">
-                        <TableBody>
-                          {item.ops.map((op: FieldOp, opIndex: number) => (
-                            <TableRow key={opIndex}>
-                              <TableCell
-                                sx={{
-                                  fontWeight: 600,
-                                  color: 'text.secondary',
-                                  width: '40%',
-                                  border: 'none',
-                                  py: 0.5,
-                                  fontSize: '0.875rem',
-                                }}
-                              >
-                                {formatFieldName(item.targetTable, op.path)}
-                              </TableCell>
-                              <TableCell
-                                sx={{
-                                  color: 'success.main',
-                                  border: 'none',
-                                  py: 0.5,
-                                }}
-                              >
-                                {formatValue(op.newValue)}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                      {getOpIcon(item.opType)}
+                      <Typography
+                        variant="body2"
+                        fontWeight={600}
+                        sx={{ flex: 1 }}
+                      >
+                        {t(getTableLocalizationKey(item.targetTable))}:{' '}
+                        {item.displayName || item.targetId}
+                      </Typography>
+                      <Chip
+                        label={getOpTypeLabel(item.opType)}
+                        color={getOpTypeColor(item.opType)}
+                        size="small"
+                        sx={{ fontWeight: 500 }}
+                      />
                     </Box>
-                  )}
 
-                  {item.opType === 'UPDATE' && item.ops.length > 0 && (
-                    <Box sx={{ p: 2 }}>
-                      <Table size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell
-                              sx={{
-                                fontWeight: 600,
-                                color: 'text.secondary',
-                                py: 1,
-                              }}
-                            >
-                              {t('changeRequest.field')}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                fontWeight: 600,
-                                color: 'text.secondary',
-                                py: 1,
-                              }}
-                            >
-                              {t('changeRequest.before')}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                fontWeight: 600,
-                                color: 'text.secondary',
-                                py: 1,
-                              }}
-                            >
-                              {t('changeRequest.after')}
-                            </TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {item.ops.map((op: FieldOp, opIndex: number) => (
-                            <TableRow key={opIndex}>
-                              <TableCell
-                                sx={{
-                                  fontWeight: 600,
-                                  width: '30%',
-                                  py: 0.5,
-                                  fontSize: '0.875rem',
-                                }}
-                              >
-                                {formatFieldName(item.targetTable, op.path)}
-                              </TableCell>
-                              <TableCell
-                                sx={{
-                                  color: 'error.main',
-                                  textDecoration: 'line-through',
-                                  py: 0.5,
-                                  maxWidth: 150,
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                }}
-                              >
-                                {formatValue(op.oldValue)}
-                              </TableCell>
-                              <TableCell
-                                sx={{ color: 'success.main', py: 0.5 }}
-                              >
-                                {formatValue(op.newValue)}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </Box>
-                  )}
-                </Paper>
-              ))}
+                    {/* Ops Detail - Reuse ChangeItemDiffDisplay for structured rendering */}
+                    {item.opType !== 'DELETE' && item.ops.length > 0 && (
+                      <Box sx={{ px: 2, py: 1 }}>
+                        <ChangeItemDiffDisplay
+                          item={diffItem}
+                          formatFieldName={formatFieldName}
+                          formatValue={formatValue}
+                        />
+                      </Box>
+                    )}
+                  </Paper>
+                );
+              })}
             </>
           )}
         </Box>

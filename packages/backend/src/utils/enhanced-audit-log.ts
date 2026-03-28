@@ -77,7 +77,7 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
           return;
         }
 
-        // Resource ID 결정 (Request에서 또는 Response에서)
+        // Determine Resource ID (from request or response)
         let resourceId = options.getResourceId
           ? options.getResourceId(req)
           : undefined;

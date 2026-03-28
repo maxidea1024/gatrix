@@ -50,6 +50,7 @@ import {
 import { useEntityLock } from '../../hooks/useEntityLock';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import TagSelector from '../common/TagSelector';
+import { ChangeRequestSubmitButtons } from '../common/ChangeRequestSubmitButtons';
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -388,7 +389,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   };
 
   // Submit handler
-  const handleSubmit = async () => {
+  const handleSubmit = async (skipCr?: boolean) => {
     // Validation
     if (!platformSurveyId.trim()) {
       enqueueSnackbar(t('surveys.platformSurveyIdRequired'), {
@@ -492,7 +493,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         const result = await surveyService.updateSurvey(
           projectApiPath,
           survey.id,
-          data
+          data,
+          skipCr
         );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -504,7 +506,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           enqueueSnackbar(t('surveys.updateSuccess'), { variant: 'success' });
         }
       } else {
-        const result = await surveyService.createSurvey(projectApiPath, data);
+        const result = await surveyService.createSurvey(projectApiPath, data, skipCr);
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
             enqueueSnackbar,
@@ -944,13 +946,13 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         <Button onClick={onClose} disabled={submitting}>
           {t('common.cancel')}
         </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
+        <ChangeRequestSubmitButtons
+          action={survey ? 'update' : 'create'}
+          requiresApproval={requiresApproval}
+          saving={submitting}
+          onSave={handleSubmit}
           disabled={submitting || (!!survey && !isDirty)}
-        >
-          {getActionLabel(survey ? 'update' : 'create', requiresApproval, t)}
-        </Button>
+        />
       </Box>
       <ErrorDialog />
     </ResizableDrawer>

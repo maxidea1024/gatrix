@@ -196,9 +196,10 @@ class BannerService {
    */
   async createBanner(
     projectApiPath: string,
-    input: CreateBannerInput
+    input: CreateBannerInput,
+    skipCr?: boolean
   ): Promise<BannerMutationResult> {
-    const response = await api.post(`${projectApiPath}/banners`, input);
+    const response = await api.post(`${projectApiPath}/banners${skipCr ? '?skipCr=true' : ''}`, input);
     return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }
 
@@ -208,10 +209,11 @@ class BannerService {
   async updateBanner(
     projectApiPath: string,
     bannerId: string,
-    input: UpdateBannerInput
+    input: UpdateBannerInput,
+    skipCr?: boolean
   ): Promise<BannerMutationResult> {
     const response = await api.put(
-      `${projectApiPath}/banners/${bannerId}`,
+      `${projectApiPath}/banners/${bannerId}${skipCr ? '?skipCr=true' : ''}`,
       input
     );
     return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
@@ -222,9 +224,10 @@ class BannerService {
    */
   async deleteBanner(
     projectApiPath: string,
-    bannerId: string
+    bannerId: string,
+    skipCr?: boolean
   ): Promise<MutationResult<void>> {
-    const response = await api.delete(`${projectApiPath}/banners/${bannerId}`);
+    const response = await api.delete(`${projectApiPath}/banners/${bannerId}${skipCr ? '?skipCr=true' : ''}`);
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
@@ -233,10 +236,11 @@ class BannerService {
    */
   async publishBanner(
     projectApiPath: string,
-    bannerId: string
+    bannerId: string,
+    skipCr?: boolean
   ): Promise<BannerMutationResult> {
     const response = await api.post(
-      `${projectApiPath}/banners/${bannerId}/publish`
+      `${projectApiPath}/banners/${bannerId}/publish${skipCr ? '?skipCr=true' : ''}`
     );
     return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }
@@ -246,10 +250,11 @@ class BannerService {
    */
   async archiveBanner(
     projectApiPath: string,
-    bannerId: string
+    bannerId: string,
+    skipCr?: boolean
   ): Promise<BannerMutationResult> {
     const response = await api.post(
-      `${projectApiPath}/banners/${bannerId}/archive`
+      `${projectApiPath}/banners/${bannerId}/archive${skipCr ? '?skipCr=true' : ''}`
     );
     return parseChangeRequestResponse<Banner>(response, (r) => r?.banner);
   }

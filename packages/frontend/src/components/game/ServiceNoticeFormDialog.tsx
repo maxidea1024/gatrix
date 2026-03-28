@@ -33,8 +33,8 @@ import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
-import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
-import { getActionLabel } from '../../utils/changeRequestToast';
+import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
+import { ChangeRequestSubmitButtons } from '../common/ChangeRequestSubmitButtons';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import {
   ServiceNotice,
@@ -552,7 +552,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     selectedTags,
   ]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (skipCr: boolean = false) => {
     // Validation
     if (!category) {
       enqueueSnackbar(t('serviceNotices.categoryRequired'), {
@@ -621,7 +621,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 
       if (notice) {
         const result = await import('../../services/serviceNoticeService').then(
-          (m) => m.default.updateServiceNotice(projectApiPath, notice.id, data)
+          (m) => m.default.updateServiceNotice(projectApiPath, notice.id, data, skipCr)
         );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -639,7 +639,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           (m) =>
             m.default.createServiceNotice(
               projectApiPath,
-              data as CreateServiceNoticeData
+              data as CreateServiceNoticeData,
+              skipCr
             )
         );
         if (result.isChangeRequest) {
@@ -1036,13 +1037,13 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
         <Button onClick={onClose} disabled={submitting}>
           {t('common.cancel')}
         </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
+        <ChangeRequestSubmitButtons
+          action={notice ? 'update' : 'create'}
+          requiresApproval={requiresApproval}
+          saving={submitting}
+          onSave={handleSubmit}
           disabled={submitting || (!!notice && !isDirty)}
-        >
-          {getActionLabel(notice ? 'update' : 'create', requiresApproval, t)}
-        </Button>
+        />
       </Box>
     </ResizableDrawer>
   );

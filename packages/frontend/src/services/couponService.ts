@@ -151,27 +151,30 @@ export const couponService = {
   },
   async createSetting(
     projectApiPath: string,
-    data: CreateCouponSettingInput
+    data: CreateCouponSettingInput,
+    skipCr?: boolean
   ): Promise<MutationResult<any>> {
-    const res = await api.post(`${projectApiPath}/coupon-settings`, data);
+    const res = await api.post(`${projectApiPath}/coupon-settings${skipCr ? '?skipCr=true' : ''}`, data);
     return parseChangeRequestResponse<any>(res, (r) => r?.setting);
   },
   async updateSetting(
     projectApiPath: string,
     id: string,
-    data: UpdateCouponSettingInput
+    data: UpdateCouponSettingInput,
+    skipCr?: boolean
   ): Promise<MutationResult<any>> {
     const res = await api.patch(
-      `${projectApiPath}/coupon-settings/${id}`,
+      `${projectApiPath}/coupon-settings/${id}${skipCr ? '?skipCr=true' : ''}`,
       data
     );
     return parseChangeRequestResponse<any>(res, (r) => r?.setting);
   },
   async deleteSetting(
     projectApiPath: string,
-    id: string
+    id: string,
+    skipCr?: boolean
   ): Promise<MutationResult<void>> {
-    const res = await api.delete(`${projectApiPath}/coupon-settings/${id}`);
+    const res = await api.delete(`${projectApiPath}/coupon-settings/${id}${skipCr ? '?skipCr=true' : ''}`);
     return parseChangeRequestResponse<void>(res, () => undefined);
   },
   async getUsage(

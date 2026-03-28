@@ -22,7 +22,7 @@ export async function checkDatabaseTimezone() {
       'SELECT NOW() as mysql_now, UTC_TIMESTAMP() as mysql_utc'
     );
 
-    // Node.js 시간 Confirm
+    // Check Node.js time
     const nodeNow = new Date();
     const nodeUTC = new Date().toISOString();
 

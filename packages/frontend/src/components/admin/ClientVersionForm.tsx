@@ -62,6 +62,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { getActionLabel } from '@/utils/changeRequestToast';
 import TagSelector from '../common/TagSelector';
 import { Tag } from '@/services/tagService';
+import { ChangeRequestSubmitButtons } from '../common/ChangeRequestSubmitButtons';
 
 interface ClientVersionFormProps {
   open: boolean;
@@ -69,6 +70,7 @@ interface ClientVersionFormProps {
   onSuccess: () => void;
   clientVersion?: ClientVersion | null;
   isCopyMode?: boolean;
+  requiresApproval?: boolean;
 }
 
 // Form validation schema
@@ -142,14 +144,13 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   onSuccess,
   clientVersion,
   isCopyMode = false,
+  requiresApproval = false,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const { currentEnvironment } = useEnvironment();
-  const { getProjectApiPath } = useOrgProject();
+  const getProjectApiPath = useOrgProject().getProjectApiPath;
   const projectApiPath = getProjectApiPath();
-  const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const { platforms } = usePlatformConfig();
   const [loading, setLoading] = useState(false);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
@@ -554,7 +555,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   }, [watchedPlatform, isEdit, setValue, getValues]);
 
   // Form submission
-  const onSubmit: SubmitHandler<ClientVersionFormData> = async (data) => {
+  const handleValidSubmit = async (data: ClientVersionFormData, skipCr: boolean) => {
     if (duplicateError) {
       return;
     }
@@ -617,7 +618,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         const updateResult = await ClientVersionService.updateClientVersion(
           projectApiPath,
           clientVersion.id,
-          cleanedData
+          cleanedData,
+          skipCr
         );
         if (updateResult.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -637,7 +639,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       } else {
         const createResult = await ClientVersionService.createClientVersion(
           projectApiPath,
-          cleanedData
+          cleanedData,
+          skipCr
         );
         if (createResult.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -692,6 +695,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     }
   };
 
+  const handleSave = (skipCr: boolean) => {
+    handleSubmit((data) => handleValidSubmit(data, skipCr))();
+  };
+
   const title = isCopyMode
     ? t('clientVersions.form.copyTitle')
     : isEdit
@@ -716,7 +723,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       zIndex={1300}
     >
       <form
-        onSubmit={handleSubmit(onSubmit as any, () => {})}
+        onSubmit={handleSubmit((data) => handleValidSubmit(data, false))}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -1378,24 +1385,14 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           <Button onClick={handleClose} disabled={isSubmitting || loading}>
             {t('common.cancel')}
           </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={
-              isSubmitting ||
-              loading ||
-              !!duplicateError ||
-              (displayIsEdit && !isDirty)
-            }
-          >
-            {displayIsCopy
-              ? t('clientVersions.form.copyTitle')
-              : getActionLabel(
-                  displayIsEdit ? 'update' : 'create',
-                  requiresApproval,
-                  t
-                )}
-          </Button>
+          <ChangeRequestSubmitButtons
+            action={displayIsCopy ? 'create' : displayIsEdit ? 'update' : 'create'}
+            requiresApproval={requiresApproval}
+            saving={isSubmitting || loading}
+            onSave={handleSave}
+            disabled={isSubmitting || loading || !!duplicateError || (displayIsEdit && !isDirty)}
+            title={displayIsCopy ? t('clientVersions.form.copyTitle') : undefined}
+          />
         </Box>
       </form>
     </ResizableDrawer>

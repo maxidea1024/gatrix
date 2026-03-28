@@ -16,6 +16,7 @@ import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { generalLimiter, apiLimiter } from './middleware/rate-limiter';
 import { appInstance } from './utils/app-instance';
 import { ALLOWED_HEADERS } from './constants/headers';
+import { requestContext } from './middleware/request-context';
 
 // Import main routes module
 import routes from './routes';
@@ -25,6 +26,11 @@ import { authenticate } from './middleware/auth';
 import { BullBoardConfig } from './config/bullboard';
 
 const app = express();
+
+// Request context middleware
+app.use((req, res, next) => {
+  requestContext.run(req, () => next());
+});
 
 // Disable "Powered by Express" header
 app.disable('x-powered-by');

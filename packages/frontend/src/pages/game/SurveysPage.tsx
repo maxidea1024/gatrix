@@ -323,13 +323,14 @@ const SurveysPage: React.FC = () => {
     setDeleteConfirmOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = async (skipCr?: boolean) => {
     if (!deletingSurvey) return;
 
     try {
       const result = await surveyService.deleteSurvey(
         projectApiPath,
-        deletingSurvey.id
+        deletingSurvey.id,
+        skipCr
       );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
@@ -356,13 +357,13 @@ const SurveysPage: React.FC = () => {
     setBulkDeleteConfirmOpen(true);
   };
 
-  const handleBulkDeleteConfirm = async () => {
+  const handleBulkDeleteConfirm = async (skipCr?: boolean) => {
     if (selectedIds.length === 0) return;
 
     try {
       let crCreated = false;
       for (const id of selectedIds) {
-        const result = await surveyService.deleteSurvey(projectApiPath, id);
+        const result = await surveyService.deleteSurvey(projectApiPath, id, skipCr);
         if (result.isChangeRequest) crCreated = true;
       }
       if (crCreated) {
@@ -868,6 +869,7 @@ const SurveysPage: React.FC = () => {
         open={deleteConfirmOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
+        requiresApproval={requiresApproval}
         title={t('surveys.deleteConfirmTitle')}
         message={t('surveys.deleteConfirmMessage', {
           platformSurveyId: deletingSurvey?.platformSurveyId || '',
@@ -879,6 +881,7 @@ const SurveysPage: React.FC = () => {
         open={bulkDeleteConfirmOpen}
         onClose={handleBulkDeleteCancel}
         onConfirm={handleBulkDeleteConfirm}
+        requiresApproval={requiresApproval}
         title={t('surveys.bulkDeleteConfirmTitle')}
         message={t('surveys.bulkDeleteConfirmMessage', {
           count: selectedIds.length,

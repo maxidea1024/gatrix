@@ -3,7 +3,6 @@ import { createLogger } from '../../config/logger';
 
 const logger = createLogger('FeatureVariantModel');
 import { ulid } from 'ulid';
-import { parseJsonField } from '../../utils/db-utils';
 import { FeatureVariantAttributes } from './types';
 
 export class FeatureVariantModel {
@@ -13,9 +12,12 @@ export class FeatureVariantModel {
     try {
       const variants = await db('g_feature_variants').where('flagId', flagId);
 
+      // mysql2 auto-parses JSON columns; no further parsing needed.
+      // Using parseJsonField here would double-parse, causing plain strings
+      // like "hello" to fail JSON.parse and become undefined.
       return variants.map((v: any) => ({
         ...v,
-        value: parseJsonField(v.value),
+        value: v.value ?? undefined,
       }));
     } catch (error) {
       logger.error('Error finding variants by flag ID:', error);
@@ -34,7 +36,7 @@ export class FeatureVariantModel {
 
       return variants.map((v: any) => ({
         ...v,
-        value: parseJsonField(v.value),
+        value: v.value ?? undefined,
       }));
     } catch (error) {
       logger.error('Error finding variants by flag ID and environment:', error);
@@ -66,7 +68,7 @@ export class FeatureVariantModel {
       const variant = await db('g_feature_variants').where('id', id).first();
       return {
         ...variant,
-        value: parseJsonField(variant.value),
+        value: variant.value ?? undefined,
       };
     } catch (error) {
       logger.error('Error creating variant:', error);

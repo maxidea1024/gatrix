@@ -58,6 +58,7 @@ import {
   ListItemIcon,
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
+import { ChangeRequestSubmitButtons } from '@/components/common/ChangeRequestSubmitButtons';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -1159,7 +1160,7 @@ const GameWorldsPage: React.FC = () => {
 
   const existingTags = allTags;
 
-  const handleSaveWorld = async () => {
+  const handleSaveWorld = async (skipCr: boolean = false) => {
     if (!validateForm()) {
       return;
     }
@@ -1230,7 +1231,8 @@ const GameWorldsPage: React.FC = () => {
         savedWorld = await gameWorldService.updateGameWorld(
           projectApiPath,
           editingWorld.id,
-          dataToSend
+          dataToSend,
+          skipCr
         );
         if (savedWorld.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -1244,7 +1246,8 @@ const GameWorldsPage: React.FC = () => {
       } else {
         savedWorld = await gameWorldService.createGameWorld(
           projectApiPath,
-          dataToSend
+          dataToSend,
+          skipCr
         );
         if (savedWorld.isChangeRequest) {
           showChangeRequestCreatedToast(
@@ -1306,6 +1309,8 @@ const GameWorldsPage: React.FC = () => {
         const result = await gameWorldService.deleteGameWorld(
           projectApiPath,
           deleteConfirmDialog.world.id
+          // Note: Delete bypass from ConfirmDeleteDialog would require modifying that dialog.
+          // For now, we leave delete as is, or we'd need a custom confirm dialog.
         );
 
         if (result.isChangeRequest) {
@@ -2082,27 +2087,14 @@ const GameWorldsPage: React.FC = () => {
           <Button onClick={() => setDialogOpen(false)} disabled={saving}>
             {t('gameWorlds.cancel')}
           </Button>
-          <Button
-            onClick={handleSaveWorld}
-            variant="contained"
-            disabled={
-              saving || formActiveTab !== 0 || (!!editingWorld && !isDirty)
-            }
-            startIcon={saving ? <CircularProgress size={20} /> : undefined}
-            title={
-              formActiveTab !== 0
-                ? t('gameWorlds.form.switchToBasicInfoToSave')
-                : undefined
-            }
-          >
-            {saving
-              ? t('common.saving')
-              : getActionLabel(
-                  editingWorld ? 'update' : 'create',
-                  requiresApproval,
-                  t
-                )}
-          </Button>
+          <ChangeRequestSubmitButtons
+            action={editingWorld ? 'update' : 'create'}
+            requiresApproval={requiresApproval}
+            saving={saving}
+            onSave={handleSaveWorld}
+            disabled={formActiveTab !== 0 || (!!editingWorld && !isDirty)}
+            title={formActiveTab !== 0 ? t('gameWorlds.form.switchToBasicInfoToSave') : undefined}
+          />
         </Box>
       </ResizableDrawer>
 

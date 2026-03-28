@@ -70,10 +70,11 @@ export const messageTemplateService = {
   },
   async create(
     projectApiPath: string,
-    data: MessageTemplate
+    data: MessageTemplate,
+    skipCr?: boolean
   ): Promise<MessageTemplateMutationResult> {
     const res = await apiService.post<any>(
-      `${projectApiPath}/message-templates`,
+      `${projectApiPath}/message-templates${skipCr ? '?skipCr=true' : ''}`,
       data
     );
 
@@ -94,10 +95,11 @@ export const messageTemplateService = {
   async update(
     projectApiPath: string,
     id: number,
-    data: MessageTemplate
+    data: MessageTemplate,
+    skipCr?: boolean
   ): Promise<MessageTemplateMutationResult> {
     const res = await apiService.put<any>(
-      `${projectApiPath}/message-templates/${id}`,
+      `${projectApiPath}/message-templates/${id}${skipCr ? '?skipCr=true' : ''}`,
       data
     );
 
@@ -135,10 +137,11 @@ export const messageTemplateService = {
   },
   async delete(
     projectApiPath: string,
-    id: number
+    id: number,
+    skipCr?: boolean
   ): Promise<MessageTemplateMutationResult> {
     const res: any = await apiService.delete(
-      `${projectApiPath}/message-templates/${id}`
+      `${projectApiPath}/message-templates/${id}${skipCr ? '?skipCr=true' : ''}`
     );
 
     const responseData = res?.data?.data || res?.data || res;
@@ -153,10 +156,11 @@ export const messageTemplateService = {
   },
   async bulkDelete(
     projectApiPath: string,
-    ids: number[]
+    ids: number[],
+    skipCr?: boolean
   ): Promise<MessageTemplateMutationResult> {
     const res: any = await apiService.post(
-      `${projectApiPath}/message-templates/bulk-delete`,
+      `${projectApiPath}/message-templates/bulk-delete${skipCr ? '?skipCr=true' : ''}`,
       { ids }
     );
 

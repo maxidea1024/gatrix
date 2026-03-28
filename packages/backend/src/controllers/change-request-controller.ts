@@ -212,7 +212,7 @@ export class ChangeRequestController {
   static approve = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const { id } = req.params;
-      const { comment } = req.body;
+      const { comment, forceApprove } = req.body;
       const userId = req.user?.userId;
 
       if (!userId) {
@@ -220,7 +220,9 @@ export class ChangeRequestController {
       }
 
       const approved = await withMinimumDelay(
-        ChangeRequestService.approveChangeRequest(id, userId, comment)
+        ChangeRequestService.approveChangeRequest(id, userId, comment, {
+          forceApprove: forceApprove === true,
+        })
       );
 
       logger.info('Approved', {
