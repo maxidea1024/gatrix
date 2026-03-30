@@ -136,6 +136,7 @@ const createValidationSchema = (t: any) =>
     maintenanceLocales: yup.array().notRequired(),
     tags: yup.array().notRequired(),
     minPatchVersion: yup.string().max(50).notRequired(),
+    targetEnv: yup.string().required(t('clientVersions.form.targetEnvRequired')),
   });
 
 const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
@@ -152,6 +153,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const getProjectApiPath = useOrgProject().getProjectApiPath;
   const projectApiPath = getProjectApiPath();
   const { platforms } = usePlatformConfig();
+  const { allEnvironments } = useEnvironment();
   const [loading, setLoading] = useState(false);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const versionFieldRef = useRef<HTMLInputElement>(null);
@@ -305,6 +307,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     maintenanceLocales: [],
     tags: [],
     minPatchVersion: '',
+    targetEnv: '',
   };
 
   const {
@@ -383,6 +386,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             ),
             tags: source.tags || [],
             minPatchVersion: source.minPatchVersion || '',
+            targetEnv: source.targetEnv || '',
           });
           setSelectedTags(source.tags || []);
           const normalizedLocales = (source.maintenanceLocales || []).map(
@@ -876,49 +880,111 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     />
                   </Box>
 
-                  {/* Status field */}
-                  <Controller
-                    name="clientStatus"
-                    control={control}
-                    render={({ field }) => (
-                      <FormControl fullWidth variant="outlined">
-                        <InputLabel id="cvf-status-label" shrink={true}>
-                          {t('clientVersions.statusLabel')}{' '}
-                          <Typography component="span" color="error">
-                            *
+                  {/* Status + Target Environment row */}
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    {/* Status field */}
+                    <Controller
+                      name="clientStatus"
+                      control={control}
+                      render={({ field }) => (
+                        <FormControl fullWidth variant="outlined">
+                          <InputLabel id="cvf-status-label" shrink={true}>
+                            {t('clientVersions.statusLabel')}{' '}
+                            <Typography component="span" color="error">
+                              *
+                            </Typography>
+                          </InputLabel>
+                          <Select
+                            labelId="cvf-status-label"
+                            {...field}
+                            label={`${t('clientVersions.statusLabel')} *`}
+                            MenuProps={{
+                              anchorOrigin: {
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                              },
+                              transformOrigin: {
+                                vertical: 'top',
+                                horizontal: 'left',
+                              },
+                            }}
+                          >
+                            {Object.values(ClientStatus).map((status) => (
+                              <MenuItem key={status} value={status}>
+                                {t(ClientStatusLabels[status])}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ mt: 0.5, display: 'block' }}
+                          >
+                            {t('clientVersions.form.statusHelp')}
                           </Typography>
-                        </InputLabel>
-                        <Select
-                          labelId="cvf-status-label"
-                          {...field}
-                          label={`${t('clientVersions.statusLabel')} *`}
-                          MenuProps={{
-                            anchorOrigin: {
-                              vertical: 'bottom',
-                              horizontal: 'left',
-                            },
-                            transformOrigin: {
-                              vertical: 'top',
-                              horizontal: 'left',
-                            },
-                          }}
-                        >
-                          {Object.values(ClientStatus).map((status) => (
-                            <MenuItem key={status} value={status}>
-                              {t(ClientStatusLabels[status])}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ mt: 0.5, display: 'block' }}
-                        >
-                          {t('clientVersions.form.statusHelp')}
-                        </Typography>
-                      </FormControl>
-                    )}
-                  />
+                        </FormControl>
+                      )}
+                    />
+
+                    {/* Target Environment field */}
+                    <Controller
+                      name="targetEnv"
+                      control={control}
+                      render={({ field }) => (
+                        <FormControl fullWidth variant="outlined">
+                          <InputLabel id="cvf-target-env-label" shrink={true}>
+                            {t('environments.targetEnvironment')}{' '}
+                            <Typography component="span" color="error">
+                              *
+                            </Typography>
+                          </InputLabel>
+                          <Select
+                            labelId="cvf-target-env-label"
+                            {...field}
+                            value={field.value || ''}
+                            label={`${t('environments.targetEnvironment')} *`}
+                            error={!!errors.targetEnv}
+                            MenuProps={{
+                              anchorOrigin: {
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                              },
+                              transformOrigin: {
+                                vertical: 'top',
+                                horizontal: 'left',
+                              },
+                            }}
+                          >
+                            {allEnvironments.map((env) => (
+                              <MenuItem key={env.environmentId} value={env.environmentId}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  {env.color && (
+                                    <Box
+                                      sx={{
+                                        width: 10,
+                                        height: 10,
+                                        borderRadius: '50%',
+                                        bgcolor: env.color,
+                                        flexShrink: 0,
+                                      }}
+                                    />
+                                  )}
+                                  {env.displayName}
+                                </Box>
+                              </MenuItem>
+                            ))}
+                          </Select>
+                          <Typography
+                            variant="caption"
+                            color={errors.targetEnv ? 'error' : 'text.secondary'}
+                            sx={{ mt: 0.5, display: 'block' }}
+                          >
+                            {errors.targetEnv?.message || t('clientVersions.form.targetEnvHelp')}
+                          </Typography>
+                        </FormControl>
+                      )}
+                    />
+                  </Box>
 
                   {/* Tags - right after status */}
                   <TagSelector

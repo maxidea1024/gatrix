@@ -14,7 +14,7 @@ export interface MirroredToken {
   id: number;
   tokenName: string;
   tokenValue: string;
-  tokenType: 'client' | 'server' | 'edge';
+  tokenType: 'client' | 'server' | 'edge' | 'project';
   orgId: string | null;
   projectId: string | null;
   environmentId: string | null; // null means no specific environment binding
@@ -58,6 +58,9 @@ class TokenMirrorService {
 
     // Fetch initial tokens
     await this.fetchAllTokens();
+
+    // Fetch initial version map
+    await this.fetchVersionMap();
 
     // Subscribe to token change events
     await this.subscribeToEvents();
@@ -125,6 +128,34 @@ class TokenMirrorService {
   }
 
   /**
+   * Fetch version map from backend for project token dynamic resolution
+   */
+  async fetchVersionMap(): Promise<void> {
+    try {
+      const response = await axios.get(
+        `${config.gatrixUrl}/api/v1/server/internal/version-map`,
+        {
+          headers: {
+            'x-api-token': config.apiToken,
+            'x-application-name': config.appName,
+          },
+          timeout: 10000,
+        }
+      );
+
+      if (response.data?.success && Array.isArray(response.data?.data)) {
+        const { versionMapService } = await import('./version-map-service');
+        versionMapService.loadVersionMap(response.data.data);
+      } else {
+        logger.warn('Invalid version map response from backend');
+      }
+    } catch (error: any) {
+      // Non-fatal: Edge can still work with environment-bound tokens
+      logger.warn('Failed to fetch version map:', error.message);
+    }
+  }
+
+  /**
    * Subscribe to token change events via Redis PubSub
    */
   private async subscribeToEvents(): Promise<void> {
@@ -162,19 +193,26 @@ class TokenMirrorService {
     try {
       const event = JSON.parse(message);
 
-      if (!event.type?.startsWith('api_token.')) {
-        return; // Not a token event
+      // Token change events → refetch all tokens
+      if (event.type?.startsWith('api_token.')) {
+        logger.info(`Received token event: ${event.type}`, {
+          id: event.data?.id,
+        });
+
+        this.fetchAllTokens().catch((err) => {
+          logger.error('Failed to refetch tokens after event:', err.message);
+        });
+        return;
       }
 
-      logger.info(`Received event: ${event.type}`, {
-        id: event.data?.id,
-      });
-
-      // For any token change, refetch all tokens
-      // This is simpler and more reliable than incremental updates
-      this.fetchAllTokens().catch((err) => {
-        logger.error('Failed to refetch tokens after event:', err.message);
-      });
+      // Client version change events → refetch version map
+      if (event.type?.startsWith('client_version.')) {
+        logger.info(`Received client_version event: ${event.type}`);
+        this.fetchVersionMap().catch((err) => {
+          logger.warn('Failed to refetch version map after event:', err.message);
+        });
+        return;
+      }
     } catch (error: any) {
       logger.error('Failed to parse event:', error.message);
     }
@@ -210,6 +248,22 @@ class TokenMirrorService {
       return { valid: true, token: unsecuredToken };
     }
 
+    // Prefix-based early type rejection (skip Map lookup for obvious mismatches)
+    const PREFIX_TYPE_MAP: Record<string, string> = {
+      'gtx_cli_': 'client',
+      'gtx_srv_': 'server',
+      'gtx_edge_': 'edge',
+      'gtx_proj_': 'project',
+    };
+    for (const [prefix, type] of Object.entries(PREFIX_TYPE_MAP)) {
+      if (tokenValue.startsWith(prefix)) {
+        if (type !== requiredType && !(type === 'project' && requiredType === 'client')) {
+          return { valid: false, reason: 'invalid_type' };
+        }
+        break;
+      }
+    }
+
     const token = this.tokens.get(tokenValue);
 
     if (!token) {
@@ -225,7 +279,8 @@ class TokenMirrorService {
     }
 
     // Check token type
-    if (token.tokenType !== requiredType) {
+    // Project tokens can be used in place of client tokens (dynamic env resolution)
+    if (token.tokenType !== requiredType && !(token.tokenType === 'project' && requiredType === 'client')) {
       return { valid: false, token, reason: 'invalid_type' };
     }
 

@@ -141,6 +141,7 @@ const createValidationSchema = (t: any) =>
     }),
     supportsMultiLanguage: yup.boolean().optional(),
     maintenanceLocales: yup.array().optional(),
+    targetEnv: yup.string().required(t('clientVersions.form.targetEnvRequired')),
   });
 
 const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
@@ -154,6 +155,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const { platforms } = usePlatformConfig();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
+  const { allEnvironments } = useEnvironment();
   const [loading, setLoading] = useState(false);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
 
@@ -291,6 +293,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     supportsMultiLanguage: false,
     maintenanceLocales: [],
     platforms: [],
+    targetEnv: '',
     tags: [],
   };
 
@@ -571,142 +574,207 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
               </Typography>
 
               <Stack spacing={2}>
-                <Controller
-                  name="clientVersion"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      value={field.value || ''}
-                      fullWidth
-                      autoFocus
-                      label={
-                        <Box component="span">
-                          {t('clientVersions.version')}{' '}
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {/* Version field */}
+                  <Controller
+                    name="clientVersion"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        value={field.value || ''}
+                        fullWidth
+                        autoFocus
+                        label={
+                          <Box component="span">
+                            {t('clientVersions.version')}{' '}
+                            <Typography component="span" color="error">
+                              *
+                            </Typography>
+                          </Box>
+                        }
+                        placeholder={
+                          CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE
+                        }
+                        error={!!errors.clientVersion}
+                        helperText={
+                          errors.clientVersion?.message ||
+                          t('clientVersions.form.versionHelp')
+                        }
+                        inputProps={{
+                          autoComplete: 'off',
+                          autoCorrect: 'off',
+                          autoCapitalize: 'off',
+                          spellCheck: false,
+                        }}
+                      />
+                    )}
+                  />
+
+                  {/* Platform field */}
+                  <FormControl fullWidth error={!!errors.platforms}>
+                    <InputLabel id="bulk-platform-label">
+                      {t('clientVersions.selectPlatforms')}{' '}
+                      <Typography component="span" color="error">
+                        *
+                      </Typography>
+                    </InputLabel>
+                    <Select<string[]>
+                      labelId="bulk-platform-label"
+                      multiple
+                      value={selectedPlatforms}
+                      onChange={handlePlatformChange}
+                      input={
+                        <OutlinedInput
+                          label={`${t('clientVersions.selectPlatforms')} *`}
+                        />
+                      }
+                      MenuProps={{
+                        anchorOrigin: {
+                          vertical: 'bottom',
+                          horizontal: 'left',
+                        },
+                        transformOrigin: {
+                          vertical: 'top',
+                          horizontal: 'left',
+                        },
+                      }}
+                      renderValue={(selected) => (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                          {selected.map((value) => (
+                            <Chip
+                              key={value}
+                              label={value.toUpperCase()}
+                              size="small"
+                            />
+                          ))}
+                        </Box>
+                      )}
+                    >
+                      {platforms.map((platform) => (
+                        <MenuItem key={platform.value} value={platform.value}>
+                          {platform.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {(errors.platforms?.message ||
+                      t('clientVersions.form.bulkPlatformHelp')) && (
+                      <Typography
+                        variant="caption"
+                        color={errors.platforms ? 'error' : 'text.secondary'}
+                        sx={{ mt: 0.5, display: 'block' }}
+                      >
+                        {errors.platforms?.message ||
+                          t('clientVersions.form.bulkPlatformHelp')}
+                      </Typography>
+                    )}
+                  </FormControl>
+                </Box>
+
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {/* Status field */}
+                  <Controller
+                    name="clientStatus"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControl fullWidth variant="outlined">
+                        <InputLabel id="bulk-status-label" shrink={true}>
+                          {t('clientVersions.statusLabel')}{' '}
                           <Typography component="span" color="error">
                             *
                           </Typography>
-                        </Box>
-                      }
-                      placeholder={
-                        CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE
-                      }
-                      error={!!errors.clientVersion}
-                      helperText={
-                        errors.clientVersion?.message ||
-                        t('clientVersions.form.versionHelp')
-                      }
-                      inputProps={{
-                        autoComplete: 'off',
-                        autoCorrect: 'off',
-                        autoCapitalize: 'off',
-                        spellCheck: false,
-                      }}
-                    />
-                  )}
-                />
-
-                <FormControl fullWidth error={!!errors.platforms}>
-                  <InputLabel id="bulk-platform-label">
-                    {t('clientVersions.selectPlatforms')}{' '}
-                    <Typography component="span" color="error">
-                      *
-                    </Typography>
-                  </InputLabel>
-                  <Select<string[]>
-                    labelId="bulk-platform-label"
-                    multiple
-                    value={selectedPlatforms}
-                    onChange={handlePlatformChange}
-                    input={
-                      <OutlinedInput
-                        label={`${t('clientVersions.selectPlatforms')} *`}
-                      />
-                    }
-                    MenuProps={{
-                      anchorOrigin: {
-                        vertical: 'bottom',
-                        horizontal: 'left',
-                      },
-                      transformOrigin: {
-                        vertical: 'top',
-                        horizontal: 'left',
-                      },
-                    }}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {selected.map((value) => (
-                          <Chip
-                            key={value}
-                            label={value.toUpperCase()}
-                            size="small"
-                          />
-                        ))}
-                      </Box>
-                    )}
-                  >
-                    {platforms.map((platform) => (
-                      <MenuItem key={platform.value} value={platform.value}>
-                        {platform.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {(errors.platforms?.message ||
-                    t('clientVersions.form.bulkPlatformHelp')) && (
-                    <Typography
-                      variant="caption"
-                      color={errors.platforms ? 'error' : 'text.secondary'}
-                      sx={{ mt: 0.5, display: 'block' }}
-                    >
-                      {errors.platforms?.message ||
-                        t('clientVersions.form.bulkPlatformHelp')}
-                    </Typography>
-                  )}
-                </FormControl>
-
-                <Controller
-                  name="clientStatus"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel id="bulk-status-label" shrink={true}>
-                        {t('clientVersions.statusLabel')}{' '}
-                        <Typography component="span" color="error">
-                          *
+                        </InputLabel>
+                        <Select
+                          labelId="bulk-status-label"
+                          {...field}
+                          value={field.value || ClientStatus.OFFLINE}
+                          label={`${t('clientVersions.statusLabel')} *`}
+                          MenuProps={{
+                            anchorOrigin: {
+                              vertical: 'bottom',
+                              horizontal: 'left',
+                            },
+                            transformOrigin: {
+                              vertical: 'top',
+                              horizontal: 'left',
+                            },
+                          }}
+                        >
+                          {Object.values(ClientStatus).map((status) => (
+                            <MenuItem key={status} value={status}>
+                              {t(ClientStatusLabels[status])}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mt: 0.5, display: 'block' }}
+                        >
+                          {t('clientVersions.form.statusHelp')}
                         </Typography>
-                      </InputLabel>
-                      <Select
-                        labelId="bulk-status-label"
-                        {...field}
-                        value={field.value || ClientStatus.OFFLINE}
-                        label={`${t('clientVersions.statusLabel')} *`}
-                        MenuProps={{
-                          anchorOrigin: {
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                          },
-                          transformOrigin: {
-                            vertical: 'top',
-                            horizontal: 'left',
-                          },
-                        }}
-                      >
-                        {Object.values(ClientStatus).map((status) => (
-                          <MenuItem key={status} value={status}>
-                            {t(ClientStatusLabels[status])}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ mt: 0.5, display: 'block' }}
-                      >
-                        {t('clientVersions.form.statusHelp')}
-                      </Typography>
-                    </FormControl>
-                  )}
-                />
+                      </FormControl>
+                    )}
+                  />
+
+                  {/* Target Environment field */}
+                  <Controller
+                    name="targetEnv"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControl fullWidth variant="outlined">
+                        <InputLabel id="bulk-target-env-label" shrink={true}>
+                          {t('environments.targetEnvironment')}{' '}
+                          <Typography component="span" color="error">
+                            *
+                          </Typography>
+                        </InputLabel>
+                        <Select
+                          labelId="bulk-target-env-label"
+                          {...field}
+                          value={field.value || ''}
+                          label={`${t('environments.targetEnvironment')} *`}
+                          MenuProps={{
+                            anchorOrigin: {
+                              vertical: 'bottom',
+                              horizontal: 'left',
+                            },
+                            transformOrigin: {
+                              vertical: 'top',
+                              horizontal: 'left',
+                            },
+                          }}
+                        >
+                          {allEnvironments.map((env) => (
+                            <MenuItem key={env.environmentId} value={env.environmentId}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                {env.color && (
+                                  <Box
+                                    sx={{
+                                      width: 10,
+                                      height: 10,
+                                      borderRadius: '50%',
+                                      bgcolor: env.color,
+                                      flexShrink: 0,
+                                    }}
+                                  />
+                                )}
+                                {env.displayName}
+                              </Box>
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mt: 0.5, display: 'block' }}
+                        >
+                          {t('clientVersions.form.targetEnvHelp')}
+                        </Typography>
+                      </FormControl>
+                    )}
+                  />
+                </Box>
 
                 {/* Tags - right after status */}
                 <TagSelector

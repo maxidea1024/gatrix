@@ -116,6 +116,7 @@ const createClientVersionSchema = Joi.object({
     )
     .optional()
     .default([]),
+  targetEnv: Joi.string().max(26).optional().allow('').empty('').default(null),
   tags: Joi.array()
     .items(
       Joi.object({
@@ -198,6 +199,7 @@ const updateClientVersionSchema = Joi.object({
       }).unknown(true)
     )
     .optional(),
+  targetEnv: Joi.string().max(26).optional().allow('').empty('').default(null),
 });
 
 const getClientVersionsQuerySchema = Joi.object({
@@ -394,6 +396,8 @@ const bulkCreateClientVersionSchema = Joi.object({
     .min(1)
     .required(),
 
+  targetEnv: Joi.string().max(26).optional().allow('').empty('').default(null),
+
   // Tag fields - accept only required fields
   tags: Joi.array()
     .items(
@@ -411,9 +415,9 @@ export class ClientVersionController {
   // Get available versions list (distinct)
   static async getAvailableVersions(req: AuthenticatedRequest, res: Response) {
     try {
-      const environmentId = req.environmentId!;
+      const projectId = req.projectId!;
       const versions =
-        await ClientVersionService.getAvailableVersions(environmentId);
+        await ClientVersionService.getAvailableVersions(projectId);
       res.json({
         success: true,
         data: versions,
@@ -476,9 +480,9 @@ export class ClientVersionController {
       }
     });
 
-    const environmentId = req.environmentId!;
+    const projectId = req.projectId!;
     const result = await ClientVersionService.getAllClientVersions(
-      environmentId,
+      projectId,
       filters,
       pagination
     );
@@ -499,10 +503,10 @@ export class ClientVersionController {
       });
     }
 
-    const environmentId = req.environmentId!;
+    const projectId = req.projectId!;
     const clientVersion = await ClientVersionService.getClientVersionById(
       id,
-      environmentId
+      projectId
     );
     if (!clientVersion) {
       return res.status(404).json({
@@ -546,18 +550,18 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const environmentId = req.environmentId!;
+    const projectId = req.projectId!;
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestCreation(
       userId,
-      environmentId,
+      projectId,
       'g_client_versions',
       clientVersionData,
       async () => {
         return await ClientVersionService.createClientVersion(
           clientVersionData,
-          environmentId
+          projectId
         );
       }
     );
@@ -602,7 +606,7 @@ export class ClientVersionController {
       });
     }
 
-    const environmentId = req.environmentId!;
+    const projectId = req.projectId!;
     const bulkCreateData = {
       ...value,
       // Convert ISO 8601 datetime to MySQL DATETIME format
@@ -612,18 +616,18 @@ export class ClientVersionController {
       maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       createdBy: userId,
       updatedBy: userId,
-      environmentId,
+      projectId,
     };
 
     // Check if CR is required
     const requiresApproval =
-      await UnifiedChangeGateway.requiresApproval(environmentId);
+      await UnifiedChangeGateway.requiresApproval(projectId);
 
     if (requiresApproval) {
       let lastResult;
       for (const platform of value.platforms) {
         const itemData = {
-          environmentId,
+          projectId,
           platform: platform.platform,
           clientVersion: value.clientVersion,
           clientStatus: value.clientStatus,
@@ -645,7 +649,7 @@ export class ClientVersionController {
 
         lastResult = await UnifiedChangeGateway.requestCreation(
           userId,
-          environmentId,
+          projectId,
           'g_client_versions',
           itemData,
           async () => {
@@ -668,7 +672,7 @@ export class ClientVersionController {
       try {
         clientVersions = await ClientVersionService.bulkCreateClientVersions(
           bulkCreateData,
-          environmentId
+          projectId
         );
       } catch (error: any) {
         if (
@@ -737,13 +741,13 @@ export class ClientVersionController {
         .filter((tid: any) => tid);
     }
 
-    const environmentId = req.environmentId!;
+    const projectId = req.projectId!;
 
     // Use UnifiedChangeGateway for CR support
     // Use function form to inject current tags into beforeData for accurate diff
     const gatewayResult = await UnifiedChangeGateway.processChange(
       userId,
-      environmentId,
+      projectId,
       'g_client_versions',
       id,
       async (currentData: any) => {
@@ -765,7 +769,7 @@ export class ClientVersionController {
         const result = await ClientVersionService.updateClientVersion(
           id,
           tableData,
-          environmentId
+          projectId
         );
         // Apply tags directly in DIRECT mode
         if (tagIds && Array.isArray(tagIds)) {
@@ -783,7 +787,7 @@ export class ClientVersionController {
     if (gatewayResult.mode === 'DIRECT') {
       // Re-fetch to include updated tags
       const updatedClientVersion =
-        await ClientVersionService.getClientVersionById(id, environmentId);
+        await ClientVersionService.getClientVersionById(id, projectId);
 
       if (!updatedClientVersion) {
         return res.status(404).json({
@@ -820,7 +824,7 @@ export class ClientVersionController {
       });
     }
 
-    const environmentId = req.environmentId!;
+    const projectId = req.projectId!;
     const userId = (req as any).user?.userId;
     if (!userId) {
       return res.status(401).json({
@@ -832,11 +836,11 @@ export class ClientVersionController {
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestDeletion(
       userId,
-      environmentId,
+      projectId,
       'g_client_versions',
       id,
       async () => {
-        await ClientVersionService.deleteClientVersion(id, environmentId);
+        await ClientVersionService.deleteClientVersion(id, projectId);
       }
     );
 
@@ -886,11 +890,11 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const environmentId = req.environmentId!;
+    const projectId = req.projectId!;
 
     // Check if CR is required
     const requiresApproval =
-      await UnifiedChangeGateway.requiresApproval(environmentId);
+      await UnifiedChangeGateway.requiresApproval(projectId);
 
     if (requiresApproval) {
       let lastResult;
@@ -927,7 +931,7 @@ export class ClientVersionController {
 
         lastResult = await UnifiedChangeGateway.requestModification(
           userId,
-          environmentId,
+          projectId,
           'g_client_versions',
           id,
           updateDataAttrs
@@ -946,7 +950,7 @@ export class ClientVersionController {
     } else {
       const updatedCount = await ClientVersionService.bulkUpdateStatus(
         bulkUpdateData,
-        environmentId
+        projectId
       );
       res.json({
         success: true,
@@ -959,8 +963,8 @@ export class ClientVersionController {
 
   // Get channel list
   static async getPlatforms(req: AuthenticatedRequest, res: Response) {
-    const environmentId = req.environmentId!;
-    const platforms = await ClientVersionService.getPlatforms(environmentId);
+    const projectId = req.projectId!;
+    const platforms = await ClientVersionService.getPlatforms(projectId);
 
     res.json({
       success: true,
@@ -981,10 +985,10 @@ export class ClientVersionController {
     }
 
     try {
-      const environmentId = req.environmentId!;
+      const projectId = req.projectId!;
       // Use a very large limit to fetch all data
       const result = await ClientVersionService.getAllClientVersions(
-        environmentId,
+        projectId,
         value,
         {
           page: 1,

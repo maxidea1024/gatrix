@@ -113,6 +113,7 @@ export class TagService {
 
   /**
    * Resolve environmentId from entity record.
+   * Client versions now use projectId (project-scoped), others use environmentId.
    */
   private static async resolveEnvironmentId(
     entityType: string,
@@ -120,8 +121,9 @@ export class TagService {
   ): Promise<string | null> {
     switch (entityType) {
       case 'client_version': {
-        const cv = await ClientVersionModel.findByIdWithoutEnv(entityId);
-        return cv?.environmentId || null;
+        // Client versions are project-scoped; use targetEnv for SDK event
+        const cv = await ClientVersionModel.findByIdWithoutProject(entityId);
+        return cv?.targetEnv || null;
       }
       case 'game_world': {
         const gw = await GameWorldModel.findByIdWithoutEnv(entityId);

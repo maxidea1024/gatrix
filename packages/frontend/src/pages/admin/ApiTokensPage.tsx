@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -36,6 +36,9 @@ import {
   MenuItem,
   InputLabel,
   Menu,
+  Collapse,
+  ButtonBase,
+  alpha,
 } from '@mui/material';
 import {
   DndContext,
@@ -70,6 +73,12 @@ import {
   ViewColumn as ViewColumnIcon,
   DragIndicator as DragIndicatorIcon,
   MoreVert as MoreVertIcon,
+  Business as OrgIcon,
+  Folder as ProjectIcon,
+  ExpandMore as ExpandMoreIcon,
+  ChevronRight as ChevronRightIcon,
+  ArrowDropDown as ArrowDropDownIcon,
+  Check as CheckIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -113,7 +122,7 @@ interface CreateTokenData {
 }
 
 // Supported token types (client+server 'all' type is not supported)
-const SUPPORTED_TOKEN_TYPES: TokenType[] = ['client', 'server', 'edge'];
+const SUPPORTED_TOKEN_TYPES: TokenType[] = ['client', 'server', 'edge', 'project'];
 
 // Column definition interface
 interface ColumnConfig {
@@ -214,6 +223,330 @@ const getDateLocale = () => {
   return 'en';
 };
 
+// ==================== ProjectTreeSelector Component ====================
+// Tree-style project selector matching AppBar EnvironmentSelector (without environments)
+
+interface ProjectTreeSelectorProps {
+  organisations: { id: string; orgName: string; displayName: string }[];
+  projects: { id: string; orgId: string; projectName: string; displayName: string }[];
+  selectedProjectId?: string;
+  onSelect: (projectId: string) => void;
+  helperText?: string;
+  disabled?: boolean;
+}
+
+const ProjectTreeSelector: React.FC<ProjectTreeSelectorProps> = ({
+  organisations,
+  projects,
+  selectedProjectId,
+  onSelect,
+  helperText,
+  disabled = false,
+}) => {
+  const { t } = useTranslation();
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set());
+
+  const isOpen = Boolean(anchorEl);
+
+  const handleOpen = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      if (disabled) return;
+      setAnchorEl(event.currentTarget);
+      // Auto-expand org that contains the selected project
+      if (selectedProjectId) {
+        const proj = projects.find((p) => p.id === selectedProjectId);
+        if (proj) {
+          setExpandedOrgs((prev) => new Set(prev).add(proj.orgId));
+        }
+      }
+    },
+    [selectedProjectId, projects]
+  );
+
+  const handleClose = useCallback(() => {
+    setAnchorEl(null);
+  }, []);
+
+  const handleToggleOrg = useCallback((orgId: string) => {
+    setExpandedOrgs((prev) => {
+      const next = new Set(prev);
+      if (next.has(orgId)) {
+        next.delete(orgId);
+      } else {
+        next.add(orgId);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleSelectProject = useCallback(
+    (projectId: string) => {
+      onSelect(projectId);
+      handleClose();
+    },
+    [onSelect, handleClose]
+  );
+
+  // Build display label: Org / Project
+  const selectedProject = projects.find((p) => p.id === selectedProjectId);
+  const selectedOrg = selectedProject
+    ? organisations.find((o) => o.id === selectedProject.orgId)
+    : null;
+
+  const displayLabel = (() => {
+    const parts: string[] = [];
+    if (organisations.length > 1 && selectedOrg) {
+      parts.push(selectedOrg.displayName || selectedOrg.orgName);
+    }
+    if (selectedProject) {
+      parts.push(selectedProject.displayName || selectedProject.projectName);
+    }
+    return parts.join(' / ');
+  })();
+
+  const isMultiOrg = organisations.length > 1;
+
+  return (
+    <Box>
+      <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+        {t('common.project')}
+      </Typography>
+      <ButtonBase
+        onClick={handleOpen}
+        disabled={disabled}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          px: 1.5,
+          py: 1,
+          borderRadius: 1,
+          border: '1px solid',
+          borderColor: isOpen ? 'primary.main' : 'divider',
+          width: '100%',
+          justifyContent: 'space-between',
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            borderColor: 'text.primary',
+          },
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, overflow: 'hidden' }}>
+          <ProjectIcon sx={{ fontSize: 18, opacity: 0.7, flexShrink: 0 }} />
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 500,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {displayLabel || t('apiTokens.projectHelp')}
+          </Typography>
+        </Box>
+        <ArrowDropDownIcon
+          sx={{
+            fontSize: 20,
+            opacity: 0.6,
+            transform: isOpen ? 'rotate(180deg)' : 'none',
+            transition: 'transform 0.2s',
+            flexShrink: 0,
+          }}
+        />
+      </ButtonBase>
+
+      {/* Tree dropdown popover */}
+      <Popover
+        open={isOpen}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 0.5,
+              minWidth: 280,
+              maxWidth: 400,
+              maxHeight: 350,
+              borderRadius: 2,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+              overflow: 'auto',
+            },
+          },
+        }}
+      >
+        <Box sx={{ py: 0.5 }}>
+          {organisations.map((org) => {
+            const orgProjects = projects.filter((p) => p.orgId === org.id);
+            const isOrgExpanded = expandedOrgs.has(org.id) || !isMultiOrg;
+
+            // Single org: skip org header, show projects directly
+            if (!isMultiOrg) {
+              return (
+                <React.Fragment key={org.id}>
+                  {orgProjects.length === 0 ? (
+                    <ListItemButton dense disabled sx={{ pl: 1.5, py: 0.75 }}>
+                      <ListItemIcon sx={{ minWidth: 24 }}>
+                        <ProjectIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={t('environments.noProjects')}
+                        primaryTypographyProps={{
+                          variant: 'caption',
+                          color: 'text.secondary',
+                          fontStyle: 'italic',
+                        }}
+                      />
+                    </ListItemButton>
+                  ) : (
+                    orgProjects.map((proj) => {
+                      const isSelected = proj.id === selectedProjectId;
+                      return (
+                        <ListItemButton
+                          key={proj.id}
+                          onClick={() => handleSelectProject(proj.id)}
+                          dense
+                          selected={isSelected}
+                          sx={{
+                            py: 0.5,
+                            pl: 1.5,
+                            '&.Mui-selected': {
+                              backgroundColor: (theme) =>
+                                alpha(
+                                  theme.palette.primary.main,
+                                  theme.palette.mode === 'dark' ? 0.15 : 0.08
+                                ),
+                            },
+                          }}
+                        >
+                          <ListItemIcon sx={{ minWidth: 24 }}>
+                            <ProjectIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={proj.displayName || proj.projectName}
+                            primaryTypographyProps={{
+                              variant: 'body2',
+                              fontWeight: isSelected ? 600 : 400,
+                            }}
+                          />
+                          {isSelected && (
+                            <CheckIcon
+                              sx={{ fontSize: 18, color: 'success.main', ml: 'auto' }}
+                            />
+                          )}
+                        </ListItemButton>
+                      );
+                    })
+                  )}
+                </React.Fragment>
+              );
+            }
+
+            // Multi-org: show org header with expandable project list
+            return (
+              <React.Fragment key={org.id}>
+                <ListItemButton
+                  onClick={() => handleToggleOrg(org.id)}
+                  dense
+                  sx={{ py: 0.5 }}
+                >
+                  <ListItemIcon sx={{ minWidth: 28 }}>
+                    {isOrgExpanded ? (
+                      <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                    ) : (
+                      <ChevronRightIcon sx={{ fontSize: 18 }} />
+                    )}
+                  </ListItemIcon>
+                  <ListItemIcon sx={{ minWidth: 24 }}>
+                    <OrgIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={org.displayName || org.orgName}
+                    primaryTypographyProps={{
+                      variant: 'body2',
+                      fontWeight: 500,
+                    }}
+                  />
+                </ListItemButton>
+
+                <Collapse in={isOrgExpanded} timeout="auto">
+                  {orgProjects.length === 0 ? (
+                    <ListItemButton dense disabled sx={{ pl: 7, py: 0.75 }}>
+                      <ListItemIcon sx={{ minWidth: 24 }}>
+                        <ProjectIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={t('environments.noProjects')}
+                        primaryTypographyProps={{
+                          variant: 'caption',
+                          color: 'text.secondary',
+                          fontStyle: 'italic',
+                        }}
+                      />
+                    </ListItemButton>
+                  ) : (
+                    orgProjects.map((proj) => {
+                      const isSelected = proj.id === selectedProjectId;
+                      return (
+                        <ListItemButton
+                          key={proj.id}
+                          onClick={() => handleSelectProject(proj.id)}
+                          dense
+                          selected={isSelected}
+                          sx={{
+                            py: 0.5,
+                            pl: 7,
+                            '&.Mui-selected': {
+                              backgroundColor: (theme) =>
+                                alpha(
+                                  theme.palette.primary.main,
+                                  theme.palette.mode === 'dark' ? 0.15 : 0.08
+                                ),
+                            },
+                          }}
+                        >
+                          <ListItemIcon sx={{ minWidth: 24 }}>
+                            <ProjectIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={proj.displayName || proj.projectName}
+                            primaryTypographyProps={{
+                              variant: 'body2',
+                              fontWeight: isSelected ? 600 : 400,
+                            }}
+                          />
+                          {isSelected && (
+                            <CheckIcon
+                              sx={{ fontSize: 18, color: 'success.main', ml: 'auto' }}
+                            />
+                          )}
+                        </ListItemButton>
+                      );
+                    })
+                  )}
+                </Collapse>
+              </React.Fragment>
+            );
+          })}
+        </Box>
+      </Popover>
+
+      {helperText && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 0.5, ml: 1.5 }}
+        >
+          {helperText}
+        </Typography>
+      )}
+    </Box>
+  );
+};
+
 const ApiTokensPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -222,7 +555,7 @@ const ApiTokensPage: React.FC = () => {
 
   // Check if user can manage (create/edit/delete) tokens
   const canManage = hasPermission([P.IP_WHITELIST_UPDATE]);
-  const { currentProjectId, currentOrgId, projects, getProjectApiPath } =
+  const { currentProjectId, currentOrgId, projects, getProjectApiPath, organisations } =
     useOrgProject();
   const projectApiPath = getProjectApiPath();
 
@@ -635,10 +968,11 @@ const ApiTokensPage: React.FC = () => {
 
   const handleCreate = async () => {
     try {
-      // Build project API path for the selected project
+      // Build project API path using the selected project's orgId (supports multi-org)
+      const selectedProj = projects.find((p) => p.id === formData.selectedProjectId);
       const createProjectApiPath =
-        formData.selectedProjectId && currentOrgId
-          ? `/admin/orgs/${currentOrgId}/projects/${formData.selectedProjectId}`
+        formData.selectedProjectId && selectedProj
+          ? `/admin/orgs/${selectedProj.orgId}/projects/${formData.selectedProjectId}`
           : projectApiPath;
 
       const response = await apiTokenService.createToken(
@@ -703,6 +1037,13 @@ const ApiTokensPage: React.FC = () => {
     if (!selectedToken) return;
 
     try {
+      // Build project API path using the selected project's orgId (supports multi-org)
+      const editProj = projects.find((p) => p.id === formData.selectedProjectId);
+      const editProjectApiPath =
+        formData.selectedProjectId && editProj
+          ? `/admin/orgs/${editProj.orgId}/projects/${formData.selectedProjectId}`
+          : projectApiPath;
+
       await apiTokenService.updateToken(
         selectedToken.id as any,
         {
@@ -711,7 +1052,7 @@ const ApiTokensPage: React.FC = () => {
           environmentId: formData.environments[0] || undefined,
           expiresAt: formData.expiresAt,
         },
-        projectApiPath
+        editProjectApiPath
       );
       await loadTokens();
       setEditDialogOpen(false);
@@ -999,6 +1340,8 @@ const ApiTokensPage: React.FC = () => {
         return 'warning';
       case 'client':
         return 'primary';
+      case 'project':
+        return 'info';
       default:
         return 'default';
     }
@@ -1388,6 +1731,7 @@ const ApiTokensPage: React.FC = () => {
                       client: t('apiTokens.clientTokenType'),
                       server: t('apiTokens.serverTokenType'),
                       edge: t('apiTokens.edgeTokenType'),
+                      project: t('apiTokens.projectTokenType'),
                     };
                     return labels[value] || value;
                   }}
@@ -1422,6 +1766,16 @@ const ApiTokensPage: React.FC = () => {
                       </Typography>
                     </Box>
                   </MenuItem>
+                  <MenuItem value="project">
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {t('apiTokens.projectTokenType')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('apiTokens.projectTokenDescription')}
+                      </Typography>
+                    </Box>
+                  </MenuItem>
                 </Select>
                 <Typography
                   variant="caption"
@@ -1432,36 +1786,23 @@ const ApiTokensPage: React.FC = () => {
                 </Typography>
               </FormControl>
 
-              {/* Project Select */}
-              <FormControl fullWidth size="small">
-                <InputLabel>{t('common.project')}</InputLabel>
-                <Select
-                  value={formData.selectedProjectId || ''}
-                  label={t('common.project')}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      selectedProjectId: e.target.value as string,
-                      environments: [], // Reset environment when project changes
-                    }))
-                  }
-                >
-                  {projects.map((proj) => (
-                    <MenuItem key={proj.id} value={proj.id}>
-                      {proj.projectName}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mt: 0.5, ml: 1.5 }}
-                >
-                  {t('apiTokens.projectHelp')}
-                </Typography>
-              </FormControl>
+              {/* Project Select (tree-style like AppBar EnvironmentSelector) */}
+              <ProjectTreeSelector
+                organisations={organisations}
+                projects={projects}
+                selectedProjectId={formData.selectedProjectId}
+                onSelect={(projectId) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    selectedProjectId: projectId,
+                    environments: [], // Reset environment when project changes
+                  }))
+                }
+                helperText={t('apiTokens.projectHelp')}
+              />
 
-              {/* Environment Select */}
+              {/* Environment Select - hidden for project tokens */}
+              {formData.tokenType !== 'project' && (
               <FormControl fullWidth size="small">
                 <InputLabel>{t('apiTokens.environmentAccess')}</InputLabel>
                 <Select
@@ -1504,6 +1845,7 @@ const ApiTokensPage: React.FC = () => {
                   {t('apiTokens.selectSingleEnvironment')}
                 </Typography>
               </FormControl>
+              )}
             </Box>
           </Paper>
 
@@ -1578,7 +1920,7 @@ const ApiTokensPage: React.FC = () => {
               !isValidTokenName(formData.tokenName) ||
               !expiresAtValidation.isValid ||
               !formData.selectedProjectId ||
-              formData.environments.length === 0
+              (formData.tokenType !== 'project' && formData.environments.length === 0)
             }
           >
             {t('apiTokens.createToken')}
@@ -1683,6 +2025,7 @@ const ApiTokensPage: React.FC = () => {
                       client: t('apiTokens.clientTokenType'),
                       server: t('apiTokens.serverTokenType'),
                       edge: t('apiTokens.edgeTokenType'),
+                      project: t('apiTokens.projectTokenType'),
                     };
                     return labels[value] || value;
                   }}
@@ -1703,36 +2046,18 @@ const ApiTokensPage: React.FC = () => {
                 </Typography>
               </FormControl>
 
-              {/* Project Select */}
-              <FormControl fullWidth size="small">
-                <InputLabel>{t('common.project')}</InputLabel>
-                <Select
-                  value={formData.selectedProjectId || ''}
-                  label={t('common.project')}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      selectedProjectId: e.target.value as string,
-                      environments: [], // Reset environment when project changes
-                    }))
-                  }
-                >
-                  {projects.map((proj) => (
-                    <MenuItem key={proj.id} value={proj.id}>
-                      {proj.projectName}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mt: 0.5, ml: 1.5 }}
-                >
-                  {t('apiTokens.projectHelp')}
-                </Typography>
-              </FormControl>
+              {/* Project Select (tree-style, disabled in edit mode) */}
+              <ProjectTreeSelector
+                organisations={organisations}
+                projects={projects}
+                selectedProjectId={formData.selectedProjectId}
+                onSelect={() => {}}
+                helperText={t('apiTokens.tokenTypeNotEditable')}
+                disabled
+              />
 
-              {/* Environment Select */}
+              {/* Environment Select - hidden for project tokens */}
+              {formData.tokenType !== 'project' && (
               <FormControl fullWidth size="small">
                 <InputLabel>{t('apiTokens.environmentAccess')}</InputLabel>
                 <Select
@@ -1768,6 +2093,7 @@ const ApiTokensPage: React.FC = () => {
                   ))}
                 </Select>
               </FormControl>
+              )}
             </Box>
           </Paper>
 
@@ -1841,7 +2167,7 @@ const ApiTokensPage: React.FC = () => {
               !isValidTokenName(formData.tokenName) ||
               !expiresAtValidation.isValid ||
               !formData.selectedProjectId ||
-              formData.environments.length === 0 ||
+              (formData.tokenType !== 'project' && formData.environments.length === 0) ||
               (!!selectedToken && !isDirty)
             }
           >
@@ -2471,7 +2797,8 @@ const ApiTokensPage: React.FC = () => {
                   </Typography>
                 </Box>
 
-                {/* Environment Access */}
+                {/* Environment Access - hidden for project tokens */}
+                {newTokenInfo.tokenType !== 'project' && (
                 <Box
                   sx={{
                     display: 'flex',
@@ -2516,6 +2843,7 @@ const ApiTokensPage: React.FC = () => {
                     })()}
                   </Box>
                 </Box>
+                )}
               </Box>
             </Box>
           )}

@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { ulid } from 'ulid';
 
-export type TokenType = 'client' | 'server' | 'edge';
+export type TokenType = 'client' | 'server' | 'edge' | 'project';
 
 export interface ApiAccessTokenData {
   id?: string; // ULID (26 characters)
@@ -56,7 +56,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
         tokenValue: { type: 'string', minLength: 1, maxLength: 255 },
         tokenType: {
           type: 'string',
-          enum: ['client', 'server', 'edge'],
+          enum: ['client', 'server', 'edge', 'project'],
         },
         expiresAt: { type: ['string', 'object', 'null'], format: 'date-time' },
         lastUsedAt: { type: ['string', 'object', 'null'], format: 'date-time' },
@@ -131,11 +131,21 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   }
 
   /**
-   * Generate a new API token
+   * Token type → prefix mapping for fast O(1) identification
    */
-  static generateToken(): string {
-    // Generate a secure random token
-    const prefix = 'gatrix_';
+  static readonly TOKEN_PREFIXES: Record<TokenType, string> = {
+    client: 'gxc_',
+    server: 'gxs_',
+    edge: 'gxe_',
+    project: 'gxp_',
+  };
+
+  /**
+   * Generate a new API token with type-specific prefix
+   * Prefix enables fast O(1) token type identification in middleware
+   */
+  static generateToken(tokenType?: TokenType): string {
+    const prefix = tokenType ? this.TOKEN_PREFIXES[tokenType] : 'gxs_';
     const randomBytes = crypto.randomBytes(32).toString('hex');
     return `${prefix}${randomBytes}`;
   }
@@ -167,9 +177,10 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     expiresAt?: Date;
     createdBy: string;
     environmentId?: string;
+    projectId?: string;
   }): Promise<{ token: ApiAccessToken; plainToken: string }> {
-    // Generate token
-    const plainToken = this.generateToken();
+    // Generate token (project tokens get 'gxp_' prefix)
+    const plainToken = this.generateToken(data.tokenType);
 
     // Create token record (store plain token instead of hash)
     const token = await this.query().insert({
@@ -179,6 +190,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       expiresAt: data.expiresAt,
       createdBy: data.createdBy,
       environmentId: data.environmentId,
+      projectId: data.projectId,
     } as any);
 
     return { token, plainToken };

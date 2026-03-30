@@ -178,8 +178,15 @@ class ApiTokensController {
       const projectId = (req as any).projectId;
       const userId = (req as any).user.id;
 
-      // Generate secure token (store as plain text)
-      const tokenValue = crypto.randomBytes(32).toString('hex');
+      // Generate secure token with type prefix for identification
+      const TOKEN_PREFIXES: Record<string, string> = {
+        client: 'gtx_cli',
+        server: 'gtx_srv',
+        edge: 'gtx_edge',
+        project: 'gtx_proj',
+      };
+      const prefix = TOKEN_PREFIXES[tokenType] || 'gtx';
+      const tokenValue = `${prefix}_${crypto.randomBytes(32).toString('hex')}`;
 
       // Generate ULID for the token
       const tokenId = ulid();
@@ -409,8 +416,15 @@ class ApiTokensController {
         });
       }
 
-      // Generate new token value (store as plain text)
-      const tokenValue = crypto.randomBytes(32).toString('hex');
+      // Generate new token value with type prefix
+      const TOKEN_PREFIXES: Record<string, string> = {
+        client: 'gtx_cli',
+        server: 'gtx_srv',
+        edge: 'gtx_edge',
+        project: 'gtx_proj',
+      };
+      const prefix = TOKEN_PREFIXES[existingToken.tokenType] || 'gtx';
+      const tokenValue = `${prefix}_${crypto.randomBytes(32).toString('hex')}`;
 
       // Update token with new plain token value
       await knex('g_api_access_tokens').where('id', id).update({

@@ -41,7 +41,7 @@ export class ServerClientVersionController {
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
           const result = await ClientVersionModel.findAll({
-            environmentId: environmentId,
+            targetEnv: environmentId,
             limit: 1000,
             offset: 0,
             sortBy: 'clientVersion',

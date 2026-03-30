@@ -379,7 +379,7 @@ const ClientVersionsPage: React.FC = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const theme = useTheme();
   const { platforms } = usePlatformConfig();
-  const { currentEnvironment } = useEnvironment();
+  const { currentEnvironment, allEnvironments } = useEnvironment();
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
@@ -539,6 +539,11 @@ const ClientVersionsPage: React.FC = () => {
     {
       id: 'clientStatus',
       labelKey: 'clientVersions.clientStatus',
+      visible: true,
+    },
+    {
+      id: 'targetEnv',
+      labelKey: 'environments.targetEnvironment',
       visible: true,
     },
     {
@@ -1533,6 +1538,25 @@ const ClientVersionsPage: React.FC = () => {
               color={ClientStatusColors[clientVersion.clientStatus]}
             />
           );
+        case 'targetEnv': {
+          const envName = clientVersion.targetEnvName || clientVersion.targetEnv;
+          if (!envName) return <Typography variant="body2" color="text.disabled">-</Typography>;
+          const matchedEnv = allEnvironments.find(
+            (e) => e.environmentId === clientVersion.targetEnv
+          );
+          return (
+            <Chip
+              label={envName}
+              size="small"
+              variant="outlined"
+              sx={matchedEnv?.color ? {
+                borderColor: matchedEnv.color,
+                color: matchedEnv.color,
+                '& .MuiChip-label': { fontWeight: 500 },
+              } : undefined}
+            />
+          );
+        }
         case 'gameServerAddress':
           return (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
