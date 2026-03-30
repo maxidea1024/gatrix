@@ -2101,7 +2101,11 @@ const GameWorldsPage: React.FC = () => {
             requiresApproval={requiresApproval}
             saving={saving}
             onSave={handleSaveWorld}
-            disabled={formActiveTab !== 0 || !isFormValid || (!!editingWorld && !isDirty)}
+            disabled={
+              formActiveTab !== 0 ||
+              !isFormValid ||
+              (!!editingWorld && !isDirty)
+            }
             title={
               formActiveTab !== 0
                 ? t('gameWorlds.form.switchToBasicInfoToSave')

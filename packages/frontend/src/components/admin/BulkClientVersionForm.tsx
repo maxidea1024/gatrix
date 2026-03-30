@@ -1105,7 +1105,12 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             requiresApproval={requiresApproval}
             saving={loading || isSubmitting}
             onSave={handleSave}
-            disabled={loading || isSubmitting || !isValid || selectedPlatforms.length === 0}
+            disabled={
+              loading ||
+              isSubmitting ||
+              !isValid ||
+              selectedPlatforms.length === 0
+            }
           />
         </Box>
       </form>

@@ -558,7 +558,10 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   // Check if required fields are filled
   const isFormValid = useMemo(() => {
     const strippedContent = content.replace(/<[^>]*>/g, '').trim();
-    const hasContent = !!strippedContent || content.includes('<img') || content.includes('<iframe');
+    const hasContent =
+      !!strippedContent ||
+      content.includes('<img') ||
+      content.includes('<iframe');
     return !!title.trim() && hasContent && !!category;
   }, [title, content, category]);
 
