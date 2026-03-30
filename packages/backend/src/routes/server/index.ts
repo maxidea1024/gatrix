@@ -61,6 +61,29 @@ router.get(
   InternalApiTokensController.getEnvironmentTree as any
 );
 
+// Get version map for Edge (projectId + clientVersion -> targetEnv)
+router.get(
+  '/internal/version-map',
+  serverAuthBase,
+  async (req: any, res: any) => {
+    try {
+      const { ClientVersionModel } = await import(
+        '../../models/client-version'
+      );
+      const versionMap = await ClientVersionModel.getVersionMap();
+      res.json({
+        success: true,
+        data: versionMap,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to get version map' },
+      });
+    }
+  }
+);
+
 // ============================================================================
 // Global routes (environment-independent) - No environment required
 // ============================================================================

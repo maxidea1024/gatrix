@@ -1,4 +1,4 @@
-// 클라이언트 Status enum
+// Client status enum
 export enum ClientStatus {
   ONLINE = 'ONLINE',
   OFFLINE = 'OFFLINE',
@@ -60,6 +60,8 @@ export interface ClientVersion {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: ClientVersionMaintenanceLocale[];
   minPatchVersion?: string;
+  targetEnv?: string;
+  targetEnvName?: string;
   tags?: { id: number; name: string; color: string }[];
   createdAt: string;
   updatedAt: string;
@@ -71,7 +73,7 @@ export interface ClientVersion {
   updatedByEmail?: string;
 }
 
-// 클라이언트 버전 Create/Edit 데이터
+// Client version Create/Edit data
 export interface ClientVersionFormData {
   platform: string;
   clientVersion: string;
@@ -90,6 +92,7 @@ export interface ClientVersionFormData {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: ClientVersionMaintenanceLocale[];
   minPatchVersion?: string;
+  targetEnv?: string;
   tags?: { id: number; name: string; color: string }[];
 }
 
@@ -116,6 +119,7 @@ export interface BulkCreateFormData {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: ClientVersionMaintenanceLocale[];
   platforms: PlatformSpecificSettings[];
+  targetEnv?: string;
   tags?: { id: number; name: string; color: string }[];
 }
 

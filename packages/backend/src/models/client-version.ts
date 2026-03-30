@@ -6,7 +6,8 @@ import TagAssignmentModel from './tag-assignment';
 const logger = createLogger('ClientVersion');
 
 export interface ClientVersionFilters {
-  environmentId: string;
+  projectId?: string;
+  targetEnv?: string; // Filter by target environment
   clientVersion?: string | string[];
   platform?: string | string[];
   clientStatus?: string | string[];
@@ -37,7 +38,8 @@ export enum ClientStatus {
 
 export interface ClientVersionAttributes {
   id?: string;
-  environmentId: string;
+  projectId: string;
+  targetEnv?: string; // Target environment ID for dynamic env routing
   clientVersion: string;
   platform: string;
   clientStatus: ClientStatus;
@@ -87,11 +89,11 @@ export interface BulkCreateClientVersionRequest {
 
 export class ClientVersionModel {
   // Get available version list (distinct)
-  static async getDistinctVersions(environmentId: string): Promise<string[]> {
+  static async getDistinctVersions(projectId: string): Promise<string[]> {
     try {
       const result = await db('g_client_versions')
         .distinct('clientVersion')
-        .where('environmentId', environmentId)
+        .where('projectId', projectId)
         .orderBy('clientVersion', 'desc');
 
       return result.map((row) => row.clientVersion);
@@ -114,17 +116,27 @@ export class ClientVersionModel {
         : 0;
       const sortBy = filters?.sortBy || 'clientVersion';
       const sortOrder = filters?.sortOrder || 'DESC';
-      const environmentId = filters.environmentId;
+      const projectId = filters.projectId;
 
-      // Base query builder with environment filter
-      const baseQuery = () =>
-        db('g_client_versions as cv')
+      // Base query builder with optional project filter
+      const baseQuery = () => {
+        const q = db('g_client_versions as cv')
           .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
-          .where('cv.environmentId', environmentId);
+          .leftJoin('g_environments as env', 'cv.targetEnv', 'env.id');
+        if (projectId) {
+          q.where('cv.projectId', projectId);
+        }
+        return q;
+      };
 
       // Apply filters
       const applyFilters = (query: any) => {
+        // targetEnv filter
+        if (filters?.targetEnv) {
+          query.where('cv.targetEnv', filters.targetEnv);
+        }
+
         // clientVersion filter - support both single value and array (any_of)
         if (filters?.clientVersion) {
           if (Array.isArray(filters.clientVersion)) {
@@ -224,6 +236,8 @@ export class ClientVersionModel {
           'creator.email as createdByEmail',
           'updater.name as updatedByName',
           'updater.email as updatedByEmail',
+          'env.name as targetEnvName',
+          'env.color as targetEnvColor',
         ])
         .orderBy(`cv.${sortBy}`, sortOrder)
         .limit(limit)
@@ -263,7 +277,7 @@ export class ClientVersionModel {
 
   static async findById(
     id: string,
-    environmentId: string,
+    projectId: string,
     trx?: any
   ): Promise<any | null> {
     try {
@@ -273,15 +287,18 @@ export class ClientVersionModel {
       const clientVersion = await query
         .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
+        .leftJoin('g_environments as env', 'cv.targetEnv', 'env.id')
         .select([
           'cv.*',
           'creator.name as createdByName',
           'creator.email as createdByEmail',
           'updater.name as updatedByName',
           'updater.email as updatedByEmail',
+          'env.name as targetEnvName',
+          'env.color as targetEnvColor',
         ])
         .where('cv.id', id)
-        .where('cv.environmentId', environmentId)
+        .where('cv.projectId', projectId)
         .first();
 
       if (!clientVersion) {
@@ -314,7 +331,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async create(data: any, environmentId: string): Promise<any> {
+  static async create(data: any, projectId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // Remove tags and maintenanceLocales fields as they are managed in separate tables
@@ -325,7 +342,7 @@ export class ClientVersionModel {
         await trx('g_client_versions').insert({
           id,
           ...clientVersionData,
-          environmentId: environmentId,
+          projectId: projectId,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -347,7 +364,7 @@ export class ClientVersionModel {
           );
         }
 
-        return await this.findById(id, environmentId, trx);
+        return await this.findById(id, projectId, trx);
       });
     } catch (error) {
       logger.error('Error creating client version:', error);
@@ -358,7 +375,7 @@ export class ClientVersionModel {
   static async update(
     id: string,
     data: any,
-    environmentId: string
+    projectId: string
   ): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
@@ -367,7 +384,7 @@ export class ClientVersionModel {
 
         await trx('g_client_versions')
           .where('id', id)
-          .where('environmentId', environmentId)
+          .where('projectId', projectId)
           .update({
             ...clientVersionData,
             updatedAt: new Date(),
@@ -398,7 +415,7 @@ export class ClientVersionModel {
           }
         }
 
-        return await this.findById(id, environmentId, trx);
+        return await this.findById(id, projectId, trx);
       });
     } catch (error) {
       logger.error('Error updating client version:', error);
@@ -406,11 +423,11 @@ export class ClientVersionModel {
     }
   }
 
-  static async delete(id: string, environmentId: string): Promise<void> {
+  static async delete(id: string, projectId: string): Promise<void> {
     try {
       await db('g_client_versions')
         .where('id', id)
-        .where('environmentId', environmentId)
+        .where('projectId', projectId)
         .del();
     } catch (error) {
       logger.error('Error deleting client version:', error);
@@ -421,7 +438,7 @@ export class ClientVersionModel {
   // Additional methods
   static async bulkCreate(
     data: ClientVersionCreationAttributes[],
-    environmentId: string
+    projectId: string
   ): Promise<any> {
     try {
       const insertedIds: string[] = [];
@@ -437,7 +454,7 @@ export class ClientVersionModel {
           await trx('g_client_versions').insert({
             id,
             ...clientVersionData,
-            environmentId: environmentId,
+            projectId: projectId,
             createdAt: new Date(),
             updatedAt: new Date(),
           });
@@ -448,7 +465,7 @@ export class ClientVersionModel {
       // Query created data after transaction completes
       const results = [];
       for (const cvId of insertedIds) {
-        const clientVersion = await this.findById(cvId, environmentId);
+        const clientVersion = await this.findById(cvId, projectId);
         if (clientVersion) {
           results.push(clientVersion);
         } else {
@@ -471,7 +488,7 @@ export class ClientVersionModel {
 
   static async bulkUpdateStatus(
     data: any,
-    environmentId: string
+    projectId: string
   ): Promise<any> {
     try {
       const updateData: any = {
@@ -499,7 +516,7 @@ export class ClientVersionModel {
 
       await db('g_client_versions')
         .whereIn('id', data.ids)
-        .where('environmentId', environmentId)
+        .where('projectId', projectId)
         .update(updateData);
 
       // Process language-specific messages
@@ -538,12 +555,12 @@ export class ClientVersionModel {
     }
   }
 
-  static async getPlatforms(environmentId: string): Promise<string[]> {
+  static async getPlatforms(projectId: string): Promise<string[]> {
     try {
       const result = await db('g_client_versions')
         .distinct('platform')
         .select('platform')
-        .where('environmentId', environmentId)
+        .where('projectId', projectId)
         .whereNotNull('platform')
         .orderBy('platform');
       return result.map((row) => row.platform);
@@ -557,19 +574,19 @@ export class ClientVersionModel {
     platform: string,
     clientVersion: string,
     excludeId?: string,
-    environmentId?: string
+    projectId?: string
   ): Promise<boolean> {
     try {
-      if (!environmentId) {
+      if (!projectId) {
         throw new Error(
-          'Environment is required for checking duplicate client versions'
+          'Project is required for checking duplicate client versions'
         );
       }
 
       let query = db('g_client_versions')
         .where('platform', platform)
         .where('clientVersion', clientVersion)
-        .where('environmentId', environmentId);
+        .where('projectId', projectId);
 
       if (excludeId) {
         query = query.where('id', '!=', excludeId);
@@ -621,20 +638,69 @@ export class ClientVersionModel {
     }
   }
   /**
-   * Find a client version by ID without requiring environmentId.
-   * Used when only environmentId lookup is needed (e.g. tag change SDK event publishing).
+   * Find a client version by ID without requiring projectId.
+   * Used when only projectId lookup is needed (e.g. tag change SDK event publishing).
    */
-  static async findByIdWithoutEnv(
+  static async findByIdWithoutProject(
     id: string
-  ): Promise<{ id: string; environmentId: string } | null> {
+  ): Promise<{ id: string; projectId: string; targetEnv?: string } | null> {
     try {
       const row = await db('g_client_versions')
-        .select('id', 'environmentId')
+        .select('id', 'projectId', 'targetEnv')
         .where('id', id)
         .first();
       return row || null;
     } catch (error) {
-      logger.error('Error finding client version by ID (no env):', error);
+      logger.error('Error finding client version by ID (no project):', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Find a client version by projectId + platform + version string.
+   * Used for dynamic env resolution from project tokens.
+   */
+  static async findByProjectAndVersion(
+    projectId: string,
+    clientVersion: string,
+    platform?: string
+  ): Promise<{ id: string; projectId: string; targetEnv: string | null; platform: string; clientVersion: string } | null> {
+    try {
+      let query = db('g_client_versions')
+        .select('id', 'projectId', 'targetEnv', 'platform', 'clientVersion')
+        .where('projectId', projectId)
+        .where('clientVersion', clientVersion);
+
+      if (platform) {
+        query = query.where('platform', platform);
+      }
+
+      const row = await query.first();
+      return row || null;
+    } catch (error) {
+      logger.error('Error finding client version by project and version:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all version-to-environment mappings for a project.
+   * Used by Edge server's versionMap service.
+   */
+  static async getVersionMap(
+    projectId?: string
+  ): Promise<Array<{ projectId: string; platform: string; clientVersion: string; targetEnv: string | null }>> {
+    try {
+      let query = db('g_client_versions')
+        .select('projectId', 'platform', 'clientVersion', 'targetEnv');
+
+      if (projectId) {
+        query = query.where('projectId', projectId);
+      }
+
+      return await query;
+    } catch (error) {
+      logger.error('Error getting version map:', error);
       throw error;
     }
   }

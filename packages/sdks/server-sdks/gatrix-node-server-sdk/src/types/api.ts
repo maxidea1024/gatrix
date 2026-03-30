@@ -74,6 +74,9 @@ export interface ClientVersion {
   maintenanceLocales?: ClientVersionMaintenanceLocale[];
   tags?: { id: number; name: string; color: string }[];
   minPatchVersion?: string;
+  projectId?: string;
+  targetEnv?: string;
+  targetEnvName?: string;
   createdAt?: string;
   updatedAt?: string;
 }

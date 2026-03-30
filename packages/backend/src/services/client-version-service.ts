@@ -74,7 +74,7 @@ async function prepareClientVersionForSDK(
   version: ClientVersionAttributes,
   environmentId: string
 ): Promise<any> {
-  // Get clientVersionPassiveData from KV settings and resolve by version
+  // Get clientVersionPassiveData from KV settings using the resolved env
   let passiveData: Record<string, any> = {};
   try {
     const passiveDataStr = await VarsModel.get(
@@ -129,10 +129,10 @@ async function prepareClientVersionForSDK(
 
 export class ClientVersionService {
   // Get available version list (distinct)
-  static async getAvailableVersions(environmentId: string): Promise<string[]> {
+  static async getAvailableVersions(projectId: string): Promise<string[]> {
     try {
       const versions =
-        await ClientVersionModel.getDistinctVersions(environmentId);
+        await ClientVersionModel.getDistinctVersions(projectId);
       return versions.sort((a, b) =>
         b.localeCompare(a, undefined, { numeric: true })
       );
@@ -143,8 +143,8 @@ export class ClientVersionService {
   }
 
   static async getClientVersions(
-    environmentId: string,
-    filters: Omit<ClientVersionFilters, 'environmentId'> = {},
+    projectId: string,
+    filters: Omit<ClientVersionFilters, 'projectId'> = {},
     pagination: ClientVersionPagination
   ): Promise<{ data: ClientVersionAttributes[]; total: number }> {
     const {
@@ -155,7 +155,7 @@ export class ClientVersionService {
     } = pagination;
     const offset = (page - 1) * limit;
 
-    const whereConditions: any = { environmentId };
+    const whereConditions: any = { projectId };
 
     // Apply filters
     if (filters.platform) {
@@ -189,8 +189,8 @@ export class ClientVersionService {
   }
 
   static async getAllClientVersions(
-    environmentId: string,
-    filters: Omit<ClientVersionFilters, 'environmentId'> = {},
+    projectId: string,
+    filters: Omit<ClientVersionFilters, 'projectId'> = {},
     pagination: ClientVersionPagination
   ): Promise<ClientVersionListResponse> {
     const {
@@ -202,7 +202,7 @@ export class ClientVersionService {
     const offset = (page - 1) * limit;
 
     // Build search conditions
-    const whereConditions: any = { environmentId };
+    const whereConditions: any = { projectId };
 
     if (filters.version) {
       whereConditions.clientVersion = filters.version;
@@ -250,7 +250,7 @@ export class ClientVersionService {
 
     // Date filter implementation
     if (filters.createdAtFrom || filters.createdAtTo) {
-      const dateFilters: any = { environmentId };
+      const dateFilters: any = { projectId };
       if (filters.createdAtFrom) {
         dateFilters.createdAtFrom = filters.createdAtFrom;
       }
@@ -285,7 +285,7 @@ export class ClientVersionService {
     // Full text search - simple implementation
     if (filters.search) {
       // If search query exists, ignore other filters and perform search only
-      const searchConditions: any = { environmentId };
+      const searchConditions: any = { projectId };
       // Multi-field search logic is handled in the Model
       searchConditions.search = filters.search;
       const result = await ClientVersionModel.findAll({
@@ -314,7 +314,7 @@ export class ClientVersionService {
 
     // ClientVersionModel Used
     const result = await ClientVersionModel.findAll({
-      environmentId,
+      projectId,
       clientVersion: filters.version,
       platform: filters.platform,
       clientStatus: filters.clientStatus,
@@ -345,9 +345,9 @@ export class ClientVersionService {
 
   static async getClientVersionById(
     id: string,
-    environmentId: string
+    projectId: string
   ): Promise<ClientVersionAttributes | null> {
-    const version = await ClientVersionModel.findById(id, environmentId);
+    const version = await ClientVersionModel.findById(id, projectId);
     if (!version) return null;
     // Apply maintenance status calculation based on time constraints
     return applyMaintenanceStatusCalculation(version);
@@ -355,43 +355,43 @@ export class ClientVersionService {
 
   static async createClientVersion(
     data: ClientVersionCreationAttributes,
-    environmentId: string
+    projectId: string
   ): Promise<ClientVersionAttributes> {
-    const result = await ClientVersionModel.create(data, environmentId);
+    const result = await ClientVersionModel.create(data, projectId);
 
     // Invalidate client version cache (including ETag cache for SDK)
     await pubSubService.invalidateByPattern('*client_version:*');
-    if (environmentId) {
+    // Use targetEnv for SDK cache key if available
+    const targetEnv = result.targetEnv;
+    if (targetEnv) {
       await pubSubService.invalidateKey(
-        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`
+        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${targetEnv}`
       );
     }
 
     // Publish event with full data for SDK cache update
     try {
-      const environmentId = result.environmentId;
-
       // Get full client version with tags for SDK cache
       const fullClientVersion = await this.getClientVersionById(
         result.id!,
-        environmentId
+        projectId
       );
 
       // Prepare data for SDK (parse customPayload and merge with passiveData)
-      const sdkReadyClientVersion = fullClientVersion
-        ? await prepareClientVersionForSDK(fullClientVersion, environmentId)
-        : null;
+      const sdkReadyClientVersion = fullClientVersion && targetEnv
+        ? await prepareClientVersionForSDK(fullClientVersion, targetEnv)
+        : fullClientVersion;
 
       await pubSubService.publishSDKEvent(
         {
           type: 'client_version.created',
           data: {
             id: result.id,
-            environmentId,
+            projectId,
             clientVersion: sdkReadyClientVersion,
           },
         },
-        { environmentId }
+        { environmentId: targetEnv || projectId }
       );
     } catch (err) {
       logger.error('Failed to publish client version event', err);
@@ -402,7 +402,7 @@ export class ClientVersionService {
 
   static async bulkCreateClientVersions(
     data: any,
-    environmentId: string
+    projectId: string
   ): Promise<ClientVersionAttributes[]> {
     // Duplicate check
     const duplicates = [];
@@ -411,7 +411,7 @@ export class ClientVersionService {
         platform.platform,
         data.clientVersion,
         undefined,
-        environmentId
+        projectId
       );
       if (isDuplicate) {
         duplicates.push(`${platform.platform}-${data.clientVersion}`);
@@ -424,7 +424,8 @@ export class ClientVersionService {
 
     // Transform received data into client version arrays per platform
     const clientVersions = data.platforms.map((platform: any) => ({
-      environmentId,
+      projectId,
+      targetEnv: data.targetEnv || null,
       platform: platform.platform,
       clientVersion: data.clientVersion,
       clientStatus: data.clientStatus,
@@ -444,7 +445,7 @@ export class ClientVersionService {
 
     const result = await ClientVersionModel.bulkCreate(
       clientVersions,
-      environmentId
+      projectId
     );
 
     // Set tags for each created client version if tags are provided
@@ -491,9 +492,9 @@ export class ClientVersionService {
     await pubSubService.publishSDKEvent(
       {
         type: 'client_version.updated',
-        data: { environmentId },
+        data: { projectId },
       },
-      { environmentId }
+      { environmentId: projectId }
     );
 
     return result;
@@ -502,12 +503,12 @@ export class ClientVersionService {
   static async updateClientVersion(
     id: string,
     data: Partial<ClientVersionCreationAttributes>,
-    environmentId: string
+    projectId: string
   ): Promise<ClientVersionAttributes | null> {
     const updatedRowsCount = await ClientVersionModel.update(
       id,
       data,
-      environmentId
+      projectId
     );
 
     if (updatedRowsCount === 0) {
@@ -519,37 +520,35 @@ export class ClientVersionService {
 
     const updatedClientVersion = await this.getClientVersionById(
       id,
-      environmentId
+      projectId
     );
 
-    // Invalidate ETag cache for SDK
-    if (environmentId) {
+    // Invalidate ETag cache for SDK using targetEnv
+    const targetEnv = updatedClientVersion?.targetEnv;
+    if (targetEnv) {
       await pubSubService.invalidateKey(
-        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`
+        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${targetEnv}`
       );
     }
 
     // Publish event with full data for SDK cache update
     if (updatedClientVersion) {
       try {
-        const environmentId = updatedClientVersion.environmentId;
-
         // Prepare data for SDK (parse customPayload and merge with passiveData)
-        const sdkReadyClientVersion = await prepareClientVersionForSDK(
-          updatedClientVersion,
-          environmentId
-        );
+        const sdkReadyClientVersion = targetEnv
+          ? await prepareClientVersionForSDK(updatedClientVersion, targetEnv)
+          : updatedClientVersion;
 
         await pubSubService.publishSDKEvent(
           {
             type: 'client_version.updated',
             data: {
               id: updatedClientVersion.id,
-              environmentId,
+              projectId,
               clientVersion: sdkReadyClientVersion,
             },
           },
-          { environmentId }
+          { environmentId: targetEnv || projectId }
         );
       } catch (err) {
         logger.error('Failed to publish client version event', err);
@@ -561,27 +560,28 @@ export class ClientVersionService {
 
   static async deleteClientVersion(
     id: string,
-    environmentId: string
+    projectId: string
   ): Promise<boolean> {
-    const clientVersion = await ClientVersionModel.findById(id, environmentId);
-    await ClientVersionModel.delete(id, environmentId);
+    const clientVersion = await ClientVersionModel.findById(id, projectId);
+    await ClientVersionModel.delete(id, projectId);
     const deletedRowsCount = 1;
+    const targetEnv = clientVersion?.targetEnv;
 
     if (deletedRowsCount > 0) {
       // Publish generic update event (deletion)
       await pubSubService.publishSDKEvent(
         {
           type: 'client_version.deleted',
-          data: { id, environmentId },
+          data: { id, projectId },
         },
-        { environmentId }
+        { environmentId: targetEnv || projectId }
       );
 
-      // Invalidate client version cache (including ETag cache - all environments for deletion)
+      // Invalidate client version cache (including ETag cache)
       await pubSubService.invalidateByPattern('*client_version:*');
-      if (environmentId) {
+      if (targetEnv) {
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`
+          `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${targetEnv}`
         );
       }
     }
@@ -591,11 +591,11 @@ export class ClientVersionService {
 
   static async bulkUpdateStatus(
     data: BulkStatusUpdateRequest,
-    environmentId: string
+    projectId: string
   ): Promise<number> {
     const result = await ClientVersionModel.bulkUpdateStatus(
       data,
-      environmentId
+      projectId
     );
 
     if (result > 0) {
@@ -603,38 +603,36 @@ export class ClientVersionService {
       await pubSubService.publishSDKEvent(
         {
           type: 'client_version.updated',
-          data: {},
+          data: { projectId },
         },
-        { environmentId }
+        { environmentId: projectId }
       );
 
-      // Invalidate client version cache (including ETag cache - all environments for bulk op)
+      // Invalidate client version cache (including ETag cache - all for bulk op)
       await pubSubService.invalidateByPattern('*client_version:*');
-      if (environmentId) {
-        await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`
-        );
-      }
+      await pubSubService.invalidateByPattern(
+        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`
+      );
     }
 
     return result;
   }
 
-  static async getPlatforms(environmentId: string): Promise<string[]> {
-    return await ClientVersionModel.getPlatforms(environmentId);
+  static async getPlatforms(projectId: string): Promise<string[]> {
+    return await ClientVersionModel.getPlatforms(projectId);
   }
 
   static async checkDuplicate(
     platform: string,
     clientVersion: string,
     excludeId?: string,
-    environmentId?: string
+    projectId?: string
   ): Promise<boolean> {
     return await ClientVersionModel.checkDuplicate(
       platform,
       clientVersion,
       excludeId,
-      environmentId
+      projectId
     );
   }
 
@@ -646,12 +644,12 @@ export class ClientVersionService {
   static async findByExact(
     platform: string,
     clientVersion: string,
-    environmentId: string
+    projectId: string
   ): Promise<ClientVersionAttributes | null> {
     const result = await ClientVersionModel.findAll({
       platform,
       clientVersion,
-      environmentId,
+      projectId,
       limit: 1,
       offset: 0,
       sortBy: 'id',
@@ -671,9 +669,9 @@ export class ClientVersionService {
   static async findOnlineByExact(
     platform: string,
     clientVersion: string,
-    environmentId: string
+    projectId: string
   ): Promise<ClientVersionAttributes | null> {
-    return this.findByExact(platform, clientVersion, environmentId);
+    return this.findByExact(platform, clientVersion, projectId);
   }
 
   /**
@@ -684,16 +682,16 @@ export class ClientVersionService {
    * @param platform - Platform identifier
    * @param status - Optional status filter. If provided, only versions with this status are considered.
    *                 If not provided, all versions are considered regardless of status.
-   * @param environment - Environment identifier
+   * @param projectId - Project identifier
    */
   static async findLatestByPlatform(
     platform: string,
     status?: ClientStatus | ClientStatus[],
-    environmentId?: string
+    projectId?: string
   ): Promise<ClientVersionAttributes | null> {
     const queryOptions: any = {
       platform,
-      environmentId,
+      projectId,
       limit: 1,
       offset: 0,
       sortBy: 'id',

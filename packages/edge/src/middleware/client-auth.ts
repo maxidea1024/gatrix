@@ -9,6 +9,9 @@ import { environmentRegistry } from '../services/environment-registry';
 // Unsecured token format: unsecured-{org}:{project}:{env}-{type}-api-token
 const UNSECURED_TOKEN_REGEX =
   /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
+// Unsecured project token format: unsecured-{org}:{project}-project-api-token
+const UNSECURED_PROJECT_TOKEN_REGEX =
+  /^unsecured-([^:]+):([^:]+)-project-api-token$/;
 
 // Legacy unsecured tokens — auto-resolve to default/default/development
 const LEGACY_TOKENS: Record<string, boolean> = {
@@ -45,6 +48,10 @@ export interface ClientRequest extends Request {
     clientVersion?: string;
     platform?: string;
     tokenName?: string;
+    /**
+     * Project ID when using project token (dynamic env resolution)
+     */
+    projectId?: string;
   };
 }
 
@@ -53,11 +60,11 @@ export interface ClientRequest extends Request {
  * Validates required headers and API token from client requests
  * Environment is resolved from the token (not from URL path)
  */
-export function clientAuth(
+export async function clientAuth(
   req: ClientRequest,
   res: Response,
   next: NextFunction
-): void {
+): Promise<void> {
   // Extract token from multiple sources
   const authHeader = req.headers['authorization'] as string | undefined;
   let apiToken = req.headers['x-api-token'] as string | undefined;
@@ -132,6 +139,57 @@ export function clientAuth(
     return next();
   }
 
+  // 1b. Unsecured project token: unsecured-{org}:{project}-project-api-token
+  const unsecuredProjectMatch = apiToken.match(UNSECURED_PROJECT_TOKEN_REGEX);
+  if (unsecuredProjectMatch) {
+    const [, , unsecuredProjectId] = unsecuredProjectMatch;
+    if (!clientVersion) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_CLIENT_VERSION',
+          message: 'x-client-version header is required for project tokens',
+        },
+      });
+      return;
+    }
+
+    // Resolve environment from version map
+    const { versionMapService } = await import('../services/version-map-service');
+    const targetEnv = versionMapService.resolveEnvironment(
+      unsecuredProjectId,
+      clientVersion,
+      platform
+    );
+    if (!targetEnv) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'ENVIRONMENT_NOT_FOUND',
+          message: `No environment mapping found for version ${clientVersion}`,
+        },
+      });
+      return;
+    }
+
+    const envId = environmentRegistry.resolveEnvironmentId(targetEnv) || targetEnv;
+    req.clientContext = {
+      apiToken,
+      applicationName,
+      environmentId: envId,
+      cacheKey: envId,
+      clientVersion,
+      platform,
+      tokenName: `Unsecured Project Token (${unsecuredProjectId})`,
+      projectId: unsecuredProjectId,
+    };
+    logger.debug('Authenticated with unsecured project token', {
+      environmentId: envId,
+      projectId: unsecuredProjectId,
+    });
+    return next();
+  }
+
   // 2. Legacy unsecured tokens → resolve to default/default/development
   if (LEGACY_TOKENS[apiToken]) {
     const envId = environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME);
@@ -196,8 +254,72 @@ export function clientAuth(
     tokenUsageTracker.recordUsage(validation.token.id);
   }
 
-  // Resolve environment from token (token:environment is 1:1)
   const token = validation.token;
+
+  // 3a. Project token — dynamic env resolution
+  if (token?.tokenType === 'project' && token.projectId) {
+    if (!clientVersion) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_CLIENT_VERSION',
+          message: 'x-client-version header is required for project tokens',
+        },
+      });
+      return;
+    }
+
+    const { versionMapService } = await import('../services/version-map-service');
+    const targetEnv = versionMapService.resolveEnvironment(
+      token.projectId.toString(),
+      clientVersion,
+      platform
+    );
+    if (!targetEnv) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'ENVIRONMENT_NOT_FOUND',
+          message: `No environment mapping found for version ${clientVersion}`,
+        },
+      });
+      return;
+    }
+
+    const envId = environmentRegistry.resolveEnvironmentId(targetEnv) || targetEnv;
+    if (!environmentRegistry.hasEnvironment(envId)) {
+      res.status(401).json({
+        success: false,
+        error: {
+          code: 'ENVIRONMENT_NOT_FOUND',
+          message: `Could not resolve target environment: ${targetEnv}`,
+        },
+      });
+      return;
+    }
+
+    req.clientContext = {
+      apiToken,
+      applicationName,
+      environmentId: envId,
+      cacheKey: envId,
+      clientVersion,
+      platform,
+      tokenName: validation.token?.tokenName,
+      projectId: token.projectId.toString(),
+    };
+
+    logger.debug('Client authenticated with project token', {
+      applicationName,
+      environmentId: envId,
+      projectId: token.projectId,
+      clientVersion,
+      platform,
+    });
+    return next();
+  }
+
+  // 3b. Legacy environment-bound token
   const tokenEnvId = token?.environmentId;
   if (!tokenEnvId) {
     res.status(401).json({

@@ -59,8 +59,8 @@ All server SDK examples and tests SHOULD use the following default values:
 
 | Scope | Description | Example |
 |-------|-------------|---------|
-| **Per-Environment** | Data is unique to a specific environment. Cache key MUST include `environmentId`. | Feature Flag definitions, Game Worlds, Popup Notices, Surveys, Whitelists, Maintenance, Banners, Store Products, Client Versions, Service Notices, Vars |
-| **Per-Project** | Data is shared across all environments within a single project, but isolated between projects. Cache key MUST include `projectId`. | **Segments** (Feature Segments) |
+| **Per-Environment** | Data is unique to a specific environment. Cache key MUST include `environmentId`. | Feature Flag definitions, Game Worlds, Popup Notices, Surveys, Whitelists, Maintenance, Banners, Store Products, Service Notices, Vars |
+| **Per-Project** | Data is shared across all environments within a single project, but isolated between projects. Cache key MUST include `projectId`. | **Segments** (Feature Segments), **Client Versions** (with `targetEnv` for dynamic env routing) |
 | **Per-Organization** | Data is shared across all projects within an organization. | (None currently) |
 | **Global** | Data is shared across all organizations. | (None currently) |
 

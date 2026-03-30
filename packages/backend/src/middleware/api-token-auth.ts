@@ -12,9 +12,11 @@ import { ErrorCodes } from '../utils/api-response';
 
 // Unsecured token format: unsecured-{org}:{project}:{env}-{server|client|edge}-api-token
 // Only allowed when ALLOW_UNSECURED_TOKENS=true is set in the environment
-const ALLOW_UNSECURED_TOKENS = process.env.ALLOW_UNSECURED_TOKENS === 'true';
+const _ALLOW_UNSECURED_TOKENS = process.env.ALLOW_UNSECURED_TOKENS === 'true';
 const UNSECURED_TOKEN_REGEX =
   /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
+const UNSECURED_PROJECT_TOKEN_REGEX =
+  /^unsecured-([^:]+):([^:]+)-project-api-token$/;
 
 // Shorthand infrastructure token — auto-resolves to __internal__/__infrastructure__/default
 export const INFRA_SERVER_TOKEN =
@@ -43,6 +45,7 @@ export interface SDKRequest extends Request {
   environments?: Environment[];
   environmentId?: string;
   environmentModel?: Environment;
+  projectId?: string;
   isUnsecuredToken?: boolean;
   isEdgeBypassToken?: boolean;
   unsecuredOrgId?: string;
@@ -149,6 +152,26 @@ function handleSpecialTokens(token: string): {
         unsecuredOrgId: orgId,
         unsecuredProjectId: projectId,
         unsecuredEnvironmentId: envId,
+      };
+    }
+  }
+
+  // Unsecured project tokens (format: unsecured-{org}:{project}-project-api-token)
+  // Environment is resolved dynamically from x-client-version
+  {
+    const match = token.match(UNSECURED_PROJECT_TOKEN_REGEX);
+    if (match) {
+      const [, orgId, projectId] = match;
+      return {
+        apiToken: {
+          id: `unsecured-project-${orgId}-${projectId}`,
+          projectId,
+          tokenType: 'project' as any,
+          tokenName: `Unsecured PROJECT Token (${orgId}/${projectId})`,
+        },
+        isUnsecured: true,
+        unsecuredOrgId: orgId,
+        unsecuredProjectId: projectId,
       };
     }
   }
@@ -359,7 +382,8 @@ export const validateApplicationName = (
 
 /**
  * Resolves environment from token (token determines everything).
- * No fallback: environment MUST come from the token.
+ * For project tokens (gxp_ prefix), dynamically resolves environment from x-client-version header.
+ * No fallback: environment MUST come from the token or dynamic resolution.
  */
 export const setSDKEnvironment = async (
   req: SDKRequest,
@@ -367,18 +391,84 @@ export const setSDKEnvironment = async (
   next: NextFunction
 ) => {
   try {
-    // Token determines environment — strict, no fallback
+    const token = req.apiToken;
+
+    // Project token: dynamic env resolution via x-client-version
+    if (token && token.tokenType === 'project' && token.projectId) {
+      const clientVersion = req.headers[HEADERS.X_CLIENT_VERSION] as string | undefined;
+      const platform = req.headers[HEADERS.X_PLATFORM] as string | undefined;
+
+      if (!clientVersion) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: ErrorCodes.BAD_REQUEST,
+            message: 'x-client-version header is required for project tokens',
+          },
+        });
+      }
+
+      // Dynamic import to avoid circular dependency
+      const { ClientVersionModel } = await import('../models/client-version');
+      const versionRecord = await ClientVersionModel.findByProjectAndVersion(
+        token.projectId,
+        clientVersion,
+        platform || undefined
+      );
+
+      if (!versionRecord || !versionRecord.targetEnv) {
+        logger.warn('Auth: No targetEnv found for project token + version', {
+          projectId: token.projectId,
+          clientVersion,
+          platform,
+        });
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: ErrorCodes.ENV_NOT_FOUND,
+            message: `No environment mapping found for version ${clientVersion}`,
+          },
+        });
+      }
+
+      // Resolve environment from targetEnv
+      const cacheKey = `sdk_env:${versionRecord.targetEnv}`;
+      let env = await CacheService.get<Environment>(cacheKey);
+      if (!env) {
+        env = (await Environment.getById(versionRecord.targetEnv)) || null;
+        if (env) {
+          await CacheService.set(cacheKey, env, CACHE_TTL);
+        }
+      }
+
+      if (!env) {
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: ErrorCodes.ENV_NOT_FOUND,
+            message: `Target environment not found: ${versionRecord.targetEnv}`,
+          },
+        });
+      }
+
+      req.environmentId = env.id as string;
+      req.environmentModel = env;
+      req.projectId = token.projectId as string;
+      return next();
+    }
+
+    // Legacy token: environment from token directly
     // Edge proxy: x-environment-id header overrides for infra/edge bypass tokens
     const headerEnvId = req.headers['x-environment-id'] as string | undefined;
     const environmentId =
       (req.isUnsecuredToken || req.isEdgeBypassToken) && headerEnvId
         ? headerEnvId
-        : req.apiToken?.environmentId || req.environmentId; // Already set by unsecured token handler
+        : token?.environmentId || req.environmentId; // Already set by unsecured token handler
 
     if (!environmentId) {
       logger.warn('Auth: Environment not determined from token', {
         url: req.originalUrl,
-        tokenId: req.apiToken?.id,
+        tokenId: token?.id,
       });
       return res.status(400).json({
         success: false,
@@ -427,15 +517,16 @@ export const setSDKEnvironment = async (
 
     req.environmentId = env.id;
     req.environmentModel = env;
+    req.projectId = token?.projectId;
 
     // Access check (skip for unsecured/bypass tokens)
-    if (!req.isUnsecuredToken && !req.isEdgeBypassToken && req.apiToken) {
-      const hasAccess = checkEnvironmentAccess(req.apiToken, req.environmentId);
+    if (!req.isUnsecuredToken && !req.isEdgeBypassToken && token) {
+      const hasAccess = checkEnvironmentAccess(token, req.environmentId);
       if (!hasAccess) {
         logger.warn('Auth: Environment access denied', {
-          tokenId: req.apiToken.id,
-          tokenType: req.apiToken.tokenType,
-          tokenEnv: req.apiToken.environmentId,
+          tokenId: token.id,
+          tokenType: token.tokenType,
+          tokenEnv: token.environmentId,
           requestedEnv: req.environmentId,
           url: req.originalUrl,
         });

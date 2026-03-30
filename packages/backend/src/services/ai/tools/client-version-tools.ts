@@ -10,16 +10,16 @@ export const clientVersionTools: AIToolConfig[] = [
     tool: {
       name: 'get_client_versions',
       description:
-        'Get list of client versions for an environment. Shows version info, platform, status, and update requirements.',
+        'Get list of client versions for a project. Shows version info, platform, status, and update requirements.',
       parameters: {
         type: 'object',
         properties: {
-          environmentId: {
+          projectId: {
             type: 'string',
-            description: 'The environment ID',
+            description: 'The project ID',
           },
         },
-        required: ['environmentId'],
+        required: ['projectId'],
       },
     },
     requiredPermission: P.CLIENT_VERSIONS_READ,
@@ -28,7 +28,7 @@ export const clientVersionTools: AIToolConfig[] = [
       const { ClientVersionService } =
         await import('../../client-version-service');
       return await ClientVersionService.getAllClientVersions(
-        args.environmentId,
+        args.projectId,
         {},
         { page: 1, limit: 20 }
       );
@@ -45,9 +45,9 @@ export const clientVersionTools: AIToolConfig[] = [
       parameters: {
         type: 'object',
         properties: {
-          environmentId: {
+          projectId: {
             type: 'string',
-            description: 'The environment ID',
+            description: 'The project ID',
           },
           platform: {
             type: 'string',
@@ -72,7 +72,7 @@ export const clientVersionTools: AIToolConfig[] = [
             description: 'Optional release notes',
           },
         },
-        required: ['environmentId', 'platform', 'version'],
+        required: ['projectId', 'platform', 'version'],
       },
     },
     requiredPermission: P.CLIENT_VERSIONS_CREATE,
@@ -82,12 +82,12 @@ export const clientVersionTools: AIToolConfig[] = [
         await import('../../client-version-service');
       return await ClientVersionService.createClientVersion(
         {
-          environmentId: args.environmentId,
+          projectId: args.projectId,
           platform: args.platform,
           clientVersion: args.version,
           clientStatus: args.status || 'online',
         },
-        args.environmentId
+        args.projectId
       );
     },
   },
@@ -102,9 +102,9 @@ export const clientVersionTools: AIToolConfig[] = [
       parameters: {
         type: 'object',
         properties: {
-          environmentId: {
+          projectId: {
             type: 'string',
-            description: 'The environment ID',
+            description: 'The project ID',
           },
           id: {
             type: 'string',
@@ -123,7 +123,7 @@ export const clientVersionTools: AIToolConfig[] = [
             description: 'Updated release notes',
           },
         },
-        required: ['environmentId', 'id'],
+        required: ['projectId', 'id'],
       },
     },
     requiredPermission: P.CLIENT_VERSIONS_UPDATE,
@@ -131,11 +131,11 @@ export const clientVersionTools: AIToolConfig[] = [
     handler: async (args) => {
       const { ClientVersionService } =
         await import('../../client-version-service');
-      const { environmentId, id, ...updates } = args;
+      const { projectId, id, ...updates } = args;
       return await ClientVersionService.updateClientVersion(
         id,
         updates,
-        environmentId
+        projectId
       );
     },
   },
