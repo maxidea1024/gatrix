@@ -209,7 +209,10 @@ class TokenMirrorService {
       if (event.type?.startsWith('client_version.')) {
         logger.info(`Received client_version event: ${event.type}`);
         this.fetchVersionMap().catch((err) => {
-          logger.warn('Failed to refetch version map after event:', err.message);
+          logger.warn(
+            'Failed to refetch version map after event:',
+            err.message
+          );
         });
         return;
       }
@@ -250,14 +253,17 @@ class TokenMirrorService {
 
     // Prefix-based early type rejection (skip Map lookup for obvious mismatches)
     const PREFIX_TYPE_MAP: Record<string, string> = {
-      'gtx_cli_': 'client',
-      'gtx_srv_': 'server',
-      'gtx_edge_': 'edge',
-      'gtx_proj_': 'project',
+      gtx_cli_: 'client',
+      gtx_srv_: 'server',
+      gtx_edge_: 'edge',
+      gtx_proj_: 'project',
     };
     for (const [prefix, type] of Object.entries(PREFIX_TYPE_MAP)) {
       if (tokenValue.startsWith(prefix)) {
-        if (type !== requiredType && !(type === 'project' && requiredType === 'client')) {
+        if (
+          type !== requiredType &&
+          !(type === 'project' && requiredType === 'client')
+        ) {
           return { valid: false, reason: 'invalid_type' };
         }
         break;
@@ -280,7 +286,10 @@ class TokenMirrorService {
 
     // Check token type
     // Project tokens can be used in place of client tokens (dynamic env resolution)
-    if (token.tokenType !== requiredType && !(token.tokenType === 'project' && requiredType === 'client')) {
+    if (
+      token.tokenType !== requiredType &&
+      !(token.tokenType === 'project' && requiredType === 'client')
+    ) {
       return { valid: false, token, reason: 'invalid_type' };
     }
 

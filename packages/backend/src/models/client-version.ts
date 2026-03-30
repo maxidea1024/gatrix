@@ -372,11 +372,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async update(
-    id: string,
-    data: any,
-    projectId: string
-  ): Promise<any> {
+  static async update(id: string, data: any, projectId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // Remove tags and maintenanceLocales fields as they are managed in separate tables
@@ -486,10 +482,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async bulkUpdateStatus(
-    data: any,
-    projectId: string
-  ): Promise<any> {
+  static async bulkUpdateStatus(data: any, projectId: string): Promise<any> {
     try {
       const updateData: any = {
         clientStatus: data.clientStatus,
@@ -664,7 +657,13 @@ export class ClientVersionModel {
     projectId: string,
     clientVersion: string,
     platform?: string
-  ): Promise<{ id: string; projectId: string; targetEnv: string | null; platform: string; clientVersion: string } | null> {
+  ): Promise<{
+    id: string;
+    projectId: string;
+    targetEnv: string | null;
+    platform: string;
+    clientVersion: string;
+  } | null> {
     try {
       let query = db('g_client_versions')
         .select('id', 'projectId', 'targetEnv', 'platform', 'clientVersion')
@@ -678,7 +677,10 @@ export class ClientVersionModel {
       const row = await query.first();
       return row || null;
     } catch (error) {
-      logger.error('Error finding client version by project and version:', error);
+      logger.error(
+        'Error finding client version by project and version:',
+        error
+      );
       throw error;
     }
   }
@@ -689,10 +691,21 @@ export class ClientVersionModel {
    */
   static async getVersionMap(
     projectId?: string
-  ): Promise<Array<{ projectId: string; platform: string; clientVersion: string; targetEnv: string | null }>> {
+  ): Promise<
+    Array<{
+      projectId: string;
+      platform: string;
+      clientVersion: string;
+      targetEnv: string | null;
+    }>
+  > {
     try {
-      let query = db('g_client_versions')
-        .select('projectId', 'platform', 'clientVersion', 'targetEnv');
+      let query = db('g_client_versions').select(
+        'projectId',
+        'platform',
+        'clientVersion',
+        'targetEnv'
+      );
 
       if (projectId) {
         query = query.where('projectId', projectId);

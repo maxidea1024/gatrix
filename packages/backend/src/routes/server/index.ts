@@ -67,9 +67,8 @@ router.get(
   serverAuthBase,
   async (req: any, res: any) => {
     try {
-      const { ClientVersionModel } = await import(
-        '../../models/client-version'
-      );
+      const { ClientVersionModel } =
+        await import('../../models/client-version');
       const versionMap = await ClientVersionModel.getVersionMap();
       res.json({
         success: true,
@@ -78,7 +77,10 @@ router.get(
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to get version map' },
+        error: {
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to get version map',
+        },
       });
     }
   }

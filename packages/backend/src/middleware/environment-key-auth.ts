@@ -145,10 +145,10 @@ export const authenticateEnvironmentKey = async (
 
     // 2. Prefix-based token type detection for early routing
     const PREFIX_TYPE_MAP: Record<string, KeyType> = {
-      'gtx_cli_': 'client',
-      'gtx_srv_': 'server',
-      'gtx_edge_': 'client', // edge tokens are treated as client for env key auth
-      'gtx_proj_': 'client', // project tokens are treated as client scope
+      gtx_cli_: 'client',
+      gtx_srv_: 'server',
+      gtx_edge_: 'client', // edge tokens are treated as client for env key auth
+      gtx_proj_: 'client', // project tokens are treated as client scope
     };
     let detectedKeyType: KeyType | undefined;
     for (const [prefix, keyType] of Object.entries(PREFIX_TYPE_MAP)) {

@@ -1539,8 +1539,14 @@ const ClientVersionsPage: React.FC = () => {
             />
           );
         case 'targetEnv': {
-          const envName = clientVersion.targetEnvName || clientVersion.targetEnv;
-          if (!envName) return <Typography variant="body2" color="text.disabled">-</Typography>;
+          const envName =
+            clientVersion.targetEnvName || clientVersion.targetEnv;
+          if (!envName)
+            return (
+              <Typography variant="body2" color="text.disabled">
+                -
+              </Typography>
+            );
           const matchedEnv = allEnvironments.find(
             (e) => e.environmentId === clientVersion.targetEnv
           );
@@ -1549,11 +1555,15 @@ const ClientVersionsPage: React.FC = () => {
               label={envName}
               size="small"
               variant="outlined"
-              sx={matchedEnv?.color ? {
-                borderColor: matchedEnv.color,
-                color: matchedEnv.color,
-                '& .MuiChip-label': { fontWeight: 500 },
-              } : undefined}
+              sx={
+                matchedEnv?.color
+                  ? {
+                      borderColor: matchedEnv.color,
+                      color: matchedEnv.color,
+                      '& .MuiChip-label': { fontWeight: 500 },
+                    }
+                  : undefined
+              }
             />
           );
         }

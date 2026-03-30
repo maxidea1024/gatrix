@@ -131,8 +131,7 @@ export class ClientVersionService {
   // Get available version list (distinct)
   static async getAvailableVersions(projectId: string): Promise<string[]> {
     try {
-      const versions =
-        await ClientVersionModel.getDistinctVersions(projectId);
+      const versions = await ClientVersionModel.getDistinctVersions(projectId);
       return versions.sort((a, b) =>
         b.localeCompare(a, undefined, { numeric: true })
       );
@@ -378,9 +377,10 @@ export class ClientVersionService {
       );
 
       // Prepare data for SDK (parse customPayload and merge with passiveData)
-      const sdkReadyClientVersion = fullClientVersion && targetEnv
-        ? await prepareClientVersionForSDK(fullClientVersion, targetEnv)
-        : fullClientVersion;
+      const sdkReadyClientVersion =
+        fullClientVersion && targetEnv
+          ? await prepareClientVersionForSDK(fullClientVersion, targetEnv)
+          : fullClientVersion;
 
       await pubSubService.publishSDKEvent(
         {
@@ -518,10 +518,7 @@ export class ClientVersionService {
     // Invalidate client version cache
     await pubSubService.invalidateByPattern('*client_version:*');
 
-    const updatedClientVersion = await this.getClientVersionById(
-      id,
-      projectId
-    );
+    const updatedClientVersion = await this.getClientVersionById(id, projectId);
 
     // Invalidate ETag cache for SDK using targetEnv
     const targetEnv = updatedClientVersion?.targetEnv;
@@ -593,10 +590,7 @@ export class ClientVersionService {
     data: BulkStatusUpdateRequest,
     projectId: string
   ): Promise<number> {
-    const result = await ClientVersionModel.bulkUpdateStatus(
-      data,
-      projectId
-    );
+    const result = await ClientVersionModel.bulkUpdateStatus(data, projectId);
 
     if (result > 0) {
       // Publish generic update event (bulk status)

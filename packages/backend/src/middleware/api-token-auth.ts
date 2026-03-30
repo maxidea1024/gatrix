@@ -395,7 +395,9 @@ export const setSDKEnvironment = async (
 
     // Project token: dynamic env resolution via x-client-version
     if (token && token.tokenType === 'project' && token.projectId) {
-      const clientVersion = req.headers[HEADERS.X_CLIENT_VERSION] as string | undefined;
+      const clientVersion = req.headers[HEADERS.X_CLIENT_VERSION] as
+        | string
+        | undefined;
       const platform = req.headers[HEADERS.X_PLATFORM] as string | undefined;
 
       if (!clientVersion) {

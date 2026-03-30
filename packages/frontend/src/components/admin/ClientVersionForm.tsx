@@ -136,7 +136,9 @@ const createValidationSchema = (t: any) =>
     maintenanceLocales: yup.array().notRequired(),
     tags: yup.array().notRequired(),
     minPatchVersion: yup.string().max(50).notRequired(),
-    targetEnv: yup.string().required(t('clientVersions.form.targetEnvRequired')),
+    targetEnv: yup
+      .string()
+      .required(t('clientVersions.form.targetEnvRequired')),
   });
 
 const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
@@ -956,8 +958,17 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                             }}
                           >
                             {allEnvironments.map((env) => (
-                              <MenuItem key={env.environmentId} value={env.environmentId}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <MenuItem
+                                key={env.environmentId}
+                                value={env.environmentId}
+                              >
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                  }}
+                                >
                                   {env.color && (
                                     <Box
                                       sx={{
@@ -976,10 +987,13 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           </Select>
                           <Typography
                             variant="caption"
-                            color={errors.targetEnv ? 'error' : 'text.secondary'}
+                            color={
+                              errors.targetEnv ? 'error' : 'text.secondary'
+                            }
                             sx={{ mt: 0.5, display: 'block' }}
                           >
-                            {errors.targetEnv?.message || t('clientVersions.form.targetEnvHelp')}
+                            {errors.targetEnv?.message ||
+                              t('clientVersions.form.targetEnvHelp')}
                           </Typography>
                         </FormControl>
                       )}

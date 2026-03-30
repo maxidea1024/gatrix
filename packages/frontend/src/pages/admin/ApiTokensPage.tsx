@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react';
 import {
   Box,
   Typography,
@@ -122,7 +128,12 @@ interface CreateTokenData {
 }
 
 // Supported token types (client+server 'all' type is not supported)
-const SUPPORTED_TOKEN_TYPES: TokenType[] = ['client', 'server', 'edge', 'project'];
+const SUPPORTED_TOKEN_TYPES: TokenType[] = [
+  'client',
+  'server',
+  'edge',
+  'project',
+];
 
 // Column definition interface
 interface ColumnConfig {
@@ -228,7 +239,12 @@ const getDateLocale = () => {
 
 interface ProjectTreeSelectorProps {
   organisations: { id: string; orgName: string; displayName: string }[];
-  projects: { id: string; orgId: string; projectName: string; displayName: string }[];
+  projects: {
+    id: string;
+    orgId: string;
+    projectName: string;
+    displayName: string;
+  }[];
   selectedProjectId?: string;
   onSelect: (projectId: string) => void;
   helperText?: string;
@@ -309,7 +325,11 @@ const ProjectTreeSelector: React.FC<ProjectTreeSelectorProps> = ({
 
   return (
     <Box>
-      <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ mb: 0.5, display: 'block' }}
+      >
         {t('common.project')}
       </Typography>
       <ButtonBase
@@ -332,7 +352,14 @@ const ProjectTreeSelector: React.FC<ProjectTreeSelectorProps> = ({
           },
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, overflow: 'hidden' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            overflow: 'hidden',
+          }}
+        >
           <ProjectIcon sx={{ fontSize: 18, opacity: 0.7, flexShrink: 0 }} />
           <Typography
             variant="body2"
@@ -434,7 +461,11 @@ const ProjectTreeSelector: React.FC<ProjectTreeSelectorProps> = ({
                           />
                           {isSelected && (
                             <CheckIcon
-                              sx={{ fontSize: 18, color: 'success.main', ml: 'auto' }}
+                              sx={{
+                                fontSize: 18,
+                                color: 'success.main',
+                                ml: 'auto',
+                              }}
                             />
                           )}
                         </ListItemButton>
@@ -520,7 +551,11 @@ const ProjectTreeSelector: React.FC<ProjectTreeSelectorProps> = ({
                           />
                           {isSelected && (
                             <CheckIcon
-                              sx={{ fontSize: 18, color: 'success.main', ml: 'auto' }}
+                              sx={{
+                                fontSize: 18,
+                                color: 'success.main',
+                                ml: 'auto',
+                              }}
                             />
                           )}
                         </ListItemButton>
@@ -555,8 +590,13 @@ const ApiTokensPage: React.FC = () => {
 
   // Check if user can manage (create/edit/delete) tokens
   const canManage = hasPermission([P.IP_WHITELIST_UPDATE]);
-  const { currentProjectId, currentOrgId, projects, getProjectApiPath, organisations } =
-    useOrgProject();
+  const {
+    currentProjectId,
+    currentOrgId,
+    projects,
+    getProjectApiPath,
+    organisations,
+  } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 
   const [tokens, setTokens] = useState<ApiAccessToken[]>([]);
@@ -969,7 +1009,9 @@ const ApiTokensPage: React.FC = () => {
   const handleCreate = async () => {
     try {
       // Build project API path using the selected project's orgId (supports multi-org)
-      const selectedProj = projects.find((p) => p.id === formData.selectedProjectId);
+      const selectedProj = projects.find(
+        (p) => p.id === formData.selectedProjectId
+      );
       const createProjectApiPath =
         formData.selectedProjectId && selectedProj
           ? `/admin/orgs/${selectedProj.orgId}/projects/${formData.selectedProjectId}`
@@ -1038,7 +1080,9 @@ const ApiTokensPage: React.FC = () => {
 
     try {
       // Build project API path using the selected project's orgId (supports multi-org)
-      const editProj = projects.find((p) => p.id === formData.selectedProjectId);
+      const editProj = projects.find(
+        (p) => p.id === formData.selectedProjectId
+      );
       const editProjectApiPath =
         formData.selectedProjectId && editProj
           ? `/admin/orgs/${editProj.orgId}/projects/${formData.selectedProjectId}`
@@ -1803,48 +1847,54 @@ const ApiTokensPage: React.FC = () => {
 
               {/* Environment Select - hidden for project tokens */}
               {formData.tokenType !== 'project' && (
-              <FormControl fullWidth size="small">
-                <InputLabel>{t('apiTokens.environmentAccess')}</InputLabel>
-                <Select
-                  value={formData.environments[0] || ''}
-                  label={t('apiTokens.environmentAccess')}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      allowAllEnvironments: false,
-                      environments: [e.target.value as string],
-                    }))
-                  }
-                  renderValue={(value) => {
-                    const env = environments.find(
-                      (e) => e.environmentId === value
-                    );
-                    return env ? env.displayName || env.environmentName : '';
-                  }}
-                >
-                  {environments.map((env) => (
-                    <MenuItem key={env.environmentId} value={env.environmentId}>
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {env.displayName || env.environmentName}
-                        </Typography>
-                        {env.description && (
-                          <Typography variant="caption" color="text.secondary">
-                            {env.description}
+                <FormControl fullWidth size="small">
+                  <InputLabel>{t('apiTokens.environmentAccess')}</InputLabel>
+                  <Select
+                    value={formData.environments[0] || ''}
+                    label={t('apiTokens.environmentAccess')}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        allowAllEnvironments: false,
+                        environments: [e.target.value as string],
+                      }))
+                    }
+                    renderValue={(value) => {
+                      const env = environments.find(
+                        (e) => e.environmentId === value
+                      );
+                      return env ? env.displayName || env.environmentName : '';
+                    }}
+                  >
+                    {environments.map((env) => (
+                      <MenuItem
+                        key={env.environmentId}
+                        value={env.environmentId}
+                      >
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {env.displayName || env.environmentName}
                           </Typography>
-                        )}
-                      </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mt: 0.5, ml: 1.5 }}
-                >
-                  {t('apiTokens.selectSingleEnvironment')}
-                </Typography>
-              </FormControl>
+                          {env.description && (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {env.description}
+                            </Typography>
+                          )}
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mt: 0.5, ml: 1.5 }}
+                  >
+                    {t('apiTokens.selectSingleEnvironment')}
+                  </Typography>
+                </FormControl>
               )}
             </Box>
           </Paper>
@@ -1920,7 +1970,8 @@ const ApiTokensPage: React.FC = () => {
               !isValidTokenName(formData.tokenName) ||
               !expiresAtValidation.isValid ||
               !formData.selectedProjectId ||
-              (formData.tokenType !== 'project' && formData.environments.length === 0)
+              (formData.tokenType !== 'project' &&
+                formData.environments.length === 0)
             }
           >
             {t('apiTokens.createToken')}
@@ -2058,41 +2109,47 @@ const ApiTokensPage: React.FC = () => {
 
               {/* Environment Select - hidden for project tokens */}
               {formData.tokenType !== 'project' && (
-              <FormControl fullWidth size="small">
-                <InputLabel>{t('apiTokens.environmentAccess')}</InputLabel>
-                <Select
-                  value={formData.environments[0] || ''}
-                  label={t('apiTokens.environmentAccess')}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      allowAllEnvironments: false,
-                      environments: [e.target.value as string],
-                    }))
-                  }
-                  renderValue={(value) => {
-                    const env = environments.find(
-                      (e) => e.environmentId === value
-                    );
-                    return env ? env.displayName || env.environmentName : '';
-                  }}
-                >
-                  {environments.map((env) => (
-                    <MenuItem key={env.environmentId} value={env.environmentId}>
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {env.displayName || env.environmentName}
-                        </Typography>
-                        {env.description && (
-                          <Typography variant="caption" color="text.secondary">
-                            {env.description}
+                <FormControl fullWidth size="small">
+                  <InputLabel>{t('apiTokens.environmentAccess')}</InputLabel>
+                  <Select
+                    value={formData.environments[0] || ''}
+                    label={t('apiTokens.environmentAccess')}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        allowAllEnvironments: false,
+                        environments: [e.target.value as string],
+                      }))
+                    }
+                    renderValue={(value) => {
+                      const env = environments.find(
+                        (e) => e.environmentId === value
+                      );
+                      return env ? env.displayName || env.environmentName : '';
+                    }}
+                  >
+                    {environments.map((env) => (
+                      <MenuItem
+                        key={env.environmentId}
+                        value={env.environmentId}
+                      >
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {env.displayName || env.environmentName}
                           </Typography>
-                        )}
-                      </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                          {env.description && (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {env.description}
+                            </Typography>
+                          )}
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               )}
             </Box>
           </Paper>
@@ -2167,7 +2224,8 @@ const ApiTokensPage: React.FC = () => {
               !isValidTokenName(formData.tokenName) ||
               !expiresAtValidation.isValid ||
               !formData.selectedProjectId ||
-              (formData.tokenType !== 'project' && formData.environments.length === 0) ||
+              (formData.tokenType !== 'project' &&
+                formData.environments.length === 0) ||
               (!!selectedToken && !isDirty)
             }
           >
@@ -2799,50 +2857,50 @@ const ApiTokensPage: React.FC = () => {
 
                 {/* Environment Access - hidden for project tokens */}
                 {newTokenInfo.tokenType !== 'project' && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ fontWeight: 500 }}
-                  >
-                    {t('apiTokens.environments')}
-                  </Typography>
                   <Box
                     sx={{
                       display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: 0.5,
-                      justifyContent: 'flex-end',
-                      maxWidth: '60%',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
                     }}
                   >
-                    {(() => {
-                      const env = newTokenInfo.environmentId
-                        ? environments.find(
-                            (e) =>
-                              e.environmentId === newTokenInfo.environmentId
-                          )
-                        : null;
-                      return env ? (
-                        <Chip
-                          label={env.displayName || env.environmentName}
-                          size="small"
-                          variant="outlined"
-                        />
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          {t('apiTokens.noEnvironmentSelected')}
-                        </Typography>
-                      );
-                    })()}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 500 }}
+                    >
+                      {t('apiTokens.environments')}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 0.5,
+                        justifyContent: 'flex-end',
+                        maxWidth: '60%',
+                      }}
+                    >
+                      {(() => {
+                        const env = newTokenInfo.environmentId
+                          ? environments.find(
+                              (e) =>
+                                e.environmentId === newTokenInfo.environmentId
+                            )
+                          : null;
+                        return env ? (
+                          <Chip
+                            label={env.displayName || env.environmentName}
+                            size="small"
+                            variant="outlined"
+                          />
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            {t('apiTokens.noEnvironmentSelected')}
+                          </Typography>
+                        );
+                      })()}
+                    </Box>
                   </Box>
-                </Box>
                 )}
               </Box>
             </Box>

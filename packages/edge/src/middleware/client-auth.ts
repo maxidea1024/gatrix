@@ -155,7 +155,8 @@ export async function clientAuth(
     }
 
     // Resolve environment from version map
-    const { versionMapService } = await import('../services/version-map-service');
+    const { versionMapService } =
+      await import('../services/version-map-service');
     const targetEnv = versionMapService.resolveEnvironment(
       unsecuredProjectId,
       clientVersion,
@@ -172,7 +173,8 @@ export async function clientAuth(
       return;
     }
 
-    const envId = environmentRegistry.resolveEnvironmentId(targetEnv) || targetEnv;
+    const envId =
+      environmentRegistry.resolveEnvironmentId(targetEnv) || targetEnv;
     req.clientContext = {
       apiToken,
       applicationName,
@@ -269,7 +271,8 @@ export async function clientAuth(
       return;
     }
 
-    const { versionMapService } = await import('../services/version-map-service');
+    const { versionMapService } =
+      await import('../services/version-map-service');
     const targetEnv = versionMapService.resolveEnvironment(
       token.projectId.toString(),
       clientVersion,
@@ -286,7 +289,8 @@ export async function clientAuth(
       return;
     }
 
-    const envId = environmentRegistry.resolveEnvironmentId(targetEnv) || targetEnv;
+    const envId =
+      environmentRegistry.resolveEnvironmentId(targetEnv) || targetEnv;
     if (!environmentRegistry.hasEnvironment(envId)) {
       res.status(401).json({
         success: false,

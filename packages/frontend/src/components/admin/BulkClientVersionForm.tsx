@@ -141,7 +141,9 @@ const createValidationSchema = (t: any) =>
     }),
     supportsMultiLanguage: yup.boolean().optional(),
     maintenanceLocales: yup.array().optional(),
-    targetEnv: yup.string().required(t('clientVersions.form.targetEnvRequired')),
+    targetEnv: yup
+      .string()
+      .required(t('clientVersions.form.targetEnvRequired')),
   });
 
 const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
@@ -640,7 +642,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                         },
                       }}
                       renderValue={(selected) => (
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        <Box
+                          sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
+                        >
                           {selected.map((value) => (
                             <Chip
                               key={value}
@@ -746,8 +750,17 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           }}
                         >
                           {allEnvironments.map((env) => (
-                            <MenuItem key={env.environmentId} value={env.environmentId}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <MenuItem
+                              key={env.environmentId}
+                              value={env.environmentId}
+                            >
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1,
+                                }}
+                              >
                                 {env.color && (
                                   <Box
                                     sx={{
