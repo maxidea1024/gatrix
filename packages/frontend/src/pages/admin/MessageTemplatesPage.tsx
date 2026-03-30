@@ -373,6 +373,11 @@ const MessageTemplatesPage: React.FC = () => {
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
   }, [editing, fullEditingData, form]);
 
+  // Check if required fields are filled
+  const isFormValid = useMemo(() => {
+    return !!form.name.trim() && !!form.defaultMessage?.trim();
+  }, [form.name, form.defaultMessage]);
+
   // Column configuration
   const defaultColumns: ColumnConfig[] = [
     { id: 'name', labelKey: 'messageTemplates.name', visible: true },
@@ -1429,7 +1434,7 @@ const MessageTemplatesPage: React.FC = () => {
             requiresApproval={requiresApproval}
             saving={saving}
             onSave={handleSave}
-            disabled={saving || (!!editing && !isDirty)}
+            disabled={saving || !isFormValid || (!!editing && !isDirty)}
           />
         </Box>
       </ResizableDrawer>

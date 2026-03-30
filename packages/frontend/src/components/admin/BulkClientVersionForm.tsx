@@ -297,7 +297,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
     reset,
     setValue,
     watch,
@@ -1102,7 +1102,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             requiresApproval={requiresApproval}
             saving={loading || isSubmitting}
             onSave={handleSave}
-            disabled={loading || isSubmitting}
+            disabled={loading || isSubmitting || !isValid || selectedPlatforms.length === 0}
           />
         </Box>
       </form>

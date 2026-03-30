@@ -339,6 +339,11 @@ const IngamePopupNoticeFormDialog: React.FC<
     selectedTags,
   ]);
 
+  // Check if required fields are filled
+  const isFormValid = useMemo(() => {
+    return !!content.trim();
+  }, [content]);
+
   const handleSubmit = async (skipCr?: boolean) => {
     // Validation
     if (!content.trim()) {
@@ -737,7 +742,7 @@ const IngamePopupNoticeFormDialog: React.FC<
           requiresApproval={requiresApproval}
           saving={submitting}
           onSave={handleSubmit}
-          disabled={submitting || (!!notice && !isDirty)}
+          disabled={submitting || !isFormValid || (!!notice && !isDirty)}
         />
       </Box>
     </ResizableDrawer>

@@ -245,6 +245,11 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
     selectedTags,
   ]);
 
+  // Check if required fields are filled
+  const isFormValid = useMemo(() => {
+    return !!name.trim() && isValidBannerName(name);
+  }, [name]);
+
   // Focus name input when dialog opens
   useEffect(() => {
     if (open) {
@@ -867,7 +872,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           requiresApproval={requiresApproval}
           saving={saving}
           onSave={handleSave}
-          disabled={saving || (!!banner && !isDirty)}
+          disabled={saving || !isFormValid || (!!banner && !isDirty)}
         />
       </Box>
     </ResizableDrawer>

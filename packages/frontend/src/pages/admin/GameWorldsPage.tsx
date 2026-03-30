@@ -833,6 +833,15 @@ const GameWorldsPage: React.FC = () => {
     formTags,
   ]);
 
+  // Check if required fields are filled
+  const isFormValid = useMemo(() => {
+    return (
+      !!formData.worldId.trim() &&
+      !!formData.name.trim() &&
+      !!formData.worldServerAddress?.trim()
+    );
+  }, [formData.worldId, formData.name, formData.worldServerAddress]);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -2092,7 +2101,7 @@ const GameWorldsPage: React.FC = () => {
             requiresApproval={requiresApproval}
             saving={saving}
             onSave={handleSaveWorld}
-            disabled={formActiveTab !== 0 || (!!editingWorld && !isDirty)}
+            disabled={formActiveTab !== 0 || !isFormValid || (!!editingWorld && !isDirty)}
             title={formActiveTab !== 0 ? t('gameWorlds.form.switchToBasicInfoToSave') : undefined}
           />
         </Box>

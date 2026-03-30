@@ -310,7 +310,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting, isDirty },
+    formState: { errors, isSubmitting, isDirty, isValid },
     reset,
     watch,
     setValue,
@@ -658,19 +658,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           throw new Error(t('common.cannotGetClientVersionId'));
         }
         enqueueSnackbar(
-          <Box
-            component="span"
-            sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}
-          >
-            Client version{' '}
-            <Chip
-              size="small"
-              color="primary"
-              label={`${data.clientVersion}:${String(data.platform || '').toUpperCase()}`}
-              sx={{ fontWeight: 600 }}
-            />{' '}
-            has been registered.
-          </Box>,
+          t('clientVersions.createSuccess', {
+            version: data.clientVersion,
+            platform: String(data.platform || '').toUpperCase(),
+          }),
           { variant: 'success' }
         );
       }
@@ -1390,7 +1381,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             requiresApproval={requiresApproval}
             saving={isSubmitting || loading}
             onSave={handleSave}
-            disabled={isSubmitting || loading || !!duplicateError || (displayIsEdit && !isDirty)}
+            disabled={isSubmitting || loading || !isValid || !!duplicateError || (displayIsEdit && !isDirty)}
             title={displayIsCopy ? t('clientVersions.form.copyTitle') : undefined}
           />
         </Box>
