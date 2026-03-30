@@ -1,0 +1,47 @@
+diff --cc packages/frontend/src/components/admin/ClientVersionForm.tsx
+index 205b3aad,95e437cd..00000000
+--- a/packages/frontend/src/components/admin/ClientVersionForm.tsx
++++ b/packages/frontend/src/components/admin/ClientVersionForm.tsx
+@@@ -1395,15 -1381,8 +1386,20 @@@ const ClientVersionForm: React.FC<Clien
+              requiresApproval={requiresApproval}
+              saving={isSubmitting || loading}
+              onSave={handleSave}
+++<<<<<<< HEAD
+ +            disabled={
+ +              isSubmitting ||
+ +              loading ||
+ +              !!duplicateError ||
+ +              (displayIsEdit && !isDirty)
+ +            }
+ +            title={
+ +              displayIsCopy ? t('clientVersions.form.copyTitle') : undefined
+ +            }
+++=======
++             disabled={isSubmitting || loading || !isValid || !!duplicateError || (displayIsEdit && !isDirty)}
++             title={displayIsCopy ? t('clientVersions.form.copyTitle') : undefined}
+++>>>>>>> feature/forced-cr-approval
+            />
+          </Box>
+        </form>
+diff --cc packages/frontend/src/pages/admin/GameWorldsPage.tsx
+index 464ec6a7,4543791a..00000000
+--- a/packages/frontend/src/pages/admin/GameWorldsPage.tsx
++++ b/packages/frontend/src/pages/admin/GameWorldsPage.tsx
+@@@ -2092,12 -2101,8 +2101,17 @@@ const GameWorldsPage: React.FC = () => 
+              requiresApproval={requiresApproval}
+              saving={saving}
+              onSave={handleSaveWorld}
+++<<<<<<< HEAD
+ +            disabled={formActiveTab !== 0 || (!!editingWorld && !isDirty)}
+ +            title={
+ +              formActiveTab !== 0
+ +                ? t('gameWorlds.form.switchToBasicInfoToSave')
+ +                : undefined
+ +            }
+++=======
++             disabled={formActiveTab !== 0 || !isFormValid || (!!editingWorld && !isDirty)}
++             title={formActiveTab !== 0 ? t('gameWorlds.form.switchToBasicInfoToSave') : undefined}
+++>>>>>>> feature/forced-cr-approval
+            />
+          </Box>
+        </ResizableDrawer>

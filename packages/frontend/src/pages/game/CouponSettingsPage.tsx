@@ -580,6 +580,17 @@ const CouponSettingsPage: React.FC = () => {
 
     return JSON.stringify(currentData) !== JSON.stringify(originalData);
   }, [editing, fullEditingData, form, rewardMode]);
+
+  // Check if required fields are filled
+  const isFormValid = useMemo(() => {
+    return (
+      !!form.name?.trim() &&
+      !!form.expiresAt &&
+      !!form.rewardEmailTitle?.trim() &&
+      !!form.rewardEmailBody?.trim()
+    );
+  }, [form.name, form.expiresAt, form.rewardEmailTitle, form.rewardEmailBody]);
+
   // Ref for channel table container
   const channelTableRef = useRef<HTMLDivElement>(null);
   const platformTableRef = useRef<HTMLDivElement>(null);
@@ -2874,7 +2885,7 @@ const CouponSettingsPage: React.FC = () => {
             requiresApproval={requiresApproval}
             saving={submitting}
             onSave={handleSave}
-            disabled={submitting || (!!editing && !isDirty)}
+            disabled={submitting || !isFormValid || (!!editing && !isDirty)}
           />
         </Box>
       </ResizableDrawer>

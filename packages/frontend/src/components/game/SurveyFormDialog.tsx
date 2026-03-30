@@ -320,6 +320,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
     selectedTags,
   ]);
 
+  // Check if required fields are filled
+  const isFormValid = useMemo(() => {
+    return !!platformSurveyId.trim() && !!surveyTitle.trim();
+  }, [platformSurveyId, surveyTitle]);
+
   // Get available condition types (exclude already used types)
   const getAvailableConditionTypes = (
     currentIndex: number
@@ -955,7 +960,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           requiresApproval={requiresApproval}
           saving={submitting}
           onSave={handleSubmit}
-          disabled={submitting || (!!survey && !isDirty)}
+          disabled={submitting || !isFormValid || (!!survey && !isDirty)}
         />
       </Box>
       <ErrorDialog />

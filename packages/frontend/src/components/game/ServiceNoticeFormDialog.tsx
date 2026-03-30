@@ -555,6 +555,13 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     selectedTags,
   ]);
 
+  // Check if required fields are filled
+  const isFormValid = useMemo(() => {
+    const strippedContent = content.replace(/<[^>]*>/g, '').trim();
+    const hasContent = !!strippedContent || content.includes('<img') || content.includes('<iframe');
+    return !!title.trim() && hasContent && !!category;
+  }, [title, content, category]);
+
   const handleSubmit = async (skipCr: boolean = false) => {
     // Validation
     if (!category) {
@@ -1051,7 +1058,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           requiresApproval={requiresApproval}
           saving={submitting}
           onSave={handleSubmit}
-          disabled={submitting || (!!notice && !isDirty)}
+          disabled={submitting || !isFormValid || (!!notice && !isDirty)}
         />
       </Box>
     </ResizableDrawer>
