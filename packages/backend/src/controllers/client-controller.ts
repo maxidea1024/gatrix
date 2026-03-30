@@ -17,7 +17,6 @@ import { sendBadRequest, sendSuccessResponse } from '../utils/api-response';
 import { IpWhitelistService } from '../services/ip-whitelist-service';
 import { SDKRequest } from '../middleware/api-token-auth';
 import VarsModel from '../models/vars';
-import { resolvePassiveData } from '../utils/passive-data-utils';
 import { FeatureFlagModel, FeatureSegmentModel } from '../models/FeatureFlag';
 import {
   FeatureFlagEvaluator,
@@ -233,23 +232,8 @@ export class ClientController {
         });
       }
 
-      // Get clientVersionPassiveData from KV settings for the specific environment and resolve by version
-      let passiveData = {};
-      try {
-        const passiveDataStr = await VarsService.get(
-          '$clientVersionPassiveData',
-          environmentId
-        );
-        passiveData = resolvePassiveData(passiveDataStr, record.clientVersion);
-      } catch (error) {
-        logger.warn(
-          `Failed to resolve clientVersionPassiveData for environmentId ${environmentId}:`,
-          error
-        );
-      }
-
       // Parse customPayload
-      let customPayload = {};
+      let customPayload: Record<string, any> = {};
       try {
         if (record.customPayload) {
           let parsed =
@@ -274,8 +258,11 @@ export class ClientController {
         logger.warn('Failed to parse customPayload:', error);
       }
 
-      // Merge meta: passiveData first, then customPayload (customPayload overwrites)
-      const meta = { ...passiveData, ...customPayload };
+      // Build meta from customPayload and inject serviceNoticeUrl
+      const meta: Record<string, any> = { ...customPayload };
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      meta.serviceNoticeUrl =
+        `${baseUrl}/game-service-notices.html?environmentId=${environmentId}`;
 
       // Handle channel/subChannel appUpdateUrl for forced/recommended updates
       if (

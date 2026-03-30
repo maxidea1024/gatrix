@@ -1,12 +1,10 @@
 import { Response } from 'express';
 import ClientVersionService from '../services/client-version-service';
 import { ClientVersionModel } from '../models/client-version';
-import VarsModel from '../models/vars';
 import { TagService } from '../services/tag-service';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cache-keys';
 import { respondWithEtagCache } from '../utils/server-sdk-etag-cache';
 import { EnvironmentRequest } from '../middleware/environment-resolver';
-import { resolvePassiveData } from '../utils/passive-data-utils';
 
 import { createLogger } from '../config/logger';
 const logger = createLogger('ServerClientVersionController');
@@ -48,19 +46,6 @@ export class ServerClientVersionController {
             sortOrder: 'DESC',
           });
 
-          // Get clientVersionPassiveData from KV settings
-          let passiveDataStr: string | null = null;
-          try {
-            passiveDataStr = await VarsModel.get(
-              '$clientVersionPassiveData',
-              environmentId
-            );
-          } catch (error) {
-            logger.warn(
-              'Failed to fetch clientVersionPassiveData for Server SDK:',
-              error
-            );
-          }
 
           // Fetch tags for each client version
           const versionsWithTags = await Promise.all(
@@ -103,12 +88,7 @@ export class ServerClientVersionController {
                 );
               }
 
-              // Resolve passive data and merge: passiveData first, then customPayload (customPayload overwrites)
-              const passiveData = resolvePassiveData(
-                passiveDataStr,
-                version.clientVersion
-              );
-              const mergedMeta = { ...passiveData, ...customPayload };
+              const mergedMeta = { ...customPayload };
 
               // Remove internal fields from response
               const { environmentId: _env, ...versionWithoutEnv } = version;
@@ -202,22 +182,7 @@ export class ServerClientVersionController {
         version.id!
       );
 
-      // Get clientVersionPassiveData from KV settings and resolve by version
-      let passiveData = {};
-      try {
-        const passiveDataStr = await VarsModel.get(
-          '$clientVersionPassiveData',
-          environmentId
-        );
-        passiveData = resolvePassiveData(passiveDataStr, version.clientVersion);
-      } catch (error) {
-        logger.warn(
-          'Failed to resolve clientVersionPassiveData for Server SDK (Single):',
-          error
-        );
-      }
-
-      // Parse customPayload and merge with passiveData
+      // Parse customPayload
       let customPayload = {};
       try {
         if (version.customPayload) {
@@ -246,8 +211,8 @@ export class ServerClientVersionController {
         );
       }
 
-      // Merge: passiveData first, then customPayload (customPayload overwrites)
-      const mergedMeta = { ...passiveData, ...customPayload };
+      // Build meta from customPayload only
+      const mergedMeta = { ...customPayload };
 
       logger.info(
         `Server SDK: Retrieved client version ${versionId} for environmentId ${environmentId}`

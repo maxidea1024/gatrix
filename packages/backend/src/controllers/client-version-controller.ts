@@ -563,7 +563,8 @@ export class ClientVersionController {
           clientVersionData,
           projectId
         );
-      }
+      },
+      { projectScope: true }
     );
 
     if (gatewayResult.mode === 'DIRECT') {
@@ -620,8 +621,8 @@ export class ClientVersionController {
     };
 
     // Check if CR is required
-    const requiresApproval =
-      await UnifiedChangeGateway.requiresApproval(projectId);
+    const crEnvId = await UnifiedChangeGateway.getProjectCrEnvironment(projectId);
+    const requiresApproval = !!crEnvId;
 
     if (requiresApproval) {
       let lastResult;
@@ -654,7 +655,8 @@ export class ClientVersionController {
           itemData,
           async () => {
             /* won't be called if requiresApproval is true */
-          }
+          },
+          { projectScope: true }
         );
       }
 
@@ -781,7 +783,8 @@ export class ClientVersionController {
           );
         }
         return result;
-      }
+      },
+      { projectScope: true }
     );
 
     if (gatewayResult.mode === 'DIRECT') {
@@ -841,7 +844,8 @@ export class ClientVersionController {
       id,
       async () => {
         await ClientVersionService.deleteClientVersion(id, projectId);
-      }
+      },
+      { projectScope: true }
     );
 
     if (gatewayResult.mode === 'DIRECT') {
@@ -893,8 +897,8 @@ export class ClientVersionController {
     const projectId = req.projectId!;
 
     // Check if CR is required
-    const requiresApproval =
-      await UnifiedChangeGateway.requiresApproval(projectId);
+    const crEnvId = await UnifiedChangeGateway.getProjectCrEnvironment(projectId);
+    const requiresApproval = !!crEnvId;
 
     if (requiresApproval) {
       let lastResult;
@@ -934,7 +938,8 @@ export class ClientVersionController {
           projectId,
           'g_client_versions',
           id,
-          updateDataAttrs
+          updateDataAttrs,
+          { projectScope: true }
         );
       }
 

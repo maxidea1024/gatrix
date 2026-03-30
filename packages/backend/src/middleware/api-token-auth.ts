@@ -395,15 +395,20 @@ export const setSDKEnvironment = async (
 
     // Project token: dynamic env resolution via x-client-version
     if (token && token.tokenType === 'project' && token.projectId) {
-      const clientVersion = req.headers[HEADERS.X_CLIENT_VERSION] as string | undefined;
-      const platform = req.headers[HEADERS.X_PLATFORM] as string | undefined;
+      // Accept version from header or query parameter
+      const clientVersion =
+        (req.headers[HEADERS.X_CLIENT_VERSION] as string | undefined) ||
+        (req.query.version as string | undefined);
+      const platform =
+        (req.headers[HEADERS.X_PLATFORM] as string | undefined) ||
+        (req.query.platform as string | undefined);
 
       if (!clientVersion) {
         return res.status(400).json({
           success: false,
           error: {
             code: ErrorCodes.BAD_REQUEST,
-            message: 'x-client-version header is required for project tokens',
+            message: 'x-client-version header or version query parameter is required for project tokens',
           },
         });
       }
@@ -564,9 +569,13 @@ export const sdkRateLimit = (
  */
 export const clientSDKAuth = [
   authenticateApiToken,
-  // Allow infra/edge bypass tokens to proxy client requests
+  // Allow infra/edge bypass tokens and project tokens to proxy client requests
   (req: SDKRequest, res: Response, next: NextFunction) => {
     if (req.isUnsecuredToken || req.isEdgeBypassToken) {
+      return next();
+    }
+    // Project tokens are treated as client-scope for SDK access
+    if (req.apiToken?.tokenType === 'project') {
       return next();
     }
     return requireTokenType('client')(req, res, next);

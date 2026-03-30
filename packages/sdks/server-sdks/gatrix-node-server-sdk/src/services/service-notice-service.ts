@@ -10,6 +10,7 @@
  */
 
 import { ApiClient } from '../client/api-client';
+import { ApiClientFactory } from '../client/api-client-factory';
 import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import {
@@ -29,6 +30,7 @@ export interface ServiceNoticeFilters {
 
 export class ServiceNoticeService {
   private apiClient: ApiClient;
+  private apiClientFactory?: ApiClientFactory;
   private logger: Logger;
   private defaultEnvironmentId: string;
   private storage?: CacheStorageProvider;
@@ -90,6 +92,25 @@ export class ServiceNoticeService {
   }
 
   /**
+   * Set ApiClientFactory for multi-environment mode.
+   * When set, listByEnvironment() uses the factory to get a per-environment ApiClient.
+   */
+  setApiClientFactory(factory: ApiClientFactory): void {
+    this.apiClientFactory = factory;
+  }
+
+  /**
+   * Get the appropriate API client for the given environment.
+   * Uses factory in multi-env mode, falls back to default client.
+   */
+  private getApiClient(environmentId?: string): ApiClient {
+    if (this.apiClientFactory) {
+      return this.apiClientFactory.getClient(environmentId);
+    }
+    return this.apiClient;
+  }
+
+  /**
    * Get service notices for a specific environment
    * GET /api/v1/server/service-notices -> { notices: [...] }
    */
@@ -101,8 +122,10 @@ export class ServiceNoticeService {
       environmentId: resolvedEnv,
     });
 
+    const client = this.getApiClient(resolvedEnv);
+
     const response =
-      await this.apiClient.get<ServiceNoticeListResponse>(endpoint);
+      await client.get<ServiceNoticeListResponse>(endpoint);
 
     if (!response.success || !response.data) {
       throw new Error(

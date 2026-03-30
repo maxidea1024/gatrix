@@ -197,6 +197,7 @@ export class CacheManager {
         this.storage
       );
       this.serviceNoticeService.setFeatureEnabled(true);
+      this.serviceNoticeService.setApiClientFactory(this.apiClientFactory);
     }
     if (this.uses.banner === true) {
       this.bannerService = new BannerService(

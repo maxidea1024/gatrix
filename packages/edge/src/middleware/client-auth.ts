@@ -84,8 +84,13 @@ export async function clientAuth(
     (req.query.appName as string) ||
     (req.query.applicationName as string);
 
-  const clientVersion = req.headers['x-client-version'] as string | undefined;
-  const platform = req.headers['x-platform'] as string | undefined;
+  // Accept version/platform from header or query parameter
+  const clientVersion =
+    (req.headers['x-client-version'] as string | undefined) ||
+    (req.query.version as string | undefined);
+  const platform =
+    (req.headers['x-platform'] as string | undefined) ||
+    (req.query.platform as string | undefined);
 
   // Validate required parameters
   if (!apiToken) {
@@ -148,7 +153,7 @@ export async function clientAuth(
         success: false,
         error: {
           code: 'MISSING_CLIENT_VERSION',
-          message: 'x-client-version header is required for project tokens',
+          message: 'x-client-version header or version query parameter is required for project tokens',
         },
       });
       return;
@@ -263,7 +268,7 @@ export async function clientAuth(
         success: false,
         error: {
           code: 'MISSING_CLIENT_VERSION',
-          message: 'x-client-version header is required for project tokens',
+          message: 'x-client-version header or version query parameter is required for project tokens',
         },
       });
       return;

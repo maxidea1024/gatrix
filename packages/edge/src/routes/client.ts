@@ -378,6 +378,11 @@ router.get(
         }
       }
 
+      // Inject serviceNoticeUrl into meta using actual ULID environmentId
+      const edgeBaseUrl = `${req.protocol}://${req.get('host')}`;
+      (meta as Record<string, unknown>).serviceNoticeUrl =
+        `${edgeBaseUrl}/game-service-notices.html?environmentId=${environmentId}`;
+
       const clientData: Record<string, unknown> = {
         platform: record.platform,
         clientVersion: record.clientVersion,

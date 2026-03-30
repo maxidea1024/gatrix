@@ -80,19 +80,23 @@ class InternalApiTokensController {
     try {
       if (!(await requireEdgeAccess(req, res))) return;
 
-      // Get all valid tokens with org/project info via environment
+      // Get all valid tokens with org/project info
+      // Project tokens have no environmentId, so we also join via token.projectId
       const tokens = await knex('g_api_access_tokens as t')
         .leftJoin('g_environments as e', 't.environmentId', 'e.id')
         .leftJoin('g_projects as p', 'e.projectId', 'p.id')
         .leftJoin('g_organisations as o', 'p.orgId', 'o.id')
+        // Fallback join for project tokens (no environmentId, but have projectId)
+        .leftJoin('g_projects as tp', 't.projectId', 'tp.id')
+        .leftJoin('g_organisations as tok_org', 'tp.orgId', 'tok_org.id')
         .select(
           't.id',
           't.tokenName',
           't.tokenValue',
           't.tokenType',
           't.environmentId',
-          'p.id as projectId',
-          'o.id as orgId',
+          knex.raw('COALESCE(p.id, tp.id) as projectId'),
+          knex.raw('COALESCE(o.id, tok_org.id) as orgId'),
           't.expiresAt',
           't.createdAt',
           't.updatedAt'
