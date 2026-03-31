@@ -706,14 +706,14 @@ router.get(
           },
         });
       }
-      const envVersions = sdk.clientVersion.getCached(
+      const projectVersions = sdk.clientVersion.getCached(
         envContext.projectId
       ) as ClientVersion[];
 
       // Optionally filter by platform
-      let filteredVersions = envVersions;
+      let filteredVersions = projectVersions;
       if (platform) {
-        filteredVersions = envVersions.filter(
+        filteredVersions = projectVersions.filter(
           (v) => v.platform === platform || v.platform === 'all'
         );
       }

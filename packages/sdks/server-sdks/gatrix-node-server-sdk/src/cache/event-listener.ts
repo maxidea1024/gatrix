@@ -463,9 +463,7 @@ export class EventListener {
 
     if (handler.scope === 'environment') {
       // Environment-scoped events require environmentId
-      scopeId = (event.data.environmentId ||
-        event.data.environment ||
-        '') as string;
+      scopeId = (event.data.environmentId || '') as string;
       if (!scopeId) {
         this.logger.warn('Event missing environmentId', {
           event: event.type,

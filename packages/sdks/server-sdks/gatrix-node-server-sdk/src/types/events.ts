@@ -50,10 +50,6 @@ export interface StandardEventData {
   key?: string; // For vars.updated events
   value?: string | null; // For vars.updated events (direct cache update)
   timestamp: number;
-  /**
-   * @deprecated Use environmentId instead. Kept for backward compatibility.
-   */
-  environment?: string;
   /** Environment identifier sent by backend */
   environmentId?: string;
   isVisible?: boolean | number; // For gameworld.updated, popup.updated events (MySQL returns 0/1)
