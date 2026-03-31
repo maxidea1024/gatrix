@@ -6,7 +6,7 @@ import { Logger } from '../../utils/logger';
 
 export class WhitelistEventHandler implements IEventHandler {
   readonly scope: EventHandlerScope = 'environment';
-  readonly eventTypes = ['whitelist.updated'];
+  readonly eventTypes = ['ip_whitelist.updated', 'account_whitelist.updated'];
 
   isEnabled(uses: UsesConfig): boolean {
     return uses.whitelist !== false;

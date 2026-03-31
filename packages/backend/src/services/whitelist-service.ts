@@ -96,7 +96,7 @@ export class WhitelistService {
 
         await pubSubService.publishSDKEvent(
           {
-            type: 'whitelist.updated',
+            type: 'account_whitelist.updated',
             data: {
               id: whitelist.id,
               environmentId,
@@ -157,7 +157,7 @@ export class WhitelistService {
 
         await pubSubService.publishSDKEvent(
           {
-            type: 'whitelist.updated',
+            type: 'account_whitelist.updated',
             data: {
               id: updated.id,
               environmentId,
@@ -207,7 +207,7 @@ export class WhitelistService {
 
         await pubSubService.publishSDKEvent(
           {
-            type: 'whitelist.updated',
+            type: 'account_whitelist.updated',
             data: {
               id,
               environmentId,
@@ -294,7 +294,7 @@ export class WhitelistService {
 
         await pubSubService.publishSDKEvent(
           {
-            type: 'whitelist.updated',
+            type: 'account_whitelist.updated',
             data: {
               id: 0,
               environmentId,
@@ -359,7 +359,7 @@ export class WhitelistService {
 
         await pubSubService.publishSDKEvent(
           {
-            type: 'whitelist.updated',
+            type: 'account_whitelist.updated',
             data: {
               id: updated.id,
               environmentId,
