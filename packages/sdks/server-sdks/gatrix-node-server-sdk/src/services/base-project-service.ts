@@ -83,7 +83,7 @@ export abstract class BaseProjectService<
 
   /**
    * Set ApiClientFactory for multi-tenant mode (Edge).
-   * When set, listByEnvironments() uses the factory to get a per-environment ApiClient.
+   * When set, listByProject() uses the factory to get a per-environment ApiClient for the correct auth context.
    */
   setApiClientFactory(factory: ApiClientFactory): void {
     this.apiClientFactory = factory;
@@ -212,82 +212,6 @@ export abstract class BaseProjectService<
     await this.persistCache(resolvedProject);
 
     return items;
-  }
-
-  /**
-   * Fetch items for multiple environments, deduplicating by projectId.
-   * Used in multi-tenant mode (Edge) where environments from the same project
-   * share the same project-scoped data.
-   *
-   * For each environment:
-   * 1. Uses the environment's API client (via apiClientFactory)
-   * 2. Extracts projectId from the first response item
-   * 3. Skips if that project has already been fetched
-   * 4. Caches by projectId
-   */
-  async listByEnvironments(environmentIds: string[]): Promise<T[]> {
-    this.logger.debug(
-      `Fetching ${this.getServiceName()} for multiple environments (dedup by project)`,
-      { count: environmentIds.length }
-    );
-
-    const fetchedProjects = new Set<string>();
-    const allItems: T[] = [];
-
-    for (const envId of environmentIds) {
-      try {
-        const client = this.getApiClient(envId);
-        const endpoint = this.getEndpoint();
-        const response = await client.get<TResponse>(endpoint);
-
-        if (!response.success || !response.data) {
-          this.logger.warn(
-            `Failed to fetch ${this.getServiceName()} for environment`,
-            { environmentId: envId }
-          );
-          continue;
-        }
-
-        const items = this.extractItems(response.data);
-
-        // Determine projectId from first item
-        const projectId =
-          items.length > 0
-            ? this.getProjectIdFromItem(items[0]) || envId
-            : envId;
-
-        // Skip if already fetched for this project
-        if (fetchedProjects.has(projectId)) {
-          this.logger.debug(
-            `${this.getServiceName()} already fetched for project, skipping`,
-            { projectId, environmentId: envId }
-          );
-          continue;
-        }
-
-        fetchedProjects.add(projectId);
-        this.cachedByProject.set(projectId, items);
-        await this.persistCache(projectId);
-        allItems.push(...items);
-
-        this.logger.info(
-          `${this.getServiceName()} fetched for project via environment`,
-          { projectId, environmentId: envId, itemCount: items.length }
-        );
-      } catch (error: any) {
-        this.logger.error(
-          `Failed to fetch ${this.getServiceName()} for environment`,
-          { environmentId: envId, error: error.message }
-        );
-      }
-    }
-
-    this.logger.info(
-      `${this.getServiceName()} fetched for all projects`,
-      { projectCount: fetchedProjects.size, totalItems: allItems.length }
-    );
-
-    return allItems;
   }
 
   /**

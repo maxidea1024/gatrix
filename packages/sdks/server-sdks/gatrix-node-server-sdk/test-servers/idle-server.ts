@@ -556,7 +556,7 @@ async function main() {
         whitelists: sdk.whitelist.getAllCached(),
         maintenance: sdk.serviceMaintenance.getCached(targetEnvironment),
         banners: sdk.banner.getCached(targetEnvironment),
-        clientVersions: sdk.clientVersion.getCached(targetEnvironment),
+        clientVersions: sdk.clientVersion.getCached(), // project-scoped: no environmentId
         serviceNotices: sdk.serviceNotice.getCached(targetEnvironment),
         storeProducts: sdk.storeProduct.getCached(targetEnvironment),
         featureFlags: featureFlags.length,

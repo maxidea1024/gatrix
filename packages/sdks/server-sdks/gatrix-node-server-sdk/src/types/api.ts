@@ -87,9 +87,9 @@ export interface ClientVersionListResponse {
   total: number;
 }
 
-// Multi-environment mode response (byEnvironment is keyed by environmentName)
-export interface ClientVersionByEnvResponse {
-  byEnvironment: Record<string, ClientVersion[]>;
+// Multi-environment mode response (byProject is keyed by projectId)
+export interface ClientVersionByProjectResponse {
+  byProject: Record<string, ClientVersion[]>;
   total: number;
 }
 
