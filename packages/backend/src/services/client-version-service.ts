@@ -482,7 +482,7 @@ export class ClientVersionService {
       }
     }
 
-    // Invalidate client version cache (including ETag cache for SDK - all environments for bulk op)
+    // Invalidate client version cache (including ETag cache for SDK - all projects for bulk op)
     await pubSubService.invalidateByPattern('*client_version:*');
     await pubSubService.invalidateByPattern(
       `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`

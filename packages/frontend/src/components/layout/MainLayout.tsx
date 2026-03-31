@@ -84,6 +84,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { AuthService } from '@/services/auth';
 import { useTheme as useCustomTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -627,7 +628,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     try {
       // Fetch latest user profile to update localStorage before reload
       // This ensures the new role/permissions are reflected after page refresh
-      const { AuthService } = await import('@/services/auth');
       await AuthService.getProfile();
     } catch (error) {
       // Continue with reload even if profile fetch fails
