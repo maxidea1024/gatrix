@@ -7,7 +7,7 @@
 
 /**
  * Environment-scoped cache key prefix
- * Used for data that varies by environment (game worlds, client versions, etc.)
+ * Used for data that varies by environment (game worlds, whitelists, etc.)
  * Format: env:{ environmentId }:{originalKey}
  */
 export const ENV_PREFIX = 'env';
@@ -328,7 +328,7 @@ export const ENV_SCOPED = {
   },
 
   /**
-   * Client versions (environment-specific)
+   * Client versions (project-scoped, but cached here for legacy compatibility)
    */
   CLIENT_VERSION: {
     BY_CHANNEL: (channel: string, subChannel: string) =>

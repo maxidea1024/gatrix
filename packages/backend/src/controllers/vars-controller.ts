@@ -78,20 +78,26 @@ export class VarsController {
         );
 
         // Force all SDKs (Edge, Game Servers) to refresh their client versions
-        // by emitting a 'client_version.updated' event for each environment
+        // client_version is project-scoped, so publish to project channel
 
         try {
-          // environment is already the name string
-          await pubSubService.publishSDKEvent(
-            {
-              type: 'client_version.updated',
-              data: {
-                id: -1, // Dummy ID to trigger refresh of the list for this environmentId
-                environmentId: environmentId,
+          const projectId = req.projectId;
+          if (projectId) {
+            await pubSubService.publishSDKEvent(
+              {
+                type: 'client_version.updated',
+                data: {
+                  id: -1, // Dummy ID to trigger full refresh
+                  projectId,
+                },
               },
-            },
-            { environmentId: environmentId }
-          );
+              { projectId }
+            );
+          } else {
+            logger.warn(
+              'Cannot publish client_version.updated: projectId not available'
+            );
+          }
         } catch (err) {
           // Log error but don't fail the request
           logger.error('Failed to broadcast client version update events', err);
@@ -306,20 +312,26 @@ export class VarsController {
         );
 
         // Force all SDKs (Edge, Game Servers) to refresh their client versions
-        // by emitting a 'client_version.updated' event for each environment
+        // client_version is project-scoped, so publish to project channel
 
         try {
-          // environment is already the name string
-          await pubSubService.publishSDKEvent(
-            {
-              type: 'client_version.updated',
-              data: {
-                id: -1, // Dummy ID to trigger refresh of the list for this environmentId
-                environmentId: environmentId,
+          const projectId = req.projectId;
+          if (projectId) {
+            await pubSubService.publishSDKEvent(
+              {
+                type: 'client_version.updated',
+                data: {
+                  id: -1, // Dummy ID to trigger full refresh
+                  projectId,
+                },
               },
-            },
-            { environmentId: environmentId }
-          );
+              { projectId }
+            );
+          } else {
+            logger.warn(
+              'Cannot publish client_version.updated: projectId not available'
+            );
+          }
         } catch (err) {
           // Log error but don't fail the request
           logger.error('Failed to broadcast client version update events', err);

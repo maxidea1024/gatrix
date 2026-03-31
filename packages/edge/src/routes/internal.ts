@@ -35,7 +35,7 @@ function buildCacheResponse(sdk: any, includeDetail: boolean = true): any {
   // Build summary with counts per environment
   const summary: Record<string, any> = {};
 
-  // Client versions by environment
+  // Client versions by project (project-scoped)
   if (allCached.clientVersions) {
     summary.clientVersions = {};
     for (const [env, versions] of Object.entries(allCached.clientVersions)) {
