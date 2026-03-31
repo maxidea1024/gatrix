@@ -121,39 +121,106 @@ export class WhitelistService {
   }
 
   /**
-   * Get all whitelists (IP and Account) for a specific environment
-   * GET /api/v1/server/whitelists
+   * Fetch IP whitelists for a specific environment
+   * GET /api/v1/server/ip-whitelists
    */
-  async listByEnvironment(environmentId?: string): Promise<WhitelistData> {
-    const endpoint = `/api/v1/server/whitelists`;
-
-    this.logger.debug('Fetching whitelists', { environmentId });
-
+  async fetchIpWhitelist(environmentId?: string): Promise<IpWhitelistEntry[]> {
+    const endpoint = `/api/v1/server/ip-whitelists`;
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
     const client = this.getApiClient(resolvedEnv);
-    const response = await client.get<WhitelistData>(endpoint);
+
+    this.logger.debug('Fetching IP whitelists', { environmentId: resolvedEnv });
+
+    const response = await client.get<IpWhitelistEntry[]>(endpoint);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch whitelists');
-    }
-
-    this.cachedWhitelistByEnv.set(resolvedEnv, response.data);
-
-    // Save to local storage if available
-    if (this.storage) {
-      await this.storage.save(
-        `Whitelist_${environmentId}`,
-        JSON.stringify(response.data)
+      throw new Error(
+        response.error?.message || 'Failed to fetch IP whitelists'
       );
     }
 
-    this.logger.info('Whitelists fetched', {
-      environmentId,
-      ipCount: response.data.ipWhitelist.length,
-      accountCount: response.data.accountWhitelist.length,
+    // Update only ipWhitelist part of cache
+    const cached = this.getCached(resolvedEnv);
+    const updatedData: WhitelistData = {
+      ...cached,
+      ipWhitelist: response.data,
+    };
+    this.cachedWhitelistByEnv.set(resolvedEnv, updatedData);
+
+    if (this.storage) {
+      await this.storage.save(
+        `Whitelist_${resolvedEnv}`,
+        JSON.stringify(updatedData)
+      );
+    }
+
+    this.logger.info('IP whitelists fetched', {
+      environmentId: resolvedEnv,
+      count: response.data.length,
     });
 
     return response.data;
+  }
+
+  /**
+   * Fetch account whitelists for a specific environment
+   * GET /api/v1/server/account-whitelists
+   */
+  async fetchAccountWhitelist(
+    environmentId?: string
+  ): Promise<AccountWhitelistEntry[]> {
+    const endpoint = `/api/v1/server/account-whitelists`;
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    const client = this.getApiClient(resolvedEnv);
+
+    this.logger.debug('Fetching account whitelists', {
+      environmentId: resolvedEnv,
+    });
+
+    const response = await client.get<AccountWhitelistEntry[]>(endpoint);
+
+    if (!response.success || !response.data) {
+      throw new Error(
+        response.error?.message || 'Failed to fetch account whitelists'
+      );
+    }
+
+    // Update only accountWhitelist part of cache
+    const cached = this.getCached(resolvedEnv);
+    const updatedData: WhitelistData = {
+      ...cached,
+      accountWhitelist: response.data,
+    };
+    this.cachedWhitelistByEnv.set(resolvedEnv, updatedData);
+
+    if (this.storage) {
+      await this.storage.save(
+        `Whitelist_${resolvedEnv}`,
+        JSON.stringify(updatedData)
+      );
+    }
+
+    this.logger.info('Account whitelists fetched', {
+      environmentId: resolvedEnv,
+      count: response.data.length,
+    });
+
+    return response.data;
+  }
+
+  /**
+   * Fetch all whitelists (IP + Account) for a specific environment
+   * Calls both separate endpoints
+   */
+  async listByEnvironment(environmentId?: string): Promise<WhitelistData> {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+
+    await Promise.all([
+      this.fetchIpWhitelist(resolvedEnv),
+      this.fetchAccountWhitelist(resolvedEnv),
+    ]);
+
+    return this.getCached(resolvedEnv);
   }
 
   /**

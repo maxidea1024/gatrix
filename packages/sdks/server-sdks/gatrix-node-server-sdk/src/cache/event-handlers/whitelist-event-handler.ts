@@ -18,11 +18,21 @@ export class WhitelistEventHandler implements IEventHandler {
   ) {}
 
   async handle(event: StandardEvent, environmentId: string): Promise<void> {
-    this.logger.info('Whitelist updated, refreshing cache', { environmentId });
     try {
-      await this.cacheManager.refreshWhitelists(environmentId);
+      if (event.type === 'ip_whitelist.updated') {
+        this.logger.info('IP whitelist updated, refreshing IP cache', {
+          environmentId,
+        });
+        await this.cacheManager.refreshIpWhitelists(environmentId);
+      } else if (event.type === 'account_whitelist.updated') {
+        this.logger.info('Account whitelist updated, refreshing account cache', {
+          environmentId,
+        });
+        await this.cacheManager.refreshAccountWhitelists(environmentId);
+      }
     } catch (error: any) {
       this.logger.error('Failed to refresh whitelist cache', {
+        eventType: event.type,
         error: error.message,
       });
     }

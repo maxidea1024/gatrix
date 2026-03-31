@@ -91,7 +91,7 @@ export class WhitelistService {
       // Publish whitelist.updated event for SDK real-time updates
       try {
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+          `${SERVER_SDK_ETAG.ACCOUNT_WHITELISTS}:${environmentId}`
         );
 
         await pubSubService.publishSDKEvent(
@@ -152,7 +152,7 @@ export class WhitelistService {
       // Publish whitelist.updated event for SDK real-time updates
       try {
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+          `${SERVER_SDK_ETAG.ACCOUNT_WHITELISTS}:${environmentId}`
         );
 
         await pubSubService.publishSDKEvent(
@@ -202,7 +202,7 @@ export class WhitelistService {
       // Publish whitelist.updated event for SDK real-time updates
       try {
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+          `${SERVER_SDK_ETAG.ACCOUNT_WHITELISTS}:${environmentId}`
         );
 
         await pubSubService.publishSDKEvent(
@@ -289,7 +289,7 @@ export class WhitelistService {
       try {
         // Publish event for SDK update (using 0 as ID to signify bulk change)
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+          `${SERVER_SDK_ETAG.ACCOUNT_WHITELISTS}:${environmentId}`
         );
 
         await pubSubService.publishSDKEvent(
@@ -354,7 +354,7 @@ export class WhitelistService {
       // Publish whitelist.updated event for SDK real-time updates
       try {
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+          `${SERVER_SDK_ETAG.ACCOUNT_WHITELISTS}:${environmentId}`
         );
 
         await pubSubService.publishSDKEvent(

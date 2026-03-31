@@ -28,25 +28,27 @@ const router = express.Router();
  * Returns enabled whitelists for server-side validation
  * Exported as a separate handler for use in both /services/whitelists and /whitelists paths
  */
-export const getWhitelistsHandler = async (
+/**
+ * Get IP whitelists route handler
+ * GET /api/v1/server/services/ip-whitelists
+ */
+export const getIpWhitelistsHandler = async (
   req: EnvironmentRequest,
   res: any
 ) => {
   const environmentId = req.environmentId!;
   try {
     await respondWithEtagCache(res, {
-      cacheKey: `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`,
+      cacheKey: `${SERVER_SDK_ETAG.IP_WHITELISTS}:${environmentId}`,
       ttlMs: DEFAULT_CONFIG.WHITELIST_TTL,
       requestEtag: req.headers?.['if-none-match'],
       buildPayload: async () => {
-        // Get all enabled IP whitelists for this environment
         const ipWhitelistsResult = await IpWhitelistModel.findAll(1, 10000, {
           isEnabled: true,
           environmentId: environmentId,
         });
         const now = new Date();
 
-        // Filter by date range
         const activeIpWhitelists = ipWhitelistsResult.ipWhitelists.filter(
           (ip: any) => {
             if (ip.startDate && new Date(ip.startDate) > now) return false;
@@ -55,13 +57,47 @@ export const getWhitelistsHandler = async (
           }
         );
 
-        // Get all enabled account whitelists for this environment
+        const ipWhitelist = activeIpWhitelists.map((ip: any) => ({
+          id: ip.id,
+          ipAddress: ip.ipAddress,
+        }));
+
+        return {
+          success: true,
+          data: ipWhitelist,
+        };
+      },
+    });
+  } catch (error: any) {
+    logger.error('Failed to get IP whitelists:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to get IP whitelists',
+    });
+  }
+};
+
+/**
+ * Get account whitelists route handler
+ * GET /api/v1/server/services/account-whitelists
+ */
+export const getAccountWhitelistsHandler = async (
+  req: EnvironmentRequest,
+  res: any
+) => {
+  const environmentId = req.environmentId!;
+  try {
+    await respondWithEtagCache(res, {
+      cacheKey: `${SERVER_SDK_ETAG.ACCOUNT_WHITELISTS}:${environmentId}`,
+      ttlMs: DEFAULT_CONFIG.WHITELIST_TTL,
+      requestEtag: req.headers?.['if-none-match'],
+      buildPayload: async () => {
         const accountWhitelistsResult = await WhitelistModel.findAll(1, 10000, {
           isEnabled: true,
           environmentId: environmentId,
         });
+        const now = new Date();
 
-        // Filter by date range
         const activeAccountWhitelists =
           accountWhitelistsResult.whitelists.filter((account: any) => {
             if (account.startDate && new Date(account.startDate) > now)
@@ -70,12 +106,6 @@ export const getWhitelistsHandler = async (
               return false;
             return true;
           });
-
-        // Format response to match SDK expectations
-        const ipWhitelist = activeIpWhitelists.map((ip: any) => ({
-          id: ip.id,
-          ipAddress: ip.ipAddress,
-        }));
 
         const accountWhitelist = activeAccountWhitelists.map(
           (account: any) => ({
@@ -87,28 +117,30 @@ export const getWhitelistsHandler = async (
 
         return {
           success: true,
-          data: {
-            ipWhitelist,
-            accountWhitelist,
-          },
+          data: accountWhitelist,
         };
       },
     });
   } catch (error: any) {
-    logger.error('Failed to get whitelists:', error);
-
+    logger.error('Failed to get account whitelists:', error);
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to get whitelists',
+      error: error.message || 'Failed to get account whitelists',
     });
   }
 };
 
 /**
- * Get whitelists route
- * GET /api/v1/server/services/whitelists
+ * IP whitelists route
+ * GET /api/v1/server/services/ip-whitelists
  */
-router.get('/whitelists', serverSDKAuth, getWhitelistsHandler);
+router.get('/ip-whitelists', serverSDKAuth, getIpWhitelistsHandler);
+
+/**
+ * Account whitelists route
+ * GET /api/v1/server/services/account-whitelists
+ */
+router.get('/account-whitelists', serverSDKAuth, getAccountWhitelistsHandler);
 
 /**
  * Register service instance (full snapshot)

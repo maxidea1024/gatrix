@@ -1587,6 +1587,26 @@ export class CacheManager {
   }
 
   /**
+   * Refresh IP whitelist cache only
+   * @param environmentId environment ID (required)
+   */
+  async refreshIpWhitelists(environmentId: string): Promise<void> {
+    if (!this.whitelistService) return;
+    this.logger.info('Refreshing IP whitelist cache...');
+    await this.whitelistService.fetchIpWhitelist(environmentId);
+  }
+
+  /**
+   * Refresh account whitelist cache only
+   * @param environmentId environment ID (required)
+   */
+  async refreshAccountWhitelists(environmentId: string): Promise<void> {
+    if (!this.whitelistService) return;
+    this.logger.info('Refreshing account whitelist cache...');
+    await this.whitelistService.fetchAccountWhitelist(environmentId);
+  }
+
+  /**
    * Get cached whitelists
    * @param environmentId environment ID (required)
    */

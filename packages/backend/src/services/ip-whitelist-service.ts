@@ -174,7 +174,6 @@ export class IpWhitelistService {
             type: 'ip_whitelist.updated',
             data: {
               id: created.id,
-
               environmentId,
             },
           },
@@ -182,7 +181,7 @@ export class IpWhitelistService {
         );
 
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+          `${SERVER_SDK_ETAG.IP_WHITELISTS}:${environmentId}`
         );
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
@@ -277,7 +276,7 @@ export class IpWhitelistService {
         );
 
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${updated.environmentId}`
+          `${SERVER_SDK_ETAG.IP_WHITELISTS}:${updated.environmentId}`
         );
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
@@ -332,7 +331,7 @@ export class IpWhitelistService {
         );
 
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${existing.environmentId}`
+          `${SERVER_SDK_ETAG.IP_WHITELISTS}:${existing.environmentId}`
         );
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
@@ -381,7 +380,7 @@ export class IpWhitelistService {
       // Publish whitelist.updated event for SDK real-time updates
       try {
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${updated.environmentId}`
+          `${SERVER_SDK_ETAG.IP_WHITELISTS}:${updated.environmentId}`
         );
 
         await pubSubService.publishSDKEvent(
