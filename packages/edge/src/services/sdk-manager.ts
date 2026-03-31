@@ -49,6 +49,8 @@ class EdgeEnvironmentProvider implements IEnvironmentProvider {
           entries.push({
             environmentId: env.id,
             token: `unsecured-${org.id}:${project.id}:${env.id}-server-api-token`,
+            projectId: project.id,
+            orgId: org.id,
           });
         }
       }

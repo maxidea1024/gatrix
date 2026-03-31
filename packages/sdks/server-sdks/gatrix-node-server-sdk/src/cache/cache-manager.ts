@@ -180,10 +180,12 @@ export class CacheManager {
       this.serviceMaintenanceService.setApiClientFactory(this.apiClientFactory);
     }
     if (this.uses.clientVersion === true) {
+      // ClientVersion is project-scoped — uses empty projectId initially,
+      // updated to resolvedProjectId after /ready
       this.clientVersionService = new ClientVersionService(
         apiClient,
         logger,
-        this.defaultEnvironmentId,
+        '',
         this.storage
       );
       this.clientVersionService.setFeatureEnabled(true);
@@ -357,6 +359,14 @@ export class CacheManager {
         );
       }
 
+      // Update project-scoped services with the resolved projectId
+      if (this.resolvedProjectId && this.clientVersionService) {
+        this.clientVersionService.setDefaultProjectId(this.resolvedProjectId);
+        this.logger.info('ClientVersionService projectId updated', {
+          projectId: this.resolvedProjectId,
+        });
+      }
+
       // Register environments to ApiClientFactory (environmentId → token mapping)
       if (this.multiMode) {
         this.registerEnvironments();
@@ -384,8 +394,7 @@ export class CacheManager {
             initPromises.push(
               this.serviceMaintenanceService.initializeAsync(env)
             );
-          if (this.clientVersionService)
-            initPromises.push(this.clientVersionService.initializeAsync(env));
+          // clientVersion is project-scoped — initialized separately below
           if (this.serviceNoticeService)
             initPromises.push(this.serviceNoticeService.initializeAsync(env));
           if (this.bannerService)
@@ -399,6 +408,13 @@ export class CacheManager {
         }
         await Promise.all(initPromises);
         this.logger.debug('Local cache initialization completed');
+      }
+
+      // 2. Initialize project-scoped services from local storage
+      if (this.clientVersionService && this.resolvedProjectId) {
+        await this.clientVersionService
+          .initializeAsync(this.resolvedProjectId)
+          .catch(() => {});
       }
 
       // 3. Remote synchronization (in background, but wait for first result)
@@ -589,13 +605,16 @@ export class CacheManager {
         }
       }
 
-      // Edge-specific features: these always use multi-environment APIs
-      // Only load if we have environments available
+      // Project-scoped features: fetched per project, not per environment
       if (this.uses.clientVersion === true && this.clientVersionService) {
-        if (envList.length > 0) {
+        if (this.multiMode) {
+          promises.push(this.fetchDataForProjects());
+          featureTypes.push('clientVersion');
+        } else if (this.resolvedProjectId) {
+          // Single-env: use resolvedProjectId from /ready
           promises.push(
             this.clientVersionService
-              .listByEnvironments(envList)
+              .listByProject(this.resolvedProjectId)
               .catch((error) => {
                 this.logger.warn('Failed to load client versions', {
                   error: error.message,
@@ -605,7 +624,6 @@ export class CacheManager {
           );
           featureTypes.push('clientVersion');
         }
-        // Skip if no environments available
       }
 
       if (this.uses.serviceNotice === true && this.serviceNoticeService) {
@@ -780,10 +798,19 @@ export class CacheManager {
                 entry.token
               );
             }
+
+            // Fetch environment-scoped data
             this.fetchDataForEnvironments(
               added.map((e) => e.environmentId)
             ).catch((error: any) => {
               this.logger.error('Failed to fetch data for new environments', {
+                error: error.message,
+              });
+            });
+
+            // Fetch project-scoped data
+            this.fetchDataForProjects().catch((error: any) => {
+              this.logger.error('Failed to fetch project-scoped data', {
                 error: error.message,
               });
             });
@@ -898,7 +925,7 @@ export class CacheManager {
       this.surveyService?.clearCacheForEnvironment(env);
       this.whitelistService?.clearCacheForEnvironment(env);
       this.serviceMaintenanceService?.clearCacheForEnvironment(env);
-      this.clientVersionService?.clearCacheForEnvironment(env);
+      // clientVersion is project-scoped — not affected by environment changes
       this.serviceNoticeService?.clearCacheForEnvironment(env);
       this.bannerService?.clearCacheForEnvironment(env);
       this.storeProductService?.clearCacheForEnvironment(env);
@@ -941,10 +968,7 @@ export class CacheManager {
             .getStatusByEnvironment(envId)
             .catch(() => null)
         );
-      if (this.clientVersionService)
-        promises.push(
-          this.clientVersionService.listByEnvironment(envId).catch(() => [])
-        );
+      // clientVersion is project-scoped — not fetched per environment
       if (this.serviceNoticeService)
         promises.push(
           this.serviceNoticeService.listByEnvironment(envId).catch(() => [])
@@ -1148,13 +1172,15 @@ export class CacheManager {
         }
       }
 
-      // Edge-specific features: these always use multi-environment APIs
-      // Only refresh if we have environments available
+      // Project-scoped features: refresh per project
       if (this.uses.clientVersion === true && this.clientVersionService) {
-        if (envList.length > 0) {
+        if (this.multiMode) {
+          promises.push(this.fetchDataForProjects());
+          refreshedTypes.push('clientVersion');
+        } else {
           promises.push(
             this.clientVersionService
-              .listByEnvironments(envList)
+              .refreshByProject(true)
               .catch((error) => {
                 this.logger.warn('Failed to refresh client versions', {
                   error: error.message,
@@ -1681,22 +1707,22 @@ export class CacheManager {
 
   /**
    * Get cached client versions
-   * @param environmentId environment ID (required)
+   * @param projectId project ID (required, client versions are project-scoped)
    */
-  getClientVersions(environmentId: string): ClientVersion[] {
-    return this.clientVersionService?.getCached(environmentId) || [];
+  getClientVersions(projectId: string): ClientVersion[] {
+    return this.clientVersionService?.getCached(projectId) || [];
   }
 
   /**
    * Update a single client version in cache (immutable)
    * @param item Client version to update
-   * @param environmentId environment ID (required)
+   * @param projectId project ID (required, client versions are project-scoped)
    */
   async updateSingleClientVersion(
     item: any,
-    environmentId: string
+    projectId: string
   ): Promise<void> {
-    this.clientVersionService?.updateSingleClientVersion(item, environmentId);
+    this.clientVersionService?.updateSingleClientVersion(item, projectId);
   }
 
   /**
@@ -1909,8 +1935,7 @@ export class CacheManager {
       addEnvIds(this.gameWorldService.getEnvironmentIds());
     if (this.popupNoticeService)
       addEnvIds(this.popupNoticeService.getEnvironmentIds());
-    if (this.clientVersionService)
-      addEnvIds(this.clientVersionService.getEnvironmentIds());
+    // clientVersion is project-scoped — not included in environment ID collection
     if (this.bannerService) addEnvIds(this.bannerService.getEnvironmentIds());
     if (this.storeProductService)
       addEnvIds(this.storeProductService.getEnvironmentIds());
@@ -1946,6 +1971,76 @@ export class CacheManager {
    */
   resolveTokenForEnvironmentId(environmentId: string): string {
     return environmentId;
+  }
+
+  /**
+   * Build a projectId → representative environmentId mapping.
+   * Groups environments by project so project-scoped services can fetch once per project.
+   * Uses the first environment of each project as the representative for API calls.
+   */
+  private getProjectEnvironmentMap(): Map<string, string> {
+    const projectEnvMap = new Map<string, string>();
+    const entries = this.environmentProvider.getEnvironmentTokens();
+
+    for (const entry of entries) {
+      if (entry.projectId && !projectEnvMap.has(entry.projectId)) {
+        projectEnvMap.set(entry.projectId, entry.environmentId);
+      }
+    }
+
+    if (projectEnvMap.size === 0 && entries.length > 0) {
+      this.logger.warn(
+        'No projectId found in environment entries. Project-scoped services will not load data.',
+        {
+          envCount: entries.length,
+          sampleKeys: Object.keys(entries[0] || {}),
+        }
+      );
+    }
+
+    return projectEnvMap;
+  }
+
+  /**
+   * Fetch all project-scoped data.
+   * Builds project list from environment entries and fetches data once per project.
+   */
+  private async fetchDataForProjects(): Promise<void> {
+    const projectEnvMap = this.getProjectEnvironmentMap();
+    if (projectEnvMap.size === 0) return;
+    await this.fetchClientVersionsByProjects(projectEnvMap);
+  }
+
+  /**
+   * Fetch client versions for each project using the project's representative environment.
+   * Each project is fetched exactly once — no duplicate calls for environments in the same project.
+   */
+  private async fetchClientVersionsByProjects(
+    projectEnvMap: Map<string, string>
+  ): Promise<void> {
+    if (!this.clientVersionService) return;
+
+    for (const [projectId, envId] of projectEnvMap) {
+      try {
+        await this.clientVersionService.listByProject(projectId, envId);
+      } catch (error: any) {
+        this.logger.warn('Failed to load client versions for project', {
+          projectId,
+          error: error.message,
+        });
+      }
+    }
+  }
+
+  /**
+   * Get a representative environmentId for a given projectId.
+   * Used by event handlers to get the correct API client for refresh in multi-tenant mode.
+   * Returns undefined in single-env mode or if the project is not found.
+   */
+  getEnvironmentIdForProject(projectId: string): string | undefined {
+    if (!this.multiMode) return undefined;
+    const projectEnvMap = this.getProjectEnvironmentMap();
+    return projectEnvMap.get(projectId);
   }
 
   getUses(): UsesConfig {

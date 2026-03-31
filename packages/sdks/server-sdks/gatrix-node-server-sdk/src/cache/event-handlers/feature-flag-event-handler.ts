@@ -1,10 +1,11 @@
-import { IEventHandler } from './event-handler';
+import { IEventHandler, EventHandlerScope } from './event-handler';
 import { StandardEvent } from '../../types/events';
 import { CacheManager } from '../cache-manager';
 import { UsesConfig } from '../../types/config';
 import { Logger } from '../../utils/logger';
 
 export class FeatureFlagEventHandler implements IEventHandler {
+  readonly scope: EventHandlerScope = 'environment';
   readonly eventTypes = [
     'feature_flag.changed',
     'segment.created',

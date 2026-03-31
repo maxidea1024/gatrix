@@ -21,6 +21,10 @@ export interface EnvironmentEntry {
   environmentId: string;
   /** API token for this environment — used for API authentication only */
   token: string;
+  /** Project ID this environment belongs to (optional, used in multi-tenant mode) */
+  projectId?: string;
+  /** Org ID this environment belongs to (optional, used in multi-tenant mode) */
+  orgId?: string;
 }
 
 /**

@@ -1,17 +1,20 @@
 /**
  * Client Version Service
  * Handles client version list and retrieval
- * Uses per-environment API pattern: GET /api/v1/server/client-versions
- * Extends BaseEnvironmentService for common fetch/caching logic
+ * Uses per-project API pattern: GET /api/v1/server/client-versions
+ * Extends BaseProjectService for project-scoped fetch/caching logic
+ *
+ * NOTE: Client versions are project-scoped, NOT environment-scoped.
+ * A single project shares the same client version list across all its environments.
  */
 
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { ClientVersion, ClientVersionListResponse } from '../types/api';
-import { BaseEnvironmentService } from './base-environment-service';
+import { BaseProjectService } from './base-project-service';
 
-export class ClientVersionService extends BaseEnvironmentService<
+export class ClientVersionService extends BaseProjectService<
   ClientVersion,
   ClientVersionListResponse,
   string
@@ -19,10 +22,10 @@ export class ClientVersionService extends BaseEnvironmentService<
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    defaultEnvironmentId: string,
+    defaultProjectId: string,
     storage?: CacheStorageProvider
   ) {
-    super(apiClient, logger, defaultEnvironmentId, storage);
+    super(apiClient, logger, defaultProjectId, storage);
   }
 
   // ==================== Abstract Method Implementations ====================
@@ -43,33 +46,41 @@ export class ClientVersionService extends BaseEnvironmentService<
     return item.id;
   }
 
+  protected getProjectIdFromItem(item: ClientVersion): string | undefined {
+    return item.projectId;
+  }
+
   // ==================== Override for ETag Invalidation ====================
 
   /**
-   * Refresh cached client versions for a specific environment.
+   * Refresh cached client versions for the project.
    * Invalidates ApiClient ETag cache first so the SDK does NOT send
    * a stale If-None-Match header that would result in a 304 with old data.
    */
-  async refreshByEnvironment(
+  async refreshByProject(
     _suppressWarnings?: boolean,
+    projectId?: string,
     environmentId?: string
   ): Promise<ClientVersion[]> {
-    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    const resolvedProject = projectId || this.defaultProjectId;
+    // In multi-tenant mode, resolve a representative environmentId for the correct API client
+    const resolvedEnvId = environmentId || undefined;
     this.logger.info('Refreshing client versions cache', {
-      environmentId: resolvedEnv,
+      projectId: resolvedProject,
     });
-    // Invalidate ETag cache to force fresh data fetch from the correct env API client
-    this.getApiClient(resolvedEnv).invalidateEtagCache(this.getEndpoint());
-    return await this.listByEnvironment(resolvedEnv);
+    // Invalidate ETag cache to force fresh data fetch
+    const client = this.getApiClient(resolvedEnvId);
+    client.invalidateEtagCache(this.getEndpoint());
+    return await this.listByProject(resolvedProject, resolvedEnvId);
   }
 
   /**
    * Update a single client version in cache (immutable)
    * @param item Client version to update
-   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
+   * @param projectId Project ID (optional, uses default)
    */
-  updateSingleClientVersion(item: ClientVersion, environmentId?: string): void {
-    this.updateItemInCache(item, environmentId);
+  updateSingleClientVersion(item: ClientVersion, projectId?: string): void {
+    this.updateItemInCache(item, projectId);
   }
 
   // ==================== Domain-specific Methods ====================
@@ -78,14 +89,14 @@ export class ClientVersionService extends BaseEnvironmentService<
    * Get client version by platform and version string
    * @param platform Platform name
    * @param version Version string
-   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
+   * @param projectId Project ID (optional, uses default)
    */
   getByPlatformAndVersion(
     platform: string,
     version: string,
-    environmentId: string
+    projectId?: string
   ): ClientVersion | null {
-    const versions = this.getCached(environmentId);
+    const versions = this.getCached(projectId);
     return (
       versions.find(
         (v) => v.platform === platform && v.clientVersion === version
@@ -98,14 +109,14 @@ export class ClientVersionService extends BaseEnvironmentService<
    * Returns the first version with ONLINE status for the given platform
    * @param platform Platform name
    * @param status Optional status filter
-   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
+   * @param projectId Project ID (optional, uses default)
    */
   getLatestByPlatform(
     platform: string,
     status?: string,
-    environmentId?: string
+    projectId?: string
   ): ClientVersion | null {
-    const versions = this.getCached(environmentId);
+    const versions = this.getCached(projectId);
     const filtered = versions.filter((v) => {
       if (v.platform !== platform) return false;
       if (status && v.clientStatus !== status) return false;
@@ -125,10 +136,10 @@ export class ClientVersionService extends BaseEnvironmentService<
   /**
    * Get all client versions by platform
    * @param platform Platform name
-   * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
+   * @param projectId Project ID (optional, uses default)
    */
-  getByPlatform(platform: string, environmentId?: string): ClientVersion[] {
-    const versions = this.getCached(environmentId);
+  getByPlatform(platform: string, projectId?: string): ClientVersion[] {
+    const versions = this.getCached(projectId);
     return versions.filter((v) => v.platform === platform);
   }
 

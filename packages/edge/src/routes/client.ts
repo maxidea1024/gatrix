@@ -4,6 +4,7 @@ import { clientAuth, ClientRequest } from '../middleware/client-auth';
 import { sdkManager } from '../services/sdk-manager';
 import { config } from '../config/env';
 import logger from '../config/logger';
+import { environmentRegistry } from '../services/environment-registry';
 import {
   ClientVersion,
   Banner,
@@ -204,13 +205,23 @@ router.get(
         statusFilter = upperStatus;
       }
 
-      // Get client versions from cache for this environment
-      const envVersions = sdk.clientVersion.getCached(
-        cacheKey || environmentId
+      // Client versions are cached by projectId, resolve from environment context
+      const envContext = environmentRegistry.getEnvironmentContext(environmentId);
+      if (!envContext) {
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to resolve project for environment',
+          },
+        });
+      }
+      const allProjectVersions = sdk.clientVersion.getCached(
+        envContext.projectId
       ) as ClientVersion[];
 
       // Filter by platform
-      const platformVersions = envVersions.filter(
+      const platformVersions = allProjectVersions.filter(
         (v) => v.platform === platform || v.platform === 'all'
       );
 
@@ -684,9 +695,19 @@ router.get(
 
       const { environmentId, platform } = req.clientContext!;
 
-      // Get client versions from cache for this environment
+      // Client versions are cached by projectId, resolve from environment context
+      const envContext = environmentRegistry.getEnvironmentContext(environmentId);
+      if (!envContext) {
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to resolve project for environment',
+          },
+        });
+      }
       const envVersions = sdk.clientVersion.getCached(
-        environmentId
+        envContext.projectId
       ) as ClientVersion[];
 
       // Optionally filter by platform

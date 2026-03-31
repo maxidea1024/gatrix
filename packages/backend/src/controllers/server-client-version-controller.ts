@@ -21,25 +21,25 @@ export class ServerClientVersionController {
    */
   static async getClientVersions(req: EnvironmentRequest, res: Response) {
     try {
-      const environmentId = req.environmentId;
+      const projectId = req.projectId;
 
-      if (!environmentId) {
+      if (!projectId) {
         return res.status(400).json({
           success: false,
           error: {
-            code: 'MISSING_ENVIRONMENT',
-            message: 'Environment is required',
+            code: 'MISSING_PROJECT',
+            message: 'Project is required',
           },
         });
       }
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`,
+        cacheKey: `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${projectId}`,
         ttlMs: DEFAULT_CONFIG.CLIENT_VERSION_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
           const result = await ClientVersionModel.findAll({
-            targetEnv: environmentId,
+            projectId,
             limit: 1000,
             offset: 0,
             sortBy: 'clientVersion',
@@ -103,7 +103,7 @@ export class ServerClientVersionController {
           );
 
           logger.info(
-            `Server SDK: Retrieved ${versionsWithTags.length} client versions for environmentId ${environmentId}`
+            `Server SDK: Retrieved ${versionsWithTags.length} client versions for projectId ${projectId}`
           );
 
           return {
