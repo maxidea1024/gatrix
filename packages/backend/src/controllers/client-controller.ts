@@ -264,8 +264,7 @@ export class ClientController {
       // Build meta from customPayload and inject serviceNoticeUrl
       const meta: Record<string, any> = { ...customPayload };
       const baseUrl = `${req.protocol}://${req.get('host')}`;
-      meta.serviceNoticeUrl =
-        `${baseUrl}/game-service-notices.html?environmentId=${environmentId}`;
+      meta.serviceNoticeUrl = `${baseUrl}/game-service-notices.html?environmentId=${environmentId}`;
 
       // Handle channel/subChannel appUpdateUrl for forced/recommended updates
       if (

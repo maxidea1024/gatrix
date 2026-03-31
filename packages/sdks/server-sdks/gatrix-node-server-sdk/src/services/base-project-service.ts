@@ -21,11 +21,7 @@ import { CacheStorageProvider } from '../cache/storage-provider';
  * @template TResponse - The API response type
  * @template TId - The ID type for items (string or number)
  */
-export abstract class BaseProjectService<
-  T,
-  TResponse,
-  TId = string | number,
-> {
+export abstract class BaseProjectService<T, TResponse, TId = string | number> {
   protected apiClient: ApiClient;
   protected logger: Logger;
   protected storage?: CacheStorageProvider;
@@ -164,7 +160,10 @@ export abstract class BaseProjectService<
    * @param projectId The project to cache under (optional, uses default)
    * @param environmentId Used in multi-tenant mode to select the correct API client
    */
-  async listByProject(projectId?: string, environmentId?: string): Promise<T[]> {
+  async listByProject(
+    projectId?: string,
+    environmentId?: string
+  ): Promise<T[]> {
     const resolvedProject = this.resolveProject(projectId);
     const endpoint = this.getEndpoint();
     const client = this.getApiClient(environmentId);
@@ -338,9 +337,7 @@ export abstract class BaseProjectService<
   removeFromCache(id: TId, projectId?: string): void {
     const resolved = this.resolveProject(projectId);
     const currentItems = this.cachedByProject.get(resolved) || [];
-    const newItems = currentItems.filter(
-      (item) => this.getItemId(item) !== id
-    );
+    const newItems = currentItems.filter((item) => this.getItemId(item) !== id);
     this.cachedByProject.set(resolved, newItems);
     this.persistCache(resolved).catch(() => {});
 

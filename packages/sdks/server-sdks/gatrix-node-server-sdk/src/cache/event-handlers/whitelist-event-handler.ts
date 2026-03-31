@@ -25,9 +25,12 @@ export class WhitelistEventHandler implements IEventHandler {
         });
         await this.cacheManager.refreshIpWhitelists(environmentId);
       } else if (event.type === 'account_whitelist.updated') {
-        this.logger.info('Account whitelist updated, refreshing account cache', {
-          environmentId,
-        });
+        this.logger.info(
+          'Account whitelist updated, refreshing account cache',
+          {
+            environmentId,
+          }
+        );
         await this.cacheManager.refreshAccountWhitelists(environmentId);
       }
     } catch (error: any) {

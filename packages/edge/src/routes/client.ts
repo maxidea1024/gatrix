@@ -225,7 +225,8 @@ router.get(
       }
 
       // Client versions are cached by projectId, resolve from environment context
-      const envContext = environmentRegistry.getEnvironmentContext(environmentId);
+      const envContext =
+        environmentRegistry.getEnvironmentContext(environmentId);
       if (!envContext) {
         return res.status(500).json({
           success: false,
@@ -751,7 +752,8 @@ router.get(
       const { environmentId, platform } = req.clientContext!;
 
       // Client versions are cached by projectId, resolve from environment context
-      const envContext = environmentRegistry.getEnvironmentContext(environmentId);
+      const envContext =
+        environmentRegistry.getEnvironmentContext(environmentId);
       if (!envContext) {
         return res.status(500).json({
           success: false,

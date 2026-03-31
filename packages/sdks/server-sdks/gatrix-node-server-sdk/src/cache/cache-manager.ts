@@ -1180,13 +1180,11 @@ export class CacheManager {
           refreshedTypes.push('clientVersion');
         } else {
           promises.push(
-            this.clientVersionService
-              .refreshByProject(true)
-              .catch((error) => {
-                this.logger.warn('Failed to refresh client versions', {
-                  error: error.message,
-                });
-              })
+            this.clientVersionService.refreshByProject(true).catch((error) => {
+              this.logger.warn('Failed to refresh client versions', {
+                error: error.message,
+              });
+            })
           );
           refreshedTypes.push('clientVersion');
         }
@@ -1739,10 +1737,7 @@ export class CacheManager {
    * @param item Client version to update
    * @param projectId project ID (required, client versions are project-scoped)
    */
-  async updateSingleClientVersion(
-    item: any,
-    projectId: string
-  ): Promise<void> {
+  async updateSingleClientVersion(item: any, projectId: string): Promise<void> {
     this.clientVersionService?.updateSingleClientVersion(item, projectId);
   }
 
