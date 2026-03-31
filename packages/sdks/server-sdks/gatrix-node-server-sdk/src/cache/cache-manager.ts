@@ -168,6 +168,7 @@ export class CacheManager {
         this.storage
       );
       this.whitelistService.setFeatureEnabled(true);
+      this.whitelistService.setApiClientFactory(this.apiClientFactory);
     }
     if (this.uses.serviceMaintenance !== false) {
       this.serviceMaintenanceService = new ServiceMaintenanceService(

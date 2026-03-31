@@ -415,22 +415,13 @@ router.get(
 
       if (effectiveStatus === 'MAINTENANCE') {
         try {
-          // Check IP whitelist
           const clientIp = getClientIp(req);
-          if (clientIp) {
-            isWhitelisted = sdk.whitelist.isIpWhitelisted(
-              clientIp,
-              environmentId
-            );
-          }
 
-          // Check account whitelist (if accountId provided and not already whitelisted)
-          if (!isWhitelisted && accountId) {
-            isWhitelisted = sdk.whitelist.isAccountWhitelisted(
-              accountId,
-              environmentId
-            );
-          }
+          isWhitelisted = sdk.whitelist.isWhitelisted({
+            accountId,
+            clientIp,
+            environmentId,
+          });
 
           if (isWhitelisted) {
             // Whitelisted client: override MAINTENANCE to ONLINE
@@ -495,7 +486,6 @@ router.get(
       return res.json({
         success: true,
         data: clientData,
-        cached: true, // Edge always serves from cache
       });
     } catch (error) {
       logger.error('Error getting client version:', error);
@@ -558,7 +548,6 @@ router.get(
       res.json({
         success: true,
         data: clientData,
-        cached: true, // Edge always serves from cache
       });
     } catch (error) {
       logger.error('Error getting game worlds:', error);

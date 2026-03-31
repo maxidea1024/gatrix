@@ -81,6 +81,7 @@ export const getWhitelistsHandler = async (
           (account: any) => ({
             id: account.id,
             accountId: account.accountId,
+            ipAddress: account.ipAddress || null,
           })
         );
 

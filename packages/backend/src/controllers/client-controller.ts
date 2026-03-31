@@ -414,22 +414,22 @@ export class ClientController {
 
       if (effectiveStatus === ClientStatus.MAINTENANCE) {
         try {
-          // Check IP whitelist
-          if (clientIp) {
-            isWhitelisted = await IpWhitelistService.isIpWhitelisted(
-              clientIp,
-              environmentId
-            );
-          }
-
-          // Check account whitelist (if accountId provided and not already whitelisted)
-          if (!isWhitelisted && accountId) {
+          // 1. Check account whitelist first (higher priority, supports AND ip condition)
+          if (accountId) {
             const result = await WhitelistService.testWhitelist(
               environmentId,
               accountId,
               clientIp || undefined
             );
             isWhitelisted = result.isAllowed;
+          }
+
+          // 2. Check IP whitelist (lower priority, fallback)
+          if (!isWhitelisted && clientIp) {
+            isWhitelisted = await IpWhitelistService.isIpWhitelisted(
+              clientIp,
+              environmentId
+            );
           }
 
           if (isWhitelisted) {
