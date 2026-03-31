@@ -167,8 +167,6 @@ export class IpWhitelistService {
 
       // Publish ip_whitelist.updated event for SDK real-time updates
       try {
-
-
         await pubSubService.invalidateKey(
           `${SERVER_SDK_ETAG.IP_WHITELISTS}:${environmentId}`
         );
@@ -184,7 +182,10 @@ export class IpWhitelistService {
           { environmentId }
         );
       } catch (eventError) {
-        logger.warn('Failed to publish ip_whitelist.updated event:', eventError);
+        logger.warn(
+          'Failed to publish ip_whitelist.updated event:',
+          eventError
+        );
         // Don't throw - event publishing failure shouldn't fail the request
       }
 
@@ -278,7 +279,10 @@ export class IpWhitelistService {
           { environmentId }
         );
       } catch (eventError) {
-        logger.warn('Failed to publish ip_whitelist.updated event:', eventError);
+        logger.warn(
+          'Failed to publish ip_whitelist.updated event:',
+          eventError
+        );
         // Don't throw - event publishing failure shouldn't fail the request
       }
 
@@ -332,7 +336,10 @@ export class IpWhitelistService {
           { environmentId }
         );
       } catch (eventError) {
-        logger.warn('Failed to publish ip_whitelist.updated event:', eventError);
+        logger.warn(
+          'Failed to publish ip_whitelist.updated event:',
+          eventError
+        );
         // Don't throw - event publishing failure shouldn't fail the request
       }
     } catch (error) {

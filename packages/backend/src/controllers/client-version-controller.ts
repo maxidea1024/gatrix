@@ -621,7 +621,8 @@ export class ClientVersionController {
     };
 
     // Check if CR is required
-    const crEnvId = await UnifiedChangeGateway.getProjectCrEnvironment(projectId);
+    const crEnvId =
+      await UnifiedChangeGateway.getProjectCrEnvironment(projectId);
     const requiresApproval = !!crEnvId;
 
     if (requiresApproval) {
@@ -897,7 +898,8 @@ export class ClientVersionController {
     const projectId = req.projectId!;
 
     // Check if CR is required
-    const crEnvId = await UnifiedChangeGateway.getProjectCrEnvironment(projectId);
+    const crEnvId =
+      await UnifiedChangeGateway.getProjectCrEnvironment(projectId);
     const requiresApproval = !!crEnvId;
 
     if (requiresApproval) {

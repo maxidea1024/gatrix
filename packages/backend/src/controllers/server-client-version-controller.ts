@@ -46,7 +46,6 @@ export class ServerClientVersionController {
             sortOrder: 'DESC',
           });
 
-
           // Fetch tags for each client version
           const versionsWithTags = await Promise.all(
             result.clientVersions.map(async (version: any) => {

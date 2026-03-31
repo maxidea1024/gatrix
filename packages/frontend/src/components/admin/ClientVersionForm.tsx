@@ -539,7 +539,14 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     } else {
       setDuplicateError(null);
     }
-  }, [watchedPlatformForDup, watchedVersion, formReady, isEdit, clientVersion?.id, t]);
+  }, [
+    watchedPlatformForDup,
+    watchedVersion,
+    formReady,
+    isEdit,
+    clientVersion?.id,
+    t,
+  ]);
 
   // Apply defaults when platform changes
   const watchedPlatform = watch('platform');

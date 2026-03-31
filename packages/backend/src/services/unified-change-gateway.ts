@@ -122,7 +122,10 @@ export class UnifiedChangeGateway {
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Environment Policy
-      const resolved = await this.resolveEnvironment(environmentId, options?.projectScope);
+      const resolved = await this.resolveEnvironment(
+        environmentId,
+        options?.projectScope
+      );
       if (!resolved.env && !options?.projectScope) {
         throw new Error(`Environment '${environmentId}' not found.`);
       }
@@ -200,7 +203,10 @@ export class UnifiedChangeGateway {
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Environment Policy
-      const resolved = await this.resolveEnvironment(environmentId, options?.projectScope);
+      const resolved = await this.resolveEnvironment(
+        environmentId,
+        options?.projectScope
+      );
       if (!resolved.env && !options?.projectScope) {
         throw new Error(`Environment '${environmentId}' not found.`);
       }
@@ -310,7 +316,10 @@ export class UnifiedChangeGateway {
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Env Policy
-      const resolved = await this.resolveEnvironment(environmentId, options?.projectScope);
+      const resolved = await this.resolveEnvironment(
+        environmentId,
+        options?.projectScope
+      );
       if (!resolved.env && !options?.projectScope) {
         throw new Error(`Environment '${environmentId}' not found.`);
       }

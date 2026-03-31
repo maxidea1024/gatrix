@@ -689,9 +689,7 @@ export class ClientVersionModel {
    * Get all version-to-environment mappings for a project.
    * Used by Edge server's versionMap service.
    */
-  static async getVersionMap(
-    projectId?: string
-  ): Promise<
+  static async getVersionMap(projectId?: string): Promise<
     Array<{
       projectId: string;
       platform: string;

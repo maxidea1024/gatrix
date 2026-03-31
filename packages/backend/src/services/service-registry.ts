@@ -72,20 +72,12 @@ export interface ServiceHandler {
   /**
    * Create a new entity (optional)
    */
-  create?: (
-    data: any,
-    scopeId: string,
-    userId?: string
-  ) => Promise<unknown>;
+  create?: (data: any, scopeId: string, userId?: string) => Promise<unknown>;
 
   /**
    * Delete an entity (optional)
    */
-  delete?: (
-    id: string,
-    scopeId: string,
-    userId?: string
-  ) => Promise<void>;
+  delete?: (id: string, scopeId: string, userId?: string) => Promise<void>;
 
   /**
    * Apply draft data for complex entities (feature flags, segments).

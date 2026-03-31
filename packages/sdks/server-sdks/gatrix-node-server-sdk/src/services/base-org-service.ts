@@ -18,11 +18,7 @@ import { CacheStorageProvider } from '../cache/storage-provider';
  * @template TResponse - The API response type
  * @template TId - The ID type for items (string or number)
  */
-export abstract class BaseOrgService<
-  T,
-  TResponse,
-  TId = string | number,
-> {
+export abstract class BaseOrgService<T, TResponse, TId = string | number> {
   protected apiClient: ApiClient;
   protected logger: Logger;
   protected storage?: CacheStorageProvider;
@@ -164,10 +160,7 @@ export abstract class BaseOrgService<
     this.cachedByOrg.delete(resolved);
   }
 
-  async refreshByOrg(
-    suppressWarnings?: boolean,
-    orgId?: string
-  ): Promise<T[]> {
+  async refreshByOrg(suppressWarnings?: boolean, orgId?: string): Promise<T[]> {
     if (!this.featureEnabled && !suppressWarnings) {
       this.logger.warn(
         `${this.getServiceName()}.refreshByOrg() called but feature is disabled`
@@ -201,9 +194,7 @@ export abstract class BaseOrgService<
   removeFromCache(id: TId, orgId?: string): void {
     const resolved = this.resolveOrg(orgId);
     const currentItems = this.cachedByOrg.get(resolved) || [];
-    const newItems = currentItems.filter(
-      (item) => this.getItemId(item) !== id
-    );
+    const newItems = currentItems.filter((item) => this.getItemId(item) !== id);
     this.cachedByOrg.set(resolved, newItems);
     this.persistCache(resolved).catch(() => {});
   }

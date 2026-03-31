@@ -471,8 +471,7 @@ export class EventListener {
         return;
       }
       // Resolve raw environment ID to cache key
-      scopeId =
-        this.cacheManager.resolveTokenForEnvironmentId(scopeId);
+      scopeId = this.cacheManager.resolveTokenForEnvironmentId(scopeId);
     } else if (handler.scope === 'project') {
       // Project-scoped events use projectId from event data or resolved context
       scopeId = (event.data.projectId || '') as string;

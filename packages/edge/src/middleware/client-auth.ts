@@ -153,7 +153,8 @@ export async function clientAuth(
         success: false,
         error: {
           code: 'MISSING_CLIENT_VERSION',
-          message: 'x-client-version header or version query parameter is required for project tokens',
+          message:
+            'x-client-version header or version query parameter is required for project tokens',
         },
       });
       return;
@@ -270,7 +271,8 @@ export async function clientAuth(
         success: false,
         error: {
           code: 'MISSING_CLIENT_VERSION',
-          message: 'x-client-version header or version query parameter is required for project tokens',
+          message:
+            'x-client-version header or version query parameter is required for project tokens',
         },
       });
       return;

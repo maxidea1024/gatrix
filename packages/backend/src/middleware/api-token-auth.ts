@@ -408,7 +408,8 @@ export const setSDKEnvironment = async (
           success: false,
           error: {
             code: ErrorCodes.BAD_REQUEST,
-            message: 'x-client-version header or version query parameter is required for project tokens',
+            message:
+              'x-client-version header or version query parameter is required for project tokens',
           },
         });
       }
