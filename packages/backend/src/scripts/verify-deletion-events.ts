@@ -35,18 +35,18 @@ async function main() {
   );
   console.log('Published service_notice.deleted event');
 
-  // Verify Client Version Deleted Event
+  // Verify Client Version Deleted Event (project-scoped)
   console.log('\n--- Verifying Client Version Deleted Event ---');
   await pubSubService.publishSDKEvent(
     {
       type: 'client_version.deleted',
       data: {
         id: 8888,
-        environmentId: 'development',
+        projectId: 'test-project',
         timestamp: Date.now(),
       },
     },
-    { environmentId: 'development' }
+    { projectId: 'test-project' }
   );
   console.log('Published client_version.deleted event');
 

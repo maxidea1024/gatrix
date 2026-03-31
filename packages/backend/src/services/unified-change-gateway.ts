@@ -68,6 +68,26 @@ export class UnifiedChangeGateway {
   }
 
   /**
+   * Resolve environment for gateway operations.
+   * For project-scoped resources, find the first CR-enabled environment in the project.
+   */
+  private static async resolveEnvironment(
+    idOrProjectId: string,
+    projectScope?: boolean
+  ): Promise<{ env: any | null; environmentId: string | null }> {
+    if (projectScope) {
+      const crEnvId = await this.getProjectCrEnvironment(idOrProjectId);
+      if (!crEnvId) {
+        return { env: null, environmentId: null };
+      }
+      const env = await Environment.query().findById(crEnvId);
+      return { env: env || null, environmentId: crEnvId };
+    }
+    const env = await Environment.query().findById(idOrProjectId);
+    return { env: env || null, environmentId: idOrProjectId };
+  }
+
+  /**
    * Request a modification (update) through the Change Request system
    */
   static async requestModification(
@@ -76,7 +96,7 @@ export class UnifiedChangeGateway {
     targetTable: string,
     targetId: string,
     newData: any,
-    options?: { skipCr?: boolean; primaryKey?: string }
+    options?: { skipCr?: boolean; primaryKey?: string; projectScope?: boolean }
   ): Promise<ChangeGatewayResult> {
     return this.processChange(
       userId,
@@ -98,20 +118,21 @@ export class UnifiedChangeGateway {
     targetTable: string,
     createData: any,
     createFunction: () => Promise<any>,
-    options?: { skipCr?: boolean }
+    options?: { skipCr?: boolean; projectScope?: boolean }
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Environment Policy
-      const env = await Environment.query().findById(environmentId);
-      if (!env) {
+      const resolved = await this.resolveEnvironment(environmentId, options?.projectScope);
+      if (!resolved.env && !options?.projectScope) {
         throw new Error(`Environment '${environmentId}' not found.`);
       }
 
-      let requiresApproval = env.requiresApproval;
+      const effectiveEnvId = resolved.environmentId || environmentId;
+      let requiresApproval = resolved.env?.requiresApproval ?? false;
       if (requiresApproval && this.isSkipCrRequested(options)) {
         const hasSkipPermission = await this.hasEnvPermission(
           userId,
-          environmentId,
+          effectiveEnvId,
           P.CHANGE_REQUESTS_SKIP
         );
         if (hasSkipPermission) {
@@ -140,14 +161,14 @@ export class UnifiedChangeGateway {
       // 3. CR Required - Create a change request for the new item
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environmentId', environmentId)
+        .where('environmentId', effectiveEnvId)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
 
       const result = await ChangeRequestService.upsertChangeRequestItem(
         userId,
-        environmentId,
+        effectiveEnvId,
         targetTable,
         `NEW_${Date.now()}`, // Temporary ID for new items
         null, // beforeData is null for creation (record doesn't exist yet)
@@ -175,20 +196,21 @@ export class UnifiedChangeGateway {
     targetTable: string,
     targetId: string,
     deleteFunction: () => Promise<void>,
-    options?: { skipCr?: boolean; primaryKey?: string }
+    options?: { skipCr?: boolean; primaryKey?: string; projectScope?: boolean }
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Environment Policy
-      const env = await Environment.query().findById(environmentId);
-      if (!env) {
+      const resolved = await this.resolveEnvironment(environmentId, options?.projectScope);
+      if (!resolved.env && !options?.projectScope) {
         throw new Error(`Environment '${environmentId}' not found.`);
       }
 
-      let requiresApproval = env.requiresApproval;
+      const effectiveEnvId = resolved.environmentId || environmentId;
+      let requiresApproval = resolved.env?.requiresApproval ?? false;
       if (requiresApproval && this.isSkipCrRequested(options)) {
         const hasSkipPermission = await this.hasEnvPermission(
           userId,
-          environmentId,
+          effectiveEnvId,
           P.CHANGE_REQUESTS_SKIP
         );
         if (hasSkipPermission) {
@@ -248,14 +270,14 @@ export class UnifiedChangeGateway {
 
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environmentId', environmentId)
+        .where('environmentId', effectiveEnvId)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
 
       const result = await ChangeRequestService.upsertChangeRequestItem(
         userId,
-        environmentId,
+        effectiveEnvId,
         targetTable,
         targetId,
         currentData, // beforeData
@@ -284,20 +306,21 @@ export class UnifiedChangeGateway {
     targetId: string,
     changeDataOrFunction: any | ((currentData: any) => Promise<any> | any),
     directChangeFunction?: (processedData: any) => Promise<any>,
-    options?: { skipCr?: boolean; primaryKey?: string }
+    options?: { skipCr?: boolean; primaryKey?: string; projectScope?: boolean }
   ): Promise<ChangeGatewayResult> {
     try {
       // 1. Fetch Env Policy
-      const env = await Environment.query().findById(environmentId);
-      if (!env) {
+      const resolved = await this.resolveEnvironment(environmentId, options?.projectScope);
+      if (!resolved.env && !options?.projectScope) {
         throw new Error(`Environment '${environmentId}' not found.`);
       }
 
-      let requiresApproval = env.requiresApproval;
+      const effectiveEnvId = resolved.environmentId || environmentId;
+      let requiresApproval = resolved.env?.requiresApproval ?? false;
       if (requiresApproval && this.isSkipCrRequested(options)) {
         const hasSkipPermission = await this.hasEnvPermission(
           userId,
-          environmentId,
+          effectiveEnvId,
           P.CHANGE_REQUESTS_SKIP
         );
         if (hasSkipPermission) {
@@ -372,14 +395,14 @@ export class UnifiedChangeGateway {
       // CASE B: Change Request Required
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environmentId', environmentId)
+        .where('environmentId', effectiveEnvId)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
 
       const result = await ChangeRequestService.upsertChangeRequestItem(
         userId,
-        environmentId,
+        effectiveEnvId,
         targetTable,
         targetId,
         currentData || {}, // Before

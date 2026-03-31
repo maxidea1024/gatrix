@@ -10,6 +10,7 @@
  */
 
 import { ApiClient } from '../client/api-client';
+import { ApiClientFactory } from '../client/api-client-factory';
 import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { validateAll } from '../utils/validation';
@@ -22,6 +23,7 @@ export interface IpWhitelistEntry {
 export interface AccountWhitelistEntry {
   id: string;
   accountId: string;
+  ipAddress?: string | null;
 }
 
 export interface WhitelistData {
@@ -46,6 +48,8 @@ export class WhitelistService {
   private cachedWhitelistByEnv: Map<string, WhitelistData> = new Map();
   // Whether this feature is enabled
   private featureEnabled: boolean = true;
+  // Optional factory for multi-environment mode
+  private apiClientFactory?: ApiClientFactory;
 
   constructor(
     apiClient: ApiClient,
@@ -57,6 +61,25 @@ export class WhitelistService {
     this.logger = logger;
     this.defaultEnvironmentId = defaultEnvironmentId;
     this.storage = storage;
+  }
+
+  /**
+   * Set ApiClientFactory for multi-environment mode.
+   * When set, listByEnvironment() uses the factory to get a per-environment ApiClient.
+   */
+  setApiClientFactory(factory: ApiClientFactory): void {
+    this.apiClientFactory = factory;
+  }
+
+  /**
+   * Get the appropriate ApiClient for a given environment.
+   * Uses the factory if available, otherwise falls back to the default client.
+   */
+  private getApiClient(environmentId?: string): ApiClient {
+    if (this.apiClientFactory) {
+      return this.apiClientFactory.getClient(environmentId);
+    }
+    return this.apiClient;
   }
 
   /**
@@ -98,38 +121,106 @@ export class WhitelistService {
   }
 
   /**
-   * Get all whitelists (IP and Account) for a specific environment
-   * GET /api/v1/server/whitelists
+   * Fetch IP whitelists for a specific environment
+   * GET /api/v1/server/ip-whitelists
    */
-  async listByEnvironment(environmentId?: string): Promise<WhitelistData> {
-    const endpoint = `/api/v1/server/whitelists`;
+  async fetchIpWhitelist(environmentId?: string): Promise<IpWhitelistEntry[]> {
+    const endpoint = `/api/v1/server/ip-whitelists`;
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    const client = this.getApiClient(resolvedEnv);
 
-    this.logger.debug('Fetching whitelists', { environmentId });
+    this.logger.debug('Fetching IP whitelists', { environmentId: resolvedEnv });
 
-    const response = await this.apiClient.get<WhitelistData>(endpoint);
+    const response = await client.get<IpWhitelistEntry[]>(endpoint);
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch whitelists');
-    }
-
-    const resolvedEnv = environmentId || this.defaultEnvironmentId;
-    this.cachedWhitelistByEnv.set(resolvedEnv, response.data);
-
-    // Save to local storage if available
-    if (this.storage) {
-      await this.storage.save(
-        `Whitelist_${environmentId}`,
-        JSON.stringify(response.data)
+      throw new Error(
+        response.error?.message || 'Failed to fetch IP whitelists'
       );
     }
 
-    this.logger.info('Whitelists fetched', {
-      environmentId,
-      ipCount: response.data.ipWhitelist.length,
-      accountCount: response.data.accountWhitelist.length,
+    // Update only ipWhitelist part of cache
+    const cached = this.getCached(resolvedEnv);
+    const updatedData: WhitelistData = {
+      ...cached,
+      ipWhitelist: response.data,
+    };
+    this.cachedWhitelistByEnv.set(resolvedEnv, updatedData);
+
+    if (this.storage) {
+      await this.storage.save(
+        `Whitelist_${resolvedEnv}`,
+        JSON.stringify(updatedData)
+      );
+    }
+
+    this.logger.info('IP whitelists fetched', {
+      environmentId: resolvedEnv,
+      count: response.data.length,
     });
 
     return response.data;
+  }
+
+  /**
+   * Fetch account whitelists for a specific environment
+   * GET /api/v1/server/account-whitelists
+   */
+  async fetchAccountWhitelist(
+    environmentId?: string
+  ): Promise<AccountWhitelistEntry[]> {
+    const endpoint = `/api/v1/server/account-whitelists`;
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+    const client = this.getApiClient(resolvedEnv);
+
+    this.logger.debug('Fetching account whitelists', {
+      environmentId: resolvedEnv,
+    });
+
+    const response = await client.get<AccountWhitelistEntry[]>(endpoint);
+
+    if (!response.success || !response.data) {
+      throw new Error(
+        response.error?.message || 'Failed to fetch account whitelists'
+      );
+    }
+
+    // Update only accountWhitelist part of cache
+    const cached = this.getCached(resolvedEnv);
+    const updatedData: WhitelistData = {
+      ...cached,
+      accountWhitelist: response.data,
+    };
+    this.cachedWhitelistByEnv.set(resolvedEnv, updatedData);
+
+    if (this.storage) {
+      await this.storage.save(
+        `Whitelist_${resolvedEnv}`,
+        JSON.stringify(updatedData)
+      );
+    }
+
+    this.logger.info('Account whitelists fetched', {
+      environmentId: resolvedEnv,
+      count: response.data.length,
+    });
+
+    return response.data;
+  }
+
+  /**
+   * Fetch all whitelists (IP + Account) for a specific environment
+   * Calls both separate endpoints
+   */
+  async listByEnvironment(environmentId?: string): Promise<WhitelistData> {
+    const resolvedEnv = environmentId || this.defaultEnvironmentId;
+
+    await Promise.all([
+      this.fetchIpWhitelist(resolvedEnv),
+      this.fetchAccountWhitelist(resolvedEnv),
+    ]);
+
+    return this.getCached(resolvedEnv);
   }
 
   /**
@@ -316,16 +407,60 @@ export class WhitelistService {
 
   /**
    * Check if account is whitelisted
-   * Note: Backend already filters for enabled and valid entries
+   * Supports AND condition: if account whitelist entry has ipAddress, both must match
    * @param accountId Account ID to check
    * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
+   * @param clientIp Client IP for AND condition check (optional)
    */
-  isAccountWhitelisted(accountId: string, environmentId?: string): boolean {
+  isAccountWhitelisted(
+    accountId: string,
+    environmentId?: string,
+    clientIp?: string
+  ): boolean {
     validateAll([{ param: 'accountId', value: accountId, type: 'string' }]);
     const whitelist = this.getCached(environmentId);
     return whitelist.accountWhitelist.some((entry) => {
-      return entry.accountId === accountId;
+      if (entry.accountId !== accountId) {
+        return false;
+      }
+      // If entry has ipAddress specified, check IP match (AND condition)
+      if (entry.ipAddress) {
+        return clientIp === entry.ipAddress;
+      }
+      return true;
     });
+  }
+
+  /**
+   * Unified whitelist check: account first (with optional IP AND condition), then IP only.
+   * Priority: 1) account whitelist (AND ip if specified) → 2) IP whitelist
+   * @param options.accountId Account ID to check (optional)
+   * @param options.clientIp Client IP address (optional)
+   * @param options.environmentId Environment ID (optional)
+   * @returns true if whitelisted by either account or IP
+   */
+  isWhitelisted(options: {
+    accountId?: string;
+    clientIp?: string;
+    environmentId?: string;
+  }): boolean {
+    const { accountId, clientIp, environmentId } = options;
+
+    // 1. Check account whitelist first (higher priority)
+    if (accountId) {
+      if (this.isAccountWhitelisted(accountId, environmentId, clientIp)) {
+        return true;
+      }
+    }
+
+    // 2. Check IP whitelist (lower priority)
+    if (clientIp) {
+      if (this.isIpWhitelisted(clientIp, environmentId)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

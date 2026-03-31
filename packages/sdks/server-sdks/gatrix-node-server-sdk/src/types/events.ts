@@ -21,7 +21,8 @@ export type StandardEventType =
   | 'maintenance.settings.updated'
   | 'maintenance.started'
   | 'maintenance.ended'
-  | 'whitelist.updated'
+  | 'ip_whitelist.updated'
+  | 'account_whitelist.updated'
   | 'client_version.created'
   | 'client_version.updated'
   | 'client_version.deleted'
@@ -50,10 +51,6 @@ export interface StandardEventData {
   key?: string; // For vars.updated events
   value?: string | null; // For vars.updated events (direct cache update)
   timestamp: number;
-  /**
-   * @deprecated Use environmentId instead. Kept for backward compatibility.
-   */
-  environment?: string;
   /** Environment identifier sent by backend */
   environmentId?: string;
   isVisible?: boolean | number; // For gameworld.updated, popup.updated events (MySQL returns 0/1)
@@ -70,7 +67,8 @@ export interface StandardEventData {
   serviceNotice?: any; // For service_notice.created, service_notice.updated events
   segmentName?: string; // For segment.created, segment.updated, segment.deleted events
   segment?: any; // For segment.created, segment.updated events (full segment data for direct cache update)
-  projectId?: string; // For segment events (project-scoped segment caching)
+  projectId?: string; // For project-scoped events (client_version, segment, etc.)
+  orgId?: string; // For org-scoped events (reserved for future use)
   // Feature flag granular event data
   changedKeys?: string[]; // For feature_flag.changed events (list of changed flag names)
   changeType?: 'definition_changed' | 'enabled_changed' | 'deleted'; // For feature_flag.changed events

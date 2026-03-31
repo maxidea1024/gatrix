@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Service Notices</title>
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" />
     <style>
       * {
         margin: 0;
@@ -752,8 +753,8 @@
         return {
           platform: params.get('platform'),
           channel: params.get('channel'),
-          subChannel: params.get('subChannel'),
-          environment: params.get('environment'),
+          subchannel: params.get('subchannel'),
+          environment: params.get('environmentId') || params.get('environment'),
         };
       }
 
@@ -800,8 +801,8 @@
         if (urlParams.channel) {
           queryString += '&channel=' + encodeURIComponent(urlParams.channel);
         }
-        if (urlParams.subChannel) {
-          queryString += '&subchannel=' + encodeURIComponent(urlParams.subChannel);
+        if (urlParams.subchannel) {
+          queryString += '&subchannel=' + encodeURIComponent(urlParams.subchannel);
         }
 
         // Helper function to ensure minimum loading time

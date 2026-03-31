@@ -391,7 +391,7 @@ export class ClientVersionService {
             clientVersion: sdkReadyClientVersion,
           },
         },
-        { environmentId: targetEnv || projectId }
+        { projectId }
       );
     } catch (err) {
       logger.error('Failed to publish client version event', err);
@@ -482,7 +482,7 @@ export class ClientVersionService {
       }
     }
 
-    // Invalidate client version cache (including ETag cache for SDK - all environments for bulk op)
+    // Invalidate client version cache (including ETag cache for SDK - all projects for bulk op)
     await pubSubService.invalidateByPattern('*client_version:*');
     await pubSubService.invalidateByPattern(
       `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`
@@ -494,7 +494,7 @@ export class ClientVersionService {
         type: 'client_version.updated',
         data: { projectId },
       },
-      { environmentId: projectId }
+      { projectId }
     );
 
     return result;
@@ -545,7 +545,7 @@ export class ClientVersionService {
               clientVersion: sdkReadyClientVersion,
             },
           },
-          { environmentId: targetEnv || projectId }
+          { projectId }
         );
       } catch (err) {
         logger.error('Failed to publish client version event', err);
@@ -571,7 +571,7 @@ export class ClientVersionService {
           type: 'client_version.deleted',
           data: { id, projectId },
         },
-        { environmentId: targetEnv || projectId }
+        { projectId }
       );
 
       // Invalidate client version cache (including ETag cache)
@@ -599,7 +599,7 @@ export class ClientVersionService {
           type: 'client_version.updated',
           data: { projectId },
         },
-        { environmentId: projectId }
+        { projectId }
       );
 
       // Invalidate client version cache (including ETag cache - all for bulk op)

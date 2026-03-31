@@ -17,21 +17,55 @@ import { TagService } from './tag-service';
 import { featureFlagService } from './feature-flag-service';
 import { pubSubService } from './pub-sub-service';
 import { createLogger } from '../config/logger';
+import knex from '../config/knex';
 
 const logger = createLogger('ServiceRegistry');
+
+/**
+ * Resolve projectId for project-scoped services (e.g., client versions).
+ * CR execution passes environmentId via ServiceHandler, but project-scoped
+ * services need projectId. Resolution order:
+ * 1. data.projectId (from the entity data itself)
+ * 2. Environment lookup (g_environments table)
+ * 3. Fall back to environmentId (should never happen in practice)
+ */
+async function resolveProjectId(
+  data: any,
+  environmentId: string
+): Promise<string> {
+  if (data?.projectId) return data.projectId;
+
+  try {
+    const env = await knex('g_environments')
+      .select('projectId')
+      .where('environmentId', environmentId)
+      .first();
+    if (env?.projectId) return env.projectId;
+  } catch (err) {
+    logger.warn('Failed to resolve projectId from environment', {
+      environmentId,
+    });
+  }
+
+  logger.error(
+    'Could not resolve projectId — falling back to environmentId (likely a bug)',
+    { environmentId }
+  );
+  return environmentId;
+}
 
 export interface ServiceHandler {
   /**
    * Apply a change to the target entity
    * @param id - Entity ID
    * @param data - New data to apply
-   * @param environment - Environment name
+   * @param scopeId - Scope identifier (environmentId for env-scoped, also environmentId for project-scoped — handler resolves projectId internally)
    * @param userId - User performing the action
    */
   apply: (
     id: string,
     data: any,
-    environmentId: string,
+    scopeId: string,
     userId?: string
   ) => Promise<unknown>;
 
@@ -40,7 +74,7 @@ export interface ServiceHandler {
    */
   create?: (
     data: any,
-    environmentId: string,
+    scopeId: string,
     userId?: string
   ) => Promise<unknown>;
 
@@ -49,7 +83,7 @@ export interface ServiceHandler {
    */
   delete?: (
     id: string,
-    environmentId: string,
+    scopeId: string,
     userId?: string
   ) => Promise<void>;
 
@@ -60,7 +94,7 @@ export interface ServiceHandler {
   applyDraft?: (
     id: string,
     draftData: Record<string, any>,
-    environmentId: string,
+    scopeId: string,
     userId?: string
   ) => Promise<unknown>;
 }
@@ -91,9 +125,10 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
     },
   },
 
-  // Client Versions
+  // Client Versions (project-scoped: resolves projectId from data or environment)
   g_client_versions: {
     apply: async (id, data, environmentId, userId) => {
+      const projectId = await resolveProjectId(data, environmentId);
       const { tagIds, ...tableData } = data;
       // Apply tags independently - even if DB update was already done
       // (e.g., during CR execution where the transaction already updated the row)
@@ -104,7 +139,7 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
         const result = await ClientVersionService.updateClientVersion(
           id,
           tableData,
-          environmentId
+          projectId
         );
         return result;
       } catch (err: any) {
@@ -114,10 +149,11 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
       }
     },
     create: async (data, environmentId, userId) => {
+      const projectId = await resolveProjectId(data, environmentId);
       const { tagIds, ...tableData } = data;
       const result = await ClientVersionService.createClientVersion(
         tableData,
-        environmentId
+        projectId
       );
       if (tagIds && Array.isArray(tagIds)) {
         await TagService.setTagsForEntity(
@@ -130,7 +166,8 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
       return result;
     },
     delete: async (id, environmentId) => {
-      await ClientVersionService.deleteClientVersion(id, environmentId);
+      const projectId = await resolveProjectId({}, environmentId);
+      await ClientVersionService.deleteClientVersion(id, projectId);
     },
   },
 

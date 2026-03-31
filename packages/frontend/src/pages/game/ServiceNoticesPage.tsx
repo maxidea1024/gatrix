@@ -586,8 +586,8 @@ const ServiceNoticesPage: React.FC = () => {
       | undefined;
     const edgeUrl =
       runtimeUrl || import.meta.env.VITE_EDGE_URL || 'http://localhost:3400';
-    const envName = currentEnvironment?.environmentName || 'development';
-    return `${edgeUrl}/game-service-notices.html?environmentId=${encodeURIComponent(envName)}`;
+    const envId = currentEnvironment?.environmentId || '';
+    return `${edgeUrl}/game-service-notices.html?environmentId=${encodeURIComponent(envId)}`;
   };
 
   const handleOpenWebviewPreview = () => {

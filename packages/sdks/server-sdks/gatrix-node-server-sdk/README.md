@@ -195,8 +195,9 @@ import { GatrixServerSDK, IEnvironmentProvider } from '@gatrix/gatrix-node-serve
 
 const environmentProvider: IEnvironmentProvider = {
   getEnvironmentTokens: () => [
-    { environmentId: 'env_dev', token: 'dev-token' },
-    { environmentId: 'env_prod', token: 'prod-token' },
+    { environmentId: 'env_dev', token: 'dev-token', projectId: 'proj_1', orgId: 'org_1' },
+    { environmentId: 'env_staging', token: 'staging-token', projectId: 'proj_1', orgId: 'org_1' },
+    { environmentId: 'env_prod', token: 'prod-token', projectId: 'proj_1', orgId: 'org_1' },
   ],
 };
 
@@ -212,43 +213,66 @@ const sdk = new GatrixServerSDK({
 
 await sdk.initialize();
 
-// Access data for specific environments
+// Environment-scoped data: pass environmentId
 const devWorlds = sdk.gameWorld.getCached('env_dev');
-const prodWorlds = sdk.gameWorld.getCached('env_prod');
+const prodNotices = sdk.serviceNotice.getCached('env_prod');
+
+// Project-scoped data: pass projectId
+const clientVersions = sdk.clientVersion.getCached('proj_1');
 ```
+
+> **Important:** `projectId` is required in each entry for project-scoped services to work correctly.
 
 ## Service Getter Pattern
 
 All services are accessed via public getters on the SDK instance:
 
-| Getter                 | Service                  | `uses` Key           |
-| ---------------------- | ------------------------ | -------------------- |
-| `sdk.gameWorld`        | GameWorldService         | `gameWorld`          |
-| `sdk.popupNotice`     | PopupNoticeService       | `popupNotice`       |
-| `sdk.survey`          | SurveyService            | `survey`            |
-| `sdk.whitelist`       | WhitelistService         | `whitelist`         |
-| `sdk.serviceMaintenance` | ServiceMaintenanceService | `serviceMaintenance` |
-| `sdk.featureFlag`     | FeatureFlagService       | `featureFlag`       |
-| `sdk.vars`            | VarsService              | `vars`              |
-| `sdk.storeProduct`    | StoreProductService      | `storeProduct`      |
-| `sdk.banner`          | BannerService            | (Edge feature)       |
-| `sdk.clientVersion`   | ClientVersionService     | (Edge feature)       |
-| `sdk.serviceNotice`   | ServiceNoticeService     | (Edge feature)       |
-| `sdk.coupon`          | CouponService            | Always available     |
-| `sdk.serviceDiscovery`| ServiceDiscoveryService  | Always available     |
-| `sdk.impactMetrics`   | MetricsAPI               | Always available     |
+| Getter                 | Service                  | `uses` Key           | Scope           |
+| ---------------------- | ------------------------ | -------------------- | --------------- |
+| `sdk.gameWorld`        | GameWorldService         | `gameWorld`          | Environment     |
+| `sdk.popupNotice`     | PopupNoticeService       | `popupNotice`       | Environment     |
+| `sdk.survey`          | SurveyService            | `survey`            | Environment     |
+| `sdk.whitelist`       | WhitelistService         | `whitelist`         | Environment     |
+| `sdk.serviceMaintenance` | ServiceMaintenanceService | `serviceMaintenance` | Environment     |
+| `sdk.featureFlag`     | FeatureFlagService       | `featureFlag`       | Environment     |
+| `sdk.vars`            | VarsService              | `vars`              | Environment     |
+| `sdk.storeProduct`    | StoreProductService      | `storeProduct`      | Environment     |
+| `sdk.banner`          | BannerService            | `banner`            | Environment     |
+| `sdk.serviceNotice`   | ServiceNoticeService     | `serviceNotice`     | Environment     |
+| `sdk.clientVersion`   | ClientVersionService     | `clientVersion`     | **Project**     |
+| `sdk.coupon`          | CouponService            | Always available     | -               |
+| `sdk.serviceDiscovery`| ServiceDiscoveryService  | Always available     | -               |
+| `sdk.impactMetrics`   | MetricsAPI               | Always available     | -               |
 
-### Common Service Methods
+### Data Scope Architecture
 
-All cacheable services (extending `BaseEnvironmentService`) share these methods:
+Services are categorized by their data scope. **Each scope has a dedicated base service class** that handles caching, fetching, and event handling correctly:
+
+#### Environment-Scoped Services (`BaseEnvironmentService`)
+
+Data is fetched and cached per **environment**. Each environment has its own independent dataset.
 
 | Method                                   | Description                               |
 | ---------------------------------------- | ----------------------------------------- |
-| `getCached(environmentId?)`              | Get cached items                          |
+| `getCached(environmentId?)`              | Get cached items for environment          |
 | `listByEnvironment(environmentId?)`      | Fetch from API and update cache           |
 | `refreshByEnvironment(environmentId?)`   | Refresh cache for specific environment    |
 
-> In single-environment mode, the `environmentId` parameter can be omitted for all methods.
+> In single-environment mode, the `environmentId` parameter can be omitted.
+
+#### Project-Scoped Services (`BaseProjectService`)
+
+Data is fetched and cached per **project**. All environments within the same project share the same dataset. The `getCached()` key is a **projectId**, NOT an environmentId.
+
+| Method                                   | Description                               |
+| ---------------------------------------- | ----------------------------------------- |
+| `getCached(projectId?)`                  | Get cached items for project              |
+| `listByProject(projectId?)`              | Fetch from API and update cache           |
+| `refreshByProject(projectId?)`           | Refresh cache for specific project        |
+
+> In single-environment mode, the `projectId` is resolved from the `/ready` endpoint.
+
+> ⚠️ **Never pass an `environmentId` to a project-scoped service.** Client versions are independent of environments.
 
 ## API Reference
 
@@ -534,12 +558,31 @@ const isAccountAllowed = sdk.whitelist.isAccountWhitelisted('account123');
 const banners = sdk.banner.getCached();
 ```
 
-### Client Versions (`sdk.clientVersion`)
+### Client Versions (`sdk.clientVersion`) — Project-Scoped
 
 > **Note:** Requires `uses: { clientVersion: true }` in config.
+> **Scope:** Project-scoped. Data is shared across all environments within the same project. Use `projectId` (not `environmentId`) for cache access.
 
 ```typescript
+// Single-environment mode: projectId is auto-resolved
 const versions = sdk.clientVersion.getCached();
+
+// Multi-environment mode: use projectId explicitly
+const versions = sdk.clientVersion.getCached('proj_1');
+
+// Look up by platform and version
+const version = sdk.clientVersion.getByPlatformAndVersion('pc', '0.0.3');
+
+// Get latest version by platform
+const latest = sdk.clientVersion.getLatestByPlatform('pc');
+const latestOnline = sdk.clientVersion.getLatestByPlatform('pc', 'ONLINE');
+
+// Get all versions for a platform
+const pcVersions = sdk.clientVersion.getByPlatform('pc');
+
+// Check maintenance status
+const isActive = sdk.clientVersion.isMaintenanceActive(version);
+const message = sdk.clientVersion.getMaintenanceMessage(version, 'ko');
 ```
 
 ### Service Notices (`sdk.serviceNotice`)

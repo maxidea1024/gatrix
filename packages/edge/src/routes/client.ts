@@ -4,6 +4,7 @@ import { clientAuth, ClientRequest } from '../middleware/client-auth';
 import { sdkManager } from '../services/sdk-manager';
 import { config } from '../config/env';
 import logger from '../config/logger';
+import { environmentRegistry } from '../services/environment-registry';
 import {
   ClientVersion,
   Banner,
@@ -37,6 +38,23 @@ function compareVersions(a: string, b: string): number {
     if (aVal !== bVal) return aVal - bVal;
   }
   return 0;
+}
+
+/**
+ * Extract client IP address from request
+ */
+function getClientIp(req: Request): string {
+  let clientIp =
+    (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
+    req.socket.remoteAddress ||
+    '';
+
+  // Remove "::ffff:" prefix from IPv4-mapped IPv6 addresses
+  if (clientIp.startsWith('::ffff:')) {
+    clientIp = clientIp.substring(7);
+  }
+
+  return clientIp.trim();
 }
 
 /**
@@ -165,6 +183,7 @@ router.get(
         channel,
         subChannel,
         patchVersion,
+        accountId,
       } = req.query as {
         platform?: string;
         version?: string;
@@ -173,6 +192,7 @@ router.get(
         channel?: string;
         subChannel?: string;
         patchVersion?: string;
+        accountId?: string;
       };
 
       // Validate required query params
@@ -204,13 +224,23 @@ router.get(
         statusFilter = upperStatus;
       }
 
-      // Get client versions from cache for this environment
-      const envVersions = sdk.clientVersion.getCached(
-        cacheKey || environmentId
+      // Client versions are cached by projectId, resolve from environment context
+      const envContext = environmentRegistry.getEnvironmentContext(environmentId);
+      if (!envContext) {
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to resolve project for environment',
+          },
+        });
+      }
+      const allProjectVersions = sdk.clientVersion.getCached(
+        envContext.projectId
       ) as ClientVersion[];
 
       // Filter by platform
-      const platformVersions = envVersions.filter(
+      const platformVersions = allProjectVersions.filter(
         (v) => v.platform === platform || v.platform === 'all'
       );
 
@@ -378,12 +408,55 @@ router.get(
         }
       }
 
+      // Check whitelist (IP + account): whitelisted clients bypass MAINTENANCE status
+      let gameServerAddress = record.gameServerAddress;
+      let patchAddress = record.patchAddress;
+      let isWhitelisted = false;
+
+      if (effectiveStatus === 'MAINTENANCE') {
+        try {
+          const clientIp = getClientIp(req);
+
+          isWhitelisted = sdk.whitelist.isWhitelisted({
+            accountId,
+            clientIp,
+            environmentId,
+          });
+
+          if (isWhitelisted) {
+            // Whitelisted client: override MAINTENANCE to ONLINE
+            effectiveStatus = 'ONLINE';
+            // Use whitelist-specific addresses if available
+            if (record.gameServerAddressForWhiteList) {
+              gameServerAddress = record.gameServerAddressForWhiteList;
+            }
+            if (record.patchAddressForWhiteList) {
+              patchAddress = record.patchAddressForWhiteList;
+            }
+            logger.info('Whitelist bypass: MAINTENANCE -> ONLINE', {
+              clientIp,
+              accountId,
+              environmentId,
+              platform,
+              version: record.clientVersion,
+            });
+          }
+        } catch (e) {
+          logger.warn('Failed to check whitelist:', e);
+        }
+      }
+
+      // Inject serviceNoticeUrl into meta using actual ULID environmentId
+      const edgeBaseUrl = `${req.protocol}://${req.get('host')}`;
+      (meta as Record<string, unknown>).serviceNoticeUrl =
+        `${edgeBaseUrl}/game-service-notices.html?environmentId=${environmentId}`;
+
       const clientData: Record<string, unknown> = {
         platform: record.platform,
         clientVersion: record.clientVersion,
         status: effectiveStatus,
-        gameServerAddress: record.gameServerAddress,
-        patchAddress: record.patchAddress,
+        gameServerAddress,
+        patchAddress,
         guestModeAllowed:
           effectiveStatus === 'MAINTENANCE' ||
           effectiveStatus === 'FORCED_UPDATE'
@@ -413,7 +486,6 @@ router.get(
       return res.json({
         success: true,
         data: clientData,
-        cached: true, // Edge always serves from cache
       });
     } catch (error) {
       logger.error('Error getting client version:', error);
@@ -476,7 +548,6 @@ router.get(
       res.json({
         success: true,
         data: clientData,
-        cached: true, // Edge always serves from cache
       });
     } catch (error) {
       logger.error('Error getting game worlds:', error);
@@ -679,15 +750,25 @@ router.get(
 
       const { environmentId, platform } = req.clientContext!;
 
-      // Get client versions from cache for this environment
-      const envVersions = sdk.clientVersion.getCached(
-        environmentId
+      // Client versions are cached by projectId, resolve from environment context
+      const envContext = environmentRegistry.getEnvironmentContext(environmentId);
+      if (!envContext) {
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to resolve project for environment',
+          },
+        });
+      }
+      const projectVersions = sdk.clientVersion.getCached(
+        envContext.projectId
       ) as ClientVersion[];
 
       // Optionally filter by platform
-      let filteredVersions = envVersions;
+      let filteredVersions = projectVersions;
       if (platform) {
-        filteredVersions = envVersions.filter(
+        filteredVersions = projectVersions.filter(
           (v) => v.platform === platform || v.platform === 'all'
         );
       }

@@ -1,10 +1,11 @@
-import { IEventHandler } from './event-handler';
+import { IEventHandler, EventHandlerScope } from './event-handler';
 import { StandardEvent } from '../../types/events';
 import { CacheManager } from '../cache-manager';
 import { UsesConfig } from '../../types/config';
 import { Logger } from '../../utils/logger';
 
 export class ServiceNoticeEventHandler implements IEventHandler {
+  readonly scope: EventHandlerScope = 'environment';
   readonly eventTypes = [
     'service_notice.created',
     'service_notice.updated',
@@ -44,7 +45,7 @@ export class ServiceNoticeEventHandler implements IEventHandler {
           try {
             await this.cacheManager
               .getServiceNoticeService()
-              ?.refreshByEnvironment(environmentId);
+              ?.refreshByEnvironment(undefined, environmentId);
           } catch (error: any) {
             this.logger.error('Failed to refresh service notice cache', {
               error: error.message,

@@ -223,7 +223,17 @@ export class EventListener {
           const org = channelContext?.orgId || '-';
           const proj = channelContext?.projectId || '-';
           const env = channelContext?.environmentId || '-';
+          // Subscribe to the full environment-level channel
           channels.push(`${this.CHANNEL_PREFIX}:${org}:${proj}:${env}`);
+
+          // Also subscribe to project-level channel for project-scoped events
+          // (e.g., client_version events published with { projectId } only)
+          if (channelContext?.projectId) {
+            const projChannel = `${this.CHANNEL_PREFIX}:-:${proj}:-`;
+            if (!channels.includes(projChannel)) {
+              channels.push(projChannel);
+            }
+          }
         }
 
         // Fallback: subscribe using known environment IDs from cache if no context provided
@@ -448,26 +458,36 @@ export class EventListener {
       return;
     }
 
-    // Extract and validate environmentId (centralized)
-    // Segments are global events — no environmentId required
-    let environmentId = (event.data.environmentId ||
-      event.data.environment ||
-      '') as string;
-    const requiresEnvironment = !event.type.startsWith('segment.');
-    if (requiresEnvironment && !environmentId) {
-      this.logger.warn('Event missing environmentId', { event: event.type });
-      return;
+    // Extract and validate scope ID based on handler scope
+    let scopeId = '';
+
+    if (handler.scope === 'environment') {
+      // Environment-scoped events require environmentId
+      scopeId = (event.data.environmentId || '') as string;
+      if (!scopeId) {
+        this.logger.warn('Event missing environmentId', {
+          event: event.type,
+        });
+        return;
+      }
+      // Resolve raw environment ID to cache key
+      scopeId =
+        this.cacheManager.resolveTokenForEnvironmentId(scopeId);
+    } else if (handler.scope === 'project') {
+      // Project-scoped events use projectId from event data or resolved context
+      scopeId = (event.data.projectId || '') as string;
+      if (!scopeId) {
+        scopeId = this.cacheManager.getChannelContext().projectId || '';
+      }
+    } else if (handler.scope === 'org') {
+      // Org-scoped events use orgId from event data or resolved context
+      scopeId = (event.data.orgId || '') as string;
+      if (!scopeId) {
+        scopeId = this.cacheManager.getChannelContext().orgId || '';
+      }
     }
 
-    // In multi-mode, resolve raw environment ID to cache token key
-    // Cache keys are token strings (e.g. unsecured-{orgId}:{projectId}:{envId}-server-api-token)
-    // while events carry raw environment IDs (ULIDs)
-    if (requiresEnvironment && environmentId) {
-      environmentId =
-        this.cacheManager.resolveTokenForEnvironmentId(environmentId);
-    }
-
-    await handler.handle(event, environmentId);
+    await handler.handle(event, scopeId);
   }
 
   /**

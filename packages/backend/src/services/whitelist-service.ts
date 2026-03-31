@@ -91,12 +91,12 @@ export class WhitelistService {
       // Publish whitelist.updated event for SDK real-time updates
       try {
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+          `${SERVER_SDK_ETAG.ACCOUNT_WHITELISTS}:${environmentId}`
         );
 
         await pubSubService.publishSDKEvent(
           {
-            type: 'whitelist.updated',
+            type: 'account_whitelist.updated',
             data: {
               id: whitelist.id,
               environmentId,
@@ -152,12 +152,12 @@ export class WhitelistService {
       // Publish whitelist.updated event for SDK real-time updates
       try {
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+          `${SERVER_SDK_ETAG.ACCOUNT_WHITELISTS}:${environmentId}`
         );
 
         await pubSubService.publishSDKEvent(
           {
-            type: 'whitelist.updated',
+            type: 'account_whitelist.updated',
             data: {
               id: updated.id,
               environmentId,
@@ -202,12 +202,12 @@ export class WhitelistService {
       // Publish whitelist.updated event for SDK real-time updates
       try {
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+          `${SERVER_SDK_ETAG.ACCOUNT_WHITELISTS}:${environmentId}`
         );
 
         await pubSubService.publishSDKEvent(
           {
-            type: 'whitelist.updated',
+            type: 'account_whitelist.updated',
             data: {
               id,
               environmentId,
@@ -289,12 +289,12 @@ export class WhitelistService {
       try {
         // Publish event for SDK update (using 0 as ID to signify bulk change)
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+          `${SERVER_SDK_ETAG.ACCOUNT_WHITELISTS}:${environmentId}`
         );
 
         await pubSubService.publishSDKEvent(
           {
-            type: 'whitelist.updated',
+            type: 'account_whitelist.updated',
             data: {
               id: 0,
               environmentId,
@@ -354,12 +354,12 @@ export class WhitelistService {
       // Publish whitelist.updated event for SDK real-time updates
       try {
         await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`
+          `${SERVER_SDK_ETAG.ACCOUNT_WHITELISTS}:${environmentId}`
         );
 
         await pubSubService.publishSDKEvent(
           {
-            type: 'whitelist.updated',
+            type: 'account_whitelist.updated',
             data: {
               id: updated.id,
               environmentId,

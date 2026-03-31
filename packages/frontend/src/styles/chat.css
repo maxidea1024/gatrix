@@ -304,11 +304,11 @@
 }
 
 /* Link styling */
-.cs-message__content a {
+.cs-message__content :is(a) {
   color: var(--mui-palette-primary-main) !important;
   text-decoration: none !important;
 }
 
-.cs-message__content a:hover {
+.cs-message__content :is(a):hover {
   text-decoration: underline !important;
 }

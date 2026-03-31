@@ -158,6 +158,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const { allEnvironments } = useEnvironment();
   const [loading, setLoading] = useState(false);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
+  const [formReady, setFormReady] = useState(false);
   const versionFieldRef = useRef<HTMLInputElement>(null);
 
   const isEdit = !!clientVersion && !isCopyMode;
@@ -323,6 +324,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   } = useForm<ClientVersionFormData>({
     resolver: yupResolver(createValidationSchema(t)) as any,
     defaultValues,
+    mode: 'onChange',
   });
 
   // Watch current status
@@ -332,6 +334,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   // Form initialization
   useEffect(() => {
     if (open) {
+      // Prevent duplicate check from running during form initialization
+      setFormReady(false);
       // Fix display mode at open time to prevent button label flickering
       setDisplayIsEdit(!!clientVersion && !isCopyMode);
       setDisplayIsCopy(!!isCopyMode);
@@ -402,6 +406,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             (source.supportsMultiLanguage ?? false) ||
               normalizedLocales.length > 0
           );
+          // Mark form as ready after reset so duplicate check does not flash
+          setFormReady(true);
         })();
       } else {
         // Initialize with default values for new creation
@@ -411,6 +417,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         setSupportsMultiLanguage(false);
         setInputMode('direct');
         setSelectedTemplateId('');
+        setFormReady(true);
 
         // Apply defaults for initial platform (e.g. 'pc') immediately (only if fields are empty)
         (async () => {
@@ -505,16 +512,18 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   // Date locale configuration
 
   // Duplicate check
-  const watchedValues = watch(['platform', 'clientVersion']);
+  const watchedVersion = watch('clientVersion');
+  const watchedPlatformForDup = watch('platform');
   useEffect(() => {
-    const [platform, version] = watchedValues;
-    if (platform && version) {
+    // Skip duplicate check until form is fully initialized
+    if (!formReady) return;
+    if (watchedPlatformForDup && watchedVersion) {
       const checkDuplicate = async () => {
         try {
           const isDuplicate = await ClientVersionService.checkDuplicate(
             projectApiPath,
-            platform,
-            version,
+            watchedPlatformForDup,
+            watchedVersion,
             isEdit ? clientVersion?.id : undefined
           );
           setDuplicateError(
@@ -530,7 +539,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     } else {
       setDuplicateError(null);
     }
-  }, [watchedValues, isEdit, clientVersion?.id, t]);
+  }, [watchedPlatformForDup, watchedVersion, formReady, isEdit, clientVersion?.id, t]);
 
   // Apply defaults when platform changes
   const watchedPlatform = watch('platform');
@@ -1014,16 +1023,23 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                       startDate={watch('maintenanceStartDate') || ''}
                       endDate={watch('maintenanceEndDate') || ''}
                       onStartDateChange={(date) =>
-                        setValue('maintenanceStartDate', date)
+                        setValue('maintenanceStartDate', date, {
+                          shouldDirty: true,
+                        })
                       }
                       onEndDateChange={(date) =>
-                        setValue('maintenanceEndDate', date)
+                        setValue('maintenanceEndDate', date, {
+                          shouldDirty: true,
+                        })
                       }
                       inputMode={inputMode}
                       onInputModeChange={setInputMode}
                       maintenanceMessage={watch('maintenanceMessage') || ''}
                       onMaintenanceMessageChange={(message) =>
-                        setValue('maintenanceMessage', message)
+                        setValue('maintenanceMessage', message, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
                       }
                       supportsMultiLanguage={supportsMultiLanguage}
                       onSupportsMultiLanguageChange={

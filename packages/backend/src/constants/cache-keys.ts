@@ -7,7 +7,7 @@
 
 /**
  * Environment-scoped cache key prefix
- * Used for data that varies by environment (game worlds, client versions, etc.)
+ * Used for data that varies by environment (game worlds, whitelists, etc.)
  * Format: env:{ environmentId }:{originalKey}
  */
 export const ENV_PREFIX = 'env';
@@ -261,9 +261,14 @@ export const SERVER_SDK_ETAG = {
   POPUP_NOTICES: 'server_sdk:etag:popup_notices',
 
   /**
-   * Whitelists for server SDK
+   * IP whitelists for server SDK
    */
-  WHITELISTS: 'server_sdk:etag:whitelists',
+  IP_WHITELISTS: 'server_sdk:etag:ip_whitelists',
+
+  /**
+   * Account whitelists for server SDK
+   */
+  ACCOUNT_WHITELISTS: 'server_sdk:etag:account_whitelists',
 
   /**
    * Maintenance status for server SDK
@@ -328,7 +333,7 @@ export const ENV_SCOPED = {
   },
 
   /**
-   * Client versions (environment-specific)
+   * Client versions (project-scoped, but cached here for legacy compatibility)
    */
   CLIENT_VERSION: {
     BY_CHANNEL: (channel: string, subChannel: string) =>
@@ -360,7 +365,8 @@ export const ENV_SCOPED = {
   SDK_ETAG: {
     GAME_WORLDS: 'server_sdk:etag:game_worlds',
     POPUP_NOTICES: 'server_sdk:etag:popup_notices',
-    WHITELISTS: 'server_sdk:etag:whitelists',
+    IP_WHITELISTS: 'server_sdk:etag:ip_whitelists',
+    ACCOUNT_WHITELISTS: 'server_sdk:etag:account_whitelists',
     MAINTENANCE: 'server_sdk:etag:maintenance',
     SURVEYS: 'server_sdk:etag:surveys',
     SURVEY_SETTINGS: 'server_sdk:etag:survey_settings',

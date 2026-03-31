@@ -13,7 +13,8 @@ import IngamePopupNoticeController from '../../controllers/ingame-popup-notice-c
 import { SurveyController } from '../../controllers/survey-controller';
 import { MaintenanceController } from '../../controllers/maintenance-controller';
 import serviceDiscoveryRoutes, {
-  getWhitelistsHandler,
+  getIpWhitelistsHandler,
+  getAccountWhitelistsHandler,
 } from './service-discovery';
 import ServerClientVersionController from '../../controllers/server-client-version-controller';
 import ServerServiceNoticeController from '../../controllers/server-service-notice-controller';
@@ -232,7 +233,8 @@ router.get('/surveys', serverSDKAuth, SurveyController.getServerSurveys);
 router.get('/surveys/:id', serverSDKAuth, SurveyController.getServerSurveyById);
 
 // Whitelist routes
-router.get('/whitelists', serverSDKAuth, getWhitelistsHandler);
+router.get('/ip-whitelists', serverSDKAuth, getIpWhitelistsHandler);
+router.get('/account-whitelists', serverSDKAuth, getAccountWhitelistsHandler);
 
 // Vars (KV) routes
 router.get('/vars', serverSDKAuth, VarsController.getServerVars as any);

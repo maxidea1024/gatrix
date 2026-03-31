@@ -1,4 +1,4 @@
-export { IEventHandler } from './event-handler';
+export { IEventHandler, EventHandlerScope } from './event-handler';
 export { GameWorldEventHandler } from './game-world-event-handler';
 export { PopupNoticeEventHandler } from './popup-notice-event-handler';
 export { SurveyEventHandler } from './survey-event-handler';
