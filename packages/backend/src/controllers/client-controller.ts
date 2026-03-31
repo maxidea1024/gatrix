@@ -15,6 +15,7 @@ import { asyncHandler } from '../utils/async-handler';
 import { VarsService } from '../services/vars-service';
 import { sendBadRequest, sendSuccessResponse } from '../utils/api-response';
 import { IpWhitelistService } from '../services/ip-whitelist-service';
+import { WhitelistService } from '../services/whitelist-service';
 import { SDKRequest } from '../middleware/api-token-auth';
 import VarsModel from '../models/vars';
 import { FeatureFlagModel, FeatureSegmentModel } from '../models/FeatureFlag';
@@ -83,6 +84,7 @@ export class ClientController {
         channel,
         subChannel,
         patchVersion,
+        accountId,
       } = req.query as {
         platform?: string;
         version?: string;
@@ -91,6 +93,7 @@ export class ClientController {
         channel?: string;
         subChannel?: string;
         patchVersion?: string;
+        accountId?: string;
       };
 
       // Validate required query params - platform is always required
@@ -336,27 +339,6 @@ export class ClientController {
         }
       }
 
-      // Get client IP and check whitelist
-      const clientIp = this.getClientIp(req);
-      let gameServerAddress = record.gameServerAddress;
-      let patchAddress = record.patchAddress;
-
-      if (clientIp) {
-        const isWhitelisted = await IpWhitelistService.isIpWhitelisted(
-          clientIp,
-          environmentId
-        );
-        if (isWhitelisted) {
-          // Use whitelist addresses if available
-          if (record.gameServerAddressForWhiteList) {
-            gameServerAddress = record.gameServerAddressForWhiteList;
-          }
-          if (record.patchAddressForWhiteList) {
-            patchAddress = record.patchAddressForWhiteList;
-          }
-        }
-      }
-
       // Get maintenance message if status is MAINTENANCE
       let maintenanceMessage: string | undefined = record.maintenanceMessage;
       if (record.clientStatus === ClientStatus.MAINTENANCE && record.id) {
@@ -420,9 +402,76 @@ export class ClientController {
       }
 
       // Determine effective status (service maintenance overrides client version status)
-      const effectiveStatus = isServiceMaintenanceActive
+      let effectiveStatus = isServiceMaintenanceActive
         ? ClientStatus.MAINTENANCE
         : record.clientStatus;
+
+      // Check whitelist (IP + account): whitelisted clients bypass MAINTENANCE status
+      const clientIp = this.getClientIp(req);
+      let gameServerAddress = record.gameServerAddress;
+      let patchAddress = record.patchAddress;
+      let isWhitelisted = false;
+
+      if (effectiveStatus === ClientStatus.MAINTENANCE) {
+        try {
+          // Check IP whitelist
+          if (clientIp) {
+            isWhitelisted = await IpWhitelistService.isIpWhitelisted(
+              clientIp,
+              environmentId
+            );
+          }
+
+          // Check account whitelist (if accountId provided and not already whitelisted)
+          if (!isWhitelisted && accountId) {
+            const result = await WhitelistService.testWhitelist(
+              environmentId,
+              accountId,
+              clientIp || undefined
+            );
+            isWhitelisted = result.isAllowed;
+          }
+
+          if (isWhitelisted) {
+            // Whitelisted client: override MAINTENANCE to ONLINE
+            effectiveStatus = ClientStatus.ONLINE;
+            // Use whitelist-specific addresses if available
+            if (record.gameServerAddressForWhiteList) {
+              gameServerAddress = record.gameServerAddressForWhiteList;
+            }
+            if (record.patchAddressForWhiteList) {
+              patchAddress = record.patchAddressForWhiteList;
+            }
+            logger.info('Whitelist bypass: MAINTENANCE -> ONLINE', {
+              clientIp,
+              accountId,
+              environmentId,
+              platform,
+              version: record.clientVersion,
+            });
+          }
+        } catch (error) {
+          logger.warn('Failed to check whitelist:', error);
+        }
+      } else if (clientIp) {
+        // Even when not in MAINTENANCE, swap addresses for whitelisted IPs
+        try {
+          isWhitelisted = await IpWhitelistService.isIpWhitelisted(
+            clientIp,
+            environmentId
+          );
+          if (isWhitelisted) {
+            if (record.gameServerAddressForWhiteList) {
+              gameServerAddress = record.gameServerAddressForWhiteList;
+            }
+            if (record.patchAddressForWhiteList) {
+              patchAddress = record.patchAddressForWhiteList;
+            }
+          }
+        } catch (error) {
+          logger.warn('Failed to check IP whitelist for address swap:', error);
+        }
+      }
 
       // Fetch tags for the client version
       let tagNames: string[] = [];

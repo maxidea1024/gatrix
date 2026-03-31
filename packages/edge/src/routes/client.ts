@@ -41,6 +41,23 @@ function compareVersions(a: string, b: string): number {
 }
 
 /**
+ * Extract client IP address from request
+ */
+function getClientIp(req: Request): string {
+  let clientIp =
+    (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
+    req.socket.remoteAddress ||
+    '';
+
+  // Remove "::ffff:" prefix from IPv4-mapped IPv6 addresses
+  if (clientIp.startsWith('::ffff:')) {
+    clientIp = clientIp.substring(7);
+  }
+
+  return clientIp.trim();
+}
+
+/**
  * Record cache hit metric
  */
 function recordCacheHit(cacheType: string): void {
@@ -166,6 +183,7 @@ router.get(
         channel,
         subChannel,
         patchVersion,
+        accountId,
       } = req.query as {
         platform?: string;
         version?: string;
@@ -174,6 +192,7 @@ router.get(
         channel?: string;
         subChannel?: string;
         patchVersion?: string;
+        accountId?: string;
       };
 
       // Validate required query params
@@ -389,6 +408,53 @@ router.get(
         }
       }
 
+      // Check whitelist (IP + account): whitelisted clients bypass MAINTENANCE status
+      let gameServerAddress = record.gameServerAddress;
+      let patchAddress = record.patchAddress;
+      let isWhitelisted = false;
+
+      if (effectiveStatus === 'MAINTENANCE') {
+        try {
+          // Check IP whitelist
+          const clientIp = getClientIp(req);
+          if (clientIp) {
+            isWhitelisted = sdk.whitelist.isIpWhitelisted(
+              clientIp,
+              environmentId
+            );
+          }
+
+          // Check account whitelist (if accountId provided and not already whitelisted)
+          if (!isWhitelisted && accountId) {
+            isWhitelisted = sdk.whitelist.isAccountWhitelisted(
+              accountId,
+              environmentId
+            );
+          }
+
+          if (isWhitelisted) {
+            // Whitelisted client: override MAINTENANCE to ONLINE
+            effectiveStatus = 'ONLINE';
+            // Use whitelist-specific addresses if available
+            if (record.gameServerAddressForWhiteList) {
+              gameServerAddress = record.gameServerAddressForWhiteList;
+            }
+            if (record.patchAddressForWhiteList) {
+              patchAddress = record.patchAddressForWhiteList;
+            }
+            logger.info('Whitelist bypass: MAINTENANCE -> ONLINE', {
+              clientIp,
+              accountId,
+              environmentId,
+              platform,
+              version: record.clientVersion,
+            });
+          }
+        } catch (e) {
+          logger.warn('Failed to check whitelist:', e);
+        }
+      }
+
       // Inject serviceNoticeUrl into meta using actual ULID environmentId
       const edgeBaseUrl = `${req.protocol}://${req.get('host')}`;
       (meta as Record<string, unknown>).serviceNoticeUrl =
@@ -398,8 +464,8 @@ router.get(
         platform: record.platform,
         clientVersion: record.clientVersion,
         status: effectiveStatus,
-        gameServerAddress: record.gameServerAddress,
-        patchAddress: record.patchAddress,
+        gameServerAddress,
+        patchAddress,
         guestModeAllowed:
           effectiveStatus === 'MAINTENANCE' ||
           effectiveStatus === 'FORCED_UPDATE'
