@@ -15,9 +15,9 @@ const logger = createLogger('ServerClientVersionController');
  */
 export class ServerClientVersionController {
   /**
-   * Get client versions for a specific environment
+   * Get client versions for a specific project (project-scoped)
    * GET /api/v1/server/client-versions
-   * Returns all active client versions with tags for the specified environment
+   * Returns all active client versions with tags for the specified project
    */
   static async getClientVersions(req: EnvironmentRequest, res: Response) {
     try {
