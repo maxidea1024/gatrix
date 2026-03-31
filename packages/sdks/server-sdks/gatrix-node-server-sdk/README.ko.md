@@ -174,8 +174,9 @@ import { GatrixServerSDK, IEnvironmentProvider } from '@gatrix/gatrix-node-serve
 
 const environmentProvider: IEnvironmentProvider = {
   getEnvironmentTokens: () => [
-    { environmentId: 'env_dev', token: 'dev-token' },
-    { environmentId: 'env_prod', token: 'prod-token' },
+    { environmentId: 'env_dev', token: 'dev-token', projectId: 'proj_1', orgId: 'org_1' },
+    { environmentId: 'env_staging', token: 'staging-token', projectId: 'proj_1', orgId: 'org_1' },
+    { environmentId: 'env_prod', token: 'prod-token', projectId: 'proj_1', orgId: 'org_1' },
   ],
 };
 
@@ -191,42 +192,66 @@ const sdk = new GatrixServerSDK({
 
 await sdk.initialize();
 
+// 환경 스코프 데이터: environmentId 전달
 const devWorlds = sdk.gameWorld.getCached('env_dev');
-const prodWorlds = sdk.gameWorld.getCached('env_prod');
+const prodNotices = sdk.serviceNotice.getCached('env_prod');
+
+// 프로젝트 스코프 데이터: projectId 전달
+const clientVersions = sdk.clientVersion.getCached('proj_1');
 ```
+
+> **중요:** 프로젝트 스코프 서비스가 정상 동작하려면 각 환경 정보에 `projectId`가 반드시 포함되어야 합니다.
 
 ## 서비스 Getter 패턴
 
 모든 서비스는 SDK 인스턴스의 public getter를 통해 접근합니다:
 
-| Getter                    | Service                   | `uses` 키            |
-| ------------------------- | ------------------------- | -------------------- |
-| `sdk.gameWorld`           | GameWorldService          | `gameWorld`          |
-| `sdk.popupNotice`        | PopupNoticeService        | `popupNotice`       |
-| `sdk.survey`             | SurveyService             | `survey`            |
-| `sdk.whitelist`          | WhitelistService          | `whitelist`         |
-| `sdk.serviceMaintenance` | ServiceMaintenanceService | `serviceMaintenance` |
-| `sdk.featureFlag`        | FeatureFlagService        | `featureFlag`       |
-| `sdk.vars`               | VarsService               | `vars`              |
-| `sdk.storeProduct`       | StoreProductService       | `storeProduct`      |
-| `sdk.banner`             | BannerService             | (Edge 기능)          |
-| `sdk.clientVersion`      | ClientVersionService      | (Edge 기능)          |
-| `sdk.serviceNotice`      | ServiceNoticeService      | (Edge 기능)          |
-| `sdk.coupon`             | CouponService             | 항상 사용 가능       |
-| `sdk.serviceDiscovery`   | ServiceDiscoveryService   | 항상 사용 가능       |
-| `sdk.impactMetrics`      | MetricsAPI                | 항상 사용 가능       |
+| Getter                    | Service                   | `uses` 키            | 스코프          |
+| ------------------------- | ------------------------- | -------------------- | --------------- |
+| `sdk.gameWorld`           | GameWorldService          | `gameWorld`          | 환경(Env)       |
+| `sdk.popupNotice`        | PopupNoticeService        | `popupNotice`       | 환경(Env)       |
+| `sdk.survey`             | SurveyService             | `survey`            | 환경(Env)       |
+| `sdk.whitelist`          | WhitelistService          | `whitelist`         | 환경(Env)       |
+| `sdk.serviceMaintenance` | ServiceMaintenanceService | `serviceMaintenance` | 환경(Env)       |
+| `sdk.featureFlag`        | FeatureFlagService        | `featureFlag`       | 환경(Env)       |
+| `sdk.vars`               | VarsService               | `vars`              | 환경(Env)       |
+| `sdk.storeProduct`       | StoreProductService       | `storeProduct`      | 환경(Env)       |
+| `sdk.banner`             | BannerService             | `banner`            | 환경(Env)       |
+| `sdk.serviceNotice`      | ServiceNoticeService      | `serviceNotice`     | 환경(Env)       |
+| `sdk.clientVersion`      | ClientVersionService      | `clientVersion`     | **프로젝트**    |
+| `sdk.coupon`             | CouponService             | 항상 사용 가능       | -               |
+| `sdk.serviceDiscovery`   | ServiceDiscoveryService   | 항상 사용 가능       | -               |
+| `sdk.impactMetrics`      | MetricsAPI                | 항상 사용 가능       | -               |
 
-### 공통 서비스 메서드
+### 데이터 스코프 아키텍처
 
-캐시 가능 서비스(`BaseEnvironmentService` 상속)의 공통 메서드:
+서비스는 데이터 스코프에 따라 분류됩니다. **각 스코프에는 전용 Base 서비스 클래스**가 있어 캐싱, fetch, 이벤트 처리가 정확하게 동작합니다:
+
+#### 환경 스코프 서비스 (`BaseEnvironmentService`)
+
+**환경(environment)** 단위로 데이터가 fetch되고 캐시됩니다. 각 환경은 독립적인 데이터셋을 가집니다.
 
 | 메서드                                 | 설명                               |
 | -------------------------------------- | ---------------------------------- |
-| `getCached(environmentId?)`            | 캐시된 항목 가져오기               |
+| `getCached(environmentId?)`            | 해당 환경의 캐시된 항목 가져오기   |
 | `listByEnvironment(environmentId?)`    | API에서 가져와 캐시 업데이트       |
 | `refreshByEnvironment(environmentId?)` | 특정 환경 캐시 갱신                |
 
-> 싱글 환경 모드에서는 모든 메서드에서 `environmentId` 파라미터를 생략할 수 있습니다.
+> 싱글 환경 모드에서는 `environmentId` 파라미터를 생략할 수 있습니다.
+
+#### 프로젝트 스코프 서비스 (`BaseProjectService`)
+
+**프로젝트(project)** 단위로 데이터가 fetch되고 캐시됩니다. 동일 프로젝트 내 모든 환경이 같은 데이터셋을 공유합니다. `getCached()`의 키는 **projectId**이며, environmentId가 아닙니다.
+
+| 메서드                                 | 설명                               |
+| -------------------------------------- | ---------------------------------- |
+| `getCached(projectId?)`                | 해당 프로젝트의 캐시된 항목        |
+| `listByProject(projectId?)`            | API에서 가져와 캐시 업데이트       |
+| `refreshByProject(projectId?)`         | 특정 프로젝트 캐시 갱신            |
+
+> 싱글 환경 모드에서는 `/ready` 엔드포인트에서 `projectId`가 자동 해석됩니다.
+
+> ⚠️ **프로젝트 스코프 서비스에 절대로 `environmentId`를 전달하지 마세요.** 클라이언트 버전은 환경과 무관합니다.
 
 ## API 레퍼런스
 
@@ -412,13 +437,46 @@ const isIpAllowed = sdk.whitelist.isIpWhitelisted('192.168.1.100');     // CIDR 
 const isAccountAllowed = sdk.whitelist.isAccountWhitelisted('account123');
 ```
 
-### 배너 / 클라이언트 버전 / 서비스 공지
+### 배너 (`sdk.banner`)
 
-> 각각 `uses`에서 명시적으로 활성화 필요
+> `uses: { banner: true }` 필요
 
 ```typescript
 const banners = sdk.banner.getCached();
+```
+
+### 클라이언트 버전 (`sdk.clientVersion`) — 프로젝트 스코프
+
+> `uses: { clientVersion: true }` 필요
+> **스코프:** 프로젝트 단위. 동일 프로젝트 내 모든 환경이 같은 데이터를 공유합니다. `environmentId`가 아닌 `projectId`를 사용하세요.
+
+```typescript
+// 싱글 환경 모드: projectId 자동 해석
 const versions = sdk.clientVersion.getCached();
+
+// 멀티 환경 모드: projectId 명시
+const versions = sdk.clientVersion.getCached('proj_1');
+
+// 플랫폼 + 버전으로 조회
+const version = sdk.clientVersion.getByPlatformAndVersion('pc', '0.0.3');
+
+// 플랫폼별 최신 버전
+const latest = sdk.clientVersion.getLatestByPlatform('pc');
+const latestOnline = sdk.clientVersion.getLatestByPlatform('pc', 'ONLINE');
+
+// 플랫폼별 전체 버전
+const pcVersions = sdk.clientVersion.getByPlatform('pc');
+
+// 점검 상태 확인
+const isActive = sdk.clientVersion.isMaintenanceActive(version);
+const message = sdk.clientVersion.getMaintenanceMessage(version, 'ko');
+```
+
+### 서비스 공지 (`sdk.serviceNotice`)
+
+> `uses: { serviceNotice: true }` 필요
+
+```typescript
 const notices = sdk.serviceNotice.getCached();
 ```
 
