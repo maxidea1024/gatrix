@@ -22,7 +22,9 @@ const createTokenValidation = [
 
   body('tokenType')
     .isIn(['client', 'server', 'edge', 'universal_client'])
-    .withMessage('Token type must be client, server, edge, or universal_client'),
+    .withMessage(
+      'Token type must be client, server, edge, or universal_client'
+    ),
 
   body('environmentId')
     .if(body('tokenType').not().equals('universal_client'))

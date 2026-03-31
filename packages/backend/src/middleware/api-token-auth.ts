@@ -423,11 +423,14 @@ export const setSDKEnvironment = async (
       );
 
       if (!versionRecord || !versionRecord.targetEnv) {
-        logger.warn('Auth: No targetEnv found for universal client token + version', {
-          projectId: token.projectId,
-          clientVersion,
-          platform,
-        });
+        logger.warn(
+          'Auth: No targetEnv found for universal client token + version',
+          {
+            projectId: token.projectId,
+            clientVersion,
+            platform,
+          }
+        );
         return res.status(400).json({
           success: false,
           error: {

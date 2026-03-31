@@ -145,7 +145,9 @@ export async function clientAuth(
   }
 
   // 1b. Unsecured universal client token: unsecured-{org}:{project}-universal-client-api-token
-  const unsecuredUniversalClientMatch = apiToken.match(UNSECURED_UNIVERSAL_CLIENT_TOKEN_REGEX);
+  const unsecuredUniversalClientMatch = apiToken.match(
+    UNSECURED_UNIVERSAL_CLIENT_TOKEN_REGEX
+  );
   if (unsecuredUniversalClientMatch) {
     const [, , unsecuredProjectId] = unsecuredUniversalClientMatch;
     if (!clientVersion) {

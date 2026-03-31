@@ -2082,12 +2082,16 @@ const ApiTokensPage: React.FC = () => {
                   }}
                 >
                   <MenuItem value={formData.tokenType}>
-                    {({
-                      client: t('apiTokens.clientTokenType'),
-                      server: t('apiTokens.serverTokenType'),
-                      edge: t('apiTokens.edgeTokenType'),
-                      universal_client: t('apiTokens.universalClientTokenType'),
-                    } as Record<string, string>)[formData.tokenType] || formData.tokenType}
+                    {(
+                      {
+                        client: t('apiTokens.clientTokenType'),
+                        server: t('apiTokens.serverTokenType'),
+                        edge: t('apiTokens.edgeTokenType'),
+                        universal_client: t(
+                          'apiTokens.universalClientTokenType'
+                        ),
+                      } as Record<string, string>
+                    )[formData.tokenType] || formData.tokenType}
                   </MenuItem>
                 </Select>
                 <Typography
