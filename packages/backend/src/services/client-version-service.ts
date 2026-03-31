@@ -376,7 +376,10 @@ export class ClientVersionService {
       // Prepare data for SDK (parse customPayload and merge with passiveData)
       const sdkReadyClientVersion =
         fullClientVersion && result.targetEnv
-          ? await prepareClientVersionForSDK(fullClientVersion, result.targetEnv)
+          ? await prepareClientVersionForSDK(
+              fullClientVersion,
+              result.targetEnv
+            )
           : fullClientVersion;
 
       await pubSubService.publishSDKEvent(
@@ -527,7 +530,10 @@ export class ClientVersionService {
       try {
         // Prepare data for SDK (parse customPayload and merge with passiveData)
         const sdkReadyClientVersion = updatedClientVersion.targetEnv
-          ? await prepareClientVersionForSDK(updatedClientVersion, updatedClientVersion.targetEnv)
+          ? await prepareClientVersionForSDK(
+              updatedClientVersion,
+              updatedClientVersion.targetEnv
+            )
           : updatedClientVersion;
 
         await pubSubService.publishSDKEvent(

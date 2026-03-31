@@ -92,9 +92,7 @@ export class TagService {
       if (!scope) return;
 
       await pubSubService.invalidateByPattern(`*${entityType}*`);
-      await pubSubService.invalidateKey(
-        `${sdkEtagPrefix}:${scope.scopeId}`
-      );
+      await pubSubService.invalidateKey(`${sdkEtagPrefix}:${scope.scopeId}`);
 
       // Publish event to correct channel based on scope type
       const channelTarget =
