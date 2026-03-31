@@ -88,20 +88,31 @@ export class TagService {
     if (!sdkEtagPrefix) return;
 
     try {
-      const environmentId = await this.resolveEnvironmentId(
-        entityType,
-        entityId
-      );
-      if (!environmentId) return;
+      const scope = await this.resolveScopeId(entityType, entityId);
+      if (!scope) return;
 
       await pubSubService.invalidateByPattern(`*${entityType}*`);
-      await pubSubService.invalidateKey(`${sdkEtagPrefix}:${environmentId}`);
+      await pubSubService.invalidateKey(
+        `${sdkEtagPrefix}:${scope.scopeId}`
+      );
+
+      // Publish event to correct channel based on scope type
+      const channelTarget =
+        scope.scopeType === 'project'
+          ? { projectId: scope.scopeId }
+          : { environmentId: scope.scopeId };
+
       await pubSubService.publishSDKEvent(
         {
           type: `${entityType}.updated`,
-          data: { id: entityId, environmentId },
+          data: {
+            id: entityId,
+            ...(scope.scopeType === 'project'
+              ? { projectId: scope.scopeId }
+              : { environmentId: scope.scopeId }),
+          },
         },
-        { environmentId }
+        channelTarget
       );
     } catch (error) {
       logger.error(
@@ -112,22 +123,26 @@ export class TagService {
   }
 
   /**
-   * Resolve environmentId from entity record.
-   * Client versions now use projectId (project-scoped), others use environmentId.
+   * Resolve scope ID from entity record for cache invalidation.
+   * Returns { scopeId, scopeType } to handle both env-scoped and project-scoped entities.
    */
-  private static async resolveEnvironmentId(
+  private static async resolveScopeId(
     entityType: string,
     entityId: string
-  ): Promise<string | null> {
+  ): Promise<{ scopeId: string; scopeType: 'environment' | 'project' } | null> {
     switch (entityType) {
       case 'client_version': {
-        // Client versions are project-scoped; use targetEnv for SDK event
+        // Client versions are project-scoped; use projectId for cache key
         const cv = await ClientVersionModel.findByIdWithoutProject(entityId);
-        return cv?.targetEnv || null;
+        return cv?.projectId
+          ? { scopeId: cv.projectId, scopeType: 'project' }
+          : null;
       }
       case 'game_world': {
         const gw = await GameWorldModel.findByIdWithoutEnv(entityId);
-        return gw?.environmentId || null;
+        return gw?.environmentId
+          ? { scopeId: gw.environmentId, scopeType: 'environment' }
+          : null;
       }
       default:
         return null;

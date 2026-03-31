@@ -360,13 +360,10 @@ export class ClientVersionService {
 
     // Invalidate client version cache (including ETag cache for SDK)
     await pubSubService.invalidateByPattern('*client_version:*');
-    // Use targetEnv for SDK cache key if available
-    const targetEnv = result.targetEnv;
-    if (targetEnv) {
-      await pubSubService.invalidateKey(
-        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${targetEnv}`
-      );
-    }
+    // Use projectId for SDK cache key (project-scoped)
+    await pubSubService.invalidateKey(
+      `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${projectId}`
+    );
 
     // Publish event with full data for SDK cache update
     try {
@@ -378,8 +375,8 @@ export class ClientVersionService {
 
       // Prepare data for SDK (parse customPayload and merge with passiveData)
       const sdkReadyClientVersion =
-        fullClientVersion && targetEnv
-          ? await prepareClientVersionForSDK(fullClientVersion, targetEnv)
+        fullClientVersion && result.targetEnv
+          ? await prepareClientVersionForSDK(fullClientVersion, result.targetEnv)
           : fullClientVersion;
 
       await pubSubService.publishSDKEvent(
@@ -520,20 +517,17 @@ export class ClientVersionService {
 
     const updatedClientVersion = await this.getClientVersionById(id, projectId);
 
-    // Invalidate ETag cache for SDK using targetEnv
-    const targetEnv = updatedClientVersion?.targetEnv;
-    if (targetEnv) {
-      await pubSubService.invalidateKey(
-        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${targetEnv}`
-      );
-    }
+    // Invalidate ETag cache for SDK using projectId (project-scoped)
+    await pubSubService.invalidateKey(
+      `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${projectId}`
+    );
 
     // Publish event with full data for SDK cache update
     if (updatedClientVersion) {
       try {
         // Prepare data for SDK (parse customPayload and merge with passiveData)
-        const sdkReadyClientVersion = targetEnv
-          ? await prepareClientVersionForSDK(updatedClientVersion, targetEnv)
+        const sdkReadyClientVersion = updatedClientVersion.targetEnv
+          ? await prepareClientVersionForSDK(updatedClientVersion, updatedClientVersion.targetEnv)
           : updatedClientVersion;
 
         await pubSubService.publishSDKEvent(
@@ -562,10 +556,15 @@ export class ClientVersionService {
     const clientVersion = await ClientVersionModel.findById(id, projectId);
     await ClientVersionModel.delete(id, projectId);
     const deletedRowsCount = 1;
-    const targetEnv = clientVersion?.targetEnv;
 
     if (deletedRowsCount > 0) {
-      // Publish generic update event (deletion)
+      // Invalidate client version cache (including ETag cache)
+      await pubSubService.invalidateByPattern('*client_version:*');
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${projectId}`
+      );
+
+      // Publish delete event
       await pubSubService.publishSDKEvent(
         {
           type: 'client_version.deleted',
@@ -573,14 +572,6 @@ export class ClientVersionService {
         },
         { projectId }
       );
-
-      // Invalidate client version cache (including ETag cache)
-      await pubSubService.invalidateByPattern('*client_version:*');
-      if (targetEnv) {
-        await pubSubService.invalidateKey(
-          `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${targetEnv}`
-        );
-      }
     }
 
     return deletedRowsCount > 0;
