@@ -1,7 +1,7 @@
 /**
  * Version Map Service
  * Maintains an in-memory map of projectId + clientVersion -> targetEnv
- * for O(1) environment resolution with project tokens.
+ * for O(1) environment resolution with universal client tokens.
  */
 
 import { createLogger } from '../config/logger';

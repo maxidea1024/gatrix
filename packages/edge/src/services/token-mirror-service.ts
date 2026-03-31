@@ -14,7 +14,7 @@ export interface MirroredToken {
   id: number;
   tokenName: string;
   tokenValue: string;
-  tokenType: 'client' | 'server' | 'edge' | 'project';
+  tokenType: 'client' | 'server' | 'edge' | 'universal_client';
   orgId: string | null;
   projectId: string | null;
   environmentId: string | null; // null means no specific environment binding
@@ -128,7 +128,7 @@ class TokenMirrorService {
   }
 
   /**
-   * Fetch version map from backend for project token dynamic resolution
+   * Fetch version map from backend for universal client token dynamic resolution
    */
   async fetchVersionMap(): Promise<void> {
     try {
@@ -256,13 +256,13 @@ class TokenMirrorService {
       gtx_cli_: 'client',
       gtx_srv_: 'server',
       gtx_edge_: 'edge',
-      gtx_proj_: 'project',
+      gxuc_: 'universal_client',
     };
     for (const [prefix, type] of Object.entries(PREFIX_TYPE_MAP)) {
       if (tokenValue.startsWith(prefix)) {
         if (
           type !== requiredType &&
-          !(type === 'project' && requiredType === 'client')
+          !(type === 'universal_client' && requiredType === 'client')
         ) {
           return { valid: false, reason: 'invalid_type' };
         }
@@ -285,10 +285,10 @@ class TokenMirrorService {
     }
 
     // Check token type
-    // Project tokens can be used in place of client tokens (dynamic env resolution)
+    // Universal client tokens can be used in place of client tokens (dynamic env resolution)
     if (
       token.tokenType !== requiredType &&
-      !(token.tokenType === 'project' && requiredType === 'client')
+      !(token.tokenType === 'universal_client' && requiredType === 'client')
     ) {
       return { valid: false, token, reason: 'invalid_type' };
     }

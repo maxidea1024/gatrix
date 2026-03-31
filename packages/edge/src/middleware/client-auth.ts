@@ -9,9 +9,9 @@ import { environmentRegistry } from '../services/environment-registry';
 // Unsecured token format: unsecured-{org}:{project}:{env}-{type}-api-token
 const UNSECURED_TOKEN_REGEX =
   /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
-// Unsecured project token format: unsecured-{org}:{project}-project-api-token
-const UNSECURED_PROJECT_TOKEN_REGEX =
-  /^unsecured-([^:]+):([^:]+)-project-api-token$/;
+// Unsecured universal client token format: unsecured-{org}:{project}-universal-client-api-token
+const UNSECURED_UNIVERSAL_CLIENT_TOKEN_REGEX =
+  /^unsecured-([^:]+):([^:]+)-universal-client-api-token$/;
 
 // Legacy unsecured tokens — auto-resolve to default/default/development
 const LEGACY_TOKENS: Record<string, boolean> = {
@@ -49,7 +49,7 @@ export interface ClientRequest extends Request {
     platform?: string;
     tokenName?: string;
     /**
-     * Project ID when using project token (dynamic env resolution)
+     * Project ID when using universal client token (dynamic env resolution)
      */
     projectId?: string;
   };
@@ -144,17 +144,17 @@ export async function clientAuth(
     return next();
   }
 
-  // 1b. Unsecured project token: unsecured-{org}:{project}-project-api-token
-  const unsecuredProjectMatch = apiToken.match(UNSECURED_PROJECT_TOKEN_REGEX);
-  if (unsecuredProjectMatch) {
-    const [, , unsecuredProjectId] = unsecuredProjectMatch;
+  // 1b. Unsecured universal client token: unsecured-{org}:{project}-universal-client-api-token
+  const unsecuredUniversalClientMatch = apiToken.match(UNSECURED_UNIVERSAL_CLIENT_TOKEN_REGEX);
+  if (unsecuredUniversalClientMatch) {
+    const [, , unsecuredProjectId] = unsecuredUniversalClientMatch;
     if (!clientVersion) {
       res.status(400).json({
         success: false,
         error: {
           code: 'MISSING_CLIENT_VERSION',
           message:
-            'x-client-version header or version query parameter is required for project tokens',
+            'x-client-version header or version query parameter is required for universal client tokens',
         },
       });
       return;
@@ -188,10 +188,10 @@ export async function clientAuth(
       cacheKey: envId,
       clientVersion,
       platform,
-      tokenName: `Unsecured Project Token (${unsecuredProjectId})`,
+      tokenName: `Unsecured Universal Client Token (${unsecuredProjectId})`,
       projectId: unsecuredProjectId,
     };
-    logger.debug('Authenticated with unsecured project token', {
+    logger.debug('Authenticated with unsecured universal client token', {
       environmentId: envId,
       projectId: unsecuredProjectId,
     });
@@ -264,15 +264,15 @@ export async function clientAuth(
 
   const token = validation.token;
 
-  // 3a. Project token — dynamic env resolution
-  if (token?.tokenType === 'project' && token.projectId) {
+  // 3a. Universal client token — dynamic env resolution
+  if (token?.tokenType === 'universal_client' && token.projectId) {
     if (!clientVersion) {
       res.status(400).json({
         success: false,
         error: {
           code: 'MISSING_CLIENT_VERSION',
           message:
-            'x-client-version header or version query parameter is required for project tokens',
+            'x-client-version header or version query parameter is required for universal client tokens',
         },
       });
       return;
@@ -320,7 +320,7 @@ export async function clientAuth(
       projectId: token.projectId.toString(),
     };
 
-    logger.debug('Client authenticated with project token', {
+    logger.debug('Client authenticated with universal client token', {
       applicationName,
       environmentId: envId,
       projectId: token.projectId,

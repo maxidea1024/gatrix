@@ -15,8 +15,8 @@ import { ErrorCodes } from '../utils/api-response';
 const _ALLOW_UNSECURED_TOKENS = process.env.ALLOW_UNSECURED_TOKENS === 'true';
 const UNSECURED_TOKEN_REGEX =
   /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
-const UNSECURED_PROJECT_TOKEN_REGEX =
-  /^unsecured-([^:]+):([^:]+)-project-api-token$/;
+const UNSECURED_UNIVERSAL_CLIENT_TOKEN_REGEX =
+  /^unsecured-([^:]+):([^:]+)-universal-client-api-token$/;
 
 // Shorthand infrastructure token — auto-resolves to __internal__/__infrastructure__/default
 export const INFRA_SERVER_TOKEN =
@@ -156,18 +156,18 @@ function handleSpecialTokens(token: string): {
     }
   }
 
-  // Unsecured project tokens (format: unsecured-{org}:{project}-project-api-token)
+  // Unsecured universal client tokens (format: unsecured-{org}:{project}-universal-client-api-token)
   // Environment is resolved dynamically from x-client-version
   {
-    const match = token.match(UNSECURED_PROJECT_TOKEN_REGEX);
+    const match = token.match(UNSECURED_UNIVERSAL_CLIENT_TOKEN_REGEX);
     if (match) {
       const [, orgId, projectId] = match;
       return {
         apiToken: {
-          id: `unsecured-project-${orgId}-${projectId}`,
+          id: `unsecured-universal-client-${orgId}-${projectId}`,
           projectId,
-          tokenType: 'project' as any,
-          tokenName: `Unsecured PROJECT Token (${orgId}/${projectId})`,
+          tokenType: 'universal_client' as any,
+          tokenName: `Unsecured Universal Client Token (${orgId}/${projectId})`,
         },
         isUnsecured: true,
         unsecuredOrgId: orgId,
@@ -382,7 +382,7 @@ export const validateApplicationName = (
 
 /**
  * Resolves environment from token (token determines everything).
- * For project tokens (gxp_ prefix), dynamically resolves environment from x-client-version header.
+ * For universal client tokens (gxuc_ prefix), dynamically resolves environment from x-client-version header.
  * No fallback: environment MUST come from the token or dynamic resolution.
  */
 export const setSDKEnvironment = async (
@@ -393,8 +393,8 @@ export const setSDKEnvironment = async (
   try {
     const token = req.apiToken;
 
-    // Project token: dynamic env resolution via x-client-version
-    if (token && token.tokenType === 'project' && token.projectId) {
+    // Universal client token: dynamic env resolution via x-client-version
+    if (token && token.tokenType === 'universal_client' && token.projectId) {
       // Accept version from header or query parameter
       const clientVersion =
         (req.headers[HEADERS.X_CLIENT_VERSION] as string | undefined) ||
@@ -409,7 +409,7 @@ export const setSDKEnvironment = async (
           error: {
             code: ErrorCodes.BAD_REQUEST,
             message:
-              'x-client-version header or version query parameter is required for project tokens',
+              'x-client-version header or version query parameter is required for universal client tokens',
           },
         });
       }
@@ -423,7 +423,7 @@ export const setSDKEnvironment = async (
       );
 
       if (!versionRecord || !versionRecord.targetEnv) {
-        logger.warn('Auth: No targetEnv found for project token + version', {
+        logger.warn('Auth: No targetEnv found for universal client token + version', {
           projectId: token.projectId,
           clientVersion,
           platform,
@@ -575,8 +575,8 @@ export const clientSDKAuth = [
     if (req.isUnsecuredToken || req.isEdgeBypassToken) {
       return next();
     }
-    // Project tokens are treated as client-scope for SDK access
-    if (req.apiToken?.tokenType === 'project') {
+    // Universal client tokens are treated as client-scope for SDK access
+    if (req.apiToken?.tokenType === 'universal_client') {
       return next();
     }
     return requireTokenType('client')(req, res, next);

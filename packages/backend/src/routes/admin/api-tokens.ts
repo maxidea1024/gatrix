@@ -21,11 +21,11 @@ const createTokenValidation = [
     .withMessage('Token name must be between 3 and 200 characters'),
 
   body('tokenType')
-    .isIn(['client', 'server', 'edge', 'project'])
-    .withMessage('Token type must be client, server, edge, or project'),
+    .isIn(['client', 'server', 'edge', 'universal_client'])
+    .withMessage('Token type must be client, server, edge, or universal_client'),
 
   body('environmentId')
-    .if(body('tokenType').not().equals('project'))
+    .if(body('tokenType').not().equals('universal_client'))
     .notEmpty()
     .withMessage('Environment ID is required'),
 
@@ -43,7 +43,7 @@ const updateTokenValidation = [
     .withMessage('Token name must be between 3 and 200 characters'),
 
   body('environmentId')
-    .if(body('tokenType').not().equals('project'))
+    .if(body('tokenType').not().equals('universal_client'))
     .optional()
     .notEmpty()
     .withMessage('Environment ID is required'),

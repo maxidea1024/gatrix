@@ -132,7 +132,7 @@ const SUPPORTED_TOKEN_TYPES: TokenType[] = [
   'client',
   'server',
   'edge',
-  'project',
+  'universal_client',
 ];
 
 // Column definition interface
@@ -370,7 +370,7 @@ const ProjectTreeSelector: React.FC<ProjectTreeSelectorProps> = ({
               whiteSpace: 'nowrap',
             }}
           >
-            {displayLabel || t('apiTokens.projectHelp')}
+            {displayLabel || t('apiTokens.universalClientHelp')}
           </Typography>
         </Box>
         <ArrowDropDownIcon
@@ -907,7 +907,7 @@ const ApiTokensPage: React.FC = () => {
           </Typography>
         );
       }
-      case 'project': {
+      case 'universal_client': {
         const proj = projects.find((p) => p.id === (token as any).projectId);
         return (
           <Typography variant="body2">{proj?.projectName || '-'}</Typography>
@@ -1384,7 +1384,7 @@ const ApiTokensPage: React.FC = () => {
         return 'warning';
       case 'client':
         return 'primary';
-      case 'project':
+      case 'universal_client':
         return 'info';
       default:
         return 'default';
@@ -1775,7 +1775,7 @@ const ApiTokensPage: React.FC = () => {
                       client: t('apiTokens.clientTokenType'),
                       server: t('apiTokens.serverTokenType'),
                       edge: t('apiTokens.edgeTokenType'),
-                      project: t('apiTokens.projectTokenType'),
+                      universal_client: t('apiTokens.universalClientTokenType'),
                     };
                     return labels[value] || value;
                   }}
@@ -1810,13 +1810,13 @@ const ApiTokensPage: React.FC = () => {
                       </Typography>
                     </Box>
                   </MenuItem>
-                  <MenuItem value="project">
+                  <MenuItem value="universal_client">
                     <Box>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {t('apiTokens.projectTokenType')}
+                        {t('apiTokens.universalClientTokenType')}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {t('apiTokens.projectTokenDescription')}
+                        {t('apiTokens.universalClientTokenDescription')}
                       </Typography>
                     </Box>
                   </MenuItem>
@@ -1842,11 +1842,11 @@ const ApiTokensPage: React.FC = () => {
                     environments: [], // Reset environment when project changes
                   }))
                 }
-                helperText={t('apiTokens.projectHelp')}
+                helperText={t('apiTokens.universalClientHelp')}
               />
 
               {/* Environment Select - hidden for project tokens */}
-              {formData.tokenType !== 'project' && (
+              {formData.tokenType !== 'universal_client' && (
                 <FormControl fullWidth size="small">
                   <InputLabel>{t('apiTokens.environmentAccess')}</InputLabel>
                   <Select
@@ -1970,7 +1970,7 @@ const ApiTokensPage: React.FC = () => {
               !isValidTokenName(formData.tokenName) ||
               !expiresAtValidation.isValid ||
               !formData.selectedProjectId ||
-              (formData.tokenType !== 'project' &&
+              (formData.tokenType !== 'universal_client' &&
                 formData.environments.length === 0)
             }
           >
@@ -2076,16 +2076,18 @@ const ApiTokensPage: React.FC = () => {
                       client: t('apiTokens.clientTokenType'),
                       server: t('apiTokens.serverTokenType'),
                       edge: t('apiTokens.edgeTokenType'),
-                      project: t('apiTokens.projectTokenType'),
+                      universal_client: t('apiTokens.universalClientTokenType'),
                     };
                     return labels[value] || value;
                   }}
                 >
                   <MenuItem value={formData.tokenType}>
-                    {t(
-                      `apiTokens.${formData.tokenType}TokenType`,
-                      formData.tokenType
-                    )}
+                    {({
+                      client: t('apiTokens.clientTokenType'),
+                      server: t('apiTokens.serverTokenType'),
+                      edge: t('apiTokens.edgeTokenType'),
+                      universal_client: t('apiTokens.universalClientTokenType'),
+                    } as Record<string, string>)[formData.tokenType] || formData.tokenType}
                   </MenuItem>
                 </Select>
                 <Typography
@@ -2108,7 +2110,7 @@ const ApiTokensPage: React.FC = () => {
               />
 
               {/* Environment Select - hidden for project tokens */}
-              {formData.tokenType !== 'project' && (
+              {formData.tokenType !== 'universal_client' && (
                 <FormControl fullWidth size="small">
                   <InputLabel>{t('apiTokens.environmentAccess')}</InputLabel>
                   <Select
@@ -2224,7 +2226,7 @@ const ApiTokensPage: React.FC = () => {
               !isValidTokenName(formData.tokenName) ||
               !expiresAtValidation.isValid ||
               !formData.selectedProjectId ||
-              (formData.tokenType !== 'project' &&
+              (formData.tokenType !== 'universal_client' &&
                 formData.environments.length === 0) ||
               (!!selectedToken && !isDirty)
             }
@@ -2361,7 +2363,7 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
+          <Button onClick={() => setDeleteDialogOpen(false)}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -2856,7 +2858,7 @@ const ApiTokensPage: React.FC = () => {
                 </Box>
 
                 {/* Environment Access - hidden for project tokens */}
-                {newTokenInfo.tokenType !== 'project' && (
+                {newTokenInfo.tokenType !== 'universal_client' && (
                   <Box
                     sx={{
                       display: 'flex',

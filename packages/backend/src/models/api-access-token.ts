@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { ulid } from 'ulid';
 
-export type TokenType = 'client' | 'server' | 'edge' | 'project';
+export type TokenType = 'client' | 'server' | 'edge' | 'universal_client';
 
 export interface ApiAccessTokenData {
   id?: string; // ULID (26 characters)
@@ -56,7 +56,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
         tokenValue: { type: 'string', minLength: 1, maxLength: 255 },
         tokenType: {
           type: 'string',
-          enum: ['client', 'server', 'edge', 'project'],
+          enum: ['client', 'server', 'edge', 'universal_client'],
         },
         expiresAt: { type: ['string', 'object', 'null'], format: 'date-time' },
         lastUsedAt: { type: ['string', 'object', 'null'], format: 'date-time' },
@@ -137,7 +137,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     client: 'gxc_',
     server: 'gxs_',
     edge: 'gxe_',
-    project: 'gxp_',
+    universal_client: 'gxuc_',
   };
 
   /**
@@ -179,7 +179,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     environmentId?: string;
     projectId?: string;
   }): Promise<{ token: ApiAccessToken; plainToken: string }> {
-    // Generate token (project tokens get 'gxp_' prefix)
+    // Generate token (universal_client tokens get 'gxuc_' prefix)
     const plainToken = this.generateToken(data.tokenType);
 
     // Create token record (store plain token instead of hash)
