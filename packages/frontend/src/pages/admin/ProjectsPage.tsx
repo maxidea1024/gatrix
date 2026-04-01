@@ -63,7 +63,20 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import { rbacService } from '@/services/rbacService';
 import { useDebounce } from '@/hooks/useDebounce';
 
-const ProjectsPage: React.FC = () => {
+interface ProjectsPageProps {
+  /** When true, renders without outer padding, breadcrumbs, and PageHeader */
+  embedded?: boolean;
+  /** Callback to navigate to environments tab for a given project */
+  onNavigateToEnvironments?: (orgId: string, projectId: string) => void;
+  /** Callback to navigate back to organisations tab */
+  onNavigateToOrgs?: () => void;
+}
+
+const ProjectsPage: React.FC<ProjectsPageProps> = ({
+  embedded = false,
+  onNavigateToEnvironments,
+  onNavigateToOrgs,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -401,42 +414,72 @@ const ProjectsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Breadcrumb */}
-      <Breadcrumbs
-        separator={<NavigateNextIcon fontSize="small" />}
-        sx={{ mb: 2 }}
-      >
-        <Link
-          component={RouterLink}
-          to="/admin/workspace"
-          underline="hover"
-          color="inherit"
-          sx={{ display: 'flex', alignItems: 'center' }}
-        >
-          {t('workspace.title')}
-        </Link>
-        <Typography color="text.primary" fontWeight={500}>
-          {effectiveOrg?.displayName ||
-            effectiveOrg?.orgName ||
-            t('common.organisation')}
-        </Typography>
-      </Breadcrumbs>
-
-      {/* Header */}
-      <PageHeader
-        title={t('rbac.projects.title')}
-        subtitle={t('rbac.projects.description')}
-        actions={
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreate}
+    <Box sx={embedded ? { pt: 2 } : { p: 3 }}>
+      {!embedded && (
+        <>
+          {/* Breadcrumb */}
+          <Breadcrumbs
+            separator={<NavigateNextIcon fontSize="small" />}
+            sx={{ mb: 2 }}
           >
+            <Link
+              component={RouterLink}
+              to="/admin/workspace"
+              underline="hover"
+              color="inherit"
+              sx={{ display: 'flex', alignItems: 'center' }}
+            >
+              {t('workspace.title')}
+            </Link>
+            <Typography color="text.primary" fontWeight={500}>
+              {effectiveOrg?.displayName ||
+                effectiveOrg?.orgName ||
+                t('common.organisation')}
+            </Typography>
+          </Breadcrumbs>
+
+          {/* Header */}
+          <PageHeader
+            title={t('rbac.projects.title')}
+            subtitle={t('rbac.projects.description')}
+            actions={
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t('rbac.projects.create')}
+              </Button>
+            }
+          />
+        </>
+      )}
+      {embedded && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          {effectiveOrg && (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                cursor: onNavigateToOrgs ? 'pointer' : 'default',
+                '&:hover': onNavigateToOrgs ? { color: 'primary.main', textDecoration: 'underline' } : {},
+              }}
+              onClick={onNavigateToOrgs}
+            >
+              {effectiveOrg.displayName || effectiveOrg.orgName}
+            </Typography>
+          )}
+          <Box sx={{ ml: 'auto' }}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
             {t('rbac.projects.create')}
-          </Button>
-        }
-      />
+            </Button>
+          </Box>
+        </Box>
+      )}
 
       <PageContentLoader loading={loading}>
         {projects.length === 0 ? (
@@ -460,7 +503,7 @@ const ProjectsPage: React.FC = () => {
               <Card
                 key={proj.id}
                 sx={{
-                  borderRadius: 3,
+                  borderRadius: 1.5,
                   border: '1px solid',
                   borderColor:
                     proj.id === currentProjectId ? 'primary.main' : 'divider',
@@ -470,6 +513,7 @@ const ProjectsPage: React.FC = () => {
                           `0 0 0 2px ${theme.palette.primary.main}40, 0 4px 12px ${theme.palette.primary.main}20`
                       : '0 2px 8px rgba(0, 0, 0, 0.06)',
                   transition: 'all 0.2s ease-in-out',
+                  cursor: 'pointer',
                   '&:hover': {
                     boxShadow:
                       proj.id === currentProjectId
@@ -477,8 +521,21 @@ const ProjectsPage: React.FC = () => {
                             `0 0 0 2px ${theme.palette.primary.main}60, 0 6px 20px ${theme.palette.primary.main}30`
                         : '0 4px 16px rgba(0, 0, 0, 0.1)',
                     transform: 'translateY(-2px)',
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.03)'
+                        : 'rgba(79,70,229,0.02)',
                   },
                   position: 'relative',
+                }}
+                onClick={() => {
+                  if (onNavigateToEnvironments) {
+                    onNavigateToEnvironments(proj.orgId, proj.id);
+                  } else {
+                    navigate(
+                      `/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`
+                    );
+                  }
                 }}
               >
                 {/* MoreVert button */}
@@ -493,14 +550,6 @@ const ProjectsPage: React.FC = () => {
                   <MoreVertIcon fontSize="small" />
                 </IconButton>
 
-                <CardActionArea
-                  disableRipple
-                  onClick={() => {
-                    navigate(
-                      `/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`
-                    );
-                  }}
-                >
                   <CardContent sx={{ p: 3 }}>
                     {/* Header */}
                     <Box
@@ -628,7 +677,6 @@ const ProjectsPage: React.FC = () => {
                       </Box>
                     </Box>
                   </CardContent>
-                </CardActionArea>
 
                 {/* Expandable environment list */}
                 <Box
@@ -676,9 +724,13 @@ const ProjectsPage: React.FC = () => {
                             key={env.environmentId}
                             sx={{ pl: 4, py: 0.25 }}
                             onClick={() => {
-                              navigate(
-                                `/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`
-                              );
+                              if (onNavigateToEnvironments) {
+                                onNavigateToEnvironments(proj.orgId, proj.id);
+                              } else {
+                                navigate(
+                                  `/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`
+                                );
+                              }
                             }}
                           >
                             {' '}
@@ -700,9 +752,13 @@ const ProjectsPage: React.FC = () => {
                           <ListItemButton
                             sx={{ pl: 4, py: 0.25 }}
                             onClick={() => {
-                              navigate(
-                                `/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`
-                              );
+                              if (onNavigateToEnvironments) {
+                                onNavigateToEnvironments(proj.orgId, proj.id);
+                              } else {
+                                navigate(
+                                  `/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`
+                                );
+                              }
                             }}
                           >
                             <ListItemText

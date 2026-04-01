@@ -186,6 +186,9 @@ const RolesPage = React.lazy(() => import('./pages/admin/RolesPage'));
 const GroupsPage = React.lazy(() => import('./pages/admin/GroupsPage'));
 const ProjectsPage = React.lazy(() => import('./pages/admin/ProjectsPage'));
 const WorkspacePage = React.lazy(() => import('./pages/admin/WorkspacePage'));
+const WorkspaceTabbedPage = React.lazy(
+  () => import('./pages/admin/WorkspaceTabbedPage')
+);
 
 // Pages - Game
 const ServiceNoticesPage = React.lazy(
@@ -730,7 +733,7 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="workspace"
-                                          element={<WorkspacePage />}
+                                          element={<WorkspaceTabbedPage />}
                                         />
                                         <Route
                                           path="client-versions"
@@ -860,11 +863,11 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="projects"
-                                          element={<ProjectsPage />}
+                                          element={<WorkspaceTabbedPage />}
                                         />
                                         <Route
                                           path="environments"
-                                          element={<EnvironmentsPage />}
+                                          element={<WorkspaceTabbedPage />}
                                         />
                                       </Routes>
                                     </EnvironmentAwareLayout>
