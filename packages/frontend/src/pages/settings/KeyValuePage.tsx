@@ -385,7 +385,10 @@ const KeyValuePage: React.FC = () => {
                         </Tooltip>
                       </TableCell>
                       <TableCell>
-                        <Tooltip title={formatDateTimeDetailed(item.updatedAt)} arrow>
+                        <Tooltip
+                          title={formatDateTimeDetailed(item.updatedAt)}
+                          arrow
+                        >
                           <Typography variant="body2" color="text.secondary">
                             {formatRelativeTime(item.updatedAt)}
                           </Typography>

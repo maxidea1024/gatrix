@@ -66,7 +66,11 @@ app.use(
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ALLOWED_HEADERS,
-    exposedHeaders: ['ETag', 'x-resolved-environment-id', 'x-resolved-environment-name'],
+    exposedHeaders: [
+      'ETag',
+      'x-resolved-environment-id',
+      'x-resolved-environment-name',
+    ],
   })
 );
 

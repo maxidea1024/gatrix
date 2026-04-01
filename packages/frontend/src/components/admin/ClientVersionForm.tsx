@@ -412,7 +412,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       } else {
         // Initialize with default values for new creation
         // Pre-select the currently active environment
-        const initialEnv = currentEnvironment?.environmentId || 
+        const initialEnv =
+          currentEnvironment?.environmentId ||
           (allEnvironments.length > 0 ? allEnvironments[0].environmentId : '');
         reset({ ...defaultValues, targetEnv: initialEnv });
         setSelectedTags([]);

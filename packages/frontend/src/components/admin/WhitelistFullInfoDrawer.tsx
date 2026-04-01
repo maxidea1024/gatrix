@@ -34,17 +34,12 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import {
-  WhitelistService,
-  Whitelist,
-} from '../../services/whitelistService';
+import { WhitelistService, Whitelist } from '../../services/whitelistService';
 import {
   IpWhitelistService,
   IpWhitelist,
 } from '../../services/ipWhitelistService';
-import {
-  formatRelativeTime,
-} from '../../utils/dateFormat';
+import { formatRelativeTime } from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import * as XLSX from 'xlsx';
@@ -73,7 +68,10 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
   // Fetch all pages with max allowed limit (100)
   const fetchAllPages = useCallback(
     async <T,>(
-      fetcher: (page: number, limit: number) => Promise<{ total: number } & Record<string, any>>,
+      fetcher: (
+        page: number,
+        limit: number
+      ) => Promise<{ total: number } & Record<string, any>>,
       dataKey: string
     ): Promise<{ items: T[]; total: number }> => {
       const PAGE_LIMIT = 100;
@@ -83,9 +81,8 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
 
       if (total > PAGE_LIMIT) {
         const totalPages = Math.ceil(total / PAGE_LIMIT);
-        const remaining = Array.from(
-          { length: totalPages - 1 },
-          (_, i) => fetcher(i + 2, PAGE_LIMIT)
+        const remaining = Array.from({ length: totalPages - 1 }, (_, i) =>
+          fetcher(i + 2, PAGE_LIMIT)
         );
         const pages = await Promise.all(remaining);
         for (const page of pages) {
@@ -133,8 +130,9 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
   }, [open, loadAllData]);
 
   // Export menu state
-  const [exportMenuAnchor, setExportMenuAnchor] =
-    useState<HTMLElement | null>(null);
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
 
   const handleCopy = (text: string) => {
     copyToClipboardWithNotification(
@@ -217,10 +215,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
         const blob = new Blob([xlsxBuffer], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
-        downloadBlob(
-          blob,
-          `whitelist-full-info-${getDateTimeStr()}.xlsx`
-        );
+        downloadBlob(blob, `whitelist-full-info-${getDateTimeStr()}.xlsx`);
       } else if (format === 'json') {
         // JSON: combined object with both sections
         const jsonData = {
@@ -243,10 +238,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
         const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
           type: 'application/json',
         });
-        downloadBlob(
-          blob,
-          `whitelist-full-info-${getDateTimeStr()}.json`
-        );
+        downloadBlob(blob, `whitelist-full-info-${getDateTimeStr()}.json`);
       } else {
         // CSV: account section first, then IP section separated by empty line
         const accountColumns: ExportColumn[] = [
@@ -263,16 +255,9 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
           startDate: w.startDate || '',
           endDate: w.endDate || '',
           purpose: w.purpose || '',
-          isEnabled: w.isEnabled
-            ? t('status.active')
-            : t('status.inactive'),
+          isEnabled: w.isEnabled ? t('status.active') : t('status.inactive'),
         }));
-        exportToFile(
-          accountRows,
-          accountColumns,
-          'whitelist-full-info',
-          'csv'
-        );
+        exportToFile(accountRows, accountColumns, 'whitelist-full-info', 'csv');
       }
 
       enqueueSnackbar(t('common.exportSuccess'), { variant: 'success' });
@@ -363,9 +348,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                     mb: 1,
                   }}
                 >
-                  <PersonIcon
-                    sx={{ fontSize: 20, color: 'primary.main' }}
-                  />
+                  <PersonIcon sx={{ fontSize: 20, color: 'primary.main' }} />
                   <Typography variant="subtitle2">
                     {t('whitelist.overview.accountWhitelists')}
                   </Typography>
@@ -408,9 +391,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                     mb: 1,
                   }}
                 >
-                  <DnsIcon
-                    sx={{ fontSize: 20, color: 'secondary.main' }}
-                  />
+                  <DnsIcon sx={{ fontSize: 20, color: 'secondary.main' }} />
                   <Typography variant="subtitle2">
                     {t('whitelist.overview.ipWhitelists')}
                   </Typography>
@@ -469,15 +450,9 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell>
-                          {t('whitelist.form.accountId')}
-                        </TableCell>
-                        <TableCell>
-                          {t('whitelist.form.ipAddress')}
-                        </TableCell>
-                        <TableCell>
-                          {t('whitelist.allowedPeriod')}
-                        </TableCell>
+                        <TableCell>{t('whitelist.form.accountId')}</TableCell>
+                        <TableCell>{t('whitelist.form.ipAddress')}</TableCell>
+                        <TableCell>{t('whitelist.allowedPeriod')}</TableCell>
                         <TableCell>{t('whitelist.form.purpose')}</TableCell>
                         <TableCell>{t('common.status')}</TableCell>
                       </TableRow>
@@ -504,9 +479,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                                 onClick={() => handleCopy(w.accountId)}
                                 sx={{ p: 0.25 }}
                               >
-                                <ContentCopyIcon
-                                  sx={{ fontSize: 14 }}
-                                />
+                                <ContentCopyIcon sx={{ fontSize: 14 }} />
                               </IconButton>
                             </Box>
                           </TableCell>
@@ -530,10 +503,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                             {getPeriodLabel(w.startDate, w.endDate)}
                           </TableCell>
                           <TableCell>
-                            <Tooltip
-                              title={w.purpose || ''}
-                              placement="top"
-                            >
+                            <Tooltip title={w.purpose || ''} placement="top">
                               <Typography
                                 variant="body2"
                                 sx={{
@@ -595,15 +565,9 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell>
-                          {t('ipWhitelist.ipAddress')}
-                        </TableCell>
-                        <TableCell>
-                          {t('ipWhitelist.purpose')}
-                        </TableCell>
-                        <TableCell>
-                          {t('ipWhitelist.period')}
-                        </TableCell>
+                        <TableCell>{t('ipWhitelist.ipAddress')}</TableCell>
+                        <TableCell>{t('ipWhitelist.purpose')}</TableCell>
+                        <TableCell>{t('ipWhitelist.period')}</TableCell>
                         <TableCell>{t('common.status')}</TableCell>
                       </TableRow>
                     </TableHead>
@@ -629,17 +593,12 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
                                 onClick={() => handleCopy(ip.ipAddress)}
                                 sx={{ p: 0.25 }}
                               >
-                                <ContentCopyIcon
-                                  sx={{ fontSize: 14 }}
-                                />
+                                <ContentCopyIcon sx={{ fontSize: 14 }} />
                               </IconButton>
                             </Box>
                           </TableCell>
                           <TableCell>
-                            <Tooltip
-                              title={ip.purpose || ''}
-                              placement="top"
-                            >
+                            <Tooltip title={ip.purpose || ''} placement="top">
                               <Typography
                                 variant="body2"
                                 sx={{
@@ -680,9 +639,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onClose}>
-          {t('common.close')}
-        </Button>
+        <Button onClick={onClose}>{t('common.close')}</Button>
         <Button
           variant="contained"
           startIcon={<DownloadIcon />}
@@ -708,10 +665,7 @@ const WhitelistFullInfoDrawer: React.FC<WhitelistFullInfoDrawerProps> = ({
             horizontal: 'right',
           }}
         >
-          <ExportImportMenuItems
-            onExport={handleExport}
-            exportOnly
-          />
+          <ExportImportMenuItems onExport={handleExport} exportOnly />
         </Menu>
       </Box>
     </ResizableDrawer>
