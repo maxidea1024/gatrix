@@ -2223,7 +2223,9 @@ const ClientVersionsPage: React.FC = () => {
               onChange={(e) => setBulkStatus(e.target.value as ClientStatus)}
               label={t('clientVersions.statusLabel')}
             >
-              {Object.values(ClientStatus).map((status) => (
+              {Object.values(ClientStatus)
+                .filter((s) => s !== ClientStatus.PATCH_UPDATE_REQUIRED)
+                .map((status) => (
                 <MenuItem key={status} value={status}>
                   {t(ClientStatusLabels[status])}
                 </MenuItem>

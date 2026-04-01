@@ -5,8 +5,8 @@ export enum ClientStatus {
   RECOMMENDED_UPDATE = 'RECOMMENDED_UPDATE',
   FORCED_UPDATE = 'FORCED_UPDATE',
   UNDER_REVIEW = 'UNDER_REVIEW',
-  BLOCKED_PATCH_ALLOWED = 'BLOCKED_PATCH_ALLOWED',
   MAINTENANCE = 'MAINTENANCE',
+  PATCH_UPDATE_REQUIRED = 'PATCH_UPDATE_REQUIRED',
 }
 
 // 클라이언트 Status 라벨 매핑
@@ -16,9 +16,9 @@ export const ClientStatusLabels: Record<ClientStatus, string> = {
   [ClientStatus.RECOMMENDED_UPDATE]: 'clientVersions.status.recommendedUpdate',
   [ClientStatus.FORCED_UPDATE]: 'clientVersions.status.forcedUpdate',
   [ClientStatus.UNDER_REVIEW]: 'clientVersions.status.underReview',
-  [ClientStatus.BLOCKED_PATCH_ALLOWED]:
-    'clientVersions.status.blockedPatchAllowed',
   [ClientStatus.MAINTENANCE]: 'clientVersions.status.maintenance',
+  [ClientStatus.PATCH_UPDATE_REQUIRED]:
+    'clientVersions.status.patchUpdateRequired',
 };
 
 // 클라이언트 Status 색상 매핑
@@ -31,8 +31,8 @@ export const ClientStatusColors: Record<
   [ClientStatus.RECOMMENDED_UPDATE]: 'warning',
   [ClientStatus.FORCED_UPDATE]: 'error',
   [ClientStatus.UNDER_REVIEW]: 'info',
-  [ClientStatus.BLOCKED_PATCH_ALLOWED]: 'warning',
   [ClientStatus.MAINTENANCE]: 'warning',
+  [ClientStatus.PATCH_UPDATE_REQUIRED]: 'info',
 };
 
 // 클라이언트 버전 Interface

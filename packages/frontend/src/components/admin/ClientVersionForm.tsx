@@ -931,7 +931,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                               },
                             }}
                           >
-                            {Object.values(ClientStatus).map((status) => (
+                            {Object.values(ClientStatus)
+                              .filter((s) => s !== ClientStatus.PATCH_UPDATE_REQUIRED)
+                              .map((status) => (
                               <MenuItem key={status} value={status}>
                                 {t(ClientStatusLabels[status])}
                               </MenuItem>

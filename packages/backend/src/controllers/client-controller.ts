@@ -191,7 +191,7 @@ export class ClientController {
               cachedResponse.minPatchVersion
             ) < 0
           ) {
-            cachedResponse.status = ClientStatus.FORCED_UPDATE;
+            cachedResponse.status = ClientStatus.PATCH_UPDATE_REQUIRED;
             cachedResponse.guestModeAllowed = false;
           }
         }
@@ -495,7 +495,9 @@ export class ClientController {
         gameServerAddress,
         patchAddress,
         guestModeAllowed:
-          effectiveStatus === ClientStatus.MAINTENANCE
+          effectiveStatus === ClientStatus.MAINTENANCE ||
+          effectiveStatus === ClientStatus.FORCED_UPDATE ||
+          effectiveStatus === ClientStatus.PATCH_UPDATE_REQUIRED
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,
@@ -531,7 +533,7 @@ export class ClientController {
             record.minPatchVersion
           ) < 0
         ) {
-          clientData.status = ClientStatus.FORCED_UPDATE;
+          clientData.status = ClientStatus.PATCH_UPDATE_REQUIRED;
           clientData.guestModeAllowed = false;
         }
       }

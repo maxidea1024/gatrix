@@ -64,9 +64,9 @@ const ClientStatusLabels = {
   [ClientStatus.RECOMMENDED_UPDATE]: 'clientVersions.status.recommendedUpdate',
   [ClientStatus.FORCED_UPDATE]: 'clientVersions.status.forcedUpdate',
   [ClientStatus.UNDER_REVIEW]: 'clientVersions.status.underReview',
-  [ClientStatus.BLOCKED_PATCH_ALLOWED]:
-    'clientVersions.status.blockedPatchAllowed',
   [ClientStatus.MAINTENANCE]: 'clientVersions.status.maintenance',
+  [ClientStatus.PATCH_UPDATE_REQUIRED]:
+    'clientVersions.status.patchUpdateRequired',
 };
 
 interface BulkClientVersionFormProps {
@@ -704,7 +704,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                             },
                           }}
                         >
-                          {Object.values(ClientStatus).map((status) => (
+                          {Object.values(ClientStatus)
+                            .filter((s) => s !== ClientStatus.PATCH_UPDATE_REQUIRED)
+                            .map((status) => (
                             <MenuItem key={status} value={status}>
                               {t(ClientStatusLabels[status])}
                             </MenuItem>
