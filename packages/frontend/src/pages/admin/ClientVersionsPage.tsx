@@ -125,6 +125,7 @@ import {
   ClientVersionFilters,
   ClientStatus,
   ClientStatusLabels,
+  ClientStatusDescriptions,
   ClientStatusColors,
   BulkStatusUpdateRequest,
 } from '../../types/clientVersion';
@@ -161,8 +162,9 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useDebounce } from '../../hooks/useDebounce';
 import ImportDialog from '../../components/common/ImportDialog';
+import ClientStatusIcon from '../../components/common/ClientStatusIcon';
 
-// HSV를 RGB로 변환하는 함수
+// Convert HSV to RGB
 const hsvToRgb = (
   h: number,
   s: number,
@@ -209,7 +211,7 @@ const hsvToRgb = (
   ];
 };
 
-// 버전별 색상을 HSV 기반으로 다양하게 Create하는 함수 (황금비 활용)
+// Generate diverse HSV-based colors per version (golden ratio method)
 const getVersionColorStyle = (
   version: string,
   isDarkMode: boolean = false
@@ -411,7 +413,7 @@ const ClientVersionsPage: React.FC = () => {
     });
   }, [debouncedSearch]);
 
-  // SWR로 데이터 로딩
+  // Load data via SWR
   const {
     data: clientVersionsData,
     error: clientVersionsError,
@@ -444,7 +446,7 @@ const ClientVersionsPage: React.FC = () => {
   const loading =
     isLoadingVersions || isLoadingAvailableVersions || isLoadingTags;
 
-  // 초기 Loading state 추적
+  // Track initial loading state
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   useEffect(() => {
     if (!loading && isInitialLoad) {
@@ -452,7 +454,7 @@ const ClientVersionsPage: React.FC = () => {
     }
   }, [loading, isInitialLoad]);
 
-  // 선택 관리
+  // Selection management
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
 
@@ -466,21 +468,21 @@ const ClientVersionsPage: React.FC = () => {
     ClientStatus.ONLINE
   );
 
-  // 점검 관련 Status
+  // Maintenance-related state
   const [maintenanceStartDate, setMaintenanceStartDate] = useState<string>('');
   const [maintenanceEndDate, setMaintenanceEndDate] = useState<string>('');
 
-  // 메시지 입력 방식
+  // Message input mode
   const [inputMode, setInputMode] = useState<'direct' | 'template'>('direct');
 
-  // 직접 입력
+  // Direct input
   const [maintenanceMessage, setMaintenanceMessage] = useState<string>('');
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
   const [maintenanceLocales, setMaintenanceLocales] = useState<MessageLocale[]>(
     []
   );
 
-  // 템플릿 선택
+  // Template selection
   const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>(
     []
   );
@@ -493,7 +495,7 @@ const ClientVersionsPage: React.FC = () => {
     useState<ClientVersion | null>(null);
   const [isCopyMode, setIsCopyMode] = useState(false);
 
-  // 태그 관련 Status
+  // Tag-related state
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [selectedClientVersionForTags, setSelectedClientVersionForTags] =
     useState<ClientVersion | null>(null);
@@ -2222,18 +2224,32 @@ const ClientVersionsPage: React.FC = () => {
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value as ClientStatus)}
               label={t('clientVersions.statusLabel')}
+              renderValue={(value) => (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <ClientStatusIcon status={value as ClientStatus} />
+                  {t(ClientStatusLabels[value as ClientStatus])}
+                </Box>
+              )}
             >
               {Object.values(ClientStatus)
                 .filter((s) => s !== ClientStatus.PATCH_UPDATE_REQUIRED)
                 .map((status) => (
-                <MenuItem key={status} value={status}>
-                  {t(ClientStatusLabels[status])}
+                <MenuItem key={status} value={status} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }}>
+                  <ClientStatusIcon status={status} />
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: 1.3 }}>
+                      {t(ClientStatusLabels[status])}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2 }}>
+                      {t(ClientStatusDescriptions[status])}
+                    </Typography>
+                  </Box>
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          {/* 점검 관련 필드들 */}
+          {/* Maintenance-related fields */}
           {bulkStatus === ClientStatus.MAINTENANCE && (
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Box
@@ -2432,7 +2448,7 @@ const ClientVersionsPage: React.FC = () => {
         </Box>
       </Drawer>
 
-      {/* 클라이언트 버전 추가/편집 Form */}
+      {/* Client Version Add/Edit Form */}
       <ClientVersionForm
         open={formDialogOpen}
         requiresApproval={requiresApproval}
@@ -2442,8 +2458,8 @@ const ClientVersionsPage: React.FC = () => {
           setIsCopyMode(false);
         }}
         onSuccess={() => {
-          mutateVersions(); // SWR cache 갱신
-          mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
+          mutateVersions(); // Refresh SWR cache
+          mutateClientVersions(projectApiPath); // Refresh all client versions cache
           setFormDialogOpen(false);
           setEditingClientVersion(null);
           setIsCopyMode(false);
@@ -2452,7 +2468,7 @@ const ClientVersionsPage: React.FC = () => {
         isCopyMode={isCopyMode}
       />
 
-      {/* 클라이언트 버전 간편 추가 Form */}
+      {/* Bulk Client Version Add Form */}
       <BulkClientVersionForm
         open={bulkFormDialogOpen}
         requiresApproval={requiresApproval}
@@ -2460,19 +2476,19 @@ const ClientVersionsPage: React.FC = () => {
           setBulkFormDialogOpen(false);
         }}
         onSuccess={() => {
-          mutateVersions(); // SWR cache 갱신
-          mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
+          mutateVersions(); // Refresh SWR cache
+          mutateClientVersions(projectApiPath); // Refresh all client versions cache
           setBulkFormDialogOpen(false);
         }}
       />
 
-      {/* 플랫Form Set default values Dialog */}
+      {/* Platform Defaults Dialog */}
       <PlatformDefaultsDialog
         open={platformDefaultsDialogOpen}
         onClose={() => setPlatformDefaultsDialogOpen(false)}
       />
 
-      {/* 일괄 Delete Confirm Dialog */}
+      {/* Bulk Delete Confirm Dialog */}
       <Dialog
         open={bulkDeleteDialogOpen}
         onClose={() => setBulkDeleteDialogOpen(false)}
@@ -2563,7 +2579,7 @@ const ClientVersionsPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* 태그 관리 Drawer */}
+      {/* Tag Management Drawer */}
       <Drawer
         anchor="right"
         open={tagDialogOpen}

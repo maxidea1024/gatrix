@@ -37,6 +37,7 @@ import {
   BulkCreateFormData,
   PlatformSpecificSettings,
   ClientStatus,
+  ClientStatusDescriptions,
   ClientVersionMaintenanceLocale,
   CLIENT_VERSION_VALIDATION,
 } from '../../types/clientVersion';
@@ -56,6 +57,7 @@ import { getActionLabel } from '../../utils/changeRequestToast';
 import TagSelector from '../common/TagSelector';
 import { Tag } from '@/services/tagService';
 import { ChangeRequestSubmitButtons } from '../common/ChangeRequestSubmitButtons';
+import ClientStatusIcon from '../common/ClientStatusIcon';
 
 // Client status label mapping
 const ClientStatusLabels = {
@@ -693,6 +695,12 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           {...field}
                           value={field.value || ClientStatus.OFFLINE}
                           label={`${t('clientVersions.statusLabel')} *`}
+                          renderValue={(value) => (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                              <ClientStatusIcon status={value as ClientStatus} />
+                              {t(ClientStatusLabels[value as ClientStatus])}
+                            </Box>
+                          )}
                           MenuProps={{
                             anchorOrigin: {
                               vertical: 'bottom',
@@ -707,8 +715,16 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           {Object.values(ClientStatus)
                             .filter((s) => s !== ClientStatus.PATCH_UPDATE_REQUIRED)
                             .map((status) => (
-                            <MenuItem key={status} value={status}>
-                              {t(ClientStatusLabels[status])}
+                            <MenuItem key={status} value={status} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }}>
+                              <ClientStatusIcon status={status} />
+                              <Box>
+                                <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: 1.3 }}>
+                                  {t(ClientStatusLabels[status])}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2 }}>
+                                  {t(ClientStatusDescriptions[status])}
+                                </Typography>
+                              </Box>
                             </MenuItem>
                           ))}
                         </Select>
