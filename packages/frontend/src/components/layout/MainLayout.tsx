@@ -199,17 +199,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     null
   );
 
-  // Load selected category from localStorage
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    () => {
-      try {
-        const stored = localStorage.getItem('sidebarSelectedCategory');
-        return stored ? stored : null;
-      } catch {
-        return null;
-      }
-    }
-  );
+
 
   // Expanded submenu items state
   const [expandedSubmenus, setExpandedSubmenus] = useState<{
@@ -375,21 +365,24 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         findPathInItem(item, currentPath)
       );
       if (hasPath) {
-        // Skip "navigation" category - it's the main menu and should not set selectedCategory
-        // This allows "Back to Main" to work properly
+        // Skip "navigation" category (dashboard/settings) from auto-expansion
         if (category.id === 'navigation') {
           initialSyncDoneRef.current = true;
           return;
         }
 
-        // Update selectedCategory if different
-        if (selectedCategory !== category.id) {
-          setSelectedCategory(category.id);
-          try {
-            localStorage.setItem('sidebarSelectedCategory', category.id);
-          } catch (error) {
-            console.warn('Failed to save selected category:', error);
-          }
+        // Expand the category section
+        const categoryKey = `category-${category.id}`;
+        if (!expandedSubmenus[categoryKey]) {
+          setExpandedSubmenus((prev) => {
+            const newState = { ...prev, [categoryKey]: true };
+            try {
+              localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState));
+            } catch (error) {
+              console.warn('Failed to save expanded submenus:', error);
+            }
+            return newState;
+          });
         }
 
         // Find and expand the submenu that contains this path
@@ -421,7 +414,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   }, [
     location.pathname,
     getFilteredMenuCategories,
-    selectedCategory,
     expandedSubmenus,
   ]);
 
@@ -789,11 +781,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     maintenanceStatus.status,
   ]);
 
-  // SSE updates - 백엔드 연결 Failed 시 적절히 처리
+  // SSE updates - Handle backend connection failures appropriately
   const sseConnection = useSSENotifications({
-    autoConnect: true, // 자동 연결 Active화
-    maxReconnectAttempts: 3, // 재연결 시도 횟수 줄임
-    reconnectInterval: 10000, // 재연결 간격 늘림 (10초)
+    autoConnect: true, // Activate auto-connect
+    maxReconnectAttempts: 3, // Reduce reconnect attempt limit
+    reconnectInterval: 10000, // Increase reconnect interval (10s)
     onEvent: (event) => {
       if (event.type === 'maintenance_status_change') {
         const { isUnderMaintenance, detail } = event.data || {};
@@ -854,7 +846,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         event.type === 'invitation_created' ||
         event.type === 'invitation_deleted'
       ) {
-        // 초대링크 Event를 다른 컴포넌트에 전달
+        // Dispatch invitation link event to other components
         window.dispatchEvent(
           new CustomEvent('invitation-change', { detail: event })
         );
@@ -893,7 +885,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
   }, [loadUnreadMailCount]);
 
-  // Used자가 변경될 때마다 아바타 Images 에러 Status Initialization
+  // Initialize avatar image error status whenever user changes
   useEffect(() => {
     setAvatarImageError(false);
   }, [user?.avatarUrl]);
@@ -976,7 +968,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   const renderMenuItem = (item: any, index: any) => {
-    // 서브메뉴가 있는 경우
+    // If there are submenus
     if (item.children) {
       const submenuKey = `submenu-${index}`;
       const isExpanded = expandedSubmenus[submenuKey];
@@ -1011,7 +1003,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <ListItemButton
                 onClick={toggleSubmenu}
                 sx={{
-                  pl: 2,
+                  pl: 4,
                   borderRadius: 1,
                   py: 0.75,
                   color: theme.palette.text.secondary,
@@ -1109,12 +1101,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       <ListItemButton
                         onClick={() => openOrNavigate(child.path)}
                         sx={{
-                          pl: 2,
+                          pl: 6,
                           pr: 2,
                           borderRadius: 1,
                           py: 0.75,
                           my: 0.5,
-                          ml: 2,
                           color: isChildActive
                             ? theme.palette.text.primary
                             : theme.palette.text.secondary,
@@ -1173,7 +1164,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       );
     }
 
-    // 일반 메뉴 아이템
+    // Regular menu item
     const isActive = isActivePath(item.path);
     const menuButton = (
       <ListItemButton
@@ -1197,7 +1188,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           },
           justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
           px: sidebarCollapsed ? 0 : 2,
-          pl: sidebarCollapsed ? 0 : 2,
+          pl: sidebarCollapsed ? 0 : 4,
         }}
       >
         <ListItemIcon
@@ -1227,7 +1218,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       </ListItemButton>
     );
 
-    // 사이드바가 접혀있을 때만 툴팁 표시
+    // Show tooltip only when sidebar is collapsed
     if (sidebarCollapsed) {
       return (
         <Tooltip key={index} title={t(item.text)} placement="right" arrow>
@@ -1263,7 +1254,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         }
       }}
     >
-      {/* 로고 및 토글 버튼 영역 - AppBar와 동일한 높이 */}
+      {/* Logo and toggle button area - Same height as AppBar */}
       <Box
         sx={{
           height: 64,
@@ -1286,12 +1277,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               },
             }}
             onClick={() => {
-              setSelectedCategory(null);
-              try {
-                localStorage.removeItem('sidebarSelectedCategory');
-              } catch (error) {
-                console.warn('Failed to clear selected category:', error);
-              }
               navigate('/dashboard');
             }}
           >
@@ -1348,12 +1333,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               },
             }}
             onClick={() => {
-              setSelectedCategory(null);
-              try {
-                localStorage.removeItem('sidebarSelectedCategory');
-              } catch (error) {
-                console.warn('Failed to clear selected category:', error);
-              }
               navigate('/dashboard');
             }}
           >
@@ -1408,278 +1387,129 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             }
           }}
         >
-          <Box
-            sx={{
-              opacity: selectedCategory ? 0 : 1,
-              visibility: selectedCategory ? 'hidden' : 'visible',
-              transform: selectedCategory ? 'scale(0.92)' : 'scale(1)',
-              transition:
-                'opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              position: selectedCategory ? 'absolute' : 'relative',
-            }}
-          >
-            {/* Show main categories */}
-            {getFilteredMenuCategories().map((category) => {
-              const categoryButton = (
-                <ListItemButton
-                  key={category.id}
-                  onClick={() => {
-                    if (category.path) {
-                      navigate(category.path);
-                      setSelectedCategory(null);
-                      try {
-                        localStorage.removeItem('sidebarSelectedCategory');
-                      } catch (error) {
-                        console.warn(
-                          'Failed to clear selected category:',
-                          error
-                        );
-                      }
-                    } else {
-                      setSelectedCategory(category.id);
-                      try {
-                        localStorage.setItem(
-                          'sidebarSelectedCategory',
-                          category.id
-                        );
-                      } catch (error) {
-                        console.warn(
-                          'Failed to save selected category:',
-                          error
-                        );
-                      }
-                    }
-                  }}
+          {/* Menu Categories */}
+          {getFilteredMenuCategories().map((category) => {
+            const categoryKey = `category-${category.id}`;
+            const isExpanded = expandedSubmenus[categoryKey];
+            
+            const toggleCategory = () => {
+              if (sidebarCollapsed) {
+                handleSidebarToggle();
+                if (!isExpanded) {
+                  setExpandedSubmenus(prev => {
+                    const newState = { ...prev, [categoryKey]: true };
+                    try { localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState)); } catch (e) {}
+                    return newState;
+                  });
+                }
+              } else {
+                setExpandedSubmenus(prev => {
+                  const newState = { ...prev, [categoryKey]: !prev[categoryKey] };
+                  try { localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState)); } catch (e) {}
+                  return newState;
+                });
+              }
+            };
+
+            const hasActiveChild = category.children.some(child => {
+              if (child.path && isActivePath(child.path)) return true;
+              if (child.children) {
+                return child.children.some(c => c.path && isActivePath(c.path));
+              }
+              return false;
+            });
+
+            // For navigation group (dashboard/settings) it acts as a normal menu, no collapsing
+            const categoryButton = (
+              <ListItemButton
+                key={category.id}
+                onClick={category.path ? () => navigate(category.path!) : toggleCategory}
+                sx={{
+                  color: hasActiveChild ? theme.palette.text.primary : theme.palette.text.secondary,
+                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                  px: sidebarCollapsed ? 0 : 2,
+                  pl: sidebarCollapsed ? 0 : 2,
+                  borderRadius: 1,
+                  py: 0.75,
+                  my: 0.5,
+                  '&:hover': {
+                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+                  },
+                }}
+              >
+                <ListItemIcon
                   sx={{
-                    color: theme.palette.text.secondary,
-                    justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-                    px: sidebarCollapsed ? 0 : 2,
-                    pl: sidebarCollapsed ? 0 : 2,
-                    borderRadius: 1,
-                    py: 0.75,
-                    my: 0.5,
-                    '&:hover': {
-                      backgroundColor:
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.1)'
-                          : 'rgba(0,0,0,0.08)',
-                    },
+                    color: 'inherit',
+                    minWidth: sidebarCollapsed ? 0 : 40,
+                    justifyContent: 'center',
                   }}
                 >
-                  <ListItemIcon
-                    sx={{
-                      color: 'inherit',
-                      minWidth: sidebarCollapsed ? 0 : 40,
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {sidebarCollapsed ? (
-                      <Badge badgeContent={category.badge} color="primary">
-                        {category.icon}
-                      </Badge>
-                    ) : (
-                      category.icon
-                    )}
-                  </ListItemIcon>
-                  {!sidebarCollapsed && (
-                    <>
-                      <ListItemText
-                        primary={t(category.text)}
-                        primaryTypographyProps={{
-                          fontSize: '0.875rem',
-                          fontWeight: 500,
+                  {sidebarCollapsed ? (
+                    <Badge badgeContent={category.badge} color="primary">
+                      {category.icon}
+                    </Badge>
+                  ) : (
+                    category.icon
+                  )}
+                </ListItemIcon>
+                {!sidebarCollapsed && (
+                  <>
+                    <ListItemText
+                      primary={t(category.text)}
+                      primaryTypographyProps={{
+                        fontSize: '0.875rem',
+                        fontWeight: 500,
+                      }}
+                    />
+                    {category.badge && (
+                      <Badge
+                        badgeContent={category.badge}
+                        color="primary"
+                        sx={{
+                          ml: 1,
+                          '& .MuiBadge-badge': { fontSize: '0.625rem' },
                         }}
                       />
-                      {category.badge && (
-                        <Badge
-                          badgeContent={category.badge}
-                          color="primary"
-                          sx={{
-                            ml: 1,
-                            '& .MuiBadge-badge': { fontSize: '0.625rem' },
-                          }}
-                        />
-                      )}
-                    </>
-                  )}
-                </ListItemButton>
-              );
+                    )}
+                    {!category.path && (isExpanded ? <ExpandLess /> : <ExpandMore />)}
+                  </>
+                )}
+              </ListItemButton>
+            );
 
-              // Show tooltip when sidebar is collapsed
-              if (sidebarCollapsed) {
-                return (
-                  <Tooltip
-                    key={category.id}
-                    title={t(category.text)}
-                    placement="right"
-                    arrow
-                  >
+            return (
+              <React.Fragment key={category.id}>
+                {sidebarCollapsed ? (
+                  <Tooltip title={t(category.text)} placement="right" arrow>
                     {categoryButton}
                   </Tooltip>
-                );
-              }
-
-              return categoryButton;
-            })}
-          </Box>
-
-          <Box
-            sx={{
-              opacity: selectedCategory ? 1 : 0,
-              visibility: selectedCategory ? 'visible' : 'hidden',
-              transform: selectedCategory ? 'scale(1)' : 'scale(0.92)',
-              transition:
-                'opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              position: selectedCategory ? 'relative' : 'absolute',
-            }}
-          >
-            {/* Show selected category's submenu */}
-            {selectedCategory && (
-              <>
-                {/* Back to main button */}
-                {sidebarCollapsed ? (
-                  <Tooltip
-                    title={t('sidebar.backToMain')}
-                    placement="right"
-                    arrow
-                  >
-                    <ListItemButton
-                      onClick={() => {
-                        setSelectedCategory(null);
-                        try {
-                          localStorage.removeItem('sidebarSelectedCategory');
-                        } catch (error) {
-                          console.warn(
-                            'Failed to clear selected category:',
-                            error
-                          );
-                        }
-                      }}
-                      sx={{
-                        color: theme.palette.text.secondary,
-                        mb: 2,
-                        borderRadius: 1,
-                        py: 0.75,
-                        justifyContent: 'center',
-                        px: 0,
-                        pl: 0,
-                        '&:hover': {
-                          backgroundColor:
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255,255,255,0.1)'
-                              : 'rgba(0,0,0,0.08)',
-                        },
-                      }}
-                    >
-                      <ListItemIcon
-                        sx={{
-                          color: 'inherit',
-                          minWidth: 0,
-                          justifyContent: 'center',
-                        }}
-                      >
-                        <ArrowBackIcon />
-                      </ListItemIcon>
-                    </ListItemButton>
-                  </Tooltip>
                 ) : (
-                  <ListItemButton
-                    onClick={() => {
-                      setSelectedCategory(null);
-                      try {
-                        localStorage.removeItem('sidebarSelectedCategory');
-                      } catch (error) {
-                        console.warn(
-                          'Failed to clear selected category:',
-                          error
-                        );
-                      }
-                    }}
-                    sx={{
-                      color: theme.palette.text.secondary,
-                      mb: 2,
-                      borderRadius: 1,
-                      py: 0.75,
-                      justifyContent: 'flex-start',
-                      px: 2,
-                      pl: 2,
-                      '&:hover': {
-                        backgroundColor:
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255,255,255,0.1)'
-                            : 'rgba(0,0,0,0.08)',
-                      },
-                    }}
-                  >
-                    <ListItemIcon
-                      sx={{
-                        color: 'inherit',
-                        minWidth: 40,
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <ArrowBackIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t('sidebar.backToMain')}
-                      primaryTypographyProps={{ fontSize: '0.875rem' }}
-                    />
-                  </ListItemButton>
-                )}
-
-                {/* Divider after back to main button */}
-                <Divider sx={{ my: 1 }} />
-
-                {/* Category title */}
-                {!sidebarCollapsed && (
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      px: 2,
-                      py: 1,
-                      display: 'block',
-                      color: theme.palette.text.secondary,
-                      fontWeight: 600,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      fontSize: '0.7rem',
-                    }}
-                  >
-                    {t(
-                      getFilteredMenuCategories().find(
-                        (c) => c.id === selectedCategory
-                      )?.text || ''
-                    )}
-                  </Typography>
+                  categoryButton
                 )}
 
                 {/* Submenu items */}
-                {getFilteredMenuCategories()
-                  .find((c) => c.id === selectedCategory)
-                  ?.children.map((item, index, items) => {
-                    // Check if previous item has children (is a submenu group)
-                    const prevItem = index > 0 ? items[index - 1] : null;
-                    const prevHasChildren =
-                      prevItem?.children && prevItem.children.length > 0;
-                    const currentHasChildren =
-                      item.children && item.children.length > 0;
+                {!category.path && !sidebarCollapsed && (
+                  <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      {category.children.map((item, index, items) => {
+                        const prevItem = index > 0 ? items[index - 1] : null;
+                        const prevHasChildren = prevItem?.children && prevItem.children.length > 0;
+                        const currentHasChildren = item.children && item.children.length > 0;
+                        const showDivider = !currentHasChildren && prevHasChildren && sidebarCollapsed;
 
-                    // Add divider if current item is regular (no children) and previous item is a submenu group
-                    const showDivider =
-                      !currentHasChildren &&
-                      prevHasChildren &&
-                      sidebarCollapsed;
-
-                    return (
-                      <React.Fragment key={index}>
-                        {showDivider && <Divider sx={{ my: 0.5 }} />}
-                        {renderMenuItem(item, index)}
-                      </React.Fragment>
-                    );
-                  })}
-              </>
-            )}
-          </Box>
+                        return (
+                          <React.Fragment key={index}>
+                            {showDivider && <Divider sx={{ my: 0.5 }} />}
+                            {renderMenuItem(item, index)}
+                          </React.Fragment>
+                        );
+                      })}
+                    </List>
+                  </Collapse>
+                )}
+              </React.Fragment>
+            );
+          })}
         </List>
       </Box>
 
@@ -1716,7 +1546,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {/* 사이드바 - 전체 높이 차지 (admin only) */}
+      {/* Sidebar - Occupies full height (admin only) */}
       {showSidebar && (
         <Box
           component="nav"
@@ -1726,7 +1556,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             zIndex: (theme) => theme.zIndex.drawer,
           }}
         >
-          {/* 모바일 드로어 */}
+          {/* Mobile drawer */}
           <Drawer
             variant="temporary"
             open={mobileOpen}
@@ -1749,7 +1579,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             {drawerContent}
           </Drawer>
 
-          {/* 데스크톱 드로어 - 전체 높이 */}
+          {/* Desktop drawer - Full height */}
           <Drawer
             variant="permanent"
             sx={{
@@ -1778,7 +1608,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </Box>
       )}
 
-      {/* 오른쪽 영역: AppBar + 메인 컨텐츠 */}
+      {/* Right area: AppBar + Main content */}
       <Box
         sx={{
           display: 'flex',
@@ -1787,7 +1617,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           overflow: 'hidden',
         }}
       >
-        {/* 상단 바 - 사이드바 옆에 위치 */}
+        {/* Top bar - Positioned next to sidebar */}
         <AppBar
           position="static"
           sx={{
@@ -1829,7 +1659,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 ))}
             </Box>
 
-            {/* 점검 배너 - AppBar 내부 */}
+            {/* Maintenance banner - Inside AppBar */}
             {maintenanceStatus.isMaintenance && (
               <Tooltip
                 title={
@@ -1871,7 +1701,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       </Box>
                     </Typography>
 
-                    {/* 유형 */}
+                    {/* Type */}
                     {maintenanceStatus.detail?.type && (
                       <Typography variant="body2" sx={{ mb: 1 }}>
                         <strong style={{ minWidth: '60px' }}>
@@ -1890,7 +1720,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       </Typography>
                     )}
 
-                    {/* 시작 시간 */}
+                    {/* Start time */}
                     {maintenanceStatus.detail?.startsAt && (
                       <Typography variant="body2" sx={{ mb: 1 }}>
                         <strong style={{ minWidth: '60px' }}>
@@ -1902,7 +1732,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       </Typography>
                     )}
 
-                    {/* 종료 시간 */}
+                    {/* End time */}
                     {maintenanceStatus.detail?.endsAt && (
                       <Typography variant="body2" sx={{ mb: 1 }}>
                         <strong style={{ minWidth: '60px' }}>
@@ -1914,7 +1744,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       </Typography>
                     )}
 
-                    {/* 소요 시간 */}
+                    {/* Duration */}
                     {maintenanceStatus.detail?.startsAt &&
                       maintenanceStatus.detail?.endsAt && (
                         <Typography variant="body2" sx={{ mb: 1 }}>
@@ -1945,7 +1775,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         </Typography>
                       )}
 
-                    {/* 메시지 */}
+                    {/* Message */}
                     {maintenanceStatus.detail?.message && (
                       <Typography variant="body2" sx={{ mb: 1.5 }}>
                         <strong style={{ minWidth: '60px' }}>
@@ -2169,7 +1999,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 </IconButton>
               </Tooltip>
 
-              {/* 구분선 */}
+              {/* Divider */}
               <Box
                 sx={{
                   width: '1px',
@@ -2184,7 +2014,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
               <TimezoneSelector />
 
-              {/* 구분선 */}
+              {/* Divider */}
               <Box
                 sx={{
                   width: '1px',
@@ -2213,7 +2043,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
               <LanguageSelector variant="text" size="medium" />
 
-              {/* 구분선 */}
+              {/* Divider */}
               <Box
                 sx={{
                   width: '1px',
@@ -2237,7 +2067,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         height: 32,
                       }}
                       onError={() => {
-                        // Images 로드 Failed 시 AccountCircle 아이콘으로 대체
+                        // Replace with AccountCircle icon when image load fails
                         setAvatarImageError(true);
                       }}
                     >
@@ -2274,7 +2104,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {/* Environment Selector with Divider - Only for admin users with environments */}
               {hasEnvironmentAccess && (
                 <>
-                  {/* 구분선 */}
+                  {/* Divider */}
                   <Box
                     sx={{
                       width: '1px',
@@ -2510,7 +2340,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Box>
         </Slide>
 
-        {/* 메인 컨텐츠 */}
+        {/* Main content */}
         <Box
           component="main"
           sx={{
