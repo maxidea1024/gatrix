@@ -1468,33 +1468,34 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                   })
                                 : t('errors.CR_ALREADY_APPROVED')}
                             </Typography>
-                            {canSkipCr && currentApprovals < requiredApprovals && (
-                              <Tooltip
-                                title={t(
-                                  'changeRequest.actions.forceApproveTooltip'
-                                )}
-                              >
-                                <Button
-                                  variant="contained"
-                                  color="warning"
-                                  size="small"
-                                  startIcon={
-                                    actionLoading ? (
-                                      <CircularProgress
-                                        size={14}
-                                        color="inherit"
-                                      />
-                                    ) : (
-                                      <AutoFixHighIcon />
-                                    )
-                                  }
-                                  onClick={handleForceApprove}
-                                  disabled={actionLoading}
+                            {canSkipCr &&
+                              currentApprovals < requiredApprovals && (
+                                <Tooltip
+                                  title={t(
+                                    'changeRequest.actions.forceApproveTooltip'
+                                  )}
                                 >
-                                  {t('changeRequest.actions.forceApprove')}
-                                </Button>
-                              </Tooltip>
-                            )}
+                                  <Button
+                                    variant="contained"
+                                    color="warning"
+                                    size="small"
+                                    startIcon={
+                                      actionLoading ? (
+                                        <CircularProgress
+                                          size={14}
+                                          color="inherit"
+                                        />
+                                      ) : (
+                                        <AutoFixHighIcon />
+                                      )
+                                    }
+                                    onClick={handleForceApprove}
+                                    disabled={actionLoading}
+                                  >
+                                    {t('changeRequest.actions.forceApprove')}
+                                  </Button>
+                                </Tooltip>
+                              )}
                           </Box>
                         )}
                       </Box>

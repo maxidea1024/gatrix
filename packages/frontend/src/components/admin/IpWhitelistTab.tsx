@@ -528,7 +528,9 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                       <TableCell>{t('ipWhitelist.status')}</TableCell>
                       <TableCell>{t('ipWhitelist.createdBy')}</TableCell>
                       <TableCell>{t('ipWhitelist.createdAt')}</TableCell>
-                      <TableCell align="center">{t('common.actions')}</TableCell>
+                      <TableCell align="center">
+                        {t('common.actions')}
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -599,7 +601,9 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                                     )}
                                   >
                                     <span>
-                                      {formatRelativeTime(ipWhitelist.startDate)}
+                                      {formatRelativeTime(
+                                        ipWhitelist.startDate
+                                      )}
                                     </span>
                                   </Tooltip>
                                 </Typography>
@@ -637,12 +641,15 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2">
-                            {ipWhitelist.createdByName || t('dashboard.unknown')}
+                            {ipWhitelist.createdByName ||
+                              t('dashboard.unknown')}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Tooltip
-                            title={formatDateTimeDetailed(ipWhitelist.createdAt)}
+                            title={formatDateTimeDetailed(
+                              ipWhitelist.createdAt
+                            )}
                           >
                             <Typography variant="body2">
                               {formatRelativeTime(ipWhitelist.createdAt)}
