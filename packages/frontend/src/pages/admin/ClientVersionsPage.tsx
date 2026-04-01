@@ -2234,18 +2234,34 @@ const ClientVersionsPage: React.FC = () => {
               {Object.values(ClientStatus)
                 .filter((s) => s !== ClientStatus.PATCH_UPDATE_REQUIRED)
                 .map((status) => (
-                <MenuItem key={status} value={status} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }}>
-                  <ClientStatusIcon status={status} />
-                  <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: 1.3 }}>
-                      {t(ClientStatusLabels[status])}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2 }}>
-                      {t(ClientStatusDescriptions[status])}
-                    </Typography>
-                  </Box>
-                </MenuItem>
-              ))}
+                  <MenuItem
+                    key={status}
+                    value={status}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      py: 1,
+                    }}
+                  >
+                    <ClientStatusIcon status={status} />
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 500, lineHeight: 1.3 }}
+                      >
+                        {t(ClientStatusLabels[status])}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ lineHeight: 1.2 }}
+                      >
+                        {t(ClientStatusDescriptions[status])}
+                      </Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
 
@@ -2804,7 +2820,8 @@ const ClientVersionsPage: React.FC = () => {
                     : false,
                 externalClickLink: item.externalClickLink || '',
                 memo: item.memo || item.Memo || '',
-                customPayload: item.customPayload || item['Custom Payload'] || '',
+                customPayload:
+                  item.customPayload || item['Custom Payload'] || '',
               });
               successCount++;
             } catch (err) {

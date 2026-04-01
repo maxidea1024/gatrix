@@ -25,11 +25,13 @@ export const ClientStatusLabels: Record<ClientStatus, string> = {
 export const ClientStatusDescriptions: Record<ClientStatus, string> = {
   [ClientStatus.ONLINE]: 'clientVersions.statusDesc.online',
   [ClientStatus.OFFLINE]: 'clientVersions.statusDesc.offline',
-  [ClientStatus.RECOMMENDED_UPDATE]: 'clientVersions.statusDesc.recommendedUpdate',
+  [ClientStatus.RECOMMENDED_UPDATE]:
+    'clientVersions.statusDesc.recommendedUpdate',
   [ClientStatus.FORCED_UPDATE]: 'clientVersions.statusDesc.forcedUpdate',
   [ClientStatus.UNDER_REVIEW]: 'clientVersions.statusDesc.underReview',
   [ClientStatus.MAINTENANCE]: 'clientVersions.statusDesc.maintenance',
-  [ClientStatus.PATCH_UPDATE_REQUIRED]: 'clientVersions.statusDesc.patchUpdateRequired',
+  [ClientStatus.PATCH_UPDATE_REQUIRED]:
+    'clientVersions.statusDesc.patchUpdateRequired',
 };
 
 // Client status color mapping
