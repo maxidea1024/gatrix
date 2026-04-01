@@ -2789,11 +2789,22 @@ const ClientVersionsPage: React.FC = () => {
                 clientVersion: item.clientVersion || item.version || '',
                 clientStatus: item.clientStatus || 'ONLINE',
                 gameServerAddress: item.gameServerAddress || '',
+                gameServerAddressForWhiteList:
+                  item.gameServerAddressForWhiteList ||
+                  item['Game Server (Whitelist)'] ||
+                  '',
                 patchAddress: item.patchAddress || '',
+                patchAddressForWhiteList:
+                  item.patchAddressForWhiteList ||
+                  item['Patch Address (Whitelist)'] ||
+                  '',
                 guestModeAllowed:
                   item.guestModeAllowed !== undefined
                     ? Boolean(item.guestModeAllowed)
                     : false,
+                externalClickLink: item.externalClickLink || '',
+                memo: item.memo || item.Memo || '',
+                customPayload: item.customPayload || item['Custom Payload'] || '',
               });
               successCount++;
             } catch (err) {
