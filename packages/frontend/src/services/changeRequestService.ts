@@ -191,16 +191,19 @@ class ChangeRequestService {
 
   /**
    * Approve change request
+   * @param forceApprove If true, bypasses required approver count and immediately marks as approved
    */
   async approve(
     id: string,
     comment?: string,
-    projectApiPath: string | null = null
+    projectApiPath: string | null = null,
+    forceApprove?: boolean
   ): Promise<ChangeRequest> {
     const response = await api.post(
       `${basePath(projectApiPath)}/${id}/approve`,
       {
         comment,
+        ...(forceApprove && { forceApprove: true }),
       }
     );
     return response.data;

@@ -37,6 +37,7 @@ import { useSnackbar } from 'notistack';
 import { useHandleApiError } from '@/hooks/useHandleApiError';
 import useSWR from 'swr';
 import { useAuth } from '@/contexts/AuthContext';
+import { P } from '@/types/permissions';
 import { RelativeTime } from '@/components/common/RelativeTime';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
@@ -143,10 +144,11 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { user, permissions } = useAuth();
+  const { user, permissions, hasPermission } = useAuth();
   const { getProjectApiPath, currentProject } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const hasAnyPermissions = permissions.length > 0;
+  const canSkipCr = hasPermission(P.CHANGE_REQUESTS_SKIP);
   const { environments: allEnvironments } = useEnvironments();
 
   // Build envId -> displayName lookup map
@@ -848,7 +850,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
       await changeRequestService.approve(
         changeRequestId!,
         comment || undefined,
-        projectApiPath
+        projectApiPath,
+        true // forceApprove: bypass required approver count
       );
       await changeRequestService.execute(changeRequestId!, projectApiPath);
       setComment('');
@@ -1416,7 +1419,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                               >
                                 {t('changeRequest.actions.approve')}
                               </Button>
-                              {hasAnyPermissions && (
+                              {canSkipCr && (
                                 <Tooltip
                                   title={t(
                                     'changeRequest.actions.forceApproveTooltip'
@@ -1458,8 +1461,40 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                           >
                             <CheckIcon color="success" sx={{ fontSize: 32 }} />
                             <Typography variant="body2" color="text.secondary">
-                              {t('errors.CR_ALREADY_APPROVED')}
+                              {currentApprovals < requiredApprovals
+                                ? t('changeRequest.approvedButNeedMore', {
+                                    current: currentApprovals,
+                                    required: requiredApprovals,
+                                  })
+                                : t('errors.CR_ALREADY_APPROVED')}
                             </Typography>
+                            {canSkipCr && currentApprovals < requiredApprovals && (
+                              <Tooltip
+                                title={t(
+                                  'changeRequest.actions.forceApproveTooltip'
+                                )}
+                              >
+                                <Button
+                                  variant="contained"
+                                  color="warning"
+                                  size="small"
+                                  startIcon={
+                                    actionLoading ? (
+                                      <CircularProgress
+                                        size={14}
+                                        color="inherit"
+                                      />
+                                    ) : (
+                                      <AutoFixHighIcon />
+                                    )
+                                  }
+                                  onClick={handleForceApprove}
+                                  disabled={actionLoading}
+                                >
+                                  {t('changeRequest.actions.forceApprove')}
+                                </Button>
+                              </Tooltip>
+                            )}
                           </Box>
                         )}
                       </Box>

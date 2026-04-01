@@ -15,6 +15,7 @@ import {
   Tabs,
   Tab,
   Collapse,
+  Tooltip,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -30,12 +31,14 @@ import {
   DifferenceOutlined as DiffIcon,
   ChatBubbleOutline as ChatIcon,
   History as HistoryIcon,
+  AutoFixHigh as AutoFixHighIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useHandleApiError } from '@/hooks/useHandleApiError';
 import useSWR from 'swr';
 import { useAuth } from '@/contexts/AuthContext';
+import { P } from '@/types/permissions';
 import { RelativeTime } from '@/components/common/RelativeTime';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import changeRequestService, {
@@ -120,8 +123,9 @@ const ChangeRequestDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { user, permissions } = useAuth();
+  const { user, permissions, hasPermission } = useAuth();
   const hasAnyPermissions = permissions.length > 0;
+  const canSkipCr = hasPermission(P.CHANGE_REQUESTS_SKIP);
 
   const [actionLoading, setActionLoading] = useState(false);
   const [comment, setComment] = useState('');
@@ -280,6 +284,29 @@ const ChangeRequestDetailPage: React.FC = () => {
         variant: 'success',
       });
       setComment('');
+      mutate();
+    } catch (err: any) {
+      handleApiError(err, 'changeRequest.errors.approveFailed');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Force approve: bypass required approver count + execute in one action
+  const handleForceApprove = async () => {
+    setActionLoading(true);
+    try {
+      await changeRequestService.approve(
+        id!,
+        comment || undefined,
+        null,
+        true // forceApprove
+      );
+      await changeRequestService.execute(id!);
+      setComment('');
+      enqueueSnackbar(t('changeRequest.actions.forceApproveSuccess'), {
+        variant: 'success',
+      });
       mutate();
     } catch (err: any) {
       handleApiError(err, 'changeRequest.errors.approveFailed');
@@ -913,6 +940,23 @@ const ChangeRequestDetailPage: React.FC = () => {
                           >
                             {t('changeRequest.actions.approve')}
                           </Button>
+                          {canSkipCr && (
+                            <Tooltip
+                              title={t(
+                                'changeRequest.actions.forceApproveTooltip'
+                              )}
+                            >
+                              <Button
+                                variant="contained"
+                                color="warning"
+                                startIcon={<AutoFixHighIcon />}
+                                onClick={handleForceApprove}
+                                disabled={actionLoading}
+                              >
+                                {t('changeRequest.actions.forceApprove')}
+                              </Button>
+                            </Tooltip>
+                          )}
                         </Box>
                       </>
                     ) : (
@@ -933,8 +977,30 @@ const ChangeRequestDetailPage: React.FC = () => {
                               sx={{ fontSize: 40, mb: 1 }}
                             />
                             <Typography variant="body2" color="text.secondary">
-                              {t('errors.CR_ALREADY_APPROVED')}
+                              {currentApprovals < requiredApprovals
+                                ? t('changeRequest.approvedButNeedMore', {
+                                    current: currentApprovals,
+                                    required: requiredApprovals,
+                                  })
+                                : t('errors.CR_ALREADY_APPROVED')}
                             </Typography>
+                            {canSkipCr && currentApprovals < requiredApprovals && (
+                              <Tooltip
+                                title={t(
+                                  'changeRequest.actions.forceApproveTooltip'
+                                )}
+                              >
+                                <Button
+                                  variant="contained"
+                                  color="warning"
+                                  startIcon={<AutoFixHighIcon />}
+                                  onClick={handleForceApprove}
+                                  disabled={actionLoading}
+                                >
+                                  {t('changeRequest.actions.forceApprove')}
+                                </Button>
+                              </Tooltip>
+                            )}
                           </>
                         ) : (
                           <Typography variant="body2" color="text.secondary">

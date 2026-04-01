@@ -742,20 +742,23 @@ export class ChangeRequestService {
         .first();
 
       if (existing) {
-        throw new GatrixError(
-          'You have already approved this request.',
-          400,
-          true,
-          ErrorCodes.CR_ALREADY_APPROVED
-        );
+        // If forceApprove, skip the error — we'll just force the status transition below
+        if (!options?.forceApprove) {
+          throw new GatrixError(
+            'You have already approved this request.',
+            400,
+            true,
+            ErrorCodes.CR_ALREADY_APPROVED
+          );
+        }
+      } else {
+        await Approval.query(trx).insert({
+          id: ulid(),
+          changeRequestId: cr.id,
+          approverId,
+          comment,
+        });
       }
-
-      await Approval.query(trx).insert({
-        id: ulid(),
-        changeRequestId: cr.id,
-        approverId,
-        comment,
-      });
 
       // 2. Check Threshold
       // Fetch all approvals to be absolutely sure of the count regardless of DB dialect
