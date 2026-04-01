@@ -145,23 +145,32 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
     }
   };
 
+  // Track the last value emitted by the editor to avoid re-sync loops
+  const lastEditorValueRef = useRef<string>(value || '');
+
   const handleEditorChange = useCallback(
     (newValue: string | undefined) => {
       if (newValue !== undefined && !isUpdatingRef.current) {
-        onChange(newValue);
+        // Normalize line endings to prevent Windows \r\n issues
+        const normalized = newValue.replace(/\r/g, '');
+        lastEditorValueRef.current = normalized;
+        onChange(normalized);
       }
     },
     [onChange]
   );
 
-  // value prop이 변경될 때 커서 위치 보존
+  // Sync EXTERNAL value prop changes to editor, preserving cursor position
+  // Skip sync when the value change originated from the editor itself
   useEffect(() => {
     if (editorRef.current && value !== undefined) {
-      const currentValue = editorRef.current.getValue();
-      if (currentValue !== value) {
+      const normalizedValue = value.replace(/\r/g, '');
+      // Only sync if the value differs from what the editor last emitted
+      if (normalizedValue !== lastEditorValueRef.current) {
+        lastEditorValueRef.current = normalizedValue;
         const position = editorRef.current.getPosition();
         isUpdatingRef.current = true;
-        editorRef.current.setValue(value);
+        editorRef.current.setValue(normalizedValue);
         if (position) {
           editorRef.current.setPosition(position);
         }

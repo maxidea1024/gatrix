@@ -85,7 +85,7 @@ app.use(
           : corsOriginConfig,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ALLOWED_HEADERS,
-    exposedHeaders: ['ETag'],
+    exposedHeaders: ['ETag', 'x-resolved-environment-id', 'x-resolved-environment-name'],
   })
 );
 

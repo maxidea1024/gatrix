@@ -463,6 +463,11 @@ export const setSDKEnvironment = async (
       req.environmentId = env.id as string;
       req.environmentModel = env;
       req.projectId = token.projectId as string;
+
+      // Include resolved target environment info in response headers
+      res.set('x-resolved-environment-id', env.id as string);
+      res.set('x-resolved-environment-name', env.name);
+
       return next();
     }
 

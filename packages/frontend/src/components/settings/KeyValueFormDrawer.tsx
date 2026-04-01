@@ -125,20 +125,26 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
       errors.varKey = t('settings.kv.keyInvalidFormat');
     }
 
-    // Validate value - must not be empty, null, or undefined
-    if (!formData.varValue || formData.varValue.trim() === '') {
-      errors.varValue = t('settings.kv.valueRequired');
-    } else {
-      // Validate JSON for object/array types
-      if (formData.valueType === 'object' || formData.valueType === 'array') {
+    // Validate value
+    if (formData.valueType === 'object' || formData.valueType === 'array') {
+      // For object/array: validate JSON syntax, allow empty {} or []
+      const trimmed = (formData.varValue || '').trim();
+      if (!trimmed) {
+        errors.varValue = t('settings.kv.valueRequired');
+      } else {
         try {
-          const parsed = JSON.parse(formData.varValue);
+          const parsed = JSON.parse(trimmed);
           if (parsed === null || parsed === undefined) {
             errors.varValue = t('settings.kv.valueRequired');
           }
         } catch (e) {
           errors.varValue = t('settings.kv.invalidJson');
         }
+      }
+    } else {
+      // For primitive types: must not be empty
+      if (!formData.varValue || formData.varValue.trim() === '') {
+        errors.varValue = t('settings.kv.valueRequired');
       }
     }
 
@@ -308,9 +314,11 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
           <Box>
             <JsonEditor
               value={formData.varValue || '{}'}
-              onChange={(value) =>
-                setFormData({ ...formData, varValue: value })
-              }
+              onChange={(value) => {
+                // Auto-fill empty value with default object
+                const effectiveValue = value.trim() === '' ? '{}' : value;
+                setFormData({ ...formData, varValue: effectiveValue });
+              }}
               height="200px"
               label={`${t('settings.kv.value')} *`}
               placeholder='{\n  "key": "value"\n}'
@@ -330,7 +338,11 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
         return (
           <ArrayEditor
             value={formData.varValue || '[]'}
-            onChange={(value) => setFormData({ ...formData, varValue: value })}
+            onChange={(value) => {
+              // Auto-fill empty value with default array
+              const effectiveValue = value.trim() === '' ? '[]' : value;
+              setFormData({ ...formData, varValue: effectiveValue });
+            }}
             elementType={formData.arrayElementType || 'string'}
             label={`${t('settings.kv.value')} *`}
             helperText={t('settings.kv.arrayEditorHelp')}

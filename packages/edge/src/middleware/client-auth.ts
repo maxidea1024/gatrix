@@ -193,6 +193,12 @@ export async function clientAuth(
       tokenName: `Unsecured Universal Client Token (${unsecuredProjectId})`,
       projectId: unsecuredProjectId,
     };
+
+    // Include resolved target environment info in response headers
+    res.set('x-resolved-environment-id', envId);
+    const envName = environmentRegistry.getEnvironmentName(envId);
+    if (envName) res.set('x-resolved-environment-name', envName);
+
     logger.debug('Authenticated with unsecured universal client token', {
       environmentId: envId,
       projectId: unsecuredProjectId,
@@ -321,6 +327,11 @@ export async function clientAuth(
       tokenName: validation.token?.tokenName,
       projectId: token.projectId.toString(),
     };
+
+    // Include resolved target environment info in response headers
+    res.set('x-resolved-environment-id', envId);
+    const envName = environmentRegistry.getEnvironmentName(envId);
+    if (envName) res.set('x-resolved-environment-name', envName);
 
     logger.debug('Client authenticated with universal client token', {
       applicationName,

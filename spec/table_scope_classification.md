@@ -36,6 +36,7 @@
 
 | 테이블                     | 설명                     | 백엔드 필터링                        |
 | -------------------------- | ------------------------ | ------------------------------------ |
+| `g_client_versions`        | 클라이언트 버전           | ✅ projectId FK 직접 사용             |
 | `g_feature_flags`          | 피처 플래그              | 🔧 모델에 추가, 라우트 미적용         |
 | `g_feature_segments`       | 세그먼트                 | ❌ 미적용                             |
 | `g_feature_context_fields` | 컨텍스트 필드            | ❌ 미적용                             |
@@ -48,7 +49,6 @@
 | 테이블                    | 설명              |
 | ------------------------- | ----------------- |
 | `g_game_worlds`           | 게임 월드         |
-| `g_client_versions`       | 클라이언트 버전   |
 | `g_account_whitelist`     | 계정 화이트리스트 |
 | `g_ip_whitelist`          | IP 화이트리스트   |
 | `g_vars`                  | Key-Value 변수    |

@@ -50,6 +50,7 @@ import {
   MoreVert as MoreVertIcon,
   Cancel as CancelIcon,
   Save as SaveIcon,
+  InfoOutlined as InfoOutlinedIcon,
 } from '@mui/icons-material';
 
 import { useSnackbar } from 'notistack';
@@ -63,6 +64,7 @@ import {
 import SimplePagination from '../../components/common/SimplePagination';
 import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
 import WhitelistOverview from '../../components/admin/WhitelistOverview';
+import WhitelistFullInfoDrawer from '../../components/admin/WhitelistFullInfoDrawer';
 import SearchTextField from '@/components/common/SearchTextField';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
@@ -169,6 +171,7 @@ const WhitelistPage: React.FC = () => {
     null
   );
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [fullInfoDrawerOpen, setFullInfoDrawerOpen] = useState(false);
 
   const isDirty = useMemo(() => {
     if (!editDialog || !fullEditingData) return true;
@@ -570,6 +573,15 @@ const WhitelistPage: React.FC = () => {
             icon={<SecurityIcon />}
             title={t('whitelist.title')}
             subtitle={t('whitelist.subtitle')}
+            actions={
+              <Button
+                variant="outlined"
+                startIcon={<InfoOutlinedIcon />}
+                onClick={() => setFullInfoDrawerOpen(true)}
+              >
+                {t('whitelist.fullInfo.button')}
+              </Button>
+            }
           />
 
           <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 3 }}>
@@ -1153,6 +1165,12 @@ const WhitelistPage: React.FC = () => {
           </Box>
         </CardContent>
       </Card>
+
+      {/* Full Info Drawer */}
+      <WhitelistFullInfoDrawer
+        open={fullInfoDrawerOpen}
+        onClose={() => setFullInfoDrawerOpen(false)}
+      />
 
       {/* Import Dialog */}
       <ImportDialog

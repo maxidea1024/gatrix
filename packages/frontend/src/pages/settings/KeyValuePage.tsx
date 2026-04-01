@@ -31,7 +31,7 @@ import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { varsService, VarItem } from '@/services/varsService';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
-import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '@/utils/dateFormat';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import KeyValueFormDrawer from '@/components/settings/KeyValueFormDrawer';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
@@ -385,9 +385,11 @@ const KeyValuePage: React.FC = () => {
                         </Tooltip>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" color="text.secondary">
-                          {formatDateTimeDetailed(item.updatedAt)}
-                        </Typography>
+                        <Tooltip title={formatDateTimeDetailed(item.updatedAt)} arrow>
+                          <Typography variant="body2" color="text.secondary">
+                            {formatRelativeTime(item.updatedAt)}
+                          </Typography>
+                        </Tooltip>
                       </TableCell>
                       {canManage && (
                         <TableCell align="center">

@@ -155,7 +155,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const getProjectApiPath = useOrgProject().getProjectApiPath;
   const projectApiPath = getProjectApiPath();
   const { platforms } = usePlatformConfig();
-  const { allEnvironments } = useEnvironment();
+  const { currentEnvironment, allEnvironments } = useEnvironment();
   const [loading, setLoading] = useState(false);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const [formReady, setFormReady] = useState(false);
@@ -411,7 +411,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         })();
       } else {
         // Initialize with default values for new creation
-        reset(defaultValues);
+        // Pre-select the currently active environment
+        const initialEnv = currentEnvironment?.environmentId || 
+          (allEnvironments.length > 0 ? allEnvironments[0].environmentId : '');
+        reset({ ...defaultValues, targetEnv: initialEnv });
         setSelectedTags([]);
         setMaintenanceLocales([]);
         setSupportsMultiLanguage(false);

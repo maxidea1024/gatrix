@@ -325,6 +325,23 @@ class EnvironmentRegistry {
   }
 
   /**
+   * Get environment name by ID.
+   * @returns The environment name, or null if not found
+   */
+  getEnvironmentName(environmentId: string): string | null {
+    for (const org of this.tree) {
+      for (const project of org.projects) {
+        for (const env of project.environments) {
+          if (env.id === environmentId) {
+            return env.name;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
    * Check if an environment ID exists
    */
   hasEnvironment(environmentId: string): boolean {
