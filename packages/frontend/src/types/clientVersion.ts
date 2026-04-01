@@ -5,23 +5,34 @@ export enum ClientStatus {
   RECOMMENDED_UPDATE = 'RECOMMENDED_UPDATE',
   FORCED_UPDATE = 'FORCED_UPDATE',
   UNDER_REVIEW = 'UNDER_REVIEW',
-  BLOCKED_PATCH_ALLOWED = 'BLOCKED_PATCH_ALLOWED',
   MAINTENANCE = 'MAINTENANCE',
+  PATCH_UPDATE_REQUIRED = 'PATCH_UPDATE_REQUIRED',
 }
 
-// 클라이언트 Status 라벨 매핑
+// Client status i18n label mapping
 export const ClientStatusLabels: Record<ClientStatus, string> = {
   [ClientStatus.ONLINE]: 'clientVersions.status.online',
   [ClientStatus.OFFLINE]: 'clientVersions.status.offline',
   [ClientStatus.RECOMMENDED_UPDATE]: 'clientVersions.status.recommendedUpdate',
   [ClientStatus.FORCED_UPDATE]: 'clientVersions.status.forcedUpdate',
   [ClientStatus.UNDER_REVIEW]: 'clientVersions.status.underReview',
-  [ClientStatus.BLOCKED_PATCH_ALLOWED]:
-    'clientVersions.status.blockedPatchAllowed',
   [ClientStatus.MAINTENANCE]: 'clientVersions.status.maintenance',
+  [ClientStatus.PATCH_UPDATE_REQUIRED]:
+    'clientVersions.status.patchUpdateRequired',
 };
 
-// 클라이언트 Status 색상 매핑
+// Client status description mapping (help text)
+export const ClientStatusDescriptions: Record<ClientStatus, string> = {
+  [ClientStatus.ONLINE]: 'clientVersions.statusDesc.online',
+  [ClientStatus.OFFLINE]: 'clientVersions.statusDesc.offline',
+  [ClientStatus.RECOMMENDED_UPDATE]: 'clientVersions.statusDesc.recommendedUpdate',
+  [ClientStatus.FORCED_UPDATE]: 'clientVersions.statusDesc.forcedUpdate',
+  [ClientStatus.UNDER_REVIEW]: 'clientVersions.statusDesc.underReview',
+  [ClientStatus.MAINTENANCE]: 'clientVersions.statusDesc.maintenance',
+  [ClientStatus.PATCH_UPDATE_REQUIRED]: 'clientVersions.statusDesc.patchUpdateRequired',
+};
+
+// Client status color mapping
 export const ClientStatusColors: Record<
   ClientStatus,
   'success' | 'error' | 'warning' | 'info' | 'default'
@@ -31,11 +42,22 @@ export const ClientStatusColors: Record<
   [ClientStatus.RECOMMENDED_UPDATE]: 'warning',
   [ClientStatus.FORCED_UPDATE]: 'error',
   [ClientStatus.UNDER_REVIEW]: 'info',
-  [ClientStatus.BLOCKED_PATCH_ALLOWED]: 'warning',
   [ClientStatus.MAINTENANCE]: 'warning',
+  [ClientStatus.PATCH_UPDATE_REQUIRED]: 'info',
 };
 
-// 클라이언트 버전 Interface
+// Client status MUI icon name mapping
+export const ClientStatusIconNames: Record<ClientStatus, string> = {
+  [ClientStatus.ONLINE]: 'CheckCircle',
+  [ClientStatus.OFFLINE]: 'Cancel',
+  [ClientStatus.RECOMMENDED_UPDATE]: 'SystemUpdateAlt',
+  [ClientStatus.FORCED_UPDATE]: 'Warning',
+  [ClientStatus.UNDER_REVIEW]: 'RateReview',
+  [ClientStatus.MAINTENANCE]: 'Build',
+  [ClientStatus.PATCH_UPDATE_REQUIRED]: 'CloudDownload',
+};
+
+// Client version interfaces
 export interface ClientVersionMaintenanceLocale {
   lang: 'ko' | 'en' | 'zh';
   message: string;
@@ -96,7 +118,7 @@ export interface ClientVersionFormData {
   tags?: { id: number; name: string; color: string }[];
 }
 
-// 간편 추가를 위한 플랫Form별 Settings
+// Platform-specific settings for bulk creation
 export interface PlatformSpecificSettings {
   platform: string;
   gameServerAddress: string;
@@ -105,7 +127,7 @@ export interface PlatformSpecificSettings {
   patchAddressForWhiteList?: string;
 }
 
-// 간편 추가 Form 데이터
+// Bulk create form data
 export interface BulkCreateFormData {
   clientVersion: string;
   clientStatus: ClientStatus;
@@ -123,7 +145,7 @@ export interface BulkCreateFormData {
   tags?: { id: number; name: string; color: string }[];
 }
 
-// 클라이언트 버전 Filter
+// Client version filters
 export interface ClientVersionFilters {
   version?: string | string[];
   platform?: string | string[];
@@ -148,7 +170,7 @@ export interface ClientVersionFilters {
   tagsOperator?: 'any_of' | 'include_all';
 }
 
-// 클라이언트 버전 Sorting 옵션
+// Client version sort fields
 export type ClientVersionSortField =
   | 'id'
   | 'platform'
@@ -159,7 +181,7 @@ export type ClientVersionSortField =
 
 export type SortOrder = 'ASC' | 'DESC';
 
-// 클라이언트 버전 목록 Response
+// Client version list response
 export interface ClientVersionListResponse {
   clientVersions: ClientVersion[];
   total: number;
@@ -168,11 +190,11 @@ export interface ClientVersionListResponse {
   totalPages: number;
 }
 
-// 일괄 Status 변경 Request
+// Bulk status update request
 export interface BulkStatusUpdateRequest {
   ids: number[];
   clientStatus: ClientStatus;
-  // 점검 관련 필드들
+  // Maintenance-related fields
   maintenanceStartDate?: string;
   maintenanceEndDate?: string;
   maintenanceMessage?: string;
@@ -189,7 +211,7 @@ export interface ClientVersionPagination {
   sortOrder?: SortOrder;
 }
 
-// 테이블 컬럼 정의
+// Table column definition
 export interface ClientVersionTableColumn {
   id: keyof ClientVersion | 'actions' | 'select';
   label: string;
@@ -199,7 +221,7 @@ export interface ClientVersionTableColumn {
   format?: (value: any, row: ClientVersion) => React.ReactNode;
 }
 
-// Form 필드 정의
+// Form field definition
 export interface ClientVersionFormField {
   name: keyof ClientVersionFormData;
   label: string;
@@ -224,12 +246,12 @@ export interface ApiResponse<T = any> {
   error?: string;
 }
 
-// 메타데이터 Response
+// Metadata response
 export interface ClientVersionMetadata {
   platforms: string[];
 }
 
-// 로컬 스토리지 키
+// Local storage keys
 export const CLIENT_VERSION_STORAGE_KEYS = {
   PAGE_SIZE: 'clientVersionPageSize',
   FILTERS: 'clientVersionFilters',
@@ -243,7 +265,7 @@ export const CLIENT_VERSION_DEFAULTS = {
   SORT_ORDER: 'DESC' as SortOrder,
 } as const;
 
-// Form Validation 규칙
+// Form validation rules
 export const CLIENT_VERSION_VALIDATION = {
   PLATFORM: {
     MIN_LENGTH: 1,

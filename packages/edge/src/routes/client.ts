@@ -211,6 +211,7 @@ router.get(
         'UPDATE_REQUIRED',
         'RECOMMENDED_UPDATE',
         'FORCED_UPDATE',
+        'PATCH_UPDATE_REQUIRED',
       ];
       let statusFilter: string | undefined;
       if (status) {
@@ -392,22 +393,9 @@ router.get(
       }
 
       // Determine effective status (service maintenance overrides client version status)
-      let effectiveStatus = isServiceMaintenanceActive
+      let effectiveStatus: string = isServiceMaintenanceActive
         ? 'MAINTENANCE'
         : record.clientStatus;
-
-      // Check minimum patch version requirement
-      if (
-        (record as any).minPatchVersion &&
-        effectiveStatus !== 'MAINTENANCE'
-      ) {
-        if (
-          !patchVersion ||
-          compareVersions(patchVersion, (record as any).minPatchVersion) < 0
-        ) {
-          effectiveStatus = 'FORCED_UPDATE';
-        }
-      }
 
       // Check whitelist (IP + account): whitelisted clients bypass MAINTENANCE status
       let gameServerAddress = record.gameServerAddress;
@@ -447,6 +435,20 @@ router.get(
         }
       }
 
+      // Check minimum patch version requirement AFTER whitelist bypass
+      // This ensures app/data patch updates take priority over whitelist
+      if (
+        (record as any).minPatchVersion &&
+        effectiveStatus !== 'MAINTENANCE'
+      ) {
+        if (
+          !patchVersion ||
+          compareVersions(patchVersion, (record as any).minPatchVersion) < 0
+        ) {
+          effectiveStatus = 'PATCH_UPDATE_REQUIRED';
+        }
+      }
+
       // Inject serviceNoticeUrl into meta using actual ULID environmentId
       const edgeBaseUrl = `${req.protocol}://${req.get('host')}`;
       (meta as Record<string, unknown>).serviceNoticeUrl =
@@ -460,7 +462,8 @@ router.get(
         patchAddress,
         guestModeAllowed:
           effectiveStatus === 'MAINTENANCE' ||
-          effectiveStatus === 'FORCED_UPDATE'
+          effectiveStatus === 'FORCED_UPDATE' ||
+          effectiveStatus === 'PATCH_UPDATE_REQUIRED'
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,

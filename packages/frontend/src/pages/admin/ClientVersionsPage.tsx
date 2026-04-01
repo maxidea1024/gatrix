@@ -125,6 +125,7 @@ import {
   ClientVersionFilters,
   ClientStatus,
   ClientStatusLabels,
+  ClientStatusDescriptions,
   ClientStatusColors,
   BulkStatusUpdateRequest,
 } from '../../types/clientVersion';
@@ -161,8 +162,9 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useDebounce } from '../../hooks/useDebounce';
 import ImportDialog from '../../components/common/ImportDialog';
+import ClientStatusIcon from '../../components/common/ClientStatusIcon';
 
-// HSV를 RGB로 변환하는 함수
+// Convert HSV to RGB
 const hsvToRgb = (
   h: number,
   s: number,
@@ -209,54 +211,54 @@ const hsvToRgb = (
   ];
 };
 
-// 버전별 색상을 HSV 기반으로 다양하게 Create하는 함수 (황금비 활용)
+// Generate diverse HSV-based colors per version (golden ratio method)
 const getVersionColorStyle = (
   version: string,
   isDarkMode: boolean = false
 ): { backgroundColor: string; color: string } => {
-  // 개선된 해시 함수 (더 균등한 분포)
+  // Improved hash function (more even distribution)
   let hash = 0;
   for (let i = 0; i < version.length; i++) {
     const char = version.charCodeAt(i);
     hash = (hash << 5) - hash + char;
-    hash = hash & hash; // 32비트 Convert to integer
+    hash = hash & hash; // Convert to 32-bit integer
   }
 
-  // 황금비(φ ≈ 0.618)를 활용한 색상 분포로 더 균등하고 아름다운 색상 Create
+  // Use golden ratio (φ ≈ 0.618) for more even and aesthetically pleasing color distribution
   const goldenRatio = 0.618033988749;
-  const baseHue = (Math.abs(hash) * goldenRatio) % 1; // 0-1 사이 값
-  const hue = baseHue * 360; // 0-359도로 변환
+  const baseHue = (Math.abs(hash) * goldenRatio) % 1; // Value between 0-1
+  const hue = baseHue * 360; // Convert to 0-359 degrees
 
-  // 해시의 다른 부분을 활용해 채도와 명도 변화
+  // Use different parts of the hash for saturation and brightness variation
   const saturationSeed = Math.abs(hash >> 8);
   const valueSeed = Math.abs(hash >> 16);
 
-  // 다크모드에 따라 채도와 명도 조정
+  // Adjust saturation and brightness based on dark mode
   let saturation, value;
   if (isDarkMode) {
-    // 다크모드: 선명하면서도 눈에 부담 없는 색상
-    saturation = 0.75 + (saturationSeed % 20) / 100; // 75-95% 채도
-    value = 0.65 + (valueSeed % 25) / 100; // 65-90% 명도
+    // Dark mode: vivid yet comfortable colors
+    saturation = 0.75 + (saturationSeed % 20) / 100; // 75-95% saturation
+    value = 0.65 + (valueSeed % 25) / 100; // 65-90% brightness
   } else {
-    // 라이트모드: 밝고 깔끔한 색상
-    saturation = 0.7 + (saturationSeed % 25) / 100; // 70-95% 채도
-    value = 0.8 + (valueSeed % 15) / 100; // 80-95% 명도
+    // Light mode: bright and clean colors
+    saturation = 0.7 + (saturationSeed % 25) / 100; // 70-95% saturation
+    value = 0.8 + (valueSeed % 15) / 100; // 80-95% brightness
   }
 
-  // HSV를 RGB로 변환
+  // Convert HSV to RGB
   const [r, g, b] = hsvToRgb(hue, saturation, value);
 
-  // 배경색 Create
+  // Generate background color
   const backgroundColor = `rgb(${r}, ${g}, ${b})`;
 
-  // WCAG 2.1 기준에 따른 더 정확한 대비 계산
+  // More accurate contrast calculation per WCAG 2.1 guidelines
   const sRGB = [r, g, b].map((c) => {
     c = c / 255;
     return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
   });
   const luminance = 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2];
 
-  // 4.5:1 대비율을 위한 텍스트 색상 결정
+  // Determine text color for 4.5:1 contrast ratio
   const textColor = luminance > 0.179 ? '#000000' : '#ffffff';
 
   return {
@@ -265,7 +267,7 @@ const getVersionColorStyle = (
   };
 };
 
-// Existing MUI 색상 시스템과의 호환성을 위한 함수 (fallback용)
+// Compatibility function for existing MUI color system (fallback)
 const getVersionColor = (
   version: string
 ):
@@ -276,20 +278,20 @@ const getVersionColor = (
   | 'info'
   | 'success'
   | 'warning' => {
-  // 간단한 해시 함수
+  // Simple hash function
   let hash = 0;
   for (let i = 0; i < version.length; i++) {
     const char = version.charCodeAt(i);
     hash = (hash << 5) - hash + char;
-    hash = hash & hash; // 32비트 Convert to integer
+    hash = hash & hash; // Convert to 32-bit integer
   }
 
-  // Used 가능한 색상 배열
+  // Available color array
   const colors: Array<
     'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'
   > = ['primary', 'secondary', 'error', 'info', 'success', 'warning'];
 
-  // 해시값을 색상 인덱스로 변환
+  // Convert hash value to color index
   const colorIndex = Math.abs(hash) % colors.length;
   return colors[colorIndex];
 };
@@ -387,7 +389,7 @@ const ClientVersionsPage: React.FC = () => {
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 
-  // 페이지 State management (localStorage 연동)
+  // Page state management (localStorage sync)
   const { pageState, updatePage, updateLimit, updateSort, updateFilters } =
     usePageState({
       defaultState: {
@@ -411,7 +413,7 @@ const ClientVersionsPage: React.FC = () => {
     });
   }, [debouncedSearch]);
 
-  // SWR로 데이터 로딩
+  // Load data via SWR
   const {
     data: clientVersionsData,
     error: clientVersionsError,
@@ -444,7 +446,7 @@ const ClientVersionsPage: React.FC = () => {
   const loading =
     isLoadingVersions || isLoadingAvailableVersions || isLoadingTags;
 
-  // 초기 Loading state 추적
+  // Track initial loading state
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   useEffect(() => {
     if (!loading && isInitialLoad) {
@@ -452,7 +454,7 @@ const ClientVersionsPage: React.FC = () => {
     }
   }, [loading, isInitialLoad]);
 
-  // 선택 관리
+  // Selection management
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
 
@@ -466,21 +468,21 @@ const ClientVersionsPage: React.FC = () => {
     ClientStatus.ONLINE
   );
 
-  // 점검 관련 Status
+  // Maintenance-related state
   const [maintenanceStartDate, setMaintenanceStartDate] = useState<string>('');
   const [maintenanceEndDate, setMaintenanceEndDate] = useState<string>('');
 
-  // 메시지 입력 방식
+  // Message input mode
   const [inputMode, setInputMode] = useState<'direct' | 'template'>('direct');
 
-  // 직접 입력
+  // Direct input
   const [maintenanceMessage, setMaintenanceMessage] = useState<string>('');
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
   const [maintenanceLocales, setMaintenanceLocales] = useState<MessageLocale[]>(
     []
   );
 
-  // 템플릿 선택
+  // Template selection
   const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>(
     []
   );
@@ -493,7 +495,7 @@ const ClientVersionsPage: React.FC = () => {
     useState<ClientVersion | null>(null);
   const [isCopyMode, setIsCopyMode] = useState(false);
 
-  // 태그 관련 Status
+  // Tag-related state
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [selectedClientVersionForTags, setSelectedClientVersionForTags] =
     useState<ClientVersion | null>(null);
@@ -516,11 +518,11 @@ const ClientVersionsPage: React.FC = () => {
     setMenuTarget(null);
   };
 
-  // 동적 Filter Status
+  // Dynamic filter state
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // 내보내기 메뉴 Status
+  // Export menu state
   const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(
     null
   );
@@ -606,7 +608,7 @@ const ClientVersionsPage: React.FC = () => {
     })
   );
 
-  // 메시지 템플릿 로드 (SWR로 변경 예정이지만 일단 유지)
+  // Load message templates (to be migrated to SWR later)
   useEffect(() => {
     messageTemplateService
       .list(projectApiPath, { isEnabled: true })
@@ -618,7 +620,7 @@ const ClientVersionsPage: React.FC = () => {
       });
   }, []);
 
-  // Filter 변경 핸들러
+  // Filter change handler
   const handleFilterChange = useCallback(
     (newFilters: ClientVersionFilters) => {
       updateFilters(newFilters);
@@ -626,7 +628,7 @@ const ClientVersionsPage: React.FC = () => {
     [updateFilters]
   );
 
-  // 동적 Filter 정의
+  // Dynamic filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
       {
@@ -690,17 +692,17 @@ const ClientVersionsPage: React.FC = () => {
     [t, versions, allTags, platforms]
   );
 
-  // 동적 Filter 추가 핸들러
+  // Dynamic filter add handler
   const handleFilterAdd = useCallback((filter: ActiveFilter) => {
     setActiveFilters((prev) => [...prev, filter]);
   }, []);
 
-  // 동적 Filter 제거 핸들러
+  // Dynamic filter remove handler
   const handleFilterRemove = useCallback((filterKey: string) => {
     setActiveFilters((prev) => prev.filter((f) => f.key !== filterKey));
   }, []);
 
-  // 동적 Filter 변경 핸들러
+  // Dynamic filter value change handler
   const handleDynamicFilterChange = useCallback(
     (filterKey: string, value: any) => {
       setActiveFilters((prev) =>
@@ -710,7 +712,7 @@ const ClientVersionsPage: React.FC = () => {
     []
   );
 
-  // 동적 Filter 연산자 변경 핸들러
+  // Dynamic filter operator change handler
   const handleOperatorChange = useCallback(
     (filterKey: string, operator: 'any_of' | 'include_all') => {
       setActiveFilters((prev) =>
@@ -720,12 +722,12 @@ const ClientVersionsPage: React.FC = () => {
     []
   );
 
-  // Search어 변경 핸들러
+  // Search term change handler
   const handleSearchChange = useCallback(
     (search: string) => {
       const newFilters: ClientVersionFilters = { search: search || undefined };
 
-      // activeFilters를 newFilters에 반영
+      // Apply activeFilters to newFilters
       activeFilters.forEach((filter) => {
         if (filter.key === 'tags') {
           newFilters.tags = Array.isArray(filter.value) ? filter.value : [];
@@ -740,7 +742,7 @@ const ClientVersionsPage: React.FC = () => {
     [activeFilters, updateFilters]
   );
 
-  // 페이지 로드 시 pageState.filters에서 activeFilters 복원
+  // Restore activeFilters from pageState.filters on page load
   useEffect(() => {
     if (filtersInitialized) return;
 
@@ -752,7 +754,7 @@ const ClientVersionsPage: React.FC = () => {
     const restoredFilters: ActiveFilter[] = [];
     const filters = pageState.filters;
 
-    // version Filter 복원
+    // Restore version filter
     if (filters.version) {
       restoredFilters.push({
         key: 'version',
@@ -764,7 +766,7 @@ const ClientVersionsPage: React.FC = () => {
       });
     }
 
-    // platform Filter 복원
+    // Restore platform filter
     if (filters.platform) {
       restoredFilters.push({
         key: 'platform',
@@ -776,7 +778,7 @@ const ClientVersionsPage: React.FC = () => {
       });
     }
 
-    // clientStatus Filter 복원
+    // Restore clientStatus filter
     if (filters.clientStatus) {
       restoredFilters.push({
         key: 'clientStatus',
@@ -788,7 +790,7 @@ const ClientVersionsPage: React.FC = () => {
       });
     }
 
-    // guestModeAllowed Filter 복원
+    // Restore guestModeAllowed filter
     if (filters.guestModeAllowed !== undefined) {
       restoredFilters.push({
         key: 'guestModeAllowed',
@@ -800,7 +802,7 @@ const ClientVersionsPage: React.FC = () => {
       });
     }
 
-    // tags Filter 복원
+    // Restore tags filter
     if (filters.tags && filters.tags.length > 0) {
       restoredFilters.push({
         key: 'tags',
@@ -816,12 +818,12 @@ const ClientVersionsPage: React.FC = () => {
     setFiltersInitialized(true);
   }, [filtersInitialized, pageState.filters, t]);
 
-  // activeFilters가 변경될 때마다 pageState.filters 업데이트
+  // Update pageState.filters whenever activeFilters change
   useEffect(() => {
-    if (!filtersInitialized) return; // Initialization 전에는 실행하지 않음
+    if (!filtersInitialized) return; // Do not run before initialization
 
     const newFilters: ClientVersionFilters = {
-      search: pageState.filters?.search, // Search어는 유지
+      search: pageState.filters?.search, // Preserve search term
     };
 
     activeFilters.forEach((filter) => {
@@ -833,26 +835,26 @@ const ClientVersionsPage: React.FC = () => {
       }
     });
 
-    // Filter가 실제로 변경되었을 때만 업데이트
+    // Only update when filters actually changed
     const currentFiltersStr = JSON.stringify(pageState.filters);
     const newFiltersStr = JSON.stringify(newFilters);
     if (currentFiltersStr !== newFiltersStr) {
       updateFilters(newFilters);
     }
-  }, [activeFilters, filtersInitialized]); // pageState.filters와 updateFilters를 의존성에서 제거
+  }, [activeFilters, filtersInitialized]); // Removed pageState.filters and updateFilters from deps
 
-  // Sorting은 고정 (버전 내림차순, 플랫Form 내림차순)
-  // Sorting 변경 기능 비Active화
+  // Sorting is fixed (version desc, platform desc)
+  // Sorting change feature disabled
 
-  // 페이지 변경 핸들러
+  // Page change handler
   const handlePageChange = useCallback(
     (_: unknown, newPage: number) => {
-      updatePage(newPage + 1); // MUI는 0부터 시작, 우리는 1부터 시작
+      updatePage(newPage + 1); // MUI is 0-based, we use 1-based
     },
     [updatePage]
   );
 
-  // 페이지 크기 변경 핸들러
+  // Page size change handler
   const handleRowsPerPageChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newLimit = parseInt(event.target.value, 10);
@@ -861,7 +863,7 @@ const ClientVersionsPage: React.FC = () => {
     [updateLimit]
   );
 
-  // 선택 관리
+  // Selection management
   const handleSelectAll = useCallback(
     (checked: boolean) => {
       if (checked) {
@@ -883,7 +885,7 @@ const ClientVersionsPage: React.FC = () => {
     }
   }, []);
 
-  // Delete 핸들러
+  // Delete handler
   const handleDelete = useCallback(async () => {
     if (!selectedClientVersion) return;
 
@@ -901,8 +903,8 @@ const ClientVersionsPage: React.FC = () => {
       }
       setDeleteDialogOpen(false);
       setSelectedClientVersion(null);
-      mutateVersions(); // SWR cache 갱신
-      mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
+      mutateVersions(); // Refresh SWR cache
+      mutateClientVersions(projectApiPath); // Refresh all client versions cache
     } catch (error: any) {
       console.error('Error deleting client version:', error);
       enqueueSnackbar(
@@ -921,12 +923,12 @@ const ClientVersionsPage: React.FC = () => {
     mutateVersions,
   ]);
 
-  // 일괄 Status 변경 핸들러
+  // Bulk status update handler
   const handleBulkStatusUpdate = useCallback(
     async (skipCr: boolean = false) => {
       if (selectedIds.length === 0) return;
 
-      // 점검 Status일 때 Validate required fields
+      // Validate required fields when in maintenance status
       if (bulkStatus === ClientStatus.MAINTENANCE) {
         if (inputMode === 'direct' && !maintenanceMessage.trim()) {
           enqueueSnackbar(t('clientVersions.maintenance.messageRequired'), {
@@ -946,7 +948,7 @@ const ClientVersionsPage: React.FC = () => {
         const request: BulkStatusUpdateRequest = {
           ids: selectedIds,
           clientStatus: bulkStatus,
-          // 점검 Status일 때만 점검 관련 데이터 포함
+          // Include maintenance data only when in maintenance status
           ...(bulkStatus === ClientStatus.MAINTENANCE && {
             maintenanceStartDate: maintenanceStartDate || undefined,
             maintenanceEndDate: maintenanceEndDate || undefined,
@@ -981,7 +983,7 @@ const ClientVersionsPage: React.FC = () => {
             navigate
           );
         } else {
-          // Localization된 메시지 Create
+          // Create success message
           const updatedCount = result?.updatedCount || selectedIds.length;
           const successMessage = t('clientVersions.bulkStatusUpdated', {
             count: updatedCount,
@@ -992,7 +994,7 @@ const ClientVersionsPage: React.FC = () => {
         setBulkStatusDialogOpen(false);
         setSelectedIds([]);
         setSelectAll(false);
-        // 점검 관련 Status Initialization
+        // Reset maintenance-related state
         setMaintenanceStartDate('');
         setMaintenanceEndDate('');
         setMaintenanceMessage('');
@@ -1000,8 +1002,8 @@ const ClientVersionsPage: React.FC = () => {
         setMaintenanceLocales([]);
         setInputMode('direct');
         setSelectedTemplateId('');
-        mutateVersions(); // SWR cache 갱신
-        mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
+        mutateVersions(); // Refresh SWR cache
+        mutateClientVersions(projectApiPath); // Refresh all client versions cache
       } catch (error: any) {
         console.error('Error updating status:', error);
         enqueueSnackbar(
@@ -1030,7 +1032,7 @@ const ClientVersionsPage: React.FC = () => {
     ]
   );
 
-  // 일괄 Delete 핸들러
+  // Bulk delete handler
   const handleBulkDelete = useCallback(
     async (skipCr: boolean = false) => {
       if (selectedIds.length === 0) return;
@@ -1061,8 +1063,8 @@ const ClientVersionsPage: React.FC = () => {
         setSelectedIds([]);
         setSelectAll(false);
         setBulkDeleteDialogOpen(false);
-        mutateVersions(); // SWR cache 갱신
-        mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
+        mutateVersions(); // Refresh SWR cache
+        mutateClientVersions(projectApiPath); // Refresh all client versions cache
       } catch (error: any) {
         console.error('Failed to delete client versions:', error);
         enqueueSnackbar(
@@ -1076,7 +1078,7 @@ const ClientVersionsPage: React.FC = () => {
     [selectedIds, t, enqueueSnackbar, closeSnackbar, navigate, mutateVersions]
   );
 
-  // 내보내기 함수들
+  // Export functions
   const handleExport = useCallback(
     async (format: 'csv' | 'json' | 'xlsx') => {
       try {
@@ -1095,11 +1097,11 @@ const ClientVersionsPage: React.FC = () => {
           );
           filename = `client-versions-${dateTimeStr}.csv`;
         } else if (format === 'json') {
-          // JSON 내보내기
+          // JSON export
           const result = await ClientVersionService.exportToCSV(
             projectApiPath,
             pageState.filters || {}
-          ); // 같은 데이터 Used
+          ); // Same data source
           const text = await result.text();
           const lines = text.split('\n');
           const headers = lines[0].split(',');
@@ -1120,7 +1122,7 @@ const ClientVersionsPage: React.FC = () => {
           });
           filename = `client-versions-${dateTimeStr}.json`;
         } else if (format === 'xlsx') {
-          // XLSX 내보내기
+          // XLSX export
           const result = await ClientVersionService.exportToCSV(
             projectApiPath,
             pageState.filters || {}
@@ -1140,18 +1142,18 @@ const ClientVersionsPage: React.FC = () => {
               return obj;
             });
 
-          // XLSX 워크북 Create
+          // Create XLSX workbook
           const worksheet = XLSX.utils.json_to_sheet(data);
           const workbook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workbook, worksheet, 'Client Versions');
 
-          // 컬럼 너비 자동 조정
+          // Auto-adjust column widths
           const colWidths = headers.map((header) => ({
             wch: Math.max(header.length, 15),
           }));
           worksheet['!cols'] = colWidths;
 
-          // XLSX 파일 Create
+          // Create XLSX file
           const xlsxBuffer = XLSX.write(workbook, {
             bookType: 'xlsx',
             type: 'array',
@@ -1191,7 +1193,7 @@ const ClientVersionsPage: React.FC = () => {
     [pageState.filters, t, enqueueSnackbar]
   );
 
-  // 선택된 항목 내보내기
+  // Export selected items
   const handleExportSelected = useCallback(
     async (format: 'csv' | 'json' | 'xlsx') => {
       if (selectedIds.length === 0) return;
@@ -1236,7 +1238,7 @@ const ClientVersionsPage: React.FC = () => {
               'Updated By Email',
               'Updated At',
             ].join(','),
-            // CSV 데이터
+            // CSV data
             ...selectedVersions.map((cv) =>
               [
                 cv.id,
@@ -1273,7 +1275,7 @@ const ClientVersionsPage: React.FC = () => {
           });
           filename = `client-versions-selected-${dateTimeStr}.json`;
         } else if (format === 'xlsx') {
-          // XLSX 내보내기 - 선택된 항목들
+          // XLSX export - selected items
           const headers = [
             'ID',
             'Platform',
@@ -1326,7 +1328,7 @@ const ClientVersionsPage: React.FC = () => {
             'Updated At': new Date(cv.updatedAt).toLocaleDateString(),
           }));
 
-          // XLSX 워크북 Create
+          // Create XLSX workbook
           const worksheet = XLSX.utils.json_to_sheet(data);
           const workbook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(
@@ -1335,13 +1337,13 @@ const ClientVersionsPage: React.FC = () => {
             'Selected Client Versions'
           );
 
-          // 컬럼 너비 자동 조정
+          // Auto-adjust column widths
           const colWidths = headers.map((header) => ({
             wch: Math.max(header.length, 15),
           }));
           worksheet['!cols'] = colWidths;
 
-          // XLSX 파일 Create
+          // Create XLSX file
           const xlsxBuffer = XLSX.write(workbook, {
             bookType: 'xlsx',
             type: 'array',
@@ -1381,7 +1383,7 @@ const ClientVersionsPage: React.FC = () => {
     [selectedIds, clientVersions, t, enqueueSnackbar]
   );
 
-  // 버전 복사 핸들러
+  // Copy version handler
   const handleCopyVersion = useCallback(
     (clientVersion: ClientVersion) => {
       console.log('Copy button clicked for client version:', {
@@ -1389,11 +1391,11 @@ const ClientVersionsPage: React.FC = () => {
         clientVersion: clientVersion,
       });
 
-      // 복사할 데이터 준비 (버전 필드는 비움)
+      // Prepare data for copy (clear the version field)
       const copiedData = {
-        id: clientVersion.id, // 상세 재조회(maintenanceLocales 포함)를 위해 원본 id를 전달. Save 시에는 isCopyMode로 신규 Create 처리됨
+        id: clientVersion.id, // Pass original ID for detail re-fetch (incl. maintenanceLocales). Save uses isCopyMode for new creation.
         platform: clientVersion.platform,
-        clientVersion: '', // 버전은 비워둠
+        clientVersion: '', // Clear version field for copy
         clientStatus: clientVersion.clientStatus,
         gameServerAddress: clientVersion.gameServerAddress,
         gameServerAddressForWhiteList:
@@ -1412,7 +1414,7 @@ const ClientVersionsPage: React.FC = () => {
         tags: clientVersion.tags || [],
       };
 
-      // Form Dialog를 열고 복사된 데이터로 Initialization
+      // Open form dialog and initialize with copied data
       console.log('Setting copied data:', copiedData);
       setEditingClientVersion(copiedData as any);
       setIsCopyMode(true);
@@ -1843,7 +1845,7 @@ const ClientVersionsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* 일괄 작업 툴바 */}
+      {/* Bulk actions toolbar */}
       {selectedIds.length > 0 && (
         <Card
           sx={{
@@ -1945,7 +1947,7 @@ const ClientVersionsPage: React.FC = () => {
         </Card>
       )}
 
-      {/* 테이블 */}
+      {/* Table */}
       <PageContentLoader loading={isInitialLoad && loading}>
         {clientVersions.length === 0 ? (
           <EmptyPagePlaceholder
@@ -2078,11 +2080,11 @@ const ClientVersionsPage: React.FC = () => {
               </Table>
             </TableContainer>
 
-            {/* Pagination - 데이터가 있을 때만 표시 */}
+            {/* Pagination - show only when data exists */}
             {total > 0 && (
               <SimplePagination
                 count={total}
-                page={pageState.page - 1} // MUI는 0부터 시작
+                page={pageState.page - 1} // MUI uses 0-based index
                 rowsPerPage={pageState.limit}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
@@ -2171,7 +2173,7 @@ const ClientVersionsPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* 일괄 Status 변경 Drawer */}
+      {/* Bulk Status Change Drawer */}
       <Drawer
         anchor="right"
         open={bulkStatusDialogOpen}
@@ -2222,16 +2224,32 @@ const ClientVersionsPage: React.FC = () => {
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value as ClientStatus)}
               label={t('clientVersions.statusLabel')}
+              renderValue={(value) => (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <ClientStatusIcon status={value as ClientStatus} />
+                  {t(ClientStatusLabels[value as ClientStatus])}
+                </Box>
+              )}
             >
-              {Object.values(ClientStatus).map((status) => (
-                <MenuItem key={status} value={status}>
-                  {t(ClientStatusLabels[status])}
+              {Object.values(ClientStatus)
+                .filter((s) => s !== ClientStatus.PATCH_UPDATE_REQUIRED)
+                .map((status) => (
+                <MenuItem key={status} value={status} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }}>
+                  <ClientStatusIcon status={status} />
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: 1.3 }}>
+                      {t(ClientStatusLabels[status])}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2 }}>
+                      {t(ClientStatusDescriptions[status])}
+                    </Typography>
+                  </Box>
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          {/* 점검 관련 필드들 */}
+          {/* Maintenance-related fields */}
           {bulkStatus === ClientStatus.MAINTENANCE && (
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Box
@@ -2267,7 +2285,7 @@ const ClientVersionsPage: React.FC = () => {
                 </Typography>
 
                 <Stack spacing={2}>
-                  {/* 점검 시작일 */}
+                  {/* Maintenance start date */}
                   <DateTimePicker
                     label={t('clientVersions.maintenance.startDate')}
                     value={parseUTCForPicker(maintenanceStartDate)}
@@ -2286,7 +2304,7 @@ const ClientVersionsPage: React.FC = () => {
                     }}
                   />
 
-                  {/* 점검 종료일 */}
+                  {/* Maintenance end date */}
                   <DateTimePicker
                     label={t('clientVersions.maintenance.endDate')}
                     value={parseUTCForPicker(maintenanceEndDate)}
@@ -2303,7 +2321,7 @@ const ClientVersionsPage: React.FC = () => {
                     }}
                   />
 
-                  {/* 구분선 */}
+                  {/* Divider */}
                   <Box sx={{ width: '100%', my: 5 }}>
                     <Box
                       sx={{
@@ -2314,7 +2332,7 @@ const ClientVersionsPage: React.FC = () => {
                     />
                   </Box>
 
-                  {/* 메시지 소스 선택 */}
+                  {/* Message source selection */}
                   <TextField
                     select
                     label={t('maintenance.messageSource')}
@@ -2338,7 +2356,7 @@ const ClientVersionsPage: React.FC = () => {
                     {t('maintenance.messageSourceHelp')}
                   </Typography>
 
-                  {/* 템플릿 선택 */}
+                  {/* Template selection */}
                   {inputMode === 'template' && (
                     <Box>
                       <TextField
@@ -2370,7 +2388,7 @@ const ClientVersionsPage: React.FC = () => {
                     </Box>
                   )}
 
-                  {/* 직접 입력 */}
+                  {/* Direct input */}
                   {inputMode === 'direct' && (
                     <MultiLanguageMessageInput
                       defaultMessage={maintenanceMessage}
@@ -2430,7 +2448,7 @@ const ClientVersionsPage: React.FC = () => {
         </Box>
       </Drawer>
 
-      {/* 클라이언트 버전 추가/편집 Form */}
+      {/* Client Version Add/Edit Form */}
       <ClientVersionForm
         open={formDialogOpen}
         requiresApproval={requiresApproval}
@@ -2440,8 +2458,8 @@ const ClientVersionsPage: React.FC = () => {
           setIsCopyMode(false);
         }}
         onSuccess={() => {
-          mutateVersions(); // SWR cache 갱신
-          mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
+          mutateVersions(); // Refresh SWR cache
+          mutateClientVersions(projectApiPath); // Refresh all client versions cache
           setFormDialogOpen(false);
           setEditingClientVersion(null);
           setIsCopyMode(false);
@@ -2450,7 +2468,7 @@ const ClientVersionsPage: React.FC = () => {
         isCopyMode={isCopyMode}
       />
 
-      {/* 클라이언트 버전 간편 추가 Form */}
+      {/* Bulk Client Version Add Form */}
       <BulkClientVersionForm
         open={bulkFormDialogOpen}
         requiresApproval={requiresApproval}
@@ -2458,19 +2476,19 @@ const ClientVersionsPage: React.FC = () => {
           setBulkFormDialogOpen(false);
         }}
         onSuccess={() => {
-          mutateVersions(); // SWR cache 갱신
-          mutateClientVersions(projectApiPath); // 모든 client versions Cache 갱신
+          mutateVersions(); // Refresh SWR cache
+          mutateClientVersions(projectApiPath); // Refresh all client versions cache
           setBulkFormDialogOpen(false);
         }}
       />
 
-      {/* 플랫Form Set default values Dialog */}
+      {/* Platform Defaults Dialog */}
       <PlatformDefaultsDialog
         open={platformDefaultsDialogOpen}
         onClose={() => setPlatformDefaultsDialogOpen(false)}
       />
 
-      {/* 일괄 Delete Confirm Dialog */}
+      {/* Bulk Delete Confirm Dialog */}
       <Dialog
         open={bulkDeleteDialogOpen}
         onClose={() => setBulkDeleteDialogOpen(false)}
@@ -2561,7 +2579,7 @@ const ClientVersionsPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* 태그 관리 Drawer */}
+      {/* Tag Management Drawer */}
       <Drawer
         anchor="right"
         open={tagDialogOpen}
@@ -2771,11 +2789,22 @@ const ClientVersionsPage: React.FC = () => {
                 clientVersion: item.clientVersion || item.version || '',
                 clientStatus: item.clientStatus || 'ONLINE',
                 gameServerAddress: item.gameServerAddress || '',
+                gameServerAddressForWhiteList:
+                  item.gameServerAddressForWhiteList ||
+                  item['Game Server (Whitelist)'] ||
+                  '',
                 patchAddress: item.patchAddress || '',
+                patchAddressForWhiteList:
+                  item.patchAddressForWhiteList ||
+                  item['Patch Address (Whitelist)'] ||
+                  '',
                 guestModeAllowed:
                   item.guestModeAllowed !== undefined
                     ? Boolean(item.guestModeAllowed)
                     : false,
+                externalClickLink: item.externalClickLink || '',
+                memo: item.memo || item.Memo || '',
+                customPayload: item.customPayload || item['Custom Payload'] || '',
               });
               successCount++;
             } catch (err) {
