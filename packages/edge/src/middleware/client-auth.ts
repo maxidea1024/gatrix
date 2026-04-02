@@ -18,6 +18,7 @@ const LEGACY_TOKENS: Record<string, boolean> = {
   'unsecured-client-api-token': true,
   'unsecured-server-api-token': true,
   'unsecured-edge-api-token': true,
+  'unsecured-universal-client-api-token': true,
 };
 const LEGACY_ENV_NAME = 'development';
 
@@ -25,10 +26,12 @@ const LEGACY_ENV_NAME = 'development';
 export const UNSECURED_CLIENT_TOKEN = 'unsecured-client-api-token';
 export const UNSECURED_SERVER_TOKEN = 'unsecured-server-api-token';
 export const UNSECURED_EDGE_TOKEN = 'unsecured-edge-api-token';
+export const UNSECURED_UNIVERSAL_CLIENT_TOKEN = 'unsecured-universal-client-api-token';
 export const UNSECURED_TOKENS = [
   UNSECURED_CLIENT_TOKEN,
   UNSECURED_SERVER_TOKEN,
   UNSECURED_EDGE_TOKEN,
+  UNSECURED_UNIVERSAL_CLIENT_TOKEN,
 ];
 
 export interface ClientRequest extends Request {
@@ -265,8 +268,8 @@ export async function clientAuth(
     return;
   }
 
-  // Record token usage for tracking (skip unsecured tokens with id=0)
-  if (validation.token?.id && validation.token.id > 0) {
+  // Record token usage for tracking (skip unsecured tokens with empty id)
+  if (validation.token?.id) {
     tokenUsageTracker.recordUsage(validation.token.id);
   }
 

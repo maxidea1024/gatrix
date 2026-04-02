@@ -46,6 +46,11 @@ const READY_LEGACY_TOKENS: Record<
     projectId: 'default',
     envId: 'development',
   },
+  'unsecured-universal-client-api-token': {
+    orgId: 'default',
+    projectId: 'default',
+    envId: 'development',
+  },
 };
 
 // Readiness check endpoint

@@ -104,7 +104,7 @@ import SimplePagination from '@/components/common/SimplePagination';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
-import { formatRelativeTime } from '@/utils/dateFormat';
+import { formatRelativeTime, formatDateTimeUI } from '@/utils/dateFormat';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -940,26 +940,36 @@ const ApiTokensPage: React.FC = () => {
           </Typography>
         );
       case 'lastUsedAt':
-        return (
-          <Typography variant="body2">
-            {token.lastUsedAt
-              ? formatRelativeTime(token.lastUsedAt)
-              : t('apiTokens.neverUsed')}
+        return token.lastUsedAt ? (
+          <Tooltip title={formatDateTimeUI(token.lastUsedAt)} arrow>
+            <Typography variant="body2">
+              {formatRelativeTime(token.lastUsedAt)}
+            </Typography>
+          </Tooltip>
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            {t('apiTokens.neverUsed')}
           </Typography>
         );
       case 'expiresAt':
-        return (
-          <Typography variant="body2">
-            {token.expiresAt
-              ? formatRelativeTime(token.expiresAt)
-              : t('apiTokens.noExpiration')}
+        return token.expiresAt ? (
+          <Tooltip title={formatDateTimeUI(token.expiresAt)} arrow>
+            <Typography variant="body2">
+              {formatRelativeTime(token.expiresAt)}
+            </Typography>
+          </Tooltip>
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            {t('apiTokens.noExpiration')}
           </Typography>
         );
       case 'createdAt':
         return (
-          <Typography variant="body2">
-            {formatRelativeTime(token.createdAt)}
-          </Typography>
+          <Tooltip title={formatDateTimeUI(token.createdAt)} arrow>
+            <Typography variant="body2">
+              {formatRelativeTime(token.createdAt)}
+            </Typography>
+          </Tooltip>
         );
       default:
         return null;

@@ -99,6 +99,7 @@ async function main(): Promise<void> {
           'unsecured-client-api-token': true,
           'unsecured-server-api-token': true,
           'unsecured-edge-api-token': true,
+          'unsecured-universal-client-api-token': true,
         };
 
         const unsecuredMatch = apiToken.match(UNSECURED_TOKEN_REGEX);

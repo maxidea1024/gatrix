@@ -776,7 +776,12 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                         >
                           <Typography
                             variant="body2"
-                            sx={{ fontFamily: 'monospace' }}
+                            sx={{
+                              fontFamily: 'monospace',
+                              cursor: 'pointer',
+                              '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                            }}
+                            onClick={() => handleOpenEditDialog(env)}
                           >
                             {env.environmentName}
                           </Typography>
@@ -821,7 +826,16 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                               }}
                             />
                           )}
-                          {env.displayName}
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              cursor: 'pointer',
+                              '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                            }}
+                            onClick={() => handleOpenEditDialog(env)}
+                          >
+                            {env.displayName}
+                          </Typography>
                         </Box>
                       </TableCell>
                       <TableCell>

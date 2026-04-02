@@ -62,6 +62,7 @@ const SystemSettingsPage: React.FC = () => {
 
   // Network settings
   const [admindUrl, setAdmindUrl] = useState('');
+  const [savedAdmindUrl, setSavedAdmindUrl] = useState('');
 
   // AI Chat settings
   const [aiSettings, setAiSettings] = useState<{
@@ -109,6 +110,7 @@ const SystemSettingsPage: React.FC = () => {
           varsService.get(projectApiPath, 'admindUrl'),
         ]);
         setAdmindUrl(admind || '');
+        setSavedAdmindUrl(admind || '');
       } catch (e) {
         // ignore load errors
       }
@@ -226,12 +228,15 @@ const SystemSettingsPage: React.FC = () => {
                   <Stack direction="row" spacing={1}>
                     <Button
                       variant="contained"
+                      disabled={admindUrl === savedAdmindUrl}
                       onClick={async () => {
                         await varsService.set(
                           projectApiPath,
                           'admindUrl',
                           admindUrl || null
                         );
+                        setSavedAdmindUrl(admindUrl);
+                        enqueueSnackbar(t('common.saved'), { variant: 'success' });
                       }}
                     >
                       {t('common.update')}

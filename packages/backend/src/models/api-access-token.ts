@@ -134,10 +134,10 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
    * Token type → prefix mapping for fast O(1) identification
    */
   static readonly TOKEN_PREFIXES: Record<TokenType, string> = {
-    client: 'gxc_',
-    server: 'gxs_',
-    edge: 'gxe_',
-    universal_client: 'gxuc_',
+    client: 'gtx_cli_',
+    server: 'gtx_srv_',
+    edge: 'gtx_edge_',
+    universal_client: 'gtx_uc_',
   };
 
   /**
@@ -145,7 +145,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
    * Prefix enables fast O(1) token type identification in middleware
    */
   static generateToken(tokenType?: TokenType): string {
-    const prefix = tokenType ? this.TOKEN_PREFIXES[tokenType] : 'gxs_';
+    const prefix = tokenType ? this.TOKEN_PREFIXES[tokenType] : 'gtx_srv_';
     const randomBytes = crypto.randomBytes(32).toString('hex');
     return `${prefix}${randomBytes}`;
   }
@@ -179,7 +179,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     environmentId?: string;
     projectId?: string;
   }): Promise<{ token: ApiAccessToken; plainToken: string }> {
-    // Generate token (universal_client tokens get 'gxuc_' prefix)
+    // Generate token (universal_client tokens get 'gtx_uc_' prefix)
     const plainToken = this.generateToken(data.tokenType);
 
     // Create token record (store plain token instead of hash)

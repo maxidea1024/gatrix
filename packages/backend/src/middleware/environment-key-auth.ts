@@ -32,6 +32,7 @@ const UNSECURED_TOKENS = {
   CLIENT: 'unsecured-client-api-token',
   SERVER: 'unsecured-server-api-token',
   EDGE: 'unsecured-edge-api-token',
+  UNIVERSAL_CLIENT: 'unsecured-universal-client-api-token',
 } as const;
 
 export const EDGE_BYPASS_TOKEN =
@@ -148,7 +149,7 @@ export const authenticateEnvironmentKey = async (
       gtx_cli_: 'client',
       gtx_srv_: 'server',
       gtx_edge_: 'client', // edge tokens are treated as client for env key auth
-      gxuc_: 'client', // universal client tokens are treated as client scope
+      gtx_uc_: 'client', // universal client tokens are treated as client scope
     };
     let detectedKeyType: KeyType | undefined;
     for (const [prefix, keyType] of Object.entries(PREFIX_TYPE_MAP)) {

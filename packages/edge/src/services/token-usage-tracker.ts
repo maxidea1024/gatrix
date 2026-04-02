@@ -14,7 +14,7 @@ interface TokenUsageStats {
  * Periodically reports usage statistics to backend for aggregation
  */
 class TokenUsageTracker {
-  private usageMap: Map<number, TokenUsageStats> = new Map(); // tokenId (number) -> stats
+  private usageMap: Map<string, TokenUsageStats> = new Map(); // tokenId (ULID string) -> stats
   private reportIntervalMs: number;
   private reportTimer: NodeJS.Timeout | null = null;
   private initialized = false;
@@ -82,7 +82,7 @@ class TokenUsageTracker {
    * Called when a token is successfully validated and used
    * @param tokenId - The numeric token ID from the database
    */
-  recordUsage(tokenId: number): void {
+  recordUsage(tokenId: string): void {
     const existing = this.usageMap.get(tokenId);
     const now = new Date();
 
@@ -95,6 +95,7 @@ class TokenUsageTracker {
         lastUsedAt: now,
       });
     }
+    logger.debug('Recorded token usage', { tokenId, mapSize: this.usageMap.size });
   }
 
   /**
@@ -108,7 +109,7 @@ class TokenUsageTracker {
 
     // Collect and clear usage data atomically
     const usageData: Array<{
-      tokenId: number;
+      tokenId: string;
       usageCount: number;
       lastUsedAt: string;
     }> = [];
@@ -126,8 +127,15 @@ class TokenUsageTracker {
     this.usageMap.clear();
 
     try {
+      const reportUrl = `${config.gatrixUrl}/api/v1/server/internal/token-usage-report`;
+      logger.info('Reporting usage to backend', {
+        url: reportUrl,
+        tokenCount: usageData.length,
+        usageData,
+      });
+
       const response = await axios.post(
-        `${config.gatrixUrl}/api/v1/server/internal/token-usage-report`,
+        reportUrl,
         {
           edgeInstanceId: this.edgeInstanceId,
           usageData,
@@ -146,6 +154,7 @@ class TokenUsageTracker {
         logger.info('Usage reported successfully', {
           tokenCount: usageData.length,
           totalUsage: usageData.reduce((sum, d) => sum + d.usageCount, 0),
+          response: response.data,
         });
       } else {
         throw new Error(response.data?.message || 'Unknown error');

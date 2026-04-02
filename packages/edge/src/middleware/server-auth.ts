@@ -12,6 +12,7 @@ const LEGACY_TOKENS: Record<string, boolean> = {
   'unsecured-client-api-token': true,
   'unsecured-server-api-token': true,
   'unsecured-edge-api-token': true,
+  'unsecured-universal-client-api-token': true,
 };
 const LEGACY_ENV_NAME = 'development';
 

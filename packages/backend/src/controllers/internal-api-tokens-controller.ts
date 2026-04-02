@@ -167,21 +167,27 @@ class InternalApiTokensController {
         reportedAt,
       });
 
-      // Process each token's usage
+      // Process each token's usage — direct DB update (no Redis pipeline needed for batch reports)
       let processedCount = 0;
       for (const usage of usageData) {
-        const { tokenId, usageCount } = usage;
+        const { tokenId, usageCount, lastUsedAt } = usage;
 
-        if (!tokenId || typeof usageCount !== 'number') {
+        if (!tokenId || typeof usageCount !== 'number' || usageCount <= 0) {
           logger.warn('Invalid usage entry:', usage);
           continue;
         }
 
         try {
-          // Record usage for each count (batch recording)
-          for (let i = 0; i < usageCount; i++) {
-            await apiTokenUsageService.recordTokenUsage(tokenId);
-          }
+          const formatForMySQL = (d: Date) =>
+            d.toISOString().slice(0, 19).replace('T', ' ');
+          const lastUsedAtFormatted = lastUsedAt
+            ? formatForMySQL(new Date(lastUsedAt))
+            : formatForMySQL(new Date());
+
+          await knex.raw(
+            `UPDATE g_api_access_tokens SET usageCount = usageCount + ?, lastUsedAt = ?, updatedAt = ? WHERE id = ?`,
+            [usageCount, lastUsedAtFormatted, lastUsedAtFormatted, tokenId]
+          );
           processedCount++;
         } catch (error) {
           logger.error(`Failed to record usage for token ${tokenId}:`, error);

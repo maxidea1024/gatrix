@@ -443,6 +443,7 @@ const startServer = async () => {
           'unsecured-client-api-token',
           'unsecured-server-api-token',
           'unsecured-edge-api-token',
+          'unsecured-universal-client-api-token',
         ];
 
         const unsecuredMatch = apiToken.match(UNSECURED_TOKEN_REGEX);

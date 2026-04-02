@@ -83,13 +83,26 @@ export class ApiTokenUsageService {
   }
 
   /**
-   * Record token usage (atomic increment in Redis)
+   * Record token usage.
+   * Uses Redis buffering when the sync pipeline is healthy (isInitialized + Redis ready).
+   * Falls back to direct atomic DB increment otherwise.
    */
   async recordTokenUsage(tokenId: string): Promise<void> {
-    try {
-      const client = redisClient.getClient();
-      if (!client) return;
+    const client = redisClient.getClient();
+    const redisReady = client && client.status === 'ready';
 
+    // If BullMQ sync job isn't running or Redis isn't connected,
+    // the Redis→DB pipeline won't flush — go straight to DB.
+    if (!this.isInitialized || !redisReady) {
+      try {
+        await this.recordTokenUsageDirectly(tokenId);
+      } catch {
+        // Usage tracking failure should never impact API requests
+      }
+      return;
+    }
+
+    try {
       const instanceId = getInstanceId();
       const countKey = `token_usage:count:${tokenId}:${instanceId}`;
       const metaKey = `token_usage:meta:${tokenId}:${instanceId}`;
@@ -98,8 +111,7 @@ export class ApiTokenUsageService {
       // Atomic increment
       await client.incr(countKey);
 
-      // Update metadata (fire and forget)
-      // We set TTL to 2x sync interval to prevent garbage accumulation if sync fails repeatedly
+      // Update metadata
       const ttlSeconds = Math.ceil((this.syncIntervalMs * 2) / 1000);
 
       await client.set(
@@ -114,9 +126,28 @@ export class ApiTokenUsageService {
 
       // Ensure count key also has TTL (refresh on every usage)
       await client.expire(countKey, ttlSeconds);
-    } catch (error) {
-      logger.error('Failed to record token usage in cache:', error);
+    } catch {
+      // Redis operation failed — silent fallback to direct DB
+      try {
+        await this.recordTokenUsageDirectly(tokenId);
+      } catch {
+        // Usage tracking failure should never impact API requests
+      }
     }
+  }
+
+  /**
+   * Direct DB fallback for usage tracking (no Redis dependency).
+   * Uses atomic SQL increment to avoid race conditions.
+   */
+  private async recordTokenUsageDirectly(tokenId: string): Promise<void> {
+    const formatForMySQL = (date: Date) =>
+      date.toISOString().slice(0, 19).replace('T', ' ');
+    const now = formatForMySQL(new Date());
+    await ApiAccessToken.knex().raw(
+      `UPDATE g_api_access_tokens SET usageCount = usageCount + 1, lastUsedAt = ?, updatedAt = ? WHERE id = ?`,
+      [now, now, tokenId]
+    );
   }
 
   /**

@@ -109,9 +109,9 @@ function updateCacheSizeMetrics(): void {
   const countWhitelistItems = (
     data:
       | Record<
-          string,
-          { ipWhitelist?: unknown[]; accountWhitelist?: unknown[] }
-        >
+        string,
+        { ipWhitelist?: unknown[]; accountWhitelist?: unknown[] }
+      >
       | undefined
   ): number => {
     if (!data || typeof data !== 'object') return 0;
@@ -143,13 +143,13 @@ function updateCacheSizeMetrics(): void {
     ?.labels('total')
     .set(
       versionsCount +
-        bannersCount +
-        noticesCount +
-        worldsCount +
-        surveysCount +
-        popupNoticesCount +
-        storeProductsCount +
-        whitelistsCount
+      bannersCount +
+      noticesCount +
+      worldsCount +
+      surveysCount +
+      popupNoticesCount +
+      storeProductsCount +
+      whitelistsCount
     );
 }
 
@@ -344,11 +344,11 @@ router.get(
                 );
                 if (subChannelData && subChannelData.appUpdateUrl) {
                   (meta as any).appUpdateUrl = subChannelData.appUpdateUrl;
-                  logger.info('appUpdateUrl successfully merged', {
-                    channel,
-                    subChannel,
-                    url: subChannelData.appUpdateUrl,
-                  });
+                  // logger.info('appUpdateUrl successfully merged', {
+                  //   channel,
+                  //   subChannel,
+                  //   url: subChannelData.appUpdateUrl,
+                  // });
                 } else {
                   logger.warn(
                     'subChannelData not found or appUpdateUrl missing',
@@ -480,8 +480,8 @@ router.get(
         patchAddress,
         guestModeAllowed:
           effectiveStatus === 'MAINTENANCE' ||
-          effectiveStatus === 'FORCED_UPDATE' ||
-          effectiveStatus === 'PATCH_UPDATE_REQUIRED'
+            effectiveStatus === 'FORCED_UPDATE' ||
+            effectiveStatus === 'PATCH_UPDATE_REQUIRED'
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,

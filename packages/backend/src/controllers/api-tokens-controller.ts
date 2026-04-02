@@ -183,7 +183,7 @@ class ApiTokensController {
         client: 'gtx_cli',
         server: 'gtx_srv',
         edge: 'gtx_edge',
-        project: 'gtx_proj',
+        universal_client: 'gtx_uc',
       };
       const prefix = TOKEN_PREFIXES[tokenType] || 'gtx';
       const tokenValue = `${prefix}_${crypto.randomBytes(32).toString('hex')}`;
@@ -224,7 +224,7 @@ class ApiTokensController {
               timestamp: Date.now(),
             },
           },
-          { environmentId: environmentId || null }
+          { projectId: projectId || undefined, environmentId: environmentId || undefined }
         );
       } catch (eventError) {
         logger.warn('Failed to publish api_token.created event', {
@@ -364,7 +364,7 @@ class ApiTokensController {
               timestamp: Date.now(),
             },
           },
-          { environmentId: updatedToken.environmentId || null }
+          { projectId: updatedToken.projectId || undefined, environmentId: updatedToken.environmentId || undefined }
         );
       } catch (eventError) {
         logger.warn('Failed to publish api_token.updated event', {
@@ -421,7 +421,7 @@ class ApiTokensController {
         client: 'gtx_cli',
         server: 'gtx_srv',
         edge: 'gtx_edge',
-        project: 'gtx_proj',
+        universal_client: 'gtx_uc',
       };
       const prefix = TOKEN_PREFIXES[existingToken.tokenType] || 'gtx';
       const tokenValue = `${prefix}_${crypto.randomBytes(32).toString('hex')}`;
@@ -456,7 +456,7 @@ class ApiTokensController {
               timestamp: Date.now(),
             },
           },
-          { environmentId: existingToken.environmentId || undefined }
+          { projectId: existingToken.projectId || undefined, environmentId: existingToken.environmentId || undefined }
         );
       } catch (eventError) {
         logger.warn(
@@ -528,7 +528,7 @@ class ApiTokensController {
               timestamp: Date.now(),
             },
           },
-          { environmentId: existingToken.environmentId || undefined }
+          { projectId: existingToken.projectId || undefined, environmentId: existingToken.environmentId || undefined }
         );
       } catch (eventError) {
         logger.warn('Failed to publish api_token.deleted event', {

@@ -29,6 +29,7 @@ const INFRA_ENV = 'default';
 const LEGACY_CLIENT_TOKEN = 'unsecured-client-api-token';
 const LEGACY_SERVER_TOKEN = 'unsecured-server-api-token';
 const LEGACY_EDGE_TOKEN = 'unsecured-edge-api-token';
+const LEGACY_UNIVERSAL_CLIENT_TOKEN = 'unsecured-universal-client-api-token';
 const LEGACY_ORG = 'default';
 const LEGACY_PROJECT = 'default';
 const LEGACY_ENV = 'development';
@@ -117,6 +118,11 @@ function handleSpecialTokens(token: string): {
       id: 'legacy-unsecured-edge',
       tokenType: 'server',
       tokenName: 'Legacy Unsecured Edge Token',
+    },
+    [LEGACY_UNIVERSAL_CLIENT_TOKEN]: {
+      id: 'legacy-unsecured-universal-client',
+      tokenType: 'universal_client',
+      tokenName: 'Legacy Unsecured Universal Client Token',
     },
   };
   const legacyEntry = LEGACY_TOKENS[token];
@@ -382,7 +388,7 @@ export const validateApplicationName = (
 
 /**
  * Resolves environment from token (token determines everything).
- * For universal client tokens (gxuc_ prefix), dynamically resolves environment from x-client-version header.
+ * For universal client tokens (gtx_uc_ prefix), dynamically resolves environment from x-client-version header.
  * No fallback: environment MUST come from the token or dynamic resolution.
  */
 export const setSDKEnvironment = async (

@@ -11,7 +11,7 @@ const logger = createLogger('TokenMirror');
  * Note: id is number to match backend database ID for usage tracking
  */
 export interface MirroredToken {
-  id: number;
+  id: string;
   tokenName: string;
   tokenValue: string;
   tokenType: 'client' | 'server' | 'edge' | 'universal_client';
@@ -38,7 +38,7 @@ export interface TokenValidationResult {
  */
 class TokenMirrorService {
   private tokens: Map<string, MirroredToken> = new Map(); // tokenValue -> token
-  private tokenById: Map<number, MirroredToken> = new Map(); // id -> token
+  private tokenById: Map<string, MirroredToken> = new Map(); // id -> token
   private subscriber: Redis | null = null;
   private initialized = false;
   private readonly CHANNEL_PREFIX = 'gatrix-sdk-events';
@@ -237,7 +237,7 @@ class TokenMirrorService {
     ) {
       logger.debug('Unsecured token used for testing');
       const unsecuredToken: MirroredToken = {
-        id: 0, // 0 indicates unsecured token, usage tracking will be skipped
+        id: '', // empty string indicates unsecured token, usage tracking will be skipped
         tokenName: 'Unsecured Token (Testing)',
         tokenValue,
         tokenType: 'server',
@@ -256,7 +256,7 @@ class TokenMirrorService {
       gtx_cli_: 'client',
       gtx_srv_: 'server',
       gtx_edge_: 'edge',
-      gxuc_: 'universal_client',
+      gtx_uc_: 'universal_client',
     };
     for (const [prefix, type] of Object.entries(PREFIX_TYPE_MAP)) {
       if (tokenValue.startsWith(prefix)) {
@@ -313,7 +313,7 @@ class TokenMirrorService {
   /**
    * Get token by ID
    */
-  getTokenById(id: number): MirroredToken | undefined {
+  getTokenById(id: string): MirroredToken | undefined {
     return this.tokenById.get(id);
   }
 
