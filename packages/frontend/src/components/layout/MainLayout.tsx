@@ -223,7 +223,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
   });
 
-  const sidebarWidth = 260; // Fixed width
+  const sidebarWidth = 270; // Fixed width
   const [avatarImageError, setAvatarImageError] = useState(false);
 
   const location = useLocation();
@@ -1252,11 +1252,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         transition: 'background-color 0.2s ease',
         '&:hover': sidebarCollapsed
           ? {
-              backgroundColor:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.08)'
-                  : 'rgba(0, 0, 0, 0.05)',
-            }
+            backgroundColor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.08)'
+                : 'rgba(0, 0, 0, 0.05)',
+          }
           : {},
       }}
       onClick={(e) => {
@@ -1406,21 +1406,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {getFilteredMenuCategories().map((category) => {
             const categoryKey = `category-${category.id}`;
             const isExpanded = expandedSubmenus[categoryKey];
-            
+
             const toggleCategory = () => {
               if (sidebarCollapsed) {
                 handleSidebarToggle();
                 if (!isExpanded) {
                   setExpandedSubmenus(prev => {
                     const newState = { ...prev, [categoryKey]: true };
-                    try { localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState)); } catch (e) {}
+                    try { localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState)); } catch (e) { }
                     return newState;
                   });
                 }
               } else {
                 setExpandedSubmenus(prev => {
                   const newState = { ...prev, [categoryKey]: !prev[categoryKey] };
-                  try { localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState)); } catch (e) {}
+                  try { localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState)); } catch (e) { }
                   return newState;
                 });
               }
@@ -1994,7 +1994,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                           {maintenanceStatus.detail?.message
                             ? maintenanceStatus.detail.message
                             : maintenanceStatus.detail?.startsAt &&
-                                maintenanceStatus.detail?.endsAt
+                              maintenanceStatus.detail?.endsAt
                               ? `${formatDateTimeDetailed(maintenanceStatus.detail.startsAt)} → ${formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}`
                               : t('maintenance.clickToManageTooltip')}
                         </Typography>
