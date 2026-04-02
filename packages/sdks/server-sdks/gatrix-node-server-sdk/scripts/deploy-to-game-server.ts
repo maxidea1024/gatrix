@@ -303,12 +303,8 @@ async function main() {
       }
     }
   } else {
-    console.warn(
-      `   ⚠ CMS source directory not found: ${cmsSourceDir}`
-    );
-    console.warn(
-      '     Planning data tools were NOT copied.'
-    );
+    console.warn(`   ⚠ CMS source directory not found: ${cmsSourceDir}`);
+    console.warn('     Planning data tools were NOT copied.');
   }
 
   // 11. Skip auto-install, let user run manually
