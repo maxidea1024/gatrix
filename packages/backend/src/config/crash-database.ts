@@ -4,9 +4,41 @@ import logger from './logger';
 
 export class CrashDatabase {
   private static instance: CrashDatabase;
-  private pool: mysql.Pool;
+  private pool!: mysql.Pool;
 
   private constructor() {
+    // Pool is created after ensureDatabase() is called
+  }
+
+  /**
+   * Ensure the crash database exists, creating it if necessary.
+   * Connects without a specific database to run CREATE DATABASE IF NOT EXISTS.
+   */
+  public static async ensureDatabase(): Promise<void> {
+    const { host, port, user, password, name } = config.crashDatabase;
+    let conn: mysql.Connection | undefined;
+    try {
+      conn = await mysql.createConnection({ host, port, user, password });
+      await conn.execute(
+        `CREATE DATABASE IF NOT EXISTS \`${name}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+      );
+      logger.info(`Crash database '${name}' ensured`);
+    } catch (error: any) {
+      // If user doesn't have CREATE privilege, try to grant it or just warn
+      if (error.code === 'ER_DBACCESS_DENIED_ERROR' || error.errno === 1044) {
+        logger.warn(
+          `Cannot create crash database '${name}' - insufficient privileges. ` +
+          `Please create it manually: CREATE DATABASE IF NOT EXISTS \`${name}\``
+        );
+      } else {
+        logger.warn(`Failed to ensure crash database '${name}':`, error);
+      }
+    } finally {
+      if (conn) await conn.end();
+    }
+  }
+
+  private initPool() {
     this.pool = mysql.createPool({
       host: config.crashDatabase.host,
       port: config.crashDatabase.port,
@@ -25,6 +57,7 @@ export class CrashDatabase {
   public static getInstance(): CrashDatabase {
     if (!CrashDatabase.instance) {
       CrashDatabase.instance = new CrashDatabase();
+      CrashDatabase.instance.initPool();
     }
     return CrashDatabase.instance;
   }

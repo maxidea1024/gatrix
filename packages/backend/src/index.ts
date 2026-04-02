@@ -231,6 +231,9 @@ const startServer = async () => {
       logger.warn('Auto-seed failed, continuing:', error);
     }
 
+    // Note: Crash tables are merged into the main database.
+    // Crash migrations (046-048) run via the main migration runner above.
+
     // Check and configure database timezone
     try {
       await setDatabaseTimezoneToUTC();
