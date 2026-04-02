@@ -1,10 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import {
-  Box,
-  Tabs,
-  Tab,
-  CircularProgress,
-} from '@mui/material';
+import { Box, Tabs, Tab, CircularProgress } from '@mui/material';
 import {
   Business as OrgIcon,
   Folder as ProjectIcon,
@@ -84,10 +79,13 @@ const WorkspaceTabbedPage: React.FC = () => {
     const tab = searchParams.get('tab');
     if (tab === 'organisations' || tab === null) {
       // Only sync if not already on the target tab to avoid unnecessary re-renders
-      if (tab === 'organisations' && activeTab !== TAB_ORGS) setActiveTab(TAB_ORGS);
+      if (tab === 'organisations' && activeTab !== TAB_ORGS)
+        setActiveTab(TAB_ORGS);
     }
-    if (tab === 'projects' && activeTab !== TAB_PROJECTS) setActiveTab(TAB_PROJECTS);
-    if (tab === 'environments' && activeTab !== TAB_ENVIRONMENTS) setActiveTab(TAB_ENVIRONMENTS);
+    if (tab === 'projects' && activeTab !== TAB_PROJECTS)
+      setActiveTab(TAB_PROJECTS);
+    if (tab === 'environments' && activeTab !== TAB_ENVIRONMENTS)
+      setActiveTab(TAB_ENVIRONMENTS);
   }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleTabChange = useCallback(

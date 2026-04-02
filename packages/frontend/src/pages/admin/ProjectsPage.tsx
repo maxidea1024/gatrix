@@ -455,14 +455,23 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
         </>
       )}
       {embedded && (
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 2,
+          }}
+        >
           {effectiveOrg && (
             <Typography
               variant="body2"
               color="text.secondary"
               sx={{
                 cursor: onNavigateToOrgs ? 'pointer' : 'default',
-                '&:hover': onNavigateToOrgs ? { color: 'primary.main', textDecoration: 'underline' } : {},
+                '&:hover': onNavigateToOrgs
+                  ? { color: 'primary.main', textDecoration: 'underline' }
+                  : {},
               }}
               onClick={onNavigateToOrgs}
             >
@@ -475,7 +484,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
               startIcon={<AddIcon />}
               onClick={handleCreate}
             >
-            {t('rbac.projects.create')}
+              {t('rbac.projects.create')}
             </Button>
           </Box>
         </Box>
@@ -550,133 +559,133 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
                   <MoreVertIcon fontSize="small" />
                 </IconButton>
 
-                  <CardContent sx={{ p: 3 }}>
-                    {/* Header */}
+                <CardContent sx={{ p: 3 }}>
+                  {/* Header */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 1.5,
+                      mb: 2,
+                      pr: 4,
+                    }}
+                  >
                     <Box
                       sx={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: 1.5,
-                        mb: 2,
-                        pr: 4,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 2,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          bgcolor: 'info.main',
-                          color: 'info.contrastText',
-                          flexShrink: 0,
-                        }}
-                      >
-                        <ProjectIcon fontSize="small" />
-                      </Box>
-                      <Box sx={{ minWidth: 0, flex: 1 }}>
-                        <Typography
-                          variant="subtitle1"
-                          fontWeight={600}
-                          noWrap
-                          title={proj.displayName || proj.projectName}
-                        >
-                          {proj.displayName || proj.projectName}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          noWrap
-                          sx={{ display: 'block' }}
-                          title={proj.projectName}
-                        >
-                          {proj.projectName}
-                        </Typography>
-                      </Box>
-                    </Box>
-
-                    {/* Chips */}
-                    <Box
-                      sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}
-                    >
-                      <Chip
-                        label={
-                          proj.isActive
-                            ? t('common.active')
-                            : t('common.inactive')
-                        }
-                        size="small"
-                        color={proj.isActive ? 'success' : 'default'}
-                        variant="outlined"
-                      />
-                      {proj.isDefault && (
-                        <Chip
-                          label={t('rbac.projects.default')}
-                          size="small"
-                          color="primary"
-                          variant="outlined"
-                        />
-                      )}
-                    </Box>
-
-                    {/* Description */}
-                    {proj.description && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{
-                          mb: 2,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          lineHeight: 1.6,
-                        }}
-                      >
-                        {proj.description}
-                      </Typography>
-                    )}
-
-                    {/* Footer info */}
-                    <Box
-                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 2,
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 2,
-                        pt: 2,
-                        borderTop: '1px solid',
-                        borderColor: 'divider',
+                        justifyContent: 'center',
+                        bgcolor: 'info.main',
+                        color: 'info.contrastText',
+                        flexShrink: 0,
                       }}
                     >
-                      <Box
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                      >
-                        <PeopleIcon
-                          sx={{ fontSize: 16, color: 'text.secondary' }}
-                        />
-                        <Typography variant="caption" color="text.secondary">
-                          {proj.memberCount ?? 0}
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                      >
-                        <CalendarTodayIcon
-                          sx={{ fontSize: 16, color: 'text.secondary' }}
-                        />
-                        <Tooltip
-                          title={formatDateTimeDetailed(proj.createdAt)}
-                          arrow
-                        >
-                          <Typography variant="caption" color="text.secondary">
-                            {formatRelativeTime(proj.createdAt)}
-                          </Typography>
-                        </Tooltip>
-                      </Box>
+                      <ProjectIcon fontSize="small" />
                     </Box>
-                  </CardContent>
+                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight={600}
+                        noWrap
+                        title={proj.displayName || proj.projectName}
+                      >
+                        {proj.displayName || proj.projectName}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        noWrap
+                        sx={{ display: 'block' }}
+                        title={proj.projectName}
+                      >
+                        {proj.projectName}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* Chips */}
+                  <Box
+                    sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}
+                  >
+                    <Chip
+                      label={
+                        proj.isActive
+                          ? t('common.active')
+                          : t('common.inactive')
+                      }
+                      size="small"
+                      color={proj.isActive ? 'success' : 'default'}
+                      variant="outlined"
+                    />
+                    {proj.isDefault && (
+                      <Chip
+                        label={t('rbac.projects.default')}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                      />
+                    )}
+                  </Box>
+
+                  {/* Description */}
+                  {proj.description && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        mb: 2,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {proj.description}
+                    </Typography>
+                  )}
+
+                  {/* Footer info */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      pt: 2,
+                      borderTop: '1px solid',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <PeopleIcon
+                        sx={{ fontSize: 16, color: 'text.secondary' }}
+                      />
+                      <Typography variant="caption" color="text.secondary">
+                        {proj.memberCount ?? 0}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <CalendarTodayIcon
+                        sx={{ fontSize: 16, color: 'text.secondary' }}
+                      />
+                      <Tooltip
+                        title={formatDateTimeDetailed(proj.createdAt)}
+                        arrow
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          {formatRelativeTime(proj.createdAt)}
+                        </Typography>
+                      </Tooltip>
+                    </Box>
+                  </Box>
+                </CardContent>
 
                 {/* Expandable environment list */}
                 <Box

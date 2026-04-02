@@ -199,8 +199,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     null
   );
 
-
-
   // Expanded submenu items state
   const [expandedSubmenus, setExpandedSubmenus] = useState<{
     [key: string]: boolean;
@@ -377,7 +375,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           setExpandedSubmenus((prev) => {
             const newState = { ...prev, [categoryKey]: true };
             try {
-              localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState));
+              localStorage.setItem(
+                'sidebarExpandedSubmenus',
+                JSON.stringify(newState)
+              );
             } catch (error) {
               console.warn('Failed to save expanded submenus:', error);
             }
@@ -411,11 +412,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
 
     initialSyncDoneRef.current = true;
-  }, [
-    location.pathname,
-    getFilteredMenuCategories,
-    expandedSubmenus,
-  ]);
+  }, [location.pathname, getFilteredMenuCategories, expandedSubmenus]);
 
   // Mail notification state
   const [unreadMailCount, setUnreadMailCount] = useState(0);
@@ -1252,11 +1249,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         transition: 'background-color 0.2s ease',
         '&:hover': sidebarCollapsed
           ? {
-            backgroundColor:
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.08)'
-                : 'rgba(0, 0, 0, 0.05)',
-          }
+              backgroundColor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.08)'
+                  : 'rgba(0, 0, 0, 0.05)',
+            }
           : {},
       }}
       onClick={(e) => {
@@ -1411,25 +1408,40 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               if (sidebarCollapsed) {
                 handleSidebarToggle();
                 if (!isExpanded) {
-                  setExpandedSubmenus(prev => {
+                  setExpandedSubmenus((prev) => {
                     const newState = { ...prev, [categoryKey]: true };
-                    try { localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState)); } catch (e) { }
+                    try {
+                      localStorage.setItem(
+                        'sidebarExpandedSubmenus',
+                        JSON.stringify(newState)
+                      );
+                    } catch (e) {}
                     return newState;
                   });
                 }
               } else {
-                setExpandedSubmenus(prev => {
-                  const newState = { ...prev, [categoryKey]: !prev[categoryKey] };
-                  try { localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState)); } catch (e) { }
+                setExpandedSubmenus((prev) => {
+                  const newState = {
+                    ...prev,
+                    [categoryKey]: !prev[categoryKey],
+                  };
+                  try {
+                    localStorage.setItem(
+                      'sidebarExpandedSubmenus',
+                      JSON.stringify(newState)
+                    );
+                  } catch (e) {}
                   return newState;
                 });
               }
             };
 
-            const hasActiveChild = category.children.some(child => {
+            const hasActiveChild = category.children.some((child) => {
               if (child.path && isActivePath(child.path)) return true;
               if (child.children) {
-                return child.children.some(c => c.path && isActivePath(c.path));
+                return child.children.some(
+                  (c) => c.path && isActivePath(c.path)
+                );
               }
               return false;
             });
@@ -1438,9 +1450,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             const categoryButton = (
               <ListItemButton
                 key={category.id}
-                onClick={category.path ? () => navigate(category.path!) : toggleCategory}
+                onClick={
+                  category.path
+                    ? () => navigate(category.path!)
+                    : toggleCategory
+                }
                 sx={{
-                  color: hasActiveChild ? theme.palette.text.primary : theme.palette.text.secondary,
+                  color: hasActiveChild
+                    ? theme.palette.text.primary
+                    : theme.palette.text.secondary,
                   justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
                   px: sidebarCollapsed ? 0 : 2,
                   pl: sidebarCollapsed ? 0 : 2,
@@ -1448,7 +1466,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   py: 0.75,
                   my: 0.5,
                   '&:hover': {
-                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+                    backgroundColor:
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.1)'
+                        : 'rgba(0,0,0,0.08)',
                   },
                 }}
               >
@@ -1486,7 +1507,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         }}
                       />
                     )}
-                    {!category.path && (isExpanded ? <ExpandLess /> : <ExpandMore />)}
+                    {!category.path &&
+                      (isExpanded ? <ExpandLess /> : <ExpandMore />)}
                   </>
                 )}
               </ListItemButton>
@@ -1520,9 +1542,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     >
                       {category.children.map((item, index, items) => {
                         const prevItem = index > 0 ? items[index - 1] : null;
-                        const prevHasChildren = prevItem?.children && prevItem.children.length > 0;
-                        const currentHasChildren = item.children && item.children.length > 0;
-                        const showDivider = !currentHasChildren && prevHasChildren && sidebarCollapsed;
+                        const prevHasChildren =
+                          prevItem?.children && prevItem.children.length > 0;
+                        const currentHasChildren =
+                          item.children && item.children.length > 0;
+                        const showDivider =
+                          !currentHasChildren &&
+                          prevHasChildren &&
+                          sidebarCollapsed;
 
                         return (
                           <React.Fragment key={index}>
@@ -1994,7 +2021,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                           {maintenanceStatus.detail?.message
                             ? maintenanceStatus.detail.message
                             : maintenanceStatus.detail?.startsAt &&
-                              maintenanceStatus.detail?.endsAt
+                                maintenanceStatus.detail?.endsAt
                               ? `${formatDateTimeDetailed(maintenanceStatus.detail.startsAt)} → ${formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}`
                               : t('maintenance.clickToManageTooltip')}
                         </Typography>
@@ -2127,8 +2154,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   {user?.name || user?.email?.split('@')[0] || ''}
                 </Typography>
               </Box>
-
-
             </Box>
           </Toolbar>
         </AppBar>

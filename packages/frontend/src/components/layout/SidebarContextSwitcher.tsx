@@ -151,10 +151,15 @@ const ContextRow: React.FC<ContextRowProps> = ({
               </Typography>
             )}
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, flexShrink: 0 }}>
-            <UnfoldMoreIcon
-              sx={{ fontSize: 14, opacity: 0.35 }}
-            />
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.25,
+              flexShrink: 0,
+            }}
+          >
+            <UnfoldMoreIcon sx={{ fontSize: 14, opacity: 0.35 }} />
             {onManageClick && (
               <Tooltip title={manageTooltip || ''} placement="top" arrow>
                 <Box
@@ -171,7 +176,8 @@ const ContextRow: React.FC<ContextRowProps> = ({
                     height: 20,
                     borderRadius: 0.5,
                     opacity: 0,
-                    transition: 'opacity 0.15s ease, background-color 0.15s ease',
+                    transition:
+                      'opacity 0.15s ease, background-color 0.15s ease',
                     '.MuiBox-root:hover > &': { opacity: 1 },
                     '&:hover': {
                       bgcolor: (theme) =>
@@ -413,13 +419,10 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
   const [projAnchor, setProjAnchor] = useState<HTMLElement | null>(null);
   const [envAnchor, setEnvAnchor] = useState<HTMLElement | null>(null);
 
-  const handleOrgClick = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      e.stopPropagation();
-      setOrgAnchor(e.currentTarget);
-    },
-    []
-  );
+  const handleOrgClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setOrgAnchor(e.currentTarget);
+  }, []);
 
   const handleSelectOrg = useCallback(
     (org: (typeof organisations)[0]) => {
@@ -428,13 +431,10 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
     [switchOrg]
   );
 
-  const handleProjClick = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      e.stopPropagation();
-      setProjAnchor(e.currentTarget);
-    },
-    []
-  );
+  const handleProjClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setProjAnchor(e.currentTarget);
+  }, []);
 
   const orgProjects = useMemo(
     () =>
@@ -451,13 +451,10 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
     [switchProject]
   );
 
-  const handleEnvClick = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      e.stopPropagation();
-      setEnvAnchor(e.currentTarget);
-    },
-    []
-  );
+  const handleEnvClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setEnvAnchor(e.currentTarget);
+  }, []);
 
   const handleSelectEnv = useCallback(
     (env: (typeof environments)[0]) => {

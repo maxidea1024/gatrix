@@ -657,7 +657,9 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                 color="text.secondary"
                 sx={{
                   cursor: onNavigateToOrgs ? 'pointer' : 'default',
-                  '&:hover': onNavigateToOrgs ? { color: 'primary.main', textDecoration: 'underline' } : {},
+                  '&:hover': onNavigateToOrgs
+                    ? { color: 'primary.main', textDecoration: 'underline' }
+                    : {},
                 }}
                 onClick={onNavigateToOrgs}
               >
@@ -665,17 +667,22 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
               </Typography>
               {effectiveProject && (
                 <>
-                  <Typography variant="body2" color="text.secondary">/</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    /
+                  </Typography>
                   <Typography
                     variant="body2"
                     color="text.secondary"
                     sx={{
                       cursor: onNavigateToProjects ? 'pointer' : 'default',
-                      '&:hover': onNavigateToProjects ? { color: 'primary.main', textDecoration: 'underline' } : {},
+                      '&:hover': onNavigateToProjects
+                        ? { color: 'primary.main', textDecoration: 'underline' }
+                        : {},
                     }}
                     onClick={() => onNavigateToProjects?.(effectiveOrg.id)}
                   >
-                    {effectiveProject.displayName || effectiveProject.projectName}
+                    {effectiveProject.displayName ||
+                      effectiveProject.projectName}
                   </Typography>
                 </>
               )}
