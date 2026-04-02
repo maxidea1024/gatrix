@@ -28,7 +28,7 @@ export class CrashDatabase {
       if (error.code === 'ER_DBACCESS_DENIED_ERROR' || error.errno === 1044) {
         logger.warn(
           `Cannot create crash database '${name}' - insufficient privileges. ` +
-          `Please create it manually: CREATE DATABASE IF NOT EXISTS \`${name}\``
+            `Please create it manually: CREATE DATABASE IF NOT EXISTS \`${name}\``
         );
       } else {
         logger.warn(`Failed to ensure crash database '${name}':`, error);
