@@ -146,11 +146,11 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     icon: 'Workspaces',
     children: [
       {
-        text: 'workspace.title',
+        text: 'sidebar.workspaceOverview',
         icon: 'Workspaces',
         path: '/admin/workspace',
         requiredPermission: P.PROJECTS_READ,
-        matchPaths: ['/admin/projects', '/admin/environments'],
+        matchPaths: ['/admin/projects', '/admin/environments', '/admin/workspace'],
       },
       {
         text: 'sidebar.roles',

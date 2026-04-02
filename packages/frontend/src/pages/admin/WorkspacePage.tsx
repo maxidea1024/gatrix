@@ -66,7 +66,17 @@ interface SearchUser {
   email: string;
 }
 
-const WorkspacePage: React.FC = () => {
+interface WorkspacePageProps {
+  /** When true, renders without outer padding and PageHeader (embedded in tabbed container) */
+  embedded?: boolean;
+  /** Callback to navigate to projects tab for a given org (used in embedded mode) */
+  onNavigateToProjects?: (orgId: string) => void;
+}
+
+const WorkspacePage: React.FC<WorkspacePageProps> = ({
+  embedded = false,
+  onNavigateToProjects,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { user: currentUser, hasPermission } = useAuth();
@@ -411,29 +421,49 @@ const WorkspacePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <PageHeader
-        title={t('workspace.title')}
-        subtitle={t('workspace.subtitle')}
-        actions={
-          canManageOrgs ? (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => {
-                setCreateData({
-                  orgName: '',
-                  displayName: '',
-                  description: '',
-                });
-                setCreateDrawerOpen(true);
-              }}
-            >
-              {t('rbac.orgs.create')}
-            </Button>
-          ) : undefined
-        }
-      />
+    <Box sx={embedded ? { pt: 2 } : { p: 3 }}>
+      {!embedded && (
+        <PageHeader
+          title={t('workspace.title')}
+          subtitle={t('workspace.subtitle')}
+          actions={
+            canManageOrgs ? (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  setCreateData({
+                    orgName: '',
+                    displayName: '',
+                    description: '',
+                  });
+                  setCreateDrawerOpen(true);
+                }}
+              >
+                {t('rbac.orgs.create')}
+              </Button>
+            ) : undefined
+          }
+        />
+      )}
+      {embedded && canManageOrgs && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => {
+              setCreateData({
+                orgName: '',
+                displayName: '',
+                description: '',
+              });
+              setCreateDrawerOpen(true);
+            }}
+          >
+            {t('rbac.orgs.create')}
+          </Button>
+        </Box>
+      )}
 
       <PageContentLoader loading={loading}>
         {error && (
@@ -478,7 +508,7 @@ const WorkspacePage: React.FC = () => {
                 <Card
                   key={org.id}
                   sx={{
-                    borderRadius: 3,
+                    borderRadius: 1.5,
                     border: '1px solid',
                     borderColor:
                       org.id === currentOrgId ? 'primary.main' : 'divider',
@@ -488,6 +518,7 @@ const WorkspacePage: React.FC = () => {
                             `0 0 0 2px ${theme.palette.primary.main}40, 0 4px 12px ${theme.palette.primary.main}20`
                         : '0 2px 8px rgba(0, 0, 0, 0.06)',
                     transition: 'all 0.2s ease-in-out',
+                    cursor: 'pointer',
                     '&:hover': {
                       boxShadow:
                         org.id === currentOrgId
@@ -495,13 +526,21 @@ const WorkspacePage: React.FC = () => {
                               `0 0 0 2px ${theme.palette.primary.main}60, 0 6px 20px ${theme.palette.primary.main}30`
                           : '0 4px 16px rgba(0, 0, 0, 0.1)',
                       transform: 'translateY(-2px)',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.03)'
+                          : 'rgba(79,70,229,0.02)',
                     },
                   }}
+                  onClick={() => {
+                    if (onNavigateToProjects) {
+                      onNavigateToProjects(org.id);
+                    } else {
+                      navigate(`/admin/projects?orgId=${org.id}`);
+                    }
+                  }}
                 >
-                  <CardContent
-                    sx={{ p: 3, cursor: 'pointer' }}
-                    onClick={() => navigate(`/admin/projects?orgId=${org.id}`)}
-                  >
+                  <CardContent sx={{ p: 3 }}>
                     {/* Header */}
                     <Box
                       sx={{
@@ -587,22 +626,21 @@ const WorkspacePage: React.FC = () => {
                     </Box>
 
                     {/* Description */}
-                    {org.description && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{
-                          mb: 2,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          lineHeight: 1.6,
-                        }}
-                      >
-                        {org.description}
-                      </Typography>
-                    )}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        mb: 2,
+                        minHeight: '2.5em',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {org.description || '\u00A0'}
+                    </Typography>
 
                     {/* Footer info */}
                     <Box
@@ -677,11 +715,15 @@ const WorkspacePage: React.FC = () => {
                           {accessibleProjects.map((proj) => (
                             <ListItemButton
                               key={proj.id}
-                              onClick={() =>
-                                navigate(
-                                  `/admin/environments?orgId=${org.id}&projectId=${proj.id}`
-                                )
-                              }
+                              onClick={() => {
+                                if (onNavigateToProjects) {
+                                  onNavigateToProjects(org.id);
+                                } else {
+                                  navigate(
+                                    `/admin/environments?orgId=${org.id}&projectId=${proj.id}`
+                                  );
+                                }
+                              }}
                               sx={{ pl: 4, py: 0.25 }}
                             >
                               <ListItemIcon sx={{ minWidth: 24 }}>

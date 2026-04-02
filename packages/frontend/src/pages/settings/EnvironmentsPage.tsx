@@ -77,7 +77,20 @@ import PageContentLoader from '../../components/common/PageContentLoader';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 
-const EnvironmentsPage: React.FC = () => {
+interface EnvironmentsPageProps {
+  /** When true, renders without outer padding and breadcrumbs */
+  embedded?: boolean;
+  /** Callback to navigate back to organisations tab */
+  onNavigateToOrgs?: () => void;
+  /** Callback to navigate to projects tab */
+  onNavigateToProjects?: (orgId: string) => void;
+}
+
+const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
+  embedded = false,
+  onNavigateToOrgs,
+  onNavigateToProjects,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const {
@@ -169,6 +182,11 @@ const EnvironmentsPage: React.FC = () => {
   };
 
   const loadEnvironments = useCallback(async () => {
+    if (!projectApiPath) {
+      setEnvironments([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -580,7 +598,7 @@ const EnvironmentsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={embedded ? { pt: 2 } : { p: 3 }}>
       <Box
         sx={{
           display: 'flex',
@@ -590,42 +608,79 @@ const EnvironmentsPage: React.FC = () => {
         }}
       >
         <Box>
-          <Breadcrumbs
-            separator={<NavigateNextIcon fontSize="small" />}
-            sx={{ mb: 1 }}
-          >
-            <Link
-              component={RouterLink}
-              to="/admin/workspace"
-              underline="hover"
-              color="inherit"
-              sx={{ display: 'flex', alignItems: 'center' }}
+          {!embedded && (
+            <Breadcrumbs
+              separator={<NavigateNextIcon fontSize="small" />}
+              sx={{ mb: 1 }}
             >
-              {t('workspace.title')}
-            </Link>
-            <Link
-              component={RouterLink}
-              to={`/admin/projects?orgId=${effectiveOrg?.id || ''}`}
-              underline="hover"
-              color="inherit"
-              sx={{ display: 'flex', alignItems: 'center' }}
-            >
-              {effectiveOrg?.displayName ||
-                effectiveOrg?.orgName ||
-                t('common.organisation')}
-            </Link>
-            <Typography color="text.primary" fontWeight={500}>
-              {effectiveProject?.displayName ||
-                effectiveProject?.projectName ||
-                t('common.project')}
-            </Typography>
-          </Breadcrumbs>
-          <Typography variant="h4" gutterBottom sx={{ mt: 1 }}>
-            {t('environments.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('environments.subtitle')}
-          </Typography>
+              <Link
+                component={RouterLink}
+                to="/admin/workspace"
+                underline="hover"
+                color="inherit"
+                sx={{ display: 'flex', alignItems: 'center' }}
+              >
+                {t('workspace.title')}
+              </Link>
+              <Link
+                component={RouterLink}
+                to={`/admin/projects?orgId=${effectiveOrg?.id || ''}`}
+                underline="hover"
+                color="inherit"
+                sx={{ display: 'flex', alignItems: 'center' }}
+              >
+                {effectiveOrg?.displayName ||
+                  effectiveOrg?.orgName ||
+                  t('common.organisation')}
+              </Link>
+              <Typography color="text.primary" fontWeight={500}>
+                {effectiveProject?.displayName ||
+                  effectiveProject?.projectName ||
+                  t('common.project')}
+              </Typography>
+            </Breadcrumbs>
+          )}
+          {!embedded && (
+            <>
+              <Typography variant="h4" gutterBottom sx={{ mt: 1 }}>
+                {t('environments.title')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('environments.subtitle')}
+              </Typography>
+            </>
+          )}
+          {embedded && effectiveOrg && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  cursor: onNavigateToOrgs ? 'pointer' : 'default',
+                  '&:hover': onNavigateToOrgs ? { color: 'primary.main', textDecoration: 'underline' } : {},
+                }}
+                onClick={onNavigateToOrgs}
+              >
+                {effectiveOrg.displayName || effectiveOrg.orgName}
+              </Typography>
+              {effectiveProject && (
+                <>
+                  <Typography variant="body2" color="text.secondary">/</Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                      cursor: onNavigateToProjects ? 'pointer' : 'default',
+                      '&:hover': onNavigateToProjects ? { color: 'primary.main', textDecoration: 'underline' } : {},
+                    }}
+                    onClick={() => onNavigateToProjects?.(effectiveOrg.id)}
+                  >
+                    {effectiveProject.displayName || effectiveProject.projectName}
+                  </Typography>
+                </>
+              )}
+            </Box>
+          )}
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
           {canManage && (

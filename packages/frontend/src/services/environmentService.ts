@@ -203,6 +203,7 @@ function mapEnvironment(raw: any): Environment {
   return {
     ...raw,
     environmentId: raw.environmentId || raw.id,
+    environmentName: raw.environmentName || raw.name,
   };
 }
 
