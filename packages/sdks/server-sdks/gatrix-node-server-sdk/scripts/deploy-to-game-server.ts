@@ -92,10 +92,15 @@ async function main() {
   if (options.bump) {
     if (options.version) {
       console.log(`\n📦 Setting version to ${options.version}...`);
-      run(`yarn version --new-version ${options.version} --no-git-tag-version`);
+      // Yarn Berry doesn't support --new-version; update package.json directly
+      const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+      pkgJson.version = options.version;
+      fs.writeFileSync('package.json', JSON.stringify(pkgJson, null, 2) + '\n');
+      console.log(`   ✓ Version set to ${options.version}`);
     } else {
       console.log('\n📦 Bumping patch version...');
-      run('yarn version --patch --no-git-tag-version');
+      // Yarn Berry syntax: `yarn version patch` (not --patch)
+      run('yarn version patch --immediate');
     }
   }
 
@@ -108,34 +113,42 @@ async function main() {
   console.log('\n🔨 Building SDK...');
   run('yarn build');
 
-  // 4. Prepare @gatrix/shared for bundling (replace symlink with actual files)
-  console.log('\n📦 Preparing @gatrix/shared for bundling...');
-  const sharedNodeModulesPath = path.join(
-    sdkRoot,
-    'node_modules',
-    '@gatrix',
-    'shared'
-  );
-  const sharedSourcePath = path.resolve(sdkRoot, '..', '..', 'shared');
+  // 4. Prepare @gatrix workspace packages for bundling (replace symlinks with actual files)
+  console.log('\n📦 Preparing @gatrix workspace packages for bundling...');
+  const gatrixNodeModulesPath = path.join(sdkRoot, 'node_modules', '@gatrix');
+  const packagesRoot = path.resolve(sdkRoot, '..', '..', '..');
 
-  // Remove symlink and copy actual files
-  if (fs.existsSync(sharedNodeModulesPath)) {
-    fs.rmSync(sharedNodeModulesPath, { recursive: true });
-  }
-  fs.mkdirSync(sharedNodeModulesPath, { recursive: true });
+  // Workspace packages to bundle: [package name, source directory name]
+  const workspacePackages = [
+    { name: 'shared', sourcePath: path.join(packagesRoot, 'shared') },
+    { name: 'evaluator', sourcePath: path.join(packagesRoot, 'evaluator') },
+  ];
 
-  // Copy shared files
-  execSync(
-    `xcopy /E /I /Y "${sharedSourcePath}\\dist" "${sharedNodeModulesPath}\\dist"`,
-    {
-      encoding: 'utf-8',
+  for (const pkg of workspacePackages) {
+    const destPath = path.join(gatrixNodeModulesPath, pkg.name);
+
+    // Remove symlink and copy actual files
+    if (fs.existsSync(destPath)) {
+      fs.rmSync(destPath, { recursive: true });
     }
-  );
-  fs.copyFileSync(
-    path.join(sharedSourcePath, 'package.json'),
-    path.join(sharedNodeModulesPath, 'package.json')
-  );
-  console.log('   ✓ Copied @gatrix/shared to node_modules');
+    fs.mkdirSync(destPath, { recursive: true });
+
+    // Copy dist and package.json
+    const distSrc = path.join(pkg.sourcePath, 'dist');
+    if (fs.existsSync(distSrc)) {
+      execSync(
+        `xcopy /E /I /Y "${distSrc}" "${destPath}\\dist"`,
+        { encoding: 'utf-8' }
+      );
+    } else {
+      console.warn(`   ⚠ No dist/ found for @gatrix/${pkg.name}, skipping dist copy`);
+    }
+    fs.copyFileSync(
+      path.join(pkg.sourcePath, 'package.json'),
+      path.join(destPath, 'package.json')
+    );
+    console.log(`   ✓ Copied @gatrix/${pkg.name} to node_modules`);
+  }
 
   // 5. Pack (using npm pack since it properly handles bundledDependencies)
   console.log('\n📦 Packing SDK...');
@@ -146,8 +159,8 @@ async function main() {
     process.exit(1);
   }
 
-  // 5.5. Modify tgz to remove @gatrix/shared from dependencies (already bundled)
-  console.log('\n🔧 Removing @gatrix/shared from dependencies in tgz...');
+  // 5.5. Remove all workspace:* dependencies from the packed tgz (they are bundled)
+  console.log('\n🔧 Removing workspace dependencies from tgz...');
   const tempDir = path.join(sdkRoot, '.temp-deploy');
   if (fs.existsSync(tempDir)) {
     fs.rmSync(tempDir, { recursive: true });
@@ -160,13 +173,21 @@ async function main() {
   // Modify package.json inside the extracted package
   const extractedPkgJsonPath = path.join(tempDir, 'package', 'package.json');
   const sdkPkgJson = JSON.parse(fs.readFileSync(extractedPkgJsonPath, 'utf-8'));
-  if (sdkPkgJson.dependencies && sdkPkgJson.dependencies['@gatrix/shared']) {
-    delete sdkPkgJson.dependencies['@gatrix/shared'];
-    fs.writeFileSync(
-      extractedPkgJsonPath,
-      JSON.stringify(sdkPkgJson, null, 2) + '\n'
-    );
-    console.log('   ✓ Removed @gatrix/shared from dependencies');
+  if (sdkPkgJson.dependencies) {
+    const removed: string[] = [];
+    for (const [dep, ver] of Object.entries(sdkPkgJson.dependencies)) {
+      if (typeof ver === 'string' && ver.startsWith('workspace:')) {
+        delete sdkPkgJson.dependencies[dep];
+        removed.push(dep);
+      }
+    }
+    if (removed.length > 0) {
+      fs.writeFileSync(
+        extractedPkgJsonPath,
+        JSON.stringify(sdkPkgJson, null, 2) + '\n'
+      );
+      console.log(`   ✓ Removed workspace deps: ${removed.join(', ')}`);
+    }
   }
 
   // Re-pack the tgz

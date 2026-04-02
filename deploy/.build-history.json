@@ -200,5 +200,17 @@
         "gitBranch":  "main",
         "tag":  "v0.1.8",
         "pushed":  true
+    },
+    {
+        "timestamp":  "2026-04-02T11:03:33Z",
+        "services":  [
+                         "edge"
+                     ],
+        "latest":  true,
+        "gitHash":  "b2f4c704",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.1.2",
+        "pushed":  true
     }
 ]
