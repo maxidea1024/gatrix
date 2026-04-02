@@ -182,6 +182,11 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
   };
 
   const loadEnvironments = useCallback(async () => {
+    if (!projectApiPath) {
+      setEnvironments([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {

@@ -89,7 +89,7 @@ import { useTheme as useCustomTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import TimezoneSelector from '../common/TimezoneSelector';
-import EnvironmentSelector from '@/components/EnvironmentSelector';
+import SidebarContextSwitcher from '@/components/layout/SidebarContextSwitcher';
 import {
   maintenanceService,
   MaintenanceDetail,
@@ -223,7 +223,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
   });
 
-  const sidebarWidth = 240; // Fixed width
+  const sidebarWidth = 260; // Fixed width
   const [avatarImageError, setAvatarImageError] = useState(false);
 
   const location = useLocation();
@@ -1091,7 +1091,19 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           ) : (
             // When sidebar is expanded, show child items with text
             <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
+              <List
+                component="div"
+                disablePadding
+                sx={{
+                  bgcolor:
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.025)'
+                      : 'rgba(0,0,0,0.02)',
+                  borderRadius: 1,
+                  mx: 0.5,
+                  mb: 0.5,
+                }}
+              >
                 {item.children.map((child: any, childIndex: number) => {
                   const isChildActive = isActivePath(child.path);
 
@@ -1362,6 +1374,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         )}
       </Box>
 
+      {/* Context Switcher: Org / Project / Environment */}
+      <SidebarContextSwitcher collapsed={sidebarCollapsed} />
+
       {/* 메뉴 영역 - 스크롤 가능 */}
       <Box
         sx={{
@@ -1490,7 +1505,19 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 {/* Submenu items */}
                 {!category.path && !sidebarCollapsed && (
                   <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
+                    <List
+                      component="div"
+                      disablePadding
+                      sx={{
+                        bgcolor:
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.025)'
+                            : 'rgba(0,0,0,0.02)',
+                        borderRadius: 1,
+                        mx: 0.5,
+                        mb: 0.5,
+                      }}
+                    >
                       {category.children.map((item, index, items) => {
                         const prevItem = index > 0 ? items[index - 1] : null;
                         const prevHasChildren = prevItem?.children && prevItem.children.length > 0;
@@ -2101,24 +2128,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 </Typography>
               </Box>
 
-              {/* Environment Selector with Divider - Only for admin users with environments */}
-              {hasEnvironmentAccess && (
-                <>
-                  {/* Divider */}
-                  <Box
-                    sx={{
-                      width: '1px',
-                      height: '24px',
-                      bgcolor:
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.2)'
-                          : 'rgba(0, 0, 0, 0.2)',
-                      mx: 1,
-                    }}
-                  />
-                  <EnvironmentSelector size="small" />
-                </>
-              )}
+
             </Box>
           </Toolbar>
         </AppBar>

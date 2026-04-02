@@ -146,7 +146,7 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     icon: 'Workspaces',
     children: [
       {
-        text: 'workspace.title',
+        text: 'sidebar.workspaceOverview',
         icon: 'Workspaces',
         path: '/admin/workspace',
         requiredPermission: P.PROJECTS_READ,

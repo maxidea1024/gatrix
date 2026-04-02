@@ -79,6 +79,17 @@ const WorkspaceTabbedPage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState(getInitialTab);
 
+  // Sync tab when URL params change externally (e.g. from sidebar context manage buttons)
+  React.useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'organisations' || tab === null) {
+      // Only sync if not already on the target tab to avoid unnecessary re-renders
+      if (tab === 'organisations' && activeTab !== TAB_ORGS) setActiveTab(TAB_ORGS);
+    }
+    if (tab === 'projects' && activeTab !== TAB_PROJECTS) setActiveTab(TAB_PROJECTS);
+    if (tab === 'environments' && activeTab !== TAB_ENVIRONMENTS) setActiveTab(TAB_ENVIRONMENTS);
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleTabChange = useCallback(
     (_: React.SyntheticEvent, newValue: number) => {
       setActiveTab(newValue);

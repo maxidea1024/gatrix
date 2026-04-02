@@ -60,6 +60,8 @@ import {
   Person as PersonIcon,
   Logout as LogoutIcon,
   Workspaces as WorkspacesIcon,
+  Shield as ShieldIcon,
+  Group as GroupIcon,
 } from '@mui/icons-material';
 
 // Icon name to component mapping
@@ -119,6 +121,8 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   Person: <PersonIcon />,
   Logout: <LogoutIcon />,
   Workspaces: <WorkspacesIcon />,
+  Shield: <ShieldIcon />,
+  Group: <GroupIcon />,
 };
 
 /**
