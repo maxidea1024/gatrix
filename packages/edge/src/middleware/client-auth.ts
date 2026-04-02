@@ -26,7 +26,8 @@ const LEGACY_ENV_NAME = 'development';
 export const UNSECURED_CLIENT_TOKEN = 'unsecured-client-api-token';
 export const UNSECURED_SERVER_TOKEN = 'unsecured-server-api-token';
 export const UNSECURED_EDGE_TOKEN = 'unsecured-edge-api-token';
-export const UNSECURED_UNIVERSAL_CLIENT_TOKEN = 'unsecured-universal-client-api-token';
+export const UNSECURED_UNIVERSAL_CLIENT_TOKEN =
+  'unsecured-universal-client-api-token';
 export const UNSECURED_TOKENS = [
   UNSECURED_CLIENT_TOKEN,
   UNSECURED_SERVER_TOKEN,

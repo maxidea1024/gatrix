@@ -779,7 +779,10 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                             sx={{
                               fontFamily: 'monospace',
                               cursor: 'pointer',
-                              '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                              '&:hover': {
+                                color: 'primary.main',
+                                textDecoration: 'underline',
+                              },
                             }}
                             onClick={() => handleOpenEditDialog(env)}
                           >
@@ -830,7 +833,10 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
                             variant="body2"
                             sx={{
                               cursor: 'pointer',
-                              '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                              '&:hover': {
+                                color: 'primary.main',
+                                textDecoration: 'underline',
+                              },
                             }}
                             onClick={() => handleOpenEditDialog(env)}
                           >

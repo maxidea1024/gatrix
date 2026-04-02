@@ -95,7 +95,10 @@ class TokenUsageTracker {
         lastUsedAt: now,
       });
     }
-    logger.debug('Recorded token usage', { tokenId, mapSize: this.usageMap.size });
+    logger.debug('Recorded token usage', {
+      tokenId,
+      mapSize: this.usageMap.size,
+    });
   }
 
   /**

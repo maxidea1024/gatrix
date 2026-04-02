@@ -236,7 +236,9 @@ const SystemSettingsPage: React.FC = () => {
                           admindUrl || null
                         );
                         setSavedAdmindUrl(admindUrl);
-                        enqueueSnackbar(t('common.saved'), { variant: 'success' });
+                        enqueueSnackbar(t('common.saved'), {
+                          variant: 'success',
+                        });
                       }}
                     >
                       {t('common.update')}

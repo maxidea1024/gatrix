@@ -224,7 +224,10 @@ class ApiTokensController {
               timestamp: Date.now(),
             },
           },
-          { projectId: projectId || undefined, environmentId: environmentId || undefined }
+          {
+            projectId: projectId || undefined,
+            environmentId: environmentId || undefined,
+          }
         );
       } catch (eventError) {
         logger.warn('Failed to publish api_token.created event', {
@@ -364,7 +367,10 @@ class ApiTokensController {
               timestamp: Date.now(),
             },
           },
-          { projectId: updatedToken.projectId || undefined, environmentId: updatedToken.environmentId || undefined }
+          {
+            projectId: updatedToken.projectId || undefined,
+            environmentId: updatedToken.environmentId || undefined,
+          }
         );
       } catch (eventError) {
         logger.warn('Failed to publish api_token.updated event', {
@@ -456,7 +462,10 @@ class ApiTokensController {
               timestamp: Date.now(),
             },
           },
-          { projectId: existingToken.projectId || undefined, environmentId: existingToken.environmentId || undefined }
+          {
+            projectId: existingToken.projectId || undefined,
+            environmentId: existingToken.environmentId || undefined,
+          }
         );
       } catch (eventError) {
         logger.warn(
@@ -528,7 +537,10 @@ class ApiTokensController {
               timestamp: Date.now(),
             },
           },
-          { projectId: existingToken.projectId || undefined, environmentId: existingToken.environmentId || undefined }
+          {
+            projectId: existingToken.projectId || undefined,
+            environmentId: existingToken.environmentId || undefined,
+          }
         );
       } catch (eventError) {
         logger.warn('Failed to publish api_token.deleted event', {
