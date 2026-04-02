@@ -189,12 +189,19 @@ export class Migration {
         // Detect pre-existing DB: if ALL migrations are pending but core tables exist,
         // this means migrations were applied before tracking was set up.
         // Seed migration records without re-running them.
-        if (executedMigrations.length === 0 && pendingMigrations.length === migrationFiles.length) {
+        if (
+          executedMigrations.length === 0 &&
+          pendingMigrations.length === migrationFiles.length
+        ) {
           const coreTablesExist = await this.checkCoreTablesExist();
           if (coreTablesExist) {
-            logger.info('Detected pre-existing database with no migration records. Seeding migration history...');
+            logger.info(
+              'Detected pre-existing database with no migration records. Seeding migration history...'
+            );
             await this.seedMigrationRecords(migrationFiles);
-            logger.info('Migration history seeded successfully. All migrations marked as completed.');
+            logger.info(
+              'Migration history seeded successfully. All migrations marked as completed.'
+            );
             return;
           }
         }
@@ -297,7 +304,9 @@ export class Migration {
    * Seed migration records for all migration files without running them.
    * Used when a DB already has all tables but no migration tracking records.
    */
-  private async seedMigrationRecords(migrations: MigrationFile[]): Promise<void> {
+  private async seedMigrationRecords(
+    migrations: MigrationFile[]
+  ): Promise<void> {
     for (const migration of migrations) {
       try {
         await database.query(
