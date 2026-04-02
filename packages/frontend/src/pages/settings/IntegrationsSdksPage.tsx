@@ -486,9 +486,9 @@ const IntegrationsSdksPage: React.FC = () => {
   return (
     <Box>
       <Box sx={{ mb: 4 }}>
-          <Typography variant="body2" color="text.secondary">
-            {t('integrations.sdks.subtitle')}
-          </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {t('integrations.sdks.subtitle')}
+        </Typography>
       </Box>
 
       <Box

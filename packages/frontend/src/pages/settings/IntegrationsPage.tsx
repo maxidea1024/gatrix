@@ -201,9 +201,9 @@ export const IntegrationsPage: React.FC = () => {
     <Box>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
-          <Typography variant="body2" color="text.secondary">
-            {t('integrations.subtitle')}
-          </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {t('integrations.subtitle')}
+        </Typography>
       </Box>
 
       <PageContentLoader loading={loading && isInitialLoad.current}>

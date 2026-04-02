@@ -313,10 +313,7 @@ router.get(
           '$clientVersionPassiveData',
           environmentId
         );
-        passiveData = resolvePassiveData(
-          passiveDataStr,
-          record.clientVersion
-        );
+        passiveData = resolvePassiveData(passiveDataStr, record.clientVersion);
       } catch (e) {
         logger.warn(
           'Failed to resolve clientVersionPassiveData for client-version:',
@@ -828,10 +825,7 @@ router.get(
 
       // Transform to client-friendly format (same as /client-version single endpoint)
       const clientVersions = filteredVersions.map((v: any) => {
-        const passiveData = resolvePassiveData(
-          passiveDataStr,
-          v.clientVersion
-        );
+        const passiveData = resolvePassiveData(passiveDataStr, v.clientVersion);
         return {
           platform: v.platform,
           clientVersion: v.clientVersion,

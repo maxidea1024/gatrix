@@ -33,8 +33,12 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 
 // Lazy-loaded tab pages
-const SystemConsolePage = React.lazy(() => import('../admin/SystemConsolePage'));
-const DataManagementPage = React.lazy(() => import('../admin/DataManagementPage'));
+const SystemConsolePage = React.lazy(
+  () => import('../admin/SystemConsolePage')
+);
+const DataManagementPage = React.lazy(
+  () => import('../admin/DataManagementPage')
+);
 const IntegrationsPage = React.lazy(() => import('./IntegrationsPage'));
 const IntegrationsSdksPage = React.lazy(() => import('./IntegrationsSdksPage'));
 
@@ -58,7 +62,6 @@ const SystemSettingsPage: React.FC = () => {
 
   // Network settings
   const [admindUrl, setAdmindUrl] = useState('');
-
 
   // AI Chat settings
   const [aiSettings, setAiSettings] = useState<{
@@ -111,7 +114,6 @@ const SystemSettingsPage: React.FC = () => {
       }
     })();
   }, [currentEnvironmentId]);
-
 
   // Load AI settings
   useEffect(() => {
@@ -175,7 +177,6 @@ const SystemSettingsPage: React.FC = () => {
       });
     }
   };
-
 
   return (
     <Box sx={{ p: 3 }}>
@@ -378,25 +379,49 @@ const SystemSettingsPage: React.FC = () => {
           )}
 
           {tab === 3 && (
-            <Suspense fallback={<PageContentLoader loading><div /></PageContentLoader>}>
+            <Suspense
+              fallback={
+                <PageContentLoader loading>
+                  <div />
+                </PageContentLoader>
+              }
+            >
               <DataManagementPage />
             </Suspense>
           )}
 
           {tab === 4 && (
-            <Suspense fallback={<PageContentLoader loading><div /></PageContentLoader>}>
+            <Suspense
+              fallback={
+                <PageContentLoader loading>
+                  <div />
+                </PageContentLoader>
+              }
+            >
               <IntegrationsPage />
             </Suspense>
           )}
 
           {tab === 5 && (
-            <Suspense fallback={<PageContentLoader loading><div /></PageContentLoader>}>
+            <Suspense
+              fallback={
+                <PageContentLoader loading>
+                  <div />
+                </PageContentLoader>
+              }
+            >
               <IntegrationsSdksPage />
             </Suspense>
           )}
 
           {tab === 6 && (
-            <Suspense fallback={<PageContentLoader loading><div /></PageContentLoader>}>
+            <Suspense
+              fallback={
+                <PageContentLoader loading>
+                  <div />
+                </PageContentLoader>
+              }
+            >
               <SystemConsolePage />
             </Suspense>
           )}

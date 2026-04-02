@@ -89,7 +89,6 @@ const DataManagementPage: React.FC = () => {
 
   return (
     <Box>
-
       {message && (
         <Alert
           severity={message.type}

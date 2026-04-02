@@ -670,7 +670,6 @@ const AppContent: React.FC = () => {
                                 }
                               />
 
-
                               <Route
                                 path="/settings/integrations/create"
                                 element={
