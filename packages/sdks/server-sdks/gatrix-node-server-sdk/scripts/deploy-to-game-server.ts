@@ -262,7 +262,56 @@ async function main() {
   fs.unlinkSync(tgzFileName);
   console.log(`   ✓ Removed: ${tgzFileName}`);
 
-  // 10. Skip auto-install, let user run manually
+  // 10. Copy planning data tools to game server
+  // Game dev team needs these to convert CMS data and upload to Gatrix
+  // without having access to the full gatrix source code.
+  console.log('\n📊 Copying planning data tools...');
+  const gameRepoRoot = path.resolve(gameServerPath, '..', '..');
+  const planningDataLibPath = path.join(
+    gameRepoRoot,
+    'gatrix',
+    'planning-data',
+    'lib'
+  );
+
+  // Source: gatrix/packages/backend/src/contents/cms/
+  const cmsSourceDir = path.resolve(
+    packagesRoot,
+    'backend',
+    'src',
+    'contents',
+    'cms'
+  );
+
+  const planningToolFiles = [
+    'admin-tool-data-builder.js',
+    'loctab-converter.js',
+  ];
+
+  if (fs.existsSync(cmsSourceDir)) {
+    // Ensure lib directory exists
+    fs.mkdirSync(planningDataLibPath, { recursive: true });
+
+    for (const toolFile of planningToolFiles) {
+      const src = path.join(cmsSourceDir, toolFile);
+      const dest = path.join(planningDataLibPath, toolFile);
+      if (fs.existsSync(src)) {
+        fs.copyFileSync(src, dest);
+        console.log(`   ✓ Copied: ${toolFile}`);
+      } else {
+        console.warn(`   ⚠ Not found: ${toolFile}`);
+      }
+    }
+  } else {
+    console.warn(
+      `   ⚠ CMS source directory not found: ${cmsSourceDir}`
+    );
+    console.warn(
+      '     Planning data tools were NOT copied.'
+    );
+  }
+
+  // 11. Skip auto-install, let user run manually
   console.log(
     '\n📋 Deployment complete. Run yarn install manually in game server.'
   );
