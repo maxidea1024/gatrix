@@ -61,7 +61,7 @@ import {
   Logout as LogoutIcon,
   Workspaces as WorkspacesIcon,
   Shield as ShieldIcon,
-  Group as GroupIcon,
+  Groups as GroupIcon,
 } from '@mui/icons-material';
 
 // Icon name to component mapping

@@ -484,16 +484,11 @@ const IntegrationsSdksPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 4 }}>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            {t('integrations.sdks.title')}
-          </Typography>
+    <Box>
+      <Box sx={{ mb: 4 }}>
           <Typography variant="body2" color="text.secondary">
             {t('integrations.sdks.subtitle')}
           </Typography>
-        </Box>
       </Box>
 
       <Box

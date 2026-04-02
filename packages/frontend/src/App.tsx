@@ -455,8 +455,8 @@ const AppContent: React.FC = () => {
                     {/* Global scrollbar styles */}
                     <GlobalStyles
                       styles={(theme) => ({
-                        // Firefox - thin scrollbar for all elements
-                        'html, body, *, div, main, section, article, aside, nav':
+                        // Thin scrollbar — only semantic elements, NOT div (Monaco uses div internally)
+                        'html, body, main, section, article, aside, nav, ul, ol, pre, table':
                           {
                             scrollbarWidth: 'thin',
                             scrollbarColor:
@@ -465,16 +465,16 @@ const AppContent: React.FC = () => {
                                 : 'rgba(0, 0, 0, 0.2) transparent',
                           },
                         // WebKit/Blink (Chrome, Edge, Safari)
-                        'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar':
+                        'html::-webkit-scrollbar, body::-webkit-scrollbar, main::-webkit-scrollbar, section::-webkit-scrollbar, article::-webkit-scrollbar, aside::-webkit-scrollbar, nav::-webkit-scrollbar, ul::-webkit-scrollbar, ol::-webkit-scrollbar, pre::-webkit-scrollbar, table::-webkit-scrollbar':
                           {
                             width: '8px',
                             height: '8px',
                           },
-                        'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track':
+                        'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, main::-webkit-scrollbar-track, section::-webkit-scrollbar-track':
                           {
                             background: 'transparent',
                           },
-                        'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb':
+                        'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, main::-webkit-scrollbar-thumb, section::-webkit-scrollbar-thumb':
                           {
                             backgroundColor:
                               theme.palette.mode === 'dark'
@@ -482,14 +482,14 @@ const AppContent: React.FC = () => {
                                 : 'rgba(0, 0, 0, 0.2)',
                             borderRadius: 0,
                           },
-                        'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover, div::-webkit-scrollbar-thumb:hover':
+                        'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, main::-webkit-scrollbar-thumb:hover, section::-webkit-scrollbar-thumb:hover':
                           {
                             backgroundColor:
                               theme.palette.mode === 'dark'
                                 ? 'rgba(255, 255, 255, 0.3)'
                                 : 'rgba(0, 0, 0, 0.3)',
                           },
-                        'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, *::-webkit-scrollbar-thumb:active, div::-webkit-scrollbar-thumb:active':
+                        'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, main::-webkit-scrollbar-thumb:active, section::-webkit-scrollbar-thumb:active':
                           {
                             backgroundColor:
                               theme.palette.mode === 'dark'
@@ -669,26 +669,7 @@ const AppContent: React.FC = () => {
                                   </ProtectedRoute>
                                 }
                               />
-                              <Route
-                                path="/settings/integrations"
-                                element={
-                                  <ProtectedRoute requiredRoles={['admin']}>
-                                    <MainLayout>
-                                      <IntegrationsPage />
-                                    </MainLayout>
-                                  </ProtectedRoute>
-                                }
-                              />
-                              <Route
-                                path="/settings/integrations/sdks"
-                                element={
-                                  <ProtectedRoute requiredRoles={['admin']}>
-                                    <MainLayout>
-                                      <IntegrationsSdksPage />
-                                    </MainLayout>
-                                  </ProtectedRoute>
-                                }
-                              />
+
 
                               <Route
                                 path="/settings/integrations/create"
@@ -792,10 +773,7 @@ const AppContent: React.FC = () => {
                                           path="api-tokens"
                                           element={<ApiTokensPage />}
                                         />
-                                        <Route
-                                          path="console"
-                                          element={<SystemConsolePage />}
-                                        />
+
                                         <Route
                                           path="server-list"
                                           element={<ServerListPage />}
@@ -824,10 +802,7 @@ const AppContent: React.FC = () => {
                                           path="event-lens/projects"
                                           element={<EventLensProjectsPage />}
                                         />
-                                        <Route
-                                          path="data-management"
-                                          element={<DataManagementPage />}
-                                        />
+
                                         <Route
                                           path="gatrix-edges"
                                           element={<GatrixEdgesPage />}

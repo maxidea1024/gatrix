@@ -180,9 +180,12 @@ export class ClientController {
         }
 
         // Check minimum patch version requirement for cached response
+        // Skip if status already requires a higher-priority action (app update)
         if (
           cachedResponse.minPatchVersion &&
-          cachedResponse.status !== ClientStatus.MAINTENANCE
+          cachedResponse.status !== ClientStatus.MAINTENANCE &&
+          cachedResponse.status !== ClientStatus.FORCED_UPDATE &&
+          cachedResponse.status !== ClientStatus.RECOMMENDED_UPDATE
         ) {
           if (
             !patchVersion ||
@@ -522,9 +525,12 @@ export class ClientController {
       await cacheService.set(cacheKey, clientData, 5 * 60 * 1000);
 
       // Apply minimum patch version check after caching
+      // Skip if status already requires a higher-priority action (app update)
       if (
         record.minPatchVersion &&
-        effectiveStatus !== ClientStatus.MAINTENANCE
+        effectiveStatus !== ClientStatus.MAINTENANCE &&
+        effectiveStatus !== ClientStatus.FORCED_UPDATE &&
+        effectiveStatus !== ClientStatus.RECOMMENDED_UPDATE
       ) {
         if (
           !patchVersion ||

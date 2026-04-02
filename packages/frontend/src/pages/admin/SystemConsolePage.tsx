@@ -1308,9 +1308,8 @@ const SystemConsolePage: React.FC = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        p: 3,
-        height: 'calc(100vh - 64px)',
-        minHeight: 0,
+        height: 'calc(100vh - 280px)',
+        minHeight: 400,
         overflow: 'hidden',
       }}
       onKeyDown={(e) => {
@@ -1319,11 +1318,9 @@ const SystemConsolePage: React.FC = () => {
           e.preventDefault();
       }}
     >
-      <PageHeader
-        icon={<TerminalIcon />}
-        title={t('console.title')}
-        subtitle={t('console.subtitle')}
-      />
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+        {t('console.subtitle')}
+      </Typography>
 
       <Box
         sx={(th) => ({

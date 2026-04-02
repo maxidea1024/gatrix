@@ -88,10 +88,7 @@ const DataManagementPage: React.FC = () => {
   };
 
   return (
-    <Box p={3}>
-      <Typography variant="h4" gutterBottom>
-        {t('Data Management')}
-      </Typography>
+    <Box>
 
       {message && (
         <Alert

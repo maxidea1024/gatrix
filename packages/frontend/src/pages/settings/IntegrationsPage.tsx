@@ -198,17 +198,12 @@ export const IntegrationsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            {t('integrations.title')}
-          </Typography>
+      <Box sx={{ mb: 3 }}>
           <Typography variant="body2" color="text.secondary">
             {t('integrations.subtitle')}
           </Typography>
-        </Box>
       </Box>
 
       <PageContentLoader loading={loading && isInitialLoad.current}>

@@ -17,6 +17,7 @@ import {
   cacheSize,
 } from '../services/edge-metrics';
 import { performEvaluation, getSDKOrError } from '../utils/evaluation-helper';
+import { resolvePassiveData } from '../utils/passive-data-utils';
 
 const router = Router();
 
@@ -305,7 +306,25 @@ router.get(
       }
 
       // Transform data for client consumption (same format as Backend)
-      const meta = { ...(record.customPayload || {}) };
+      // Merge $clientVersionPassiveData from KV into customPayload
+      let passiveData: Record<string, any> = {};
+      try {
+        const passiveDataStr = sdk.vars.getValue(
+          '$clientVersionPassiveData',
+          environmentId
+        );
+        passiveData = resolvePassiveData(
+          passiveDataStr,
+          record.clientVersion
+        );
+      } catch (e) {
+        logger.warn(
+          'Failed to resolve clientVersionPassiveData for client-version:',
+          e
+        );
+      }
+      // passiveData first, then customPayload overwrites
+      const meta = { ...passiveData, ...(record.customPayload || {}) };
 
       // Handle channel/subChannel appUpdateUrl for forced/recommended updates
       if (
@@ -436,10 +455,12 @@ router.get(
       }
 
       // Check minimum patch version requirement AFTER whitelist bypass
-      // This ensures app/data patch updates take priority over whitelist
+      // Skip if status already requires a higher-priority action (app update)
       if (
         (record as any).minPatchVersion &&
-        effectiveStatus !== 'MAINTENANCE'
+        effectiveStatus !== 'MAINTENANCE' &&
+        effectiveStatus !== 'FORCED_UPDATE' &&
+        effectiveStatus !== 'RECOMMENDED_UPDATE'
       ) {
         if (
           !patchVersion ||
@@ -791,20 +812,40 @@ router.get(
         count: filteredVersions.length,
       });
 
+      // Resolve $clientVersionPassiveData for merging into each version's meta
+      let passiveDataStr: string | null = null;
+      try {
+        passiveDataStr = sdk.vars.getValue(
+          '$clientVersionPassiveData',
+          environmentId
+        );
+      } catch (e) {
+        logger.warn(
+          'Failed to get clientVersionPassiveData for client-versions:',
+          e
+        );
+      }
+
       // Transform to client-friendly format (same as /client-version single endpoint)
-      const clientVersions = filteredVersions.map((v: any) => ({
-        platform: v.platform,
-        clientVersion: v.clientVersion,
-        status: v.clientStatus,
-        gameServerAddress: v.gameServerAddress,
-        patchAddress: v.patchAddress,
-        guestModeAllowed: Boolean(v.guestModeAllowed),
-        externalClickLink: v.externalClickLink,
-        tags: Array.isArray(v.tags)
-          ? v.tags.map((t: any) => (typeof t === 'string' ? t : t.name))
-          : [],
-        meta: v.customPayload || {},
-      }));
+      const clientVersions = filteredVersions.map((v: any) => {
+        const passiveData = resolvePassiveData(
+          passiveDataStr,
+          v.clientVersion
+        );
+        return {
+          platform: v.platform,
+          clientVersion: v.clientVersion,
+          status: v.clientStatus,
+          gameServerAddress: v.gameServerAddress,
+          patchAddress: v.patchAddress,
+          guestModeAllowed: Boolean(v.guestModeAllowed),
+          externalClickLink: v.externalClickLink,
+          tags: Array.isArray(v.tags)
+            ? v.tags.map((t: any) => (typeof t === 'string' ? t : t.name))
+            : [],
+          meta: { ...passiveData, ...(v.customPayload || {}) },
+        };
+      });
 
       res.json({
         success: true,

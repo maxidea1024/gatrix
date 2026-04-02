@@ -321,6 +321,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
   const [objectEditorOpen, setObjectEditorOpen] = useState(false);
   const [editingObjectId, setEditingObjectId] = useState<string | null>(null);
   const [editingObjectValue, setEditingObjectValue] = useState('');
+  const [initialObjectValue, setInitialObjectValue] = useState('');
 
   // Parse JSON value to items (only on initial load or when value changes externally)
   useEffect(() => {
@@ -621,6 +622,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
         : item.value || '{}';
     setEditingObjectId(id);
     setEditingObjectValue(jsonStr);
+    setInitialObjectValue(jsonStr);
     setObjectEditorOpen(true);
   };
 
@@ -886,7 +888,11 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
           <Button onClick={() => setObjectEditorOpen(false)}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleSaveObject} variant="contained">
+          <Button
+            onClick={handleSaveObject}
+            variant="contained"
+            disabled={editingObjectValue === initialObjectValue}
+          >
             {t('common.update')}
           </Button>
         </DialogActions>

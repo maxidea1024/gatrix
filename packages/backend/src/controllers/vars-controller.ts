@@ -64,7 +64,9 @@ export class VarsController {
       // Invalidate related caches when specific KV items are updated via setVar
       if (
         key === '$clientVersionPassiveData' ||
-        key === 'kv:clientVersionPassiveData'
+        key === 'kv:clientVersionPassiveData' ||
+        key === '$channels' ||
+        key === 'kv:channels'
       ) {
         /**
          * NOTE: This is a temporary workaround for an edge case.
@@ -295,7 +297,9 @@ export class VarsController {
       // Invalidate related caches when specific KV items are updated
       if (
         fullKey === '$clientVersionPassiveData' ||
-        fullKey === 'kv:clientVersionPassiveData'
+        fullKey === 'kv:clientVersionPassiveData' ||
+        fullKey === '$channels' ||
+        fullKey === 'kv:channels'
       ) {
         /**
          * NOTE: This is a temporary workaround for an edge case.
