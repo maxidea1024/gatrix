@@ -136,12 +136,13 @@ async function main() {
     // Copy dist and package.json
     const distSrc = path.join(pkg.sourcePath, 'dist');
     if (fs.existsSync(distSrc)) {
-      execSync(
-        `xcopy /E /I /Y "${distSrc}" "${destPath}\\dist"`,
-        { encoding: 'utf-8' }
-      );
+      execSync(`xcopy /E /I /Y "${distSrc}" "${destPath}\\dist"`, {
+        encoding: 'utf-8',
+      });
     } else {
-      console.warn(`   ⚠ No dist/ found for @gatrix/${pkg.name}, skipping dist copy`);
+      console.warn(
+        `   ⚠ No dist/ found for @gatrix/${pkg.name}, skipping dist copy`
+      );
     }
     fs.copyFileSync(
       path.join(pkg.sourcePath, 'package.json'),
