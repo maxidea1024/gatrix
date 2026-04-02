@@ -10,6 +10,7 @@
  */
 
 import { ApiClient } from '../client/api-client';
+import { ApiClientFactory } from '../client/api-client-factory';
 import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { Survey, SurveyListParams, SurveySettings } from '../types/api';
@@ -26,6 +27,8 @@ export class SurveyService {
   private cachedSettingsByEnv: Map<string, SurveySettings> = new Map();
   // Whether this feature is enabled
   private featureEnabled: boolean = true;
+  // Optional factory for multi-environment mode (Edge)
+  private apiClientFactory?: ApiClientFactory;
 
   constructor(
     apiClient: ApiClient,
@@ -85,6 +88,26 @@ export class SurveyService {
   }
 
   /**
+   * Set ApiClientFactory for multi-environment mode.
+   * When set, API calls use the factory to get a per-environment ApiClient
+   * that includes the x-environment-id header.
+   */
+  setApiClientFactory(factory: ApiClientFactory): void {
+    this.apiClientFactory = factory;
+  }
+
+  /**
+   * Get the appropriate ApiClient for a given environment.
+   * Uses the factory if available, otherwise falls back to the default client.
+   */
+  private getApiClient(environmentId?: string): ApiClient {
+    if (this.apiClientFactory) {
+      return this.apiClientFactory.getClient(environmentId);
+    }
+    return this.apiClient;
+  }
+
+  /**
    * Get active surveys with settings for a specific environment
    * GET /api/v1/server/surveys
    */
@@ -100,7 +123,8 @@ export class SurveyService {
       params,
     });
 
-    const response = await this.apiClient.get<{
+    const client = this.getApiClient(resolvedEnv);
+    const response = await client.get<{
       surveys: Survey[];
       settings: SurveySettings;
     }>(endpoint, {
@@ -257,7 +281,8 @@ export class SurveyService {
     validateAll([{ param: 'id', value: id, type: 'string' }]);
     this.logger.debug('Fetching survey by ID', { id, environmentId });
 
-    const response = await this.apiClient.get<{ survey: Survey }>(
+    const client = this.getApiClient(environmentId);
+    const response = await client.get<{ survey: Survey }>(
       `/api/v1/server/surveys/${id}`
     );
 
@@ -281,7 +306,8 @@ export class SurveyService {
       environmentId: resolvedEnv,
     });
 
-    const response = await this.apiClient.get<{ settings: SurveySettings }>(
+    const client = this.getApiClient(resolvedEnv);
+    const response = await client.get<{ settings: SurveySettings }>(
       `/api/v1/server/surveys/settings`
     );
 

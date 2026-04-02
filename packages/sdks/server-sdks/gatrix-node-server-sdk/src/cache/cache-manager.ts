@@ -159,6 +159,7 @@ export class CacheManager {
         this.storage
       );
       this.surveyService.setFeatureEnabled(true);
+      this.surveyService.setApiClientFactory(this.apiClientFactory);
     }
     if (this.uses.whitelist !== false) {
       this.whitelistService = new WhitelistService(
