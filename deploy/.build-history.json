@@ -1,62 +1,192 @@
 ﻿[
-  {
-    "timestamp": "2026-01-14T03:09:18Z",
-    "services": ["frontend"],
-    "latest": true,
-    "gitHash": "fd7221b3",
-    "registry": "uwocn.tencentcloudcr.com/uwocn",
-    "gitBranch": "main",
-    "tag": "v0.0.1",
-    "pushed": false
-  },
-  {
-    "timestamp": "2026-01-14T04:04:55Z",
-    "services": ["chat-server", "backend", "frontend", "edge", "event-lens"],
-    "latest": true,
-    "gitHash": "618bc73a",
-    "registry": "uwocn.tencentcloudcr.com/uwocn",
-    "gitBranch": "main",
-    "tag": "v0.0.1",
-    "pushed": false
-  },
-  {
-    "timestamp": "2026-01-14T04:58:12Z",
-    "services": ["event-lens"],
-    "latest": true,
-    "gitHash": "618bc73a",
-    "registry": "uwocn.tencentcloudcr.com/uwocn",
-    "gitBranch": "main",
-    "tag": "v0.0.1",
-    "pushed": true
-  },
-  {
-    "timestamp": "2026-01-14T05:59:10Z",
-    "services": ["chat-server", "backend", "frontend", "edge", "event-lens"],
-    "latest": true,
-    "gitHash": "ee37d02e",
-    "registry": "uwocn.tencentcloudcr.com/uwocn",
-    "gitBranch": "main",
-    "tag": "v0.0.2",
-    "pushed": true
-  },
-  {
-    "timestamp": "2026-01-14T08:00:09Z",
-    "services": ["chat-server", "backend", "frontend", "edge", "event-lens"],
-    "latest": true,
-    "gitHash": "de52f36b",
-    "registry": "uwocn.tencentcloudcr.com/uwocn",
-    "gitBranch": "main",
-    "tag": "v0.0.3",
-    "pushed": true
-  },
-  {
-    "timestamp": "2026-01-24T15:18:03Z",
-    "services": ["chat-server", "backend", "frontend", "edge", "event-lens"],
-    "latest": true,
-    "gitHash": "5e127b00",
-    "registry": "uwocn.tencentcloudcr.com/uwocn",
-    "gitBranch": "main",
-    "tag": "v0.0.4",
-    "pushed": true
-  }
+    {
+        "timestamp":  "2026-01-14T03:09:18Z",
+        "services":  [
+                         "frontend"
+                     ],
+        "latest":  true,
+        "gitHash":  "fd7221b3",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.0.1",
+        "pushed":  false
+    },
+    {
+        "timestamp":  "2026-01-14T04:04:55Z",
+        "services":  [
+                         "chat-server",
+                         "backend",
+                         "frontend",
+                         "edge",
+                         "event-lens"
+                     ],
+        "latest":  true,
+        "gitHash":  "618bc73a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.0.1",
+        "pushed":  false
+    },
+    {
+        "timestamp":  "2026-01-14T04:58:12Z",
+        "services":  [
+                         "event-lens"
+                     ],
+        "latest":  true,
+        "gitHash":  "618bc73a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.0.1",
+        "pushed":  true
+    },
+    {
+        "timestamp":  "2026-01-14T05:59:10Z",
+        "services":  [
+                         "chat-server",
+                         "backend",
+                         "frontend",
+                         "edge",
+                         "event-lens"
+                     ],
+        "latest":  true,
+        "gitHash":  "ee37d02e",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.0.2",
+        "pushed":  true
+    },
+    {
+        "timestamp":  "2026-01-14T08:00:09Z",
+        "services":  [
+                         "chat-server",
+                         "backend",
+                         "frontend",
+                         "edge",
+                         "event-lens"
+                     ],
+        "latest":  true,
+        "gitHash":  "de52f36b",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.0.3",
+        "pushed":  true
+    },
+    {
+        "timestamp":  "2026-01-24T15:18:03Z",
+        "services":  [
+                         "chat-server",
+                         "backend",
+                         "frontend",
+                         "edge",
+                         "event-lens"
+                     ],
+        "latest":  true,
+        "gitHash":  "5e127b00",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.0.4",
+        "pushed":  true
+    },
+    {
+        "timestamp":  "2026-04-02T07:13:29Z",
+        "services":  [
+                         "event-lens",
+                         "edge",
+                         "frontend"
+                     ],
+        "latest":  true,
+        "gitHash":  "4bd3627a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.1.0",
+        "pushed":  true
+    },
+    {
+        "timestamp":  "2026-04-02T07:35:14Z",
+        "services":  [
+                         "chat-server",
+                         "backend",
+                         "frontend",
+                         "edge",
+                         "event-lens"
+                     ],
+        "latest":  true,
+        "gitHash":  "4bd3627a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.1.1",
+        "pushed":  true
+    },
+    {
+        "timestamp":  "2026-04-02T07:42:56Z",
+        "services":  [
+                         "backend"
+                     ],
+        "latest":  true,
+        "gitHash":  "4bd3627a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.1.2",
+        "pushed":  true
+    },
+    {
+        "timestamp":  "2026-04-02T07:49:52Z",
+        "services":  [
+                         "backend"
+                     ],
+        "latest":  true,
+        "gitHash":  "4bd3627a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.1.3",
+        "pushed":  true
+    },
+    {
+        "timestamp":  "2026-04-02T08:02:13Z",
+        "services":  [
+                         "backend"
+                     ],
+        "latest":  true,
+        "gitHash":  "4bd3627a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.1.4",
+        "pushed":  true
+    },
+    {
+        "timestamp":  "2026-04-02T08:08:55Z",
+        "services":  [
+                         "backend"
+                     ],
+        "latest":  true,
+        "gitHash":  "4bd3627a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.1.5",
+        "pushed":  true
+    },
+    {
+        "timestamp":  "2026-04-02T08:18:23Z",
+        "services":  [
+                         "backend"
+                     ],
+        "latest":  true,
+        "gitHash":  "4bd3627a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.1.6",
+        "pushed":  true
+    },
+    {
+        "timestamp":  "2026-04-02T08:30:48Z",
+        "services":  [
+                         "backend"
+                     ],
+        "latest":  true,
+        "gitHash":  "4bd3627a",
+        "registry":  "uwocn.tencentcloudcr.com/uwocn",
+        "gitBranch":  "main",
+        "tag":  "v0.1.7",
+        "pushed":  true
+    }
 ]

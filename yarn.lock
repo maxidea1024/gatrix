@@ -3023,6 +3023,7 @@ __metadata:
     murmurhash: "npm:^2.0.1"
     mustache: "npm:^4.2.0"
     mysql2: "npm:^3.6.5"
+    nanoid: "npm:^3.3.11"
     node-cron: "npm:^4.2.1"
     nodemailer: "npm:^7.0.5"
     objection: "npm:^3.1.5"

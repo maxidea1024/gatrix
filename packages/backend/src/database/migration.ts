@@ -186,6 +186,19 @@ export class Migration {
           return;
         }
 
+        // Detect pre-existing DB: if ALL migrations are pending but core tables exist,
+        // this means migrations were applied before tracking was set up.
+        // Seed migration records without re-running them.
+        if (executedMigrations.length === 0 && pendingMigrations.length === migrationFiles.length) {
+          const coreTablesExist = await this.checkCoreTablesExist();
+          if (coreTablesExist) {
+            logger.info('Detected pre-existing database with no migration records. Seeding migration history...');
+            await this.seedMigrationRecords(migrationFiles);
+            logger.info('Migration history seeded successfully. All migrations marked as completed.');
+            return;
+          }
+        }
+
         logger.info(`Found ${pendingMigrations.length} pending migrations:`, {
           migrations: pendingMigrations.map((m) => m.id),
         });
@@ -261,6 +274,40 @@ export class Migration {
       throw error;
     } finally {
       connection.release();
+    }
+  }
+
+  /**
+   * Check if core application tables already exist in the database.
+   * Used to detect a pre-existing DB that was set up before migration tracking.
+   */
+  private async checkCoreTablesExist(): Promise<boolean> {
+    try {
+      const rows = await database.query(
+        `SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.TABLES 
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN ('g_organisations', 'g_users', 'g_projects', 'g_environments')`
+      );
+      return (rows as any)[0]?.cnt >= 4;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Seed migration records for all migration files without running them.
+   * Used when a DB already has all tables but no migration tracking records.
+   */
+  private async seedMigrationRecords(migrations: MigrationFile[]): Promise<void> {
+    for (const migration of migrations) {
+      try {
+        await database.query(
+          'INSERT IGNORE INTO g_migrations (id, name) VALUES (?, ?)',
+          [migration.id, migration.name]
+        );
+        logger.info(`  [SEEDED] ${migration.id}`);
+      } catch (error) {
+        logger.warn(`  [SKIP] Could not seed: ${migration.id}`, error);
+      }
     }
   }
 

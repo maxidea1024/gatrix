@@ -6,22 +6,42 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Use Tencent npm mirror for faster downloads in China
-RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
+# Enable Corepack for Yarn 4
+RUN corepack enable
+
+# Copy Yarn 4 configuration and binary
+COPY .yarnrc.yml ./
+COPY .yarn/releases/ ./.yarn/releases/
 
 # Copy package files
-COPY package.json yarn.lock* ./
+COPY package.json yarn.lock ./
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/shared/package.json ./packages/shared/
+COPY packages/storage/package.json ./packages/storage/
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/chat-server/package.json ./packages/chat-server/
+COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/edge/package.json ./packages/edge/
+COPY packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/sdks/server-sdks/gatrix-node-server-sdk/
+
+COPY packages/evaluator/package.json ./packages/evaluator/
 
 # Skip Cypress binary download - not needed in production Docker image
 ENV CYPRESS_INSTALL_BINARY=0
 
-RUN yarn install --frozen-lockfile --network-timeout 600000 --ignore-optional
+RUN yarn install
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
+
+# Enable Corepack for Yarn 4
+RUN corepack enable
+
+# Copy Yarn 4 configuration and binary
+COPY .yarnrc.yml ./
+COPY .yarn/releases/ ./.yarn/releases/
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -35,7 +55,8 @@ ENV NODE_ENV=production
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 # Build shared package first (required for frontend)
 RUN yarn workspace @gatrix/shared build
-RUN yarn workspace @gatrix/frontend build
+# Run tsc and vite build directly (cross-env not available in Docker)
+RUN cd packages/frontend && npx tsc --noEmit && npx vite build
 # Verify dist/index.html exists
 RUN ls -la packages/frontend/dist/index.html
 

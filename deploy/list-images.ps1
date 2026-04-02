@@ -87,7 +87,27 @@ foreach ($svc in $Services) {
             $sortedTags = $response.tags | Sort-Object -Descending
             foreach ($tag in $sortedTags) {
                 $fullUrl = "$REGISTRY_HOST/$REGISTRY_NAMESPACE/gatrix-$svc`:$tag"
-                Write-Host "  $fullUrl" -ForegroundColor Green
+                # Fetch manifest to get image size
+                $sizeStr = ""
+                try {
+                    $manifestUrl = "https://$REGISTRY_HOST/v2/$repo/manifests/$tag"
+                    $manifestHeaders = @{
+                        "Authorization" = "Bearer $token"
+                        "Accept"        = "application/vnd.docker.distribution.manifest.v2+json, application/vnd.oci.image.manifest.v1+json"
+                    }
+                    $manifest = Invoke-RestMethod -Uri $manifestUrl -Headers $manifestHeaders -Method Get
+                    $totalSize = 0
+                    if ($manifest.layers) {
+                        foreach ($layer in $manifest.layers) { $totalSize += $layer.size }
+                    }
+                    if ($manifest.config -and $manifest.config.size) { $totalSize += $manifest.config.size }
+                    if ($totalSize -gt 0) {
+                        $sizeMB = [math]::Round($totalSize / 1MB, 1)
+                        $sizeStr = " ($sizeMB MB)"
+                    }
+                }
+                catch {}
+                Write-Host "  $fullUrl$sizeStr" -ForegroundColor Green
             }
         }
         else {

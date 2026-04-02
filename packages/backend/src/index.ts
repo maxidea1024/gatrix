@@ -223,6 +223,14 @@ const startServer = async () => {
       throw error;
     }
 
+    // Auto-seed: ensure admin user, default org/project/environments exist
+    try {
+      const { autoSeed } = await import('./database/seed');
+      await autoSeed();
+    } catch (error) {
+      logger.warn('Auto-seed failed, continuing:', error);
+    }
+
     // Check and configure database timezone
     try {
       await setDatabaseTimezoneToUTC();

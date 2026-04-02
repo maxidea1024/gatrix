@@ -861,6 +861,16 @@ async function clearDatabase() {
   }
 }
 
+// ==================== Auto-seed (called from server startup) ====================
+
+/**
+ * Auto-seed on server startup. All operations are idempotent
+ * (check "already exists" before creating), so safe to call every restart.
+ */
+export async function autoSeed() {
+  await seedDatabase();
+}
+
 // Parse command line arguments
 const command = process.argv[2];
 

@@ -6,53 +6,54 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Use Tencent npm mirror for faster downloads in China
-RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
+# Enable Corepack for Yarn 4
+RUN corepack enable
+
+# Copy Yarn 4 configuration and binary
+COPY .yarnrc.yml ./
+COPY .yarn/releases/ ./.yarn/releases/
 
 # Copy package files
-COPY package.json yarn.lock* ./
+COPY package.json yarn.lock ./
 COPY packages/backend/package.json ./packages/backend/
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/edge/package.json ./packages/edge/
 COPY packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/sdks/server-sdks/gatrix-node-server-sdk/
+
 COPY packages/evaluator/package.json ./packages/evaluator/
 COPY packages/shared/package.json ./packages/shared/
+COPY packages/storage/package.json ./packages/storage/
 
 # Skip Cypress binary download - not needed in production Docker image
 ENV CYPRESS_INSTALL_BINARY=0
 
-RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
+RUN yarn install
 
 # Rebuild the source code only when needed
 FROM base AS builder
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Use Tencent npm mirror for faster downloads in China
-RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
+# Enable Corepack for Yarn 4
+RUN corepack enable
 
-# Copy all package files first
-COPY package.json yarn.lock* ./
-COPY packages/backend/package.json ./packages/backend/
-COPY packages/frontend/package.json ./packages/frontend/
-COPY packages/chat-server/package.json ./packages/chat-server/
-COPY packages/event-lens/package.json ./packages/event-lens/
-COPY packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/sdks/server-sdks/gatrix-node-server-sdk/
-COPY packages/evaluator/package.json ./packages/evaluator/
-COPY packages/shared/package.json ./packages/shared/
+# Copy Yarn 4 configuration and binary
+COPY .yarnrc.yml ./
+COPY .yarn/releases/ ./.yarn/releases/
 
-# Skip Cypress binary download - not needed in production Docker image
-ENV CYPRESS_INSTALL_BINARY=0
-
-# Install dependencies
-RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
 
 # Copy all source files
 COPY . .
 
 # Build shared package first (required by other packages)
 RUN cd packages/shared && yarn build
+
+# Build storage (required by backend)
+RUN cd packages/storage && yarn build
 
 # Build evaluator (required by server-sdk)
 RUN cd packages/evaluator && yarn build
@@ -62,13 +63,19 @@ RUN cd packages/sdks/server-sdks/gatrix-node-server-sdk && yarn build
 
 # Build the backend
 RUN yarn workspace @gatrix/backend build
+# Resolve @/ path aliases in compiled output
+RUN cd packages/backend && npx tsc-alias -p tsconfig.json
 
 # Production image, copy all the files and run the app
 FROM base AS runner
 WORKDIR /app
 
-# Use Tencent npm mirror for faster downloads in China
-RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
+# Enable Corepack for Yarn 4
+RUN corepack enable
+
+# Copy Yarn 4 configuration and binary
+COPY .yarnrc.yml ./
+COPY .yarn/releases/ ./.yarn/releases/
 
 # Create a non-root user
 RUN addgroup --system --gid 1001 nodejs
@@ -79,14 +86,17 @@ COPY --from=builder /app/packages/backend/dist ./dist
 COPY --from=builder /app/packages/backend/package.json ./package.json
 
 # Copy production dependencies
-COPY package.json yarn.lock* ./
+COPY package.json yarn.lock ./
 COPY packages/backend/package.json ./packages/backend/
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/edge/package.json ./packages/edge/
 COPY packages/sdks/server-sdks/gatrix-node-server-sdk/package.json ./packages/sdks/server-sdks/gatrix-node-server-sdk/
+
 COPY packages/evaluator/package.json ./packages/evaluator/
 COPY packages/shared/package.json ./packages/shared/
+COPY packages/storage/package.json ./packages/storage/
 
 # Copy server-sdk source (needed for file: dependency)
 COPY packages/sdks/server-sdks/gatrix-node-server-sdk ./packages/sdks/server-sdks/gatrix-node-server-sdk
@@ -95,14 +105,23 @@ COPY packages/evaluator ./packages/evaluator
 # Copy shared package source (needed for file: dependency)
 COPY packages/shared ./packages/shared
 
-RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 --ignore-optional && \
-  yarn cache clean
+# Copy storage source (needed for file: dependency)
+COPY packages/storage ./packages/storage
+
+RUN yarn workspaces focus @gatrix/backend --production && \
+  yarn cache clean --all
 
 # Copy built server-sdk dist to node_modules (required because main points to dist/index.js)
 COPY --from=builder /app/packages/sdks/server-sdks/gatrix-node-server-sdk/dist ./node_modules/@gatrix/gatrix-node-server-sdk/dist
 
 # Copy built shared dist to node_modules
 COPY --from=builder /app/packages/shared/dist ./node_modules/@gatrix/shared/dist
+
+# Copy built storage dist to node_modules
+COPY --from=builder /app/packages/storage/dist ./node_modules/@gatrix/storage/dist
+
+# Copy built evaluator dist to node_modules
+COPY --from=builder /app/packages/evaluator/dist ./node_modules/@gatrix/evaluator/dist
 
 # Create logs, uploads, and data directories
 RUN mkdir -p logs uploads data && chown nodejs:nodejs logs uploads data

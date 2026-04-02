@@ -25,3 +25,41 @@ coverage
 
 # Docker volume data
 data/
+
+# Large reference/docs directories
+.gatrix-reference-codes
+docs
+
+# Yarn PnP state
+.yarn/install-state.gz
+.pnp.*
+
+# Deploy scripts
+deploy
+
+# Non-Node edge runtimes
+packages/edge-dotnet
+packages/edge-rust
+
+# All client SDKs (not needed in server Docker images)
+packages/sdks/client-sdks
+
+# Non-Node server SDKs (only gatrix-node-server-sdk is needed)
+packages/sdks/server-sdks/gatrix-dotnet-server-sdk
+packages/sdks/server-sdks/gatrix-go-server-sdk
+packages/sdks/server-sdks/gatrix-java-server-sdk
+packages/sdks/server-sdks/gatrix-rust-server-sdk
+packages/sdks/server-sdks/archived
+packages/sdks/server-sdks/spec
+
+# Backend large data
+packages/backend/uploads
+packages/backend/data
+
+# Other large non-essential dirs
+manual
+converted-planning-data
+archived
+benchmark
+artifacts
+local test

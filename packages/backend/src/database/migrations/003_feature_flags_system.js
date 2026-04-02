@@ -284,7 +284,7 @@ exports.up = async function (connection) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
-  console.log('[003] ✓ Feature flags system tables completed');
+  console.log('[003] ??Feature flags system tables completed');
 };
 
 exports.down = async function (connection) {
