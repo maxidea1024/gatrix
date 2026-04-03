@@ -1478,9 +1478,7 @@ const ApiTokensPage: React.FC = () => {
               e.stopPropagation();
               const org = organisations.find((o) => o.id === proj.orgId);
               if (org) {
-                navigate(
-                  `/admin/workspace?tab=projects&orgId=${org.id}`
-                );
+                navigate(`/admin/workspace?tab=projects&orgId=${org.id}`);
               }
             }}
           >
@@ -2792,7 +2790,10 @@ const ApiTokensPage: React.FC = () => {
                   borderColor: (theme) => alpha(theme.palette.error.main, 0.12),
                 }}
               >
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 600, mb: 0.5 }}
+                >
                   {selectedToken.tokenName}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -2886,11 +2887,15 @@ const ApiTokensPage: React.FC = () => {
                   bgcolor: (theme) => alpha(theme.palette.warning.main, 0.04),
                   borderRadius: 2,
                   border: '1px solid',
-                  borderColor: (theme) => alpha(theme.palette.warning.main, 0.12),
+                  borderColor: (theme) =>
+                    alpha(theme.palette.warning.main, 0.12),
                   mb: 3,
                 }}
               >
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 600, mb: 0.5 }}
+                >
                   {selectedToken.tokenName}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -2900,7 +2905,11 @@ const ApiTokensPage: React.FC = () => {
                   )}
                 </Typography>
                 {selectedToken.description && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mt: 0.5 }}
+                  >
                     {selectedToken.description}
                   </Typography>
                 )}
@@ -2951,9 +2960,7 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={closeRegenerateDialog}>
-            {t('common.cancel')}
-          </Button>
+          <Button onClick={closeRegenerateDialog}>{t('common.cancel')}</Button>
           <Button
             onClick={handleRegenerate}
             color="primary"
