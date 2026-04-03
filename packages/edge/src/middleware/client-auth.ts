@@ -212,7 +212,10 @@ export async function clientAuth(
 
   // 2. Legacy unsecured tokens → resolve to default/default/development
   //    Note: Legacy universal client token is handled as unsecured universal client (dynamic env resolution)
-  if (LEGACY_TOKENS[apiToken] && apiToken !== 'unsecured-universal-client-api-token') {
+  if (
+    LEGACY_TOKENS[apiToken] &&
+    apiToken !== 'unsecured-universal-client-api-token'
+  ) {
     const envId = environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME);
     if (!envId) {
       res.status(401).json({
