@@ -81,6 +81,7 @@ import {
   MoreVert as MoreVertIcon,
   Business as OrgIcon,
   Folder as ProjectIcon,
+  Public as EnvironmentIcon,
   ExpandMore as ExpandMoreIcon,
   ChevronRight as ChevronRightIcon,
   ArrowDropDown as ArrowDropDownIcon,
@@ -98,7 +99,10 @@ import 'dayjs/locale/zh-cn';
 import { ApiAccessToken, TokenType } from '@/types/apiToken';
 import SearchTextField from '../../components/common/SearchTextField';
 import { apiTokenService } from '@/services/apiTokenService';
-import { Environment } from '@/services/environmentService';
+import {
+  Environment,
+  environmentService,
+} from '@/services/environmentService';
 import { useEnvironments } from '@/contexts/EnvironmentContext';
 import SimplePagination from '@/components/common/SimplePagination';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
@@ -559,6 +563,566 @@ const ProjectTreeSelector: React.FC<ProjectTreeSelectorProps> = ({
                             />
                           )}
                         </ListItemButton>
+                      );
+                    })
+                  )}
+                </Collapse>
+              </React.Fragment>
+            );
+          })}
+        </Box>
+      </Popover>
+
+      {helperText && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 0.5, ml: 1.5 }}
+        >
+          {helperText}
+        </Typography>
+      )}
+    </Box>
+  );
+};
+
+// ==================== EnvironmentTreeSelector Component ====================
+// Tree-style environment selector matching AppBar EnvironmentSelector
+// Shows Org → Project → Environment hierarchy, selects a leaf environment
+
+// Environment type colors (same as AppBar EnvironmentSelector)
+const getEnvironmentColor = (type: string, customColor?: string): string => {
+  if (customColor) return customColor;
+  switch (type) {
+    case 'production':
+      return '#d32f2f';
+    case 'staging':
+      return '#ed6c02';
+    case 'development':
+      return '#2e7d32';
+    default:
+      return '#757575';
+  }
+};
+
+interface EnvironmentTreeSelection {
+  environmentId: string;
+  projectId: string;
+  orgId: string;
+}
+
+interface EnvironmentTreeSelectorProps {
+  organisations: { id: string; orgName: string; displayName: string }[];
+  projects: {
+    id: string;
+    orgId: string;
+    projectName: string;
+    displayName: string;
+  }[];
+  selectedEnvironmentId?: string;
+  selectedProjectId?: string;
+  onSelect: (selection: EnvironmentTreeSelection) => void;
+  helperText?: string;
+  disabled?: boolean;
+}
+
+const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
+  organisations,
+  projects,
+  selectedEnvironmentId,
+  selectedProjectId,
+  onSelect,
+  helperText,
+  disabled = false,
+}) => {
+  const { t } = useTranslation();
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set());
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(
+    new Set()
+  );
+
+  // Per-project environment cache
+  const [projectEnvMap, setProjectEnvMap] = useState<
+    Record<string, Environment[]>
+  >({});
+  const [loadingProjects, setLoadingProjects] = useState<Set<string>>(
+    new Set()
+  );
+  const loadedProjectsRef = useRef<Set<string>>(new Set());
+
+  const isOpen = Boolean(anchorEl);
+
+  // Load environments for a specific project
+  const loadProjectEnvironments = useCallback(
+    async (projectId: string, orgId: string) => {
+      if (loadedProjectsRef.current.has(projectId)) return;
+      loadedProjectsRef.current.add(projectId);
+
+      setLoadingProjects((prev) => new Set(prev).add(projectId));
+      try {
+        const apiPath = `/admin/orgs/${orgId}/projects/${projectId}`;
+        const envs = await environmentService.getEnvironments(apiPath);
+        setProjectEnvMap((prev) => ({ ...prev, [projectId]: envs }));
+      } catch (error) {
+        console.error(
+          `Failed to load environments for project ${projectId}:`,
+          error
+        );
+        loadedProjectsRef.current.delete(projectId);
+      } finally {
+        setLoadingProjects((prev) => {
+          const next = new Set(prev);
+          next.delete(projectId);
+          return next;
+        });
+      }
+    },
+    []
+  );
+
+  const handleOpen = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      if (disabled) return;
+      setAnchorEl(event.currentTarget);
+      // Auto-expand org and project that contain the selected environment
+      if (selectedProjectId) {
+        const proj = projects.find((p) => p.id === selectedProjectId);
+        if (proj) {
+          setExpandedOrgs((prev) => new Set(prev).add(proj.orgId));
+          setExpandedProjects((prev) => new Set(prev).add(proj.id));
+          loadProjectEnvironments(proj.id, proj.orgId);
+        }
+      }
+    },
+    [selectedProjectId, projects, loadProjectEnvironments, disabled]
+  );
+
+  const handleClose = useCallback(() => {
+    setAnchorEl(null);
+  }, []);
+
+  const handleToggleOrg = useCallback((orgId: string) => {
+    setExpandedOrgs((prev) => {
+      const next = new Set(prev);
+      if (next.has(orgId)) {
+        next.delete(orgId);
+      } else {
+        next.add(orgId);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleToggleProject = useCallback(
+    (projectId: string, orgId: string) => {
+      setExpandedProjects((prev) => {
+        const next = new Set(prev);
+        if (next.has(projectId)) {
+          next.delete(projectId);
+        } else {
+          next.add(projectId);
+          loadProjectEnvironments(projectId, orgId);
+        }
+        return next;
+      });
+    },
+    [loadProjectEnvironments]
+  );
+
+  const handleSelectEnvironment = useCallback(
+    (envId: string, projectId: string, orgId: string) => {
+      onSelect({ environmentId: envId, projectId, orgId });
+      handleClose();
+    },
+    [onSelect, handleClose]
+  );
+
+  // Build display label: [Org /] Project / Environment
+  const displayLabel = useMemo(() => {
+    const parts: string[] = [];
+    const isMultiOrg = organisations.length > 1;
+    if (selectedProjectId) {
+      const proj = projects.find((p) => p.id === selectedProjectId);
+      if (proj) {
+        if (isMultiOrg) {
+          const org = organisations.find((o) => o.id === proj.orgId);
+          if (org) parts.push(org.displayName || org.orgName);
+        }
+        parts.push(proj.displayName || proj.projectName);
+      }
+    }
+    if (selectedEnvironmentId) {
+      // Search cached environments
+      for (const envs of Object.values(projectEnvMap)) {
+        const env = envs.find((e) => e.environmentId === selectedEnvironmentId);
+        if (env) {
+          parts.push(env.displayName || env.environmentName);
+          break;
+        }
+      }
+    }
+    return parts.join(' / ');
+  }, [
+    organisations,
+    projects,
+    selectedProjectId,
+    selectedEnvironmentId,
+    projectEnvMap,
+  ]);
+
+  const isMultiOrg = organisations.length > 1;
+
+  // Render environment items for a given project
+  const renderEnvironments = (
+    projectId: string,
+    orgId: string,
+    indent: number
+  ) => {
+    const envList = projectEnvMap[projectId] || [];
+    const isLoadingEnvs = loadingProjects.has(projectId);
+
+    if (isLoadingEnvs && envList.length === 0) {
+      return (
+        <ListItemButton dense disabled sx={{ pl: indent, py: 0.5 }}>
+          <ListItemIcon sx={{ minWidth: 24 }}>
+            <EnvironmentIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('common.loading')}
+            primaryTypographyProps={{
+              variant: 'caption',
+              color: 'text.secondary',
+              fontStyle: 'italic',
+            }}
+          />
+        </ListItemButton>
+      );
+    }
+
+    if (envList.length === 0) {
+      return (
+        <ListItemButton dense disabled sx={{ pl: indent, py: 0.5 }}>
+          <ListItemIcon sx={{ minWidth: 24 }}>
+            <EnvironmentIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('environments.noEnvironments')}
+            primaryTypographyProps={{
+              variant: 'caption',
+              color: 'text.secondary',
+              fontStyle: 'italic',
+            }}
+          />
+        </ListItemButton>
+      );
+    }
+
+    return envList.map((env) => {
+      const itemColor = getEnvironmentColor(env.environmentType, env.color);
+      const isSelected = env.environmentId === selectedEnvironmentId;
+
+      return (
+        <ListItemButton
+          key={env.environmentId}
+          onClick={() =>
+            handleSelectEnvironment(env.environmentId, projectId, orgId)
+          }
+          dense
+          selected={isSelected}
+          sx={{
+            pl: indent,
+            py: 0.5,
+            '&.Mui-selected': {
+              backgroundColor: (theme) =>
+                alpha(
+                  itemColor,
+                  theme.palette.mode === 'dark' ? 0.2 : 0.1
+                ),
+              '&:hover': {
+                backgroundColor: (theme) =>
+                  alpha(
+                    itemColor,
+                    theme.palette.mode === 'dark' ? 0.25 : 0.15
+                  ),
+              },
+            },
+            '&:hover': {
+              backgroundColor: (theme) =>
+                alpha(
+                  itemColor,
+                  theme.palette.mode === 'dark' ? 0.15 : 0.08
+                ),
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 24 }}>
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: 0.5,
+                backgroundColor: itemColor,
+                boxShadow: isSelected
+                  ? `0 0 6px ${alpha(itemColor, 0.6)}`
+                  : 'none',
+              }}
+            />
+          </ListItemIcon>
+          <ListItemText
+            primary={env.displayName || env.environmentName}
+            primaryTypographyProps={{
+              variant: 'body2',
+              fontWeight: isSelected ? 600 : 400,
+            }}
+          />
+          {isSelected && (
+            <CheckIcon
+              sx={{ fontSize: 18, color: 'success.main', ml: 'auto' }}
+            />
+          )}
+        </ListItemButton>
+      );
+    });
+  };
+
+  return (
+    <Box>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ mb: 0.5, display: 'block' }}
+      >
+        {t('apiTokens.environmentAccess')}
+      </Typography>
+      <ButtonBase
+        onClick={handleOpen}
+        disabled={disabled}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          px: 1.5,
+          py: 1,
+          borderRadius: 1,
+          border: '1px solid',
+          borderColor: isOpen ? 'primary.main' : 'divider',
+          width: '100%',
+          justifyContent: 'space-between',
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            borderColor: 'text.primary',
+          },
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            overflow: 'hidden',
+          }}
+        >
+          <EnvironmentIcon
+            sx={{ fontSize: 18, opacity: 0.7, flexShrink: 0 }}
+          />
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 500,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              color: displayLabel ? 'text.primary' : 'text.secondary',
+            }}
+          >
+            {displayLabel || t('apiTokens.selectEnvironment')}
+          </Typography>
+        </Box>
+        <ArrowDropDownIcon
+          sx={{
+            fontSize: 20,
+            opacity: 0.6,
+            transform: isOpen ? 'rotate(180deg)' : 'none',
+            transition: 'transform 0.2s',
+            flexShrink: 0,
+          }}
+        />
+      </ButtonBase>
+
+      {/* Tree dropdown popover */}
+      <Popover
+        open={isOpen}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 0.5,
+              minWidth: 280,
+              maxWidth: 400,
+              maxHeight: 400,
+              borderRadius: 2,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+              overflow: 'auto',
+            },
+          },
+        }}
+      >
+        <Box sx={{ py: 0.5 }}>
+          {organisations.map((org) => {
+            const orgProjects = projects.filter((p) => p.orgId === org.id);
+            const isOrgExpanded = expandedOrgs.has(org.id) || !isMultiOrg;
+
+            // Single org: skip org header, show projects directly
+            if (!isMultiOrg) {
+              return (
+                <React.Fragment key={org.id}>
+                  {orgProjects.length === 0 ? (
+                    <ListItemButton dense disabled sx={{ pl: 1.5, py: 0.75 }}>
+                      <ListItemIcon sx={{ minWidth: 24 }}>
+                        <ProjectIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={t('environments.noProjects')}
+                        primaryTypographyProps={{
+                          variant: 'caption',
+                          color: 'text.secondary',
+                          fontStyle: 'italic',
+                        }}
+                      />
+                    </ListItemButton>
+                  ) : (
+                    orgProjects.map((proj) => {
+                      const isProjExpanded = expandedProjects.has(proj.id);
+
+                      return (
+                        <React.Fragment key={proj.id}>
+                          {/* Project node */}
+                          <ListItemButton
+                            onClick={() =>
+                              handleToggleProject(proj.id, org.id)
+                            }
+                            dense
+                            sx={{ py: 0.5, pl: 1.5 }}
+                          >
+                            <ListItemIcon sx={{ minWidth: 28 }}>
+                              {isProjExpanded ? (
+                                <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                              ) : (
+                                <ChevronRightIcon sx={{ fontSize: 18 }} />
+                              )}
+                            </ListItemIcon>
+                            <ListItemIcon sx={{ minWidth: 24 }}>
+                              <ProjectIcon
+                                sx={{ fontSize: 16, opacity: 0.7 }}
+                              />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={proj.displayName || proj.projectName}
+                              primaryTypographyProps={{
+                                variant: 'body2',
+                                fontWeight:
+                                  proj.id === selectedProjectId ? 600 : 400,
+                              }}
+                            />
+                          </ListItemButton>
+
+                          {/* Environment nodes under this project */}
+                          <Collapse in={isProjExpanded} timeout="auto">
+                            {renderEnvironments(proj.id, org.id, 4)}
+                          </Collapse>
+                        </React.Fragment>
+                      );
+                    })
+                  )}
+                </React.Fragment>
+              );
+            }
+
+            // Multi-org: show org header with expandable project list
+            return (
+              <React.Fragment key={org.id}>
+                <ListItemButton
+                  onClick={() => handleToggleOrg(org.id)}
+                  dense
+                  sx={{ py: 0.5 }}
+                >
+                  <ListItemIcon sx={{ minWidth: 28 }}>
+                    {isOrgExpanded ? (
+                      <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                    ) : (
+                      <ChevronRightIcon sx={{ fontSize: 18 }} />
+                    )}
+                  </ListItemIcon>
+                  <ListItemIcon sx={{ minWidth: 24 }}>
+                    <OrgIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={org.displayName || org.orgName}
+                    primaryTypographyProps={{
+                      variant: 'body2',
+                      fontWeight: 500,
+                    }}
+                  />
+                </ListItemButton>
+
+                <Collapse in={isOrgExpanded} timeout="auto">
+                  {orgProjects.length === 0 ? (
+                    <ListItemButton dense disabled sx={{ pl: 7, py: 0.75 }}>
+                      <ListItemIcon sx={{ minWidth: 24 }}>
+                        <ProjectIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={t('environments.noProjects')}
+                        primaryTypographyProps={{
+                          variant: 'caption',
+                          color: 'text.secondary',
+                          fontStyle: 'italic',
+                        }}
+                      />
+                    </ListItemButton>
+                  ) : (
+                    orgProjects.map((proj) => {
+                      const isProjExpanded = expandedProjects.has(proj.id);
+
+                      return (
+                        <React.Fragment key={proj.id}>
+                          <ListItemButton
+                            onClick={() =>
+                              handleToggleProject(proj.id, org.id)
+                            }
+                            dense
+                            sx={{ py: 0.5, pl: 4 }}
+                          >
+                            <ListItemIcon sx={{ minWidth: 28 }}>
+                              {isProjExpanded ? (
+                                <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                              ) : (
+                                <ChevronRightIcon sx={{ fontSize: 18 }} />
+                              )}
+                            </ListItemIcon>
+                            <ListItemIcon sx={{ minWidth: 24 }}>
+                              <ProjectIcon
+                                sx={{ fontSize: 16, opacity: 0.7 }}
+                              />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={proj.displayName || proj.projectName}
+                              primaryTypographyProps={{
+                                variant: 'body2',
+                                fontWeight:
+                                  proj.id === selectedProjectId ? 600 : 400,
+                              }}
+                            />
+                          </ListItemButton>
+
+                          <Collapse in={isProjExpanded} timeout="auto">
+                            {renderEnvironments(proj.id, org.id, 7)}
+                          </Collapse>
+                        </React.Fragment>
                       );
                     })
                   )}
@@ -1840,71 +2404,36 @@ const ApiTokensPage: React.FC = () => {
                 </Typography>
               </FormControl>
 
-              {/* Project Select (tree-style like AppBar EnvironmentSelector) */}
-              <ProjectTreeSelector
-                organisations={organisations}
-                projects={projects}
-                selectedProjectId={formData.selectedProjectId}
-                onSelect={(projectId) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    selectedProjectId: projectId,
-                    environments: [], // Reset environment when project changes
-                  }))
-                }
-                helperText={t('apiTokens.universalClientHelp')}
-              />
-
-              {/* Environment Select - hidden for project tokens */}
-              {formData.tokenType !== 'universal_client' && (
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t('apiTokens.environmentAccess')}</InputLabel>
-                  <Select
-                    value={formData.environments[0] || ''}
-                    label={t('apiTokens.environmentAccess')}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        allowAllEnvironments: false,
-                        environments: [e.target.value as string],
-                      }))
-                    }
-                    renderValue={(value) => {
-                      const env = environments.find(
-                        (e) => e.environmentId === value
-                      );
-                      return env ? env.displayName || env.environmentName : '';
-                    }}
-                  >
-                    {environments.map((env) => (
-                      <MenuItem
-                        key={env.environmentId}
-                        value={env.environmentId}
-                      >
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {env.displayName || env.environmentName}
-                          </Typography>
-                          {env.description && (
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {env.description}
-                            </Typography>
-                          )}
-                        </Box>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ mt: 0.5, ml: 1.5 }}
-                  >
-                    {t('apiTokens.selectSingleEnvironment')}
-                  </Typography>
-                </FormControl>
+              {/* Scope selection: environment tree for env-scoped tokens, project tree for universal_client */}
+              {formData.tokenType === 'universal_client' ? (
+                <ProjectTreeSelector
+                  organisations={organisations}
+                  projects={projects}
+                  selectedProjectId={formData.selectedProjectId}
+                  onSelect={(projectId) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      selectedProjectId: projectId,
+                      environments: [],
+                    }))
+                  }
+                  helperText={t('apiTokens.universalClientHelp')}
+                />
+              ) : (
+                <EnvironmentTreeSelector
+                  organisations={organisations}
+                  projects={projects}
+                  selectedEnvironmentId={formData.environments[0]}
+                  selectedProjectId={formData.selectedProjectId}
+                  onSelect={({ environmentId, projectId }) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      selectedProjectId: projectId,
+                      environments: [environmentId],
+                    }))
+                  }
+                  helperText={t('apiTokens.selectSingleEnvironment')}
+                />
               )}
             </Box>
           </Paper>
@@ -2113,59 +2642,30 @@ const ApiTokensPage: React.FC = () => {
                 </Typography>
               </FormControl>
 
-              {/* Project Select (tree-style, disabled in edit mode) */}
-              <ProjectTreeSelector
-                organisations={organisations}
-                projects={projects}
-                selectedProjectId={formData.selectedProjectId}
-                onSelect={() => {}}
-                helperText={t('apiTokens.tokenTypeNotEditable')}
-                disabled
-              />
-
-              {/* Environment Select - hidden for project tokens */}
-              {formData.tokenType !== 'universal_client' && (
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t('apiTokens.environmentAccess')}</InputLabel>
-                  <Select
-                    value={formData.environments[0] || ''}
-                    label={t('apiTokens.environmentAccess')}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        allowAllEnvironments: false,
-                        environments: [e.target.value as string],
-                      }))
-                    }
-                    renderValue={(value) => {
-                      const env = environments.find(
-                        (e) => e.environmentId === value
-                      );
-                      return env ? env.displayName || env.environmentName : '';
-                    }}
-                  >
-                    {environments.map((env) => (
-                      <MenuItem
-                        key={env.environmentId}
-                        value={env.environmentId}
-                      >
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {env.displayName || env.environmentName}
-                          </Typography>
-                          {env.description && (
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {env.description}
-                            </Typography>
-                          )}
-                        </Box>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+              {/* Scope display: environment tree for env-scoped tokens, project tree for universal_client */}
+              {formData.tokenType === 'universal_client' ? (
+                <ProjectTreeSelector
+                  organisations={organisations}
+                  projects={projects}
+                  selectedProjectId={formData.selectedProjectId}
+                  onSelect={() => {}}
+                  helperText={t('apiTokens.tokenTypeNotEditable')}
+                  disabled
+                />
+              ) : (
+                <EnvironmentTreeSelector
+                  organisations={organisations}
+                  projects={projects}
+                  selectedEnvironmentId={formData.environments[0]}
+                  selectedProjectId={formData.selectedProjectId}
+                  onSelect={({ environmentId, projectId }) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      selectedProjectId: projectId,
+                      environments: [environmentId],
+                    }))
+                  }
+                />
               )}
             </Box>
           </Paper>
@@ -2937,7 +3437,7 @@ const ApiTokensPage: React.FC = () => {
                 {t('apiTokens.tokenValue')}
               </Typography>
 
-              {/* Token Display with Copy Button */}
+              {/* Token Display with Copy Button - uses input for manual select+copy fallback in HTTP */}
               <Box
                 sx={{
                   display: 'flex',
@@ -2950,18 +3450,23 @@ const ApiTokensPage: React.FC = () => {
                   borderColor: 'divider',
                 }}
               >
-                <Typography
-                  variant="body2"
-                  fontFamily="monospace"
-                  sx={{
+                <input
+                  readOnly
+                  value={newTokenValue}
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                  style={{
                     flex: 1,
+                    fontFamily: 'monospace',
                     fontSize: '0.875rem',
                     letterSpacing: '0.5px',
-                    color: 'text.primary',
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    color: 'inherit',
+                    padding: 0,
+                    width: '100%',
                   }}
-                >
-                  {maskToken(newTokenValue)}
-                </Typography>
+                />
                 <Tooltip title={t('apiTokens.copyTokenValue')}>
                   <IconButton
                     onClick={async () => await copyToClipboard(newTokenValue)}
