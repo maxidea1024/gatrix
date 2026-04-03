@@ -51,6 +51,7 @@ export class VersionMapService {
   loadVersionMap(
     entries: Array<{
       projectId: string;
+      projectName?: string;
       clientVersion: string;
       platform?: string;
       targetEnv: string;
@@ -65,10 +66,20 @@ export class VersionMapService {
       if (entry.platform) {
         const key = `${entry.projectId}:${entry.platform}:${entry.clientVersion}`;
         newPlatformVersionMap.set(key, entry.targetEnv);
+        // Also register by projectName for unsecured token resolution
+        if (entry.projectName) {
+          const nameKey = `${entry.projectName}:${entry.platform}:${entry.clientVersion}`;
+          newPlatformVersionMap.set(nameKey, entry.targetEnv);
+        }
       }
       // Always add to generic map (last write wins for same projectId:version)
       const genericKey = `${entry.projectId}:${entry.clientVersion}`;
       newVersionMap.set(genericKey, entry.targetEnv);
+      // Also register by projectName
+      if (entry.projectName) {
+        const nameKey = `${entry.projectName}:${entry.clientVersion}`;
+        newVersionMap.set(nameKey, entry.targetEnv);
+      }
     }
 
     this.versionMap = newVersionMap;

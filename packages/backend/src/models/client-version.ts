@@ -692,21 +692,25 @@ export class ClientVersionModel {
   static async getVersionMap(projectId?: string): Promise<
     Array<{
       projectId: string;
+      projectName: string;
       platform: string;
       clientVersion: string;
       targetEnv: string | null;
     }>
   > {
     try {
-      let query = db('g_client_versions').select(
-        'projectId',
-        'platform',
-        'clientVersion',
-        'targetEnv'
-      );
+      let query = db('g_client_versions as cv')
+        .join('g_projects as p', 'cv.projectId', 'p.id')
+        .select(
+          'cv.projectId',
+          'p.projectName',
+          'cv.platform',
+          'cv.clientVersion',
+          'cv.targetEnv'
+        );
 
       if (projectId) {
-        query = query.where('projectId', projectId);
+        query = query.where('cv.projectId', projectId);
       }
 
       return await query;

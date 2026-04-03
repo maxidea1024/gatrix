@@ -211,7 +211,8 @@ export async function clientAuth(
   }
 
   // 2. Legacy unsecured tokens → resolve to default/default/development
-  if (LEGACY_TOKENS[apiToken]) {
+  //    Note: Legacy universal client token is handled as unsecured universal client (dynamic env resolution)
+  if (LEGACY_TOKENS[apiToken] && apiToken !== 'unsecured-universal-client-api-token') {
     const envId = environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME);
     if (!envId) {
       res.status(401).json({
@@ -234,6 +235,63 @@ export async function clientAuth(
     };
     logger.debug('Authenticated with legacy unsecured token', {
       environmentId: envId,
+    });
+    return next();
+  }
+
+  // 2b. Legacy universal client token → treat as unsecured-default:default-universal-client-api-token
+  if (apiToken === 'unsecured-universal-client-api-token') {
+    if (!clientVersion) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_CLIENT_VERSION',
+          message:
+            'x-client-version header or version query parameter is required for universal client tokens',
+        },
+      });
+      return;
+    }
+
+    const { versionMapService } =
+      await import('../services/version-map-service');
+    const targetEnv = versionMapService.resolveEnvironment(
+      'default',
+      clientVersion,
+      platform
+    );
+    if (!targetEnv) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'ENVIRONMENT_NOT_FOUND',
+          message: `No environment mapping found for version ${clientVersion}`,
+        },
+      });
+      return;
+    }
+
+    const envId =
+      environmentRegistry.resolveEnvironmentId(targetEnv) || targetEnv;
+    req.clientContext = {
+      apiToken,
+      applicationName,
+      environmentId: envId,
+      cacheKey: envId,
+      clientVersion,
+      platform,
+      tokenName: 'Legacy Unsecured Universal Client Token',
+      projectId: 'default',
+    };
+
+    res.set('x-resolved-environment-id', envId);
+    const envName = environmentRegistry.getEnvironmentName(envId);
+    if (envName) res.set('x-resolved-environment-name', envName);
+
+    logger.debug('Authenticated with legacy universal client token', {
+      environmentId: envId,
+      clientVersion,
+      platform,
     });
     return next();
   }

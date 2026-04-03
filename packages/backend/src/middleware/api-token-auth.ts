@@ -400,81 +400,113 @@ export const setSDKEnvironment = async (
     const token = req.apiToken;
 
     // Universal client token: dynamic env resolution via x-client-version
-    if (token && token.tokenType === 'universal_client' && token.projectId) {
-      // Accept version from header or query parameter
-      const clientVersion =
-        (req.headers[HEADERS.X_CLIENT_VERSION] as string | undefined) ||
-        (req.query.version as string | undefined);
-      const platform =
-        (req.headers[HEADERS.X_PLATFORM] as string | undefined) ||
-        (req.query.platform as string | undefined);
+    if (token && token.tokenType === 'universal_client') {
+      // Resolve projectId: from token (real tokens) or from unsecured fields (legacy/unsecured tokens)
+      let resolvedProjectId = token.projectId as string | undefined;
 
-      if (!clientVersion) {
-        return res.status(400).json({
-          success: false,
-          error: {
-            code: ErrorCodes.BAD_REQUEST,
-            message:
-              'x-client-version header or version query parameter is required for universal client tokens',
-          },
-        });
-      }
-
-      // Dynamic import to avoid circular dependency
-      const { ClientVersionModel } = await import('../models/client-version');
-      const versionRecord = await ClientVersionModel.findByProjectAndVersion(
-        token.projectId,
-        clientVersion,
-        platform || undefined
-      );
-
-      if (!versionRecord || !versionRecord.targetEnv) {
-        logger.warn(
-          'Auth: No targetEnv found for universal client token + version',
-          {
-            projectId: token.projectId,
-            clientVersion,
-            platform,
-          }
+      if (!resolvedProjectId && req.unsecuredProjectId) {
+        // For unsecured/legacy universal client tokens, resolve org+project names → project ULID
+        const { Project } = await import('../models/project');
+        const orgName = req.unsecuredOrgId || 'default';
+        const project = await Project.getByOrgAndName(
+          orgName,
+          req.unsecuredProjectId
         );
-        return res.status(400).json({
-          success: false,
-          error: {
-            code: ErrorCodes.ENV_NOT_FOUND,
-            message: `No environment mapping found for version ${clientVersion}`,
-          },
-        });
-      }
-
-      // Resolve environment from targetEnv
-      const cacheKey = `sdk_env:${versionRecord.targetEnv}`;
-      let env = await CacheService.get<Environment>(cacheKey);
-      if (!env) {
-        env = (await Environment.getById(versionRecord.targetEnv)) || null;
-        if (env) {
-          await CacheService.set(cacheKey, env, CACHE_TTL);
+        resolvedProjectId = project?.id;
+        if (!resolvedProjectId) {
+          logger.warn(
+            'Auth: Could not resolve project for unsecured universal client token',
+            {
+              orgId: req.unsecuredOrgId,
+              projectName: req.unsecuredProjectId,
+            }
+          );
+          return res.status(400).json({
+            success: false,
+            error: {
+              code: ErrorCodes.ENV_NOT_FOUND,
+              message: `Could not resolve project: ${req.unsecuredOrgId}/${req.unsecuredProjectId}`,
+            },
+          });
         }
       }
 
-      if (!env) {
-        return res.status(404).json({
-          success: false,
-          error: {
-            code: ErrorCodes.ENV_NOT_FOUND,
-            message: `Target environment not found: ${versionRecord.targetEnv}`,
-          },
-        });
+      if (resolvedProjectId) {
+        // Accept version from header or query parameter
+        const clientVersion =
+          (req.headers[HEADERS.X_CLIENT_VERSION] as string | undefined) ||
+          (req.query.version as string | undefined);
+        const platform =
+          (req.headers[HEADERS.X_PLATFORM] as string | undefined) ||
+          (req.query.platform as string | undefined);
+
+        if (!clientVersion) {
+          return res.status(400).json({
+            success: false,
+            error: {
+              code: ErrorCodes.BAD_REQUEST,
+              message:
+                'x-client-version header or version query parameter is required for universal client tokens',
+            },
+          });
+        }
+
+        // Dynamic import to avoid circular dependency
+        const { ClientVersionModel } = await import('../models/client-version');
+        const versionRecord = await ClientVersionModel.findByProjectAndVersion(
+          resolvedProjectId,
+          clientVersion,
+          platform || undefined
+        );
+
+        if (!versionRecord || !versionRecord.targetEnv) {
+          logger.warn(
+            'Auth: No targetEnv found for universal client token + version',
+            {
+              projectId: resolvedProjectId,
+              clientVersion,
+              platform,
+            }
+          );
+          return res.status(400).json({
+            success: false,
+            error: {
+              code: ErrorCodes.ENV_NOT_FOUND,
+              message: `No environment mapping found for version ${clientVersion}`,
+            },
+          });
+        }
+
+        // Resolve environment from targetEnv
+        const cacheKey = `sdk_env:${versionRecord.targetEnv}`;
+        let env = await CacheService.get<Environment>(cacheKey);
+        if (!env) {
+          env = (await Environment.getById(versionRecord.targetEnv)) || null;
+          if (env) {
+            await CacheService.set(cacheKey, env, CACHE_TTL);
+          }
+        }
+
+        if (!env) {
+          return res.status(404).json({
+            success: false,
+            error: {
+              code: ErrorCodes.ENV_NOT_FOUND,
+              message: `Target environment not found: ${versionRecord.targetEnv}`,
+            },
+          });
+        }
+
+        req.environmentId = env.id as string;
+        req.environmentModel = env;
+        req.projectId = resolvedProjectId;
+
+        // Include resolved target environment info in response headers
+        res.set('x-resolved-environment-id', env.id as string);
+        res.set('x-resolved-environment-name', env.name);
+
+        return next();
       }
-
-      req.environmentId = env.id as string;
-      req.environmentModel = env;
-      req.projectId = token.projectId as string;
-
-      // Include resolved target environment info in response headers
-      res.set('x-resolved-environment-id', env.id as string);
-      res.set('x-resolved-environment-name', env.name);
-
-      return next();
     }
 
     // Legacy token: environment from token directly

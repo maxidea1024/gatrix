@@ -114,6 +114,24 @@ export class Project extends Model implements ProjectData {
   }
 
   /**
+   * Get project by org name and project name
+   * Resolves org → project path for multi-org environments
+   */
+  static async getByOrgAndName(
+    orgName: string,
+    projectName: string
+  ): Promise<Project | undefined> {
+    const knex = this.knex();
+    const row = await knex('g_projects as p')
+      .join('g_organisations as o', 'p.orgId', 'o.id')
+      .where('o.orgName', orgName)
+      .where('p.projectName', projectName)
+      .select('p.*')
+      .first();
+    return row ? (Project.fromJson(row) as Project) : undefined;
+  }
+
+  /**
    * Get all active projects
    */
   static async getAllActive(): Promise<Project[]> {
