@@ -147,7 +147,11 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
       }
 
       // 웹 폰트 로드 등 지연으로 인해 글꼴 크기 계산이 어긋나는(커서 튐) 문제 방지
-      if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+      if (
+        typeof document !== 'undefined' &&
+        document.fonts &&
+        document.fonts.ready
+      ) {
         document.fonts.ready.then(() => {
           if (monaco?.editor?.remeasureFonts) {
             monaco.editor.remeasureFonts();
