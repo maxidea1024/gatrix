@@ -99,10 +99,7 @@ import 'dayjs/locale/zh-cn';
 import { ApiAccessToken, TokenType } from '@/types/apiToken';
 import SearchTextField from '../../components/common/SearchTextField';
 import { apiTokenService } from '@/services/apiTokenService';
-import {
-  Environment,
-  environmentService,
-} from '@/services/environmentService';
+import { Environment, environmentService } from '@/services/environmentService';
 import { useEnvironments } from '@/contexts/EnvironmentContext';
 import SimplePagination from '@/components/common/SimplePagination';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
@@ -835,24 +832,15 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
             py: 0.5,
             '&.Mui-selected': {
               backgroundColor: (theme) =>
-                alpha(
-                  itemColor,
-                  theme.palette.mode === 'dark' ? 0.2 : 0.1
-                ),
+                alpha(itemColor, theme.palette.mode === 'dark' ? 0.2 : 0.1),
               '&:hover': {
                 backgroundColor: (theme) =>
-                  alpha(
-                    itemColor,
-                    theme.palette.mode === 'dark' ? 0.25 : 0.15
-                  ),
+                  alpha(itemColor, theme.palette.mode === 'dark' ? 0.25 : 0.15),
               },
             },
             '&:hover': {
               backgroundColor: (theme) =>
-                alpha(
-                  itemColor,
-                  theme.palette.mode === 'dark' ? 0.15 : 0.08
-                ),
+                alpha(itemColor, theme.palette.mode === 'dark' ? 0.15 : 0.08),
             },
           }}
         >
@@ -923,9 +911,7 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
             overflow: 'hidden',
           }}
         >
-          <EnvironmentIcon
-            sx={{ fontSize: 18, opacity: 0.7, flexShrink: 0 }}
-          />
+          <EnvironmentIcon sx={{ fontSize: 18, opacity: 0.7, flexShrink: 0 }} />
           <Typography
             variant="body2"
             sx={{
@@ -1002,9 +988,7 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
                         <React.Fragment key={proj.id}>
                           {/* Project node */}
                           <ListItemButton
-                            onClick={() =>
-                              handleToggleProject(proj.id, org.id)
-                            }
+                            onClick={() => handleToggleProject(proj.id, org.id)}
                             dense
                             sx={{ py: 0.5, pl: 1.5 }}
                           >
@@ -1091,9 +1075,7 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
                       return (
                         <React.Fragment key={proj.id}>
                           <ListItemButton
-                            onClick={() =>
-                              handleToggleProject(proj.id, org.id)
-                            }
+                            onClick={() => handleToggleProject(proj.id, org.id)}
                             dense
                             sx={{ py: 0.5, pl: 4 }}
                           >
