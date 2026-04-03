@@ -88,6 +88,7 @@ import {
   Check as CheckIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -1133,6 +1134,7 @@ const ApiTokensPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { language } = useI18n();
   const { hasPermission } = useAuth();
+  const navigate = useNavigate();
 
   // Check if user can manage (create/edit/delete) tokens
   const canManage = hasPermission([P.IP_WHITELIST_UPDATE]);
@@ -1453,10 +1455,37 @@ const ApiTokensPage: React.FC = () => {
           </Typography>
         );
       }
-      case 'universal_client': {
-        const proj = projects.find((p) => p.id === (token as any).projectId);
+      case 'project': {
+        const proj = projects.find((p) => p.id === token.projectId);
+        if (!proj) {
+          return (
+            <Typography variant="body2" color="text.secondary">
+              -
+            </Typography>
+          );
+        }
         return (
-          <Typography variant="body2">{proj?.projectName || '-'}</Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              cursor: 'pointer',
+              '&:hover': {
+                color: 'primary.main',
+                textDecoration: 'underline',
+              },
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              const org = organisations.find((o) => o.id === proj.orgId);
+              if (org) {
+                navigate(
+                  `/admin/workspace?tab=projects&orgId=${org.id}`
+                );
+              }
+            }}
+          >
+            {proj.displayName || proj.projectName}
+          </Typography>
         );
       }
       case 'description':
@@ -2733,55 +2762,20 @@ const ApiTokensPage: React.FC = () => {
       </ResizableDrawer>
 
       {/* Delete Confirmation Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 500 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
+        title={t('apiTokens.deleteToken')}
+        storageKey="api-token-delete-drawer"
+        defaultWidth={500}
+        minWidth={400}
+        zIndex={1301}
       >
-        <Box
-          sx={{
-            p: 3,
-            borderBottom: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            backgroundColor: 'background.paper',
-            position: 'sticky',
-            top: 0,
-            zIndex: 1301,
-          }}
-        >
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{ fontWeight: 600, color: 'error.main' }}
-          >
-            {t('apiTokens.deleteToken')}
-          </Typography>
-          <IconButton
-            onClick={() => setDeleteDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
+        <Box sx={{ p: 3, flexGrow: 1, overflow: 'auto' }}>
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {t('apiTokens.deleteWarning')}
+          </Alert>
 
-        <Box sx={{ p: 3, flexGrow: 1 }}>
           <Typography variant="body1" sx={{ mb: 3, fontWeight: 500 }}>
             {t('apiTokens.deleteConfirmation')}
           </Typography>
@@ -2791,26 +2785,15 @@ const ApiTokensPage: React.FC = () => {
               <Box
                 sx={{
                   mb: 3,
-                  p: 3,
-                  bgcolor: 'background.paper',
+                  p: 2.5,
+                  bgcolor: (theme) => alpha(theme.palette.error.main, 0.04),
                   borderRadius: 2,
                   border: '1px solid',
-                  borderColor: 'divider',
+                  borderColor: (theme) => alpha(theme.palette.error.main, 0.12),
                 }}
               >
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                  {t('apiTokens.tokenName')}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 2 }}
-                >
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
                   {selectedToken.tokenName}
-                </Typography>
-
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                  {t('apiTokens.tokenType')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {t(
@@ -2874,57 +2857,19 @@ const ApiTokensPage: React.FC = () => {
             {t('common.delete')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* Regenerate Token Side Panel */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={regenerateDialogOpen}
         onClose={closeRegenerateDialog}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: 500,
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
-        ModalProps={{
-          keepMounted: false,
-        }}
+        title={t('apiTokens.regenerateToken')}
+        storageKey="api-token-regenerate-drawer"
+        defaultWidth={500}
+        minWidth={400}
+        zIndex={1301}
       >
-        <Box
-          sx={{
-            p: 3,
-            borderBottom: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            backgroundColor: 'background.paper',
-            position: 'sticky',
-            top: 0,
-            zIndex: 1300,
-          }}
-        >
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('apiTokens.regenerateToken')}
-          </Typography>
-          <IconButton
-            onClick={closeRegenerateDialog}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        <Box sx={{ p: 3, flexGrow: 1 }}>
+        <Box sx={{ p: 3, flexGrow: 1, overflow: 'auto' }}>
           <Alert severity="warning" sx={{ mb: 3 }}>
             {t('apiTokens.regenerateWarning')}
           </Alert>
@@ -2937,29 +2882,25 @@ const ApiTokensPage: React.FC = () => {
             <>
               <Box
                 sx={{
-                  p: 3,
-                  bgcolor: 'background.default',
+                  p: 2.5,
+                  bgcolor: (theme) => alpha(theme.palette.warning.main, 0.04),
                   borderRadius: 2,
                   border: '1px solid',
-                  borderColor: 'divider',
+                  borderColor: (theme) => alpha(theme.palette.warning.main, 0.12),
                   mb: 3,
                 }}
               >
-                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
                   {selectedToken.tokenName}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 1 }}
-                >
+                <Typography variant="body2" color="text.secondary">
                   {t(
                     `apiTokens.${selectedToken.tokenType}TokenType`,
                     selectedToken.tokenType
                   )}
                 </Typography>
                 {selectedToken.description && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                     {selectedToken.description}
                   </Typography>
                 )}
@@ -3010,7 +2951,7 @@ const ApiTokensPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={closeRegenerateDialog} variant="outlined">
+          <Button onClick={closeRegenerateDialog}>
             {t('common.cancel')}
           </Button>
           <Button
@@ -3027,7 +2968,7 @@ const ApiTokensPage: React.FC = () => {
             {t('apiTokens.regenerate')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* Bulk Delete Confirmation Drawer */}
       <Drawer
