@@ -76,9 +76,11 @@ export class StoreProductService extends BaseEnvironmentService<
    * @param id Store product ID
    * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
-  async getById(id: string, _environmentId?: string): Promise<StoreProduct> {
+  async getById(id: string, environmentId?: string): Promise<StoreProduct> {
     validateAll([{ param: 'id', value: id, type: 'string' }]);
-    const response = await this.apiClient.get<{ product: StoreProduct }>(
+    // Use environment-specific ApiClient for multi-env mode (Edge)
+    const client = this.getApiClient(environmentId);
+    const response = await client.get<{ product: StoreProduct }>(
       `/api/v1/server/store-products/${id}`
     );
     if (!response.success || !response.data) {

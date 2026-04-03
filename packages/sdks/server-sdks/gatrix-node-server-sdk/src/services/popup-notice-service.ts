@@ -55,10 +55,12 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * @param id Popup notice ID
    * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
-  async getById(id: string, _environmentId?: string): Promise<PopupNotice> {
+  async getById(id: string, environmentId?: string): Promise<PopupNotice> {
     validateAll([{ param: 'id', value: id, type: 'string' }]);
 
-    const response = await this.apiClient.get<{ notice: PopupNotice }>(
+    // Use environment-specific ApiClient for multi-env mode (Edge)
+    const client = this.getApiClient(environmentId);
+    const response = await client.get<{ notice: PopupNotice }>(
       `/api/v1/server/ingame-popup-notices/${id}`
     );
 

@@ -226,6 +226,16 @@ export class EventListener {
           // Subscribe to the full environment-level channel
           channels.push(`${this.CHANNEL_PREFIX}:${org}:${proj}:${env}`);
 
+          // Also subscribe to env-only channel for backend services that publish
+          // with only environmentId (no orgId/projectId context)
+          // Backend resolveChannels produces: gatrix-sdk-events:-:-:{envId}
+          if (channelContext?.environmentId) {
+            const envOnlyChannel = `${this.CHANNEL_PREFIX}:-:-:${env}`;
+            if (!channels.includes(envOnlyChannel)) {
+              channels.push(envOnlyChannel);
+            }
+          }
+
           // Also subscribe to project-level channel for project-scoped events
           // (e.g., client_version events published with { projectId } only)
           if (channelContext?.projectId) {

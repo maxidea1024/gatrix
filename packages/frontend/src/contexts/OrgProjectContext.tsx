@@ -371,15 +371,21 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({
       const projs = await orgProjectService.getProjects();
       setProjects(projs);
 
-      // Auto-select: stored → default → first
+      const orgProjs = projs.filter((p) => p.orgId === currentOrgId);
+
+      // Auto-select: stored -> default -> first
       const stored = getStoredProjectId();
-      const valid = projs.find((p) => p.id === stored);
+      const valid = orgProjs.find((p) => p.id === stored);
       if (valid) {
         setCurrentProjectId(valid.id);
-      } else if (projs.length > 0) {
-        const defaultProj = projs.find((p) => p.isDefault) || projs[0];
+        storeProjectId(valid.id);
+      } else if (orgProjs.length > 0) {
+        const defaultProj = orgProjs.find((p) => p.isDefault) || orgProjs[0];
         setCurrentProjectId(defaultProj.id);
         storeProjectId(defaultProj.id);
+      } else {
+        setCurrentProjectId(null);
+        localStorage.removeItem(STORAGE_KEY_PROJECT);
       }
     } catch (error) {
       devLogger.error('Failed to load projects:', error);
@@ -438,17 +444,30 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({
 
   // Switch org only (resets project — loadProjects will auto-select)
   const switchOrg = useCallback((orgId: string) => {
+    if (currentOrgId === orgId) return;
+
     setCurrentOrgId(orgId);
     storeOrgId(orgId);
-    setCurrentProjectId(null);
-    localStorage.removeItem(STORAGE_KEY_PROJECT);
-  }, []);
+    
+    // Synchronously try to select a project to avoid flashing 'No project'
+    const orgProjs = projects.filter(p => p.orgId === orgId);
+    if (orgProjs.length > 0) {
+      const defaultProj = orgProjs.find((p) => p.isDefault) || orgProjs[0];
+      setCurrentProjectId(defaultProj.id);
+      storeProjectId(defaultProj.id);
+    } else {
+      setCurrentProjectId(null);
+      localStorage.removeItem(STORAGE_KEY_PROJECT);
+    }
+  }, [currentOrgId, projects]);
 
   // Switch project within current org
   const switchProject = useCallback((projectId: string) => {
+    if (currentProjectId === projectId) return;
+
     setCurrentProjectId(projectId);
     storeProjectId(projectId);
-  }, []);
+  }, [currentProjectId]);
 
   // Atomically switch both org and project at once.
   const switchContext = useCallback((orgId: string, projectId: string) => {

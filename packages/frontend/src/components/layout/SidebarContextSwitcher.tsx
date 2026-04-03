@@ -525,7 +525,7 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
         icon={<OrgIcon sx={{ fontSize: 16, opacity: 0.6 }} />}
         label={orgLabel}
         onClick={handleOrgClick}
-        loading={orgLoading}
+        loading={orgLoading && organisations.length === 0}
         collapsed={collapsed}
         tooltipTitle={orgLabel}
         onManageClick={() => navigate('/admin/workspace?tab=organisations')}
@@ -537,7 +537,7 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
         icon={<ProjectIcon sx={{ fontSize: 16, opacity: 0.6 }} />}
         label={projLabel}
         onClick={handleProjClick}
-        loading={orgLoading}
+        loading={orgLoading && projects.length === 0}
         collapsed={collapsed}
         tooltipTitle={projLabel}
         onManageClick={() => navigate('/admin/workspace?tab=projects')}
@@ -549,7 +549,7 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
         icon={envDotIcon}
         label={envLabel}
         onClick={handleEnvClick}
-        loading={envLoading}
+        loading={envLoading && environments.length === 0}
         collapsed={collapsed}
         tooltipTitle={envLabel}
         isLast

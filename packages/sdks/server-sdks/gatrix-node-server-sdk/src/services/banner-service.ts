@@ -70,9 +70,11 @@ export class BannerService extends BaseEnvironmentService<
    * @param bannerId Banner ID
    * @param environmentId Environment ID (optional, only used in multi-env mode such as edge)
    */
-  async fetchById(bannerId: string, _environmentId?: string): Promise<Banner> {
+  async fetchById(bannerId: string, environmentId?: string): Promise<Banner> {
     validateAll([{ param: 'bannerId', value: bannerId, type: 'string' }]);
-    const response = await this.apiClient.get<{ banner: Banner }>(
+    // Use environment-specific ApiClient for multi-env mode (Edge)
+    const client = this.getApiClient(environmentId);
+    const response = await client.get<{ banner: Banner }>(
       `/api/v1/server/banners/${bannerId}`
     );
     if (!response.success || !response.data) {
