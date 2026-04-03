@@ -443,31 +443,37 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({
   }, [currentProjectId, currentProject]);
 
   // Switch org only (resets project — loadProjects will auto-select)
-  const switchOrg = useCallback((orgId: string) => {
-    if (currentOrgId === orgId) return;
+  const switchOrg = useCallback(
+    (orgId: string) => {
+      if (currentOrgId === orgId) return;
 
-    setCurrentOrgId(orgId);
-    storeOrgId(orgId);
-    
-    // Synchronously try to select a project to avoid flashing 'No project'
-    const orgProjs = projects.filter(p => p.orgId === orgId);
-    if (orgProjs.length > 0) {
-      const defaultProj = orgProjs.find((p) => p.isDefault) || orgProjs[0];
-      setCurrentProjectId(defaultProj.id);
-      storeProjectId(defaultProj.id);
-    } else {
-      setCurrentProjectId(null);
-      localStorage.removeItem(STORAGE_KEY_PROJECT);
-    }
-  }, [currentOrgId, projects]);
+      setCurrentOrgId(orgId);
+      storeOrgId(orgId);
+
+      // Synchronously try to select a project to avoid flashing 'No project'
+      const orgProjs = projects.filter((p) => p.orgId === orgId);
+      if (orgProjs.length > 0) {
+        const defaultProj = orgProjs.find((p) => p.isDefault) || orgProjs[0];
+        setCurrentProjectId(defaultProj.id);
+        storeProjectId(defaultProj.id);
+      } else {
+        setCurrentProjectId(null);
+        localStorage.removeItem(STORAGE_KEY_PROJECT);
+      }
+    },
+    [currentOrgId, projects]
+  );
 
   // Switch project within current org
-  const switchProject = useCallback((projectId: string) => {
-    if (currentProjectId === projectId) return;
+  const switchProject = useCallback(
+    (projectId: string) => {
+      if (currentProjectId === projectId) return;
 
-    setCurrentProjectId(projectId);
-    storeProjectId(projectId);
-  }, [currentProjectId]);
+      setCurrentProjectId(projectId);
+      storeProjectId(projectId);
+    },
+    [currentProjectId]
+  );
 
   // Atomically switch both org and project at once.
   const switchContext = useCallback((orgId: string, projectId: string) => {
