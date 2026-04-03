@@ -673,6 +673,11 @@ const GroupsPage: React.FC = () => {
             ? t('rbac.groups.createTitle')
             : t('rbac.groups.editTitle')
         }
+        subtitle={
+          dialogMode === 'create'
+            ? t('rbac.groups.createDescription')
+            : t('rbac.groups.editDescription')
+        }
         storageKey="groupsDrawerWidth"
         defaultWidth={450}
         minWidth={380}
@@ -748,7 +753,7 @@ const GroupsPage: React.FC = () => {
             ) : dialogMode === 'edit' ? (
               t('common.update')
             ) : (
-              t('common.save')
+              t('common.add')
             )}
           </Button>
         </Box>
