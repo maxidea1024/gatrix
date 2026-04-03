@@ -38,7 +38,6 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   const theme = useTheme();
   const editorRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const isUpdatingRef = useRef(false);
   const [internalError, setInternalError] = useState<string | null>(null);
 
   // Real-time JSON validation with debounce to prevent flickering
@@ -124,6 +123,12 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         editorElement.style.border = 'none';
       }
 
+      // EOL을 LF로 강제 설정하여 \r\n 으로 인한 커서 튐 문제 방지
+      const model = editor.getModel();
+      if (model && monaco?.editor?.EndOfLineSequence) {
+        model.setEOL(monaco.editor.EndOfLineSequence.LF);
+      }
+
       // 포맷팅 단축키 Settings
       if (editor?.addAction && monaco?.KeyMod && monaco?.KeyCode) {
         editor.addAction({
@@ -140,44 +145,28 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
           },
         });
       }
+
+      // 웹 폰트 로드 등 지연으로 인해 글꼴 크기 계산이 어긋나는(커서 튐) 문제 방지
+      if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          if (monaco?.editor?.remeasureFonts) {
+            monaco.editor.remeasureFonts();
+          }
+        });
+      }
     } catch (error) {
       prodLogger.warn('Monaco Editor initialization warning:', error);
     }
   };
 
-  // Track the last value emitted by the editor to avoid re-sync loops
-  const lastEditorValueRef = useRef<string>(value || '');
-
   const handleEditorChange = useCallback(
     (newValue: string | undefined) => {
-      if (newValue !== undefined && !isUpdatingRef.current) {
-        // Normalize line endings to prevent Windows \r\n issues
-        const normalized = newValue.replace(/\r/g, '');
-        lastEditorValueRef.current = normalized;
-        onChange(normalized);
+      if (newValue !== undefined) {
+        onChange(newValue);
       }
     },
     [onChange]
   );
-
-  // Sync EXTERNAL value prop changes to editor, preserving cursor position
-  // Skip sync when the value change originated from the editor itself
-  useEffect(() => {
-    if (editorRef.current && value !== undefined) {
-      const normalizedValue = value.replace(/\r/g, '');
-      // Only sync if the value differs from what the editor last emitted
-      if (normalizedValue !== lastEditorValueRef.current) {
-        lastEditorValueRef.current = normalizedValue;
-        const position = editorRef.current.getPosition();
-        isUpdatingRef.current = true;
-        editorRef.current.setValue(normalizedValue);
-        if (position) {
-          editorRef.current.setPosition(position);
-        }
-        isUpdatingRef.current = false;
-      }
-    }
-  }, [value]);
 
   const editorTheme = theme.palette.mode === 'dark' ? 'vs-dark' : 'vs';
 
@@ -251,7 +240,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
           <Editor
             height="100%"
             defaultLanguage={json5Mode ? 'javascript' : 'json'}
-            defaultValue={value || placeholder}
+            value={value !== undefined ? value : placeholder}
             onChange={handleEditorChange}
             onMount={handleEditorDidMount}
             theme={editorTheme}
@@ -268,7 +257,9 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
               insertSpaces: true,
               lineNumbers: 'on',
               fontFamily:
-                'D2Coding, NanumGothicCoding, "Source Han Mono", "Noto Sans Mono CJK KR", Consolas, Monaco, "Courier New", monospace',
+                '"D2Coding", "NanumGothicCoding", "Consolas", "Courier New", monospace',
+              fontSize: 14,
+              letterSpacing: 0,
               glyphMargin: false,
               folding: true,
               lineDecorationsWidth: 0,
