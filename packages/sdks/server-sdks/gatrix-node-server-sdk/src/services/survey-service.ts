@@ -43,6 +43,14 @@ export class SurveyService {
   }
 
   /**
+   * Update the default environment ID.
+   * Called by CacheManager after /ready resolves the real environmentId.
+   */
+  setDefaultEnvironmentId(environmentId: string): void {
+    this.defaultEnvironmentId = environmentId;
+  }
+
+  /**
    * Initialize service and load data from local storage
    */
   async initializeAsync(environmentId?: string): Promise<void> {

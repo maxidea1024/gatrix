@@ -1005,7 +1005,9 @@ export class GatrixServerSDK {
       );
     }
 
-    return this.config.apiToken;
+    // Use the resolved environment ID from /ready if available,
+    // otherwise fall back to apiToken (before /ready completes)
+    return this.cacheManager?.getResolvedEnvironmentId() || this.config.apiToken;
   }
 
   // ============================================================================

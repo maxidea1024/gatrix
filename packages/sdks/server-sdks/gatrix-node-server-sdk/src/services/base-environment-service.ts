@@ -68,6 +68,14 @@ export abstract class BaseEnvironmentService<
   }
 
   /**
+   * Update the default environment ID.
+   * Called by CacheManager after /ready resolves the real environmentId.
+   */
+  setDefaultEnvironmentId(environmentId: string): void {
+    this.defaultEnvironmentId = environmentId;
+  }
+
+  /**
    * Set feature enabled flag
    * When false, refresh methods will log a warning
    */
@@ -206,11 +214,10 @@ export abstract class BaseEnvironmentService<
     const items = this.extractItems(response.data);
 
     if (items.length === 0 && currentItems.length > 0) {
-      this.logger.warn(
-        `${this.getServiceName()} received empty list from backend, but local cache has data. Keeping local data.`,
-        { localCount: currentItems.length }
+      this.logger.info(
+        `${this.getServiceName()} received empty list from backend. Clearing local cache.`,
+        { previousCount: currentItems.length }
       );
-      return currentItems;
     }
 
     this.logger.info(`${this.getServiceName()} received from backend`, {

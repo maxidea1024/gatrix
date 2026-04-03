@@ -219,9 +219,12 @@ export class StoreProductService extends BaseEnvironmentService<
     const now = new Date();
 
     return products.filter((p) => {
-      // All cached products are already isActive=true from backend
-      // Only check sale period
+      // Check isActive flag (may be toggled off via admin or event)
+      if (p.isActive === false) {
+        return false;
+      }
 
+      // Check sale period
       if (p.saleStartAt) {
         const startDate = new Date(p.saleStartAt);
         if (!Number.isNaN(startDate.getTime()) && now < startDate) {

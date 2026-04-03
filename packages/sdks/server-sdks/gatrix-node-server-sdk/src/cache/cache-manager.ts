@@ -250,6 +250,34 @@ export class CacheManager {
   }
 
   /**
+   * Propagate resolved environmentId to all initialized services.
+   * In single-env mode, after /ready resolves the real environmentId,
+   * CacheManager.defaultEnvironmentId is updated but each service still
+   * holds the old apiToken. This method synchronizes them so that
+   * getCached() (no-arg) correctly looks up by the real environmentId.
+   */
+  private propagateDefaultEnvironmentId(environmentId: string): void {
+    this.gameWorldService?.setDefaultEnvironmentId(environmentId);
+    this.popupNoticeService?.setDefaultEnvironmentId(environmentId);
+    this.surveyService?.setDefaultEnvironmentId(environmentId);
+    this.whitelistService?.setDefaultEnvironmentId(environmentId);
+    this.serviceMaintenanceService?.setDefaultEnvironmentId(environmentId);
+    this.serviceNoticeService?.setDefaultEnvironmentId(environmentId);
+    this.bannerService?.setDefaultEnvironmentId(environmentId);
+    this.storeProductService?.setDefaultEnvironmentId(environmentId);
+    this.featureFlagService?.setDefaultEnvironmentId(environmentId);
+    this.varsService?.setDefaultEnvironmentId(environmentId);
+  }
+
+  /**
+   * Get the resolved environment ID from /ready.
+   * Returns null if not yet resolved.
+   */
+  getResolvedEnvironmentId(): string | null {
+    return this.resolvedEnvironmentId;
+  }
+
+  /**
    * Get environment IDs from the environment provider.
    * Maps EnvironmentEntry[] to string[] of environmentIds.
    */
@@ -353,6 +381,11 @@ export class CacheManager {
         this.apiClientFactory.remapDefaultEnvironment(
           this.resolvedEnvironmentId
         );
+        // Propagate resolved environmentId to ALL services.
+        // Without this, each service's getCached() (no-arg) still uses
+        // the old apiToken as lookup key, but data is stored under the
+        // real environmentId — causing a cache-key mismatch (all counts = 0).
+        this.propagateDefaultEnvironmentId(this.resolvedEnvironmentId);
         this.logger.info(
           'Default environment updated with resolved environmentId',
           {

@@ -64,6 +64,14 @@ export class WhitelistService {
   }
 
   /**
+   * Update the default environment ID.
+   * Called by CacheManager after /ready resolves the real environmentId.
+   */
+  setDefaultEnvironmentId(environmentId: string): void {
+    this.defaultEnvironmentId = environmentId;
+  }
+
+  /**
    * Set ApiClientFactory for multi-environment mode.
    * When set, listByEnvironment() uses the factory to get a per-environment ApiClient.
    */

@@ -75,6 +75,14 @@ export class FeatureFlagService {
   }
 
   /**
+   * Update the default environment ID.
+   * Called by CacheManager after /ready resolves the real environmentId.
+   */
+  setDefaultEnvironmentId(environmentId: string): void {
+    this.defaultEnvironmentId = environmentId;
+  }
+
+  /**
    * Set static context (default context merged with per-evaluation context)
    * Static context is applied to all evaluations, with per-evaluation context taking precedence
    */
