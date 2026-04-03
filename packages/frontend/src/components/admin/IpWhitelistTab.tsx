@@ -846,7 +846,11 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           <Button
             onClick={handleSave}
             variant="contained"
-            disabled={editDialog && !isDirty}
+            disabled={
+              editDialog
+                ? !isDirty
+                : !formData.ipAddress.trim() || !formData.purpose.trim()
+            }
           >
             {editDialog ? t('common.update') : t('common.add')}
           </Button>

@@ -1055,7 +1055,13 @@ const WhitelistPage: React.FC = () => {
                   onClick={handleSave}
                   variant="contained"
                   disabled={
-                    loading || (editDialog && !!selectedWhitelist && !isDirty)
+                    loading ||
+                    (editDialog
+                      ? !!selectedWhitelist && !isDirty
+                      : !formData.accountId.trim() ||
+                        formData.accountId.trim().length < 4 ||
+                        formData.accountId.trim().length > 36 ||
+                        !formData.purpose?.trim())
                   }
                 >
                   {editDialog ? t('common.update') : t('common.add')}
