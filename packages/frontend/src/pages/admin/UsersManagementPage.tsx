@@ -2468,11 +2468,11 @@ const UsersManagementPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={handleCloseAddUserDialog} variant="outlined">
+          <Button onClick={handleCloseAddUserDialog}>
             {t('common.cancel')}
           </Button>
           <Button onClick={handleCreateUser} variant="contained">
-            {t('users.addUser')}
+            {t('common.add')}
           </Button>
         </Box>
       </ResizableDrawer>
