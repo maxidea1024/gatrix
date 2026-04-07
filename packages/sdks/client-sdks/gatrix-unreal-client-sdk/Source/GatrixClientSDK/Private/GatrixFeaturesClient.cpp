@@ -2086,7 +2086,7 @@ void UGatrixFeaturesClient::FetchPartialFlags(const TArray<FString>& FlagKeys) {
   }
 
   HttpRequest->OnProcessRequestComplete().BindLambda(
-      [this, RequestedKeys](FHttpRequestPtr Request, FHttpResponsePtr Response,
+      [this, RequestedKeys, PartialFetchStartHash](FHttpRequestPtr Request, FHttpResponsePtr Response,
                             bool bWasSuccessful) {
         bStreamingFetching = false;
 
@@ -2181,10 +2181,10 @@ void UGatrixFeaturesClient::MergePartialResponse(const FString& ResponseBody,
   TMap<FString, FGatrixEvaluatedFlag> NewRealtime = RealtimeFlags;
 
   EmitFlagChanges(OldFlags, NewRealtime);
-  InvokeWatchCallbacks(RealtimeWatchCallbacks, OldFlags, NewRealtime, /*bForceRealtime=*/true);
+  InvokeWatchCallbacks(RealtimeWatchCallbacks, OldFlags, NewRealtime, /*bForceRealtime=*/true, LastContextHash, LastContextHash);
 
   if (!ClientConfig.Features.bExplicitSyncMode) {
-    InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, NewRealtime, /*bForceRealtime=*/false);
+    InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, NewRealtime, /*bForceRealtime=*/false, LastContextHash, LastContextHash);
     if (EventEmitter)
       EventEmitter->Emit(GatrixEvents::FlagsChange);
     OnChange.Broadcast();
@@ -2226,15 +2226,8 @@ FString UGatrixFeaturesClient::ComputeEtag(const TMap<FString, FGatrixEvaluatedF
                                   F.bEnabled ? TEXT("true") : TEXT("false"), *VariantPart);
   }
 
-  // Use SHA-256 for ETag (standard SHA-256 hex string)
-  FString Result;
-  FSHA256Signature Signature;
-  FTCHARToUTF8 Utf8Source(*EtagSource);
-  FSHA256::HashBuffer(Signature.Signature, (const uint8*)Utf8Source.Get(), Utf8Source.Length());
-
-  for (int32 i = 0; i < 32; i++) {
-    Result += FString::Printf(TEXT("%02x"), Signature.Signature[i]);
-  }
+  // Use MD5 for ETag computation (fast, collision-resistant enough for caching)
+  FString Result = FMD5::HashAnsiString(*EtagSource);
 
   return FString::Printf(TEXT("\"%s\""), *Result);
 }

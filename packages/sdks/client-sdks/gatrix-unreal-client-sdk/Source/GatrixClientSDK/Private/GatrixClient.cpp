@@ -119,6 +119,12 @@ bool UGatrixClient::InitInternal(const FGatrixClientConfig& InConfig) {
   FeaturesClient = NewObject<UGatrixFeaturesClient>(this);
   FeaturesClient->Initialize(StoredConfig, &EventEmitter, StorageProvider, ClientConnectionId);
 
+  // Create banner client (shares same API URL and token)
+  BannerClient = NewObject<UGatrixBannerClient>(this);
+  TMap<FString, FString> BannerHeaders;
+  BannerHeaders.Add(TEXT("x-application-name"), StoredConfig.AppName);
+  BannerClient->Initialize(StoredConfig.ApiUrl, StoredConfig.ApiToken, BannerHeaders);
+
   bInitialized = true;
 
   UE_LOG(LogGatrix, Log, TEXT("Initialized. App=%s ConnectionId=%s"), *StoredConfig.AppName,
@@ -172,6 +178,8 @@ void UGatrixClient::Stop() {
     FeaturesClient->Stop();
     FeaturesClient = nullptr;
   }
+
+  BannerClient = nullptr;
 
   EventEmitter.RemoveAll();
 

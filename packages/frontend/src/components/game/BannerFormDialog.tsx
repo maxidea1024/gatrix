@@ -245,6 +245,14 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
     selectedTags,
   ]);
 
+  // Regex for valid identifier: lowercase letters, numbers, underscore, hyphen (must start with letter)
+  const BANNER_NAME_REGEX = /^[a-z][a-z0-9_-]*$/;
+
+  // Validate banner name format
+  const isValidBannerName = (value: string): boolean => {
+    return BANNER_NAME_REGEX.test(value);
+  };
+
   // Check if required fields are filled
   const isFormValid = useMemo(() => {
     return !!name.trim() && isValidBannerName(name);
@@ -331,13 +339,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < sequenceHistory.length - 1;
 
-  // Regex for valid identifier: lowercase letters, numbers, underscore, hyphen (must start with letter)
-  const BANNER_NAME_REGEX = /^[a-z][a-z0-9_-]*$/;
 
-  // Validate banner name format
-  const isValidBannerName = (value: string): boolean => {
-    return BANNER_NAME_REGEX.test(value);
-  };
 
   // Get name validation error message
   const getNameError = (): string | null => {

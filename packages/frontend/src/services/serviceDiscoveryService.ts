@@ -158,6 +158,25 @@ class ServiceDiscoveryService {
   }
 
   /**
+   * Force cache refresh on a service instance
+   * Calls the service's /internal/cache/refresh endpoint via backend proxy
+   */
+  async refreshCache(
+    serviceType: string,
+    instanceId: string
+  ): Promise<{
+    success: boolean;
+    data?: any;
+    error?: string;
+    latency?: number;
+  }> {
+    const response = await api.post(
+      `/admin/services/${serviceType}/${instanceId}/cache/refresh`
+    );
+    return response.data;
+  }
+
+  /**
    * Get request statistics from a service instance
    * Calls the service's /internal/stats/requests endpoint via backend proxy
    */

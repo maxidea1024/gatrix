@@ -23,7 +23,9 @@ import {
   Tooltip,
   Stack,
   Dialog,
+  DialogTitle,
   DialogContent,
+  DialogActions,
 } from '@mui/material';
 import {
   KeyboardArrowDown,
@@ -36,6 +38,7 @@ import {
   ContentCopy as CopyIcon,
   BarChart as BarChartIcon,
   Stream as StreamIcon,
+  DeleteSweep as InvalidateIcon,
 } from '@mui/icons-material';
 
 import { useTranslation } from 'react-i18next';
@@ -105,6 +108,11 @@ const GatrixEdgesPage: React.FC = () => {
   const [jsonDialogData, setJsonDialogData] = useState<any>(null);
   const [jsonDialogTitle, setJsonDialogTitle] = useState('');
   const [fullJsonLoading, setFullJsonLoading] = useState<string | null>(null);
+
+  // Cache invalidation
+  const [cacheInvalidateDialogOpen, setCacheInvalidateDialogOpen] = useState(false);
+  const [cacheInvalidateTarget, setCacheInvalidateTarget] = useState<ServiceInstance | null>(null);
+  const [cacheInvalidating, setCacheInvalidating] = useState(false);
 
   // JSON Search State
   const [jsonSearchQuery, setJsonSearchQuery] = useState('');
@@ -320,6 +328,27 @@ const GatrixEdgesPage: React.FC = () => {
       openJsonDialog(result, t('gatrixEdges.streamingStats'));
     } catch (err: any) {
       console.error('Failed to fetch streaming stats:', err);
+    }
+  };
+
+  // Cache invalidation handler
+  const handleCacheInvalidate = async () => {
+    if (!cacheInvalidateTarget) return;
+    setCacheInvalidating(true);
+    try {
+      const serviceType = cacheInvalidateTarget.labels.service;
+      await serviceDiscoveryService.refreshCache(
+        serviceType,
+        cacheInvalidateTarget.instanceId
+      );
+      enqueueSnackbar(t('gatrixEdges.cacheInvalidateSuccess'), { variant: 'success' });
+    } catch (err: any) {
+      console.error('Failed to invalidate cache:', err);
+      enqueueSnackbar(t('gatrixEdges.cacheInvalidateFailed'), { variant: 'error' });
+    } finally {
+      setCacheInvalidating(false);
+      setCacheInvalidateDialogOpen(false);
+      setCacheInvalidateTarget(null);
     }
   };
 
@@ -638,6 +667,26 @@ const GatrixEdgesPage: React.FC = () => {
             sx={{ fontSize: '0.75rem', textTransform: 'none' }}
           >
             {t('gatrixEdges.streamingStats')}
+          </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            color="warning"
+            startIcon={
+              cacheInvalidating && cacheInvalidateTarget?.instanceId === instance.instanceId ? (
+                <CircularProgress size={14} color="inherit" />
+              ) : (
+                <InvalidateIcon fontSize="small" />
+              )
+            }
+            onClick={() => {
+              setCacheInvalidateTarget(instance);
+              setCacheInvalidateDialogOpen(true);
+            }}
+            disabled={cacheInvalidating}
+            sx={{ fontSize: '0.75rem', textTransform: 'none' }}
+          >
+            {t('gatrixEdges.cacheInvalidate')}
           </Button>
         </Box>
       </Box>
@@ -1239,6 +1288,65 @@ const GatrixEdgesPage: React.FC = () => {
           </Box>
         </Box>
       </PageContentLoader>
+
+      {/* Cache Invalidation Confirmation Dialog */}
+      <Dialog
+        open={cacheInvalidateDialogOpen}
+        onClose={() => {
+          if (!cacheInvalidating) {
+            setCacheInvalidateDialogOpen(false);
+            setCacheInvalidateTarget(null);
+          }
+        }}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <InvalidateIcon color="warning" />
+          {t('gatrixEdges.cacheInvalidate')}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            {t('gatrixEdges.cacheInvalidateConfirm')}
+          </Typography>
+          {cacheInvalidateTarget && (
+            <Chip
+              label={`${cacheInvalidateTarget.hostname} (${cacheInvalidateTarget.instanceId})`}
+              size="small"
+              sx={{ mb: 2, fontFamily: 'monospace', fontSize: '0.75rem' }}
+            />
+          )}
+          <Alert severity="warning" sx={{ mt: 1 }}>
+            {t('gatrixEdges.cacheInvalidateWarning')}
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setCacheInvalidateDialogOpen(false);
+              setCacheInvalidateTarget(null);
+            }}
+            disabled={cacheInvalidating}
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={handleCacheInvalidate}
+            disabled={cacheInvalidating}
+            startIcon={
+              cacheInvalidating ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : (
+                <InvalidateIcon />
+              )
+            }
+          >
+            {t('gatrixEdges.cacheInvalidate')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* JSON View Dialog */}
       <Dialog

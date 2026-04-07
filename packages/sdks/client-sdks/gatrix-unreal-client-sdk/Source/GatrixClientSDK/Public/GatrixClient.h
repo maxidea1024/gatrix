@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "GatrixEventEmitter.h"
 #include "GatrixFeaturesClient.h"
+#include "GatrixBannerClient.h"
 #include "GatrixStorageProvider.h"
 #include "GatrixTypes.h"
 #include "GatrixClient.generated.h"
@@ -64,6 +65,10 @@ public:
   /** Get the features client for flag access */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix")
   UGatrixFeaturesClient* GetFeatures() const { return FeaturesClient; }
+
+  /** Get the banner client for banner access */
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix")
+  UGatrixBannerClient* GetBanners() const { return BannerClient; }
 
   // ==================== Event Subscription (C++) ====================
 
@@ -136,6 +141,9 @@ private:
 
   UPROPERTY()
   UGatrixFeaturesClient* FeaturesClient = nullptr;
+
+  UPROPERTY()
+  UGatrixBannerClient* BannerClient = nullptr;
 
   FGatrixEventEmitter EventEmitter;
   TSharedPtr<IGatrixStorageProvider> StorageProvider;

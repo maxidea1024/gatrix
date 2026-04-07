@@ -1281,6 +1281,27 @@ const ApiTokensPage: React.FC = () => {
     null
   );
 
+  // View Token Dialog state (for HTTP environments where clipboard doesn't work)
+  const [viewTokenDialogOpen, setViewTokenDialogOpen] = useState(false);
+  const [viewTokenValue, setViewTokenValue] = useState('');
+  const viewTokenInputRef = useRef<HTMLInputElement>(null);
+
+  const isInsecureContext = !window.isSecureContext || window.location.protocol === 'http:';
+
+  const openViewTokenDialog = (token: ApiAccessToken) => {
+    const value = token.tokenValue || '';
+    if (!value) {
+      enqueueSnackbar(t('apiTokens.tokenValueError'), { variant: 'error' });
+      return;
+    }
+    setViewTokenValue(value);
+    setViewTokenDialogOpen(true);
+    // Auto-select text after dialog opens
+    setTimeout(() => {
+      viewTokenInputRef.current?.select();
+    }, 200);
+  };
+
   // Column handlers
   const handleToggleColumnVisibility = (columnId: string) => {
     const newColumns = columns.map((col) =>
@@ -2203,7 +2224,21 @@ const ApiTokensPage: React.FC = () => {
       >
         <MenuItem
           onClick={async () => {
-            if (menuTargetToken) await copyTokenValue(menuTargetToken);
+            if (menuTargetToken) {
+              const tokenVal = menuTargetToken.tokenValue || '';
+              if (!tokenVal) {
+                enqueueSnackbar(t('apiTokens.tokenValueError'), { variant: 'error' });
+              } else if (isInsecureContext) {
+                openViewTokenDialog(menuTargetToken);
+              } else {
+                // HTTPS: await so clipboard write completes before menu closes
+                await copyToClipboardWithNotification(
+                  tokenVal,
+                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                );
+              }
+            }
             setMenuAnchorEl(null);
             setMenuTargetToken(null);
           }}
@@ -2212,6 +2247,18 @@ const ApiTokensPage: React.FC = () => {
             <CopyIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t('apiTokens.copyToken')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTargetToken) openViewTokenDialog(menuTargetToken);
+            setMenuAnchorEl(null);
+            setMenuTargetToken(null);
+          }}
+        >
+          <ListItemIcon>
+            <VisibilityIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('apiTokens.showToken')}</ListItemText>
         </MenuItem>
         {canManage && [
           <MenuItem
@@ -2255,6 +2302,71 @@ const ApiTokensPage: React.FC = () => {
           </MenuItem>,
         ]}
       </Menu>
+
+      {/* View Token Dialog (for HTTP environments) */}
+      <Dialog
+        open={viewTokenDialogOpen}
+        onClose={() => {
+          setViewTokenDialogOpen(false);
+          setViewTokenValue('');
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <VisibilityIcon />
+          {t('apiTokens.showToken')}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {t('apiTokens.tokenValue')}
+          </Typography>
+          <TextField
+            fullWidth
+            value={viewTokenValue}
+            inputRef={viewTokenInputRef}
+            slotProps={{
+              input: {
+                readOnly: true,
+                sx: {
+                  fontFamily: 'monospace',
+                  fontSize: '0.85rem',
+                  wordBreak: 'break-all',
+                },
+              },
+            }}
+            multiline
+            maxRows={4}
+            onClick={() => viewTokenInputRef.current?.select()}
+          />
+          <Alert severity="info" sx={{ mt: 2 }}>
+            Ctrl+C / Cmd+C
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            startIcon={<CopyIcon />}
+            onClick={async () => {
+              await copyToClipboardWithNotification(
+                viewTokenValue,
+                () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+              );
+            }}
+          >
+            {t('apiTokens.copyToken')}
+          </Button>
+          <Button
+            onClick={() => {
+              setViewTokenDialogOpen(false);
+              setViewTokenValue('');
+            }}
+          >
+            {t('common.close')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Create Token Side Panel */}
       <ResizableDrawer
@@ -2674,6 +2786,7 @@ const ApiTokensPage: React.FC = () => {
                       environments: [environmentId],
                     }))
                   }
+                  disabled
                 />
               )}
             </Box>

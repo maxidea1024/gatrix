@@ -101,14 +101,9 @@ interface FrameEditorProps {
   onDialogClose?: () => void; // Callback when dialog closes (for list view)
 }
 
-// Auto-detect frame type from URL extension
-const detectFrameType = (url: string): FrameType | null => {
-  // Return null if URL is empty or not a valid URL format
-  if (!url || !url.trim()) {
-    return null;
-  }
-
-  // Check if it looks like a valid URL (starts with http://, https://, or //)
+// Auto-detect frame type from URL extension (fast fallback)
+const detectFrameTypeFromUrl = (url: string): FrameType | null => {
+  if (!url || !url.trim()) return null;
   const trimmedUrl = url.trim().toLowerCase();
   if (
     !trimmedUrl.startsWith('http://') &&
@@ -130,8 +125,66 @@ const detectFrameType = (url: string): FrameType | null => {
     case 'mp4':
     case 'webm':
       return 'mp4';
+    case 'webp':
+      return 'webp';
+    case 'svg':
+      return 'svg';
     default:
       return null;
+  }
+};
+
+// Detect frame type from file header (magic bytes) — async, more accurate
+const detectFrameTypeFromHeader = async (url: string): Promise<FrameType | null> => {
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { Range: 'bytes=0-31' },
+    });
+    if (!response.ok) return null;
+
+    const buffer = await response.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    if (bytes.length < 4) return null;
+
+    // RIFF....WEBP
+    if (
+      bytes.length >= 12 &&
+      bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
+      bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50
+    ) {
+      return 'webp';
+    }
+    // GIF87a / GIF89a
+    if (bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46) {
+      return 'gif';
+    }
+    // PNG: 0x89 P N G
+    if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) {
+      return 'png';
+    }
+    // JPG: 0xFF 0xD8 0xFF
+    if (bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF) {
+      return 'jpg';
+    }
+    // SVG: starts with '<' (XML)
+    if (bytes[0] === 0x3C) {
+      const text = new TextDecoder().decode(bytes);
+      if (text.includes('<svg') || text.includes('<SVG')) {
+        return 'svg';
+      }
+    }
+    // MP4: ftyp
+    if (
+      bytes.length >= 8 &&
+      bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70
+    ) {
+      return 'mp4';
+    }
+
+    return null;
+  } catch {
+    return null;
   }
 };
 
@@ -330,13 +383,21 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
   const handleImageUrlChange = (imageUrl: string) => {
     setImageError(false);
     setImageInfo(null); // Reset image info when URL changes
-    const detectedType = detectFrameType(imageUrl);
-    // Only set type if detected, otherwise keep previous type or use 'png' as fallback for valid URLs
+    // Immediate: use URL extension as fast fallback
+    const urlType = detectFrameTypeFromUrl(imageUrl);
     setEditFrame({
       ...editFrame,
       imageUrl,
-      type: detectedType || editFrame.type || 'png',
+      type: urlType || editFrame.type || 'png',
     });
+    // Async: detect from file header (magic bytes) for accuracy
+    if (imageUrl && imageUrl.trim()) {
+      detectFrameTypeFromHeader(imageUrl).then((headerType) => {
+        if (headerType) {
+          setEditFrame((prev) => ({ ...prev, type: headerType }));
+        }
+      });
+    }
   };
 
   // Handle image load to get dimensions
@@ -948,7 +1009,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 size="small"
                 placeholder="https://cdn.example.com/image.png"
                 helperText={
-                  editFrame.imageUrl && detectFrameType(editFrame.imageUrl)
+                  editFrame.imageUrl && detectFrameTypeFromUrl(editFrame.imageUrl)
                     ? `${t('banners.detectedType')}: ${editFrame.type?.toUpperCase()}`
                     : ''
                 }
@@ -1451,8 +1512,12 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleDialogClose}>{t('common.cancel')}</Button>
-          <Button variant="contained" onClick={handleDialogApply}>
-            {t('common.apply')}
+          <Button
+            variant="contained"
+            onClick={handleDialogApply}
+            disabled={JSON.stringify(editFrame) === JSON.stringify(frame)}
+          >
+            {t('common.update')}
           </Button>
         </DialogActions>
       </Dialog>

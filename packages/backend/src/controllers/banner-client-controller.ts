@@ -42,10 +42,24 @@ export class BannerClientController {
       const { bannerId } = req.params;
       const environmentId = req.environmentId!;
 
-      const banner = await BannerService.getPublishedBannerById(
-        bannerId,
-        environmentId
-      );
+      // Try by ID first, then by name
+      let banner;
+      try {
+        banner = await BannerService.getPublishedBannerById(
+          bannerId,
+          environmentId
+        );
+      } catch (e: any) {
+        // If not found by ID, try by name
+        if (e.statusCode === 404) {
+          banner = await BannerService.getPublishedBannerByName(
+            bannerId,
+            environmentId
+          );
+        } else {
+          throw e;
+        }
+      }
 
       // Transform for client (remove internal fields)
       const clientBanner = {

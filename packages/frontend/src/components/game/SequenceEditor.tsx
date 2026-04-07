@@ -1138,6 +1138,10 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
       case 'mp4':
       case 'webm':
         return 'mp4';
+      case 'webp':
+        return 'webp';
+      case 'svg':
+        return 'svg';
       default:
         return 'png';
     }

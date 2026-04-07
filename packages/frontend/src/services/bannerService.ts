@@ -28,7 +28,7 @@ export type TransitionType = 'fade' | 'slide' | 'crossfade' | 'none';
 export type LoopModeType = 'loop' | 'pingpong' | 'once';
 
 // Frame type
-export type FrameType = 'jpg' | 'png' | 'gif' | 'mp4';
+export type FrameType = 'jpg' | 'png' | 'gif' | 'mp4' | 'webp' | 'svg';
 
 // Banner status
 export type BannerStatus = 'draft' | 'published' | 'archived';

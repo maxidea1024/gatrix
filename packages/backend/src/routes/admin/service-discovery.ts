@@ -527,6 +527,94 @@ router.get('/:type/:instanceId/cache', async (req: Request, res: Response) => {
 });
 
 /**
+ * Force cache refresh on a service instance
+ * POST /api/v1/admin/services/:type/:instanceId/cache/refresh
+ * Proxies request to the service's /internal/cache/refresh endpoint
+ */
+router.post(
+  '/:type/:instanceId/cache/refresh',
+  async (req: Request, res: Response) => {
+    try {
+      const { type, instanceId } = req.params;
+
+      if (!type || !instanceId) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'type and instanceId are required' },
+        });
+      }
+
+      const services = await serviceDiscoveryService.getServices(type);
+      const service = services.find((s) => s.instanceId === instanceId);
+
+      if (!service) {
+        return res.status(404).json({
+          success: false,
+          error: { message: 'Service not found' },
+        });
+      }
+
+      const webPort =
+        service.ports?.internalApi ||
+        service.ports?.externalApi ||
+        service.ports?.web ||
+        service.ports?.http ||
+        service.ports?.api;
+      if (!webPort) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'Service does not have an API port' },
+        });
+      }
+
+      const address = service.internalAddress || service.externalAddress;
+      const refreshUrl = `http://${address}:${webPort}/internal/cache/refresh`;
+
+      logger.info(
+        `Force cache refresh on: ${type}:${instanceId} at ${refreshUrl}`
+      );
+
+      const axios = (await import('axios')).default;
+      const startTime = Date.now();
+
+      try {
+        const response = await axios.post(refreshUrl, {}, { timeout: 15000 });
+        const latency = Date.now() - startTime;
+
+        res.json({
+          success: true,
+          data: {
+            ...response.data,
+            latency,
+          },
+        });
+      } catch (refreshError: any) {
+        const latency = Date.now() - startTime;
+        const message =
+          refreshError.code === 'ECONNREFUSED'
+            ? 'Connection refused'
+            : refreshError.code === 'ETIMEDOUT' ||
+                refreshError.code === 'ECONNABORTED'
+              ? 'Connection timeout'
+              : refreshError.message || 'Unknown error';
+
+        res.status(500).json({
+          success: false,
+          error: { message },
+          latency,
+        });
+      }
+    } catch (error) {
+      logger.error('Error forcing cache refresh:', error);
+      res.status(500).json({
+        success: false,
+        error: { message: 'Failed to force cache refresh' },
+      });
+    }
+  }
+);
+
+/**
  * Get request statistics from a service instance
  * GET /api/v1/admin/services/:type/:instanceId/stats/requests
  * Proxies request to the service's /internal/stats/requests endpoint

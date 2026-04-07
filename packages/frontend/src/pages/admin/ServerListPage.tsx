@@ -2411,6 +2411,7 @@ const ServerListPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
+  const theme = useTheme();
   const canManage = hasPermission([P.SERVERS_UPDATE]);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -4434,7 +4435,6 @@ const ServerListPage: React.FC = () => {
         {(services.length > 0 || !isLoading) &&
           viewMode === 'list' &&
           (() => {
-            const theme = useTheme();
 
             interface ListGroup {
               id: string;

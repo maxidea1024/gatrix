@@ -173,10 +173,20 @@ export class BannerController {
           sequences,
           updatedBy: userId,
         },
-        async () => {
-          const banner = await BannerService.getBannerById(
+        async (processedData: any) => {
+          const banner = await BannerService.updateBanner(
             bannerId,
-            environmentId
+            environmentId,
+            {
+              name: processedData.name ?? name,
+              description: processedData.description ?? description,
+              width: processedData.width ?? width,
+              height: processedData.height ?? height,
+              metadata: processedData.metadata ?? metadata,
+              playbackSpeed: processedData.playbackSpeed ?? playbackSpeed,
+              sequences: processedData.sequences ?? sequences,
+              updatedBy: userId,
+            }
           );
           return { banner };
         }
@@ -268,9 +278,10 @@ export class BannerController {
         bannerId,
         { status: 'published', updatedBy: userId },
         async () => {
-          const banner = await BannerService.getBannerById(
+          const banner = await BannerService.publishBanner(
             bannerId,
-            environmentId
+            environmentId,
+            userId
           );
           return { banner };
         }
@@ -314,9 +325,10 @@ export class BannerController {
         bannerId,
         { status: 'archived', updatedBy: userId },
         async () => {
-          const banner = await BannerService.getBannerById(
+          const banner = await BannerService.archiveBanner(
             bannerId,
-            environmentId
+            environmentId,
+            userId
           );
           return { banner };
         }

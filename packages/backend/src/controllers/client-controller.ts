@@ -107,6 +107,25 @@ export class ClientController {
       // Environment is resolved by clientSDKAuth middleware
       const environmentId = req.environmentId!;
 
+      // Resolve projectId: client versions are stored by projectId, not environmentId
+      // req.projectId is set by middleware for universal client tokens
+      // For env-bound tokens, resolve from environmentModel.projectId
+      const projectId = req.projectId || req.environmentModel?.projectId;
+      if (!projectId) {
+        logger.error('Could not resolve projectId for client version query', {
+          environmentId,
+          hasProjectId: !!req.projectId,
+          hasEnvModel: !!req.environmentModel,
+        });
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to resolve project for environment',
+          },
+        });
+      }
+
       // Validate status parameter if provided
       const validStatuses = Object.values(ClientStatus);
       let statusFilter: ClientStatus | undefined;
@@ -214,18 +233,18 @@ export class ClientController {
 
       let record;
       if (isLatestRequest) {
-        // Get the latest version for the platform (with optional status filter and environment)
+        // Get the latest version for the platform (with optional status filter)
         record = await ClientVersionService.findLatestByPlatform(
           platform,
           statusFilter,
-          environmentId
+          projectId
         );
       } else {
         // Get exact version match
         record = await ClientVersionService.findByExact(
           platform,
           version,
-          environmentId
+          projectId
         );
       }
 
@@ -648,11 +667,22 @@ export class ClientController {
   static getClientVersions = asyncHandler(
     async (req: SDKRequest, res: Response) => {
       const environmentId = req.environmentId!;
+      // Resolve projectId: client versions are stored by projectId, not environmentId
+      const projectId = req.projectId || req.environmentModel?.projectId;
+      if (!projectId) {
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to resolve project for environment',
+          },
+        });
+      }
       const { platform } = req.query as { platform?: string };
 
-      // Fetch all client versions for this environment
+      // Fetch all client versions for this project
       const result = await ClientVersionService.getClientVersions(
-        environmentId,
+        projectId,
         platform ? { platform } : {},
         { page: 1, limit: 10000, sortBy: 'createdAt', sortOrder: 'DESC' }
       );

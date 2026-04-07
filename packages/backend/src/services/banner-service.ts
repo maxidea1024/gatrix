@@ -554,6 +554,42 @@ class BannerService {
   }
 
   /**
+   * Get published banner by name for client
+   */
+  static async getPublishedBannerByName(
+    name: string,
+    environmentId: string
+  ): Promise<BannerAttributes> {
+    try {
+      const cacheKey = `${CACHE_PREFIX}:published:name:${name}:${environmentId}`;
+      const cached = await cacheService.get<BannerAttributes>(cacheKey);
+
+      if (cached) {
+        return cached;
+      }
+
+      const banner = await BannerModel.findByName(name, environmentId);
+
+      if (!banner || banner.status !== 'published') {
+        throw new GatrixError('Banner not found', 404);
+      }
+
+      // Cache the result
+      await cacheService.set(cacheKey, banner, CACHE_TTL);
+
+      return banner;
+    } catch (error) {
+      if (error instanceof GatrixError) throw error;
+      logger.error('Failed to get published banner by name', {
+        error,
+        name,
+        environmentId,
+      });
+      throw new GatrixError('Failed to get published banner', 500);
+    }
+  }
+
+  /**
    * Invalidate banner cache
    */
   static async invalidateCache(environmentId?: string): Promise<void> {

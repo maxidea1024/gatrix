@@ -6,7 +6,7 @@
  * Try execCommand fallback for clipboard copy
  * This works in some HTTP environments where navigator.clipboard is not available
  */
-const tryExecCommandCopy = (text: string): boolean => {
+export const tryExecCommandCopy = (text: string): boolean => {
   try {
     console.log('[Clipboard] Trying execCommand fallback...');
     const textArea = document.createElement('textarea');
@@ -24,7 +24,15 @@ const tryExecCommandCopy = (text: string): boolean => {
     textArea.style.boxShadow = 'none';
     textArea.style.background = 'transparent';
 
-    document.body.appendChild(textArea);
+    // Determine the container to append to.
+    // Appending to document.body outside a MUI FocusTrap causes the trap to instantly steal focus back,
+    // breaking the copy. Appending to the active element's parent container keeps it inside the trap.
+    const activeEl = document.activeElement;
+    const container = activeEl && activeEl !== document.body && activeEl.parentElement
+      ? activeEl.parentElement
+      : document.body;
+
+    container.appendChild(textArea);
 
     // Select and copy
     textArea.focus();
@@ -36,7 +44,7 @@ const tryExecCommandCopy = (text: string): boolean => {
     const successful = document.execCommand('copy');
 
     // Clean up
-    document.body.removeChild(textArea);
+    container.removeChild(textArea);
 
     if (successful) {
       console.log('[Clipboard] ✓ execCommand fallback success');
@@ -99,9 +107,8 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
       'Automatic copy failed. Please select the text below and press Ctrl+C to copy:',
       text
     );
-    // If user clicked OK or Cancel, we consider it "handled"
-    // Return false to indicate actual copy didn't happen automatically
-    return result !== null ? false : false;
+    // If user clicked OK, they had the chance to copy the text
+    return result !== null;
   }
 
   // For secure context where modern API failed, try execCommand
