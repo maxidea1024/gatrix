@@ -4435,7 +4435,6 @@ const ServerListPage: React.FC = () => {
         {(services.length > 0 || !isLoading) &&
           viewMode === 'list' &&
           (() => {
-
             interface ListGroup {
               id: string;
               name: string;

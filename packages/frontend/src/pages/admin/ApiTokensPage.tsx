@@ -1286,7 +1286,8 @@ const ApiTokensPage: React.FC = () => {
   const [viewTokenValue, setViewTokenValue] = useState('');
   const viewTokenInputRef = useRef<HTMLInputElement>(null);
 
-  const isInsecureContext = !window.isSecureContext || window.location.protocol === 'http:';
+  const isInsecureContext =
+    !window.isSecureContext || window.location.protocol === 'http:';
 
   const openViewTokenDialog = (token: ApiAccessToken) => {
     const value = token.tokenValue || '';
@@ -2227,15 +2228,23 @@ const ApiTokensPage: React.FC = () => {
             if (menuTargetToken) {
               const tokenVal = menuTargetToken.tokenValue || '';
               if (!tokenVal) {
-                enqueueSnackbar(t('apiTokens.tokenValueError'), { variant: 'error' });
+                enqueueSnackbar(t('apiTokens.tokenValueError'), {
+                  variant: 'error',
+                });
               } else if (isInsecureContext) {
                 openViewTokenDialog(menuTargetToken);
               } else {
                 // HTTPS: await so clipboard write completes before menu closes
                 await copyToClipboardWithNotification(
                   tokenVal,
-                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                  () =>
+                    enqueueSnackbar(t('common.copiedToClipboard'), {
+                      variant: 'success',
+                    }),
+                  () =>
+                    enqueueSnackbar(t('common.copyFailed'), {
+                      variant: 'error',
+                    })
                 );
               }
             }
@@ -2350,8 +2359,12 @@ const ApiTokensPage: React.FC = () => {
             onClick={async () => {
               await copyToClipboardWithNotification(
                 viewTokenValue,
-                () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-                () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                () =>
+                  enqueueSnackbar(t('common.copiedToClipboard'), {
+                    variant: 'success',
+                  }),
+                () =>
+                  enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
               );
             }}
           >

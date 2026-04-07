@@ -339,8 +339,6 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < sequenceHistory.length - 1;
 
-
-
   // Get name validation error message
   const getNameError = (): string | null => {
     if (!name.trim()) {

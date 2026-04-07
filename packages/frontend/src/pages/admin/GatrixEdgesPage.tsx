@@ -110,8 +110,10 @@ const GatrixEdgesPage: React.FC = () => {
   const [fullJsonLoading, setFullJsonLoading] = useState<string | null>(null);
 
   // Cache invalidation
-  const [cacheInvalidateDialogOpen, setCacheInvalidateDialogOpen] = useState(false);
-  const [cacheInvalidateTarget, setCacheInvalidateTarget] = useState<ServiceInstance | null>(null);
+  const [cacheInvalidateDialogOpen, setCacheInvalidateDialogOpen] =
+    useState(false);
+  const [cacheInvalidateTarget, setCacheInvalidateTarget] =
+    useState<ServiceInstance | null>(null);
   const [cacheInvalidating, setCacheInvalidating] = useState(false);
 
   // JSON Search State
@@ -341,10 +343,14 @@ const GatrixEdgesPage: React.FC = () => {
         serviceType,
         cacheInvalidateTarget.instanceId
       );
-      enqueueSnackbar(t('gatrixEdges.cacheInvalidateSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('gatrixEdges.cacheInvalidateSuccess'), {
+        variant: 'success',
+      });
     } catch (err: any) {
       console.error('Failed to invalidate cache:', err);
-      enqueueSnackbar(t('gatrixEdges.cacheInvalidateFailed'), { variant: 'error' });
+      enqueueSnackbar(t('gatrixEdges.cacheInvalidateFailed'), {
+        variant: 'error',
+      });
     } finally {
       setCacheInvalidating(false);
       setCacheInvalidateDialogOpen(false);
@@ -673,7 +679,8 @@ const GatrixEdgesPage: React.FC = () => {
             variant="outlined"
             color="warning"
             startIcon={
-              cacheInvalidating && cacheInvalidateTarget?.instanceId === instance.instanceId ? (
+              cacheInvalidating &&
+              cacheInvalidateTarget?.instanceId === instance.instanceId ? (
                 <CircularProgress size={14} color="inherit" />
               ) : (
                 <InvalidateIcon fontSize="small" />

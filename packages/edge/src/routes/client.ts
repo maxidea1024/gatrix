@@ -709,7 +709,9 @@ router.get(
       const envBanners = sdk.banner.getCached(environmentId) as Banner[];
 
       // Find the specific banner by ID or name
-      const banner = envBanners.find((b) => b.bannerId === bannerId || b.name === bannerId);
+      const banner = envBanners.find(
+        (b) => b.bannerId === bannerId || b.name === bannerId
+      );
 
       if (!banner) {
         return res.status(404).json({

@@ -93,8 +93,9 @@ export class ServerBannerController {
         });
       }
 
-      const banner = await BannerModel.findById(bannerId, environmentId)
-        ?? await BannerModel.findByName(bannerId, environmentId);
+      const banner =
+        (await BannerModel.findById(bannerId, environmentId)) ??
+        (await BannerModel.findByName(bannerId, environmentId));
 
       if (!banner) {
         return res.status(404).json({

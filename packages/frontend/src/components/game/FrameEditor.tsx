@@ -135,7 +135,9 @@ const detectFrameTypeFromUrl = (url: string): FrameType | null => {
 };
 
 // Detect frame type from file header (magic bytes) — async, more accurate
-const detectFrameTypeFromHeader = async (url: string): Promise<FrameType | null> => {
+const detectFrameTypeFromHeader = async (
+  url: string
+): Promise<FrameType | null> => {
   try {
     const response = await fetch(url, {
       method: 'GET',
@@ -150,8 +152,14 @@ const detectFrameTypeFromHeader = async (url: string): Promise<FrameType | null>
     // RIFF....WEBP
     if (
       bytes.length >= 12 &&
-      bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
-      bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50
+      bytes[0] === 0x52 &&
+      bytes[1] === 0x49 &&
+      bytes[2] === 0x46 &&
+      bytes[3] === 0x46 &&
+      bytes[8] === 0x57 &&
+      bytes[9] === 0x45 &&
+      bytes[10] === 0x42 &&
+      bytes[11] === 0x50
     ) {
       return 'webp';
     }
@@ -160,15 +168,20 @@ const detectFrameTypeFromHeader = async (url: string): Promise<FrameType | null>
       return 'gif';
     }
     // PNG: 0x89 P N G
-    if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) {
+    if (
+      bytes[0] === 0x89 &&
+      bytes[1] === 0x50 &&
+      bytes[2] === 0x4e &&
+      bytes[3] === 0x47
+    ) {
       return 'png';
     }
     // JPG: 0xFF 0xD8 0xFF
-    if (bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF) {
+    if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
       return 'jpg';
     }
     // SVG: starts with '<' (XML)
-    if (bytes[0] === 0x3C) {
+    if (bytes[0] === 0x3c) {
       const text = new TextDecoder().decode(bytes);
       if (text.includes('<svg') || text.includes('<SVG')) {
         return 'svg';
@@ -177,7 +190,10 @@ const detectFrameTypeFromHeader = async (url: string): Promise<FrameType | null>
     // MP4: ftyp
     if (
       bytes.length >= 8 &&
-      bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70
+      bytes[4] === 0x66 &&
+      bytes[5] === 0x74 &&
+      bytes[6] === 0x79 &&
+      bytes[7] === 0x70
     ) {
       return 'mp4';
     }
@@ -1009,7 +1025,8 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 size="small"
                 placeholder="https://cdn.example.com/image.png"
                 helperText={
-                  editFrame.imageUrl && detectFrameTypeFromUrl(editFrame.imageUrl)
+                  editFrame.imageUrl &&
+                  detectFrameTypeFromUrl(editFrame.imageUrl)
                     ? `${t('banners.detectedType')}: ${editFrame.type?.toUpperCase()}`
                     : ''
                 }

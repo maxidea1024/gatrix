@@ -28,9 +28,10 @@ export const tryExecCommandCopy = (text: string): boolean => {
     // Appending to document.body outside a MUI FocusTrap causes the trap to instantly steal focus back,
     // breaking the copy. Appending to the active element's parent container keeps it inside the trap.
     const activeEl = document.activeElement;
-    const container = activeEl && activeEl !== document.body && activeEl.parentElement
-      ? activeEl.parentElement
-      : document.body;
+    const container =
+      activeEl && activeEl !== document.body && activeEl.parentElement
+        ? activeEl.parentElement
+        : document.body;
 
     container.appendChild(textArea);
 
