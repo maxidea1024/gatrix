@@ -76,6 +76,52 @@ public:
   int32_t GetFrameCount() const { return static_cast<int32_t>(Frames.size()); }
   const FGatrixGifFrame& GetFrame(int32_t Index) const { return Frames[Index]; }
 
+  /**
+   * Parse GIF header and extensions only — no LZW decompression.
+   * Extracts frame count, per-frame delays, and dimensions.
+   * ~100x faster than full Load() for metadata-only needs.
+   */
+  struct FMetadata {
+    int32_t Width = 0;
+    int32_t Height = 0;
+    int32_t FrameCount = 0;
+    std::vector<int32_t> FrameDelays;
+  };
+
+  bool LoadMetadataOnly(const uint8_t* Data, size_t DataSize, FMetadata& OutMeta) {
+    Pos = 0;
+    Buf = Data;
+    BufSize = DataSize;
+    Width = Height = 0;
+    Frames.clear();
+
+    if (!ReadHeader()) return false;
+    if (!ReadGlobalColorTable()) return false;
+
+    OutMeta.Width = Width;
+    OutMeta.Height = Height;
+    OutMeta.FrameCount = 0;
+
+    while (Pos < BufSize) {
+      uint8_t Sep = ReadByte();
+      if (Sep == 0x3B) break; // Trailer
+      if (Sep == 0x21) {
+        ReadExtension();
+      } else if (Sep == 0x2C) {
+        // Image Descriptor — skip past it without LZW decode
+        OutMeta.FrameCount++;
+        int32_t DelayMs = HasPendingGCE ? static_cast<int32_t>(CurrentGCE.Delay) * 10 : 100;
+        OutMeta.FrameDelays.push_back(DelayMs);
+        HasPendingGCE = false;
+        SkipImageData();
+      } else {
+        break;
+      }
+    }
+
+    return OutMeta.FrameCount > 0;
+  }
+
 private:
   const uint8_t* Buf = nullptr;
   size_t BufSize = 0;
@@ -142,6 +188,22 @@ private:
       if (Size == 0) break;
       Skip(Size);
     }
+  }
+
+  /** Skip Image Descriptor + LCT + LZW data without decompression */
+  void SkipImageData() {
+    // Image descriptor: x, y, w, h (8 bytes) + packed (1 byte)
+    Skip(4); // x, y
+    Skip(4); // w, h
+    uint8_t Packed = ReadByte();
+    bool HasLCT = (Packed & 0x80) != 0;
+    if (HasLCT) {
+      int LCTSize = 1 << ((Packed & 0x07) + 1);
+      Skip(LCTSize * 3);
+    }
+    // LZW minimum code size (1 byte) + sub-blocks
+    Skip(1); // min code size
+    SkipSubBlocks();
   }
 
   // ==================== Header ====================

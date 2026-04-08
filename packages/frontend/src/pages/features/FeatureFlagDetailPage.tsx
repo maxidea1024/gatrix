@@ -1599,10 +1599,23 @@ const FeatureFlagDetailPage: React.FC = () => {
   };
 
   // Save global (flag-level) settings to draft under the _global key
+  // Only saves to CR draft if at least one environment requires approval;
+  // otherwise applies the change directly via API.
   const saveGlobalChangesToDraft = async (updates: Record<string, any>) => {
     if (!flag) return;
 
-    // Get current pending CR draft data or start fresh
+    // Check if any environment requires approval
+    const anyEnvRequiresApproval = environments.some(
+      (env) => env.requiresApproval
+    );
+
+    if (!anyEnvRequiresApproval) {
+      // No environment requires approval → apply directly via API
+      await api.put(`${projectApiPath}/features/${flag.flagName}`, updates);
+      return;
+    }
+
+    // At least one environment requires approval → save to CR draft
     const pendingCR = await changeRequestService.getPendingFlagDraft(
       flag.flagName,
       projectApiPath

@@ -134,6 +134,152 @@ void UGatrixImageLoader::Prefetch(const TArray<FString>& Urls) {
   }
 }
 
+// ==================== LoadImageRaw (for UGatrixImageManager) ====================
+
+void UGatrixImageLoader::LoadImageRaw(const FString& Url, EGatrixFrameType FrameType,
+                                       FGatrixImageRawLoadedDelegate OnLoaded) {
+  if (Url.IsEmpty()) {
+    FGatrixImageRawResult Empty;
+    OnLoaded.ExecuteIfBound(false, Empty);
+    return;
+  }
+
+  TWeakObjectPtr<UGatrixImageLoader> WeakThis(this);
+  FString UrlCopy = Url;
+  EGatrixFrameType TypeCopy = FrameType;
+
+  // Helper lambda: extract metadata from raw bytes without creating GPU textures.
+  // Runs on a background thread for CPU-heavy decoding.
+  auto ExtractMetadata = [](const TArray<uint8>& Data, EGatrixFrameType TypeHint,
+                            const FString& UrlForLog) -> FGatrixImageRawResult {
+    FGatrixImageRawResult R;
+    R.RawBytes = Data;
+
+    // Auto-detect format from magic bytes
+    if (Data.Num() >= 12) {
+      const uint8* D = Data.GetData();
+      if (D[0] == 'R' && D[1] == 'I' && D[2] == 'F' && D[3] == 'F' &&
+          D[8] == 'W' && D[9] == 'E' && D[10] == 'B' && D[11] == 'P') {
+        R.DetectedType = EGatrixFrameType::Webp;
+      } else if (D[0] == 'G' && D[1] == 'I' && D[2] == 'F') {
+        R.DetectedType = EGatrixFrameType::Gif;
+      } else if (D[0] == 0x89 && D[1] == 'P' && D[2] == 'N' && D[3] == 'G') {
+        R.DetectedType = EGatrixFrameType::Png;
+      } else if (D[0] == 0xFF && D[1] == 0xD8 && D[2] == 0xFF) {
+        R.DetectedType = EGatrixFrameType::Jpg;
+      }
+    } else {
+      R.DetectedType = TypeHint;
+    }
+
+    // Extract metadata based on format
+    switch (R.DetectedType) {
+      case EGatrixFrameType::Gif: {
+        // Header-only parse: extracts frame count, delays, dimensions
+        // WITHOUT LZW decompression. Full decode happens later in DecodeFramesAsync.
+        FGatrixGifDecoder Decoder;
+        FGatrixGifDecoder::FMetadata Meta;
+        if (Decoder.LoadMetadataOnly(Data.GetData(), Data.Num(), Meta)) {
+          R.Width = Meta.Width;
+          R.Height = Meta.Height;
+          R.FrameCount = Meta.FrameCount;
+          R.FrameDelays.Reserve(Meta.FrameCount);
+          for (int32 Delay : Meta.FrameDelays) {
+            R.FrameDelays.Add(Delay);
+          }
+        }
+        break;
+      }
+      case EGatrixFrameType::Webp: {
+        TArray<uint8> RGBAData;
+        TArray<TPair<TArray<uint8>, int32>> WebPFrames;
+        if (DecodeWebP(Data, R.Width, R.Height, RGBAData, WebPFrames)) {
+          if (WebPFrames.Num() > 1) {
+            R.FrameCount = WebPFrames.Num();
+            R.FrameDelays.Reserve(WebPFrames.Num());
+            for (const auto& F : WebPFrames) {
+              R.FrameDelays.Add(F.Value);
+            }
+          } else {
+            R.FrameCount = 1;
+            // Preserve decoded RGBA for static WebP (same as PNG/JPG)
+            if (RGBAData.Num() > 0) {
+              R.DecodedRGBA = MoveTemp(RGBAData);
+            }
+          }
+        }
+        break;
+      }
+      case EGatrixFrameType::Png:
+      case EGatrixFrameType::Jpg:
+      default: {
+        TArray<uint8> RGBAData;
+        if (DecodeStandardImage(Data, R.Width, R.Height, RGBAData)) {
+          R.FrameCount = 1;
+          R.RawBytes = Data;
+          // Preserve decoded RGBA so the Manager can create the texture
+          // directly without re-decoding on the game thread.
+          R.DecodedRGBA = MoveTemp(RGBAData);
+        }
+        break;
+      }
+    }
+
+    return R;
+  };
+
+  // 1. Try disk cache first
+  TArray<uint8> DiskData;
+  if (LoadFromDiskCache(Url, DiskData)) {
+    AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask,
+              [DiskData = MoveTemp(DiskData), TypeCopy, UrlCopy, ExtractMetadata, OnLoaded, WeakThis]() {
+      FGatrixImageRawResult Result = ExtractMetadata(DiskData, TypeCopy, UrlCopy);
+      Result.bFromDiskCache = true;
+
+      AsyncTask(ENamedThreads::GameThread, [Result = MoveTemp(Result), OnLoaded]() {
+        OnLoaded.ExecuteIfBound(Result.IsValid(), Result);
+      });
+    });
+    return;
+  }
+
+  // 2. Download from network
+  auto HttpRequest = FHttpModule::Get().CreateRequest();
+  HttpRequest->SetURL(Url);
+  HttpRequest->SetVerb(TEXT("GET"));
+
+  HttpRequest->OnProcessRequestComplete().BindLambda(
+      [WeakThis, UrlCopy, TypeCopy, ExtractMetadata, OnLoaded](
+          FHttpRequestPtr Req, FHttpResponsePtr Resp, bool bConnected) {
+    if (!bConnected || !Resp.IsValid() || Resp->GetResponseCode() != 200) {
+      AsyncTask(ENamedThreads::GameThread, [OnLoaded]() {
+        FGatrixImageRawResult Empty;
+        OnLoaded.ExecuteIfBound(false, Empty);
+      });
+      return;
+    }
+
+    TArray<uint8> RawData = Resp->GetContent();
+
+    // Save to disk cache
+    if (WeakThis.IsValid()) {
+      WeakThis->SaveToDiskCache(UrlCopy, RawData);
+    }
+
+    // Extract metadata on background thread
+    AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask,
+              [RawData = MoveTemp(RawData), TypeCopy, UrlCopy, ExtractMetadata, OnLoaded]() {
+      FGatrixImageRawResult Result = ExtractMetadata(RawData, TypeCopy, UrlCopy);
+
+      AsyncTask(ENamedThreads::GameThread, [Result = MoveTemp(Result), OnLoaded]() {
+        OnLoaded.ExecuteIfBound(Result.IsValid(), Result);
+      });
+    });
+  });
+
+  HttpRequest->ProcessRequest();
+}
+
 bool UGatrixImageLoader::IsInMemoryCache(const FString& Url) const {
   FScopeLock Lock(&MemoryCacheLock);
   return MemoryCache.Contains(Url);
@@ -251,10 +397,11 @@ bool UGatrixImageLoader::LoadFromDiskCache(const FString& Url,
 void UGatrixImageLoader::SaveToDiskCache(const FString& Url,
                                          const TArray<uint8>& Data) {
   FString Path = GetDiskCachePath(Url);
-  // Write on background thread to avoid blocking
+  // Move data into lambda to avoid deep copy of image bytes
+  TArray<uint8> DataToWrite = Data;
   AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask,
-            [Path, Data]() {
-              FFileHelper::SaveArrayToFile(Data, *Path);
+            [Path, DataToWrite = MoveTemp(DataToWrite)]() {
+              FFileHelper::SaveArrayToFile(DataToWrite, *Path);
             });
 }
 
@@ -481,8 +628,6 @@ void UGatrixImageLoader::DecodeImageAsync(
                   bSuccess = DecodeWebP(Data, Width, Height, RGBAData, GifFrames);
                   break;
 
-
-
                 case EGatrixFrameType::Svg:
                   UE_LOG(LogGatrixImageLoader, Warning,
                          TEXT("SVG format detected but not supported: %s"), *Url);
@@ -560,6 +705,76 @@ UTexture2DDynamic* UGatrixImageLoader::CreateTextureFromRGBA(
   }
 
   return Texture;
+}
+
+void UGatrixImageLoader::CreateTexturesFromRGBABatch(
+    const TArray<TArray<uint8>>& RGBADataArray,
+    int32 Width, int32 Height,
+    TArray<UTexture2DDynamic*>& OutTextures) {
+  check(IsInGameThread());
+
+  if (Width <= 0 || Height <= 0 || RGBADataArray.Num() == 0) return;
+
+  const int32 ExpectedSize = Width * Height * 4;
+  OutTextures.Reserve(RGBADataArray.Num());
+
+  // Step 1: Create all texture objects (no Flush yet)
+  for (int32 i = 0; i < RGBADataArray.Num(); ++i) {
+    if (RGBADataArray[i].Num() < ExpectedSize) {
+      OutTextures.Add(nullptr);
+      continue;
+    }
+    UTexture2DDynamic* Tex = UTexture2DDynamic::Create(Width, Height, PF_R8G8B8A8);
+    if (Tex) {
+      Tex->AddToRoot();
+      Tex->SRGB = true;
+    }
+    OutTextures.Add(Tex);
+  }
+
+  // Step 2: Single Flush — ensure ALL render resources are created
+  FlushRenderingCommands();
+
+  // Step 3: Enqueue ALL RGBA uploads in one batch
+  for (int32 i = 0; i < OutTextures.Num(); ++i) {
+    UTexture2DDynamic* Tex = OutTextures[i];
+    if (!Tex) continue;
+
+    FTexture2DDynamicResource* TextureResource =
+        static_cast<FTexture2DDynamicResource*>(Tex->GetResource());
+    if (!TextureResource) continue;
+
+    TArray<uint8> DataCopy = RGBADataArray[i];
+    int32 W = Width;
+    int32 H = Height;
+    ENQUEUE_RENDER_COMMAND(UpdateGatrixTextureBatch)
+    ([TextureResource, DataCopy = MoveTemp(DataCopy), W, H](FRHICommandListImmediate& RHICmdList) {
+      FTexture2DRHIRef TextureRHI = TextureResource->GetTexture2DRHI();
+      if (TextureRHI.IsValid()) {
+        uint32 Stride = 0;
+        void* TextureData = RHILockTexture2D(
+            TextureRHI, 0, RLM_WriteOnly, Stride, false);
+        if (TextureData) {
+          const int32 SrcPitch = W * 4;
+          if ((int32)Stride == SrcPitch) {
+            FMemory::Memcpy(TextureData, DataCopy.GetData(), DataCopy.Num());
+          } else {
+            const uint8* SrcPtr = DataCopy.GetData();
+            uint8* DstPtr = static_cast<uint8*>(TextureData);
+            for (int32 y = 0; y < H; ++y) {
+              FMemory::Memcpy(DstPtr, SrcPtr, SrcPitch);
+              SrcPtr += SrcPitch;
+              DstPtr += Stride;
+            }
+          }
+          RHIUnlockTexture2D(TextureRHI, 0, false);
+        }
+      }
+    });
+  }
+
+  // Step 4: Single final Flush — ensure ALL uploads complete
+  FlushRenderingCommands();
 }
 
 bool UGatrixImageLoader::DecodeStandardImage(const TArray<uint8>& Data,

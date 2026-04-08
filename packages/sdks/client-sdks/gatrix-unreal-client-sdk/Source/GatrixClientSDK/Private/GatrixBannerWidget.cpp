@@ -15,6 +15,7 @@
 #include "MediaTexture.h"
 #include "Async/Async.h"
 #include "Http.h"
+#include "GatrixImageManager.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -52,18 +53,14 @@ void UGatrixBannerWidget::Tick(float DeltaTime) {
     UpdateEffect(DeltaTime);
   }
 
-  // Update GIF animation
-  if (CurrentGifFrames.Num() > 1 && Playback && Playback->IsPlaying()) {
-    GifFrameTimer -= DeltaTime;
-    if (GifFrameTimer <= 0.0f) {
-      CurrentGifFrameIndex = (CurrentGifFrameIndex + 1) % CurrentGifFrames.Num();
-      if (CurrentGifFrames[CurrentGifFrameIndex]) {
-        ApplyFrameTexture(CurrentGifFrames[CurrentGifFrameIndex]);
-      }
-      float DelayMs = CurrentGifDelays.IsValidIndex(CurrentGifFrameIndex)
-                          ? CurrentGifDelays[CurrentGifFrameIndex]
-                          : 100;
-      GifFrameTimer = FMath::Max(0.01f, DelayMs / 1000.0f);
+  // For animated sources with per-frame textures, update the brush
+  // when the Manager advances to a new frame (cheap pointer swap).
+  if (CurrentFrameSource.IsValid() && CurrentFrameSource->IsAnimated() &&
+      CurrentFrameSource->IsReady() && CurrentImage) {
+    UTexture2DDynamic* CurrentTex = CurrentFrameSource->GetDisplayTexture();
+    if (CurrentTex && CurrentTex != LastDisplayedTexture) {
+      CurrentImage->SetBrushFromTextureDynamic(CurrentTex, true);
+      LastDisplayedTexture = CurrentTex;
     }
   }
 }
@@ -102,6 +99,8 @@ void UGatrixBannerWidget::NativeDestruct() {
     Playback->OnSequenceChanged.RemoveDynamic(this, &UGatrixBannerWidget::OnSequenceChanged);
     Playback->OnFrameAction.RemoveDynamic(this, &UGatrixBannerWidget::OnFrameActionTriggered);
   }
+  // Release shared image source reference (memory safety)
+  ReleaseCurrentFrameSource();
   CleanupVideoPlayer();
   Super::NativeDestruct();
 }
@@ -553,6 +552,9 @@ void UGatrixBannerWidget::LoadFirstFrame() {
     return;
   }
 
+  // Release any previous frame source
+  ReleaseCurrentFrameSource();
+
   TWeakObjectPtr<UGatrixBannerWidget> WeakThis(this);
   FGatrixImageLoadedDelegate Delegate;
   Delegate.BindLambda([WeakThis](bool bSuccess, const FGatrixImageResult& Result) {
@@ -561,7 +563,8 @@ void UGatrixBannerWidget::LoadFirstFrame() {
     }
   });
 
-  UGatrixImageLoader::Get()->LoadImage(
+  // Acquire source from central manager (shared texture, no per-widget duplication)
+  CurrentFrameSource = UGatrixImageManager::Get()->AcquireSource(
       FirstFrame.ImageUrl, FirstFrame.Type, Delegate);
 
   // Start prefetching upcoming frames
@@ -574,22 +577,19 @@ void UGatrixBannerWidget::OnFirstFrameLoaded(bool bSuccess,
   bFirstFrameLoaded = bSuccess;
 
   UE_LOG(LogGatrixBannerWidget, Log,
-         TEXT("OnFirstFrameLoaded: success=%d, valid=%d, isGif=%d, texture=%p, currentImage=%p"),
-         bSuccess, Result.IsValid(), Result.IsGif(), Result.Texture, CurrentImage);
+         TEXT("OnFirstFrameLoaded: success=%d, valid=%d, texture=%p, currentImage=%p"),
+         bSuccess, Result.IsValid(), Result.Texture, CurrentImage);
 
   if (bSuccess && Result.IsValid()) {
-    if (Result.IsGif()) {
-      CurrentGifFrames = Result.GifFrames;
-      CurrentGifDelays = Result.GifFrameDelays;
-      CurrentGifFrameIndex = 0;
-      GifFrameTimer = CurrentGifDelays.Num() > 0
-                          ? CurrentGifDelays[0] / 1000.0f
-                          : 0.1f;
-      if (CurrentGifFrames.Num() > 0) {
-        ApplyFrameTexture(CurrentGifFrames[0]);
-      }
+    // Use the display texture from the shared source
+    UTexture2DDynamic* DisplayTex = nullptr;
+    if (CurrentFrameSource.IsValid()) {
+      DisplayTex = CurrentFrameSource->GetDisplayTexture();
     } else {
-      ApplyFrameTexture(Result.Texture);
+      DisplayTex = Result.Texture;
+    }
+    if (DisplayTex) {
+      ApplyFrameTexture(DisplayTex);
     }
   }
 
@@ -622,10 +622,8 @@ void UGatrixBannerWidget::HandlePlaybackFinished() {
 }
 
 void UGatrixBannerWidget::ShowFrame(const FGatrixBannerFrame& Frame) {
-  // Clear GIF state
-  CurrentGifFrames.Empty();
-  CurrentGifDelays.Empty();
-  CurrentGifFrameIndex = 0;
+  // Release previous frame source
+  ReleaseCurrentFrameSource();
 
   switch (Frame.Type) {
     case EGatrixFrameType::Mp4:
@@ -654,42 +652,41 @@ void UGatrixBannerWidget::ShowImageFrame(const FGatrixBannerFrame& Frame) {
     auto* Self = WeakThis.Get();
 
     if (bSuccess && Result.IsValid()) {
-      // Check if the decode result is actually animated (e.g. animated WebP detected via magic bytes)
-      if (Result.IsGif()) {
-        Self->CurrentGifFrames = Result.GifFrames;
-        Self->CurrentGifDelays = Result.GifFrameDelays;
-        Self->CurrentGifFrameIndex = 0;
-        Self->GifFrameTimer = Self->CurrentGifDelays.Num() > 0
-                                  ? Self->CurrentGifDelays[0] / 1000.0f
-                                  : 0.1f;
-        if (Self->CurrentGifFrames.Num() > 0) {
-          Self->ApplyFrameTexture(Self->CurrentGifFrames[0]);
-        }
+      // Get display texture from shared source
+      UTexture2DDynamic* DisplayTex = nullptr;
+      if (Self->CurrentFrameSource.IsValid()) {
+        DisplayTex = Self->CurrentFrameSource->GetDisplayTexture();
       } else {
-        // Begin transition
-        if (Self->bEnableTransitions &&
-            FrameCopy.Transition.Type != EGatrixTransitionType::None) {
-          float Dur = Self->TransitionDurationOverride > 0.0f
-                          ? Self->TransitionDurationOverride
-                          : FrameCopy.Transition.Duration / 1000.0f;
-          Self->StartTransition(FrameCopy.Transition.Type, Dur);
-        }
+        DisplayTex = Result.Texture;
+      }
 
-        Self->ApplyFrameTexture(Result.Texture);
+      // Begin transition
+      if (Self->bEnableTransitions &&
+          FrameCopy.Transition.Type != EGatrixTransitionType::None) {
+        float Dur = Self->TransitionDurationOverride > 0.0f
+                        ? Self->TransitionDurationOverride
+                        : FrameCopy.Transition.Duration / 1000.0f;
+        Self->StartTransition(FrameCopy.Transition.Type, Dur);
+      }
 
-        // Apply enter effect
-        if (Self->bEnableEffects &&
-            FrameCopy.Effects.Enter != EGatrixFrameEffectType::None) {
-          Self->StartEnterEffect(FrameCopy.Effects.Enter,
-                                 FrameCopy.Effects.Duration / 1000.0f);
-        }
+      if (DisplayTex) {
+        Self->ApplyFrameTexture(DisplayTex);
+      }
+
+      // Apply enter effect
+      if (Self->bEnableEffects &&
+          FrameCopy.Effects.Enter != EGatrixFrameEffectType::None) {
+        Self->StartEnterEffect(FrameCopy.Effects.Enter,
+                               FrameCopy.Effects.Duration / 1000.0f);
       }
     } else {
       Self->ShowPlaceholder();
     }
   });
 
-  UGatrixImageLoader::Get()->LoadImage(Frame.ImageUrl, Frame.Type, Delegate);
+  // Acquire shared source from Manager
+  CurrentFrameSource = UGatrixImageManager::Get()->AcquireSource(
+      Frame.ImageUrl, Frame.Type, Delegate);
 }
 
 void UGatrixBannerWidget::ShowVideoFrame(const FGatrixBannerFrame& Frame) {
@@ -721,26 +718,24 @@ void UGatrixBannerWidget::ShowGifFrame(const FGatrixBannerFrame& Frame) {
     auto* Self = WeakThis.Get();
 
     if (bSuccess && Result.IsValid()) {
-      if (Result.IsGif()) {
-        Self->CurrentGifFrames = Result.GifFrames;
-        Self->CurrentGifDelays = Result.GifFrameDelays;
-        Self->CurrentGifFrameIndex = 0;
-        Self->GifFrameTimer = Self->CurrentGifDelays.Num() > 0
-                                  ? Self->CurrentGifDelays[0] / 1000.0f
-                                  : 0.1f;
-        if (Self->CurrentGifFrames.Num() > 0) {
-          Self->ApplyFrameTexture(Self->CurrentGifFrames[0]);
-        }
+      // Use shared display texture from Manager source
+      UTexture2DDynamic* DisplayTex = nullptr;
+      if (Self->CurrentFrameSource.IsValid()) {
+        DisplayTex = Self->CurrentFrameSource->GetDisplayTexture();
       } else {
-        // GIF decoded as single frame
-        Self->ApplyFrameTexture(Result.Texture);
+        DisplayTex = Result.Texture;
+      }
+      if (DisplayTex) {
+        Self->ApplyFrameTexture(DisplayTex);
       }
     } else {
       Self->ShowPlaceholder();
     }
   });
 
-  UGatrixImageLoader::Get()->LoadImage(Frame.ImageUrl, Frame.Type, Delegate);
+  // Acquire shared source from Manager
+  CurrentFrameSource = UGatrixImageManager::Get()->AcquireSource(
+      Frame.ImageUrl, Frame.Type, Delegate);
 }
 
 void UGatrixBannerWidget::ApplyFrameTexture(UTexture2DDynamic* Texture) {
@@ -958,7 +953,13 @@ void UGatrixBannerWidget::PrefetchUpcomingFrames() {
 
   TArray<FString> Urls = Playback->GetUpcomingImageUrls(PrefetchCount);
   if (Urls.Num() > 0) {
-    UGatrixImageLoader::Get()->Prefetch(Urls);
+    UGatrixImageManager::Get()->Prefetch(Urls);
+  }
+}
+
+void UGatrixBannerWidget::ReleaseCurrentFrameSource() {
+  if (CurrentFrameSource.IsValid()) {
+    UGatrixImageManager::Get()->ReleaseSource(CurrentFrameSource);
   }
 }
 

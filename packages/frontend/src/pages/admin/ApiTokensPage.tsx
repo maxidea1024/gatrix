@@ -349,9 +349,17 @@ const ProjectTreeSelector: React.FC<ProjectTreeSelectorProps> = ({
           width: '100%',
           justifyContent: 'space-between',
           transition: 'all 0.2s ease-in-out',
-          '&:hover': {
-            borderColor: 'text.primary',
-          },
+          ...(disabled
+            ? {
+                opacity: 0.6,
+                cursor: 'default',
+                pointerEvents: 'none',
+              }
+            : {
+                '&:hover': {
+                  borderColor: 'text.primary',
+                },
+              }),
         }}
       >
         <Box
@@ -362,7 +370,7 @@ const ProjectTreeSelector: React.FC<ProjectTreeSelectorProps> = ({
             overflow: 'hidden',
           }}
         >
-          <ProjectIcon sx={{ fontSize: 18, opacity: 0.7, flexShrink: 0 }} />
+          <ProjectIcon sx={{ fontSize: 18, opacity: disabled ? 0.4 : 0.7, flexShrink: 0 }} />
           <Typography
             variant="body2"
             sx={{
@@ -370,20 +378,23 @@ const ProjectTreeSelector: React.FC<ProjectTreeSelectorProps> = ({
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
+              color: disabled ? 'text.disabled' : 'text.primary',
             }}
           >
             {displayLabel || t('apiTokens.universalClientHelp')}
           </Typography>
         </Box>
-        <ArrowDropDownIcon
-          sx={{
-            fontSize: 20,
-            opacity: 0.6,
-            transform: isOpen ? 'rotate(180deg)' : 'none',
-            transition: 'transform 0.2s',
-            flexShrink: 0,
-          }}
-        />
+        {!disabled && (
+          <ArrowDropDownIcon
+            sx={{
+              fontSize: 20,
+              opacity: 0.6,
+              transform: isOpen ? 'rotate(180deg)' : 'none',
+              transition: 'transform 0.2s',
+              flexShrink: 0,
+            }}
+          />
+        )}
       </ButtonBase>
 
       {/* Tree dropdown popover */}
@@ -622,6 +633,7 @@ interface EnvironmentTreeSelectorProps {
   onSelect: (selection: EnvironmentTreeSelection) => void;
   helperText?: string;
   disabled?: boolean;
+  knownEnvironments?: { environmentId: string; environmentName: string; displayName?: string }[];
 }
 
 const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
@@ -632,6 +644,7 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
   onSelect,
   helperText,
   disabled = false,
+  knownEnvironments,
 }) => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -751,12 +764,20 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
       }
     }
     if (selectedEnvironmentId) {
-      // Search cached environments
+      // Search cached environments first, then fall back to knownEnvironments prop
+      let envFound = false;
       for (const envs of Object.values(projectEnvMap)) {
         const env = envs.find((e) => e.environmentId === selectedEnvironmentId);
         if (env) {
           parts.push(env.displayName || env.environmentName);
+          envFound = true;
           break;
+        }
+      }
+      if (!envFound && knownEnvironments) {
+        const env = knownEnvironments.find((e) => e.environmentId === selectedEnvironmentId);
+        if (env) {
+          parts.push(env.displayName || env.environmentName);
         }
       }
     }
@@ -767,6 +788,7 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
     selectedProjectId,
     selectedEnvironmentId,
     projectEnvMap,
+    knownEnvironments,
   ]);
 
   const isMultiOrg = organisations.length > 1;
@@ -899,9 +921,17 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
           width: '100%',
           justifyContent: 'space-between',
           transition: 'all 0.2s ease-in-out',
-          '&:hover': {
-            borderColor: 'text.primary',
-          },
+          ...(disabled
+            ? {
+                opacity: 0.6,
+                cursor: 'default',
+                pointerEvents: 'none',
+              }
+            : {
+                '&:hover': {
+                  borderColor: 'text.primary',
+                },
+              }),
         }}
       >
         <Box
@@ -912,7 +942,7 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
             overflow: 'hidden',
           }}
         >
-          <EnvironmentIcon sx={{ fontSize: 18, opacity: 0.7, flexShrink: 0 }} />
+          <EnvironmentIcon sx={{ fontSize: 18, opacity: disabled ? 0.4 : 0.7, flexShrink: 0 }} />
           <Typography
             variant="body2"
             sx={{
@@ -920,21 +950,23 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              color: displayLabel ? 'text.primary' : 'text.secondary',
+              color: disabled ? 'text.disabled' : (displayLabel ? 'text.primary' : 'text.secondary'),
             }}
           >
             {displayLabel || t('apiTokens.selectEnvironment')}
           </Typography>
         </Box>
-        <ArrowDropDownIcon
-          sx={{
-            fontSize: 20,
-            opacity: 0.6,
-            transform: isOpen ? 'rotate(180deg)' : 'none',
-            transition: 'transform 0.2s',
-            flexShrink: 0,
-          }}
-        />
+        {!disabled && (
+          <ArrowDropDownIcon
+            sx={{
+              fontSize: 20,
+              opacity: 0.6,
+              transform: isOpen ? 'rotate(180deg)' : 'none',
+              transition: 'transform 0.2s',
+              flexShrink: 0,
+            }}
+          />
+        )}
       </ButtonBase>
 
       {/* Tree dropdown popover */}
@@ -2800,6 +2832,8 @@ const ApiTokensPage: React.FC = () => {
                     }))
                   }
                   disabled
+                  knownEnvironments={environments}
+                  helperText={t('apiTokens.tokenTypeNotEditable')}
                 />
               )}
             </Box>

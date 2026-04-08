@@ -5,35 +5,36 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Tickable.h"
 #include "Components/Image.h"
 #include "Components/ScaleBox.h"
 #include "Engine/Texture2DDynamic.h"
 #include "GatrixImageLoader.h"
+#include "GatrixImageSource.h"
 #include "GatrixImageScaleMode.h"
 #include "GatrixWebImage.generated.h"
+
+// Forward declaration
+class UGatrixImageManager;
 
 /**
  * A lightweight UMG widget that displays an image from a URL.
  *
  * Features:
- * - Async download with disk/memory caching
+ * - Async download with disk/memory caching via central UGatrixImageManager
  * - Auto-detect format from file header (PNG, JPG, GIF, WebP)
- * - Animated GIF / animated WebP playback
+ * - Animated GIF / animated WebP playback (shared across consumers)
  * - Blueprint-friendly: just set ImageUrl and it works
+ *
+ * Memory model:
+ * - Holds a TSharedPtr<FGatrixImageSource> from the central manager
+ * - No per-widget texture arrays — all textures are shared
+ * - Manager updates the shared texture; widget just displays it
  */
 UCLASS(Blueprintable, BlueprintType)
-class GATRIXCLIENTSDK_API UGatrixWebImage : public UUserWidget, public FTickableGameObject {
+class GATRIXCLIENTSDK_API UGatrixWebImage : public UUserWidget {
   GENERATED_BODY()
 
 public:
-  // ==================== FTickableGameObject ====================
-  virtual void Tick(float DeltaTime) override;
-  virtual bool IsTickable() const override { return bIsAnimating && !IsTemplate(); }
-  virtual TStatId GetStatId() const override {
-    RETURN_QUICK_DECLARE_CYCLE_STAT(UGatrixWebImage, STATGROUP_Tickables);
-  }
-
   // ==================== Configuration ====================
 
   /** The image URL to display. Setting this triggers download. */
@@ -45,7 +46,7 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|WebImage")
   FLinearColor PlaceholderColor = FLinearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
-  /** Whether to loop animated images (GIF/WebP) */
+  /** Whether to loop animated images (GIF/WebP) — reserved for future independent playback */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|WebImage")
   bool bLoopAnimation = true;
 
@@ -81,7 +82,7 @@ public:
 
   /** Is the image animated (GIF/WebP)? */
   UFUNCTION(BlueprintPure, Category = "Gatrix|WebImage")
-  bool IsAnimated() const { return AnimFrames.Num() > 1; }
+  bool IsAnimated() const;
 
   /** Get the image dimensions (0,0 if not loaded) */
   UFUNCTION(BlueprintPure, Category = "Gatrix|WebImage")
@@ -94,16 +95,17 @@ protected:
   virtual TSharedRef<SWidget> RebuildWidget() override;
   virtual void NativeConstruct() override;
   virtual void NativeDestruct() override;
+  virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
   virtual void SynchronizeProperties() override;
 
 private:
   void SetupWidgetHierarchy();
   void ApplyScaleModeToScaleBox();
   void StartDownload();
-  void OnImageDecoded(const FGatrixImageResult& Result);
-  void BuildAnimFrameTextures(const FGatrixImageResult& Result);
+  void OnSourceReady(bool bSuccess, const FGatrixImageResult& Result);
   void ApplyTexture(UTexture2DDynamic* Texture);
   void ShowPlaceholder();
+  void ReleaseCurrentSource();
 
   // UMG widgets (created dynamically via WidgetTree)
   UPROPERTY()
@@ -115,12 +117,9 @@ private:
   UPROPERTY()
   UScaleBox* ImageScaleBox = nullptr;
 
-  /** Animation state */
-  TArray<UTexture2DDynamic*> AnimFrames;
-  TArray<int32> AnimDelays; // ms per frame
-  int32 CurrentAnimFrame = 0;
-  float AnimAccumulator = 0.0f;
-  bool bIsAnimating = false;
+  /** Shared image source from UGatrixImageManager.
+   *  No per-widget texture duplication — all consumers share this source. */
+  TSharedPtr<FGatrixImageSource> ImageSource;
 
   /** Loading state */
   bool bIsLoading = false;
@@ -131,7 +130,9 @@ private:
   /** Current URL being loaded (to detect changes) */
   FString LoadedUrl;
 
+  /** Last texture pointer applied to UImage (to detect frame changes) */
+  UTexture2DDynamic* LastDisplayedTexture = nullptr;
+
   /** Editor preview: last synced URL to avoid redundant downloads */
   FString LastSyncedUrl;
 };
-

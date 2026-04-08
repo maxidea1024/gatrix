@@ -13,6 +13,7 @@
 #include "GatrixBannerClient.h"
 #include "GatrixBannerPlayback.h"
 #include "GatrixImageLoader.h"
+#include "GatrixImageSource.h"
 #include "MediaPlayer.h"
 #include "MediaTexture.h"
 #include "GatrixBannerWidget.generated.h"
@@ -242,11 +243,11 @@ private:
   bool bEffectActive = false;
   EGatrixFrameEffectType ActiveEnterEffect = EGatrixFrameEffectType::None;
 
-  // GIF playback state
-  TArray<UTexture2DDynamic*> CurrentGifFrames;
-  TArray<int32> CurrentGifDelays;
-  int32 CurrentGifFrameIndex = 0;
-  float GifFrameTimer = 0.0f;
+  // GIF playback: shared source from Manager (no per-widget texture arrays)
+  TSharedPtr<FGatrixImageSource> CurrentFrameSource;
+
+  // Last texture pointer applied to UImage (to detect frame changes for per-frame textures)
+  UTexture2DDynamic* LastDisplayedTexture = nullptr;
 
   // ==================== Internal Methods ====================
 
@@ -286,8 +287,11 @@ private:
   void UpdateEffect(float DeltaTime);
   void FinishEffect();
 
-  // Prefetch
+  // Prefetch (delegates to UGatrixImageManager)
   void PrefetchUpcomingFrames();
+
+  // Source management
+  void ReleaseCurrentFrameSource();
 
   // Video
   void InitVideoPlayer();

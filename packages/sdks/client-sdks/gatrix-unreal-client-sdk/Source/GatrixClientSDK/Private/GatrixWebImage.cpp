@@ -1,39 +1,14 @@
 // Copyright Gatrix. All Rights Reserved.
 
 #include "GatrixWebImage.h"
+#include "GatrixImageManager.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Components/ScaleBox.h"
 #include "Blueprint/WidgetTree.h"
 #include "Engine/Texture2DDynamic.h"
-#include "Async/Async.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogGatrixWebImage, Log, All);
-
-// ==================== FTickableGameObject ====================
-
-void UGatrixWebImage::Tick(float DeltaTime) {
-  if (!bIsAnimating || AnimFrames.Num() <= 1) return;
-
-  AnimAccumulator += DeltaTime;
-  float DelaySeconds = AnimDelays.IsValidIndex(CurrentAnimFrame)
-                           ? AnimDelays[CurrentAnimFrame] / 1000.0f
-                           : 0.1f;
-
-  if (AnimAccumulator >= DelaySeconds) {
-    AnimAccumulator -= DelaySeconds;
-    CurrentAnimFrame = (CurrentAnimFrame + 1) % AnimFrames.Num();
-
-    if (!bLoopAnimation && CurrentAnimFrame == 0) {
-      bIsAnimating = false;
-      return;
-    }
-
-    if (AnimFrames[CurrentAnimFrame]) {
-      ApplyTexture(AnimFrames[CurrentAnimFrame]);
-    }
-  }
-}
 
 // ==================== Lifecycle ====================
 
@@ -147,10 +122,26 @@ void UGatrixWebImage::NativeConstruct() {
 }
 
 void UGatrixWebImage::NativeDestruct() {
-  bIsAnimating = false;
-  AnimFrames.Empty();
-  AnimDelays.Empty();
+  // Release the shared source reference (critical for memory management)
+  ReleaseCurrentSource();
   Super::NativeDestruct();
+}
+
+void UGatrixWebImage::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
+  Super::NativeTick(MyGeometry, InDeltaTime);
+
+  // For animated sources with per-frame textures, update the brush
+  // when the Manager advances to a new frame. This is a cheap pointer swap
+  // — no GPU upload, no decode, just changing which pre-created texture
+  // the UImage widget references.
+  if (ImageSource.IsValid() && ImageSource->IsAnimated() &&
+      ImageSource->IsReady() && DisplayImage) {
+    UTexture2DDynamic* CurrentTex = ImageSource->GetDisplayTexture();
+    if (CurrentTex && CurrentTex != LastDisplayedTexture) {
+      DisplayImage->SetBrushFromTextureDynamic(CurrentTex, true);
+      LastDisplayedTexture = CurrentTex;
+    }
+  }
 }
 
 // ==================== Public API ====================
@@ -169,13 +160,10 @@ void UGatrixWebImage::SetImageUrl(const FString& Url) {
 }
 
 void UGatrixWebImage::ClearImage() {
-  bIsAnimating = false;
+  ReleaseCurrentSource();
+
   bIsLoading = false;
   bIsLoaded = false;
-  AnimFrames.Empty();
-  AnimDelays.Empty();
-  CurrentAnimFrame = 0;
-  AnimAccumulator = 0.0f;
   ImageWidth = 0;
   ImageHeight = 0;
   LoadedUrl.Empty();
@@ -188,7 +176,17 @@ void UGatrixWebImage::SetExternalImage(UImage* ExternalImg) {
   DisplayImage = ExternalImg;
 }
 
+bool UGatrixWebImage::IsAnimated() const {
+  return ImageSource.IsValid() && ImageSource->IsAnimated();
+}
+
 // ==================== Internal ====================
+
+void UGatrixWebImage::ReleaseCurrentSource() {
+  if (ImageSource.IsValid()) {
+    UGatrixImageManager::Get()->ReleaseSource(ImageSource);
+  }
+}
 
 void UGatrixWebImage::ApplyTexture(UTexture2DDynamic* Texture) {
   if (!Texture) return;
@@ -226,18 +224,12 @@ void UGatrixWebImage::ShowPlaceholder() {
 
 void UGatrixWebImage::StartDownload() {
   if (ImageUrl.IsEmpty()) return;
-  if (!UGatrixImageLoader::Get()) {
-    UE_LOG(LogGatrixWebImage, Error, TEXT("ImageLoader not available"));
-    return;
-  }
+
+  // Release previous source if any
+  ReleaseCurrentSource();
 
   bIsLoading = true;
   bIsLoaded = false;
-  bIsAnimating = false;
-  AnimFrames.Empty();
-  AnimDelays.Empty();
-  CurrentAnimFrame = 0;
-  AnimAccumulator = 0.0f;
   LoadedUrl = ImageUrl;
 
   UE_LOG(LogGatrixWebImage, Log, TEXT("StartDownload: %s"), *ImageUrl);
@@ -250,54 +242,41 @@ void UGatrixWebImage::StartDownload() {
     Self->bIsLoading = false;
 
     if (bSuccess && Result.IsValid()) {
-      Self->OnImageDecoded(Result);
+      Self->OnSourceReady(bSuccess, Result);
     } else {
       UE_LOG(LogGatrixWebImage, Warning, TEXT("Failed to load: %s"),
              *Self->LoadedUrl);
     }
   });
 
-  UGatrixImageLoader::Get()->LoadImage(ImageUrl, EGatrixFrameType::Png, Delegate);
+  // Acquire source from the central manager (shared across all consumers)
+  ImageSource = UGatrixImageManager::Get()->AcquireSource(
+      ImageUrl, EGatrixFrameType::Png, Delegate);
 }
 
-void UGatrixWebImage::OnImageDecoded(const FGatrixImageResult& Result) {
+void UGatrixWebImage::OnSourceReady(bool bSuccess,
+                                     const FGatrixImageResult& Result) {
   bIsLoaded = true;
 
-  if (Result.IsGif()) {
-    BuildAnimFrameTextures(Result);
+  // Get the display texture from the shared source
+  UTexture2DDynamic* DisplayTexture = nullptr;
 
-    if (AnimFrames.Num() > 0) {
-      ApplyTexture(AnimFrames[0]);
-
-      if (AnimFrames.Num() > 1) {
-        bIsAnimating = true;
-        CurrentAnimFrame = 0;
-        AnimAccumulator = 0.0f;
-      }
-    }
-
-    UE_LOG(LogGatrixWebImage, Log,
-           TEXT("Loaded animated: %s (%d frames, %dx%d)"),
-           *LoadedUrl, AnimFrames.Num(), ImageWidth, ImageHeight);
-  } else {
-    if (Result.Texture) {
-      ImageWidth = Result.Texture->SizeX;
-      ImageHeight = Result.Texture->SizeY;
-      ApplyTexture(Result.Texture);
-    }
-
-    UE_LOG(LogGatrixWebImage, Log,
-           TEXT("Loaded static: %s (%dx%d)"),
-           *LoadedUrl, ImageWidth, ImageHeight);
+  if (ImageSource.IsValid()) {
+    DisplayTexture = ImageSource->GetDisplayTexture();
+    ImageWidth = ImageSource->Width;
+    ImageHeight = ImageSource->Height;
+  } else if (Result.Texture) {
+    DisplayTexture = Result.Texture;
+    ImageWidth = Result.Width;
+    ImageHeight = Result.Height;
   }
-}
 
-void UGatrixWebImage::BuildAnimFrameTextures(const FGatrixImageResult& Result) {
-  AnimFrames = Result.GifFrames;
-  AnimDelays = Result.GifFrameDelays;
-
-  if (AnimFrames.Num() > 0 && AnimFrames[0]) {
-    ImageWidth = AnimFrames[0]->SizeX;
-    ImageHeight = AnimFrames[0]->SizeY;
+  if (DisplayTexture) {
+    ApplyTexture(DisplayTexture);
   }
+
+  UE_LOG(LogGatrixWebImage, Log,
+         TEXT("Loaded: %s (%dx%d, %s)"),
+         *LoadedUrl, ImageWidth, ImageHeight,
+         IsAnimated() ? TEXT("animated") : TEXT("static"));
 }

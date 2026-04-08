@@ -8,6 +8,42 @@
 #include "Engine/Texture2DDynamic.h"
 #include "GatrixImageLoader.generated.h"
 
+/** Lightweight result: raw bytes + metadata, no GPU textures.
+ *  Used by UGatrixImageManager. */
+struct GATRIXCLIENTSDK_API FGatrixImageRawResult {
+  /** Raw compressed file bytes (GIF/WebP/PNG/JPG) */
+  TArray<uint8> RawBytes;
+
+  /** Format auto-detected from magic bytes */
+  EGatrixFrameType DetectedType = EGatrixFrameType::Png;
+
+  /** Image dimensions */
+  int32 Width = 0;
+  int32 Height = 0;
+
+  /** For animated formats: number of frames */
+  int32 FrameCount = 1;
+
+  /** For animated formats: per-frame delays in milliseconds */
+  TArray<int32> FrameDelays;
+
+  /** Whether this came from disk cache */
+  bool bFromDiskCache = false;
+
+  /** For static images: decoded RGBA from background thread.
+   *  Avoids double-decode: background thread decodes for metadata,
+   *  game thread reuses RGBA for texture creation. */
+  TArray<uint8> DecodedRGBA;
+
+  bool IsValid() const { return RawBytes.Num() > 0 && Width > 0 && Height > 0; }
+  bool IsAnimated() const { return FrameCount > 1; }
+};
+
+/** Delegate for raw image load completion */
+DECLARE_DELEGATE_TwoParams(FGatrixImageRawLoadedDelegate,
+                           bool /*bSuccess*/,
+                           const FGatrixImageRawResult& /*Result*/);
+
 /** Result of an image load operation */
 USTRUCT(BlueprintType)
 struct GATRIXCLIENTSDK_API FGatrixImageResult {
@@ -76,6 +112,17 @@ public:
    */
   void Prefetch(const TArray<FString>& Urls);
 
+  /**
+   * Load an image and return raw bytes + metadata (no GPU textures).
+   * Intended for UGatrixImageManager: the manager creates its own
+   * shared textures from the raw data.
+   *
+   * Flow: disk cache → network download → metadata extraction
+   * Does NOT create UTexture2DDynamic objects.
+   */
+  void LoadImageRaw(const FString& Url, EGatrixFrameType FrameType,
+                    FGatrixImageRawLoadedDelegate OnLoaded);
+
   /** Check if an image is already in memory cache */
   bool IsInMemoryCache(const FString& Url) const;
 
@@ -123,9 +170,14 @@ private:
 
   FString GetDiskCachePath(const FString& Url) const;
   FString ComputeCacheKey(const FString& Url) const;
-  bool LoadFromDiskCache(const FString& Url, TArray<uint8>& OutData) const;
   void SaveToDiskCache(const FString& Url, const TArray<uint8>& Data);
   void EnsureDiskCacheDir();
+
+public:
+  /** Load raw bytes from disk cache (public for UGatrixImageManager) */
+  bool LoadFromDiskCache(const FString& Url, TArray<uint8>& OutData) const;
+
+private:
 
   // ==================== Download Queue ====================
 
@@ -148,37 +200,45 @@ private:
   void ProcessDownloadQueue();
   void StartDownload(const FDownloadRequest& Request);
 
-  // ==================== Decoding ====================
+  // ==================== Decoding (public for UGatrixImageManager) ====================
 
-  /** Decode raw bytes into RGBA pixel buffer on a background thread.
-   *  @param Data        Raw file bytes
-   *  @param FrameType   Format hint
-   *  @param OnDecoded   Callback with (bSuccess, Width, Height, RGBAData, GifFrames)
+public:
+  /** Create UTexture2DDynamic from RGBA buffer (must be called on game thread) */
+  static UTexture2DDynamic* CreateTextureFromRGBA(const TArray<uint8>& RGBAData,
+                                                  int32 Width, int32 Height);
+
+  /**
+   * Batch-create multiple UTexture2DDynamic from RGBA buffers.
+   * Uses only 2 FlushRenderingCommands total instead of 2 per texture.
+   * Must be called on game thread.
    */
+  static void CreateTexturesFromRGBABatch(
+      const TArray<TArray<uint8>>& RGBADataArray,
+      int32 Width, int32 Height,
+      TArray<UTexture2DDynamic*>& OutTextures);
+
+  /** Decode PNG/JPG to RGBA (thread-safe, no GPU) */
+  static bool DecodeStandardImage(const TArray<uint8>& Data,
+                                  int32& OutWidth, int32& OutHeight,
+                                  TArray<uint8>& OutRGBA);
+
+  /** Decode GIF to array of (RGBA, delay_ms) per frame (thread-safe) */
+  static bool DecodeGif(const TArray<uint8>& Data,
+                        int32& OutWidth, int32& OutHeight,
+                        TArray<TPair<TArray<uint8>, int32>>& OutFrames);
+
+  /** Decode WebP (thread-safe) */
+  static bool DecodeWebP(const TArray<uint8>& Data,
+                         int32& OutWidth, int32& OutHeight,
+                         TArray<uint8>& OutRGBA,
+                         TArray<TPair<TArray<uint8>, int32>>& OutGifFrames);
+
+private:
+  /** Decode raw bytes into RGBA pixel buffer on a background thread (internal) */
   void DecodeImageAsync(const TArray<uint8>& Data, EGatrixFrameType FrameType,
                         const FString& Url,
                         TFunction<void(bool bSuccess, int32 Width, int32 Height,
                                        const TArray<uint8>& RGBAData,
                                        const TArray<TPair<TArray<uint8>, int32>>& GifFrames)>
                             OnDecoded);
-
-  /** Create UTexture2DDynamic from RGBA buffer (must be called on game thread) */
-  static UTexture2DDynamic* CreateTextureFromRGBA(const TArray<uint8>& RGBAData,
-                                                  int32 Width, int32 Height);
-
-  // Static image decoding (PNG, JPG)
-  static bool DecodeStandardImage(const TArray<uint8>& Data,
-                                  int32& OutWidth, int32& OutHeight,
-                                  TArray<uint8>& OutRGBA);
-
-  // WebP decoding
-  static bool DecodeWebP(const TArray<uint8>& Data,
-                         int32& OutWidth, int32& OutHeight,
-                         TArray<uint8>& OutRGBA,
-                         TArray<TPair<TArray<uint8>, int32>>& OutGifFrames);
-
-  // GIF decoding — returns array of (RGBA, delay_ms) per frame
-  static bool DecodeGif(const TArray<uint8>& Data,
-                        int32& OutWidth, int32& OutHeight,
-                        TArray<TPair<TArray<uint8>, int32>>& OutFrames);
 };

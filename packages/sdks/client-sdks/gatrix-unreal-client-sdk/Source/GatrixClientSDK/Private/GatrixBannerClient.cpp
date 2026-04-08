@@ -1,11 +1,16 @@
 // Copyright Gatrix. All Rights Reserved.
 
 #include "GatrixBannerClient.h"
+#include "GatrixImageManager.h"
 #include "Http.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
 #include "Async/Async.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
+#include "HAL/PlatformFilemanager.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogGatrixBanner, Log, All);
 
@@ -16,6 +21,18 @@ void UGatrixBannerClient::Initialize(const FString& InApiUrl, const FString& InA
   ApiUrl = InApiUrl;
   ApiToken = InApiToken;
   CustomHeaders = InCustomHeaders;
+  EnsureCacheDir();
+
+  // Load cached banners from disk on startup (offline support)
+  TArray<FGatrixBanner> CachedBanners;
+  if (LoadBannerListFromCache(CachedBanners)) {
+    for (const auto& B : CachedBanners) {
+      BannerCache.Add(B.BannerId, B);
+    }
+    UE_LOG(LogGatrixBanner, Log,
+           TEXT("BannerClient: Loaded %d banners from disk cache"),
+           CachedBanners.Num());
+  }
 
   UE_LOG(LogGatrixBanner, Log, TEXT("BannerClient initialized. ApiUrl=%s"), *ApiUrl);
 }
@@ -31,13 +48,16 @@ void UGatrixBannerClient::FetchAllBanners(
   TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request =
       CreateRequest(TEXT("/client/banners"));
 
-  // prevent GC during async operation
+  // Set ETag for conditional request (304 Not Modified)
+  if (!BannerListEtag.IsEmpty()) {
+    Request->SetHeader(TEXT("If-None-Match"), BannerListEtag);
+  }
+
   TWeakObjectPtr<UGatrixBannerClient> WeakThis(this);
 
   Request->OnProcessRequestComplete().BindLambda(
       [WeakThis, OnComplete](FHttpRequestPtr Req, FHttpResponsePtr Resp,
                              bool bConnectedSuccessfully) {
-        // Must process results on game thread
         AsyncTask(ENamedThreads::GameThread, [WeakThis, Resp, bConnectedSuccessfully, OnComplete]() {
           if (!WeakThis.IsValid()) return;
 
@@ -46,12 +66,26 @@ void UGatrixBannerClient::FetchAllBanners(
 
           if (!bConnectedSuccessfully || !Resp.IsValid()) {
             UE_LOG(LogGatrixBanner, Warning, TEXT("FetchAllBanners: Connection failed"));
-            if (OnComplete) OnComplete(false, Banners);
-            Self->OnAllBannersLoaded.Broadcast(false, Banners);
+            // Fall back to disk cache
+            Banners = Self->GetCachedBanners();
+            bool bHasCache = Banners.Num() > 0;
+            if (OnComplete) OnComplete(bHasCache, Banners);
+            Self->OnAllBannersLoaded.Broadcast(bHasCache, Banners);
             return;
           }
 
           const int32 StatusCode = Resp->GetResponseCode();
+
+          // 304 Not Modified — cached data is still valid
+          if (StatusCode == 304) {
+            UE_LOG(LogGatrixBanner, Log,
+                   TEXT("FetchAllBanners: 304 Not Modified — using cache"));
+            Banners = Self->GetCachedBanners();
+            if (OnComplete) OnComplete(true, Banners);
+            Self->OnAllBannersLoaded.Broadcast(true, Banners);
+            return;
+          }
+
           if (StatusCode != 200) {
             UE_LOG(LogGatrixBanner, Warning,
                    TEXT("FetchAllBanners: HTTP %d — %s"), StatusCode,
@@ -59,6 +93,12 @@ void UGatrixBannerClient::FetchAllBanners(
             if (OnComplete) OnComplete(false, Banners);
             Self->OnAllBannersLoaded.Broadcast(false, Banners);
             return;
+          }
+
+          // Store new ETag
+          FString NewEtag = Resp->GetHeader(TEXT("ETag"));
+          if (!NewEtag.IsEmpty()) {
+            Self->BannerListEtag = NewEtag;
           }
 
           // Parse JSON
@@ -73,7 +113,6 @@ void UGatrixBannerClient::FetchAllBanners(
             return;
           }
 
-          // Extract data.banners array
           const TSharedPtr<FJsonObject>* DataObj = nullptr;
           if (!RootObj->TryGetObjectField(TEXT("data"), DataObj)) {
             UE_LOG(LogGatrixBanner, Warning, TEXT("FetchAllBanners: Missing 'data' field"));
@@ -104,6 +143,13 @@ void UGatrixBannerClient::FetchAllBanners(
 
           UE_LOG(LogGatrixBanner, Log, TEXT("FetchAllBanners: Loaded %d banners"),
                  Banners.Num());
+
+          // Save to disk cache for offline use
+          Self->SaveBannerListToCache(Banners);
+
+          // Prefetch all referenced images
+          Self->PrefetchBannerImages(Banners);
+
           if (OnComplete) OnComplete(true, Banners);
           Self->OnAllBannersLoaded.Broadcast(true, Banners);
         });
@@ -497,5 +543,204 @@ void UGatrixBannerClient::ParseTargetingFromJson(
   FString FilterLogic;
   if (JsonObj->TryGetStringField(TEXT("filterLogic"), FilterLogic)) {
     OutTargeting.FilterLogic = GatrixBannerParse::ParseFilterLogic(FilterLogic);
+  }
+}
+
+// ==================== Disk Cache ====================
+
+void UGatrixBannerClient::EnsureCacheDir() {
+  BannerCacheDir = FPaths::ProjectSavedDir() / TEXT("GatrixCache") / TEXT("Banners");
+  IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+  if (!PlatformFile.DirectoryExists(*BannerCacheDir)) {
+    PlatformFile.CreateDirectoryTree(*BannerCacheDir);
+  }
+}
+
+FString UGatrixBannerClient::GetCacheFilePath(const FString& Filename) const {
+  return BannerCacheDir / Filename;
+}
+
+void UGatrixBannerClient::SaveBannerListToCache(const TArray<FGatrixBanner>& Banners) {
+  // Save raw banner JSON response as a simplified format
+  FString JsonContent = TEXT("[");
+  for (int32 i = 0; i < Banners.Num(); ++i) {
+    if (i > 0) JsonContent += TEXT(",");
+    JsonContent += SerializeBannerToJson(Banners[i]);
+  }
+  JsonContent += TEXT("]");
+
+  FFileHelper::SaveStringToFile(
+      JsonContent, *GetCacheFilePath(TEXT("banner_list.json")),
+      FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+
+  // Save ETag separately
+  if (!BannerListEtag.IsEmpty()) {
+    FFileHelper::SaveStringToFile(
+        BannerListEtag, *GetCacheFilePath(TEXT("banner_list.etag")),
+        FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+  }
+
+  UE_LOG(LogGatrixBanner, Log, TEXT("SaveBannerListToCache: %d banners saved"),
+         Banners.Num());
+}
+
+bool UGatrixBannerClient::LoadBannerListFromCache(TArray<FGatrixBanner>& OutBanners) {
+  FString JsonContent;
+  if (!FFileHelper::LoadFileToString(
+          JsonContent, *GetCacheFilePath(TEXT("banner_list.json")))) {
+    return false;
+  }
+
+  // Load ETag
+  FString CachedEtag;
+  if (FFileHelper::LoadFileToString(
+          CachedEtag, *GetCacheFilePath(TEXT("banner_list.etag")))) {
+    BannerListEtag = CachedEtag.TrimStartAndEnd();
+  }
+
+  // Parse JSON array
+  TArray<TSharedPtr<FJsonValue>> JsonArray;
+  TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonContent);
+  if (!FJsonSerializer::Deserialize(Reader, JsonArray)) {
+    UE_LOG(LogGatrixBanner, Warning, TEXT("LoadBannerListFromCache: JSON parse failed"));
+    return false;
+  }
+
+  for (const auto& Val : JsonArray) {
+    const TSharedPtr<FJsonObject>* Obj = nullptr;
+    if (Val->TryGetObject(Obj)) {
+      FGatrixBanner Banner;
+      if (ParseBannerFromJson(*Obj, Banner)) {
+        OutBanners.Add(MoveTemp(Banner));
+      }
+    }
+  }
+
+  return OutBanners.Num() > 0;
+}
+
+void UGatrixBannerClient::SaveBannerToCache(const FGatrixBanner& Banner) {
+  FString Filename = FString::Printf(TEXT("banner_%s.json"), *Banner.BannerId);
+  FString JsonContent = SerializeBannerToJson(Banner);
+  FFileHelper::SaveStringToFile(
+      JsonContent, *GetCacheFilePath(Filename),
+      FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+}
+
+bool UGatrixBannerClient::LoadBannerFromCache(const FString& BannerId,
+                                               FGatrixBanner& OutBanner) {
+  FString Filename = FString::Printf(TEXT("banner_%s.json"), *BannerId);
+  FString JsonContent;
+  if (!FFileHelper::LoadFileToString(JsonContent, *GetCacheFilePath(Filename))) {
+    return false;
+  }
+
+  TSharedPtr<FJsonObject> JsonObj;
+  TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonContent);
+  if (!FJsonSerializer::Deserialize(Reader, JsonObj) || !JsonObj.IsValid()) {
+    return false;
+  }
+
+  return ParseBannerFromJson(JsonObj, OutBanner);
+}
+
+// ==================== Serialization ====================
+
+FString UGatrixBannerClient::SerializeBannerToJson(const FGatrixBanner& Banner) {
+  TSharedRef<FJsonObject> Obj = MakeShared<FJsonObject>();
+  Obj->SetStringField(TEXT("bannerId"), Banner.BannerId);
+  Obj->SetStringField(TEXT("name"), Banner.Name);
+  Obj->SetNumberField(TEXT("width"), Banner.Width);
+  Obj->SetNumberField(TEXT("height"), Banner.Height);
+  Obj->SetNumberField(TEXT("playbackSpeed"), Banner.PlaybackSpeed);
+  Obj->SetBoolField(TEXT("shuffle"), Banner.bShuffle);
+  Obj->SetNumberField(TEXT("version"), Banner.Version);
+
+  // Serialize sequences
+  TArray<TSharedPtr<FJsonValue>> SeqArray;
+  for (const auto& Seq : Banner.Sequences) {
+    TSharedRef<FJsonObject> SeqObj = MakeShared<FJsonObject>();
+    SeqObj->SetStringField(TEXT("sequenceId"), Seq.SequenceId);
+    SeqObj->SetStringField(TEXT("name"), Seq.Name);
+    SeqObj->SetNumberField(TEXT("speedMultiplier"), Seq.SpeedMultiplier);
+
+    TArray<TSharedPtr<FJsonValue>> FrameArray;
+    for (const auto& Frame : Seq.Frames) {
+      TSharedRef<FJsonObject> FrameObj = MakeShared<FJsonObject>();
+      FrameObj->SetStringField(TEXT("frameId"), Frame.FrameId);
+      FrameObj->SetStringField(TEXT("imageUrl"), Frame.ImageUrl);
+
+      // Frame type as string (reverse of ParseFrameType)
+      FString TypeStr = TEXT("png");
+      switch (Frame.Type) {
+        case EGatrixFrameType::Jpg:  TypeStr = TEXT("jpg"); break;
+        case EGatrixFrameType::Png:  TypeStr = TEXT("png"); break;
+        case EGatrixFrameType::Gif:  TypeStr = TEXT("gif"); break;
+        case EGatrixFrameType::Mp4:  TypeStr = TEXT("mp4"); break;
+        case EGatrixFrameType::Webp: TypeStr = TEXT("webp"); break;
+        case EGatrixFrameType::Svg:  TypeStr = TEXT("svg"); break;
+        default: break;
+      }
+      FrameObj->SetStringField(TEXT("type"), TypeStr);
+      FrameObj->SetNumberField(TEXT("delay"), Frame.Delay);
+      FrameObj->SetBoolField(TEXT("loop"), Frame.bLoop);
+
+      // Action
+      if (!Frame.Action.Value.IsEmpty()) {
+        TSharedRef<FJsonObject> ActionObj = MakeShared<FJsonObject>();
+        ActionObj->SetStringField(TEXT("value"), Frame.Action.Value);
+
+        // Action type as string (reverse of ParseActionType)
+        FString ActionStr = TEXT("none");
+        switch (Frame.Action.Type) {
+          case EGatrixFrameActionType::OpenUrl:  ActionStr = TEXT("openUrl"); break;
+          case EGatrixFrameActionType::Command:  ActionStr = TEXT("command"); break;
+          case EGatrixFrameActionType::DeepLink: ActionStr = TEXT("deepLink"); break;
+          default: break;
+        }
+        ActionObj->SetStringField(TEXT("type"), ActionStr);
+        FrameObj->SetObjectField(TEXT("action"), ActionObj);
+      }
+
+      // Click URL
+      if (!Frame.ClickUrl.IsEmpty()) {
+        FrameObj->SetStringField(TEXT("clickUrl"), Frame.ClickUrl);
+      }
+
+      FrameArray.Add(MakeShared<FJsonValueObject>(FrameObj));
+    }
+    SeqObj->SetArrayField(TEXT("frames"), FrameArray);
+    SeqArray.Add(MakeShared<FJsonValueObject>(SeqObj));
+  }
+  Obj->SetArrayField(TEXT("sequences"), SeqArray);
+
+  // Serialize to string
+  FString Result;
+  TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Result);
+  FJsonSerializer::Serialize(Obj, Writer);
+  return Result;
+}
+
+// ==================== Image Prefetch ====================
+
+void UGatrixBannerClient::PrefetchBannerImages(const TArray<FGatrixBanner>& Banners) {
+  TArray<FString> AllImageUrls;
+
+  for (const auto& Banner : Banners) {
+    for (const auto& Seq : Banner.Sequences) {
+      for (const auto& Frame : Seq.Frames) {
+        if (!Frame.ImageUrl.IsEmpty() &&
+            Frame.Type != EGatrixFrameType::Mp4) { // Skip video URLs
+          AllImageUrls.AddUnique(Frame.ImageUrl);
+        }
+      }
+    }
+  }
+
+  if (AllImageUrls.Num() > 0) {
+    UE_LOG(LogGatrixBanner, Log,
+           TEXT("PrefetchBannerImages: Prefetching %d image URLs"),
+           AllImageUrls.Num());
+    UGatrixImageManager::Get()->Prefetch(AllImageUrls);
   }
 }
