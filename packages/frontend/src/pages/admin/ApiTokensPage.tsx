@@ -370,7 +370,9 @@ const ProjectTreeSelector: React.FC<ProjectTreeSelectorProps> = ({
             overflow: 'hidden',
           }}
         >
-          <ProjectIcon sx={{ fontSize: 18, opacity: disabled ? 0.4 : 0.7, flexShrink: 0 }} />
+          <ProjectIcon
+            sx={{ fontSize: 18, opacity: disabled ? 0.4 : 0.7, flexShrink: 0 }}
+          />
           <Typography
             variant="body2"
             sx={{
@@ -633,7 +635,11 @@ interface EnvironmentTreeSelectorProps {
   onSelect: (selection: EnvironmentTreeSelection) => void;
   helperText?: string;
   disabled?: boolean;
-  knownEnvironments?: { environmentId: string; environmentName: string; displayName?: string }[];
+  knownEnvironments?: {
+    environmentId: string;
+    environmentName: string;
+    displayName?: string;
+  }[];
 }
 
 const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
@@ -775,7 +781,9 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
         }
       }
       if (!envFound && knownEnvironments) {
-        const env = knownEnvironments.find((e) => e.environmentId === selectedEnvironmentId);
+        const env = knownEnvironments.find(
+          (e) => e.environmentId === selectedEnvironmentId
+        );
         if (env) {
           parts.push(env.displayName || env.environmentName);
         }
@@ -942,7 +950,9 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
             overflow: 'hidden',
           }}
         >
-          <EnvironmentIcon sx={{ fontSize: 18, opacity: disabled ? 0.4 : 0.7, flexShrink: 0 }} />
+          <EnvironmentIcon
+            sx={{ fontSize: 18, opacity: disabled ? 0.4 : 0.7, flexShrink: 0 }}
+          />
           <Typography
             variant="body2"
             sx={{
@@ -950,7 +960,11 @@ const EnvironmentTreeSelector: React.FC<EnvironmentTreeSelectorProps> = ({
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              color: disabled ? 'text.disabled' : (displayLabel ? 'text.primary' : 'text.secondary'),
+              color: disabled
+                ? 'text.disabled'
+                : displayLabel
+                  ? 'text.primary'
+                  : 'text.secondary',
             }}
           >
             {displayLabel || t('apiTokens.selectEnvironment')}
