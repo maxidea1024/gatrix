@@ -130,6 +130,15 @@ void UGatrixWebImage::NativeDestruct() {
 void UGatrixWebImage::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
   Super::NativeTick(MyGeometry, InDeltaTime);
 
+  // Shimmer animation while loading
+  if (bIsLoading && bEnableShimmer && DisplayImage) {
+    ShimmerAccumulator += InDeltaTime;
+    // Sine wave: 0..1..0 pulsing
+    float Alpha = (FMath::Sin(ShimmerAccumulator * ShimmerSpeed * 2.0f * PI) + 1.0f) * 0.5f;
+    FLinearColor PulseColor = FMath::Lerp(PlaceholderColor, ShimmerHighlightColor, Alpha);
+    DisplayImage->SetColorAndOpacity(PulseColor);
+  }
+
   // For animated sources with per-frame textures, update the brush
   // when the Manager advances to a new frame. This is a cheap pointer swap
   // — no GPU upload, no decode, just changing which pre-created texture
@@ -220,6 +229,7 @@ void UGatrixWebImage::ShowPlaceholder() {
   if (!DisplayImage) return;
   DisplayImage->SetBrushFromTexture(nullptr);
   DisplayImage->SetColorAndOpacity(PlaceholderColor);
+  ShimmerAccumulator = 0.0f;
 }
 
 void UGatrixWebImage::StartDownload() {

@@ -281,12 +281,16 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
   }, [forceDialogOpen]);
 
   // Reset local edit state when dialog opens
+  // Note: frame is intentionally NOT in the dependency array.
+  // Including it would reset editFrame on every parent re-render,
+  // making the Update button appear disabled even after editing.
   useEffect(() => {
     if (settingsOpen) {
       setEditFrame(frame);
       setLocalDelaySeconds((frame.delay / 1000).toString());
     }
-  }, [settingsOpen, frame]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settingsOpen]);
 
   // Handle dialog close (cancel)
   const handleDialogClose = useCallback(() => {

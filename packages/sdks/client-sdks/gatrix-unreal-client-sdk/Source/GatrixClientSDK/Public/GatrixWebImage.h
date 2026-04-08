@@ -46,6 +46,19 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|WebImage")
   FLinearColor PlaceholderColor = FLinearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
+  /** Enable shimmer animation while loading (pulsing glow effect) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|WebImage")
+  bool bEnableShimmer = true;
+
+  /** Shimmer highlight color (the bright phase of the pulse) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|WebImage")
+  FLinearColor ShimmerHighlightColor = FLinearColor(0.22f, 0.22f, 0.25f, 1.0f);
+
+  /** Shimmer pulse speed (cycles per second) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|WebImage",
+            meta = (ClampMin = "0.5", ClampMax = "5.0"))
+  float ShimmerSpeed = 1.5f;
+
   /** Whether to loop animated images (GIF/WebP) — reserved for future independent playback */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|WebImage")
   bool bLoopAnimation = true;
@@ -132,6 +145,9 @@ private:
 
   /** Last texture pointer applied to UImage (to detect frame changes) */
   UTexture2DDynamic* LastDisplayedTexture = nullptr;
+
+  /** Shimmer animation accumulator */
+  float ShimmerAccumulator = 0.0f;
 
   /** Editor preview: last synced URL to avoid redundant downloads */
   FString LastSyncedUrl;

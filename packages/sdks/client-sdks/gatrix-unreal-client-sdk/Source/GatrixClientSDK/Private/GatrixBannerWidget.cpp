@@ -53,6 +53,14 @@ void UGatrixBannerWidget::Tick(float DeltaTime) {
     UpdateEffect(DeltaTime);
   }
 
+  // Shimmer animation while loading
+  if (bShowingShimmer && bEnableShimmer && CurrentImage) {
+    ShimmerAccumulator += DeltaTime;
+    float Alpha = (FMath::Sin(ShimmerAccumulator * ShimmerSpeed * 2.0f * PI) + 1.0f) * 0.5f;
+    FLinearColor PulseColor = FMath::Lerp(PlaceholderColor, ShimmerHighlightColor, Alpha);
+    CurrentImage->SetColorAndOpacity(PulseColor);
+  }
+
   // For animated sources with per-frame textures, update the brush
   // when the Manager advances to a new frame (cheap pointer swap).
   if (CurrentFrameSource.IsValid() && CurrentFrameSource->IsAnimated() &&
@@ -750,6 +758,7 @@ void UGatrixBannerWidget::ApplyFrameTexture(UTexture2DDynamic* Texture) {
 
   CurrentImage->SetColorAndOpacity(FLinearColor::White);
   CurrentImage->SetBrushFromTextureDynamic(Texture, true);
+  bShowingShimmer = false;
   CurrentImage->SetVisibility(ESlateVisibility::Visible);
   SetImageOpacity(CurrentImage, 1.0f);
   ResetImageTransform(CurrentImage);
@@ -781,6 +790,8 @@ void UGatrixBannerWidget::ShowPlaceholder() {
 
   CurrentImage->SetBrushFromTexture(nullptr);
   CurrentImage->SetColorAndOpacity(PlaceholderColor);
+  bShowingShimmer = true;
+  ShimmerAccumulator = 0.0f;
 }
 
 // ==================== Transition Animation ====================

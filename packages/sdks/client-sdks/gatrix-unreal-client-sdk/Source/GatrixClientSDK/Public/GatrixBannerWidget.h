@@ -78,6 +78,19 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Banner")
   FLinearColor PlaceholderColor = FLinearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
+  /** Enable shimmer animation while loading (pulsing glow effect) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Banner")
+  bool bEnableShimmer = true;
+
+  /** Shimmer highlight color (the bright phase of the pulse) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Banner")
+  FLinearColor ShimmerHighlightColor = FLinearColor(0.22f, 0.22f, 0.25f, 1.0f);
+
+  /** Shimmer pulse speed (cycles per second) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Banner",
+            meta = (ClampMin = "0.5", ClampMax = "5.0"))
+  float ShimmerSpeed = 1.5f;
+
   /** Enable transition effects between frames */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Banner")
   bool bEnableTransitions = true;
@@ -230,6 +243,8 @@ private:
   bool bBannerLoaded = false;
   bool bFirstFrameLoaded = false;
   bool bClientInitialized = false;
+  bool bShowingShimmer = false;
+  float ShimmerAccumulator = 0.0f;
 
   // Transition animation state
   float TransitionAlpha = 1.0f;
