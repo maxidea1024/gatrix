@@ -99,22 +99,36 @@ export const PlanningDataGuideContent: React.FC<
     );
   };
 
-  // Get the backend URL from environment config
-  // Priority: runtime config > VITE_API_URL > current origin with /api/v1 fallback
+  // Get the backend URL for CLI commands.
+  // CLI tools connect directly to the backend (port 45000), not through
+  // the frontend proxy (port 43000). Priority:
+  //   1. VITE_BACKEND_BASE_URL (explicit backend URL, e.g. http://localhost:45000)
+  //   2. VITE_API_URL if it's a full URL (strip /api/v1 suffix)
+  //   3. Current origin as last resort
   const getBackendUrl = () => {
+    // 1. Check VITE_BACKEND_BASE_URL (runtime config then build-time env)
+    const runtimeBackendUrl = (window as any)?.ENV?.VITE_BACKEND_BASE_URL;
+    if (runtimeBackendUrl && runtimeBackendUrl.trim()) {
+      return runtimeBackendUrl.trim().replace(/\/$/, '');
+    }
+    const envBackendUrl = (import.meta as any).env?.VITE_BACKEND_BASE_URL;
+    if (envBackendUrl && envBackendUrl.trim()) {
+      return envBackendUrl.trim().replace(/\/$/, '');
+    }
+
+    // 2. Check VITE_API_URL if it's a full URL (not relative path)
     if (typeof window !== 'undefined') {
-      // Check runtime config first (set dynamically in production)
       const runtimeUrl = (window as any)?.ENV?.VITE_API_URL;
       if (runtimeUrl && runtimeUrl.trim() && !runtimeUrl.startsWith('/')) {
         return runtimeUrl.trim().replace(/\/api\/v1$/, '');
       }
     }
-    // Check build-time env
     const envUrl = (import.meta as any).env?.VITE_API_URL;
     if (envUrl && envUrl.trim() && !envUrl.startsWith('/')) {
       return envUrl.trim().replace(/\/api\/v1$/, '');
     }
-    // Fallback to current origin (same server)
+
+    // 3. Fallback to current origin
     return typeof window !== 'undefined'
       ? window.location.origin
       : 'https://your-gatrix-server.com';
@@ -128,26 +142,28 @@ yarn planning-data:convert --input=./cms --output=./converted-planning-data
 yarn planning-data:convert --input=./cms --output=./converted-planning-data --binary-code=kr --country-code=0`;
   const uploadCommand = `yarn upload-planning-data \\
   --api-url=${backendUrl} \\
-  --env=qa \\
-  --dir=./converted-planning-data
+  --dir=./converted-planning-data \\
+  --api-token=<SERVER_API_TOKEN>
 
 # Options:
-#   --api-url   (Required) Backend API URL
-#   --env       (Required) Target environmentId (dev, qa, production, development)
-#   --dir       (Optional) Directory with planning data files (default: ./output)
-#   --token     (Optional) Server API token (default: unsecured-server-api-token)
-#   --uploader  (Optional) Uploader name for CI/CD
-#   --comment   (Optional) Upload comment`;
+#   --api-url     (Required) Backend API URL
+#   --dir         (Required) Directory containing planning data files
+#   --api-token   (Required) Server API token (GATRIX_API_TOKEN env var 대체 가능)
+#   --uploader    (Optional) Uploader name for CI/CD
+#   --comment     (Optional) Upload comment`;
 
   const standaloneCommand = `# game 저장소 독립 도구 (Gatrix 저장소 없이 사용 가능)
 cd game/gatrix/planning-data
 yarn install
-yarn convert                                    # game/cms → ./output
-yarn upload --api-url=${backendUrl} --env=qa    # 업로드`;
+yarn convert                                                    # game/cms → ./output
+yarn upload --api-url=${backendUrl} --api-token=<TOKEN>    # 업로드
+
+# convert 옵션: --source-root, --output, --binary-code, --country-code
+# upload 옵션:  --api-url (필수), --api-token (필수), --dir, --uploader, --comment`;
 
   const curlCommand = `# Upload all JSON files from a directory
 for file in ./converted-planning-data/*.json; do
-  curl -X POST ${backendUrl}/api/v1/server/qa/planning-data/upload \\
+  curl -X POST ${backendUrl}/api/v1/server/planning-data/upload \\
     -H "X-API-Token: <YOUR_SERVER_API_TOKEN>" \\
     -H "X-Application-Name: PlanningDataUploader" \\
     -F "files=@$file" \\
@@ -155,7 +171,7 @@ for file in ./converted-planning-data/*.json; do
 done
 
 # Or upload a single file
-curl -X POST ${backendUrl}/api/v1/server/qa/planning-data/upload \\
+curl -X POST ${backendUrl}/api/v1/server/planning-data/upload \\
   -H "X-API-Token: <YOUR_SERVER_API_TOKEN>" \\
   -H "X-Application-Name: PlanningDataUploader" \\
   -F "files=@./converted-planning-data/reward.json" \\

@@ -9,6 +9,11 @@ export const config = {
   metricsPort: parseInt(process.env.EDGE_METRICS_PORT || '9400', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
 
+  // Public-facing URL for this Edge server (used to generate URLs sent to clients)
+  // e.g. EDGE_PUBLIC_URL=https://yourdomain.com:3400
+  // If not set, falls back to req.protocol + req.get('host') at runtime
+  publicUrl: process.env.EDGE_PUBLIC_URL || '',
+
   // Backend API configuration
   gatrixUrl: process.env.GATRIX_URL || 'http://localhost:45000',
 

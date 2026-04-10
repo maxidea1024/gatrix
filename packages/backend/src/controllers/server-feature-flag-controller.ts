@@ -449,6 +449,21 @@ export default class ServerFeatureFlagController {
         sdkVersion
       );
 
+      // Handle missing flags (unknown flag reporting)
+      const missingFlags = metrics.filter((m: any) => m.variantName === '$missing');
+      if (missingFlags.length > 0) {
+        const { unknownFlagService } = await import('../services/unknown-flag-service');
+        for (const metric of missingFlags) {
+          await unknownFlagService.reportUnknownFlag({
+            flagName: metric.flagName,
+            environmentId,
+            appName,
+            sdkVersion,
+            count: metric.count || 1,
+          });
+        }
+      }
+
       res.json({ success: true });
     } catch (error: any) {
       logger.error('Error processing metrics:', error);

@@ -59,9 +59,7 @@ import {
   formatDateTimeDetailed,
 } from '../../utils/dateFormat';
 import PlanningDataUpload from '../../components/planning-data/PlanningDataUpload';
-import PlanningDataGuideDrawer, {
-  PlanningDataGuideContent,
-} from '../../components/planning-data/PlanningDataGuideDrawer';
+import PlanningDataGuideDrawer from '../../components/planning-data/PlanningDataGuideDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
@@ -3306,10 +3304,6 @@ const PlanningDataPage: React.FC = () => {
                   {t('planningData.noDataDescription')}
                 </Typography>
 
-                {/* Reusable Guide Content */}
-                <Box sx={{ mb: 3 }}>
-                  <PlanningDataGuideContent variant="inline" />
-                </Box>
 
                 {canManage && (
                   <Button

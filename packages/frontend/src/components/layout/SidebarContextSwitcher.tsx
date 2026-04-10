@@ -15,7 +15,6 @@ import {
 import {
   Business as OrgIcon,
   Folder as ProjectIcon,
-  UnfoldMore as UnfoldMoreIcon,
   Search as SearchIcon,
   Check as CheckIcon,
   Settings as SettingsIcon,
@@ -47,7 +46,7 @@ interface SidebarContextSwitcherProps {
   collapsed: boolean;
 }
 
-// ─── Single row: label + unfold icon ───
+// ─── Single row: label + manage icon ───
 interface ContextRowProps {
   icon: React.ReactNode;
   label: string;
@@ -57,8 +56,6 @@ interface ContextRowProps {
   collapsed?: boolean;
   tooltipTitle?: string;
   isLast?: boolean;
-  /** URL to navigate to for managing this entity */
-  manageUrl?: string;
   onManageClick?: () => void;
   manageTooltip?: string;
 }
@@ -151,47 +148,38 @@ const ContextRow: React.FC<ContextRowProps> = ({
               </Typography>
             )}
           </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.25,
-              flexShrink: 0,
-            }}
-          >
-            <UnfoldMoreIcon sx={{ fontSize: 14, opacity: 0.35 }} />
-            {onManageClick && (
-              <Tooltip title={manageTooltip || ''} placement="top" arrow>
-                <Box
-                  component="span"
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    onManageClick();
-                  }}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 20,
-                    height: 20,
-                    borderRadius: 0.5,
-                    opacity: 0,
-                    transition:
-                      'opacity 0.15s ease, background-color 0.15s ease',
-                    '.MuiBox-root:hover > &': { opacity: 1 },
-                    '&:hover': {
-                      bgcolor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.1)'
-                          : 'rgba(0,0,0,0.08)',
-                    },
-                  }}
-                >
-                  <SettingsIcon sx={{ fontSize: 13, opacity: 0.5 }} />
-                </Box>
-              </Tooltip>
-            )}
-          </Box>
+          {onManageClick && (
+            <Tooltip title={manageTooltip || ''} placement="top" arrow>
+              <Box
+                component="span"
+                onClick={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  onManageClick();
+                }}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 24,
+                  height: 24,
+                  borderRadius: 0.5,
+                  flexShrink: 0,
+                  opacity: 0,
+                  transition:
+                    'opacity 0.15s ease, background-color 0.15s ease',
+                  '.MuiBox-root:hover > &': { opacity: 1 },
+                  '&:hover': {
+                    bgcolor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.1)'
+                        : 'rgba(0,0,0,0.08)',
+                  },
+                }}
+              >
+                <SettingsIcon sx={{ fontSize: 13, opacity: 0.5 }} />
+              </Box>
+            </Tooltip>
+          )}
         </>
       )}
     </Box>

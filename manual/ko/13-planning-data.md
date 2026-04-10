@@ -84,16 +84,14 @@ yarn planning-data:convert --help
 # 기본 사용법
 yarn upload-planning-data \
   --api-url=https://gatrix.example.com \
-  --env=production \
   --dir=./packages/backend/data/planning \
-  --token=<SERVER_API_TOKEN>
+  --api-token=<SERVER_API_TOKEN>
 
 # 업로더 이름 및 코멘트 추가 (CI/CD용)
 yarn upload-planning-data \
   --api-url=https://gatrix.example.com \
-  --env=qa \
   --dir=./planning-data \
-  --token=$GATRIX_API_TOKEN \
+  --api-token=$GATRIX_API_TOKEN \
   --uploader="Jenkins CI" \
   --comment="Build #123"
 ```
@@ -103,9 +101,8 @@ yarn upload-planning-data \
 | 옵션         | 필수 | 설명                                                          |
 | ------------ | :--: | ------------------------------------------------------------- |
 | `--api-url`  |  ✅  | Gatrix 백엔드 API URL                                         |
-| `--env`      |  ✅  | 대상 환경 (dev, qa, production, development)                  |
-| `--dir`      |      | 업로드할 JSON 파일이 있는 폴더 (기본값: `./output`)           |
-| `--token`    |      | Server API 토큰 (기본값: `unsecured-server-api-token`) |
+| `--dir`      |  ✅  | 업로드할 JSON 파일이 있는 폴더                                |
+| `--api-token`|  ✅  | Server API 토큰 (`GATRIX_API_TOKEN` 환경변수로 대체 가능)     |
 | `--uploader` |      | 업로더 이름 (예: "Jenkins CI")                                |
 | `--comment`  |      | 업로드 코멘트                                                 |
 
@@ -126,7 +123,7 @@ yarn install
 yarn convert
 
 # 4. Gatrix 서버에 업로드
-yarn upload --api-url=gatrix.example.com --env=production
+yarn upload --api-url=http://localhost:45000
 ```
 
 **변환 옵션:**
@@ -140,12 +137,13 @@ yarn upload --api-url=gatrix.example.com --env=production
 
 **업로드 옵션:**
 
-| 옵션        | 필수 | 설명                                       |
-| ----------- | :--: | ------------------------------------------ |
-| `--api-url` |  ✅  | Gatrix 백엔드 API URL (프로토콜 생략 가능) |
-| `--env`     |  ✅  | 대상 환경 (development, qa, production)    |
-| `--dir`     |      | 업로드할 폴더 (기본값: `./output`)         |
-| `--token`   |      | API 토큰 (기본값: 개발용 토큰)             |
+| 옵션         | 필수 | 설명                                                      |
+| ------------ | :--: | --------------------------------------------------------- |
+| `--api-url`  |  ✅  | Gatrix 백엔드 API URL (프로토콜 생략 가능)                |
+| `--dir`      |      | 업로드할 폴더 (기본값: `./output`)                        |
+| `--api-token`|      | API 토큰 (기본값: `gatrix-unsecured-server-api-token`)    |
+| `--uploader` |      | 업로더 이름 (예: "Jenkins CI")                            |
+| `--comment`  |      | 업로드 코멘트                                             |
 
 **출력 예시:**
 
@@ -156,8 +154,7 @@ yarn upload --api-url=gatrix.example.com --env=production
 
 📋 Configuration
 ────────────────────────────────────────────────────────────────
-   API URL     : http://127.0.0.1:45000
-   Environment : development
+   API URL     : http://localhost:45000
    Source Dir  : C:\work\uwo\game\gatrix\planning-data\output
    Token       : (default dev token)
 
@@ -176,7 +173,7 @@ yarn upload --api-url=gatrix.example.com --env=production
 
 📊 Result Summary
 ────────────────────────────────────────────────────────────────
-   Environment    : development
+   API URL        : http://localhost:45000
    Files Uploaded : 23
    Changed Files  : 23
    Upload Hash    : c9e3586f4f9960e1

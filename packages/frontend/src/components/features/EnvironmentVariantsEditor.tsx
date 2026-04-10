@@ -490,14 +490,9 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     valueType,
   ]);
 
-  // Handle override toggle with immediate save (no debounce for checkboxes)
+  // Handle override toggle (local state only, wait for Apply to save)
   const handleOverrideToggle = useCallback(
     async (field: 'enabled' | 'disabled', checked: boolean) => {
-      const newOverrideEnabled =
-        field === 'enabled' ? checked : overrideEnabled;
-      const newOverrideDisabled =
-        field === 'disabled' ? checked : overrideDisabled;
-
       // Compute corresponding value
       let newEnabledValue = editingEnabledValue;
       let newDisabledValue = editingDisabledValue;
@@ -517,46 +512,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
       // Immediately notify parent that changes exist
       onChangeDetectedRef.current?.();
-
-      // Immediately save (no debounce for checkbox toggle)
-      if (!onSaveValuesRef.current) return;
-      try {
-        setSavingValues(true);
-
-        const ensureNonNull = (val: any) => {
-          if (val === null || val === undefined || val === '') {
-            switch (valueType) {
-              case 'boolean':
-                return false;
-              case 'number':
-                return 0;
-              case 'json':
-                return {};
-              default:
-                return '';
-            }
-          }
-          return val;
-        };
-
-        const sendEnabled = newOverrideEnabled
-          ? ensureNonNull(toApiValue(newEnabledValue))
-          : toApiValue(newEnabledValue);
-        const sendDisabled = newOverrideDisabled
-          ? ensureNonNull(toApiValue(newDisabledValue))
-          : toApiValue(newDisabledValue);
-
-        await onSaveValuesRef.current(
-          sendEnabled,
-          sendDisabled,
-          newOverrideEnabled,
-          newOverrideDisabled
-        );
-      } catch {
-        // Error handled by parent via enqueueSnackbar
-      } finally {
-        setSavingValues(false);
-      }
     },
     [
       overrideEnabled,
@@ -567,9 +522,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       enabledValue,
       envDisabledValue,
       disabledValue,
-      toApiValue,
-      valueType,
-      canonicalize,
     ]
   );
 

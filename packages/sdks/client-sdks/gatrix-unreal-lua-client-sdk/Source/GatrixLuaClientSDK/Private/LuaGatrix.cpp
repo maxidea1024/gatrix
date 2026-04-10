@@ -575,8 +575,43 @@ static FGatrixClientConfig ParseConfigFromLuaTable(lua_State* L, int TableIndex)
     if (lua_isboolean(L, -1))
       Config.Features.bOfflineMode = (lua_toboolean(L, -1) != 0);
     lua_pop(L, 1);
+
+    // Features.Context — initial targeting context
+    lua_getfield(L, -1, "Context");
+    if (lua_istable(L, -1)) {
+      lua_getfield(L, -1, "Properties");
+      if (lua_istable(L, -1)) {
+        lua_pushnil(L);
+        while (lua_next(L, -2) != 0) {
+          const char* RawKey = lua_tostring(L, -2);
+          const char* RawVal = lua_tostring(L, -1);
+          if (RawKey && RawVal) {
+            Config.Features.Context.Properties.Add(
+                UTF8_TO_TCHAR(RawKey), UTF8_TO_TCHAR(RawVal));
+          }
+          lua_pop(L, 1);
+        }
+      }
+      lua_pop(L, 1); // pop Properties
+    }
+    lua_pop(L, 1); // pop Context
   }
   lua_pop(L, 1); // Pop Features table
+
+  // CustomHeaders — additional HTTP headers for SDK requests
+  lua_getfield(L, AbsIndex, "CustomHeaders");
+  if (lua_istable(L, -1)) {
+    lua_pushnil(L);
+    while (lua_next(L, -2) != 0) {
+      const char* RawKey = lua_tostring(L, -2);
+      const char* RawVal = lua_tostring(L, -1);
+      if (RawKey && RawVal) {
+        Config.CustomHeaders.Add(UTF8_TO_TCHAR(RawKey), UTF8_TO_TCHAR(RawVal));
+      }
+      lua_pop(L, 1);
+    }
+  }
+  lua_pop(L, 1); // Pop CustomHeaders
 
   return Config;
 }
@@ -905,13 +940,56 @@ int FGatrixLuaBindings::Lua_HasFlag(lua_State* L) {
 
 int FGatrixLuaBindings::Lua_UpdateContext(lua_State* L) {
   luaL_checktype(L, 1, LUA_TTABLE);
-  FGatrixContext Ctx = ReadContextFromTable(L, 1);
+
+  // 1. Get current context to merge with
+  FGatrixContext Ctx;
+  UGatrixClient* Client = UGatrixClient::Get();
+  if (Client && Client->GetFeatures()) {
+      Ctx = Client->GetFeatures()->GetContext();
+  }
+
+  // 2. Iterate over incoming fields
+  lua_pushnil(L);
+  while (lua_next(L, 1) != 0) {
+    FString Key = SafeToString(L, -2);
+    
+    if (!Key.IsEmpty()) {
+      if (Key.Equals(TEXT("UserId"), ESearchCase::IgnoreCase)) {
+        Ctx.UserId = SafeToString(L, -1);
+      } else if (Key.Equals(TEXT("SessionId"), ESearchCase::IgnoreCase)) {
+        Ctx.SessionId = SafeToString(L, -1);
+      } else if (Key.Equals(TEXT("RemoteAddress"), ESearchCase::IgnoreCase)) {
+        Ctx.RemoteAddress = SafeToString(L, -1);
+      } else if (Key.Equals(TEXT("CurrentTime"), ESearchCase::IgnoreCase)) {
+        Ctx.CurrentTime = SafeToString(L, -1);
+      } else if (Key.Equals(TEXT("AppName"), ESearchCase::IgnoreCase)) {
+        Ctx.AppName = SafeToString(L, -1);
+      } else if (Key.Equals(TEXT("Properties"), ESearchCase::IgnoreCase)) {
+        if (lua_istable(L, -1)) {
+          lua_pushnil(L);
+          while (lua_next(L, -2) != 0) {
+             FString SubKey = SafeToString(L, -2);
+             FString SubVal = SafeToString(L, -1);
+             if (!SubKey.IsEmpty()) {
+               Ctx.Properties.Add(SubKey, SubVal);
+             }
+             lua_pop(L, 1);
+          }
+        }
+      } else {
+        Ctx.Properties.Add(Key, SafeToString(L, -1));
+      }
+    }
+    lua_pop(L, 1);
+  }
 
   // Create deferred promise
   int DeferredRef = CreateDeferred(L);
   if (DeferredRef == LUA_NOREF) {
     // 'deferred' module unavailable — fire and forget
-    UGatrixClient::Get()->GetFeatures()->UpdateContext(Ctx);
+    if (Client && Client->GetFeatures()) {
+      Client->GetFeatures()->UpdateContext(Ctx);
+    }
     lua_pushnil(L);
     return 1;
   }

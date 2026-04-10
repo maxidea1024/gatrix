@@ -23,6 +23,9 @@ const app: Application = express();
 // Disable Express built-in ETag (we use our own ETag middleware)
 app.set('etag', false);
 
+// Trust first proxy (e.g. Nginx) so req.protocol reflects X-Forwarded-Proto
+app.set('trust proxy', 1);
+
 // Check if HTTPS is enforced (for HTTP environments, disable HSTS and related headers)
 const forceHttps = process.env.EDGE_FORCE_HTTPS !== 'false';
 

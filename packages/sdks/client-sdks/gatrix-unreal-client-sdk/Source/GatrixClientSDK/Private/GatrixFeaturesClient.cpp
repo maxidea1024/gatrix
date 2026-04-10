@@ -359,6 +359,55 @@ void UGatrixFeaturesClient::UpdateContext(const FGatrixContext& NewContext,
 
   // Check if context actually changed using hash
   FString NewHash = ComputeContextHash(MergedContext);
+  
+  // Compute Delta (What changed)
+  FString DeltaStr;
+  
+  auto FormatVal = [](const FString& InVal) -> FString {
+      if (InVal == TEXT("(none)") || InVal == TEXT("(removed)")) return InVal;
+      if (InVal.IsNumeric() || InVal.Equals(TEXT("true"), ESearchCase::IgnoreCase) || InVal.Equals(TEXT("false"), ESearchCase::IgnoreCase)) {
+          return InVal;
+      }
+      return FString::Printf(TEXT("'%s'"), *InVal);
+  };
+  
+  if (ClientConfig.Features.Context.AppName != MergedContext.AppName) {
+      DeltaStr += FString::Printf(TEXT("AppName: %s -> %s, "), *FormatVal(ClientConfig.Features.Context.AppName), *FormatVal(MergedContext.AppName));
+  }
+  if (ClientConfig.Features.Context.UserId != MergedContext.UserId) {
+      DeltaStr += FString::Printf(TEXT("UserId: %s -> %s, "), *FormatVal(ClientConfig.Features.Context.UserId), *FormatVal(MergedContext.UserId));
+  }
+  if (ClientConfig.Features.Context.SessionId != MergedContext.SessionId) {
+      DeltaStr += FString::Printf(TEXT("SessionId: %s -> %s, "), *FormatVal(ClientConfig.Features.Context.SessionId), *FormatVal(MergedContext.SessionId));
+  }
+  if (ClientConfig.Features.Context.RemoteAddress != MergedContext.RemoteAddress) {
+      DeltaStr += FString::Printf(TEXT("RemoteAddress: %s -> %s, "), *FormatVal(ClientConfig.Features.Context.RemoteAddress), *FormatVal(MergedContext.RemoteAddress));
+  }
+  if (ClientConfig.Features.Context.CurrentTime != MergedContext.CurrentTime) {
+      DeltaStr += FString::Printf(TEXT("CurrentTime: %s -> %s, "), *FormatVal(ClientConfig.Features.Context.CurrentTime), *FormatVal(MergedContext.CurrentTime));
+  }
+
+  for (const auto& Prop : MergedContext.Properties) {
+      const FString* OldVal = ClientConfig.Features.Context.Properties.Find(Prop.Key);
+      if (!OldVal || *OldVal != Prop.Value) {
+          DeltaStr += FString::Printf(TEXT("%s: %s -> %s, "), *Prop.Key, *FormatVal(OldVal ? *OldVal : TEXT("(none)")), *FormatVal(Prop.Value));
+      }
+  }
+  for (const auto& OldProp : ClientConfig.Features.Context.Properties) {
+      if (!MergedContext.Properties.Contains(OldProp.Key)) {
+          DeltaStr += FString::Printf(TEXT("%s: %s -> (removed), "), *OldProp.Key, *FormatVal(OldProp.Value));
+      }
+  }
+
+  if (DeltaStr.IsEmpty()) {
+      DeltaStr = TEXT("No Changes");
+  } else {
+      DeltaStr.RemoveFromEnd(TEXT(", "));
+  }
+
+  UE_LOG(LogGatrix, Log, TEXT("UpdateContext invoked: Hash=%s, bChanged=%s, Delta=[%s]"), 
+         *NewHash, (NewHash == LastContextHash) ? TEXT("false") : TEXT("true"), *DeltaStr);
+
   if (NewHash == LastContextHash) {
     // No change — notify immediately without fetching
     if (OnComplete) {
@@ -1047,19 +1096,19 @@ int32 UGatrixFeaturesClient::WatchRealtimeFlagWithInitialState(const FString& Fl
                                                                const FString& Name) {
   int32 Handle = WatchRealtimeFlag(FlagName, Callback, Name);
 
-  // Emit initial state — always use realtimeFlags for realtime watchers
-  if (bReadyEmitted) {
-    UGatrixFlagProxy* Proxy = CreateProxyForWatch(FlagName, /*bForceRealtime=*/true);
-    Callback.ExecuteIfBound(Proxy);
-  } else if (EventEmitter) {
-    // Capture by value for safe deferred invocation
+  // Always emit the current local state immediately so UI can initialize without waiting
+  UGatrixFlagProxy* Proxy = CreateProxyForWatch(FlagName, /*bForceRealtime=*/true);
+  Callback.ExecuteIfBound(Proxy);
+
+  // If not yet ready, also ensure it fires once the initial fetch completes
+  if (!bReadyEmitted && EventEmitter) {
     FString CapturedFlagName = FlagName;
     FGatrixFlagWatchDelegate CapturedCallback = Callback;
     EventEmitter->Once(
         GatrixEvents::FlagsReady,
         [this, CapturedFlagName, CapturedCallback](const TArray<FString>&) {
-          UGatrixFlagProxy* Proxy = CreateProxyForWatch(CapturedFlagName, /*bForceRealtime=*/true);
-          CapturedCallback.ExecuteIfBound(Proxy);
+          UGatrixFlagProxy* ReadyProxy = CreateProxyForWatch(CapturedFlagName, /*bForceRealtime=*/true);
+          CapturedCallback.ExecuteIfBound(ReadyProxy);
         },
         Name.IsEmpty() ? FString() : Name + TEXT("_initial"));
   }
@@ -1072,18 +1121,18 @@ int32 UGatrixFeaturesClient::WatchSyncedFlagWithInitialState(const FString& Flag
                                                              const FString& Name) {
   int32 Handle = WatchSyncedFlag(FlagName, Callback, Name);
 
-  // Emit initial state — respect explicitSyncMode for synced watchers
-  if (bReadyEmitted) {
-    UGatrixFlagProxy* Proxy = CreateProxyForWatch(FlagName, /*bForceRealtime=*/false);
-    Callback.ExecuteIfBound(Proxy);
-  } else if (EventEmitter) {
+  // Always emit the current local state immediately
+  UGatrixFlagProxy* Proxy = CreateProxyForWatch(FlagName, /*bForceRealtime=*/false);
+  Callback.ExecuteIfBound(Proxy);
+
+  if (!bReadyEmitted && EventEmitter) {
     FString CapturedFlagName = FlagName;
     FGatrixFlagWatchDelegate CapturedCallback = Callback;
     EventEmitter->Once(
         GatrixEvents::FlagsReady,
         [this, CapturedFlagName, CapturedCallback](const TArray<FString>&) {
-          UGatrixFlagProxy* Proxy = CreateProxyForWatch(CapturedFlagName, /*bForceRealtime=*/false);
-          CapturedCallback.ExecuteIfBound(Proxy);
+          UGatrixFlagProxy* ReadyProxy = CreateProxyForWatch(CapturedFlagName, /*bForceRealtime=*/false);
+          CapturedCallback.ExecuteIfBound(ReadyProxy);
         },
         Name.IsEmpty() ? FString() : Name + TEXT("_initial"));
   }

@@ -4,13 +4,13 @@
  * CLI tool for uploading planning data to a remote Gatrix server.
  *
  * Usage:
- *   yarn upload-planning-data --api-url=https://gatrix.example.com --env=qa --dir=./planning-data --token=<TOKEN>
+ *   yarn upload-planning-data --api-url=https://gatrix.example.com --dir=./planning-data --token=<TOKEN>
  *
  * Options:
  *   --api-url   (Required) Backend API URL (e.g., https://gatrix.example.com)
- *   --env       (Required) Target environment (dev, qa, production)
  *   --dir       (Required) Directory containing planning data files
  *   --token     (Required) Server API token for authentication. Can also use GATRIX_API_TOKEN env var.
+ *               Alias: --api-token (for backward compatibility)
  *   --uploader  (Optional) Override uploader name (e.g., "Jenkins CI", "Build Server")
  *   --comment   (Optional) Upload comment/description
  */
@@ -35,22 +35,26 @@ function parseArgs() {
 
 // Validate required arguments
 function validateArgs(args) {
-    const required = ['api-url', 'env', 'dir'];
+    // Normalize aliases: --api-token → --token (backward compatibility)
+    if (args['api-token'] && !args.token) {
+        args.token = args['api-token'];
+    }
+
+    const required = ['api-url', 'dir'];
     const missing = required.filter(key => !args[key]);
 
     if (missing.length > 0) {
         console.error('❌ Missing required arguments:', missing.join(', '));
         console.error('\nUsage:');
-        console.error('  yarn upload-planning-data --api-url=<URL> --env=<ENV> --dir=<DIR> --token=<TOKEN> [--uploader=<NAME>] [--comment=<TEXT>]');
+        console.error('  yarn upload-planning-data --api-url=<URL> --dir=<DIR> --token=<TOKEN> [--uploader=<NAME>] [--comment=<TEXT>]');
         console.error('\nOptions:');
         console.error('  --api-url   (Required) Backend API URL (e.g., https://gatrix.example.com)');
-        console.error('  --env       (Required) Target environment (dev, qa, production)');
         console.error('  --dir       (Required) Directory containing planning data files');
         console.error('  --token     (Required) Server API token for authentication');
         console.error('  --uploader  (Optional) Override uploader name (e.g., "Jenkins CI")');
         console.error('  --comment   (Optional) Upload comment/description');
         console.error('\nExample:');
-        console.error('  yarn upload-planning-data --api-url=https://gatrix.motifgames.in --env=qa --dir=./planning-data --token=abc123 --uploader="Jenkins CI" --comment="Automated build #123"');
+        console.error('  yarn upload-planning-data --api-url=https://gatrix.example.com --dir=./planning-data --token=abc123 --uploader="Jenkins CI" --comment="Automated build #123"');
         process.exit(1);
     }
 
@@ -78,7 +82,7 @@ function getFiles(dir) {
 }
 
 // Upload files to server
-async function uploadFiles(apiUrl, env, files, token, uploader, comment) {
+async function uploadFiles(apiUrl, files, token, uploader, comment) {
     return new Promise((resolve, reject) => {
         const form = new FormData();
 
@@ -93,8 +97,8 @@ async function uploadFiles(apiUrl, env, files, token, uploader, comment) {
             form.append('comment', comment);
         }
 
-        // Parse URL - use server API route: /api/v1/server/:env/planning-data/upload
-        const url = new URL(`${apiUrl}/api/v1/server/${env}/planning-data/upload`);
+        // Parse URL - environment is determined by API token, not URL path
+        const url = new URL(`${apiUrl}/api/v1/server/planning-data/upload`);
         const isHttps = url.protocol === 'https:';
         const lib = isHttps ? https : http;
 
@@ -119,7 +123,6 @@ async function uploadFiles(apiUrl, env, files, token, uploader, comment) {
         };
 
         console.log(`📤 Uploading ${files.length} file(s) to ${apiUrl}...`);
-        console.log(`   Environment: ${env}`);
         console.log(`   API Endpoint: ${url.pathname}`);
         if (uploader) {
             console.log(`   Uploader: ${uploader}`);
@@ -162,7 +165,6 @@ async function main() {
     const args = validateArgs(parseArgs());
 
     const apiUrl = args['api-url'].replace(/\/$/, ''); // Remove trailing slash
-    const env = args.env;
     const dir = args.dir;
     const token = args.token || process.env.GATRIX_API_TOKEN;
     const uploader = args.uploader;
@@ -188,7 +190,7 @@ async function main() {
     console.log();
 
     try {
-        const result = await uploadFiles(apiUrl, env, files, token, uploader, comment);
+        const result = await uploadFiles(apiUrl, files, token, uploader, comment);
         console.log('\n✅ Upload successful!');
         if (result.message) {
             console.log(`   ${result.message}`);

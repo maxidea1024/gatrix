@@ -1549,7 +1549,9 @@ const FeatureFlagDetailPage: React.FC = () => {
       }
       if (
         updates.enabledValue !== undefined ||
-        updates.disabledValue !== undefined
+        updates.disabledValue !== undefined ||
+        updates.overrideEnabledValue !== undefined ||
+        updates.overrideDisabledValue !== undefined
       ) {
         await featureFlagService.updateFlagValues(
           flag.flagName,
@@ -1806,14 +1808,14 @@ const FeatureFlagDetailPage: React.FC = () => {
       const updates: Record<string, any> = {};
 
       if (
-        JSON.stringify(enabledValue) !==
-        JSON.stringify(currentEnv?.enabledValue ?? flag.enabledValue)
+        JSON.stringify(enabledValue) !== JSON.stringify(currentEnv?.enabledValue) ||
+        (overrideEnabledValue && !currentEnv?.overrideEnabledValue)
       ) {
         updates.enabledValue = enabledValue;
       }
       if (
-        JSON.stringify(disabledValue) !==
-        JSON.stringify(currentEnv?.disabledValue ?? flag.disabledValue)
+        JSON.stringify(disabledValue) !== JSON.stringify(currentEnv?.disabledValue) ||
+        (overrideDisabledValue && !currentEnv?.overrideDisabledValue)
       ) {
         updates.disabledValue = disabledValue;
       }
