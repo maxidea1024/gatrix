@@ -3304,7 +3304,6 @@ const PlanningDataPage: React.FC = () => {
                   {t('planningData.noDataDescription')}
                 </Typography>
 
-
                 {canManage && (
                   <Button
                     variant="contained"

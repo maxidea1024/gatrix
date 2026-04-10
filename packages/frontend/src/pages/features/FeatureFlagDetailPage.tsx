@@ -1808,13 +1808,15 @@ const FeatureFlagDetailPage: React.FC = () => {
       const updates: Record<string, any> = {};
 
       if (
-        JSON.stringify(enabledValue) !== JSON.stringify(currentEnv?.enabledValue) ||
+        JSON.stringify(enabledValue) !==
+          JSON.stringify(currentEnv?.enabledValue) ||
         (overrideEnabledValue && !currentEnv?.overrideEnabledValue)
       ) {
         updates.enabledValue = enabledValue;
       }
       if (
-        JSON.stringify(disabledValue) !== JSON.stringify(currentEnv?.disabledValue) ||
+        JSON.stringify(disabledValue) !==
+          JSON.stringify(currentEnv?.disabledValue) ||
         (overrideDisabledValue && !currentEnv?.overrideDisabledValue)
       ) {
         updates.disabledValue = disabledValue;

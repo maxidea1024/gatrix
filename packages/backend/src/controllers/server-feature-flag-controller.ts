@@ -450,9 +450,12 @@ export default class ServerFeatureFlagController {
       );
 
       // Handle missing flags (unknown flag reporting)
-      const missingFlags = metrics.filter((m: any) => m.variantName === '$missing');
+      const missingFlags = metrics.filter(
+        (m: any) => m.variantName === '$missing'
+      );
       if (missingFlags.length > 0) {
-        const { unknownFlagService } = await import('../services/unknown-flag-service');
+        const { unknownFlagService } =
+          await import('../services/unknown-flag-service');
         for (const metric of missingFlags) {
           await unknownFlagService.reportUnknownFlag({
             flagName: metric.flagName,

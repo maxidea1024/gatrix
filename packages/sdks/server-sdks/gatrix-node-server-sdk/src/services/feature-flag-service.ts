@@ -462,11 +462,11 @@ export class FeatureFlagService {
     const resolvedEnv = environmentId || this.defaultEnvironmentId;
     const envCache = this.cachedFlagsByEnv.get(resolvedEnv);
     const flag = envCache?.get(flagName);
-    
+
     if (!flag) {
       this.recordMetric(flagName, false, VALUE_SOURCE.MISSING, resolvedEnv);
     }
-    
+
     return flag;
   }
 

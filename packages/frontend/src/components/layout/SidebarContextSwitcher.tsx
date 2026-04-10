@@ -165,8 +165,7 @@ const ContextRow: React.FC<ContextRowProps> = ({
                   borderRadius: 0.5,
                   flexShrink: 0,
                   opacity: 0,
-                  transition:
-                    'opacity 0.15s ease, background-color 0.15s ease',
+                  transition: 'opacity 0.15s ease, background-color 0.15s ease',
                   '.MuiBox-root:hover > &': { opacity: 1 },
                   '&:hover': {
                     bgcolor: (theme) =>

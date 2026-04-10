@@ -109,9 +109,9 @@ function updateCacheSizeMetrics(): void {
   const countWhitelistItems = (
     data:
       | Record<
-        string,
-        { ipWhitelist?: unknown[]; accountWhitelist?: unknown[] }
-      >
+          string,
+          { ipWhitelist?: unknown[]; accountWhitelist?: unknown[] }
+        >
       | undefined
   ): number => {
     if (!data || typeof data !== 'object') return 0;
@@ -143,13 +143,13 @@ function updateCacheSizeMetrics(): void {
     ?.labels('total')
     .set(
       versionsCount +
-      bannersCount +
-      noticesCount +
-      worldsCount +
-      surveysCount +
-      popupNoticesCount +
-      storeProductsCount +
-      whitelistsCount
+        bannersCount +
+        noticesCount +
+        worldsCount +
+        surveysCount +
+        popupNoticesCount +
+        storeProductsCount +
+        whitelistsCount
     );
 }
 
@@ -468,7 +468,8 @@ router.get(
       }
 
       // Inject serviceNoticeUrl into meta using actual ULID environmentId
-      const edgeBaseUrl = config.publicUrl || `${req.protocol}://${req.get('host')}`;
+      const edgeBaseUrl =
+        config.publicUrl || `${req.protocol}://${req.get('host')}`;
       (meta as Record<string, unknown>).serviceNoticeUrl =
         `${edgeBaseUrl}/game-service-notices.html?environmentId=${environmentId}`;
 
@@ -480,8 +481,8 @@ router.get(
         patchAddress,
         guestModeAllowed:
           effectiveStatus === 'MAINTENANCE' ||
-            effectiveStatus === 'FORCED_UPDATE' ||
-            effectiveStatus === 'PATCH_UPDATE_REQUIRED'
+          effectiveStatus === 'FORCED_UPDATE' ||
+          effectiveStatus === 'PATCH_UPDATE_REQUIRED'
             ? false
             : Boolean(record.guestModeAllowed),
         externalClickLink: record.externalClickLink,

@@ -271,7 +271,11 @@ export class EventListener {
           const event = JSON.parse(message);
           this.logger.info('SDK Event received', {
             type: event.type,
-            id: event.data?.id || event.data?.key || event.data?.changedKeys?.join(',') || 'N/A',
+            id:
+              event.data?.id ||
+              event.data?.key ||
+              event.data?.changedKeys?.join(',') ||
+              'N/A',
           });
           try {
             this.metrics?.incEventReceived(event.type);
@@ -449,7 +453,11 @@ export class EventListener {
   private async handleStandardEvent(event: StandardEvent): Promise<void> {
     this.logger.info('Handling standard event', {
       type: event.type,
-      id: event.data.id || event.data.key || (event.data as any).changedKeys?.join(',') || 'N/A',
+      id:
+        event.data.id ||
+        event.data.key ||
+        (event.data as any).changedKeys?.join(',') ||
+        'N/A',
     });
 
     // Dispatch to domain handler
