@@ -1962,7 +1962,9 @@ const FeatureFlagDetailPage: React.FC = () => {
             // Convert back to the appropriate type
             if (type === 'number') {
               setFlag((prev) =>
-                prev ? { ...prev, [field]: val === '' ? '' : Number(val) } : prev
+                prev
+                  ? { ...prev, [field]: val === '' ? '' : Number(val) }
+                  : prev
               );
             } else if (type === 'boolean') {
               setFlag((prev) =>

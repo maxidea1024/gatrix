@@ -603,7 +603,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     const updatedVariants = distributeWeights([...editingVariants, newVariant]);
     setEditingVariants(updatedVariants);
     setExpanded(true);
-  }, [editingVariants, valueType, flagType, useFixedWeightVariants, validationRules]);
+  }, [
+    editingVariants,
+    valueType,
+    flagType,
+    useFixedWeightVariants,
+    validationRules,
+  ]);
 
   const removeVariant = useCallback(
     (index: number) => {
@@ -1195,7 +1201,8 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                               }))
                             }
                             legalValues={
-                              validationRules?.enabled && validationRules.legalValues?.length
+                              validationRules?.enabled &&
+                              validationRules.legalValues?.length
                                 ? validationRules.legalValues
                                 : undefined
                             }
@@ -1468,7 +1475,11 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             startIcon={<SaveIcon />}
             onClick={handleApplyAll}
             disabled={
-              saving || savingValues || hasDuplicateNames || hasJsonErrors || hasInvalidLegalValues
+              saving ||
+              savingValues ||
+              hasDuplicateNames ||
+              hasJsonErrors ||
+              hasInvalidLegalValues
             }
           >
             {t('common.apply')}
