@@ -3742,6 +3742,28 @@ function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
           loctab
         );
 
+        // Parse dates if they exist (format is YYYY/MM/DD/HH:mm:ss)
+        // Apply timezone offset (+08:00 by default for Shanghai time)
+        const formatCmsDate = (d) => {
+          if (!d) return null;
+          try {
+            // Split "2026/02/05/00:00:00" -> ["2026", "02", "05", "00:00:00"]
+            const parts = d.split('/');
+            if (parts.length >= 4) {
+               const offsetHrs = global.TIME_OFFSET !== undefined ? global.TIME_OFFSET : 8;
+               const offsetSign = offsetHrs >= 0 ? '+' : '-';
+               const offsetStr = `${offsetSign}${String(Math.abs(offsetHrs)).padStart(2, '0')}:00`;
+               const [y, m, date, timeStr] = parts;
+               const isoString = `${y}-${m}-${date}T${timeStr}${offsetStr}`;
+               const parsed = new Date(isoString);
+               return isNaN(parsed.getTime()) ? null : parsed.toISOString();
+            }
+            return null;
+          } catch {
+            return null;
+          }
+        };
+
         // Unified structure with language keys (ko, en, zh)
         return {
           id: item.id,
@@ -3760,6 +3782,8 @@ function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
           productCategory: item.productCategory || 0,
           productType: item.productType || 0,
           saleType: item.saleType || 0,
+          saleStartAt: formatCmsDate(item.saleStartDate),
+          saleEndAt: formatCmsDate(item.saleEndDate),
         };
       });
 
@@ -3850,8 +3874,14 @@ Examples:
       binaryCode = args[++i];
     } else if (arg === '--country-code') {
       countryCode = parseInt(args[++i], 10);
+    } else if (arg === '--time-offset') {
+      global.TIME_OFFSET = parseInt(args[++i], 10);
     }
     // All other options are ignored - always build everything
+  }
+
+  if (global.TIME_OFFSET === undefined) {
+    global.TIME_OFFSET = 8;
   }
 
   // If LOCDATA_DIR not set, use default based on cmsDir

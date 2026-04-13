@@ -108,6 +108,8 @@ export interface CmsCashShopProduct {
   productType: number;
   saleType: number;
   productDesc?: string; // Product description (localized)
+  saleStartAt: string | null;
+  saleEndAt: string | null;
 }
 
 export interface GetCmsCashShopResponse {
@@ -405,6 +407,8 @@ export interface SyncAddItem {
   descriptionKo: string | null;
   descriptionEn: string | null;
   descriptionZh: string | null;
+  saleStartAt: string | null;
+  saleEndAt: string | null;
 }
 
 export interface SyncUpdateItem {

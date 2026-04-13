@@ -877,12 +877,14 @@ const PlanningDataPage: React.FC = () => {
                       <Typography variant="body2" color="text.secondary">
                         {t('planningData.uploadInfo.lastUpload')}:
                       </Typography>
-                      <Chip
-                        size="small"
-                        label={formatRelativeTime(latestUpload.uploadedAt)}
-                        color="primary"
-                        variant="outlined"
-                      />
+                      <Tooltip title={formatDateTimeDetailed(latestUpload.uploadedAt)} arrow placement="top">
+                        <Chip
+                          size="small"
+                          label={formatRelativeTime(latestUpload.uploadedAt)}
+                          color="primary"
+                          variant="outlined"
+                        />
+                      </Tooltip>
                       <Typography variant="body2" color="text.secondary">
                         {t('planningData.uploadInfo.by')}:
                       </Typography>

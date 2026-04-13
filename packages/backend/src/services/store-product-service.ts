@@ -1232,6 +1232,8 @@ class StoreProductService {
             descriptionKo: descKo,
             descriptionEn: descEn,
             descriptionZh: descZh,
+            saleStartAt: planningProduct.saleStartAt || null,
+            saleEndAt: planningProduct.saleEndAt || null,
             cmsProductId: planningProduct.id,
           });
         } else {
@@ -1300,6 +1302,22 @@ class StoreProductService {
               newValue: descZh,
             });
           }
+
+          // Check date changes
+          const checkDateChange = (field: string, dbVal: Date | string | null | undefined, planVal: string | null | undefined) => {
+            const dDb = dbVal ? new Date(dbVal).getTime() : null;
+            const dPl = planVal ? new Date(planVal).getTime() : null;
+            if (dDb !== dPl) {
+              changes.push({
+                field,
+                oldValue: dbVal instanceof Date ? dbVal.toISOString() : (dbVal || null),
+                newValue: planVal || null,
+              });
+            }
+          };
+
+          checkDateChange('saleStartAt', dbProduct.saleStartAt, planningProduct.saleStartAt);
+          checkDateChange('saleEndAt', dbProduct.saleEndAt, planningProduct.saleEndAt);
 
           // Skip changes for fields that are overridden by user
           const overrides: string[] = dbProduct.overriddenFields
@@ -1415,8 +1433,8 @@ class StoreProductService {
             'sdo', // Default store
             item.price,
             'CNY', // Default currency
-            null, // saleStartAt
-            null, // saleEndAt
+            item.saleStartAt ? new Date(item.saleStartAt) : null, // saleStartAt
+            item.saleEndAt ? new Date(item.saleEndAt) : null, // saleEndAt
             item.description, // description (default display description)
             item.descriptionKo,
             item.descriptionEn,
@@ -1447,10 +1465,16 @@ class StoreProductService {
               'descriptionZh',
               'price',
               'productId',
+              'saleStartAt',
+              'saleEndAt',
             ].includes(field)
           ) {
             updates.push(`${field} = ?`);
-            values.push(change.newValue ?? null);
+            if (field === 'saleStartAt' || field === 'saleEndAt') {
+              values.push(change.newValue ? new Date(change.newValue) : null);
+            } else {
+              values.push(change.newValue ?? null);
+            }
           }
         }
 
@@ -1576,6 +1600,8 @@ class StoreProductService {
       descriptionKo: planningProduct.description?.ko || null,
       descriptionEn: planningProduct.description?.en || null,
       descriptionZh: planningProduct.description?.zh || null,
+      saleStartAt: planningProduct.saleStartAt || null,
+      saleEndAt: planningProduct.saleEndAt || null,
     };
   }
 
@@ -1634,6 +1660,7 @@ class StoreProductService {
       `UPDATE g_store_products SET
         productId = ?, productName = ?, nameKo = ?, nameEn = ?, nameZh = ?,
         price = ?, description = ?, descriptionKo = ?, descriptionEn = ?, descriptionZh = ?,
+        saleStartAt = ?, saleEndAt = ?,
         overriddenFields = NULL, updatedBy = ?, updatedAt = UTC_TIMESTAMP()
        WHERE id = ? AND environmentId = ?`,
       [
@@ -1647,6 +1674,8 @@ class StoreProductService {
         descKo,
         descEn,
         descZh,
+        planningProduct.saleStartAt || null,
+        planningProduct.saleEndAt || null,
         userId || null,
         id,
         environmentId,
@@ -1718,6 +1747,8 @@ class StoreProductService {
       descriptionKo: planningProduct.description?.ko || null,
       descriptionEn: planningProduct.description?.en || null,
       descriptionZh: planningProduct.description?.zh || null,
+      saleStartAt: planningProduct.saleStartAt || null,
+      saleEndAt: planningProduct.saleEndAt || null,
     };
 
     if (!(field in fieldValueMap)) {
@@ -1728,7 +1759,11 @@ class StoreProductService {
     }
 
     // Update the field value
-    const value = fieldValueMap[field];
+    let value = fieldValueMap[field];
+    if (field === 'saleStartAt' || field === 'saleEndAt') {
+      value = value ? new Date(value) : null;
+    }
+    
     await pool.execute(
       `UPDATE g_store_products SET \`${field}\` = ?, updatedBy = ?, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environmentId = ?`,
       [value, userId || null, id, environmentId]
@@ -1779,6 +1814,8 @@ export interface SyncAddItem {
   descriptionKo: string | null;
   descriptionEn: string | null;
   descriptionZh: string | null;
+  saleStartAt: string | null;
+  saleEndAt: string | null;
   cmsProductId: string;
 }
 

@@ -29,6 +29,8 @@ export interface CmsCashShopProduct {
   productCategory: number;
   productType: number;
   saleType: number;
+  saleStartAt: string | null;
+  saleEndAt: string | null;
 }
 
 /**

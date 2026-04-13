@@ -801,8 +801,9 @@ export class PlanningDataService {
       allBuffers.forEach((buf) => combinedHash.update(buf));
       const uploadHash = combinedHash.digest('hex');
 
-      // Get previous upload to determine changed files
+      // Get previous upload to determine changed files (only fetch needed columns to avoid filesort memory issues)
       const previousUpload = await db('g_planning_data_uploads')
+        .select('uploadHash')
         .where({ environmentId })
         .orderBy('uploadedAt', 'desc')
         .first();
@@ -988,10 +989,23 @@ export class PlanningDataService {
     limit: number = 20
   ): Promise<any[]> {
     try {
-      const uploads = await db('g_planning_data_uploads')
+      // Fetch IDs first to avoid ER_OUT_OF_SORTMEMORY on large TEXT columns
+      const uploadIds = await db('g_planning_data_uploads')
+        .select('id')
         .where({ environmentId })
         .orderBy('uploadedAt', 'desc')
         .limit(limit);
+
+      if (uploadIds.length === 0) return [];
+
+      const uploads = await db('g_planning_data_uploads')
+        .whereIn(
+          'id',
+          uploadIds.map((u) => u.id)
+        );
+        
+      // Sort in memory to completely avoid MySQL filesort on large BLOBs
+      uploads.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
 
       return uploads.map((upload) => ({
         id: upload.id,
@@ -1027,9 +1041,16 @@ export class PlanningDataService {
    */
   static async getLatestUpload(environmentId: string): Promise<any | null> {
     try {
-      const upload = await db('g_planning_data_uploads')
+      const latestDoc = await db('g_planning_data_uploads')
+        .select('id')
         .where({ environmentId })
         .orderBy('uploadedAt', 'desc')
+        .first();
+
+      if (!latestDoc) return null;
+
+      const upload = await db('g_planning_data_uploads')
+        .where({ id: latestDoc.id })
         .first();
 
       if (!upload) return null;

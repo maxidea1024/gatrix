@@ -347,7 +347,7 @@ const PlanningDataHistoryPage: React.FC = () => {
                           {t('planningData.history.changedFilesCount')}
                         </TableSortLabel>
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell align="left">
                         {t('planningData.history.changes')}
                       </TableCell>
                       <TableCell>{t('planningData.history.comment')}</TableCell>
@@ -487,7 +487,7 @@ const PlanningDataHistoryPage: React.FC = () => {
                           <TableCell align="center">
                             {record.changedFiles?.length || 0}
                           </TableCell>
-                          <TableCell align="center">
+                          <TableCell align="left">
                             {record.fileDiffs ? (
                               (() => {
                                 // Calculate total changes from all file diffs
@@ -506,7 +506,7 @@ const PlanningDataHistoryPage: React.FC = () => {
                                     sx={{
                                       display: 'flex',
                                       gap: 0.5,
-                                      justifyContent: 'center',
+                                      justifyContent: 'flex-start',
                                     }}
                                   >
                                     <Chip

@@ -28,6 +28,7 @@ interface ConvertOptions {
   verbose: boolean;
   binaryCode: string;
   countryCode: number;
+  timeOffset: number;
 }
 
 class PlanningDataConverter {
@@ -102,8 +103,8 @@ class PlanningDataConverter {
 
       this.log('Running adminToolDataBuilder...');
 
-      // Build with binaryCode and countryCode options
-      const command = `node "${builderPath}" --cms-dir "${this.options.input}" --output-dir "${this.options.output}" --binary-code ${this.options.binaryCode} --country-code ${this.options.countryCode}`;
+      // Build with binaryCode, countryCode, and timeOffset options
+      const command = `node "${builderPath}" --cms-dir "${this.options.input}" --output-dir "${this.options.output}" --binary-code ${this.options.binaryCode} --country-code ${this.options.countryCode} --time-offset ${this.options.timeOffset}`;
 
       if (this.options.verbose) {
         this.log(`Command: ${command}`);
@@ -202,6 +203,7 @@ function parseArgs(): ConvertOptions {
     verbose: false,
     binaryCode: 'cn',
     countryCode: 6,
+    timeOffset: 8,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -220,6 +222,9 @@ function parseArgs(): ConvertOptions {
         break;
       case '--country-code':
         options.countryCode = parseInt(args[++i], 10);
+        break;
+      case '--time-offset':
+        options.timeOffset = parseInt(args[++i], 10);
         break;
       case '--help':
         printHelp();
@@ -246,6 +251,8 @@ Options:
                         CMS 파일 접미사 결정 (예: cn -> CashShop_BCCN.json)
   --country-code <num>  국가 코드 (기본값: 6)
                         localBitFlag 필터링용. 0=KOREA, 2=GLOBAL, 6=CHINA
+  --time-offset <num>   타임존 오프셋 (기본값: 8)
+                        기획데이터 시간 파싱용
   --verbose             상세 로그 출력
   --help                도움말 표시
 

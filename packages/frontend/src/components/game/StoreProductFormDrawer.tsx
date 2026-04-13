@@ -43,7 +43,7 @@ import storeProductService, {
 } from '../../services/storeProductService';
 import translationService from '../../services/translationService';
 import { Tag } from '../../services/tagService';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import LocalizedDateTimePicker from '../common/LocalizedDateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
@@ -171,8 +171,8 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   const [price, setPrice] = useState<number>(0);
   const [currency, setCurrency] = useState('USD');
   const [isActive, setIsActive] = useState(true);
-  const [saleStartAt, setSaleStartAt] = useState<Dayjs | null>(null);
-  const [saleEndAt, setSaleEndAt] = useState<Dayjs | null>(null);
+  const [saleStartAt, setSaleStartAt] = useState<string | null>(null);
+  const [saleEndAt, setSaleEndAt] = useState<string | null>(null);
   const [description, setDescription] = useState('');
   // Multi-language description fields
   const [descriptionKo, setDescriptionKo] = useState('');
@@ -238,8 +238,8 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
       setPrice(product.price);
       setCurrency(product.currency || 'USD');
       setIsActive(product.isActive);
-      setSaleStartAt(product.saleStartAt ? dayjs(product.saleStartAt) : null);
-      setSaleEndAt(product.saleEndAt ? dayjs(product.saleEndAt) : null);
+      setSaleStartAt(product.saleStartAt || null);
+      setSaleEndAt(product.saleEndAt || null);
       setDescription(product.description || '');
       // Multi-language description fields
       setDescriptionKo(product.descriptionKo || '');
@@ -312,8 +312,8 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
       price,
       currency,
       isActive,
-      saleStartAt: saleStartAt ? saleStartAt.toISOString() : null,
-      saleEndAt: saleEndAt ? saleEndAt.toISOString() : null,
+      saleStartAt,
+      saleEndAt,
       description,
       descriptionKo,
       descriptionEn,
@@ -331,12 +331,8 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
       price: product.price,
       currency: product.currency || 'USD',
       isActive: product.isActive,
-      saleStartAt: product.saleStartAt
-        ? dayjs(product.saleStartAt).toISOString()
-        : null,
-      saleEndAt: product.saleEndAt
-        ? dayjs(product.saleEndAt).toISOString()
-        : null,
+      saleStartAt: product.saleStartAt || null,
+      saleEndAt: product.saleEndAt || null,
       description: product.description || '',
       descriptionKo: product.descriptionKo || '',
       descriptionEn: product.descriptionEn || '',
@@ -470,8 +466,8 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
         price,
         currency,
         isActive,
-        saleStartAt: saleStartAt ? saleStartAt.toISOString() : null,
-        saleEndAt: saleEndAt ? saleEndAt.toISOString() : null,
+        saleStartAt,
+        saleEndAt,
         description: description.trim() || undefined,
         // Multi-language description fields
         descriptionKo: descriptionKo.trim() || undefined,
@@ -895,41 +891,19 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                   <Typography variant="subtitle2" sx={{ mb: 1 }}>
                     {t('storeProducts.saleStartAt')}
                   </Typography>
-                  <DateTimePicker
+                  <LocalizedDateTimePicker
                     value={saleStartAt}
                     onChange={(value) => setSaleStartAt(value)}
-                    timeSteps={{ minutes: 1 }}
-                    slotProps={{
-                      textField: {
-                        size: 'small',
-                        fullWidth: true,
-                        slotProps: { input: { readOnly: true } },
-                      },
-                      actionBar: {
-                        actions: ['clear', 'cancel', 'accept'],
-                      },
-                    }}
                   />
                 </Box>
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="subtitle2" sx={{ mb: 1 }}>
                     {t('storeProducts.saleEndAt')}
                   </Typography>
-                  <DateTimePicker
+                  <LocalizedDateTimePicker
                     value={saleEndAt}
                     onChange={(value) => setSaleEndAt(value)}
-                    minDateTime={saleStartAt || undefined}
-                    timeSteps={{ minutes: 1 }}
-                    slotProps={{
-                      textField: {
-                        size: 'small',
-                        fullWidth: true,
-                        slotProps: { input: { readOnly: true } },
-                      },
-                      actionBar: {
-                        actions: ['clear', 'cancel', 'accept'],
-                      },
-                    }}
+                    minDateTime={saleStartAt ? dayjs(saleStartAt) : undefined}
                   />
                 </Box>
               </Box>
