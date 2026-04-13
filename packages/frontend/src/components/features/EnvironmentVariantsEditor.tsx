@@ -49,6 +49,7 @@ import ValueEditorField from '../common/ValueEditorField';
 import BooleanSwitch from '../common/BooleanSwitch';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import FieldTypeIcon from '../common/FieldTypeIcon';
+import { ValidationRules } from '../../services/featureFlagService';
 
 // Compact override toggle with text inside the track
 const OverrideSwitch = styled(Switch)(({ theme }) => ({
@@ -150,6 +151,8 @@ interface EnvironmentVariantsEditorProps {
   onChangeDetected?: () => void;
   onGoToPayloadTab: () => void;
   defaultExpanded?: boolean;
+  /** Validation rules from the flag definition (for legalValues dropdown) */
+  validationRules?: ValidationRules;
 }
 
 // Helper function to distribute weights equally among variants
@@ -185,6 +188,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   onChangeDetected,
   onGoToPayloadTab,
   defaultExpanded = false,
+  validationRules,
 }) => {
   const { t } = useTranslation();
 
@@ -562,10 +566,18 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   }, []);
 
   const addVariant = useCallback(() => {
+    const legalVals =
+      validationRules?.enabled && validationRules.legalValues?.length
+        ? validationRules.legalValues
+        : undefined;
+
     const lastVariant = editingVariants[editingVariants.length - 1];
     let defaultValue: any;
 
-    if (lastVariant?.value !== undefined) {
+    // If legalValues are configured, always default to the first legal value
+    if (legalVals) {
+      defaultValue = legalVals[0];
+    } else if (lastVariant?.value !== undefined) {
       defaultValue = lastVariant.value;
     } else if (valueType === 'number') {
       defaultValue = 0;
@@ -591,7 +603,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     const updatedVariants = distributeWeights([...editingVariants, newVariant]);
     setEditingVariants(updatedVariants);
     setExpanded(true);
-  }, [editingVariants, valueType, flagType, useFixedWeightVariants]);
+  }, [editingVariants, valueType, flagType, useFixedWeightVariants, validationRules]);
 
   const removeVariant = useCallback(
     (index: number) => {
@@ -751,6 +763,21 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
   // Check for JSON errors
   const hasJsonErrors = Object.values(jsonErrors).some((e) => e !== null);
 
+  // Check for invalid legalValues — if legalValues are set, all variant values must be in the list
+  const activeLegalValues =
+    validationRules?.enabled && validationRules.legalValues?.length
+      ? validationRules.legalValues
+      : undefined;
+  const hasInvalidLegalValues = activeLegalValues
+    ? editingVariants.some(
+        (v) =>
+          v.value === '' ||
+          v.value === null ||
+          v.value === undefined ||
+          !activeLegalValues.includes(String(v.value))
+      )
+    : false;
+
   const VARIANT_COLORS = [
     '#7C4DFF',
     '#448AFF',
@@ -861,6 +888,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       );
     }
 
+    // Extract legalValues from validation rules
+    const legalValues =
+      validationRules?.enabled && validationRules.legalValues?.length
+        ? validationRules.legalValues
+        : undefined;
+
     // JSON and String use ValueEditorField
     return (
       <ValueEditorField
@@ -908,6 +941,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
           setValueJsonErrors((prev) => ({ ...prev, [field]: err }))
         }
         sx={viewOnlyStyle}
+        legalValues={legalValues}
       />
     );
   };
@@ -1159,6 +1193,11 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                                 ...prev,
                                 [index]: error,
                               }))
+                            }
+                            legalValues={
+                              validationRules?.enabled && validationRules.legalValues?.length
+                                ? validationRules.legalValues
+                                : undefined
                             }
                           />
                         ) : valueType === 'boolean' ? (
@@ -1429,7 +1468,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
             startIcon={<SaveIcon />}
             onClick={handleApplyAll}
             disabled={
-              saving || savingValues || hasDuplicateNames || hasJsonErrors
+              saving || savingValues || hasDuplicateNames || hasJsonErrors || hasInvalidLegalValues
             }
           >
             {t('common.apply')}

@@ -17,6 +17,7 @@ import {
   IconButton,
   InputAdornment,
   Tooltip,
+  Autocomplete,
 } from '@mui/material';
 import {
   OpenInFull as ExpandIcon,
@@ -41,6 +42,8 @@ interface ValueEditorFieldProps {
   rows?: number;
   /** Optional SX prop for additional styling */
   sx?: any;
+  /** If provided, renders a dropdown select instead of free text input */
+  legalValues?: string[];
 }
 
 // Calculate byte length of a value
@@ -72,6 +75,7 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
   multiline = false,
   rows = 3,
   sx,
+  legalValues,
 }) => {
   const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -226,9 +230,39 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
     }
   };
 
+  // When legalValues are configured, render a dropdown instead of free text input
+  const hasLegalValues = legalValues && legalValues.length > 0;
+
   return (
     <>
-      {multiline ? (
+      {hasLegalValues ? (
+        <Autocomplete
+          options={legalValues}
+          value={
+            legalValues.includes(String(value ?? ''))
+              ? String(value ?? '')
+              : null
+          }
+          onChange={(_, newValue) => {
+            onChange(newValue ?? '');
+          }}
+          disabled={disabled}
+          size={size}
+          fullWidth
+          disableClearable
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={label}
+              error={!!error}
+              helperText={helperText}
+              placeholder={placeholder || t('featureFlags.selectValue')}
+              sx={sx}
+            />
+          )}
+          sx={{ minWidth: 120 }}
+        />
+      ) : multiline ? (
         <TextField
           fullWidth
           size={size}

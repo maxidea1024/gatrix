@@ -1947,6 +1947,43 @@ const FeatureFlagDetailPage: React.FC = () => {
     const type = flag.valueType || 'boolean';
     const error = valueJsonErrors[field];
 
+    // Extract legalValues from validation rules
+    const legalValues =
+      flag.validationRules?.enabled && flag.validationRules.legalValues?.length
+        ? flag.validationRules.legalValues
+        : undefined;
+
+    // When legalValues are configured, use ValueEditorField with dropdown for any type
+    if (legalValues) {
+      return (
+        <ValueEditorField
+          value={String(value ?? '')}
+          onChange={(val) => {
+            // Convert back to the appropriate type
+            if (type === 'number') {
+              setFlag((prev) =>
+                prev ? { ...prev, [field]: val === '' ? '' : Number(val) } : prev
+              );
+            } else if (type === 'boolean') {
+              setFlag((prev) =>
+                prev ? { ...prev, [field]: val === 'true' } : prev
+              );
+            } else {
+              setFlag((prev) => (prev ? { ...prev, [field]: val } : prev));
+            }
+          }}
+          valueType={type}
+          label={
+            field === 'enabledValue'
+              ? t('featureFlags.enabledValue')
+              : t('featureFlags.disabledValue')
+          }
+          disabled={!canManage}
+          legalValues={legalValues}
+        />
+      );
+    }
+
     if (type === 'boolean') {
       return (
         <BooleanSwitch
@@ -3154,6 +3191,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     }
                                     onGoToPayloadTab={() => setTabValue(1)}
                                     defaultExpanded={true}
+                                    validationRules={flag.validationRules}
                                   />
                                 </>
                               ) : strategies.length === 0 ? (
@@ -3309,6 +3347,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     }
                                     onGoToPayloadTab={() => setTabValue(1)}
                                     defaultExpanded={true}
+                                    validationRules={flag.validationRules}
                                   />
                                 </>
                               ) : (
@@ -3537,6 +3576,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     }}
                                     onGoToPayloadTab={() => setTabValue(1)}
                                     defaultExpanded={true}
+                                    validationRules={flag.validationRules}
                                   />
                                 </>
                               )}
