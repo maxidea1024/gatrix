@@ -149,9 +149,10 @@ export class PlanningDataService {
         .first();
 
       if (row && row.dataContent) {
-        const data = typeof row.dataContent === 'string'
-          ? JSON.parse(row.dataContent)
-          : row.dataContent;
+        const data =
+          typeof row.dataContent === 'string'
+            ? JSON.parse(row.dataContent)
+            : row.dataContent;
 
         // Re-populate Redis cache
         await cacheService.setWithoutTTL(cacheKey, data);
@@ -489,7 +490,9 @@ export class PlanningDataService {
       );
       if (data) return data;
 
-      logger.debug(`HotTimeBuff lookup data (${lang}) not found`, { environmentId });
+      logger.debug(`HotTimeBuff lookup data (${lang}) not found`, {
+        environmentId,
+      });
       return {};
     } catch (error) {
       logger.error('Failed to read HotTimeBuff lookup data', {
@@ -518,7 +521,9 @@ export class PlanningDataService {
       );
       if (data) return data;
 
-      logger.debug(`EventPage lookup data (${lang}) not found`, { environmentId });
+      logger.debug(`EventPage lookup data (${lang}) not found`, {
+        environmentId,
+      });
       return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read EventPage lookup data', {
@@ -547,7 +552,9 @@ export class PlanningDataService {
       );
       if (data) return data;
 
-      logger.debug(`LiveEvent lookup data (${lang}) not found`, { environmentId });
+      logger.debug(`LiveEvent lookup data (${lang}) not found`, {
+        environmentId,
+      });
       return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read LiveEvent lookup data', {
@@ -576,7 +583,9 @@ export class PlanningDataService {
       );
       if (data) return data;
 
-      logger.debug(`MateRecruitingGroup lookup data (${lang}) not found`, { environmentId });
+      logger.debug(`MateRecruitingGroup lookup data (${lang}) not found`, {
+        environmentId,
+      });
       return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read MateRecruitingGroup lookup data', {
@@ -608,7 +617,9 @@ export class PlanningDataService {
       );
       if (data) return data;
 
-      logger.debug(`OceanNpcAreaSpawner lookup data (${lang}) not found`, { environmentId });
+      logger.debug(`OceanNpcAreaSpawner lookup data (${lang}) not found`, {
+        environmentId,
+      });
       return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read OceanNpcAreaSpawner lookup data', {

@@ -257,9 +257,9 @@ export class StoreProductController {
         {
           productId: productId?.trim(),
           productName: productName?.trim(),
-          nameKo: nameKo !== undefined ? (nameKo?.trim() || null) : undefined,
-          nameEn: nameEn !== undefined ? (nameEn?.trim() || null) : undefined,
-          nameZh: nameZh !== undefined ? (nameZh?.trim() || null) : undefined,
+          nameKo: nameKo !== undefined ? nameKo?.trim() || null : undefined,
+          nameEn: nameEn !== undefined ? nameEn?.trim() || null : undefined,
+          nameZh: nameZh !== undefined ? nameZh?.trim() || null : undefined,
           store: store?.trim(),
           price,
           currency: currency?.trim(),
@@ -278,9 +278,18 @@ export class StoreProductController {
               : undefined,
           description:
             description !== undefined ? description?.trim() || null : undefined,
-          descriptionKo: descriptionKo !== undefined ? (descriptionKo?.trim() || null) : undefined,
-          descriptionEn: descriptionEn !== undefined ? (descriptionEn?.trim() || null) : undefined,
-          descriptionZh: descriptionZh !== undefined ? (descriptionZh?.trim() || null) : undefined,
+          descriptionKo:
+            descriptionKo !== undefined
+              ? descriptionKo?.trim() || null
+              : undefined,
+          descriptionEn:
+            descriptionEn !== undefined
+              ? descriptionEn?.trim() || null
+              : undefined,
+          descriptionZh:
+            descriptionZh !== undefined
+              ? descriptionZh?.trim() || null
+              : undefined,
           metadata,
           overrideResets,
         },

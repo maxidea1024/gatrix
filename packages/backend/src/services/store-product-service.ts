@@ -16,7 +16,9 @@ import { SERVER_SDK_ETAG } from '../constants/cache-keys';
  * MySQL DATETIME rejects ISO 8601 'T'/'Z' characters (e.g., '2026-04-12T15:00:00.000Z').
  * This produces 'YYYY-MM-DD HH:MM:SS' which MySQL accepts.
  */
-function toMySQLDateTime(date: Date | string | null | undefined): string | null {
+function toMySQLDateTime(
+  date: Date | string | null | undefined
+): string | null {
   if (!date) return null;
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return null;
@@ -536,9 +538,20 @@ class StoreProductService {
 
     // Track overridden fields: compare with planning data to detect real overrides
     const OVERRIDABLE_FIELDS = [
-      'productId', 'productName', 'nameKo', 'nameEn', 'nameZh',
-      'store', 'price', 'currency', 'saleStartAt', 'saleEndAt',
-      'description', 'descriptionKo', 'descriptionEn', 'descriptionZh',
+      'productId',
+      'productName',
+      'nameKo',
+      'nameEn',
+      'nameZh',
+      'store',
+      'price',
+      'currency',
+      'saleStartAt',
+      'saleEndAt',
+      'description',
+      'descriptionKo',
+      'descriptionEn',
+      'descriptionZh',
     ];
     try {
       const [existingRows] = await pool.execute(
@@ -549,36 +562,47 @@ class StoreProductService {
       if (existing) {
         let currentOverrides: string[] = [];
         if (existing.overriddenFields) {
-          currentOverrides = typeof existing.overriddenFields === 'string'
-            ? JSON.parse(existing.overriddenFields)
-            : existing.overriddenFields;
+          currentOverrides =
+            typeof existing.overriddenFields === 'string'
+              ? JSON.parse(existing.overriddenFields)
+              : existing.overriddenFields;
         }
 
         // Fetch planning data to compare final values against source of truth
         let planningValues: Record<string, any> = {};
         if (existing.cmsProductId) {
           try {
-            const planningData = await PlanningDataService.getCashShopLookup(environmentId);
+            const planningData =
+              await PlanningDataService.getCashShopLookup(environmentId);
             const planningProducts = planningData?.items || [];
-            const planningProduct = planningProducts.find((p: any) => p.id === existing.cmsProductId);
+            const planningProduct = planningProducts.find(
+              (p: any) => p.id === existing.cmsProductId
+            );
             if (planningProduct) {
               planningValues = {
                 productId: planningProduct.productCode,
-                productName: planningProduct.name?.zh || planningProduct.name?.ko || '',
+                productName:
+                  planningProduct.name?.zh || planningProduct.name?.ko || '',
                 nameKo: planningProduct.name?.ko || null,
                 nameEn: planningProduct.name?.en || null,
                 nameZh: planningProduct.name?.zh || null,
                 store: 'sdo',
                 price: planningProduct.price,
                 currency: 'CNY',
-                description: planningProduct.description?.zh || planningProduct.description?.ko || null,
+                description:
+                  planningProduct.description?.zh ||
+                  planningProduct.description?.ko ||
+                  null,
                 descriptionKo: planningProduct.description?.ko || null,
                 descriptionEn: planningProduct.description?.en || null,
                 descriptionZh: planningProduct.description?.zh || null,
               };
             }
           } catch (err) {
-            logger.debug('Could not fetch planning data for override comparison', { err });
+            logger.debug(
+              'Could not fetch planning data for override comparison',
+              { err }
+            );
           }
         }
 
@@ -600,8 +624,9 @@ class StoreProductService {
                 normInput = Number(inputVal ?? 0);
                 normDb = Number(dbVal ?? 0);
               } else {
-                normInput = (inputVal === '' || inputVal == null) ? null : String(inputVal);
-                normDb = (dbVal === '' || dbVal == null) ? null : String(dbVal);
+                normInput =
+                  inputVal === '' || inputVal == null ? null : String(inputVal);
+                normDb = dbVal === '' || dbVal == null ? null : String(dbVal);
               }
               if (normInput !== normDb) {
                 newOverrides.push(field);
@@ -624,11 +649,19 @@ class StoreProductService {
             normalizedFinal = Number(finalVal ?? 0);
             normalizedPlanning = Number(planningVal ?? 0);
           } else if (field === 'saleStartAt' || field === 'saleEndAt') {
-            normalizedFinal = finalVal ? new Date(finalVal as any).getTime() : null;
-            normalizedPlanning = planningVal ? new Date(planningVal).getTime() : null;
+            normalizedFinal = finalVal
+              ? new Date(finalVal as any).getTime()
+              : null;
+            normalizedPlanning = planningVal
+              ? new Date(planningVal).getTime()
+              : null;
           } else {
-            normalizedFinal = (finalVal === '' || finalVal == null) ? null : String(finalVal);
-            normalizedPlanning = (planningVal === '' || planningVal == null) ? null : String(planningVal);
+            normalizedFinal =
+              finalVal === '' || finalVal == null ? null : String(finalVal);
+            normalizedPlanning =
+              planningVal === '' || planningVal == null
+                ? null
+                : String(planningVal);
           }
 
           if (normalizedFinal !== normalizedPlanning) {
@@ -639,9 +672,14 @@ class StoreProductService {
         }
 
         const uniqueOverrides = [...new Set(newOverrides)];
-        if (JSON.stringify(uniqueOverrides.sort()) !== JSON.stringify(currentOverrides.sort())) {
+        if (
+          JSON.stringify(uniqueOverrides.sort()) !==
+          JSON.stringify(currentOverrides.sort())
+        ) {
           updates.push('overriddenFields = ?');
-          values.push(uniqueOverrides.length > 0 ? JSON.stringify(uniqueOverrides) : null);
+          values.push(
+            uniqueOverrides.length > 0 ? JSON.stringify(uniqueOverrides) : null
+          );
         }
       }
     } catch (err) {
@@ -659,21 +697,29 @@ class StoreProductService {
         );
         const current = (currentRows as any[])[0];
         if (current?.cmsProductId) {
-          const planningData = await PlanningDataService.getCashShopLookup(environmentId);
-          const planningProducts: CmsCashShopProduct[] = planningData.items || [];
-          const planningProduct = planningProducts.find((p: CmsCashShopProduct) => p.id === current.cmsProductId);
+          const planningData =
+            await PlanningDataService.getCashShopLookup(environmentId);
+          const planningProducts: CmsCashShopProduct[] =
+            planningData.items || [];
+          const planningProduct = planningProducts.find(
+            (p: CmsCashShopProduct) => p.id === current.cmsProductId
+          );
 
           if (planningProduct) {
             const fieldValueMap: Record<string, any> = {
               productId: planningProduct.productCode,
-              productName: (planningProduct.name?.zh || planningProduct.name?.ko || ''),
+              productName:
+                planningProduct.name?.zh || planningProduct.name?.ko || '',
               nameKo: planningProduct.name?.ko || '',
               nameEn: planningProduct.name?.en || '',
               nameZh: planningProduct.name?.zh || '',
               store: 'sdo',
               price: planningProduct.price,
               currency: 'CNY',
-              description: (planningProduct.description?.zh || planningProduct.description?.ko || null),
+              description:
+                planningProduct.description?.zh ||
+                planningProduct.description?.ko ||
+                null,
               descriptionKo: planningProduct.description?.ko || null,
               descriptionEn: planningProduct.description?.en || null,
               descriptionZh: planningProduct.description?.zh || null,
@@ -682,7 +728,9 @@ class StoreProductService {
             for (const resetField of input.overrideResets) {
               if (resetField in fieldValueMap) {
                 // Check if this field isn't already being explicitly set by the user in this same update
-                const isAlsoBeingUpdated = updates.some(u => u.startsWith(`${resetField} = ?`));
+                const isAlsoBeingUpdated = updates.some((u) =>
+                  u.startsWith(`${resetField} = ?`)
+                );
                 if (!isAlsoBeingUpdated) {
                   updates.push(`${resetField} = ?`);
                   values.push(fieldValueMap[resetField]);
@@ -692,27 +740,43 @@ class StoreProductService {
 
             // Remove reset fields from overriddenFields
             let currentOverrides: string[] = current.overriddenFields
-              ? (typeof current.overriddenFields === 'string'
-                  ? JSON.parse(current.overriddenFields)
-                  : current.overriddenFields)
+              ? typeof current.overriddenFields === 'string'
+                ? JSON.parse(current.overriddenFields)
+                : current.overriddenFields
               : [];
-            currentOverrides = currentOverrides.filter(f => !input.overrideResets!.includes(f));
+            currentOverrides = currentOverrides.filter(
+              (f) => !input.overrideResets!.includes(f)
+            );
 
             // Update overriddenFields (might already have been pushed by the tracking logic above)
-            const existingOverrideIdx = updates.findIndex(u => u === 'overriddenFields = ?');
+            const existingOverrideIdx = updates.findIndex(
+              (u) => u === 'overriddenFields = ?'
+            );
             if (existingOverrideIdx >= 0) {
               // Merge: the tracking logic added new overrides; now also remove the reset ones
-              const trackedValue = JSON.parse(values[existingOverrideIdx] as string);
-              const merged = trackedValue.filter((f: string) => !input.overrideResets!.includes(f));
-              values[existingOverrideIdx] = merged.length > 0 ? JSON.stringify(merged) : null;
+              const trackedValue = JSON.parse(
+                values[existingOverrideIdx] as string
+              );
+              const merged = trackedValue.filter(
+                (f: string) => !input.overrideResets!.includes(f)
+              );
+              values[existingOverrideIdx] =
+                merged.length > 0 ? JSON.stringify(merged) : null;
             } else {
               updates.push('overriddenFields = ?');
-              values.push(currentOverrides.length > 0 ? JSON.stringify(currentOverrides) : null);
+              values.push(
+                currentOverrides.length > 0
+                  ? JSON.stringify(currentOverrides)
+                  : null
+              );
             }
           }
         }
       } catch (err) {
-        logger.warn('Failed to process overrideResets', { err, overrideResets: input.overrideResets });
+        logger.warn('Failed to process overrideResets', {
+          err,
+          overrideResets: input.overrideResets,
+        });
       }
     }
 
@@ -1239,9 +1303,9 @@ class StoreProductService {
 
           // Skip changes for fields that are overridden by user
           const overrides: string[] = dbProduct.overriddenFields
-            ? (typeof dbProduct.overriddenFields === 'string'
-                ? JSON.parse(dbProduct.overriddenFields as any)
-                : dbProduct.overriddenFields)
+            ? typeof dbProduct.overriddenFields === 'string'
+              ? JSON.parse(dbProduct.overriddenFields as any)
+              : dbProduct.overriddenFields
             : [];
 
           if (changes.length > 0) {
@@ -1396,8 +1460,11 @@ class StoreProductService {
         const nameKoChange = item.changes.find((c) => c.field === 'nameKo');
         if (nameZhChange || nameKoChange) {
           // Check if productName is overridden
-          const isProductNameOverridden = (item as any).hasOverrides &&
-            (item as any).skippedChanges?.some((c: any) => c.field === 'productName');
+          const isProductNameOverridden =
+            (item as any).hasOverrides &&
+            (item as any).skippedChanges?.some(
+              (c: any) => c.field === 'productName'
+            );
           if (!isProductNameOverridden) {
             updates.push('productName = ?');
             values.push(nameZhChange?.newValue || nameKoChange?.newValue || '');
@@ -1412,11 +1479,16 @@ class StoreProductService {
         );
         if (descZhChange || descKoChange) {
           // Check if description is overridden
-          const isDescOverridden = (item as any).hasOverrides &&
-            (item as any).skippedChanges?.some((c: any) => c.field === 'description');
+          const isDescOverridden =
+            (item as any).hasOverrides &&
+            (item as any).skippedChanges?.some(
+              (c: any) => c.field === 'description'
+            );
           if (!isDescOverridden) {
             updates.push('description = ?');
-            values.push(descZhChange?.newValue || descKoChange?.newValue || null);
+            values.push(
+              descZhChange?.newValue || descKoChange?.newValue || null
+            );
           }
         }
 
@@ -1477,9 +1549,12 @@ class StoreProductService {
       return null;
     }
 
-    const planningData = await PlanningDataService.getCashShopLookup(environmentId);
+    const planningData =
+      await PlanningDataService.getCashShopLookup(environmentId);
     const planningProducts: CmsCashShopProduct[] = planningData.items || [];
-    const planningProduct = planningProducts.find((p) => p.id === product.cmsProductId);
+    const planningProduct = planningProducts.find(
+      (p) => p.id === product.cmsProductId
+    );
 
     if (!planningProduct) {
       return null;
@@ -1494,7 +1569,10 @@ class StoreProductService {
       store: 'sdo',
       price: planningProduct.price,
       currency: 'CNY',
-      description: planningProduct.description?.zh || planningProduct.description?.ko || null,
+      description:
+        planningProduct.description?.zh ||
+        planningProduct.description?.ko ||
+        null,
       descriptionKo: planningProduct.description?.ko || null,
       descriptionEn: planningProduct.description?.en || null,
       descriptionZh: planningProduct.description?.zh || null,
@@ -1528,9 +1606,12 @@ class StoreProductService {
     }
 
     // Get planning data to restore values
-    const planningData = await PlanningDataService.getCashShopLookup(environmentId);
+    const planningData =
+      await PlanningDataService.getCashShopLookup(environmentId);
     const planningProducts: CmsCashShopProduct[] = planningData.items || [];
-    const planningProduct = planningProducts.find((p) => p.id === product.cmsProductId);
+    const planningProduct = planningProducts.find(
+      (p) => p.id === product.cmsProductId
+    );
 
     if (!planningProduct) {
       // Planning data not found — just clear the overrides flag
@@ -1558,12 +1639,17 @@ class StoreProductService {
       [
         planningProduct.productCode,
         nameZh || nameKo,
-        nameKo, nameEn, nameZh,
+        nameKo,
+        nameEn,
+        nameZh,
         planningProduct.price,
         descZh || descKo,
-        descKo, descEn, descZh,
+        descKo,
+        descEn,
+        descZh,
         userId || null,
-        id, environmentId,
+        id,
+        environmentId,
       ]
     );
 
@@ -1598,12 +1684,18 @@ class StoreProductService {
 
     // Get planning data
     if (!product.cmsProductId) {
-      throw new GatrixError('Product has no CMS reference — cannot restore field from planning data', 400);
+      throw new GatrixError(
+        'Product has no CMS reference — cannot restore field from planning data',
+        400
+      );
     }
 
-    const planningData = await PlanningDataService.getCashShopLookup(environmentId);
+    const planningData =
+      await PlanningDataService.getCashShopLookup(environmentId);
     const planningProducts: CmsCashShopProduct[] = planningData.items || [];
-    const planningProduct = planningProducts.find((p) => p.id === product.cmsProductId);
+    const planningProduct = planningProducts.find(
+      (p) => p.id === product.cmsProductId
+    );
 
     if (!planningProduct) {
       throw new GatrixError('Planning data for this product not found', 404);
@@ -1612,21 +1704,27 @@ class StoreProductService {
     // Map field name to planning data value
     const fieldValueMap: Record<string, any> = {
       productId: planningProduct.productCode,
-      productName: (planningProduct.name?.zh || planningProduct.name?.ko || ''),
+      productName: planningProduct.name?.zh || planningProduct.name?.ko || '',
       nameKo: planningProduct.name?.ko || '',
       nameEn: planningProduct.name?.en || '',
       nameZh: planningProduct.name?.zh || '',
       store: 'sdo', // Default store from planning data
       price: planningProduct.price,
       currency: 'CNY', // Default currency from planning data
-      description: (planningProduct.description?.zh || planningProduct.description?.ko || null),
+      description:
+        planningProduct.description?.zh ||
+        planningProduct.description?.ko ||
+        null,
       descriptionKo: planningProduct.description?.ko || null,
       descriptionEn: planningProduct.description?.en || null,
       descriptionZh: planningProduct.description?.zh || null,
     };
 
     if (!(field in fieldValueMap)) {
-      throw new GatrixError(`Field '${field}' cannot be restored from planning data`, 400);
+      throw new GatrixError(
+        `Field '${field}' cannot be restored from planning data`,
+        400
+      );
     }
 
     // Update the field value
@@ -1641,7 +1739,11 @@ class StoreProductService {
     currentOverrides = currentOverrides.filter((f) => f !== field);
     await pool.execute(
       'UPDATE g_store_products SET overriddenFields = ? WHERE id = ? AND environmentId = ?',
-      [currentOverrides.length > 0 ? JSON.stringify(currentOverrides) : null, id, environmentId]
+      [
+        currentOverrides.length > 0 ? JSON.stringify(currentOverrides) : null,
+        id,
+        environmentId,
+      ]
     );
 
     // Invalidate cache
@@ -1650,7 +1752,9 @@ class StoreProductService {
         `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`
       );
     } catch (err) {
-      logger.warn('Failed to invalidate cache after field override reset', { err });
+      logger.warn('Failed to invalidate cache after field override reset', {
+        err,
+      });
     }
 
     return this.getStoreProductById(id, environmentId);

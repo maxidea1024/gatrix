@@ -23,7 +23,10 @@ router.get('/:id', StoreProductController.getStoreProductById);
 router.post('/', StoreProductController.createStoreProduct);
 router.put('/:id', StoreProductController.updateStoreProduct);
 router.get('/:id/planning-values', StoreProductController.getPlanningValues);
-router.delete('/:id/overrides/:field', StoreProductController.resetFieldOverride);
+router.delete(
+  '/:id/overrides/:field',
+  StoreProductController.resetFieldOverride
+);
 router.delete('/:id/overrides', StoreProductController.resetOverrides);
 router.delete('/:id', StoreProductController.deleteStoreProduct);
 router.delete('/', StoreProductController.deleteStoreProducts);
