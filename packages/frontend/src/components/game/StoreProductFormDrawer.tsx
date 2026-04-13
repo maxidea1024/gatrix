@@ -57,7 +57,7 @@ import TagSelector from '../common/TagSelector';
 interface StoreProductFormDrawerProps {
   open: boolean;
   onClose: () => void;
-  onSave: () => void;
+  onSave: (isNew: boolean) => void;
   product?: StoreProduct | null;
 }
 
@@ -518,7 +518,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
           enqueueSnackbar(message, { variant: 'success' });
         }
       }
-      onSave();
+      onSave(!isEditMode);
     } catch (error: any) {
       console.error('Failed to save store product:', error);
       const fallbackKey = requiresApproval
@@ -590,33 +590,36 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                 !overriddenFields.every((f) =>
                   pendingOverrideResets.includes(f)
                 ) && (
-                  <Alert
-                    severity="warning"
-                    icon={<EditIcon />}
-                    action={
-                      hasCmsProduct ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Alert
+                      severity="warning"
+                      icon={<EditIcon />}
+                    >
+                      <AlertTitle>{t('storeProducts.overrideNotice')}</AlertTitle>
+                      {t('storeProducts.overrideDescription', {
+                        count: overriddenFields.filter(
+                          (f) => !pendingOverrideResets.includes(f)
+                        ).length,
+                        fields: overriddenFields
+                          .filter((f) => !pendingOverrideResets.includes(f))
+                          .join(', '),
+                      })}
+                    </Alert>
+                    {hasCmsProduct && (
+                      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Button
-                          color="inherit"
+                          color="warning"
                           size="small"
+                          variant="outlined"
                           startIcon={<ResetIcon />}
                           onClick={handleResetAllOverrides}
                           disabled={saving}
                         >
                           {t('storeProducts.resetAllOverrides')}
                         </Button>
-                      ) : undefined
-                    }
-                  >
-                    <AlertTitle>{t('storeProducts.overrideNotice')}</AlertTitle>
-                    {t('storeProducts.overrideDescription', {
-                      count: overriddenFields.filter(
-                        (f) => !pendingOverrideResets.includes(f)
-                      ).length,
-                      fields: overriddenFields
-                        .filter((f) => !pendingOverrideResets.includes(f))
-                        .join(', '),
-                    })}
-                  </Alert>
+                      </Box>
+                    )}
+                  </Box>
                 )}
 
               {/* Active Status */}
@@ -888,23 +891,43 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
               {/* Sale Period */}
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    {t('storeProducts.saleStartAt')}
-                  </Typography>
-                  <LocalizedDateTimePicker
-                    value={saleStartAt}
-                    onChange={(value) => setSaleStartAt(value)}
-                  />
+                  <OverrideFieldWrapper
+                    fieldName="saleStartAt"
+                    overriddenFields={overriddenFields}
+                    hasCmsProduct={hasCmsProduct}
+                    onReset={handleResetField}
+                    label=""
+                  >
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                        {t('storeProducts.saleStartAt')}
+                      </Typography>
+                      <LocalizedDateTimePicker
+                        value={saleStartAt}
+                        onChange={(value) => setSaleStartAt(value)}
+                      />
+                    </Box>
+                  </OverrideFieldWrapper>
                 </Box>
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    {t('storeProducts.saleEndAt')}
-                  </Typography>
-                  <LocalizedDateTimePicker
-                    value={saleEndAt}
-                    onChange={(value) => setSaleEndAt(value)}
-                    minDateTime={saleStartAt ? dayjs(saleStartAt) : undefined}
-                  />
+                  <OverrideFieldWrapper
+                    fieldName="saleEndAt"
+                    overriddenFields={overriddenFields}
+                    hasCmsProduct={hasCmsProduct}
+                    onReset={handleResetField}
+                    label=""
+                  >
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                        {t('storeProducts.saleEndAt')}
+                      </Typography>
+                      <LocalizedDateTimePicker
+                        value={saleEndAt}
+                        onChange={(value) => setSaleEndAt(value)}
+                        minDateTime={saleStartAt ? dayjs(saleStartAt) : undefined}
+                      />
+                    </Box>
+                  </OverrideFieldWrapper>
                 </Box>
               </Box>
 

@@ -111,6 +111,7 @@ const StoreProductsPage: React.FC = () => {
   const [allProducts, setAllProducts] = useState<StoreProduct[]>([]);
   const [allRegistryTags, setAllRegistryTags] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
+  const [overriddenTotal, setOverriddenTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(false);
@@ -154,6 +155,7 @@ const StoreProductsPage: React.FC = () => {
     total: 0,
     active: 0,
     inactive: 0,
+    overridden: 0,
   });
 
   // Sorting state with localStorage persistence
@@ -231,6 +233,15 @@ const StoreProductsPage: React.FC = () => {
         key: 'priceMax',
         label: t('storeProducts.priceMax'),
         type: 'number',
+      },
+      {
+        key: 'hasOverrides',
+        label: t('storeProducts.hasOverrides', '오버라이드 여부'),
+        type: 'select',
+        options: [
+          { value: 'true', label: t('common.yes', '있음') },
+          { value: 'false', label: t('common.no', '없음') },
+        ],
       },
     ],
     [t, allRegistryTags]
@@ -351,6 +362,10 @@ const StoreProductsPage: React.FC = () => {
   const loadProducts = async () => {
     setLoading(true);
     try {
+      const storeFilter = activeFilters.find((f) => f.key === 'store')?.value;
+      const isActiveFilter = activeFilters.find((f) => f.key === 'isActive')?.value;
+      const hasOverridesFilter = activeFilters.find((f) => f.key === 'hasOverrides')?.value;
+
       const result = await storeProductService.getStoreProducts(
         projectApiPath,
         {
@@ -359,6 +374,9 @@ const StoreProductsPage: React.FC = () => {
           search: debouncedSearchTerm || undefined,
           sortBy: orderBy,
           sortOrder: order,
+          store: storeFilter ? String(storeFilter) : undefined,
+          isActive: isActiveFilter !== undefined ? isActiveFilter === 'true' : undefined,
+          hasOverrides: hasOverridesFilter !== undefined ? hasOverridesFilter === 'true' : undefined,
         }
       );
 
@@ -384,10 +402,16 @@ const StoreProductsPage: React.FC = () => {
             ? result.total
             : 0;
         setTotal(validTotal);
+        
+        const validOverridden = typeof result.overriddenTotal === 'number' && !isNaN(result.overriddenTotal)
+          ? result.overriddenTotal
+          : 0;
+        setOverriddenTotal(validOverridden);
       } else {
         setProducts([]);
         setAllProducts([]);
         setTotal(0);
+        setOverriddenTotal(0);
       }
     } catch (error: any) {
       console.error('Failed to load products:', error);
@@ -397,6 +421,7 @@ const StoreProductsPage: React.FC = () => {
       setProducts([]);
       setAllProducts([]);
       setTotal(0);
+      setOverriddenTotal(0);
     } finally {
       setLoading(false);
       setIsInitialLoad(false);
@@ -535,9 +560,11 @@ const StoreProductsPage: React.FC = () => {
     setEditingProduct(null);
   };
 
-  const handleFormSave = async () => {
+  const handleFormSave = async (isNew: boolean) => {
     handleFormClose();
-    setPage(0);
+    if (isNew) {
+      setPage(0);
+    }
     setSelectedIds([]);
     await loadProducts();
     loadStats();
@@ -822,39 +849,64 @@ const StoreProductsPage: React.FC = () => {
               onClose={() => setPageMenuAnchor(null)}
             >
               <ExportImportMenuItems
-                onExport={(format) => {
+                onExport={async (format) => {
                   setPageMenuAnchor(null);
-                  const exportColumns: ExportColumn[] = [
-                    { key: 'cmsProductId', header: 'cmsProductId' },
-                    { key: 'productId', header: 'productId' },
-                    { key: 'productName', header: 'productName' },
-                    { key: 'nameKo', header: 'nameKo' },
-                    { key: 'nameEn', header: 'nameEn' },
-                    { key: 'nameZh', header: 'nameZh' },
-                    { key: 'store', header: 'store' },
-                    { key: 'price', header: 'price' },
-                    { key: 'currency', header: 'currency' },
-                    { key: 'isActive', header: 'isActive' },
-                    { key: 'description', header: 'description' },
-                    { key: 'descriptionKo', header: 'descriptionKo' },
-                    { key: 'descriptionEn', header: 'descriptionEn' },
-                    { key: 'descriptionZh', header: 'descriptionZh' },
-                    { key: 'saleStartAt', header: 'saleStartAt' },
-                    { key: 'saleEndAt', header: 'saleEndAt' },
-                    { key: 'createdAt', header: 'createdAt' },
-                    { key: 'updatedAt', header: 'updatedAt' },
-                  ];
+                  
+                  const exportToastId = enqueueSnackbar(t('common.export') + '...', {
+                    variant: 'info',
+                  });
+
+                  // Fetch all products for export, ignoring pagination but applying current search/filters
                   try {
+                    const result = await storeProductService.getStoreProducts(
+                      projectApiPath,
+                      {
+                        page: 1,
+                        limit: 100000, // Large number to get all
+                        search: debouncedSearchTerm || undefined,
+                        sortBy: orderBy,
+                        sortOrder: order,
+                      }
+                    );
+                    
+                    if (!result || !result.products) {
+                      throw new Error('Failed to fetch products for export');
+                    }
+
+                    const exportColumns: ExportColumn[] = [
+                      { key: 'cmsProductId', header: 'cmsProductId' },
+                      { key: 'productId', header: 'productId' },
+                      { key: 'productName', header: 'productName' },
+                      { key: 'nameKo', header: 'nameKo' },
+                      { key: 'nameEn', header: 'nameEn' },
+                      { key: 'nameZh', header: 'nameZh' },
+                      { key: 'store', header: 'store' },
+                      { key: 'price', header: 'price' },
+                      { key: 'currency', header: 'currency' },
+                      { key: 'isActive', header: 'isActive' },
+                      { key: 'description', header: 'description' },
+                      { key: 'descriptionKo', header: 'descriptionKo' },
+                      { key: 'descriptionEn', header: 'descriptionEn' },
+                      { key: 'descriptionZh', header: 'descriptionZh' },
+                      { key: 'saleStartAt', header: 'saleStartAt' },
+                      { key: 'saleEndAt', header: 'saleEndAt' },
+                      { key: 'createdAt', header: 'createdAt' },
+                      { key: 'updatedAt', header: 'updatedAt' },
+                    ];
+                  
                     exportToFile(
-                      allProducts,
+                      result.products,
                       exportColumns,
                       'store-products',
                       format
                     );
+                    closeSnackbar(exportToastId);
                     enqueueSnackbar(t('common.exportSuccess'), {
                       variant: 'success',
                     });
                   } catch (err) {
+                    console.error('Export error:', err);
+                    closeSnackbar(exportToastId);
                     enqueueSnackbar(t('common.exportFailed'), {
                       variant: 'error',
                     });
@@ -1030,6 +1082,37 @@ const StoreProductsPage: React.FC = () => {
                           {t('storeProducts.statsInactive')}{' '}
                           <strong style={{ color: 'inherit' }}>
                             {productStats.inactive}
+                          </strong>
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{ width: '1px', height: 20, bgcolor: 'divider' }}
+                      />
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.75,
+                          px: 1.5,
+                          py: 0.5,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: '50%',
+                            bgcolor: 'warning.main',
+                          }}
+                        />
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ whiteSpace: 'nowrap' }}
+                        >
+                          {t('storeProducts.statsOverridden', '오버라이드')}{' '}
+                          <strong style={{ color: 'inherit' }}>
+                            {productStats.overridden}
                           </strong>
                         </Typography>
                       </Box>
@@ -1488,20 +1571,32 @@ const StoreProductsPage: React.FC = () => {
                             );
                           }
                           if (column.id === 'saleStartAt') {
+                            const isOverridden = product.overriddenFields?.includes('saleStartAt');
                             return (
                               <TableCell key={column.id}>
-                                {product.saleStartAt
-                                  ? formatDateTimeDetailed(product.saleStartAt)
-                                  : '-'}
+                                <Box
+                                  component="span"
+                                  sx={isOverridden ? { color: 'warning.main', fontWeight: 600 } : {}}
+                                >
+                                  {product.saleStartAt
+                                    ? formatDateTimeDetailed(product.saleStartAt)
+                                    : '-'}
+                                </Box>
                               </TableCell>
                             );
                           }
                           if (column.id === 'saleEndAt') {
+                            const isOverridden = product.overriddenFields?.includes('saleEndAt');
                             return (
                               <TableCell key={column.id}>
-                                {product.saleEndAt
-                                  ? formatDateTimeDetailed(product.saleEndAt)
-                                  : '-'}
+                                <Box
+                                  component="span"
+                                  sx={isOverridden ? { color: 'warning.main', fontWeight: 600 } : {}}
+                                >
+                                  {product.saleEndAt
+                                    ? formatDateTimeDetailed(product.saleEndAt)
+                                    : '-'}
+                                </Box>
                               </TableCell>
                             );
                           }

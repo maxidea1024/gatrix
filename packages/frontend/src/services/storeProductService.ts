@@ -87,11 +87,13 @@ export interface GetStoreProductsParams {
   sortOrder?: 'asc' | 'desc';
   store?: string;
   isActive?: boolean;
+  hasOverrides?: boolean;
 }
 
 export interface GetStoreProductsResponse {
   products: StoreProduct[];
   total: number;
+  overriddenTotal: number;
   page: number;
   limit: number;
 }
@@ -121,6 +123,7 @@ export interface StoreProductStats {
   total: number;
   active: number;
   inactive: number;
+  overridden: number;
 }
 
 class StoreProductService {

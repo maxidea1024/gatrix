@@ -15,7 +15,7 @@ export class StoreProductController {
    */
   static getStoreProducts = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const { page, limit, search, sortBy, sortOrder, store, isActive } =
+      const { page, limit, search, sortBy, sortOrder, store, isActive, hasOverrides } =
         req.query;
       const environmentId = req.environmentId;
 
@@ -31,6 +31,8 @@ export class StoreProductController {
         sortOrder: (sortOrder as string)?.toLowerCase() as 'asc' | 'desc',
         store: store as string,
         isActive: isActive !== undefined ? isActive === 'true' : undefined,
+        hasOverrides:
+          hasOverrides !== undefined ? hasOverrides === 'true' : undefined,
         environmentId,
       });
 

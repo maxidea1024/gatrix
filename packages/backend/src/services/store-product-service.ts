@@ -10,20 +10,7 @@ import { PlanningDataService } from './planning-data-service';
 import { CmsCashShopProduct } from './cms-cash-shop-service';
 import { pubSubService } from './pub-sub-service';
 import { SERVER_SDK_ETAG } from '../constants/cache-keys';
-
-/**
- * Convert a Date or ISO string to MySQL DATETIME-compatible format.
- * MySQL DATETIME rejects ISO 8601 'T'/'Z' characters (e.g., '2026-04-12T15:00:00.000Z').
- * This produces 'YYYY-MM-DD HH:MM:SS' which MySQL accepts.
- */
-function toMySQLDateTime(
-  date: Date | string | null | undefined
-): string | null {
-  if (!date) return null;
-  const d = typeof date === 'string' ? new Date(date) : date;
-  if (isNaN(d.getTime())) return null;
-  return d.toISOString().slice(0, 19).replace('T', ' ');
-}
+import { convertFromMySQLDateTime } from '../utils/date-utils';
 
 export interface StoreProduct {
   id: string;
@@ -109,12 +96,14 @@ export interface GetStoreProductsParams {
   sortOrder?: 'asc' | 'desc';
   store?: string;
   isActive?: boolean;
+  hasOverrides?: boolean;
   environmentId: string;
 }
 
 export interface GetStoreProductsResponse {
   products: StoreProduct[];
   total: number;
+  overriddenTotal: number;
   page: number;
   limit: number;
 }
@@ -143,9 +132,9 @@ class StoreProductService {
 
     if (search) {
       // Check if search is a number (for CMS ID search)
-      const searchNumber = Number(search);
-      if (!isNaN(searchNumber) && String(searchNumber) === search.trim()) {
-        // Search by CMS ID if input is a pure number
+      const searchNumber = parseInt(search, 10);
+      if (!isNaN(searchNumber)) {
+        // Include cmsProductId exact match
         conditions.push(
           '(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ? OR description LIKE ? OR cmsProductId = ?)'
         );
@@ -186,6 +175,15 @@ class StoreProductService {
       queryParams.push(params.isActive ? 1 : 0);
     }
 
+    if (params?.hasOverrides !== undefined) {
+      // Stringified JSON empty array is '[]'
+      if (params.hasOverrides) {
+        conditions.push("overriddenFields IS NOT NULL AND overriddenFields != '[]'");
+      } else {
+        conditions.push("(overriddenFields IS NULL OR overriddenFields = '[]')");
+      }
+    }
+
     const whereClause =
       conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
@@ -208,12 +206,13 @@ class StoreProductService {
     const safeSortOrder = sortOrder === 'ASC' ? 'ASC' : 'DESC';
 
     try {
-      // Get total count
+      // Get total count and overridden count
       const [countResult] = await pool.execute<RowDataPacket[]>(
-        `SELECT COUNT(*) as total FROM g_store_products ${whereClause}`,
+        `SELECT COUNT(*) as total, SUM(CASE WHEN overriddenFields IS NOT NULL AND overriddenFields != '[]' THEN 1 ELSE 0 END) as overriddenTotal FROM g_store_products ${whereClause}`,
         queryParams
       );
-      const total = countResult[0].total;
+      const total = Number(countResult[0].total) || 0;
+      const overriddenTotal = Number(countResult[0].overriddenTotal) || 0;
 
       // Get products (use template literal for LIMIT/OFFSET as they are already validated numbers)
       const [products] = await pool.execute<RowDataPacket[]>(
@@ -247,6 +246,7 @@ class StoreProductService {
       return {
         products: productsWithTags as StoreProduct[],
         total,
+        overriddenTotal,
         page,
         limit,
       };
@@ -261,7 +261,7 @@ class StoreProductService {
    */
   static async getStats(
     environmentId: string
-  ): Promise<{ total: number; active: number; inactive: number }> {
+  ): Promise<{ total: number; active: number; inactive: number; overridden: number }> {
     const pool = database.getPool();
 
     try {
@@ -269,15 +269,19 @@ class StoreProductService {
         `SELECT
           COUNT(*) as total,
           SUM(CASE WHEN isActive = 1 THEN 1 ELSE 0 END) as active,
-          SUM(CASE WHEN isActive = 0 THEN 1 ELSE 0 END) as inactive
-        FROM g_store_products WHERE environmentId = ?`,
+          SUM(CASE WHEN isActive = 0 THEN 1 ELSE 0 END) as inactive,
+          SUM(CASE WHEN overriddenFields IS NOT NULL AND overriddenFields != '[]' THEN 1 ELSE 0 END) as overridden
+         FROM g_store_products
+         WHERE environmentId = ?`,
         [environmentId]
       );
 
+      const row = result[0];
       return {
-        total: result[0].total || 0,
-        active: result[0].active || 0,
-        inactive: result[0].inactive || 0,
+        total: Number(row.total) || 0,
+        active: Number(row.active) || 0,
+        inactive: Number(row.inactive) || 0,
+        overridden: Number(row.overridden) || 0,
       };
     } catch (error) {
       logger.error('Failed to get store product stats', { error });
@@ -396,8 +400,8 @@ class StoreProductService {
           input.store,
           input.price,
           input.currency || 'USD',
-          toMySQLDateTime(input.saleStartAt),
-          toMySQLDateTime(input.saleEndAt),
+          input.saleStartAt ? new Date(input.saleStartAt) : null,
+          input.saleEndAt ? new Date(input.saleEndAt) : null,
           input.description || null,
           input.descriptionKo || null,
           input.descriptionEn || null,
@@ -459,7 +463,7 @@ class StoreProductService {
 
     // Build dynamic update query
     const updates: string[] = [];
-    const values: (string | number | boolean | null)[] = [];
+    const values: (string | number | boolean | Date | null)[] = [];
 
     if (input.productId !== undefined) {
       updates.push('productId = ?');
@@ -500,11 +504,11 @@ class StoreProductService {
     }
     if (input.saleStartAt !== undefined) {
       updates.push('saleStartAt = ?');
-      values.push(toMySQLDateTime(input.saleStartAt));
+      values.push(input.saleStartAt ? new Date(input.saleStartAt) : null);
     }
     if (input.saleEndAt !== undefined) {
       updates.push('saleEndAt = ?');
-      values.push(toMySQLDateTime(input.saleEndAt));
+      values.push(input.saleEndAt ? new Date(input.saleEndAt) : null);
     }
     if (input.description !== undefined) {
       updates.push('description = ?');
@@ -649,12 +653,14 @@ class StoreProductService {
             normalizedFinal = Number(finalVal ?? 0);
             normalizedPlanning = Number(planningVal ?? 0);
           } else if (field === 'saleStartAt' || field === 'saleEndAt') {
-            normalizedFinal = finalVal
-              ? new Date(finalVal as any).getTime()
+            // finalVal could be a raw mysql2 Date. We MUST use convertFromMySQLDateTime
+            // to properly recover the correct UTC string representation.
+            const isoFinal = convertFromMySQLDateTime(finalVal as Date | string | null);
+            const isoPlanning = planningVal
+              ? new Date(planningVal).toISOString()
               : null;
-            normalizedPlanning = planningVal
-              ? new Date(planningVal).getTime()
-              : null;
+            normalizedFinal = isoFinal ? new Date(isoFinal).getTime() : null;
+            normalizedPlanning = isoPlanning ? new Date(isoPlanning).getTime() : null;
           } else {
             normalizedFinal =
               finalVal === '' || finalVal == null ? null : String(finalVal);
@@ -1304,19 +1310,20 @@ class StoreProductService {
           }
 
           // Check date changes
-          const checkDateChange = (
-            field: string,
-            dbVal: Date | string | null | undefined,
-            planVal: string | null | undefined
-          ) => {
-            const dDb = dbVal ? new Date(dbVal).getTime() : null;
-            const dPl = planVal ? new Date(planVal).getTime() : null;
-            if (dDb !== dPl) {
+          const checkDateChange = (field: string, dbVal: Date | string | null | undefined, planVal: string | null | undefined) => {
+            const getIso = (val: Date | string | null | undefined) => {
+              if (!val) return null;
+              const d = typeof val === 'string' ? new Date(val) : val;
+              if (isNaN(d.getTime())) return null;
+              return d.toISOString();
+            };
+            const isoDb = getIso(dbVal);
+            const isoPl = getIso(planVal);
+            if (isoDb !== isoPl) {
               changes.push({
                 field,
-                oldValue:
-                  dbVal instanceof Date ? dbVal.toISOString() : dbVal || null,
-                newValue: planVal || null,
+                oldValue: isoDb,
+                newValue: isoPl,
               });
             }
           };
@@ -1406,13 +1413,13 @@ class StoreProductService {
     // Filter items based on selection if provided
     const toAddFiltered = selected?.toAdd
       ? preview.toAdd.filter((item) =>
-          selected.toAdd.includes(item.cmsProductId)
-        )
+        selected.toAdd.includes(item.cmsProductId)
+      )
       : preview.toAdd;
     const toUpdateFiltered = selected?.toUpdate
       ? preview.toUpdate.filter((item) =>
-          selected.toUpdate.includes(item.cmsProductId)
-        )
+        selected.toUpdate.includes(item.cmsProductId)
+      )
       : preview.toUpdate;
     const toDeleteFiltered = selected?.toDelete
       ? preview.toDelete.filter((item) => selected.toDelete.includes(item.id))
