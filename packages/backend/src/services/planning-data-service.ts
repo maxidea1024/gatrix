@@ -998,14 +998,16 @@ export class PlanningDataService {
 
       if (uploadIds.length === 0) return [];
 
-      const uploads = await db('g_planning_data_uploads')
-        .whereIn(
-          'id',
-          uploadIds.map((u) => u.id)
-        );
-        
+      const uploads = await db('g_planning_data_uploads').whereIn(
+        'id',
+        uploadIds.map((u) => u.id)
+      );
+
       // Sort in memory to completely avoid MySQL filesort on large BLOBs
-      uploads.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
+      uploads.sort(
+        (a, b) =>
+          new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+      );
 
       return uploads.map((upload) => ({
         id: upload.id,

@@ -877,7 +877,11 @@ const PlanningDataPage: React.FC = () => {
                       <Typography variant="body2" color="text.secondary">
                         {t('planningData.uploadInfo.lastUpload')}:
                       </Typography>
-                      <Tooltip title={formatDateTimeDetailed(latestUpload.uploadedAt)} arrow placement="top">
+                      <Tooltip
+                        title={formatDateTimeDetailed(latestUpload.uploadedAt)}
+                        arrow
+                        placement="top"
+                      >
                         <Chip
                           size="small"
                           label={formatRelativeTime(latestUpload.uploadedAt)}

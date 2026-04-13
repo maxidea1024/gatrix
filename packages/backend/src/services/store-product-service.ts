@@ -1304,20 +1304,33 @@ class StoreProductService {
           }
 
           // Check date changes
-          const checkDateChange = (field: string, dbVal: Date | string | null | undefined, planVal: string | null | undefined) => {
+          const checkDateChange = (
+            field: string,
+            dbVal: Date | string | null | undefined,
+            planVal: string | null | undefined
+          ) => {
             const dDb = dbVal ? new Date(dbVal).getTime() : null;
             const dPl = planVal ? new Date(planVal).getTime() : null;
             if (dDb !== dPl) {
               changes.push({
                 field,
-                oldValue: dbVal instanceof Date ? dbVal.toISOString() : (dbVal || null),
+                oldValue:
+                  dbVal instanceof Date ? dbVal.toISOString() : dbVal || null,
                 newValue: planVal || null,
               });
             }
           };
 
-          checkDateChange('saleStartAt', dbProduct.saleStartAt, planningProduct.saleStartAt);
-          checkDateChange('saleEndAt', dbProduct.saleEndAt, planningProduct.saleEndAt);
+          checkDateChange(
+            'saleStartAt',
+            dbProduct.saleStartAt,
+            planningProduct.saleStartAt
+          );
+          checkDateChange(
+            'saleEndAt',
+            dbProduct.saleEndAt,
+            planningProduct.saleEndAt
+          );
 
           // Skip changes for fields that are overridden by user
           const overrides: string[] = dbProduct.overriddenFields
@@ -1763,7 +1776,7 @@ class StoreProductService {
     if (field === 'saleStartAt' || field === 'saleEndAt') {
       value = value ? new Date(value) : null;
     }
-    
+
     await pool.execute(
       `UPDATE g_store_products SET \`${field}\` = ?, updatedBy = ?, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environmentId = ?`,
       [value, userId || null, id, environmentId]
