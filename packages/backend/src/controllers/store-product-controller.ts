@@ -15,8 +15,16 @@ export class StoreProductController {
    */
   static getStoreProducts = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const { page, limit, search, sortBy, sortOrder, store, isActive, hasOverrides } =
-        req.query;
+      const {
+        page,
+        limit,
+        search,
+        sortBy,
+        sortOrder,
+        store,
+        isActive,
+        hasOverrides,
+      } = req.query;
       const environmentId = req.environmentId;
 
       if (!environmentId) {

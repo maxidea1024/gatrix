@@ -590,12 +590,13 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                 !overriddenFields.every((f) =>
                   pendingOverrideResets.includes(f)
                 ) && (
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Alert
-                      severity="warning"
-                      icon={<EditIcon />}
-                    >
-                      <AlertTitle>{t('storeProducts.overrideNotice')}</AlertTitle>
+                  <Box
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+                  >
+                    <Alert severity="warning" icon={<EditIcon />}>
+                      <AlertTitle>
+                        {t('storeProducts.overrideNotice')}
+                      </AlertTitle>
                       {t('storeProducts.overrideDescription', {
                         count: overriddenFields.filter(
                           (f) => !pendingOverrideResets.includes(f)
@@ -924,7 +925,9 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                       <LocalizedDateTimePicker
                         value={saleEndAt}
                         onChange={(value) => setSaleEndAt(value)}
-                        minDateTime={saleStartAt ? dayjs(saleStartAt) : undefined}
+                        minDateTime={
+                          saleStartAt ? dayjs(saleStartAt) : undefined
+                        }
                       />
                     </Box>
                   </OverrideFieldWrapper>

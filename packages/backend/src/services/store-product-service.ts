@@ -178,9 +178,13 @@ class StoreProductService {
     if (params?.hasOverrides !== undefined) {
       // Stringified JSON empty array is '[]'
       if (params.hasOverrides) {
-        conditions.push("overriddenFields IS NOT NULL AND overriddenFields != '[]'");
+        conditions.push(
+          "overriddenFields IS NOT NULL AND overriddenFields != '[]'"
+        );
       } else {
-        conditions.push("(overriddenFields IS NULL OR overriddenFields = '[]')");
+        conditions.push(
+          "(overriddenFields IS NULL OR overriddenFields = '[]')"
+        );
       }
     }
 
@@ -261,7 +265,12 @@ class StoreProductService {
    */
   static async getStats(
     environmentId: string
-  ): Promise<{ total: number; active: number; inactive: number; overridden: number }> {
+  ): Promise<{
+    total: number;
+    active: number;
+    inactive: number;
+    overridden: number;
+  }> {
     const pool = database.getPool();
 
     try {
@@ -655,12 +664,16 @@ class StoreProductService {
           } else if (field === 'saleStartAt' || field === 'saleEndAt') {
             // finalVal could be a raw mysql2 Date. We MUST use convertFromMySQLDateTime
             // to properly recover the correct UTC string representation.
-            const isoFinal = convertFromMySQLDateTime(finalVal as Date | string | null);
+            const isoFinal = convertFromMySQLDateTime(
+              finalVal as Date | string | null
+            );
             const isoPlanning = planningVal
               ? new Date(planningVal).toISOString()
               : null;
             normalizedFinal = isoFinal ? new Date(isoFinal).getTime() : null;
-            normalizedPlanning = isoPlanning ? new Date(isoPlanning).getTime() : null;
+            normalizedPlanning = isoPlanning
+              ? new Date(isoPlanning).getTime()
+              : null;
           } else {
             normalizedFinal =
               finalVal === '' || finalVal == null ? null : String(finalVal);
@@ -1310,7 +1323,11 @@ class StoreProductService {
           }
 
           // Check date changes
-          const checkDateChange = (field: string, dbVal: Date | string | null | undefined, planVal: string | null | undefined) => {
+          const checkDateChange = (
+            field: string,
+            dbVal: Date | string | null | undefined,
+            planVal: string | null | undefined
+          ) => {
             const getIso = (val: Date | string | null | undefined) => {
               if (!val) return null;
               const d = typeof val === 'string' ? new Date(val) : val;
@@ -1413,13 +1430,13 @@ class StoreProductService {
     // Filter items based on selection if provided
     const toAddFiltered = selected?.toAdd
       ? preview.toAdd.filter((item) =>
-        selected.toAdd.includes(item.cmsProductId)
-      )
+          selected.toAdd.includes(item.cmsProductId)
+        )
       : preview.toAdd;
     const toUpdateFiltered = selected?.toUpdate
       ? preview.toUpdate.filter((item) =>
-        selected.toUpdate.includes(item.cmsProductId)
-      )
+          selected.toUpdate.includes(item.cmsProductId)
+        )
       : preview.toUpdate;
     const toDeleteFiltered = selected?.toDelete
       ? preview.toDelete.filter((item) => selected.toDelete.includes(item.id))

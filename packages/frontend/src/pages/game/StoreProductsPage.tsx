@@ -363,8 +363,12 @@ const StoreProductsPage: React.FC = () => {
     setLoading(true);
     try {
       const storeFilter = activeFilters.find((f) => f.key === 'store')?.value;
-      const isActiveFilter = activeFilters.find((f) => f.key === 'isActive')?.value;
-      const hasOverridesFilter = activeFilters.find((f) => f.key === 'hasOverrides')?.value;
+      const isActiveFilter = activeFilters.find(
+        (f) => f.key === 'isActive'
+      )?.value;
+      const hasOverridesFilter = activeFilters.find(
+        (f) => f.key === 'hasOverrides'
+      )?.value;
 
       const result = await storeProductService.getStoreProducts(
         projectApiPath,
@@ -375,8 +379,14 @@ const StoreProductsPage: React.FC = () => {
           sortBy: orderBy,
           sortOrder: order,
           store: storeFilter ? String(storeFilter) : undefined,
-          isActive: isActiveFilter !== undefined ? isActiveFilter === 'true' : undefined,
-          hasOverrides: hasOverridesFilter !== undefined ? hasOverridesFilter === 'true' : undefined,
+          isActive:
+            isActiveFilter !== undefined
+              ? isActiveFilter === 'true'
+              : undefined,
+          hasOverrides:
+            hasOverridesFilter !== undefined
+              ? hasOverridesFilter === 'true'
+              : undefined,
         }
       );
 
@@ -402,10 +412,12 @@ const StoreProductsPage: React.FC = () => {
             ? result.total
             : 0;
         setTotal(validTotal);
-        
-        const validOverridden = typeof result.overriddenTotal === 'number' && !isNaN(result.overriddenTotal)
-          ? result.overriddenTotal
-          : 0;
+
+        const validOverridden =
+          typeof result.overriddenTotal === 'number' &&
+          !isNaN(result.overriddenTotal)
+            ? result.overriddenTotal
+            : 0;
         setOverriddenTotal(validOverridden);
       } else {
         setProducts([]);
@@ -851,10 +863,13 @@ const StoreProductsPage: React.FC = () => {
               <ExportImportMenuItems
                 onExport={async (format) => {
                   setPageMenuAnchor(null);
-                  
-                  const exportToastId = enqueueSnackbar(t('common.export') + '...', {
-                    variant: 'info',
-                  });
+
+                  const exportToastId = enqueueSnackbar(
+                    t('common.export') + '...',
+                    {
+                      variant: 'info',
+                    }
+                  );
 
                   // Fetch all products for export, ignoring pagination but applying current search/filters
                   try {
@@ -868,7 +883,7 @@ const StoreProductsPage: React.FC = () => {
                         sortOrder: order,
                       }
                     );
-                    
+
                     if (!result || !result.products) {
                       throw new Error('Failed to fetch products for export');
                     }
@@ -893,7 +908,7 @@ const StoreProductsPage: React.FC = () => {
                       { key: 'createdAt', header: 'createdAt' },
                       { key: 'updatedAt', header: 'updatedAt' },
                     ];
-                  
+
                     exportToFile(
                       result.products,
                       exportColumns,
@@ -1571,27 +1586,45 @@ const StoreProductsPage: React.FC = () => {
                             );
                           }
                           if (column.id === 'saleStartAt') {
-                            const isOverridden = product.overriddenFields?.includes('saleStartAt');
+                            const isOverridden =
+                              product.overriddenFields?.includes('saleStartAt');
                             return (
                               <TableCell key={column.id}>
                                 <Box
                                   component="span"
-                                  sx={isOverridden ? { color: 'warning.main', fontWeight: 600 } : {}}
+                                  sx={
+                                    isOverridden
+                                      ? {
+                                          color: 'warning.main',
+                                          fontWeight: 600,
+                                        }
+                                      : {}
+                                  }
                                 >
                                   {product.saleStartAt
-                                    ? formatDateTimeDetailed(product.saleStartAt)
+                                    ? formatDateTimeDetailed(
+                                        product.saleStartAt
+                                      )
                                     : '-'}
                                 </Box>
                               </TableCell>
                             );
                           }
                           if (column.id === 'saleEndAt') {
-                            const isOverridden = product.overriddenFields?.includes('saleEndAt');
+                            const isOverridden =
+                              product.overriddenFields?.includes('saleEndAt');
                             return (
                               <TableCell key={column.id}>
                                 <Box
                                   component="span"
-                                  sx={isOverridden ? { color: 'warning.main', fontWeight: 600 } : {}}
+                                  sx={
+                                    isOverridden
+                                      ? {
+                                          color: 'warning.main',
+                                          fontWeight: 600,
+                                        }
+                                      : {}
+                                  }
                                 >
                                   {product.saleEndAt
                                     ? formatDateTimeDetailed(product.saleEndAt)
