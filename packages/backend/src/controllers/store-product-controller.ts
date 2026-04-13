@@ -231,6 +231,9 @@ export class StoreProductController {
       const {
         productId,
         productName,
+        nameKo,
+        nameEn,
+        nameZh,
         store,
         price,
         currency,
@@ -238,8 +241,12 @@ export class StoreProductController {
         saleStartAt,
         saleEndAt,
         description,
+        descriptionKo,
+        descriptionEn,
+        descriptionZh,
         metadata,
         tagIds,
+        overrideResets,
       } = req.body;
 
       const result = await UnifiedChangeGateway.processChange(
@@ -250,6 +257,9 @@ export class StoreProductController {
         {
           productId: productId?.trim(),
           productName: productName?.trim(),
+          nameKo: nameKo !== undefined ? (nameKo?.trim() || null) : undefined,
+          nameEn: nameEn !== undefined ? (nameEn?.trim() || null) : undefined,
+          nameZh: nameZh !== undefined ? (nameZh?.trim() || null) : undefined,
           store: store?.trim(),
           price,
           currency: currency?.trim(),
@@ -268,7 +278,11 @@ export class StoreProductController {
               : undefined,
           description:
             description !== undefined ? description?.trim() || null : undefined,
+          descriptionKo: descriptionKo !== undefined ? (descriptionKo?.trim() || null) : undefined,
+          descriptionEn: descriptionEn !== undefined ? (descriptionEn?.trim() || null) : undefined,
+          descriptionZh: descriptionZh !== undefined ? (descriptionZh?.trim() || null) : undefined,
           metadata,
+          overrideResets,
         },
         async (processedData: any) => {
           const product = await StoreProductService.updateStoreProduct(
@@ -624,6 +638,103 @@ export class StoreProductController {
         success: true,
         data: result,
         message: 'Sync applied successfully',
+      });
+    }
+  );
+
+  /**
+   * Get planning data values for a store product
+   * GET /api/v1/admin/store-products/:id/planning-values
+   */
+  static getPlanningValues = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { id } = req.params;
+      const environmentId = req.environmentId;
+
+      if (!id) {
+        throw new GatrixError('Store product ID is required', 400);
+      }
+
+      const planningValues = await StoreProductService.getPlanningValues(
+        id,
+        environmentId!
+      );
+
+      res.json({
+        success: true,
+        data: planningValues,
+      });
+    }
+  );
+
+  /**
+   * Reset all overrides for a store product, reverting to planning data values
+   * DELETE /api/v1/admin/store-products/:id/overrides
+   */
+  static resetOverrides = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { id } = req.params;
+      const environmentId = req.environmentId;
+      const userId =
+        (req as any).userDetails?.id ??
+        (req as any).user?.id ??
+        (req as any).user?.userId;
+
+      if (!id) {
+        throw new GatrixError('Store product ID is required', 400);
+      }
+      if (!environmentId) {
+        throw new GatrixError('Environment not specified', 400);
+      }
+
+      const product = await StoreProductService.resetOverrides(
+        id,
+        environmentId,
+        userId
+      );
+
+      res.json({
+        success: true,
+        data: { product },
+        message: 'All overrides reset successfully',
+      });
+    }
+  );
+
+  /**
+   * Reset a single field override, reverting that field to planning data value
+   * DELETE /api/v1/admin/store-products/:id/overrides/:field
+   */
+  static resetFieldOverride = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { id, field } = req.params;
+      const environmentId = req.environmentId;
+      const userId =
+        (req as any).userDetails?.id ??
+        (req as any).user?.id ??
+        (req as any).user?.userId;
+
+      if (!id) {
+        throw new GatrixError('Store product ID is required', 400);
+      }
+      if (!field) {
+        throw new GatrixError('Field name is required', 400);
+      }
+      if (!environmentId) {
+        throw new GatrixError('Environment not specified', 400);
+      }
+
+      const product = await StoreProductService.resetFieldOverride(
+        id,
+        environmentId,
+        field,
+        userId
+      );
+
+      res.json({
+        success: true,
+        data: { product },
+        message: `Override for field '${field}' reset successfully`,
       });
     }
   );

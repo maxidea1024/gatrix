@@ -124,6 +124,85 @@ export class PlanningDataService {
     return fileKeyMap[fileName] || null;
   }
 
+  /**
+   * Get data with Redis-first, DB-fallback pattern.
+   * 1. Check Redis cache → return if hit
+   * 2. Check DB g_planning_data_cache → re-populate Redis and return if hit
+   * 3. Return null if neither has data
+   */
+  private static async getDataWithFallback<T>(
+    environmentId: string,
+    baseCacheKey: string,
+    dataType: string
+  ): Promise<T | null> {
+    // 1. Try Redis cache
+    const cacheKey = this.getEnvCacheKey(environmentId, baseCacheKey);
+    const cached = await cacheService.get<T>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    // 2. Try DB fallback
+    try {
+      const row = await db('g_planning_data_cache')
+        .where({ environmentId, dataType })
+        .first();
+
+      if (row && row.dataContent) {
+        const data = typeof row.dataContent === 'string'
+          ? JSON.parse(row.dataContent)
+          : row.dataContent;
+
+        // Re-populate Redis cache
+        await cacheService.setWithoutTTL(cacheKey, data);
+        logger.info(`Planning data restored from DB to Redis`, {
+          dataType,
+          environmentId,
+        });
+
+        return data as T;
+      }
+    } catch (dbError) {
+      // DB table might not exist yet (pre-migration); silently fall through
+      logger.debug('DB fallback failed for planning data', {
+        dataType,
+        environmentId,
+        error: dbError,
+      });
+    }
+
+    return null;
+  }
+
+  /**
+   * Persist planning data to database (write-through).
+   * Uses UPSERT to handle both insert and update cases.
+   */
+  private static async persistToDatabase(
+    environmentId: string,
+    dataType: string,
+    data: any
+  ): Promise<void> {
+    try {
+      const content = JSON.stringify(data);
+      const hash = crypto.createHash('sha256').update(content).digest('hex');
+
+      await db.raw(
+        `INSERT INTO g_planning_data_cache (id, environmentId, dataType, dataContent, dataHash, updatedAt)
+         VALUES (?, ?, ?, ?, ?, UTC_TIMESTAMP())
+         ON DUPLICATE KEY UPDATE dataContent = VALUES(dataContent), dataHash = VALUES(dataHash), updatedAt = UTC_TIMESTAMP()`,
+        [ulid(), environmentId, dataType, content, hash]
+      );
+    } catch (dbError) {
+      // Don't fail the upload if DB persistence fails — Redis still has the data
+      logger.warn('Failed to persist planning data to DB', {
+        dataType,
+        environmentId,
+        error: dbError,
+      });
+    }
+  }
+
   // Cache TTL: 24 hours (in milliseconds)
 
   /**
@@ -174,21 +253,16 @@ export class PlanningDataService {
           : lang === 'zh'
             ? this.CACHE_KEYS.REWARD_LOOKUP_ZH
             : this.CACHE_KEYS.REWARD_LOOKUP_KR;
-      const cacheKey = this.getEnvCacheKey(environmentId, baseCacheKey);
+      const dataType = `reward-lookup-${lang}`;
 
-      // Get from Redis cache only
-      const cached = await cacheService.get<RewardLookupData>(cacheKey);
-      if (cached) {
-        logger.debug(`Reward lookup data (${lang}) retrieved from cache`, {
-          environmentId,
-        });
-        return cached;
-      }
-
-      // No data in cache - return empty
-      logger.debug(`Reward lookup data (${lang}) not found in cache`, {
+      const data = await this.getDataWithFallback<RewardLookupData>(
         environmentId,
-      });
+        baseCacheKey,
+        dataType
+      );
+      if (data) return data;
+
+      logger.debug(`Reward lookup data (${lang}) not found`, { environmentId });
       return {};
     } catch (error) {
       logger.error('Failed to read reward lookup data', {
@@ -209,22 +283,14 @@ export class PlanningDataService {
     environmentId: string
   ): Promise<RewardTypeInfo[]> {
     try {
-      const cacheKey = this.getEnvCacheKey(
+      const data = await this.getDataWithFallback<RewardTypeInfo[]>(
         environmentId,
-        this.CACHE_KEYS.REWARD_TYPE_LIST
+        this.CACHE_KEYS.REWARD_TYPE_LIST,
+        'reward-type-list'
       );
+      if (data) return data;
 
-      // Get from Redis cache only
-      const cached = await cacheService.get<RewardTypeInfo[]>(cacheKey);
-      if (cached) {
-        logger.debug('Reward type list retrieved from cache', {
-          environmentId,
-        });
-        return cached;
-      }
-
-      // No data in cache - return empty
-      logger.debug('Reward type list not found in cache', { environmentId });
+      logger.debug('Reward type list not found', { environmentId });
       return [];
     } catch (error) {
       logger.error('Failed to read reward type list', { error, environmentId });
@@ -281,24 +347,14 @@ export class PlanningDataService {
     lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<any> {
     try {
-      const cacheKey = this.getEnvCacheKey(
+      const data = await this.getDataWithFallback<any>(
         environmentId,
-        `${this.CACHE_KEYS.UI_LIST_DATA}:${lang}`
+        `${this.CACHE_KEYS.UI_LIST_DATA}:${lang}`,
+        `ui-list-data-${lang}`
       );
+      if (data) return data;
 
-      // Get from Redis cache only
-      const cached = await cacheService.get<any>(cacheKey);
-      if (cached) {
-        logger.debug(`UI list data (${lang}) retrieved from cache`, {
-          environmentId,
-        });
-        return cached;
-      }
-
-      // No data in cache - return empty
-      logger.debug(`UI list data (${lang}) not found in cache`, {
-        environmentId,
-      });
+      logger.debug(`UI list data (${lang}) not found`, { environmentId });
       return { nations: [], towns: [], villages: [] };
     } catch (error) {
       logger.error('Failed to read UI list data', { error, environmentId });
@@ -426,24 +482,14 @@ export class PlanningDataService {
     lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<Record<string, any>> {
     try {
-      const cacheKey = this.getEnvCacheKey(
+      const data = await this.getDataWithFallback<Record<string, any>>(
         environmentId,
-        `${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`
+        `${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`,
+        `hottimebuff-lookup-${lang}`
       );
+      if (data) return data;
 
-      // Get from Redis cache only
-      const cached = await cacheService.get<Record<string, any>>(cacheKey);
-      if (cached) {
-        logger.debug(`HotTimeBuff lookup data (${lang}) retrieved from cache`, {
-          environmentId,
-        });
-        return cached;
-      }
-
-      // No data in cache - return empty
-      logger.debug(`HotTimeBuff lookup data (${lang}) not found in cache`, {
-        environmentId,
-      });
+      logger.debug(`HotTimeBuff lookup data (${lang}) not found`, { environmentId });
       return {};
     } catch (error) {
       logger.error('Failed to read HotTimeBuff lookup data', {
@@ -465,24 +511,14 @@ export class PlanningDataService {
     lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<Record<string, any>> {
     try {
-      const cacheKey = this.getEnvCacheKey(
+      const data = await this.getDataWithFallback<Record<string, any>>(
         environmentId,
-        `${this.CACHE_KEYS.EVENT_PAGE}:${lang}`
+        `${this.CACHE_KEYS.EVENT_PAGE}:${lang}`,
+        `eventpage-lookup-${lang}`
       );
+      if (data) return data;
 
-      // Get from Redis cache only
-      const cached = await cacheService.get<Record<string, any>>(cacheKey);
-      if (cached) {
-        logger.debug(`EventPage lookup data (${lang}) retrieved from cache`, {
-          environmentId,
-        });
-        return cached;
-      }
-
-      // No data in cache - return empty
-      logger.debug(`EventPage lookup data (${lang}) not found in cache`, {
-        environmentId,
-      });
+      logger.debug(`EventPage lookup data (${lang}) not found`, { environmentId });
       return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read EventPage lookup data', {
@@ -504,24 +540,14 @@ export class PlanningDataService {
     lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<Record<string, any>> {
     try {
-      const cacheKey = this.getEnvCacheKey(
+      const data = await this.getDataWithFallback<Record<string, any>>(
         environmentId,
-        `${this.CACHE_KEYS.LIVE_EVENT}:${lang}`
+        `${this.CACHE_KEYS.LIVE_EVENT}:${lang}`,
+        `liveevent-lookup-${lang}`
       );
+      if (data) return data;
 
-      // Get from Redis cache only
-      const cached = await cacheService.get<Record<string, any>>(cacheKey);
-      if (cached) {
-        logger.debug(`LiveEvent lookup data (${lang}) retrieved from cache`, {
-          environmentId,
-        });
-        return cached;
-      }
-
-      // No data in cache - return empty
-      logger.debug(`LiveEvent lookup data (${lang}) not found in cache`, {
-        environmentId,
-      });
+      logger.debug(`LiveEvent lookup data (${lang}) not found`, { environmentId });
       return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read LiveEvent lookup data', {
@@ -543,30 +569,14 @@ export class PlanningDataService {
     lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<Record<string, any>> {
     try {
-      const cacheKey = this.getEnvCacheKey(
+      const data = await this.getDataWithFallback<Record<string, any>>(
         environmentId,
-        `${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`
+        `${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`,
+        `materecruiting-lookup-${lang}`
       );
+      if (data) return data;
 
-      // Get from Redis cache only
-      const cached = await cacheService.get<Record<string, any>>(cacheKey);
-      if (cached) {
-        logger.debug(
-          `MateRecruitingGroup lookup data (${lang}) retrieved from cache`,
-          {
-            environmentId,
-          }
-        );
-        return cached;
-      }
-
-      // No data in cache - return empty
-      logger.debug(
-        `MateRecruitingGroup lookup data (${lang}) not found in cache`,
-        {
-          environmentId,
-        }
-      );
+      logger.debug(`MateRecruitingGroup lookup data (${lang}) not found`, { environmentId });
       return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read MateRecruitingGroup lookup data', {
@@ -591,30 +601,14 @@ export class PlanningDataService {
     lang: 'kr' | 'en' | 'zh' = 'kr'
   ): Promise<Record<string, any>> {
     try {
-      const cacheKey = this.getEnvCacheKey(
+      const data = await this.getDataWithFallback<Record<string, any>>(
         environmentId,
-        `${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`
+        `${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`,
+        `oceannpcarea-lookup-${lang}`
       );
+      if (data) return data;
 
-      // Get from Redis cache only
-      const cached = await cacheService.get<Record<string, any>>(cacheKey);
-      if (cached) {
-        logger.debug(
-          `OceanNpcAreaSpawner lookup data (${lang}) retrieved from cache`,
-          {
-            environmentId,
-          }
-        );
-        return cached;
-      }
-
-      // No data in cache - return empty
-      logger.debug(
-        `OceanNpcAreaSpawner lookup data (${lang}) not found in cache`,
-        {
-          environmentId,
-        }
-      );
+      logger.debug(`OceanNpcAreaSpawner lookup data (${lang}) not found`, { environmentId });
       return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read OceanNpcAreaSpawner lookup data', {
@@ -637,24 +631,14 @@ export class PlanningDataService {
     environmentId: string
   ): Promise<Record<string, any>> {
     try {
-      const cacheKey = this.getEnvCacheKey(
+      const data = await this.getDataWithFallback<Record<string, any>>(
         environmentId,
-        this.CACHE_KEYS.CASH_SHOP
+        this.CACHE_KEYS.CASH_SHOP,
+        'cashshop-lookup'
       );
+      if (data) return data;
 
-      // Get from Redis cache only
-      const cached = await cacheService.get<Record<string, any>>(cacheKey);
-      if (cached) {
-        logger.debug('CashShop lookup data retrieved from cache', {
-          environmentId,
-        });
-        return cached;
-      }
-
-      // No data in cache - return empty
-      logger.debug('CashShop lookup data not found in cache', {
-        environmentId,
-      });
+      logger.debug('CashShop lookup data not found', { environmentId });
       return { totalCount: 0, items: [] };
     } catch (error) {
       logger.error('Failed to read CashShop lookup data', {
@@ -1174,7 +1158,7 @@ export class PlanningDataService {
     fileParsedData: Record<string, any>
   ): Promise<void> {
     try {
-      logger.info('Caching uploaded files in Redis...', { environmentId });
+      logger.info('Caching uploaded files in Redis + DB...', { environmentId });
 
       // Map file names to base cache keys
       const fileKeyMap: Record<string, string> = {
@@ -1203,6 +1187,33 @@ export class PlanningDataService {
         'cashshop-lookup.json': this.CACHE_KEYS.CASH_SHOP,
       };
 
+      // Map file names to DB dataType keys (must match getDataWithFallback usage)
+      const fileDataTypeMap: Record<string, string> = {
+        'reward-lookup-kr.json': 'reward-lookup-kr',
+        'reward-lookup-en.json': 'reward-lookup-en',
+        'reward-lookup-zh.json': 'reward-lookup-zh',
+        'reward-type-list.json': 'reward-type-list',
+        'ui-list-data-kr.json': 'ui-list-data-kr',
+        'ui-list-data-en.json': 'ui-list-data-en',
+        'ui-list-data-zh.json': 'ui-list-data-zh',
+        'hottimebuff-lookup-kr.json': 'hottimebuff-lookup-kr',
+        'hottimebuff-lookup-en.json': 'hottimebuff-lookup-en',
+        'hottimebuff-lookup-zh.json': 'hottimebuff-lookup-zh',
+        'eventpage-lookup-kr.json': 'eventpage-lookup-kr',
+        'eventpage-lookup-en.json': 'eventpage-lookup-en',
+        'eventpage-lookup-zh.json': 'eventpage-lookup-zh',
+        'liveevent-lookup-kr.json': 'liveevent-lookup-kr',
+        'liveevent-lookup-en.json': 'liveevent-lookup-en',
+        'liveevent-lookup-zh.json': 'liveevent-lookup-zh',
+        'materecruiting-lookup-kr.json': 'materecruiting-lookup-kr',
+        'materecruiting-lookup-en.json': 'materecruiting-lookup-en',
+        'materecruiting-lookup-zh.json': 'materecruiting-lookup-zh',
+        'oceannpcarea-lookup-kr.json': 'oceannpcarea-lookup-kr',
+        'oceannpcarea-lookup-en.json': 'oceannpcarea-lookup-en',
+        'oceannpcarea-lookup-zh.json': 'oceannpcarea-lookup-zh',
+        'cashshop-lookup.json': 'cashshop-lookup',
+      };
+
       // Cache each file directly from memory
       for (const fileName of uploadedFiles) {
         const baseCacheKey = fileKeyMap[fileName];
@@ -1223,17 +1234,23 @@ export class PlanningDataService {
         // Cache in Redis without TTL (persistent)
         await cacheService.setWithoutTTL(cacheKey, data);
 
-        logger.info(`File cached in Redis: ${fileName}`, {
+        // Persist to database (write-through)
+        const dataType = fileDataTypeMap[fileName];
+        if (dataType) {
+          await this.persistToDatabase(environmentId, dataType, data);
+        }
+
+        logger.info(`File cached in Redis + DB: ${fileName}`, {
           cacheKey,
           environmentId,
         });
       }
 
-      logger.info('All uploaded files cached in Redis successfully', {
+      logger.info('All uploaded files cached successfully', {
         environmentId,
       });
     } catch (error) {
-      logger.error('Failed to cache uploaded files in Redis', {
+      logger.error('Failed to cache uploaded files', {
         error,
         environmentId,
       });

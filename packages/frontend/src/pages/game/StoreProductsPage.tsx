@@ -43,6 +43,8 @@ import {
   Sync as SyncIcon,
   PlaylistPlay as BatchProcessIcon,
   MoreVert as MoreVertIcon,
+  Build as BuildIcon,
+  CloudUpload as CloudUploadIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -250,6 +252,7 @@ const StoreProductsPage: React.FC = () => {
     { id: 'saleStartAt', labelKey: 'storeProducts.saleStartAt', visible: true },
     { id: 'saleEndAt', labelKey: 'storeProducts.saleEndAt', visible: true },
     { id: 'tags', labelKey: 'storeProducts.tags', visible: true },
+    { id: 'override', labelKey: 'storeProducts.override', visible: true },
     { id: 'createdAt', labelKey: 'storeProducts.createdAt', visible: false },
     { id: 'updatedAt', labelKey: 'storeProducts.updatedAt', visible: false },
     { id: 'actions', labelKey: 'common.actions', visible: true },
@@ -822,19 +825,28 @@ const StoreProductsPage: React.FC = () => {
                 onExport={(format) => {
                   setPageMenuAnchor(null);
                   const exportColumns: ExportColumn[] = [
-                    { key: 'productName', header: t('common.name') },
-                    {
-                      key: 'productId',
-                      header: t('storeProducts.columns.productId'),
-                    },
-                    { key: 'store', header: t('storeProducts.columns.store') },
-                    { key: 'price', header: t('storeProducts.columns.price') },
-                    { key: 'isActive', header: t('common.status') },
-                    { key: 'createdAt', header: t('common.createdAt') },
+                    { key: 'cmsProductId', header: 'cmsProductId' },
+                    { key: 'productId', header: 'productId' },
+                    { key: 'productName', header: 'productName' },
+                    { key: 'nameKo', header: 'nameKo' },
+                    { key: 'nameEn', header: 'nameEn' },
+                    { key: 'nameZh', header: 'nameZh' },
+                    { key: 'store', header: 'store' },
+                    { key: 'price', header: 'price' },
+                    { key: 'currency', header: 'currency' },
+                    { key: 'isActive', header: 'isActive' },
+                    { key: 'description', header: 'description' },
+                    { key: 'descriptionKo', header: 'descriptionKo' },
+                    { key: 'descriptionEn', header: 'descriptionEn' },
+                    { key: 'descriptionZh', header: 'descriptionZh' },
+                    { key: 'saleStartAt', header: 'saleStartAt' },
+                    { key: 'saleEndAt', header: 'saleEndAt' },
+                    { key: 'createdAt', header: 'createdAt' },
+                    { key: 'updatedAt', header: 'updatedAt' },
                   ];
                   try {
                     exportToFile(
-                      products,
+                      allProducts,
                       exportColumns,
                       'store-products',
                       format
@@ -1257,6 +1269,7 @@ const StoreProductsPage: React.FC = () => {
                             );
                           }
                           if (column.id === 'productId') {
+                            const isProductIdOverridden = product.overriddenFields?.includes('productId');
                             return (
                               <TableCell key={column.id}>
                                 <Box
@@ -1272,6 +1285,7 @@ const StoreProductsPage: React.FC = () => {
                                       '&:hover': {
                                         textDecoration: 'underline',
                                       },
+                                      ...(isProductIdOverridden ? { color: 'warning.main', fontWeight: 600 } : {}),
                                     }}
                                     onClick={() => handleEdit(product)}
                                   >
@@ -1323,6 +1337,10 @@ const StoreProductsPage: React.FC = () => {
                             ) {
                               displayName = product.nameZh;
                             }
+                            const isNameOverridden = product.overriddenFields?.includes('productName') ||
+                              product.overriddenFields?.includes('nameKo') ||
+                              product.overriddenFields?.includes('nameEn') ||
+                              product.overriddenFields?.includes('nameZh');
                             return (
                               <TableCell key={column.id}>
                                 <Box
@@ -1338,6 +1356,7 @@ const StoreProductsPage: React.FC = () => {
                                       '&:hover': {
                                         textDecoration: 'underline',
                                       },
+                                      ...(isNameOverridden ? { color: 'warning.main', fontWeight: 600 } : {}),
                                     }}
                                     onClick={() => handleEdit(product)}
                                   >
@@ -1367,14 +1386,37 @@ const StoreProductsPage: React.FC = () => {
                                       }}
                                       sx={{ p: 0.25 }}
                                     >
-                                      <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                  <ContentCopyIcon sx={{ fontSize: 14 }} />
                                     </IconButton>
                                   </Tooltip>
                                 </Box>
                               </TableCell>
                             );
                           }
+                          if (column.id === 'override') {
+                            const overrides = product.overriddenFields || [];
+                            return (
+                              <TableCell key={column.id}>
+                                {overrides.length > 0 ? (
+                                  <Tooltip title={overrides.join(', ')}>
+                                    <Chip
+                                      icon={<BuildIcon sx={{ fontSize: 14 }} />}
+                                      label={t('storeProducts.overridden')}
+                                      size="small"
+                                      color="warning"
+                                      variant="filled"
+                                    />
+                                  </Tooltip>
+                                ) : (
+                                  <Typography variant="body2" color="text.disabled">
+                                    —
+                                  </Typography>
+                                )}
+                              </TableCell>
+                            );
+                          }
                           if (column.id === 'store') {
+                            const isStoreOverridden = product.overriddenFields?.includes('store');
                             return (
                               <TableCell key={column.id}>
                                 <Chip
@@ -1384,15 +1426,22 @@ const StoreProductsPage: React.FC = () => {
                                   }
                                   size="small"
                                   variant="outlined"
+                                  color={isStoreOverridden ? 'warning' : 'default'}
                                 />
                               </TableCell>
                             );
                           }
                           if (column.id === 'price') {
+                            const isPriceOverridden = product.overriddenFields?.includes('price');
+                            const isCurrencyOverridden = product.overriddenFields?.includes('currency');
                             return (
                               <TableCell key={column.id}>
-                                {product.price.toLocaleString()}{' '}
-                                {product.currency}
+                                <Box component="span" sx={isPriceOverridden ? { color: 'warning.main', fontWeight: 600 } : {}}>
+                                  {product.price.toLocaleString()}
+                                </Box>{' '}
+                                <Box component="span" sx={isCurrencyOverridden ? { color: 'warning.main', fontWeight: 600 } : {}}>
+                                  {product.currency}
+                                </Box>
                               </TableCell>
                             );
                           }

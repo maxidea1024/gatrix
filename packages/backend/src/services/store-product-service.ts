@@ -11,6 +11,18 @@ import { CmsCashShopProduct } from './cms-cash-shop-service';
 import { pubSubService } from './pub-sub-service';
 import { SERVER_SDK_ETAG } from '../constants/cache-keys';
 
+/**
+ * Convert a Date or ISO string to MySQL DATETIME-compatible format.
+ * MySQL DATETIME rejects ISO 8601 'T'/'Z' characters (e.g., '2026-04-12T15:00:00.000Z').
+ * This produces 'YYYY-MM-DD HH:MM:SS' which MySQL accepts.
+ */
+function toMySQLDateTime(date: Date | string | null | undefined): string | null {
+  if (!date) return null;
+  const d = typeof date === 'string' ? new Date(date) : date;
+  if (isNaN(d.getTime())) return null;
+  return d.toISOString().slice(0, 19).replace('T', ' ');
+}
+
 export interface StoreProduct {
   id: string;
   environmentId: string;
@@ -33,6 +45,7 @@ export interface StoreProduct {
   descriptionEn: string | null;
   descriptionZh: string | null;
   metadata: Record<string, any> | null;
+  overriddenFields: string[] | null;
   createdBy: string | null;
   updatedBy: string | null;
   createdAt: Date;
@@ -83,6 +96,7 @@ export interface UpdateStoreProductInput {
   descriptionZh?: string;
   metadata?: Record<string, any>;
   updatedBy?: string;
+  overrideResets?: string[]; // Fields to reset to planning data values
 }
 
 export interface GetStoreProductsParams {
@@ -219,6 +233,10 @@ class StoreProductService {
               typeof product.metadata === 'string'
                 ? JSON.parse(product.metadata)
                 : product.metadata,
+            overriddenFields:
+              typeof product.overriddenFields === 'string'
+                ? JSON.parse(product.overriddenFields)
+                : product.overriddenFields || null,
             tags,
           };
         })
@@ -294,6 +312,10 @@ class StoreProductService {
           typeof product.metadata === 'string'
             ? JSON.parse(product.metadata)
             : product.metadata,
+        overriddenFields:
+          typeof product.overriddenFields === 'string'
+            ? JSON.parse(product.overriddenFields)
+            : product.overriddenFields || null,
         tags,
       } as StoreProduct;
     } catch (error) {
@@ -372,8 +394,8 @@ class StoreProductService {
           input.store,
           input.price,
           input.currency || 'USD',
-          input.saleStartAt || null,
-          input.saleEndAt || null,
+          toMySQLDateTime(input.saleStartAt),
+          toMySQLDateTime(input.saleEndAt),
           input.description || null,
           input.descriptionKo || null,
           input.descriptionEn || null,
@@ -476,11 +498,11 @@ class StoreProductService {
     }
     if (input.saleStartAt !== undefined) {
       updates.push('saleStartAt = ?');
-      values.push(input.saleStartAt ? input.saleStartAt.toISOString() : null);
+      values.push(toMySQLDateTime(input.saleStartAt));
     }
     if (input.saleEndAt !== undefined) {
       updates.push('saleEndAt = ?');
-      values.push(input.saleEndAt ? input.saleEndAt.toISOString() : null);
+      values.push(toMySQLDateTime(input.saleEndAt));
     }
     if (input.description !== undefined) {
       updates.push('description = ?');
@@ -510,6 +532,188 @@ class StoreProductService {
 
     if (updates.length === 0) {
       return this.getStoreProductById(id, environmentId);
+    }
+
+    // Track overridden fields: compare with planning data to detect real overrides
+    const OVERRIDABLE_FIELDS = [
+      'productId', 'productName', 'nameKo', 'nameEn', 'nameZh',
+      'store', 'price', 'currency', 'saleStartAt', 'saleEndAt',
+      'description', 'descriptionKo', 'descriptionEn', 'descriptionZh',
+    ];
+    try {
+      const [existingRows] = await pool.execute(
+        'SELECT * FROM g_store_products WHERE id = ? AND environmentId = ?',
+        [id, environmentId]
+      );
+      const existing = (existingRows as any[])[0];
+      if (existing) {
+        let currentOverrides: string[] = [];
+        if (existing.overriddenFields) {
+          currentOverrides = typeof existing.overriddenFields === 'string'
+            ? JSON.parse(existing.overriddenFields)
+            : existing.overriddenFields;
+        }
+
+        // Fetch planning data to compare final values against source of truth
+        let planningValues: Record<string, any> = {};
+        if (existing.cmsProductId) {
+          try {
+            const planningData = await PlanningDataService.getCashShopLookup(environmentId);
+            const planningProducts = planningData?.items || [];
+            const planningProduct = planningProducts.find((p: any) => p.id === existing.cmsProductId);
+            if (planningProduct) {
+              planningValues = {
+                productId: planningProduct.productCode,
+                productName: planningProduct.name?.zh || planningProduct.name?.ko || '',
+                nameKo: planningProduct.name?.ko || null,
+                nameEn: planningProduct.name?.en || null,
+                nameZh: planningProduct.name?.zh || null,
+                store: 'sdo',
+                price: planningProduct.price,
+                currency: 'CNY',
+                description: planningProduct.description?.zh || planningProduct.description?.ko || null,
+                descriptionKo: planningProduct.description?.ko || null,
+                descriptionEn: planningProduct.description?.en || null,
+                descriptionZh: planningProduct.description?.zh || null,
+              };
+            }
+          } catch (err) {
+            logger.debug('Could not fetch planning data for override comparison', { err });
+          }
+        }
+
+        // Determine which fields should be overridden based on final saved value vs planning data
+        const newOverrides: string[] = [];
+        for (const field of OVERRIDABLE_FIELDS) {
+          const inputVal = input[field as keyof UpdateStoreProductInput];
+          // Use input value if provided, otherwise current DB value
+          const finalVal = inputVal !== undefined ? inputVal : existing[field];
+
+          // If no planning data for this field, compare against DB value
+          if (!(field in planningValues)) {
+            if (inputVal !== undefined) {
+              // Check if input differs from DB value
+              const dbVal = existing[field];
+              let normInput: any = inputVal;
+              let normDb: any = dbVal;
+              if (field === 'price') {
+                normInput = Number(inputVal ?? 0);
+                normDb = Number(dbVal ?? 0);
+              } else {
+                normInput = (inputVal === '' || inputVal == null) ? null : String(inputVal);
+                normDb = (dbVal === '' || dbVal == null) ? null : String(dbVal);
+              }
+              if (normInput !== normDb) {
+                newOverrides.push(field);
+              } else if (currentOverrides.includes(field)) {
+                newOverrides.push(field);
+              }
+            } else if (currentOverrides.includes(field)) {
+              newOverrides.push(field);
+            }
+            continue;
+          }
+
+          const planningVal = planningValues[field];
+
+          // Normalize for comparison
+          let normalizedFinal: any = finalVal;
+          let normalizedPlanning: any = planningVal;
+
+          if (field === 'price') {
+            normalizedFinal = Number(finalVal ?? 0);
+            normalizedPlanning = Number(planningVal ?? 0);
+          } else if (field === 'saleStartAt' || field === 'saleEndAt') {
+            normalizedFinal = finalVal ? new Date(finalVal as any).getTime() : null;
+            normalizedPlanning = planningVal ? new Date(planningVal).getTime() : null;
+          } else {
+            normalizedFinal = (finalVal === '' || finalVal == null) ? null : String(finalVal);
+            normalizedPlanning = (planningVal === '' || planningVal == null) ? null : String(planningVal);
+          }
+
+          if (normalizedFinal !== normalizedPlanning) {
+            // Value differs from planning data → override
+            newOverrides.push(field);
+          }
+          // else: value matches planning data → no override (auto-cleared)
+        }
+
+        const uniqueOverrides = [...new Set(newOverrides)];
+        if (JSON.stringify(uniqueOverrides.sort()) !== JSON.stringify(currentOverrides.sort())) {
+          updates.push('overriddenFields = ?');
+          values.push(uniqueOverrides.length > 0 ? JSON.stringify(uniqueOverrides) : null);
+        }
+      }
+    } catch (err) {
+      // Column might not exist yet (pre-migration), skip
+      logger.debug('Could not update overriddenFields', { err });
+    }
+
+    // Handle overrideResets: restore specified fields to planning data values
+    if (input.overrideResets && input.overrideResets.length > 0) {
+      try {
+        // Get current product to find cmsProductId
+        const [currentRows] = await pool.execute(
+          'SELECT cmsProductId, overriddenFields FROM g_store_products WHERE id = ? AND environmentId = ?',
+          [id, environmentId]
+        );
+        const current = (currentRows as any[])[0];
+        if (current?.cmsProductId) {
+          const planningData = await PlanningDataService.getCashShopLookup(environmentId);
+          const planningProducts: CmsCashShopProduct[] = planningData.items || [];
+          const planningProduct = planningProducts.find((p: CmsCashShopProduct) => p.id === current.cmsProductId);
+
+          if (planningProduct) {
+            const fieldValueMap: Record<string, any> = {
+              productId: planningProduct.productCode,
+              productName: (planningProduct.name?.zh || planningProduct.name?.ko || ''),
+              nameKo: planningProduct.name?.ko || '',
+              nameEn: planningProduct.name?.en || '',
+              nameZh: planningProduct.name?.zh || '',
+              store: 'sdo',
+              price: planningProduct.price,
+              currency: 'CNY',
+              description: (planningProduct.description?.zh || planningProduct.description?.ko || null),
+              descriptionKo: planningProduct.description?.ko || null,
+              descriptionEn: planningProduct.description?.en || null,
+              descriptionZh: planningProduct.description?.zh || null,
+            };
+
+            for (const resetField of input.overrideResets) {
+              if (resetField in fieldValueMap) {
+                // Check if this field isn't already being explicitly set by the user in this same update
+                const isAlsoBeingUpdated = updates.some(u => u.startsWith(`${resetField} = ?`));
+                if (!isAlsoBeingUpdated) {
+                  updates.push(`${resetField} = ?`);
+                  values.push(fieldValueMap[resetField]);
+                }
+              }
+            }
+
+            // Remove reset fields from overriddenFields
+            let currentOverrides: string[] = current.overriddenFields
+              ? (typeof current.overriddenFields === 'string'
+                  ? JSON.parse(current.overriddenFields)
+                  : current.overriddenFields)
+              : [];
+            currentOverrides = currentOverrides.filter(f => !input.overrideResets!.includes(f));
+
+            // Update overriddenFields (might already have been pushed by the tracking logic above)
+            const existingOverrideIdx = updates.findIndex(u => u === 'overriddenFields = ?');
+            if (existingOverrideIdx >= 0) {
+              // Merge: the tracking logic added new overrides; now also remove the reset ones
+              const trackedValue = JSON.parse(values[existingOverrideIdx] as string);
+              const merged = trackedValue.filter((f: string) => !input.overrideResets!.includes(f));
+              values[existingOverrideIdx] = merged.length > 0 ? JSON.stringify(merged) : null;
+            } else {
+              updates.push('overriddenFields = ?');
+              values.push(currentOverrides.length > 0 ? JSON.stringify(currentOverrides) : null);
+            }
+          }
+        }
+      } catch (err) {
+        logger.warn('Failed to process overrideResets', { err, overrideResets: input.overrideResets });
+      }
     }
 
     updates.push('updatedAt = UTC_TIMESTAMP()');
@@ -1033,14 +1237,33 @@ class StoreProductService {
             });
           }
 
+          // Skip changes for fields that are overridden by user
+          const overrides: string[] = dbProduct.overriddenFields
+            ? (typeof dbProduct.overriddenFields === 'string'
+                ? JSON.parse(dbProduct.overriddenFields as any)
+                : dbProduct.overriddenFields)
+            : [];
+
           if (changes.length > 0) {
-            toUpdate.push({
-              id: dbProduct.id,
-              cmsProductId: planningProduct.id,
-              productCode: planningProduct.productCode,
-              name: nameZh || nameKo, // Default display name
-              changes,
-            });
+            // Separate changes into applicable and skipped (overridden)
+            const applicableChanges = changes.filter(
+              (c) => !overrides.includes(c.field)
+            );
+            const skippedChanges = changes.filter((c) =>
+              overrides.includes(c.field)
+            );
+
+            if (applicableChanges.length > 0) {
+              toUpdate.push({
+                id: dbProduct.id,
+                cmsProductId: planningProduct.id,
+                productCode: planningProduct.productCode,
+                name: nameZh || nameKo, // Default display name
+                changes: applicableChanges,
+                skippedChanges,
+                hasOverrides: overrides.length > 0,
+              });
+            }
           }
         }
       }
@@ -1146,6 +1369,7 @@ class StoreProductService {
         const updates: string[] = [];
         const values: any[] = [];
 
+        // Only apply non-overridden changes (item.changes already filtered by previewSync)
         for (const change of item.changes) {
           const field = change.field;
           // Handle multi-language fields and productId
@@ -1167,11 +1391,17 @@ class StoreProductService {
         }
 
         // Also update productName and description with default language values
+        // but only if those fields are not overridden
         const nameZhChange = item.changes.find((c) => c.field === 'nameZh');
         const nameKoChange = item.changes.find((c) => c.field === 'nameKo');
         if (nameZhChange || nameKoChange) {
-          updates.push('productName = ?');
-          values.push(nameZhChange?.newValue || nameKoChange?.newValue || '');
+          // Check if productName is overridden
+          const isProductNameOverridden = (item as any).hasOverrides &&
+            (item as any).skippedChanges?.some((c: any) => c.field === 'productName');
+          if (!isProductNameOverridden) {
+            updates.push('productName = ?');
+            values.push(nameZhChange?.newValue || nameKoChange?.newValue || '');
+          }
         }
 
         const descZhChange = item.changes.find(
@@ -1181,8 +1411,13 @@ class StoreProductService {
           (c) => c.field === 'descriptionKo'
         );
         if (descZhChange || descKoChange) {
-          updates.push('description = ?');
-          values.push(descZhChange?.newValue || descKoChange?.newValue || null);
+          // Check if description is overridden
+          const isDescOverridden = (item as any).hasOverrides &&
+            (item as any).skippedChanges?.some((c: any) => c.field === 'description');
+          if (!isDescOverridden) {
+            updates.push('description = ?');
+            values.push(descZhChange?.newValue || descKoChange?.newValue || null);
+          }
         }
 
         if (updates.length > 0) {
@@ -1228,6 +1463,198 @@ class StoreProductService {
       throw new GatrixError('Failed to apply sync with planning data', 500);
     }
   }
+
+  /**
+   * Get planning data values for a specific product.
+   * Used by frontend to preview what values fields will revert to.
+   */
+  static async getPlanningValues(
+    id: string,
+    environmentId: string
+  ): Promise<Record<string, any> | null> {
+    const product = await this.getStoreProductById(id, environmentId);
+    if (!product || !product.cmsProductId) {
+      return null;
+    }
+
+    const planningData = await PlanningDataService.getCashShopLookup(environmentId);
+    const planningProducts: CmsCashShopProduct[] = planningData.items || [];
+    const planningProduct = planningProducts.find((p) => p.id === product.cmsProductId);
+
+    if (!planningProduct) {
+      return null;
+    }
+
+    return {
+      productId: planningProduct.productCode,
+      productName: planningProduct.name?.zh || planningProduct.name?.ko || '',
+      nameKo: planningProduct.name?.ko || null,
+      nameEn: planningProduct.name?.en || null,
+      nameZh: planningProduct.name?.zh || null,
+      store: 'sdo',
+      price: planningProduct.price,
+      currency: 'CNY',
+      description: planningProduct.description?.zh || planningProduct.description?.ko || null,
+      descriptionKo: planningProduct.description?.ko || null,
+      descriptionEn: planningProduct.description?.en || null,
+      descriptionZh: planningProduct.description?.zh || null,
+    };
+  }
+
+  /**
+   * Reset all overrides for a store product, reverting to planning data values.
+   * Clears overriddenFields and restores all fields from the planning data source.
+   */
+  static async resetOverrides(
+    id: string,
+    environmentId: string,
+    userId?: string
+  ): Promise<StoreProduct> {
+    const pool = database.getPool();
+
+    // Get current product
+    const product = await this.getStoreProductById(id, environmentId);
+    if (!product) {
+      throw new GatrixError('Store product not found', 404);
+    }
+
+    if (!product.cmsProductId) {
+      // No CMS product ID — just clear the overrides flag
+      await pool.execute(
+        'UPDATE g_store_products SET overriddenFields = NULL, updatedBy = ?, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environmentId = ?',
+        [userId || null, id, environmentId]
+      );
+      return this.getStoreProductById(id, environmentId);
+    }
+
+    // Get planning data to restore values
+    const planningData = await PlanningDataService.getCashShopLookup(environmentId);
+    const planningProducts: CmsCashShopProduct[] = planningData.items || [];
+    const planningProduct = planningProducts.find((p) => p.id === product.cmsProductId);
+
+    if (!planningProduct) {
+      // Planning data not found — just clear the overrides flag
+      await pool.execute(
+        'UPDATE g_store_products SET overriddenFields = NULL, updatedBy = ?, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environmentId = ?',
+        [userId || null, id, environmentId]
+      );
+      return this.getStoreProductById(id, environmentId);
+    }
+
+    // Restore all fields from planning data
+    const nameKo = planningProduct.name?.ko || '';
+    const nameEn = planningProduct.name?.en || '';
+    const nameZh = planningProduct.name?.zh || '';
+    const descKo = planningProduct.description?.ko || null;
+    const descEn = planningProduct.description?.en || null;
+    const descZh = planningProduct.description?.zh || null;
+
+    await pool.execute(
+      `UPDATE g_store_products SET
+        productId = ?, productName = ?, nameKo = ?, nameEn = ?, nameZh = ?,
+        price = ?, description = ?, descriptionKo = ?, descriptionEn = ?, descriptionZh = ?,
+        overriddenFields = NULL, updatedBy = ?, updatedAt = UTC_TIMESTAMP()
+       WHERE id = ? AND environmentId = ?`,
+      [
+        planningProduct.productCode,
+        nameZh || nameKo,
+        nameKo, nameEn, nameZh,
+        planningProduct.price,
+        descZh || descKo,
+        descKo, descEn, descZh,
+        userId || null,
+        id, environmentId,
+      ]
+    );
+
+    // Invalidate cache
+    try {
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`
+      );
+    } catch (err) {
+      logger.warn('Failed to invalidate cache after override reset', { err });
+    }
+
+    return this.getStoreProductById(id, environmentId);
+  }
+
+  /**
+   * Reset a single field override, reverting that field to its planning data value.
+   */
+  static async resetFieldOverride(
+    id: string,
+    environmentId: string,
+    field: string,
+    userId?: string
+  ): Promise<StoreProduct> {
+    const pool = database.getPool();
+
+    // Get current product
+    const product = await this.getStoreProductById(id, environmentId);
+    if (!product) {
+      throw new GatrixError('Store product not found', 404);
+    }
+
+    // Get planning data
+    if (!product.cmsProductId) {
+      throw new GatrixError('Product has no CMS reference — cannot restore field from planning data', 400);
+    }
+
+    const planningData = await PlanningDataService.getCashShopLookup(environmentId);
+    const planningProducts: CmsCashShopProduct[] = planningData.items || [];
+    const planningProduct = planningProducts.find((p) => p.id === product.cmsProductId);
+
+    if (!planningProduct) {
+      throw new GatrixError('Planning data for this product not found', 404);
+    }
+
+    // Map field name to planning data value
+    const fieldValueMap: Record<string, any> = {
+      productId: planningProduct.productCode,
+      productName: (planningProduct.name?.zh || planningProduct.name?.ko || ''),
+      nameKo: planningProduct.name?.ko || '',
+      nameEn: planningProduct.name?.en || '',
+      nameZh: planningProduct.name?.zh || '',
+      store: 'sdo', // Default store from planning data
+      price: planningProduct.price,
+      currency: 'CNY', // Default currency from planning data
+      description: (planningProduct.description?.zh || planningProduct.description?.ko || null),
+      descriptionKo: planningProduct.description?.ko || null,
+      descriptionEn: planningProduct.description?.en || null,
+      descriptionZh: planningProduct.description?.zh || null,
+    };
+
+    if (!(field in fieldValueMap)) {
+      throw new GatrixError(`Field '${field}' cannot be restored from planning data`, 400);
+    }
+
+    // Update the field value
+    const value = fieldValueMap[field];
+    await pool.execute(
+      `UPDATE g_store_products SET \`${field}\` = ?, updatedBy = ?, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environmentId = ?`,
+      [value, userId || null, id, environmentId]
+    );
+
+    // Remove field from overriddenFields
+    let currentOverrides: string[] = product.overriddenFields || [];
+    currentOverrides = currentOverrides.filter((f) => f !== field);
+    await pool.execute(
+      'UPDATE g_store_products SET overriddenFields = ? WHERE id = ? AND environmentId = ?',
+      [currentOverrides.length > 0 ? JSON.stringify(currentOverrides) : null, id, environmentId]
+    );
+
+    // Invalidate cache
+    try {
+      await pubSubService.invalidateKey(
+        `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`
+      );
+    } catch (err) {
+      logger.warn('Failed to invalidate cache after field override reset', { err });
+    }
+
+    return this.getStoreProductById(id, environmentId);
+  }
 }
 
 // Sync related interfaces
@@ -1257,6 +1684,8 @@ export interface SyncUpdateItem {
   productCode: string;
   name: string;
   changes: SyncChange[];
+  skippedChanges?: SyncChange[];
+  hasOverrides?: boolean;
 }
 
 export interface SyncDeleteItem {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Button,
   TextField,
@@ -12,7 +12,27 @@ import {
   FormControl,
   Alert,
   AlertTitle,
+  IconButton,
+  Tooltip,
+  Chip,
+  Divider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  CircularProgress,
 } from '@mui/material';
+import {
+  RestartAlt as ResetIcon,
+  Undo as UndoIcon,
+  Edit as EditIcon,
+  ExpandMore as ExpandMoreIcon,
+  Translate as TranslateIcon,
+} from '@mui/icons-material';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -21,6 +41,7 @@ import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import storeProductService, {
   StoreProduct,
 } from '../../services/storeProductService';
+import translationService from '../../services/translationService';
 import { Tag } from '../../services/tagService';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -53,6 +74,64 @@ const STORE_OPTIONS = [
 
 // Currency options
 const CURRENCY_OPTIONS = ['USD', 'KRW', 'JPY', 'EUR', 'CNY', 'TWD'];
+
+/**
+ * OverrideFieldWrapper: Shows override indicator + per-field reset button
+ */
+const OverrideFieldWrapper: React.FC<{
+  fieldName: string;
+  overriddenFields: string[];
+  hasCmsProduct: boolean;
+  onReset: (field: string) => void;
+  label: string;
+  children: React.ReactNode;
+}> = ({ fieldName, overriddenFields, hasCmsProduct, onReset, label, children }) => {
+  const { t } = useTranslation();
+  const isOverridden = overriddenFields.includes(fieldName);
+  const isPendingReset = (onReset as any).__pendingResets?.includes(fieldName);
+
+  return (
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 0.5 }}>
+        <Typography variant="subtitle2">{label}</Typography>
+        {isOverridden && !isPendingReset && (
+          <>
+            <Chip
+              icon={<EditIcon sx={{ fontSize: 14 }} />}
+              label={t('storeProducts.overridden')}
+              size="small"
+              color="warning"
+              variant="outlined"
+              sx={{ height: 20, '& .MuiChip-label': { px: 0.5, fontSize: '0.7rem' } }}
+            />
+            {hasCmsProduct && (
+              <Tooltip title={t('storeProducts.resetFieldOverride')}>
+                <IconButton
+                  size="small"
+                  onClick={() => onReset(fieldName)}
+                  sx={{ p: 0.25 }}
+                >
+                  <UndoIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </Tooltip>
+            )}
+          </>
+        )}
+        {isPendingReset && (
+          <Chip
+            icon={<UndoIcon sx={{ fontSize: 14 }} />}
+            label={t('storeProducts.pendingReset')}
+            size="small"
+            color="info"
+            variant="outlined"
+            sx={{ height: 20, '& .MuiChip-label': { px: 0.5, fontSize: '0.7rem' } }}
+          />
+        )}
+      </Box>
+      {children}
+    </Box>
+  );
+};
 
 const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   open,
@@ -89,6 +168,13 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [saving, setSaving] = useState(false);
   const [isCopy, setIsCopy] = useState(false);
+  const [pendingOverrideResets, setPendingOverrideResets] = useState<string[]>([]);
+  const [namesSectionOpen, setNamesSectionOpen] = useState(false);
+  const [descSectionOpen, setDescSectionOpen] = useState(false);
+  const [confirmResetAllOpen, setConfirmResetAllOpen] = useState(false);
+  const [translatingName, setTranslatingName] = useState(false);
+  const [translatingDesc, setTranslatingDesc] = useState(false);
+  const [planningValues, setPlanningValues] = useState<Record<string, any> | null>(null);
 
   const { handleApiError, ErrorDialog } = useHandleApiError();
   const nameInputRef = React.useRef<HTMLInputElement>(null);
@@ -104,8 +190,20 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   // Check if this is edit mode (existing product)
   const isEditMode = !!product?.id;
 
+  // Override tracking
+  const overriddenFields: string[] = useMemo(() => {
+    if (!product?.overriddenFields) return [];
+    return Array.isArray(product.overriddenFields) ? product.overriddenFields : [];
+  }, [product?.overriddenFields]);
+
+  const hasCmsProduct = !!product?.cmsProductId;
+  const hasOverrides = overriddenFields.length > 0;
+
   // Initialize form
   useEffect(() => {
+    // Always reset pending override resets on form init
+    setPendingOverrideResets([]);
+
     if (product) {
       const isCopyOperation = !product.id;
       setIsCopy(isCopyOperation);
@@ -167,19 +265,50 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
     }
   }, [product, open]);
 
+  // Fetch planning data values for override reset preview
+  useEffect(() => {
+    if (product?.id && product?.cmsProductId && hasOverrides) {
+      storeProductService.getPlanningValues(projectApiPath, product.id)
+        .then((values) => setPlanningValues(values))
+        .catch(() => setPlanningValues(null));
+    } else {
+      setPlanningValues(null);
+    }
+  }, [product?.id, product?.cmsProductId, hasOverrides, projectApiPath]);
+
   // Check if form is dirty (data changed)
   const isDirty = useMemo(() => {
     if (!product) return true;
     if (!product.id) return true; // New or Copy
 
     const currentData = {
+      productId,
+      productName,
+      nameKo,
+      nameEn,
+      nameZh,
+      store,
+      price,
+      currency,
       isActive,
       saleStartAt: saleStartAt ? saleStartAt.toISOString() : null,
       saleEndAt: saleEndAt ? saleEndAt.toISOString() : null,
+      description,
+      descriptionKo,
+      descriptionEn,
+      descriptionZh,
       tagIds: selectedTags.map((tag) => tag.id).sort((a, b) => a - b),
     };
 
     const originalData = {
+      productId: product.productId,
+      productName: product.productName,
+      nameKo: product.nameKo || '',
+      nameEn: product.nameEn || '',
+      nameZh: product.nameZh || '',
+      store: product.store,
+      price: product.price,
+      currency: product.currency || 'USD',
       isActive: product.isActive,
       saleStartAt: product.saleStartAt
         ? dayjs(product.saleStartAt).toISOString()
@@ -187,14 +316,76 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
       saleEndAt: product.saleEndAt
         ? dayjs(product.saleEndAt).toISOString()
         : null,
+      description: product.description || '',
+      descriptionKo: product.descriptionKo || '',
+      descriptionEn: product.descriptionEn || '',
+      descriptionZh: product.descriptionZh || '',
       tagIds: (product.tags || [])
         .map((tag: any) => tag.id)
         .sort((a: number, b: number) => a - b),
     };
 
-    return JSON.stringify(currentData) !== JSON.stringify(originalData);
-  }, [product, isActive, saleStartAt, saleEndAt, selectedTags]);
+    return JSON.stringify(currentData) !== JSON.stringify(originalData) || pendingOverrideResets.length > 0;
+  }, [
+    product, productId, productName, nameKo, nameEn, nameZh, store, price,
+    currency, isActive, saleStartAt, saleEndAt, description,
+    descriptionKo, descriptionEn, descriptionZh, selectedTags, pendingOverrideResets,
+  ]);
 
+  // Reset a single field override (local state only, applied on save)
+  const handleResetField = useCallback((field: string) => {
+    setPendingOverrideResets(prev => {
+      if (prev.includes(field)) return prev;
+      return [...prev, field];
+    });
+    // Apply planning data value to form field for instant preview
+    if (planningValues && field in planningValues) {
+      const val = planningValues[field];
+      const setters: Record<string, (v: any) => void> = {
+        productId: setProductId,
+        productName: setProductName,
+        nameKo: (v) => setNameKo(v || ''),
+        nameEn: (v) => setNameEn(v || ''),
+        nameZh: (v) => setNameZh(v || ''),
+        store: setStore,
+        price: setPrice,
+        currency: setCurrency,
+        description: (v) => setDescription(v || ''),
+        descriptionKo: (v) => setDescriptionKo(v || ''),
+        descriptionEn: (v) => setDescriptionEn(v || ''),
+        descriptionZh: (v) => setDescriptionZh(v || ''),
+      };
+      if (setters[field]) setters[field](val);
+    }
+  }, [planningValues]);
+
+  // Attach pendingResets info so OverrideFieldWrapper can read it
+  (handleResetField as any).__pendingResets = pendingOverrideResets;
+
+  // Reset all overrides (local state only, applied on save)
+  const handleResetAllOverrides = useCallback(() => {
+    setConfirmResetAllOpen(true);
+  }, []);
+
+  const confirmResetAll = useCallback(() => {
+    setPendingOverrideResets([...overriddenFields]);
+    // Apply all planning data values to form fields
+    if (planningValues) {
+      if ('productId' in planningValues) setProductId(planningValues.productId);
+      if ('productName' in planningValues) setProductName(planningValues.productName);
+      if ('nameKo' in planningValues) setNameKo(planningValues.nameKo || '');
+      if ('nameEn' in planningValues) setNameEn(planningValues.nameEn || '');
+      if ('nameZh' in planningValues) setNameZh(planningValues.nameZh || '');
+      if ('store' in planningValues) setStore(planningValues.store);
+      if ('price' in planningValues) setPrice(planningValues.price);
+      if ('currency' in planningValues) setCurrency(planningValues.currency);
+      if ('description' in planningValues) setDescription(planningValues.description || '');
+      if ('descriptionKo' in planningValues) setDescriptionKo(planningValues.descriptionKo || '');
+      if ('descriptionEn' in planningValues) setDescriptionEn(planningValues.descriptionEn || '');
+      if ('descriptionZh' in planningValues) setDescriptionZh(planningValues.descriptionZh || '');
+    }
+    setConfirmResetAllOpen(false);
+  }, [overriddenFields, planningValues]);
   const handleSave = async () => {
     // Validation
     if (!productId.trim()) {
@@ -221,7 +412,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
     setSaving(true);
     try {
       const tagIds = selectedTags.map((tag) => tag.id);
-      const payload = {
+      const payload: any = {
         productId: productId.trim(),
         productName: productName.trim(),
         // Multi-language name fields
@@ -241,6 +432,11 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
         descriptionZh: descriptionZh.trim() || undefined,
         tagIds,
       };
+
+      // Include pending override resets if any
+      if (pendingOverrideResets.length > 0) {
+        payload.overrideResets = pendingOverrideResets;
+      }
 
       if (product && product.id) {
         // Update existing product
@@ -345,6 +541,35 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                 </Alert>
               )}
 
+              {/* Override Summary Banner - hide when all fields are pending reset */}
+              {isEditMode && hasOverrides && !overriddenFields.every(f => pendingOverrideResets.includes(f)) && (
+                <Alert
+                  severity="warning"
+                  icon={<EditIcon />}
+                  action={
+                    hasCmsProduct ? (
+                      <Button
+                        color="inherit"
+                        size="small"
+                        startIcon={<ResetIcon />}
+                        onClick={handleResetAllOverrides}
+                        disabled={saving}
+                      >
+                        {t('storeProducts.resetAllOverrides')}
+                      </Button>
+                    ) : undefined
+                  }
+                >
+                  <AlertTitle>
+                    {t('storeProducts.overrideNotice')}
+                  </AlertTitle>
+                  {t('storeProducts.overrideDescription', {
+                    count: overriddenFields.filter(f => !pendingOverrideResets.includes(f)).length,
+                    fields: overriddenFields.filter(f => !pendingOverrideResets.includes(f)).join(', '),
+                  })}
+                </Alert>
+              )}
+
               {/* Active Status */}
               <FormControlLabel
                 control={
@@ -357,116 +582,170 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                 label={t('storeProducts.isActive')}
               />
 
-              {/* Product ID - Read-only in edit mode */}
-              <Box>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                  {t('storeProducts.productId')}
-                  {!isEditMode && (
-                    <span style={{ color: '#d32f2f', marginLeft: '4px' }}>
-                      *
-                    </span>
-                  )}
-                </Typography>
-                <TextField
-                  inputRef={nameInputRef}
-                  value={productId}
-                  onChange={(e) => setProductId(e.target.value)}
-                  fullWidth
-                  size="small"
-                  placeholder={t('storeProducts.productIdHelp')}
-                  disabled={isEditMode}
-                  InputProps={{
-                    readOnly: isEditMode,
-                  }}
-                />
+              {/* CMS ID + Product ID (same row) */}
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                {isEditMode && product?.cmsProductId && (
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 0.5 }}>
+                      <Typography variant="subtitle2">{t('storeProducts.cmsProductId')}</Typography>
+                    </Box>
+                    <TextField
+                      value={product.cmsProductId}
+                      fullWidth
+                      size="small"
+                      InputProps={{ readOnly: true }}
+                      sx={{ '& .MuiInputBase-input': { color: 'text.secondary' } }}
+                    />
+                  </Box>
+                )}
+
+                <Box sx={{ flex: 1 }}>
+                  <OverrideFieldWrapper
+                    fieldName="productId"
+                    overriddenFields={overriddenFields}
+                    hasCmsProduct={hasCmsProduct}
+                    onReset={handleResetField}
+                    label={t('storeProducts.productId')}
+                  >
+                    <TextField
+                      inputRef={nameInputRef}
+                      value={productId}
+                      onChange={(e) => setProductId(e.target.value)}
+                      fullWidth
+                      size="small"
+                      placeholder={t('storeProducts.productIdHelp')}
+                    />
+                  </OverrideFieldWrapper>
+                </Box>
               </Box>
 
-              {/* Product Name - Read-only in edit mode */}
-              <Box>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                  {t('storeProducts.productName')}
-                  {!isEditMode && (
-                    <span style={{ color: '#d32f2f', marginLeft: '4px' }}>
-                      *
-                    </span>
-                  )}
-                </Typography>
-                <TextField
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                  fullWidth
-                  size="small"
-                  placeholder={t('storeProducts.productNameHelp')}
-                  disabled={isEditMode}
-                  InputProps={{
-                    readOnly: isEditMode,
-                  }}
-                />
-              </Box>
-
-              {/* Multi-language Product Names */}
-              <Box
-                sx={{
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  p: 2,
-                }}
+              {/* Product Name + AI Translate */}
+              <OverrideFieldWrapper
+                fieldName="productName"
+                overriddenFields={overriddenFields}
+                hasCmsProduct={hasCmsProduct}
+                onReset={handleResetField}
+                label={t('storeProducts.productName')}
               >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ mb: 2, color: 'text.secondary' }}
-                >
-                  {t('storeProducts.multiLangNames')}
-                </Typography>
-                <Stack spacing={1.5}>
+                <Box sx={{ display: 'flex', gap: 0.5 }}>
                   <TextField
-                    label={t('storeProducts.nameKo')}
-                    value={nameKo}
-                    onChange={(e) => setNameKo(e.target.value)}
+                    value={productName}
+                    onChange={(e) => setProductName(e.target.value)}
                     fullWidth
                     size="small"
-                    disabled={isEditMode}
-                    InputProps={{ readOnly: isEditMode }}
+                    placeholder={t('storeProducts.productNameHelp')}
                   />
-                  <TextField
-                    label={t('storeProducts.nameEn')}
-                    value={nameEn}
-                    onChange={(e) => setNameEn(e.target.value)}
-                    fullWidth
-                    size="small"
-                    disabled={isEditMode}
-                    InputProps={{ readOnly: isEditMode }}
-                  />
-                  <TextField
-                    label={t('storeProducts.nameZh')}
-                    value={nameZh}
-                    onChange={(e) => setNameZh(e.target.value)}
-                    fullWidth
-                    size="small"
-                    disabled={isEditMode}
-                    InputProps={{ readOnly: isEditMode }}
-                  />
-                </Stack>
-              </Box>
-
-              {/* Store - Read-only in edit mode */}
-              <Box>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                  {t('storeProducts.store')}
-                  {!isEditMode && (
-                    <span style={{ color: '#d32f2f', marginLeft: '4px' }}>
-                      *
+                  <Tooltip title={t('common.aiTranslate', 'AI 번역')}>
+                    <span>
+                      <IconButton
+                        size="small"
+                        onClick={async () => {
+                          if (!productName.trim()) return;
+                          setTranslatingName(true);
+                          try {
+                            const result = await translationService.translateToMultipleLanguages({
+                              text: productName.trim(),
+                              targetLanguages: ['ko', 'en', 'zh'],
+                              sourceLanguage: 'auto',
+                            });
+                            if (result.ko) setNameKo(result.ko.translatedText);
+                            if (result.en) setNameEn(result.en.translatedText);
+                            if (result.zh) setNameZh(result.zh.translatedText);
+                            setNamesSectionOpen(true);
+                            enqueueSnackbar(t('common.translateSuccess', '번역 완료'), { variant: 'success' });
+                          } catch (err) {
+                            enqueueSnackbar(t('common.translateFailed', '번역 실패'), { variant: 'error' });
+                          } finally {
+                            setTranslatingName(false);
+                          }
+                        }}
+                        disabled={translatingName || !productName.trim()}
+                        color="primary"
+                        sx={{ flexShrink: 0 }}
+                      >
+                        {translatingName ? <CircularProgress size={18} /> : <TranslateIcon fontSize="small" />}
+                      </IconButton>
                     </span>
-                  )}
-                </Typography>
+                  </Tooltip>
+                </Box>
+              </OverrideFieldWrapper>
+
+              {/* Multi-language Product Names - Collapsible */}
+              <Accordion
+                expanded={namesSectionOpen}
+                onChange={(_, expanded) => setNamesSectionOpen(expanded)}
+                variant="outlined"
+                disableGutters
+                sx={{ borderColor: overriddenFields.some((f) =>
+                  ['nameKo', 'nameEn', 'nameZh'].includes(f)
+                ) ? 'warning.main' : 'divider' }}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
+                    {t('storeProducts.multiLangNames')}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                <Stack spacing={1.5}>
+                  <OverrideFieldWrapper
+                    fieldName="nameKo"
+                    overriddenFields={overriddenFields}
+                    hasCmsProduct={hasCmsProduct}
+                    onReset={handleResetField}
+                    label={t('storeProducts.nameKo')}
+                  >
+                    <TextField
+                      value={nameKo}
+                      onChange={(e) => setNameKo(e.target.value)}
+                      fullWidth
+                      size="small"
+                    />
+                  </OverrideFieldWrapper>
+                  <OverrideFieldWrapper
+                    fieldName="nameEn"
+                    overriddenFields={overriddenFields}
+                    hasCmsProduct={hasCmsProduct}
+                    onReset={handleResetField}
+                    label={t('storeProducts.nameEn')}
+                  >
+                    <TextField
+                      value={nameEn}
+                      onChange={(e) => setNameEn(e.target.value)}
+                      fullWidth
+                      size="small"
+                    />
+                  </OverrideFieldWrapper>
+                  <OverrideFieldWrapper
+                    fieldName="nameZh"
+                    overriddenFields={overriddenFields}
+                    hasCmsProduct={hasCmsProduct}
+                    onReset={handleResetField}
+                    label={t('storeProducts.nameZh')}
+                  >
+                    <TextField
+                      value={nameZh}
+                      onChange={(e) => setNameZh(e.target.value)}
+                      fullWidth
+                      size="small"
+                    />
+                  </OverrideFieldWrapper>
+                </Stack>
+                </AccordionDetails>
+              </Accordion>
+
+              {/* Store */}
+              <OverrideFieldWrapper
+                fieldName="store"
+                overriddenFields={overriddenFields}
+                hasCmsProduct={hasCmsProduct}
+                onReset={handleResetField}
+                label={t('storeProducts.store')}
+              >
                 <FormControl fullWidth size="small">
                   <Select
                     value={store}
                     onChange={(e) => setStore(e.target.value)}
                     displayEmpty
-                    disabled={isEditMode}
-                    readOnly={isEditMode}
                   >
                     <MenuItem value="" disabled>
                       {t('storeProducts.selectStore')}
@@ -478,47 +757,49 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                     ))}
                   </Select>
                 </FormControl>
-              </Box>
+              </OverrideFieldWrapper>
 
-              {/* Price and Currency - Read-only in edit mode */}
+              {/* Price and Currency */}
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <Box sx={{ flex: 2 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    {t('storeProducts.price')}
-                    {!isEditMode && (
-                      <span style={{ color: '#d32f2f', marginLeft: '4px' }}>
-                        *
-                      </span>
-                    )}
-                  </Typography>
-                  <TextField
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
-                    fullWidth
-                    size="small"
-                    inputProps={{ min: 0, step: 0.01, readOnly: isEditMode }}
-                    disabled={isEditMode}
-                  />
+                  <OverrideFieldWrapper
+                    fieldName="price"
+                    overriddenFields={overriddenFields}
+                    hasCmsProduct={hasCmsProduct}
+                    onReset={handleResetField}
+                    label={t('storeProducts.price')}
+                  >
+                    <TextField
+                      type="number"
+                      value={price}
+                      onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
+                      fullWidth
+                      size="small"
+                      inputProps={{ min: 0, step: 0.01 }}
+                    />
+                  </OverrideFieldWrapper>
                 </Box>
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    {t('storeProducts.currency')}
-                  </Typography>
-                  <FormControl fullWidth size="small">
-                    <Select
-                      value={currency}
-                      onChange={(e) => setCurrency(e.target.value)}
-                      disabled={isEditMode}
-                      readOnly={isEditMode}
-                    >
-                      {CURRENCY_OPTIONS.map((curr) => (
-                        <MenuItem key={curr} value={curr}>
-                          {curr}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                  <OverrideFieldWrapper
+                    fieldName="currency"
+                    overriddenFields={overriddenFields}
+                    hasCmsProduct={hasCmsProduct}
+                    onReset={handleResetField}
+                    label={t('storeProducts.currency')}
+                  >
+                    <FormControl fullWidth size="small">
+                      <Select
+                        value={currency}
+                        onChange={(e) => setCurrency(e.target.value)}
+                      >
+                        {CURRENCY_OPTIONS.map((curr) => (
+                          <MenuItem key={curr} value={curr}>
+                            {curr}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </OverrideFieldWrapper>
                 </Box>
               </Box>
 
@@ -567,78 +848,127 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                 </Box>
               </Box>
 
-              {/* Description (default) */}
-              <Box>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                  {t('storeProducts.description')}
-                </Typography>
-                <TextField
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  fullWidth
-                  multiline
-                  rows={2}
-                  size="small"
-                  placeholder={t('storeProducts.descriptionHelp')}
-                  slotProps={{
-                    input: {
-                      readOnly: isEditMode,
-                    },
-                  }}
-                />
-              </Box>
-
-              {/* Multi-language Descriptions */}
-              <Box
-                sx={{
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  p: 2,
-                }}
+              {/* Description (default) + AI Translate */}
+              <OverrideFieldWrapper
+                fieldName="description"
+                overriddenFields={overriddenFields}
+                hasCmsProduct={hasCmsProduct}
+                onReset={handleResetField}
+                label={t('storeProducts.description')}
               >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ mb: 2, color: 'text.secondary' }}
-                >
-                  {t('storeProducts.multiLangDescriptions')}
-                </Typography>
+                <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'flex-start' }}>
+                  <TextField
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    fullWidth
+                    multiline
+                    rows={2}
+                    size="small"
+                    placeholder={t('storeProducts.descriptionHelp')}
+                  />
+                  <Tooltip title={t('common.aiTranslate', 'AI 번역')}>
+                    <span>
+                      <IconButton
+                        size="small"
+                        onClick={async () => {
+                          if (!description.trim()) return;
+                          setTranslatingDesc(true);
+                          try {
+                            const result = await translationService.translateToMultipleLanguages({
+                              text: description.trim(),
+                              targetLanguages: ['ko', 'en', 'zh'],
+                              sourceLanguage: 'auto',
+                            });
+                            if (result.ko) setDescriptionKo(result.ko.translatedText);
+                            if (result.en) setDescriptionEn(result.en.translatedText);
+                            if (result.zh) setDescriptionZh(result.zh.translatedText);
+                            setDescSectionOpen(true);
+                            enqueueSnackbar(t('common.translateSuccess', '번역 완료'), { variant: 'success' });
+                          } catch (err) {
+                            enqueueSnackbar(t('common.translateFailed', '번역 실패'), { variant: 'error' });
+                          } finally {
+                            setTranslatingDesc(false);
+                          }
+                        }}
+                        disabled={translatingDesc || !description.trim()}
+                        color="primary"
+                        sx={{ flexShrink: 0, mt: 0.5 }}
+                      >
+                        {translatingDesc ? <CircularProgress size={18} /> : <TranslateIcon fontSize="small" />}
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                </Box>
+              </OverrideFieldWrapper>
+
+              {/* Multi-language Descriptions - Collapsible */}
+              <Accordion
+                expanded={descSectionOpen}
+                onChange={(_, expanded) => setDescSectionOpen(expanded)}
+                variant="outlined"
+                disableGutters
+                sx={{ borderColor: overriddenFields.some((f) =>
+                  ['descriptionKo', 'descriptionEn', 'descriptionZh'].includes(f)
+                ) ? 'warning.main' : 'divider' }}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
+                    {t('storeProducts.multiLangDescriptions')}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
                 <Stack spacing={1.5}>
-                  <TextField
+                  <OverrideFieldWrapper
+                    fieldName="descriptionKo"
+                    overriddenFields={overriddenFields}
+                    hasCmsProduct={hasCmsProduct}
+                    onReset={handleResetField}
                     label={t('storeProducts.descriptionKo')}
-                    value={descriptionKo}
-                    onChange={(e) => setDescriptionKo(e.target.value)}
-                    fullWidth
-                    multiline
-                    rows={2}
-                    size="small"
-                    disabled={isEditMode}
-                    InputProps={{ readOnly: isEditMode }}
-                  />
-                  <TextField
+                  >
+                    <TextField
+                      value={descriptionKo}
+                      onChange={(e) => setDescriptionKo(e.target.value)}
+                      fullWidth
+                      multiline
+                      rows={2}
+                      size="small"
+                    />
+                  </OverrideFieldWrapper>
+                  <OverrideFieldWrapper
+                    fieldName="descriptionEn"
+                    overriddenFields={overriddenFields}
+                    hasCmsProduct={hasCmsProduct}
+                    onReset={handleResetField}
                     label={t('storeProducts.descriptionEn')}
-                    value={descriptionEn}
-                    onChange={(e) => setDescriptionEn(e.target.value)}
-                    fullWidth
-                    multiline
-                    rows={2}
-                    size="small"
-                    disabled={isEditMode}
-                    InputProps={{ readOnly: isEditMode }}
-                  />
-                  <TextField
+                  >
+                    <TextField
+                      value={descriptionEn}
+                      onChange={(e) => setDescriptionEn(e.target.value)}
+                      fullWidth
+                      multiline
+                      rows={2}
+                      size="small"
+                    />
+                  </OverrideFieldWrapper>
+                  <OverrideFieldWrapper
+                    fieldName="descriptionZh"
+                    overriddenFields={overriddenFields}
+                    hasCmsProduct={hasCmsProduct}
+                    onReset={handleResetField}
                     label={t('storeProducts.descriptionZh')}
-                    value={descriptionZh}
-                    onChange={(e) => setDescriptionZh(e.target.value)}
-                    fullWidth
-                    multiline
-                    rows={2}
-                    size="small"
-                    disabled={isEditMode}
-                    InputProps={{ readOnly: isEditMode }}
-                  />
+                  >
+                    <TextField
+                      value={descriptionZh}
+                      onChange={(e) => setDescriptionZh(e.target.value)}
+                      fullWidth
+                      multiline
+                      rows={2}
+                      size="small"
+                    />
+                  </OverrideFieldWrapper>
                 </Stack>
-              </Box>
+                </AccordionDetails>
+              </Accordion>
 
               {/* Tags */}
               <TagSelector value={selectedTags} onChange={setSelectedTags} />
@@ -663,7 +993,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
             <Button
               variant="contained"
               onClick={handleSave}
-              disabled={saving || (!!product?.id && !isDirty)}
+              disabled={saving || !productId.trim() || (!!product?.id && !isDirty)}
             >
               {saving
                 ? t('common.saving')
@@ -677,6 +1007,33 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
         </Box>
       </LocalizationProvider>
       <ErrorDialog />
+
+      {/* Reset All Overrides Confirmation Dialog */}
+      <Dialog
+        open={confirmResetAllOpen}
+        onClose={() => setConfirmResetAllOpen(false)}
+      >
+        <DialogTitle>{t('storeProducts.resetAllOverrides')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {t('storeProducts.overrideDescription', {
+              count: overriddenFields.length,
+              fields: overriddenFields.join(', '),
+            })}
+          </DialogContentText>
+          <DialogContentText sx={{ mt: 1 }}>
+            {t('storeProducts.fieldOverrideWillReset')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmResetAllOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={confirmResetAll} color="warning" variant="contained">
+            {t('storeProducts.resetAllOverrides')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ResizableDrawer>
   );
 };

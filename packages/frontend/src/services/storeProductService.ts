@@ -27,6 +27,7 @@ export interface StoreProduct {
   descriptionEn: string | null;
   descriptionZh: string | null;
   metadata: Record<string, any> | null;
+  overriddenFields: string[] | null;
   createdBy: number | null;
   updatedBy: number | null;
   createdAt: string;
@@ -330,6 +331,52 @@ class StoreProductService {
     );
     return response.data;
   }
+
+  /**
+   * Get planning data values for a product (for override reset preview)
+   */
+  async getPlanningValues(
+    projectApiPath: string,
+    id: string
+  ): Promise<Record<string, any> | null> {
+    const response = await api.get(
+      `${projectApiPath}/store-products/${id}/planning-values`
+    );
+    return response.data;
+  }
+
+  /**
+   * Reset all overrides for a product, reverting to planning data values
+   */
+  async resetOverrides(
+    projectApiPath: string,
+    id: string
+  ): Promise<MutationResult<StoreProduct>> {
+    const response = await api.delete(
+      `${projectApiPath}/store-products/${id}/overrides`
+    );
+    return parseChangeRequestResponse<StoreProduct>(
+      response,
+      (r) => r?.product
+    );
+  }
+
+  /**
+   * Reset a single field override, reverting that field to planning data value
+   */
+  async resetFieldOverride(
+    projectApiPath: string,
+    id: string,
+    field: string
+  ): Promise<MutationResult<StoreProduct>> {
+    const response = await api.delete(
+      `${projectApiPath}/store-products/${id}/overrides/${field}`
+    );
+    return parseChangeRequestResponse<StoreProduct>(
+      response,
+      (r) => r?.product
+    );
+  }
 }
 
 // Selected items for selective sync
@@ -366,6 +413,8 @@ export interface SyncUpdateItem {
   productCode: string;
   name: string;
   changes: SyncChange[];
+  skippedChanges?: SyncChange[];
+  hasOverrides?: boolean;
 }
 
 export interface SyncDeleteItem {
