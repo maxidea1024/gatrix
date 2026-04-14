@@ -333,25 +333,6 @@ const SortableRow: React.FC<SortableRowProps> = ({
             {renderCellContent(world, column.id)}
           </TableCell>
         ))}
-      <TableCell>
-        {world.createdByName ? (
-          <Box>
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {world.createdByName}
-            </Typography>
-            <Typography
-              variant="caption"
-              sx={{ color: 'text.secondary', display: 'block' }}
-            >
-              {world.createdByEmail}
-            </Typography>
-          </Box>
-        ) : (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            -
-          </Typography>
-        )}
-      </TableCell>
       {canManage && (
         <TableCell align="center">
           <IconButton size="small" onClick={handleMenuOpen}>
@@ -531,6 +512,7 @@ const GameWorldsPage: React.FC = () => {
     },
     { id: 'tags', labelKey: 'common.tags', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
+    { id: 'creator', labelKey: 'gameWorlds.creator', visible: true },
   ];
 
   // Column configuration state (persisted in localStorage)
@@ -1816,6 +1798,24 @@ const GameWorldsPage: React.FC = () => {
             </Typography>
           </Tooltip>
         );
+      case 'creator':
+        return world.createdByName ? (
+          <Box>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              {world.createdByName}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ color: 'text.secondary', display: 'block' }}
+            >
+              {world.createdByEmail}
+            </Typography>
+          </Box>
+        ) : (
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            -
+          </Typography>
+        );
       default:
         return null;
     }
@@ -1987,7 +1987,6 @@ const GameWorldsPage: React.FC = () => {
                               {t(column.labelKey)}
                             </TableCell>
                           ))}
-                        <TableCell>{t('gameWorlds.creator')}</TableCell>
                         {canManage && (
                           <TableCell align="center">
                             {t('gameWorlds.actions')}

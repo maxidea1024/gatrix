@@ -392,13 +392,13 @@ export abstract class BaseEnvironmentService<
     const itemId = this.getItemId(item);
 
     const existsInCache = currentItems.some(
-      (i) => this.getItemId(i) === itemId
+      (i) => String(this.getItemId(i)) === String(itemId)
     );
     let newItems: T[];
 
     if (existsInCache) {
       newItems = currentItems.map((i) =>
-        this.getItemId(i) === itemId ? item : i
+        String(this.getItemId(i)) === String(itemId) ? item : i
       );
     } else {
       newItems = [...currentItems, item];
@@ -419,7 +419,7 @@ export abstract class BaseEnvironmentService<
   removeFromCache(id: TId, environmentId?: string): void {
     const resolvedEnv = this.resolveEnvironment(environmentId);
     const currentItems = this.cachedByEnv.get(resolvedEnv) || [];
-    const newItems = currentItems.filter((item) => this.getItemId(item) !== id);
+    const newItems = currentItems.filter((item) => String(this.getItemId(item)) !== String(id));
     this.cachedByEnv.set(resolvedEnv, newItems);
     this.persistCache(resolvedEnv).catch(() => {});
 
