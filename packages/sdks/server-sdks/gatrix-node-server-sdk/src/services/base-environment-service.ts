@@ -419,7 +419,9 @@ export abstract class BaseEnvironmentService<
   removeFromCache(id: TId, environmentId?: string): void {
     const resolvedEnv = this.resolveEnvironment(environmentId);
     const currentItems = this.cachedByEnv.get(resolvedEnv) || [];
-    const newItems = currentItems.filter((item) => String(this.getItemId(item)) !== String(id));
+    const newItems = currentItems.filter(
+      (item) => String(this.getItemId(item)) !== String(id)
+    );
     this.cachedByEnv.set(resolvedEnv, newItems);
     this.persistCache(resolvedEnv).catch(() => {});
 
