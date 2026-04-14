@@ -359,22 +359,22 @@ async function main() {
     });
 
     // Listen to specific events
-    sdk.on('gameworld.created', (event) => {
+    sdk.on('game_world.created', (event) => {
       logger.info('GAMEWORLD CREATED', event.data);
       printCachedData();
     });
 
-    sdk.on('gameworld.updated', (event) => {
+    sdk.on('game_world.updated', (event) => {
       logger.info('GAMEWORLD UPDATED', event.data);
       printCachedData();
     });
 
-    sdk.on('gameworld.deleted', (event) => {
+    sdk.on('game_world.deleted', (event) => {
       logger.info('GAMEWORLD DELETED', event.data);
       printCachedData();
     });
 
-    sdk.on('gameworld.order_changed', (event) => {
+    sdk.on('game_world.order_changed', (event) => {
       logger.info('GAMEWORLD ORDER CHANGED', event.data);
       printCachedData();
     });

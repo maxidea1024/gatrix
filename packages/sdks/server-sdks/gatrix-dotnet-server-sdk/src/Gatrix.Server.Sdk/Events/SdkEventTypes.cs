@@ -6,10 +6,10 @@ namespace Gatrix.Server.Sdk.Events;
 public static class SdkEventTypes
 {
     // Game World
-    public const string GameWorldCreated = "gameworld.created";
-    public const string GameWorldUpdated = "gameworld.updated";
-    public const string GameWorldDeleted = "gameworld.deleted";
-    public const string GameWorldOrderChanged = "gameworld.order_changed";
+    public const string GameWorldCreated = "game_world.created";
+    public const string GameWorldUpdated = "game_world.updated";
+    public const string GameWorldDeleted = "game_world.deleted";
+    public const string GameWorldOrderChanged = "game_world.order_changed";
 
     // Popup Notice
     public const string PopupCreated = "popup.created";

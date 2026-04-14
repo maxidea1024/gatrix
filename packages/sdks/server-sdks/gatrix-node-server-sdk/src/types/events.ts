@@ -7,10 +7,10 @@
 // ============================================================================
 
 export type StandardEventType =
-  | 'gameworld.created'
-  | 'gameworld.updated'
-  | 'gameworld.deleted'
-  | 'gameworld.order_changed'
+  | 'game_world.created'
+  | 'game_world.updated'
+  | 'game_world.deleted'
+  | 'game_world.order_changed'
   | 'popup.created'
   | 'popup.updated'
   | 'popup.deleted'
@@ -53,7 +53,7 @@ export interface StandardEventData {
   timestamp: number;
   /** Environment identifier sent by backend */
   environmentId?: string;
-  isVisible?: boolean | number; // For gameworld.updated, popup.updated events (MySQL returns 0/1)
+  isVisible?: boolean | number; // For game_world.updated, popup.updated events (MySQL returns 0/1)
   isActive?: boolean | number; // For survey.updated, store_product.updated events (MySQL returns 0/1)
   status?: string; // For banner.created, banner.updated events (draft, published, archived)
   isMaintenance?: boolean; // For maintenance.settings.updated events

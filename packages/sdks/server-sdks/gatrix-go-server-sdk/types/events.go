@@ -4,10 +4,10 @@ package types
 type StandardEventType string
 
 const (
-	EventGameWorldCreated      StandardEventType = "gameworld.created"
-	EventGameWorldUpdated      StandardEventType = "gameworld.updated"
-	EventGameWorldDeleted      StandardEventType = "gameworld.deleted"
-	EventGameWorldOrderChanged StandardEventType = "gameworld.order_changed"
+	EventGameWorldCreated      StandardEventType = "game_world.created"
+	EventGameWorldUpdated      StandardEventType = "game_world.updated"
+	EventGameWorldDeleted      StandardEventType = "game_world.deleted"
+	EventGameWorldOrderChanged StandardEventType = "game_world.order_changed"
 	EventPopupCreated          StandardEventType = "popup.created"
 	EventPopupUpdated          StandardEventType = "popup.updated"
 	EventPopupDeleted          StandardEventType = "popup.deleted"

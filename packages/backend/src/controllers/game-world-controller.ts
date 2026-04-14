@@ -379,7 +379,7 @@ export class GameWorldController {
 
           // Publish event for SDK real-time updates
           await pubSubService.publishNotification({
-            type: 'gameworld.created',
+            type: 'game_world.created',
             data: { world: { ...world, tags } },
             targetChannels: ['gameworld', 'admin'],
           });
@@ -492,7 +492,7 @@ export class GameWorldController {
 
           // Publish event for SDK real-time updates
           await pubSubService.publishNotification({
-            type: 'gameworld.updated',
+            type: 'game_world.updated',
             data: { world: { ...world, tags } },
             targetChannels: ['gameworld', 'admin'],
           });
@@ -552,7 +552,7 @@ export class GameWorldController {
 
           // Publish event for SDK real-time updates
           await pubSubService.publishNotification({
-            type: 'gameworld.deleted',
+            type: 'game_world.deleted',
             data: { worldId: id },
             targetChannels: ['gameworld', 'admin'],
           });
@@ -618,7 +618,7 @@ export class GameWorldController {
 
           // Publish event for SDK real-time updates
           await pubSubService.publishNotification({
-            type: 'gameworld.updated',
+            type: 'game_world.updated',
             data: { world: { ...world, tags } },
             targetChannels: ['gameworld', 'admin'],
           });
@@ -684,7 +684,7 @@ export class GameWorldController {
 
           // Publish event for SDK real-time updates
           await pubSubService.publishNotification({
-            type: 'gameworld.updated',
+            type: 'game_world.updated',
             data: { world: { ...world, tags } },
             targetChannels: ['gameworld', 'admin'],
           });
@@ -806,7 +806,7 @@ export class GameWorldController {
 
           // Publish event for SDK real-time updates
           await pubSubService.publishNotification({
-            type: 'gameworld.updated',
+            type: 'game_world.updated',
             data: { world: { ...world, tags } },
             targetChannels: ['gameworld', 'admin'],
           });

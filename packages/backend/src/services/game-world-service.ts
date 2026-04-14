@@ -130,7 +130,7 @@ export class GameWorldService {
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent(
         {
-          type: 'gameworld.created',
+          type: 'game_world.created',
           data: {
             id: result.id,
 
@@ -202,7 +202,7 @@ export class GameWorldService {
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent(
         {
-          type: 'gameworld.updated',
+          type: 'game_world.updated',
           data: {
             id: updatedWorld.id,
 
@@ -254,7 +254,7 @@ export class GameWorldService {
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent(
         {
-          type: 'gameworld.deleted',
+          type: 'game_world.deleted',
           data: {
             id,
 
@@ -315,7 +315,7 @@ export class GameWorldService {
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent(
         {
-          type: 'gameworld.updated',
+          type: 'game_world.updated',
           data: {
             id: updatedWorld.id,
 
@@ -369,7 +369,7 @@ export class GameWorldService {
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent(
         {
-          type: 'gameworld.updated',
+          type: 'game_world.updated',
           data: {
             id: updatedWorld.id,
 
@@ -410,7 +410,7 @@ export class GameWorldService {
       // Publish event for SDK to clear entire game worlds cache
       await pubSubService.publishSDKEvent(
         {
-          type: 'gameworld.order_changed',
+          type: 'game_world.order_changed',
           data: {
             id: 0, // Dummy id for order_changed event
 

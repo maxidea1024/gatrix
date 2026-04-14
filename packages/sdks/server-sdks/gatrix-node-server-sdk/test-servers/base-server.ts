@@ -299,15 +299,15 @@ export class BaseTestServer {
    */
   protected setupEventListeners(): void {
     // Game world events
-    this.sdk.on('gameworld.updated', (data) => {
+    this.sdk.on('game_world.updated', (data) => {
       this.log(`[EVENT] Game world updated: ${JSON.stringify(data)}`);
     });
 
-    this.sdk.on('gameworld.created', (data) => {
+    this.sdk.on('game_world.created', (data) => {
       this.log(`[EVENT] Game world created: ${JSON.stringify(data)}`);
     });
 
-    this.sdk.on('gameworld.deleted', (data) => {
+    this.sdk.on('game_world.deleted', (data) => {
       this.log(`[EVENT] Game world deleted: ${JSON.stringify(data)}`);
     });
 

@@ -3693,7 +3693,7 @@ function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
         return true;
       }
       // Check if the country bit is set
-      return (item.productLocalBitflag & countryCodeMask) !== 0;
+      if (item.productLocalBitflag === 0) return true; return (item.productLocalBitflag & countryCodeMask) !== 0;
     };
 
     // Format product name: replace ALL {0} occurrences with formatText

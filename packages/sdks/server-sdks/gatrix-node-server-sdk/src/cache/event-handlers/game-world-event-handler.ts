@@ -7,10 +7,10 @@ import { Logger } from '../../utils/logger';
 export class GameWorldEventHandler implements IEventHandler {
   readonly scope: EventHandlerScope = 'environment';
   readonly eventTypes = [
-    'gameworld.created',
-    'gameworld.updated',
-    'gameworld.deleted',
-    'gameworld.order_changed',
+    'game_world.created',
+    'game_world.updated',
+    'game_world.deleted',
+    'game_world.order_changed',
   ];
 
   isEnabled(uses: UsesConfig): boolean {
@@ -24,8 +24,8 @@ export class GameWorldEventHandler implements IEventHandler {
 
   async handle(event: StandardEvent, environmentId: string): Promise<void> {
     switch (event.type) {
-      case 'gameworld.created':
-      case 'gameworld.updated': {
+      case 'game_world.created':
+      case 'game_world.updated': {
         const isVisible =
           event.data.isVisible === 0
             ? false
@@ -39,10 +39,10 @@ export class GameWorldEventHandler implements IEventHandler {
         );
         break;
       }
-      case 'gameworld.deleted':
+      case 'game_world.deleted':
         this.cacheManager.removeGameWorld(String(event.data.id), environmentId);
         break;
-      case 'gameworld.order_changed':
+      case 'game_world.order_changed':
         this.logger.info('Game world order changed, refreshing cache', {
           environmentId,
         });

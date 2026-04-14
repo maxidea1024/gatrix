@@ -15,10 +15,10 @@ pub struct SdkEvent {
 /// Standard event types
 pub mod event_types {
     // Game World events
-    pub const GAMEWORLD_CREATED: &str = "gameworld.created";
-    pub const GAMEWORLD_UPDATED: &str = "gameworld.updated";
-    pub const GAMEWORLD_DELETED: &str = "gameworld.deleted";
-    pub const GAMEWORLD_ORDER_CHANGED: &str = "gameworld.order_changed";
+    pub const GAMEWORLD_CREATED: &str = "game_world.created";
+    pub const GAMEWORLD_UPDATED: &str = "game_world.updated";
+    pub const GAMEWORLD_DELETED: &str = "game_world.deleted";
+    pub const GAMEWORLD_ORDER_CHANGED: &str = "game_world.order_changed";
 
     // Popup events
     pub const POPUP_CREATED: &str = "popup.created";
