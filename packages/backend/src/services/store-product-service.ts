@@ -263,9 +263,7 @@ class StoreProductService {
   /**
    * Get store product statistics
    */
-  static async getStats(
-    environmentId: string
-  ): Promise<{
+  static async getStats(environmentId: string): Promise<{
     total: number;
     active: number;
     inactive: number;
