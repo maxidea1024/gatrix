@@ -216,7 +216,7 @@ deploy-swarm/
 ├── build-and-push.sh / .ps1    # Build & push to registry (⚠️ dev environment only, not in package)
 ├── update.sh / .ps1            # Rolling update
 ├── rollback.sh / .ps1          # Rollback
-├── ephemeral-scale.sh / .ps1   # Scaling (ephemeral, reverts on redeploy)
+├── scale.sh / .ps1             # Scaling (auto-persists to .env)
 ├── status.sh / .ps1            # Status check
 ├── list-images.sh / .ps1       # List registry images
 ├── login-registry.sh / .ps1    # Registry login
@@ -305,10 +305,10 @@ deploy-swarm/
 ### Scaling
 
 ```bash
-./ephemeral-scale.sh --preset minimal                     # backend:1  frontend:1  edge:1
-./ephemeral-scale.sh --preset standard                    # backend:2  frontend:1  edge:2
-./ephemeral-scale.sh --preset high                        # backend:4  frontend:2  edge:8
-./ephemeral-scale.sh --service backend --replicas 4       # Scale individual service
+./scale.sh --preset minimal                     # backend:1  frontend:1  edge:1
+./scale.sh --preset standard                    # backend:2  frontend:1  edge:2
+./scale.sh --preset high                        # backend:4  frontend:2  edge:8
+./scale.sh --service backend --replicas 4       # Scale individual service
 ```
 
 ### Status Check
@@ -439,12 +439,15 @@ echo -n "new-value" | docker secret create jwt_secret -
 vi .env    # Change EDGE_REPLICAS=8
 docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
 
-# Option B: Use scale script (immediate, does NOT persist in .env)
-./ephemeral-scale.sh --service edge --replicas 8
+# Option B: Use scale script (immediate + auto-saves to .env)
+./scale.sh --service edge --replicas 8
+
+# Option C: Ephemeral scaling (.env NOT updated)
+./scale.sh --service edge --replicas 8 --no-persist
 ```
 
-> **Important**: `ephemeral-scale.sh` changes are **temporary**. If you redeploy without updating `.env`,  
-> replicas will revert to the `.env` values. Always update `.env` for permanent changes.
+> **Note**: With `--no-persist`, `.env` is NOT updated, so the change  
+> will revert to `.env` values on the next deploy.
 
 ### Procedure: Changing Image Version
 
@@ -465,7 +468,7 @@ vi .env    # Change GATRIX_VERSION=1.2.0
 |---------|-------------|-----|
 | Edit `.env` but don't redeploy | Nothing changes, old values still running | Run `docker stack deploy ...` |
 | Change `JWT_SECRET` in `.env` only | Secret in Docker secret store is still the old value | Must delete + recreate Docker secret |
-| Use `ephemeral-scale.sh` but don't update `.env` | Next `docker stack deploy` reverts replicas to `.env` value | Update `.env` after scaling |
+| Use `scale.sh --no-persist` without updating `.env` | Next `docker stack deploy` reverts replicas to `.env` value | Run `scale.sh` without `--no-persist` to auto-save |
 | Set `DB_HOST=your-cloud-...` (placeholder) | `deploy.sh` blocks deployment with validation error | Replace with actual Cloud DB host |
 | Edit `.env` on one manager node | Other manager nodes may have different `.env` | Sync `.env` to all manager nodes |
 
@@ -645,7 +648,7 @@ The Nginx config is at `config/nginx.conf`. Changes take effect after redeployin
 9. **Docker images must be pushed to the registry first**: `build-and-push.sh` **requires source code and is only available in the dev environment** — it is NOT included in the deploy package. The dev team pushes images to the registry first, then production servers use `deploy.sh` to pull and deploy those images.
 10. **`registry.env` is NOT included in the package**: You must create it manually on the deploy server. Request registry credentials from the dev team.
 11. **`.env` is only read at deploy time**: After editing `.env`, you must redeploy for changes to take effect. Editing alone does NOT affect running services.
-12. **`ephemeral-scale.sh` changes are temporary**: Replica counts set via `ephemeral-scale.sh` revert to `.env` values on the next deploy. For permanent changes, update `*_REPLICAS` in `.env`.
+12. **`scale.sh` auto-persists to `.env` by default**: Scaling changes are automatically saved to `.env` so they survive redeployments. Use `--no-persist` for temporary scaling only.
 13. **SSL/TLS should be terminated at the Cloud LB**: Services only serve HTTP. Configure HTTPS certificates on your Cloud LB (Tencent CLB / AWS ALB).
 
 ### Data & Volumes

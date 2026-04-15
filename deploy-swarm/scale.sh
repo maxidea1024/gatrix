@@ -1,17 +1,18 @@
 #!/bin/bash
 #
-# Gatrix Swarm Ephemeral Scaling Script
-# ⚠ Changes are TEMPORARY — they do NOT persist across redeployments.
-# To make permanent changes, update *_REPLICAS in .env and redeploy.
+# Gatrix Swarm Scaling Script
+# Scales services and persists the change to .env for redeployment.
+# Use --no-persist to apply changes without updating .env (ephemeral).
 #
 # Usage:
-#   ./ephemeral-scale.sh [options]
+#   ./scale.sh [options]
 #
 # Options:
 #   -s, --stack <name>        Stack name (default: gatrix)
 #   --service <name>          Service to scale
 #   --replicas <n>            Number of replicas
 #   --preset <name>           Use scaling preset (minimal, standard, high)
+#   --no-persist              Do NOT update .env (ephemeral, reverts on redeploy)
 #   --status                  Show current scaling status
 #   -h, --help                Show help
 
@@ -28,6 +29,8 @@ SERVICE_NAME=""
 REPLICAS=""
 PRESET=""
 SHOW_STATUS=false
+NO_PERSIST=false
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 SCALABLE_SERVICES=("backend" "frontend" "edge")
 
@@ -37,17 +40,19 @@ while [[ $# -gt 0 ]]; do
         --service) SERVICE_NAME="$2"; shift 2 ;;
         --replicas) REPLICAS="$2"; shift 2 ;;
         --preset) PRESET="$2"; shift 2 ;;
+        --no-persist) NO_PERSIST=true; shift ;;
         --status) SHOW_STATUS=true; shift ;;
         -h|--help)
             echo "Gatrix Swarm Scaling Script"
             echo ""
-            echo "Usage: ./ephemeral-scale.sh [options]"
+            echo "Usage: ./scale.sh [options]"
             echo ""
             echo "Options:"
             echo "  -s, --stack <name>        Stack name (default: gatrix)"
             echo "  --service <name>          Service to scale"
             echo "  --replicas <n>            Number of replicas"
             echo "  --preset <name>           Use scaling preset (minimal, standard, high)"
+            echo "  --no-persist              Do NOT update .env (ephemeral, reverts on redeploy)"
             echo "  --status                  Show current scaling status"
             echo "  -h, --help                Show help"
             echo ""
@@ -57,6 +62,9 @@ while [[ $# -gt 0 ]]; do
             echo "  high      - backend:4  frontend:2  edge:8  (peak traffic)"
             echo ""
             echo "Available services: ${SCALABLE_SERVICES[*]}"
+            echo ""
+            echo "By default, changes are saved to .env so they persist across redeployments."
+            echo "Use --no-persist to make ephemeral changes only."
             exit 0
             ;;
         *) echo "Unknown option: $1"; exit 1 ;;
@@ -68,15 +76,46 @@ log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
+# Update .env file with the new replica count
+update_env_replicas() {
+    local service="$1"
+    local replicas="$2"
+    local env_file="$SCRIPT_DIR/.env"
+    local var_name=""
+
+    case "$service" in
+        backend) var_name="BACKEND_REPLICAS" ;;
+        frontend) var_name="FRONTEND_REPLICAS" ;;
+        edge) var_name="EDGE_REPLICAS" ;;
+        *) return ;;
+    esac
+
+    if [ ! -f "$env_file" ]; then
+        log_warn ".env file not found, skipping persist"
+        return
+    fi
+
+    if grep -q "^${var_name}=" "$env_file"; then
+        sed -i "s/^${var_name}=.*/${var_name}=${replicas}/" "$env_file"
+    else
+        echo "${var_name}=${replicas}" >> "$env_file"
+    fi
+    log_success "Saved to .env: ${var_name}=${replicas}"
+}
+
 scale_service() {
     local service="$1"
     local replicas="$2"
     local full_service_name="${STACK_NAME}_${service}"
-    
+
     if docker service inspect "$full_service_name" &> /dev/null; then
         log_info "Scaling $service to $replicas replicas..."
         docker service scale "$full_service_name=$replicas"
         log_success "Scaled $service to $replicas replicas"
+
+        if [ "$NO_PERSIST" = false ]; then
+            update_env_replicas "$service" "$replicas"
+        fi
     else
         log_warn "Service not found: $full_service_name"
     fi
@@ -116,10 +155,13 @@ show_status() {
 
 main() {
     echo "========================================"
-    echo "   Gatrix Swarm Ephemeral Scaling"
-    echo "   ⚠ Changes are TEMPORARY"
+    echo "   Gatrix Swarm Scaling"
     echo "========================================"
     echo ""
+
+    if [ "$NO_PERSIST" = true ]; then
+        log_warn "Running in ephemeral mode (--no-persist). Changes will NOT be saved to .env."
+    fi
 
     if [ "$SHOW_STATUS" = true ]; then show_status; exit 0; fi
 

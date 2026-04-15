@@ -223,7 +223,7 @@ deploy-swarm/
 ├── build-and-push.sh / .ps1    # 이미지 빌드 & 레지스트리 푸시 (⚠️ 개발 환경 전용, 패키지 미포함)
 ├── update.sh / .ps1            # 롤링 업데이트
 ├── rollback.sh / .ps1          # 롤백
-├── ephemeral-scale.sh / .ps1   # 스케일링 (임시, 재배포 시 복원됨)
+├── scale.sh / .ps1             # 스케일링 (.env 자동 반영)
 ├── status.sh / .ps1            # 상태 확인
 ├── list-images.sh / .ps1       # 레지스트리 이미지 목록
 ├── login-registry.sh / .ps1    # 레지스트리 로그인
@@ -312,10 +312,10 @@ deploy-swarm/
 ### 스케일링
 
 ```bash
-./ephemeral-scale.sh --preset minimal                     # backend:1  frontend:1  edge:1
-./ephemeral-scale.sh --preset standard                    # backend:2  frontend:1  edge:2
-./ephemeral-scale.sh --preset high                        # backend:4  frontend:2  edge:8
-./ephemeral-scale.sh --service backend --replicas 4       # 개별 스케일링
+./scale.sh --preset minimal                     # backend:1  frontend:1  edge:1
+./scale.sh --preset standard                    # backend:2  frontend:1  edge:2
+./scale.sh --preset high                        # backend:4  frontend:2  edge:8
+./scale.sh --service backend --replicas 4       # 개별 스케일링
 ```
 
 ### 상태 확인
@@ -446,12 +446,15 @@ echo -n "새-값" | docker secret create jwt_secret -
 vi .env    # EDGE_REPLICAS=8 변경
 docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
 
-# 방법 B: scale 스크립트 사용 (즉시 반영, .env에는 저장 안됨)
-./ephemeral-scale.sh --service edge --replicas 8
+# 방법 B: scale 스크립트 사용 (즉시 반영 + .env 자동 수정)
+./scale.sh --service edge --replicas 8
+
+# 방법 C: 임시 스케일링 (.env 수정 없이 즉시만 반영)
+./scale.sh --service edge --replicas 8 --no-persist
 ```
 
-> **중요**: `ephemeral-scale.sh`로 변경한 값은 **임시**입니다. `.env`를 수정하지 않고 재배포하면,  
-> 레플리카 수가 `.env` 값으로 되돌아갑니다. 영구 변경은 반드시 `.env`도 함께 수정하세요.
+> **참고**: `--no-persist` 옵션을 사용하면 `.env`를 수정하지 않으므로,  
+> 재배포 시 `.env` 값으로 되돌아갑니다.
 
 ### 절차: 이미지 버전 변경
 
@@ -472,7 +475,7 @@ vi .env    # GATRIX_VERSION=1.2.0 변경
 |------|------|------|
 | `.env` 수정 후 재배포 안함 | 아무것도 바뀌지 않음 | `docker stack deploy ...` 실행 |
 | `.env`에서만 `JWT_SECRET` 변경 | Docker Secret은 여전히 이전 값 | Secret 삭제 + 재생성 필요 |
-| `ephemeral-scale.sh` 사용 후 `.env` 미수정 | 다음 재배포 시 `.env` 값으로 되돌아감 | 스케일링 후 `.env`도 업데이트 |
+| `scale.sh --no-persist` 사용 후 `.env` 미수정 | 다음 재배포 시 `.env` 값으로 되돌아감 | `--no-persist` 없이 실행하면 자동 반영 |
 | `DB_HOST=your-cloud-...` (플레이스홀더) | `deploy.sh`가 검증 실패로 차단 | 실제 Cloud DB 주소로 교체 |
 | 한 매니저 노드에서만 `.env` 수정 | 다른 매니저 노드는 다른 `.env` 사용 가능 | 모든 매니저 노드에 `.env` 동기화 |
 
@@ -649,7 +652,7 @@ Nginx 설정은 `config/nginx.conf`에 있습니다. 수정 후 재배포하면 
 9. **Docker 이미지가 레지스트리에 먼저 푸시되어야 합니다**: `build-and-push.sh`는 **소스코드가 필요하므로 개발 환경에서만 실행 가능**하며, 배포 패키지에 포함되지 않습니다. 개발팀이 이미지를 레지스트리에 업로드한 뒤, 운영 서버에서는 `deploy.sh`로 해당 이미지를 pull하여 배포합니다.
 10. **`registry.env`는 패키지에 포함되지 않습니다**: 배포 서버에서 수동으로 생성해야 합니다. 개발팀에게 레지스트리 인증 정보를 요청하세요.
 11. **`.env`는 배포 시점에만 읽힙니다**: `.env`를 수정한 후 반드시 재배포해야 적용됩니다. 편집만으로는 실행 중인 서비스에 영향이 없습니다.
-12. **`ephemeral-scale.sh` 변경은 일시적입니다**: `ephemeral-scale.sh`로 변경한 레플리카 수는 재배포 시 `.env`의 값으로 되돌아갑니다. 영구 변경은 `.env`의 `*_REPLICAS` 값을 수정하세요.
+12. **`scale.sh`는 기본적으로 `.env`를 자동 수정합니다**: 스케일링 시 `.env`의 `*_REPLICAS` 값도 함께 업데이트됩니다. 임시 스케일링만 하려면 `--no-persist` 옵션을 사용하세요.
 13. **SSL/TLS는 Cloud LB에서 종료하세요**: 서비스 자체는 HTTP만 제공합니다. HTTPS는 Cloud LB (Tencent CLB / AWS ALB)에서 인증서를 설정하여 처리하세요.
 
 ### 데이터 & 볼륨

@@ -1,17 +1,18 @@
 #!/usr/bin/env pwsh
 #
-# Gatrix Swarm Ephemeral Scaling Script
-# ⚠ Changes are TEMPORARY — they do NOT persist across redeployments.
-# To make permanent changes, update *_REPLICAS in .env and redeploy.
+# Gatrix Swarm Scaling Script
+# Scales services and persists the change to .env for redeployment.
+# Use --no-persist to apply changes without updating .env (ephemeral).
 #
 # Usage:
-#   ./ephemeral-scale.ps1 [options]
+#   ./scale.ps1 [options]
 #
 # Options:
 #   -n, --stack <name>        Stack name (default: gatrix)
 #   -s, --service <name>      Service to scale
 #   -r, --replicas <count>    Number of replicas
 #   --preset <name>           Use scaling preset (minimal, standard, high)
+#   --no-persist              Do NOT update .env (ephemeral, reverts on redeploy)
 #   --status                  Show current scaling status
 #   -h, --help                Show help
 
@@ -22,17 +23,19 @@ $Service = ""
 $Replicas = 0
 $Preset = ""
 $Status = $false
+$NoPersist = $false
 
 function Show-Help {
     Write-Host "Gatrix Swarm Scaling Script"
     Write-Host ""
-    Write-Host "Usage: ./ephemeral-scale.ps1 [options]"
+    Write-Host "Usage: ./scale.ps1 [options]"
     Write-Host ""
     Write-Host "Options:"
     Write-Host "  -n, --stack <name>        Stack name (default: gatrix)"
     Write-Host "  -s, --service <name>      Service to scale"
     Write-Host "  -r, --replicas <count>    Number of replicas"
     Write-Host "  --preset <name>           Use scaling preset (minimal, standard, high)"
+    Write-Host "  --no-persist              Do NOT update .env (ephemeral, reverts on redeploy)"
     Write-Host "  --status                  Show current scaling status"
     Write-Host "  -h, --help                Show help"
     Write-Host ""
@@ -44,9 +47,13 @@ function Show-Help {
     Write-Host "  high      - backend:4  frontend:2  edge:8  (peak traffic)"
     Write-Host ""
     Write-Host "Examples:"
-    Write-Host "  ./ephemeral-scale.ps1 -s backend -r 4"
-    Write-Host "  ./ephemeral-scale.ps1 --preset high"
-    Write-Host "  ./ephemeral-scale.ps1 --status"
+    Write-Host "  ./scale.ps1 -s backend -r 4"
+    Write-Host "  ./scale.ps1 --preset high"
+    Write-Host "  ./scale.ps1 --preset minimal --no-persist"
+    Write-Host "  ./scale.ps1 --status"
+    Write-Host ""
+    Write-Host "By default, changes are saved to .env so they persist across redeployments."
+    Write-Host "Use --no-persist to make ephemeral changes only."
     exit 0
 }
 
@@ -57,6 +64,7 @@ while ($i -lt $args.Count) {
         { $_ -eq "-s" -or $_ -eq "--service" } { $Service = $args[$i + 1]; $i += 2 }
         { $_ -eq "-r" -or $_ -eq "--replicas" } { $Replicas = [int]$args[$i + 1]; $i += 2 }
         "--preset" { $Preset = $args[$i + 1]; $i += 2 }
+        "--no-persist" { $NoPersist = $true; $i += 1 }
         "--status" { $Status = $true; $i += 1 }
         { $_ -eq "-h" -or $_ -eq "--help" } { Show-Help }
         default { Write-Host "Unknown option: $($args[$i])" -ForegroundColor Red; exit 1 }
@@ -70,6 +78,31 @@ function Show-Success($msg) { Write-Host "[SUCCESS] $msg" -ForegroundColor Green
 function Show-Warn($msg) { Write-Host "[WARN] $msg" -ForegroundColor Yellow }
 function Show-Error($msg) { Write-Host "[ERROR] $msg" -ForegroundColor Red }
 
+# Update .env file with the new replica count
+function Update-EnvReplicas($svcName, $count) {
+    $varName = switch ($svcName) {
+        "backend" { "BACKEND_REPLICAS" }
+        "frontend" { "FRONTEND_REPLICAS" }
+        "edge" { "EDGE_REPLICAS" }
+        default { return }
+    }
+
+    $envPath = Join-Path $PSScriptRoot ".env"
+    if (-not (Test-Path $envPath)) {
+        Show-Warn ".env file not found, skipping persist"
+        return
+    }
+
+    $content = Get-Content $envPath -Raw
+    if ($content -match "(?m)^${varName}=") {
+        $content = $content -replace "(?m)^${varName}=.*", "${varName}=${count}"
+    } else {
+        $content = $content.TrimEnd() + "`n${varName}=${count}`n"
+    }
+    Set-Content $envPath $content -NoNewline
+    Show-Success "Saved to .env: ${varName}=${count}"
+}
+
 function Scale-Service($svcName, $count) {
     $fullServiceName = "$Stack`_$svcName"
     docker service inspect $fullServiceName > $null 2>&1
@@ -80,6 +113,10 @@ function Scale-Service($svcName, $count) {
     Show-Info "Scaling $svcName to $count replicas..."
     docker service scale "$fullServiceName=$count"
     Show-Success "Scaled $svcName to $count replicas"
+
+    if (-not $NoPersist) {
+        Update-EnvReplicas $svcName $count
+    }
 }
 
 function Apply-Preset($name) {
@@ -117,10 +154,13 @@ function Show-CurrentStatus {
 }
 
 Write-Host "========================================"
-Write-Host "   Gatrix Swarm Ephemeral Scaling"
-Write-Host "   ⚠ Changes are TEMPORARY"
+Write-Host "   Gatrix Swarm Scaling"
 Write-Host "========================================"
 Write-Host ""
+
+if ($NoPersist) {
+    Show-Warn "Running in ephemeral mode (--no-persist). Changes will NOT be saved to .env."
+}
 
 if ($Status) { Show-CurrentStatus; exit 0 }
 
