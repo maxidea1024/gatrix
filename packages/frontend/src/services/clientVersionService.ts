@@ -602,7 +602,7 @@ export class ClientVersionService {
       if (response?.success && response?.data) {
         return {
           healthy: response.data.healthy,
-          latency: response.data.latency || (Date.now() - startTime),
+          latency: response.data.latency || Date.now() - startTime,
           ...(response.data.error && { error: response.data.error }),
         };
       }
