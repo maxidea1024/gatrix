@@ -218,7 +218,7 @@ deploy-swarm/
 ├── deploy.sh / .ps1            # 배포 스크립트
 ├── teardown.sh / .ps1          # 스택 제거 스크립트
 ├── health-check.sh / .ps1      # 헬스 체크 스크립트
-├── build-and-push.sh / .ps1    # 이미지 빌드 & 레지스트리 푸시
+├── build-and-push.sh / .ps1    # 이미지 빌드 & 레지스트리 푸시 (⚠️ 개발 환경 전용, 패키지 미포함)
 ├── update.sh / .ps1            # 롤링 업데이트
 ├── rollback.sh / .ps1          # 롤백
 ├── scale.sh / .ps1             # 스케일링
@@ -279,9 +279,14 @@ deploy-swarm/
 
 ## 🛠️ 운영 가이드
 
-### 이미지 빌드 및 푸시
+### 이미지 빌드 및 푸시 (⚠️ 개발 환경 전용)
+
+> **주의**: 이미지 빌드는 **소스코드가 있는 개발 환경**에서만 가능합니다.  
+> `build-and-push.sh`는 `package.sh`로 생성한 배포 패키지에 **포함되지 않습니다**.  
+> 운영 서버에서는 개발팀이 미리 레지스트리에 푸시한 이미지를 `deploy.sh`로 배포합니다.
 
 ```bash
+# 개발 환경에서 실행:
 ./build-and-push.sh -t v1.0.0 -l -p           # 모든 서비스
 ./build-and-push.sh -s backend -t v1.0.0 -p    # 특정 서비스만
 ```
@@ -327,8 +332,11 @@ deploy-swarm/
 
 ### 보안 키 생성
 
+> **참고**: 아래 명령어는 키를 **화면에 출력만** 합니다 (`.env`를 자동 수정하지 않음).  
+> 출력된 값을 **복사하여 `.env` 파일에 직접 붙여넣기** 하세요.
+
 ```bash
-./generate-secrets.sh --env                     # 모든 .env 보안 키 생성
+./generate-secrets.sh --env                     # 모든 보안 키 생성 (복사용 출력)
 ./generate-secrets.sh                           # 단일 키 생성 (32바이트 base64)
 ./generate-secrets.sh -l 64 -e hex              # 64바이트 hex 키
 ./generate-secrets.sh -l 48 -e alphanumeric     # 48자 영숫자 키
@@ -634,7 +642,7 @@ Nginx 설정은 `config/nginx.conf`에 있습니다. 수정 후 재배포하면 
 
 ### 배포 & 운영
 
-9. **Docker 이미지가 레지스트리에 먼저 푸시되어야 합니다**: 원격 서버에 배포하기 전에 개발팀에서 `build-and-push.sh`로 이미지를 레지스트리에 업로드해야 합니다.
+9. **Docker 이미지가 레지스트리에 먼저 푸시되어야 합니다**: `build-and-push.sh`는 **소스코드가 필요하므로 개발 환경에서만 실행 가능**하며, 배포 패키지에 포함되지 않습니다. 개발팀이 이미지를 레지스트리에 업로드한 뒤, 운영 서버에서는 `deploy.sh`로 해당 이미지를 pull하여 배포합니다.
 10. **`registry.env`는 패키지에 포함되지 않습니다**: 배포 서버에서 수동으로 생성해야 합니다. 개발팀에게 레지스트리 인증 정보를 요청하세요.
 11. **`.env`는 배포 시점에만 읽힙니다**: `.env`를 수정한 후 반드시 재배포해야 적용됩니다. 편집만으로는 실행 중인 서비스에 영향이 없습니다.
 12. **`scale.sh` 변경은 일시적입니다**: `scale.sh`로 변경한 레플리카 수는 재배포 시 `.env`의 값으로 되돌아갑니다. 영구 변경은 `.env`의 `*_REPLICAS` 값을 수정하세요.

@@ -211,7 +211,7 @@ deploy-swarm/
 ├── deploy.sh / .ps1            # Deployment script
 ├── teardown.sh / .ps1          # Stack removal script
 ├── health-check.sh / .ps1      # Post-deploy health check
-├── build-and-push.sh / .ps1    # Build & push to registry
+├── build-and-push.sh / .ps1    # Build & push to registry (⚠️ dev environment only, not in package)
 ├── update.sh / .ps1            # Rolling update
 ├── rollback.sh / .ps1          # Rollback
 ├── scale.sh / .ps1             # Scaling
@@ -272,9 +272,14 @@ deploy-swarm/
 
 ## 🛠️ Operations Guide
 
-### Build & Push Images
+### Build & Push Images (⚠️ Dev Environment Only)
+
+> **Note**: Image building requires the **full source code** and is only possible in the **development environment**.  
+> `build-and-push.sh` is **NOT included** in packages created by `package.sh`.  
+> On production servers, use `deploy.sh` to deploy images that the dev team has already pushed to the registry.
 
 ```bash
+# Run from development environment:
 ./build-and-push.sh -t v1.0.0 -l -p           # All services
 ./build-and-push.sh -s backend -t v1.0.0 -p    # Specific service
 ```
@@ -320,8 +325,11 @@ deploy-swarm/
 
 ### Generate Security Keys
 
+> **Note**: These commands only **print keys to stdout** (they do NOT auto-update `.env`).  
+> **Copy the output and paste it into your `.env` file** manually.
+
 ```bash
-./generate-secrets.sh --env                     # Generate all .env security keys
+./generate-secrets.sh --env                     # Generate all security keys (copy-paste output)
 ./generate-secrets.sh                           # Single key (32-byte base64)
 ./generate-secrets.sh -l 64 -e hex              # 64-byte hex key
 ./generate-secrets.sh -l 48 -e alphanumeric     # 48-char alphanumeric key
@@ -630,7 +638,7 @@ The Nginx config is at `config/nginx.conf`. Changes take effect after redeployin
 
 ### Deployment & Operations
 
-9. **Docker images must be pushed to the registry first**: Before deploying on a remote server, the dev team must push images using `build-and-push.sh`.
+9. **Docker images must be pushed to the registry first**: `build-and-push.sh` **requires source code and is only available in the dev environment** — it is NOT included in the deploy package. The dev team pushes images to the registry first, then production servers use `deploy.sh` to pull and deploy those images.
 10. **`registry.env` is NOT included in the package**: You must create it manually on the deploy server. Request registry credentials from the dev team.
 11. **`.env` is only read at deploy time**: After editing `.env`, you must redeploy for changes to take effect. Editing alone does NOT affect running services.
 12. **`scale.sh` changes are temporary**: Replica counts set via `scale.sh` revert to `.env` values on the next deploy. For permanent changes, update `*_REPLICAS` in `.env`.

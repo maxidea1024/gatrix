@@ -151,7 +151,7 @@ load_env() {
 
 # Validate required environment variables
 validate_env() {
-    local required_vars=("DB_HOST" "DB_USER" "DB_PASSWORD" "REDIS_HOST")
+    local required_vars=("DB_HOST" "DB_USER" "DB_PASSWORD" "REDIS_HOST" "EDGE_REDIS_HOST")
     local has_error=false
 
     for var in "${required_vars[@]}"; do

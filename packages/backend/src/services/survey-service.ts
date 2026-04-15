@@ -610,10 +610,11 @@ export class SurveyService {
     // Update each var using raw query for ON DUPLICATE KEY UPDATE
     for (const update of updates) {
       await db.raw(
-        `INSERT INTO g_vars (environmentId, varKey, varValue, description, createdBy)
-         VALUES (?, ?, ?, ?, 1)
+        `INSERT INTO g_vars (id, environmentId, varKey, varValue, description, createdBy)
+         VALUES (?, ?, ?, ?, ?, 1)
          ON DUPLICATE KEY UPDATE varValue = VALUES(varValue), updatedBy = 1`,
         [
+          ulid(),
           environmentId,
           update.key,
           update.value,

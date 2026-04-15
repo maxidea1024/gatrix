@@ -132,8 +132,8 @@ COPY --from=builder /app/packages/storage/dist ./node_modules/@gatrix/storage/di
 # Copy built evaluator dist
 COPY --from=builder /app/packages/evaluator/dist ./node_modules/@gatrix/evaluator/dist
 
-# Create logs directory
-RUN mkdir -p logs && chown nodejs:nodejs logs
+# Create logs and cache directories (writable by non-root nodejs user)
+RUN mkdir -p logs .gatrix_cache && chown nodejs:nodejs logs .gatrix_cache
 
 USER nodejs
 

@@ -81,6 +81,10 @@ services:
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-zh}
       MONITORING_ENABLED: 'true'
       DISABLE_RATE_LIMIT: 'true'
+      # Admin user seed (auto-creates on first startup)
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@gatrix.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      ADMIN_NAME: ${ADMIN_NAME:-Administrator}
       # OAuth (optional)
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
@@ -169,9 +173,11 @@ services:
       EDGE_SYNC_METHOD: ${EDGE_SYNC_METHOD:-polling}
       EDGE_CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
       EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-*}
-      EDGE_REDIS_HOST: ${EDGE_REDIS_HOST:-${REDIS_HOST}}
-      EDGE_REDIS_PORT: ${EDGE_REDIS_PORT:-${REDIS_PORT:-6379}}
-      EDGE_REDIS_PASSWORD: ${EDGE_REDIS_PASSWORD:-${REDIS_PASSWORD:-}}
+      # NOTE: Docker Compose does NOT support nested ${} substitution.
+      # EDGE_REDIS_* must be explicitly set in .env (do NOT use ${VAR:-${OTHER}}).
+      EDGE_REDIS_HOST: ${EDGE_REDIS_HOST:?EDGE_REDIS_HOST is required}
+      EDGE_REDIS_PORT: ${EDGE_REDIS_PORT:-6379}
+      EDGE_REDIS_PASSWORD: ${EDGE_REDIS_PASSWORD:-}
       EDGE_REDIS_DB: ${EDGE_REDIS_DB:-0}
       EDGE_FORCE_HTTPS: ${EDGE_FORCE_HTTPS:-false}
     # Ports exposed directly for Cloud Load Balancer.
@@ -231,7 +237,9 @@ services:
         mode: ingress
     volumes:
       - prometheus_data:/prometheus
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
     networks:
       - gatrix-internal
       - gatrix-public
@@ -265,14 +273,20 @@ services:
         mode: ingress
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
-      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+    configs:
+      - source: grafana_datasources
+        target: /etc/grafana/provisioning/datasources/datasource.yml
+      - source: grafana_dashboards
+        target: /etc/grafana/provisioning/dashboards/dashboards.yml
     networks:
       - gatrix-internal
       - gatrix-public
     deploy:
       mode: replicated
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       resources:
         limits:
           memory: 512M
@@ -304,13 +318,17 @@ services:
         published: ${HTTPS_PORT:-443}
         protocol: tcp
         mode: ingress
-    volumes:
-      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+    configs:
+      - source: nginx_config
+        target: /etc/nginx/nginx.conf
     networks:
       - gatrix-public
     deploy:
       mode: replicated
       replicas: ${NGINX_REPLICAS:-0}
+      placement:
+        constraints:
+          - node.role == manager
       resources:
         limits:
           memory: 128M
@@ -322,6 +340,21 @@ services:
       timeout: 10s
       retries: 3
     logging: *default-logging
+
+# ============================================
+# Docker Configs (distributed to all Swarm nodes)
+# ============================================
+# Unlike bind mounts, configs are automatically available on every node.
+# This is critical for multi-node Swarm deployments.
+configs:
+  prometheus_config:
+    file: ./config/prometheus.yml
+  grafana_datasources:
+    file: ./config/grafana/provisioning/datasources/datasource.yml
+  grafana_dashboards:
+    file: ./config/grafana/provisioning/dashboards/dashboards.yml
+  nginx_config:
+    file: ./config/nginx.conf
 
 # ============================================
 # Networks
@@ -350,19 +383,3 @@ volumes:
   grafana_data:
     driver: local
 
-# ============================================
-# Secrets
-# ============================================
-secrets:
-  jwt_secret:
-    external: true
-  jwt_refresh_secret:
-    external: true
-  session_secret:
-    external: true
-  api_secret:
-    external: true
-  edge_api_token:
-    external: true
-  grafana_password:
-    external: true

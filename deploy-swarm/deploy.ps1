@@ -133,7 +133,7 @@ else {
 $env:GATRIX_VERSION = $Version
 
 # Validate required environment variables
-$requiredVars = @("DB_HOST", "DB_USER", "DB_PASSWORD", "REDIS_HOST")
+$requiredVars = @("DB_HOST", "DB_USER", "DB_PASSWORD", "REDIS_HOST", "EDGE_REDIS_HOST")
 foreach ($var in $requiredVars) {
     $val = [Environment]::GetEnvironmentVariable($var, "Process")
     if (-not $val -or $val -match "^your-") {

@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  AppBar,
-  Toolbar,
   Button,
   TextField,
   Box,
-  Typography,
-  IconButton,
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -35,6 +30,7 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({
     linkCaption: '',
     joinedSecretKey: '',
   });
+  const [initialConfig, setInitialConfig] = useState<SurveyConfig | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -42,6 +38,8 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({
   useEffect(() => {
     if (open) {
       loadConfig();
+    } else {
+      setInitialConfig(null);
     }
   }, [open]);
 
@@ -50,6 +48,7 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({
       setLoading(true);
       const data = await surveyService.getSurveyConfig(projectApiPath);
       setConfig(data);
+      setInitialConfig(data);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('surveys.configLoadFailed'), {
         variant: 'error',
@@ -74,29 +73,20 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({
     }
   };
 
+  const hasChanges = initialConfig
+    ? JSON.stringify(config) !== JSON.stringify(initialConfig)
+    : false;
+
   return (
     <ResizableDrawer
       open={open}
       onClose={onClose}
+      title={t('surveys.config')}
+      subtitle={t('surveys.configSubtitle')}
       defaultWidth={600}
       minWidth={400}
       maxWidth={1200}
     >
-      {/* Header */}
-      <AppBar position="static" color="default" elevation={0}>
-        <Toolbar>
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h6">{t('surveys.config')}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('surveys.configSubtitle')}
-            </Typography>
-          </Box>
-          <IconButton edge="end" onClick={onClose} sx={{ ml: 2 }}>
-            <CloseIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-
       {/* Content */}
       <Box sx={{ p: 3, flexGrow: 1, overflow: 'auto' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -162,7 +152,7 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={loading || submitting}
+          disabled={loading || submitting || !hasChanges}
         >
           {submitting ? t('common.saving') : t('common.update')}
         </Button>

@@ -512,6 +512,45 @@ async function createSampleReleaseFlows(createdBy: string) {
   }
 }
 
+// ==================== Ensure Admin Role Binding ====================
+
+/**
+ * Idempotently ensure the admin user is bound to the Super Admin role.
+ * This handles the case where roles already exist (e.g., from a previous seed
+ * with a different admin email) but the current admin user has no role binding.
+ */
+async function ensureAdminRoleBinding(orgId: string, adminUserId: string) {
+  // Find Super Admin role
+  const superAdminRole = await database.query(
+    `SELECT id FROM g_roles WHERE orgId = ? AND roleName = 'Super Admin' LIMIT 1`,
+    [orgId]
+  );
+  if (superAdminRole.length === 0) {
+    logger.warn('Super Admin role not found, cannot bind admin user');
+    return;
+  }
+
+  const superAdminRoleId = superAdminRole[0].id;
+
+  // Check if binding already exists
+  const existingBinding = await database.query(
+    `SELECT id FROM g_role_bindings WHERE userId = ? AND roleId = ? LIMIT 1`,
+    [adminUserId, superAdminRoleId]
+  );
+  if (existingBinding.length > 0) {
+    logger.info('Admin user already bound to Super Admin role');
+    return;
+  }
+
+  // Create binding
+  await database.query(
+    `INSERT INTO g_role_bindings (id, userId, roleId, scopeType, scopeId, assignedAt)
+     VALUES (?, ?, ?, 'org', ?, UTC_TIMESTAMP())`,
+    [ulid(), adminUserId, superAdminRoleId, orgId]
+  );
+  logger.info(`Admin user bound to Super Admin role (orgId: ${orgId})`);
+}
+
 // ==================== Default RBAC Roles ====================
 
 async function createDefaultRoles(orgId: string, adminUserId: string) {
@@ -520,7 +559,9 @@ async function createDefaultRoles(orgId: string, adminUserId: string) {
     [orgId]
   );
   if (existing.length > 0) {
-    logger.info('Default roles already exist, skipping creation');
+    logger.info('Default roles already exist, skipping role creation');
+    // Even if roles exist, ensure admin user has Super Admin binding
+    await ensureAdminRoleBinding(orgId, adminUserId);
     return;
   }
 
