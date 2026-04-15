@@ -93,8 +93,6 @@ if ($GenEnv) {
     Write-Host "JWT_SECRET=$(Generate-Key -KeyLength 32 -KeyEncoding 'base64')"
     Write-Host "JWT_REFRESH_SECRET=$(Generate-Key -KeyLength 32 -KeyEncoding 'base64')"
     Write-Host "SESSION_SECRET=$(Generate-Key -KeyLength 32 -KeyEncoding 'base64')"
-    Write-Host "EDGE_API_TOKEN=$(Generate-Key -KeyLength 24 -KeyEncoding 'alphanumeric')"
-    Write-Host "EDGE_BYPASS_TOKEN=$(Generate-Key -KeyLength 24 -KeyEncoding 'alphanumeric')"
     Write-Host "GRAFANA_ADMIN_PASSWORD=$(Generate-Key -KeyLength 16 -KeyEncoding 'alphanumeric')"
     Write-Host ""
     Write-Host "[INFO] Keys generated using .NET System.Security.Cryptography" -ForegroundColor Green

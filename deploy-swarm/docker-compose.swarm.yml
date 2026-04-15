@@ -13,7 +13,7 @@
 # Prerequisites:
 #   1. Configure Cloud DB/Redis connection in .env
 #   2. Initialize Docker Swarm (docker swarm init)
-#   3. Create Docker Secrets (use deploy.sh --init)
+#   3. Docker Secrets are auto-created by deploy.sh (skips existing)
 
 version: '3.9'
 
@@ -246,9 +246,6 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
       resources:
         limits:
           memory: 1G
@@ -284,9 +281,6 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
       resources:
         limits:
           memory: 512M

@@ -179,7 +179,9 @@ EOF
 
 ```bash
 chmod +x *.sh
-./deploy.sh -v 1.0.0 --init    # 初始化 Swarm + 创建 Secrets + 部署
+# --init: 如果 Swarm 未初始化则自动初始化
+# Docker Secrets 在每次部署时自动创建（已存在则跳过）
+./deploy.sh -v 1.0.0 --init
 ```
 
 PowerShell（Windows）：
@@ -214,7 +216,7 @@ deploy-swarm/
 ├── build-and-push.sh / .ps1    # 镜像构建 & 推送（⚠️ 仅限开发环境，不含在包中）
 ├── update.sh / .ps1            # 滚动更新
 ├── rollback.sh / .ps1          # 回滚
-├── scale.sh / .ps1             # 扩缩容
+├── ephemeral-scale.sh / .ps1   # 扩缩容（临时，重新部署后恢复）
 ├── status.sh / .ps1            # 状态查看
 ├── list-images.sh / .ps1       # 仓库镜像列表
 ├── login-registry.sh / .ps1    # 仓库登录
@@ -250,8 +252,10 @@ deploy-swarm/
 | `JWT_SECRET` | JWT 令牌签名密钥 |
 | `JWT_REFRESH_SECRET` | JWT 刷新令牌密钥 |
 | `SESSION_SECRET` | 会话加密密钥 |
-| `EDGE_API_TOKEN` | Edge 服务器 API 令牌 |
 | `GRAFANA_ADMIN_PASSWORD` | Grafana 管理员密码 |
+
+> **注意**：`EDGE_API_TOKEN` / `EDGE_BYPASS_TOKEN` 是用于内部服务间通信的固定约定值。  
+> 请勿重新生成或更改。默认值已在 `.env.example` 中设置。
 
 ### 可选项
 
@@ -301,10 +305,10 @@ deploy-swarm/
 ### 扩缩容
 
 ```bash
-./scale.sh --preset minimal                     # backend:1  frontend:1  edge:1
-./scale.sh --preset standard                    # backend:2  frontend:1  edge:2
-./scale.sh --preset high                        # backend:4  frontend:2  edge:8
-./scale.sh --service backend --replicas 4       # 单独扩容
+./ephemeral-scale.sh --preset minimal                     # backend:1  frontend:1  edge:1
+./ephemeral-scale.sh --preset standard                    # backend:2  frontend:1  edge:2
+./ephemeral-scale.sh --preset high                        # backend:4  frontend:2  edge:8
+./ephemeral-scale.sh --service backend --replicas 4       # 单独扩容
 ```
 
 ### 状态检查
@@ -401,13 +405,13 @@ docker service inspect gatrix_backend --format '{{range .Spec.TaskTemplate.Conta
 
 ### 操作：更改安全密钥（JWT、Session 等）
 
-更改 `JWT_SECRET`、`JWT_REFRESH_SECRET`、`SESSION_SECRET`、`EDGE_API_TOKEN`：
+更改 `JWT_SECRET`、`JWT_REFRESH_SECRET`、`SESSION_SECRET`：
 
 > ⚠️ **警告**：更改 JWT Secret 将使所有现有用户会话失效。  
 > 请在维护窗口期间进行此操作。
 
 > **注意**：服务从**环境变量**（通过 `.env` 设置）读取安全值，
-> 而不是从 Docker secret 文件挂载读取。Docker secrets 在 `--init` 时创建，
+> 而不是从 Docker secret 文件挂载读取。Docker secrets 在每次部署时自动创建（已存在则跳过），
 > 仅供参考/备份。请同时更新 `.env` 和 Docker secrets 以保持一致。
 
 ```bash
@@ -436,10 +440,10 @@ vi .env    # 修改 EDGE_REPLICAS=8
 docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
 
 # 方法 B：使用 scale 脚本（立即生效，不保存到 .env）
-./scale.sh --service edge --replicas 8
+./ephemeral-scale.sh --service edge --replicas 8
 ```
 
-> **重要**：`scale.sh` 的更改是**临时的**。如果不更新 `.env` 就重新部署，  
+> **重要**：`ephemeral-scale.sh` 的更改是**临时的**。如果不更新 `.env` 就重新部署，  
 > 副本数会恢复为 `.env` 中的值。永久更改请同时更新 `.env`。
 
 ### 操作：更改镜像版本
@@ -461,7 +465,7 @@ vi .env    # 修改 GATRIX_VERSION=1.2.0
 |------|------|----------|
 | 编辑 `.env` 后未重新部署 | 无变化，旧值仍在运行 | 运行 `docker stack deploy ...` |
 | 仅在 `.env` 中更改 `JWT_SECRET` | Docker Secret 仍为旧值 | 需删除 + 重建 Docker Secret |
-| 使用 `scale.sh` 后未更新 `.env` | 下次部署时恢复为 `.env` 值 | 扩缩容后同时更新 `.env` |
+| 使用 `ephemeral-scale.sh` 后未更新 `.env` | 下次部署时恢复为 `.env` 值 | 扩缩容后同时更新 `.env` |
 | 设置 `DB_HOST=your-cloud-...`（占位符） | `deploy.sh` 验证失败阻止部署 | 替换为实际云 DB 地址 |
 | 仅在一个管理节点修改 `.env` | 其他管理节点可能使用不同的 `.env` | 同步 `.env` 到所有管理节点 |
 
@@ -638,7 +642,7 @@ Nginx 配置位于 `config/nginx.conf`。修改后重新部署即可生效。
 9. **Docker 镜像必须先推送到仓库**：`build-and-push.sh` **需要源代码，仅限开发环境使用**，不包含在部署包中。开发团队将镜像上传到仓库后，生产服务器使用 `deploy.sh` 拉取并部署镜像。
 10. **`registry.env` 不包含在包中**：必须在部署服务器上手动创建。请向开发团队索取仓库认证信息。
 11. **`.env` 仅在部署时读取**：修改 `.env` 后必须重新部署才能生效。仅编辑不会影响正在运行的服务。
-12. **`scale.sh` 更改是临时的**：通过 `scale.sh` 设置的副本数在下次部署时会恢复为 `.env` 中的值。永久更改请修改 `.env` 中的 `*_REPLICAS` 值。
+12. **`ephemeral-scale.sh` 更改是临时的**：通过 `ephemeral-scale.sh` 设置的副本数在下次部署时会恢复为 `.env` 中的值。永久更改请修改 `.env` 中的 `*_REPLICAS` 值。
 13. **SSL/TLS 应在 Cloud LB 终止**：服务本身仅提供 HTTP。请在 Cloud LB（腾讯 CLB / AWS ALB）上配置 HTTPS 证书。
 
 ### 数据 & 卷

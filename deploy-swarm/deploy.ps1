@@ -143,39 +143,37 @@ foreach ($var in $requiredVars) {
 }
 Show-Success "Environment variables validated"
 
-# Create Secrets
-if ($Init) {
-    Show-Info "Creating Docker secrets..."
-    
-    $secrets = @{
-        "jwt_secret"         = $env:JWT_SECRET;
-        "jwt_refresh_secret" = $env:JWT_REFRESH_SECRET;
-        "session_secret"     = $env:SESSION_SECRET;
-        "api_secret"         = $env:GATRIX_API_SECRET;
-        "edge_api_token"     = $env:EDGE_API_TOKEN;
-        "grafana_password"   = $env:GRAFANA_ADMIN_PASSWORD;
+# Create Secrets (idempotent - skips existing secrets)
+Show-Info "Creating Docker secrets..."
+
+$secrets = @{
+    "jwt_secret"         = $env:JWT_SECRET;
+    "jwt_refresh_secret" = $env:JWT_REFRESH_SECRET;
+    "session_secret"     = $env:SESSION_SECRET;
+    "api_secret"         = $env:GATRIX_API_SECRET;
+    "edge_api_token"     = $env:EDGE_API_TOKEN;
+    "grafana_password"   = $env:GRAFANA_ADMIN_PASSWORD;
+}
+
+foreach ($key in $secrets.Keys) {
+    $val = $secrets[$key]
+    if (-not $val) { $val = "default_unsafe_value_change_me" } # Fallback if env missing
+
+    $secretExists = $false
+    try {
+        $null = docker secret inspect $key 2>&1
+        if ($LASTEXITCODE -eq 0) { $secretExists = $true }
+    }
+    catch {
+        $secretExists = $false
     }
 
-    foreach ($key in $secrets.Keys) {
-        $val = $secrets[$key]
-        if (-not $val) { $val = "default_unsafe_value_change_me" } # Fallback if env missing
-
-        $secretExists = $false
-        try {
-            $null = docker secret inspect $key 2>&1
-            if ($LASTEXITCODE -eq 0) { $secretExists = $true }
-        }
-        catch {
-            $secretExists = $false
-        }
-
-        if ($secretExists) {
-            Show-Warn "Secret '$key' already exists, skipping..."
-        }
-        else {
-            $val | docker secret create $key -
-            Show-Success "Created secret: $key"
-        }
+    if ($secretExists) {
+        Show-Warn "Secret '$key' already exists, skipping..."
+    }
+    else {
+        $val | docker secret create $key -
+        Show-Success "Created secret: $key"
     }
 }
 
@@ -222,7 +220,8 @@ $elapsed = 0
 while ($elapsed -lt $timeout) {
     $svcList = docker stack services $Stack --format '{{.Replicas}}'
     
-    $notReady = $svcList | Where-Object { $_ -match "0/" }
+    # Match "0/N" where N>0 (not ready). Skip "0/0" (intentionally scaled to 0).
+    $notReady = $svcList | Where-Object { $_ -match "0/[1-9]" }
     
     if ($notReady) {
         Start-Sleep -Seconds 10

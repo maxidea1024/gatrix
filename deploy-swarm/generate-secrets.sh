@@ -91,8 +91,6 @@ if [ "$GEN_ENV" = true ]; then
     echo "JWT_SECRET=$(generate_key 32 base64 | tr -d '\n')"
     echo "JWT_REFRESH_SECRET=$(generate_key 32 base64 | tr -d '\n')"
     echo "SESSION_SECRET=$(generate_key 32 base64 | tr -d '\n')"
-    echo "EDGE_API_TOKEN=$(generate_key 24 alphanumeric | tr -d '\n')"
-    echo "EDGE_BYPASS_TOKEN=$(generate_key 24 alphanumeric | tr -d '\n')"
     echo "GRAFANA_ADMIN_PASSWORD=$(generate_key 16 alphanumeric | tr -d '\n')"
     echo ""
     echo -e "${GREEN}[INFO] Keys generated using $(openssl version 2>/dev/null || echo '/dev/urandom')${NC}"

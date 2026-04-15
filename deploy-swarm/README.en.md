@@ -179,7 +179,9 @@ EOF
 
 ```bash
 chmod +x *.sh
-./deploy.sh -v 1.0.0 --init    # Init swarm + create secrets + deploy
+# --init: Initializes Swarm if not already initialized
+# Docker Secrets are auto-created on every deploy (skips existing ones)
+./deploy.sh -v 1.0.0 --init
 ```
 
 PowerShell (Windows):
@@ -214,7 +216,7 @@ deploy-swarm/
 ├── build-and-push.sh / .ps1    # Build & push to registry (⚠️ dev environment only, not in package)
 ├── update.sh / .ps1            # Rolling update
 ├── rollback.sh / .ps1          # Rollback
-├── scale.sh / .ps1             # Scaling
+├── ephemeral-scale.sh / .ps1   # Scaling (ephemeral, reverts on redeploy)
 ├── status.sh / .ps1            # Status check
 ├── list-images.sh / .ps1       # List registry images
 ├── login-registry.sh / .ps1    # Registry login
@@ -250,8 +252,10 @@ deploy-swarm/
 | `JWT_SECRET` | JWT token signing key |
 | `JWT_REFRESH_SECRET` | JWT refresh token key |
 | `SESSION_SECRET` | Session encryption key |
-| `EDGE_API_TOKEN` | Edge server API token |
 | `GRAFANA_ADMIN_PASSWORD` | Grafana admin password |
+
+> **Note**: `EDGE_API_TOKEN` / `EDGE_BYPASS_TOKEN` are hardcoded convention values for internal  
+> service-to-service communication. Do NOT regenerate or change them. Defaults are set in `.env.example`.
 
 ### Optional
 
@@ -301,10 +305,10 @@ deploy-swarm/
 ### Scaling
 
 ```bash
-./scale.sh --preset minimal                     # backend:1  frontend:1  edge:1
-./scale.sh --preset standard                    # backend:2  frontend:1  edge:2
-./scale.sh --preset high                        # backend:4  frontend:2  edge:8
-./scale.sh --service backend --replicas 4       # Scale individual service
+./ephemeral-scale.sh --preset minimal                     # backend:1  frontend:1  edge:1
+./ephemeral-scale.sh --preset standard                    # backend:2  frontend:1  edge:2
+./ephemeral-scale.sh --preset high                        # backend:4  frontend:2  edge:8
+./ephemeral-scale.sh --service backend --replicas 4       # Scale individual service
 ```
 
 ### Status Check
@@ -401,14 +405,14 @@ docker service inspect gatrix_backend --format '{{range .Spec.TaskTemplate.Conta
 
 ### Procedure: Changing Security Keys (JWT, Session, etc.)
 
-For changes to `JWT_SECRET`, `JWT_REFRESH_SECRET`, `SESSION_SECRET`, `EDGE_API_TOKEN`:
+For changes to `JWT_SECRET`, `JWT_REFRESH_SECRET`, `SESSION_SECRET`:
 
 > ⚠️ **Warning**: Changing JWT secrets will invalidate ALL existing user sessions.  
 > Plan this change during a maintenance window.
 
 > **Note**: Services read security values from **environment variables** (set via `.env`), 
-> not from Docker secret file mounts. Docker secrets are created during `--init` for 
-> reference/backup purposes. You must update **both** `.env` and Docker secrets to stay consistent.
+> not from Docker secret file mounts. Docker secrets are auto-created on every deploy (skipped if they already exist)
+> for reference/backup purposes. You must update **both** `.env` and Docker secrets to stay consistent.
 
 ```bash
 # 1. Update .env with the new value
@@ -436,10 +440,10 @@ vi .env    # Change EDGE_REPLICAS=8
 docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
 
 # Option B: Use scale script (immediate, does NOT persist in .env)
-./scale.sh --service edge --replicas 8
+./ephemeral-scale.sh --service edge --replicas 8
 ```
 
-> **Important**: `scale.sh` changes are **temporary**. If you redeploy without updating `.env`,  
+> **Important**: `ephemeral-scale.sh` changes are **temporary**. If you redeploy without updating `.env`,  
 > replicas will revert to the `.env` values. Always update `.env` for permanent changes.
 
 ### Procedure: Changing Image Version
@@ -461,7 +465,7 @@ vi .env    # Change GATRIX_VERSION=1.2.0
 |---------|-------------|-----|
 | Edit `.env` but don't redeploy | Nothing changes, old values still running | Run `docker stack deploy ...` |
 | Change `JWT_SECRET` in `.env` only | Secret in Docker secret store is still the old value | Must delete + recreate Docker secret |
-| Use `scale.sh` but don't update `.env` | Next `docker stack deploy` reverts replicas to `.env` value | Update `.env` after scaling |
+| Use `ephemeral-scale.sh` but don't update `.env` | Next `docker stack deploy` reverts replicas to `.env` value | Update `.env` after scaling |
 | Set `DB_HOST=your-cloud-...` (placeholder) | `deploy.sh` blocks deployment with validation error | Replace with actual Cloud DB host |
 | Edit `.env` on one manager node | Other manager nodes may have different `.env` | Sync `.env` to all manager nodes |
 
@@ -641,7 +645,7 @@ The Nginx config is at `config/nginx.conf`. Changes take effect after redeployin
 9. **Docker images must be pushed to the registry first**: `build-and-push.sh` **requires source code and is only available in the dev environment** — it is NOT included in the deploy package. The dev team pushes images to the registry first, then production servers use `deploy.sh` to pull and deploy those images.
 10. **`registry.env` is NOT included in the package**: You must create it manually on the deploy server. Request registry credentials from the dev team.
 11. **`.env` is only read at deploy time**: After editing `.env`, you must redeploy for changes to take effect. Editing alone does NOT affect running services.
-12. **`scale.sh` changes are temporary**: Replica counts set via `scale.sh` revert to `.env` values on the next deploy. For permanent changes, update `*_REPLICAS` in `.env`.
+12. **`ephemeral-scale.sh` changes are temporary**: Replica counts set via `ephemeral-scale.sh` revert to `.env` values on the next deploy. For permanent changes, update `*_REPLICAS` in `.env`.
 13. **SSL/TLS should be terminated at the Cloud LB**: Services only serve HTTP. Configure HTTPS certificates on your Cloud LB (Tencent CLB / AWS ALB).
 
 ### Data & Volumes

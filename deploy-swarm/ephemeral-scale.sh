@@ -1,9 +1,11 @@
 #!/bin/bash
 #
-# Gatrix Swarm Scaling Script
+# Gatrix Swarm Ephemeral Scaling Script
+# ⚠ Changes are TEMPORARY — they do NOT persist across redeployments.
+# To make permanent changes, update *_REPLICAS in .env and redeploy.
 #
 # Usage:
-#   ./scale.sh [options]
+#   ./ephemeral-scale.sh [options]
 #
 # Options:
 #   -s, --stack <name>        Stack name (default: gatrix)
@@ -39,7 +41,7 @@ while [[ $# -gt 0 ]]; do
         -h|--help)
             echo "Gatrix Swarm Scaling Script"
             echo ""
-            echo "Usage: ./scale.sh [options]"
+            echo "Usage: ./ephemeral-scale.sh [options]"
             echo ""
             echo "Options:"
             echo "  -s, --stack <name>        Stack name (default: gatrix)"
@@ -114,7 +116,8 @@ show_status() {
 
 main() {
     echo "========================================"
-    echo "   Gatrix Swarm Scaling"
+    echo "   Gatrix Swarm Ephemeral Scaling"
+    echo "   ⚠ Changes are TEMPORARY"
     echo "========================================"
     echo ""
 

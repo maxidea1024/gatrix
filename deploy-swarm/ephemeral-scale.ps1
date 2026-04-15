@@ -1,9 +1,11 @@
 #!/usr/bin/env pwsh
 #
-# Gatrix Swarm Scaling Script
+# Gatrix Swarm Ephemeral Scaling Script
+# ⚠ Changes are TEMPORARY — they do NOT persist across redeployments.
+# To make permanent changes, update *_REPLICAS in .env and redeploy.
 #
 # Usage:
-#   ./scale.ps1 [options]
+#   ./ephemeral-scale.ps1 [options]
 #
 # Options:
 #   -n, --stack <name>        Stack name (default: gatrix)
@@ -24,7 +26,7 @@ $Status = $false
 function Show-Help {
     Write-Host "Gatrix Swarm Scaling Script"
     Write-Host ""
-    Write-Host "Usage: ./scale.ps1 [options]"
+    Write-Host "Usage: ./ephemeral-scale.ps1 [options]"
     Write-Host ""
     Write-Host "Options:"
     Write-Host "  -n, --stack <name>        Stack name (default: gatrix)"
@@ -42,9 +44,9 @@ function Show-Help {
     Write-Host "  high      - backend:4  frontend:2  edge:8  (peak traffic)"
     Write-Host ""
     Write-Host "Examples:"
-    Write-Host "  ./scale.ps1 -s backend -r 4"
-    Write-Host "  ./scale.ps1 --preset high"
-    Write-Host "  ./scale.ps1 --status"
+    Write-Host "  ./ephemeral-scale.ps1 -s backend -r 4"
+    Write-Host "  ./ephemeral-scale.ps1 --preset high"
+    Write-Host "  ./ephemeral-scale.ps1 --status"
     exit 0
 }
 
@@ -115,7 +117,8 @@ function Show-CurrentStatus {
 }
 
 Write-Host "========================================"
-Write-Host "   Gatrix Swarm Scaling"
+Write-Host "   Gatrix Swarm Ephemeral Scaling"
+Write-Host "   ⚠ Changes are TEMPORARY"
 Write-Host "========================================"
 Write-Host ""
 

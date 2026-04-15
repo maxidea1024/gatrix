@@ -246,7 +246,8 @@ wait_for_services() {
     local elapsed=0
 
     while [ $elapsed -lt $timeout ]; do
-        if $DOCKER_CMD stack services "$STACK_NAME" --format '{{.Replicas}}' | grep -q "0/"; then
+        # Match "0/N" where N>0 (not ready). Skip "0/0" (intentionally scaled to 0).
+        if $DOCKER_CMD stack services "$STACK_NAME" --format '{{.Replicas}}' | grep -qE '0/[1-9]'; then
             sleep 10
             elapsed=$((elapsed + 10))
             printf "."
@@ -291,9 +292,7 @@ main() {
     load_env
     validate_env
 
-    if [ "$INIT_MODE" = true ]; then
-        create_secrets
-    fi
+    create_secrets
 
     login_registry
     pull_images
