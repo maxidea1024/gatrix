@@ -38,6 +38,12 @@ router.patch(
   ClientVersionController.bulkUpdateStatus as any
 );
 
+// Proxy health check to an arbitrary address (avoids CORS from browser)
+router.post(
+  '/health-check' as any,
+  ClientVersionController.checkAddressHealth as any
+);
+
 // Get client version detail (admin)
 router.get('/:id' as any, ClientVersionController.getClientVersionById as any);
 

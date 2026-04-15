@@ -584,44 +584,34 @@ export class ClientVersionService {
   }
 
   /**
-   * Check if a game server address is reachable by directly calling its /health endpoint
+   * Check if a game server address is reachable by proxying through the backend
+   * to avoid CORS issues with cross-origin requests.
    */
   static async checkAddressHealth(
-    _projectApiPath: string,
+    projectApiPath: string,
     address: string
   ): Promise<{ healthy: boolean; latency: number; error?: string }> {
     const startTime = Date.now();
     try {
-      const normalizedAddress = address.replace(/\/+$/, '');
-      const healthUrl = `${normalizedAddress}/health`;
+      const response = await apiService.post<any>(
+        `${this.basePath(projectApiPath)}/health-check`,
+        { address }
+      );
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-      try {
-        const response = await fetch(healthUrl, {
-          method: 'GET',
-          signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-        const latency = Date.now() - startTime;
-
+      // apiService.post returns response.data (the { success, data } wrapper)
+      if (response?.success && response?.data) {
         return {
-          healthy: response.ok,
-          latency,
-          ...(!response.ok && { error: `HTTP ${response.status}` }),
-        };
-      } catch (fetchError: any) {
-        clearTimeout(timeoutId);
-        return {
-          healthy: false,
-          latency: Date.now() - startTime,
-          error:
-            fetchError.name === 'AbortError'
-              ? 'Connection timeout'
-              : fetchError.message || 'Connection failed',
+          healthy: response.data.healthy,
+          latency: response.data.latency || (Date.now() - startTime),
+          ...(response.data.error && { error: response.data.error }),
         };
       }
+
+      return {
+        healthy: false,
+        latency: Date.now() - startTime,
+        error: 'Unexpected response from server',
+      };
     } catch (err: any) {
       return {
         healthy: false,

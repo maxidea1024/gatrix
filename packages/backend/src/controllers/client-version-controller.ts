@@ -1019,6 +1019,69 @@ export class ClientVersionController {
   }
 
   /**
+   * Proxy health check to an arbitrary address server-side
+   * POST /api/v1/admin/client-versions/health-check
+   * Body: { address: string }
+   *
+   * This avoids CORS issues when the frontend tries to directly call
+   * external game server /health endpoints from the browser.
+   */
+  static async checkAddressHealth(req: AuthenticatedRequest, res: Response) {
+    try {
+      const { address } = req.body;
+      if (!address || typeof address !== 'string') {
+        return res.status(400).json({
+          success: false,
+          message: 'address is required',
+        });
+      }
+
+      const normalizedAddress = address.replace(/\/+$/, '');
+      const healthUrl = `${normalizedAddress}/health`;
+
+      const axios = (await import('axios')).default;
+      const startTime = Date.now();
+
+      try {
+        const response = await axios.get(healthUrl, { timeout: 5000 });
+        const latency = Date.now() - startTime;
+
+        res.json({
+          success: true,
+          data: {
+            healthy: response.status >= 200 && response.status < 400,
+            latency,
+          },
+        });
+      } catch (healthError: any) {
+        const latency = Date.now() - startTime;
+        const message =
+          healthError.code === 'ECONNREFUSED'
+            ? 'Connection refused'
+            : healthError.code === 'ETIMEDOUT' ||
+                healthError.code === 'ECONNABORTED'
+              ? 'Connection timeout'
+              : healthError.message || 'Connection failed';
+
+        res.json({
+          success: true,
+          data: {
+            healthy: false,
+            latency,
+            error: message,
+          },
+        });
+      }
+    } catch (error: any) {
+      logger.error('Error checking address health:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to check address health',
+      });
+    }
+  }
+
+  /**
    * Reset all client versions and clear cache (for testing)
    * DELETE /api/v1/admin/client-versions/reset/all
    */
