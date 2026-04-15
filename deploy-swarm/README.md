@@ -505,41 +505,105 @@ docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
 ## 🔍 서비스 아키텍처
 
 ```
-                    ┌──────────────┐
-                    │   Internet   │
-                    └──────┬───────┘
-                           │
-                  ┌────────┴────────┐
-                  │   Cloud LB      │  (Tencent CLB / AWS ALB)
-                  └────────┬────────┘
-                           │
-         ┌─────────────────┼──────────────────┐
-         │                 │                  │
- ┌───────┴──────┐  ┌──────┴──────┐  ┌────────┴───────┐
- │   Edge ×N    │  │  Frontend   │  │   Backend      │
- │  :3400       │  │  :43000     │  │   :45000       │
- │ (Game SDK)   │  │ (Admin UI)  │  │  (Admin API)   │
- └──────────────┘  └─────────────┘  └────────┬───────┘
+                     ┌──────────────┐
+                     │   Internet   │
+                     └──────┬───────┘
+                            │
+                   ┌────────┴────────┐
+                   │    Cloud LB     │  (Tencent CLB / AWS ALB)
+                   └────────┬────────┘
+                            │
+         ┌──────────────────┼──────────────────┐
+         │                  │                  │
+  ┌──────┴───────┐  ┌──────┴───────┐  ┌───────┴──────┐
+  │   Edge ×N    │  │  Frontend    │  │   Backend    │
+  │    :3400     │  │   :43000     │  │   :45000     │
+  │ (Client API) │  │  (Admin UI)  │  │ (Admin API)  │
+  └──────────────┘  └──────────────┘  └──────┬───────┘
                                              │
                    ┌─────────────────────────┘
                    │
-         ┌─────────┴────────┐
-         │                  │
-   ┌─────┴─────┐    ┌──────┴──────┐
-   │Cloud MySQL│    │ Cloud Redis │
-   │ (External)│    │ (External)  │
-   └───────────┘    └─────────────┘
+         ┌─────────┴─────────┐
+         │                   │
+  ┌──────┴──────┐    ┌──────┴──────┐
+  │ Cloud MySQL │    │ Cloud Redis │
+  │ (External)  │    │ (External)  │
+  └─────────────┘    └─────────────┘
 
-   ┌────────────┐     ┌────────────┐
-   │ Prometheus │────→│  Grafana   │
-   │  :9090     │     │   :3000    │
-   └────────────┘     └────────────┘
+  ┌─────────────┐    ┌─────────────┐
+  │ Prometheus  │───→│   Grafana   │
+  │   :9090     │    │    :3000    │
+  └─────────────┘    └─────────────┘
 
-   ┌─────────────────────────────────────┐
-   │ Nginx (optional, NGINX_REPLICAS=1)  │
-   │ Dev/staging unified gateway :80     │
-   └─────────────────────────────────────┘
+  ┌─────────────────────────────────────┐
+  │ Nginx (optional, NGINX_REPLICAS=1)  │
+  │ Dev/staging unified gateway :80     │
+  └─────────────────────────────────────┘
 ```
+
+---
+
+## 🔀 Nginx 리버스 프록시 (선택사항)
+
+Nginx는 **기본적으로 비활성화**되어 있습니다 (`NGINX_REPLICAS=0`).
+
+### 언제 Nginx가 필요한가?
+
+| 환경 | Nginx | 이유 |
+|------|-------|------|
+| **프로덕션 (Cloud LB 사용)** | ❌ 비활성화 | Cloud LB (Tencent CLB / AWS ALB)가 라우팅, SSL 종료, 헬스체크를 처리 |
+| **개발/스테이징 (LB 없음)** | ✅ 활성화 | 단일 포트 (:80)로 모든 서비스에 접근 가능 |
+| **온프레미스 (Cloud LB 없음)** | ✅ 활성화 | Nginx가 경량 리버스 프록시/로드밸런서 역할 |
+
+### Nginx 활성화 방법
+
+```bash
+# 1. .env에서 NGINX_REPLICAS를 1로 변경
+vi .env
+# NGINX_REPLICAS=1
+
+# 2. 재배포
+docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
+
+# 3. 확인
+curl http://localhost:80/health
+```
+
+활성화하면 아래와 같이 단일 포트로 접근 가능:
+
+| 경로 | 라우팅 대상 |
+|------|-----------|
+| `http://localhost/` | Frontend (Admin UI) |
+| `http://localhost/api/v1/` | Backend API |
+| `http://localhost/grafana/` | Grafana Dashboard |
+| `http://localhost/health` | Nginx 헬스체크 |
+
+### Nginx 비활성화 방법 (기본값)
+
+```bash
+# 1. .env에서 NGINX_REPLICAS를 0으로 변경
+vi .env
+# NGINX_REPLICAS=0
+
+# 2. 재배포
+docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
+```
+
+비활성화하면 각 서비스에 직접 포트로 접근:
+
+| 서비스 | 직접 포트 |
+|--------|----------|
+| Frontend | `:43000` |
+| Backend | `:45000` |
+| Edge | `:3400` |
+| Grafana | `:3000` |
+| Prometheus | `:9090` |
+
+### Nginx 설정 파일
+
+Nginx 설정은 `config/nginx.conf`에 있습니다. 수정 후 재배포하면 즉시 적용됩니다.
+
+> ⚠️ **주의**: Nginx를 활성화해도 직접 포트 접근은 여전히 가능합니다. 프로덕션에서 Nginx만 외부 노출하려면 방화벽에서 내부 포트를 차단하세요.
 
 ---
 

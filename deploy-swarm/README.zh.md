@@ -498,41 +498,105 @@ docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
 ## 🔍 服务架构
 
 ```
-                    ┌──────────────┐
-                    │   Internet   │
-                    └──────┬───────┘
-                           │
-                  ┌────────┴────────┐
-                  │   Cloud LB      │  (腾讯云 CLB / AWS ALB)
-                  └────────┬────────┘
-                           │
-         ┌─────────────────┼──────────────────┐
-         │                 │                  │
- ┌───────┴──────┐  ┌──────┴──────┐  ┌────────┴───────┐
- │   Edge ×N    │  │  Frontend   │  │   Backend      │
- │  :3400       │  │  :43000     │  │   :45000       │
- │ (Game SDK)   │  │ (Admin UI)  │  │  (Admin API)   │
- └──────────────┘  └─────────────┘  └────────┬───────┘
+                     ┌──────────────┐
+                     │   Internet   │
+                     └──────┬───────┘
+                            │
+                   ┌────────┴────────┐
+                   │    Cloud LB     │  (Tencent CLB / AWS ALB)
+                   └────────┬────────┘
+                            │
+         ┌──────────────────┼──────────────────┐
+         │                  │                  │
+  ┌──────┴───────┐  ┌──────┴───────┐  ┌───────┴──────┐
+  │   Edge ×N    │  │  Frontend    │  │   Backend    │
+  │    :3400     │  │   :43000     │  │   :45000     │
+  │ (Client API) │  │  (Admin UI)  │  │ (Admin API)  │
+  └──────────────┘  └──────────────┘  └──────┬───────┘
                                              │
                    ┌─────────────────────────┘
                    │
-         ┌─────────┴────────┐
-         │                  │
-   ┌─────┴─────┐    ┌──────┴──────┐
-   │  云 MySQL  │    │  云 Redis   │
-   │ （外部）    │    │ （外部）     │
-   └───────────┘    └─────────────┘
+         ┌─────────┴─────────┐
+         │                   │
+  ┌──────┴──────┐    ┌──────┴──────┐
+  │ Cloud MySQL │    │ Cloud Redis │
+  │ (External)  │    │ (External)  │
+  └─────────────┘    └─────────────┘
 
-   ┌────────────┐     ┌────────────┐
-   │ Prometheus │────→│  Grafana   │
-   │  :9090     │     │   :3000    │
-   └────────────┘     └────────────┘
+  ┌─────────────┐    ┌─────────────┐
+  │ Prometheus  │───→│   Grafana   │
+  │   :9090     │    │    :3000    │
+  └─────────────┘    └─────────────┘
 
-   ┌─────────────────────────────────────┐
-   │ Nginx（可选, NGINX_REPLICAS=1）      │
-   │ 开发/测试环境统一网关 :80             │
-   └─────────────────────────────────────┘
+  ┌─────────────────────────────────────┐
+  │ Nginx (optional, NGINX_REPLICAS=1)  │
+  │ Dev/staging unified gateway :80     │
+  └─────────────────────────────────────┘
 ```
+
+---
+
+## 🔀 Nginx 反向代理（可选）
+
+Nginx **默认禁用**（`NGINX_REPLICAS=0`）。
+
+### 何时需要 Nginx？
+
+| 环境 | Nginx | 原因 |
+|------|-------|------|
+| **生产环境（使用 Cloud LB）** | ❌ 禁用 | Cloud LB（腾讯 CLB / AWS ALB）处理路由、SSL 终止、健康检查 |
+| **开发/测试（无 LB）** | ✅ 启用 | 通过单一端口 (:80) 访问所有服务 |
+| **本地部署（无 Cloud LB）** | ✅ 启用 | Nginx 作为轻量级反向代理 / 负载均衡器 |
+
+### 如何启用 Nginx
+
+```bash
+# 1. 在 .env 中设置 NGINX_REPLICAS=1
+vi .env
+# NGINX_REPLICAS=1
+
+# 2. 重新部署
+docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
+
+# 3. 验证
+curl http://localhost:80/health
+```
+
+启用后，可通过单一端口访问所有服务：
+
+| 路径 | 路由到 |
+|------|--------|
+| `http://localhost/` | Frontend（管理界面） |
+| `http://localhost/api/v1/` | Backend API |
+| `http://localhost/grafana/` | Grafana 仪表板 |
+| `http://localhost/health` | Nginx 健康检查 |
+
+### 如何禁用 Nginx（默认）
+
+```bash
+# 1. 在 .env 中设置 NGINX_REPLICAS=0
+vi .env
+# NGINX_REPLICAS=0
+
+# 2. 重新部署
+docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
+```
+
+禁用后，通过直接端口访问各服务：
+
+| 服务 | 直接端口 |
+|------|---------|
+| Frontend | `:43000` |
+| Backend | `:45000` |
+| Edge | `:3400` |
+| Grafana | `:3000` |
+| Prometheus | `:9090` |
+
+### Nginx 配置文件
+
+Nginx 配置位于 `config/nginx.conf`。修改后重新部署即可生效。
+
+> ⚠️ **注意**：即使启用了 Nginx，直接端口访问仍然可用。在生产环境中，如果只想通过 Nginx 接收流量，请通过防火墙阻止内部端口。
 
 ---
 

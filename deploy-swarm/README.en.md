@@ -501,41 +501,105 @@ docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
 ## 🔍 Service Architecture
 
 ```
-                    ┌──────────────┐
-                    │   Internet   │
-                    └──────┬───────┘
-                           │
-                  ┌────────┴────────┐
-                  │   Cloud LB      │  (Tencent CLB / AWS ALB)
-                  └────────┬────────┘
-                           │
-         ┌─────────────────┼──────────────────┐
-         │                 │                  │
- ┌───────┴──────┐  ┌──────┴──────┐  ┌────────┴───────┐
- │   Edge ×N    │  │  Frontend   │  │   Backend      │
- │  :3400       │  │  :43000     │  │   :45000       │
- │ (Game SDK)   │  │ (Admin UI)  │  │  (Admin API)   │
- └──────────────┘  └─────────────┘  └────────┬───────┘
+                     ┌──────────────┐
+                     │   Internet   │
+                     └──────┬───────┘
+                            │
+                   ┌────────┴────────┐
+                   │    Cloud LB     │  (Tencent CLB / AWS ALB)
+                   └────────┬────────┘
+                            │
+         ┌──────────────────┼──────────────────┐
+         │                  │                  │
+  ┌──────┴───────┐  ┌──────┴───────┐  ┌───────┴──────┐
+  │   Edge ×N    │  │  Frontend    │  │   Backend    │
+  │    :3400     │  │   :43000     │  │   :45000     │
+  │ (Client API) │  │  (Admin UI)  │  │ (Admin API)  │
+  └──────────────┘  └──────────────┘  └──────┬───────┘
                                              │
                    ┌─────────────────────────┘
                    │
-         ┌─────────┴────────┐
-         │                  │
-   ┌─────┴─────┐    ┌──────┴──────┐
-   │Cloud MySQL│    │ Cloud Redis │
-   │ (External)│    │ (External)  │
-   └───────────┘    └─────────────┘
+         ┌─────────┴─────────┐
+         │                   │
+  ┌──────┴──────┐    ┌──────┴──────┐
+  │ Cloud MySQL │    │ Cloud Redis │
+  │ (External)  │    │ (External)  │
+  └─────────────┘    └─────────────┘
 
-   ┌────────────┐     ┌────────────┐
-   │ Prometheus │────→│  Grafana   │
-   │  :9090     │     │   :3000    │
-   └────────────┘     └────────────┘
+  ┌─────────────┐    ┌─────────────┐
+  │ Prometheus  │───→│   Grafana   │
+  │   :9090     │    │    :3000    │
+  └─────────────┘    └─────────────┘
 
-   ┌─────────────────────────────────────┐
-   │ Nginx (optional, NGINX_REPLICAS=1)  │
-   │ Dev/staging unified gateway :80     │
-   └─────────────────────────────────────┘
+  ┌─────────────────────────────────────┐
+  │ Nginx (optional, NGINX_REPLICAS=1)  │
+  │ Dev/staging unified gateway :80     │
+  └─────────────────────────────────────┘
 ```
+
+---
+
+## 🔀 Nginx Reverse Proxy (Optional)
+
+Nginx is **disabled by default** (`NGINX_REPLICAS=0`).
+
+### When Do You Need Nginx?
+
+| Environment | Nginx | Reason |
+|-------------|-------|--------|
+| **Production (with Cloud LB)** | ❌ Disabled | Cloud LB (Tencent CLB / AWS ALB) handles routing, SSL termination, health checks |
+| **Dev/Staging (no LB)** | ✅ Enabled | Access all services through a single port (:80) |
+| **On-premises (no Cloud LB)** | ✅ Enabled | Nginx acts as a lightweight reverse proxy / load balancer |
+
+### How to Enable Nginx
+
+```bash
+# 1. Set NGINX_REPLICAS=1 in .env
+vi .env
+# NGINX_REPLICAS=1
+
+# 2. Redeploy
+docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
+
+# 3. Verify
+curl http://localhost:80/health
+```
+
+When enabled, all services are accessible through a single port:
+
+| Path | Routes To |
+|------|-----------|
+| `http://localhost/` | Frontend (Admin UI) |
+| `http://localhost/api/v1/` | Backend API |
+| `http://localhost/grafana/` | Grafana Dashboard |
+| `http://localhost/health` | Nginx health check |
+
+### How to Disable Nginx (Default)
+
+```bash
+# 1. Set NGINX_REPLICAS=0 in .env
+vi .env
+# NGINX_REPLICAS=0
+
+# 2. Redeploy
+docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
+```
+
+When disabled, access each service via its direct port:
+
+| Service | Direct Port |
+|---------|-------------|
+| Frontend | `:43000` |
+| Backend | `:45000` |
+| Edge | `:3400` |
+| Grafana | `:3000` |
+| Prometheus | `:9090` |
+
+### Nginx Configuration
+
+The Nginx config is at `config/nginx.conf`. Changes take effect after redeploying.
+
+> ⚠️ **Note**: Even with Nginx enabled, direct port access is still available. In production, if you only want traffic through Nginx, block the internal ports via firewall.
 
 ---
 
