@@ -79,8 +79,13 @@ if (-not $SkipConfirm) {
 
 # Remove stack
 Show-Info "Removing stack: $Stack..."
-docker stack rm $Stack 2>$null
-Show-Success "Stack removal initiated: $Stack"
+$stackExists = docker stack ls --format '{{.Name}}' | Where-Object { $_ -eq $Stack }
+if ($stackExists) {
+    docker stack rm $Stack 2>&1 | Out-Null
+    Show-Success "Stack removal initiated: $Stack"
+} else {
+    Write-Host "[WARN] Stack '$Stack' not found (already removed)" -ForegroundColor Yellow
+}
 
 Show-Info "Waiting for services to stop..."
 Start-Sleep -Seconds 10

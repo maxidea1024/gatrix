@@ -48,10 +48,6 @@ const INCLUDE_ITEMS = [
   'deploy.sh',
   'deploy.ps1',
 
-  // Build scripts
-  'build-and-push.sh',
-  'build-and-push.ps1',
-
   // Login scripts
   'login-registry.sh',
   'login-registry.ps1',

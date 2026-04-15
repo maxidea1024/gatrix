@@ -55,8 +55,6 @@ $IncludeFiles = @(
     "config"
     "deploy.sh"
     "deploy.ps1"
-    "build-and-push.sh"
-    "build-and-push.ps1"
     "login-registry.sh"
     "login-registry.ps1"
     "update.sh"
