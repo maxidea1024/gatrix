@@ -538,6 +538,8 @@ docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
 
 ## ⚠️ 注意事项
 
+### 安全
+
 1. **不要将 `.env` 提交到 Git** — 包含真实密码。
 2. **不要将 `registry.env` 提交到 Git** — 包含仓库认证令牌。
 3. **安全密钥是环境变量**：服务从 `.env` 读取 `JWT_SECRET`、`SESSION_SECRET` 等（不是从 Docker secret 文件挂载）。要更改这些值，请修改 `.env` 并重新部署：
@@ -545,8 +547,55 @@ docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
    # 修改 .env 后：
    docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
    ```
-4. **云 DB/Redis 防火墙**：确保 Docker Swarm 节点可以访问您的云 DB/Redis，配置安全组/防火墙规则。
-5. **Redis Pub/Sub 访问**：Gatrix 通过 Redis Pub/Sub 与游戏服务器实时通信（Feature Flag 变更、配置同步等）。云 Redis 不仅需要 **Gatrix 服务可访问，还需要游戏服务器也可访问**。如果游戏服务器在不同网络中，需要在云 Redis 安全组中添加游戏服务器的 IP。
+4. **务必更改 Grafana 默认密码** — 在 `.env` 中将 `GRAFANA_ADMIN_PASSWORD` 设置为强密码。
+
+### 网络 & 防火墙
+
+5. **云 DB/Redis 防火墙**：确保 Docker Swarm 节点可以访问您的云 DB/Redis，配置安全组/防火墙规则。
+6. **Redis Pub/Sub 访问**：Gatrix 通过 Redis Pub/Sub 与游戏服务器实时通信（Feature Flag 变更、配置同步等）。云 Redis 不仅需要 **Gatrix 服务可访问，还需要游戏服务器也可访问**。如果游戏服务器在不同网络中，需要在云 Redis 安全组中添加游戏服务器的 IP。
+7. **Swarm 节点间端口**：多节点环境中，节点间 `2377`（管理）、`7946`（发现）、`4789`（VXLAN）端口必须开放。
+8. **Cloud LB 健康检查路径**：配置 Cloud LB 时使用以下端点：
+   | 服务 | 健康检查路径 | 端口 |
+   |------|-------------|------|
+   | Edge | `/health` | 3400 |
+   | Frontend | `/health` | 43000 |
+   | Backend | `/health` | 45000 |
+
+### 部署 & 运维
+
+9. **Docker 镜像必须先推送到仓库**：在远程服务器部署前，开发团队必须使用 `build-and-push.sh` 将镜像上传到仓库。
+10. **`registry.env` 不包含在包中**：必须在部署服务器上手动创建。请向开发团队索取仓库认证信息。
+11. **`.env` 仅在部署时读取**：修改 `.env` 后必须重新部署才能生效。仅编辑不会影响正在运行的服务。
+12. **`scale.sh` 更改是临时的**：通过 `scale.sh` 设置的副本数在下次部署时会恢复为 `.env` 中的值。永久更改请修改 `.env` 中的 `*_REPLICAS` 值。
+13. **SSL/TLS 应在 Cloud LB 终止**：服务本身仅提供 HTTP。请在 Cloud LB（腾讯 CLB / AWS ALB）上配置 HTTPS 证书。
+
+### 数据 & 卷
+
+14. **卷数据是节点本地的**：Prometheus 和 Grafana 的数据仅存储在容器运行的节点上。节点故障可能导致监控数据丢失。关键数据使用云 DB/Redis（已在设计中考虑）。
+15. **`teardown.sh` 默认不删除卷**：要完全清理 Prometheus/Grafana 数据，请使用 `--volumes` 参数：
+    ```bash
+    ./teardown.sh --volumes    # 同时删除卷
+    ```
+16. **Docker 日志磁盘空间**：Docker 默认不轮换日志，可能导致磁盘满。此堆栈将 `json-file` 日志器配置为 `max-size: 10m`、`max-file: 3`，每个服务最多约 30MB。
+
+### 多节点环境
+
+17. **配置文件只需在管理节点上**：`docker-compose.swarm.yml`、`.env`、`config/` 等只需存在于管理节点上。无需复制到工作节点。
+18. **所有节点都需要仓库登录**：虽然部署脚本包含 `--with-registry-auth` 参数，但每个节点必须先运行 `docker login`。
+19. **时间同步（NTP）**：所有 Swarm 节点的时钟必须同步。时间偏差会影响 JWT 令牌验证和 Raft 共识：
+    ```bash
+    timedatectl status    # 检查时间同步状态
+    ```
+
+### 故障排除
+
+20. **服务无法启动时**：
+    ```bash
+    docker service ps gatrix_backend --no-trunc    # 查看失败原因
+    docker service logs gatrix_backend             # 查看日志
+    ```
+21. **镜像拉取失败**：检查 `registry.env` 的认证信息，验证在受影响的节点上 `docker login` 是否有效。
+22. **端口冲突**：如果端口已被占用，在 `.env` 中更改端口（`BACKEND_PORT`、`FRONTEND_PORT`、`GRAFANA_PORT` 等）。
 
 ---
 

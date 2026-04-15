@@ -1,0 +1,59 @@
+# ============================================
+# Gatrix Local Development - MySQL & Redis ONLY
+# ============================================
+# This file runs ONLY MySQL and Redis for local development/testing.
+# It does NOT include Gatrix services (backend, frontend, edge).
+#
+# Usage:
+#   docker compose -f docker-compose.dev-infra.yml up -d
+#   docker compose -f docker-compose.dev-infra.yml down
+#
+# Ports:
+#   MySQL: localhost:43306
+#   Redis: localhost:46379
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: gatrix-dev-mysql
+    command: --innodb-use-native-aio=0
+    environment:
+      MYSQL_ROOT_PASSWORD: gatrix_rootpassword
+      MYSQL_DATABASE: gatrix
+      MYSQL_USER: gatrix_user
+      MYSQL_PASSWORD: gatrix_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../docker/mysql/init:/docker-entrypoint-initdb.d:ro
+      - ../docker/mysql/conf.d:/etc/mysql/conf.d:ro
+    ports:
+      - "43306:3306"
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h localhost']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: gatrix-dev-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "46379:6379"
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local

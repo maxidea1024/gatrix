@@ -541,15 +541,64 @@ docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
 
 ## ⚠️ Important Notes
 
+### Security
+
 1. **Do not commit `.env` to Git** — it contains real passwords.
 2. **Do not commit `registry.env` to Git** — it contains registry auth tokens.
-3. **Security keys are environment variables**: Services read `JWT_SECRET`, `SESSION_SECRET` etc. from `.env` (not from Docker secret file mounts). To change them, update `.env` and redeploy. Optionally recreate Docker secrets for consistency:
+3. **Security keys are environment variables**: Services read `JWT_SECRET`, `SESSION_SECRET` etc. from `.env` (not from Docker secret file mounts). To change them, update `.env` and redeploy:
    ```bash
    # Update .env, then:
    docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
    ```
-4. **Cloud DB/Redis Firewall**: Ensure Docker Swarm nodes can access your Cloud DB/Redis by configuring security groups/firewall rules.
-5. **Redis Pub/Sub Access**: Gatrix communicates with game servers in real-time via Redis Pub/Sub (feature flag changes, config sync, etc.). Cloud Redis must be accessible **not only from Gatrix services but also from game servers**. If game servers are on a separate network, add their IPs to the Cloud Redis security group as well.
+4. **Change the default Grafana password** — Set `GRAFANA_ADMIN_PASSWORD` in `.env` to a strong password.
+
+### Network & Firewall
+
+5. **Cloud DB/Redis Firewall**: Ensure Docker Swarm nodes can access your Cloud DB/Redis by configuring security groups/firewall rules.
+6. **Redis Pub/Sub Access**: Gatrix communicates with game servers in real-time via Redis Pub/Sub (feature flag changes, config sync, etc.). Cloud Redis must be accessible **not only from Gatrix services but also from game servers**. If game servers are on a separate network, add their IPs to the Cloud Redis security group as well.
+7. **Swarm inter-node ports**: In multi-node environments, ports `2377` (management), `7946` (discovery), `4789` (VXLAN) must be open between nodes.
+8. **Cloud LB health check paths**: When configuring your Cloud LB, use these endpoints:
+   | Service | Health Check Path | Port |
+   |---------|------------------|------|
+   | Edge | `/health` | 3400 |
+   | Frontend | `/health` | 43000 |
+   | Backend | `/health` | 45000 |
+
+### Deployment & Operations
+
+9. **Docker images must be pushed to the registry first**: Before deploying on a remote server, the dev team must push images using `build-and-push.sh`.
+10. **`registry.env` is NOT included in the package**: You must create it manually on the deploy server. Request registry credentials from the dev team.
+11. **`.env` is only read at deploy time**: After editing `.env`, you must redeploy for changes to take effect. Editing alone does NOT affect running services.
+12. **`scale.sh` changes are temporary**: Replica counts set via `scale.sh` revert to `.env` values on the next deploy. For permanent changes, update `*_REPLICAS` in `.env`.
+13. **SSL/TLS should be terminated at the Cloud LB**: Services only serve HTTP. Configure HTTPS certificates on your Cloud LB (Tencent CLB / AWS ALB).
+
+### Data & Volumes
+
+14. **Volume data is node-local**: Prometheus and Grafana data is stored only on the node where the container runs. Node failure may cause monitoring data loss. Critical data uses Cloud DB/Redis (by design).
+15. **`teardown.sh` does NOT delete volumes by default**: To fully clean up Prometheus/Grafana data, use the `--volumes` flag:
+    ```bash
+    ./teardown.sh --volumes    # Remove volumes too
+    ```
+16. **Docker log disk space**: Docker doesn't rotate logs by default, which can fill disks. This stack configures `json-file` logger with `max-size: 10m`, `max-file: 3`, limiting each service to ~30MB max.
+
+### Multi-Node
+
+17. **Config files only need to be on the manager node**: `docker-compose.swarm.yml`, `.env`, `config/` etc. only need to exist on the manager node. No need to copy to worker nodes.
+18. **All nodes need registry login**: The `--with-registry-auth` flag is included in deploy scripts, but `docker login` must be run on each node first.
+19. **Time synchronization (NTP)**: All Swarm nodes must have synchronized clocks. Time drift affects JWT token validation and Raft consensus:
+    ```bash
+    timedatectl status    # Check time sync status
+    ```
+
+### Troubleshooting
+
+20. **When a service fails to start**:
+    ```bash
+    docker service ps gatrix_backend --no-trunc    # See failure reason
+    docker service logs gatrix_backend             # Check logs
+    ```
+21. **Image pull failures**: Check `registry.env` credentials and verify `docker login` works on the affected node.
+22. **Port conflicts**: If a port is already in use, change it in `.env` (`BACKEND_PORT`, `FRONTEND_PORT`, `GRAFANA_PORT`, etc.).
 
 ---
 

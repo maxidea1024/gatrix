@@ -545,6 +545,8 @@ docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
 
 ## ⚠️ 주의사항
 
+### 보안
+
 1. **`.env` 파일을 Git에 커밋하지 마세요** — 실제 비밀번호가 포함되어 있습니다.
 2. **`registry.env`를 Git에 커밋하지 마세요** — 레지스트리 인증 토큰이 포함되어 있습니다.
 3. **보안 키는 환경 변수입니다**: 서비스는 `JWT_SECRET`, `SESSION_SECRET` 등을 `.env`에서 읽습니다 (Docker secret 파일 마운트가 아닙니다). 변경하려면 `.env`를 수정하고 재배포하세요:
@@ -552,8 +554,55 @@ docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
    # .env 수정 후:
    docker stack deploy -c docker-compose.swarm.yml --with-registry-auth gatrix
    ```
-4. **Cloud DB/Redis 방화벽**: Docker Swarm 노드의 IP에서 Cloud DB/Redis에 접근할 수 있도록 보안 그룹/방화벽을 설정하세요.
-5. **Redis Pub/Sub 접근**: Gatrix는 Redis Pub/Sub을 통해 게임 서버와 실시간으로 통신합니다 (Feature Flag 변경, 설정 동기화 등). Cloud Redis는 **Gatrix 서비스뿐만 아니라 게임 서버에서도 접근 가능해야** 합니다. 게임 서버가 별도 네트워크에 있는 경우, Cloud Redis의 보안 그룹에 게임 서버 IP도 허용해야 합니다.
+4. **Grafana 기본 비밀번호를 반드시 변경하세요** — `.env`의 `GRAFANA_ADMIN_PASSWORD`를 강력한 비밀번호로 설정하세요.
+
+### 네트워크 & 방화벽
+
+5. **Cloud DB/Redis 방화벽**: Docker Swarm 노드의 IP에서 Cloud DB/Redis에 접근할 수 있도록 보안 그룹/방화벽을 설정하세요.
+6. **Redis Pub/Sub 접근**: Gatrix는 Redis Pub/Sub을 통해 게임 서버와 실시간으로 통신합니다 (Feature Flag 변경, 설정 동기화 등). Cloud Redis는 **Gatrix 서비스뿐만 아니라 게임 서버에서도 접근 가능해야** 합니다. 게임 서버가 별도 네트워크에 있는 경우, Cloud Redis의 보안 그룹에 게임 서버 IP도 허용해야 합니다.
+7. **Swarm 노드 간 포트**: 멀티노드 환경에서 노드 간 `2377`(관리), `7946`(디스커버리), `4789`(VXLAN) 포트가 열려 있어야 합니다.
+8. **Cloud LB 헬스체크 경로**: Cloud LB를 구성할 때 아래 경로를 사용하세요:
+   | 서비스 | 헬스체크 경로 | 포트 |
+   |--------|--------------|------|
+   | Edge | `/health` | 3400 |
+   | Frontend | `/health` | 43000 |
+   | Backend | `/health` | 45000 |
+
+### 배포 & 운영
+
+9. **Docker 이미지가 레지스트리에 먼저 푸시되어야 합니다**: 원격 서버에 배포하기 전에 개발팀에서 `build-and-push.sh`로 이미지를 레지스트리에 업로드해야 합니다.
+10. **`registry.env`는 패키지에 포함되지 않습니다**: 배포 서버에서 수동으로 생성해야 합니다. 개발팀에게 레지스트리 인증 정보를 요청하세요.
+11. **`.env`는 배포 시점에만 읽힙니다**: `.env`를 수정한 후 반드시 재배포해야 적용됩니다. 편집만으로는 실행 중인 서비스에 영향이 없습니다.
+12. **`scale.sh` 변경은 일시적입니다**: `scale.sh`로 변경한 레플리카 수는 재배포 시 `.env`의 값으로 되돌아갑니다. 영구 변경은 `.env`의 `*_REPLICAS` 값을 수정하세요.
+13. **SSL/TLS는 Cloud LB에서 종료하세요**: 서비스 자체는 HTTP만 제공합니다. HTTPS는 Cloud LB (Tencent CLB / AWS ALB)에서 인증서를 설정하여 처리하세요.
+
+### 데이터 & 볼륨
+
+14. **볼륨 데이터는 노드 로컬입니다**: Prometheus, Grafana의 데이터는 해당 컨테이너가 실행되는 노드에만 저장됩니다. 노드 장애 시 모니터링 데이터가 유실될 수 있습니다. 중요 데이터는 Cloud DB/Redis를 사용합니다 (이미 설계에 반영됨).
+15. **`teardown.sh` 기본 실행은 볼륨을 삭제하지 않습니다**: Prometheus/Grafana 데이터를 완전히 삭제하려면 `--volumes` 플래그를 사용하세요:
+    ```bash
+    ./teardown.sh --volumes    # 볼륨까지 삭제
+    ```
+16. **Docker 로그 디스크 공간**: Docker는 기본적으로 로그 회전을 하지 않아 디스크가 가득 찰 수 있습니다. 이 스택은 `json-file` 로거를 `max-size: 10m`, `max-file: 3`으로 설정하여 서비스당 최대 30MB로 제한합니다.
+
+### 멀티노드 환경
+
+17. **설정 파일은 매니저 노드에만 필요합니다**: `docker-compose.swarm.yml`, `.env`, `config/` 등은 매니저 노드에만 존재하면 됩니다. 워커 노드에는 복사할 필요 없습니다.
+18. **모든 노드에서 레지스트리 로그인이 필요합니다**: `--with-registry-auth` 플래그가 배포 스크립트에 포함되어 있지만, 각 노드에서 `docker login`이 선행되어야 합니다.
+19. **시간 동기화 (NTP)**: 모든 Swarm 노드의 시간이 동기화되어야 합니다. JWT 토큰 검증과 Raft 합의에 시간 차이가 영향을 줄 수 있습니다:
+    ```bash
+    timedatectl status    # 시간 동기화 상태 확인
+    ```
+
+### 트러블슈팅
+
+20. **서비스가 시작되지 않을 때**:
+    ```bash
+    docker service ps gatrix_backend --no-trunc    # 실패 원인 확인
+    docker service logs gatrix_backend             # 로그 확인
+    ```
+21. **이미지 풀 실패**: `registry.env`의 인증 정보를 확인하고, 해당 노드에서 `docker login`이 되는지 확인하세요.
+22. **포트 충돌**: 이미 사용 중인 포트가 있으면 `.env`에서 포트를 변경하세요 (`BACKEND_PORT`, `FRONTEND_PORT`, `GRAFANA_PORT` 등).
 
 ---
 
