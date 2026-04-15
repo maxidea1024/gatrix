@@ -39,6 +39,105 @@ This folder contains **application services only** — no infrastructure contain
 
 ---
 
+## 🐝 Swarm Cluster Setup
+
+### Single-Node (Development / Small Scale)
+
+Initialize Docker Swarm on a single server:
+
+```bash
+docker swarm init
+```
+
+This node becomes both a **manager** and a **worker**. Sufficient for dev/staging or small production deployments.
+
+### Multi-Node (Production)
+
+#### 1. Initialize Manager Node
+
+On the **first server** (manager):
+
+```bash
+docker swarm init --advertise-addr <MANAGER_IP>
+```
+
+This outputs a `docker swarm join` command with a token. Save it.
+
+#### 2. Add Worker Nodes
+
+On each **worker server**, run the join command from step 1:
+
+```bash
+docker swarm join --token <WORKER_TOKEN> <MANAGER_IP>:2377
+```
+
+> To retrieve the join token later:
+> ```bash
+> docker swarm join-token worker    # Worker token
+> docker swarm join-token manager   # Manager token (for additional managers)
+> ```
+
+#### 3. Add Additional Manager Nodes (High Availability)
+
+For fault tolerance, use **3 or 5 manager nodes** (must be odd number for Raft consensus):
+
+```bash
+# On the existing manager, get the manager join token:
+docker swarm join-token manager
+
+# On the new manager node:
+docker swarm join --token <MANAGER_TOKEN> <MANAGER_IP>:2377
+```
+
+#### 4. Verify Cluster
+
+```bash
+docker node ls
+```
+
+Expected output:
+```
+ID              HOSTNAME    STATUS    AVAILABILITY   MANAGER STATUS
+abc123 *        manager-1   Ready     Active         Leader
+def456          manager-2   Ready     Active         Reachable
+ghi789          worker-1    Ready     Active
+jkl012          worker-2    Ready     Active
+```
+
+### Node Labels (Optional)
+
+Assign labels to nodes for service placement constraints:
+
+```bash
+# Label a node for edge services
+docker node update --label-add role=edge <NODE_ID>
+
+# Label a node for monitoring
+docker node update --label-add role=monitoring <NODE_ID>
+```
+
+### Required Ports (Firewall)
+
+Ensure the following ports are open **between Swarm nodes**:
+
+| Port | Protocol | Purpose |
+|------|----------|---------|
+| 2377 | TCP | Cluster management & Raft |
+| 7946 | TCP/UDP | Node discovery & gossip |
+| 4789 | UDP | Overlay network (VXLAN) |
+
+### Docker Registry Authentication
+
+All Swarm nodes must be able to pull images from the registry. Run on **each node**:
+
+```bash
+./login-registry.sh
+```
+
+Or use `--with-registry-auth` flag during deploy (already included in deploy scripts).
+
+---
+
 ## 🚀 Quick Start
 
 ### Step 1: Configure Environment

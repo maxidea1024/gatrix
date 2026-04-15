@@ -39,6 +39,105 @@ MySQL과 Redis는 Cloud 인프라(Tencent Cloud, AWS RDS/ElastiCache 등)를 사
 
 ---
 
+## 🐝 Swarm 클러스터 구성
+
+### 단일 노드 (개발 / 소규모)
+
+단일 서버에서 Docker Swarm 초기화:
+
+```bash
+docker swarm init
+```
+
+이 노드가 **매니저** 겸 **워커**가 됩니다. 개발/스테이징 또는 소규모 운영 환경에 적합합니다.
+
+### 멀티 노드 (프로덕션)
+
+#### 1. 매니저 노드 초기화
+
+**첫 번째 서버** (매니저)에서:
+
+```bash
+docker swarm init --advertise-addr <매니저_IP>
+```
+
+`docker swarm join` 명령어와 토큰이 출력됩니다. 저장해두세요.
+
+#### 2. 워커 노드 추가
+
+각 **워커 서버**에서 1단계에서 받은 join 명령어 실행:
+
+```bash
+docker swarm join --token <워커_토큰> <매니저_IP>:2377
+```
+
+> 토큰을 나중에 다시 확인하려면:
+> ```bash
+> docker swarm join-token worker    # 워커 토큰
+> docker swarm join-token manager   # 매니저 토큰 (추가 매니저용)
+> ```
+
+#### 3. 추가 매니저 노드 (고가용성)
+
+장애 허용을 위해 매니저 노드를 **3대 또는 5대** (Raft 합의를 위해 홀수 필수)로 구성:
+
+```bash
+# 기존 매니저에서 매니저 join 토큰 확인:
+docker swarm join-token manager
+
+# 새 매니저 노드에서:
+docker swarm join --token <매니저_토큰> <매니저_IP>:2377
+```
+
+#### 4. 클러스터 확인
+
+```bash
+docker node ls
+```
+
+예상 출력:
+```
+ID              HOSTNAME    STATUS    AVAILABILITY   MANAGER STATUS
+abc123 *        manager-1   Ready     Active         Leader
+def456          manager-2   Ready     Active         Reachable
+ghi789          worker-1    Ready     Active
+jkl012          worker-2    Ready     Active
+```
+
+### 노드 라벨 (선택)
+
+서비스 배치 제약 조건을 위한 노드 라벨 설정:
+
+```bash
+# Edge 서비스용 노드 라벨링
+docker node update --label-add role=edge <노드_ID>
+
+# 모니터링용 노드 라벨링
+docker node update --label-add role=monitoring <노드_ID>
+```
+
+### 필수 포트 (방화벽)
+
+Swarm 노드 **간** 다음 포트가 열려 있어야 합니다:
+
+| 포트 | 프로토콜 | 용도 |
+|------|----------|------|
+| 2377 | TCP | 클러스터 관리 & Raft 합의 |
+| 7946 | TCP/UDP | 노드 디스커버리 & 가십 |
+| 4789 | UDP | 오버레이 네트워크 (VXLAN) |
+
+### Docker Registry 인증
+
+모든 Swarm 노드가 레지스트리에서 이미지를 풀받을 수 있어야 합니다. **각 노드**에서 실행:
+
+```bash
+./login-registry.sh
+```
+
+또는 배포 시 `--with-registry-auth` 플래그 사용 (배포 스크립트에 이미 포함됨).
+
+---
+
 ## 🚀 빠른 시작
 
 ### 1단계: 환경 설정
