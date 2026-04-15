@@ -517,20 +517,24 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
   // Date locale configuration
 
-  // Duplicate check
+  // Duplicate check (skip in edit mode — version/platform are immutable)
   const watchedVersion = watch('clientVersion');
   const watchedPlatformForDup = watch('platform');
   useEffect(() => {
     // Skip duplicate check until form is fully initialized
     if (!formReady) return;
+    // In edit mode, version and platform cannot be changed, so no duplicate check needed
+    if (isEdit) {
+      setDuplicateError(null);
+      return;
+    }
     if (watchedPlatformForDup && watchedVersion) {
       const checkDuplicate = async () => {
         try {
           const isDuplicate = await ClientVersionService.checkDuplicate(
             projectApiPath,
             watchedPlatformForDup,
-            watchedVersion,
-            isEdit ? clientVersion?.id : undefined
+            watchedVersion
           );
           setDuplicateError(
             isDuplicate ? t('clientVersions.form.duplicateVersion') : null
@@ -794,6 +798,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           {...field}
                           inputRef={versionFieldRef}
                           fullWidth
+                          disabled={isEdit}
                           label={
                             <Box component="span">
                               {t('clientVersions.version')}{' '}
@@ -807,8 +812,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           }
                           error={!!errors.clientVersion}
                           helperText={
-                            errors.clientVersion?.message ||
-                            t('clientVersions.form.versionHelp')
+                            isEdit
+                              ? t('clientVersions.form.versionReadonly')
+                              : errors.clientVersion?.message ||
+                                t('clientVersions.form.versionHelp')
                           }
                           inputProps={{
                             autoComplete: 'off',
@@ -835,6 +842,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           <Select
                             labelId="cvf-platform-label"
                             {...field}
+                            disabled={isEdit}
                             label={`${t('clientVersions.platform')} *`}
                             MenuProps={{
                               anchorOrigin: {
@@ -886,19 +894,18 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                               </MenuItem>
                             ))}
                           </Select>
-                          {(errors.platform?.message ||
-                            t('clientVersions.form.platformHelp')) && (
-                            <Typography
-                              variant="caption"
-                              color={
-                                errors.platform ? 'error' : 'text.secondary'
-                              }
-                              sx={{ mt: 0.5, display: 'block' }}
-                            >
-                              {errors.platform?.message ||
+                          <Typography
+                            variant="caption"
+                            color={
+                              errors.platform ? 'error' : 'text.secondary'
+                            }
+                            sx={{ mt: 0.5, display: 'block' }}
+                          >
+                            {isEdit
+                              ? t('clientVersions.form.platformReadonly')
+                              : errors.platform?.message ||
                                 t('clientVersions.form.platformHelp')}
-                            </Typography>
-                          )}
+                          </Typography>
                         </FormControl>
                       )}
                     />
