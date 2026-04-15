@@ -896,9 +896,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           </Select>
                           <Typography
                             variant="caption"
-                            color={
-                              errors.platform ? 'error' : 'text.secondary'
-                            }
+                            color={errors.platform ? 'error' : 'text.secondary'}
                             sx={{ mt: 0.5, display: 'block' }}
                           >
                             {isEdit
