@@ -1,0 +1,133 @@
+#!/usr/bin/env pwsh
+#
+# Gatrix List Images Script
+#
+# Usage:
+#   ./list-images.ps1
+#
+# Description:
+#   Queries the registry API to list all available tags for Gatrix services.
+
+$ErrorActionPreference = "Stop"
+
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$EnvFile = Join-Path $ScriptDir "registry.env"
+
+if (Test-Path $EnvFile) {
+    Get-Content $EnvFile | Where-Object { $_ -match "=" } | ForEach-Object {
+        $parts = $_ -split "=", 2
+        $key = $parts[0].Trim()
+        $val = $parts[1].Trim()
+        Set-Variable -Name $key -Value $val -Scope Script
+    }
+}
+else {
+    Write-Host "[ERROR] registry.env not found." -ForegroundColor Red
+    exit 1
+}
+
+# Services to check (Swarm edition)
+$Services = @("backend", "frontend", "edge")
+
+Write-Host "Fetching image tags from $REGISTRY_HOST..." -ForegroundColor Cyan
+Write-Host ""
+
+function Get-BearerToken($repo) {
+    try {
+        $ChallengeResponse = Invoke-WebRequest -Uri "https://$REGISTRY_HOST/v2/" -Method Get -ErrorAction SilentlyContinue
+    }
+    catch {
+        $ChallengeResponse = $_.Exception.Response
+    }
+
+    $AuthHeader = $ChallengeResponse.Headers["Www-Authenticate"]
+    if (-not $AuthHeader) { return $null }
+
+    if ($AuthHeader -match 'Bearer realm="([^"]+)",service="([^"]+)"') {
+        $Realm = "$($matches[1].Trim())"
+        $Service = "$($matches[2].Trim())"
+        $Scope = "repository:$repo`:pull"
+
+        $EncodedService = [System.Net.WebUtility]::UrlEncode($Service)
+        $EncodedScope = [System.Net.WebUtility]::UrlEncode($Scope)
+        $TokenUrl = "{0}?service={1}&scope={2}" -f $Realm, $EncodedService, $EncodedScope
+        $BasicAuth = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("${REGISTRY_USER}:${REGISTRY_PASS}"))
+
+        try {
+            $TokenResponse = Invoke-RestMethod -Uri $TokenUrl -Headers @{ "Authorization" = "Basic $BasicAuth" }
+            $BearerToken = $TokenResponse.token
+            if (-not $BearerToken) { $BearerToken = $TokenResponse.access_token }
+            return $BearerToken
+        }
+        catch {
+            return $null
+        }
+    }
+    return $null
+}
+
+foreach ($svc in $Services) {
+    $repo = "$REGISTRY_NAMESPACE/gatrix-$svc"
+    $url = "https://$REGISTRY_HOST/v2/$repo/tags/list"
+
+    Write-Host "[$svc]" -ForegroundColor Yellow
+
+    $token = Get-BearerToken $repo
+    if (-not $token) {
+        Write-Host "  (auth failed)" -ForegroundColor Red
+        continue
+    }
+
+    try {
+        $response = Invoke-RestMethod -Uri $url -Headers @{ "Authorization" = "Bearer $token" } -Method Get
+        if ($response.tags -and $response.tags.Count -gt 0) {
+            $sortedTags = $response.tags | Sort-Object -Descending
+            foreach ($tag in $sortedTags) {
+                $fullUrl = "$REGISTRY_HOST/$REGISTRY_NAMESPACE/gatrix-$svc`:$tag"
+                $sizeStr = ""
+                try {
+                    $manifestUrl = "https://$REGISTRY_HOST/v2/$repo/manifests/$tag"
+                    $manifestHeaders = @{
+                        "Authorization" = "Bearer $token"
+                        "Accept"        = "application/vnd.docker.distribution.manifest.v2+json, application/vnd.oci.image.manifest.v1+json"
+                    }
+                    $manifest = Invoke-RestMethod -Uri $manifestUrl -Headers $manifestHeaders -Method Get
+                    $totalSize = 0
+                    if ($manifest.layers) {
+                        foreach ($layer in $manifest.layers) { $totalSize += $layer.size }
+                    }
+                    if ($manifest.config -and $manifest.config.size) { $totalSize += $manifest.config.size }
+                    if ($totalSize -gt 0) {
+                        $sizeMB = [math]::Round($totalSize / 1MB, 1)
+                        $sizeStr = " ($sizeMB MB)"
+                    }
+                }
+                catch {}
+                Write-Host "  $fullUrl$sizeStr" -ForegroundColor Green
+            }
+        }
+        else {
+            Write-Host "  (no tags)" -ForegroundColor Gray
+        }
+    }
+    catch {
+        $errBody = ""
+        if ($_.Exception.Response) {
+            try {
+                $stream = $_.Exception.Response.GetResponseStream()
+                $reader = New-Object System.IO.StreamReader($stream)
+                $errBody = $reader.ReadToEnd()
+            }
+            catch {}
+        }
+        if ($errBody -match "NAME_UNKNOWN") {
+            Write-Host "  (not found)" -ForegroundColor Gray
+        }
+        else {
+            Write-Host "  (error)" -ForegroundColor Red
+        }
+    }
+    Write-Host ""
+}
+
+Write-Host "Done." -ForegroundColor Cyan

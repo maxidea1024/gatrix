@@ -1,0 +1,368 @@
+# ============================================
+# Gatrix Docker Swarm Stack (Cloud Infra Edition)
+# ============================================
+#
+# This stack uses Cloud MySQL + Cloud Redis. No local infra containers.
+#
+# Deploy:
+#   docker stack deploy -c docker-compose.swarm.yml gatrix
+#
+# Remove:
+#   docker stack rm gatrix
+#
+# Prerequisites:
+#   1. Configure Cloud DB/Redis connection in .env
+#   2. Initialize Docker Swarm (docker swarm init)
+#   3. Create Docker Secrets (use deploy.sh --init)
+
+version: '3.9'
+
+# ============================================
+# Common Deploy Configuration (YAML Anchor)
+# ============================================
+x-common-deploy: &common-deploy
+  update_config:
+    parallelism: 1
+    delay: 10s
+    failure_action: rollback
+    monitor: 30s
+    max_failure_ratio: 0.3
+    order: start-first
+  rollback_config:
+    parallelism: 1
+    delay: 10s
+    failure_action: pause
+    monitor: 30s
+    order: stop-first
+  restart_policy:
+    condition: on-failure
+    delay: 5s
+    max_attempts: 10
+    window: 120s
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: '50m'
+    max-file: '5'
+    labels: 'service,environment'
+
+services:
+  # ============================================
+  # Application Services
+  # ============================================
+
+  backend:
+    image: uwocn.tencentcloudcr.com/uwocn/gatrix-backend:${GATRIX_VERSION:-latest}
+    environment:
+      NODE_ENV: production
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-backend
+      PORT: 5000
+      # Cloud Database
+      DB_HOST: ${DB_HOST:?DB_HOST is required}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-gatrix}
+      DB_USER: ${DB_USER:?DB_USER is required}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      # Cloud Redis
+      REDIS_HOST: ${REDIS_HOST:?REDIS_HOST is required}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      # Security
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-super-secret-refresh-key}
+      SESSION_SECRET: ${SESSION_SECRET:-your-super-secret-session-key}
+      CORS_ORIGIN: '*'
+      DISABLE_X_POWERED_BY: 'true'
+      # Service Discovery (Redis only, etcd removed)
+      SERVICE_DISCOVERY_MODE: redis
+      # Application
+      DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-zh}
+      MONITORING_ENABLED: 'true'
+      DISABLE_RATE_LIMIT: 'true'
+      # OAuth (optional)
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+    ports:
+      - target: 5000
+        published: ${BACKEND_PORT:-45000}
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - backend_logs:/app/logs
+      - backend_data:/app/data
+    networks:
+      - gatrix-internal
+      - gatrix-public
+    deploy:
+      <<: *common-deploy
+      mode: replicated
+      replicas: ${BACKEND_REPLICAS:-1}
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:5000/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    logging: *default-logging
+
+  frontend:
+    image: uwocn.tencentcloudcr.com/uwocn/gatrix-frontend:${GATRIX_VERSION:-latest}
+    environment:
+      VITE_API_URL: /api/v1
+      VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
+      VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-zh}
+    ports:
+      - target: 80
+        published: ${FRONTEND_PORT:-43000}
+        protocol: tcp
+        mode: ingress
+    networks:
+      - gatrix-public
+    deploy:
+      <<: *common-deploy
+      mode: replicated
+      replicas: ${FRONTEND_REPLICAS:-1}
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://127.0.0.1:80/health']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    logging: *default-logging
+
+  edge:
+    image: uwocn.tencentcloudcr.com/uwocn/gatrix-edge:${GATRIX_VERSION:-latest}
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: ${EDGE_LOG_LEVEL:-info}
+      EDGE_PORT: 3400
+      EDGE_METRICS_PORT: 9400
+      GATRIX_URL: http://backend:5000
+      EDGE_API_TOKEN: ${EDGE_API_TOKEN:-gatrix-edge-internal-bypass-token}
+      EDGE_BYPASS_TOKEN: ${EDGE_BYPASS_TOKEN:-gatrix-edge-internal-bypass-token}
+      EDGE_APPLICATION_NAME: ${EDGE_APPLICATION_NAME:-edge-server}
+      # Cloud Redis
+      REDIS_HOST: ${REDIS_HOST:?REDIS_HOST is required}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      # Edge configuration
+      EDGE_SYNC_METHOD: ${EDGE_SYNC_METHOD:-polling}
+      EDGE_CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
+      EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-*}
+      EDGE_REDIS_HOST: ${EDGE_REDIS_HOST:-${REDIS_HOST}}
+      EDGE_REDIS_PORT: ${EDGE_REDIS_PORT:-${REDIS_PORT:-6379}}
+      EDGE_REDIS_PASSWORD: ${EDGE_REDIS_PASSWORD:-${REDIS_PASSWORD:-}}
+      EDGE_REDIS_DB: ${EDGE_REDIS_DB:-0}
+      EDGE_FORCE_HTTPS: ${EDGE_FORCE_HTTPS:-false}
+    # Ports exposed directly for Cloud Load Balancer.
+    # Cloud LB should target port 3400 (API) and optionally 3410 (WebSocket).
+    ports:
+      - target: 3400
+        published: 3400
+        protocol: tcp
+        mode: ingress
+      - target: 3410
+        published: 3410
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - edge_logs:/app/logs
+    networks:
+      - gatrix-internal
+      - gatrix-public
+    deploy:
+      <<: *common-deploy
+      mode: replicated
+      replicas: ${EDGE_REPLICAS:-1}
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:3400/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    logging: *default-logging
+
+  # ============================================
+  # Monitoring Services
+  # ============================================
+
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=${PROM_RETENTION_TIME:-14d}'
+      - '--web.enable-lifecycle'
+    ports:
+      - target: 9090
+        published: ${PROMETHEUS_PORT:-9090}
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - prometheus_data:/prometheus
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - gatrix-internal
+      - gatrix-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+    logging: *default-logging
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_SECURITY_ALLOW_EMBEDDING: 'true'
+      GF_SERVER_DOMAIN: ${GRAFANA_DOMAIN:-localhost}
+      GF_SECURITY_CSRF_TRUSTED_ORIGINS: ${GRAFANA_TRUSTED_ORIGINS:-*}
+      GF_LIVE_ALLOWED_ORIGINS: ${GRAFANA_ALLOWED_ORIGINS:-*}
+    ports:
+      - target: 3000
+        published: ${GRAFANA_PORT:-3000}
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+    networks:
+      - gatrix-internal
+      - gatrix-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    logging: *default-logging
+
+  # ============================================
+  # Reverse Proxy (Optional)
+  # ============================================
+  # Nginx is OPTIONAL. By default replicas=0 (disabled).
+  # Cloud LB handles routing in production:
+  #   - Cloud LB -> Edge (:3400)       for game clients
+  #   - Cloud LB -> Frontend (:43000)  for admin UI
+  #   - Cloud LB -> Backend (:45000)   for admin API
+  #
+  # Enable nginx only if you need a local unified gateway
+  # (e.g., dev/staging without a Cloud LB):
+  #   Set NGINX_REPLICAS=1 in .env
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - target: 80
+        published: ${HTTP_PORT:-80}
+        protocol: tcp
+        mode: ingress
+      - target: 443
+        published: ${HTTPS_PORT:-443}
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - gatrix-public
+    deploy:
+      mode: replicated
+      replicas: ${NGINX_REPLICAS:-0}
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 32M
+    healthcheck:
+      test: ['CMD', 'nginx', '-t']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging: *default-logging
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  gatrix-internal:
+    driver: overlay
+    attachable: true
+    internal: true
+  gatrix-public:
+    driver: overlay
+    attachable: true
+
+# ============================================
+# Volumes (app data only, no infra)
+# ============================================
+volumes:
+  backend_logs:
+    driver: local
+  backend_data:
+    driver: local
+  edge_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# ============================================
+# Secrets
+# ============================================
+secrets:
+  jwt_secret:
+    external: true
+  jwt_refresh_secret:
+    external: true
+  session_secret:
+    external: true
+  api_secret:
+    external: true
+  edge_api_token:
+    external: true
+  grafana_password:
+    external: true

@@ -1,0 +1,57 @@
+# Prometheus configuration for Gatrix Docker Swarm (Cloud Infra Edition)
+# Uses Docker Swarm DNS for service discovery
+# MySQL/Redis are cloud-managed, no local exporters
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: 'production'
+    cluster: 'gatrix-swarm'
+
+alerting:
+  alertmanagers: []
+
+rule_files: []
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Backend API metrics
+  - job_name: 'backend'
+    dns_sd_configs:
+      - names:
+          - 'tasks.backend'
+        type: 'A'
+        port: 5000
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.+):5000'
+        replacement: 'backend-${1}'
+
+  # Edge Server metrics (port must match EDGE_METRICS_PORT in compose)
+  - job_name: 'edge'
+    dns_sd_configs:
+      - names:
+          - 'tasks.edge'
+        type: 'A'
+        port: 9400
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.+):9400'
+        replacement: 'edge-${1}'
+
+  # Node Exporter for infrastructure metrics (if deployed)
+  # - job_name: 'node'
+  #   dns_sd_configs:
+  #     - names:
+  #         - 'tasks.node-exporter'
+  #       type: 'A'
+  #       port: 9100

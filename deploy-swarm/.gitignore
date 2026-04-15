@@ -1,0 +1,12 @@
+# Secrets & credentials
+.env
+.env.backup.*
+registry.env
+
+# Build artifacts
+.build-history.json
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
