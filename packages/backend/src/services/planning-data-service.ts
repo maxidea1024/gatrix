@@ -805,7 +805,7 @@ export class PlanningDataService {
       const previousUpload = await db('g_planning_data_uploads')
         .select('uploadHash')
         .where({ environmentId })
-        .orderBy('uploadedAt', 'desc')
+        .orderBy('id', 'desc')
         .first();
 
       // Check if upload hash is the same - skip if no changes (unless forceUpload is true)
@@ -928,12 +928,12 @@ export class PlanningDataService {
         uploadComment: uploadInfo?.uploadComment || null,
         changedFiles: JSON.stringify(changedFiles),
         fileDiffs: JSON.stringify(fileDiffs),
-        uploadedAt: db.raw('UTC_TIMESTAMP()'),
+        uploadedAt: db.fn.now(),
       });
 
       // Fetch the created record
       const uploadRecord = await db('g_planning_data_uploads')
-        .where({ id: uploadRecordId })
+        .where({ id: newId })
         .first();
 
       // Cache all uploaded files in Redis (environment-scoped) - directly from parsed data
@@ -993,7 +993,7 @@ export class PlanningDataService {
       const uploadIds = await db('g_planning_data_uploads')
         .select('id')
         .where({ environmentId })
-        .orderBy('uploadedAt', 'desc')
+        .orderBy('id', 'desc')
         .limit(limit);
 
       if (uploadIds.length === 0) return [];
@@ -1004,10 +1004,8 @@ export class PlanningDataService {
       );
 
       // Sort in memory to completely avoid MySQL filesort on large BLOBs
-      uploads.sort(
-        (a, b) =>
-          new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
-      );
+      // Sort by id descending (id is ULID, which is chronologically sortable)
+      uploads.sort((a, b) => (b.id > a.id ? 1 : b.id < a.id ? -1 : 0));
 
       return uploads.map((upload) => ({
         id: upload.id,
@@ -1046,7 +1044,7 @@ export class PlanningDataService {
       const latestDoc = await db('g_planning_data_uploads')
         .select('id')
         .where({ environmentId })
-        .orderBy('uploadedAt', 'desc')
+        .orderBy('id', 'desc')
         .first();
 
       if (!latestDoc) return null;

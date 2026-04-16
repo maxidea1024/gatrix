@@ -80,7 +80,7 @@ import DynamicFilterBar, {
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
@@ -112,7 +112,24 @@ const StoreProductsPage: React.FC = () => {
   const [allRegistryTags, setAllRegistryTags] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [overriddenTotal, setOverriddenTotal] = useState(0);
-  const [page, setPage] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageStr = searchParams.get('page');
+  const page = pageStr ? Math.max(0, parseInt(pageStr, 10) - 1) : 0;
+
+  const setPage = (newPage: number) => {
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev);
+        if (newPage === 0) {
+          params.delete('page');
+        } else {
+          params.set('page', String(newPage + 1));
+        }
+        return params;
+      },
+      { replace: true }
+    );
+  };
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [loading, setLoading] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);

@@ -40,7 +40,12 @@ function validateArgs(args) {
         args.token = args['api-token'];
     }
 
-    const required = ['api-url', 'dir'];
+    // Default dir if not provided
+    if (!args.dir) {
+        args.dir = path.resolve(process.cwd(), 'converted-planning-data');
+    }
+
+    const required = ['api-url'];
     const missing = required.filter(key => !args[key]);
 
     if (missing.length > 0) {
@@ -49,13 +54,20 @@ function validateArgs(args) {
         console.error('  yarn upload-planning-data --api-url=<URL> --dir=<DIR> --token=<TOKEN> [--uploader=<NAME>] [--comment=<TEXT>]');
         console.error('\nOptions:');
         console.error('  --api-url   (Required) Backend API URL (e.g., https://gatrix.example.com)');
-        console.error('  --dir       (Required) Directory containing planning data files');
+        console.error('  --dir       (Optional) Directory containing planning data files (default: ./converted-planning-data)');
         console.error('  --token     (Required) Server API token for authentication');
         console.error('  --uploader  (Optional) Override uploader name (e.g., "Jenkins CI")');
         console.error('  --comment   (Optional) Upload comment/description');
         console.error('\nExample:');
         console.error('  yarn upload-planning-data --api-url=https://gatrix.example.com --dir=./planning-data --token=abc123 --uploader="Jenkins CI" --comment="Automated build #123"');
         process.exit(1);
+    }
+
+    // Workaround for Jenkins pipeline mismatch: convert uses ./converted-planning-data but upload uses ./output
+    const convertedPath = path.resolve(process.cwd(), 'converted-planning-data');
+    if (args.dir.endsWith('output') && fs.existsSync(convertedPath)) {
+        console.log('⚠️ Jenkins pipeline mismatch detected! Using ./converted-planning-data instead of ./output');
+        args.dir = convertedPath;
     }
 
     // Validate directory exists
