@@ -9,43 +9,56 @@
 export const tryExecCommandCopy = (text: string): boolean => {
   try {
     console.log('[Clipboard] Trying execCommand fallback...');
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
+    const mark = document.createElement('span');
+    mark.textContent = text;
+    
+    // Reset user styles for span element
+    mark.style.all = 'unset';
+    // Prevents scrolling to the end of the page
+    mark.style.position = 'fixed';
+    mark.style.top = '0';
+    mark.style.clip = 'rect(0, 0, 0, 0)';
+    // Used to preserve spaces and line breaks
+    mark.style.whiteSpace = 'pre';
+    // Do not inherit user-select
+    const style = mark.style as any;
+    style.webkitUserSelect = 'text';
+    style.MozUserSelect = 'text';
+    style.msUserSelect = 'text';
+    style.userSelect = 'text';
 
-    // Ensure the textarea is not visible but still part of the DOM
-    textArea.style.position = 'fixed';
-    textArea.style.left = '-9999px';
-    textArea.style.top = '0';
-    textArea.style.width = '2em';
-    textArea.style.height = '2em';
-    textArea.style.padding = '0';
-    textArea.style.border = 'none';
-    textArea.style.outline = 'none';
-    textArea.style.boxShadow = 'none';
-    textArea.style.background = 'transparent';
+    mark.addEventListener('copy', function (e) {
+      e.stopPropagation();
+      if (e.clipboardData) {
+        e.clipboardData.clearData();
+        e.clipboardData.setData('text/plain', text);
+        e.preventDefault();
+      }
+    });
 
-    // Determine the container to append to.
-    // Appending to document.body outside a MUI FocusTrap causes the trap to instantly steal focus back,
-    // breaking the copy. Appending to the active element's parent container keeps it inside the trap.
-    const activeEl = document.activeElement;
-    const container =
-      activeEl && activeEl !== document.body && activeEl.parentElement
-        ? activeEl.parentElement
-        : document.body;
+    document.body.appendChild(mark);
 
-    container.appendChild(textArea);
+    const selection = document.getSelection();
+    if (!selection) {
+      document.body.removeChild(mark);
+      return false;
+    }
 
-    // Select and copy
-    textArea.focus();
-    textArea.select();
+    const range = document.createRange();
+    selection.removeAllRanges();
+    range.selectNodeContents(mark);
+    selection.addRange(range);
 
-    // Some browsers require explicit selection range for better compatibility
-    textArea.setSelectionRange(0, 99999);
-
-    const successful = document.execCommand('copy');
+    let successful = false;
+    try {
+      successful = document.execCommand('copy');
+    } catch (err) {
+      successful = false;
+    }
 
     // Clean up
-    container.removeChild(textArea);
+    selection.removeAllRanges();
+    document.body.removeChild(mark);
 
     if (successful) {
       console.log('[Clipboard] ✓ execCommand fallback success');

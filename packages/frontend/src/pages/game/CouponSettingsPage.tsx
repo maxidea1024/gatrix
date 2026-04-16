@@ -3100,14 +3100,22 @@ const CouponSettingsPage: React.FC = () => {
                           />
                         </TableCell>
                         <TableCell sx={{ py: 1, px: 2 }}>
-                          <Typography variant="caption">
-                            {formatDateTime(c.createdAt)}
-                          </Typography>
+                          <Tooltip title={formatDateTimeDetailed(c.createdAt)}>
+                            <Typography variant="caption" sx={{ cursor: 'help' }}>
+                              {formatRelativeTime(c.createdAt, undefined, language)}
+                            </Typography>
+                          </Tooltip>
                         </TableCell>
                         <TableCell sx={{ py: 1, px: 2 }}>
-                          <Typography variant="caption">
-                            {c.usedAt ? formatDateTime(c.usedAt) : '-'}
-                          </Typography>
+                          {c.usedAt ? (
+                            <Tooltip title={formatDateTimeDetailed(c.usedAt)}>
+                              <Typography variant="caption" sx={{ cursor: 'help' }}>
+                                {formatRelativeTime(c.usedAt, undefined, language)}
+                              </Typography>
+                            </Tooltip>
+                          ) : (
+                            <Typography variant="caption">-</Typography>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))

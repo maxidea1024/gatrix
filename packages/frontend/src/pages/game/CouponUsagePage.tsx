@@ -384,16 +384,20 @@ const CouponUsagePage: React.FC = () => {
     () => async () => {
       setLoading(true);
       try {
-        const res = await couponService.getUsage(settingIdFilter || undefined, {
-          page: page + 1,
-          limit: rowsPerPage,
-          search: debouncedSearchTerm || undefined,
-          platform: platformFilter || undefined,
-          channel: channelFilter || undefined,
-          subChannel: subChannelFilter || undefined,
-          gameWorldId: worldFilter || undefined,
-          characterId: characterIdFilter || undefined,
-        } as any);
+        const res = await couponService.getUsage(
+          projectApiPath,
+          settingIdFilter || undefined,
+          {
+            page: page + 1,
+            limit: rowsPerPage,
+            search: debouncedSearchTerm || undefined,
+            platform: platformFilter || undefined,
+            channel: channelFilter || undefined,
+            subChannel: subChannelFilter || undefined,
+            gameWorldId: worldFilter || undefined,
+            characterId: characterIdFilter || undefined,
+          } as any
+        );
         setRecords(res.records || []);
         setTotal(res.total || 0);
       } finally {
