@@ -154,6 +154,7 @@ class SDKManager {
         enabled: true,
         serverEnabled: true,
         port: config.metricsPort,
+        bindAddress: config.metricsBindAddress,
         userMetricsEnabled: true,
       },
     };

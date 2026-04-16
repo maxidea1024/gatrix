@@ -7,6 +7,7 @@ export const config = {
   // Server configuration
   port: parseInt(process.env.EDGE_PORT || '3400', 10),
   metricsPort: parseInt(process.env.EDGE_METRICS_PORT || '9400', 10),
+  metricsBindAddress: process.env.EDGE_METRICS_BIND_ADDRESS || '0.0.0.0',
   nodeEnv: process.env.NODE_ENV || 'development',
 
   // Public-facing URL for this Edge server (used to generate URLs sent to clients)
