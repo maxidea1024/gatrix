@@ -41,7 +41,11 @@ function getInternalIp(): string {
     if (!iface) continue;
 
     for (const addr of iface) {
-      if (addr.family === 'IPv4' && !addr.internal && !addr.address.startsWith('169.254.')) {
+      if (
+        addr.family === 'IPv4' &&
+        !addr.internal &&
+        !addr.address.startsWith('169.254.')
+      ) {
         return addr.address;
       }
     }
@@ -92,7 +96,9 @@ const consolePrettyFormat = winston.format.combine(
           ? ' ' + JSON.stringify(meta)
           : '\n' + JSON.stringify(meta, null, 2);
       } catch (error) {
-        metaStr = isECS ? ' [Object could not be serialized]' : '\n[Object could not be serialized]';
+        metaStr = isECS
+          ? ' [Object could not be serialized]'
+          : '\n[Object could not be serialized]';
       }
     }
     const result = `${timestamp} [${level}]: ${message}${metaStr}`;
@@ -228,7 +234,9 @@ const createLogger = (category: string): winston.Logger => {
             ? ' ' + JSON.stringify(meta)
             : '\n' + JSON.stringify(meta, null, 2);
         } catch (error) {
-          metaStr = isECS ? ' [Object could not be serialized]' : '\n[Object could not be serialized]';
+          metaStr = isECS
+            ? ' [Object could not be serialized]'
+            : '\n[Object could not be serialized]';
         }
       }
       // In ECS: no ANSI color codes. Otherwise: yellow category name

@@ -120,7 +120,8 @@ export class ServiceDiscoveryService {
   }> {
     // Auto-detect hostname and internalAddress if not provided
     // In ECS Fargate, getContainerAddress() queries the metadata API for the real ENI IP
-    const internalAddress = input.internalAddress || await getContainerAddress();
+    const internalAddress =
+      input.internalAddress || (await getContainerAddress());
     const hostname = input.hostname || os.hostname();
 
     // Apply enrichment if configured

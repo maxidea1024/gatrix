@@ -24,7 +24,11 @@ export function getFirstNicAddress(): string {
     if (!iface) continue;
 
     for (const addr of iface) {
-      if (addr.family === 'IPv4' && !addr.internal && !isLinkLocal(addr.address)) {
+      if (
+        addr.family === 'IPv4' &&
+        !addr.internal &&
+        !isLinkLocal(addr.address)
+      ) {
         return addr.address;
       }
     }
@@ -102,13 +106,22 @@ function httpGetJson(url: string, timeoutMs = 2000): Promise<any> {
           return;
         }
         let data = '';
-        res.on('data', (chunk) => { data += chunk; });
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
         res.on('end', () => {
-          try { resolve(JSON.parse(data)); } catch { resolve(null); }
+          try {
+            resolve(JSON.parse(data));
+          } catch {
+            resolve(null);
+          }
         });
       }
     );
     req.on('error', () => resolve(null));
-    req.on('timeout', () => { req.destroy(); resolve(null); });
+    req.on('timeout', () => {
+      req.destroy();
+      resolve(null);
+    });
   });
 }
