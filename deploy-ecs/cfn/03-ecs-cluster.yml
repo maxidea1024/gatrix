@@ -1,0 +1,172 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Gatrix ECS - Cluster, IAM Roles, and CloudWatch Log Groups
+  Creates ECS Cluster with Fargate, task execution/task roles, and log groups.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: gatrix
+    Description: Environment name prefix for resources
+
+Resources:
+  # ============================================
+  # ECS Cluster
+  # ============================================
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub '${EnvironmentName}-cluster'
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-cluster'
+
+  # ============================================
+  # CloudWatch Log Groups
+  # ============================================
+  BackendLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/ecs/${EnvironmentName}-backend'
+      RetentionInDays: 30
+
+  FrontendLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/ecs/${EnvironmentName}-frontend'
+      RetentionInDays: 30
+
+  EdgeLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/ecs/${EnvironmentName}-edge'
+      RetentionInDays: 30
+
+  PrometheusLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/ecs/${EnvironmentName}-prometheus'
+      RetentionInDays: 14
+
+  GrafanaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/ecs/${EnvironmentName}-grafana'
+      RetentionInDays: 14
+
+  # ============================================
+  # ECS Task Execution Role
+  # Used by ECS agent: pull ECR images, push CloudWatch logs,
+  # read Secrets Manager values
+  # ============================================
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${EnvironmentName}-ecs-execution-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: SecretsManagerRead
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${EnvironmentName}/*'
+
+  # ============================================
+  # ECS Task Role
+  # Used by the application container itself (e.g., access S3, SQS, etc.)
+  # Currently minimal. Add policies as needed.
+  # ============================================
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${EnvironmentName}-ecs-task-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3UploadsAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub 'arn:aws:s3:::${EnvironmentName}-uploads-${AWS::AccountId}'
+                  - !Sub 'arn:aws:s3:::${EnvironmentName}-uploads-${AWS::AccountId}/*'
+
+Outputs:
+  ECSClusterArn:
+    Description: ECS Cluster ARN
+    Value: !GetAtt ECSCluster.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-ECSClusterArn'
+
+  ECSClusterName:
+    Description: ECS Cluster Name
+    Value: !Ref ECSCluster
+    Export:
+      Name: !Sub '${EnvironmentName}-ECSClusterName'
+
+  ECSTaskExecutionRoleArn:
+    Description: ECS Task Execution Role ARN
+    Value: !GetAtt ECSTaskExecutionRole.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-ECSTaskExecutionRoleArn'
+
+  ECSTaskRoleArn:
+    Description: ECS Task Role ARN
+    Value: !GetAtt ECSTaskRole.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-ECSTaskRoleArn'
+
+  BackendLogGroupName:
+    Description: Backend CloudWatch Log Group
+    Value: !Ref BackendLogGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-BackendLogGroupName'
+
+  FrontendLogGroupName:
+    Description: Frontend CloudWatch Log Group
+    Value: !Ref FrontendLogGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-FrontendLogGroupName'
+
+  EdgeLogGroupName:
+    Description: Edge CloudWatch Log Group
+    Value: !Ref EdgeLogGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-EdgeLogGroupName'
+
+  PrometheusLogGroupName:
+    Description: Prometheus CloudWatch Log Group
+    Value: !Ref PrometheusLogGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-PrometheusLogGroupName'
+
+  GrafanaLogGroupName:
+    Description: Grafana CloudWatch Log Group
+    Value: !Ref GrafanaLogGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-GrafanaLogGroupName'

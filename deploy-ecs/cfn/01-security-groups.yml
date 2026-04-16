@@ -1,0 +1,207 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Gatrix ECS - Security Groups
+  Creates security groups for ALB, ECS services, and monitoring.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: gatrix
+    Description: Environment name prefix for resources
+
+Resources:
+  # ============================================
+  # ALB Security Group
+  # ============================================
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Application Load Balancer
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: '0.0.0.0/0'
+          Description: HTTP from internet
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: '0.0.0.0/0'
+          Description: HTTPS from internet
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-alb-sg'
+
+  # ============================================
+  # Backend Service Security Group
+  # ============================================
+  BackendSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Backend ECS tasks
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5000
+          ToPort: 5000
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+          Description: Backend API from ALB
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-backend-sg'
+
+  # Allow backend-to-backend (metrics scraping by Prometheus)
+  BackendIngressFromMonitoring:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref BackendSecurityGroup
+      IpProtocol: tcp
+      FromPort: 5000
+      ToPort: 5000
+      SourceSecurityGroupId: !Ref MonitoringSecurityGroup
+      Description: Prometheus scrape from monitoring
+
+  # Allow Edge -> Backend (Cloud Map service discovery)
+  BackendIngressFromEdge:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref BackendSecurityGroup
+      IpProtocol: tcp
+      FromPort: 5000
+      ToPort: 5000
+      SourceSecurityGroupId: !Ref EdgeSecurityGroup
+      Description: Edge to Backend via Cloud Map
+
+  # ============================================
+  # Frontend Service Security Group
+  # ============================================
+  FrontendSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Frontend ECS tasks
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+          Description: Frontend HTTP from ALB
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-frontend-sg'
+
+  # ============================================
+  # Edge Service Security Group
+  # ============================================
+  EdgeSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Edge ECS tasks
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3400
+          ToPort: 3400
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+          Description: Edge API from ALB
+        - IpProtocol: tcp
+          FromPort: 3410
+          ToPort: 3410
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+          Description: Edge WebSocket from ALB
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-edge-sg'
+
+  # Allow edge metrics scraping by Prometheus
+  EdgeIngressFromMonitoring:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref EdgeSecurityGroup
+      IpProtocol: tcp
+      FromPort: 9400
+      ToPort: 9400
+      SourceSecurityGroupId: !Ref MonitoringSecurityGroup
+      Description: Prometheus scrape from monitoring
+
+  # Allow Backend -> Edge internal (cache inspection from admin UI)
+  EdgeIngressFromBackend:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref EdgeSecurityGroup
+      IpProtocol: tcp
+      FromPort: 3410
+      ToPort: 3410
+      SourceSecurityGroupId: !Ref BackendSecurityGroup
+      Description: Backend to Edge internal API
+
+  # ============================================
+  # Monitoring Security Group (Prometheus, Grafana)
+  # ============================================
+  MonitoringSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for monitoring services (Prometheus, Grafana)
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 9090
+          ToPort: 9090
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+          Description: Prometheus UI from ALB
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+          Description: Grafana UI from ALB
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-monitoring-sg'
+
+  # Allow Grafana ??Prometheus within monitoring SG
+  MonitoringSelfIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref MonitoringSecurityGroup
+      IpProtocol: tcp
+      FromPort: 9090
+      ToPort: 9090
+      SourceSecurityGroupId: !Ref MonitoringSecurityGroup
+      Description: Grafana to Prometheus internal
+
+Outputs:
+  ALBSecurityGroupId:
+    Description: ALB Security Group ID
+    Value: !Ref ALBSecurityGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-ALBSecurityGroupId'
+
+  BackendSecurityGroupId:
+    Description: Backend Security Group ID
+    Value: !Ref BackendSecurityGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-BackendSecurityGroupId'
+
+  FrontendSecurityGroupId:
+    Description: Frontend Security Group ID
+    Value: !Ref FrontendSecurityGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-FrontendSecurityGroupId'
+
+  EdgeSecurityGroupId:
+    Description: Edge Security Group ID
+    Value: !Ref EdgeSecurityGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-EdgeSecurityGroupId'
+
+  MonitoringSecurityGroupId:
+    Description: Monitoring Security Group ID
+    Value: !Ref MonitoringSecurityGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-MonitoringSecurityGroupId'

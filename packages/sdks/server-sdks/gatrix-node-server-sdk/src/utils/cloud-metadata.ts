@@ -134,14 +134,74 @@ function httpGet(
 }
 
 /**
- * Detect AWS EC2 metadata
+ * Detect AWS metadata (supports both ECS Fargate and EC2)
+ *
+ * ECS Fargate does NOT support EC2 IMDS (169.254.169.254).
+ * Instead, it provides the ECS_CONTAINER_METADATA_URI_V4 environment variable.
+ * We try ECS metadata first, then fall back to EC2 IMDS for EC2 instances.
  */
 async function detectAWS(): Promise<CloudMetadata | null> {
+  // 1. Try ECS Fargate metadata endpoint (ECS_CONTAINER_METADATA_URI_V4)
+  const ecsMetadataUri = process.env.ECS_CONTAINER_METADATA_URI_V4;
+  if (ecsMetadataUri) {
+    try {
+      const taskResponse = await httpGet(`${ecsMetadataUri}/task`, {
+        timeout: 2000,
+      });
+      if (taskResponse) {
+        const taskDoc = JSON.parse(taskResponse);
+        // TaskARN format: arn:aws:ecs:REGION:ACCOUNT_ID:task/CLUSTER/TASK_ID
+        const taskArn = taskDoc.TaskARN || '';
+        const arnParts = taskArn.split(':');
+        const region = arnParts.length >= 4 ? arnParts[3] : undefined;
+        const accountId = arnParts.length >= 5 ? arnParts[4] : undefined;
+
+        // AvailabilityZone from task metadata
+        const zone = taskDoc.AvailabilityZone || undefined;
+
+        // Task ID from the ARN
+        const taskIdParts = taskArn.split('/');
+        const taskId =
+          taskIdParts.length >= 3
+            ? taskIdParts[taskIdParts.length - 1]
+            : undefined;
+
+        return {
+          provider: 'aws',
+          region,
+          zone,
+          instanceId: taskId,
+          accountId,
+        };
+      }
+    } catch {
+      // Fall through to EC2 IMDS
+    }
+  }
+
+  // 2. Also detect via AWS_REGION / AWS_DEFAULT_REGION env vars (set by ECS task definition)
+  const envRegion = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
+  if (envRegion && ecsMetadataUri) {
+    // We're in AWS (ECS) but task metadata parsing might have failed
+    return {
+      provider: 'aws',
+      region: envRegion,
+    };
+  }
+
+  // 3. Fall back to EC2 IMDS (for EC2 instances, not Fargate)
   const endpoint = METADATA_ENDPOINTS.aws;
   const url = `${endpoint.base}${endpoint.identity}`;
 
   const response = await httpGet(url, { timeout: endpoint.timeout });
   if (!response) {
+    // Last resort: check if we have AWS env vars
+    if (envRegion) {
+      return {
+        provider: 'aws',
+        region: envRegion,
+      };
+    }
     return null;
   }
 

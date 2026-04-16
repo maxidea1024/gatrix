@@ -1,0 +1,272 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Gatrix ECS - Monitoring (Prometheus + Grafana on Fargate)
+  Deploys Prometheus and Grafana as ECS Fargate services
+  with EFS for persistent storage.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: gatrix
+
+  PrometheusImage:
+    Type: String
+    Default: prom/prometheus:latest
+
+  GrafanaImage:
+    Type: String
+    Default: grafana/grafana:latest
+
+  GrafanaAdminUser:
+    Type: String
+    Default: admin
+  GrafanaAdminPassword:
+    Type: String
+    NoEcho: true
+    Default: admin
+
+Resources:
+  # ============================================
+  # EFS for Persistent Storage
+  # ============================================
+  MonitoringEFS:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      PerformanceMode: generalPurpose
+      ThroughputMode: bursting
+      Encrypted: true
+      FileSystemTags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-monitoring-efs'
+
+  EFSMountTarget1:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref MonitoringEFS
+      SubnetId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-PrivateSubnet1Id'
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+  EFSMountTarget2:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref MonitoringEFS
+      SubnetId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-PrivateSubnet2Id'
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+  EFSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EFS mount targets security group
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          SourceSecurityGroupId: !ImportValue
+            Fn::Sub: '${EnvironmentName}-MonitoringSecurityGroupId'
+          Description: NFS from monitoring tasks
+
+  PrometheusAccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref MonitoringEFS
+      PosixUser:
+        Uid: '65534'
+        Gid: '65534'
+      RootDirectory:
+        Path: /prometheus
+        CreationInfo:
+          OwnerUid: '65534'
+          OwnerGid: '65534'
+          Permissions: '755'
+
+  GrafanaAccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref MonitoringEFS
+      PosixUser:
+        Uid: '472'
+        Gid: '472'
+      RootDirectory:
+        Path: /grafana
+        CreationInfo:
+          OwnerUid: '472'
+          OwnerGid: '472'
+          Permissions: '755'
+
+  # ============================================
+  # Prometheus Task Definition
+  # ============================================
+  PrometheusTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub '${EnvironmentName}-prometheus'
+      Cpu: '512'
+      Memory: '1024'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSTaskExecutionRoleArn'
+      TaskRoleArn: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSTaskRoleArn'
+      Volumes:
+        - Name: prometheus-data
+          EFSVolumeConfiguration:
+            FilesystemId: !Ref MonitoringEFS
+            TransitEncryption: ENABLED
+            AuthorizationConfig:
+              AccessPointId: !Ref PrometheusAccessPoint
+              IAM: DISABLED
+      ContainerDefinitions:
+        - Name: prometheus
+          Image: !Ref PrometheusImage
+          Essential: true
+          PortMappings:
+            - ContainerPort: 9090
+              Protocol: tcp
+          Command:
+            - '--config.file=/etc/prometheus/prometheus.yml'
+            - '--storage.tsdb.path=/prometheus'
+            - '--storage.tsdb.retention.time=14d'
+            - '--web.enable-lifecycle'
+          MountPoints:
+            - SourceVolume: prometheus-data
+              ContainerPath: /prometheus
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !ImportValue
+                Fn::Sub: '${EnvironmentName}-PrometheusLogGroupName'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: prometheus
+
+  # ============================================
+  # Grafana Task Definition
+  # ============================================
+  GrafanaTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub '${EnvironmentName}-grafana'
+      Cpu: '256'
+      Memory: '512'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSTaskExecutionRoleArn'
+      TaskRoleArn: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSTaskRoleArn'
+      Volumes:
+        - Name: grafana-data
+          EFSVolumeConfiguration:
+            FilesystemId: !Ref MonitoringEFS
+            TransitEncryption: ENABLED
+            AuthorizationConfig:
+              AccessPointId: !Ref GrafanaAccessPoint
+              IAM: DISABLED
+      ContainerDefinitions:
+        - Name: grafana
+          Image: !Ref GrafanaImage
+          Essential: true
+          PortMappings:
+            - ContainerPort: 3000
+              Protocol: tcp
+          Environment:
+            - Name: GF_SECURITY_ADMIN_USER
+              Value: !Ref GrafanaAdminUser
+            - Name: GF_SECURITY_ADMIN_PASSWORD
+              Value: !Ref GrafanaAdminPassword
+            - Name: GF_USERS_ALLOW_SIGN_UP
+              Value: 'false'
+            - Name: GF_SECURITY_ALLOW_EMBEDDING
+              Value: 'true'
+            - Name: GF_SECURITY_CSRF_TRUSTED_ORIGINS
+              Value: '*'
+            - Name: GF_LIVE_ALLOWED_ORIGINS
+              Value: '*'
+          MountPoints:
+            - SourceVolume: grafana-data
+              ContainerPath: /var/lib/grafana
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !ImportValue
+                Fn::Sub: '${EnvironmentName}-GrafanaLogGroupName'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: grafana
+
+  # ============================================
+  # Prometheus ECS Service
+  # ============================================
+  PrometheusService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - EFSMountTarget1
+      - EFSMountTarget2
+    Properties:
+      ServiceName: !Sub '${EnvironmentName}-prometheus'
+      Cluster: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSClusterArn'
+      TaskDefinition: !Ref PrometheusTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-MonitoringSecurityGroupId'
+          Subnets:
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-PrivateSubnet1Id'
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-PrivateSubnet2Id'
+      LoadBalancers:
+        - ContainerName: prometheus
+          ContainerPort: 9090
+          TargetGroupArn: !ImportValue
+            Fn::Sub: '${EnvironmentName}-PrometheusTargetGroupArn'
+      ServiceRegistries:
+        - RegistryArn: !ImportValue
+            Fn::Sub: '${EnvironmentName}-PrometheusDiscoveryServiceArn'
+
+  # ============================================
+  # Grafana ECS Service
+  # ============================================
+  GrafanaService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - EFSMountTarget1
+      - EFSMountTarget2
+    Properties:
+      ServiceName: !Sub '${EnvironmentName}-grafana'
+      Cluster: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSClusterArn'
+      TaskDefinition: !Ref GrafanaTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-MonitoringSecurityGroupId'
+          Subnets:
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-PrivateSubnet1Id'
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-PrivateSubnet2Id'
+      LoadBalancers:
+        - ContainerName: grafana
+          ContainerPort: 3000
+          TargetGroupArn: !ImportValue
+            Fn::Sub: '${EnvironmentName}-GrafanaTargetGroupArn'
+      ServiceRegistries:
+        - RegistryArn: !ImportValue
+            Fn::Sub: '${EnvironmentName}-GrafanaDiscoveryServiceArn'

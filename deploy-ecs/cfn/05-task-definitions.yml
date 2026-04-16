@@ -1,0 +1,375 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Gatrix ECS - Task Definitions
+  Defines Fargate task definitions for backend, frontend, and edge services.
+  Environment variables mirror the Docker Swarm compose configuration.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: gatrix
+
+  # Container Images
+  BackendImage:
+    Type: String
+    Description: 'Full ECR image URI for backend (e.g., 123456789012.dkr.ecr.ap-northeast-2.amazonaws.com/gatrix-backend:latest)'
+
+  FrontendImage:
+    Type: String
+    Description: 'Full ECR image URI for frontend'
+
+  EdgeImage:
+    Type: String
+    Description: 'Full ECR image URI for edge'
+
+  # Resources
+  BackendCpu:
+    Type: String
+    Default: '512'
+  BackendMemory:
+    Type: String
+    Default: '1024'
+  FrontendCpu:
+    Type: String
+    Default: '256'
+  FrontendMemory:
+    Type: String
+    Default: '512'
+  EdgeCpu:
+    Type: String
+    Default: '256'
+  EdgeMemory:
+    Type: String
+    Default: '512'
+
+  # Database
+  DbHost:
+    Type: String
+  DbPort:
+    Type: String
+    Default: '3306'
+  DbName:
+    Type: String
+    Default: gatrix
+  DbUser:
+    Type: String
+  DbPassword:
+    Type: String
+    NoEcho: true
+
+  # Redis
+  RedisHost:
+    Type: String
+  RedisPort:
+    Type: String
+    Default: '6379'
+  RedisPassword:
+    Type: String
+    NoEcho: true
+    Default: ''
+
+  # Edge Redis
+  EdgeRedisHost:
+    Type: String
+  EdgeRedisPort:
+    Type: String
+    Default: '6379'
+  EdgeRedisPassword:
+    Type: String
+    NoEcho: true
+    Default: ''
+  EdgeRedisDb:
+    Type: String
+    Default: '0'
+
+  # Application
+  DefaultLanguage:
+    Type: String
+    Default: zh
+  ViteAppName:
+    Type: String
+    Default: Gatrix
+  ViteDefaultLanguage:
+    Type: String
+    Default: zh
+  AdminEmail:
+    Type: String
+    Default: admin@gatrix.com
+  AdminPassword:
+    Type: String
+    NoEcho: true
+    Default: admin123
+  AdminName:
+    Type: String
+    Default: Administrator
+
+  # Edge
+  EdgeApiToken:
+    Type: String
+    Default: gatrix-edge-internal-bypass-token
+  EdgeBypassToken:
+    Type: String
+    Default: gatrix-edge-internal-bypass-token
+  EdgeLogLevel:
+    Type: String
+    Default: info
+  EdgeSyncMethod:
+    Type: String
+    Default: polling
+  EdgeCachePollingInterval:
+    Type: String
+    Default: '60000'
+  EdgeEnvironments:
+    Type: String
+    Default: '*'
+  EdgeForceHttps:
+    Type: String
+    Default: 'false'
+
+  # Secrets Manager ARNs
+  JwtSecretArn:
+    Type: String
+    Description: ARN of the JWT Secret in Secrets Manager
+  JwtRefreshSecretArn:
+    Type: String
+    Description: ARN of the JWT Refresh Secret in Secrets Manager
+  SessionSecretArn:
+    Type: String
+    Description: ARN of the Session Secret in Secrets Manager
+
+Resources:
+  # ============================================
+  # Backend Task Definition
+  # ============================================
+  BackendTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub '${EnvironmentName}-backend'
+      Cpu: !Ref BackendCpu
+      Memory: !Ref BackendMemory
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSTaskExecutionRoleArn'
+      TaskRoleArn: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSTaskRoleArn'
+      ContainerDefinitions:
+        - Name: backend
+          Image: !Ref BackendImage
+          Essential: true
+          PortMappings:
+            - ContainerPort: 5000
+              Protocol: tcp
+          Environment:
+            - Name: NODE_ENV
+              Value: production
+            - Name: LOG_FORMAT
+              Value: json
+            - Name: LOG_SERVICE_NAME
+              Value: gatrix-backend
+            - Name: PORT
+              Value: '5000'
+            - Name: DB_HOST
+              Value: !Ref DbHost
+            - Name: DB_PORT
+              Value: !Ref DbPort
+            - Name: DB_NAME
+              Value: !Ref DbName
+            - Name: DB_USER
+              Value: !Ref DbUser
+            - Name: DB_PASSWORD
+              Value: !Ref DbPassword
+            - Name: REDIS_HOST
+              Value: !Ref RedisHost
+            - Name: REDIS_PORT
+              Value: !Ref RedisPort
+            - Name: REDIS_PASSWORD
+              Value: !Ref RedisPassword
+            - Name: CORS_ORIGIN
+              Value: '*'
+            - Name: DISABLE_X_POWERED_BY
+              Value: 'true'
+            - Name: SERVICE_DISCOVERY_MODE
+              Value: redis
+            - Name: DEFAULT_LANGUAGE
+              Value: !Ref DefaultLanguage
+            - Name: MONITORING_ENABLED
+              Value: 'true'
+            - Name: DISABLE_RATE_LIMIT
+              Value: 'true'
+            - Name: ADMIN_EMAIL
+              Value: !Ref AdminEmail
+            - Name: ADMIN_PASSWORD
+              Value: !Ref AdminPassword
+            - Name: ADMIN_NAME
+              Value: !Ref AdminName
+          Secrets:
+            - Name: JWT_SECRET
+              ValueFrom: !Ref JwtSecretArn
+            - Name: JWT_REFRESH_SECRET
+              ValueFrom: !Ref JwtRefreshSecretArn
+            - Name: SESSION_SECRET
+              ValueFrom: !Ref SessionSecretArn
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - "node -e \"require('http').get('http://127.0.0.1:5000/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\""
+            Interval: 30
+            Timeout: 10
+            Retries: 5
+            StartPeriod: 60
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !ImportValue
+                Fn::Sub: '${EnvironmentName}-BackendLogGroupName'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: backend
+
+  # ============================================
+  # Frontend Task Definition
+  # ============================================
+  FrontendTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub '${EnvironmentName}-frontend'
+      Cpu: !Ref FrontendCpu
+      Memory: !Ref FrontendMemory
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSTaskExecutionRoleArn'
+      TaskRoleArn: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSTaskRoleArn'
+      ContainerDefinitions:
+        - Name: frontend
+          Image: !Ref FrontendImage
+          Essential: true
+          PortMappings:
+            - ContainerPort: 80
+              Protocol: tcp
+          Environment:
+            - Name: VITE_API_URL
+              Value: /api/v1
+            - Name: VITE_APP_NAME
+              Value: !Ref ViteAppName
+            - Name: VITE_DEFAULT_LANGUAGE
+              Value: !Ref ViteDefaultLanguage
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - 'wget --no-verbose --tries=1 --spider http://127.0.0.1:80/health || exit 1'
+            Interval: 30
+            Timeout: 10
+            Retries: 5
+            StartPeriod: 30
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !ImportValue
+                Fn::Sub: '${EnvironmentName}-FrontendLogGroupName'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: frontend
+
+  # ============================================
+  # Edge Task Definition
+  # ============================================
+  EdgeTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub '${EnvironmentName}-edge'
+      Cpu: !Ref EdgeCpu
+      Memory: !Ref EdgeMemory
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSTaskExecutionRoleArn'
+      TaskRoleArn: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSTaskRoleArn'
+      ContainerDefinitions:
+        - Name: edge
+          Image: !Ref EdgeImage
+          Essential: true
+          PortMappings:
+            - ContainerPort: 3400
+              Protocol: tcp
+            - ContainerPort: 3410
+              Protocol: tcp
+            - ContainerPort: 9400
+              Protocol: tcp
+          Environment:
+            - Name: NODE_ENV
+              Value: production
+            - Name: LOG_LEVEL
+              Value: !Ref EdgeLogLevel
+            - Name: EDGE_PORT
+              Value: '3400'
+            - Name: EDGE_METRICS_PORT
+              Value: '9400'
+            - Name: GATRIX_URL
+              Value: http://backend.gatrix.local:5000
+            - Name: EDGE_API_TOKEN
+              Value: !Ref EdgeApiToken
+            - Name: EDGE_BYPASS_TOKEN
+              Value: !Ref EdgeBypassToken
+            - Name: EDGE_APPLICATION_NAME
+              Value: edge-server
+            - Name: REDIS_HOST
+              Value: !Ref RedisHost
+            - Name: REDIS_PORT
+              Value: !Ref RedisPort
+            - Name: REDIS_PASSWORD
+              Value: !Ref RedisPassword
+            - Name: EDGE_SYNC_METHOD
+              Value: !Ref EdgeSyncMethod
+            - Name: EDGE_CACHE_POLLING_INTERVAL_MS
+              Value: !Ref EdgeCachePollingInterval
+            - Name: EDGE_ENVIRONMENTS
+              Value: !Ref EdgeEnvironments
+            - Name: EDGE_REDIS_HOST
+              Value: !Ref EdgeRedisHost
+            - Name: EDGE_REDIS_PORT
+              Value: !Ref EdgeRedisPort
+            - Name: EDGE_REDIS_PASSWORD
+              Value: !Ref EdgeRedisPassword
+            - Name: EDGE_REDIS_DB
+              Value: !Ref EdgeRedisDb
+            - Name: EDGE_FORCE_HTTPS
+              Value: !Ref EdgeForceHttps
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - "node -e \"require('http').get('http://127.0.0.1:3400/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\""
+            Interval: 30
+            Timeout: 10
+            Retries: 5
+            StartPeriod: 120
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !ImportValue
+                Fn::Sub: '${EnvironmentName}-EdgeLogGroupName'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: edge
+
+Outputs:
+  BackendTaskDefinitionArn:
+    Description: Backend Task Definition ARN
+    Value: !Ref BackendTaskDefinition
+    Export:
+      Name: !Sub '${EnvironmentName}-BackendTaskDefinitionArn'
+
+  FrontendTaskDefinitionArn:
+    Description: Frontend Task Definition ARN
+    Value: !Ref FrontendTaskDefinition
+    Export:
+      Name: !Sub '${EnvironmentName}-FrontendTaskDefinitionArn'
+
+  EdgeTaskDefinitionArn:
+    Description: Edge Task Definition ARN
+    Value: !Ref EdgeTaskDefinition
+    Export:
+      Name: !Sub '${EnvironmentName}-EdgeTaskDefinitionArn'

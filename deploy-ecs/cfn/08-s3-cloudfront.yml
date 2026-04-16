@@ -1,0 +1,147 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Gatrix ECS - S3 Bucket + CloudFront Distribution
+  Creates an S3 bucket for image/file uploads and a CloudFront CDN distribution.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: gatrix
+    Description: Environment name prefix for resources
+
+  BucketName:
+    Type: String
+    Default: ''
+    Description: S3 bucket name (leave empty for auto-generated name)
+
+Conditions:
+  HasBucketName: !Not [!Equals [!Ref BucketName, '']]
+
+Resources:
+  # ============================================
+  # S3 Bucket for image/file uploads
+  # ============================================
+  UploadsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !If
+        - HasBucketName
+        - !Ref BucketName
+        - !Sub '${EnvironmentName}-uploads-${AWS::AccountId}'
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ['*']
+            AllowedMethods: [GET, PUT, POST, DELETE, HEAD]
+            AllowedOrigins: ['*']
+            MaxAge: 3600
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-uploads'
+
+  # ============================================
+  # S3 Bucket Policy for CloudFront OAC
+  # ============================================
+  UploadsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref UploadsBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontServicePrincipal
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub '${UploadsBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                'AWS:SourceArn': !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+
+  # ============================================
+  # CloudFront Origin Access Control (OAC)
+  # ============================================
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub '${EnvironmentName}-s3-oac'
+        Description: OAC for S3 uploads bucket
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # ============================================
+  # CloudFront Distribution
+  # ============================================
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub '${EnvironmentName} image/file CDN'
+        DefaultRootObject: ''
+        PriceClass: PriceClass_200  # US, Europe, Asia (cheapest multi-region)
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt UploadsBucket.RegionalDomainName
+            OriginAccessControlId: !Ref CloudFrontOAC
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: '658327ea-f89d-4fab-a63d-7e88639e58f6'  # CachingOptimized
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+        HttpVersion: http2and3
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-cdn'
+
+Outputs:
+  UploadsBucketName:
+    Description: S3 Bucket name for uploads
+    Value: !Ref UploadsBucket
+    Export:
+      Name: !Sub '${EnvironmentName}-UploadsBucketName'
+
+  UploadsBucketArn:
+    Description: S3 Bucket ARN
+    Value: !GetAtt UploadsBucket.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-UploadsBucketArn'
+
+  CloudFrontDistributionId:
+    Description: CloudFront Distribution ID
+    Value: !Ref CloudFrontDistribution
+    Export:
+      Name: !Sub '${EnvironmentName}-CloudFrontDistributionId'
+
+  CloudFrontDomainName:
+    Description: CloudFront Domain Name (use this URL for images)
+    Value: !GetAtt CloudFrontDistribution.DomainName
+    Export:
+      Name: !Sub '${EnvironmentName}-CloudFrontDomainName'
+
+  ImageBaseUrl:
+    Description: Base URL for serving images via CloudFront
+    Value: !Sub 'https://${CloudFrontDistribution.DomainName}'
+    Export:
+      Name: !Sub '${EnvironmentName}-ImageBaseUrl'

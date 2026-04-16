@@ -10,6 +10,10 @@ const logLevel = config.logLevel || 'info';
 const logFormat = process.env.LOG_FORMAT || '';
 const nodeEnv = process.env.NODE_ENV || 'development';
 const serviceName = process.env.LOG_SERVICE_NAME || 'gatrix-edge';
+
+// Detect AWS ECS environment for log format adjustments
+// In ECS: no ANSI codes, single-line JSON metadata
+const isECS = !!process.env.ECS_CONTAINER_METADATA_URI_V4;
 const monitoringEnabled =
   process.env.MONITORING_ENABLED === 'true' ||
   process.env.MONITORING_ENABLED === '1';
@@ -32,26 +36,25 @@ const useJsonConsoleFormat = process.env.LOG_CONSOLE_FORMAT === 'json';
 function getInternalIp(): string {
   const interfaces = os.networkInterfaces();
 
-  // First pass: Look for non-internal IPv4 addresses
+  // First pass: Look for non-internal, non-link-local IPv4 addresses
   for (const name of Object.keys(interfaces)) {
     const iface = interfaces[name];
     if (!iface) continue;
 
     for (const addr of iface) {
-      // Skip non-IPv4 and internal addresses
-      if (addr.family === 'IPv4' && !addr.internal) {
+      if (addr.family === 'IPv4' && !addr.internal && !addr.address.startsWith('169.254.')) {
         return addr.address;
       }
     }
   }
 
-  // Second pass: Fall back to internal IPv4 addresses (e.g., 127.0.0.1)
+  // Second pass: Fall back to internal IPv4 addresses, still skip link-local
   for (const name of Object.keys(interfaces)) {
     const iface = interfaces[name];
     if (!iface) continue;
 
     for (const addr of iface) {
-      if (addr.family === 'IPv4') {
+      if (addr.family === 'IPv4' && !addr.address.startsWith('169.254.')) {
         return addr.address;
       }
     }
@@ -224,14 +227,19 @@ const createLogger = (category: string): winston.Logger => {
       const { service, hostname: _h, internalIp: _ip, ...displayMeta } = meta;
       if (Object.keys(displayMeta).length > 0) {
         try {
-          metaStr = '\n' + JSON.stringify(displayMeta, null, 2);
+          // In ECS: single-line JSON. Otherwise: multi-line pretty-printed
+          metaStr = isECS
+            ? ' ' + JSON.stringify(displayMeta)
+            : '\n' + JSON.stringify(displayMeta, null, 2);
         } catch (error) {
-          metaStr = '\n[Object could not be serialized]';
+          metaStr = isECS ? ' [Object could not be serialized]' : '\n[Object could not be serialized]';
         }
       }
-      // Apply yellow color to category name only
-      const coloredCategory = `[\x1b[33m${category}\x1b[0m]`;
-      const result = `${timestamp} [${level}] ${coloredCategory}: ${message}${metaStr}`;
+      // In ECS: no ANSI color codes. Otherwise: yellow category name
+      const categoryLabel = isECS
+        ? `[${category}]`
+        : `[\x1b[33m${category}\x1b[0m]`;
+      const result = `${timestamp} [${level}] ${categoryLabel}: ${message}${metaStr}`;
       return result;
     })
   );

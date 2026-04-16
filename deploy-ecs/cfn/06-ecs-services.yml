@@ -1,0 +1,211 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Gatrix ECS - Services with Auto Scaling
+  Creates ECS Fargate services for backend, frontend, and edge
+  with ALB integration, service discovery, and auto-scaling.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: gatrix
+
+  BackendDesiredCount:
+    Type: Number
+    Default: 2
+  FrontendDesiredCount:
+    Type: Number
+    Default: 2
+  EdgeDesiredCount:
+    Type: Number
+    Default: 2
+
+Resources:
+  # ============================================
+  # Backend ECS Service
+  # ============================================
+  BackendService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub '${EnvironmentName}-backend'
+      Cluster: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSClusterArn'
+      TaskDefinition: !ImportValue
+        Fn::Sub: '${EnvironmentName}-BackendTaskDefinitionArn'
+      DesiredCount: !Ref BackendDesiredCount
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-BackendSecurityGroupId'
+          Subnets:
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-PrivateSubnet1Id'
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-PrivateSubnet2Id'
+      LoadBalancers:
+        - ContainerName: backend
+          ContainerPort: 5000
+          TargetGroupArn: !ImportValue
+            Fn::Sub: '${EnvironmentName}-BackendTargetGroupArn'
+      ServiceRegistries:
+        - RegistryArn: !ImportValue
+            Fn::Sub: '${EnvironmentName}-BackendDiscoveryServiceArn'
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 100
+        MaximumPercent: 200
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      EnableExecuteCommand: true
+      PropagateTags: SERVICE
+
+  # ============================================
+  # Frontend ECS Service
+  # ============================================
+  FrontendService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub '${EnvironmentName}-frontend'
+      Cluster: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSClusterArn'
+      TaskDefinition: !ImportValue
+        Fn::Sub: '${EnvironmentName}-FrontendTaskDefinitionArn'
+      DesiredCount: !Ref FrontendDesiredCount
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-FrontendSecurityGroupId'
+          Subnets:
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-PrivateSubnet1Id'
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-PrivateSubnet2Id'
+      LoadBalancers:
+        - ContainerName: frontend
+          ContainerPort: 80
+          TargetGroupArn: !ImportValue
+            Fn::Sub: '${EnvironmentName}-FrontendTargetGroupArn'
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 100
+        MaximumPercent: 200
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      PropagateTags: SERVICE
+
+  # ============================================
+  # Edge ECS Service
+  # ============================================
+  EdgeService:
+    Type: AWS::ECS::Service
+    DependsOn: BackendService
+    Properties:
+      ServiceName: !Sub '${EnvironmentName}-edge'
+      Cluster: !ImportValue
+        Fn::Sub: '${EnvironmentName}-ECSClusterArn'
+      TaskDefinition: !ImportValue
+        Fn::Sub: '${EnvironmentName}-EdgeTaskDefinitionArn'
+      DesiredCount: !Ref EdgeDesiredCount
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-EdgeSecurityGroupId'
+          Subnets:
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-PrivateSubnet1Id'
+            - !ImportValue
+              Fn::Sub: '${EnvironmentName}-PrivateSubnet2Id'
+      LoadBalancers:
+        - ContainerName: edge
+          ContainerPort: 3400
+          TargetGroupArn: !ImportValue
+            Fn::Sub: '${EnvironmentName}-EdgeTargetGroupArn'
+      ServiceRegistries:
+        - RegistryArn: !ImportValue
+            Fn::Sub: '${EnvironmentName}-EdgeDiscoveryServiceArn'
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 100
+        MaximumPercent: 200
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      EnableExecuteCommand: true
+      PropagateTags: SERVICE
+
+  # ============================================
+  # Auto Scaling
+  # ============================================
+  BackendScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 10
+      MinCapacity: 1
+      ResourceId: !Sub 'service/${EnvironmentName}-cluster/${EnvironmentName}-backend'
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      RoleARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService'
+    DependsOn: BackendService
+
+  BackendCPUScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub '${EnvironmentName}-backend-cpu-scaling'
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref BackendScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        TargetValue: 70.0
+        ScaleInCooldown: 300
+        ScaleOutCooldown: 60
+
+  EdgeScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 20
+      MinCapacity: 1
+      ResourceId: !Sub 'service/${EnvironmentName}-cluster/${EnvironmentName}-edge'
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      RoleARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService'
+    DependsOn: EdgeService
+
+  EdgeCPUScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub '${EnvironmentName}-edge-cpu-scaling'
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref EdgeScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        TargetValue: 70.0
+        ScaleInCooldown: 300
+        ScaleOutCooldown: 60
+
+Outputs:
+  BackendServiceName:
+    Description: Backend ECS Service Name
+    Value: !GetAtt BackendService.Name
+    Export:
+      Name: !Sub '${EnvironmentName}-BackendServiceName'
+
+  FrontendServiceName:
+    Description: Frontend ECS Service Name
+    Value: !GetAtt FrontendService.Name
+    Export:
+      Name: !Sub '${EnvironmentName}-FrontendServiceName'
+
+  EdgeServiceName:
+    Description: Edge ECS Service Name
+    Value: !GetAtt EdgeService.Name
+    Export:
+      Name: !Sub '${EnvironmentName}-EdgeServiceName'

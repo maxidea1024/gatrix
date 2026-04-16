@@ -1,0 +1,313 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Gatrix ECS - Application Load Balancer
+  Creates ALB, target groups, and listener rules for backend, frontend, and edge services.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: gatrix
+    Description: Environment name prefix for resources
+
+Resources:
+  # ============================================
+  # Application Load Balancer
+  # ============================================
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub '${EnvironmentName}-alb'
+      Scheme: internet-facing
+      Type: application
+      Subnets:
+        - !ImportValue
+          Fn::Sub: '${EnvironmentName}-PublicSubnet1Id'
+        - !ImportValue
+          Fn::Sub: '${EnvironmentName}-PublicSubnet2Id'
+      SecurityGroups:
+        - !ImportValue
+          Fn::Sub: '${EnvironmentName}-ALBSecurityGroupId'
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-alb'
+
+  # ============================================
+  # Target Groups
+  # ============================================
+  BackendTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub '${EnvironmentName}-backend-tg'
+      Port: 5000
+      Protocol: HTTP
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      TargetType: ip
+      HealthCheckEnabled: true
+      HealthCheckPath: /health
+      HealthCheckProtocol: HTTP
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
+      Matcher:
+        HttpCode: '200'
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: '30'
+
+  FrontendTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub '${EnvironmentName}-frontend-tg'
+      Port: 80
+      Protocol: HTTP
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      TargetType: ip
+      HealthCheckEnabled: true
+      HealthCheckPath: /health
+      HealthCheckProtocol: HTTP
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
+      Matcher:
+        HttpCode: '200'
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: '15'
+
+  EdgeTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub '${EnvironmentName}-edge-tg'
+      Port: 3400
+      Protocol: HTTP
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      TargetType: ip
+      HealthCheckEnabled: true
+      HealthCheckPath: /health
+      HealthCheckProtocol: HTTP
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
+      Matcher:
+        HttpCode: '200'
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: '30'
+
+  PrometheusTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub '${EnvironmentName}-prom-tg'
+      Port: 9090
+      Protocol: HTTP
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      TargetType: ip
+      HealthCheckEnabled: true
+      HealthCheckPath: /-/healthy
+      HealthCheckProtocol: HTTP
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+      Matcher:
+        HttpCode: '200'
+
+  GrafanaTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub '${EnvironmentName}-grafana-tg'
+      Port: 3000
+      Protocol: HTTP
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      TargetType: ip
+      HealthCheckEnabled: true
+      HealthCheckPath: /api/health
+      HealthCheckProtocol: HTTP
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+      Matcher:
+        HttpCode: '200'
+
+  # ============================================
+  # HTTP Listener (port 80)
+  # ============================================
+  HTTPListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref FrontendTargetGroup
+          Order: 1
+
+  # ============================================
+  # Listener Rules (order matters: more specific first)
+  # ============================================
+
+  # /api/* ??Backend
+  BackendAPIRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HTTPListener
+      Priority: 10
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '/api/*'
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref BackendTargetGroup
+
+  # /health ??Backend (for direct health checking)
+  BackendHealthRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HTTPListener
+      Priority: 15
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '/health'
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref BackendTargetGroup
+
+  # /metrics ??Backend (for direct metrics scraping)
+  BackendMetricsRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HTTPListener
+      Priority: 16
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '/metrics'
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref BackendTargetGroup
+
+  # Host: edge.* ??Edge (game clients connect via edge subdomain)
+  EdgeHostRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HTTPListener
+      Priority: 20
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - 'edge.*'
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref EdgeTargetGroup
+
+  # /edge/* ??Edge (alternative path-based routing)
+  EdgePathRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HTTPListener
+      Priority: 25
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '/edge/*'
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref EdgeTargetGroup
+
+  # /grafana/* ??Grafana
+  GrafanaRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HTTPListener
+      Priority: 30
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '/grafana/*'
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref GrafanaTargetGroup
+
+  # /prometheus/* ??Prometheus
+  PrometheusRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HTTPListener
+      Priority: 35
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '/prometheus/*'
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref PrometheusTargetGroup
+
+  # Default: /* ??Frontend (already set as default action)
+
+Outputs:
+  ALBArn:
+    Description: ALB ARN
+    Value: !Ref ApplicationLoadBalancer
+    Export:
+      Name: !Sub '${EnvironmentName}-ALBArn'
+
+  ALBDnsName:
+    Description: ALB DNS Name (use this to access services)
+    Value: !GetAtt ApplicationLoadBalancer.DNSName
+    Export:
+      Name: !Sub '${EnvironmentName}-ALBDnsName'
+
+  ALBHostedZoneId:
+    Description: ALB Hosted Zone ID (for Route53 alias records)
+    Value: !GetAtt ApplicationLoadBalancer.CanonicalHostedZoneID
+    Export:
+      Name: !Sub '${EnvironmentName}-ALBHostedZoneId'
+
+  BackendTargetGroupArn:
+    Description: Backend Target Group ARN
+    Value: !Ref BackendTargetGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-BackendTargetGroupArn'
+
+  FrontendTargetGroupArn:
+    Description: Frontend Target Group ARN
+    Value: !Ref FrontendTargetGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-FrontendTargetGroupArn'
+
+  EdgeTargetGroupArn:
+    Description: Edge Target Group ARN
+    Value: !Ref EdgeTargetGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-EdgeTargetGroupArn'
+
+  PrometheusTargetGroupArn:
+    Description: Prometheus Target Group ARN
+    Value: !Ref PrometheusTargetGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-PrometheusTargetGroupArn'
+
+  GrafanaTargetGroupArn:
+    Description: Grafana Target Group ARN
+    Value: !Ref GrafanaTargetGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-GrafanaTargetGroupArn'

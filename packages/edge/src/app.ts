@@ -169,6 +169,16 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+// Strip /edge prefix for ALB path-based routing (/edge/* -> /*)
+// ALB forwards the full path (e.g., /edge/health) but container routes expect /health.
+// Mount a sub-router at /edge that re-dispatches to the main app's routes.
+const edgeProxyRouter = express.Router();
+edgeProxyRouter.use('/health', healthRoutes);
+edgeProxyRouter.use('/public', publicRoutes);
+edgeProxyRouter.use('/api/v1/client', clientRoutes);
+edgeProxyRouter.use('/api/v1/server', serverRoutes);
+app.use('/edge', edgeProxyRouter);
+
 // Health check routes (no auth required)
 app.use('/health', healthRoutes);
 

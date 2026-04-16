@@ -1,0 +1,15 @@
+# Secrets & credentials
+.env
+.env.backup.*
+registry.env
+
+# Build artifacts
+.build-history.json
+dist/
+
+# AWS
+.aws/
+
+# OS files
+.DS_Store
+Thumbs.db

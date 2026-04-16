@@ -1,0 +1,49 @@
+# Prometheus configuration for Gatrix AWS ECS (Fargate)
+# Uses AWS Cloud Map (Service Discovery) for target resolution.
+# Cloud MySQL (RDS) / Redis (ElastiCache) are managed — no local exporters.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: 'production'
+    cluster: 'gatrix-ecs'
+
+alerting:
+  alertmanagers: []
+
+rule_files: []
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Backend API metrics (via Cloud Map DNS)
+  - job_name: 'backend'
+    dns_sd_configs:
+      - names:
+          - 'backend.gatrix.local'
+        type: 'A'
+        port: 5000
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.+):5000'
+        replacement: 'backend-${1}'
+
+  # Edge Server metrics (via Cloud Map DNS)
+  - job_name: 'edge'
+    dns_sd_configs:
+      - names:
+          - 'edge.gatrix.local'
+        type: 'A'
+        port: 9400
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.+):9400'
+        replacement: 'edge-${1}'

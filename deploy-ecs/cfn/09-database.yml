@@ -1,0 +1,245 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Gatrix ECS - RDS MySQL + ElastiCache Redis
+  Creates the cheapest RDS MySQL and ElastiCache Redis instances
+  dedicated to Gatrix, within the existing VPC private subnets.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: gatrix
+
+  # RDS MySQL
+  DBInstanceClass:
+    Type: String
+    Default: db.t4g.micro
+    Description: 'Cheapest: db.t4g.micro (2 vCPU, 1GB, ~$12/mo)'
+    AllowedValues:
+      - db.t4g.micro
+      - db.t4g.small
+      - db.t4g.medium
+      - db.t3.micro
+      - db.t3.small
+
+  DBName:
+    Type: String
+    Default: gatrix
+
+  DBMasterUsername:
+    Type: String
+    Default: gatrix_user
+
+  DBMasterPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 8
+    Description: 'Master password for RDS MySQL (min 8 characters)'
+
+  DBAllocatedStorage:
+    Type: Number
+    Default: 20
+    Description: 'Storage in GB (20 GB is free tier eligible)'
+
+  # ElastiCache Redis
+  CacheNodeType:
+    Type: String
+    Default: cache.t4g.micro
+    Description: 'Cheapest: cache.t4g.micro (2 vCPU, 0.5GB, ~$9/mo)'
+    AllowedValues:
+      - cache.t4g.micro
+      - cache.t4g.small
+      - cache.t4g.medium
+      - cache.t3.micro
+      - cache.t3.small
+
+  RedisAuthToken:
+    Type: String
+    NoEcho: true
+    Default: ''
+    Description: 'Redis AUTH token (leave empty for no auth, must be 16+ chars if set)'
+
+Conditions:
+  HasRedisAuth: !Not [!Equals [!Ref RedisAuthToken, '']]
+
+Resources:
+  # ============================================
+  # RDS Subnet Group
+  # ============================================
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupName: !Sub '${EnvironmentName}-db-subnet-group'
+      DBSubnetGroupDescription: Subnet group for Gatrix RDS MySQL
+      SubnetIds:
+        - !ImportValue
+          Fn::Sub: '${EnvironmentName}-PrivateSubnet1Id'
+        - !ImportValue
+          Fn::Sub: '${EnvironmentName}-PrivateSubnet2Id'
+
+  # ============================================
+  # RDS Security Group
+  # ============================================
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Gatrix RDS MySQL
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      SecurityGroupIngress:
+        # Allow from Backend ECS tasks
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !ImportValue
+            Fn::Sub: '${EnvironmentName}-BackendSecurityGroupId'
+          Description: MySQL from Backend
+        # Allow from Edge ECS tasks
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !ImportValue
+            Fn::Sub: '${EnvironmentName}-EdgeSecurityGroupId'
+          Description: MySQL from Edge
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-rds-sg'
+
+  # ============================================
+  # RDS MySQL Instance
+  # ============================================
+  DBInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    Properties:
+      DBInstanceIdentifier: !Sub '${EnvironmentName}-mysql'
+      DBInstanceClass: !Ref DBInstanceClass
+      Engine: mysql
+      EngineVersion: '8.0'
+      DBName: !Ref DBName
+      MasterUsername: !Ref DBMasterUsername
+      MasterUserPassword: !Ref DBMasterPassword
+      AllocatedStorage: !Ref DBAllocatedStorage
+      StorageType: gp3
+      StorageEncrypted: true
+      PubliclyAccessible: false
+      MultiAZ: false  # Single AZ for cost savings
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VPCSecurityGroups:
+        - !Ref DBSecurityGroup
+      BackupRetentionPeriod: 7
+      PreferredBackupWindow: '03:00-04:00'
+      PreferredMaintenanceWindow: 'sun:04:00-sun:05:00'
+      AutoMinorVersionUpgrade: true
+      CopyTagsToSnapshot: true
+      DeletionProtection: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-mysql'
+
+  # ============================================
+  # ElastiCache Subnet Group
+  # ============================================
+  CacheSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      CacheSubnetGroupName: !Sub '${EnvironmentName}-redis-subnet-group'
+      Description: Subnet group for Gatrix ElastiCache Redis
+      SubnetIds:
+        - !ImportValue
+          Fn::Sub: '${EnvironmentName}-PrivateSubnet1Id'
+        - !ImportValue
+          Fn::Sub: '${EnvironmentName}-PrivateSubnet2Id'
+
+  # ============================================
+  # ElastiCache Security Group
+  # ============================================
+  CacheSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Gatrix ElastiCache Redis
+      VpcId: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      SecurityGroupIngress:
+        # Allow from Backend ECS tasks
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          SourceSecurityGroupId: !ImportValue
+            Fn::Sub: '${EnvironmentName}-BackendSecurityGroupId'
+          Description: Redis from Backend
+        # Allow from Edge ECS tasks
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          SourceSecurityGroupId: !ImportValue
+            Fn::Sub: '${EnvironmentName}-EdgeSecurityGroupId'
+          Description: Redis from Edge
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-redis-sg'
+
+  # ============================================
+  # ElastiCache Redis (Single node, cheapest option)
+  # ============================================
+  RedisCacheCluster:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      ClusterName: !Sub '${EnvironmentName}-redis'
+      Engine: redis
+      EngineVersion: '7.1'
+      CacheNodeType: !Ref CacheNodeType
+      NumCacheNodes: 1
+      CacheSubnetGroupName: !Ref CacheSubnetGroup
+      VpcSecurityGroupIds:
+        - !Ref CacheSecurityGroup
+      AutoMinorVersionUpgrade: true
+      PreferredMaintenanceWindow: 'sun:05:00-sun:06:00'
+      SnapshotRetentionLimit: 1
+      SnapshotWindow: '03:00-04:00'
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-redis'
+
+Outputs:
+  DBEndpoint:
+    Description: RDS MySQL endpoint (use this as DB_HOST in .env)
+    Value: !GetAtt DBInstance.Endpoint.Address
+    Export:
+      Name: !Sub '${EnvironmentName}-DBEndpoint'
+
+  DBPort:
+    Description: RDS MySQL port
+    Value: !GetAtt DBInstance.Endpoint.Port
+    Export:
+      Name: !Sub '${EnvironmentName}-DBPort'
+
+  DBName:
+    Description: Database name
+    Value: !Ref DBName
+    Export:
+      Name: !Sub '${EnvironmentName}-DBName'
+
+  RedisEndpoint:
+    Description: ElastiCache Redis endpoint (use this as REDIS_HOST in .env)
+    Value: !GetAtt RedisCacheCluster.RedisEndpoint.Address
+    Export:
+      Name: !Sub '${EnvironmentName}-RedisEndpoint'
+
+  RedisPort:
+    Description: ElastiCache Redis port
+    Value: !GetAtt RedisCacheCluster.RedisEndpoint.Port
+    Export:
+      Name: !Sub '${EnvironmentName}-RedisPort'
+
+  DBSecurityGroupId:
+    Description: RDS Security Group ID
+    Value: !Ref DBSecurityGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-DBSecurityGroupId'
+
+  CacheSecurityGroupId:
+    Description: ElastiCache Security Group ID
+    Value: !Ref CacheSecurityGroup
+    Export:
+      Name: !Sub '${EnvironmentName}-CacheSecurityGroupId'
+

@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Gatrix ECS - Service Discovery (AWS Cloud Map)
+  Creates a private DNS namespace and service discovery services
+  for inter-service communication within ECS.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: gatrix
+    Description: Environment name prefix for resources
+
+Resources:
+  # ============================================
+  # Private DNS Namespace (gatrix.local)
+  # ============================================
+  ServiceDiscoveryNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Name: gatrix.local
+      Vpc: !ImportValue
+        Fn::Sub: '${EnvironmentName}-VpcId'
+      Description: Private DNS namespace for Gatrix ECS services
+
+  # ============================================
+  # Service Discovery Services
+  # ============================================
+  BackendDiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: backend
+      NamespaceId: !Ref ServiceDiscoveryNamespace
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 10
+        RoutingPolicy: MULTIVALUE
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+
+  EdgeDiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: edge
+      NamespaceId: !Ref ServiceDiscoveryNamespace
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 10
+        RoutingPolicy: MULTIVALUE
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+
+  PrometheusDiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: prometheus
+      NamespaceId: !Ref ServiceDiscoveryNamespace
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 10
+        RoutingPolicy: MULTIVALUE
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+
+  GrafanaDiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: grafana
+      NamespaceId: !Ref ServiceDiscoveryNamespace
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 10
+        RoutingPolicy: MULTIVALUE
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+
+Outputs:
+  ServiceDiscoveryNamespaceId:
+    Description: Cloud Map Namespace ID
+    Value: !Ref ServiceDiscoveryNamespace
+    Export:
+      Name: !Sub '${EnvironmentName}-ServiceDiscoveryNamespaceId'
+
+  ServiceDiscoveryNamespaceArn:
+    Description: Cloud Map Namespace ARN
+    Value: !GetAtt ServiceDiscoveryNamespace.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-ServiceDiscoveryNamespaceArn'
+
+  BackendDiscoveryServiceArn:
+    Description: Backend Cloud Map Service ARN
+    Value: !GetAtt BackendDiscoveryService.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-BackendDiscoveryServiceArn'
+
+  EdgeDiscoveryServiceArn:
+    Description: Edge Cloud Map Service ARN
+    Value: !GetAtt EdgeDiscoveryService.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-EdgeDiscoveryServiceArn'
+
+  PrometheusDiscoveryServiceArn:
+    Description: Prometheus Cloud Map Service ARN
+    Value: !GetAtt PrometheusDiscoveryService.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-PrometheusDiscoveryServiceArn'
+
+  GrafanaDiscoveryServiceArn:
+    Description: Grafana Cloud Map Service ARN
+    Value: !GetAtt GrafanaDiscoveryService.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-GrafanaDiscoveryServiceArn'

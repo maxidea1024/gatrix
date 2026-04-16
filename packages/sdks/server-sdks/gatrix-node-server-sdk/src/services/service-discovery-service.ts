@@ -13,7 +13,7 @@ import {
   UpdateServiceStatusInput,
   ServiceLabels,
 } from '../types/api';
-import { getFirstNicAddress } from '../utils/network';
+import { getFirstNicAddress, getContainerAddress } from '../utils/network';
 import type { EventListener } from '../cache/event-listener';
 import type { CloudMetadata } from '../utils/cloud-metadata';
 
@@ -119,7 +119,8 @@ export class ServiceDiscoveryService {
     environmentId: string | null;
   }> {
     // Auto-detect hostname and internalAddress if not provided
-    const internalAddress = input.internalAddress || getFirstNicAddress();
+    // In ECS Fargate, getContainerAddress() queries the metadata API for the real ENI IP
+    const internalAddress = input.internalAddress || await getContainerAddress();
     const hostname = input.hostname || os.hostname();
 
     // Apply enrichment if configured
