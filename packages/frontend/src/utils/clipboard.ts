@@ -11,7 +11,7 @@ export const tryExecCommandCopy = (text: string): boolean => {
     console.log('[Clipboard] Trying execCommand fallback...');
     const mark = document.createElement('span');
     mark.textContent = text;
-    
+
     // Reset user styles for span element
     mark.style.all = 'unset';
     // Prevents scrolling to the end of the page
