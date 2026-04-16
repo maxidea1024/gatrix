@@ -342,12 +342,16 @@ services:
 # This is critical for multi-node Swarm deployments.
 configs:
   prometheus_config:
+    name: gatrix_prometheus_config_${PROM_CONFIG_ID:-v1}
     file: ./config/prometheus.yml
   grafana_datasources:
+    name: gatrix_grafana_ds_${GRAFANA_DS_ID:-v1}
     file: ./config/grafana/provisioning/datasources/datasource.yml
   grafana_dashboards:
+    name: gatrix_grafana_db_${GRAFANA_DB_ID:-v1}
     file: ./config/grafana/provisioning/dashboards/dashboards.yml
   nginx_config:
+    name: gatrix_nginx_config_${NGINX_CONFIG_ID:-v1}
     file: ./config/nginx.conf
 
 # ============================================

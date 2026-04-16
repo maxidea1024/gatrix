@@ -168,6 +168,33 @@ validate_env() {
     log_success "Environment variables validated"
 }
 
+# Generate file hash for config rotation
+get_file_hash() {
+    local file=$1
+    if [ -f "$file" ]; then
+        if command -v md5sum >/dev/null 2>&1; then
+            md5sum "$file" | awk '{print $1}' | cut -c1-8
+        elif command -v shasum >/dev/null 2>&1; then
+            shasum "$file" | awk '{print $1}' | cut -c1-8
+        elif command -v md5 >/dev/null 2>&1; then
+            md5 -q "$file" | cut -c1-8
+        else
+            date +%s
+        fi
+    else
+        echo "default"
+    fi
+}
+
+# Setup config Hashes
+setup_config_hashes() {
+    export PROM_CONFIG_ID=$(get_file_hash "$SCRIPT_DIR/config/prometheus.yml")
+    export GRAFANA_DS_ID=$(get_file_hash "$SCRIPT_DIR/config/grafana/provisioning/datasources/datasource.yml")
+    export GRAFANA_DB_ID=$(get_file_hash "$SCRIPT_DIR/config/grafana/provisioning/dashboards/dashboards.yml")
+    export NGINX_CONFIG_ID=$(get_file_hash "$SCRIPT_DIR/config/nginx.conf")
+    log_info "Config hashes generated for dynamic rotation"
+}
+
 # Create Docker secrets
 create_secrets() {
     log_info "Creating Docker secrets..."
@@ -291,6 +318,7 @@ main() {
     check_swarm
     load_env
     validate_env
+    setup_config_hashes
 
     create_secrets
 
