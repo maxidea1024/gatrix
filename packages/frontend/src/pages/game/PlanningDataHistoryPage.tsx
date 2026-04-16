@@ -156,6 +156,10 @@ const PlanningDataHistoryPage: React.FC = () => {
       if (orderBy === 'changedFilesCount') {
         valA = a.changedFiles?.length || 0;
         valB = b.changedFiles?.length || 0;
+      } else if (orderBy === 'uploadedAt') {
+        // Use numeric timestamp comparison to avoid string format issues
+        valA = valA ? new Date(valA).getTime() : 0;
+        valB = valB ? new Date(valB).getTime() : 0;
       }
 
       if (valA === undefined || valA === null) valA = '';
@@ -407,13 +411,16 @@ const PlanningDataHistoryPage: React.FC = () => {
                                 <Typography
                                   variant="body2"
                                   sx={{
-                                    fontWeight: index === 0 ? 'bold' : 'normal',
+                                    fontWeight:
+                                      record.id === history[0]?.id
+                                        ? 'bold'
+                                        : 'normal',
                                   }}
                                 >
                                   {formatRelativeTime(record.uploadedAt)}
                                 </Typography>
                               </Tooltip>
-                              {index === 0 && (
+                              {record.id === history[0]?.id && (
                                 <Chip
                                   size="small"
                                   label={t('planningData.history.latest')}

@@ -62,6 +62,7 @@ function Show-Info($msg) { Write-Host "[INFO] $msg" -ForegroundColor Blue }
 function Show-Success($msg) { Write-Host "[SUCCESS] $msg" -ForegroundColor Green }
 function Show-Warn($msg) { Write-Host "[WARN] $msg" -ForegroundColor Yellow }
 function Show-Error($msg) { Write-Host "[ERROR] $msg" -ForegroundColor Red }
+function Coalesce($val, $default) { if ($val) { $val } else { $default } }
 
 # Check AWS CLI
 if (-not (Get-Command aws -ErrorAction SilentlyContinue)) {
@@ -128,25 +129,29 @@ function Deploy-Stack {
 
     if ($stackExists) {
         Show-Info "Updating stack: $fullStackName"
-        try {
-            aws cloudformation update-stack `
-                --stack-name $fullStackName `
-                --template-body "file://$templatePath" `
-                --capabilities CAPABILITY_NAMED_IAM `
-                --region $Region `
-                @paramArgs 2>&1
+        # Temporarily allow stderr without terminating (AWS CLI writes errors to stderr)
+        $prevEAP = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        $updateOutput = aws cloudformation update-stack `
+            --stack-name $fullStackName `
+            --template-body "file://$templatePath" `
+            --capabilities CAPABILITY_NAMED_IAM `
+            --region $Region `
+            @paramArgs 2>&1
+        $updateExitCode = $LASTEXITCODE
+        $ErrorActionPreference = $prevEAP
 
-            if ($LASTEXITCODE -eq 0) {
-                Show-Info "Waiting for stack update: $fullStackName ..."
-                aws cloudformation wait stack-update-complete --stack-name $fullStackName --region $Region
-                Show-Success "Stack updated: $fullStackName"
-            }
-        } catch {
-            if ($_.ToString() -match "No updates are to be performed") {
-                Show-Warn "No changes for stack: $fullStackName"
-            } else {
-                throw $_
-            }
+        $outputStr = ($updateOutput | Out-String)
+        if ($updateExitCode -eq 0) {
+            Show-Info "Waiting for stack update: $fullStackName ..."
+            aws cloudformation wait stack-update-complete --stack-name $fullStackName --region $Region
+            Show-Success "Stack updated: $fullStackName"
+        } elseif ($outputStr -match "No updates are to be performed") {
+            Show-Warn "No changes for stack: $fullStackName"
+        } else {
+            Show-Error "Failed to update stack: $fullStackName"
+            Write-Host $outputStr
+            throw "Stack update failed: $fullStackName"
         }
     } else {
         Show-Info "Creating stack: $fullStackName"
@@ -210,12 +215,12 @@ if (-not $SkipInfra) {
         Show-Info "Deploying database stack (RDS + ElastiCache)..."
         $dbParams = @(
             "ParameterKey=EnvironmentName,ParameterValue=$Prefix",
-            "ParameterKey=DBInstanceClass,ParameterValue=$($env:DB_INSTANCE_CLASS ?? 'db.t4g.micro')",
-            "ParameterKey=DBAllocatedStorage,ParameterValue=$($env:DB_ALLOCATED_STORAGE ?? '20')",
-            "ParameterKey=DBName,ParameterValue=$($env:DB_NAME ?? 'gatrix')",
-            "ParameterKey=DBMasterUsername,ParameterValue=$($env:DB_USER ?? 'gatrix_user')",
+            "ParameterKey=DBInstanceClass,ParameterValue=$(Coalesce $env:DB_INSTANCE_CLASS 'db.t4g.micro')",
+            "ParameterKey=DBAllocatedStorage,ParameterValue=$(Coalesce $env:DB_ALLOCATED_STORAGE '20')",
+            "ParameterKey=DBName,ParameterValue=$(Coalesce $env:DB_NAME 'gatrix')",
+            "ParameterKey=DBMasterUsername,ParameterValue=$(Coalesce $env:DB_USER 'gatrix_user')",
             "ParameterKey=DBMasterPassword,ParameterValue=$env:DB_PASSWORD",
-            "ParameterKey=CacheNodeType,ParameterValue=$($env:CACHE_NODE_TYPE ?? 'cache.t4g.micro')"
+            "ParameterKey=CacheNodeType,ParameterValue=$(Coalesce $env:CACHE_NODE_TYPE 'cache.t4g.micro')"
         )
         if ($env:REDIS_PASSWORD -and $env:REDIS_PASSWORD -notmatch '^your-') {
             $dbParams += "ParameterKey=RedisAuthToken,ParameterValue=$env:REDIS_PASSWORD"
@@ -252,46 +257,46 @@ Deploy-Stack "task-defs" "05-task-definitions.yml" @(
     "ParameterKey=BackendImage,ParameterValue=$BackendImage",
     "ParameterKey=FrontendImage,ParameterValue=$FrontendImage",
     "ParameterKey=EdgeImage,ParameterValue=$EdgeImage",
-    "ParameterKey=BackendCpu,ParameterValue=$($env:BACKEND_CPU ?? '512')",
-    "ParameterKey=BackendMemory,ParameterValue=$($env:BACKEND_MEMORY ?? '1024')",
-    "ParameterKey=FrontendCpu,ParameterValue=$($env:FRONTEND_CPU ?? '256')",
-    "ParameterKey=FrontendMemory,ParameterValue=$($env:FRONTEND_MEMORY ?? '512')",
-    "ParameterKey=EdgeCpu,ParameterValue=$($env:EDGE_CPU ?? '256')",
-    "ParameterKey=EdgeMemory,ParameterValue=$($env:EDGE_MEMORY ?? '512')",
+    "ParameterKey=BackendCpu,ParameterValue=$(Coalesce $env:BACKEND_CPU '512')",
+    "ParameterKey=BackendMemory,ParameterValue=$(Coalesce $env:BACKEND_MEMORY '1024')",
+    "ParameterKey=FrontendCpu,ParameterValue=$(Coalesce $env:FRONTEND_CPU '256')",
+    "ParameterKey=FrontendMemory,ParameterValue=$(Coalesce $env:FRONTEND_MEMORY '512')",
+    "ParameterKey=EdgeCpu,ParameterValue=$(Coalesce $env:EDGE_CPU '256')",
+    "ParameterKey=EdgeMemory,ParameterValue=$(Coalesce $env:EDGE_MEMORY '512')",
     "ParameterKey=DbHost,ParameterValue=$env:DB_HOST",
-    "ParameterKey=DbPort,ParameterValue=$($env:DB_PORT ?? '3306')",
-    "ParameterKey=DbName,ParameterValue=$($env:DB_NAME ?? 'gatrix')",
+    "ParameterKey=DbPort,ParameterValue=$(Coalesce $env:DB_PORT '3306')",
+    "ParameterKey=DbName,ParameterValue=$(Coalesce $env:DB_NAME 'gatrix')",
     "ParameterKey=DbUser,ParameterValue=$env:DB_USER",
     "ParameterKey=DbPassword,ParameterValue=$env:DB_PASSWORD",
     "ParameterKey=RedisHost,ParameterValue=$env:REDIS_HOST",
-    "ParameterKey=RedisPort,ParameterValue=$($env:REDIS_PORT ?? '6379')",
-    "ParameterKey=RedisPassword,ParameterValue=$($env:REDIS_PASSWORD ?? '')",
+    "ParameterKey=RedisPort,ParameterValue=$(Coalesce $env:REDIS_PORT '6379')",
+    "ParameterKey=RedisPassword,ParameterValue=$(Coalesce $env:REDIS_PASSWORD '')",
     "ParameterKey=EdgeRedisHost,ParameterValue=$env:EDGE_REDIS_HOST",
-    "ParameterKey=EdgeRedisPort,ParameterValue=$($env:EDGE_REDIS_PORT ?? '6379')",
-    "ParameterKey=EdgeRedisPassword,ParameterValue=$($env:EDGE_REDIS_PASSWORD ?? '')",
+    "ParameterKey=EdgeRedisPort,ParameterValue=$(Coalesce $env:EDGE_REDIS_PORT '6379')",
+    "ParameterKey=EdgeRedisPassword,ParameterValue=$(Coalesce $env:EDGE_REDIS_PASSWORD '')",
     "ParameterKey=JwtSecretArn,ParameterValue=$jwtArn",
     "ParameterKey=JwtRefreshSecretArn,ParameterValue=$jwtRefreshArn",
     "ParameterKey=SessionSecretArn,ParameterValue=$sessionArn",
-    "ParameterKey=DefaultLanguage,ParameterValue=$($env:DEFAULT_LANGUAGE ?? 'zh')",
-    "ParameterKey=AdminEmail,ParameterValue=$($env:ADMIN_EMAIL ?? 'admin@gatrix.com')",
-    "ParameterKey=AdminPassword,ParameterValue=$($env:ADMIN_PASSWORD ?? 'admin123')"
+    "ParameterKey=DefaultLanguage,ParameterValue=$(Coalesce $env:DEFAULT_LANGUAGE 'zh')",
+    "ParameterKey=AdminEmail,ParameterValue=$(Coalesce $env:ADMIN_EMAIL 'admin@gatrix.com')",
+    "ParameterKey=AdminPassword,ParameterValue=$(Coalesce $env:ADMIN_PASSWORD 'admin123')"
 )
 
 # 7. ECS Services
 Show-Info "Deploying ECS services..."
 Deploy-Stack "ecs-services" "06-ecs-services.yml" @(
     "ParameterKey=EnvironmentName,ParameterValue=$Prefix",
-    "ParameterKey=BackendDesiredCount,ParameterValue=$($env:BACKEND_REPLICAS ?? '2')",
-    "ParameterKey=FrontendDesiredCount,ParameterValue=$($env:FRONTEND_REPLICAS ?? '2')",
-    "ParameterKey=EdgeDesiredCount,ParameterValue=$($env:EDGE_REPLICAS ?? '2')"
+    "ParameterKey=BackendDesiredCount,ParameterValue=$(Coalesce $env:BACKEND_REPLICAS '2')",
+    "ParameterKey=FrontendDesiredCount,ParameterValue=$(Coalesce $env:FRONTEND_REPLICAS '2')",
+    "ParameterKey=EdgeDesiredCount,ParameterValue=$(Coalesce $env:EDGE_REPLICAS '2')"
 )
 
 # 8. Monitoring
 Show-Info "Deploying monitoring stack..."
 Deploy-Stack "monitoring" "07-monitoring.yml" @(
     "ParameterKey=EnvironmentName,ParameterValue=$Prefix",
-    "ParameterKey=GrafanaAdminUser,ParameterValue=$($env:GRAFANA_ADMIN_USER ?? 'admin')",
-    "ParameterKey=GrafanaAdminPassword,ParameterValue=$($env:GRAFANA_ADMIN_PASSWORD ?? 'admin')"
+    "ParameterKey=GrafanaAdminUser,ParameterValue=$(Coalesce $env:GRAFANA_ADMIN_USER 'admin')",
+    "ParameterKey=GrafanaAdminPassword,ParameterValue=$(Coalesce $env:GRAFANA_ADMIN_PASSWORD 'admin')"
 )
 
 # 9. S3 + CloudFront (Image Uploads)
