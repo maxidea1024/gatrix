@@ -39,8 +39,8 @@ export interface CreateJobExecutionData {
 
 export interface UpdateJobExecutionData {
   status?: JobExecutionStatus;
-  startedAt?: string;
-  completedAt?: string;
+  startedAt?: string | Date;
+  completedAt?: string | Date;
   result?: any;
   errorMessage?: string;
   executionTimeMs?: number;

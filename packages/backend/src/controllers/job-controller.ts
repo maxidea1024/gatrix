@@ -271,7 +271,7 @@ export const executeJob = async (req: AuthenticatedRequest, res: Response) => {
     const startTime = Date.now();
     await JobExecutionModel.update(execution.id, {
       status: JobExecutionStatus.RUNNING,
-      startedAt: new Date().toISOString(),
+      startedAt: new Date(),
     });
 
     // Execute based on job type
@@ -316,7 +316,7 @@ export const executeJob = async (req: AuthenticatedRequest, res: Response) => {
       const executionTimeMs = Date.now() - startTime;
       const updated = await JobExecutionModel.update(execution.id, {
         status: JobExecutionStatus.COMPLETED,
-        completedAt: new Date().toISOString(),
+        completedAt: new Date(),
         executionTimeMs,
         result,
       });
@@ -326,7 +326,7 @@ export const executeJob = async (req: AuthenticatedRequest, res: Response) => {
       const executionTimeMs = Date.now() - startTime;
       await JobExecutionModel.update(execution.id, {
         status: JobExecutionStatus.FAILED,
-        completedAt: new Date().toISOString(),
+        completedAt: new Date(),
         executionTimeMs,
         errorMessage: execError.message || 'Unknown execution error',
       });
