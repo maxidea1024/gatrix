@@ -244,6 +244,7 @@ export class JobTypeModel {
     try {
       const envName = environmentId ?? getCurrentEnvironment();
       const results = await db('g_job_types as jt')
+        .leftJoin('g_users as cu', 'jt.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
         .select([
           'jt.*',

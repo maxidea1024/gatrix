@@ -14,11 +14,7 @@ export const jobService = {
   // Job Types
   async getJobTypes(): Promise<JobType[]> {
     const response = await api.get('/admin/jobs/job-types');
-    console.log('jobService.getJobTypes - Raw response:', response);
-    console.log('jobService.getJobTypes - Response data:', response.data);
-    const result = response.data?.data || response.data || [];
-    console.log('jobService.getJobTypes - Final result:', result);
-    return result;
+    return response.data?.data || response.data || [];
   },
 
   async getJobType(id: number): Promise<JobType> {

@@ -1,19 +1,21 @@
 import { Request, Response } from 'express';
+import { AuthenticatedRequest } from '../middleware/auth';
 import { JobTypeModel } from '../models/job-type';
 
 import { createLogger } from '../config/logger';
 const logger = createLogger('jobTypeController');
 
 // Job Type Get list
-export const getJobTypes = async (req: Request, res: Response) => {
+export const getJobTypes = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { enabled } = req.query;
+    const environmentId = req.environmentId!;
 
     let jobTypes;
     if (enabled === 'true') {
-      jobTypes = await JobTypeModel.findEnabled();
+      jobTypes = await JobTypeModel.findEnabled(environmentId);
     } else {
-      jobTypes = await JobTypeModel.findAll();
+      jobTypes = await JobTypeModel.findAll(environmentId);
     }
 
     res.json({
@@ -28,24 +30,24 @@ export const getJobTypes = async (req: Request, res: Response) => {
       {
         id: 1,
         name: 'mailsend',
-        displayName: '메일 발송',
-        description: '이메일을 발송하는 Job',
+        displayName: 'jobTypes.mailsend.displayName',
+        description: 'jobTypes.mailsend.description',
         isEnabled: true,
         jobSchema: {
           to: {
             type: 'string',
-            label: '받는 사람',
+            label: 'jobTypes.mailsend.fields.to.label',
             required: true,
-            description: '이메일 주소',
+            description: 'jobTypes.mailsend.fields.to.description',
           },
           subject: {
             type: 'string',
-            label: '제목',
+            label: 'jobTypes.mailsend.fields.subject.label',
             required: true,
           },
           body: {
             type: 'text',
-            label: '내용',
+            label: 'jobTypes.mailsend.fields.body.label',
             required: true,
           },
         },
@@ -53,105 +55,105 @@ export const getJobTypes = async (req: Request, res: Response) => {
       {
         id: 2,
         name: 'http_request',
-        displayName: 'HTTP 요청',
-        description: 'HTTP API를 호출하는 Job',
+        displayName: 'jobTypes.httpRequest.displayName',
+        description: 'jobTypes.httpRequest.description',
         isEnabled: true,
         jobSchema: {
           url: {
             type: 'string',
             label: 'URL',
             required: true,
-            description: '요청할 URL',
+            description: 'jobTypes.httpRequest.fields.url.description',
           },
           method: {
             type: 'select',
-            label: 'HTTP 메서드',
+            label: 'jobTypes.httpRequest.fields.method.label',
             required: true,
             options: ['GET', 'POST', 'PUT', 'DELETE'],
             default: 'GET',
           },
           headers: {
             type: 'object',
-            label: '헤더',
-            description: 'HTTP 헤더 (JSON 형식)',
+            label: 'jobTypes.httpRequest.fields.headers.label',
+            description: 'jobTypes.httpRequest.fields.headers.description',
           },
           body: {
             type: 'text',
-            label: '요청 본문',
-            description: 'POST/PUT 요청 시 본문 데이터',
+            label: 'jobTypes.httpRequest.fields.body.label',
+            description: 'jobTypes.httpRequest.fields.body.description',
           },
         },
       },
       {
         id: 3,
         name: 'ssh_command',
-        displayName: 'SSH 명령',
-        description: '원격 서버에서 SSH 명령을 실행하는 Job',
+        displayName: 'jobTypes.sshCommand.displayName',
+        description: 'jobTypes.sshCommand.description',
         isEnabled: true,
         jobSchema: {
           host: {
             type: 'string',
-            label: '호스트',
+            label: 'jobTypes.sshCommand.fields.host.label',
             required: true,
-            description: '접속할 서버 주소',
+            description: 'jobTypes.sshCommand.fields.host.description',
           },
           port: {
             type: 'number',
-            label: '포트',
+            label: 'jobTypes.sshCommand.fields.port.label',
             default: 22,
           },
           username: {
             type: 'string',
-            label: '사용자명',
+            label: 'jobTypes.sshCommand.fields.username.label',
             required: true,
           },
           password: {
             type: 'string',
-            label: '비밀번호',
+            label: 'jobTypes.sshCommand.fields.password.label',
             required: true,
-            description: '보안상 실제 운영에서는 키 파일 사용 권장',
+            description: 'jobTypes.sshCommand.fields.password.description',
           },
           command: {
             type: 'text',
-            label: '실행할 명령',
+            label: 'jobTypes.sshCommand.fields.command.label',
             required: true,
-            description: '실행할 SSH 명령어',
+            description: 'jobTypes.sshCommand.fields.command.description',
           },
         },
       },
       {
         id: 4,
         name: 'log_message',
-        displayName: '로그 메시지',
-        description: '지정된 로그 레벨로 메시지를 기록하는 Job',
+        displayName: 'jobTypes.logMessage.displayName',
+        description: 'jobTypes.logMessage.description',
         isEnabled: true,
         jobSchema: {
           message: {
             type: 'text',
-            label: '로그 메시지',
+            label: 'jobTypes.logMessage.fields.message.label',
             required: true,
-            description: '기록할 로그 메시지 내용',
+            description: 'jobTypes.logMessage.fields.message.description',
           },
           level: {
             type: 'select',
-            label: '로그 레벨',
+            label: 'jobTypes.logMessage.fields.level.label',
             required: true,
             options: ['debug', 'info', 'warn', 'error'],
             default: 'info',
-            description: '로그 레벨을 선택하세요',
+            description: 'jobTypes.logMessage.fields.level.description',
           },
           category: {
             type: 'string',
-            label: '카테고리',
+            label: 'jobTypes.logMessage.fields.category.label',
             required: false,
             default: 'job',
-            description: '로그 카테고리 (선택사항)',
+            description: 'jobTypes.logMessage.fields.category.description',
           },
           metadata: {
             type: 'object',
-            label: '추가 메타데이터',
+            label: 'jobTypes.logMessage.fields.metadata.label',
             required: false,
-            description: '로그와 함께 기록할 추가 정보 (JSON 형식)',
+            description: 'jobTypes.logMessage.fields.metadata.description',
           },
         },
       },
@@ -165,10 +167,11 @@ export const getJobTypes = async (req: Request, res: Response) => {
 };
 
 // Job Type Get details
-export const getJobType = async (req: Request, res: Response) => {
+export const getJobType = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const jobType = await JobTypeModel.findById(id);
+    const environmentId = req.environmentId!;
+    const jobType = await JobTypeModel.findById(id, environmentId);
 
     if (!jobType) {
       return res.status(404).json({

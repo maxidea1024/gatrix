@@ -35,6 +35,7 @@ import {
   Work as WorkIcon,
   ViewColumn as ViewColumnIcon,
 } from '@mui/icons-material';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -642,51 +643,15 @@ const JobsPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Job Form Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={formDialogOpen}
         onClose={() => setFormDialogOpen(false)}
-        PaperProps={{
-          sx: {
-            width: { xs: '100%', sm: 700 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
-        ModalProps={{
-          keepMounted: false,
-        }}
+        title={editingJob ? t('jobs.editJob') : t('jobs.addJob')}
+        subtitle={t('jobs.description')}
+        storageKey="job-form-drawer-width"
+        defaultWidth={700}
+        minWidth={500}
       >
-        {/* Header */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            p: 2,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-          }}
-        >
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {editingJob ? t('jobs.editJob') : t('jobs.addJob')}
-          </Typography>
-          <IconButton
-            onClick={() => setFormDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        {/* Content */}
         <Box sx={{ flex: 1, overflow: 'auto' }}>
           <JobForm
             job={editingJob}
@@ -696,7 +661,7 @@ const JobsPage: React.FC = () => {
             isDrawer={true}
           />
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* Job History Drawer */}
       <Drawer

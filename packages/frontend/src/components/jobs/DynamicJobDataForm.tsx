@@ -34,43 +34,31 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  console.log('DynamicJobDataForm received data:', data);
-  console.log('DynamicJobDataForm received jobSchema:', jobSchema);
+  // Helper to translate field values that may be i18n keys
+  const tf = (value: string | undefined): string => {
+    if (!value) return '';
+    return t(value);
+  };
 
-  // 스키마가 변경될 때만 Set default values
+  // Set default values when schema changes
   useEffect(() => {
     if (!jobSchema || Object.keys(jobSchema).length === 0) return;
 
-    console.log('DynamicJobDataForm useEffect - jobSchema changed');
-    console.log('Current data:', data);
-    console.log('JobSchema:', jobSchema);
-
-    // Default values이 필요한 필드만 처리
     const newData = { ...data };
     let hasChanges = false;
 
     Object.entries(jobSchema).forEach(([fieldName, field]) => {
-      // 필드에 값이 없고 Default values이 있는 경우에만 Set default values
       const currentValue = data[fieldName];
       const hasValue =
         currentValue !== undefined &&
         currentValue !== null &&
         currentValue !== '';
 
-      console.log(
-        `Field ${fieldName}: currentValue=${currentValue}, hasValue=${hasValue}, default=${field.default}`
-      );
-
-      // Default values이 있고 현재 값이 없는 경우에만 Settings
       if (!hasValue && field.default !== undefined) {
-        console.log(`Setting default value for ${fieldName}: ${field.default}`);
         newData[fieldName] = field.default;
         hasChanges = true;
       }
     });
-
-    console.log('New data after defaults:', newData);
-    console.log('Has changes:', hasChanges);
 
     if (hasChanges) {
       onChange(newData);
@@ -115,7 +103,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
         return (
           <TextField
             fullWidth
-            label={field.description}
+            label={tf(field.description)}
             value={value}
             onChange={(e) => handleFieldChange(fieldName, e.target.value)}
             required={field.required}
@@ -129,7 +117,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
           <TextField
             fullWidth
             type="password"
-            label={field.description}
+            label={tf(field.description)}
             value={value}
             onChange={(e) => handleFieldChange(fieldName, e.target.value)}
             required={field.required}
@@ -144,7 +132,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
             fullWidth
             multiline
             rows={4}
-            label={field.description}
+            label={tf(field.description)}
             value={value}
             onChange={(e) => handleFieldChange(fieldName, e.target.value)}
             required={field.required}
@@ -158,7 +146,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
           <TextField
             fullWidth
             type="number"
-            label={field.description}
+            label={tf(field.description)}
             value={value}
             onChange={(e) =>
               handleFieldChange(fieldName, parseFloat(e.target.value) || 0)
@@ -182,7 +170,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
                 onChange={(e) => handleFieldChange(fieldName, e.target.checked)}
               />
             }
-            label={field.description}
+            label={tf(field.description)}
           />
         );
 
@@ -190,12 +178,12 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
         return (
           <FormControl fullWidth error={hasError}>
             <InputLabel required={field.required}>
-              {field.description}
+              {tf(field.description)}
             </InputLabel>
             <Select
               value={value}
               onChange={(e) => handleFieldChange(fieldName, e.target.value)}
-              label={field.description}
+              label={tf(field.description)}
             >
               {field.options?.map((option) => (
                 <MenuItem key={option} value={option}>
@@ -221,7 +209,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <Typography variant="body2" fontWeight="medium">
-                {field.description}
+                {tf(field.description)}
                 {field.required && <span style={{ color: 'red' }}> *</span>}
               </Typography>
               <Button size="small" onClick={() => handleArrayAdd(fieldName)}>
@@ -237,7 +225,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
                   onChange={(e) =>
                     handleArrayItemChange(fieldName, index, e.target.value)
                   }
-                  placeholder={`${field.description} ${index + 1}`}
+                  placeholder={`${tf(field.description)} ${index + 1}`}
                 />
                 <IconButton
                   size="small"
@@ -264,7 +252,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
         return (
           <Box>
             <Typography variant="body2" sx={{ mb: 1 }}>
-              {field.label} {field.required && `(${t('common.required')})`}
+              {tf(field.label)} {field.required && `(${t('common.required')})`}
             </Typography>
             <JsonEditor
               value={jsonValue}
@@ -278,7 +266,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
                 }
               }}
               error={hasError ? errors[errorKey] : undefined}
-              helperText={field.description}
+              helperText={tf(field.description)}
               height="200px"
             />
           </Box>
@@ -288,7 +276,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
         return (
           <TextField
             fullWidth
-            label={field.description}
+            label={tf(field.description)}
             value={value}
             onChange={(e) => handleFieldChange(fieldName, e.target.value)}
             required={field.required}

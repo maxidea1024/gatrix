@@ -196,10 +196,6 @@ const JobForm: React.FC<JobFormProps> = ({
         {/* Content */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {/* Basic Information */}
-            <Typography variant="h6" gutterBottom>
-              {t('jobs.basicInformation')}
-            </Typography>
 
             <Box>
               <FormControlLabel
@@ -219,6 +215,7 @@ const JobForm: React.FC<JobFormProps> = ({
             <Box>
               <TextField
                 fullWidth
+                autoFocus
                 label={t('common.name')}
                 value={formData.name}
                 onChange={(e) => handleFieldChange('name', e.target.value)}
@@ -255,7 +252,7 @@ const JobForm: React.FC<JobFormProps> = ({
                             gap: 1,
                           }}
                         >
-                          {jobType.displayName}
+                          {t(jobType.displayName)}
                           <Chip
                             label={jobType.name}
                             size="small"
@@ -309,7 +306,7 @@ const JobForm: React.FC<JobFormProps> = ({
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="h6">
                       {t('jobs.jobDataConfiguration')} -{' '}
-                      {selectedJobType.displayName}
+                      {selectedJobType.displayName ? t(selectedJobType.displayName) : ''}
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
@@ -319,7 +316,7 @@ const JobForm: React.FC<JobFormProps> = ({
                         color="text.secondary"
                         sx={{ mb: 2 }}
                       >
-                        {selectedJobType.description}
+                        {t(selectedJobType.description)}
                       </Typography>
                     )}
                     <DynamicJobDataForm
