@@ -153,7 +153,9 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                       <TableCell component="th" scope="row" sx={{ bgcolor: 'grey.50', py: 1 }}>
                         {t('jobs.retryAttempt')}
                       </TableCell>
-                      <TableCell sx={{ py: 1 }}>{execution.retryAttempt}</TableCell>
+                      <TableCell sx={{ py: 1 }}>
+                        {execution.retryAttempt > 0 ? execution.retryAttempt : t('common.none')}
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell component="th" scope="row" sx={{ bgcolor: 'grey.50', py: 1 }}>
@@ -314,7 +316,9 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                     )}
                   </TableCell>
                   <TableCell>{formatExecutionTime(execution)}</TableCell>
-                  <TableCell>{execution.retryAttempt}</TableCell>
+                  <TableCell>
+                    {execution.retryAttempt > 0 ? execution.retryAttempt : t('common.none')}
+                  </TableCell>
                   <TableCell>
                     <Tooltip title={formatDateTimeDetailed(execution.createdAt)}>
                       <span>
