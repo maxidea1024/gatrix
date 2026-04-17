@@ -24,18 +24,23 @@ import {
   ExpandLess as ExpandLessIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
+import PageContentLoader from '../common/PageContentLoader';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { jobService } from '../../services/jobService';
 import { JobExecution, JobExecutionStatus } from '../../types/job';
-import { formatDateTimeDetailed, formatDuration } from '../../utils/dateFormat';
+import {
+  formatDateTimeDetailed,
+  formatDuration,
+  formatRelativeTime,
+} from '../../utils/dateFormat';
 
 interface JobExecutionHistoryProps {
   jobId: number;
 }
 
 const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
   const [executions, setExecutions] = useState<JobExecution[]>([]);
@@ -136,29 +141,48 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                 <Typography variant="subtitle2" gutterBottom>
                   {t('jobs.executionDetails')}
                 </Typography>
-                <Typography variant="body2">
-                  <strong>{t('jobs.executionId')}:</strong> {execution.id}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>{t('jobs.retryAttempt')}:</strong>{' '}
-                  {execution.retryAttempt}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>{t('jobs.startedAt')}:</strong>{' '}
-                  {execution.startedAt
-                    ? formatDateTimeDetailed(execution.startedAt)
-                    : '-'}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>{t('jobs.completedAt')}:</strong>{' '}
-                  {execution.completedAt
-                    ? formatDateTimeDetailed(execution.completedAt)
-                    : '-'}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>{t('jobs.executionTime')}:</strong>{' '}
-                  {formatExecutionTime(execution)}
-                </Typography>
+                <Table size="small" sx={{ border: '1px solid', borderColor: 'divider' }}>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell component="th" scope="row" sx={{ width: '120px', bgcolor: 'grey.50', py: 1 }}>
+                        {t('jobs.executionId')}
+                      </TableCell>
+                      <TableCell sx={{ py: 1 }}>{execution.id}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row" sx={{ bgcolor: 'grey.50', py: 1 }}>
+                        {t('jobs.retryAttempt')}
+                      </TableCell>
+                      <TableCell sx={{ py: 1 }}>{execution.retryAttempt}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row" sx={{ bgcolor: 'grey.50', py: 1 }}>
+                        {t('jobs.startedAt')}
+                      </TableCell>
+                      <TableCell sx={{ py: 1 }}>
+                        {execution.startedAt
+                          ? formatDateTimeDetailed(execution.startedAt)
+                          : '-'}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row" sx={{ bgcolor: 'grey.50', py: 1 }}>
+                        {t('jobs.completedAt')}
+                      </TableCell>
+                      <TableCell sx={{ py: 1 }}>
+                        {execution.completedAt
+                          ? formatDateTimeDetailed(execution.completedAt)
+                          : '-'}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row" sx={{ bgcolor: 'grey.50', py: 1 }}>
+                        {t('jobs.executionTime')}
+                      </TableCell>
+                      <TableCell sx={{ py: 1 }}>{formatExecutionTime(execution)}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </Grid>
@@ -209,36 +233,8 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
     );
   };
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (executions.length === 0) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flex: 1,
-          height: '100%',
-          p: 3,
-        }}
-      >
-        <Typography variant="body2" color="text.secondary">
-          {t('jobs.noExecutions')}
-        </Typography>
-      </Box>
-    );
-  }
-
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box
         sx={{
           display: 'flex',
@@ -248,15 +244,33 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
         }}
       >
         <Typography variant="h6">
-          {t('jobs.executionHistory')} ({executions.length})
+          {t('jobs.executionHistory')} {executions.length > 0 && `(${executions.length})`}
         </Typography>
-        <IconButton onClick={loadExecutions} size="small">
+        <IconButton onClick={loadExecutions} size="small" disabled={loading}>
           <RefreshIcon />
         </IconButton>
       </Box>
 
-      <TableContainer component={Paper} variant="outlined">
-        <Table size="small">
+      <PageContentLoader loading={loading} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {executions.length === 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              height: '100%',
+              p: 3,
+            }}
+          >
+            <Typography variant="body2" color="text.secondary">
+              {t('jobs.noExecutions')}
+            </Typography>
+          </Box>
+        ) : (
+          <TableContainer component={Paper} variant="outlined">
+            <Table size="small">
           <TableHead>
             <TableRow>
               <TableCell width="40px"></TableCell>
@@ -285,14 +299,32 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                   </TableCell>
                   <TableCell>{getStatusChip(execution.status)}</TableCell>
                   <TableCell>
-                    {execution.startedAt
-                      ? formatDateTimeDetailed(execution.startedAt)
-                      : '-'}
+                    {execution.startedAt ? (
+                      <Tooltip title={formatDateTimeDetailed(execution.startedAt)}>
+                        <span>
+                          {formatRelativeTime(
+                            execution.startedAt,
+                            undefined,
+                            i18n.language
+                          )}
+                        </span>
+                      </Tooltip>
+                    ) : (
+                      '-'
+                    )}
                   </TableCell>
                   <TableCell>{formatExecutionTime(execution)}</TableCell>
                   <TableCell>{execution.retryAttempt}</TableCell>
                   <TableCell>
-                    {formatDateTimeDetailed(execution.createdAt)}
+                    <Tooltip title={formatDateTimeDetailed(execution.createdAt)}>
+                      <span>
+                        {formatRelativeTime(
+                          execution.createdAt,
+                          undefined,
+                          i18n.language
+                        )}
+                      </span>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -311,6 +343,8 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
           </TableBody>
         </Table>
       </TableContainer>
+        )}
+      </PageContentLoader>
     </Box>
   );
 };
