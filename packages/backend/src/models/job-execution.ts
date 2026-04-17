@@ -135,9 +135,7 @@ export class JobExecutionModel {
       await db('g_job_executions').insert({
         id,
         jobId: data.jobId,
-        scheduleId: data.scheduleId || null,
         status: data.status || JobExecutionStatus.PENDING,
-        retryAttempt: data.retryAttempt || 0,
       });
 
       const created = await this.findById(id);

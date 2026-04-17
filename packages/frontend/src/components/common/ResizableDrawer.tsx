@@ -149,8 +149,9 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
           onClick={onClose}
           size="small"
           sx={{
+            bgcolor: 'action.hover',
             '&:hover': {
-              bgcolor: 'action.hover',
+              bgcolor: 'action.selected',
             },
           }}
         >

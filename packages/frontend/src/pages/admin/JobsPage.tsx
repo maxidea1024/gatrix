@@ -709,56 +709,20 @@ const JobsPage: React.FC = () => {
       </ResizableDrawer>
 
       {/* Job History Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={historyDialogOpen}
         onClose={() => setHistoryDialogOpen(false)}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 800 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
+        title={`${t('jobs.executionHistory')} - ${selectedJobForHistory?.name}`}
+        subtitle={t('jobs.description')}
+        storageKey="job-history-drawer-width"
+        defaultWidth={800}
+        minWidth={600}
       >
-        {/* Header */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            p: 2,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-          }}
-        >
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('jobs.executionHistory')} - {selectedJobForHistory?.name}
-          </Typography>
-          <IconButton
-            onClick={() => setHistoryDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2, display: 'flex', flexDirection: 'column' }}>
           {selectedJobForHistory && (
             <JobExecutionHistory jobId={selectedJobForHistory.id} />
           )}
         </Box>
-
-        {/* Footer */}
         <Box
           sx={{
             p: 2,
@@ -777,7 +741,7 @@ const JobsPage: React.FC = () => {
             {t('common.close')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* Delete Confirmation Drawer */}
       <Drawer
