@@ -196,7 +196,6 @@ const JobForm: React.FC<JobFormProps> = ({
         {/* Content */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-
             <Box>
               <FormControlLabel
                 control={
@@ -306,7 +305,9 @@ const JobForm: React.FC<JobFormProps> = ({
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="h6">
                       {t('jobs.jobDataConfiguration')} -{' '}
-                      {selectedJobType.displayName ? t(selectedJobType.displayName) : ''}
+                      {selectedJobType.displayName
+                        ? t(selectedJobType.displayName)
+                        : ''}
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
