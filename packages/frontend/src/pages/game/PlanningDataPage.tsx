@@ -131,7 +131,6 @@ const PlanningDataPage: React.FC = () => {
     'asc' | 'desc'
   >('asc');
 
-
   // Upload history state
   const [latestUpload, setLatestUpload] = useState<UploadRecord | null>(null);
 
@@ -143,7 +142,6 @@ const PlanningDataPage: React.FC = () => {
   const [eventPageSearchTerm, setEventPageSearchTerm] = useState('');
   const debouncedEventPageSearchTerm = useDebounce(eventPageSearchTerm, 300);
 
-
   // LiveEvent state
   const [liveEventData, setLiveEventData] = useState<any>(null);
   const [loadingLiveEvent, setLoadingLiveEvent] = useState(false);
@@ -151,7 +149,6 @@ const PlanningDataPage: React.FC = () => {
   const [liveEventRowsPerPage, setLiveEventRowsPerPage] = useState(20);
   const [liveEventSearchTerm, setLiveEventSearchTerm] = useState('');
   const debouncedLiveEventSearchTerm = useDebounce(liveEventSearchTerm, 300);
-
 
   // MateRecruitingGroup state
   const [mateRecruitingGroupData, setMateRecruitingGroupData] =
@@ -168,7 +165,6 @@ const PlanningDataPage: React.FC = () => {
     300
   );
 
-
   // OceanNpcAreaSpawner state
   const [oceanNpcAreaSpawnerData, setOceanNpcAreaSpawnerData] =
     useState<any>(null);
@@ -183,7 +179,6 @@ const PlanningDataPage: React.FC = () => {
     oceanNpcAreaSpawnerSearchTerm,
     300
   );
-
 
   // Load stats on mount
   useEffect(() => {
