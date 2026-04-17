@@ -87,6 +87,7 @@ export class JobExecutionModel {
         .offset(filters?.offset || 0);
       return results.map((row: any) => ({
         ...row,
+        errorMessage: row.error,
         result: row.result ? JSON.parse(row.result) : null,
       }));
     } catch (error) {
@@ -107,6 +108,7 @@ export class JobExecutionModel {
       const row = results[0];
       return {
         ...row,
+        errorMessage: row.error,
         result: row.result ? JSON.parse(row.result) : null,
       };
     } catch (error) {
@@ -158,10 +160,7 @@ export class JobExecutionModel {
         updateData.result = data.result ? JSON.stringify(data.result) : null;
       }
       if (data.errorMessage !== undefined) {
-        updateData.errorMessage = data.errorMessage;
-      }
-      if (data.executionTimeMs !== undefined) {
-        updateData.executionTimeMs = data.executionTimeMs;
+        updateData.error = data.errorMessage;
       }
 
       if (Object.keys(updateData).length === 0) {
