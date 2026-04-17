@@ -287,8 +287,6 @@ const JobForm: React.FC<JobFormProps> = ({
               />
             </Box>
 
-
-
             <Box>
               <TagSelector
                 value={selectedTags}
