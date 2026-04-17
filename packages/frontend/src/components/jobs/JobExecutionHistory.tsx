@@ -141,24 +141,41 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                 <Typography variant="subtitle2" gutterBottom>
                   {t('jobs.executionDetails')}
                 </Typography>
-                <Table size="small" sx={{ border: '1px solid', borderColor: 'divider' }}>
+                <Table
+                  size="small"
+                  sx={{ border: '1px solid', borderColor: 'divider' }}
+                >
                   <TableBody>
                     <TableRow>
-                      <TableCell component="th" scope="row" sx={{ width: '120px', bgcolor: 'grey.50', py: 1 }}>
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{ width: '120px', bgcolor: 'grey.50', py: 1 }}
+                      >
                         {t('jobs.executionId')}
                       </TableCell>
                       <TableCell sx={{ py: 1 }}>{execution.id}</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell component="th" scope="row" sx={{ bgcolor: 'grey.50', py: 1 }}>
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{ bgcolor: 'grey.50', py: 1 }}
+                      >
                         {t('jobs.retryAttempt')}
                       </TableCell>
                       <TableCell sx={{ py: 1 }}>
-                        {execution.retryAttempt > 0 ? execution.retryAttempt : t('common.none')}
+                        {execution.retryAttempt > 0
+                          ? execution.retryAttempt
+                          : t('common.none')}
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell component="th" scope="row" sx={{ bgcolor: 'grey.50', py: 1 }}>
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{ bgcolor: 'grey.50', py: 1 }}
+                      >
                         {t('jobs.startedAt')}
                       </TableCell>
                       <TableCell sx={{ py: 1 }}>
@@ -168,7 +185,11 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell component="th" scope="row" sx={{ bgcolor: 'grey.50', py: 1 }}>
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{ bgcolor: 'grey.50', py: 1 }}
+                      >
                         {t('jobs.completedAt')}
                       </TableCell>
                       <TableCell sx={{ py: 1 }}>
@@ -178,10 +199,16 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell component="th" scope="row" sx={{ bgcolor: 'grey.50', py: 1 }}>
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{ bgcolor: 'grey.50', py: 1 }}
+                      >
                         {t('jobs.executionTime')}
                       </TableCell>
-                      <TableCell sx={{ py: 1 }}>{formatExecutionTime(execution)}</TableCell>
+                      <TableCell sx={{ py: 1 }}>
+                        {formatExecutionTime(execution)}
+                      </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -246,14 +273,18 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
         }}
       >
         <Typography variant="h6">
-          {t('jobs.executionHistory')} {executions.length > 0 && `(${executions.length})`}
+          {t('jobs.executionHistory')}{' '}
+          {executions.length > 0 && `(${executions.length})`}
         </Typography>
         <IconButton onClick={loadExecutions} size="small" disabled={loading}>
           <RefreshIcon />
         </IconButton>
       </Box>
 
-      <PageContentLoader loading={loading} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <PageContentLoader
+        loading={loading}
+        sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+      >
         {executions.length === 0 ? (
           <Box
             sx={{
@@ -273,80 +304,86 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
         ) : (
           <TableContainer component={Paper} variant="outlined">
             <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell width="40px"></TableCell>
-              <TableCell>{t('jobs.status')}</TableCell>
-              <TableCell>{t('jobs.startedAt')}</TableCell>
-              <TableCell>{t('jobs.executionTime')}</TableCell>
-              <TableCell>{t('jobs.retryAttempt')}</TableCell>
-              <TableCell>{t('common.createdAt')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {executions.map((execution) => (
-              <React.Fragment key={execution.id}>
-                <TableRow hover>
-                  <TableCell>
-                    <IconButton
-                      size="small"
-                      onClick={() => toggleRowExpansion(execution.id)}
-                    >
-                      {expandedRows.has(execution.id) ? (
-                        <ExpandLessIcon />
-                      ) : (
-                        <ExpandMoreIcon />
-                      )}
-                    </IconButton>
-                  </TableCell>
-                  <TableCell>{getStatusChip(execution.status)}</TableCell>
-                  <TableCell>
-                    {execution.startedAt ? (
-                      <Tooltip title={formatDateTimeDetailed(execution.startedAt)}>
-                        <span>
-                          {formatRelativeTime(
-                            execution.startedAt,
-                            undefined,
-                            i18n.language
-                          )}
-                        </span>
-                      </Tooltip>
-                    ) : (
-                      '-'
-                    )}
-                  </TableCell>
-                  <TableCell>{formatExecutionTime(execution)}</TableCell>
-                  <TableCell>
-                    {execution.retryAttempt > 0 ? execution.retryAttempt : t('common.none')}
-                  </TableCell>
-                  <TableCell>
-                    <Tooltip title={formatDateTimeDetailed(execution.createdAt)}>
-                      <span>
-                        {formatRelativeTime(
-                          execution.createdAt,
-                          undefined,
-                          i18n.language
-                        )}
-                      </span>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
+              <TableHead>
                 <TableRow>
-                  <TableCell colSpan={6} sx={{ p: 0, border: 0 }}>
-                    <Collapse
-                      in={expandedRows.has(execution.id)}
-                      timeout="auto"
-                      unmountOnExit
-                    >
-                      {renderExecutionDetails(execution)}
-                    </Collapse>
-                  </TableCell>
+                  <TableCell width="40px"></TableCell>
+                  <TableCell>{t('jobs.status')}</TableCell>
+                  <TableCell>{t('jobs.startedAt')}</TableCell>
+                  <TableCell>{t('jobs.executionTime')}</TableCell>
+                  <TableCell>{t('jobs.retryAttempt')}</TableCell>
+                  <TableCell>{t('common.createdAt')}</TableCell>
                 </TableRow>
-              </React.Fragment>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              </TableHead>
+              <TableBody>
+                {executions.map((execution) => (
+                  <React.Fragment key={execution.id}>
+                    <TableRow hover>
+                      <TableCell>
+                        <IconButton
+                          size="small"
+                          onClick={() => toggleRowExpansion(execution.id)}
+                        >
+                          {expandedRows.has(execution.id) ? (
+                            <ExpandLessIcon />
+                          ) : (
+                            <ExpandMoreIcon />
+                          )}
+                        </IconButton>
+                      </TableCell>
+                      <TableCell>{getStatusChip(execution.status)}</TableCell>
+                      <TableCell>
+                        {execution.startedAt ? (
+                          <Tooltip
+                            title={formatDateTimeDetailed(execution.startedAt)}
+                          >
+                            <span>
+                              {formatRelativeTime(
+                                execution.startedAt,
+                                undefined,
+                                i18n.language
+                              )}
+                            </span>
+                          </Tooltip>
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell>{formatExecutionTime(execution)}</TableCell>
+                      <TableCell>
+                        {execution.retryAttempt > 0
+                          ? execution.retryAttempt
+                          : t('common.none')}
+                      </TableCell>
+                      <TableCell>
+                        <Tooltip
+                          title={formatDateTimeDetailed(execution.createdAt)}
+                        >
+                          <span>
+                            {formatRelativeTime(
+                              execution.createdAt,
+                              undefined,
+                              i18n.language
+                            )}
+                          </span>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell colSpan={6} sx={{ p: 0, border: 0 }}>
+                        <Collapse
+                          in={expandedRows.has(execution.id)}
+                          timeout="auto"
+                          unmountOnExit
+                        >
+                          {renderExecutionDetails(execution)}
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
       </PageContentLoader>
     </Box>
