@@ -2,10 +2,7 @@ import { Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { JobModel, CreateJobData, UpdateJobData } from '../models/job';
 import { JobTypeModel } from '../models/job-type';
-import {
-  JobExecutionModel,
-  JobExecutionStatus,
-} from '../models/job-execution';
+import { JobExecutionModel, JobExecutionStatus } from '../models/job-execution';
 import { createLogger } from '../config/logger';
 import {
   sendBadRequest,
@@ -286,10 +283,13 @@ export const executeJob = async (req: AuthenticatedRequest, res: Response) => {
 
       switch (jobType?.name) {
         case 'log_message':
-          jobLogger.info(`[Job:${job.name}] ${jobData.message || '(no message)'}`, {
-            level: jobData.level || 'info',
-            category: jobData.category || 'job',
-          });
+          jobLogger.info(
+            `[Job:${job.name}] ${jobData.message || '(no message)'}`,
+            {
+              level: jobData.level || 'info',
+              category: jobData.category || 'job',
+            }
+          );
           result = { logged: true, message: jobData.message };
           break;
 
