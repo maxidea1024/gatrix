@@ -4304,6 +4304,7 @@ const ServerListPage: React.FC = () => {
                         size="small"
                         onClick={() => handleViewModeChange(item.mode as any)}
                         sx={{
+                          borderRadius: 0,
                           bgcolor:
                             viewMode === item.mode
                               ? 'primary.main'
@@ -5155,6 +5156,7 @@ const ServerListPage: React.FC = () => {
               <EmptyPagePlaceholder message={t('serverList.noData')} />
             ) : (
               <Card
+                variant="outlined"
                 sx={{
                   flex: 1,
                   display: 'flex',
@@ -5677,15 +5679,14 @@ const ServerListPage: React.FC = () => {
                   sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    padding: 1.5,
+                    p: 1.5,
+                    gap: 1,
                     border: '1px solid',
                     borderColor: 'divider',
                     borderRadius: 1,
                     bgcolor: isUpdated
                       ? (theme) => getHighlightColor(highlightStatus, theme)
-                      : (theme) =>
-                          getStatusBgColor(service.status, theme) ||
-                          'background.paper',
+                      : 'background.paper',
                     transition: 'all 0.1s ease-in-out',
                     animation: isNew
                       ? 'appearEffect 0.5s ease-out'
