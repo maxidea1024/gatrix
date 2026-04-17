@@ -856,7 +856,7 @@ const JobsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
+          <Button onClick={() => setDeleteDialogOpen(false)} variant="contained" color="inherit">
             {t('common.cancel')}
           </Button>
           <Button
