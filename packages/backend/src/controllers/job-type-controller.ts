@@ -18,6 +18,11 @@ export const getJobTypes = async (req: AuthenticatedRequest, res: Response) => {
       jobTypes = await JobTypeModel.findAll(environmentId);
     }
 
+    // If DB has no job types, use fallback data
+    if (!jobTypes || jobTypes.length === 0) {
+      throw new Error('No job types found in database, using fallback');
+    }
+
     res.json({
       success: true,
       data: jobTypes,
