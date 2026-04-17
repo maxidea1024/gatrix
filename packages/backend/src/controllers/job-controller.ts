@@ -105,13 +105,13 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
+    const environmentId = req.environmentId!;
+
     // Check if job type exists
-    const jobType = await JobTypeModel.findById(jobTypeId);
+    const jobType = await JobTypeModel.findById(jobTypeId, environmentId);
     if (!jobType) {
       return sendBadRequest(res, 'Invalid job type', { field: 'jobTypeId' });
     }
-
-    const environmentId = req.environmentId!;
 
     // Validate job name uniqueness
     const existingJob = await JobModel.findByName(name, environmentId);

@@ -202,13 +202,28 @@ const JobForm: React.FC<JobFormProps> = ({
             </Typography>
 
             <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.isEnabled}
+                    onChange={(e) =>
+                      handleFieldChange('isEnabled', e.target.checked)
+                    }
+                    color="primary"
+                  />
+                }
+                label={t('common.usable')}
+              />
+            </Box>
+
+            <Box>
               <TextField
                 fullWidth
                 label={t('common.name')}
                 value={formData.name}
                 onChange={(e) => handleFieldChange('name', e.target.value)}
                 error={!!errors.name}
-                helperText={errors.name}
+                helperText={errors.name || t('jobs.helperText.name')}
                 required
               />
             </Box>
@@ -250,15 +265,13 @@ const JobForm: React.FC<JobFormProps> = ({
                       </MenuItem>
                     ))}
                 </Select>
-                {errors.jobTypeId && (
-                  <Typography
-                    variant="caption"
-                    color="error"
-                    sx={{ mt: 0.5, ml: 1.5 }}
-                  >
-                    {errors.jobTypeId}
-                  </Typography>
-                )}
+                <Typography
+                  variant="caption"
+                  color={errors.jobTypeId ? 'error' : 'text.secondary'}
+                  sx={{ mt: 0.5, ml: 1.5 }}
+                >
+                  {errors.jobTypeId || t('jobs.helperText.jobType')}
+                </Typography>
               </FormControl>
             </Box>
 
@@ -268,25 +281,13 @@ const JobForm: React.FC<JobFormProps> = ({
                 label={t('common.memo')}
                 value={formData.memo}
                 onChange={(e) => handleFieldChange('memo', e.target.value)}
+                helperText={t('jobs.helperText.memo')}
                 multiline
                 rows={2}
               />
             </Box>
 
-            <Box>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.isEnabled}
-                    onChange={(e) =>
-                      handleFieldChange('isEnabled', e.target.checked)
-                    }
-                    color="primary"
-                  />
-                }
-                label={t('common.usable')}
-              />
-            </Box>
+
 
             <Box>
               <TagSelector
@@ -349,7 +350,11 @@ const JobForm: React.FC<JobFormProps> = ({
           }}
         >
           <Button onClick={onCancel}>{t('common.cancel')}</Button>
-          <Button type="submit" variant="contained">
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={!formData.name.trim() || !formData.jobTypeId}
+          >
             {job ? t('common.save') : t('jobs.addJob')}
           </Button>
         </Box>
