@@ -4419,7 +4419,13 @@ const ServerListPage: React.FC = () => {
 
       <PageContentLoader
         loading={isLoading && services.length === 0}
-        sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
       >
         {/* List View */}
         {(services.length > 0 || !isLoading) &&
