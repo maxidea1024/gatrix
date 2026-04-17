@@ -580,7 +580,9 @@ const QueueMonitorPage: React.FC = () => {
                                 </TableCell>
                                 <TableCell
                                   sx={{ fontWeight: 600, width: 60 }}
-                                />
+                                >
+                                  {t('common.actions')}
+                                </TableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>
@@ -681,7 +683,9 @@ const QueueMonitorPage: React.FC = () => {
                                 )}
                                 <TableCell
                                   sx={{ fontWeight: 600, width: 80 }}
-                                />
+                                >
+                                  {t('common.actions')}
+                                </TableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>
@@ -779,19 +783,21 @@ const QueueMonitorPage: React.FC = () => {
                                             </IconButton>
                                           </Tooltip>
                                         )}
-                                        <Tooltip
-                                          title={t('queueMonitor.remove')}
-                                        >
-                                          <IconButton
-                                            size="small"
-                                            color="error"
-                                            onClick={() =>
-                                              handleRemoveJob(job.id)
-                                            }
+                                        {!job.id.startsWith('repeat:') && (
+                                          <Tooltip
+                                            title={t('queueMonitor.remove')}
                                           >
-                                            <DeleteIcon fontSize="small" />
-                                          </IconButton>
-                                        </Tooltip>
+                                            <IconButton
+                                              size="small"
+                                              color="error"
+                                              onClick={() =>
+                                                handleRemoveJob(job.id)
+                                              }
+                                            >
+                                              <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                          </Tooltip>
+                                        )}
                                       </Stack>
                                     </TableCell>
                                   </TableRow>
