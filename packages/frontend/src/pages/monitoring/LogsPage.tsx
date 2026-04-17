@@ -65,10 +65,14 @@ const LogsPage: React.FC = () => {
       ) : (
         <Box sx={{ textAlign: 'center', p: 4 }}>
           <Alert severity="info" sx={{ mb: 2 }}>
-            {t('grafanaDashboard.notConfigured', 'Grafana URL이 설정되지 않았습니다. 환경 변수 VITE_GRAFANA_URL을 설정해주세요.')}
+            {t(
+              'grafanaDashboard.notConfigured',
+              'Grafana URL이 설정되지 않았습니다. 환경 변수 VITE_GRAFANA_URL을 설정해주세요.'
+            )}
           </Alert>
           <Typography variant="body2" color="text.secondary">
-            docker-compose.yml 또는 .env 파일에서 VITE_GRAFANA_URL 환경 변수를 설정하세요.
+            docker-compose.yml 또는 .env 파일에서 VITE_GRAFANA_URL 환경 변수를
+            설정하세요.
           </Typography>
         </Box>
       )}

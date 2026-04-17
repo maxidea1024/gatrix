@@ -141,90 +141,90 @@ const AlertsPage: React.FC = () => {
       />
 
       <Card variant="outlined">
-          {loading ? (
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: 200,
-              }}
-            >
-              <CircularProgress size={32} />
-            </Box>
-          ) : (
-            <>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 600 }}>
-                        {t('monitoring.alerts.fields.name')}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>
-                        {t('monitoring.alerts.fields.severity')}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>
-                        {t('monitoring.alerts.fields.status')}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>
-                        {t('monitoring.alerts.fields.message')}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>
-                        {t('monitoring.alerts.fields.startsAt')}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>
-                        {t('monitoring.alerts.fields.endsAt')}
+        {loading ? (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: 200,
+            }}
+          >
+            <CircularProgress size={32} />
+          </Box>
+        ) : (
+          <>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      {t('monitoring.alerts.fields.name')}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      {t('monitoring.alerts.fields.severity')}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      {t('monitoring.alerts.fields.status')}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      {t('monitoring.alerts.fields.message')}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      {t('monitoring.alerts.fields.startsAt')}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      {t('monitoring.alerts.fields.endsAt')}
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {alerts.length === 0 ? (
+                    <TableRow hover>
+                      <TableCell colSpan={6} align="center">
+                        <Typography variant="body2" color="text.secondary">
+                          {t('common.noData')}
+                        </Typography>
                       </TableCell>
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {alerts.length === 0 ? (
-                      <TableRow hover>
-                        <TableCell colSpan={6} align="center">
-                          <Typography variant="body2" color="text.secondary">
-                            {t('common.noData')}
-                          </Typography>
+                  ) : (
+                    alerts.map((alert) => (
+                      <TableRow key={alert.id} hover>
+                        <TableCell>{alert.alertName}</TableCell>
+                        <TableCell>
+                          {renderSeverityChip(alert.alertSeverity)}
+                        </TableCell>
+                        <TableCell>
+                          {renderStatusChip(alert.alertStatus)}
+                        </TableCell>
+                        <TableCell>{alert.alertMessage}</TableCell>
+                        <TableCell>
+                          {alert.startsAt
+                            ? new Date(alert.startsAt).toLocaleString()
+                            : '-'}
+                        </TableCell>
+                        <TableCell>
+                          {alert.endsAt
+                            ? new Date(alert.endsAt).toLocaleString()
+                            : '-'}
                         </TableCell>
                       </TableRow>
-                    ) : (
-                      alerts.map((alert) => (
-                        <TableRow key={alert.id} hover>
-                          <TableCell>{alert.alertName}</TableCell>
-                          <TableCell>
-                            {renderSeverityChip(alert.alertSeverity)}
-                          </TableCell>
-                          <TableCell>
-                            {renderStatusChip(alert.alertStatus)}
-                          </TableCell>
-                          <TableCell>{alert.alertMessage}</TableCell>
-                          <TableCell>
-                            {alert.startsAt
-                              ? new Date(alert.startsAt).toLocaleString()
-                              : '-'}
-                          </TableCell>
-                          <TableCell>
-                            {alert.endsAt
-                              ? new Date(alert.endsAt).toLocaleString()
-                              : '-'}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-              <SimplePagination
-                count={total}
-                page={pageState.page - 1}
-                rowsPerPage={pageState.limit}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                rowsPerPageOptions={[5, 10, 25, 50, 100]}
-              />
-            </>
-          )}
+            <SimplePagination
+              count={total}
+              page={pageState.page - 1}
+              rowsPerPage={pageState.limit}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            />
+          </>
+        )}
       </Card>
     </Box>
   );
