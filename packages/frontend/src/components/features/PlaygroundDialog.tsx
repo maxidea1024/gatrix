@@ -647,7 +647,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
           const draftResponse = await api.get(
             `${projectApiPath}/features/${flagName}/pending-change-request`
           );
-          const draftData = draftResponse.data?.data?.draftData || draftResponse.data?.draftData;
+          const draftData =
+            draftResponse.data?.data?.draftData ||
+            draftResponse.data?.draftData;
           if (draftData && typeof draftData === 'object') {
             for (const envDraft of Object.values(draftData)) {
               if (

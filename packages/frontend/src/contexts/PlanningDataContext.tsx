@@ -49,7 +49,11 @@ export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({
   // Load planning data on mount and when language or environment changes
   useEffect(() => {
     // Only load if environment is selected, project path is available, and we haven't loaded yet or language changed
-    if (currentEnvironmentId && projectApiPath && (!hasLoaded || rewardTypes.length === 0)) {
+    if (
+      currentEnvironmentId &&
+      projectApiPath &&
+      (!hasLoaded || rewardTypes.length === 0)
+    ) {
       loadPlanningData();
     }
   }, [i18n.language, currentEnvironmentId, projectApiPath]);

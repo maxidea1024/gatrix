@@ -374,7 +374,9 @@ const QueueMonitorPage: React.FC = () => {
                       cursor: 'pointer',
                       border: 2,
                       borderColor:
-                        selectedQueue === q.name ? 'primary.main' : 'transparent',
+                        selectedQueue === q.name
+                          ? 'primary.main'
+                          : 'transparent',
                       bgcolor:
                         selectedQueue === q.name
                           ? (theme) =>
@@ -386,11 +388,13 @@ const QueueMonitorPage: React.FC = () => {
                         boxShadow: (theme: any) =>
                           `0 2px 12px ${alpha(theme.palette.primary.main, 0.15)}`,
                       }),
-                      transition: 'border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease',
+                      transition:
+                        'border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease',
                       '&:hover': {
-                        borderColor: selectedQueue === q.name
-                          ? 'primary.main'
-                          : 'primary.light',
+                        borderColor:
+                          selectedQueue === q.name
+                            ? 'primary.main'
+                            : 'primary.light',
                         ...(selectedQueue !== q.name && {
                           bgcolor: (theme: any) =>
                             alpha(theme.palette.primary.main, 0.02),
@@ -540,13 +544,10 @@ const QueueMonitorPage: React.FC = () => {
                           variant="outlined"
                           color="warning"
                           startIcon={<CleanIcon />}
-                          onClick={() =>
-                            handleClean(statusTabs[activeTab - 1])
-                          }
+                          onClick={() => handleClean(statusTabs[activeTab - 1])}
                           sx={{ mr: 1.5, whiteSpace: 'nowrap' }}
                         >
-                          {t('queueMonitor.clean')}{' '}
-                          {statusTabs[activeTab - 1]}
+                          {t('queueMonitor.clean')} {statusTabs[activeTab - 1]}
                         </Button>
                       )}
                   </Box>
@@ -624,9 +625,7 @@ const QueueMonitorPage: React.FC = () => {
                                   </TableCell>
                                   <TableCell>
                                     <Tooltip
-                                      title={t(
-                                        'queueMonitor.removeRepeatable'
-                                      )}
+                                      title={t('queueMonitor.removeRepeatable')}
                                     >
                                       <IconButton
                                         size="small"
@@ -650,8 +649,6 @@ const QueueMonitorPage: React.FC = () => {
                     {/* Job History Tabs */}
                     {activeTab > 0 && (
                       <Box>
-
-
                         {jobs.length === 0 ? (
                           <Box sx={{ py: 4, textAlign: 'center' }}>
                             <Typography color="text.secondary">
@@ -748,8 +745,7 @@ const QueueMonitorPage: React.FC = () => {
                                         {job.attemptsMade}
                                       </Typography>
                                     </TableCell>
-                                    {statusTabs[activeTab - 1] ===
-                                      'failed' && (
+                                    {statusTabs[activeTab - 1] === 'failed' && (
                                       <TableCell>
                                         <Typography
                                           variant="body2"

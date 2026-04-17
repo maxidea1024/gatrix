@@ -3054,23 +3054,40 @@ const CouponSettingsPage: React.FC = () => {
                             <Typography
                               variant="h6"
                               color="error"
-                              sx={{ mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
+                              sx={{
+                                mb: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 1,
+                              }}
                             >
                               ⚠️ {t('coupons.couponSettings.generationFailed')}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                              {t('coupons.couponSettings.generationFailedDescription')}
+                              {t(
+                                'coupons.couponSettings.generationFailedDescription'
+                              )}
                             </Typography>
                           </Box>
-                        ) : codesSetting?.generationStatus === 'IN_PROGRESS' || codesSetting?.generationStatus === 'PENDING' ? (
+                        ) : codesSetting?.generationStatus === 'IN_PROGRESS' ||
+                          codesSetting?.generationStatus === 'PENDING' ? (
                           <Box sx={{ py: 6, px: 3, textAlign: 'center' }}>
                             <Typography
                               variant="body1"
                               color="warning.main"
-                              sx={{ mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
+                              sx={{
+                                mb: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 1,
+                              }}
                             >
                               <HourglassEmptyIcon fontSize="small" />
-                              {t('coupons.couponSettings.generatingInBackground')}
+                              {t(
+                                'coupons.couponSettings.generatingInBackground'
+                              )}
                             </Typography>
                           </Box>
                         ) : (

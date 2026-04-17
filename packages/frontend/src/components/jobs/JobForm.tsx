@@ -71,7 +71,6 @@ const JobForm: React.FC<JobFormProps> = ({
 
   // Initialize form data
   useEffect(() => {
-
     if (job) {
       const hasJobDataMap =
         job.jobDataMap && Object.keys(job.jobDataMap).length > 0;
@@ -126,7 +125,6 @@ const JobForm: React.FC<JobFormProps> = ({
 
   // Handle job data map changes
   const handleJobDataChange = (jobDataMap: any) => {
-
     setFormData((prev) => {
       return {
         ...prev,
