@@ -18,10 +18,10 @@ const dashboards: DashboardDefinition[] = [
 
 /**
  * Resolve the Grafana base URL.
- * Returns null when no Grafana endpoint is explicitly configured –
- * in that case we must NOT render the iframe because the relative
- * fallback `/grafana` would be served by the SPA catch-all,
- * embedding the Gatrix app inside itself.
+ * - Runtime/build-time env: always used if set
+ * - Production: falls back to '/grafana' (nginx proxies it)
+ * - Dev mode without explicit URL: returns null to prevent
+ *   the SPA catch-all from embedding Gatrix inside itself.
  */
 function resolveGrafanaUrl(): string | null {
   // Priority 1: runtime config injected by docker-entrypoint / config.js
@@ -38,7 +38,12 @@ function resolveGrafanaUrl(): string | null {
     return buildEnv.trim();
   }
 
-  // No explicit URL → cannot safely render iframe
+  // Priority 3: production build → nginx proxies /grafana
+  if (!import.meta.env.DEV) {
+    return '/grafana';
+  }
+
+  // Dev mode without explicit URL → cannot safely render iframe
   return null;
 }
 

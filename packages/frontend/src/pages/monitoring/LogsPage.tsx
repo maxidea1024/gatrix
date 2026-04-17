@@ -5,7 +5,9 @@ import { useTranslation } from 'react-i18next';
 
 /**
  * Resolve the Grafana base URL.
- * Returns null when no Grafana endpoint is explicitly configured.
+ * - Runtime/build-time env: always used if set
+ * - Production: falls back to '/grafana' (nginx proxies it)
+ * - Dev mode without explicit URL: returns null to prevent self-embedding.
  */
 function resolveGrafanaUrl(): string | null {
   const runtimeEnv = (window as any)?.ENV?.VITE_GRAFANA_URL as
@@ -18,6 +20,11 @@ function resolveGrafanaUrl(): string | null {
   const buildEnv = import.meta.env.VITE_GRAFANA_URL as string | undefined;
   if (buildEnv && buildEnv.trim()) {
     return buildEnv.trim();
+  }
+
+  // Production build → nginx proxies /grafana
+  if (!import.meta.env.DEV) {
+    return '/grafana';
   }
 
   return null;
