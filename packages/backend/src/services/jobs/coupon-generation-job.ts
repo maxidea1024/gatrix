@@ -88,7 +88,7 @@ export class CouponGenerationJob {
 
       // Get codePattern and environment from settings
       const [settings] = await pool.execute<RowDataPacket[]>(
-        'SELECT codePattern, environment FROM g_coupon_settings WHERE id = ?',
+        'SELECT codePattern, environmentId FROM g_coupon_settings WHERE id = ?',
         [settingId]
       );
       const codePattern = (settings[0]?.codePattern ||

@@ -47,19 +47,18 @@ export class UnknownFlagService {
       const client = redisClient.getClient();
       const count = input.count || 1;
 
-      // Create unique key for this flag + environment combo
-      const bufferKey = `${REDIS_KEY_PREFIX}${input.environmentId}:${input.flagName}`;
-      const metadataKey = `${REDIS_METADATA_PREFIX}${input.environmentId}:${input.flagName}`;
+      // Create unique key for this flag + environment + app combo
+      // Include appName in key to prevent merging data from different applications
+      const safeAppName = input.appName || '__none__';
+      const bufferKey = `${REDIS_KEY_PREFIX}${input.environmentId}:${safeAppName}:${input.flagName}`;
+      const metadataKey = `${REDIS_METADATA_PREFIX}${input.environmentId}:${safeAppName}:${input.flagName}`;
 
       // Increment count in Redis (atomic operation, handles high volume)
       await client.hincrby(bufferKey, 'count', count);
 
-      // Store metadata (will be overwritten if already exists, which is fine)
-      if (input.appName || input.sdkVersion) {
-        if (input.appName)
-          await client.hset(metadataKey, 'appName', input.appName);
-        if (input.sdkVersion)
-          await client.hset(metadataKey, 'sdkVersion', input.sdkVersion);
+      // Store metadata (sdkVersion may vary per request, last writer wins which is acceptable)
+      if (input.sdkVersion) {
+        await client.hset(metadataKey, 'sdkVersion', input.sdkVersion);
       }
 
       // Set TTL to expire old data (24 hours) - auto cleanup if not flushed
@@ -123,12 +122,15 @@ export class UnknownFlagService {
 
       for (const bufferKey of bufferKeys) {
         try {
-          // Extract environment and flagName from key
+          // Extract environment, appName, and flagName from key
+          // Key format: prefix + environmentId:appName:flagName
           const keyParts = bufferKey.replace(REDIS_KEY_PREFIX, '').split(':');
-          if (keyParts.length < 2) continue;
+          if (keyParts.length < 3) continue;
 
           const environmentId = keyParts[0];
-          const flagName = keyParts.slice(1).join(':'); // flagName might contain ":"
+          const rawAppName = keyParts[1];
+          const appName = rawAppName === '__none__' ? null : rawAppName;
+          const flagName = keyParts.slice(2).join(':'); // flagName might contain ":"
 
           // Get count and delete atomically using GETDEL (or GET + DEL)
           const countData = await client.hgetall(bufferKey);
@@ -139,19 +141,19 @@ export class UnknownFlagService {
             continue;
           }
 
-          // Get metadata
-          const metadataKey = `${REDIS_METADATA_PREFIX}${environmentId}:${flagName}`;
+          // Get metadata (sdkVersion)
+          const metadataKey = `${REDIS_METADATA_PREFIX}${environmentId}:${rawAppName}:${flagName}`;
           const metadata = await client.hgetall(metadataKey);
 
           // Delete keys first (to avoid double counting on retry)
           await client.del(bufferKey);
           await client.del(metadataKey);
 
-          // Upsert to database
+          // Upsert to database — appName is now correctly parsed from key
           await this.upsertToDb({
             flagName,
             environmentId,
-            appName: metadata.appName || null,
+            appName,
             sdkVersion: metadata.sdkVersion || null,
             count,
           });
@@ -160,6 +162,7 @@ export class UnknownFlagService {
           logger.debug('Flushed unknown flag to DB', {
             flagName,
             environmentId,
+            appName,
             count,
           });
         } catch (error) {

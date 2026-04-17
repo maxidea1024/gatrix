@@ -2976,6 +2976,7 @@ const CouponSettingsPage: React.FC = () => {
                 }
                 value={codesSearch}
                 onChange={setCodesSearch}
+                sx={{ maxWidth: 'none', flex: 1 }}
               />
               <Button
                 variant="outlined"
@@ -3048,7 +3049,33 @@ const CouponSettingsPage: React.FC = () => {
                   ) : codesItems.length === 0 ? (
                     <TableRow hover>
                       <TableCell colSpan={4} sx={{ p: 0 }}>
-                        <EmptyPagePlaceholder message={t('common.noData')} />
+                        {codesSetting?.generationStatus === 'FAILED' ? (
+                          <Box sx={{ py: 6, px: 3, textAlign: 'center' }}>
+                            <Typography
+                              variant="h6"
+                              color="error"
+                              sx={{ mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
+                            >
+                              ⚠️ {t('coupons.couponSettings.generationFailed')}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {t('coupons.couponSettings.generationFailedDescription')}
+                            </Typography>
+                          </Box>
+                        ) : codesSetting?.generationStatus === 'IN_PROGRESS' || codesSetting?.generationStatus === 'PENDING' ? (
+                          <Box sx={{ py: 6, px: 3, textAlign: 'center' }}>
+                            <Typography
+                              variant="body1"
+                              color="warning.main"
+                              sx={{ mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
+                            >
+                              <HourglassEmptyIcon fontSize="small" />
+                              {t('coupons.couponSettings.generatingInBackground')}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          <EmptyPagePlaceholder message={t('common.noData')} />
+                        )}
                       </TableCell>
                     </TableRow>
                   ) : (

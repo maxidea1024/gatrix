@@ -48,11 +48,11 @@ export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({
 
   // Load planning data on mount and when language or environment changes
   useEffect(() => {
-    // Only load if environment is selected and we haven't loaded yet or language changed
-    if (currentEnvironmentId && (!hasLoaded || rewardTypes.length === 0)) {
+    // Only load if environment is selected, project path is available, and we haven't loaded yet or language changed
+    if (currentEnvironmentId && projectApiPath && (!hasLoaded || rewardTypes.length === 0)) {
       loadPlanningData();
     }
-  }, [i18n.language, currentEnvironmentId]);
+  }, [i18n.language, currentEnvironmentId, projectApiPath]);
 
   // Listen for planning data updates via custom event (dispatched by SSE handler)
   useEffect(() => {
@@ -70,6 +70,7 @@ export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({
   }, []);
 
   const loadPlanningData = async () => {
+    if (!projectApiPath) return; // Guard: org/project not yet selected
     try {
       setIsLoading(true);
       setError(null);

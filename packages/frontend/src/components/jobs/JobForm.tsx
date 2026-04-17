@@ -55,10 +55,6 @@ const JobForm: React.FC<JobFormProps> = ({
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 
-  console.log('JobForm - Component rendered with jobTypes:', jobTypes);
-  console.log('JobForm - jobTypes length:', jobTypes?.length);
-  console.log('JobForm - jobTypes type:', typeof jobTypes);
-
   // Form state
   const [formData, setFormData] = useState({
     name: '',
@@ -75,26 +71,10 @@ const JobForm: React.FC<JobFormProps> = ({
 
   // Initialize form data
   useEffect(() => {
-    console.log(
-      'JobForm useEffect triggered - job:',
-      job,
-      'jobTypes:',
-      jobTypes
-    );
-    if (job) {
-      console.log('Initializing form with job:', job);
-      console.log('Job jobDataMap:', job.jobDataMap);
-      console.log('Job jobDataMap type:', typeof job.jobDataMap);
-      console.log('Job jobDataMap keys:', Object.keys(job.jobDataMap || {}));
 
-      // Job 편집 모드에서 jobDataMap이 비어있으면 상세 정보를 다시 조회
+    if (job) {
       const hasJobDataMap =
         job.jobDataMap && Object.keys(job.jobDataMap).length > 0;
-      console.log('Has jobDataMap:', hasJobDataMap);
-
-      if (!hasJobDataMap && job.id) {
-        console.log('JobDataMap is empty, but no fetcher is defined.');
-      }
 
       const newFormData = {
         name: job.name,
@@ -105,23 +85,19 @@ const JobForm: React.FC<JobFormProps> = ({
         jobDataMap: job.jobDataMap || {},
       };
 
-      console.log('Setting formData to:', newFormData);
       setFormData(newFormData);
       setSelectedTags(job.tags || []);
 
       const jobType = jobTypes.find((jt) => jt.id === job.jobTypeId);
-      console.log('Found job type:', jobType);
       setSelectedJobType(jobType || null);
     } else {
-      console.log('No job provided, skipping initialization');
+      // New job — no initialization needed
     }
   }, [job, jobTypes]);
 
   // Handle job type change
   const handleJobTypeChange = (jobTypeId: string) => {
     const jobType = jobTypes.find((jt) => jt.id === parseInt(jobTypeId));
-    console.log('Selected job type:', jobType);
-    console.log('Job schema:', jobType?.jobSchema);
     setSelectedJobType(jobType || null);
     setFormData((prev) => ({
       ...prev,
@@ -150,15 +126,12 @@ const JobForm: React.FC<JobFormProps> = ({
 
   // Handle job data map changes
   const handleJobDataChange = (jobDataMap: any) => {
-    console.log('JobForm handleJobDataChange called with:', jobDataMap);
+
     setFormData((prev) => {
-      console.log('JobForm previous formData.jobDataMap:', prev.jobDataMap);
-      const updated = {
+      return {
         ...prev,
         jobDataMap: jobDataMap,
       };
-      console.log('JobForm updated formData.jobDataMap:', updated.jobDataMap);
-      return updated;
     });
   };
 
@@ -223,7 +196,7 @@ const JobForm: React.FC<JobFormProps> = ({
         sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
       >
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto' }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {/* Basic Information */}
             <Typography variant="h6" gutterBottom>
@@ -379,7 +352,7 @@ const JobForm: React.FC<JobFormProps> = ({
         >
           <Button onClick={onCancel}>{t('common.cancel')}</Button>
           <Button type="submit" variant="contained">
-            {job ? '작업 수정' : '작업 추가'}
+            {job ? t('common.save') : t('jobs.addJob')}
           </Button>
         </Box>
       </Box>
@@ -495,7 +468,7 @@ const JobForm: React.FC<JobFormProps> = ({
         >
           <Button onClick={onCancel}>{t('common.cancel')}</Button>
           <Button type="submit" variant="contained">
-            {job ? '작업 수정' : '작업 추가'}
+            {job ? t('common.save') : t('jobs.addJob')}
           </Button>
         </Box>
       </Box>

@@ -644,17 +644,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       // Also scan draft strategies for context fields (unpublished changes)
       for (const flagName of flagNames) {
         try {
-          // Get flag ID first
-          const flagResponse = await api.get(
-            `${projectApiPath}/features/${flagName}`
-          );
-          const flagId = flagResponse.data?.flag?.id || flagResponse.data?.id;
-          if (!flagId) continue;
-
           const draftResponse = await api.get(
-            `${projectApiPath}/drafts/feature_flag/${flagId}`
+            `${projectApiPath}/features/${flagName}/pending-change-request`
           );
-          const draftData = draftResponse.data?.draftData;
+          const draftData = draftResponse.data?.data?.draftData || draftResponse.data?.draftData;
           if (draftData && typeof draftData === 'object') {
             for (const envDraft of Object.values(draftData)) {
               if (
@@ -680,7 +673,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
             }
           }
         } catch {
-          // Skip draft fetch errors
+          // Skip draft fetch errors (e.g., no pending draft for this flag)
         }
       }
     } else if (initialFlagDetails) {

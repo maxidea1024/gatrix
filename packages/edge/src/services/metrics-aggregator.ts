@@ -242,7 +242,7 @@ class MetricsAggregator {
           {
             headers: {
               'x-api-token': config.apiToken,
-              'x-application-name': config.appName,
+              'x-application-name': appName || config.appName,
               'x-environment-id': environmentId,
               ...(buffer.sdkVersion && { 'x-sdk-version': buffer.sdkVersion }),
             },

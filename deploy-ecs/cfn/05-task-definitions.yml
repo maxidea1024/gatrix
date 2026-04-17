@@ -126,16 +126,19 @@ Parameters:
     Type: String
     Default: 'false'
 
-  # Secrets Manager ARNs
-  JwtSecretArn:
+  # Secrets (passed as env vars since no NAT Gateway / VPC Endpoints)
+  JwtSecret:
     Type: String
-    Description: ARN of the JWT Secret in Secrets Manager
-  JwtRefreshSecretArn:
+    NoEcho: true
+    Description: JWT secret value
+  JwtRefreshSecret:
     Type: String
-    Description: ARN of the JWT Refresh Secret in Secrets Manager
-  SessionSecretArn:
+    NoEcho: true
+    Description: JWT refresh secret value
+  SessionSecret:
     Type: String
-    Description: ARN of the Session Secret in Secrets Manager
+    NoEcho: true
+    Description: Session secret value
 
 Resources:
   # ============================================
@@ -204,13 +207,12 @@ Resources:
               Value: !Ref AdminPassword
             - Name: ADMIN_NAME
               Value: !Ref AdminName
-          Secrets:
             - Name: JWT_SECRET
-              ValueFrom: !Ref JwtSecretArn
+              Value: !Ref JwtSecret
             - Name: JWT_REFRESH_SECRET
-              ValueFrom: !Ref JwtRefreshSecretArn
+              Value: !Ref JwtRefreshSecret
             - Name: SESSION_SECRET
-              ValueFrom: !Ref SessionSecretArn
+              Value: !Ref SessionSecret
           HealthCheck:
             Command:
               - CMD-SHELL

@@ -246,10 +246,10 @@ $BackendImage = "$EcrRegistry/gatrix-backend:$Version"
 $FrontendImage = "$EcrRegistry/gatrix-frontend:$Version"
 $EdgeImage = "$EcrRegistry/gatrix-edge:$Version"
 
-# Check for secrets in Secrets Manager
-$jwtArn = "arn:aws:secretsmanager:${Region}:${AccountId}:secret:${Prefix}/jwt-secret"
-$jwtRefreshArn = "arn:aws:secretsmanager:${Region}:${AccountId}:secret:${Prefix}/jwt-refresh-secret"
-$sessionArn = "arn:aws:secretsmanager:${Region}:${AccountId}:secret:${Prefix}/session-secret"
+# Secrets (direct values - no Secrets Manager since no NAT Gateway)
+$jwtSecret = Coalesce $env:JWT_SECRET 'change-me-jwt-secret'
+$jwtRefreshSecret = Coalesce $env:JWT_REFRESH_SECRET 'change-me-jwt-refresh-secret'
+$sessionSecret = Coalesce $env:SESSION_SECRET 'change-me-session-secret'
 
 Show-Info "Deploying task definitions..."
 Deploy-Stack "task-defs" "05-task-definitions.yml" @(
@@ -274,9 +274,9 @@ Deploy-Stack "task-defs" "05-task-definitions.yml" @(
     "ParameterKey=EdgeRedisHost,ParameterValue=$env:EDGE_REDIS_HOST",
     "ParameterKey=EdgeRedisPort,ParameterValue=$(Coalesce $env:EDGE_REDIS_PORT '6379')",
     "ParameterKey=EdgeRedisPassword,ParameterValue=$(Coalesce $env:EDGE_REDIS_PASSWORD '')",
-    "ParameterKey=JwtSecretArn,ParameterValue=$jwtArn",
-    "ParameterKey=JwtRefreshSecretArn,ParameterValue=$jwtRefreshArn",
-    "ParameterKey=SessionSecretArn,ParameterValue=$sessionArn",
+    "ParameterKey=JwtSecret,ParameterValue=$jwtSecret",
+    "ParameterKey=JwtRefreshSecret,ParameterValue=$jwtRefreshSecret",
+    "ParameterKey=SessionSecret,ParameterValue=$sessionSecret",
     "ParameterKey=DefaultLanguage,ParameterValue=$(Coalesce $env:DEFAULT_LANGUAGE 'zh')",
     "ParameterKey=AdminEmail,ParameterValue=$(Coalesce $env:ADMIN_EMAIL 'admin@gatrix.com')",
     "ParameterKey=AdminPassword,ParameterValue=$(Coalesce $env:ADMIN_PASSWORD 'admin123')"

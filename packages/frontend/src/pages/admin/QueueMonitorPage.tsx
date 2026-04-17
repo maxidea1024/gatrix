@@ -16,7 +16,6 @@ import {
   Tab,
   Stack,
   Tooltip,
-  CircularProgress,
   Alert,
   Switch,
   FormControlLabel,
@@ -37,6 +36,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import {
@@ -54,6 +54,7 @@ import type {
   RepeatableJob,
 } from '@/services/queueMonitorService';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import ContentLoader from '@/components/common/ContentLoader';
 import PageHeader from '@/components/common/PageHeader';
 
 // Format duration in ms to human-readable
@@ -110,10 +111,16 @@ const QueueMonitorPage: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [stats, setStats] = useState<QueueStats[]>([]);
-  const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState(0); // 0: repeatable, 1-5: status tabs
+  const [selectedQueue, setSelectedQueue] = useState<string | null>(
+    searchParams.get('queue') || null
+  );
+  const [activeTab, setActiveTab] = useState(() => {
+    const tabParam = searchParams.get('tab');
+    return tabParam ? parseInt(tabParam, 10) : 0;
+  });
   const [repeatables, setRepeatables] = useState<RepeatableJob[]>([]);
   const [jobs, setJobs] = useState<QueueJob[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,6 +132,14 @@ const QueueMonitorPage: React.FC = () => {
   const [confirmMessage, setConfirmMessage] = useState('');
 
   const statusTabs = ['completed', 'failed', 'active', 'waiting', 'delayed'];
+
+  // Sync state to URL query params
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (selectedQueue) params.queue = selectedQueue;
+    if (activeTab !== 0) params.tab = String(activeTab);
+    setSearchParams(params, { replace: true });
+  }, [selectedQueue, activeTab, setSearchParams]);
 
   // Load queue stats
   const loadStats = useCallback(async () => {
@@ -259,6 +274,15 @@ const QueueMonitorPage: React.FC = () => {
     setConfirmOpen(true);
   };
 
+  const handleSelectQueue = (queueName: string) => {
+    setSelectedQueue(queueName);
+    setActiveTab(0);
+  };
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
+
   if (!user) {
     return (
       <Box sx={{ p: 3 }}>
@@ -268,6 +292,33 @@ const QueueMonitorPage: React.FC = () => {
   }
 
   const selectedStats = stats.find((s) => s.name === selectedQueue);
+
+  // Build tab label with badge count
+  const getTabLabel = (statusKey: string) => {
+    const count = selectedStats?.[statusKey as keyof QueueStats] as number;
+    if (count && count > 0) {
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+          {t(`queueMonitor.${statusKey}`)}
+          <Chip
+            size="small"
+            label={count}
+            color={statusColors[statusKey]}
+            sx={{
+              height: 18,
+              minWidth: 24,
+              '& .MuiChip-label': {
+                px: 0.6,
+                fontSize: '0.7rem',
+                fontWeight: 700,
+              },
+            }}
+          />
+        </Box>
+      );
+    }
+    return t(`queueMonitor.${statusKey}`);
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -294,7 +345,7 @@ const QueueMonitorPage: React.FC = () => {
             />
             <Button
               size="small"
-              variant="outlined"
+              variant="contained"
               startIcon={<RefreshIcon />}
               onClick={() => {
                 loadStats();
@@ -313,37 +364,43 @@ const QueueMonitorPage: React.FC = () => {
         ) : (
           <Box sx={{ display: 'flex', gap: 3 }}>
             {/* Queue List Sidebar */}
-            <Box sx={{ width: 280, flexShrink: 0 }}>
-              <Typography
-                variant="subtitle2"
-                sx={{ mb: 1.5, px: 1, color: 'text.secondary' }}
-              >
-                {t('queueMonitor.queues')}
-              </Typography>
-              <Stack spacing={1}>
+            <Box sx={{ width: 260, flexShrink: 0 }}>
+              <Stack spacing={0.75}>
                 {stats.map((q) => (
                   <Card
                     key={q.name}
                     variant="outlined"
                     sx={{
                       cursor: 'pointer',
-                      border: selectedQueue === q.name ? 2 : 1,
+                      border: 2,
                       borderColor:
-                        selectedQueue === q.name ? 'primary.main' : 'divider',
+                        selectedQueue === q.name ? 'primary.main' : 'transparent',
                       bgcolor:
                         selectedQueue === q.name
-                          ? (theme) => alpha(theme.palette.primary.main, 0.04)
+                          ? (theme) =>
+                              `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0.03)} 100%)`
                           : 'background.paper',
-                      transition: 'all 0.15s',
-                      '&:hover': { borderColor: 'primary.light' },
+                      ...(selectedQueue === q.name && {
+                        background: (theme: any) =>
+                          `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
+                        boxShadow: (theme: any) =>
+                          `0 2px 12px ${alpha(theme.palette.primary.main, 0.15)}`,
+                      }),
+                      transition: 'border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease',
+                      '&:hover': {
+                        borderColor: selectedQueue === q.name
+                          ? 'primary.main'
+                          : 'primary.light',
+                        ...(selectedQueue !== q.name && {
+                          bgcolor: (theme: any) =>
+                            alpha(theme.palette.primary.main, 0.02),
+                        }),
+                      },
                     }}
-                    onClick={() => {
-                      setSelectedQueue(q.name);
-                      setActiveTab(0);
-                    }}
+                    onClick={() => handleSelectQueue(q.name)}
                   >
                     <CardContent
-                      sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}
+                      sx={{ py: 1.25, px: 2, '&:last-child': { pb: 1.25 } }}
                     >
                       <Typography
                         variant="subtitle2"
@@ -440,71 +497,23 @@ const QueueMonitorPage: React.FC = () => {
                   </Typography>
                 </Box>
               ) : (
-                <>
-                  {/* Stats summary */}
-                  {selectedStats && (
-                    <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-                      {(
-                        [
-                          ['waiting', 'warning'],
-                          ['active', 'info'],
-                          ['completed', 'success'],
-                          ['failed', 'error'],
-                          ['delayed', 'default'],
-                        ] as const
-                      ).map(([key, color]) => (
-                        <Card
-                          key={key}
-                          variant="outlined"
-                          sx={{
-                            flex: 1,
-                            textAlign: 'center',
-                            py: 1,
-                            cursor: 'pointer',
-                            '&:hover': { borderColor: `${color}.main` },
-                          }}
-                          onClick={() => {
-                            const idx = statusTabs.indexOf(key);
-                            setActiveTab(idx + 1);
-                          }}
-                        >
-                          <CardContent
-                            sx={{ py: 0.5, '&:last-child': { pb: 0.5 } }}
-                          >
-                            <Typography
-                              variant="h5"
-                              sx={{
-                                fontWeight: 700,
-                                color:
-                                  color !== 'default'
-                                    ? `${color}.main`
-                                    : 'text.primary',
-                              }}
-                            >
-                              {selectedStats[key]}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {t(`queueMonitor.${key}`)}
-                            </Typography>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </Stack>
-                  )}
-
-                  {/* Tabs */}
-                  <Card variant="outlined">
+                <Card variant="outlined">
+                  {/* Tabs bar with clean button */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      borderBottom: 1,
+                      borderColor: 'divider',
+                    }}
+                  >
                     <Tabs
                       value={activeTab}
-                      onChange={(_, v) => setActiveTab(v)}
+                      onChange={handleTabChange}
                       sx={{
-                        borderBottom: 1,
-                        borderColor: 'divider',
-                        minHeight: 40,
-                        '& .MuiTab-root': { minHeight: 40, py: 0 },
+                        flex: 1,
+                        minHeight: 42,
+                        '& .MuiTab-root': { minHeight: 42, py: 0 },
                       }}
                     >
                       <Tab
@@ -518,319 +527,287 @@ const QueueMonitorPage: React.FC = () => {
                           key={s}
                           icon={statusIcons[s]}
                           iconPosition="start"
-                          label={t(`queueMonitor.${s}`)}
+                          label={getTabLabel(s)}
                           sx={{ textTransform: 'none', fontSize: '0.8rem' }}
                         />
                       ))}
                     </Tabs>
-
-                    <Box sx={{ position: 'relative', minHeight: 200 }}>
-                      {jobsLoading && (
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            inset: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            bgcolor: 'rgba(255,255,255,0.6)',
-                            zIndex: 1,
-                          }}
+                    {/* Clean button — visible for completed/failed tabs */}
+                    {(activeTab === 1 || activeTab === 2) &&
+                      jobs.length > 0 && (
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="warning"
+                          startIcon={<CleanIcon />}
+                          onClick={() =>
+                            handleClean(statusTabs[activeTab - 1])
+                          }
+                          sx={{ mr: 1.5, whiteSpace: 'nowrap' }}
                         >
-                          <CircularProgress size={24} />
-                        </Box>
+                          {t('queueMonitor.clean')}{' '}
+                          {statusTabs[activeTab - 1]}
+                        </Button>
                       )}
+                  </Box>
 
-                      {/* Repeatable Jobs Tab */}
-                      {activeTab === 0 && (
-                        <Box>
-                          {repeatables.length === 0 ? (
-                            <Box sx={{ py: 4, textAlign: 'center' }}>
-                              <Typography color="text.secondary">
-                                {t('queueMonitor.noRepeatableJobs')}
-                              </Typography>
-                            </Box>
-                          ) : (
-                            <Table size="small">
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell sx={{ fontWeight: 600 }}>
-                                    {t('queueMonitor.jobName')}
+                  <ContentLoader loading={jobsLoading}>
+                    {/* Repeatable Jobs Tab */}
+                    {activeTab === 0 && (
+                      <Box>
+                        {repeatables.length === 0 ? (
+                          <Box sx={{ py: 4, textAlign: 'center' }}>
+                            <Typography color="text.secondary">
+                              {t('queueMonitor.noRepeatableJobs')}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          <Table size="small">
+                            <TableHead>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 600 }}>
+                                  {t('queueMonitor.jobName')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>
+                                  {t('queueMonitor.pattern')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>
+                                  {t('queueMonitor.every')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>
+                                  {t('queueMonitor.nextRun')}
+                                </TableCell>
+                                <TableCell
+                                  sx={{ fontWeight: 600, width: 60 }}
+                                />
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {repeatables.map((rj) => (
+                                <TableRow key={rj.key} hover>
+                                  <TableCell>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
+                                        fontFamily: 'monospace',
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      {rj.name}
+                                    </Typography>
                                   </TableCell>
-                                  <TableCell sx={{ fontWeight: 600 }}>
-                                    {t('queueMonitor.pattern')}
+                                  <TableCell>
+                                    {rj.pattern ? (
+                                      <Chip
+                                        size="small"
+                                        label={rj.pattern}
+                                        variant="outlined"
+                                        sx={{
+                                          fontFamily: 'monospace',
+                                          height: 22,
+                                          '& .MuiChip-label': {
+                                            fontSize: '0.75rem',
+                                          },
+                                        }}
+                                      />
+                                    ) : (
+                                      '-'
+                                    )}
                                   </TableCell>
-                                  <TableCell sx={{ fontWeight: 600 }}>
-                                    {t('queueMonitor.every')}
+                                  <TableCell>
+                                    {rj.every
+                                      ? formatDuration(parseInt(rj.every))
+                                      : '-'}
                                   </TableCell>
-                                  <TableCell sx={{ fontWeight: 600 }}>
-                                    {t('queueMonitor.nextRun')}
+                                  <TableCell>
+                                    {formatDateTime(rj.next)}
                                   </TableCell>
-                                  <TableCell
-                                    sx={{ fontWeight: 600, width: 60 }}
-                                  />
+                                  <TableCell>
+                                    <Tooltip
+                                      title={t(
+                                        'queueMonitor.removeRepeatable'
+                                      )}
+                                    >
+                                      <IconButton
+                                        size="small"
+                                        color="error"
+                                        onClick={() =>
+                                          handleRemoveRepeatable(rj.key)
+                                        }
+                                      >
+                                        <DeleteIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </TableCell>
                                 </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {repeatables.map((rj) => (
-                                  <TableRow key={rj.key} hover>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        )}
+                      </Box>
+                    )}
+
+                    {/* Job History Tabs */}
+                    {activeTab > 0 && (
+                      <Box>
+
+
+                        {jobs.length === 0 ? (
+                          <Box sx={{ py: 4, textAlign: 'center' }}>
+                            <Typography color="text.secondary">
+                              {t('queueMonitor.noJobs')}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          <Table size="small">
+                            <TableHead>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: 600 }}>
+                                  {t('queueMonitor.jobId')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>
+                                  {t('queueMonitor.jobName')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>
+                                  {t('queueMonitor.createdAt')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>
+                                  {t('queueMonitor.duration')}
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>
+                                  {t('queueMonitor.attempts')}
+                                </TableCell>
+                                {statusTabs[activeTab - 1] === 'failed' && (
+                                  <TableCell sx={{ fontWeight: 600 }}>
+                                    {t('queueMonitor.failedReason')}
+                                  </TableCell>
+                                )}
+                                <TableCell
+                                  sx={{ fontWeight: 600, width: 80 }}
+                                />
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {jobs.map((job) => {
+                                const duration =
+                                  job.finishedOn && job.processedOn
+                                    ? job.finishedOn - job.processedOn
+                                    : null;
+                                return (
+                                  <TableRow key={job.id} hover>
                                     <TableCell>
                                       <Typography
                                         variant="body2"
                                         sx={{
                                           fontFamily: 'monospace',
-                                          fontWeight: 600,
+                                          fontSize: '0.75rem',
                                         }}
                                       >
-                                        {rj.name}
+                                        {job.id}
                                       </Typography>
                                     </TableCell>
                                     <TableCell>
-                                      {rj.pattern ? (
-                                        <Chip
-                                          size="small"
-                                          label={rj.pattern}
-                                          variant="outlined"
-                                          sx={{
-                                            fontFamily: 'monospace',
-                                            height: 22,
-                                            '& .MuiChip-label': {
-                                              fontSize: '0.75rem',
-                                            },
-                                          }}
-                                        />
-                                      ) : (
-                                        '-'
-                                      )}
-                                    </TableCell>
-                                    <TableCell>
-                                      {rj.every
-                                        ? formatDuration(parseInt(rj.every))
-                                        : '-'}
-                                    </TableCell>
-                                    <TableCell>
-                                      {formatDateTime(rj.next)}
-                                    </TableCell>
-                                    <TableCell>
-                                      <Tooltip
-                                        title={t(
-                                          'queueMonitor.removeRepeatable'
-                                        )}
-                                      >
-                                        <IconButton
-                                          size="small"
-                                          color="error"
-                                          onClick={() =>
-                                            handleRemoveRepeatable(rj.key)
-                                          }
-                                        >
-                                          <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                      </Tooltip>
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          )}
-                        </Box>
-                      )}
-
-                      {/* Job History Tabs */}
-                      {activeTab > 0 && (
-                        <Box>
-                          {/* Clean button for completed/failed */}
-                          {(activeTab === 1 || activeTab === 2) &&
-                            jobs.length > 0 && (
-                              <Box
-                                sx={{
-                                  px: 2,
-                                  pt: 1.5,
-                                  display: 'flex',
-                                  justifyContent: 'flex-end',
-                                }}
-                              >
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  color="warning"
-                                  startIcon={<CleanIcon />}
-                                  onClick={() =>
-                                    handleClean(statusTabs[activeTab - 1])
-                                  }
-                                >
-                                  {t('queueMonitor.clean')}{' '}
-                                  {statusTabs[activeTab - 1]}
-                                </Button>
-                              </Box>
-                            )}
-
-                          {jobs.length === 0 ? (
-                            <Box sx={{ py: 4, textAlign: 'center' }}>
-                              <Typography color="text.secondary">
-                                {t('queueMonitor.noJobs')}
-                              </Typography>
-                            </Box>
-                          ) : (
-                            <Table size="small">
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell sx={{ fontWeight: 600 }}>
-                                    {t('queueMonitor.jobId')}
-                                  </TableCell>
-                                  <TableCell sx={{ fontWeight: 600 }}>
-                                    {t('queueMonitor.jobName')}
-                                  </TableCell>
-                                  <TableCell sx={{ fontWeight: 600 }}>
-                                    {t('queueMonitor.createdAt')}
-                                  </TableCell>
-                                  <TableCell sx={{ fontWeight: 600 }}>
-                                    {t('queueMonitor.duration')}
-                                  </TableCell>
-                                  <TableCell sx={{ fontWeight: 600 }}>
-                                    {t('queueMonitor.attempts')}
-                                  </TableCell>
-                                  {statusTabs[activeTab - 1] === 'failed' && (
-                                    <TableCell sx={{ fontWeight: 600 }}>
-                                      {t('queueMonitor.failedReason')}
-                                    </TableCell>
-                                  )}
-                                  <TableCell
-                                    sx={{ fontWeight: 600, width: 80 }}
-                                  />
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {jobs.map((job) => {
-                                  const duration =
-                                    job.finishedOn && job.processedOn
-                                      ? job.finishedOn - job.processedOn
-                                      : null;
-                                  return (
-                                    <TableRow key={job.id} hover>
-                                      <TableCell>
-                                        <Typography
-                                          variant="body2"
-                                          sx={{
-                                            fontFamily: 'monospace',
+                                      <Chip
+                                        size="small"
+                                        label={job.name}
+                                        color={
+                                          statusColors[
+                                            statusTabs[activeTab - 1]
+                                          ]
+                                        }
+                                        variant="outlined"
+                                        sx={{
+                                          fontFamily: 'monospace',
+                                          height: 22,
+                                          '& .MuiChip-label': {
                                             fontSize: '0.75rem',
-                                            maxWidth: 160,
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap',
-                                          }}
-                                        >
-                                          {job.id}
-                                        </Typography>
-                                      </TableCell>
+                                          },
+                                        }}
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <Typography
+                                        variant="body2"
+                                        sx={{ fontSize: '0.8rem' }}
+                                      >
+                                        {formatTime(job.timestamp)}
+                                      </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Typography
+                                        variant="body2"
+                                        sx={{ fontSize: '0.8rem' }}
+                                      >
+                                        {duration !== null
+                                          ? formatDuration(duration)
+                                          : '-'}
+                                      </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Typography variant="body2">
+                                        {job.attemptsMade}
+                                      </Typography>
+                                    </TableCell>
+                                    {statusTabs[activeTab - 1] ===
+                                      'failed' && (
                                       <TableCell>
-                                        <Chip
-                                          size="small"
-                                          label={job.name}
-                                          color={
-                                            statusColors[
-                                              statusTabs[activeTab - 1]
-                                            ]
-                                          }
-                                          variant="outlined"
+                                        <Typography
+                                          variant="body2"
+                                          color="error"
                                           sx={{
-                                            fontFamily: 'monospace',
-                                            height: 22,
-                                            '& .MuiChip-label': {
-                                              fontSize: '0.75rem',
-                                            },
+                                            maxWidth: 360,
+                                            fontSize: '0.75rem',
+                                            whiteSpace: 'pre-wrap',
+                                            wordBreak: 'break-word',
                                           }}
-                                        />
-                                      </TableCell>
-                                      <TableCell>
-                                        <Typography
-                                          variant="body2"
-                                          sx={{ fontSize: '0.8rem' }}
                                         >
-                                          {formatTime(job.timestamp)}
+                                          {job.failedReason || '-'}
                                         </Typography>
                                       </TableCell>
-                                      <TableCell>
-                                        <Typography
-                                          variant="body2"
-                                          sx={{ fontSize: '0.8rem' }}
-                                        >
-                                          {duration !== null
-                                            ? formatDuration(duration)
-                                            : '-'}
-                                        </Typography>
-                                      </TableCell>
-                                      <TableCell>
-                                        <Typography variant="body2">
-                                          {job.attemptsMade}
-                                        </Typography>
-                                      </TableCell>
-                                      {statusTabs[activeTab - 1] ===
-                                        'failed' && (
-                                        <TableCell>
+                                    )}
+                                    <TableCell>
+                                      <Stack direction="row" spacing={0.5}>
+                                        {statusTabs[activeTab - 1] ===
+                                          'failed' && (
                                           <Tooltip
-                                            title={job.failedReason || ''}
-                                          >
-                                            <Typography
-                                              variant="body2"
-                                              color="error"
-                                              sx={{
-                                                maxWidth: 200,
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap',
-                                                fontSize: '0.75rem',
-                                              }}
-                                            >
-                                              {job.failedReason || '-'}
-                                            </Typography>
-                                          </Tooltip>
-                                        </TableCell>
-                                      )}
-                                      <TableCell>
-                                        <Stack direction="row" spacing={0.5}>
-                                          {statusTabs[activeTab - 1] ===
-                                            'failed' && (
-                                            <Tooltip
-                                              title={t('queueMonitor.retry')}
-                                            >
-                                              <IconButton
-                                                size="small"
-                                                color="primary"
-                                                onClick={() =>
-                                                  handleRetry(job.id)
-                                                }
-                                              >
-                                                <RetryIcon fontSize="small" />
-                                              </IconButton>
-                                            </Tooltip>
-                                          )}
-                                          <Tooltip
-                                            title={t('queueMonitor.remove')}
+                                            title={t('queueMonitor.retry')}
                                           >
                                             <IconButton
                                               size="small"
-                                              color="error"
+                                              color="primary"
                                               onClick={() =>
-                                                handleRemoveJob(job.id)
+                                                handleRetry(job.id)
                                               }
                                             >
-                                              <DeleteIcon fontSize="small" />
+                                              <RetryIcon fontSize="small" />
                                             </IconButton>
                                           </Tooltip>
-                                        </Stack>
-                                      </TableCell>
-                                    </TableRow>
-                                  );
-                                })}
-                              </TableBody>
-                            </Table>
-                          )}
-                        </Box>
-                      )}
-                    </Box>
-                  </Card>
-                </>
+                                        )}
+                                        <Tooltip
+                                          title={t('queueMonitor.remove')}
+                                        >
+                                          <IconButton
+                                            size="small"
+                                            color="error"
+                                            onClick={() =>
+                                              handleRemoveJob(job.id)
+                                            }
+                                          >
+                                            <DeleteIcon fontSize="small" />
+                                          </IconButton>
+                                        </Tooltip>
+                                      </Stack>
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
+                        )}
+                      </Box>
+                    )}
+                  </ContentLoader>
+                </Card>
               )}
             </Box>
           </Box>

@@ -29,8 +29,7 @@ Resources:
       ServiceName: !Sub '${EnvironmentName}-backend'
       Cluster: !ImportValue
         Fn::Sub: '${EnvironmentName}-ECSClusterArn'
-      TaskDefinition: !ImportValue
-        Fn::Sub: '${EnvironmentName}-BackendTaskDefinitionArn'
+      TaskDefinition: !Sub '${EnvironmentName}-backend'
       DesiredCount: !Ref BackendDesiredCount
       LaunchType: FARGATE
       NetworkConfiguration:
@@ -70,8 +69,7 @@ Resources:
       ServiceName: !Sub '${EnvironmentName}-frontend'
       Cluster: !ImportValue
         Fn::Sub: '${EnvironmentName}-ECSClusterArn'
-      TaskDefinition: !ImportValue
-        Fn::Sub: '${EnvironmentName}-FrontendTaskDefinitionArn'
+      TaskDefinition: !Sub '${EnvironmentName}-frontend'
       DesiredCount: !Ref FrontendDesiredCount
       LaunchType: FARGATE
       NetworkConfiguration:
@@ -108,8 +106,7 @@ Resources:
       ServiceName: !Sub '${EnvironmentName}-edge'
       Cluster: !ImportValue
         Fn::Sub: '${EnvironmentName}-ECSClusterArn'
-      TaskDefinition: !ImportValue
-        Fn::Sub: '${EnvironmentName}-EdgeTaskDefinitionArn'
+      TaskDefinition: !Sub '${EnvironmentName}-edge'
       DesiredCount: !Ref EdgeDesiredCount
       LaunchType: FARGATE
       NetworkConfiguration:
