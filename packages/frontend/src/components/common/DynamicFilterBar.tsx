@@ -729,7 +729,6 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 height: '28px',
                 fontSize: '0.8125rem',
                 bgcolor: 'background.paper',
-  
               },
               '& .MuiOutlinedInput-notchedOutline': {
                 borderColor: 'rgba(0, 0, 0, 0.12)',
@@ -766,7 +765,6 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 height: '28px',
                 fontSize: '0.8125rem',
                 bgcolor: 'background.paper',
-  
               },
               '& .MuiOutlinedInput-notchedOutline': {
                 borderColor: 'rgba(0, 0, 0, 0.12)',
@@ -812,7 +810,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 height: '28px',
                 fontSize: '0.8125rem',
                 bgcolor: 'background.paper',
-  
+
                 '& .MuiOutlinedInput-notchedOutline': {
                   borderColor: 'rgba(0, 0, 0, 0.12)',
                 },
@@ -904,7 +902,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 minHeight: '28px',
                 fontSize: '0.8125rem',
                 bgcolor: 'background.paper',
-  
+
                 '& .MuiOutlinedInput-notchedOutline': {
                   borderColor: 'rgba(0, 0, 0, 0.12)',
                 },

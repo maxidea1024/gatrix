@@ -441,11 +441,15 @@ const JobsPage: React.FC = () => {
                 onClick={(e) => {
                   e.stopPropagation();
                   navigator.clipboard.writeText(job.name);
-                  enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                  enqueueSnackbar(t('common.copiedToClipboard'), {
+                    variant: 'success',
+                  });
                 }}
                 sx={{ p: 0.5 }}
               >
-                <ContentCopyIcon sx={{ fontSize: '1rem', color: 'text.secondary' }} />
+                <ContentCopyIcon
+                  sx={{ fontSize: '1rem', color: 'text.secondary' }}
+                />
               </IconButton>
             </Tooltip>
           </Box>
@@ -745,7 +749,15 @@ const JobsPage: React.FC = () => {
         defaultWidth={800}
         minWidth={600}
       >
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2, display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            flex: 1,
+            overflow: 'auto',
+            p: 2,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           {selectedJobForHistory && (
             <JobExecutionHistory jobId={selectedJobForHistory.id} />
           )}

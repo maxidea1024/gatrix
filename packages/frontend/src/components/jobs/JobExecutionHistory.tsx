@@ -219,15 +219,15 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
 
   if (executions.length === 0) {
     return (
-      <Box 
-        sx={{ 
+      <Box
+        sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           flex: 1,
           height: '100%',
-          p: 3 
+          p: 3,
         }}
       >
         <Typography variant="body2" color="text.secondary">
