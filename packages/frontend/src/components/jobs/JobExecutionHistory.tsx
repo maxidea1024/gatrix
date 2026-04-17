@@ -141,10 +141,8 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                 <Typography variant="subtitle2" gutterBottom>
                   {t('jobs.executionDetails')}
                 </Typography>
-                <Table
-                  size="small"
-                  sx={{ border: '1px solid', borderColor: 'divider' }}
-                >
+                <TableContainer sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, overflow: 'hidden' }}>
+                  <Table size="small">
                   <TableBody>
                     <TableRow>
                       <TableCell
@@ -212,6 +210,7 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                     </TableRow>
                   </TableBody>
                 </Table>
+                </TableContainer>
               </CardContent>
             </Card>
           </Grid>
@@ -307,7 +306,7 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
               <TableHead>
                 <TableRow>
                   <TableCell width="40px"></TableCell>
-                  <TableCell>{t('jobs.status')}</TableCell>
+                  <TableCell>{t('common.status')}</TableCell>
                   <TableCell>{t('jobs.startedAt')}</TableCell>
                   <TableCell>{t('jobs.executionTime')}</TableCell>
                   <TableCell>{t('jobs.retryAttempt')}</TableCell>
@@ -315,9 +314,12 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {executions.map((execution) => (
+                {executions.map((execution, index) => (
                   <React.Fragment key={execution.id}>
-                    <TableRow hover>
+                    <TableRow 
+                      hover
+                      sx={{ bgcolor: index % 2 === 1 ? 'action.hover' : 'inherit' }}
+                    >
                       <TableCell>
                         <IconButton
                           size="small"

@@ -57,6 +57,7 @@ import JobForm from '../../components/jobs/JobForm';
 import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
 import SimplePagination from '../../components/common/SimplePagination';
 import TagChips from '../../components/common/TagChips';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ColumnSettingsDialog, {
@@ -137,6 +138,8 @@ const JobsPage: React.FC = () => {
   const [selectedJobForHistory, setSelectedJobForHistory] =
     useState<Job | null>(null);
   const [jobToDelete, setJobToDelete] = useState<Job | null>(null);
+  const [executeDialogOpen, setExecuteDialogOpen] = useState(false);
+  const [jobToExecute, setJobToExecute] = useState<Job | null>(null);
 
   // Context menu state
   const [contextMenuAnchor, setContextMenuAnchor] =
@@ -319,12 +322,18 @@ const JobsPage: React.FC = () => {
     setDeleteDialogOpen(true);
   };
 
-  const handleExecuteJob = async (job: Job) => {
+  const confirmExecuteJob = (job: Job) => {
+    setJobToExecute(job);
+    setExecuteDialogOpen(true);
+  };
+
+  const handleExecuteJob = async () => {
+    if (!jobToExecute) return;
     try {
-      const result = await jobService.executeJob(job.id);
+      const result = await jobService.executeJob(jobToExecute.id);
       enqueueSnackbar(
         t('jobs.executeStarted', {
-          name: job.name,
+          name: jobToExecute.name,
           executionId: result.id,
         }),
         {
@@ -334,6 +343,9 @@ const JobsPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to execute job:', error);
       enqueueSnackbar(t('common.jobExecuteFailed'), { variant: 'error' });
+    } finally {
+      setExecuteDialogOpen(false);
+      setJobToExecute(null);
     }
   };
 
@@ -668,7 +680,7 @@ const JobsPage: React.FC = () => {
       >
         <MuiMenuItem
           onClick={() => {
-            if (contextMenuJob) handleExecuteJob(contextMenuJob);
+            if (contextMenuJob) confirmExecuteJob(contextMenuJob);
             setContextMenuAnchor(null);
             setContextMenuJob(null);
           }}
@@ -746,8 +758,8 @@ const JobsPage: React.FC = () => {
         title={`${t('jobs.executionHistory')} - ${selectedJobForHistory?.name}`}
         subtitle={t('jobs.description')}
         storageKey="job-history-drawer-width"
-        defaultWidth={800}
-        minWidth={600}
+        defaultWidth={1600}
+        minWidth={800}
       >
         <Box
           sx={{
@@ -865,6 +877,16 @@ const JobsPage: React.FC = () => {
         columns={columns}
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
+      />
+
+      <ConfirmDialog
+        open={executeDialogOpen}
+        onClose={() => setExecuteDialogOpen(false)}
+        onConfirm={handleExecuteJob}
+        title={t('jobs.executeJob')}
+        message={t('jobs.executeConfirm', { name: jobToExecute?.name })}
+        confirmText={t('common.execute')}
+        confirmColor="primary"
       />
     </Box>
   );
