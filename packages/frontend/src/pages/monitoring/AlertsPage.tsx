@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Card,
-  CardContent,
   CircularProgress,
   Table,
   TableBody,
@@ -141,8 +140,7 @@ const AlertsPage: React.FC = () => {
         subtitle={t('monitoring.alerts.subtitle')}
       />
 
-      <Card>
-        <CardContent>
+      <Card variant="outlined">
           {loading ? (
             <Box
               sx={{
@@ -160,22 +158,22 @@ const AlertsPage: React.FC = () => {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>
                         {t('monitoring.alerts.fields.name')}
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>
                         {t('monitoring.alerts.fields.severity')}
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>
                         {t('monitoring.alerts.fields.status')}
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>
                         {t('monitoring.alerts.fields.message')}
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>
                         {t('monitoring.alerts.fields.startsAt')}
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>
                         {t('monitoring.alerts.fields.endsAt')}
                       </TableCell>
                     </TableRow>
@@ -227,7 +225,6 @@ const AlertsPage: React.FC = () => {
               />
             </>
           )}
-        </CardContent>
       </Card>
     </Box>
   );
