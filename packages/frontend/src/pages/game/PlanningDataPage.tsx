@@ -107,13 +107,9 @@ const PlanningDataPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<'id' | 'name'>('id');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // View all state - persist in sessionStorage
-  const [viewAllRewardItems, setViewAllRewardItems] = useState(() => {
-    const saved = sessionStorage.getItem('planningDataViewAllRewardItems');
-    return saved === 'true';
-  });
-  const [viewAllUiItems, setViewAllUiItems] = useState(() => {
-    const saved = sessionStorage.getItem('planningDataViewAllUiItems');
+  // View all state - persist in localStorage (unified across all tabs)
+  const [viewAll, setViewAll] = useState(() => {
+    const saved = localStorage.getItem('planningDataViewAll');
     return saved === 'true';
   });
 
@@ -134,10 +130,7 @@ const PlanningDataPage: React.FC = () => {
   const [hotTimeBuffSortOrder, setHotTimeBuffSortOrder] = useState<
     'asc' | 'desc'
   >('asc');
-  const [viewAllHotTimeBuff, setViewAllHotTimeBuff] = useState(() => {
-    const saved = sessionStorage.getItem('planningDataViewAllHotTimeBuff');
-    return saved === 'true';
-  });
+
 
   // Upload history state
   const [latestUpload, setLatestUpload] = useState<UploadRecord | null>(null);
@@ -149,10 +142,7 @@ const PlanningDataPage: React.FC = () => {
   const [eventPageRowsPerPage, setEventPageRowsPerPage] = useState(20);
   const [eventPageSearchTerm, setEventPageSearchTerm] = useState('');
   const debouncedEventPageSearchTerm = useDebounce(eventPageSearchTerm, 300);
-  const [viewAllEventPage, setViewAllEventPage] = useState(() => {
-    const saved = sessionStorage.getItem('planningDataViewAllEventPage');
-    return saved === 'true';
-  });
+
 
   // LiveEvent state
   const [liveEventData, setLiveEventData] = useState<any>(null);
@@ -161,10 +151,7 @@ const PlanningDataPage: React.FC = () => {
   const [liveEventRowsPerPage, setLiveEventRowsPerPage] = useState(20);
   const [liveEventSearchTerm, setLiveEventSearchTerm] = useState('');
   const debouncedLiveEventSearchTerm = useDebounce(liveEventSearchTerm, 300);
-  const [viewAllLiveEvent, setViewAllLiveEvent] = useState(() => {
-    const saved = sessionStorage.getItem('planningDataViewAllLiveEvent');
-    return saved === 'true';
-  });
+
 
   // MateRecruitingGroup state
   const [mateRecruitingGroupData, setMateRecruitingGroupData] =
@@ -180,14 +167,7 @@ const PlanningDataPage: React.FC = () => {
     mateRecruitingGroupSearchTerm,
     300
   );
-  const [viewAllMateRecruitingGroup, setViewAllMateRecruitingGroup] = useState(
-    () => {
-      const saved = sessionStorage.getItem(
-        'planningDataViewAllMateRecruitingGroup'
-      );
-      return saved === 'true';
-    }
-  );
+
 
   // OceanNpcAreaSpawner state
   const [oceanNpcAreaSpawnerData, setOceanNpcAreaSpawnerData] =
@@ -203,14 +183,7 @@ const PlanningDataPage: React.FC = () => {
     oceanNpcAreaSpawnerSearchTerm,
     300
   );
-  const [viewAllOceanNpcAreaSpawner, setViewAllOceanNpcAreaSpawner] = useState(
-    () => {
-      const saved = sessionStorage.getItem(
-        'planningDataViewAllOceanNpcAreaSpawner'
-      );
-      return saved === 'true';
-    }
-  );
+
 
   // Load stats on mount
   useEffect(() => {
@@ -1074,12 +1047,12 @@ const PlanningDataPage: React.FC = () => {
                               <FormControlLabel
                                 control={
                                   <Checkbox
-                                    checked={viewAllRewardItems}
+                                    checked={viewAll}
                                     onChange={(e) => {
                                       const newValue = e.target.checked;
-                                      setViewAllRewardItems(newValue);
-                                      sessionStorage.setItem(
-                                        'planningDataViewAllRewardItems',
+                                      setViewAll(newValue);
+                                      localStorage.setItem(
+                                        'planningDataViewAll',
                                         newValue.toString()
                                       );
                                     }}
@@ -1105,7 +1078,7 @@ const PlanningDataPage: React.FC = () => {
                         ) : currentRewardType.hasTable &&
                           rewardTypeItems[currentRewardType.value] ? (
                           <>
-                            {viewAllRewardItems ? (
+                            {viewAll ? (
                               /* Grid view - show all items in table-like layout */
                               <Box
                                 sx={{
@@ -1115,7 +1088,7 @@ const PlanningDataPage: React.FC = () => {
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
-                                  borderRadius: 0,
+                                  borderRadius: 1,
                                   overflow: 'hidden',
                                 }}
                               >
@@ -1386,12 +1359,12 @@ const PlanningDataPage: React.FC = () => {
                                 <FormControlLabel
                                   control={
                                     <Checkbox
-                                      checked={viewAllUiItems}
+                                      checked={viewAll}
                                       onChange={(e) => {
                                         const newValue = e.target.checked;
-                                        setViewAllUiItems(newValue);
-                                        sessionStorage.setItem(
-                                          'planningDataViewAllUiItems',
+                                        setViewAll(newValue);
+                                        localStorage.setItem(
+                                          'planningDataViewAll',
                                           newValue.toString()
                                         );
                                       }}
@@ -1403,7 +1376,7 @@ const PlanningDataPage: React.FC = () => {
                               </Tooltip>
                             </Box>
 
-                            {viewAllUiItems ? (
+                            {viewAll ? (
                               /* Grid view - show all items in table-like layout */
                               <Box
                                 sx={{
@@ -1413,7 +1386,7 @@ const PlanningDataPage: React.FC = () => {
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
-                                  borderRadius: 0,
+                                  borderRadius: 1,
                                   overflow: 'hidden',
                                 }}
                               >
@@ -1639,12 +1612,12 @@ const PlanningDataPage: React.FC = () => {
                           <FormControlLabel
                             control={
                               <Checkbox
-                                checked={viewAllHotTimeBuff}
+                                checked={viewAll}
                                 onChange={(e) => {
                                   const newValue = e.target.checked;
-                                  setViewAllHotTimeBuff(newValue);
-                                  sessionStorage.setItem(
-                                    'planningDataViewAllHotTimeBuff',
+                                  setViewAll(newValue);
+                                  localStorage.setItem(
+                                    'planningDataViewAll',
                                     newValue.toString()
                                   );
                                 }}
@@ -1671,7 +1644,7 @@ const PlanningDataPage: React.FC = () => {
                       hotTimeBuffData.items &&
                       hotTimeBuffData.items.length > 0 ? (
                       <>
-                        {viewAllHotTimeBuff ? (
+                        {viewAll ? (
                           /* Grid view - show all items in table-like layout */
                           <Box
                             sx={{
@@ -2036,12 +2009,12 @@ const PlanningDataPage: React.FC = () => {
                               <FormControlLabel
                                 control={
                                   <Checkbox
-                                    checked={viewAllEventPage}
+                                    checked={viewAll}
                                     onChange={(e) => {
                                       const newValue = e.target.checked;
-                                      setViewAllEventPage(newValue);
-                                      sessionStorage.setItem(
-                                        'planningDataViewAllEventPage',
+                                      setViewAll(newValue);
+                                      localStorage.setItem(
+                                        'planningDataViewAll',
                                         newValue.toString()
                                       );
                                     }}
@@ -2057,7 +2030,7 @@ const PlanningDataPage: React.FC = () => {
                         eventPageData.items &&
                         eventPageData.items.length > 0 ? (
                           <>
-                            {viewAllEventPage ? (
+                            {viewAll ? (
                               /* Grid view - show all items in table-like layout */
                               <Box
                                 sx={{
@@ -2067,7 +2040,7 @@ const PlanningDataPage: React.FC = () => {
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
-                                  borderRadius: 0,
+                                  borderRadius: 1,
                                   overflow: 'hidden',
                                 }}
                               >
@@ -2254,12 +2227,12 @@ const PlanningDataPage: React.FC = () => {
                               <FormControlLabel
                                 control={
                                   <Checkbox
-                                    checked={viewAllLiveEvent}
+                                    checked={viewAll}
                                     onChange={(e) => {
                                       const newValue = e.target.checked;
-                                      setViewAllLiveEvent(newValue);
-                                      sessionStorage.setItem(
-                                        'planningDataViewAllLiveEvent',
+                                      setViewAll(newValue);
+                                      localStorage.setItem(
+                                        'planningDataViewAll',
                                         newValue.toString()
                                       );
                                     }}
@@ -2275,7 +2248,7 @@ const PlanningDataPage: React.FC = () => {
                         liveEventData.items &&
                         liveEventData.items.length > 0 ? (
                           <>
-                            {viewAllLiveEvent ? (
+                            {viewAll ? (
                               /* Grid view - show all items in table-like layout */
                               <Box
                                 sx={{
@@ -2285,7 +2258,7 @@ const PlanningDataPage: React.FC = () => {
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
-                                  borderRadius: 0,
+                                  borderRadius: 1,
                                   overflow: 'hidden',
                                 }}
                               >
@@ -2564,12 +2537,12 @@ const PlanningDataPage: React.FC = () => {
                               <FormControlLabel
                                 control={
                                   <Checkbox
-                                    checked={viewAllMateRecruitingGroup}
+                                    checked={viewAll}
                                     onChange={(e) => {
                                       const newValue = e.target.checked;
-                                      setViewAllMateRecruitingGroup(newValue);
-                                      sessionStorage.setItem(
-                                        'planningDataViewAllMateRecruitingGroup',
+                                      setViewAll(newValue);
+                                      localStorage.setItem(
+                                        'planningDataViewAll',
                                         newValue.toString()
                                       );
                                     }}
@@ -2585,7 +2558,7 @@ const PlanningDataPage: React.FC = () => {
                         mateRecruitingGroupData.items &&
                         mateRecruitingGroupData.items.length > 0 ? (
                           <>
-                            {viewAllMateRecruitingGroup ? (
+                            {viewAll ? (
                               /* Grid view - show all items in table-like layout */
                               <Box
                                 sx={{
@@ -2595,7 +2568,7 @@ const PlanningDataPage: React.FC = () => {
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
-                                  borderRadius: 0,
+                                  borderRadius: 1,
                                   overflow: 'hidden',
                                 }}
                               >
@@ -2850,12 +2823,12 @@ const PlanningDataPage: React.FC = () => {
                               <FormControlLabel
                                 control={
                                   <Checkbox
-                                    checked={viewAllOceanNpcAreaSpawner}
+                                    checked={viewAll}
                                     onChange={(e) => {
                                       const newValue = e.target.checked;
-                                      setViewAllOceanNpcAreaSpawner(newValue);
-                                      sessionStorage.setItem(
-                                        'planningDataViewAllOceanNpcAreaSpawner',
+                                      setViewAll(newValue);
+                                      localStorage.setItem(
+                                        'planningDataViewAll',
                                         newValue.toString()
                                       );
                                     }}
@@ -2871,7 +2844,7 @@ const PlanningDataPage: React.FC = () => {
                         oceanNpcAreaSpawnerData.items &&
                         oceanNpcAreaSpawnerData.items.length > 0 ? (
                           <>
-                            {viewAllOceanNpcAreaSpawner ? (
+                            {viewAll ? (
                               /* Grid view - show all items in table-like layout */
                               <Box
                                 sx={{
@@ -2881,7 +2854,7 @@ const PlanningDataPage: React.FC = () => {
                                   gap: 0,
                                   border: '1px dashed',
                                   borderColor: 'divider',
-                                  borderRadius: 0,
+                                  borderRadius: 1,
                                   overflow: 'hidden',
                                 }}
                               >

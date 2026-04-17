@@ -638,13 +638,13 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                           'collapse',
                                                         fontSize: '0.75rem',
                                                         fontFamily: 'monospace',
-                                                        border: '1px dashed',
+                                                        border: '1px solid',
                                                         borderColor: 'divider',
                                                         '& th, & td': {
                                                           borderBottom:
-                                                            '1px dashed',
+                                                            '1px solid',
                                                           borderRight:
-                                                            '1px dashed',
+                                                            '1px solid',
                                                           borderColor:
                                                             'divider',
                                                           p: 0.5,
@@ -788,13 +788,13 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                           'collapse',
                                                         fontSize: '0.75rem',
                                                         fontFamily: 'monospace',
-                                                        border: '1px dashed',
+                                                        border: '1px solid',
                                                         borderColor: 'divider',
                                                         '& th, & td': {
                                                           borderBottom:
-                                                            '1px dashed',
+                                                            '1px solid',
                                                           borderRight:
-                                                            '1px dashed',
+                                                            '1px solid',
                                                           borderColor:
                                                             'divider',
                                                           p: 0.5,
@@ -809,11 +809,6 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                             'action.hover',
                                                           fontWeight: 'bold',
                                                         },
-                                                        '& tbody tr:nth-of-type(odd)':
-                                                          {
-                                                            bgcolor:
-                                                              'rgba(255, 255, 255, 0.02)',
-                                                          },
                                                       }}
                                                     >
                                                       <thead>
@@ -914,13 +909,13 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                           'collapse',
                                                         fontSize: '0.75rem',
                                                         fontFamily: 'monospace',
-                                                        border: '1px dashed',
+                                                        border: '1px solid',
                                                         borderColor: 'divider',
                                                         '& th, & td': {
                                                           borderBottom:
-                                                            '1px dashed',
+                                                            '1px solid',
                                                           borderRight:
-                                                            '1px dashed',
+                                                            '1px solid',
                                                           borderColor:
                                                             'divider',
                                                           p: 0.5,
@@ -935,11 +930,6 @@ const PlanningDataHistoryPage: React.FC = () => {
                                                             'action.hover',
                                                           fontWeight: 'bold',
                                                         },
-                                                        '& tbody tr:nth-of-type(odd)':
-                                                          {
-                                                            bgcolor:
-                                                              'rgba(255, 255, 255, 0.02)',
-                                                          },
                                                       }}
                                                     >
                                                       <thead>
